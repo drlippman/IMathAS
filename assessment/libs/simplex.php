@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 36
+// File Version : 37
 
 global $allowedmacros;
 
@@ -19,7 +19,7 @@ define("simplexTolerance", .001);
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 36;
+	return 37;
 }
 
 // function simplex(type, objective, constraints)
@@ -218,14 +218,11 @@ function simplex($type,$objective,$constraints) {
 //			etc.
 //			This is returned from simplexsolve
 //
-// ismixed: an optional flag for the function that tells the routine that the solution is negative
-//		  default is  FALSE
-//
 // stuanswer: the answer the student submitted
 //
 //
 // RETURNS:  0 if no match is found, 1 if a match is found
-function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismixed=FALSE) {
+function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 
     if(count($solutionlist)==0) {
         return 0;
@@ -250,18 +247,32 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
         for($r=0; $r< count($solutionlist); $r++) {
             if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
                 $match = 1;  // found a possible solution
-                // $colvalue is an fraction array
-                $solutionlistarray = $solutionlist[$r][$OptimizedValuecol];
-				$dec1 = $solutionlistarray[0]/$solutionlistarray[1];
 
-				if(is_array($stuanswer[$LastStuColumn])) {
-					$dec2 = $stuanswer[$LastStuColumn][0]/$stuanswer[$LastStuColumn][1];
-                } else {
-					$dec2 = $stuanswer[$LastStuColumn];
-                }
-
-                // Check Objective
+				// Check Objective
                 if($HasObjective==1) {
+                    $solutionlistarray = $solutionlist[$r][$OptimizedValuecol];
+
+					// verify it is an array.
+					if (is_array($solutionlistarray)) {
+						// not checking for division by zero as this is instructor supplied
+					    $dec1 = $solutionlistarray[0]/$solutionlistarray[1];
+				    } else {
+                        $dec1 = $solutionlistarray;
+					}
+
+					// verify it is an array.
+                    if(is_array($stuanswer[$LastStuColumn])) {
+						if($stuanswer[$LastStuColumn][1]!=0) {
+                            $dec2 = $stuanswer[$LastStuColumn][0]/$stuanswer[$LastStuColumn][1];
+                        } else {
+                            // division by zero
+							$match = 0;  // not a solution
+                            break;
+                        }
+                    } else {
+                        $dec2 = $stuanswer[$LastStuColumn];
+                    }
+
                     if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
@@ -273,9 +284,16 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
                     // now check to see if this solution matches the student
                     // need to evaluate  $solutionlist[$r][$c] to a decimal
 
-					//if(fractiontodecimal($solutionlist[$r][$c])!=fractiontodecimal($stuanswer[$c])) {
-					$dec1 = $solutionlist[$r][$c][0]/$solutionlist[$r][$c][1];
-					if(is_array($stuanswer[$LastStuColumn])) {
+					// make sure the denominator is not zero
+                    // verify it is an array.
+                    if (is_array($solutionlist[$r][$c])) {
+                        // not checking for division by zero as this is instructor supplied
+						$dec1 = $solutionlist[$r][$c][0]/$solutionlist[$r][$c][1];
+                    } else {
+                        $dec1 = $solutionlist[$r][$c];
+                    }
+
+                    if(is_array($stuanswer[$LastStuColumn])) {
                         $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
                     } else {
                         $dec2 = $stuanswer[$c];
@@ -293,21 +311,29 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
         for($r=0; $r< count($solutionlist); $r++) {
             if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
                 $match = 1;  // found a possible solution
-
-				$dec1 = $solutionlist[$r][$OptimizedValuecol][0]/$solutionlist[$r][$OptimizedValuecol][1];
-                if(is_array($stuanswer[$LastStuColumn])) {
-                    $dec2 = $stuanswer[$LastStuColumn][0]/$stuanswer[$LastStuColumn][1];
-                } else {
-                    $dec2 = $stuanswer[$LastStuColumn];
-                }
-
-                //if($ismixed){
-                //    $colvalue = -$solutionlist[$r][$OptimizedValuecol];
-                //} else {
-                //    $colvalue = $solutionlist[$r][$OptimizedValuecol];
-                //}
-                // Check Objective
+				// Check Objective
                 if($HasObjective==1) {
+                    if (is_array($solutionlistarray)) {
+                        // not checking for division by zero as this is instructor supplied
+                        $dec1 = $solutionlist[$r][$OptimizedValuecol][0]/$solutionlist[$r][$OptimizedValuecol][1];
+                    } else {
+                        $dec1 = $solutionlist[$r][$OptimizedValuecol];
+                    }
+
+
+                    if(is_array($stuanswer[$LastStuColumn])) {
+						if($stuanswer[$LastStuColumn][1]!=0) {
+                            $dec2 = $stuanswer[$LastStuColumn][0]/$stuanswer[$LastStuColumn][1];
+                        } else {
+                            // division by zero
+							$match = 0;  // not a solution
+                            break;
+                        }
+                    } else {
+                        $dec2 = $stuanswer[$LastStuColumn];
+                    }
+
+
                     if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
@@ -320,14 +346,25 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
                 for($c=0;$c<$LastAnswer;$c++) {
                     // now check to see if this solution matches the student
                     $j = $start+$c;
-                    //echo "$c) [$r][$j] =".$solutionlist[$r][$j].",".$stuanswer[$c]."<br/>";
 
-                    //if(fractiontodecimal($solutionlist[$r][$j])!=fractiontodecimal($stuanswer[$c])) {
-				    $dec1 = $solutionlist[$r][$j][0]/$solutionlist[$r][$j][1];
-                    $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
+					if (is_array($solutionlist[$r][$j])) {
+                        // not checking for division by zero as this is instructor supplied
+                        $dec1 = $solutionlist[$r][$j][0]/$solutionlist[$r][$j][1];
+                    } else {
+                        $dec1 = $solutionlist[$r][$j];
+                    }
+
+					if (is_array($stuanswer[$c])) {
+                        // not checking for division by zero as this is instructor supplied
+                        $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
+                    } else {
+                        $dec2 = $stuanswer[$c];
+                    }
+
+
                     if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
-                        //break;
+                        break;
                     }
                 }
                 if($match==1) break;
@@ -3264,7 +3301,9 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 // Change Log
 //
-// 2021-xx-xx ver 36  - Fixed bug in the simplexsolve2 return value
+// 2021-08-22 ver 37 - Fixed division by 0 bugs and added checks for array/vaules in the simplexchecksolution function
+//
+// 2021-08-18 ver 36  - Fixed bug in the simplexsolve2 return value
 //
 // 2021-04-29 ver 35  - Bug fixes
 //
