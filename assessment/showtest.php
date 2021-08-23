@@ -1447,7 +1447,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		$stm = $DBH->prepare("SELECT LastName, FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_SESSION['actas']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo $row[1].' '.$row[0];
+		echo '<span class="pii-full-name">'.$row[1].' '.$row[0].'</span>';
 		echo '<p>';
 	}
 	echo '<div class="clear"></div>';
