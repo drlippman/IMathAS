@@ -296,10 +296,12 @@
 		echo '<td><input type=checkbox name="stus[]" value="'.Sanitize::onlyInt($line['userid']).'"> ';
 		if ($line['locked']>0) {
 			echo '<span style="text-decoration: line-through;">';
-			printf("%s, %s</span>", Sanitize::encodeStringForDisplay($line['LastName']),
+			printf("<span class='pii-full-name'>%s, %s</span></span>",
+				Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		} else {
-			printf("%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),
+			printf("<span class='pii-full-name'>%s, %s</span>",
+				Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		echo '</td>';

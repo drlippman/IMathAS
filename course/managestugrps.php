@@ -733,9 +733,9 @@ if ($overwriteBody==1) {
 						}
 					}
 					if ($stulocked[$uid]) {
-						echo '<span class="greystrike">'.$name.'</span>';
+						echo '<span class="greystrike pii-full-name">'.$name.'</span>';
 					} else {
-						echo $name;
+						echo '<span class="pii-full-name">'.$name.'</span>';
 					}
 					echo " <span class=linkgrp>| <a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&remove=" . Sanitize::onlyInt($uid) . "&grpid=" . Sanitize::encodeUrlParam($grpid) . "\">Remove from group</a></span></li>";
 				}
@@ -766,9 +766,9 @@ if ($overwriteBody==1) {
 					}
 				}
 				if ($stulocked[$uid]) {
-					echo '<span class="greystrike">'.$name.'</span>';
+					echo '<span class="greystrike pii-full-name">'.$name.'</span>';
 				} else {
-					echo $name;
+					echo '<span class="pii-full-name">'.$name.'</span>';
 				}
 				echo "<label></li>";
 			}
