@@ -81,7 +81,8 @@ var MQeditor = (function($) {
         var span = $("<span/>", {
           id: "mqinput-"+textId,
           class: "mathquill-math-field",
-          text: initval
+          text: initval,
+          "aria-label": el.getAttribute("aria-label")
         });
         var m;
         if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
