@@ -333,6 +333,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
 			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -382,6 +383,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
 			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -762,6 +764,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
 			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -808,6 +811,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
 			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
@@ -1964,6 +1968,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
 			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -2003,6 +2008,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
 			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -2372,6 +2378,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
 			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -2409,6 +2416,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
 			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
