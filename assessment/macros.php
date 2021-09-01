@@ -4795,7 +4795,7 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 				} else {
 					if (strlen(ltrim($absgivenans,'0'))-1 != $reqsigfigs) { return false;}
 				}
-                $gasigfig = strlen($givenans) - 1;
+                $gasigfig = $reqsigfigs;
 			}
 		}
 	}
