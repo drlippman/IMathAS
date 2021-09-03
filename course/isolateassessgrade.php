@@ -91,6 +91,13 @@
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+aid+"&uid="+uid, 500, 500);
 			return false;
 		}
+        $(function() {
+            $("a[href*=gbviewassess]").each(function() {
+                var uid = $(this).closest("tr").find("input").val();
+                $(this).attr("data-gtg", uid);
+                $(this).closest("tr").find(".pii-full-name").attr("data-gtu", uid);
+            });
+        });
 		</script>';
 	require("../header.php");
     echo "<div class=breadcrumb>$breadcrumbbase ";
