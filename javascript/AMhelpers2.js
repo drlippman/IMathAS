@@ -1164,7 +1164,15 @@ function AMnumfuncPrepVar(qn,str) {
 
  function processNumber(origstr, format) {
      var err = '';
-     if (format.indexOf('list')!== -1) {
+     origstr = origstr.replace(/^\s+|\s+$/g, '');
+     if (format.indexOf('set') !== -1) {
+        if (origstr.charAt(0) !== '{' || origstr.substr(-1) !== '}') {
+            err += _('Invalid set notation');
+        } else {
+            origstr = origstr.slice(1, -1);
+        }
+     }
+     if (format.indexOf('list')!== -1 || format.indexOf('set') !== -1) {
          var strs = origstr.split(/\s*,\s*/);
      } else {
          var strs = [origstr.replace(/,/g,'')];
