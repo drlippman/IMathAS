@@ -398,6 +398,8 @@ class ScoreEngine
                 } else if (is_numeric($_POST["qn$partnum"])) { // number
                   $stuanswersval[$thisq][$kidx] = floatval($_POST["qn$partnum"]);
                 }
+                $stuanswers[$thisq][$kidx] = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $stuanswers[$thisq][$kidx]);
+
                 if (isset($_SESSION['choicemap'][$assessmentId][$partnum])) {
                     if (is_array($stuanswers[$thisq][$kidx])) { //multans
                         foreach ($stuanswers[$thisq][$kidx] as $k => $v) {
