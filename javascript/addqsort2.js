@@ -1023,17 +1023,19 @@ function generateOutput() {
             });
         } else if (itemarray[i].length < 5) {
             //is group
-            if (out.length > 0) {
-                out += ",";
+            if (itemarray[i][2].length > 0) { // skip if group is empty; shouldn't happen
+                if (out.length > 0) {
+                    out += ",";
+                }
+                out += itemarray[i][0] + "|" + itemarray[i][1];
+                for (var j = 0; j < itemarray[i][2].length; j++) {
+                    out += "~" + itemarray[i][2][j][0];
+                    pts["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][4];
+                    itemarray[i][2][j][9] = 0;
+                    extracredit["qn" + itemarray[i][2][j][0]] = 0; // no EC in groups
+                }
+                qcnt += itemarray[i][0];
             }
-            out += itemarray[i][0] + "|" + itemarray[i][1];
-            for (var j = 0; j < itemarray[i][2].length; j++) {
-                out += "~" + itemarray[i][2][j][0];
-                pts["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][4];
-                itemarray[i][2][j][9] = 0;
-                extracredit["qn" + itemarray[i][2][j][0]] = 0; // no EC in groups
-            }
-            qcnt += itemarray[i][0];
         } else {
             if (out.length > 0) {
                 out += ",";
