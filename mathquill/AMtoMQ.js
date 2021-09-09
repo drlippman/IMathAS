@@ -716,7 +716,7 @@ AMQinitSymbols();
 return function(str) {
  AMQnestingDepth = 0;
   str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
-  str = str.replace(/^\s*<([^<].*?[^>])>\s*$/,"<<$1>>");
+  str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
