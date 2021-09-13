@@ -110,7 +110,7 @@ function additems2($arr) {
             'startdate' => time() + 60*60,
             'enddate' => time() + 7*24*60*60,
             'avail' => 1,
-            'SH' => 'OH0',
+            'SH' => 'HO0',
             'colors' => '',
             'public' => 0,
             'innav' => 0,
