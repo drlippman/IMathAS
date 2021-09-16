@@ -118,7 +118,11 @@ class CalculatedIntervalAnswerBox implements AnswerBox
 
         if ($answer !== '' && !is_array($answer)) {
             if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
-                $sa = '`' . intervaltoineq($answer, $variables) . '`';
+                $anspts = explode('or', $answer);
+                foreach ($anspts as $k=>$v) {
+                    $anspts[$k] = '`' . intervaltoineq($v, $variables) . '`';
+                }
+                $sa = implode($anspts, ' or ');
             } else {
                 $sa = '`' . str_replace('U', 'uu', $answer) . '`';
             }
