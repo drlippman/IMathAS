@@ -173,6 +173,7 @@ class Imathas_LTI_Database implements LTI\Database
         return LTI\LTI_Registration::new ()
             ->set_auth_login_url($row['auth_login_url'])
             ->set_auth_token_url($row['auth_token_url'])
+            ->set_auth_server($row['auth_server'])
             ->set_client_id($row['client_id'])
             ->set_key_set_url($row['key_set_url'])
             ->set_issuer($iss)
