@@ -416,7 +416,7 @@ function initsuggest() {
 	var tbod = table.getElementsByTagName("tbody")[0];
 	trs = tbod.getElementsByTagName("tr");
 	for (var i=1;i<trs.length;i++) {
-		names.push(trs[i].getElementsByTagName("td")[0].innerHTML);
+		names.push(trs[i].getElementsByTagName("td")[0].innerText);
 	}
 	new AutoSuggest(document.getElementById("qaname"),names);
 }
