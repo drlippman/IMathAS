@@ -1990,7 +1990,7 @@ function roundsigfig($val, $sigfig) {
 	return round($val, $sigfig - $log - 1);
 }
 
-function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=false) {
+function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=false,$sigfigbar=false) {
 	if (!is_array($aarr)) {
 		$arrayout = false;
 		$aarr = array($aarr);
@@ -2026,13 +2026,26 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 
 		$v = floor(-log10($a)-1e-12);
 		if ($v+$sigfig <= 0) {
-			if ($v<-16 && $scinot=='') { //special handling of really huge numbers
-				$multof3 = floor(-($v+$sigfig)/3);
-				$tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
-				$out[] = $sign.number_format($tmp,0,'.',$comma).str_repeat(',000',$multof3).$scinot;
-			} else {
-				$out[] = $sign.number_format(round($a,$v+$sigfig),0,'.',$comma).$scinot;
-			}
+      $multof3 = floor(-($v+$sigfig)/3);
+      $tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
+      $a = number_format($tmp,0,'.',$comma).str_repeat($comma.'000',$multof3);
+      if ($sigfigbar) {
+        //number of digits before first comma
+        $digbc = floor((log10($a)+1)%3)+3*((log10($a)+1)%3==0);
+        $anums = preg_replace('/[^\d]/','',$a);
+        if ($comma != '') {
+          //number of commas before sigfig digit
+          $acom = ($sigfig>$digbc)+floor(($sigfig-1-$digbc)/3)*($sigfig>$digbc);
+        } else {
+          $acom = 0;
+        }
+        if (isset($anums[$sigfig]) && $anums[$sigfig] === '0' && $anums[$sigfig-1] === '0') {
+          $a = substr_replace($a, 'overline(0)', $sigfig-1+$acom*strlen($comma), 1);
+        } elseif ($anums[$sigfig-1] === '0' && !isset($anums[$sigfig])) {
+          $a = $a.".";
+        }
+      }
+      $out[] = $sign.$a.$scinot;
 		} else {
 			$nv = round($a, $v+$sigfig);
 			$n = number_format($a,$v+$sigfig,'.',$comma);
