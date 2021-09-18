@@ -198,9 +198,10 @@ class LTI_Grade_Update {
    * @param  int $platform_id    imas_lti_platforms.id
    * @param  string $client_id    optional if known - the client_id
    * @param  string $token_server optional if known - the token_server_url
+   * @param  string $auth_server  optional if known - the aud for token request
    * @return false|string access token, or false on failure
    */
-  public function get_access_token(int $platform_id, string $client_id='', string $token_server='') {
+  public function get_access_token(int $platform_id, string $client_id='', string $token_server='', string $auth_server='') {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
       $this->access_tokens[$platform_id]['expires'] < time()
@@ -231,12 +232,12 @@ class LTI_Grade_Update {
 
     // Need to request a token
     if (empty($client_id)) {
-      $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
+      $stm = $this->dbh->prepare('SELECT client_id,auth_token_url,auth_server FROM imas_lti_platforms WHERE id=?');
       $stm->execute(array($platform_id));
-      list($client_id, $token_server) = $stm->fetch(PDO::FETCH_NUM);
+      list($client_id, $token_server, $auth_server) = $stm->fetch(PDO::FETCH_NUM);
     }
     $this->debuglog('requesting a token from '.$platform_id);
-    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server);
+    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server, $auth_server);
     // Make request to get auth token
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $token_server);
@@ -290,16 +291,17 @@ class LTI_Grade_Update {
    * @param  int    $platform_id
    * @param  string $client_id
    * @param  string $token_server
+   * @param  string $auth_server
    * @return string output of http_build_query
    */
   public function get_token_request_post(int $platform_id, string $client_id,
-    string $token_server
+    string $token_server, string $auth_server
   ): string {
     // Build up JWT to exchange for an auth token
     $jwt_claim = [
       "iss" => $client_id,
       "sub" => $client_id,
-      "aud" => $token_server,
+      "aud" => empty($auth_server) ? $token_server : $auth_server,
       "iat" => time() - 5,
       "exp" => time() + 60,
       "jti" => 'lti-service-token' . hash('sha256', random_bytes(64))
