@@ -343,12 +343,12 @@ class LTI_Grade_Update {
   }
 
   /**
-   * Get client_id and auth_token_url for a platform
+   * Get client_id and auth_token_url and auth_server for a platform
    * @param  int   $platform_id
    * @return array
    */
   public function get_platform_info(int $platform_id): array {
-    $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
+    $stm = $this->dbh->prepare('SELECT client_id,auth_token_url,auth_server FROM imas_lti_platforms WHERE id=?');
     $stm->execute(array($platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }

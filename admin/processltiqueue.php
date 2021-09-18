@@ -256,7 +256,9 @@ function LTIqueuePostdataCallback($data) {
 			return [
 				'body' => $updater1p3->get_token_request_post($data['platformid'],
 										$platforminfo['client_id'],
-										$platforminfo['auth_token_url']),
+										$platforminfo['auth_token_url'],
+										$platforminfo['auth_server']
+									),
 				'header' => array()
 			];
 		} else if ($data['action'] == 'update') {
