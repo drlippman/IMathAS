@@ -70,7 +70,9 @@ class StringScorePart implements ScorePart
                     $torem[] = $pc[1];
                     continue;
                 }
-                if ($pc[1]==='true' || $pc[1]==='1' || $pc[1]===1) {
+                if ($pc[0] == 'allow_diff') {
+                    $pc[1] = intval($pc[1]);
+                } else if ($pc[1]==='true' || $pc[1]==='1' || $pc[1]===1) {
                     $pc[1] = true;
                 } else {
                     $pc[1] = false;
