@@ -1893,7 +1893,7 @@ function draw_triangle() {
             }
           }
         }
-      } elseif ($hasAltSidLab !== true && $hasAltAngLab !== true) {
+      } elseif ($hasPerp === true && $hasAltSidLab !== true && $hasAltAngLab !== true) {
         $alt .= " One angle is labeled with a right angle box.";
       }
     }
