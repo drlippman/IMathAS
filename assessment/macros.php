@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples","isset");
+ "array_values","comparelogic","stuansready","comparentuples","isset","atan2");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -2066,11 +2066,11 @@ function makescinot($n,$d=8,$f="x") {
 		$mant = number_format($n/pow(10,$exp),$d);
 	}
 	if ($f=="*") {
-		return "$isneg $mant * 10^($exp)";
+		return "$isneg$mant*10^($exp)";
 	} else if ($f=="E") {
-		return "$isneg $mant E $exp";
+		return "$isneg{$mant}E$exp";
 	} else {
-		return "$isneg $mant xx 10^($exp)";
+		return "$isneg$mant xx 10^($exp)";
 	}
 }
 
@@ -4783,15 +4783,19 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			$absgivenans = str_replace('-','',$givenans);
 			$gadploc = strpos($absgivenans,'.');
 			if ($gadploc===false) { //no decimal place
-				if (strlen(rtrim($absgivenans,'0')) > $reqsigfigs) { return false;}
-                $gasigfig = strlen(rtrim($givenans,'0'));
+				if (strlen(rtrim($absgivenans,'0')) > $reqsigfigs || 
+                    strlen($absgivenans) < $reqsigfigs
+                ) { 
+                    return false;
+                }
+                $gasigfig = $reqsigfigs;
 			} else {
 				if (abs($givenans)<1) {
 					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
 				} else {
 					if (strlen(ltrim($absgivenans,'0'))-1 != $reqsigfigs) { return false;}
 				}
-                $gasigfig = strlen($givenans) - 1;
+                $gasigfig = $reqsigfigs;
 			}
 		}
 	}

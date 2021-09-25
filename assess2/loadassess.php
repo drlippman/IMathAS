@@ -104,7 +104,8 @@ if ($canViewAll && $userid !== $uid) {
     echo '{"error": "invalid_uid"}';
     exit;
   }
-  $assessInfoOut['stu_fullname'] = $row['LastName'] . ', ' . $row['FirstName'];
+  $userfullname = $row['LastName'] . ', ' . $row['FirstName'];
+  $assessInfoOut['stu_fullname'] = $userfullname;
 }
 
 // set userid

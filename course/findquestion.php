@@ -18,9 +18,16 @@ if (!(isset($teacherid))) {
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
     $cid = Sanitize::courseId($_GET['cid']);
     $aid = Sanitize::onlyInt($_GET['aid']);
+    if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+        $addq = 'addquestions2';
+        $from = 'addq2';
+    } else {
+        $addq = 'addquestions';
+        $from = 'addq';
+    }
 
     $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
+	$curBreadcrumb .= "&gt; <a href=\"$addq.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 	$curBreadcrumb .= _("Question Search and Replace");
 
     $didreplace = false;
@@ -99,7 +106,7 @@ if ($overwriteBody==1) {
                     echo 'disabled class="q-taken"';
                 }
                 echo '>';
-                echo '<a href="addquestions.php?cid='.$cid.'&aid='.$result['aid'].'" target="_blank">';
+                echo '<a href="'.$addq.'.php?cid='.$cid.'&aid='.$result['aid'].'" target="_blank">';
                 echo $result['name'].'</a></li>';
             }
             echo '</ul>';

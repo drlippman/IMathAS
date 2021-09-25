@@ -51,6 +51,9 @@ class StringAnswerBox implements AnswerBox
         if (empty($answerboxsize)) {$answerboxsize = 20;}
         if (!empty($ansprompt)) {$out .= $ansprompt;}
 
+        $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
+            (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
+
         if ($answerformat == 'list') {
             $tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
             $shorttip = _('Enter a list of text');
@@ -66,7 +69,7 @@ class StringAnswerBox implements AnswerBox
         }
         if ($displayformat == 'select') {
             $out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
-            $out .= 'aria-label="' . $this->answerBoxParams->getQuestionIdentifierString() . '">';
+            $out .= 'aria-label="' . $arialabel . '">';
             $out .= '<option value=""> </option>';
             foreach ($questions as $i => $v) {
                 $out .= '<option value="' . htmlentities($v) . '"';
@@ -88,8 +91,7 @@ class StringAnswerBox implements AnswerBox
                 'id' => "qn$qn",
                 'value' => $la,
                 'autocomplete' => 'off',
-                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() .
-                (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : ''),
+                'aria-label' => $arialabel,
             ];
 
             if ($displayformat == 'alignright') {

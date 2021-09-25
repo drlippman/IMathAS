@@ -153,7 +153,7 @@ switch($_GET['action']) {
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
 			echo '<div class="pagetitle"><h1>'._('New User').'</h1></div>';
-			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):0);
+			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):-2);
             $oldrights = 10;
             $oldspecialrights = 0;
 		} else {
@@ -229,10 +229,10 @@ switch($_GET['action']) {
 								text: msg[i].name
 							}));
 						}
-						if (document.getElementById("group").options.length > 2) {
-							document.getElementById("group").selectedIndex = 2;
+						if (document.getElementById("group").options.length > 3) {
+							document.getElementById("group").selectedIndex = 3;
 						} else {
-							document.getElementById("group").selectedIndex = document.getElementById("group").options.length-1;
+							document.getElementById("group").selectedIndex = 0;
 						}
 					});
 				}
@@ -376,6 +376,7 @@ switch($_GET['action']) {
 			echo "<span class=formright>";
 			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
 			echo "<label for=\"group\">Assign to:</label> <select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
+			echo '<option value="-2"'.($oldgroup==-2?' selected':'').'>'._('Select a Group').'</option>';
 			echo '<option value="-1">New Group</option>';
 			echo "<option value=0 ";
 			if ($oldgroup==0) {
@@ -408,7 +409,7 @@ switch($_GET['action']) {
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {
 			require_once("../includes/newusercommon.php");
-			showNewUserValidation("userform");
+			showNewUserValidation("userform", ['group'], ['group' => 'true, min: -1']);
 		} else if ($myrights==100) {
 			echo '<p>&nbsp;</p><p>&nbsp;</p>';
 			echo '<a href="forms.php?action=deladmin&id='.Sanitize::encodeUrlParam($_GET['id']).'">Delete User</a> ';
