@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 18;
+	return 19;
 }
 
 global $allowedmacros;
@@ -96,12 +96,13 @@ function verifyTickMarks($input) {
 	return $TickMarks;
 }
 
-function verifyEqualSign($input) {
+function verifyEqualSign($input,$tick) {
+    $TickMarks = verifyTickMarks($tick);
 	if(!is_null($input)) {
         if($input=="=") {
             $retval = "=";
         } elseif($input=="~") {
-            $retval = "~~";
+            $retval = "$TickMarks~~$TickMarks";
         } else {
             $retval =  "&#8776;"; //&#8776; &#x2248; &thickapprox;
         }
@@ -318,7 +319,8 @@ function conversionAbbreviations() {
 //            1 = use Full name (feet squared)
 //            2 = use Full name (square feet)
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
-//     tick: add a tick mark around items with exponents
+//     tick: y = add a tick mark around items with exponents
+//           n = don't add
 //     Sign: use an = or html approximately equal symbol
 //
 // Examples
@@ -336,7 +338,7 @@ function conversionArea() {
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
 	$tick = $args[3];
-    $sign = verifyEqualSign($args[4]);
+    $sign = verifyEqualSign($args[4],$tick);
 
     $retval = array();
 
@@ -428,6 +430,8 @@ function conversionArea() {
 //     Sign: = gives you =
 //           ~ gives you ~~
 //          "" gives you html approximately equal symbol
+//     tick: y = add a tick mark around items with exponents
+//           n = don't add
 //
 // Examples
 //
@@ -443,7 +447,8 @@ function conversionCapacity() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-    $sign = verifyEqualSign($args[3]);
+    $tick = verifyTickMarks($args[4]);
+    $sign = verifyEqualSign($args[3],$tick);
 
     $retval = array();
 
@@ -802,6 +807,8 @@ function conversionFormulaTemperature() {
 //     Sign: = gives you =
 //           ~ gives you ~~
 //          "" gives you html approximately equal symbol
+//     tick: y = add a tick mark around items with exponents
+//           n = don't add
 //
 // Examples
 //
@@ -817,7 +824,9 @@ function conversionLength() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-    $sign = verifyEqualSign($args[3]);
+    $tick = verifyTickMarks($args[4]);
+    $sign = verifyEqualSign($args[3],$tick);
+
 
     $retval = array();
 
@@ -1158,7 +1167,8 @@ function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$u
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
-//     tick: add a tick mark around items with exponents
+//     tick: y = add a tick mark around items with exponents
+//           n = don't add
 //     Sign: = gives you =
 //           ~ gives you ~~
 //          "" gives you html approximately equal symbol
@@ -1177,8 +1187,8 @@ function conversionVolume() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-	$tick = $args[3];
-    $sign = verifyEqualSign($args[4]);
+	$tick = verifyTickMarks($args[3]);
+    $sign = verifyEqualSign($args[4],$tick);
 
     $retval = array();
 
@@ -1260,7 +1270,9 @@ function conversionVolume() {
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
 //     Sign: = gives you =
 //           ~ gives you ~~
-//          "" gives you html approximately equal symbolsymbol
+//          "" gives you html approximately equal symbol
+//     tick: y = add a tick mark around items with exponents
+//           n = don't add
 //
 // Examples
 //
@@ -1276,7 +1288,8 @@ function conversionWeight() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-    $sign = verifyEqualSign($args[3]);
+    $tick = verifyTickMarks($args[4]);
+    $sign = verifyEqualSign($args[3],$tick);
 
     $retval = array();
 
@@ -1329,6 +1342,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2021-09-24 ver 19 - fixed tick mark typo and added to functions
 // 2021-03-08 ver 18 - fixed typo in surface area of a right circular cylinder
 // 2021-02-26 ver 17 - fixed conversionLength, conversionCapacity, and conversionWeight missing spaces
 // 2021-02-26 ver 16 - added rectangle and square to conversionFormulaGeometry and conversionFormulaAbbreviations, typo in conversionVolume
