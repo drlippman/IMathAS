@@ -119,7 +119,8 @@
 			} else {
 				$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 			}
-			printf("</td><td>%s</td>", Sanitize::encodeStringForDisplay($line['fullname']));
+			printf("</td><td><span class='pii-full-name'>%s</span></td>",
+                Sanitize::encodeStringForDisplay($line['fullname']));
 			if ($line['name']==null) {
 				$line['name'] = "[Deleted]";
 			}

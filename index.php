@@ -408,7 +408,8 @@ echo '<div class="pagetitle" id="headerhome" role="banner"><h1>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
-	echo _('Welcome to'), " $installname, " . Sanitize::encodeStringForDisplay($userfullname);
+	echo _('Welcome to'), " $installname, ";
+    printf('<span class="pii-full-name">%s</span>', Sanitize::encodeStringForDisplay($userfullname));
 }
 echo '</h1>';
 echo '</div>';
@@ -490,7 +491,7 @@ for ($i=0; $i<3; $i++) {
 require('footer.php');
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
-	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $courseListOrder;
+	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $username, $courseListOrder;
 	if (count($data)==0 && $type=='tutor' && !$hashiddencourses) {return;}
 
 	echo '<div role="navigation" aria-label="'.$title.'">';
@@ -658,7 +659,7 @@ function printMessagesGadget() {
 		} else {
 			$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 		}
-		echo '<td>'.Sanitize::encodeStringForDisplay($line['fullname']).'</td>';
+		echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($line['fullname']).'</span></td>';
 		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
 		echo '</tr>';
@@ -716,7 +717,7 @@ function printPostsGadget() {
 		if ($threaddata[$line['threadid']]['isanon']==1) {
 			echo '<td>', _('Anonymous'), '</td>';
 		} else {
-			echo '<td>'.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['LastName']).', '.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['FirstName']).'</td>';
+			echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['LastName']).', '.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['FirstName']).'</span></td>';
 		}
 		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';

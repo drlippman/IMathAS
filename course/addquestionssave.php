@@ -16,6 +16,7 @@
 		echo "error: invalid ID";
 		exit;
     }
+    
     $showwork = ($showwork & 3);
     if ($aver > 1) {
 		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
@@ -33,6 +34,10 @@
 	}
 
     if (isset($_POST['addnewdef'])) {
+        if (!isset($_POST['lastitemhash']) || md5($rawitemorder) !== $_POST['lastitemhash']) {
+            echo '{"error": "assessment questions have changed elsewhere. Reload the page and try again."}';
+            exit;
+        }
         header('Content-Type: application/json; charset=utf-8');
         if ($beentaken) {
             echo '{"error": "'._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page').'"}';
@@ -104,13 +109,14 @@
             'showhints' => $showhints
         ]);
         
-        echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
+        echo json_encode(['itemarray'=>$jsarr, 'lastitemhash'=>md5($itemorder)], 
+            JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
         exit;
     } else if (isset($_POST['addnew'])) {
 
     } 
 
-	if (!isset($_POST['order']) || !isset($_POST['text_order'])) {
+	if (!isset($_POST['order']) || !isset($_POST['text_order']) || !isset($_POST['lastitemhash'])) {
 		echo "error: missing required values";
 		exit;
     }
@@ -118,6 +124,11 @@
         echo 'error: '._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page');
         exit;
     }
+    if (md5($rawitemorder) !== $_POST['lastitemhash']) {
+        echo "error: assessment questions have changed elsewhere. Reload the page and try again.";
+        exit;
+    }
+    
 
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
@@ -253,15 +264,16 @@
 	$ptschanged = false;
 	if (isset($_POST['pts'])) {
 		$newpts = json_decode($_POST['pts'], true);
-		$upd_pts = $DBH->prepare("UPDATE imas_questions SET points=? WHERE id=?");
-		$stm = $DBH->prepare("SELECT id,points FROM imas_questions WHERE assessmentid=?");
+        $newextracredit = json_decode($_POST['extracredit'], true);
+		$upd_pts = $DBH->prepare("UPDATE imas_questions SET points=?,extracredit=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,points,extracredit FROM imas_questions WHERE assessmentid=?");
 		$stm->execute(array($aid));
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($newpts['qn'.$row['id']])) {
 				continue;  //shouldn't happen
 			}
-			if ($row['points'] != $newpts['qn'.$row['id']]) {
-				$upd_pts->execute(array($newpts['qn'.$row['id']], $row['id']));
+			if ($row['points'] != $newpts['qn'.$row['id']] || $row['extracredit'] != $newextracredit['qn'.$row['id']]) {
+				$upd_pts->execute(array($newpts['qn'.$row['id']], $newextracredit['qn'.$row['id']], $row['id']));
 				$ptschanged = true;
 			}
 		}
@@ -300,7 +312,8 @@
 		$stm = $DBH->prepare($query);
 		$stm->execute(array($cid, $aid));
 
-		echo "OK";
+        echo md5($_REQUEST['order']);
+		//echo "OK";
 	} else {
 		echo "error: not saved";
 	}

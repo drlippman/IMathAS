@@ -29,7 +29,7 @@
 			if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {
 				$tex = '\\reverse '.$tex;
 			}
-			if ($GLOBALS['texdisp']==true) {
+			if (!empty($GLOBALS['texdisp'])) {
 				if (isset($GLOBALS['texdoubleescape'])) {
 					return ' \\\\('.htmlentities($tex).'\\\\) ';
 				} else {
@@ -276,6 +276,9 @@
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1" alt="Graph"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
         $str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
+        $str = preg_replace('/<input[^>]*button[^>]*>/','',$str); //strip buttons
+        $str = preg_replace('/<button[^>]*>.*?<\/button>/','',$str); //strip buttons
+
 		if (isset($_POST['hidetxtboxes'])) {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);
 			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','',$str);

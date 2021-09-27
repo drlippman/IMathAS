@@ -25,7 +25,7 @@ if (!(isset($teacherid))) {
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 	$aid = Sanitize::onlyInt($_GET['id']);
 
-	if ($_POST['remove']=="really") {
+	if (isset($_POST['remove']) && $_POST['remove']=="really") {
 		$DBH->beginTransaction();
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='Assessment' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$aid, ':courseid'=>$cid));

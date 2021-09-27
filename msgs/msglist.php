@@ -13,7 +13,7 @@ If deleted on both ends, delete from DB
 	require("../init.php");
 	require('../includes/getcourseopts.php');
 
-	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	if (isset($cid) && $cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 	   require("../footer.php");
@@ -29,7 +29,7 @@ If deleted on both ends, delete from DB
 	$threadsperpage = intval($listperpage);
 
 	$cid = Sanitize::courseId($_GET['cid']);
-    $cidP = Sanitize::courseId($_POST['courseid']);
+    
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
@@ -57,7 +57,7 @@ If deleted on both ends, delete from DB
 	} else {
 		$filteruid = 0;
 	}
-	$type = $_GET['type'];
+	$type = $_GET['type'] ?? '';
 
 	if (isset($_GET['getstulist'])) {
 		$cid = intval($_GET['getstulist']);
@@ -122,8 +122,8 @@ If deleted on both ends, delete from DB
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$opts[] = sprintf('<option value="%d">%s, %s</option>', $row[0],
-					Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
+				$opts[] = sprintf('<option value="%d"><span class="pii-first-name">%s, %s</span></option>',
+                    $row[0], Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 		}
 		echo json_encode($opts, JSON_INVALID_UTF8_IGNORE);
@@ -131,7 +131,8 @@ If deleted on both ends, delete from DB
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
-			$msgToPost = Sanitize::onlyInt($_POST['to']);
+            $msgToPost = Sanitize::onlyInt($_POST['to']);
+            $cidP = Sanitize::courseId($_POST['courseid']);
 
 			// validate message settings allow this
 			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
@@ -397,7 +398,8 @@ If deleted on both ends, delete from DB
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$courseid, ':id'=>$_GET['to']));
 				$row = $stm->fetch(PDO::FETCH_NUM);
-				printf('%s, %s', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
+				printf('<span class="pii-full-name">%s, %s</span>',
+                    Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 				$ismsgsrcteacher = false;
 				if ($courseid==$cid && $isteacher) {
 					$ismsgsrcteacher = true;
@@ -409,7 +411,7 @@ If deleted on both ends, delete from DB
 					}
 				}
 				if ($ismsgsrcteacher) {
-					echo " <a href=\"mailto:".Sanitize::emailAddress($row[2])."\">email</a> | ";
+					echo " <a class=\"pii-email\" href=\"mailto:".Sanitize::emailAddress($row[2])."\"><span class='pii-safe'>email</span></a> | ";
 					echo " <a href=\"$imasroot/course/gradebook.php?cid=".Sanitize::courseId($courseid)."&stu=". Sanitize::onlyInt($to)."\" target=\"_popoutgradebook\">gradebook</a>";
 					if ($row[3]!=null) {
 						echo " | Last login ".tzdate("F j, Y, g:i a",$row[3]);
@@ -419,15 +421,15 @@ If deleted on both ends, delete from DB
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				if (isset($_GET['to']) && $row[4]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+						echo " <img class='pii-image' style=\"vertical-align: middle;\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					} else {
-						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+						echo " <img class='pii-image' style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					}
 				}
 				echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
 			} else {
 				if ($filtercid>0) {
-					echo '<select name="to" id="to" aria-label="'._('Select an individual').'">';
+					echo '<select class="pii-full-name" name="to" id="to" aria-label="'._('Select an individual').'">';
 					echo '<option value="0">Select a recipient...</option>';
 					if ($isteacher || $msgset<2) {
 						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -715,7 +717,7 @@ function chgfilter() {
 	echo getCourseOpts(false, $filtercid);
 	echo "</select> ";
 
-	echo '<label for="filteruid">By sender</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
+	echo '<label for="filteruid">By sender</label>: <select id="filteruid" class="pii-full-name" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';
 	}
@@ -835,9 +837,9 @@ function chgfilter() {
 
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo " <img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  alt=\"User picture\"/>";
+				echo " <img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  alt=\"User picture\"/>";
 			} else {
-				echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  alt=\"User picture\"/>";
+				echo " <img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  alt=\"User picture\"/>";
 			}
 		}
 
@@ -850,7 +852,7 @@ function chgfilter() {
 		}
 		echo '</a>';
 		echo '</td>';
-		printf('<td>%s</td>', Sanitize::encodeStringForDisplay($line['fullname']));
+		printf('<td><span class="pii-full-name">%s</span></td>', Sanitize::encodeStringForDisplay($line['fullname']));
 
 
 		if ($line['name']==null) {

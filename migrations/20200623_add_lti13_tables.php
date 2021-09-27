@@ -12,7 +12,7 @@ $query = 'CREATE TABLE `imas_lti_keys` (
   `privatekey` TEXT NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   INDEX `keyinf` ( key_set_url(100), kid)
-) ENGINE=InnoDB;';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -28,7 +28,7 @@ $query = 'CREATE TABLE `imas_lti_platforms` (
   `key_set_url` varchar(2000) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   INDEX `isscli` (`issuer`,`client_id`)
-) ENGINE=InnoDB;';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -41,7 +41,7 @@ $query = 'CREATE TABLE `imas_lti_deployments` (
   `deployment` varchar(254) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   INDEX `platdep` (`platform`,`deployment`)
-) ENGINE=InnoDB;';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -54,7 +54,7 @@ $query = 'CREATE TABLE `imas_lti_groupassoc` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`deploymentid`,`groupid`),
   INDEX (`groupid`)
-) ENGINE=InnoDB;';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -68,7 +68,7 @@ $query = 'CREATE TABLE `imas_lti_tokens` (
   `expires` INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`platformid`,`scopes`),
   INDEX (`expires`)
-) ENGINE=InnoDB;';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -84,7 +84,7 @@ if ($res===false) {
 }
 
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 echo '<p>LTI 1.3 tables created</p>';
 
 return true;

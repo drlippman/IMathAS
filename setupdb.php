@@ -107,7 +107,7 @@ $sql = 'CREATE TABLE `imas_users` ('
 	. ' INDEX (`lastaccess`), INDEX (`rights`), INDEX (`groupid`),'
         . ' UNIQUE (`SID`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'User Information\';';
 $DBH->query($sql);
 
@@ -132,7 +132,7 @@ $sql = 'CREATE TABLE `imas_students` ('
         . ' INDEX (`userid`), INDEX (`courseid`), '
 	. ' INDEX(`code`), INDEX(`section`), INDEX(`locked`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Which courses each student is enrolled in\';';
 $DBH->query($sql);
 echo 'imas_students created<br/>';
@@ -144,7 +144,7 @@ $sql = 'CREATE TABLE `imas_teachers` ('
         . ' `hidefromcourselist` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`userid`), INDEX(`courseid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Which courses each teacher is teaching\';';
 $DBH->query($sql);
 echo 'imas_teachers created<br/>';
@@ -156,7 +156,7 @@ $sql = 'CREATE TABLE `imas_tutors` ('
 	. '`section` VARCHAR(40) NOT NULL, '
 	. '`hidefromcourselist` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. 'INDEX (`userid`), INDEX(`courseid`) '
-	. ' ) ENGINE = InnoDB '
+	. ' ) ENGINE = InnoDB ROW_FORMAT=DYNAMIC  '
 	. 'COMMENT = \'course tutors\'';
 $DBH->query($sql);
 echo 'imas_tutors created<br/>';
@@ -187,7 +187,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
 	. ' INDEX(`ownerid`), INDEX(`name`), INDEX(`available`), INDEX(`istemplate`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Course list\';';
 $DBH->query($sql);
 echo 'imas_courses created<br/>';
@@ -241,7 +241,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
         . ' INDEX (`courseid`), INDEX(`startdate`), INDEX(`enddate`),'
 	. ' INDEX(`cntingb`), INDEX(`reviewdate`), INDEX(`avail`), INDEX(`ancestors`(10))'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Assessment info\';';
 $DBH->query($sql);
 echo 'imas_assessments created<br/>';
@@ -263,7 +263,7 @@ $sql = 'CREATE TABLE `imas_questions` ('
 	. ' `fixedseeds` TEXT NULL DEFAULT NULL,'
         . ' INDEX (`assessmentid`), INDEX(`questionsetid`), INDEX(`category`) '
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Questions in an assessment\';';
 $DBH->query($sql);
 echo 'imas_questions created<br/>';
@@ -297,7 +297,7 @@ $sql = 'CREATE TABLE `imas_questionset` ('
 	. ' `solutionopts` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' INDEX (`ownerid`), INDEX(`userights`), INDEX(`deleted`), INDEX(`replaceby`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Actual set of questions\';';
 $DBH->query($sql);
 echo 'imas_questionset created<br/>';
@@ -310,7 +310,7 @@ $sql = 'CREATE TABLE `imas_qimages` ('
         . ' `alttext` VARCHAR(254) NOT NULL,'
         . ' INDEX (`qsetid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Static image ref for questionset\';';
 $DBH->query($sql);
 echo 'imas_qimages created<br/>';
@@ -322,7 +322,7 @@ $sql = 'CREATE TABLE `imas_items` ('
         . ' `typeid` INT(10) UNSIGNED NOT NULL,'
         . ' INDEX (`courseid`), INDEX(`typeid`), INDEX(`itemtype`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Items within a course\';';
 $DBH->query($sql);
 echo 'imas_items created<br/>';
@@ -356,7 +356,7 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
         . ' INDEX (`userid`), INDEX(`assessmentid`), INDEX(`agroupid`), INDEX(`endtime`),'
         . ' UNIQUE INDEX (userid, assessmentid) '
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Assessment Sessions\';';
 $DBH->query($sql);
 echo 'imas_assessment_sessions created<br/>';
@@ -369,7 +369,7 @@ $sql = 'CREATE TABLE `imas_firstscores` (
 	`scoredet` TEXT NOT NULL,
 	`timespent` SMALLINT(5) UNSIGNED NOT NULL,
 	INDEX ( `courseid`), INDEX(`qsetid`)
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'imas_firstscores created<br/>';
 
@@ -388,7 +388,7 @@ $sql = 'CREATE TABLE `imas_inlinetext` ('
 	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Inline text items\';';
 $DBH->query($sql);
 echo 'imas_inlinetext created<br/>';
@@ -400,7 +400,7 @@ $sql = 'CREATE TABLE `imas_instr_files` ('
         . ' `itemid` INT(10) UNSIGNED NOT NULL,'
         . ' INDEX (`itemid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Inline text file attachments\';';
 $DBH->query($sql);
 echo 'imas_instr_files created<br/>';
@@ -421,7 +421,7 @@ $sql = 'CREATE TABLE `imas_linkedtext` ('
 	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Linked Text Items\';';
 $DBH->query($sql);
 echo 'imas_linkedtext created<br/>';
@@ -438,7 +438,7 @@ $sql = 'CREATE TABLE `imas_exceptions` ('
 	. ' `exceptionpenalty` TINYINT(1) UNSIGNED NULL DEFAULT NULL, '
         . ' INDEX (`userid`), INDEX(`assessmentid`), INDEX(`itemtype`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Per student exceptions to assessment start/end date\';';
 $DBH->query($sql);
 echo 'imas_exceptions created<br/>';
@@ -456,7 +456,7 @@ $sql = 'CREATE TABLE `imas_libraries` ('
 	. ' `groupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
         . ' INDEX (`ownerid`), INDEX(`userights`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'QuestionSet Libraries\';';
 $DBH->query($sql);
 echo 'imas_libraries created<br/>';
@@ -469,7 +469,7 @@ $sql = 'CREATE TABLE `imas_library_items` ('
 	. ' `junkflag` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`libid`), INDEX(`qsetid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Library assignments\';';
 $DBH->query($sql);
 echo 'imas_library_items created<br/>';
@@ -504,7 +504,7 @@ $sql = 'CREATE TABLE `imas_forums` ('
         . ' INDEX (`courseid`), INDEX(`points`), INDEX(`grpaid`), '
 	. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`replyby`), INDEX(`postby`) '
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Forums\';';
 $DBH->query($sql);
 echo 'imas_forums created<br/>';
@@ -517,7 +517,7 @@ $sql = 'CREATE TABLE `imas_forum_threads` ('
 	. '`lastpostuser` INT(10) UNSIGNED NOT NULL, '
 	. '`views` INT(10) UNSIGNED NOT NULL, '
 	. ' PRIMARY KEY (`id`), INDEX (`forumid`), INDEX(`lastposttime`), INDEX(`stugroupid`) ) '
-	. ' ENGINE = InnoDB '
+	. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC  '
 	. ' COMMENT = \'Forum threads\'';
 $DBH->query($sql);
 echo 'imas_forum_threads created<br/>';
@@ -539,7 +539,7 @@ $sql = 'CREATE TABLE `imas_forum_posts` ('
 	. ' `replyby` INT(10) UNSIGNED NULL,'
 	. ' INDEX (`forumid`), INDEX(`threadid`), INDEX(`userid`), INDEX(`postdate`), INDEX(`tag`) '
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Forum Postings\';';
 $DBH->query($sql);
 echo 'imas_forum_posts created<br/>';
@@ -552,7 +552,7 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
 	. ' `tagged` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`userid`), INDEX(`threadid`), INDEX(`lastview`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Forum last viewings\';';
 $DBH->query($sql);
 echo 'imas_forum_views created<br/>';
@@ -564,7 +564,7 @@ $sql = 'CREATE TABLE `imas_forum_likes` (
 	`postid` INT(10) UNSIGNED NOT NULL,
 	`type` TINYINT(1) UNSIGNED NOT NULL,
 	INDEX (`userid`), INDEX(`threadid`), INDEX(`postid`)
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'imas_forum_likes created<br/>';
 
@@ -582,7 +582,7 @@ $sql = 'CREATE TABLE `imas_wikis` ('
         . ' INDEX (`courseid`), '
 	. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`editbydate`) '
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Wikis\';';
 $DBH->query($sql);
 echo 'imas_wikis created<br/>';
@@ -596,7 +596,7 @@ $sql = 'CREATE TABLE `imas_wiki_revisions` ('
 	. ' `revision` TEXT NOT NULL, '
         . ' INDEX (`wikiid`), INDEX(`stugroupid`), INDEX(`time`) '
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Wiki revisions\';';
 $DBH->query($sql);
 echo 'imas_wiki_revisions created<br/>';
@@ -609,7 +609,7 @@ $sql = 'CREATE TABLE `imas_wiki_views` ('
         . ' `stugroupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	 . ' INDEX (`userid`), INDEX(`wikiid`), INDEX(`stugroupid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Wiki last viewings\';';
 $DBH->query($sql);
 echo 'imas_wiki_views created<br/>';
@@ -620,7 +620,7 @@ $sql = 'CREATE TABLE `imas_groups` ('
         . ' `name` VARCHAR(255) NOT NULL,'
         . ' `parent` INT(10) UNSIGNED NOT NULL DEFAULT \'0\''
         . ' )'
-        . ' ENGINE = InnoDB;';
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_groups created<br/>';
 
@@ -633,7 +633,7 @@ $sql = 'CREATE TABLE `imas_rubrics` ('
 	. ' `rubric` TEXT NOT NULL, '
 	. ' INDEX(`ownerid`), INDEX(`groupid`)'
 	. ' )'
-	. ' ENGINE = InnoDB'
+	. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
 	. ' COMMENT = \'Rubrics\';';
 $DBH->query($sql);
 echo 'imas_rubrics created<br/>';
@@ -658,7 +658,7 @@ $sql = 'CREATE TABLE `imas_diags` ('
 	. ' `reentrytime` SMALLINT(5) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`ownerid`), INDEX(`public`), INDEX(`cid`)'
         . ' )'
-        . ' ENGINE = InnoDB;';
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_diags created<br/>';
 
@@ -670,7 +670,7 @@ $sql = 'CREATE TABLE `imas_diag_onetime` ('
 	. ' `goodfor` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`diag`), INDEX(`time`), INDEX(`code`)'
         . ' )'
-        . ' ENGINE = InnoDB;';
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_diag_onetime created<br/>';
 
@@ -688,7 +688,7 @@ $sql = 'CREATE TABLE `imas_msgs` ('
         . ' `baseid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' INDEX (`msgto`), INDEX (`isread`), INDEX(`msgfrom`), INDEX(`baseid`), INDEX(`courseid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Internal messages\';';
 $DBH->query($sql);
 echo 'imas_msgs created<br/>';
@@ -699,7 +699,7 @@ $sql = 'CREATE TABLE `imas_forum_subscriptions` ('
         . ' `userid` INT(10) UNSIGNED NOT NULL,'
         . ' INDEX (`forumid`), INDEX(`userid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Forum subscriptions\';';
 $DBH->query($sql);
 echo 'imas_forum_subscriptions created<br/>';
@@ -717,7 +717,7 @@ $sql = 'CREATE TABLE `imas_gbscheme` ('
 	. ' `colorize` VARCHAR(20) NOT NULL, '
 	. ' INDEX(`courseid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Gradebook scheme\';';
 $DBH->query($sql);
 echo 'imas_gbscheme created<br/>';
@@ -735,7 +735,7 @@ $sql = 'CREATE TABLE `imas_gbitems` ('
 	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`showdate`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Gradebook offline items\';';
 $DBH->query($sql);
 echo 'imas_gbitems created<br/>';
@@ -750,7 +750,7 @@ $sql = 'CREATE TABLE `imas_grades` ('
 	. ' `feedback` TEXT NOT NULL, '
         . ' INDEX (`userid`), INDEX (`gradetype`), INDEX(`gradetypeid`), INDEX(`refid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Offline grades\';';
 $DBH->query($sql);
 echo 'imas_grades created<br/>';
@@ -768,7 +768,7 @@ $sql = 'CREATE TABLE `imas_gbcats` ('
 	. ' `hidden` TINYINT(1) NOT NULL DEFAULT \'0\', '
         . ' INDEX (`courseid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Gradebook Categories\';';
 $DBH->query($sql);
 echo 'imas_gbcats created<br/>';
@@ -781,7 +781,7 @@ $sql = 'CREATE TABLE `imas_calitems` ('
         . ' `tag` VARCHAR(254) NOT NULL,'
         . ' INDEX (`courseid`), INDEX(`date`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Calendar Items\';';
 $DBH->query($sql);
 echo 'imas_calitems created<br/>';
@@ -793,7 +793,7 @@ $sql = 'CREATE TABLE `imas_stugroupset` ('
 	. ' `delempty` TINYINT(1) NOT NULL DEFAULT \'1\', '
         . ' INDEX (`courseid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Student Group Sets\';';
 $DBH->query($sql);
 echo 'imas_stugroupset created<br/>';
@@ -804,7 +804,7 @@ $sql = 'CREATE TABLE `imas_stugroups` ('
         . ' `name` VARCHAR(254) NOT NULL, '
         . ' INDEX (`groupsetid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Student Groups\';';
 $DBH->query($sql);
 echo 'imas_stugroups created<br/>';
@@ -815,7 +815,7 @@ $sql = 'CREATE TABLE `imas_stugroupmembers` ('
         . ' `userid` INT(10) UNSIGNED NOT NULL, '
         . ' INDEX (`stugroupid`), INDEX (`userid`)'
         . ' )'
-        . ' ENGINE = InnoDB'
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC '
         . ' COMMENT = \'Student Group Members\';';
 $DBH->query($sql);
 echo 'imas_stugroupmembers created<br/>';
@@ -826,7 +826,7 @@ $sql = 'CREATE TABLE `imas_outcomes` (
 	`name` VARCHAR(255) NOT NULL,
 	`ancestors` TEXT NOT NULL,
 	INDEX ( `courseid`)
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'imas_outcomes created<br/>';
 
@@ -837,7 +837,7 @@ $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' `userid` INT(10) NOT NULL, '
         . ' INDEX ( `ltiuserid`) '
         . ' )'
-        . ' ENGINE = InnoDB;';
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_ltiusers created<br/>';
 
@@ -846,7 +846,7 @@ $sql = 'CREATE TABLE `imas_ltinonces` ('
         . ' `nonce` TEXT NOT NULL, '
         . ' `time` INT(10) UNSIGNED NOT NULL'
         . ' )'
-        . ' ENGINE = InnoDB;';
+        . ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_ltinonces created<br/>';
 
@@ -856,7 +856,7 @@ $sql = 'CREATE TABLE `imas_lti_courses` (
 	`contextid` VARCHAR( 255 ) NOT NULL ,
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`org`,`contextid`)
-	) ENGINE = InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_lti_courses created<br/>';
 
@@ -868,7 +868,7 @@ $sql = 'CREATE TABLE `imas_lti_placements` (
 	`typeid` INT( 10 ) UNSIGNED NOT NULL ,
 	`placementtype` VARCHAR( 10 ) NOT NULL ,
 	 INDEX(`org`, `contextid`, `linkid`)
-	) ENGINE = InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_lti_placements created<br/>';
 
@@ -881,7 +881,7 @@ $sql = 'CREATE TABLE `mc_sessions` ('
         . ' `mathdisp` TINYINT( 1 ) NOT NULL ,'
         . ' `graphdisp` TINYINT( 1 ) NOT NULL,'
         . ' INDEX ( `sessionid` ), INDEX( `room` ), INDEX( `lastping` )'
-        . ' ) ENGINE = InnoDB;';
+        . ' ) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'mc_sessions created<br/>';
 
@@ -891,7 +891,7 @@ $sql = 'CREATE TABLE `mc_msgs` ('
         . ' `msg` TEXT NOT NULL ,'
         . ' `time` INT( 10 ) UNSIGNED NOT NULL ,'
         . ' INDEX ( `userid` ), INDEX ( `time` )'
-        . ' ) ENGINE = InnoDB;';
+        . ' ) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'mc_msgs created<br/>';
 
@@ -912,7 +912,7 @@ $sql = 'CREATE TABLE `imas_drillassess` (
 	`classbests` TEXT NOT NULL ,
 	`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
 	INDEX ( `courseid` ), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)
-	) ENGINE = InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_drillassess created<br/>';
 
@@ -926,7 +926,7 @@ $sql = 'CREATE TABLE `imas_drillassess_sessions` (
 	`starttime` INT( 10 ) UNSIGNED NOT NULL ,
 	`scorerec` TEXT NOT NULL ,
 	INDEX ( `drillassessid`), INDEX(`userid` )
-	) ENGINE = InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_drillassess_sessions created<br/>';
 
@@ -937,7 +937,7 @@ $sql = 'CREATE TABLE `imas_login_log` (
 	`logintime` INT( 10 ) UNSIGNED NOT NULL ,
 	`lastaction` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`userid` ), INDEX(`courseid`)
-	) ENGINE = InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_login_log created<br/>';
 
@@ -945,7 +945,7 @@ $sql = 'CREATE TABLE `imas_log` (
 	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 	`time` INT( 10 ) UNSIGNED NOT NULL ,
 	`log` TEXT NOT NULL
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'imas_log created<br/>';
 
@@ -960,7 +960,7 @@ $sql = 'CREATE TABLE `imas_external_tools` (
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 	`groupid` INT( 10 ) UNSIGNED NOT NULL ,
 	INDEX ( `url` ), INDEX( `courseid` ), INDEX( `groupid` )
-	) ENGINE = InnoDB COMMENT = \'LTI external tools\'';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC  COMMENT = \'LTI external tools\'';
 $DBH->query($sql);
 echo 'imas_external_tools created<br/>';
 
@@ -973,7 +973,7 @@ $sql = 'CREATE TABLE `imas_badgesettings` (
 	  `courseid` int(10) unsigned NOT NULL,
 	  `requirements` text NOT NULL,
 	  INDEX(`courseid`)
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_badgesettings created<br/>';
 
@@ -983,7 +983,7 @@ $sql = 'CREATE TABLE `imas_badgerecords` (
 	  `badgeid` int(10) unsigned NOT NULL,
 	  `data` text NOT NULL,
 	  INDEX (`userid`), INDEX(`badgeid`)
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_badgerecords created<br/>';
 
@@ -994,7 +994,7 @@ $sql = 'CREATE TABLE `imas_bookmarks` (
 	`name` VARCHAR( 128 ) NOT NULL ,
 	`value` TEXT NOT NULL ,
 	INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'imas_bookmarks created<br/>';
 
@@ -1008,7 +1008,7 @@ $sql = 'CREATE TABLE `imas_content_track` (
 	`info` VARCHAR(254) NOT NULL,
 	INDEX ( `courseid`) , INDEX( `userid`),
 	INDEX ( `typeid`)
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'imas_content_track created<br/>';
 
@@ -1018,14 +1018,14 @@ $sql = 'CREATE TABLE `imas_livepoll_status` (
 	  `curstate` TINYINT(1) unsigned NOT NULL,
 	  `seed` INT(10) unsigned NOT NULL,
 	  `startt` BIGINT(13) unsigned NOT NULL
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $DBH->query($sql);
 echo 'imas_livepoll_status created<br/>';
 
 $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
 	`ver` INT( 10 ) UNSIGNED NOT NULL
-	) ENGINE = InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest account counter
 $DBH->query($sql);
@@ -1037,7 +1037,7 @@ $sql = 'CREATE TABLE `php_sessions` (
 	`data` TEXT,
 	PRIMARY KEY (`id`),
 	INDEX (`access`)
-	) ENGINE=InnoDB';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 $DBH->query($sql);
 echo 'php_sessions created<br/>';
 

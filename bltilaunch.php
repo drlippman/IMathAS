@@ -280,16 +280,33 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$stm = $DBH->prepare('SELECT password,id FROM imas_users WHERE SID=:sid');
+				$stm = $DBH->prepare('SELECT password,id,mfa FROM imas_users WHERE SID=:sid');
 				$stm->execute(array(':sid'=>$_POST['curSID']));
 				//if (mysql_num_rows($result)==0) {
 				if ($stm->rowCount()==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					list($realpw,$tmpuserid) = $stm->fetch(PDO::FETCH_NUM); //DB mysql_result($result,0,0);
+					list($realpw,$tmpuserid,$mfadata) = $stm->fetch(PDO::FETCH_NUM); //DB mysql_result($result,0,0);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
 					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
-						$userid= $tmpuserid; //DB mysql_result($result,0,1);
+                        if ($mfadata != '') {
+                            $mfadata = json_decode($mfadata, true);
+                            if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
+                                $flexwidth = true;
+                                $nologo = true;
+                                require_once(__DIR__.'/includes/mfa.php');
+                                $formaction = $imasroot."/bltilaunch.php?userinfo=set";
+                                if (!isset($_POST['mfatoken'])) {
+                                    mfa_showLoginEntryForm($formaction, '', false);
+                                    exit;
+                                } else if (mfa_verify($mfadata, $formaction, $tmpuserid, false)) {
+                                    // good to go
+                                } else {
+                                    $infoerr = "MFA verification failed";
+                                }
+                            }
+                        }
+                        $userid= $tmpuserid;
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 						unset($tmpuserid);
@@ -316,6 +333,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
 			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -365,6 +383,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
 			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -745,6 +764,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
 			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -791,6 +811,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
 			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
@@ -1892,15 +1913,32 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$stm = $DBH->prepare("SELECT password,id FROM imas_users WHERE SID=:SID");
+				$stm = $DBH->prepare("SELECT password,id,mfa FROM imas_users WHERE SID=:SID");
 				$stm->execute(array(':SID'=>$_POST['curSID']));
 				if ($stm->rowCount()==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					list($realpw,$queryuserid) = $stm->fetch(PDO::FETCH_NUM);
+					list($realpw,$queryuserid,$mfadata) = $stm->fetch(PDO::FETCH_NUM);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
 					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
-						$userid = $queryuserid;
+                        $userid = $queryuserid;
+                        if ($mfadata != '') {
+                            $mfadata = json_decode($mfadata, true);
+                            if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
+                                $flexwidth = true;
+                                $nologo = true;
+                                require_once(__DIR__.'/includes/mfa.php');
+                                $formaction = $imasroot."/bltilaunch.php?userinfo=set";
+                                if (!isset($_POST['mfatoken'])) {
+                                    mfa_showLoginEntryForm($formaction, '', false);
+                                    exit;
+                                } else if (mfa_verify($mfadata, $formaction, $userid, false)) {
+                                    // good to go
+                                } else {
+                                    $infoerr = "MFA verification failed";
+                                }
+                            }
+                        }
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 					}
@@ -1930,6 +1968,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
 			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -1969,6 +2008,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
 			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -2338,6 +2378,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
 			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -2375,6 +2416,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
 			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;

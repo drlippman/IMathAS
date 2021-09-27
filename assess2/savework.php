@@ -51,7 +51,9 @@ $assess_info->loadQuestionSettings('all', false, false);
 // if have active scored record end it
 if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';
-} else if ($assessInfoOut['has_active_attempt']) {
+} else if ($assess_info->getSetting('submitby') === 'by_assessment' && 
+    $assess_record->hasActiveAttempt()
+) {
   echo '{"error": "active_attempt"}';
 } else {
   $res = $assess_record->saveWork($_POST['work']);

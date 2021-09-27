@@ -27,6 +27,7 @@
             class="secondarybtn"
             id="qprev"
             :aria-label="$t('previous')"
+            :title="$t('previous')"
             v-if = "showNextPrev"
           >
             <icons name="left"/>
@@ -38,6 +39,7 @@
             class="secondarybtn"
             id="qnext"
             :aria-label="$t('next')"
+            :title="$t('next')"
             v-if = "showNextPrev"
           >
             <icons name="right" />

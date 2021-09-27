@@ -71,7 +71,7 @@
 			$lastgroup = $row[0];
 		}
 
-		$grpdata .= Sanitize::encodeStringForDisplay($row[1]) .":  ".  Sanitize::encodeStringForDisplay($row[2]) ."<br/>";
+		$grpdata .= "<span class='pii-last-name'>".Sanitize::encodeStringForDisplay($row[1]) ."</span>:  ".  Sanitize::encodeStringForDisplay($row[2]) ."<br/>";
 		$grpcnt += $row[2];
 	}
 	echo "<b>".Sanitize::encodeStringForDisplay($lastgroup). "</b>: " .Sanitize::onlyInt($grpcnt) ."<br/>";
@@ -90,7 +90,7 @@
 		$stm = $DBH->query("SELECT email FROM imas_users WHERE rights>20");
 		echo "<p>";
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo Sanitize::encodeStringForDisplay($row[0]) . "; ";
+			echo '<span class="pii-email">'.Sanitize::encodeStringForDisplay($row[0]) . "</span>; ";
 		}
 		echo "</p>";
 	}

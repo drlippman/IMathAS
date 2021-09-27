@@ -17,6 +17,14 @@
         :html = "intro"
         key = "-1"
       />
+      <router-link
+          v-if = "qn == -1"
+          :to="'/skip/1'"
+          tag="button"
+      >
+        <icons name="right" alt=""/>
+        {{ $t('question.firstq') }}
+      </router-link>
       <inter-question-text-skiplist
         pos = "before"
         :qn = "qn"
@@ -47,6 +55,7 @@ import SkipQuestionHeader from '@/components/SkipQuestionHeader.vue';
 import InterQuestionTextSkiplist from '@/components/InterQuestionTextSkiplist.vue';
 import Question from '@/components/question/Question.vue';
 import IntroText from '@/components/IntroText.vue';
+import Icons from '@/components/widgets/Icons.vue';
 
 import { store } from '../basicstore';
 
@@ -57,7 +66,8 @@ export default {
     Question,
     InterQuestionTextSkiplist,
     AssessHeader,
-    IntroText
+    IntroText,
+    Icons
   },
   computed: {
     qn () {

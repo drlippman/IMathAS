@@ -215,7 +215,7 @@ $placeinhead .= '</script>';
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeradmin" class="pagetitle"><h1><?php echo $installname ?> Administration</h1></div>
-	<b>Hello <?php echo $username ?></b>
+    <b>Hello <span class="pii-username"><?php echo $username ?></span></b>
 
 <?php //WRITE OUT COURSES BLOCK ?>
 	<h2>Courses</h2>
@@ -257,7 +257,7 @@ $placeinhead .= '</script>';
 				</a>
 				</td>
 				<td class=c><?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></td>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></span></td>
 				<td class=c><a href="forms.php?action=modify&id=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>" class="sl">Settings</a></td>
 				<td class=c><?php echo $page_courseList[$i]['addRemove']; ?></td>
 				<td class=c><?php echo $page_courseList[$i]['transfer']; ?></td>
@@ -391,9 +391,9 @@ $placeinhead .= '</script>';
 		for ($i=0;$i<count($page_userDataId);$i++) {
 			if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></td>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></span></td>
+                <td><span class="pii-username"><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></span></td>
+                <td><span class="pii-email"><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></span></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataType[$i]); ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastAccess[$i]); ?></td>
 				<td class=c><a href="forms.php?action=chgrights&id=<?php echo Sanitize::onlyInt($page_userDataId[$i]); ?>">Change</a></td>

@@ -120,7 +120,7 @@ function chgfilter() {
 }
 </script>
 	<form id="qform" method=post action="allstumsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
-	<p>Filter by student: <select id="filterstu" onchange="chgfilter()">
+	<p>Filter by student: <select id="filterstu" class='pii-full-name' onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
 	if ($filtercid==0) {
@@ -193,9 +193,19 @@ function chgfilter() {
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"" . Sanitize::onlyInt($line['id']) . "\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page" . Sanitize::onlyInt($page) . "&cid=$cid&filterstu=" . Sanitize::encodeStringForDisplay($filterstu) . "&type=msg&msgid=" . Sanitize::onlyInt($line['id']) . "&type=allstu\">";
 		echo $line['title']; // sanitized above
-		echo "</a></td><td>";
-		echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
-		echo "</td><td>" . Sanitize::encodeStringForDisplay($stulist[$line['msgto']]) . "</td>";
+        echo "</a></td><td>";
+        if (isset($stulist[$line['msgfrom']])) {
+            echo '<span class="pii-full-name">';
+            echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
+            echo '</span>';
+        }
+        echo "</td><td>";
+        if (isset($stulist[$line['msgto']])) {
+            echo '<span class="pii-full-name">';
+            Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
+            echo '</span>';
+        }
+        echo "</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
 	}

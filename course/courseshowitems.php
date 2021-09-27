@@ -83,10 +83,8 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 		//$out .= ' onclick="tipshow(this, null, true, event);"';
 		//$out .= ' onmouseover="tipshow(this);" onmouseout="tipout()"';
 	}
-	$out .= '>';
-	if ($faded) {
-		$class = 'class="faded"';
-	}
+    $out .= '>';
+    $class = ($faded ? 'class="faded"' : '');
 	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
 	if ($status>-1) {
 		switch ($status) {
@@ -162,7 +160,7 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name) {
 	$out .= '</div>';
 	return $out;
 }
-function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true, $name) {
+function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats, $name) {
 	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
@@ -261,7 +259,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$enddate = formatdate($items[$i]['enddate']);
 			}
 
-			$bnum = $i+1;
+            $bnum = $i+1;
 			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
 				$availbeh = _('Expanded');
@@ -278,7 +276,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$contentbehavior = 0;
 			}
 
-			if ($items[$i]['colors']=='') {
+			if (empty($items[$i]['colors'])) {
 				$titlebg = '';
 			} else {
 				list($titlebg,$titletxt,$bicolor) = explode(',',$items[$i]['colors']);
@@ -663,6 +661,10 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   continue;
 		   }
 
+           if (!isset($itemshowdata[$items[$i]])) {
+               // missing item?
+               continue;
+           }
 		   $line = $itemshowdata[$items[$i]];
 		   $typeid = Sanitize::onlyInt($line['id']);
 
@@ -748,7 +750,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   $nothidden = true;  $showgreyedout = false;
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
-			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
+                      && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)
+                      && empty($excused['A'. $line['reqscoreaid']])
+               ) {
 			   	   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 			   	   	   $showgreyedout = true;
 			   	   }
@@ -789,7 +793,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   $preReqNote = '';
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0) {
 			   	$preReqNote = '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
-				$preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
+                $preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename'] ?? '').'</span>';
 			   }
 
                $excusedNote = '';

@@ -1162,65 +1162,96 @@ function AMnumfuncPrepVar(qn,str) {
  *   .submitstr: the evaluated answer, formatted for submission
  */
 
-function processNumber(origstr, format) {
-    var err = '';
-    if (format.indexOf('list')!== -1) {
-        var strs = origstr.split(/\s*,\s*/);
-    } else {
-        var strs = [origstr.replace(/,/g,'')];
-    }
-    var str;
-    for (var j=0;j<strs.length;j++) {
-        str = strs[j];
-        if (format.indexOf('units')!=-1) {
-            var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
-            if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
-                err += _('Answer must start with a number. ');
-            }
-            // strip number
-            str = str.replace(/^\s*(-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|-?\s*\d+\.?\d*|-?\s*\.\d+)\s*[\-\*]?\s*/,'');
-            str = str.replace(/\s*\-\s*([a-zA-Z])/g,'*$1');
-            str = str.replace(/\*\*/g,'^');
-            str = str.replace(/\s*(\/|\^|\-)\s*/g,'$1');
-            str = str.replace(/\(\s*(.*?)\s*\)\s*\//, '$1/').replace(/\/\s*\(\s*(.*?)\s*\)/,'/$1');
-            str = str.replace(/\s*[\*\s]\s*/g,'*');
-            // strip word^power since those are valid
-            str = str.replace(/([a-zA-Z]\w*)\^[\-\+]?\d+/g, '$1');
-            if (str.match(/\^/)) {
-                err += _('Invalid exponents. ');
-                str = str.replace(/\^/g,'');
-            }
-            if ((str.match(/\//g) || []).length > 1) {
-                err += _('Only one division symbol allowed in the units. ');
-            }
-            str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
-
-            if (str.length > 0) {
-                var pts = str.split(/\s*\*\s*/);
-                var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
-                for (var i=0; i<pts.length; i++) {
-                    if (!unitsregex.test(pts[i])) {
-                        err += _('Unknown unit ')+'"'+pts[i]+'". ';
-                    }
-                }
-            } else {
-                err += _("Missing units");
-            }
-        } else if (format.indexOf('integer')!=-1) {
-            if (!str.match(/^\s*\-?\d+\s*$/)) {
-                err += _('This is not an integer.');
-            }
+ function processNumber(origstr, format) {
+     var err = '';
+     origstr = origstr.replace(/^\s+|\s+$/g, '');
+     if (format.indexOf('set') !== -1) {
+        if (origstr.charAt(0) !== '{' || origstr.substr(-1) !== '}') {
+            err += _('Invalid set notation');
         } else {
-            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
-                err += _('This is not a decimal or integer value.');
-            }
+            origstr = origstr.slice(1, -1);
         }
-    }
-    return {
-        err: err,
-        dispvalstr: origstr
-    };
-}
+     }
+     if (format.indexOf('list')!== -1 || format.indexOf('set') !== -1) {
+         var strs = origstr.split(/\s*,\s*/);
+     } else {
+         var strs = [origstr.replace(/,/g,'')];
+     }
+     var str;
+     for (var j=0;j<strs.length;j++) {
+         str = strs[j];
+         if (format.indexOf('units')!=-1) {
+             var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
+             if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
+                 err += _('Answer must start with a number. ');
+             }
+             // disallow (sq|cu|square|cubic|squared|cubed)^power
+             if (str.match(/\b(sq|square|cu|cubic|squared|cubed)\s*\^\s*[\-\+]?\s*\d+/)) {
+               err += _('Invalid base for exponent. ');
+               str = str.replace(/\^/,'');
+             }
+             // disallow (sq|square|cu|cubic)per
+             if (str.match(/\b(sq|square|cu|cubic)\s+per\b/)) {
+               err += _('Missing unit before "per". ');
+               str = str.replace(/per\b/,'');
+             }
+             // disallow per(squared|cubed)
+             if (str.match(/\bper\s+(squared|cubed)/)) {
+               err += _('Missing unit after "per". ');
+               str = str.replace(/\bper/,'');
+             }
+             // strip unit^number (squared|cubed)
+             str = str.replace(/([a-zA-Z]\w*\s*)(\^\s*[\-\+]?\s*\d+\s*)(?:squared|cubed)\b/g, '$1');
+             // strip (sq|cu|square|cubic) unit and unit (squared|cubed) since those are valid
+             str = str.replace(/(?:sq|square|cu|cubic)\s+([a-zA-Z]\w*)/g,'$1');
+             str = str.replace(/([a-zA-Z]\w*)\s+(?:squared|cubed)/g,'$1');
+             // "this per that" => this/that
+             str = str.replace(/\sper\s/g,'/');
+             // strip number
+             str = str.replace(/^\s*(-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|-?\s*\d+\.?\d*|-?\s*\.\d+)\s*[\-\*]?\s*/,'');
+             str = str.replace(/\s*\-\s*([a-zA-Z])/g,'*$1');
+             str = str.replace(/\*\*/g,'^');
+             str = str.replace(/\s*(\/|\^|\-)\s*/g,'$1');
+             str = str.replace(/\(\s*(.*?)\s*\)\s*\//, '$1/').replace(/\/\s*\(\s*(.*?)\s*\)/,'/$1');
+             str = str.replace(/\s*[\*\s]\s*/g,'*');
+             // strip word^power since those are valid
+             str = str.replace(/([a-zA-Z]\w*)\^[\-\+]?\d+/g, '$1');
+             if (str.match(/\^/)) {
+                 err += _('Invalid exponents. ');
+                 str = str.replace(/\^/g,'');
+             }
+             if ((str.match(/\//g) || []).length > 1) {
+                 err += _('Only one division symbol allowed in the units. ');
+             }
+             
+             str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
+
+             if (str.length > 0) {
+                 var pts = str.split(/\s*\*\s*/);
+                 var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
+                 for (var i=0; i<pts.length; i++) {
+                     if (!unitsregex.test(pts[i])) {
+                         err += _('Unknown unit ')+'"'+pts[i]+'". ';
+                     }
+                 }
+             } else {
+                 err += _("Missing units");
+             }
+         } else if (format.indexOf('integer')!=-1) {
+             if (!str.match(/^\s*\-?\d+\s*$/)) {
+                 err += _('This is not an integer.');
+             }
+         } else {
+             if (!str.match(/^\s*(\+|\-)?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
+                 err += _('This is not a decimal or integer value.');
+             }
+         }
+     }
+     return {
+         err: err,
+         dispvalstr: origstr
+     };
+ }
 
 function processCalculated(fullstr, format) {
   fullstr = fullstr.replace(/=/,'');
@@ -1356,8 +1387,9 @@ function processCalcNtuple(fullstr, format) {
   var notationok = true;
   var res = NaN;
   var dec;
+  // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
   fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
-  fullstr = fullstr.replace(/<<(.*)>>/, '<$1>');
+  fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
   }
@@ -1371,7 +1403,9 @@ function processCalcNtuple(fullstr, format) {
           !fullstr.substring(0,i).match(/[\)\]\>\}]\s*$/)
         ) {
           notationok=false;
-        }
+        } 
+      } else if (i > 0 && fullstr.charAt(i-1) != ',') {
+        notationok=false;
       }
     }
     if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
@@ -1564,65 +1598,75 @@ function processNumfunc(qn, fullstr, format) {
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
-  var totesteqn = strprocess[0];
-  totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
-  var remapVars = strprocess[2].split('|');
-
-  if (fullstr.match(/(<=|>=|<|>)/)) {
-    if (!isineq) {
-      if (iseqn) {
-        err += _("syntax error: you gave an inequality, not an equation");
-      } else {
-        err += _("syntax error: you gave an inequality, not an expression");
-      }
-    } else if (fullstr.match(/(<=|>=|<|>)/g).length>1) {
-      err += _("syntax error: your inequality should only contain one inequality symbol");
-    }
-    totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
-  } else if (fullstr.match(/=/)) {
-    if (isineq) {
-      err += _("syntax error: you gave an equation, not an inequality");
-    } else if (!iseqn) {
-      err += _("syntax error: you gave an equation, not an expression");
-    } else if (fullstr.match(/=/g).length>1) {
-      err += _("syntax error: your equation should only contain one equal sign");
-    }
-    totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
-  } else if (iseqn) {
-    err += _("syntax error: this is not an equation");
-  } else if (isineq) {
-    err += _("syntax error: this is not an inequality");
+  var totesteqn;
+  var totestarr;
+  if (format.match(/list/)) {
+      totestarr = strprocess[0].split(/,/);
+  } else {
+      totestarr = [strprocess[0]];
   }
-
-  if (fvars.length > 0) {
-	  reg = new RegExp("("+fvars.join('|')+")\\(","g");
-	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
-  }
-
-  totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-
   var i,j,totest,testval,res;
   var successfulEvals = 0;
-  for (j=0; j < 20; j++) {
-    totest = 'var DNE=1;';
-    for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-      if (domain[i][2]) { //integers
-        testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-      } else { //any real between min and max
-        testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-      }
-      totest += 'var ' + remapVars[i] + '=' + testval + ';';
+  for (var tti=0; tti < totestarr.length; tti++) {
+    totesteqn = totestarr[tti];
+    totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
+    var remapVars = strprocess[2].split('|');
+
+    if (totesteqn.match(/(<=|>=|<|>)/)) {
+        if (!isineq) {
+            if (iseqn) {
+                err += _("syntax error: you gave an inequality, not an equation") + '. ';
+            } else {
+                err += _("syntax error: you gave an inequality, not an expression")+ '. ';
+            }
+        } else if (totesteqn.match(/(<=|>=|<|>)/g).length>1) {
+            err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
+        }
+        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+    } else if (totesteqn.match(/=/)) {
+        if (isineq) {
+            err += _("syntax error: you gave an equation, not an inequality")+ '. ';
+        } else if (!iseqn) {
+            err += _("syntax error: you gave an equation, not an expression")+ '. ';
+        } else if (totesteqn.match(/=/g).length>1) {
+            err += _("syntax error: your equation should only contain one equal sign")+ '. ';
+        }
+        totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
+    } else if (iseqn) {
+        err += _("syntax error: this is not an equation")+ '. ';
+    } else if (isineq) {
+        err += _("syntax error: this is not an inequality")+ '. ';
     }
-    res = scopedeval(totest + totesteqn);
-    if (res !== 'synerr') {
-      successfulEvals++;
-      break;
+
+    if (fvars.length > 0) {
+        reg = new RegExp("("+fvars.join('|')+")\\(","g");
+        totesteqn = totesteqn.replace(reg,"$1*sin($1+");
     }
+
+    totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+
+    successfulEvals = 0;
+    for (j=0; j < 20; j++) {
+        totest = 'var DNE=1;';
+        for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+        if (domain[i][2]) { //integers
+            testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+        } else { //any real between min and max
+            testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
+        }
+        totest += 'var ' + remapVars[i] + '=' + testval + ';';
+        }
+        res = scopedeval(totest + totesteqn);
+        if (res !== 'synerr') {
+        successfulEvals++;
+        break;
+        }
+    }
+    if (successfulEvals === 0) {
+        err += _("syntax error") + '. ';
+    }
+    err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   }
-  if (successfulEvals === 0) {
-    err += _("syntax error") + '. ';
-  }
-  err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
@@ -1893,7 +1937,9 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(repvars\\d+|degree|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
+          var reglist = 'degree|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
+          reglist.sort(function(x,y) { return y.length - x.length});
+	  	  reg = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
 	  	  }

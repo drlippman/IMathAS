@@ -83,9 +83,9 @@ if ($overwriteBody==1) {
         foreach ($teacher_actions as $action) {
             echo '<tr>';
             echo '<td>' . formatdate($action['created_at']) . '</td>';
-            echo "<td>";
+            echo "<td><span class='pii-full-name'>";
 						echo Sanitize::encodeStringForDisplay($teacherNames[$action['userid']]);
-						echo " (" . Sanitize::onlyInt($action['userid']) . ')</td>';
+						echo " (" . Sanitize::onlyInt($action['userid']) . ')</span></td>';
             echo '<td>' . Sanitize::encodeStringForDisplay($action['action']) . '</td>';
             echo '<td>' . Sanitize::onlyInt($action['itemid']) . '</td>';
             echo '<td><a href="javascript:alert(\'' . Sanitize::encodeStringForDisplay($action['metadata']) . '\')">Details</a></td>';

@@ -9,6 +9,7 @@
   "next": "Next",
   "previous": "Previous",
   "question_n": "Question {n}",
+  "extracredit": "Extra Credit",
   "jumptocontent": "Skip Navigation",
   "launch": {
     "continue_assess": "Resume",
@@ -125,7 +126,9 @@
     "jump_warn": "This will use up your remaining tries at this version of the question.",
     "showwork": "Show work here by typing it or attaching a file or picture",
     "uploadwork": "Show work here by attaching a file or picture",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "intronext": "To begin, navigate to a question using the selector or > Next button above.",
+    "firstq": "First Question"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
@@ -258,7 +261,8 @@
     "gbscore": "Recorded score",
     "bestpractice": "Best practice score",
     "lastscore": "Score on last try",
-    "license": "License"
+    "license": "License",
+    "extracredit": "This question is extra credit"
   },
   "timer": {
     "hrs": "hr | hrs",
@@ -406,7 +410,8 @@
     "filters": "Filters and Options",
     "hide": "Hide",
     "hide_perfect": "Score = 100% (before penalties)",
-    "hide_nonzero": "0 < score < 100%",
+    "hide_100": "Score = 100% (after penalties)",
+    "hide_nonzero": "0 < score < 100% (before penalties)",
     "hide_zero": "Score = 0",
     "hide_fb": "Questions with Feedback",
     "hide_nowork": "Questions without Work",

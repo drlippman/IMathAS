@@ -30,7 +30,7 @@ if ($sig != md5($id.$_SESSION['secsalt'])) {
 }
 
 require("displayq2.php");
-$txt = displayq(0,$id,0,false,false,0,2+$t);
+$txt = displayq(0,$id,100000,false,false,0,2+$t);
 echo filter($txt);
 require("../footer.php");
 

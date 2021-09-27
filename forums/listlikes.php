@@ -31,7 +31,8 @@ if ($stm->rowCount()==0) {
 } else {
 	echo '<ul class="nomark">';
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		printf('<li>%s, %s</li>', Sanitize::encodeStringForDisplay($row['LastName']),
+		printf('<li><span class="pii-full-name">%s, %s</span></li>',
+			Sanitize::encodeStringForDisplay($row['LastName']),
 			Sanitize::encodeStringForDisplay($row['FirstName']));
 	}
 	echo '</ul>';

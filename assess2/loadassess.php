@@ -85,8 +85,8 @@ if ($assessInfoOut['displaymethod'] === 'livepoll') {
 // indicate if teacher or tutor user
 $assessInfoOut['can_view_all'] = $canViewAll;
 $assessInfoOut['is_teacher'] = $isteacher;
-if ($istutor && $assess_info->getSetting('tutoredit') < 2) {
-    // tutor can edit
+if ($istutor && $assess_info->getSetting('tutoredit') != 2) {
+    // tutor can view
     $assessInfoOut['tutor_gblinks'] = [
         $basesiteurl . '/course/isolateassessgrade.php?cid=' . $cid . '&aid=' . $aid,
         $basesiteurl . '/course/gb-itemanalysis2.php?cid=' . $cid . '&aid=' . $aid
@@ -104,7 +104,8 @@ if ($canViewAll && $userid !== $uid) {
     echo '{"error": "invalid_uid"}';
     exit;
   }
-  $assessInfoOut['stu_fullname'] = $row['LastName'] . ', ' . $row['FirstName'];
+  $userfullname = $row['LastName'] . ', ' . $row['FirstName'];
+  $assessInfoOut['stu_fullname'] = $userfullname;
 }
 
 // set userid

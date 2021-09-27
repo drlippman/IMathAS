@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
-$from = $_GET['from'];
+$from = $_GET['from'] ?? '';
 
 /*
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
@@ -121,7 +121,7 @@ if (count($lastpost)>0) {
     echo '<tr>';
     echo '<td><input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'"/></td>';
     echo "<td><a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
-    printf("<td>%s</td>", Sanitize::encodeStringForDisplay($name));
+    printf("<td><span class='pii-full-name'>%s</span></td>", Sanitize::encodeStringForDisplay($name));
     echo "<td><a href=\"thread.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
     echo "<td>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</td></tr>";
   }

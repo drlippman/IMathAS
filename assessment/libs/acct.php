@@ -739,13 +739,13 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 	for ($i=0;$i<count($rows[0]);$i++) {
 		$out .= '<tr>';  $sa .= '<tr>';
 		for ($j=0;$j<count($rows);$j++) {
-			if ($rows[$j][$i]{0}==' ') { $rows[$j][$i] = '&nbsp;'.$rows[$j][$i];}
+			if ($rows[$j][$i][0]==' ') { $rows[$j][$i] = '&nbsp;'.$rows[$j][$i];}
 			$out .= '<td>'.$rows[$j][$i].'</td>';
 			$sa .= '<td>'.$rows[$j][$i].'</td>';
 		}
 		for ($j=0;$j<count($ansarray);$j++) {
-			$out .= '<td class="r">'.($ansarray[$j][$i]{0}=='$'?'$':'').'[AB'.$sn.']</td>';
-			$sa .= '<td class="r">'.($ansarray[$j][$i]{0}=='$'?'$':'');
+			$out .= '<td class="r">'.($ansarray[$j][$i][0]=='$'?'$':'').'[AB'.$sn.']</td>';
+			$sa .= '<td class="r">'.($ansarray[$j][$i][0]=='$'?'$':'');
 			$ansarray[$j][$i] = str_replace(array('$',','),'',$ansarray[$j][$i]) * 1;
 			$answer[$sn] = $ansarray[$j][$i];
 			if ($hasdecimals) {
@@ -869,7 +869,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
                 $dec = ''; 
 			}
 			if ($coltypes[$j]==false) {//fixed
-				if ($cols[$j][$i]{0}==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
+				if ($cols[$j][$i][0]==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
                 if ($cols[$j][$i] == '') { $cols[$j][$i] = '&nbsp;'; }
                 if ($j==0) {
                     $out .= "<th$dec scope=row>".$beforetxt.$cols[$j][$i].$aftertxt.'</th>';
@@ -891,8 +891,8 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 
 				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec $class>$beforetxt $f $aftertxt</td>"; $sa.= "<td$dec $class>$beforetxt $f $aftertxt</td>"; continue;}
 
-				$out .= '<td'.$dec.' class="r">'.$beforetxt.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']'.$aftertxt.'</td>';
-				$sa .= '<td'.$dec.' class="r">'.$beforetxt.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'');
+				$out .= '<td'.$dec.' class="r">'.$beforetxt.(($cols[$j][$i][0]=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']'.$aftertxt.'</td>';
+				$sa .= '<td'.$dec.' class="r">'.$beforetxt.(($cols[$j][$i][0]=='$'||$coltypes[$j]===2)?'$':'');
 
 				$cols[$j][$i] = str_replace('$','',$cols[$j][$i]);
 				$answer[$sn] = $cols[$j][$i];
@@ -1052,7 +1052,7 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 				$dec = '';
 			}
 			if ($coltypes[$j]==false) {//fixed
-				if ($cols[$j][$i]{0}==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
+				if ($cols[$j][$i][0]==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
 				if ($cols[$j][$i] == '') { $cols[$j][$i] = '&nbsp;'; }
 				if ($j==0) {
                     $out .= "<th$dec scope=row>".$beforetxt.$cols[$j][$i].$aftertxt.'</th>';
@@ -1083,8 +1083,8 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 				if ($cols[$j][$i]==='nobox') {$out .= "<td$dec></td>"; $sa.= "<td$dec></td>"; continue;}
 				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec $class>$beforetxt $f $aftertxt</td>"; $sa.= "<td$dec $class>$beforetxt $f $aftertxt</td>"; continue;}
 
-				$out .= '<td'.$dec.' '.$class.'>'.$beforetxt.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']'.$aftertxt.'</td>';
-				$sa .= '<td'.$dec.' '.$class.'>'.$beforetxt.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'');
+				$out .= '<td'.$dec.' '.$class.'>'.$beforetxt.(($cols[$j][$i][0]=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']'.$aftertxt.'</td>';
+				$sa .= '<td'.$dec.' '.$class.'>'.$beforetxt.(($cols[$j][$i][0]=='$'||$coltypes[$j]===2)?'$':'');
 
 				$answer[$sn] = $cols[$j][$i];
 				if ($cols[$j][$i]!=='') {

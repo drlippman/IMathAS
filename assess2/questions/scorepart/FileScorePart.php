@@ -36,9 +36,10 @@ class FileScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
-        if (isset($options['answer'])) {if ($multi) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        $optionkeys = ['answer', 'answerformat', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -63,9 +64,12 @@ class FileScorePart implements ScorePart
                     }*/
                 }
                 $hasfile = true;
+                if ($scoremethod == 'filesize') {
+                    $filesize = getfilesize('adata', 'adata/'.substr($givenans,6,-1));
+                }
             } else {
                 $scorePartResult->setLastAnswerAsGiven('');
-                if (isset($scoremethod) && $scoremethod=='takeanythingorblank') {
+                if (!empty($scoremethod) && $scoremethod=='takeanythingorblank') {
                     $scorePartResult->setRawScore(1);
                     return $scorePartResult;
                 } else {
@@ -137,6 +141,9 @@ class FileScorePart implements ScorePart
                 }
 
                 $s3object = "adata/$s3asid/$filename";
+                if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+                    $filesize = $_FILES["qn$qn"]['size'];
+                }
                 if (storeuploadedfile("qn$qn",$s3object)) {
                     $scorePartResult->setLastAnswerAsGiven("@FILE:$s3asid/$filename@");
                     $scorePartResult->addScoreMessage(_("Successful"));
@@ -162,7 +169,10 @@ class FileScorePart implements ScorePart
                 return $scorePartResult;
             }
         }
-        if (isset($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
+        if (!empty($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+        } else if ($scoremethod=='filesize' && $filesize == $answer) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else {

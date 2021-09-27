@@ -11,20 +11,24 @@ function updatePointsPossible($aid, $itemorder = null, $defpoints = null) {
 		list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 	}
 	
-	$stm = $DBH->prepare("SELECT id,points FROM imas_questions WHERE assessmentid=? AND points<9999");
+	$stm = $DBH->prepare("SELECT id,points,extracredit FROM imas_questions WHERE assessmentid=? AND (points < 9999 OR extracredit > 0)");
 	$stm->execute(array($aid));
 	$questionpointdata = array();
+    $questionecdata = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$questionpointdata[$row['id']] = $row['points'];
+        if ($row['points'] < 9999) {
+		    $questionpointdata[$row['id']] = $row['points'];
+        }
+        $questionecdata[$row['id']] = $row['extracredit'];
 	}
-	$poss = calcPointsPossible($itemorder, $questionpointdata, $defpoints);
+	$poss = calcPointsPossible($itemorder, $questionpointdata, $questionecdata, $defpoints);
 	
 	$stm = $DBH->prepare("UPDATE imas_assessments SET ptsposs=? WHERE id=?");
 	$stm->execute(array($poss, $aid));
 	return $poss;
 }
 
-function calcPointsPossible($itemorder, $questionpointdata, $defpoints) {
+function calcPointsPossible($itemorder, $questionpointdata, $questionecdata, $defpoints) {
 	if (is_array($itemorder)) {
 		$aitems = $itemorder;
 	} else {
@@ -36,20 +40,27 @@ function calcPointsPossible($itemorder, $questionpointdata, $defpoints) {
 		if (strpos($v,'~')!==FALSE) {
 			$sub = explode('~',$v);
 			if (strpos($sub[0],'|')===false) { //backwards compat
-				$totalpossible += (isset($questionpointdata[$sub[0]]))?$questionpointdata[$sub[0]]:$defpoints;
+                if (empty($questionecdata[$sub[0]])) {
+				    $totalpossible += (isset($questionpointdata[$sub[0]]))?$questionpointdata[$sub[0]]:$defpoints;
+                }
 			} else {
 				$grpparts = explode('|',$sub[0]);
 				if ($grpparts[0]==count($sub)-1) { //handle diff point values in group if n=count of group
 					for ($i=1;$i<count($sub);$i++) {
-						$totalpossible += (isset($questionpointdata[$sub[$i]]))?$questionpointdata[$sub[$i]]:$defpoints;
+                        if (empty($questionecdata[$sub[$i]])) {
+						    $totalpossible += (isset($questionpointdata[$sub[$i]]))?$questionpointdata[$sub[$i]]:$defpoints;
+                        }
 					}
-				} else {
+				} else if (empty($questionecdata[$sub[1]])) {
 					$totalpossible += $grpparts[0]*((isset($questionpointdata[$sub[1]]))?$questionpointdata[$sub[1]]:$defpoints);
 				}
 			}
 		} else {
-			$totalpossible += (isset($questionpointdata[$v]))?$questionpointdata[$v]:$defpoints;
+            if (empty($questionecdata[$v])) {
+			    $totalpossible += (isset($questionpointdata[$v]))?$questionpointdata[$v]:$defpoints;
+            }
 		}
 	}	
+
 	return $totalpossible;
 }

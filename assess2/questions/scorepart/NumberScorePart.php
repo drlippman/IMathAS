@@ -32,18 +32,18 @@ class NumberScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$partnum];} else {$reqsigfigs = $options['reqsigfigs'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-        if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
-        if (!isset($answerformat)) { $answerformat = '';}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'reqdecimals',
+            'reqsigfigs', 'answerformat', 'requiretimes', 'requiretimeslistpart', 
+            'ansprompt'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $optionkeys = ['partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
+        }
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
+
         $ansformats = array_map('trim',explode(',',$answerformat));
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         
@@ -55,7 +55,7 @@ class NumberScorePart implements ScorePart
         $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt ?? '');
         }
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
@@ -66,7 +66,7 @@ class NumberScorePart implements ScorePart
         }
 
 
-        if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
+        if (!empty($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
@@ -76,7 +76,7 @@ class NumberScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        if (isset($partialcredit)) {
+        if (!empty($partialcredit)) {
             if (!is_array($partialcredit)) {
                 $partialcredit = array_map('trim',explode(',',$partialcredit));
             }
@@ -88,7 +88,7 @@ class NumberScorePart implements ScorePart
         }
 
         $exactreqdec = false;
-        if (isset($reqdecimals)) {
+        if ($reqdecimals !== '') {
             list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
             if ($exactreqdec || count($reqdecscoretype)==2) { // exact or not default
                 if ($reqdecscoretype[0] == 'rel') {
@@ -99,10 +99,7 @@ class NumberScorePart implements ScorePart
             }
         }
 
-
-
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if (isset($reqsigfigs)) {
+        if ($reqsigfigs !== '') {
             list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
         }
 
@@ -189,6 +186,7 @@ class NumberScorePart implements ScorePart
                 $anarr = array($answer);
             }
             $islist = false;
+            $gaarrcnt = 1;
         }
 
         if (in_array('orderedlist',$ansformats)) {
@@ -253,7 +251,7 @@ class NumberScorePart implements ScorePart
                 }
             }
             foreach($gaarr as $j=>$givenans) {
-                if (isset($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
+                if (!empty($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
                     continue;
                 }
                 foreach ($anss as $k=>$anans) {
@@ -291,13 +289,13 @@ class NumberScorePart implements ScorePart
                                         continue;
                                     }
                                 } 
-                                if (isset($reqsigfigs)) {
+                                if ($reqsigfigs !== '') {
                                     if (checkunitssigfigs($gaunitsarr[$j], $anssunits[$k], $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
                                         $correct += 1; $foundloc = $j; break 2;
                                     } else {
                                         continue;
                                     }
-                                } else if (isset($abstolerance)) {
+                                } else if ($abstolerance !== '') {
                                     $adjabstolerance = $abstolerance*$anssunits[$k][3];
                                     if (abs($anans-$givenans) < $adjabstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;}
                                 } else {
@@ -315,13 +313,13 @@ class NumberScorePart implements ScorePart
                                     }
                                     $anans = round($anans, $reqdecimals);
                                 }
-                                if (isset($reqsigfigs)) {
+                                if ($reqsigfigs !== '') {
                                     if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
                                         $correct += 1; $foundloc = $j; break 2;
                                     } else {
                                         continue;
                                     }
-                                } else if (isset($abstolerance)) {
+                                } else if ($abstolerance !== '') {
                                     if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;}
                                 } else {
                                     if ($anans==0) {
@@ -353,7 +351,7 @@ class NumberScorePart implements ScorePart
         }
 
         if ($score<0) { $score = 0; }
-        if ($score==0 && isset($partialcredit) && !$islist && is_numeric($givenans)) {
+        if ($score==0 && !empty($partialcredit) && !$islist && is_numeric($givenans)) {
             foreach ($altanswers as $i=>$anans) {
                 /*  disabled until we can support array $reqsigfigs
 				if (isset($reqsigfigs)) {
@@ -364,7 +362,7 @@ class NumberScorePart implements ScorePart
 					}
 				} else
 				*/
-                if (isset($abstolerance)) {
+                if ($abstolerance !== '') {
                     if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$score = $altweights[$i]; break;}
                 } else {
                     if ($anans==0) {

@@ -30,14 +30,15 @@ class AssessInfo
   * @param mixed $questions   questions to load settings for.
   *                           accepts false for no load, 'all' for all,
   *                           or an array of question IDs.
+  * @param bool $forcecodeload true to force load of question code
   */
-  function __construct($DBH, $aid, $cid, $questions = false) {
+  function __construct($DBH, $aid, $cid, $questions = false, $forcecodeload = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
     $this->cid = $cid;
     $this->loadAssessSettings();
     if ($questions !== false) {
-      $get_code = ($this->assessData['displaymethod'] === 'full');
+      $get_code = ($this->assessData['displaymethod'] === 'full' || $forcecodeload);
       $this->loadQuestionSettings($questions, $get_code);
     }
   }
@@ -310,7 +311,7 @@ class AssessInfo
       }
       foreach ($tolookupAids as $qid=>$aid) {
         // TODO: include enough for link to assessment too
-        $this->questionData[$qid]['category'] = $aidmap[$aid];
+        $this->questionData[$qid]['category'] = $aidmap[$aid] ?? null;
       }
     }
     if (count($tolookupOutcomes) > 0 && $get_cats) {
@@ -323,7 +324,7 @@ class AssessInfo
         $outcomemap[$row['id']] = $row['name'];
       }
       foreach ($tolookupOutcomes as $qid=>$oid) {
-        $this->questionData[$qid]['category'] = $outcomemap[$oid];
+        $this->questionData[$qid]['category'] = $outcomemap[$oid] ?? null;
       }
     }
     if ($get_code && count($qsids) > 0) {
@@ -370,7 +371,7 @@ class AssessInfo
   public function getQuestionSettings($id) {
     $by_q = array('regens_max');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
-      'showans','showans_aftern','points_possible','questionsetid',
+      'showans','showans_aftern','points_possible','extracredit','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
     if (!isset($this->questionData[$id])) {
@@ -576,10 +577,18 @@ class AssessInfo
    * @return void
    */
   public function checkPrereq($uid) {
+    if ($this->assessData['available'] == 'practice') { return; } // don't block in practice mode
     if ($this->assessData['reqscore'] > 0 &&
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
     ) {
+      $stm = $this->DBH->prepare("SELECT id FROM imas_excused WHERE userid=? AND type='A' AND typeid=?");
+      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
+      if ($stm->rowCount() > 0) {
+          // has excusal for prereq - ignore prereq score
+          return;
+      }
+
       $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";
@@ -853,7 +862,7 @@ class AssessInfo
         } else if ($this->assessData['shuffle']&4) {
           //all stu same seed using fixed seed list, pick next in list
           $n = count($this->questionData[$newq]['fixedseeds']);
-          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds) + ($ispractice?1:0)) % $n];
+          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds)) % $n];
         } else {
           $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
           if (count($unused) == 0) {
@@ -1388,6 +1397,40 @@ class AssessInfo
         $this->assessData['intro'] = str_replace($matches[0], $vals[0], $this->assessData['intro']);
       }
   	}
+  }
+
+  /**
+   * Loads new message and forum post counts for LTI users
+   * @return void
+   */
+  public function loadLTIMsgPosts($uid, $canviewall) {
+    global $coursemsgset;
+
+    if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
+      if ($coursemsgset < 4 && $this->assessData['help_features']['message']==true) {
+        $this->assessData['lti_showmsg'] = 1;
+        // get msg count
+        $stm = $this->DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
+            $stm->execute(array(':msgto'=>$uid, ':courseid'=>$this->cid));
+            $this->assessData['lti_msgcnt'] = intval($stm->fetchColumn(0));
+      }
+      if (!empty($this->assessData['help_features']['forum'])) {
+        // get new post count
+        $query = "SELECT COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+        $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
+        $query .= "WHERE imas_forum_threads.forumid=:forumid AND ";
+        $query .= "imas_forum_threads.lastposttime<:now AND ";
+        $query .= "(imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+        $qarr = array(':now'=>time(), ':forumid'=>$this->assessData['help_features']['forum'], ':userid'=>$uid);
+        if (!$canviewall) {
+            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2 )) ";
+            $qarr[':userid2']=$uid;
+        }
+        $stm = $this->DBH->prepare($query);
+        $stm->execute($qarr);
+        $this->assessData['lti_forumcnt'] = intval($stm->fetchColumn(0));
+      }
+    }
   }
 
 }

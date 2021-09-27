@@ -483,7 +483,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=100820\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=090821\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -498,6 +498,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
+    $showworkdef = ($showworkdef & 3);
 	$ln = 1;
 
 	// Format of imas_assessments.intro is a JSON representation like
@@ -541,7 +542,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
 	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
     $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
-    $query .= "iqs.meantimen FROM imas_questions AS iq ";
+    $query .= "iqs.meantimen,iq.extracredit FROM imas_questions AS iq ";
 	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
 	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
@@ -615,7 +616,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			(int)$canedit,
 			(int)Sanitize::onlyInt($line['withdrawn']),
 			(int)$extrefval,
-            $timeout
+            $timeout,
+            (int)Sanitize::onlyInt($line['extracredit'])
         );
 
 	}
@@ -628,7 +630,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$items = explode(",",$itemorder);
 	} else {
 		$items = array();
-	}
+    }
+    $alt = 0;
 	for ($i = 0; $i < count($items); $i++) {
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {
@@ -716,9 +719,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$searchall = $_SESSION['searchall'.$cid];
-			$searchmine = $_SESSION['searchmine'.$cid];
-			$newonly = $_SESSION['searchnewonly'.$cid];
+			$searchall = $_SESSION['searchall'.$cid] ?? 0;
+			$searchmine = $_SESSION['searchmine'.$cid] ?? 0;
+			$newonly = $_SESSION['searchnewonly'.$cid] ?? 0;
 		} else {
 			$search = '';
 			$searchall = 0;
@@ -1080,7 +1083,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			$x=0;
-			$page_assessmentQuestions = array();
+			$page_assessmentQuestions = array('aiddesc' => []);
 			foreach ($_SESSION['aidstolist'.$aid] as $aidq) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
@@ -1108,7 +1111,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 
-				$page_assessmentQuestions['aiddesc'][$x] = $aidnames[$aidq];
+				$page_assessmentQuestions['aiddesc'][] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
@@ -1213,7 +1216,7 @@ if ($overwriteBody==1) {
 		var curaid = <?php echo $aid ?>;
 		var defpoints = <?php echo (int) Sanitize::onlyInt($defpoints); ?>;
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
-		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
+		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs ?? ''); ?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 
@@ -1239,6 +1242,7 @@ if ($overwriteBody==1) {
     if ($aver > 1 && $submitby == 'by_assessment') {
         echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define Auto-Excuse').'</a>';
     }
+    echo '<br><a href="findquestion.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Find Question in Course').'</a>';
     if ($aver > 1) {
         echo '<br><a href="addquestions2.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Try New Add/Remove (Beta)').'</a>';
     }
@@ -1318,7 +1322,8 @@ if ($overwriteBody==1) {
 	<script>
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var lastitemhash = "<?php echo md5($itemorder); ?>";
 		//$(refreshTable);
 		refreshTable();
 	</script>
@@ -1377,7 +1382,7 @@ if ($overwriteBody==1) {
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				echo _("Must provide a search term when searching all libraries");
 			} elseif (isset($search)) {
-				if ($noSearchResults) {
+				if (!empty($noSearchResults)) {
 					echo "<p>",_("No Questions matched search"),"</p>\n";
 				} else {
 ?>

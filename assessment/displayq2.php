@@ -2974,7 +2974,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$settings[3] = 0;
 			if (strpos($settings[4],':')!==false) {
 				$settings[4] = explode(':',$settings[4]);
-				if ($settings[4][0]{0}=='h') {
+				if ($settings[4][0][0]=='h') {
 					$sclinglbl = substr($settings[4][0],1).':0:off';
 				} else {
 					$sclinglbl = $settings[4][0];
@@ -3337,14 +3337,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if ($ans=='') { continue;}
 				$function = array_map('trim',explode(',',$ans));
 				if ($answerformat[0]=='inequality') {
-					if ($function[0]{2}=='=') {
+					if ($function[0][2]=='=') {
 						$type = 10;
 						$c = 3;
 					} else {
 						$type = 10.2;
 						$c = 2;
 					}
-					$dir = $function[0]{1};
+					$dir = $function[0][1];
 					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
 				} else {
 					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
@@ -4525,7 +4525,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if (!is_array($cpts)) {
 						return 0;
 					}
-					if ($cpts[1]{0}=='+') {
+					if ($cpts[1][0]=='+') {
 						$cpts[1] = substr($cpts[1],1);
 					}
 					if ($cpts[1]!='' && $cpts[1][strlen($cpts[1])-1]=='*') {
@@ -6737,11 +6737,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($adjdiff>$defpttol*$reltolerance) {
 						continue;
 					}
-					$adjdiff = abs($anscos[1]-$coss[$i][1]);
-					$adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-					if ($adjdiff>$defpttol*$reltolerance) {
-						continue;
-					}
+					// check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
+                        continue;
+                    }
 					if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
 						continue;
 					}
@@ -6793,20 +6793,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
 				$function = array_map('trim',explode(',',$function));
-				if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+				if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
 					$isxequals = true;
 					$function[0] = substr($function[0],1);
 				} else {
 					$isxequals = false;
 				}
-				if ($function[0]{1}=='=') {
+				if ($function[0][1]=='=') {
 					$type = 10;
 					$c = 2;
 				} else {
 					$type = 10.2;
 					$c = 1;
 				}
-				$dir = $function[0]{0};
+				$dir = $function[0][0];
 				if ($isxequals) {
 					$anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
 				} else {
@@ -7604,7 +7604,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		foreach ($answer as $ans) {
 			if (is_array($ans)) {
-				if ($ans[0]{0}=='!') {
+				if ($ans[0][0]=='!') {
 					$flip = true;
 					$ans[0] = substr($ans[0],1);
 				} else {

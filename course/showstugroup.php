@@ -21,7 +21,8 @@ $stm = $DBH->prepare($query);
 $stm->execute(array(':stugroupid'=>$sgid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[0]==$userid) {$userfound = true;}
-	$out .= sprintf('<li>%s, %s</li>', Sanitize::encodeStringForDisplay($row[1]),
+	$out .= sprintf('<li><span class="pii-full-name">%s, %s</span></li>',
+		Sanitize::encodeStringForDisplay($row[1]),
 		Sanitize::encodeStringForDisplay($row[2]));
 }
 $out .= '</ul>';

@@ -33,12 +33,16 @@ class ChoicesScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        $optionkeys = ['answer', 'noshuffle'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $optionkeys = ['questions', 'partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
+        }
 
-        if (isset($partialcredit)) {
+        if (!empty($partialcredit)) {
             if (!is_array($partialcredit)) {
                 $partialcredit = explode(',',$partialcredit);
             }
@@ -97,7 +101,7 @@ class ChoicesScorePart implements ScorePart
         if (in_array($adjGiven,$anss)) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
-        } else if (isset($partialcredit) && isset($creditweight[$adjGiven])) {
+        } else if (!empty($partialcredit) && !empty($creditweight[$adjGiven])) {
             $scorePartResult->setRawScore($creditweight[$adjGiven]);
             return $scorePartResult;
         } else {

@@ -15,9 +15,21 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$now = time();
+    $now = time();
+    
+    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
+	if ($stm->rowCount()==0) {
+		echo "Invalid ID";
+		exit;
+	}
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible) = $stm->fetch(PDO::FETCH_NUM);
+    if ($istutor && $tutoredit == 2) {  // tutor, no access to view grades
+        echo 'No access';
+        exit;
+    }
 
-	if ($isteacher) {
+	if ($isteacher || ($istutor && ($tutoredit&1) == 1 )) {
 		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
@@ -26,20 +38,21 @@
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
         }
+        if (isset($_POST['submitua'])) {
+			require('../assess2/AssessHelpers.php');
+			AssessHelpers::submitAllUnsumitted($cid, $aid);
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
+        }
+    }
+    if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
             $calledfrom='isolateassess';
             $_POST['checked'] = $_POST['stus'];
             $_POST['assesschk'] = array($aid);
 			include("massexception.php");
         }
-        
-		if (isset($_POST['submitua'])) {
-			require('../assess2/AssessHelpers.php');
-			AssessHelpers::submitAllUnsumitted($cid, $aid);
-			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
-				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
-			exit;
-		}
 	}
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
@@ -69,16 +82,7 @@
 		}
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
-	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-	if ($stm->rowCount()==0) {
-		echo "Invalid ID";
-		exit;
-	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
-
-
-	$placeinhead .= '<script type="text/javascript">
+	$placeinhead = '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
 			return false;
@@ -87,6 +91,13 @@
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+aid+"&uid="+uid, 500, 500);
 			return false;
 		}
+        $(function() {
+            $("a[href*=gbviewassess]").each(function() {
+                var uid = $(this).closest("tr").find("input").val();
+                $(this).attr("data-gtg", uid);
+                $(this).closest("tr").find(".pii-full-name").attr("data-gtu", uid);
+            });
+        });
 		</script>';
 	require("../header.php");
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -149,20 +160,7 @@
 			$aitemcnt[$k] = 1;
 		}
 	}
-	$stm = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
-	$stm->execute(array(':assessmentid'=>$aid));
-	$totalpossible = 0;
-	while ($r = $stm->fetch(PDO::FETCH_NUM)) {
-		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
-			if ($r[0]==9999) {
-				$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
-			} else {
-				$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
-			}
-		}
-	}
-
-
+	
 	echo '<div id="headerisolateassessgrade" class="pagetitle"><h1>';
 	echo "Grades for " . Sanitize::encodeStringForDisplay($name) . "</h1></div>";
 	echo "<p>$totalpossible points possible</p>";
@@ -224,7 +222,9 @@
 			$line['useexception'] = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
 			if ($line['useexception']) {
 				$line['thisenddate'] = $exceptions[$line['userid']][1];
-			}
+			} else {
+                $line['thisenddate'] = $enddate;
+            }
 		} else {
 			$line['thisenddate'] = $enddate;
 		}
@@ -241,7 +241,7 @@
 		}
 	}
 
-	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
+	echo '<form method="post" id="sform" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
 
 	if ($hasUA > 0) {
 		echo '<p>',_('One or more students has unsubmitted assessment attempts.');
@@ -250,13 +250,21 @@
 		echo '</span></p>';
 	}
 
-	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-	echo '<p>',_('With selected:');
-	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
-    echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
-    echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+    echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+    
+    
+    if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {
+        echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
+        echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
+        echo _('With selected:');
+        echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
+        echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+        if ($isteacher || ($istutor && $tutoredit == 3)) {
+            echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+        }
+        echo '</p>';
+    }
 
-	echo '</p>';
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
 	if ($hassection && !$hidesection) {
 		echo '<th>Section</th>';
@@ -295,10 +303,12 @@
 		echo '<td><input type=checkbox name="stus[]" value="'.Sanitize::onlyInt($line['userid']).'"> ';
 		if ($line['locked']>0) {
 			echo '<span style="text-decoration: line-through;">';
-			printf("%s, %s</span>", Sanitize::encodeStringForDisplay($line['LastName']),
+			printf("<span class='pii-full-name'>%s, %s</span></span>",
+				Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		} else {
-			printf("%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),
+			printf("<span class='pii-full-name'>%s, %s</span>",
+				Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		echo '</td>';
@@ -526,7 +536,11 @@
 	} else {
 		$timeavg = '-';
 	}
-	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
+	echo "</a></td><td>$pct</td><td></td>";
+    if ($includeduedate) {
+        echo '<td></td>';
+    }
+    echo "<td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
 		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";

@@ -73,8 +73,8 @@ function vecdiff($a,$b) {
 }
 
 //vecprod(a,c)
-//returns sum c*a
-//a arrays, c scalar
+//returns product c*a
+//a array, c scalar
 function vecprod($a,$c) {
 	for ($i=0;$i<count($a);$i++) {
 		$prod[$i] = $c*$a[$i];

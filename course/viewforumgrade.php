@@ -98,7 +98,7 @@
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$possiblepoints = $row[3];
 	$tutoredit = $row[4];
-	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
 	$showlink = ($caneditscore || time()<$row[5]);
 
 	$pagetitle = "View Forum Grade";

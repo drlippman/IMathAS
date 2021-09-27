@@ -32,17 +32,14 @@ class CalculatedScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$partnum];} else {$reqsigfigs = $options['reqsigfigs'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-        if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'reqsigfigs', 
+            'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt', 
+            'formatfeedbackon'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $hasNumVal = !empty($_POST["qn$qn-val"]);
 
@@ -78,12 +75,12 @@ class CalculatedScorePart implements ScorePart
         }
 
         $formatok = "all";
-        if (checkreqtimes($givenans, $requiretimes)==0) {
+        if (!empty($requiretimes) && checkreqtimes($givenans, $requiretimes)==0) {
             //return 0;
             $formatok = "nowhole";
         }
 
-        if (isset($reqsigfigs)) {
+        if ($reqsigfigs !== '') {
             if (!in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
                 unset($reqsigfigs);
             } else {
@@ -91,7 +88,7 @@ class CalculatedScorePart implements ScorePart
             }
         }
 
-        if (isset($requiretimeslistpart) && strpos($requiretimeslistpart,';')!==false) {
+        if (!empty($requiretimeslistpart) && strpos($requiretimeslistpart,';')!==false) {
             $requiretimeslistpart = explode(';', $requiretimeslistpart);
         }
 
@@ -237,20 +234,20 @@ class CalculatedScorePart implements ScorePart
                 $lastval = $v;
             }
 
-            if (isset($requiretimeslistpart) && is_array($requiretimeslistpart)) {
+            if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart)) {
                 list($tmp,$tmprtlp) = jointsort($anarr,$requiretimeslistpart);
             } else {
                 $tmp = $anarr;
                 sort($tmp);
             }
             $anarr = array($tmp[0]);
-            if (isset($requiretimeslistpart) && is_array($requiretimeslistpart)) {
+            if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart)) {
                 $requiretimeslistpart = array($tmprtlp[0]);
             }
             for ($i=1;$i<count($tmp);$i++) {
                 if (!is_numeric($tmp[$i][0]) || !is_numeric($tmp[$i-1][0]) || count($tmp[$i])>1 || count($tmp[$i-1])>1 || abs($tmp[$i][0]-$tmp[$i-1][0])>1E-12) {
                     $anarr[] = $tmp[$i];
-                    if (isset($requiretimeslistpart) && is_array($requiretimeslistpart)) {
+                    if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart)) {
                         $requiretimeslistpart[] = $tmprtlp[$i];
                     }
                 }
@@ -301,7 +298,7 @@ class CalculatedScorePart implements ScorePart
                     $formatok = "nopart";  $partformatok = false;
                     //continue;
                 }
-                if (isset($requiretimeslistpart) && !is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
+                if (!empty($requiretimeslistpart) && !is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
                     $formatok = "nopart";  $partformatok = false;
                     //continue;
                 }
@@ -324,10 +321,10 @@ class CalculatedScorePart implements ScorePart
                         }
                     } else if (is_numeric($numericans)) {
                         //echo "{$ganorm[$j]} vs {$ansnorm[$i][$k]}";
-                        if (isset($reqsigfigs)) {
+                        if ($reqsigfigs !== '') {
                             $tocheck = preg_replace('/\s*(\*|x|X|×|✕)\s*10\s*\^/','E',$givenans);
                             if (checksigfigs($tocheck, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
-                                if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
+                                if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
                                     $formatok = "nopart";  $partformatok = false;
                                 } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                     $formatok = "nopart";  $partformatok = false;
@@ -337,9 +334,9 @@ class CalculatedScorePart implements ScorePart
                                 //see if it'd be right aside from exact sigfigs
                                 $formatok = "nopart";  $partformatok = false; $correctanyformat++; $foundloc = $j; break 2;
                             }
-                        } else if (isset($abstolerance)) {
+                        } else if ($abstolerance !== '') {
                             if (abs($anans-$numericans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
-                                if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
+                                if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
                                     $formatok = "nopart";  $partformatok = false;
                                 } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                     $formatok = "nopart";  $partformatok = false;
@@ -349,7 +346,7 @@ class CalculatedScorePart implements ScorePart
                         } else {
                             if ($anans==0) {
                                 if (abs($anans - $numericans) < $reltolerance/1000 + 1E-12) {
-                                    if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
+                                    if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
                                         $formatok = "nopart";  $partformatok = false;
                                     } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                         $formatok = "nopart";  $partformatok = false;
@@ -358,7 +355,7 @@ class CalculatedScorePart implements ScorePart
                                 }
                             } else {
                                 if (abs($anans - $numericans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {
-                                    if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
+                                    if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
                                         $formatok = "nopart";  $partformatok = false;
                                     } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                         $formatok = "nopart";  $partformatok = false;

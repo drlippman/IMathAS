@@ -185,7 +185,7 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 //                   "parts", returns an array of the parts:  array(2,3,5)
 function reduceradicalfrac2($n,$d,$rootnum,$rat=false,$root=2,$format="string") {
 	if ($rat==true) {
-		return reduceradicalfrac($n, $rootnum, $d*$rootnum, $root, $format);
+		return reduceradicalfrac($n, pow($rootnum, $root-1), $d*$rootnum, $root, $format);
 	}
 	list($rootA,$in) = reduceradical($rootnum,$root,"parts");
 	$d *= $rootA;

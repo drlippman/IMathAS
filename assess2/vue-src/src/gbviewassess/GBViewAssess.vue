@@ -5,7 +5,7 @@
     </div>
     <div v-else class="gbmainview">
       <h1>{{ $t('gradebook.detail_title')}}</h1>
-      <h2>{{ aData.userfullname }}</h2>
+      <h2><span class="pii-full-name">{{ aData.userfullname }}</span></h2>
       <h3>{{ aData.name }}</h3>
 
       <div>
@@ -26,7 +26,7 @@
       <div>
         {{ $t('gradebook.due')}}: {{ aData.enddate_disp }}
           <button
-            v-if = "canEdit"
+            v-if = "canEdit && aData.can_make_exception"
             type="button"
             class="slim"
             @click = "makeException"
@@ -62,6 +62,7 @@
             <input id="assessoverride" size=4
               :value = "aData.scoreoverride"
               @input = "setScoreOverride"
+              @keyup.enter="submitForm"
             />/{{ aData.points_possible }}
           </span>
           <span v-else>
@@ -86,7 +87,7 @@
           </button>
           <span v-if="showOverride">
             <label for="assessoverride">{{ $t('gradebook.override') }}</label>:
-            <input id="assessoverride" size=4 v-model="assessOverride" />
+            <input id="assessoverride" size=4 v-model="assessOverride" @keyup.enter="submitForm" />
           </span>
         </span>
         <button
@@ -216,6 +217,12 @@
               </li>
               <li>
                 <label>
+                  <input type=checkbox v-model="hide100">
+                  {{ $t('gradebook.hide_100') }}
+                </label>
+              </li>
+              <li>
+                <label>
                   <input type=checkbox v-model="hideFeedback">
                   {{ $t('gradebook.hide_fb') }}
                 </label>
@@ -282,6 +289,9 @@
                 <strong>
                   {{ $tc('question_n', qn+1) }}.
                 </strong>
+                <em v-if="qdata[curQver[qn]].extracredit" class="small subdued">
+                  {{ $t('extracredit') }}
+                </em>
 
                 <gb-question-select
                   v-if = "aData.submitby === 'by_question'"
@@ -316,6 +326,7 @@
                 :canedit = "canEdit"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
+                @submitform = "submitForm"
               />
             </div>
           </div>
@@ -331,7 +342,7 @@
         <gb-feedback
           qn="gen"
           :username="aData.userfullname"
-          :show="viewFull"
+          :show="viewFull && (canEdit || assessFeedback !== '')"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
@@ -430,6 +441,7 @@ export default {
     return {
       showOverride: false,
       assessOverride: '',
+      hide100: false,
       hidePerfect: false,
       hideNonzero: false,
       hideZero: false,
@@ -564,7 +576,9 @@ export default {
       for (let i = 0; i < this.curQuestions.length; i++) {
         const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
+        if (this.hide100 && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
+          showit = false;
+        } else if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
         } else if (this.hideUnanswered && qdata.parts.reduce((a, c) => Math.max(a, c.try), 0) === 0) {
           showit = false;
@@ -580,21 +594,6 @@ export default {
         out[i] = showit;
       }
       return out;
-    },
-    hidePerfectLabel () {
-      return this.hidePerfect
-        ? this.$t('gradebook.show_perfect')
-        : this.$t('gradebook.hide_perfect');
-    },
-    hideCorrectLabel () {
-      return this.hideCorrect
-        ? this.$t('gradebook.show_correct')
-        : this.$t('gradebook.hide_correct');
-    },
-    hideUnansweredLabel () {
-      return this.hideUnanswered
-        ? this.$t('gradebook.show_unans')
-        : this.$t('gradebook.hide_unans');
     },
     exceptionActionLabel () {
       if (this.aData.hasexception) {
@@ -722,6 +721,9 @@ export default {
       }
       var doexit = (exit === true);
       actions.saveChanges(doexit);
+    },
+    submitForm () {
+      this.submitChanges(true);
     },
     exit () {
       window.location = window.exiturl;

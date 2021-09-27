@@ -30,7 +30,7 @@
 	}
 
 	if ($istutor) {
-		$isok = ($tutoredit==1);
+		$isok = (($tutoredit&1)==1);
 		if (!$isok) {
 			require("../header.php");
 			echo "You don't have authority for this action";
@@ -230,8 +230,9 @@
 			} else {
 				echo '<tr><td>';
 			}
+			echo '<span class="pii-full-name">';
 			echo Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]);
-			echo '</td>';
+			echo '</span></td>';
 			if ($hassection) {
 				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}

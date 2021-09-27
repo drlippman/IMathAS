@@ -46,11 +46,16 @@ function formpoly($coef,$deg) {
 //use writepoly to create a display form of the polynomial
 //stretch:  a stretch factor; the A in A*(x-root)(x-root)...
 //roots: an array of the roots (zeros, x-intercepts) of the polynomial
+//       for a complex root pair a+-bi give a single array [a,b] as the root.
 //multiplicites (optional): an array of multiplicites of the roots.  Assumed to
 //  be all 1 if not provided
 function formpolyfromroots($a,$roots,$mult=1) {
 	for($i=0; $i<count($roots); $i++) {
-		$newpoly = formpoly(array(1,-1*$roots[$i]),1);
+        if (is_array($roots[$i])) { // complex a+bi as [a,b]
+            $newpoly = formpoly(array(1,-2*$roots[$i][0],($roots[$i][0])**2 + ($roots[$i][1])**2),2);
+        } else {
+            $newpoly = formpoly(array(1,-1*$roots[$i]),1);
+        }
 		if (is_array($mult) && $mult[$i]>1) {
 			$newpoly = polypower($newpoly,$mult[$i]);
 		}

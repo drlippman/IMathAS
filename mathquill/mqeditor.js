@@ -81,7 +81,8 @@ var MQeditor = (function($) {
         var span = $("<span/>", {
           id: "mqinput-"+textId,
           class: "mathquill-math-field",
-          text: initval
+          text: initval,
+          "aria-label": el.getAttribute("aria-label")
         });
         var m;
         if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
@@ -116,6 +117,9 @@ var MQeditor = (function($) {
         if (calcformat.match(/chem/)) {
             thisMQconfig.charsThatBreakOutOfSupSubVar = '';
             thisMQconfig.charsThatBreakOutOfSupSubOp = '';
+        }
+        if (calcformat.match(/list/)) {
+            thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
         }
 
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
@@ -310,15 +314,17 @@ var MQeditor = (function($) {
     Hide the editor
    */
   function hideEditor(event) {
-    $(document).trigger('mqeditor:hide');
-    
-    if (config.curlayoutstyle === 'OSK' && !inIframe()) {
-      $("#mqeditor").slideUp(50);
-    } else {
-      $("#mqeditor").hide();
+    if (curMQfield) {
+        $(document).trigger('mqeditor:hide');
+        
+        if (config.curlayoutstyle === 'OSK' && !inIframe()) {
+        $("#mqeditor").slideUp(50);
+        } else {
+        $("#mqeditor").hide();
+        }
+        $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
+        curMQfield = null;
     }
-    $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
-    curMQfield = null;
   }
 
   /*
@@ -437,11 +443,11 @@ var MQeditor = (function($) {
         }
       }
     }
-    if (tabcnt > 1) {
-      $(baseel).find(".mqed-tab").first().addClass("mqed-activetab");
-    } else {
-      $(tabdiv).hide();
-    }
+    // add close button
+    buildButton(tabdiv, {s: 1});
+    buildButton(tabdiv, {p: '&times;', c: 'close', lb: 'close'});
+
+    $(baseel).find(".mqed-tab").first().addClass("mqed-activetab");
   }
 
   /*
@@ -570,7 +576,12 @@ var MQeditor = (function($) {
         $(btnel).addClass("mqed-shift");
       } else if (cmdtype == 'k') {
         $(btnel).addClass("mqed-navkey");
+      } else if (cmdtype == 'close') {
+        $(btnel).addClass("mqed-closebtn");
       }
+    }
+    if (btn.lb) {
+        btnel.setAttribute('aria-label', btn.lb);
     }
     // make it small; 1 for 90%, 2 for 80%, etc.
     if (btn.sm) {
@@ -727,6 +738,9 @@ var MQeditor = (function($) {
           }
         }
       });
+    } else if (cmdtype=='close') {
+        curMQfield.blur();
+        //hideEditor();
     }
   }
   return {

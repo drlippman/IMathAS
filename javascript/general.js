@@ -812,7 +812,7 @@ function togglevideoembed() {
 			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
 			var vidsrc = 'player.vimeo.com/video/';
 		}
-		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s)?.*/);
+		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s?)?.*/);
 		if (m == null) {
 			var timeref = qsconn+'rel=0';
 			m = href.match(/.*start=(\d+)/);
@@ -1536,6 +1536,9 @@ function initSageCell(base) {
 		sagecellcounter++;
 		var url = imasroot+'/assessment/libs/sagecellframe.html?frame_id='+frame_id;
 		url += '&code='+encodeURIComponent(code);
+        if ($this[0].hasAttribute('data-lang')) {
+            url += '&lang='+encodeURIComponent($this.attr('data-lang'));
+        }
 		var returnid = null;
 		if (typeof jQuery(ta).attr("id") != "undefined") {
 				url += '&update_id='+jQuery(ta).attr("id");

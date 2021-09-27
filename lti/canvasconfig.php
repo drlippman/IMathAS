@@ -27,6 +27,7 @@ header("Content-type: application/json;");
          "domain":"<?php echo $shorthost; ?>",
          "tool_id":"<?php echo Sanitize::encodeStringForDisplay($installname); ?>",
          "platform":"canvas.instructure.com",
+         "privacy_level": "public",
          "settings":{
             "text":"<?php echo Sanitize::encodeStringForDisplay($installname); ?>",
             "placements":[

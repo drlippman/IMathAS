@@ -231,9 +231,13 @@ class Sanitize
 		$port = isset($parsed_url['port']) ? preg_replace('/[^\d]/', '', $parsed_url['port']) : '';
 		$fragment = isset($parsed_url['fragment']) ? rawurlencode(rawurldecode($parsed_url['fragment'])) : '';
 
-		// Sanitize the path
-		$path = rawurlencode(rawurldecode($parsed_url['path']));
-		$path = preg_replace("/%2F/", "/", $path);
+        // Sanitize the path
+        if (isset($parsed_url['path'])) {
+            $path = rawurlencode(rawurldecode($parsed_url['path']));
+            $path = preg_replace("/%2F/", "/", $path);
+        } else {
+            $path = '';
+        }
 
 		// Sanitize query string
 		$query_map = array();

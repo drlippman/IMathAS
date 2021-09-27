@@ -154,6 +154,15 @@ class QuestionHtmlGenerator
                 $doShowAnswer = true;
             }
         }
+        if ($quesData['qtype'] == "multipart") {
+            // if multipart only has one part, need to re-array scoreiscorrect
+            if (isset($scoreiscorrect[$thisq]) && !is_array($scoreiscorrect[$thisq])) {
+                $scoreiscorrect[$thisq] = array($scoreiscorrect[$thisq]);
+            }
+            if (isset($scorenonzero[$thisq]) && !is_array($scorenonzero[$thisq])) {
+                $scorenonzero[$thisq] = array($scorenonzero[$thisq]);
+            }
+        }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {
@@ -162,7 +171,7 @@ class QuestionHtmlGenerator
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
-              if ($iidx==0) {
+              if ($iidx==0 || !isset($scoreiscorrect[$thisq][$kidx])) {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = ($scoreiscorrect[$thisq][$kidx] < 0 ? -1 : ($scoreiscorrect[$thisq][$kidx]==1 ? 1 : 0));
@@ -316,7 +325,7 @@ class QuestionHtmlGenerator
             }
 
             // Get the answers to all parts of this question.
-            $lastAnswersAllParts = $stuanswers[$thisq];
+            $lastAnswersAllParts = $stuanswers[$thisq] ?? [];
             if (isset($autosaves[$thisq])) {
               if (is_array($autosaves[$thisq])) {
                 foreach ($autosaves[$thisq] as $iidx=>$kidx) {
@@ -417,9 +426,9 @@ class QuestionHtmlGenerator
                     ->setQuestionPartNumber($atIdx)
                     ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
-                    ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
+                    ->setStudentLastAnswers($lastAnswersAllParts[$atIdx] ?? '')
                     ->setColorboxKeyword($questionColor)
-                    ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[$atIdx]);
+                    ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[$atIdx] ?? false);
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
@@ -480,7 +489,7 @@ class QuestionHtmlGenerator
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
 
-            $lastAnswer = $stuanswers[$thisq];
+            $lastAnswer = $stuanswers[$thisq] ?? '';
             if (isset($autosaves[$thisq])) {
               $lastAnswer = $autosaves[$thisq];
             }
@@ -505,7 +514,7 @@ class QuestionHtmlGenerator
                 ->setIsMultiPartQuestion(false)
                 ->setStudentLastAnswers($lastAnswer)
                 ->setColorboxKeyword($questionColor)
-                ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0]);
+                ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0] ?? false);
 
             $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
             $answerBoxGenerator->generate();
@@ -748,7 +757,7 @@ class QuestionHtmlGenerator
           $sadiv .= '<div>'.$showanswerloc.'</div>';
         } else if (is_array($showanswerloc)) {
           foreach ($showanswerloc as $iidx => $saloc) {
-            if (($doShowAnswer || (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx])) &&
+            if (($doShowAnswer || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) &&
               strpos($toevalqtxt,'$showanswerloc['.$iidx.']')===false
             ) {
               $sadiv .= '<div>'.$saloc.'</div>';
@@ -1114,7 +1123,7 @@ class QuestionHtmlGenerator
               }
             }
             if (!is_array($answerBoxes) && count($showanswerloc) < 2) { //not a multipart question
-                $showanswerloc = str_replace($qnidx . '-0"', $qnidx . '"', $showanswerloc[0]);
+                $showanswerloc = str_replace($qnidx . '-0"', $qnidx . '"', $showanswerloc[0] ?? '');
             }
         }
 

@@ -35,12 +35,12 @@ class MatchingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-        if (isset($options['answers'])) {if (is_array($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
-        else if (isset($options['answer'])) {if (is_array($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
-        if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$partnum];} else {$matchlist = $options['matchlist'];}
-        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
+        $optionkeys = ['matchlist', 'noshuffle', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        $answers = getOptionVal($options, 'answers', $multi, $partnum, 2);
 
         if (!is_array($questions) || !is_array($answers)) {
             $scorePartResult->addScoreMessage(_('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.'));
@@ -62,14 +62,14 @@ class MatchingScorePart implements ScorePart
             $randakeys = $RND->array_rand($answers,count($answers));
             $RND->shuffle($randakeys);
         }
-        if (isset($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}
+        if (!empty($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}
 
         $origla = array();
         for ($i=0;$i<count($questions);$i++) {
           if ($isRescore) {
             $origla = explode('|', $givenans);
             if ($origla[$i] !== '') {
-              if (isset($matchlist)) {
+              if (!empty($matchlist)) {
                 if ($matchlist[$i] != $origla[$i]) {
                   $score -= $deduct;
                 }
@@ -85,7 +85,7 @@ class MatchingScorePart implements ScorePart
             if ($_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
-                if (isset($matchlist)) {
+                if (!empty($matchlist)) {
                     if ($matchlist[$randqkeys[$i]]!=$randakeys[$qa]) {
                         $score -= $deduct;
                     }
@@ -101,7 +101,7 @@ class MatchingScorePart implements ScorePart
 
         // only store unrandomized
         $scorePartResult->setLastAnswerAsGiven(implode('|', $origla));
-        if (isset($scoremethod) && $scoremethod=='allornothing') {
+        if (!empty($scoremethod) && $scoremethod=='allornothing') {
             if ($score<.99) {
                 $score = 0;
             } 

@@ -23,6 +23,7 @@
     ></tinymce-input>
     <div
       v-else
+      class="fbbox"
       ref = "fbbox"
       v-html="value"
     />

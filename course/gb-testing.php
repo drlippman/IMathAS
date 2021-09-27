@@ -265,7 +265,7 @@ function gbinstrdisp() {
 		echo '<td class="locked" scope="row">';
 
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
-		echo $gbt[$i][0][0];
+		echo '<span class="pii-full-name">'.$gbt[$i][0][0].'</span>';
 		echo '</a></td>';
 
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {

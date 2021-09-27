@@ -63,15 +63,19 @@ function showallwork() {
 	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
-	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    if (confirm(_('Are you SURE you want to give all students full credit?'))) {
+	    $(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    }
 }
 function allvisnocred() {
-	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+    if (confirm(_('Are you SURE you want to give all students zero credit?'))) {
+    	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+    }
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
-    var filters = ['unans','zero','nonzero','perfect','fb','nowork'];
-    for (var i=0; i<6; i++) {
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork', '100'];
+    for (var i=0; i<7; i++) {
         if (document.getElementById('filter-' + filters[i]).checked) {
             $(".bigquestionwrap.qfilter-" + filters[i]).hide();
         }
@@ -237,7 +241,10 @@ function initAnswerboxHighlights() {
 	});
 };
 
+var sidebysideenabled = false;
 function sidebysidegrading() {
+    if (sidebysideenabled) { return; }
+    sidebysideenabled = true;
 	$("body").removeClass("fw1000").removeClass("fw1920");
 	$(".scrollpane").wrap('<div class="sidebyside">');
 	$(".sidebyside").append('<div class="sidepreview">');

@@ -19,13 +19,9 @@
 
 require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
-if (isset($teacherid)) {
-	$isteacher = true;
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
 
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
 if (!$isteacher && !$istutor && !isset($studentid)) {
 	echo _('Error - you are not a student, teacher, or tutor for this course');
 	exit;
@@ -121,7 +117,8 @@ if ($canviewall) {
 	$showpercents = 0;
 	$lastlogin = false;
 	$includeduedate = false;
-	$includelastchange = false;
+    $includelastchange = false;
+    $gbmode = '';
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
@@ -623,7 +620,9 @@ function gbstudisp($stu) {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$equivavailshow = $availshow;
 	if ($availshow == 3) {
 		$equivavailshow = 1; // treat past & attempted like past & available
@@ -669,9 +668,9 @@ function gbstudisp($stu) {
 
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-					echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/> ";
+					echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/> ";
 				} else {
-					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/>";
+					echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/>";
 				}
 			}
 			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
@@ -690,7 +689,7 @@ function gbstudisp($stu) {
 				$stm->execute(array(':courseid'=>$cid));
 			}
 
-			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
+			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
 			$lastsec = '';
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
@@ -898,7 +897,7 @@ function gbstudisp($stu) {
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
 				//not started, so no canuselatepass record
-				$gbt[1][1][$i][10] = $exceptionfuncs->getCanUseAssessLatePass(array('enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12], 'LPcutoff'=>$gbt[0][1][$i][14]));
+				$gbt[1][1][$i][10] = $exceptionfuncs->getCanUseAssessLatePass(array('id'=>$gbt[0][1][$i][7], 'enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12], 'LPcutoff'=>$gbt[0][1][$i][14]));
 			}
 			/*if (!$isteacher && !$istutor && $latepasses>0  &&	(
 				(isset($gbt[1][1][$i][10]) && $gbt[1][1][$i][10]>0 && !in_array($gbt[0][1][$i][7],$viewedassess)) ||  //started, and already figured it's ok
@@ -912,7 +911,7 @@ function gbstudisp($stu) {
 					$afterduelatepass = true;
 				}
 			}
-			if (!$isteacher && !$istutor && $gbt[1][1][$i][16] == 1) {
+			if (!$isteacher && !$istutor && !empty($gbt[1][1][$i][16])) {
 				echo ' <span class="small"><a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'#/showwork">[';
 				echo _('Attach Work') .']</a></span>';
 			}
@@ -935,7 +934,7 @@ function gbstudisp($stu) {
 
 			$haslink = false;
 
-			if ($isteacher || $istutor || $gbt[1][1][$i][2]==1) { //show link
+			if ($isteacher || $istutor || !empty($gbt[1][1][$i][2])) { //show link
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
 						if (isset($gbt[1][1][$i][0])) { //has score
@@ -1049,21 +1048,23 @@ function gbstudisp($stu) {
 				}
 			}
 			if (isset($gbt[1][1][$i][0])) {
-				if ($gbt[1][1][$i][3]>9) {
-					$gbt[1][1][$i][3] -= 10;
-				}
-				echo $gbt[1][1][$i][0];
-				if ($gbt[1][1][$i][3]==1) {
-					echo ' (NC)';
-				} else if ($gbt[1][1][$i][3]==2) {
-					echo ' (IP)';
-				} else if ($gbt[1][1][$i][3]==5) {
-					echo ' (UA)';
-				} else if ($gbt[1][1][$i][3]==3) {
-					echo ' (OT)';
-				} else if ($gbt[1][1][$i][3]==4) {
-					echo ' (PT)';
-				}
+                echo $gbt[1][1][$i][0];
+                if (isset($gbt[1][1][$i][3])) {
+                    if ($gbt[1][1][$i][3]>9) {
+                        $gbt[1][1][$i][3] -= 10;
+                    }
+                    if ($gbt[1][1][$i][3]==1) {
+                        echo ' (NC)';
+                    } else if ($gbt[1][1][$i][3]==2) {
+                        echo ' (IP)';
+                    } else if ($gbt[1][1][$i][3]==5) {
+                        echo ' (UA)';
+                    } else if ($gbt[1][1][$i][3]==3) {
+                        echo ' (OT)';
+                    } else if ($gbt[1][1][$i][3]==4) {
+                        echo ' (PT)';
+                    }
+                }
 			} else {
 				echo '-';
 			}
@@ -1106,13 +1107,13 @@ function gbstudisp($stu) {
 			echo '</td>';
 
 			if ($stu>0 && $isteacher) {
-				if ($gbt[1][1][$i][7] > -1) {
+				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7] > -1) {
 					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
 				} else {
 					echo '<td></td>';
 				}
 				if ($includelastchange) {
-					if ($gbt[1][1][$i][9]>0) {
+					if (!empty($gbt[1][1][$i][9]) && $gbt[1][1][$i][9]>0) {
 						echo '<td>'.tzdate('n/j/y g:ia', $gbt[1][1][$i][9]);
 					} else {
 						echo '<td></td>';
@@ -1136,7 +1137,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
+				if ((empty($gbt[1][1][$i][1])) || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
@@ -1330,7 +1331,7 @@ function gbstudisp($stu) {
 			$outcometype = 1;
 		}
 		if (($show&4)==4) {
-			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '</dd><br/>';
+			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t started working on them yet.'), '</dd><br/>';
 		}
 		if (($show&8)==8) {
 			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '</dd><br/>';
@@ -1406,7 +1407,7 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 					echo '<br/>'.$gbt[0][2][$i][11].'%';
 				}
 			}
-			if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
+			if (isset($collapsegbcat[$gbt[0][2][$i][1]]) && $collapsegbcat[$gbt[0][2][$i][1]]==0) {
 				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
 			} else {
 				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
@@ -1426,8 +1427,12 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 	//total totals
 	$tot = '';
 	if ($catfilter<0) {
-		$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
-		if ($gbt[$i][3][4+$availshow]>0) {
+        if (isset($gbt[0][3][3+$availshow])) {
+            $fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+        } else {
+            $fivenum = '<span>';
+        }
+		if (!empty($gbt[$i][3][4+$availshow]) && $gbt[$i][3][4+$availshow]>0) {
 			$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
 		} else {
 			$pct = 0;
@@ -1537,7 +1542,9 @@ function gbinstrdisp() {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$equivavailshow = $availshow;
 	if ($availshow == 3) {
 		$equivavailshow = 1; // treat past & attempted like past & available
@@ -1631,7 +1638,7 @@ function gbinstrdisp() {
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
 			}
-			if ($collapsegbcat[$gbt[0][1][$i][1]]==2) {
+			if (isset($collapsegbcat[$gbt[0][1][$i][1]]) && $collapsegbcat[$gbt[0][1][$i][1]]==2) {
 				continue;
 			}
 			//name and points
@@ -1707,25 +1714,29 @@ function gbinstrdisp() {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
-		if ($gbt[$i][4][1]>0) {
-			echo '<span class="greystrike">'.$gbt[$i][0][0].'</span>';
+		if (!empty($gbt[$i][4][1]) && $gbt[$i][4][1]>0) {
+			echo '<span class="greystrike pii-full-name">'.$gbt[$i][0][0].'</span>';
 		} else {
-			echo Sanitize::encodeStringForDisplay($gbt[$i][0][0]);
+			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($gbt[$i][0][0]).'</span>';
 		}
 		echo '</a>';
-		if ($gbt[$i][4][3]==1) {
+		if (!empty($gbt[$i][4][3]) &&  $gbt[$i][4][3]==1) {
 			echo '<sup>*</sup>';
 		}
 		echo '</div></td>';
-		if ($showpics==1 && $gbt[$i][4][2]==1) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
-		} else if ($showpics==2 && $gbt[$i][4][2]==1) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+		if ($showpics==1 && !empty($gbt[$i][4][2])) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
+			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+		} else if ($showpics==2 && !empty($gbt[$i][4][2])) {
+			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
 		} else {
 			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
+            if (isset($gbt[$i][0][$j])) {
+                echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
+            } else {
+                echo '<td class="c">'.$insdiv.$enddiv .'</td>';
+            }
 		}
 
 		if ($totonleft && !$hidepast) {
@@ -1748,11 +1759,15 @@ function gbinstrdisp() {
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
 					continue;
 				}
-				if ($collapsegbcat[$gbt[0][1][$j][1]]==2) {
+				if (isset($collapsegbcat[$gbt[0][1][$j][1]]) && $collapsegbcat[$gbt[0][1][$j][1]]==2) {
 					continue;
 				}
 				//if online, not average, and either score exists and active, or score doesn't exist and assess is current,
-				if ($gbt[0][1][$j][6]==0 && $gbt[$i][1][$j][4]!='average' && ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))) {
+                if (isset($gbt[$i][1][$j][4]) && $gbt[$i][1][$j][4]!='average' && 
+                    $gbt[0][1][$j][6]==0 && 
+                    ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || 
+                    (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))
+                ) {
 					echo '<td class="c isact">'.$insdiv;
 				} else {
 					echo '<td class="c">'.$insdiv;
@@ -1788,36 +1803,37 @@ function gbinstrdisp() {
 
 						echo '</a>';
 
-						if ($gbt[$i][1][$j][3]>9) {
-							$gbt[$i][1][$j][3] -= 10;
-						}
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						} else if ($gbt[$i][1][$j][3]==2) {
-							echo ' (IP)';
-						} else if ($gbt[$i][1][$j][3]==5) {
-							echo ' (UA)';
-						} else if ($gbt[$i][1][$j][3]==3) {
-							// echo ' (OT)';
-						} else if ($gbt[$i][1][$j][3]==4) {
-							echo ' (PT)';
-						}
+						
+                        if (isset($gbt[$i][1][$j][3])) {
+                            if ($gbt[$i][1][$j][3]>9) {
+                                $gbt[$i][1][$j][3] -= 10;
+                            }
+                            if ($gbt[$i][1][$j][3]==1) {
+                                echo ' (NC)';
+                            } else if ($gbt[$i][1][$j][3]==2) {
+                                echo ' (IP)';
+                            } else if ($gbt[$i][1][$j][3]==5) {
+                                echo ' (UA)';
+                            } else if ($gbt[$i][1][$j][3]==3) {
+                                // echo ' (OT)';
+                            } else if ($gbt[$i][1][$j][3]==4) {
+                                echo ' (PT)';
+                            }
+                        }
 
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
-						} else if ($isteacher) {
+						} else {
 							if ($gbt[0][1][$j][15] > 1) { // assess2
 								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							} else {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							}
-						} else {
-							echo '-';
 						}
 					}
 					if (isset($gbt[$i][1][$j][6]) ) {
@@ -1834,7 +1850,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							if ($gbt[0][1][$j][2]>0) {
+							if (!empty($gbt[0][1][$j][2]) && $gbt[0][1][$j][2]>0 && isset($gbt[$i][1][$j][0])) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
 								$avgtip = '';
@@ -1857,7 +1873,7 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
 
-						if ($gbt[$i][1][$j][3]==1) {
+						if (isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
 					} else {
@@ -1866,7 +1882,7 @@ function gbinstrdisp() {
 					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				} else if ($gbt[0][1][$j][6]==2) { //discuss

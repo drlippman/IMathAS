@@ -36,7 +36,7 @@ if ($stm->rowCount()==0) {
 	echo '<table><thead><tr><th>'._('Name').'</th><th>'._('Last Viewed').'</th></tr></thead>';
 	echo '<tbody>';
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<tr><td>'.$row['LastName'].', '.$row['FirstName'].'</td>';
+		echo '<tr><td><span class="pii-full-name">'.$row['LastName'].', '.$row['FirstName'].'</span></td>';
 		echo '<td>'.tzdate("F j, Y, g:i a", $row['lastview']).'</td></tr>';
 	}
 	echo '</tbody></table>';

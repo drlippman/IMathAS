@@ -78,7 +78,8 @@ switch($_GET['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		echo "<p>"._("Are you sure you want to anonymize this user").", <b>";
-		printf("%s, %s (%s)", Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
+		printf("<span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)",
+            Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
 		echo "</b>?</p>\n";
 
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
@@ -91,7 +92,7 @@ switch($_GET['action']) {
 		echo '<input type=radio id="full" name=anontype value="full"> ';
 		echo '<label for="full">Replace the user\'s email, username, password, <em>and name</em> with random values. ';
 		echo '</label></p>';
-		echo '<p>Replace email with: <input type=email name=anonemail value="none@none.com" /></p>';
+		echo '<p>Replace email with: <input type=email class="pii-email" name=anonemail value="none@none.com" /></p>';
 
 		echo '<p>Anonymization does NOT delete the user\'s courses or course work</p>';
 
@@ -128,7 +129,8 @@ switch($_GET['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		echo "<p>Are you sure you want to delete this user, <b>";
-		printf("%s, %s (%s)", Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
+		printf("<span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)",
+            Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
 		echo "</b>?</p>\n";
 		if ($hasstu) {
 			echo '<p class="noticetext">WARNING! This user has student activity within the last two years. Double-check you will not ';
@@ -145,23 +147,28 @@ switch($_GET['action']) {
 	case "chgrights":
 	case "newadmin":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
-		echo "<form method=post id=userform class=limitaftervalidate action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
+    echo "<form method=post id=userform class=limitaftervalidate action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if ($_GET['action']=="chgrights") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
 			echo '<div class="pagetitle"><h1>'._('New User').'</h1></div>';
-			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):0);
-			$oldrights = 10;
+			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):-2);
+            $oldrights = 10;
+            $oldspecialrights = 0;
 		} else {
-			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
 				echo "You do not have access to edit this user";
 				break;
 			}
-			printf("<div class=pagetitle><h1>%s %s</h1></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
+            if (($myrights >= 75 || ($myspecialrights&48)>0) && isset($CFG['GEN']['COPPA'])) {
+                $line['jsondata'] = json_decode($line['jsondata'], true);
+            }
+
+			printf("<div class=pagetitle><h1 class='pii-full-name'>%s %s</h1></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
 				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];
 			$oldrights = $line['rights'];
@@ -222,38 +229,46 @@ switch($_GET['action']) {
 								text: msg[i].name
 							}));
 						}
-						if (document.getElementById("group").options.length > 2) {
-							document.getElementById("group").selectedIndex = 2;
+						if (document.getElementById("group").options.length > 3) {
+							document.getElementById("group").selectedIndex = 3;
 						} else {
-							document.getElementById("group").selectedIndex = document.getElementById("group").options.length-1;
+							document.getElementById("group").selectedIndex = 0;
 						}
 					});
 				}
 			}
 			</script>
 		<?php
-		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
+		echo "<span class=form>Username:</span>  <input class='form pii-username' type=text size=40 name=SID ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>First Name:</span> <input class=form type=text size=40 name=firstname ";
+		echo "<span class=form>First Name:</span> <input class='form pii-first-name' type=text size=40 name=firstname ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['FirstName']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>Last Name:</span> <input class=form type=text size=40 name=lastname ";
+		echo "<span class=form>Last Name:</span> <input class='form pii-last-name' type=text size=40 name=lastname ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['LastName']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>Email:</span> <input class=form type=email size=40 name=email ";
+		echo "<span class=form>Email:</span> <input class='form pii-email' type=email size=40 name=email ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
 		}
 		echo "><BR class=form>\n";
+        if (($myrights >= 75 || ($myspecialrights&48)>0) && isset($CFG['GEN']['COPPA'])) {
+            echo "<span class=form><label for=\"over13\">",_('13 years old or older'),"</label></span>";
+            echo "<span class=formright><input type=checkbox name=over13 id=over13 ";
+            if (empty($line['jsondata']) || empty($line['jsondata']['under13'])) {
+                echo 'checked';
+            }
+            echo "></span><br class=form />\n";
+        }
 		if ($_GET['action'] == "newadmin") {
-			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="pw1"/><br class="form"/>';
+			echo '<span class="form">Password:</span> <input class="form pii-security" type="text" size="40" name="pw1"/><br class="form"/>';
 		} else {
 			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ';
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
@@ -361,6 +376,7 @@ switch($_GET['action']) {
 			echo "<span class=formright>";
 			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
 			echo "<label for=\"group\">Assign to:</label> <select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
+			echo '<option value="-2"'.($oldgroup==-2?' selected':'').'>'._('Select a Group').'</option>';
 			echo '<option value="-1">New Group</option>';
 			echo "<option value=0 ";
 			if ($oldgroup==0) {
@@ -393,7 +409,7 @@ switch($_GET['action']) {
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {
 			require_once("../includes/newusercommon.php");
-			showNewUserValidation("userform");
+			showNewUserValidation("userform", ['group'], ['group' => 'true, min: -1']);
 		} else if ($myrights==100) {
 			echo '<p>&nbsp;</p><p>&nbsp;</p>';
 			echo '<a href="forms.php?action=deladmin&id='.Sanitize::encodeUrlParam($_GET['id']).'">Delete User</a> ';
@@ -598,7 +614,7 @@ switch($_GET['action']) {
 				if (!empty($_POST['coursebrowserctc'])) {
 					$ctc = Sanitize::onlyInt($_POST['coursebrowserctc']);
 				} else {
-					$ctc = Sanitize::onlyInt($_POST['ctc']);
+					$ctc = Sanitize::onlyInt($_POST['ctc'] ?? 0);
 				}
 				if ($ctc>0) {
 					$query = "SELECT ic.*,iu.groupid ";
@@ -713,7 +729,7 @@ switch($_GET['action']) {
 		if ($_GET['action']=='addcourse') {
 			if ($for != 0) {
 				echo '<span class=form>'._('Creating course for:').'</span>';
-				echo '<span class=formright>'.Sanitize::encodeStringForDisplay($forname);
+				echo '<span class="formright pii-full-name">'.Sanitize::encodeStringForDisplay($forname);
 				echo '<input type=hidden name=for value="'.Sanitize::onlyInt($for).'" />';
 				echo '</span><br class=form>';
 			}
@@ -734,8 +750,11 @@ switch($_GET['action']) {
 		}
 		if ($isadminview) {
 			echo '<span class="form">Owner:</span><span class="formright">';
-			printf('%s, %s (%s)</span><br class="form"/>', Sanitize::encodeStringForDisplay($udat['LastName']),
-				Sanitize::encodeStringForDisplay($udat['FirstName']), Sanitize::encodeStringForDisplay($udat['name']));
+			printf('<span class="pii-full-name">%s, %s</span> (<span class="pii-username">%s</span>)</span><br class="form"/>',
+                Sanitize::encodeStringForDisplay($udat['LastName']),
+				Sanitize::encodeStringForDisplay($udat['FirstName']),
+                Sanitize::encodeStringForDisplay($udat['name'])
+            );
 		}
 		echo "<span class=form>",_("Course name"),":</span><input class=form type=text size=80 name=\"coursename\" value=\"".Sanitize::encodeStringForDisplay($name)."\"><BR class=form>\n";
 		echo "<span class=form>",_("Enrollment key"),":</span><input class=form type=text size=30 name=\"ekey\" value=\"".Sanitize::encodeStringForDisplay($ekey)."\"><BR class=form>\n";
@@ -809,7 +828,7 @@ switch($_GET['action']) {
 			echo '<span class=formright><input type=checkbox name="copyrubrics" id="copyrubrics" value="1" checked/>';
 			echo '</span><br class=form>';
 			echo '<span class=form><label for=copyoutcomes>'._('Copy outcomes?').'</label></span>';
-			echo '<span class=formright><input type=checkbox name="copyoutcomes" id="copyoutcomes" value="1"/>';
+			echo '<span class=formright><input type=checkbox name="copyoutcomes" id="copyoutcomes" value="1" checked/>';
 			echo '</span><br class=form>';
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
@@ -1096,7 +1115,7 @@ switch($_GET['action']) {
 				if (($istemplate&2)==2) {echo 'checked="checked"';};
 				echo ' /> ',_('Mark as group template course');
 			}
-			if ((($myspecialrights&2)==2 || $myrights==100) && $hassupergroup) {
+			if ((($myspecialrights&2)==2 || $myrights==100) && !empty($hassupergroup)) {
 				echo '<br/><input type=checkbox name="issupergrptemplate" value="32" ';
 				if (($istemplate&32)==32) {echo 'checked="checked"';};
 				echo ' /> ',_('Mark as super-group template course');
@@ -1199,7 +1218,7 @@ switch($_GET['action']) {
 								$ingroup = true;
 							} else {
 								echo '<option value="'.Sanitize::encodeStringForDisplay($k).'"';
-								if ($k==$browser[$propname]) { echo ' selected';}
+								if (isset($browser[$propname]) && $k==$browser[$propname]) { echo ' selected';}
 								echo '>';
 								echo Sanitize::encodeStringForDisplay($v).'</option>';
 							}
@@ -1210,14 +1229,14 @@ switch($_GET['action']) {
 						echo '</select>';
 
 						if (isset($propvals['options']['other'])) {
-							echo '<span id="browser'.$propname.'otherwrap" '.($browser[$propname]!='other'?'style="display:none"':'').'>';
-							echo '<br/>Other: <input type=text size=40 name="browser'.$propname.'other" value="'.($browser[$propname]=='other'?Sanitize::encodeStringForDisplay($browser[$propname.'other']):'').'"></span>';
+							echo '<span id="browser'.$propname.'otherwrap" '.(!isset($browser[$propname]) || $browser[$propname]!='other'?'style="display:none"':'').'>';
+							echo '<br/>Other: <input type=text size=40 name="browser'.$propname.'other" value="'.(isset($browser[$propname]) && $browser[$propname]=='other'?Sanitize::encodeStringForDisplay($browser[$propname.'other']):'').'"></span>';
 						}
 					}
 				} else if ($propvals['type']=='string') {
 					echo '<input type=text name="browser'.$propname.'" size=50 value="'.Sanitize::encodeStringForDisplay($browser[$propname]).'" />';
 				} else if ($propvals['type']=='textarea') {
-					echo '<textarea rows=6 cols=70 name=browser'.$propname.'>'.Sanitize::encodeStringForDisplay($browser[$propname], true).'</textarea>';
+					echo '<textarea rows=6 cols=70 name=browser'.$propname.'>'.Sanitize::encodeStringForDisplay($browser[$propname] ?? '', true).'</textarea>';
 				}
 				echo '</span><br class="form">';
 			}
@@ -1664,7 +1683,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Find Student'),'</h1></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
 		echo '<p>',_('Enter all or part of the name, email, or username:'),' ';
-		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo']).'"/></p>';
+		echo '<input type=text class="pii-mixed" size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo'] ?? '').'"/></p>';
 		echo '<input type="submit">';
 		echo '</form>';
 		if (!empty($_POST['userinfo'])) {
@@ -1717,8 +1736,8 @@ switch($_GET['action']) {
 					echo ($i==0)?'<tr class=even>':'<tr class=odd>'; $i = 1-$i;
 					echo '<td>';
 					echo '<a href="../course/gradebook.php?cid='.Sanitize::onlyInt($row['cid']).'&stu='.Sanitize::onlyInt($row['id']).'">';
-					echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</td>';
-					echo '</a><td>'.Sanitize::encodeStringForDisplay($row['SID']).'</td>';
+					echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></td>';
+					echo '</a><td><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></td>';
 					echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
 					if ($from!='home' && $myrights>=75) {
 						echo '<td>'.Sanitize::encodeStringForDisplay($row['teacherlast'].', '.$row['teacherfirst']).'</td>';

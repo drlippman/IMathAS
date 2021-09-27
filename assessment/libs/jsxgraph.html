@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>JSXG</title>
+  <title>jsxgraph</title>
 
   <style media="screen">
     pre {
@@ -82,13 +82,14 @@
     <li><a href="#jsxSlider">jsxSlider</a></li>
 	<li><a href="#jsxPoint">jsxPoint</a></li>
 	<li><a href="#jsxGlider">jsxGlider</a></li>
+	<li><a href="#jsxIntersection">jsxIntersection</a></li>
     <li><a href="#jsxFunction">jsxFunction</a></li>
     <li><a href="#jsxParametric">jsxParametric</a></li>
     <li><a href="#jsxPolar">jsxPolar</a></li>
     <li><a href="#jsxCircle">jsxCircle</a></li>
     <li><a href="#jsxPolygon">jsxPolygon</a></li>
     <li><a href="#jsxLine">jsxLine</a></li>
-	<li><a href="$jsxSegment">jsxSegment</a></li>
+	<li><a href="#jsxSegment">jsxSegment</a></li>
 	<li><a href="#jsxRay">jsxRay</a></li>
     <li><a href="#jsxVector">jsxVector</a></li>
 	<li><a href="#jsxTangent">jsxTangent</a></li>
@@ -97,8 +98,9 @@
 	<li><a href="#jsxIntegral">jsxIntegral</a></li>
 	<li><a href="#jsxRiemannSum">jsxRiemannSum</a></li>
 	<li><a href="#jsxSuspendUpdate">jsxSuspendUpdate</a></li>
-	<li><a href="#jsxUnsuspendUpdate">jsxUnsuspendUpdate</a></li>
-	<li><a href="$jsx_getCoords">jsx_getCoords</a></li>
+    <li><a href="#jsxUnsuspendUpdate">jsxUnsuspendUpdate</a></li>
+    <li><a href="#jsxSetChild">jsxSetChild</a></li>
+	<li><a href="$jsx_getCoords">jsx_getCoords</li>
 	<li><a href="#jsx_getXCoord">jsx_getXCoord</a></li>
 	<li><a href="#jsx_getYCoord">jsx_getYCoord</a></li>
 
@@ -280,6 +282,8 @@ $p = jsxPoint($board, [2, 1], $ops)
 	<li><i>fontcolor</i> (string) - The color for the label text</li>
 	<li><i>trace</i> (boolean) - If set to true, the glider will leave a trail of points on the board as it is moved. The trace points
 		can be erased by pressing the 'o' button on the navigation panel.</li>
+	<li><i>xsnapsize</i> (float) - forces the point to snap to specified intervals in the x-direction</li>
+	<li><i>ysnapsize</i> (float) - forces the point to snap to specified intervals in the y-direction</li>
 	<li><i>answerbox</i> [$thisq, (optional) partNumber] - Places the value the a slider in an answerbox. This will look like: [$thisq] or [$thisq, n] for a multipart question
 		where n is the box number to use.</li>
 	<li><i>attributes</i> (json) - A json object encoded as a string that contains the value of any additional attributes you can modify from the jsxgraph API.</li>
@@ -297,6 +301,49 @@ $board = jsxBoard('geometry', ['pan' => false])
 $c = jsxCircle($board, [[0, 0], 2], ['visible' => false])
 $p = jsxGlider($board, [[0, -2], $c], ['label'=>"A", 'color' => 'blue', 'trace' => true]) 
   </pre>
+
+  <!-- jsxIntersection -->
+  <h2><a style="color:blue" name="jsxIntersection">jsxIntersection($board, [$obj1 $obj2], <i>[$options]</i>)</a></h2>
+  <p>Creates an intersection point between two lines, two circles, or a circle and a line. If a circle is used, then only one
+    intersection point will be found, but you can choose which one is found through the parameter 'negativeroot'. By default,
+	jsxgraph will find the one that results in a positive square root when it is locating the intersection. $bj1 and $obj2 are
+	expected to be references to either jsx lines or circles that were previously used in your construction. </p>
+  <p>$options is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li><i>color</i> (string) - A value indicating the color of the point ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
+		a value such as rbga(45, 45, 45, 28)</li>
+    <li><i>size</i> (int) - sets the size of the point, defaults to 2</li>
+    <li><i>face</i> (string) - sets the face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleUp, 
+		triangleDown, triangleLeft, triangleRight</li>
+    <li><i>label</i> (string) - attaches a text label to a point, ASCIIMath can be used.</li>
+	<li><i>fontsize</i> (integer) - Affects the font size of the label text.</li>
+	<li><i>fontcolor</i> (string) - The color for the label text</li>
+	<li><i>visible</i> (boolean) - makes the point visible or invisible, useful in creating other objects</li>
+	<li><i>trace</i> (boolean) - If set to true, the point will leave a trail of points on the board as it is moved. The trace points
+		can be erased by pressing the 'o' button on the navigation panel.</li>
+	<li><i>answerbox</i> [$thisq, (optional) partNumber] - Places the value the a slider in an answerbox. This will look like: [$thisq] or [$thisq, n] for a multipart question
+		where n is the box number to use.</li>
+	<li><i>attributes</i> (json) - A json object encoded as a string that contains the value of any additional attributes you can modify from the jsxgraph API.</li>
+  </ul>
+    <p>Additional JavaScript functions that can be used in JSX constructions and labels:</p>
+  <ul>
+	<li>.X() - the x-coordinate of the point</li>
+	<li>.Y() - the y-coordinate of the point</li>
+  </ul>
+  <p>Note: For easier grading you can either set question type to N-Tuple, or use the function jsx_getCoords() to help read the coordinates from the answerbox.</p>
+  <h4>Example 1</h4>
+  <pre>
+loadlibrary("jsxgraph")
+$board = jsxBoard('rectangular')
+$a = jsxPoint($board, [-4, -3])
+$b = jsxPoint($board, [-2, 4])
+$c = jsxPoint($board, [3, 3])
+$d = jsxPoint($board, [-5, -1])
+$l1 = jsxLine($board, [$a, $b])
+$l2 = jsxLine($board, [$c, $d])
+$i = jsxIntersection($board, [$l1, $l2], ['color' => 'blue', 'label' => 'A'])
+  </pre>
+
 
   <!-- addFunction -->
   <h2><a style="color:blue" name="jsxFunction">jsxFunction($board, $f, <i>[$options]</i>)</a></h2>
@@ -528,6 +575,7 @@ $line = jsxLine($board, [[-4, 0], $p])
 	segment that can be used in other jsx object creations.</p>
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
+    <li><i>length</i> (float) - Sets the length of a segment, uses the two points given for direction</li>
 	<li><i>color</i> (string) - A value indicating the color of the segemnt ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>width</i> (int) - The width of the segment between 1 and 9, default is 2</li>
@@ -540,9 +588,10 @@ $line = jsxLine($board, [[-4, 0], $p])
   </ul>
 	<p>Additional JavaScript functions that can be used in JSX constructions and labels:</p>
   <ul>
-	<li>.getSlope() - returns the slope of the line</li>
+	<li>.getSlope() - returns the slope of the segment</li>
 	<li>.point1.X(), .point1.Y() - the coordinates of the first point</li>
 	<li>.point2.X(), .point2.Y() - the coordinates of the second point</li>
+	<li>.L() - returns the length of the segment</li>
   </ul>
   <h4>Example</h4>
   <pre>
@@ -552,8 +601,8 @@ $a = jsxPoint($board, [-4, -3], ['label' => 'A'])
 $b = jsxPoint($board, [-2, 4], ['label' => 'B'])
 $c = jsxPoint($board, [1, 0], ['label' => 'C'])
 $s0 = jsxSegment($board, [$a, $b])
-$s1 = jsxSegment($board, [$b, $c])
-$s2 = jsxSegment($board, [$c, $a])
+$s1 = jsxSegment($board, [$b, $c], ['label' => "this.L()"])
+$s2 = jsxSegment($board, [$c, $a], ['length' => 5.8])
   </pre>
 
  <!-- Ray -->
@@ -696,7 +745,7 @@ $angle = jsxAngle($board, [$p1, $p2, $p3], $ops)
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
     <li><i>anchor</i> (point) - The position of the text object on screen. This needs to be a jsxPoint that was previously
-		declared.</li>r
+		declared.</li>
    	<li><i>fontcolor</i> (string) - The color of the label</li>
 	<li><i>fontsize</i> (int) - The size of the label text</li>
 	<li><i>attributes</i> (json) - A json object encoded as a string that contains the value of any additional attributes you can modify from the jsxgraph API.</li>
@@ -805,15 +854,21 @@ $sum = jsxRiemannSum($board, [["$a.X()", "$b.X()", $n], [$f, $g]])
   <h2><a style="color:blue" name="jsxUnsuspendUpdate">jsxUnsuspendUpdate($board)</a></h2>
   <p>Unpauses updates to a board object so that objects will become interactive again.</p>
   
-  <h2><a style="color:blue" name="jsx_getCoords">jsx_getCoords(string))</a></h2>
+  <h2><a style="color:blue" name="jsxSetChild">jsxSetChild($parentBoard, $childBoard)</a></h2>
+  <p>Sets a relation between two boards so that changes to sliders/gliders in the parent board 
+     trigger updates in the child board.  Note that the parent board needs to be displayed first to
+     prevent errors.</p>
+
+
+  <h2><a style="color:blue" name="jsx_getCoords">jsx_getCoords(string)</a></h2>
   <p>Takes a string that depicts a point and returns the x and y coordinates contained within, useful for grading questions
 	based on the location of a jsx point.</p>
 	
-  <h2><a style="color:blue" name="jsx_getXCoord">jsx_getXCoord(string))</a></h2>
+  <h2><a style="color:blue" name="jsx_getXCoord">jsx_getXCoord(string)</a></h2>
   <p>Takes a string that depicts a point and returns only the x coordinate of the point, useful for grading questions
 	based on the location of a jsx point.</p>
 	
-  <h2><a style="color:blue" name="jsx_getYCoord">jsx_getYCoord(string))</a></h2>
+  <h2><a style="color:blue" name="jsx_getYCoord">jsx_getYCoord(string)</a></h2>
   <p>Takes a string that depicts a point and returns only the y coordinate of the point, useful for grading questions
 	based on the location of a jsx point.</p>
 
@@ -845,6 +900,37 @@ $b = jsxPoint($board, [4, 1])
 $midpoint = jsxPoint($board, ["($a.X() + $b.X()) / 2", "($a.Y() + $b.Y()) / 2"], ['visible' => false])
 $line = jsxLine($board, [$a, $b])
 $label = jsxText($board, [[0,0], "'slope = ' + $line.getSlope().toFixed(2)"], ['anchor' => "$midpoint"])
+</pre>
+
+<p>The next example is an example that utilizes grading within jsxgraph. The question type here is set to "Conditional".</p>
+<h4>Example 3</h4>
+<pre>
+// Common Control:
+
+loadlibrary("jsxgraph")
+$anstypes = ["number"]
+$board = jsxBoard("geometry", $ops)
+
+$c = jsxCircle($board, [[1, -2], 2], ["fillcolor" => "red", "color" => "red"])
+$p = jsxPoint($board, [0, 0], ["answerbox" => [$thisq, 0]])
+
+$stu = getstuans($stuanswers, $thisq, 0)
+if($stu == null) {
+  $stu = -50 // Make a default answer
+} else {
+  $x, $y = jsx_getCoords($stu) // parse the x and y coordinates from the point
+}
+
+$dist = sqrt(($center[0] - $x)^2 + ($center[1] - $y)^2)
+//print_r($dist)
+
+$answer = ($dist < $radius)
+
+// Question Text:
+Move the point into the circle for credit.
+$board
+// Note: you can hide the answerbox with a line like below, but remove the extra spaces after the < and the \
+< p hidden>$answerbox<\ p>
 </pre>
 
 </body>

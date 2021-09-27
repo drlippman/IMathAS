@@ -155,10 +155,10 @@ function outputHtml() {
 		if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 		echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
 		echo '<td>';
-		echo '<a href="../admin/userdetails.php?id='.$row['id'].'" target="_blank">';
-		echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</a></td>';
-		echo '<td>'.Sanitize::encodeStringForDisplay($row['SID']).'</td>';
-		echo '<td>'.Sanitize::encodeStringForDisplay($row['email']).'</td>';
+		echo '<a href="../admin/userdetails.php?id='.$row['id'].'" target="_blank"><span class="pii-full-name">';
+		echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></a></td>';
+		echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></td>';
+		echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($row['email']).'</span></td>';
 		echo '<td>'.getFormattedRequestDate($row).'</td>';
 		echo '<td>'.getFormattedApprovalDate($row).'</td>';
 		echo '<td>'.Sanitize::encodeStringForDisplay($GLOBALS['reqhow'][$row['id']]).'</td>';

@@ -1,7 +1,7 @@
 <template>
   <div v-if="showDiagInfo">
     <p class="big">
-      {{ diagUserName }}
+      <span class="pii-full-name">{{ diagUserName }}</span>
     </p>
     <p>
       {{ $d(new Date(), 'long') }}
