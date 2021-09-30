@@ -1537,6 +1537,7 @@ function processCalcMatrix(fullstr, format) {
   }
   fullstr = fullstr.substring(1,fullstr.length-1);
   var err = '';
+  var blankerr = '';
   var rowlist = [];
   var lastcut = 0;
   var MCdepth = 0;
@@ -1567,18 +1568,25 @@ function processCalcMatrix(fullstr, format) {
     lastnumcols = collist.length;
     for (var j=0; j<collist.length; j++) {
       str = collist[j].replace(/^\s+/,'').replace(/\s+$/,'');
-      err += syntaxcheckexpr(str,format);
-      err += singlevalsyntaxcheck(str,format);
-      res = singlevaleval(str, format);
-      err += res[1];
-      outcalc[i][j] = res[0];
-      outsub.push(res[0]);
+      if (str == '') {
+        blankerr = _('No elements of the matrix should be left blank.');
+        outcalc[i][j] = '';
+        outsub.push('');
+      } else {
+        err += syntaxcheckexpr(str,format);
+        err += singlevalsyntaxcheck(str,format);
+        res = singlevaleval(str, format);
+        err += res[1];
+        outcalc[i][j] = res[0];
+        outsub.push(res[0]);
+      }
     }
     outcalc[i] = '(' + outcalc[i].join(',') + ')';
   }
   if (!okformat) {
     err = _('Invalid matrix format')+'. ';
   }
+  err += blankerr;
   return {
     err: err,
     dispvalstr: '[' + outcalc.join(',') + ']',
