@@ -98,7 +98,7 @@ if (strpos($_SERVER['HTTP_HOST'],'localhost')!==false) {
 }
 
 //pull all lti queue items ready to send; we'll process until we're done or timeout
-$stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<7 ORDER BY sendon');
+$stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<7 ORDER BY sendon LIMIT 2000');
 $stm->execute(array(time()));
 $LTIsecrets = array();
 $cntsuccess = 0;
