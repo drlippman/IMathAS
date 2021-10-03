@@ -368,7 +368,7 @@
 	}
 
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=112519\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=091721\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {

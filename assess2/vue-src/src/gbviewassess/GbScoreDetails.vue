@@ -26,6 +26,7 @@
           :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
           v-model="curScores[i]"
           @input="updateScore(i, $event)"
+          @keyup.enter="$emit('submitform')"
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
         <button
           v-if="canedit && !isPractice && qdata.rubric > 0"

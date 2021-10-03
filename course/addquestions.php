@@ -483,7 +483,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=081521\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=090821\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -498,6 +498,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
+    $showworkdef = ($showworkdef & 3);
 	$ln = 1;
 
 	// Format of imas_assessments.intro is a JSON representation like

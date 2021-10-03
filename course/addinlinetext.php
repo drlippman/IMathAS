@@ -163,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "(:courseid, :title, :text, :startdate, :enddate, :avail, :oncal, :caltag, :outcomes, :isplaylist);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':title'=>$_POST['title'], ':text'=>$_POST['text'], ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':avail'=>$_POST['avail'], ':oncal'=>$_POST['oncal'], ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist));
+				':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist));
 			$newtextid = $DBH->lastInsertId();
 			$_GET['id'] = $newtextid;
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";

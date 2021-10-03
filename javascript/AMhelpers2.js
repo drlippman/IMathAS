@@ -1164,7 +1164,15 @@ function AMnumfuncPrepVar(qn,str) {
 
  function processNumber(origstr, format) {
      var err = '';
-     if (format.indexOf('list')!== -1) {
+     origstr = origstr.replace(/^\s+|\s+$/g, '');
+     if (format.indexOf('set') !== -1) {
+        if (origstr.charAt(0) !== '{' || origstr.substr(-1) !== '}') {
+            err += _('Invalid set notation');
+        } else {
+            origstr = origstr.slice(1, -1);
+        }
+     }
+     if (format.indexOf('list')!== -1 || format.indexOf('set') !== -1) {
          var strs = origstr.split(/\s*,\s*/);
      } else {
          var strs = [origstr.replace(/,/g,'')];
@@ -1381,7 +1389,7 @@ function processCalcNtuple(fullstr, format) {
   var dec;
   // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
   fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
-  fullstr = fullstr.replace(/<<(.*)>>/, '<$1>');
+  fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
   }
@@ -1529,6 +1537,7 @@ function processCalcMatrix(fullstr, format) {
   }
   fullstr = fullstr.substring(1,fullstr.length-1);
   var err = '';
+  var blankerr = '';
   var rowlist = [];
   var lastcut = 0;
   var MCdepth = 0;
@@ -1559,18 +1568,25 @@ function processCalcMatrix(fullstr, format) {
     lastnumcols = collist.length;
     for (var j=0; j<collist.length; j++) {
       str = collist[j].replace(/^\s+/,'').replace(/\s+$/,'');
-      err += syntaxcheckexpr(str,format);
-      err += singlevalsyntaxcheck(str,format);
-      res = singlevaleval(str, format);
-      err += res[1];
-      outcalc[i][j] = res[0];
-      outsub.push(res[0]);
+      if (str == '') {
+        blankerr = _('No elements of the matrix should be left blank.');
+        outcalc[i][j] = '';
+        outsub.push('');
+      } else {
+        err += syntaxcheckexpr(str,format);
+        err += singlevalsyntaxcheck(str,format);
+        res = singlevaleval(str, format);
+        err += res[1];
+        outcalc[i][j] = res[0];
+        outsub.push(res[0]);
+      }
     }
     outcalc[i] = '(' + outcalc[i].join(',') + ')';
   }
   if (!okformat) {
     err = _('Invalid matrix format')+'. ';
   }
+  err += blankerr;
   return {
     err: err,
     dispvalstr: '[' + outcalc.join(',') + ']',

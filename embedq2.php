@@ -308,6 +308,7 @@ $placeinhead .= '<script type="text/javascript">
   var thisqn = '.$qn.';
   function sendresizemsg() {
    if(inIframe()){
+       console.log(document.body.scrollHeight + "," + document.body.offsetHeight + "," + document.getElementById("embedspacer").offsetHeight);
       var default_height = Math.max(
         document.body.scrollHeight, document.body.offsetHeight) + 20;
       var wrap_height = default_height - document.getElementById("embedspacer").offsetHeight;
@@ -348,7 +349,7 @@ $placeinhead .= '<script type="text/javascript">
   }
   </script>
   <style>
-  body { margin: 0;}
+  body { margin: 0; overflow-y: hidden;}
   .question {
       margin-top: 0 !important;
   }
