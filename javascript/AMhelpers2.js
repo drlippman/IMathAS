@@ -1417,15 +1417,11 @@ function processCalcNtuple(fullstr, format) {
 
     if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
       sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
-      if (sub=='oo' || sub=='+oo' || sub=='-oo') {
-        outcalced += sub;
-      } else {
-        err += singlevalsyntaxcheck(sub, format);
-        err += syntaxcheckexpr(sub, format);
-        res = singlevaleval(sub, format);
-        err += res[1];
-        outcalced += res[0];
-      }
+      err += singlevalsyntaxcheck(sub, format);
+      err += syntaxcheckexpr(sub, format);
+      res = singlevaleval(sub, format);
+      err += res[1];
+      outcalced += res[0];
       outcalced += fullstr.charAt(i);
       lastcut = i+1;
     }

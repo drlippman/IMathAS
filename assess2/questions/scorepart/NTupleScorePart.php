@@ -192,10 +192,12 @@ class NTupleScorePart implements ScorePart
         $partialmatches = array();
         $matchedans = array();
         $matchedgivenans = array();
+
         foreach ($anarr as $ai=>$ansors) {
             $foundloc = -1;
             foreach ($ansors as $answer) {  //each of the "or" options
                 foreach ($gaarr as $j=>$givenans) {
+
                     if (isset($matchedgivenans[$j])) {continue;}
 
                     if ($answer['lb']!=$givenans['lb'] || $answer['rb']!=$givenans['rb']) {
@@ -218,7 +220,7 @@ class NTupleScorePart implements ScorePart
                                     $matchedparts++;
                                 }
                             }
-                        } else if (($ansval=='oo' && $gansval=='oo') || ($ansval=='-oo' && $gansval=='-oo')) {
+                        } else if (($ansval==='oo' && $gansval==='oo') || ($ansval==='-oo' && $gansval==='-oo')) {
                             $matchedparts++;
                             //is ok
                         }
