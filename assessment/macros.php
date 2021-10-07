@@ -507,7 +507,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					if ($isparametric) {
 						$y = $evalyfunc(['t'=>$t-1E-10]);
 						$tempy = $evalyfunc(['t'=>$t-$dx/100-1E-10]);
-						$temppy = $evalyfunc(['t'=>$px + 1/pow(10,$xrnd)]);
+						$temppy = $evalyfunc(['t'=>$t - $dx + $dx/100]);
 					} else {
 						$y = $evalfunc(['x'=>$x-1E-10]);
 						$tempy = $evalfunc(['x'=>$x-$dx/100-1E-10]);
