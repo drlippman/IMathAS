@@ -682,7 +682,7 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
           if ($gadploc === false) {
             if ($anans != 0 && strlen($absgivenans) < $reqsigfigs) { return false; } //not enough digits
             if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($absgivenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
-            $gasigfig = strlen(rtrim($absgivenans,'0'));
+            $gasigfig = max($reqsigfigs, strlen(rtrim($absgivenans,'0')));
           } else {
             if ($anans != 0 && $v < 0 && strlen($absgivenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
             if ($anans != 0 && $reqsigfigoffset>0 && strlen($absgivenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
@@ -721,7 +721,7 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
         // need to adjust 0 abs tolerance, since comparison is being made in base units
         // make it one final sigfig value in givenans units.
         $v = -1 * floor(-log10(abs($givenunits[2])) - 1e-12) - $gasigfig;
-        $sigfigscoretype[1] = pow(10, $v) * $givenunits[3];
+        $sigfigscoretype[1] = pow(10, $v) * $givenunits[3] * .9;
       } else {
         // adjust tolerance given unit conversions
         $sigfigscoretype[1] = $sigfigscoretype[1] * $ansunits[3];
