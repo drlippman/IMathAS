@@ -4792,9 +4792,13 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
                 if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($absgivenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
                 $gasigfig = strlen(rtrim($absgivenans,'0'));
             } else {
-                if ($anans != 0 && $v < 0 && strlen($absgivenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
-                if ($anans != 0 && $reqsigfigoffset>0 && strlen($absgivenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
-                $gasigfig = strlen($absgivenans) - 1;
+				if (abs($givenans)<1) {
+					$gasigfig = strlen(ltrim(substr($absgivenans,$gadploc+1),'0'));
+				} else {
+					$gasigfig = strlen(ltrim($absgivenans,'0'))-1;
+				}
+                if ($anans != 0 && $gasigfig < $reqsigfigs ) { return false; } //not enough sigfigs
+                if ($anans != 0 && $reqsigfigoffset>0 && $gasigfig > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
             }
 		} else {
 			$absgivenans = str_replace('-','',$givenans);
