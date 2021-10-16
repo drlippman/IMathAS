@@ -441,6 +441,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$lastl = 0;
 		$px = null;
 		$py = null;
+		$pyorig = null;
 		$pathstr = '';
 		$firstpoint = false;
 		$nextavoid = null;
@@ -452,15 +453,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
+				$pt = $t;
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = $evalxfunc(['t'=>$t]);
-				$y = $evalyfunc(['t'=>$t]);
-				if (isNaN($x) || isNaN($y)) {
+				$yorig = $evalyfunc(['t'=>$t]);
+				if (isNaN($x) || isNaN($yorig)) {
 					continue;
 				}
 				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
-				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
+				$y = round($yorig,$yrnd);//round(eval("return ($yfunc);"),3);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
@@ -468,9 +470,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-                $y = $evalfunc(['x'=>$x]);
+                $yorig = $evalfunc(['x'=>$x]);
 
-				if (isNaN($y)) {
+				if (isNaN($yorig)) {
                     if ($lastl != 0) {
                         if ($py !== null) {
                             $pathstr .= ",[$px,$py]";
@@ -482,7 +484,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     }
 					continue;
 				}
-				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
+				$y = round($yorig,$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
@@ -514,7 +516,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 						$temppy = $evalfunc(['x'=>$px + 1/pow(10,$xrnd)]);
                     }
 
-					if ($temppy > $py) {//if ($tempy<$y) { // going up
+					if ($temppy > $pyorig) {//if ($tempy<$y) { // going up
 						$iy = $yymax;
 						//if jumping from top of graph to bottom, change value
 						//for interpolation purposes
@@ -586,6 +588,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			$px = $x;
 			$py = $y;
+			$pyorig = $yorig;
 
 			if ($nextavoid !== null && $x > $nextavoid) {
 				// grab next avoid point
