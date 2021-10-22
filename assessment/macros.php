@@ -4793,7 +4793,7 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			if ($gadploc===false) { // no decimal place
                 if ($anans != 0 && strlen($absgivenans) < $reqsigfigs) { return false; } //not enough digits
                 if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($absgivenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
-                $gasigfig = strlen(rtrim($absgivenans,'0'));
+                $gasigfig = max($reqsigfigs, strlen(rtrim($absgivenans,'0')));
             } else {
 				if (abs($givenans)<1) {
 					$gasigfig = strlen(ltrim(substr($absgivenans,$gadploc+1),'0'));
