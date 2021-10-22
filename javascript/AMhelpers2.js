@@ -82,7 +82,7 @@ function clearparams(paramarr) {
 function toMQwVars(str, elid) {
     var qn = elid.substr(2).split(/-/)[0];
     var qtype = allParams[qn].qtype;
-    if (qtype === 'numfunc') {
+    if (qtype === 'numfunc' || (qtype === 'calcinterval' && allParams[qn].calcformat.indexOf('inequality')!=-1)) {
         str = AMnumfuncPrepVar(qn, str)[1];
     }
     return AMtoMQ(str);
@@ -1008,6 +1008,7 @@ function preformat(qn, text, qtype, calcformat) {
     if (!calcformat.match(/inequality/)) {
       text = text.replace(/U/g,"uu");
     } else {
+      text = AMnumfuncPrepVar(qn, text)[1];
       text = text.replace(/<=/g,' le ').replace(/>=/g,' ge ').replace(/</g,' lt ').replace(/>/g,' gt ');
       if (text.match(/all\s*real/i)) {
         text = "text("+text+")";
@@ -1032,9 +1033,17 @@ function preformat(qn, text, qtype, calcformat) {
 var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 
 function AMnumfuncPrepVar(qn,str) {
-  var vars = allParams[qn].vars.slice();
+  var vars, fvarslist = '';
+  if (typeof allParams[qn].vars === 'string') {
+    vars = [allParams[qn].vars];
+  } else {
+    vars = allParams[qn].vars.slice();
+  }
+
   var vl = vars.map(escapeRegExp).join('|');
-  var fvarslist = allParams[qn].fvars.map(escapeRegExp).join('|');
+  if (allParams[qn].fvars) {
+    fvarslist = allParams[qn].fvars.map(escapeRegExp).join('|');
+  }
   vars.push("DNE");
 
   if (vl.match(/lambda/)) {
@@ -1151,6 +1160,7 @@ function AMnumfuncPrepVar(qn,str) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
   }
+
   return [str,dispstr,vars.join("|"),submitstr];
 }
 
