@@ -1150,7 +1150,7 @@ function draw_triangle() {
       if (isset($in[1])) {
         if (is_numeric($in[1])) {
           $rotateTriangleBy = true;
-          $rotateTriangleByAngle = $in[1];
+          $rotateTriangleByAngle = ($in[1] >= 0) ? $in[1]%360 : 360+$in[1]%360;
         }
       }
     }
