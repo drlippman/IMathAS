@@ -5,7 +5,7 @@
 //
 
 function simplexver() {
-	return 38;
+	return 39;
 }
 
 global $allowedmacros;
@@ -14,11 +14,9 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
+array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexreadsolutionarray", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
 
 define("simplexTolerance", .001);
-
-
 
 // function simplex(type, objective, constraints)
 // Creates and returns a new simplex matrix. elements are fractions
@@ -709,7 +707,6 @@ function simplexcreateinequalities() {
 	return $simplexestring;
 }
 
-
 //function simplexconverttodecimals(simplexmatrix)
 //
 // simplexmatrix: a valid simplex matrix.
@@ -815,7 +812,6 @@ function simplexdefaultheaders($sm, $type){
 
 	return $headers;
 }
-
 
 //simplexdisplaycolortable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), tabletextcolor = "black", ShowObjectiveColumn=1])
 //
@@ -1309,7 +1305,6 @@ function simplexdisplaylatex() {
 	return $Tableau;
 }
 
-
 //simplexdisplaylatex2(simplex solution sets [, show$pivot=1, showentriesfractions=1, ShowObjectiveColumn=1])
 //
 // Creates an array of strings that is valid latex syntax for display.
@@ -1426,7 +1421,6 @@ function simplexdisplaylatex2() {
 
     return $solutionsetsreturn;
 }
-
 
 //simplexdisplaytable2(simplex solution sets[, ASCII tick marks,mode,show fractions,header column names,CSS tabletextcolor=black, multiple solution pivot border color=red, multiple solution pivot text color=blue, pivot border color=blue, pivot text color=black, ShowObjectiveColumn=1])
 //
@@ -2036,7 +2030,6 @@ function simplexgetentry($sm,$r,$c) {
     return $f; // simplexfractionreduce($sm[$r][$c]);
 }
 
-
 // simplexpivot(simplexmatrix,pivotpoint)
 //
 // this function pivots the simplex matrix on the given point
@@ -2324,7 +2317,6 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0)
 	return $solution;
 }
 
-
 //simplexsetentry(simplexmatrix,row,col,numerator,denominator)
 //
 // set entry for the simplex matrix at the given row and col with the given numerator and denominator.
@@ -2360,7 +2352,6 @@ function simplexsetentry($sm,$r,$c,$n,$d) {
     $sm[$r][$c][1] = $d;
     return 1;
 }
-
 
 // simplexsolutiontolatex(solution)
 //
@@ -2403,7 +2394,6 @@ function simplexsolutionconverttofraction($objectivereached){
 
     return $sol;
 }
-
 
 //simplexsolve2(simplexmatrix,type,[showfractions=1])
 //
@@ -2749,8 +2739,6 @@ function simplexfractionreduce() {
 		return $f[0].'/'.$f[1];
 	}
 }
-
-
 
 // *********************************************************************************************************************************
 // *********************************************************************************************************************************
@@ -3363,8 +3351,8 @@ function simplexsolve($sm,$type,$showfractions=1) {
 }
 
 
-// Change
-// 2021-xx-xx ver 39
+// Change log
+// 2021-xx-xx ver 39 - added simplexreadsolutionarray to the allowed callable functions
 //
 // 2021-10-06 ver 38 - renamed fractionparse to simplexfractionparse as it was included in the file.  Added simplexfractionreduce
 //                     to replace fractionreduce
@@ -3443,5 +3431,20 @@ function simplexsolve($sm,$type,$showfractions=1) {
 // 2014-09-18 Added simplexsetentry and correct help file typos.
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
+
+
+// NOTES:
+// uses fractionparse for
+//     createsimplexelement
+//     simplextoarray
+//     simplexsolutiontolatex
+
+
+// uses fractionreduce for
+//     simplexcreateinequalities
+//     simplexconverttofraction
+//     simplexdisplaycolortable
+//     simplexsolutionconverttofraction
+
 
 ?>
