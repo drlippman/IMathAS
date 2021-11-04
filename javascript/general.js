@@ -1501,7 +1501,7 @@ jQuery(document).ready(function($) {
 });
 var sagecellcounter = 0;
 function initSageCell(base) {
-	jQuery(base).find(".converttosagecell:visible").each(function() {
+	jQuery(base).find(".converttosagecell:visible:not(.inited)").each(function() {
 		var ta, code;
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
@@ -1544,6 +1544,7 @@ function initSageCell(base) {
 				url += '&update_id='+jQuery(ta).attr("id");
 		}
 		url += '&evallabel=' + encodeURIComponent(_('Evaluate'));
+        $this.addClass("inited");
 		jQuery(ta).addClass("allowupdate").hide()
 		.after(jQuery("<iframe/>", {
 				id: frame_id,
