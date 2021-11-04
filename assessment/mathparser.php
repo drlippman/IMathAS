@@ -131,7 +131,7 @@ class MathParser
    */
   function __construct($variables, $allowedfuncs = array()) {
     if ($variables != '') {
-      $this->variables = array_map('trim', explode(',', $variables));
+      $this->variables = array_values(array_filter(array_map('trim', explode(',', $variables)), 'strlen'));
     }
     //treat pi and e as variables for parsing
     array_push($this->variables, 'pi', 'e');

@@ -86,7 +86,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         }
 
         if (empty($variables)) {$variables = "x";}
-        $variables = array_map('trim', explode(",", $variables));
+        $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
             $variables[$i] = trim($variables[$i]);
