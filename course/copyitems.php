@@ -200,11 +200,6 @@ if (!(isset($teacherid))) {
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$ctc, ':courseid2'=>$cid));
-				if ($stm->rowCount()>0) {
-					$hasoutcomes = true;
-				} else {
-					$hasoutcomes = false;
-				}
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$outcomes[$row[0]] = $row[1];
 				}
@@ -229,7 +224,10 @@ if (!(isset($teacherid))) {
 					$newoutcomes[] = $outcomes[$row[0]];
 				}
 
-				if ($hasoutcomes) {
+                $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$cid));
+				$row = $stm->fetch(PDO::FETCH_NUM);
+				if ($row[0] != '') {
 					//already has outcomes, so we'll just add to the end of the existing list new outcomes
 					$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 					$stm->execute(array(':id'=>$cid));
