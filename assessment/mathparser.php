@@ -923,7 +923,9 @@ class MathParser
    */
   public function normalizeTreeString() {
     $this->removeOneTimes();
-    //return $this->normalizeNodeToString($this->AST);
+    // $this->normalizeNodeToString($this->AST);
+    //echo $this->toOutputString($this->normalizeNode($this->AST));
+    //print_r($this->normalizeNode($this->AST));
     return $this->toOutputString($this->normalizeNode($this->AST));
   }
 
@@ -978,7 +980,16 @@ class MathParser
     } else if ($node['symbol'] == '~') {
       // recurse in
       $node['left'] = $this->normalizeNode($node['left']);
-      return $node;
+      if ($node['left']['symbol'] == '*') {
+        // if we have the opposite of a product, move the negative to the first element of the product
+        $node['left']['left'] = $this->negNode($node['left']['left']);
+        return $node['left'];
+      } else if ($node['left']['type'] == 'number') {
+        $node['left']['symbol'] = -1*$node['left']['symbol'];
+        return $node['left'];
+      } else {
+        return $node;
+      }
     } else if ($node['symbol'] == '^') {
       // recurse in. We're not doing any reordering for these
       $node['left'] = $this->normalizeNode($node['left']);

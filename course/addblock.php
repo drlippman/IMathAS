@@ -141,7 +141,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['startdate'] = $startdate;
 		$sub[$existingid]['enddate'] = $enddate;
 		$sub[$existingid]['avail'] = $_POST['avail'];
-		$sub[$existingid]['SH'] = $_POST['showhide'] . $_POST['availbeh'] . $_POST['contentbehavior'];
+		$sub[$existingid]['SH'] = ($_POST['showhide'] ?? 'H') . 
+			($_POST['availbeh'] ?? 'O') . 
+			($_POST['contentbehavior'] ?? '0');
 		$sub[$existingid]['colors'] = $colors;
 		$sub[$existingid]['public'] = $public;
 		$sub[$existingid]['innav'] = $innav;
@@ -154,7 +156,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['startdate'] = $startdate;
 		$blockitems['enddate'] = $enddate;
 		$blockitems['avail'] = $_POST['avail'];
-		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'] . $_POST['contentbehavior'];;
+		$blockitems['SH'] = ($_POST['showhide'] ?? 'H') . 
+			($_POST['availbeh'] ?? 'O') . 
+			($_POST['contentbehavior'] ?? '0');
 		$blockitems['colors'] = $colors;
 		$blockitems['public'] = $public;
 		$blockitems['innav'] = $innav;

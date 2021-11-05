@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples","isset");
+ "array_values","comparelogic","stuansready","comparentuples","isset","atan2");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -441,6 +441,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$lastl = 0;
 		$px = null;
 		$py = null;
+		$pyorig = null;
 		$pathstr = '';
 		$firstpoint = false;
 		$nextavoid = null;
@@ -452,15 +453,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
+				$pt = $t;
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = $evalxfunc(['t'=>$t]);
-				$y = $evalyfunc(['t'=>$t]);
-				if (isNaN($x) || isNaN($y)) {
+				$yorig = $evalyfunc(['t'=>$t]);
+				if (isNaN($x) || isNaN($yorig)) {
 					continue;
 				}
 				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
-				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
+				$y = round($yorig,$yrnd);//round(eval("return ($yfunc);"),3);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
@@ -468,9 +470,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-                $y = $evalfunc(['x'=>$x]);
+                $yorig = $evalfunc(['x'=>$x]);
 
-				if (isNaN($y)) {
+				if (isNaN($yorig)) {
                     if ($lastl != 0) {
                         if ($py !== null) {
                             $pathstr .= ",[$px,$py]";
@@ -482,7 +484,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     }
 					continue;
 				}
-				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
+				$y = round($yorig,$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
@@ -507,11 +509,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					if ($isparametric) {
 						$y = $evalyfunc(['t'=>$t-1E-10]);
 						$tempy = $evalyfunc(['t'=>$t-$dx/100-1E-10]);
+						$temppy = $evalyfunc(['t'=>$t - $dx + $dx/100]);
 					} else {
 						$y = $evalfunc(['x'=>$x-1E-10]);
 						$tempy = $evalfunc(['x'=>$x-$dx/100-1E-10]);
+						$temppy = $evalfunc(['x'=>$px + 1/pow(10,$xrnd)]);
                     }
-					if ($tempy<$y) { // going up
+
+					if ($temppy > $pyorig) {//if ($tempy<$y) { // going up
 						$iy = $yymax;
 						//if jumping from top of graph to bottom, change value
 						//for interpolation purposes
@@ -583,6 +588,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			$px = $x;
 			$py = $y;
+			$pyorig = $yorig;
 
 			if ($nextavoid !== null && $x > $nextavoid) {
 				// grab next avoid point
@@ -1990,7 +1996,7 @@ function roundsigfig($val, $sigfig) {
 	return round($val, $sigfig - $log - 1);
 }
 
-function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=false) {
+function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=false,$sigfigbar=false) {
 	if (!is_array($aarr)) {
 		$arrayout = false;
 		$aarr = array($aarr);
@@ -2026,13 +2032,26 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 
 		$v = floor(-log10($a)-1e-12);
 		if ($v+$sigfig <= 0) {
-			if ($v<-16 && $scinot=='') { //special handling of really huge numbers
-				$multof3 = floor(-($v+$sigfig)/3);
-				$tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
-				$out[] = $sign.number_format($tmp,0,'.',$comma).str_repeat(',000',$multof3).$scinot;
-			} else {
-				$out[] = $sign.number_format(round($a,$v+$sigfig),0,'.',$comma).$scinot;
-			}
+      $multof3 = floor(-($v+$sigfig)/3);
+      $tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
+      $a = number_format($tmp,0,'.',$comma).str_repeat($comma.'000',$multof3);
+      if ($sigfigbar) {
+        //number of digits before first comma
+        $digbc = floor((log10($a)+1)%3)+3*((log10($a)+1)%3==0);
+        $anums = preg_replace('/[^\d]/','',$a);
+        if ($comma != '') {
+          //number of commas before sigfig digit
+          $acom = ($sigfig>$digbc)+floor(($sigfig-1-$digbc)/3)*($sigfig>$digbc);
+        } else {
+          $acom = 0;
+        }
+        if (isset($anums[$sigfig]) && $anums[$sigfig] === '0' && $anums[$sigfig-1] === '0') {
+          $a = substr_replace($a, 'overline(0)', $sigfig-1+$acom*strlen($comma), 1);
+        } elseif ($anums[$sigfig-1] === '0' && !isset($anums[$sigfig])) {
+          $a = $a.".";
+        }
+      }
+      $out[] = $sign.$a.$scinot;
 		} else {
 			$nv = round($a, $v+$sigfig);
 			$n = number_format($a,$v+$sigfig,'.',$comma);
@@ -4769,15 +4788,20 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 		}
 	} else {
 		if (!$exactsigfig) {
-			$gadploc = strpos($givenans,'.');
+			$absgivenans = str_replace('-','',$givenans);
+			$gadploc = strpos($absgivenans,'.');
 			if ($gadploc===false) { // no decimal place
-                if ($anans != 0 && strlen($givenans) < $reqsigfigs) { return false; } //not enough digits
-                if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($givenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
-                $gasigfig = strlen(rtrim($givenans,'0'));
+                if ($anans != 0 && strlen($absgivenans) < $reqsigfigs) { return false; } //not enough digits
+                if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($absgivenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
+                $gasigfig = max($reqsigfigs, strlen(rtrim($absgivenans,'0')));
             } else {
-                if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
-                if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
-                $gasigfig = strlen($givenans) - 1;
+				if (abs($givenans)<1) {
+					$gasigfig = strlen(ltrim(substr($absgivenans,$gadploc+1),'0'));
+				} else {
+					$gasigfig = strlen(ltrim($absgivenans,'0'))-1;
+				}
+                if ($anans != 0 && $gasigfig < $reqsigfigs ) { return false; } //not enough sigfigs
+                if ($anans != 0 && $reqsigfigoffset>0 && $gasigfig > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
             }
 		} else {
 			$absgivenans = str_replace('-','',$givenans);

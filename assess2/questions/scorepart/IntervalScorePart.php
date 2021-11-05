@@ -66,7 +66,8 @@ class IntervalScorePart implements ScorePart
         }
 
         $ansformatsHasList = in_array('list',$ansformats);
-        $givenans = str_replace('u', 'U', $givenans);
+        //$givenans = str_replace('u', 'U', $givenans);
+        $givenans = preg_replace('/\bu\b/', 'U', $givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
             $scorePartResult->setLastAnswerAsNumber($givenansval);

@@ -37,12 +37,16 @@ if (!empty($_POST['lms']) &&
             $_POST['canvas_'.$key] = str_replace('canvas.', 'canvas.'.$_POST['canvasenv'].'.', $_POST['canvas_'.$key]);
         }
     }
-  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid,created_by) VALUES (?,?,?,?,?,?,?)");
+    if (empty(trim($_POST[$lms.'_authserver']))) {
+      $_POST[$lms.'_authserver'] = '';
+    }
+  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,auth_server,key_set_url,uniqid,created_by) VALUES (?,?,?,?,?,?,?,?)");
   $stm->execute(array(
     trim($_POST[$lms.'_issuer']),
     trim($_POST[$lms.'_clientid']),
     trim($_POST[$lms.'_authurl']),
     trim($_POST[$lms.'_tokenurl']),
+    trim($_POST[$lms.'_authserver']),
     trim($_POST[$lms.'_keyseturl']),
     trim($_POST[$lms.'_uniqid']),
     $userid
@@ -288,7 +292,8 @@ echo '<ul>';
 echo '<li><label>'._('Client Id:').' <input name=d2l_clientid size=50/></label></li>';
 echo '<li><label>'._('Brightspace Keyset URL:').' <input name=d2l_keyseturl size=50/></label></li>';
 echo '<li><label>'._('Brightspace OAuth2 Access Token URL:').' <input name=d2l_tokenurl size=50/></label></li>';
-echo '<li><label>'._('OpenID COnnect Authentication Endpoint:').' <input name=d2l_authurl size=50/></label></li>';
+echo '<li><label>'._('OpenID Connect Authentication Endpoint:').' <input name=d2l_authurl size=50/></label></li>';
+echo '<li><label>'._('Brightspace OAuth2 Audience:').' <input name=d2l_authserver size=50/></label></li>';
 echo '<li><label>'._('Issuer:').' <input name=d2l_issuer size=50/></label></li>';
 echo '<li><label>'._('The u= from the OpenID Connect URL:').'<input size=15 name=d2l_uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" /></label></li>';
 echo '</ul>';

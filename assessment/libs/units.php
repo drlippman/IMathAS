@@ -655,55 +655,68 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
 	if ($ansunits[2]!=0) {
 		$v = -1*floor(-log10(abs($ansunits[2]))-1e-12) - $reqsigfigs;
 	}
-	if ($sigfigscoretype[0]=='abs') {
-		$sigfigscoretype[1] = max(pow(10,$v)/2, $sigfigscoretype[1]);
-	} else if ($sigfigscoretype[1]/100 * $ansunits[2] < pow(10,$v)/2) {
-        // relative tolerance, but too small
-        $sigfigscoretype = ['abs', pow(10,$v)/2];
-    }
+	
     $epsilon = (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12));
     //base this on baseNumber
-	if (strpos($givenunits[2],'E')!==false) {  //handle computer-style scientific notation
-		preg_match('/^-?[1-9]\.?(\d*)E/', $givenunits[2], $matches);
-		$gasigfig = 1+strlen($matches[1]);
-		if ($exactsigfig) {
-			if ($gasigfig != $reqsigfigs) {return false;}
-		} else {
-			if ($gasigfig < $reqsigfigs) {return false;}
-			if ($reqsigfigoffset>0 && $gasigfig-$reqsigfigs>$reqsigfigoffset) {return false;}
-		}
-	} else {
-		if (!$exactsigfig) {
-			$gadploc = strpos($givenunits[2],'.');
-            if ($gadploc===false) {
-                $absgivenans = str_replace('-','',$givenunits[2]);
-                $gasigfigs = strlen(rtrim($absgivenans,'0'));
-                if ($anans != 0 && $v < 0 && $gasigfigs < 1-$v) { return false; } // not enough
-                if ($anans != 0 && $reqsigfigoffset>0 && $gasigfigs > 1-$v+$reqsigfigoffset) { return false;} // too many
-            } else {
-                if ($anans != 0 && $v < 0 && strlen($givenunits[2]) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
-                if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenunits[2]) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+  if (strpos($givenunits[2], 'E') !== false) { //handle computer-style scientific notation
+      preg_match('/^-?[1-9]\.?(\d*)E/', $givenunits[2], $matches);
+      $gasigfig = 1 + strlen($matches[1]);
+      if ($exactsigfig) {
+          if ($gasigfig != $reqsigfigs) {return false;}
+      } else {
+          if ($gasigfig < $reqsigfigs) {return false;}
+          if ($reqsigfigoffset > 0 && $gasigfig - $reqsigfigs > $reqsigfigoffset) {return false;}
+      }
+  } else {
+    if (!$exactsigfig) {
+        $absgivenans = str_replace('-','',$givenunits[2]);
+        $gadploc = strpos($absgivenans, '.');
+        if ($gadploc === false) {
+          if ($anans != 0 && strlen($absgivenans) < $reqsigfigs) { return false; } //not enough digits
+          if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($absgivenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
+          $gasigfig = max($reqsigfigs, strlen(rtrim($absgivenans,'0')));
+        } else {
+          if (abs($absgivenans)<1) {
+              $gasigfig = strlen(ltrim(substr($absgivenans,$gadploc+1),'0'));
+          } else {
+              $gasigfig = strlen(ltrim($absgivenans,'0'))-1;
+          }
+          if ($anans != 0 && $gasigfig < $reqsigfigs ) { return false; } //not enough sigfigs
+          if ($anans != 0 && $reqsigfigoffset>0 && $gasigfig > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
+        }
+      } else {
+          $absgivenans = str_replace('-', '', $givenunits[2]);
+          $gadploc = strpos($absgivenans, '.');
+          if ($gadploc === false) { //no decimal place
+            if (strlen(rtrim($absgivenans,'0')) > $reqsigfigs || 
+                strlen($absgivenans) < $reqsigfigs
+            ) { 
+                return false;
             }
-		} else {
-			$absgivenans = str_replace('-','',$givenunits[2]);
-			$gadploc = strpos($absgivenans,'.');
-            if ($gadploc===false) { //no decimal place
-                if (strlen(rtrim($absgivenans,'0')) != $reqsigfigs) { return false;}
-			} else {
-				if (abs($givenunits[2])<1) {
-					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
-				} else {
-					if (strlen(ltrim($absgivenans,'0'))-1 != $reqsigfigs) { return false;}
-				}
-			}
-		}
-    }
+            $gasigfig = $reqsigfigs;
+          } else {
+            if (abs($givenunits[2]) < 1) {
+                if (strlen(ltrim(substr($absgivenans, $gadploc + 1), '0')) != $reqsigfigs) {return false;}
+            } else {
+                if (strlen(ltrim($absgivenans, '0')) - 1 != $reqsigfigs) {return false;}
+            }
+            $gasigfig = $reqsigfigs;
+          }
+      }
+  }
     //checked format, now check values, using values in base units
-	if ($sigfigscoretype[0]=='abs') {
-        // adjust tolerance given unit conversions
-        $sigfigscoretype[1] = $sigfigscoretype[1]*$ansunits[3];
-		if (abs($anans-$givenans)< $sigfigscoretype[1]+$epsilon) {return true;}
-	} else if ($sigfigscoretype[0]=='rel') {
+    if ($sigfigscoretype[0] == 'abs') {
+      // adjust tolerance given unit conversions
+      $sigfigscoretype[1] = $sigfigscoretype[1] * $ansunits[3];
+      if ($givenunits[2] != 0) {
+        // may need to adjust abs tolerance, since comparison is being made in base units
+        // make it one final sigfig value in givenans units.
+        $v = -1 * floor(-log10(abs($givenunits[2])) - 1e-12) - $gasigfig;
+        $altabstol = pow(10, $v) * $givenunits[3] * .5;
+        $sigfigscoretype[1] = max($sigfigscoretype[1], $altabstol);
+      } 
+        if (abs($anans - $givenans) < $sigfigscoretype[1] + $epsilon) {return true;}
+    } else if ($sigfigscoretype[0]=='rel') {
 		if ($anans==0) {
 			if (abs($anans - $givenans) < $sigfigscoretype[1]+$epsilon) {return true;}
 		} else {

@@ -1861,6 +1861,9 @@ function draw_triangle() {
             $alt .= ($i == 0) ? " a" : " A";
             $alt .= " side".$altMark[$i]." is unlabeled".$altVerLabNoAngle[$i];
           }
+          if ($hasPerp === true && $i == $perpKey) {
+            $alt .= " with its opposite angle labeled with a right angle box";
+          }
           $alt .= ".";
           if ($hasAltitude === true) {
             if ($altitudes[$i] == 1) {
@@ -1890,6 +1893,8 @@ function draw_triangle() {
             }
           }
         }
+      } elseif ($hasPerp === true && $hasAltSidLab !== true && $hasAltAngLab !== true) {
+        $alt .= " One angle is labeled with a right angle box.";
       }
     }
   } else {
