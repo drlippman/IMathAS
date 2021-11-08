@@ -162,7 +162,9 @@ class CalculatedMatrixScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        if (in_array('scalarmult',$ansformats)) {
+        $fullmatrix = !in_array("",  $givenanslist, true);
+
+        if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist
             $mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $answerlist)));
             $mag2 = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $givenanslistvals)));
@@ -181,7 +183,7 @@ class CalculatedMatrixScorePart implements ScorePart
             }
         }
 
-        if (in_array('ref',$ansformats)) {
+        if ($fullmatrix && in_array('ref',$ansformats)) {
             // reduce correct answer to rref
             $answerlist = matrix_scorer_rref($answerlist, $N);
             $M = count($answerlist) / $N;
