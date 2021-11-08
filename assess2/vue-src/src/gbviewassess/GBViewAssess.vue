@@ -261,6 +261,11 @@
             </p>
           </div>
         </div>
+        <div v-else-if="viewFull">
+          <button @click="hidetexts = !hidetexts; loadTexts()">
+            {{ $t(hidetexts ? 'print.show_text' : 'print.hide_text') }}
+          </button>
+        </div>
 
         <div v-if="viewFull">
           <inter-question-text
