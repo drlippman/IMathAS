@@ -68,7 +68,7 @@ class FunctionExpressionScorePart implements ScorePart
         $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$givenans);
 
         if (empty($variables)) { $variables = "x";}
-        $variables = array_map('trim',explode(",",$variables));
+        $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
             if ($variables[$i]=='lambda') { //correct lamda/lambda

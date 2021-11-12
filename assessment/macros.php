@@ -441,6 +441,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$lastl = 0;
 		$px = null;
 		$py = null;
+		$pyorig = null;
 		$pathstr = '';
 		$firstpoint = false;
 		$nextavoid = null;
@@ -452,15 +453,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
+				$pt = $t;
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = $evalxfunc(['t'=>$t]);
-				$y = $evalyfunc(['t'=>$t]);
-				if (isNaN($x) || isNaN($y)) {
+				$yorig = $evalyfunc(['t'=>$t]);
+				if (isNaN($x) || isNaN($yorig)) {
 					continue;
 				}
 				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
-				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
+				$y = round($yorig,$yrnd);//round(eval("return ($yfunc);"),3);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
@@ -468,9 +470,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-                $y = $evalfunc(['x'=>$x]);
+                $yorig = $evalfunc(['x'=>$x]);
 
-				if (isNaN($y)) {
+				if (isNaN($yorig)) {
                     if ($lastl != 0) {
                         if ($py !== null) {
                             $pathstr .= ",[$px,$py]";
@@ -482,7 +484,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     }
 					continue;
 				}
-				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
+				$y = round($yorig,$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
@@ -507,14 +509,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					if ($isparametric) {
 						$y = $evalyfunc(['t'=>$t-1E-10]);
 						$tempy = $evalyfunc(['t'=>$t-$dx/100-1E-10]);
-						$temppy = $evalyfunc(['t'=>$px + 1/pow(10,$xrnd)]);
+						$temppy = $evalyfunc(['t'=>$t - $dx + $dx/100]);
 					} else {
 						$y = $evalfunc(['x'=>$x-1E-10]);
 						$tempy = $evalfunc(['x'=>$x-$dx/100-1E-10]);
 						$temppy = $evalfunc(['x'=>$px + 1/pow(10,$xrnd)]);
                     }
 
-					if ($temppy > $py) {//if ($tempy<$y) { // going up
+					if ($temppy > $pyorig) {//if ($tempy<$y) { // going up
 						$iy = $yymax;
 						//if jumping from top of graph to bottom, change value
 						//for interpolation purposes
@@ -586,6 +588,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			$px = $x;
 			$py = $y;
+			$pyorig = $yorig;
 
 			if ($nextavoid !== null && $x > $nextavoid) {
 				// grab next avoid point
@@ -4785,15 +4788,20 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 		}
 	} else {
 		if (!$exactsigfig) {
-			$gadploc = strpos($givenans,'.');
+			$absgivenans = str_replace('-','',$givenans);
+			$gadploc = strpos($absgivenans,'.');
 			if ($gadploc===false) { // no decimal place
-                if ($anans != 0 && strlen($givenans) < $reqsigfigs) { return false; } //not enough digits
-                if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($givenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
-                $gasigfig = strlen(rtrim($givenans,'0'));
+                if ($anans != 0 && strlen($absgivenans) < $reqsigfigs) { return false; } //not enough digits
+                if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($absgivenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
+                $gasigfig = max($reqsigfigs, strlen(rtrim($absgivenans,'0')));
             } else {
-                if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
-                if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
-                $gasigfig = strlen($givenans) - 1;
+				if (abs($givenans)<1) {
+					$gasigfig = strlen(ltrim(substr($absgivenans,$gadploc+1),'0'));
+				} else {
+					$gasigfig = strlen(ltrim($absgivenans,'0'))-1;
+				}
+                if ($anans != 0 && $gasigfig < $reqsigfigs ) { return false; } //not enough sigfigs
+                if ($anans != 0 && $reqsigfigoffset>0 && $gasigfig > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
             }
 		} else {
 			$absgivenans = str_replace('-','',$givenans);

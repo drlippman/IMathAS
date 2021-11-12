@@ -102,9 +102,8 @@ class StringScorePart implements ScorePart
                     if (comparelogic($givenans, $answer, $variables)) {
                         $correct += 1;
                         $foundloc = $j;
-                    } else {
-                        continue; // skip normal processing
-                    }
+                    } 
+                    continue; // skip normal processing
                 }
 
                 if (count($torem)>0) {

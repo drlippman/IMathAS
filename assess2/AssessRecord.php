@@ -2593,6 +2593,13 @@ class AssessRecord
           $partla = $scoreResult['lastAnswerAsGiven'];
           $partlaNum = $scoreResult['lastAnswerAsNumber'];
 
+          if (is_array($scoreResult['answeights']) && 
+              (empty($curQver['answeights']) || $scoreResult['answeights'] !== $curQver['answeights'])
+          ) {
+            // answeights changed during rescoring
+            $this->setAnsweights($qn, $scoreResult['answeights'], $by_question ? $qv : $av);
+          }
+
           // overwrite scores and only keep newly rescored try
           foreach ($partla as $pn=>$v) {
             if (isset($rawparts[$pn])) {
@@ -2612,6 +2619,7 @@ class AssessRecord
     }
     $this->reTotalAssess();
     if ($by_question) {
+
       $qnsAffected = array_unique($qnsAffected);
       $curQuestions = &$this->data['assess_versions'][0]['questions'];
       // Loop through affected question numbers
