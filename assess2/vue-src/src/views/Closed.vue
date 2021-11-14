@@ -240,7 +240,7 @@ export default {
       }
     },
     canViewScored () {
-      return (this.settings.is_lti &&
+      return (
         !this.canViewAll &&
         this.settings.viewingb !== 'never' &&
         this.settings.prev_attempts.length > 0 &&
