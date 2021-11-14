@@ -197,7 +197,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 
 	$showgrayedout = false;
-    if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && 
+    if (!isset($teacherid) && $status < 2 && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && 
         (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0) &&
         empty($excused['A'.$row['reqscoreaid']])
     ) {
