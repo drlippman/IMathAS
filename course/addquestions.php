@@ -982,7 +982,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							}
 						}
 						if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
-							$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/assess_tiny.png\" alt=\""._("Detailed Solution")."\"/>";
+							$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/assess_tiny.png\" alt=\""._("Written Example")."\"/>";
 						}
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
