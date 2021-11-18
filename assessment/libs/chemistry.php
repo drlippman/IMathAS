@@ -1,7 +1,7 @@
 <?php
 //A collection of chemistry routines
 //
-//Version 0.2 April 16, 2014
+//Version 0.3 October 19, 2021
 
 global $allowedmacros;
 array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
@@ -477,7 +477,17 @@ $GLOBALS['chem_periodic_table'] = array(
         106=>array("Sg", "Seaborgium", 106,263.118, "unknown", "unknown", ""),
         107=>array("Bh", "Bohrium", 107,264, "unknown", "unknown", ""),
         108=>array("Hs", "Hassium", 108,269, "unknown", "unknown", ""),
-        109=>array("Mt", "Meitnerium", 109,268, "unknown", "unknown", "")
+        109=>array("Mt", "Meitnerium", 109,268, "unknown", "unknown", ""),
+		110=>array("Ds", "Darmstadtium", 110,281, "unknown", "unknown", ""), //110 t0 118 updated in Oct 2021; Source: https://ptable.com/
+		111=>array("Rg", "Roentgenium", 111,282, "unknown", "unknown", ""),
+		112=>array("Cn", "Copernicium", 112,285, "unknown", "unknown", ""),
+		113=>array("Nh", "Nihonium", 113,286, "unknown", "unknown", ""),
+		114=>array("Fl", "Flerovium", 114,289, "unknown", "unknown", ""),
+		115=>array("Mc", "Moscovium", 115,290, "unknown", "unknown", ""),
+		116=>array("Lv", "Livermorium", 116,293, "unknown", "unknown", "Chalcogen"),
+		117=>array("Ts", "Tennessine", 117,294, "unknown", "unknown", "Halogen"),
+		118=>array("Og", "Oganesson", 118,294, "unknown", "unknown", "Noble gas"),
+
     );
 
 $GLOBALS['chem_families'] = array(
