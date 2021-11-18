@@ -96,8 +96,18 @@ class FunctionExpressionAnswerBox implements AnswerBox
             }
         }
 
-        if (!empty($domain)) {$fromto = array_map('trim', explode(",", $domain));} else { $fromto[0] = -10;
-            $fromto[1] = 10;}
+        if (!empty($domain)) {
+            $fromto = array_map('trim', explode(",", $domain));
+            for ($i=0; $i < count($fromto); $i++) {
+                if ($fromto[$i] === 'integers') { continue; }
+                else if (!is_numeric($fromto[$i])) {
+                    $fromto[$i] = evalbasic($fromto[$i]);
+                }
+            }
+        } else { 
+            $fromto[0] = -10;
+            $fromto[1] = 10;
+        }
         if (count($fromto) == 1) {$fromto[0] = -10;
             $fromto[1] = 10;}
         $domaingroups = array();

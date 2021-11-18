@@ -87,6 +87,12 @@ class FunctionExpressionScorePart implements ScorePart
 
         if (!empty($domain)) {
             $fromto = array_map('trim',explode(",",$domain));
+            for ($i=0; $i < count($fromto); $i++) {
+                if ($fromto[$i] === 'integers') { continue; }
+                else if (!is_numeric($fromto[$i])) {
+                    $fromto[$i] = evalbasic($fromto[$i]);
+                }
+            }
         } else {
             $fromto = array(-10, 10);
         }
