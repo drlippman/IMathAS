@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples","isset","atan2");
+ "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits","isset","atan2");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -5065,6 +5065,27 @@ function comparentuples() {
   }
   if ($correct == $dim) {
     return true;
+  }
+}
+
+function comparenumberswithunits($unitExp1, $unitExp2, $tol='0.001') {
+  require_once(__DIR__.'/../assessment/libs/units.php');
+  if (strval($tol)[0]=='|') {
+    $abstolerance = floatval(substr($tol,1));
+  }
+  [$unitVal1, $unitArray1] = parseunits($unitExp1);
+  [$unitVal2, $unitArray2] = parseunits($unitExp2);
+  if ($unitArray1 !== $unitArray2) {return false;}
+  if ($unitArray1 === $unitArray2) {
+    if (isset($abstolerance)) {
+      if (abs($unitVal1 - $unitVal2) < $abstolerance+1E-12) {
+        return true;
+      }
+    } else {
+      if (abs($unitVal1 - $unitVal2)/abs($unitVal1+0.0001) < $tol+1E-12 && abs($unitVal1 - $unitVal2)/abs($unitVal2+0.0001) < $tol+1E-12) {
+        return true;
+      }
+    }
   }
 }
 
