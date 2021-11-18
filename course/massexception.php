@@ -539,7 +539,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
             $forumarr[$row[0]] = $row[1];
         }
     }
-    $query = "SELECT id,name,date_by_lti FROM imas_assessments WHERE courseid=:courseid ";
+    $query = "SELECT id,name,date_by_lti FROM imas_assessments WHERE courseid=:courseid AND avail=1 ";
     if (isset($tutorid)) {
         $query .= "AND tutoredit=3 ";
     }
