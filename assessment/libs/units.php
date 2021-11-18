@@ -211,10 +211,10 @@ function parseunits($unitsExpression) {
       'kPa' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)], //kilopascal
       'MPa' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)], //megapascal
       'GPa' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)], //gigapascal
-      'atm' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
-      'atms' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
-      'atmosphere' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
-      'atmospheres' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+      'atm' => [1.01325E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+      'atms' => [1.01325E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+      'atmosphere' => [1.01325E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+      'atmospheres' => [1.01325E5,array(1,-1,-2,0,0,0,0,0,0,0)],
       'bar' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
       'bars' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
       'barometer' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
@@ -224,8 +224,8 @@ function parseunits($unitsExpression) {
       'Torr' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
       'torr' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
       'mmHg' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
-      'cmWater' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)], //This comes from a cmH2O preg_replace
-      'psi' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)],
+      'cmWater' => [98.0665,array(1,-1,-2,0,0,0,0,0,0,0)], //This comes from a cmH2O preg_replace
+      'psi' => [6894.76,array(1,-1,-2,0,0,0,0,0,0,0)],
     //Electrical Units
       'C' => [1,array(0,0,1,0,0,0,0,0,1,0)],
       'Coulomb' => [1,array(0,0,1,0,0,0,0,0,1,0)],
