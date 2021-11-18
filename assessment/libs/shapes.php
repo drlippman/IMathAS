@@ -1872,7 +1872,7 @@ function draw_triangle() {
           if ($altitudes[$i] == 1) {
             $altAltLab[$i] = (!empty($altitudes[$i+3])) ? " labeled ".$altitudes[$i+3]." " : "";
             $altAltPtLab[$i] = (!empty($altitudes[$i+6])) ? " at point ".$altitudes[$i+6] : "";
-            $alt .= " An altitude".$altAltLab[$i]." is drawn from that angle's vertex to its opposite side".$altAltPtLab[$i];
+            $alt .= " An altitude".$altAltLab[$i]." is drawn from that angle's vertex to the line containing its opposite side".$altAltPtLab[$i];
             $alt .= ($medians[$i] == 1 || $bisectors[$i] == 1) ? "," : ".";
             $alt .= (($medians[$i] == 1 || $bisectors[$i] == 1) && !($medians[$i] == 1 && $bisectors[$i] == 1)) ? " and " : " ";
           }
