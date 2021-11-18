@@ -10,8 +10,9 @@ array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_s
 
 //--------------------------------------------draw_angle()----------------------------------------------------
 
-// draw_angle("measurement,[label]","rotate","axes")
+// draw_angle("measurement,[label],[noarc]","rotate","axes")
 // You must include at least the angle's measurement to define the angle, and "label" is optional for the angle.
+// Angle arc is shown by default. Put noarc in the last entry to not show the angle arc.
 // Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "57, 1 rad".
 // Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
 // Options include:
@@ -31,7 +32,7 @@ function draw_angle() {
   foreach ($argsArray as $in) {
     if ($in[0] == "rotate") {
       if (isset($in[1])) {
-        $rot = $in[1];
+        $rot = ($in[1]>=0) ? $in[1] : 360+$in[1];
       } elseif (!isset($in[1])) {
         $rot = $GLOBALS['RND']->rand(0,360);
       }
@@ -49,17 +50,20 @@ function draw_angle() {
       }
     }
   }
-  
   $rotRad = $rot*M_PI/180;
   if (is_numeric($argsArray[0][0])) {
     $ang = $argsArray[0][0];
+    $hasArc = true;
     if (isset($argsArray[0][1])) {
       $lab = $argsArray[0][1];
       $degSymbol = "&deg;";
-    }  
+    }
+    if (isset($argsArray[0][2])) {
+      if ($argsArray[0][2] === "noarc") {$hasArc = false;}
+    }
   }
   if (abs($ang)>=2000) {
-    echo "Angle must be between less than 2000 degrees in magnitude.";
+    echo "Angle must be strictly between -2000 degrees and 2000 degrees.";
     return '';
   }
   $angRad = $ang*M_PI/180;
@@ -69,26 +73,22 @@ function draw_angle() {
   $yEnd = sin($angRad+$rotRad);
   
   // Draw the sides of the angle
-  $args = $args."strokewidth=2;line([0,0],[$xStart,$yStart]);line([0,0],[$xEnd,$yEnd]);dot([0,0]);strokewidth=1;";
+  $args = $args."stroke='blue'; strokewidth=2;line([0,0],[$xStart,$yStart]);line([0,0],[$xEnd,$yEnd]);dot([0,0]);strokewidth=1; stroke='black';";
   
   // Label the angle
   $belowFactor = 1;
-  $labFact = 0.35+0.05*abs(ceil($ang/360));
-  if (abs($ang)<30) {
-    if ($ang<0) {
-      $belowFactor = -1;
-    }
-    [$xLabLoc,$yLabLoc] = [$labFact*cos(($rot+$ang+$belowFactor*20)*M_PI/180),$labFact*sin(($rot+$ang+$belowFactor*20)*M_PI/180)];
-  } elseif (abs($ang)>=30) {
-    $halfAngle = $ang/2;
-    if (($halfAngle%90<20 && $halfAngle%90>=0) || $halfAngle%90<-70) {
-      $moveAxis = 40;
-    } elseif (($halfAngle%90>-20 && $halfAngle%90<0) || $halfAngle%90>70) {
-      $moveAxis = -40;
-    } 
-    [$xLabLoc,$yLabLoc] = [$labFact*cos(($halfAngle+$rot+$moveAxis)*M_PI/180),$labFact*sin(($halfAngle+$rot+$moveAxis)*M_PI/180)];
+  $labFact = 0.3;
+  $halfAngle = ($ang+$rot)/2;
+  if ($hasArc === true) {
+    $labFact += 0.09*(abs($ang/360));
   }
-  $altAngleLab = $lab;
+  $quadAng = (abs($ang+$rot)%90 != 0) ? (4*($ang+$rot<0 || ($ang+$rot)%360>270) + 1*ceil((($ang+$rot)/90))%4) : 0;
+  $quadRot = (abs($rot)%90 != 0) ? (4*($rot<0) + 1*ceil($rot/90)) : 0;
+  $labAngArray = diffarrays([1,2,3,4],[$quadAng,$quadRot]);
+  $labAng = ($labAngArray[$GLOBALS['RND']->rand(0,count($labAngArray)-1)]*90-45)*M_PI/180;
+  [$xLabLoc,$yLabLoc] = [$labFact*cos($labAng),$labFact*sin($labAng)];
+
+  $altAngleLab = numtowords($lab);
   $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
   $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
   $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
@@ -100,32 +100,64 @@ function draw_angle() {
         $altAngleLab = preg_replace($greekSpelled[$j],$altGreekSymbol[$j],$altAngleLab);
       }
     }  
-  }
+  } elseif (empty($lab)) {$degSymbol='';}
   $args = $args."text([$xLabLoc,$yLabLoc],'$lab$degSymbol');";
   
   // Draw the angle arc
-  if ($ang < 0) {
-    [$xStartTmp,$yStartTmp] = [$xStart,$yStart];
-    [$xStart,$yStart] = [$xEnd,$yEnd];
-    [$xEnd,$yEnd] = [$xStartTmp,$yStartTmp]; 
-  }
-  // Starting position of the arc
-  $arcRad = 0.15;
-  if (abs($ang)>360) {
-    $minAng = $rotRad;
-    $maxAng = $rotRad+$angRad;
-    if ($ang<0) {
-      $minAng = $rotRad+$angRad;
-      $maxAng = $rotRad;
+  if ($hasArc === true) {
+    if ($ang < 0) {
+      [$xStartTmp,$yStartTmp] = [$xStart,$yStart];
+      [$xStart,$yStart] = [$xEnd,$yEnd];
+      [$xEnd,$yEnd] = [$xStartTmp,$yStartTmp]; 
     }
-    $args = $args."plot(['($arcRad+.06/(2*pi)*abs(t-$rotRad))*cos(t)','($arcRad+.06/(2*pi)*abs(t-$rotRad))*sin(t)'],$minAng,$maxAng);";
-  } else {
+    // Starting position of the arc
+    $arcRad = (abs($ang)<=90) ? 0.85 : 0.15;
+    if (abs($ang)>=0) {
+      $minAng = $rotRad;
+      $maxAng = $rotRad+$angRad;
+      if ($ang<0) {
+        $minAng = $rotRad+$angRad;
+        $maxAng = $rotRad;
+      }
+      if (abs($ang) > 10) {
+        $args = $args."plot(['($arcRad+.09/(2*pi)*abs(t-$rotRad))*cos(t)','($arcRad+.09/(2*pi)*abs(t-$rotRad))*sin(t)'],$minAng,$maxAng);";
+      }
+    }
     if (abs($ang) <= 180) {
-      $arc = "arc([$arcRad*$xStart,$arcRad*$yStart],[$arcRad*$xEnd,$arcRad*$yEnd],$arcRad);";
-    } elseif (abs($ang) > 180 && abs($ang)<=360) {
-      $arc = "arc([$arcRad*$xStart,$arcRad*$yStart],[-$arcRad*$xStart,-$arcRad*$yStart],$arcRad);arc([-$arcRad*$xStart,-$arcRad*$yStart],[$arcRad*$xEnd,$arcRad*$yEnd],$arcRad);";
-    } 
-    $args = $args.$sectorArc.$arc;
+      $arrowOffset = (abs($ang)<=90) ? 0.2*abs($angRad) : 0.7;
+    } elseif (abs($ang) > 180 && abs($ang) < 360) {
+      $arrowOffset = (abs($ang)<=270) ? 0.15*abs($angRad) : 0.1*abs($angRad);
+    } else {
+      $arrowOffset = 0.7-0.01*abs($angRad);
+    }
+    $arrowWeight = 0;
+    if ($angRad >= 0) {
+      if ($ang > 10) {
+        [$xArrowStart,$yArrowStart] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($maxAng-$arrowOffset),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($maxAng-$arrowOffset)];
+        [$xArrowEnd,$yArrowEnd] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($maxAng),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($maxAng)];
+      } else {
+        $arrowWeight = 1;
+        [$xArrowStart,$yArrowStart] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($maxAng+0.3),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($maxAng+0.3)];
+        [$xArrowEnd,$yArrowEnd] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($maxAng),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($maxAng)];
+        [$xArrowStart1,$yArrowStart1] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($minAng-0.3),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($minAng-0.3)];
+        [$xArrowEnd1,$yArrowEnd1] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($minAng),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($minAng)];
+      }
+    } else {
+      if ($ang < -10) {
+        [$xArrowStart,$yArrowStart] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($minAng+$arrowOffset),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($minAng+$arrowOffset)];
+        [$xArrowEnd,$yArrowEnd] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($minAng),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($minAng)];
+      } else {
+        $arrowWeight = 1;
+        [$xArrowStart,$yArrowStart] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($minAng-0.3),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($minAng-0.3)];
+        [$xArrowEnd,$yArrowEnd] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($minAng),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($minAng)];
+        [$xArrowStart1,$yArrowStart1] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($maxAng+0.3),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($maxAng+0.3)];
+        [$xArrowEnd1,$yArrowEnd1] = [($arcRad+.09/(2*M_PI)*abs($angRad))*cos($maxAng),($arcRad+.09/(2*M_PI)*abs($angRad))*sin($maxAng)];
+      }
+    }
+    $args .= "marker='arrow'; strokewidth=$arrowWeight; line([$xArrowStart,$yArrowStart],[$xArrowEnd,$yArrowEnd]); strokewidth=1; marker='none';";
+    if (abs($ang) <= 10) {
+      $args .= "marker='arrow'; line([$xArrowStart1,$yArrowStart1],[$xArrowEnd1,$yArrowEnd1]); strokewidth=1; marker='none';";
+    }
   }
   
   // Build alt text
@@ -1113,8 +1145,14 @@ function draw_triangle() {
     if ($in[0]=="sides") {
       $noSides = false;
     }
-    if (in_array("rotate",$in)) {
+    if ($in[0]=="rotate") {
       $rotateTriangle = true;
+      if (isset($in[1])) {
+        if (is_numeric($in[1])) {
+          $rotateTriangleBy = true;
+          $rotateTriangleByAngle = ($in[1] >= 0) ? $in[1]%360 : 360+$in[1]%360;
+        }
+      }
     }
   }
   
@@ -1219,8 +1257,12 @@ function draw_triangle() {
       $noAngles = false;
     }
     if ($rotateTriangle === true) {
-      $rndNum = $GLOBALS['RND']->rand(0,360)*M_PI/180;
-    } elseif ($rotateTriangle === false) {
+      if ($rotateTriangleBy===true) {
+        $rndNum = ($rotateTriangleByAngle + $ang[2])*M_PI/180 - M_PI/2;
+      } elseif ($rotateTriangleBy === false) {
+        $rndNum = $GLOBALS['RND']->rand(0,360)*M_PI/180;
+      }
+    } elseif ($rotateTriangle !== true) {
       $rndNum = $ang[2]*M_PI/180 - M_PI/2;
     }
   }
@@ -1367,7 +1409,11 @@ function draw_triangle() {
   if ($rotateTriangle === false) {
     $rndNum = $angRad[2] - M_PI/2;
   } elseif ($rotateTriangle === true) {
-    $rndNum = $GLOBALS['RND']->rand(0,360)*M_PI/180;
+    if ($rotateTriangleBy === true) {
+      $rndNum = $rotateTriangleByAngle*M_PI/180 + $angRad[2] - M_PI/2;
+    } elseif ($rotateTriangleBy !== true) {
+      $rndNum = $GLOBALS['RND']->rand(0,360)*M_PI/180;
+    }
   }
   
   foreach ($ang as $key => $angle) {
