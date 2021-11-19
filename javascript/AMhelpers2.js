@@ -545,13 +545,11 @@ function setupDraw(qn) {
       }
     });
   }
-  var a11ydrawbtn = document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd");
-  if (a11ydrawbtn) {
-    a11ydrawbtn.addEventListener('click', function(event) {
-      var qn = event.target.getAttribute('data-qn');
-      imathasDraw.adda11ydraw(qn);
-    });
-  }
+  $("#qn"+qn).parent().find(".a11ydrawadd:not(.inited)").off("click.adda11ydraw").on("click.adda11ydraw", function(event) {
+    var qn = event.target.getAttribute('data-qn');
+    $(event.target).addClass("inited");
+    imathasDraw.adda11ydraw(qn);
+  });
 }
 
 function initMultAns(qn) {
