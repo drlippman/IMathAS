@@ -4,7 +4,7 @@
 //Version 0.3 October 19, 2021
 
 global $allowedmacros;
-array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
+array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily","chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
 
 //chem_disp(compound)
 //formats a compound for display in as HTML
@@ -486,7 +486,7 @@ $GLOBALS['chem_periodic_table'] = array(
 		115=>array("Mc", "Moscovium", 115,290, "unknown", "unknown", ""),
 		116=>array("Lv", "Livermorium", 116,293, "unknown", "unknown", "Chalcogen"),
 		117=>array("Ts", "Tennessine", 117,294, "unknown", "unknown", "Halogen"),
-		118=>array("Og", "Oganesson", 118,294, "unknown", "unknown", "Noble gas"),
+		118=>array("Og", "Oganesson", 118,294, "unknown", "unknown", "Noble gas")
 
     );
 
