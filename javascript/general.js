@@ -839,6 +839,9 @@ function rewriteVideoUrl(href) {
 		} else if (href.match(/youtu\.be/)) {
 			var vidid = href.split('.be/')[1].split(/[#&]/)[0];
 			var vidsrc = 'www.youtube.com/embed/';
+            if (vidid.indexOf('?') > -1) {
+                qsconn = '&';
+            }
 		} else if (href.match(/vimeo/)) {
 			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
 			var vidsrc = 'player.vimeo.com/video/';
