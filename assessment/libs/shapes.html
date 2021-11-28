@@ -40,20 +40,22 @@
 <p><a name="angle"></a></p>
 <h2><strong>draw_angle</strong></h2>
 <p>Draws and labels an angle.</p>
-<p>Syntax: draw_angle("measurement,[label]",["rotate,[ang]"],["axes"])</p>
+<p>Syntax: draw_angle("measurement,[label],[noarc]",["rotate,[ang]"],["axes"])</p>
 <p>The first option must include the angle measurement.
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
-  <li><strong>"measurement,[label]"</strong> -- The label will include the degree symbol by default. To not use degree symbol, use "rad", e.g. "57,1rad".</li>
+  <li><strong>"measurement,[label],[noarc]"</strong> -- The label will include the degree symbol by default. To not use degree symbol, use "rad", e.g. "57,1rad". Leave label blank to not include a label. Angle arc will be drawn to show direction of angle. To not show the arc, put <em>noarc</em> as the last entry.</li>
   <li><strong>"rotate,[deg]"</strong> -- Rotates the image by deg degrees. If "deg" is omitted, rotates by a random angle.</li>
   <li><strong>"axes"</strong> -- Draws the xy axes.</li>
   <li><strong>"size,length"</strong> -- Changes the size of the image to be lengthxlength. Default is 300x300.</li>
-  <li>Note: Angles can be any size (between -2000 and 2000 degrees), and arcs will be drawn by default.</li>
+  <li>Note: Angles must be strictly between -2000 and 2000 degrees.</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
 <br />
 <p>Examples:</p>
-<p><strong>$gr = draw_angle("120,2pi/3")</strong> -- This draws a 120 degree angle in standar position, labeled 2&pi;/3.</p>
+<p><strong>$gr = draw_angle("340,theta","axes")</strong> -- Draws a 340 degree angle, labeled &theta;, in standard position on coordinate axes, and an angle arc with arrow is shown.
+<p><strong>$gr = draw_angle("120,2pi/3,noarc")</strong> -- This draws a 120 degree angle in standard position, labeled 2&pi;/3. Angle arc is not drawn.</p>
+<p><strong>$gr = draw_angle("-150,-150","axes","rotate")</strong> -- This draws a 150 degree angle clockwise, labeled -150&deg;. Coordinate axes are drawn, and starting ray of the angle is rotated by a random angle. Angle arc is shown with arrow.</p>
 
 
 <p><a name="circle"></a></p>
@@ -232,7 +234,7 @@
   <li><strong>"median,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle. lab1,lab2,lab3 are labels for the medians, and ptlab1,ptlab2,ptlab3 are labels for where the medians intersect their opposite sides</li>
   <li><strong>"altitude,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle. lab1,lab2,lab3 are labels for the altitudes, and ptlab1,ptlab2,ptlab3 are labels for where the altitudes intersect their opposite (extended) sides. Dashed lines are drawn to extend opposite side if necessary.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
-  <li><strong>"rotate"</strong> Rotates the triangle by a random angle.</li>
+  <li><strong>"rotate,[ang]"</strong> Rotates the triangle counterclockwise by ang degrees. If "ang" is omitted, rotates by a random angle.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
 </ul>
   <p>Notes</p>
@@ -252,6 +254,7 @@
 <p><strong>$gr = draw_triangle("angles,30,60,90,pi/6,pi/3")</strong> -- A 30-60-90 right triangle with angle labels &pi;/6 and &pi;/3. The right angle box is displayed by default.</p>
 <p><strong>$gr = draw_triangle("sides,5,10,12,a,b,c", "angles,A,B,C")</strong> -- A triangle with side lengths 5, 10 and 12, labeled with letters a,b,c. Angles are labeled with A,B,C.</p>
 <p><strong>$gr = draw_triangle("rotate","points")</strong> -- A random triangle with points on the vertices (unlabeled), drawn with random rotation.</p>
+<p><strong>$gr = draw_triangle("angles,30,90,60","rotate,90")</strong> -- A 30-60-90 triangle rotated so the right edge is drawn vertically and the right angle is at top right.
 <p><strong>$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")</strong> -- A triangle with random angles, points are labeled P,Q,R, angles are labeled a,b,c and they have arcs (, (( and (((.</p>
 <p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, labeled with the letter "P".</p>
 

@@ -294,7 +294,7 @@ function CalcPlot3Dembed($funcs, $width=500, $height=500, $xmin=-2, $xmax=2, $ym
 	$out .= '<div class="fluid-width-video-wrapper" style="padding-top:'.$aspectRatio.'%">';
 	$out .= '<iframe frameborder=0 scrolling="no" ';
 	//$querystring is sanitized as it's constructed
-	$out .= 'src="https://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/dynamicFigure/?'.$querystring.'"></iframe>';
+	$out .= 'src="https://c3d.libretexts.org/CalcPlot3D/dynamicFigure/index.html?'.$querystring.'"></iframe>';
 	$out .= '</div></div>';
 	return $out;
 }
@@ -310,7 +310,7 @@ function CalcPlot3Dlink($funcs, $linktext="View Graph", $xmin=-2, $xmax=2, $ymin
 	}
 	$querystring = CalcPlot3Dquerystring($funcs, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $xscl, $yscl, $zscl, $zclipmin, $zclipmax);
 	//$querystring is sanitized as it's constructed
-	$out = '<a href="https://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/?'.$querystring.'" target="_blank">';
+	$out = '<a href="https://c3d.libretexts.org/CalcPlot3D/index.html?'.$querystring.'" target="_blank">';
 	$out .= Sanitize::encodeStringForDisplay($linktext).'</a>';
 	return $out;
 }

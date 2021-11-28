@@ -470,11 +470,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($sectionsort) {
-				$stunames[$row[0]] = '<span class="small">(Section '.Sanitize::encodeStringForDisplay($row[4]).')</span> <span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]).'</span>';
+				$stunames[$row[0]] = '<span class="small">(Section '.Sanitize::encodeStringForDisplay($row[4]).')</span> '.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]);
 			} else if ($hassection) {
-				$stunames[$row[0]] = '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]).'</span> <span class="small">(Section '.Sanitize::encodeStringForDisplay($row[4]).')</span>';
+				$stunames[$row[0]] = Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]).' <span class="small">(Section '.Sanitize::encodeStringForDisplay($row[4]).')</span>';
 			} else {
-				$stunames[$row[0]] = '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]).'</span>';
+				$stunames[$row[0]] = Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]);
 			}
 			$hasuserimg[$row[0]] = $row[3];
 			$stulocked[$row[0]] = $row[5];

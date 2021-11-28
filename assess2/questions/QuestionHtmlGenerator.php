@@ -547,7 +547,7 @@ class QuestionHtmlGenerator
 
         if (isset($hints) && is_array($hints) && count($hints) > 0 && $showHints) {
             // Eval'd question writer code expects this to be "$hintloc".
-            $hintloc = $this->getHintText($hints);
+            $hintloc = $this->getHintText($hints, $hintlabel ?? '');
         }
 
         /*
@@ -883,9 +883,10 @@ class QuestionHtmlGenerator
      * Get hint text for question and/or individual parts.
      *
      * @param array $hints As provided by the question writer.
+     * @param string $hintlabel 
      * @return string|array The hint text.
      */
-    private function getHintText(array $hints)
+    private function getHintText(array $hints, string $hintlabel)
     {
         $qdata = $this->questionParams->getQuestionData();
         $attemptn = $this->questionParams->getStudentAttemptNumber();
@@ -946,7 +947,7 @@ class QuestionHtmlGenerator
                         $hintloc[$iidx] = $hintpart[$usenum];
                     } else if (strpos($hintpart[$usenum], 'button"') !== false) {
                         $hintloc[$iidx] = "<p>{$hintpart[$usenum]}</p>\n";
-                    } else if (isset($hintlabel)) {
+                    } else if (!empty($hintlabel)) {
                         $hintloc[$iidx] = "<p>$hintlabel {$hintpart[$usenum]}</p>\n";
                     } else {
                         $hintloc[$iidx] = "<p><i>" . _('Hint:') . "</i> {$hintpart[$usenum]}</p>\n";
@@ -964,7 +965,7 @@ class QuestionHtmlGenerator
                     $hintloc = $hints[$usenum];
                 } else if (strpos($hints[$usenum], 'button"') !== false) {
                     $hintloc = "<p>{$hints[$usenum]}</p>\n";
-                } else if (isset($hintlabel)) {
+                } else if (!empty($hintlabel)) {
                     $hintloc = "<p>$hintlabel {$hints[$usenum]}</p>\n";
                 } else {
                     $hintloc = "<p><i>" . _('Hint:') . "</i> {$hints[$usenum]}</p>\n";

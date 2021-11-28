@@ -78,7 +78,7 @@ $(function() {
 		code: code,
 		callback: initcell,
 		evalButtonText: evallabel,
-        languages: (lang == '' ? sagecell.allLanguages : lang),
+        languages: (lang == '' ? sagecell.allLanguages : [lang]),
 		hide: ["permalink", "fullScreen"]
 	});
 });
