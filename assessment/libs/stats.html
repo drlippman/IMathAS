@@ -1,6 +1,6 @@
 <html><body>
 <h1>Macro Library stats</h1>
-A library of Stats functions.  Version 1.20, Jan 8, 2021
+A library of Stats functions.  Version 1.30, Nov 20, 2021
 <BR><ul>
 <li><a href="#nCr">nCr</a></li>
 <li><a href="#nPr">nPr</a></li>
@@ -57,6 +57,7 @@ A library of Stats functions.  Version 1.20, Jan 8, 2021
 <li><a href="#anova2way">Two-way ANOVA: Data</a></li>
 <li><a href="#anova2way_f">Two-way ANOVA: F ratios/P values </a></li>
 <li><a href="#anova_table">ANOVA Table</a></li>
+<li><a href="#student_t">Two-sample student t-test</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -414,3 +415,17 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>ANOVA table for displaying data.</p>  
+  <p>&nbsp;</p>
+
+  <p><h3><a name="student_t"></a><strong>student_t</strong>(arr1, arr2, [equalVar = False, paired = False, roundto = 12])</h3></p>
+  <p>Function student_t() computes t statistic and coressponding P-value for two-sample student t-test.</p>
+  <p><em>Parameters:</em></p>
+  <ul>
+      <li><strong>arr1, arr2</strong>: Arrays in the form [2,3,4,5,...]; unequal sample sizes are accepted for independent samples. </li>
+      <li><strong>equalVar</strong>: Optional - Boolean. Set to True for equal population variances; default is False. </li>
+      <li><strong>paired</strong>: Optional - Boolean. Set to True for paired (dependent) samples; default is False.</li>
+      <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places.</li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>t statistic, coressponding P-value (area to the right of t-value -  one-tail), and degree of freedom for two sample student t-test as an array in the form [t, P-value, df].</p>
+  <p>&nbsp;</p> 
