@@ -85,7 +85,7 @@ class CalculatedAnswerBox implements AnswerBox
         list($longtip, $shorttip) = formathint($eword, $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calculated', (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats) || in_array('set', $ansformats) || in_array('exactset', $ansformats)), 1);
         $tip .= $longtip;
         if ($reqsigfigs !== '' && !in_array("scinot", $ansformats) && !in_array("scinotordec", $ansformats) && !in_array("decimal", $ansformats)) {
-            unset($reqsigfigs);
+            $reqsigfigs = '';
         }
         if ($reqsigfigs !== '') {
             list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);

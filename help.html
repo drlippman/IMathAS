@@ -3480,7 +3480,7 @@ drawn line from the correct line.
 
 <p><strong>Recommended Variables</strong></p>
 <dl>
-<dt>$answerformat = "twopoint", "polygon", "inequality", "numberline", or (for the older tools), "line,lineseg,dot,opendot" </dt>
+<dt>$answerformat = "twopoint", "polygon", "inequality", "numberline", "freehand", or (for the older tools), "line,lineseg,dot,opendot" </dt>
 	<dd>Limits the drawing tools available to students.  Defaults to the older drawing tools "line,dot,opendot".
 	    <p>$answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
 	    control points to define the shape. It is strongly recommended you use these instead of the older tools.</p>
@@ -3531,7 +3531,10 @@ drawn line from the correct line.
             like "&gt;=abs(x-3)+4", "&lt;3abs(x)".  Use $answerformat="inequality,line,abs,parab" or some combo to turn on multiple tools.</p>
 	    <p>$answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
 	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.</p>
-	    <p>$answerformat can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"</p>
+        <p>$answerformat="freehand" will allow freehand drawing without any drawing tools. This mode can NOT be autograded, and should 
+            only be used for manually graded answers.
+        </p>
+        <p>$answerformat can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"</p>
 	     </dd>
  <dt>$snaptogrid = spacing </dt>
 	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
