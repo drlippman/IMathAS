@@ -2441,8 +2441,8 @@ function anova1way(... $arr){
 		if (!is_array($a)) { $a = explode(',',$a);};
 		$n[]=count($a);
 	}
-	if (count($n)<3) {
-		echo "Error: ANOVA requires three or more arrays";
+	if (count($n)<2) {
+		echo "Error: ANOVA requires two or more arrays";
 		return false;
 	}
 	$N=array_sum($n);	
