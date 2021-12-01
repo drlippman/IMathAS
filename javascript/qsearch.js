@@ -151,6 +151,7 @@ function doAdvSearch() {
 function doQuestionSearch(offset) {
     offset = offset || 0;
     $("#searcherror").hide();
+    $("#searchspinner").show();
     var search = document.getElementById("search").value;
     if (cursearchtype == 'all' && search.trim()=='') {
         $("#searcherror").html(_('You must provide a search term when searching All Libraries')).show();
@@ -171,8 +172,10 @@ function doQuestionSearch(offset) {
         displayQuestionList(msg);
         document.getElementById("myTable").focus();
         document.getElementById("fullqsearchwrap").scrollIntoView();
+        $("#searchspinner").hide();
     }).fail(function() {
         $("#searcherror").show();
+        $("#searchspinner").hide();
     });
 }
 
