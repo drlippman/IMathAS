@@ -147,8 +147,9 @@ function doAdvSearch() {
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
 }
-
+var qsearchintransit = false;
 function doQuestionSearch(offset) {
+    if (qsearchintransit) { return; }
     offset = offset || 0;
     $("#searcherror").hide();
     $("#searchspinner").show();
@@ -158,6 +159,7 @@ function doQuestionSearch(offset) {
         $("#search").focus();
         return;
     }
+    qsearchintransit = true;
     $.ajax({
         url: qsearchaddr,
         method: 'POST',
@@ -173,9 +175,11 @@ function doQuestionSearch(offset) {
         document.getElementById("myTable").focus();
         document.getElementById("fullqsearchwrap").scrollIntoView();
         $("#searchspinner").hide();
+        qsearchintransit = false;
     }).fail(function() {
         $("#searcherror").show();
         $("#searchspinner").hide();
+        qsearchintransit = false;
     });
 }
 
