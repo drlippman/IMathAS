@@ -2454,7 +2454,8 @@ function simplexsolve2() {
 	// save start time -------------------------------------------------
 	$starttime = microtime(true);  //  for function timing
 
-	// process arguments -----------------------------------------------
+#region  process arguments -----------------------------------------------
+
 	$args = func_get_args();
 	if (count($args)==0) {
 		echo "Nothing to solve - no simplex matrix supplied.<br/>\r\n";
@@ -2482,6 +2483,8 @@ function simplexsolve2() {
         $showfractions = 1;
 	}
 
+#endregion
+
 	// Done processing arguments ---------------------------------------
 	$simplexstack = array();		// a stack of simplexset object that need to be pivoted on
 	$simplexsets = array();			// simplex list of matricies
@@ -2490,7 +2493,7 @@ function simplexsolve2() {
 	$rows = 0;						// set to the initial simplex matrix row
 	$simplexsets[$rows] = null;     // set initial condition
 	$columns = 0;					// set to the initial simplex matrix column
-	$parentcolumn = 0;				// set to the current active column
+	$parentcolumn = $columns;		// set to the current active column
 	$exitwhile = FALSE;				// flag to exit loop
 	$popstack = FALSE;				// flag to get an item from the stack
 
@@ -2500,24 +2503,25 @@ function simplexsolve2() {
 	// step 1
 	$solution = simplexreadsolutionarray($sm,$type,$showfractions,$ismixed);
 
-	// step 2
-	// is this a objective reached?
+	// step 2-  is this a objective reached?
 	if($solution[(count($solution)-1)]=="Yes") {
 		$objectivereached[] = $solution;
 	}
-
+    $doloopcheck = 0;
 	do {
+        $doloopcheck++;
 		// check for mixed constraints
         $hasmixedconstraints = simplexhasmixedconstrants($sm);
 
-		// step 3
+		#region  step 3 - get pivot points
+
 		$pivots = NULL;
 
-		if($parentcolumn==$columns) {
+		if((!$popstack)&&($parentcolumn==$columns)) {
             // Need to find all pivot(s) for the simplex matrix
             $pivotpoint = NULL;
 
-			// step 1 - See if this is a mixed constraint simplex matrix
+			//  See if this is a mixed constraint simplex matrix
             if($hasmixedconstraints)
 			{
 				$pivotpointList	  = simplexfindpivotpointmixed($sm);
@@ -2532,11 +2536,13 @@ function simplexsolve2() {
             }
         }
 		else {
-			// from the stack - has not been processed
-			// do not find a pivot this round
+			// use the pivot point from the stack
+			$pivotpoint = $pivotpoints[0];
         }
 
-		// step 4
+		#endregion
+
+		#region step 4 - test for no solution
 		if ($PivotPointCondition == PivotPointNoSolution) {
 			//								   parent column
 			//								   , Pivot Point Condition
@@ -2553,19 +2559,20 @@ function simplexsolve2() {
 			break;
 		}
 
-		// step 5
-		// count the number of pivots points
+		#endregion
+
+		#region step 5 - count the number of pivots points and add to stack if needed
+
 		if(count($pivotpoints) > 1) {
 			// add the multiple pivot point matrix to the output
 			if(is_null($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 
-			// step 7
 			//  parent column, pivot, all pivot points, simplex matrix, soluiton
 			$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, NULL, $pivotpoints, $sm, $solution);
 
-			// push all extra pivot points to the stack
+			// push all extra pivot points to the stack the zero number will be processes this round
 			$i = 1;
 			while ($i <count($pivotpoints)):
                 // might need to keep all possible pivot points on the stack?
@@ -2582,9 +2589,9 @@ function simplexsolve2() {
 			}
 		}
 
-		// step 6
-		//  parent column, pivot, all pivot points, simplex matrix, solution
-		//$rowflag = count($simplexsets);
+		#endregion
+
+		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
         if(is_null($simplexsets[$rows])) {
             $simplexsets[$rows] = array();
@@ -2592,26 +2599,30 @@ function simplexsolve2() {
 
 		$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
 
-		// step 7
-		//if($rowflag<$rows) {
-		//	$simplexsets[$rows] = array();
-		//}
+		#endregion
 
-		// step 8
+		// step 7 - set the $parentcolumn to teh current column
 		$parentcolumn = $columns;
 
-		// step 9
-		// pivot if possible
+		#region step 8 - pivot if possible
+
 		if (!is_null($pivotpoint)) {
 			$sm = simplexpivot($sm,$pivotpoint);
 			$solution = simplexreadsolutionarray($sm,$type,$showfractions,$ismixed);
 		}
 
-		// step 10
+		#endregion
+
+		// step 9 - set to not pop off the stack
 		$popstack = FALSE;
 
-		// step 11
+		#region step 10 test pivot point type (Multiple solutions, one solution, or no solutions)
+
 		if ($PivotPointCondition == PivotPointFoundMultipleSolutionList) {
+
+			// add the result of the pivot
+			$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
+
 			// compare the new solution found in step 8 above to all previous solutions
 			// and see if it is unique
 			if(simplexfindsolutioninlist($objectivereached,$solution)==1) {
@@ -2626,32 +2637,44 @@ function simplexsolve2() {
 			// is this a objective reached?
 			if($solution[(count($solution)-1)]=="Yes") {
 				if(simplexfindsolutioninlist($objectivereached,$solution)==1) {
-					// solution is already in the list return the results
-					// don't save it'
+					// solution is already in the list return the results - don't save it'
 				} else {
 					$objectivereached[count($objectivereached)] = $solution;
 				}
 			}
 		}
 
+		#endregion
+
+		#region step 11 - do we need to pop the stack?
 		if($popstack) {
 			// is there any item in the stack?
 			if(count($simplexstack) > 0) {
-				$columns++;
 
 				// pop the Stack and set the variables
 				$stack = array_pop($simplexstack);
 				$rows = $stack[0];
 				$parentcolumn = $stack[1];
 				$PivotPointCondition = $stack[2];
+				$pivotpoints = array();  // clear
+				$pivotpoints[0] = $stack[3];
 				$pivotpoint = $stack[3];
 				$sm= $stack[4];
 				$solution = $stack[5];
 
+				$columns++;
 			} else {
 				$exitwhile = TRUE;
 			}
 		}
+
+		#endregion
+
+		// this is here to prevent a run away loop
+		if(($rows > 30)||($columns>30)||($doloopcheck>90)) {
+			// failsafe - tripped
+			$exitwhile = TRUE;
+        }
 
 	} while (!$exitwhile);
 
