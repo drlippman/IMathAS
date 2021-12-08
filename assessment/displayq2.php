@@ -506,14 +506,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 
-	if ($returnqtxt===2) {
-		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
-	} else if ($returnqtxt===3) {
-		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
-	}
-	if (($qdata['solutionopts']&1)==0) {
-		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
-	}
+	
 
 	if (strpos($evaledqtext,'[AB')!==false) {
 		if (is_array($answerbox)) {
@@ -542,6 +535,14 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$evaledqtext = str_replace('[SAB]', $showanswerloc, $evaledqtext);
 			$toevalqtxt .= '$showanswerloc';
 		}
+	}
+    if ($returnqtxt===2) {
+		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
+	} else if ($returnqtxt===3) {
+		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
+	}
+	if (($qdata['solutionopts']&1)==0) {
+		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
 	}
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
