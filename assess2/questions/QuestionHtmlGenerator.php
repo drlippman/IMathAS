@@ -603,7 +603,8 @@ class QuestionHtmlGenerator
         // This variable must be named $showanswerloc, as it may be used by
         // the question writer.
         $showanswerloc = $this->getShowAnswerLocation($doShowAnswer, $doShowAnswerParts,
-          $answerbox, $entryTips, $displayedAnswersForParts, $questionWriterVars);
+          $answerbox, $entryTips, $displayedAnswersForParts, $questionWriterVars,
+          $anstypes ?? $quesData['qtype']);
 
         /*
          * Eval the question code.
@@ -1027,6 +1028,7 @@ class QuestionHtmlGenerator
      * @param array $entryTips Tooltips displayed for answer boxes.
      * @param array $displayedAnswersForParts
      * @param array $questionWriterVars
+     * @param array|string $anstypes or qtype
      * @return array|string
      */
     private function getShowAnswerLocation(int $doShowAnswer,
@@ -1034,7 +1036,8 @@ class QuestionHtmlGenerator
                                            $answerBoxes,
                                            array $entryTips,
                                            array $displayedAnswersForParts,
-                                           array $questionWriterVars
+                                           array $questionWriterVars,
+                                           $procanstypes
     )
     {
         $qnidx = $this->questionParams->getDisplayQuestionNumber();
@@ -1058,19 +1061,20 @@ class QuestionHtmlGenerator
          */
 
         if (isset($showanswer) && !is_array($showanswer)) {
-            $showanswer = $this->fixDegrees($showanswer);
+            $showanswer = $this->fixDegrees($showanswer, $procanstypes);
         } else if (isset($showanswer)) {
             foreach ($showanswer as $k=>$v) {
                 if ($v === null) {continue;}
-                $showanswer[$k] = $this->fixDegrees($v);
+                $showanswer[$k] = $this->fixDegrees($v, $procanstypes[$k]);
             }
         }
         if (!is_array($shanspt)) {
-            $shanspt = $this->fixDegrees($shanspt);
+            $shanspt = $this->fixDegrees($shanspt, $procanstypes);
         } else {
             foreach ($shanspt as $k=>$v) {
                 if ($v === null) {continue;}
-                $shanspt[$k] = $this->fixDegrees($v);
+                $shanspt[$k] = $this->fixDegrees($v, 
+                    is_array($procanstypes) ? $procanstypes[$k] : $procanstypes);
             }
         }
         
@@ -1300,9 +1304,12 @@ class QuestionHtmlGenerator
         $this->errors[] = $errorMessage;
     }
 
-    private function fixDegrees($str) 
+    private function fixDegrees($str, $atype) 
     {
         if ($str === null) { return ''; }
+        if (is_array($atype) || $atype == 'choices' || $atype == 'multans' || $atype == 'string') {
+            return $str;
+        }
         return preg_replace_callback('/`(.*?)`/s', function($m) {
             return '`' . str_replace(['degrees','degree'],'^@', $m[1]).'`';
         }, $str);
