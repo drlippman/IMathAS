@@ -606,6 +606,19 @@ class QuestionHtmlGenerator
           $answerbox, $entryTips, $displayedAnswersForParts, $questionWriterVars,
           $anstypes ?? $quesData['qtype']);
 
+        // incorporate $showanswer.  Really this should be done prior to the last line,
+        // and remove the redundant logic from that function, but I don't want to refactor 
+        // that much right now
+        if (!empty($showanswer)) {
+            if (!is_array($showanswer)) {
+                $displayedAnswersForParts = [0 => $showanswer];
+            } else {
+                foreach ($showanswer as $iidx => $atIdx) {
+                    $displayedAnswersForParts[$iidx] = $atIdx;
+                }
+            }
+        }
+
         /*
          * Eval the question code.
          *
