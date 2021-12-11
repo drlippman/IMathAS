@@ -55,9 +55,9 @@
 		$secfilter = -1;
 	}
 
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,ver FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -377,8 +377,11 @@
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h1></div>";
-	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
-	echo '<div class="cpmid">';
+	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions";
+    if ($submitby == 'by_assessment') {
+        echo '<br>Note: Only students who have submitted their assessment will show here.';
+    }
+	echo '</p><div class="cpmid">';
 	if ($page==-1) {
 		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
@@ -459,6 +462,9 @@
 		if ($hidelocked) {
 			$query .= "AND imas_students.locked=0 ";
 		}
+        if ($submitby == 'by_assessment') {
+            $query .= "AND (imas_assessment_records.status & 64)=64 ";
+        }
 		if ($secfilter != -1) {
 			$query .= "AND imas_students.section=:section ";
 			$qarr[':section'] = $secfilter;
@@ -485,6 +491,9 @@
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
 	}
+    if ($submitby == 'by_assessment') {
+        $query .= "AND (imas_assessment_records.status & 64)=64 ";
+    }
 	if ($secfilter != -1) {
 		$query .= "AND imas_students.section=:section ";
 		$qarr[':section'] = $secfilter;
