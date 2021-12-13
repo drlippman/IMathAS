@@ -55,9 +55,9 @@
 		$secfilter = -1;
 	}
 
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,ver FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -123,12 +123,13 @@
 		$DBH->beginTransaction();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_records.* FROM imas_users,imas_assessment_records ";
 		$query .= "WHERE imas_assessment_records.userid=imas_users.id AND imas_assessment_records.assessmentid=:assessmentid ";
-		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
-		if ($page != -1 && isset($_GET['userid'])) {
-			$query .= " AND userid=:userid";
+		if ($page != -1 && !$onepergroup && isset($_POST['userid'])) {
+			$query .= " AND imas_users.id=:userid ";
 		}
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
+		
 		$stm = $DBH->prepare($query);
-		if ($page != -1 && isset($_GET['userid'])) {
+		if ($page != -1 && !$onepergroup && isset($_POST['userid'])) {
 			$stm->execute(array(':assessmentid'=>$aid, ':userid'=>$_POST['userid']));
 		} else {
 			$stm->execute(array(':assessmentid'=>$aid));
@@ -136,6 +137,7 @@
 		$cnt = 0;
 		$updatedata = array();
 		$changesToLog = array();
+
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 
 			$GLOBALS['assessver'] = $line['ver'];
@@ -375,8 +377,11 @@
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h1></div>";
-	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
-	echo '<div class="cpmid">';
+	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions";
+    if ($submitby == 'by_assessment') {
+        echo '<br>Note: Only students who have submitted their assessment will show here.';
+    }
+	echo '</p><div class="cpmid">';
 	if ($page==-1) {
 		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
@@ -457,6 +462,9 @@
 		if ($hidelocked) {
 			$query .= "AND imas_students.locked=0 ";
 		}
+        if ($submitby == 'by_assessment') {
+            $query .= "AND (imas_assessment_records.status & 64)=64 ";
+        }
 		if ($secfilter != -1) {
 			$query .= "AND imas_students.section=:section ";
 			$qarr[':section'] = $secfilter;
@@ -483,6 +491,9 @@
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
 	}
+    if ($submitby == 'by_assessment') {
+        $query .= "AND (imas_assessment_records.status & 64)=64 ";
+    }
 	if ($secfilter != -1) {
 		$query .= "AND imas_students.section=:section ";
 		$qarr[':section'] = $secfilter;

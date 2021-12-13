@@ -2492,8 +2492,9 @@ function simplexsolve2() {
 	if($solution[(count($solution)-1)]=="Yes") {
 		$objectivereached[] = $solution;
 	}
-
+    $doloopcheck = 0;
 	do {
+        $doloopcheck++;
 		// check for mixed constraints
         $hasmixedconstraints = simplexhasmixedconstrants($sm);
 
@@ -2631,7 +2632,10 @@ function simplexsolve2() {
 		#endregion
 
 		#region step 11 - do we need to pop the stack?
+<<<<<<< HEAD
 
+=======
+>>>>>>> adbf878d45f1a51d6cec364455a56ac841cde536
 		if($popstack) {
 			// is there any item in the stack?
 			if(count($simplexstack) > 0) {
@@ -2656,7 +2660,11 @@ function simplexsolve2() {
 		#endregion
 
 		// this is here to prevent a run away loop
+<<<<<<< HEAD
 		if(($rows > 30)||($columns>30)) {
+=======
+		if(($rows > 30)||($columns>30)||($doloopcheck>90)) {
+>>>>>>> adbf878d45f1a51d6cec364455a56ac841cde536
 			// failsafe - tripped
 			$exitwhile = TRUE;
         }
@@ -3461,6 +3469,7 @@ function simplexsolve($sm,$type,$showfractions=1) {
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
 
+<<<<<<< HEAD
 
 // NOTES:
 // uses fractionparse for
@@ -3477,3 +3486,6 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 ?>
+=======
+?>
+>>>>>>> adbf878d45f1a51d6cec364455a56ac841cde536
