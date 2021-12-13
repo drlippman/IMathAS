@@ -382,7 +382,7 @@ function updateInAssessMarkers() {
     $("#selq tbody tr").each(function(i,el) {
         if (el.childNodes.length == 1) { return; }
         $(el.childNodes[1]).toggleClass('qinassess', 
-            existingq.indexOf(parseInt(el.childNodes[3].textContent)) !== -1);
+            existingq.indexOf(parseInt(el.childNodes[0].firstChild.value)) !== -1);
     });
 }
 
