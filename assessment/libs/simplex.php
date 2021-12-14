@@ -4,8 +4,10 @@
 // licensed under GPL version 2 or later
 //
 
+include_once("fractions.php");  // fraction routine
+
 function simplexver() {
-	return 41;
+	return 42;
 }
 
 global $allowedmacros;
@@ -644,7 +646,7 @@ function simplexcreateinequalities() {
 				// add the number as a fraction display, or decimal value
 				$frac = createsimplexelement($objective[$j]);
 				if($showfractions==1) {
-					$simplexestring[0] .= simplexfractionreduce($frac);
+					$simplexestring[0] .= fractionreduce($frac);
 				}
 				else {
                     //$simplexestring[0] .= fractiontodecimal($frac);
@@ -689,7 +691,7 @@ function simplexcreateinequalities() {
 					// add the number as a fraction display, or decimal value
 					$frac = createsimplexelement($coeff[$j]);
 					if($showfractions==1) {
-						$simplexestring[$row] .= simplexfractionreduce($frac);
+						$simplexestring[$row] .= fractionreduce($frac);
 					}
 					else {
 						//$simplexestring[$row] .= fractiontodecimal($frac);
@@ -734,7 +736,7 @@ function simplexconverttofraction($sm){
 
     for($r=0,$sizerow = count($sm);$r<$sizerow;$r++) {
         for($c=0,$sizecol = count($sm[0]);$c<$sizecol;$c++) {
-            $sm[$r][$c] = simplexfractionreduce($sm[$r][$c]);
+            $sm[$r][$c] = fractionreduce($sm[$r][$c]);
         }
     }
 
@@ -1048,7 +1050,7 @@ function simplexdisplaycolortable() {
             }
             elseif($showfractions==1) {
 				// fraction parse - used to display a string fraction or digitif the denominator is 1 it returns a digit not an array
-                $Element = simplexfractionreduce($sm[$rloop][$cloop]);   // convert to fraction
+                $Element = fractionreduce($sm[$rloop][$cloop]);   // convert to fraction
             }
             else {
 				$Element = $sm[$rloop][$cloop][0]/$sm[$rloop][$cloop][1]; // convert to decimal
@@ -2027,7 +2029,7 @@ function simplexgetentry($sm,$r,$c) {
     $f[0] /= $g;
     $f[1] /= $g;
 
-    return $f; // simplexfractionreduce($sm[$r][$c]);
+    return $f; // fractionreduce($sm[$r][$c]);
 }
 
 // simplexpivot(simplexmatrix,pivotpoint)
@@ -2212,7 +2214,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0)
                         $f[0] /= $g;
                         $f[1] /= $g;
 
-						$solution[$c] = $f; // simplexfractionreduce($sma[$zerorow][$lastcol]);
+						$solution[$c] = $f; // fractionreduce($sma[$zerorow][$lastcol]);
                     } else {
                         // return a decimal
 						$solution[$c] = $sma[$zerorow][$lastcol][0]/$sma[$zerorow][$lastcol][1];
@@ -2230,7 +2232,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0)
                 $f[0] /= $g;
                 $f[1] /= $g;
 
-				$solution[$c] = $f; // simplexfractionreduce($sma[$lastrow][$c]);
+				$solution[$c] = $f; // fractionreduce($sma[$lastrow][$c]);
 			}
 			else {
 				// return a decimal
@@ -2262,7 +2264,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0)
                         $f[0] /= $g;
                         $f[1] /= $g;
 
-						$solution[$c] = $f; //simplexfractionreduce($sma[$zerorow][$lastcol]);
+						$solution[$c] = $f; //fractionreduce($sma[$zerorow][$lastcol]);
 					}
 					else {
 						// return a decimal
@@ -2366,7 +2368,7 @@ function simplexsolutiontolatex($solution){
 
 	for($i=0,$size = count($solution);$i<$size;$i++)
 	{
-		$xvar = simplexfractionparse($solution[$i]);
+		$xvar = fractionparse($solution[$i]);
 		$Top = $xvar[0];
 		$Bot = $xvar[1];
 		if($Bot > 1) {
@@ -2387,7 +2389,7 @@ function simplexsolutionconverttofraction($objectivereached){
 
     for($r=0;$r<$sizerow;$r++) {
         for($c=0;$c<$sizecol;$c++) {
-            $sol[$r][$c] = simplexfractionreduce($objectivereached[$r][$c]);
+            $sol[$r][$c] = fractionreduce($objectivereached[$r][$c]);
         }
 		$sol[$r][$c] = "Yes";
     }
@@ -2492,9 +2494,8 @@ function simplexsolve2() {
 	if($solution[(count($solution)-1)]=="Yes") {
 		$objectivereached[] = $solution;
 	}
-    $doloopcheck = 0;
+
 	do {
-        $doloopcheck++;
 		// check for mixed constraints
         $hasmixedconstraints = simplexhasmixedconstrants($sm);
 
@@ -2586,7 +2587,7 @@ function simplexsolve2() {
 
 		#endregion
 
-		// step 7 - set the $parentcolumn to teh current column
+		// step 7 - set the $parentcolumn to the current column
 		$parentcolumn = $columns;
 
 		#region step 8 - pivot if possible
@@ -2632,10 +2633,7 @@ function simplexsolve2() {
 		#endregion
 
 		#region step 11 - do we need to pop the stack?
-<<<<<<< HEAD
 
-=======
->>>>>>> adbf878d45f1a51d6cec364455a56ac841cde536
 		if($popstack) {
 			// is there any item in the stack?
 			if(count($simplexstack) > 0) {
@@ -2660,11 +2658,7 @@ function simplexsolve2() {
 		#endregion
 
 		// this is here to prevent a run away loop
-<<<<<<< HEAD
 		if(($rows > 30)||($columns>30)) {
-=======
-		if(($rows > 30)||($columns>30)||($doloopcheck>90)) {
->>>>>>> adbf878d45f1a51d6cec364455a56ac841cde536
 			// failsafe - tripped
 			$exitwhile = TRUE;
         }
@@ -2703,74 +2697,6 @@ function simplexsolve2() {
 	return array($simplexsets, simplexsolutionconverttofraction($objectivereached), (microtime(true)-$starttime), $objectivereached);
 }
 
-// from https://github.com/drlippman/IMathAS/blob/7f838e9160cc10d51b128def17862c9b9f43acea/assessment/macros.php
-function gcd($n,$m) { //greatest common divisor
-    $m = round(abs($m));
-    $n = round(abs($n));
-    if(!$m)return$n;
-    if(!$n)return$m;
-    return $m<$n?gcd($m,$n%$m):gcd($n,$m%$n);
-}
-
-//simplexfractionparse(fraction)
-//converts a fraction into an array(num, denom)
-function simplexfractionparse($f) {
-	if (is_array($f)) {return $f;}
-	$p = explode('/',trim($f));
-	if (count($p)==1) {
-		return array($p[0],1);
-	} else {
-		$wp = explode(' ',$p[0]);
-		if (count($wp)==1) {
-			return array($p[0],$p[1]);
-		} else {
-			if ($wp[0]<0) {
-				return array($wp[0]*$p[1] - $wp[1], $p[1]);
-			} else {
-				return array($wp[0]*$p[1] + $wp[1], $p[1]);
-			}
-		}
-	}
-}
-
-//simplexfractionreduce(f)
-//takes a fraction string or array(num,denom)
-//returns a reduced fraction string
-function simplexfractionreduce() {
-	$args = func_get_args();
-	$retarr = false;
-	if (count($args)==1) {
-		if (is_array($args[0])) {
-			$f = $args[0];
-		} else {
-			$f = fractionparse($args[0]);
-		}
-	} else if (count($args)==2 && is_array($args[0])) {
-		$f = $args[0];
-		$retarr = $args[1];
-	} else if (count($args)==2) {
-		$f = array($args[0],$args[1]);
-	} else if (count($args)==3) {
-		$f = array($args[0],$args[1]);
-		$retarr = $args[2];
-	}
-	$g = gcd($f[0],$f[1]);
-	$f[0] /= $g;
-	$f[1] /= $g;
-	if ($f[1]<0) {
-		$f[0] *= -1;
-		$f[1] *= -1;
-	}
-	if ($retarr) {
-		return $f;
-	}
-	if ($f[1]==1) {
-		return $f[0];
-	} else {
-		return $f[0].'/'.$f[1];
-	}
-}
-
 // *********************************************************************************************************************************
 // *********************************************************************************************************************************
 //
@@ -2793,9 +2719,9 @@ function createsimplexelement($value) {
 	if (is_array($value)) {return $value;}
 	if (is_numeric($value) && floor($value)!=$value) {
 		$frac = decimaltofraction($value);  // located in /assessment/macros.php
-		return simplexfractionparse($frac);
+		return fractionparse($frac);
 	} else {
-		return simplexfractionparse($value);
+		return fractionparse($value);
 	}
     // creat an array of (numerator, denominator)
 }
@@ -2809,7 +2735,7 @@ function simplextoarray($sm){
 
 	for($r=0,$sizerow = count($sm);$r<$sizerow;$r++) {
 		for($c=0,$sizecol = count($sm[0]);$c<$sizecol;$c++) {
-			$sm[$r][$c] = simplexfractionparse($sm[$r][$c]);
+			$sm[$r][$c] = fractionparse($sm[$r][$c]);
 		}
 	}
 
@@ -2871,15 +2797,15 @@ function verifyshowfraction($from,$showfractions,$default,$override=0) {
 }
 
 function verifyASCIIticks($from,$displayASCII,$default) {
-	if(($displayASCII!=0)&&($displayASCII!=1)) {
-		echo "In $from - the supplied displayASCII value ($displayASCII) is invalid.  Valid values are 0 or 1.<br/>\r\n";
+	if(($displayASCII!=0)&&($displayASCII!=1)&&($displayASCII!="`")&&($displayASCII!="")) {
+		//echo "In $from - the supplied displayASCII value ($displayASCII) is invalid.  Valid values are 0 or 1.<br/>\r\n";
 		return $default;
 	}
 	else {
-		if($displayASCII==0) {
+		if(($displayASCII==0)||($displayASCII=="")) {
             return "";
 		}
-		else {
+        {
             return "`";
 		}
 	}
@@ -3212,7 +3138,7 @@ function simplexdisplaytable() {
                 $Element = $sm[$rloop][$cloop];					// ignore the denominator and show the string numerator
             } elseif($showfractions==1) {
 				// fraction parse - used to display a string fraction or digitif the denominator is 1 it returns a digit not an array
-                $Element = simplexfractionreduce($sm[$rloop][$cloop]);   // convert to fraction
+                $Element = fractionreduce($sm[$rloop][$cloop]);   // convert to fraction
             }
             else {
                 //$Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
@@ -3383,7 +3309,8 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change log
-// 2021-xx-xx ver 42
+// 2021-12-13 ver 42 - eliminated a logic bug in verifyASCIIticks. Eliminated simplex fraction routines and am using the 
+//                     fraction.php versions.
 //
 // 2021-12-07 ver 41 - Added another saftey check into simplexsolve2()
 //
@@ -3391,7 +3318,7 @@ function simplexsolve($sm,$type,$showfractions=1) {
 //
 // 2021-xx-xx ver 39 - added simplexreadsolutionarray to the allowed callable functions
 //
-// 2021-10-06 ver 38 - renamed fractionparse to simplexfractionparse as it was included in the file.  Added simplexfractionreduce
+// 2021-10-06 ver 38 - renamed fractionparse to fractionparse as it was included in the file.  Added fractionreduce
 //                     to replace fractionreduce
 //
 // 2021-08-22 ver 37 - Fixed division by 0 bugs and added checks for array/vaules in the simplexchecksolution function
@@ -3469,7 +3396,6 @@ function simplexsolve($sm,$type,$showfractions=1) {
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
 
-<<<<<<< HEAD
 
 // NOTES:
 // uses fractionparse for
@@ -3486,6 +3412,3 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 ?>
-=======
-?>
->>>>>>> adbf878d45f1a51d6cec364455a56ac841cde536
