@@ -1244,7 +1244,7 @@ if ($overwriteBody==1) {
     }
     echo '<br><a href="findquestion.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Find Question in Course').'</a>';
     if ($aver > 1) {
-        echo '<br><a href="addquestions2.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Try New Add/Remove (Beta)').'</a>';
+        echo '<br><a href="addquestions2.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Use New Add/Remove').'</a>';
     }
     echo '</span><br class=clear /></div>';
 	if ($beentaken) {
