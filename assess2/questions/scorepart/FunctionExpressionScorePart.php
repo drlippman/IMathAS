@@ -321,7 +321,7 @@ class FunctionExpressionScorePart implements ScorePart
                         continue; // already used this givenans
                     }
 
-                    $givenansnormalized = $givenanslistnormalized[$gaidx];
+                    $givenansnormalized = $givenanslistnormalized[$gaidx] ?? '';
                     $correct = true;
                     $cntnan = 0;
                     $cntzero = 0;

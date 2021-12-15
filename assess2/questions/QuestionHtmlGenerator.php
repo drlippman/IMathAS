@@ -944,7 +944,7 @@ class QuestionHtmlGenerator
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
-                    if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
+                    if (!empty($scoreiscorrect[$thisq][$iidx])) {
                         continue;
                     }
                     if (!isset($partattemptn[$iidx])) {
