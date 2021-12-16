@@ -159,7 +159,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.meanscore < ?';
             $searchvals[] = $avgscoreparts[1];
         }
-        $searchand[] = 'iq.meantimen > 3';
+        $searchand[] = 'iq.meanscoren > 3';
     }
     if (!empty($search['lastmod'])) {
         $lastmodparts = explode(',', $search['lastmod']);
