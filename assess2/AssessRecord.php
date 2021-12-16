@@ -3938,7 +3938,7 @@ class AssessRecord
 
     for ($pn = 0; $pn < count($qdata['tries']); $pn++) {
       $firstTry = $qdata['tries'][$pn][0];
-      $scoreonfirst += $firstTry['raw'] * $qdata['answeights'][$pn]/$answeightTot;
+      $scoreonfirst += max($firstTry['raw'],0) * $qdata['answeights'][$pn]/$answeightTot;
       $scoredet[$pn] = $firstTry['raw'];
       if (!isset($subsUsed[$firstTry['sub']])) {
         $timeonfirst += $firstTry['time'];
