@@ -166,9 +166,9 @@ class QuestionHtmlGenerator
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {
-          if (count($partattemptn) == 1 && isset($partattemptn[0])) {
+          if ($quesData['qtype'] != "multipart" && isset($partattemptn[0])) {
             $GLOBALS['assess2-curq-iscorrect'] = ($scoreiscorrect[$thisq] < 0 ? -1 : ($scoreiscorrect[$thisq]==1 ? 1 : 0));
-          } else {
+          } else if ($quesData['qtype'] == "multipart") {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
               if ($iidx==0 || !isset($scoreiscorrect[$thisq][$kidx])) {
