@@ -17,7 +17,7 @@ function show_postback_form($launch, $db, $err='') {
   $platform_id = $launch->get_platform_id();
   $migration_claim = $launch->get_migration_claim();
   // see if we already know who this person is
-  $localuserid = $db->get_local_userid($launch);
+  $localuserid = $db->get_local_userid($launch, $role);
 
   if ($role == 'Learner') {
     $localcourse = $db->get_local_course($contextid, $launch);
