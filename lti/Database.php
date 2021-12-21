@@ -324,6 +324,7 @@ class Imathas_LTI_Database implements LTI\Database
         if ($role == 'Instructor') {
             $query .= ' AND iu.rights > 19';
         }
+        $query .= ' ORDER BY iu.rights, lti.id';
 
         $stm = $this->dbh->prepare($query);
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
@@ -348,7 +349,8 @@ class Imathas_LTI_Database implements LTI\Database
                 WHERE lti.ltiuserid=? AND lti.org LIKE ?';
             if ($role == 'Instructor') {
                 $query .= ' AND iu.rights > 19';
-            }    
+            }
+            $query .= ' ORDER BY iu.rights, lti.id';
             $stm = $this->dbh->prepare($query);
             $stm->execute(array($oldltiuserid, $oldkey.':%'));
             $userid = $stm->fetchColumn(0);
@@ -400,6 +402,7 @@ class Imathas_LTI_Database implements LTI\Database
                 if ($role == 'Instructor') {
                     $query .= ' AND iu.rights > 19';
                 }
+                $query .= ' ORDER BY iu.rights, lti.id';
                 $stm = $this->dbh->prepare($query);
                 $stm->execute($qarr);
                 $userid = $stm->fetchColumn(0);
