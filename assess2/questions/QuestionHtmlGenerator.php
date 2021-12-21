@@ -478,7 +478,7 @@ class QuestionHtmlGenerator
         } else {
 
 
-            if ($GLOBALS['myrights'] > 10) {
+            if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10) {
                 if (isset($anstypes)) {
                     $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
                 } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
@@ -1160,6 +1160,7 @@ class QuestionHtmlGenerator
         $qnidx = $this->questionParams->getDisplayQuestionNumber();
         $qidx = $this->questionParams->getDbQuestionSetId();
         $qid = $this->questionParams->getQuestionId();
+        $qref = '';
 
         $externalReferences = [];
 
@@ -1174,9 +1175,7 @@ class QuestionHtmlGenerator
                 if ($qid > 0 && (!isset($_SESSION['isteacher'])
                         || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
                     $qref = $qid . '-' . ($qnidx + 1);
-                } else {
-                    $qref = '';
-                }
+                } 
                 for ($i = 0; $i < count($extref); $i++) {
                     $extrefpt = explode('!!', $extref[$i]);
                     if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
