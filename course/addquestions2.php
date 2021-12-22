@@ -598,7 +598,7 @@ if ($overwriteBody==1) {
 <?php
     
 	if ($displaymethod=='VideoCue' || $displaymethod == 'video_cued') {
-		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
+		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&from=addq2&aid='.$aid.'\'"/></p>';
 	} else if ($displaymethod == 'full') {
 		echo '<p>'._('You can break your assessment into pages by using the +Text button and selecting the New Page option.').'</p>';
 	}
@@ -613,7 +613,7 @@ if ($overwriteBody==1) {
 			}
         ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"><?php echo _("Preview"); ?></button>
         <?php if (!$beentaken) { ?>
-        <a href="moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'"><?php echo _("Add New Question") ?></a>
+        <a href="moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>&from=addq2"><?php echo _("Add New Question") ?></a>
         <?php } ?>
 
 	</p>
