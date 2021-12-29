@@ -2562,7 +2562,7 @@ function prettytime($time,$in,$out) {
 				$outst .= " and $sec second" . ($sec!=1 ? 's':'');
 			} else {//just hrs
 				$hrs = round($hrs,4);
-				$outst = "$hrs hours" . ($hrs!=1 ? 's':'');
+				$outst = "$hrs hour" . ($hrs!=1 ? 's':'');
 			}
 		}
 	} else { //no hours
