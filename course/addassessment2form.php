@@ -296,7 +296,7 @@ $vueData = array(
 					<?php echo _('per try');?>
 					<span v-show="defattemptpenalty>0">
 						<?php echo _('after');?>
-						<input type=number min=1 :max="Math.min(defattempts,9)" size=3 id="defattemptpenaltyaftern"
+						<input type=number min=1 :max="defattemptpenalty>0 ? Math.min(defattempts,9) : 9" size=3 id="defattemptpenaltyaftern"
 							name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern" />
 						<?php echo _('full-credit tries');?>
 					</span>

@@ -3675,7 +3675,11 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		$val = $GLOBALS['assess2-curq-iscorrect'] ?? -1;
 		if ($partn !== null && is_array($val)) {
-			$res = $val[$partn];
+            if (isset($val[$partn])) {
+			    $res = $val[$partn];
+            } else {
+                $res = -1;
+            }
 		} else {
 			$res = $val;
 		}

@@ -25,7 +25,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = removeDisallowedVarsString($str,$anstype,$countcnt);
+		$str = removeDisallowedVarsString($str,$anstype,$countcnt,'"');
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -570,7 +570,7 @@ function tokenize($str,$anstype,$countcnt) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt);
+				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype);
 			}
 			$i++;
 			$c = $str[$i];
@@ -685,12 +685,16 @@ function tokenize($str,$anstype,$countcnt) {
 }
 
 //handle braces and variable variables in strings and qtext
-function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
+function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	global $disallowedvar;
 
 	//remove any blatent disallowed var
 	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str);
 	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+
+    if ($quotetype!='"') {
+        return $str;
+    }
 
 	$startmarker = 0; $lastend = 0;
 	$invarvar = false;
@@ -731,7 +735,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 					//interpret stuff in braces as code
 					$insidebrace = interpretline(substr($str,$startmarker+1,$c-$startmarker-1),$anstype,$countcnt+1);
 					if ($insidebrace!='error') {
-						$outstr .= '{'.$insidebrace.'}';
+						$outstr .= '".('.$insidebrace.')."';
 					}
 				} else if ($invarvar) {
 					$insidebrace = substr($str,$startmarker+1,$c-$startmarker-2);

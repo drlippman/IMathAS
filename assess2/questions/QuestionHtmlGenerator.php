@@ -166,9 +166,9 @@ class QuestionHtmlGenerator
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {
-          if (count($partattemptn) == 1 && isset($partattemptn[0])) {
+          if ($quesData['qtype'] != "multipart" && isset($partattemptn[0])) {
             $GLOBALS['assess2-curq-iscorrect'] = ($scoreiscorrect[$thisq] < 0 ? -1 : ($scoreiscorrect[$thisq]==1 ? 1 : 0));
-          } else {
+          } else if ($quesData['qtype'] == "multipart") {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
               if ($iidx==0 || !isset($scoreiscorrect[$thisq][$kidx])) {
@@ -478,7 +478,7 @@ class QuestionHtmlGenerator
         } else {
 
 
-            if ($GLOBALS['myrights'] > 10) {
+            if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10) {
                 if (isset($anstypes)) {
                     $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
                 } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
@@ -944,7 +944,7 @@ class QuestionHtmlGenerator
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
-                    if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
+                    if (!empty($scoreiscorrect[$thisq][$iidx])) {
                         continue;
                     }
                     if (!isset($partattemptn[$iidx])) {
@@ -1160,6 +1160,7 @@ class QuestionHtmlGenerator
         $qnidx = $this->questionParams->getDisplayQuestionNumber();
         $qidx = $this->questionParams->getDbQuestionSetId();
         $qid = $this->questionParams->getQuestionId();
+        $qref = '';
 
         $externalReferences = [];
 
@@ -1174,9 +1175,7 @@ class QuestionHtmlGenerator
                 if ($qid > 0 && (!isset($_SESSION['isteacher'])
                         || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
                     $qref = $qid . '-' . ($qnidx + 1);
-                } else {
-                    $qref = '';
-                }
+                } 
                 for ($i = 0; $i < count($extref); $i++) {
                     $extrefpt = explode('!!', $extref[$i]);
                     if (strpos($extrefpt[1],'youtube.com/watch')!==false ||

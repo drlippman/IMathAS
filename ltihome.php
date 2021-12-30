@@ -482,7 +482,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 			$addassess = 'addassessment.php';
 		}
 		echo "<p><a href=\"course/$addassess?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a> | ";
-		echo "<a href=\"course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
+		echo "<a href=\"course/addquestions2.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
 		if ($_SESSION['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">'._('Change placement').'</a></p>';
 		}

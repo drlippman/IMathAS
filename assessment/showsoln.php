@@ -22,6 +22,9 @@ $t = Sanitize::onlyInt($_GET['t']);
 $_SESSION['coursetheme'] = $coursetheme;
 
 $flexwidth = true;
+$isdiag = false;
+$useeqnhelper = false;
+$isfw = false;
 require("header.php");
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
 if ($sig != md5($id.$_SESSION['secsalt'])) {

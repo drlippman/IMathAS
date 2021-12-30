@@ -128,7 +128,7 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
 	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
-	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
+	$out .= " <li><a href=\"addquestions2.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
 	$out .= " <li><a href=\"$thisaddassess?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
@@ -2208,10 +2208,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 					 if ($line['ver']>1) {
+                         echo " <a href=\"addquestions2.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 						 echo "<a href=\"addassessment2.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 					 } else {
+                         echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 						 echo "<a href=\"addassessment.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 					 }
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";

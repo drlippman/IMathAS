@@ -16,6 +16,8 @@ $assessUIver = 2;
 $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
+$cid = 'embedq';
+$_SESSION['secsalt'] = "12345";
 
 $issigned = false;
 // Get basic settings from JWT or query string
@@ -50,7 +52,7 @@ $_SESSION['userprefs'] = array();
 foreach ($prefdefaults as $key => $def) {
     if (isset($QS[$key])) { // can overwrite via JWT
         $_SESSION['userprefs'][$key] = filter_var($QS[$key], FILTER_SANITIZE_NUMBER_INT);
-    } else if ($prefcookie !== null && isset($prefcookie[$key])) {
+    } else if (!empty($prefcookie) && isset($prefcookie[$key])) {
         $_SESSION['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
     } else {
         $_SESSION['userprefs'][$key] = $def;
@@ -233,16 +235,16 @@ if (isset($_POST['toscoreqn'])) {
 $ph = Sanitize::generateQueryPlaceholders($QS['id']);
 $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
 $stm->execute($QS['id']);
-$line = $stm->fetch(PDO::FETCH_ASSOC);
 $qsdata = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $qsdata[$row['id']] = $row;
 }
 
 $disps = array();
+
 for ($qn=0; $qn < $numq; $qn++) {
     $qsid = $QS['id'][$qn];
-    $a2->setQuestionData($qsid, $qsdata[$qn]);
+    $a2->setQuestionData($qsid, $qsdata[$qsid]);
     $disps[$qn] = $a2->displayQuestion($qn);
     // force submitall
     if ($state['submitall']) {
@@ -261,7 +263,7 @@ if (isset($_GET['theme'])) {
 }
 
 $lastupdate = '20200422';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastupdate . '" />';
+$placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/chunk-common.css?v=' . $lastupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastupdate . '" media="print">';
 $placeinhead .= '<script src="' . $staticroot . '/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
