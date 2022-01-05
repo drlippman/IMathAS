@@ -249,7 +249,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $groupid = $options['isgroupadmin'];
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $groupid;
             }
@@ -257,14 +257,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
                 $searchvals[] = $groupid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
                 $searchvals[] = $groupid;
             }
         } else {
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals[] = $userid;
             }
@@ -272,7 +272,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
                 $searchvals[] = $userid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
                 $searchvals[] = $userid;
             }
