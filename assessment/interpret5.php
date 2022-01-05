@@ -684,6 +684,16 @@ function tokenize($str,$anstype,$countcnt) {
 	return $syms;
 }
 
+function testIsEscaped($str,$c) {
+    $cnt = 0;
+    $i = $c-1;
+    while ($i >= 0 && $str[$i] == '\\') {
+        $cnt++;
+        $i--;
+    }
+    return (($cnt%2)==1);
+}
+
 //handle braces and variable variables in strings and qtext
 function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	global $disallowedvar;
@@ -702,7 +712,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	$outstr = '';
 	$depth = 0;
 	for ($c=0;$c<strlen($str);$c++) {
-		if ($str[$c]=='{') {
+		if ($str[$c]=='{' && !testIsEscaped($str,$c)) {
 			if ($invarvar || $inbraces) {
 				$depth++;
 			} else { //may be starting new brace or varvar item
