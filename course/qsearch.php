@@ -13,6 +13,11 @@ $libs = explode(',', $_POST['libs']);
 $_SESSION['searchtype'.$aid] = $_POST['searchtype'];
 $_SESSION['searchin'.$aid] = $libs;
 $_SESSION['lastsearch'.$aid] = $_POST['search'];
+if ($_POST['searchtype'] == 'libs') {
+    $_SESSION['lastsearchlibs'.$aid] = $_POST['libs'];
+} else {
+    unset($_SESSION['lastsearchlibs'.$aid]);
+}
 
 header('Content-Type: application/json; charset=utf-8');
 
