@@ -499,14 +499,6 @@ switch($_POST['action']) {
 			$theme = $_POST['theme'];
 		}
 
-        $unenroll = 0;
-		if (isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==0) {
-			$unenroll = $CFG['CPS']['unenroll'][0];
-		} else if (isset($CFG['CPS']['unenroll'])) {
-			$unenroll = $_POST['allowunenroll'];
-        }
-        $unenroll += empty($_POST['allowenroll']) ? 2 : 0;
-
 		if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
 			$copyrights = $CFG['CPS']['copyrights'][0];
 		} else {
@@ -595,6 +587,17 @@ switch($_POST['action']) {
 				$istemplate |= 8;
 			}
 		}
+
+        $unenroll = 0;
+        if ((isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==1) ||
+            ($myrights == 100 && ($istemplate&4)==4)
+        ) {
+            $unenroll = $_POST['allowunenroll'];
+        } else if (isset($CFG['CPS']['unenroll'])) {
+            $unenroll = $CFG['CPS']['unenroll'][0];
+        }
+        $unenroll += empty($_POST['allowenroll']) ? 2 : 0;
+
 		if (!isset($CFG['coursebrowserRightsToPromote'])) {
 			$CFG['coursebrowserRightsToPromote'] = 40;
 		}
