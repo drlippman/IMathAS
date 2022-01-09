@@ -79,6 +79,12 @@ if (strpos($url,'vimeo.com/')!==false) {
 	$videoUrl = 'http://player.vimeo.com/video/'.$vidid;
 	$out = '<iframe width="853" height="480" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
+if (strpos($url,'https://www.loom.com/')===0) {
+	//loom
+    $videoUrl = str_replace('/share/','/embed/',$url);
+	$doembed = true;
+	$out = '<iframe width="853" height="480" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
+}
 if ($doembed) {
 	echo '<html><head><title>Video</title>';
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';

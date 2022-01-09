@@ -1180,7 +1180,8 @@ class QuestionHtmlGenerator
                     $extrefpt = explode('!!', $extref[$i]);
                     if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
             					strpos($extrefpt[1],'youtu.be/')!==false ||
-            					strpos($extrefpt[1],'vimeo.com/')!==false
+            					strpos($extrefpt[1],'vimeo.com/')!==false ||
+                                strpos($extrefpt[1],'loom.com/')!==false
             				) {
                         $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
                         $externalReferences[] = [
