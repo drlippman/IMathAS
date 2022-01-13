@@ -94,6 +94,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_POST['chggreyout'])) {
 		$sets['SH'][2] = $_POST['contentbehavior'];
 	}
+    if (isset($_POST['chginnav'])) {
+		$sets['innav'] = !empty($_POST['innav']) ? 1 : 0;
+	}
 	if (isset($_POST['chggrouplimit'])) {
 		$grouplimit = array();
 		if ($_POST['grouplimit']!='none') {
@@ -256,6 +259,13 @@ foreach ($existblocks as $pos=>$name) {
 		<td class="r">Restrict access to students in section:</td>
 		<td>
 			<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,0); ?>
+		</td>
+	</tr>
+    <tr>
+		<td><input type="checkbox" name="chginnav" class="chgbox"/></td>
+		<td class="r">Quick Links:</td>
+		<td>
+			<input type=checkbox name=innav value=1 /> List block in student left navigation
 		</td>
 	</tr>
 	<tr>
