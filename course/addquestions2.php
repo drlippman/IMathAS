@@ -385,7 +385,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         var assessver = '$aver';
 		</script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090821\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=121321\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=011322\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -660,7 +660,7 @@ if ($overwriteBody==1) {
                 id="searchclear" aria-label="Clear Search">&times;</button>
         </div>
         <div class="dropdown splitbtn" id="searchbtngrp" >
-            <button type="button" class="primary" onclick="doQuestionSearch()">
+            <button type="button" class="primary" onclick="startQuestionSearch()">
                 <?php echo _('Search');?>
             </button><button type="button" id="advsearchbtn" class="primary dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only"><?php echo _('Advanced Search'); ?></span>

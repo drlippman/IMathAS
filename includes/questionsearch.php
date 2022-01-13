@@ -172,6 +172,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchvals[] = strtotime($lastmodparts[1]);
         }
     }
+    if (!empty($search['mine'])) {
+        $searchand[] = 'iq.ownerid=?';
+        $searchvals[] = $userid;
+    }
     if (!empty($search['res'])) {
         $helps = explode(',', $search['res']);
         if (in_array('help', $helps)) {

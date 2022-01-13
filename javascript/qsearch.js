@@ -23,8 +23,6 @@ $(function() {
             advform.scrollIntoView(false);
         }
     }).on('hide.bs.dropdown', function () {
-        console.log("here");
-        console.log(datePickerDivID);
         if (datePickerDivID) {
             $("#"+datePickerDivID).css('visibility','hidden').css('display','none');
         }
@@ -147,18 +145,25 @@ function doAdvSearch() {
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
 }
+function startQuestionSearch(offset) {
+    if ($("#advsearchbtn").attr("aria-expanded") === 'true') {
+        doAdvSearch();
+    } else {
+        doQuestionSearch(offset);
+    }
+}
 var qsearchintransit = false;
 function doQuestionSearch(offset) {
     if (qsearchintransit) { return; }
     offset = offset || 0;
     $("#searcherror").hide();
-    $("#searchspinner").show();
     var search = document.getElementById("search").value;
     if (cursearchtype == 'all' && search.trim()=='') {
         $("#searcherror").html(_('You must provide a search term when searching All Libraries')).show();
         $("#search").focus();
         return;
     }
+    $("#searchspinner").show();
     qsearchintransit = true;
     $.ajax({
         url: qsearchaddr,
