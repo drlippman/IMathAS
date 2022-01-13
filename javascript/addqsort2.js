@@ -1046,7 +1046,7 @@ function generateOutput() {
             qcnt++;
         }
     }
-    return [out, text_segments, pts];
+    return [out, text_segments, pts, extracredit];
 }
 
 function collapseqgrp(i) {
@@ -1142,6 +1142,7 @@ function generateTable() {
         //var ms = generateMoveSelect(i,itemcount);
         var ms = generateMoveSelect2(i);
         grppoints = -1;
+        grpextracredit = -1;
         badthisgrppoints = false;
         for (var j = 0; j < curitems.length; j++) {
             if (alt == 0) {
