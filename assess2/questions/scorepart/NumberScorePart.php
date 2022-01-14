@@ -293,7 +293,7 @@ class NumberScorePart implements ScorePart
                                 }
                                 if ($exactreqdec) {
                                     //check number of decimal places in base givenans
-                                    if ($reqdecimals != (($p = strpos($gaunitsarr[$j][3],'.'))===false?0:(strlen($gaunitsarr[$j][3])-$p-1))) {
+                                    if ($reqdecimals != (($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1))) {
                                         continue;
                                     }
                                 } 
