@@ -4827,6 +4827,9 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			}
 		}
 	}
+    if ($sigfigscoretype === false) {
+        return true;
+    }
     // We've confirmed the sigfigs on givenans are acceptable, so
     // now round anans to givenans's sigfigs for numeric comparison
     $anans = roundsigfig($anans, $gasigfig);

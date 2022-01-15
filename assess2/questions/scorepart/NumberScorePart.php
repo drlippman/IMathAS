@@ -265,6 +265,25 @@ class NumberScorePart implements ScorePart
                 foreach ($anss as $k=>$anans) {
                     if (!is_numeric($anans)) {
                         if (preg_match('/(\(|\[)(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|-oo)\,(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|oo)(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
+                            //check reqdecimals/sigfigs
+                            if ($reqdecimals !== '') {
+                                $decimalsingivenans = ($p = strpos($givenans,'.'))===false ? 0 : (strlen($givenans)-$p-1);
+                                if ($exactreqdec) {
+                                    if ($reqdecimals != $decimalsingivenans ) {
+                                        continue;
+                                    }
+                                } else {
+                                    if ($reqdecimals > $decimalsingivenans ) {
+                                        continue;
+                                    }
+                                }
+                            }
+                            if ($reqsigfigs !== '') {
+                                // only check sigfigs, not value
+                                if (!checksigfigs($givenans, 1, $reqsigfigs, $exactsigfig, $reqsigfigoffset, false)) {
+                                    continue;
+                                } 
+                            }
                             if ($matches[2]=='-oo') {$matches[2] = -1e99;}
                             if ($matches[3]=='oo') {$matches[3] = 1e99;}
                             if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
