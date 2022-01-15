@@ -1358,7 +1358,12 @@ function linreg($xarr,$yarr) {
 		$sxy += $xarr[$i]*$yarr[$i];
 	}
 	$n = count($xarr);
-	$r = ($n*$sxy - $sx*$sy)/(sqrt($n*$sxx-$sx*$sx)*sqrt($n*$syy-$sy*$sy));
+    $rd = (sqrt($n*$sxx-$sx*$sx)*sqrt($n*$syy-$sy*$sy));
+    if ($rd == 0) {
+        $r = 1; // perfect horizontal data
+    } else {
+	    $r = ($n*$sxy - $sx*$sy)/$rd;
+    }
 	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
 	$b = ($sy - $sx*$m)/$n;
 	return array($r,$m,$b);
