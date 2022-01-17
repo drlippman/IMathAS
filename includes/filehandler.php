@@ -252,10 +252,9 @@ function downsizeimage($fileinfo) {
 		if ($imgdata === false || $imgdata[2] !== IMAGETYPE_JPEG) {
 			return;
 		}
-		try {
-			$exif = exif_read_data($fileinfo['tmp_name']);
-		} catch (Exception $exp) {
-			$exif = false;
+        $exif = false;
+        if (function_exists('exif_read_data')) {
+            $exif = @exif_read_data($fileinfo['tmp_name']);
 		}
 		$changed = false;
 		if ((min($imgdata[0],$imgdata[1])>1000 || !empty($exif['Orientation'])) &&
