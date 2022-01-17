@@ -110,20 +110,29 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
     if (!empty($search['terms'])) {
         $wholewords = array();
+        $haspos = false;
         foreach ($search['terms'] as $k => $v) {
-            $sgn = '+';
-            if ($v[0] == '!') {
-                $sgn = '-';
-                $v = substr($v, 1);
-            }
-            if (ctype_alnum($v) && strlen($v) > 3) {
-                $wholewords[] = $sgn . $v . '*';
-                unset($search['terms'][$k]);
+            if ($v[0] != '!' && ctype_alnum($v) && strlen($v) > 3) {
+                $haspos = true;
+                break;
             }
         }
-        if (count($wholewords) > 0) {
-            $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
-            $searchvals[] = implode(' ', $wholewords);
+        if ($haspos) {
+            foreach ($search['terms'] as $k => $v) {
+                $sgn = '+';
+                if ($v[0] == '!') {
+                    $sgn = '-';
+                    $v = substr($v, 1);
+                }
+                if (ctype_alnum($v) && strlen($v) > 3) {
+                    $wholewords[] = $sgn . $v . '*';
+                    unset($search['terms'][$k]);
+                }
+            }
+            if (count($wholewords) > 0) {
+                $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
+                $searchvals[] = implode(' ', $wholewords);
+            }
         }
         if (count($search['terms']) > 0) {
             foreach ($search['terms'] as $k => $v) {
