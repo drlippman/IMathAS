@@ -3181,10 +3181,12 @@ function draw_rectprism() {
 //--------------------------------------------draw_polyomino()----------------------------------------------------
 // draw_polyomino([n],[options],["size,length"])
 // draw_polyomino() will draw a random, connected polyomino, shaded and on a grid.
-// draw_polyomino(n) will draw a random, connected polyomino with n squares, shaded and on a grid.
+// draw_polyomino(n) will draw a random, connected polyomino with (at least) n squares, shaded and on a grid.
 // Options include:
-// "color,transred" will shade in the squares of the polyomino. Best to use a transparent color, such as transblue, gransgreen, etc.
+// "color,[transred]" will shade in the squares of the polyomino. Best to use a transparent color, such as transblue, gransgreen, etc.
+// Using just "color" will shade with a random color
 // "grid" will show the background grid
+// "data" will output an array [graph,area,perimeter]
 // "size,length" sets the image size to be length x length.
 function draw_polyomino() {
   $size = 300;
@@ -3198,24 +3200,37 @@ function draw_polyomino() {
     $argsArray[]=$list;
   }
   $axes = ";";
-  $color = 'none';
+  $fillcolor = 'none';
   foreach ($argsArray as $in) {
+    if ($in[0]=="data") {
+      $getdata = true;
+    }
     if ($in[0]=="grid") {
       $axes = "axes(300,300,1,1,1);";
     }
-    if ($in[0]=="color") {
+    if ($in[0]=="fill") {
       if (isset($in[1])) {
-        $color = $in[1];
+        $fillcolor = $in[1];
       } else {
-        $color = randfrom("transblue,transpurple,transgreen,transred");
+        $fillcolor = randfrom("translightblue,transblue,transpurple,translightgreen,transgreen,transred");
       }
     }
     if ($in[0] == "size") {
       $size = $in[1];
     }
+    if ($in[0]=="alttext") {
+      if (isset($in[1])) {
+        $hasUserAltText = true;
+        $alttext = $in[1];
+      }
+    }
   }
-  if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0) {
+  if (is_numeric($argsArray[0][0])) {
     $squares = $argsArray[0][0]-1;
+    if ($squares > 99 || $squares < 0 || !is_int($squares)) {
+      echo "Number of squares should be an integer in the range [1,100].";
+      return "";
+    }
   } else {
     $squares = $GLOBALS['RND']->rand(3,8);
   }
@@ -3243,7 +3258,7 @@ function draw_polyomino() {
     $used[] = $q;
     $xused[] = $q[0];
     $yused[] = $q[1];
-    $pt .= "rect([{$used[$i][0]},{$used[$i][1]}],[{$used[$i][0]}+1,{$used[$i][1]}+1]);";
+    $pt .= "stroke='red'; rect([{$used[$i][0]},{$used[$i][1]}],[{$used[$i][0]}+1,{$used[$i][1]}+1]);";
   }
   [$xmin,$xmax] = [min($xused),max($xused)];
   [$ymin,$ymax] = [min($yused),max($yused)];
@@ -3294,11 +3309,12 @@ function draw_polyomino() {
         $used[] = $thegrid[$i];
         $xused[] = $thegrid[$i][0];
         $yused[] = $thegrid[$i][1];
-        $pt .= "fill='red';rect([{$thegrid[$i][0]},{$thegrid[$i][1]}],[{$thegrid[$i][0]}+1,{$thegrid[$i][1]}+1]);";
+        $pt .= "rect([{$thegrid[$i][0]},{$thegrid[$i][1]}],[{$thegrid[$i][0]}+1,{$thegrid[$i][1]}+1]);";
       }
     }
+    // Attempt below sometimes creates disconnected parts of the polyomino
     // Now find squares to erase from left-most columns to bring total squares back to $squares
-    for ($i=0; $i<$hasholes; $i++) {
+    /*for ($i=0; $i<$hasholes; $i++) {
       for ($col=$xmin; $col<=$xmax; $col++) {
         for ($row=$ymin; $row<=$ymax; $row++) {
           if (in_array([$col,$row],$used)) {
@@ -3313,9 +3329,9 @@ function draw_polyomino() {
         }
         if ($filled == $hasholes) {break;}
       }
-    }
+    }*/
   }
-  $used = array_values($used);
+  //$used = array_values($used);
   $xused = [];
   $yused = [];
   for ($i=0; $i<count($used); $i++) {
@@ -3329,19 +3345,25 @@ function draw_polyomino() {
   $yl = $ymax-$ymin+3;
   $countused = count($used)-1;
   $perimeter = 4*($countused+1);
-  $description = "A connected region of shaded squares. On the coordinate plane, each shaded square has its bottom left corner given in coordinate form in the following list of x y pairs: ";
-  for ($i=0; $i<=$countused; $i++) {
-    if (in_array([$used[$i][0],$used[$i][1]+1],$used)) {
-      $perimeter -= 2;
+  if ($hasUserAltText != true) {
+    $alttext = "A connected region of shaded squares. On the coordinate plane, each shaded square has its bottom left corner given in coordinate form in the following list of x y pairs: ";
+    for ($i=0; $i<=$countused; $i++) {
+      if (in_array([$used[$i][0],$used[$i][1]+1],$used)) {
+        $perimeter -= 2;
+      }
+      if (in_array([$used[$i][0]+1,$used[$i][1]],$used)) {
+        $perimeter -= 2;
+      }
+      [$thisx,$thisy] = [$xused[$i]-$xmin,$yused[$i]-$ymin];
+      $alttext .= ifthen($i==0,"($thisx,$thisy)",", ($thisx,$thisy)");
     }
-    if (in_array([$used[$i][0]+1,$used[$i][1]],$used)) {
-      $perimeter -= 2;
-    }
-    [$thisx,$thisy] = [$xused[$i]-$xmin,$yused[$i]-$ymin];
-    $description .= ifthen($i==0,"($thisx,$thisy)",", ($thisx,$thisy)");
   }
-
-  $gr = showasciisvg("setBorder(40,40*$yl/$xl,40,40*$yl/$xl); initPicture($xmin-1,$xmax+2,$ymin-1,$ymax+2); $axes; stroke='black'; fill='$color'; $ptcode;",$size,$yl/$xl*$size,$description);
-  return [$gr,count($used),$perimeter];
+  $gr = showasciisvg("setBorder(40,40*$yl/$xl,40,40*$yl/$xl); initPicture($xmin-1,$xmax+2,$ymin-1,$ymax+2); $axes; strokewidth=1.5; fill='$fillcolor'; $ptcode;",$size,$yl/$xl*$size,$alttext);
+  if ($getdata === true) {
+    return [$gr,count($used),$perimeter];
+  } else {
+    return $gr;
+  }
+  
 }
 ?>
