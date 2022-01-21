@@ -3405,6 +3405,12 @@ A student is asked to enter a string (a word or list of letters).
     </dd>
 <dt>$variables</dt>
     <dd>When $answerformat="logic" is used, define the $variables in the logic statement, like "p,q"</dd>
+<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
+	<dd>Adds format checking to the student's answer.  Usually not needed for string questions, but can 
+        be useful when the "logic" answerformat is used. The list can include multiple checks, 
+        which come in pairs.  The first is the symbol to look for.  The second describes what is 
+        acceptable.  For example, in the string shown above, the symbol "^" would be required to show 
+        up exactly 3 times, and "cos" would be required to show up less than 2 times. </dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
 <dt>$answerboxsize = number </dt>

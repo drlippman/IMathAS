@@ -32,7 +32,7 @@ class StringScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'strflags', 'scoremethod', 'answerformat', 'variables'];
+        $optionkeys = ['answer', 'strflags', 'scoremethod', 'answerformat', 'variables', 'requiretimes'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -49,7 +49,11 @@ class StringScorePart implements ScorePart
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         }
-
+        if ($requiretimes !== '' && checkreqtimes($givenans,$requiretimes)==0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+        
         if ($answerformat=='list') {
             $gaarr = array_map('trim',explode(',',$givenans));
             $anarr = array_map('trim',explode(',',$answer));
