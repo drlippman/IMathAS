@@ -86,18 +86,18 @@ var AMQsymbols = [
 {input:"nn",  tag:"mo", output:"\u2229", tex:"cap", ttype:CONST},
 //{input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
-{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
+//{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 //{input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
 {input:"xx", tex:"times", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
 //{input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
-{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
-{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+//{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
+//{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
-{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
-{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
+//{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
+//{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
 {input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 //{input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
@@ -713,7 +713,7 @@ function AMQTparseExpr(str,rightbracket) {
 
 AMQinitSymbols();
 
-return function(str) {
+return function(str,elid) {
  AMQnestingDepth = 0;
   str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
   str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
@@ -723,6 +723,11 @@ return function(str) {
   str = str.replace(/all\s+real\s+numbers/g,'"all real numbers"');
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
   str = str.replace(/\bDNE\b/gi,'"DNE"');
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/interval/)
+  ) {
+      str = str.replace(/\bU\b/g,'cup');
+  }
   if (str.match(/\S/)==null) {
 	  return "";
   }

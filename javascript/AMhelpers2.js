@@ -85,7 +85,7 @@ function toMQwVars(str, elid) {
     if (qtype === 'numfunc' || (qtype === 'calcinterval' && allParams[qn].calcformat.indexOf('inequality')!=-1)) {
         str = AMnumfuncPrepVar(qn, str)[1];
     }
-    return AMtoMQ(str);
+    return AMtoMQ(str, elid);
 }
 function fromMQwText(str, elid) {
     str = MQtoAM(str);
