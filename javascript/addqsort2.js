@@ -1429,18 +1429,35 @@ function generateTable() {
                     "</a></td>";
                 //}
             } else {
+                var tdtitle = '';
+                var tdclass = '';
+                var descricon = '';
                 if (beentaken && curitems[j][6] == 1) {
-                    html +=
-                        '<td class="greystrike" title="' + _("Question Withdrawn") + '">';
-                } else {
-                    html += "<td>";
+                    tdclass = 'greystrike';
+                    tdtitle = _("Question Withdrawn");
+                } else if (curitems[j][10] == 1) {
+                    tdclass = 'qbroken';
                 }
+                if (curitems[j][10] == 1) {
+                    descricon = '<span title="' + _('Marked as broken') + '">' + 
+                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19.7 1.3 19.6 9 16.2 6.3 13.8 11.3 10.5 8.3 7 11.7 3.6 9.2l0-7.9z" class="a"></path><path d="m19.7 22.9 0-7.8-2-1.4-3.1 4-3.3-3-3.8 3.8-4-3.9v8.4z" class="a"></path></svg>' + 
+                    '</span> ';
+                }
+                html += '<td';
+                if (tdclass !== '') {
+                    html += ' class="' + tdclass + '"';
+                }
+                if (tdtitle !== '') {
+                    html += ' title="' + tdtitle + '"';
+                }
+                html += '>' + descricon;
                 html +=
                     '<input type=hidden name="curq[]" id="oqc' +
                     ln +
                     '" value="' +
                     curitems[j][1] +
                     '"/>';
+                
                 html += curitems[j][2] + "</td>"; //description
                 html += '<td class="nowrap">';
                 if ((curitems[j][7] & 32) == 32) {
