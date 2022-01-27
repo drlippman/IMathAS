@@ -6,7 +6,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes","draw_cylinder","draw_cone","draw_sphere","draw_pyramid","draw_rectprism");
+array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes","draw_cylinder","draw_cone","draw_sphere","draw_pyramid","draw_rectprism","draw_polyomino");
 
 //--------------------------------------------draw_angle()----------------------------------------------------
 
@@ -3175,5 +3175,195 @@ function draw_rectprism() {
   }
   $gr = showasciisvg("setBorder(10);initPicture(-$xyMax/10,1.1*$xyMax,-$xyMax/10,1.1*$xyMax);$args;",$size,$size,$alt);
   return $gr;
+}
+
+
+//--------------------------------------------draw_polyomino()----------------------------------------------------
+// draw_polyomino([n],[options],["size,length"])
+// draw_polyomino() will draw a random, connected polyomino, shaded and on a grid.
+// draw_polyomino(n) will draw a random, connected polyomino with (at least) n squares, shaded and on a grid.
+// Options include:
+// "color,[transred]" will shade in the squares of the polyomino. Best to use a transparent color, such as transblue, gransgreen, etc.
+// Using just "color" will shade with a random color
+// "grid" will show the background grid
+// "data" will output an array [graph,area,perimeter]
+// "size,length" sets the image size to be length x length.
+function draw_polyomino() {
+  $size = 300;
+  $input = func_get_args();
+  $argsArray = [];
+  foreach ($input as $list) {
+    if (!is_array($list)) {
+      $list = listtoarray($list);
+    }
+    $list = array_map('trim', $list);
+    $argsArray[]=$list;
+  }
+  $axes = ";";
+  $fillcolor = 'none';
+  foreach ($argsArray as $in) {
+    if ($in[0]=="data") {
+      $getdata = true;
+    }
+    if ($in[0]=="grid") {
+      $axes = "axes(300,300,1,1,1);";
+    }
+    if ($in[0]=="fill") {
+      if (isset($in[1])) {
+        $fillcolor = $in[1];
+      } else {
+        $fillcolor = randfrom("translightblue,transblue,transpurple,translightgreen,transgreen,transred");
+      }
+    }
+    if ($in[0] == "size") {
+      $size = $in[1];
+    }
+    if ($in[0]=="alttext") {
+      if (isset($in[1])) {
+        $hasUserAltText = true;
+        $alttext = $in[1];
+      }
+    }
+  }
+  if (is_numeric($argsArray[0][0])) {
+    $squares = $argsArray[0][0]-1;
+    if ($squares > 99 || $squares < 0 || !is_int($squares)) {
+      echo "Number of squares should be an integer in the range [1,100].";
+      return "";
+    }
+  } else {
+    $squares = $GLOBALS['RND']->rand(3,8);
+  }
+  $used = [[100,100]];
+  $xused = [100];
+  $yused = [100];
+  $pt = "rect([100,100],[101,101]);";
+  // add a square
+  for ($i=1; $i<=$squares; $i++) {
+    $togo = [];
+    $im = $i-1;
+    for ($l=0; $l <= $im; $l++) {
+      $nearby0 = [$used[$l][0]+1,$used[$l][1]];
+      $nearby1 = [$used[$l][0]-1,$used[$l][1]];
+      $nearby2 = [$used[$l][0],$used[$l][1]+1];
+      $nearby3 = [$used[$l][0],$used[$l][1]-1];
+      if (!in_array($nearby0,$used) || !in_array($nearby1,$used) || !in_array($nearby2,$used) || !in_array($nearby3,$used)) {
+        if (!in_array($nearby0,$used) && !in_array($nearby0,$togo)) {$togo[] = $nearby0;}
+        if (!in_array($nearby1,$used) && !in_array($nearby1,$togo)) {$togo[] = $nearby1;}
+        if (!in_array($nearby2,$used) && !in_array($nearby2,$togo)) {$togo[] = $nearby2;}
+        if (!in_array($nearby3,$used) && !in_array($nearby3,$togo)) {$togo[] = $nearby3;}
+      }
+    }
+    $q = randfrom($togo);
+    $used[] = $q;
+    $xused[] = $q[0];
+    $yused[] = $q[1];
+    $pt .= "stroke='red'; rect([{$used[$i][0]},{$used[$i][1]}],[{$used[$i][0]}+1,{$used[$i][1]}+1]);";
+  }
+  [$xmin,$xmax] = [min($xused),max($xused)];
+  [$ymin,$ymax] = [min($yused),max($yused)];
+  // Now look for holes in the shape
+  // $empty will start with all empty squares along the rectangular boundary
+  $empty = [];
+  for ($i=$xmin; $i<=$xmax; $i++) {
+    for ($j=$ymin; $j <= $ymax; $j++) {
+      // $thegrid is the whole rectangular grid
+      $thegrid[] = [$i,$j];
+      if ($i==$xmin || $j==$ymax || $i==$xmax || $j==$ymin) {
+        if (!in_array([$i,$j],$used)) {
+          $empty[] = [$i,$j];
+        }
+      }
+    }
+  }
+  $emptycount = count($empty)-1;
+  // $knownempty contains the empty squares that are connected to the rectangular boundary
+  $knownempty = [$empty[0]];
+  for ($i=0; $i <= $emptycount; $i++) {
+    // $check contains the points up, down, left and right of $empty[$i]
+    $check = [[$empty[$i][0]+1,$empty[$i][1]],[$empty[$i][0]-1,$empty[$i][1]],[$empty[$i][0],$empty[$i][1]+1],[$empty[$i][0],$empty[$i][1]-1]];
+    for ($j=0; $j<4; $j++) {
+      // is it in the grid?
+      if (in_array($check[$j],$thegrid) && !in_array($check[$j],$knownempty)) {
+        // is it empty?
+        if (!in_array($check[$j],$used)) {
+          $knownempty[] = $check[$j];
+            if (!in_array($check[$j],$empty)) {
+            $empty[] = $check[$j];
+          }
+          // redefine $emptycount to update the size of the for loop
+          $emptycount = count($empty)-1;
+        }
+      }
+    }
+  }
+  $emptycount = count($empty);
+  // if there is a hole in the shape, color it in
+  $hasholes = ($xmax+1-$xmin)*($ymax+1-$ymin) - (count($used) + count($empty));
+  $tofill = [];
+  if ($hasholes > 0) {
+    $gridcount = ($xmax-$xmin+1)*($ymax-$ymin+1)-1;
+    for ($i=0; $i <= $gridcount; $i++) {
+      if (!in_array($thegrid[$i],$used) && !in_array($thegrid[$i],$empty)) {
+        $tofill[$i] = $thegrid[$i];
+        $used[] = $thegrid[$i];
+        $xused[] = $thegrid[$i][0];
+        $yused[] = $thegrid[$i][1];
+        $pt .= "rect([{$thegrid[$i][0]},{$thegrid[$i][1]}],[{$thegrid[$i][0]}+1,{$thegrid[$i][1]}+1]);";
+      }
+    }
+    // Attempt below sometimes creates disconnected parts of the polyomino
+    // Now find squares to erase from left-most columns to bring total squares back to $squares
+    /*for ($i=0; $i<$hasholes; $i++) {
+      for ($col=$xmin; $col<=$xmax; $col++) {
+        for ($row=$ymin; $row<=$ymax; $row++) {
+          if (in_array([$col,$row],$used)) {
+            $toblank[] = [$col,$row];
+            $pt .= "fill='transblue';rect([$col,$row],[$col+1,$row+1]);";
+            $filled++;
+            $key = array_search([$col,$row],$used);
+            unset($used[$key]);
+            if ($filled == $hasholes) {break;}
+          }
+          if ($filled == $hasholes) {break;}
+        }
+        if ($filled == $hasholes) {break;}
+      }
+    }*/
+  }
+  //$used = array_values($used);
+  $xused = [];
+  $yused = [];
+  for ($i=0; $i<count($used); $i++) {
+    $ptcode .= "rect([{$used[$i][0]},{$used[$i][1]}],[{$used[$i][0]}+1,{$used[$i][1]}+1]);";
+    $xused[] = $used[$i][0];
+    $yused[] = $used[$i][1];
+  }
+  [$xmin,$xmax] = [min($xused),max($xused)];
+  [$ymin,$ymax] = [min($yused),max($yused)];
+  $xl = $xmax-$xmin+3;
+  $yl = $ymax-$ymin+3;
+  $countused = count($used)-1;
+  $perimeter = 4*($countused+1);
+  if ($hasUserAltText != true) {
+    $alttext = "A connected region of shaded squares. On the coordinate plane, each shaded square has its bottom left corner given in coordinate form in the following list of x y pairs: ";
+    for ($i=0; $i<=$countused; $i++) {
+      if (in_array([$used[$i][0],$used[$i][1]+1],$used)) {
+        $perimeter -= 2;
+      }
+      if (in_array([$used[$i][0]+1,$used[$i][1]],$used)) {
+        $perimeter -= 2;
+      }
+      [$thisx,$thisy] = [$xused[$i]-$xmin,$yused[$i]-$ymin];
+      $alttext .= ifthen($i==0,"($thisx,$thisy)",", ($thisx,$thisy)");
+    }
+  }
+  $gr = showasciisvg("setBorder(40,40*$yl/$xl,40,40*$yl/$xl); initPicture($xmin-1,$xmax+2,$ymin-1,$ymax+2); $axes; strokewidth=1.5; fill='$fillcolor'; $ptcode;",$size,$yl/$xl*$size,$alttext);
+  if ($getdata === true) {
+    return [$gr,count($used),$perimeter];
+  } else {
+    return $gr;
+  }
+  
 }
 ?>
