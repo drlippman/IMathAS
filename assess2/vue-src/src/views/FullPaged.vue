@@ -22,12 +22,13 @@
         :class="{inactive: pagenum !== page}"
         :aria-hidden = "pagenum !== page"
       >
-        <div v-if = "pageData[0].questions.length === 0">
+        <div v-if = "pageData[0].questions.length === 0" class="noqtext">
           <inter-question-text-list
             pos="all"
-            :textlist = "pageTexts"
-            :lastq = "lastQ"
+            :textlist = "pageData"
+            :lastq = "lastQ[pagenum]"
             :active = "pagenum === page"
+            :key="'iqtp'+pagenum"
           />
         </div>
         <div v-else>
@@ -39,8 +40,8 @@
               pos="beforeexact"
               :qn="curqn"
               :key="'iqt'+curqn"
-              :textlist = "pageTexts"
-              :lastq = "lastQ"
+              :textlist = "pageData"
+              :lastq = "lastQ[pagenum]"
               :active = "pagenum === page"
             />
             <div>
@@ -55,10 +56,12 @@
           </div>
 
           <inter-question-text-list
+            id="aftertext"
             pos="after"
             :qn="pageData[0].questions[pageData[0].questions.length - 1]"
-            :textlist = "pageTexts"
-            :lastq = "lastQ"
+            :key="'iqte'+pagenum"
+            :textlist = "pageData"
+            :lastq = "lastQ[pagenum]"
             :active = "pagenum === page"
           />
         </div>
@@ -121,22 +124,14 @@ export default {
     showSubmit () {
       return (store.assessInfo.submitby === 'by_assessment');
     },
-    pageTexts () {
-      if (!store.assessInfo.hasOwnProperty('interquestion_pages') ||
-        !store.assessInfo.interquestion_pages.hasOwnProperty(this.page)
-      ) {
-        return [];
-      } else {
-        return store.assessInfo.interquestion_pages[this.page];
-      }
-    },
     lastQ () {
-      if (typeof this.page === 'undefined' || this.page < 0) {
-        return store.assessInfo.questions.length - 1;
-      } else {
-        const qlist = store.assessInfo.interquestion_pages[this.page][0].questions;
-        return qlist[qlist.length - 1];
+      const out = [];
+      let qlist;
+      for (const i in this.allPages) {
+        qlist = this.allPages[i][0].questions;
+        out[i] = qlist[qlist.length - 1];
       }
+      return out;
     }
   },
   methods: {
