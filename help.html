@@ -2503,6 +2503,7 @@ These macros are for working with arrays:
 <li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values</li>
 <li><strong>array_values(array)</strong>: Returns the values of an array, reindexing with consecutive numeric indices.</li>
 <li><strong>count(array)</strong>:  Counts the number of entries in the array</li>
+<li><strong>is_array(variable)</strong>:  Determines if the variable is an array</li>
 <li><strong>sumarray(array)</strong>: Adds the entries in an array</li>
 <li><strong>in_array(needle,haystack)</strong>:  Checks if value needle is in array haystack.  Returns true or false</li>
 <li><strong>arrayfindindex(needle,haystack)</strong>: Returns the index in the array haystack of the value needle.  If there are multiple matches, it only returns the first.</li>
@@ -2629,7 +2630,8 @@ These macros are used to select and format feedback messages to students.  They 
 <ul>
 <li><strong>getfeedbackbasic(correct msg, incorrect msg, $thisq, [partnum])</strong>:  Generates a feedback string based solely on whether the
   question was scored correct or not.  Provide the correct and incorrect messages to display, and provide $thisq.  Give a part number for
-  multipart questions to get part-based feedback.</li>
+  multipart questions to get part-based feedback. Can give an array of part-numbers, in which case the 
+  correct message only shows if all parts are correct.</li>
 <li><strong>getfeedbacktxt(stuans, feedbacktxt, ans)</strong>:  Gives feedback on multiple choice questions.  <br/>
   stuans should be the student answer, obtained from
    $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart. <br/>

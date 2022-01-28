@@ -9,7 +9,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands",
  "randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand",
  "nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands",
- "nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle",
+ "nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","is_array",
  "makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays",
  "showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive",
  "gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays",
@@ -3674,7 +3674,17 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 	}
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		$val = $GLOBALS['assess2-curq-iscorrect'] ?? -1;
-		if ($partn !== null && is_array($val)) {
+        if (is_array($partn) && is_array($val)) {
+            $res = 1;
+            foreach ($partn as $i) {
+                if (!isset($val[$i])) {
+                    $res = -1;
+                    break;
+                } else if ($val[$i] < $res) {
+                    $res = $val[$i];
+                }
+            }
+        } else if ($partn !== null && is_array($val)) {
             if (isset($val[$partn])) {
 			    $res = $val[$partn];
             } else {
