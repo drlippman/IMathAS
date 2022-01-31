@@ -23,7 +23,7 @@ if (count($ids)>0) {
 }
 $stm = $DBH->prepare($query);
 $stm->execute(array(':to'=>$to, ':from'=>$from, ':courseid'=>$cid));
-echo $DBH->rowCount().' assessment sessions moved<br/><br/>';
+echo $stm->rowCount().' assessment sessions moved<br/><br/>';
 
 $ids = array();
 $stm = $DBH->prepare("SELECT assessmentid FROM imas_assessment_records WHERE userid=:userid");
@@ -39,7 +39,7 @@ if (count($ids)>0) {
 }
 $stm = $DBH->prepare($query);
 $stm->execute(array(':to'=>$to, ':from'=>$from, ':courseid'=>$cid));
-echo $DBH->rowCount().' assessment records moved<br/><br/>';
+echo $stm->rowCount().' assessment records moved<br/><br/>';
 
 $ids = array();
 $stm = $DBH->prepare("SELECT gradetypeid FROM imas_grades WHERE userid=:userid AND gradetype='offline' AND score IS NOT NULL");
@@ -55,6 +55,6 @@ if (count($ids)>0) {
 }
 $stm = $DBH->prepare($query);
 $stm->execute(array(':to'=>$to, ':from'=>$from, ':courseid'=>$cid));
-echo $DBH->rowCount().' offline grades moved<br/><br/>';
+echo $stm->rowCount().' offline grades moved<br/><br/>';
 
 ?>
