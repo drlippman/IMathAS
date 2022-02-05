@@ -195,19 +195,19 @@ class MathParser
         'precedence'=>7,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return ($a || $b);}],
-      'La' => [
+      '#a' => [
         'precedence'=>8,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return ($a && $b);}],
-      'Lo' => [
+      '#o' => [
         'precedence'=>7,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return ($a || $b);}],
-      'Li' => [
+      '#i' => [
         'precedence'=>6,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return ((!$a) || $b);}],
-      'Lb' => [
+      '#b' => [
         'precedence'=>6,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return (($a && $b) || (!$a && !$b));}],
@@ -361,7 +361,7 @@ class MathParser
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
         continue;
-      } else if (($c=='|' || $c=='&' || $c=='L' || $c=='<' || $c=='>') &&
+      } else if (($c=='|' || $c=='&' || $c=='#' || $c=='<' || $c=='>') &&
         isset($this->operators[substr($str,$n,2)])
       ) {
         $tokens[] = [

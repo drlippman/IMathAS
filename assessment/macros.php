@@ -4990,9 +4990,9 @@ function comparelogic($a,$b,$vars) {
     }
     $varlist = implode(',', $vars);
     $a = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['La', 'La','Lo','Lo','!','Lb', 'Lb', 'Lb', 'Li',     'Li','Li'], $a);
+                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $a);
     $b = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['La', 'La','Lo','Lo','!','Lb', 'Lb', 'Lb', 'Li',     'Li','Li'], $b);
+                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $b);
     $afunc = makeMathFunction($a, $varlist);
     if ($afunc === false) {
         return false;
