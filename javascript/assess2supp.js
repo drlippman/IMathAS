@@ -238,7 +238,7 @@ function disableInputs(qn, disabled) {
      const qn = qns[k];
      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
-       if ((m = el.name.match(regex)) !== null) {
+       if ((m = el.name.match(regex)) !== null && !el.name.match(/-val/)) {
          let thisChanged = false;
          if (el.type === 'radio' || el.type === 'checkbox') {
            if (el.checked && el.value !== el.getAttribute('data-initval')) {
