@@ -53,10 +53,10 @@ class CalculatedScorePart implements ScorePart
               $_POST["qn$qn-val"] = $givenans;
             }
         }
-
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
-          $givenansval = $_POST["qn$qn-val"];
+          $givenansval = trim($_POST["qn$qn-val"]," ,");
           $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($answer==='') {

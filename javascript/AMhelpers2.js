@@ -1307,7 +1307,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
-    fullstr = fullstr.replace(/\s*,\s*/g,',');
+    fullstr = fullstr.replace(/\s*,\s*/g,',').replace(/(^,|,$)/g,'');
     joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
@@ -1396,7 +1396,7 @@ function processCalcNtuple(fullstr, format) {
   var res = NaN;
   var dec;
   // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
-  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
+  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',').replace(/(^,|,$)/g,'');;
   fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;

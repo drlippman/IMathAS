@@ -48,7 +48,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        $givenans = normalizemathunicode(trim($givenans));
+        $givenans = normalizemathunicode(trim($givenans, " \n\r\t\v\x00,"));
 
         $givenans = preg_replace_callback(
             '/(arcsinh|arccosh|arctanh|arcsin|arccos|arctan|arcsec|arccsc|arccot|root|sqrt|sign|sinh|cosh|tanh|sech|csch|coth|abs|sin|cos|tan|sec|csc|cot|exp|log|ln)[\(\[]/i',

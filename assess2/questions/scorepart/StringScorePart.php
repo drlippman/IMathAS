@@ -39,7 +39,9 @@ class StringScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
-
+        if ($answerformat=='list') {
+            $givenans = trim($givenans, " ,");
+        }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if (!empty($scoremethod) &&
