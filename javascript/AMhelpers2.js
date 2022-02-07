@@ -1262,7 +1262,7 @@ function AMnumfuncPrepVar(qn,str) {
  }
 
 function processCalculated(fullstr, format) {
-  fullstr = fullstr.replace(/=/,'');
+  // give error instead.  fullstr = fullstr.replace(/=/,'');
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else if (format.indexOf('set')!=-1) {
@@ -1465,7 +1465,7 @@ function processCalcComplex(fullstr, format) {
         err += singlevalsyntaxcheck(cparts[1], format);
       }
     }
-    err + syntaxcheckexpr(str, format);
+    err += syntaxcheckexpr(str, format);
     prep = prepWithMath(mathjs(str,'i'));
     real = scopedeval('var i=0;'+prep);
     imag = scopedeval('var i=1;'+prep);
@@ -1903,7 +1903,9 @@ function singlevalsyntaxcheck(str,format) {
 		}
 	} else if (!onlyAscii.test(str)) {
 		return _("Your answer contains an unrecognized symbol")+". ";
-  	}
+  	} else if (str.match(/=/)) {
+        return _("You gave an equation, not an expression")+ '. ';
+    }
 	return '';
 }
 
@@ -1968,6 +1970,7 @@ function syntaxcheckexpr(str,format,vl) {
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
 	  }
+
 	  return err;
 }
 

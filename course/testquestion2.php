@@ -174,7 +174,7 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/as
 if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=031721" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=020722" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=032721" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
