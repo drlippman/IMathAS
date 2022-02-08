@@ -222,21 +222,22 @@ class AssessRecord
   /**
    * Update the LTI score for the current assessment record. 
    * Should be called after saveRecord.
+   * @param  boolean $sendnow   true to send now, false to delay
    */
-  public function updateLTIscore() {
+  public function updateLTIscore($sendnow = true) {
     $lti_sourcedid = $this->getLTIsourcedId();
     if (strlen($lti_sourcedid) > 1) {
         require_once(__DIR__ . '/../includes/ltioutcomes.php');
         $gbscore = $this->getGbScore();
         $aidposs = $this->assess_info->getSetting('points_possible');
-        calcandupdateLTIgrade($lti_sourcedid, $this->curAid, $this->curUid, $gbscore['gbscore'], true, $aidposs);
+        calcandupdateLTIgrade($lti_sourcedid, $this->curAid, $this->curUid, $gbscore['gbscore'], $sendnow, $aidposs);
         if ($this->assessRecord['agroupid'] > 0) {
             // has group; update their scores too
             $stm = $this->DBH->prepare('SELECT userid,lti_sourcedid FROM imas_assessment_records WHERE agroupid=? AND userid<>?');
             $stm->execute(array($this->assessRecord['agroupid'], $this->curUid));
             while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
                 if (strlen($row['lti_sourcedid']) > 1) {
-                    calcandupdateLTIgrade($row['lti_sourcedid'], $this->curAid, $row['userid'], $gbscore['gbscore'], true, $aidposs);
+                    calcandupdateLTIgrade($row['lti_sourcedid'], $this->curAid, $row['userid'], $gbscore['gbscore'], $sendnow, $aidposs);
                 }
             }
         }
