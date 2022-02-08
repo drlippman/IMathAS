@@ -65,7 +65,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
     // new assesses
     $total = $scores;
   }
-	$grade = min(1, max(0,$total/$aidposs));
+	$grade = max(0,$total/$aidposs);
 	$grade = number_format($grade,8);
 	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow);
 }
