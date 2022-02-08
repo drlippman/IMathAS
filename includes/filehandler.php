@@ -132,10 +132,10 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 		}
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		if ($s3->putObjectFile($tmpdir.'/'.$fn,$GLOBALS['AWSbucket'],$keydir.'/'.$fn,$sec)) {
-			unlink($tmpdir.'/'.$fn);
+			@unlink($tmpdir.'/'.$fn);
 			return $fn;
 		} else {
-			unlink($tmpdir.'/'.$fn);
+			@unlink($tmpdir.'/'.$fn);
 			return false;
 		}
 	} else {
@@ -242,7 +242,7 @@ function deleteimport($key) {
 		$s3->deleteObject($GLOBALS['AWSbucket'],'import/'.$key);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
-		unlink(realpath($base.$key));
+		@unlink(realpath($base.$key));
 	}
 }
 
@@ -496,7 +496,7 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink($base.'/adata/'.$file)) {
+			if (@unlink($base.'/adata/'.$file)) {
 				$deled[] = $file;
 				recursiveRmdir(dirname($base.'/adata/'.$file));
 			}
@@ -580,7 +580,7 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink(realpath($base.'/adata/'.$file))) {
+			if (@unlink(realpath($base.'/adata/'.$file))) {
 				$deled[] = $file;
 				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
@@ -666,7 +666,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink(realpath($base.'/adata/'.$file))) {
+			if (@unlink(realpath($base.'/adata/'.$file))) {
 				$deled[] = $file;
 				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
@@ -785,7 +785,7 @@ function deleteuserfile($uid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ufiles/$uid/$safeFilename")) {
+		if (@unlink($base."/ufiles/$uid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -806,7 +806,7 @@ function deleteforumfile($postid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ffiles/$postid/$safeFilename")) {
+		if (@unlink($base."/ffiles/$postid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -826,7 +826,7 @@ function deletecoursefile($file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
-		if (unlink($base."/$safeFilename")) {
+		if (@unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -845,7 +845,7 @@ function deleteqimage($file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
-		if (unlink($base."/$safeFilename")) {
+		if (@unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -865,7 +865,7 @@ function deletefilebykey($key) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/$safeFilename")) {
+		if (@unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -1067,7 +1067,7 @@ function unlinkRecursive($dir, $deleteRootToo) {
             continue;
         }
 	if (is_file($dir . '/' . $obj)) {
-		if (unlink($dir . '/' . $obj)) {
+		if (@unlink($dir . '/' . $obj)) {
 			$cnt++;
 		}
 	} else if (is_dir($dir . '/' . $obj)) {

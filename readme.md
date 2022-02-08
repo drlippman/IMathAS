@@ -216,6 +216,9 @@ Automated course cleanup (unenrolling students from a course) can be enabled.  T
 If allowing guest logins:
 - `/util/deloldguests.php`:  Run about once a day (once for every 50 guests)
 
+To cleanup old unused student accounts:
+- `/util/deloldstus.php`:  Run about once a day or longer (once for 1000 accounts)
+
 If using a scheduled web call, you'll need to define:
 - `$CFG['cleanup']['authcode']`:  define this and pass it in the query string, like `runcoursecleanup.php?authcode=####`
 
@@ -227,6 +230,8 @@ Options:
 - `$CFG['cleanup']['allowoptout']`:   (default: true) set to false to prevent teachers opting out
 - `$CFG['cleanup']['groups']`: You can specify different old/delay values for different groups by defining
 `$CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));`
+- `$CFG['cleanup']['oldstu']`: a number of days of inactivity in a student account after which the account is 
+  deleted if they are not enrolled in any courses (def: 365)
 
 ## Additional Feature Setup
 ### LivePoll
