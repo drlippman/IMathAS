@@ -148,7 +148,7 @@ if (!$assess_record->hasRecord()) {
     $new_gb_score = $assess_record->getGbScore()['gbscore'];
     if ($new_gb_score != $orig_gb_score) {
         $assess_record->saveRecord();
-        $assess_record->updateLTIscore();
+        $assess_record->updateLTIscore(true);
     }
 }
 
