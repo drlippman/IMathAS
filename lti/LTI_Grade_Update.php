@@ -164,7 +164,7 @@ class LTI_Grade_Update {
    * @param  string $token            the token string
    * @param  float $score             the score, normalized 0-1
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
-   * @param  int    $isstu            default 1
+   * @param  boolean    $isstu            default true
    * @param  int?   $addedon          the time the submission was added (null for default)
    * @param  string $activityProgress default 'Submitted'
    * @param  string $gradingProgress  default 'FullyGraded'
@@ -172,12 +172,12 @@ class LTI_Grade_Update {
    * @return array [body=>, header=>]
    */
   public function get_update_body(string $token, float $score, string $ltiuserid, 
-    $isstu = 1, $addedon = null,
+    $isstu = true, $addedon = null,
     string $activityProgress='Submitted', string $gradingProgress='FullyGraded',
     string $comment = ''
   ) {
     $canvasext = [
-        'new_submission' => ($isstu == 1 ? true : false)
+        'new_submission' => $isstu
     ];
     if ($isstu && !empty($addedon)) {
         $canvasext['submitted_at'] = date('Y-m-d\TH:i:s.uP', $addedon);

@@ -39,7 +39,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=1) {
 
 $aidtotalpossible = array();
 //use this if we don't know the total possible
-function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1,$isstu=1) {
+function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1,$isstu=true) {
 	global $DBH, $aidtotalpossible;
   if ($aidposs == -1) {
     if (isset($aidtotalpossible[$aid])) {
@@ -74,7 +74,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
 }
 
 //use this if we know the grade, or want to delete
-function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$isstu=1) {
+function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$isstu=true) {
 	global $CFG;
 
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {

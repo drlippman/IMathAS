@@ -81,7 +81,8 @@ if (!empty($_POST['makelineitem'])) {
             $scoredata['userid'],
             $scoredata['score'],
             true,
-            $iteminfo['ptsposs']
+            $iteminfo['ptsposs'],
+            false
         );
         $cnt++;
     }

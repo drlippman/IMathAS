@@ -396,7 +396,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true, -1, false);
 					}
 				}
 				$DBH->commit();
@@ -440,7 +440,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true, -1, false);
 					}
 				}
 			}
