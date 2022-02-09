@@ -35,7 +35,7 @@
 	if (isset($_POST['remove'])) {
 		$goodmsgs = array();
 		foreach ($_POST['checked'] as $msgid) {
-			if (in_numeric($msgid) && $msgid!=0) {
+			if (is_numeric($msgid) && $msgid!=0) {
 				$goodmsgs[] = intval($msgid);
 			}
 		}
