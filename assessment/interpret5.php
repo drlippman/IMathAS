@@ -425,7 +425,8 @@ function tokenize($str,$anstype,$countcnt) {
 					$connecttolast = 2;
 				} else {
 					//not a function, so what is it?
-					if ($out=='true' || $out=='false' || $out=='null') {
+                    $outlower = strtolower($out);
+					if ($outlower=='true' || $outlower=='false' || $outlower=='null') {
 						//we like this - it's an acceptable unquoted string
 					} else {//
 						//an unquoted string!  give a warning to instructor,
