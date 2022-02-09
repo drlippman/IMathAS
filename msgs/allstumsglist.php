@@ -202,7 +202,7 @@ function chgfilter() {
         echo "</td><td>";
         if (isset($stulist[$line['msgto']])) {
             echo '<span class="pii-full-name">';
-            Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
+            echo Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
             echo '</span>';
         }
         echo "</td>";
