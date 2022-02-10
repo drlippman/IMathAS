@@ -1223,6 +1223,18 @@ class AssessRecord
       $lastvernum = count($this->data['assess_versions']) - 1;
       $lastver = $this->data['assess_versions'][$lastvernum];
       $returnVal = $lastver['timelimit_end'];
+      // recalc, in case timelimit has changed
+      $new_timelimit_end = $lastver['starttime'] + $this->assess_info->getAdjustedTimelimit();
+      if (isset($lastver['timelimit_ext'])) {
+          foreach ($lastver['timelimit_ext'] as $v) {
+            $new_timelimit_end += $v*60;
+          }
+      }
+      if ($new_timelimit_end != $returnVal) {
+        $this->data['assess_versions'][$lastvernum]['timelimit_end'] = $new_timelimit_end;
+        $returnVal = $new_timelimit_end;
+        $this->need_to_record = true;
+      }
       $enddate = $this->assess_info->getSetting('enddate');
       if ($returnVal > $enddate) {
         $returnVal = $enddate;
