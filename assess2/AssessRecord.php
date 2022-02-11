@@ -684,10 +684,16 @@ class AssessRecord
         }
         // record now as lastchange on attempt if no submissions have been made
         if (!$active && $this->data['assess_versions'][$lastver]['lastchange'] === 0) {
-          $this->data['assess_versions'][$lastver]['lastchange'] = $this->now;
+          $this->data['assess_versions'][$lastver]['lastchange'] = 
+            !empty($this->data['assess_versions'][$lastver]['timelimit_end']) ? 
+            $this->data['assess_versions'][$lastver]['timelimit_end'] :
+            $this->now;
         }
         if (!$active && intval($this->assessRecord['lastchange']) === 0) {
-          $this->assessRecord['lastchange'] = $this->now;
+          $this->assessRecord['lastchange'] = 
+            !empty($this->data['assess_versions'][$lastver]['timelimit_end']) ? 
+            $this->data['assess_versions'][$lastver]['timelimit_end'] :
+            $this->now;
         }
         // if there's a time limit, set the time limit
         if ($active && $this->assess_info->getSetting('timelimit') > 0) {
