@@ -59,10 +59,20 @@ if (count($stus) > 0) {
     $stm->execute($stus);
     
     //delete profile pics
+    $pics = [];
     foreach ($stus as $deluid) {
-        deletecoursefiles(['userimg_'.$deluid.'.jpg', 'userimg_sm'.$deluid.'.jpg']);
+        //deletecoursefiles(['userimg_'.$deluid.'.jpg', 'userimg_sm'.$deluid.'.jpg']);
+        array_push($pics, 'userimg_'.$deluid.'.jpg', 'userimg_sm'.$deluid.'.jpg');
+        if (count($pics)>500) {
+            deletecoursefiles($pics);
+            $pics = [];
+        }
         //delete all user uploads
         deletealluserfiles($deluid);
+    }
+    if (count($pics)>0) {
+        deletecoursefiles($pics);
+        $pics = [];
     }
 }
 
