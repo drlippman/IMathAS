@@ -424,7 +424,7 @@ class S3 {
 			$rest->error['code'], $rest->error['message']), E_USER_WARNING);
 			return false;
 		}
-		return $rest->code == 200 ? $returnInfo ? $rest->headers : true : false;
+		return $rest->code == 200 ? ($returnInfo ? $rest->headers : true) : false;
 	}
 
 
