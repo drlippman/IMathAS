@@ -60,8 +60,7 @@ if (count($stus) > 0) {
     
     //delete profile pics
     foreach ($stus as $deluid) {
-        deletecoursefile('userimg_'.$deluid.'.jpg');
-        deletecoursefile('userimg_sm'.$deluid.'.jpg');
+        deletecoursefiles(['userimg_'.$deluid.'.jpg', 'userimg_sm'.$deluid.'.jpg']);
         //delete all user uploads
         deletealluserfiles($deluid);
     }

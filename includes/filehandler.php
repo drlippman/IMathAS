@@ -713,11 +713,7 @@ function deleteallaidfiles($aid) {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"adata/$aid/");
 		if ($arr!=false) {
-			foreach ($arr as $k=>$file) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$file['name'])) {
-					$delcnt++;
-				}
-			}
+			$delcnt = deleteFilesFromGetBucketCall($s3,$arr);
 		}
 
 	} else {
@@ -833,6 +829,34 @@ function deletecoursefile($file) {
 		}
 	}
 }
+
+function deletecoursefiles($files) {
+    if (getfilehandlertype('filehandlertypecfiles') == 's3') {
+        $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+        $fileuris = [];
+        foreach ($files as $file) {
+            $safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
+            $fileuris[] = "cfiles/$safeFilename";
+        }
+        if ($s3->deleteObjects($GLOBALS['AWSbucket'], $fileuris)) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
+        $success = true;
+        foreach ($files as $file) {
+            $safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
+            if (@unlink($base."/$safeFilename")) {
+            } else {
+                $success = false;
+            }
+        }
+        return $success;
+    }
+}
+
 function deleteqimage($file) {
 	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
@@ -880,11 +904,7 @@ function deleteallpostfiles($postid) {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ffiles/$postid/");
 		if ($arr!=false) {
-			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
-					$delcnt++;
-				}
-			}
+			$delcnt = deleteFilesFromGetBucketCall($s3,$arr);
 		} else {
 			return false;
 		}
@@ -896,18 +916,35 @@ function deleteallpostfiles($postid) {
 	}
 	return $delcnt;
 }
+
+// use internally only
+function deleteFilesFromGetBucketCall($s3,$arr) {
+    $delcnt = 0;
+    $files = [];
+    foreach ($arr as $s3object) {
+        $files[] = $s3object['name'];
+        if (count($files)>500) {
+            if ($s3->deleteObjects($GLOBALS['AWSbucket'], $files)) {
+                $delcnt += count($files);
+            }
+            $files = [];
+        }
+    }
+    if (count($files)>0) {
+        if ($s3->deleteObjects($GLOBALS['AWSbucket'], $files)) {
+            $delcnt += count($files);
+        }
+    }
+    return $delcnt;
+}
+
 function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if (getfilehandlertype('filehandlertype') == 's3') {
-
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
-			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
-					$delcnt++;
-				}
-			}
+            $delcnt = deleteFilesFromGetBucketCall($s3,$arr);
 		} else {
 			return false;
 		}
