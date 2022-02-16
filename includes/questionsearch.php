@@ -453,7 +453,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         });
         $out = ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
     } else {
-        $out = ['qs' => $res, 'type'=>'all'];
+        $out = ['qs' => $res, 'type'=>'all', 'names' => []];
     }
     $out['offset'] = $offset;
     if (count($res) == $max) {
