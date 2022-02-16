@@ -753,7 +753,8 @@
 				echo Sanitize::outgoingHtml($qdata['feedback']);
 				echo '</div>';
 			}
-			echo '<br/>Question #'.($loc+1);
+			echo '<br/>' . _('Question').' #'.($loc+1);
+            echo ', '._('version').' '.($qdata['ver']+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
                     'to' => $line['userid'])) . "\">Use in Message</a>";
