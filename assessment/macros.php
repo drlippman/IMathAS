@@ -160,9 +160,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$commands = '';
 	$alt = '';
 	if (strpos($settings[4],':')) {
-		$settings[4] = str_replace(array('(',')'),'',$settings[4]);
 		$lbl = explode(':',$settings[4]);
-		$lbl = array_map('evalbasic', $lbl);
+        $lbl[0] = evalbasic($lbl[0]);
+        $lbl[1] = evalbasic($lbl[1]);
 	} else {
         $settings[4] = evalbasic($settings[4]);
         $lbl = [];
