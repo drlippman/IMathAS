@@ -20,7 +20,7 @@ function parseunits($unitsExpression) {
     $baseunits=['kg','m','sec','rad','degC','degF','degK','mol','amp','cd'];
     
     //Units array: 'unit' => [numerical factor, [array of factors of fundamental units], prefixtype, pluraltype, casetype]
-    // prefixtype: 0 => no prefixes allowed, 1 => short prefixes allowed, 2 => long prefixes allowed, 3 => long or short prefixes allowed
+    // prefixtype: 0 => no prefixes allowed, 1 => short prefixes allowed, 2 => long prefixes allowed
     // pluraltype: 0 => cannot add s at the end, 1 => can add s at the end
     // casetype: 0 => cannot change case, 1 => can change case
     
