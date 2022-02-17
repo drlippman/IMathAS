@@ -44,7 +44,7 @@ function parseunits($unitsExpression) {
       'yard' => [0.9144,array(0,1,0,0,0,0,0,0,0,0),0,1,1],
     //Time
       's' => [1,array(0,0,1,0,0,0,0,0,0,0),1,0,0],
-      'sec' => [1,array(0,0,1,0,0,0,0,0,0,0),2,0,0],
+      'sec' => [1,array(0,0,1,0,0,0,0,0,0,0),2,0,1],
       'second' => [1,array(0,0,1,0,0,0,0,0,0,0),2,1,1],
       'min' => [60,array(0,0,1,0,0,0,0,0,0,0),0,0,0],
       'minute' => [60,array(0,0,1,0,0,0,0,0,0,0),0,1,1],
@@ -109,7 +109,7 @@ function parseunits($unitsExpression) {
     //Force
       'N' => [1,array(1,1,-2,0,0,0,0,0,0,0),1,0,0],
       'newton' => [1,array(1,1,-2,0,0,0,0,0,0,0),2,1,1],
-      'kip' => [4448.22,array(1,1,-2,0,0,0,0,0,0,0),0,1,0],
+      'kip' => [4448.22,array(1,1,-2,0,0,0,0,0,0,0),0,1,1],
       'dyn' => [1E-5,array(1,1,-2,0,0,0,0,0,0,0),1,0,0],
       'dyne' => [1E-5,array(1,1,-2,0,0,0,0,0,0,0),2,1,1],
       'lb' => [4.4482216152605,array(1,1,-2,0,0,0,0,0,0,0),0,1,1], // treated as pound force
@@ -164,7 +164,7 @@ function parseunits($unitsExpression) {
       'G' => [0.0001,array(1,0,-2,0,0,0,0,0,-1,0),1,0,0],
       'gauss' => [0.0001,array(1,0,-2,0,0,0,0,0,-1,0),2,0,1],
       'Wb' => [1,array(1,2,-2,0,0,0,0,0,-1,0),1,0,0],
-      'weber' => [1,array(1,2,-2,0,0,0,0,0,-1,0),2,1,1,1],
+      'weber' => [1,array(1,2,-2,0,0,0,0,0,-1,0),2,1,1],
       'H' => [1,array(1,2,-2,0,0,0,0,0,-2,0),1,0,0],
       'henry' => [1,array(1,2,-2,0,0,0,0,0,-2,0),2,1,1],
     //Luminosity
@@ -414,7 +414,7 @@ function parseunits($unitsExpression) {
                 $prefixWasAbb = true;
               }
             }
-            
+          }
             $prefixCount=-1;
             $partPrefix=[];
             // Does it have a metric prefix? Is that okay?
@@ -478,7 +478,7 @@ function parseunits($unitsExpression) {
                 }
               }
             }
-          }
+          //}
           
           if ($pow>0) {
             for ($i=-1; $i<($pow-1); $i++) {
@@ -526,7 +526,7 @@ function parseunits($unitsExpression) {
           }
           $part = substr($part,0,strpos($part,'^')); //Now $part is the prefix-and-unit.
           
-          // Only look for prefixes, plural and case if part isn't already a unit
+          // Only look for prefixes if part isn't already a unit
           if (!in_array($part,$unitKeys)) {
             
             // Does it have (what could be) an abbreviated prefix?
@@ -547,7 +547,7 @@ function parseunits($unitsExpression) {
                 $prefixWasAbb = true;
               }
             }
-            
+          }
             $prefixCount=-1;
             $partPrefix=[];
             // Does it have a metric prefix? Is that okay?
@@ -612,7 +612,7 @@ function parseunits($unitsExpression) {
                 }
               }
             }
-          }
+          //}
           
           
           //if ($partCount > -1) {
@@ -687,7 +687,7 @@ function parseunits($unitsExpression) {
     }
     //At this point, $numerical is the number and $unitArray is the array of factors of fundamental units: e.g. [0,1,-2,0,0,0,0,0,1,0] would mean meter*amp/sec^2 
     //Code block below converts expression in terms of fundamental metric units.
-    $unitsExpressionSimple=$numerical; //Build the equivalent, simplifed answer in mks
+    $unitsExpressionSimple=$baseNumber*$numerical; //Build the equivalent, simplifed answer in mks
     if (max($unitArray)>0) {
       foreach ($unitArray as $k => $factor) {
         if ($factor>0) {
@@ -798,4 +798,23 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
 }
 
 // regex of all units, for possible JS use later:
-// \b(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|hr|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)\b
+// \b(m|meter|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)\b
+//
+// regex of all units that cannot use a prefix
+//
+// \b(micron|in|inch|inches|mi|mile|furlong|yd|yard|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|grad|gradian|knot|kt|c|mph|kph|rev|revolution|cycle|kip|lb|lbf|lbft|ftlb|therm|atm|atmosphere|mmHg|umHg|cmWater|psi|ksi|Mpsi|amu|me|R|roentgen|AU|au|solarmass|solarradius|degF|degC|degK|K)\b
+//
+// regex of all units that only use abbreviated prefix
+//
+// \b(m|ft|s|b|L|cc|g|t|Hz|N|dyn|J|cal|eV|Wh|Btu|W|hp|Pa|C|V|F|A|T|G|Wb|weber|H|lm|lx|Da|mol|Ci|sr|Bq|ls|ly|pc)\b
+//
+// regex of all units that only use a long prefix
+//
+// \b(meter|angstrom|fermi|foot|feet|sec|second|barn|liter|litre|arcminute|arcsecond|gram|tonne|hertz|newton|dyne|pound|ton|joule|erg|calorie|electronvolt|watt|horsepower|pascal|Torr|coulomb|volt|farad|ohm|amp|ampere|tesla|gauss|henry|lumen|lux|dalton|mole|curie|steradian|becquerel|lightsecond|lightyear|parsec)\b
+//
+// regex of all units that can be pluralized with an s
+//
+// \b(meter|micron|angstrom|mile|furlong|yard|second|minute|hour|day|week|month|year|fortnight|acre|hectare|barn|liter|litre|gallon|cup|pint|quart|tablespoon|teaspoon|radian|degree|arcminute|arcsecond|gradian|knot|gram|tonne|revolution|cycle|newton|kip|dyne|lb|pound|ton|joule|erg|calorie|electronvolt|therm|watt|pascal|atmosphere|bar|coulomb|volt|farad|ohm|amp|ampere|tesla|weber|henry|lumen|dalton|mole|curie|roentgen|steradian|becquerel|lightsecond|lightyear|parsec)\b
+//
+// regex of all units that are case insensitive
+// \b(meter|micron|angstrom|fermi|inch|inches|foot|feet|mile|furlong|yard|sec|second|minute|hour|day|week|month|year|fortnight|acre|hectare|barn|L|liter|litre|gallon|cup|pint|quart|tablespoon|teaspoon|radian|degree|arcminute|arcsecond|gradian|knot|gram|tonne|Hz|hertz|revolution|cycle|newton|kip|dyne|lb|pound|ton|joule|erg|lbft|ftlb|calorie|electronvolt|Btu|therm|watt|horsepower|pascal|atmosphere|bar|Torr|coulomb|volt|farad|ohm|amp|ampere|tesla|gauss|weber|henry|lumen|lux|dalton|mole|curie|roentgen|steradian|becquerel|lightsecond|lightyear|parsec|solarmass|solarradius)\b

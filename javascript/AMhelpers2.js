@@ -1235,12 +1235,51 @@ function AMnumfuncPrepVar(qn,str) {
              str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
 
              if (str.length > 0) {
+               var unitsregexlongprefix = /(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)/;
+               var unitsregexabbprefix = /(Y|Z|E|P|T|G|M|k|h|da|d|c|m|u|n|p|f|a|z|y)/;
+               var unitsregexfull = /^(m|meter|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)$/;
+               //000 noprefix, noplural, sensitive
+               var unitsregex000 = /(in|mi|yd|min|h|hr|mo|yr|ha|gal|pt|qt|tbsp|tsp|rad|deg|grad|kt|c|mph|kph|rev|lbf|atm|mmHg|umHg|cmWater|psi|ksi|Mpsi|weber|amu|me|R|AU|au|degF|degC|degK|K)/;
+               //100 abb, noplural, sensitive
+               var unitsregex100 = /(m|meter|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)/;
+               //001 noprefix, noplural, insensitive
+               var unitsregex001 = /(inch|inches|lbft|ftlb|solarmass|solarradius)/;
+               //101 abb, noplural, insensitive
+               var unitsregex101 = /(L|Hz|Btu)/;
+               //201 long, noplural, insensitive
+               var unitsregex201 = /(fermi|foot|feet|sec|hertz|horsepower|Torr|gauss|lux)/;
+               //011 noprefix, plural, insensitive
+               var unitsregex011 = /(micron|mile|furlong|yard|minute|hour|day|week|month|year|fortnight|acre|hectare|gallon|cup|pint|quart|tablespoon|teaspoon|radian|degree|gradian|knot|revolution|cycle|kip|lb|therm|atmosphere|roentgen)/;
+               //211 long, plural, insensitive
+               var unitsregex211 = /(meter|angstrom|second|barn|liter|litre|arcminute|arcsecond|gram|tonne|newton|dyne|pound|ton|joule|erg|calorie|electronvolt|watt|pascal|coulomb|volt|farad|ohm|amp|ampere|tesla|weber|henry|lumen|dalton|mole|curie|steradian|becquerel|lightsecond|lightyear|parsec)/;
+               
+               var unitsregexfull100 = new RegExp("^" + unitsregexabbprefix.source + "?" + unitsregex100.source + "$");
+               var unitsregexfull001 = new RegExp("^" + unitsregex001.source + "$", 'i');
+               var unitsregexfull101 = new RegExp("^" + unitsregexabbprefix.source + "?" + unitsregex101.source + "$", 'i');
+               var unitsregexfull201 = new RegExp("^" + unitsregexlongprefix.source + "?" + unitsregex201.source + "$", 'i');
+               var unitsregexfull011 = new RegExp("^" + unitsregex011.source + "s?$", 'i');
+               var unitsregexfull111 = new RegExp("^" + unitsregexabbprefix.source + "?" + unitsregex111.source + "s?$", 'i');
+               var unitsregexfull211 = new RegExp("^" + unitsregexlongprefix.source + "?" + unitsregex211.source + "s?$", 'i');
+
                  var pts = str.split(/\s*\*\s*/);
-                 var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
                  for (var i=0; i<pts.length; i++) {
-                     if (!unitsregex.test(pts[i])) {
-                         err += _('Unknown unit ')+'"'+pts[i]+'". ';
+                   if (!unitsregexfull.test(pts[i])) {
+                     if (!unitsregexfull100.test(pts[i])) {
+                       if (!unitsregexfull001.test(pts[i])) {
+                         if (!unitsregexfull101.test(pts[i])) {
+                           if (!unitsregexfull201.test(pts[i])) {
+                             if (!unitsregexfull011.test(pts[i])) {
+                               if (!unitsregexfull111.test(pts[i])) {
+                                 if (!unitsregexfull211.test(pts[i])) {
+                                   err += _('Unknownn unit ')+'"'+pts[i]+'". ';
+                                 }
+                               }
+                             } 
+                           }
+                         }
+                       } 
                      }
+                   }
                  }
              } else {
                  err += _("Missing units");
