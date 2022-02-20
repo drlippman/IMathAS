@@ -36,7 +36,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			'jsUrl' => ''  //set in init, after basesiteurl is defined
 		);
 
-		public static function init($validate = true)
+		public static function init($length = null, $action = null)
 		{
 			global $userid;
 			if (empty($userid)) { //only run if $userid is set
@@ -50,7 +50,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js?v=022022";
 
 			// Authorise the incoming request
-			if (isset($_SESSION[CSRFP_TOKEN]) && $validate) {
+			if (isset($_SESSION[CSRFP_TOKEN])) {
 				self::authorizePost();
 			}
 

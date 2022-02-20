@@ -1,5 +1,5 @@
 <?php
-
+$init_skip_csrfp = true;
 require('../init.php');
 
 if ($myrights < 20) {
