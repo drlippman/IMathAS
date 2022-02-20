@@ -7,7 +7,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 	define('__CSRF_PROTECTOR__', true); 	// to avoid multiple declaration errors
 
 	// name of HTTP POST variable for authentication
-	define("CSRFP_TOKEN","csrfp_token");
+	define("CSRFP_TOKEN","csrfp-token");
 
 	/**
 	 * child exception classes
@@ -47,7 +47,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 				self::$config['failedAuthAction'] = 'log';
 			}
 
-			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js";
+			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js?v=022022";
 
 			// Authorise the incoming request
 			if (isset($_SESSION[CSRFP_TOKEN])) {
