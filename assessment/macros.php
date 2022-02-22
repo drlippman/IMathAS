@@ -904,6 +904,7 @@ function showarrays() {
 	$alist = func_get_args();
 	$format = "default";
 	$caption = "";
+    $tablealign = '';
 	if (count($alist)<2) {return false;}
 	if (count($alist)%2==1) {
 		if (is_array($alist[count($alist)-1])) {
@@ -913,6 +914,9 @@ function showarrays() {
 			}
 			if (isset($opts['caption'])) {
 				$caption = $opts['caption'];
+			}
+            if (isset($opts['tablealign'])) {
+				$tablealign = $opts['tablealign'];
 			}
 		} else {
 			$format = $alist[count($alist)-1];
@@ -929,7 +933,11 @@ function showarrays() {
 		}
 		$alist = $newalist;
 	}
-	$out = '<table class=stats>';
+	$out = '<table class=stats';
+    if ($tablealign == 'center') {
+        $out .= ' style="margin:0 auto;"';
+    }
+    $out .= '>';
 	if ($caption != '') {
 		$out .= '<caption>'.Sanitize::encodeStringForDisplay($caption).'</caption>';
 	}
