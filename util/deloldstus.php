@@ -74,6 +74,10 @@ if (count($stus) > 0) {
         deletecoursefiles($pics);
         $pics = [];
     }
+
+    // now actually delete user record
+    $stm = $DBH->prepare("DELETE FROM imas_users WHERE id IN ($ph)");
+    $stm->execute($stus);
 }
 
 $n = count($stus);
