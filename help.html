@@ -3448,9 +3448,10 @@ None - the essay type is not computer graded.
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
 <dt>$displayformat = "editor" </dt>
 	<dd>Use the rich text editor for the essay answer box.</dd>
-<dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
-	<dd>Sets the problem to give full credit for any answer.  The latter also counts
-	blank answers as correct.</dd>
+<dt>$scoremethod = "takeanything" or "takeanythingorblank" or "nomanual"</dt>
+	<dd>The first two sets the problem to give full credit for any answer.  The second also counts
+	blank answers as correct.  The "nomanual" option will give no credit for any answer, but doesn't 
+    mark the question as needing manual grading.</dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
