@@ -435,7 +435,8 @@ if ($myrights==100 || ($myspecialrights&64)!=0) {
 	}
 	if (count($newreqs)>0) {
 		echo '<div> There are <span class=noticetext>'.(isset($newreqs[0])?$newreqs[0]:0).'</span> new account requests';
-		if (count($newreqs)>1 || !isset($newreqs[0])) {
+		unset($newreqs[0]); // don't count below
+        if (count($newreqs)>0) {
 			echo ' and <span class=noticetext>'.array_sum($newreqs).'</span> pending requests';
 		}
 		echo '. <a href="admin/approvepending2.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
