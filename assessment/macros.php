@@ -3579,6 +3579,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 
 	$cntnana = 0;
 	$cntnanb = 0;
+    $diffnan = 0;
 	$correct = true;
 	$ratios = array();
 	$evalerr = false;
@@ -3595,8 +3596,20 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 			break;
 		}
 		//echo "real: $ansa, my: $ansb <br/>";
-		if (isNaN($ansa)) {$cntnana++; if (isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
-		if (isNaN($ansb)) {$cntnanb++; continue;}
+		if (isNaN($ansa)) {
+            $cntnana++; 
+            if (isNaN($ansb)) {
+                $cntnanb++;
+            } else {
+                $diffnan++;
+            }
+            continue;
+        } //avoid NaN problems
+		if (isNaN($ansb)) {
+            $cntnanb++;
+            $diffnan++;
+            continue;
+        }
 
 		if ($type=='equation') {
 			if (abs($ansa)>.000001 && is_numeric($ansb)) {
@@ -3632,7 +3645,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		return false;
 	}
 
-	if (abs($cntnana - $cntnanb)>1) {
+	if ($diffnan>1) {
 		return false;
 	}
 	if ($type=="equation") {
