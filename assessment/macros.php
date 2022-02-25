@@ -3998,6 +3998,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				continue;
 			}
 			$cntnanb = 0;
+            $diffnan = 0;
 			$ratios = array();
 			for ($i = 0; $i < $numpts; $i++) {
 				$varvals = array();
@@ -4007,7 +4008,13 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				$ansb = $bfunc($varvals);
 
 				//echo "real: $ansa, my: $ansb <br/>";
-				if (isNaN($ansb)) {$cntnanb++; continue;}
+				if (isNaN($ansb)) {
+                    $cntnanb++; 
+                    if (!isNaN($stupts[$i])) { $diffnan++; }
+                    continue;
+                } else if (isNaN($stupts[$i])) {
+                    $diffnan++;
+                }
 				if (isNaN($stupts[$i])) {continue;} //avoid NaN problems
 
 				if ($type=='equation') {
@@ -4033,7 +4040,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			} else if ($i<20) {
 				continue;
 			}
-			if (abs($cntnana - $cntnanb)>1) {
+			if ($diffnan>1) {
 				continue;
 			}
 			if ($type=="equation") {
