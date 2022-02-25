@@ -95,6 +95,7 @@ function mathjs(st,varlist) {
   //while ^ in string, find term on left and right
   //slice and concat new formula string
   //parenthesizes the function variables
+  st = st.replace(/(\+\s*-|-\s*\+)/g,'-').replace(/-\s*-/g,'+');
   st = st.replace("[","(");
   st = st.replace("]",")");
   st = st.replace(/root\s*(\d+)/,"root($1)");
@@ -287,6 +288,5 @@ function mathjs(st,varlist) {
     st = st.slice(0,j+1)+"safepow("+st.slice(j+1,i)+","+st.slice(i+1,k)+")"+
            st.slice(k);
   }
-
   return st;
 }
