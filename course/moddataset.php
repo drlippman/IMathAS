@@ -155,8 +155,10 @@
 					'timeout' => 1
 				    )
 				));
-				$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
-				$captioned = (strpos($t, '<track')===false)?0:1;
+				$t = @file_get_contents('https://www.youtube.com/watch?v='.$vidid, false, $ctx);
+                // auto-gen captions have vssId of "a.langcode"; manual are just ".langcode"
+                // so look for vssId that starts with .; don't care about language
+				$captioned = (preg_match('/"vssId":\s*"\./', $t))?1:0; 
             }
             $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
 			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
