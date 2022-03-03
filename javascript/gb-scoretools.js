@@ -268,3 +268,48 @@ function sidebysidegrading() {
 		$(el).closest(".sidebyside").find('.sidepreview').append(el);
 	});
 }
+
+var scrollingscoreboxes = false;
+function toggleScrollingScoreboxes() {
+    if (scrollingscoreboxes) {
+        $(window).off('scroll.scoreboxes');
+        $(".scoredetails").removeClass("hoverbox");
+    } else {
+        $(window).on('scroll.scoreboxes', updatescoreboxscroll);
+        updatescoreboxscroll();
+    }
+    scrollingscoreboxes = !scrollingscoreboxes;
+}
+
+function updatescoreboxscroll() {
+    var scroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var viewbot = scroll + document.documentElement.clientHeight;
+    var wraps = document.getElementsByClassName("bigquestionwrap");
+    var objtop, scoredet, objbot;
+    for (var i=0; i<wraps.length; i++) {
+        if (wraps[i].style.display == "none") { continue; }
+        var rect = wraps[i].childNodes[1].getBoundingClientRect();
+        objtop = rect.top + scroll; 
+        scoredet = wraps[i].childNodes[2];
+        objbot = objtop + wraps[i].childNodes[1].offsetHeight + scoredet.offsetHeight ;
+        if (viewbot > objtop + scoredet.offsetHeight + 20 && 
+            viewbot < objbot && 
+            scoredet.offsetHeight < .5*document.documentElement.clientHeight 
+        ) {
+            if (scoredet.style.position == "static") { 
+                scoredet.style.width = $(scoredet).width() + "px";
+                wraps[i].childNodes[1].style.marginBottom = scoredet.offsetHeight + "px";
+                scoredet.style.position = "fixed";
+                scoredet.style.bottom = 0;
+                scoredet.style.marginLeft = '5px';
+                scoredet.classList.add("hoverbox");
+            }
+        } else {
+            scoredet.style.position = "static";
+            scoredet.style.width = 'auto';
+            scoredet.style.marginLeft = '0';
+            wraps[i].childNodes[1].style.marginBottom = 0;
+            scoredet.classList.remove("hoverbox");
+        }
+    };
+}
