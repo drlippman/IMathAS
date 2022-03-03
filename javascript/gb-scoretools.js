@@ -273,7 +273,8 @@ var scrollingscoreboxes = false;
 function toggleScrollingScoreboxes() {
     if (scrollingscoreboxes) {
         $(window).off('scroll.scoreboxes');
-        $(".scoredetails").removeClass("hoverbox");
+        $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);
+        $(".biquestionwrap .scrollpane").css("margin-bottom","0");
     } else {
         $(window).on('scroll.scoreboxes', updatescoreboxscroll);
         updatescoreboxscroll();
