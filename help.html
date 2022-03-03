@@ -2488,6 +2488,8 @@ These macros are for working with arrays:
 <li><strong>calconarrayif(array,calculation,ifcondition)</strong>:  Like calconarray, but allows you to specify a condition for each element for whether to
     do the calculation.  Example:  $b = calconarrayif($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
     other elements unchanged.</li>
+<li><strong>keepif(array,condition)</strong>  Filters an array, only keeping values that meet the 
+    supplied condition. Example: keepif($a,"x%3==0").</li>
 <li><strong>subarray(array,params)</strong>:  Creates a new array as a subset of the specified array.  The params can take several forms:
 	<ul>
 	<li>subarray($a,2,4,6):  creates an array from $a[2], $a[4], and $a[6]</li>
