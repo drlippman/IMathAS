@@ -1237,7 +1237,7 @@ class AssessRecord
             $new_timelimit_end += $v*60;
           }
       }
-      if ($new_timelimit_end != $returnVal) {
+      if ($new_timelimit_end > $returnVal) {
         $this->data['assess_versions'][$lastvernum]['timelimit_end'] = $new_timelimit_end;
         $returnVal = $new_timelimit_end;
         $this->need_to_record = true;
