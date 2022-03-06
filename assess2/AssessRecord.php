@@ -1979,7 +1979,8 @@ class AssessRecord
         ->setScoreIsCorrect($scoreiscorrect)
         ->setLastRawScores($qcolors)
         ->setSeqPartDone($seqPartDone)
-        ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat);
+        ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat)
+        ->setTeacherInGb($this->teacherInGb);
     if ($this->dispqn !== null) {
       $questionParams->setDisplayQuestionNumber($this->dispqn);
     }
