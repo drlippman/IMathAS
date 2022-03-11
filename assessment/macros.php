@@ -37,7 +37,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits",
- "isset","atan2","keepif");
+ "isset","atan2","keepif","checkanswerformat");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -5168,7 +5168,7 @@ function comparenumberswithunits($unitExp1, $unitExp2, $tol='0.001') {
   }
 }
 
-function stuansready($stu, $qn, $parts, $anstypes = null) {
+function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) {
     if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
         return false;
     }
@@ -5186,6 +5186,19 @@ function stuansready($stu, $qn, $parts, $anstypes = null) {
             if (is_string($v) && $v[0]=='~') {
                 $blankok = true;
                 $v = substr($v,1);
+            }
+            if ($anstypes !== null && $answerformat !== null && $stu[$qn][$v] !== '') {
+                $thisaf = '';
+                if (is_array($answerformat) && !empty($answerformat[$v])) {
+                    $thisaf = $answerformat[$v];
+                } else if (!is_array($answerformat)) {
+                    $thisaf = $answerformat;
+                }
+                if ($thisaf !== '') {
+                    if ($anstypes[$v] == 'calculated' && !checkanswerformat($stu[$qn][$v],$thisaf)) {
+                        continue;
+                    }
+                }
             }
             //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
