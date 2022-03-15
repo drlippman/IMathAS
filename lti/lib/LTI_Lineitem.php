@@ -123,6 +123,7 @@ class LTI_Lineitem {
           "tag" => $this->tag,
           "startDateTime" => $this->start_date_time,
           "endDateTime" => $this->end_date_time,
+          "gradesReleased" => true,
           "submissionReview" => ($this->submission_review === null) ? 
             null :
             $this->submission_review->getObject()
