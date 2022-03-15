@@ -221,6 +221,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   	   $itemshowdata = loadItemShowData($items, true, $viewall, $inpublic, $ispublic);
 	   }
 
+       // sanitize to prevent XSS
+       $parent = implode('-', array_map('intval', explode('-', $parent)));
+
 	   $now = time();
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
