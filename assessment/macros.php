@@ -3554,20 +3554,13 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	if (strpos($a, '=')!==false && strpos($b, '=')!==false) {
 		$type = "equation";
 	}
-	$fromto = listtoarray($domain);
-	$variables = listtoarray($vars);
+
+    list($variables, $tps, $flist) = numfuncGenerateTestpoints($vars, $domain);
+
 	$vlist = implode(",",$variables);
-	for ($i = 0; $i < 20; $i++) {
-		for($j=0; $j < count($variables); $j++) {
-			if (isset($fromto[2]) && $fromto[2]=="integers") {
-				$tps[$i][$j] = $GLOBALS['RND']->rand($fromto[0],$fromto[1]);
-			} else if (isset($fromto[2*$j+1])) {
-				$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
-			} else {
-				$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
-			}
-		}
-	}
+    $a = numfuncPrepForEval($a, $variables, $flist);
+    $b = numfuncPrepForEval($b, $variables, $flist);
+
 	if ($type=='equation') {
 		if (substr_count($a, '=')!=1) {return false;}
 		$a = preg_replace('/(.*)=(.*)/','$1-($2)',$a);
@@ -3721,6 +3714,134 @@ function stringtopolyterms($str) {
 	}
 	return $out;
 }
+
+/*
+ abstracts some of the common numfunc processing
+ @param $variables string (comma separated) 
+ @param $domain   string
+ return
+ array of
+   $variables  array
+   $testpoints  2d array
+   $flist string (function variables, | separated) 
+*/
+function numfuncGenerateTestpoints($variables,$domain='') {
+    $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
+    $ofunc = array();
+    for ($i = 0; $i < count($variables); $i++) {
+        //find f() function variables
+        if (strpos($variables[$i],'()')!==false) {
+            $ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
+            $variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+        }
+    }
+    if (!empty($domain)) {
+        $fromto = array_map('trim',explode(",",$domain));
+        for ($i=0; $i < count($fromto); $i++) {
+            if ($fromto[$i] === 'integers') { continue; }
+            else if (!is_numeric($fromto[$i])) {
+                $fromto[$i] = evalbasic($fromto[$i]);
+            }
+        }
+    } else {
+        $fromto = array(-10, 10);
+    }
+    if (count($fromto)==1) {
+        $fromto = array(-10, 10);
+    }
+
+    $domaingroups = array();
+    $i=0;
+    while ($i<count($fromto)) {
+        if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
+            $domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
+            $i += 3;
+        } else if (isset($fromto[$i+1])) {
+            $domaingroups[] = array($fromto[$i], $fromto[$i+1], false);
+            $i += 2;
+        } else {
+            break;
+        }
+    }
+
+    uasort($variables,'lensort');
+    $newdomain = array();
+    $restrictvartoint = array();
+    foreach($variables as $i=>$v) {
+        if (isset($domaingroups[$i])) {
+            $touse = $i;
+        } else {
+            $touse = 0;
+        }
+        $newdomain[] = $domaingroups[$touse][0];
+        $newdomain[] = $domaingroups[$touse][1];
+        $restrictvartoint[] = $domaingroups[$touse][2];
+    }
+    $fromto = $newdomain;
+    $variables = array_values($variables);
+
+    $flist = '';
+    if (count($ofunc)>0) {
+        usort($ofunc,'lensort');
+        $flist = implode("|",$ofunc);
+    }
+
+    for($j=0; $j < count($variables); $j++) {
+        if ($fromto[2*$j+1]==$fromto[2*$j]) {
+            for ($i = 0; $i < 20; $i++) {
+                $tps[$i][$j] = $fromto[2*$j];
+            } 
+        } else if ($restrictvartoint[$j]) {
+            if ($fromto[2*$j+1]-$fromto[2*$j] > 200) {
+                for ($i = 0; $i < 20; $i++) {
+                    $tps[$i][$j] = rand($fromto[2*$j],$fromto[2*$j+1]);
+                }
+            } else {
+                $allbetween = range($fromto[2*$j],$fromto[2*$j+1]);
+                shuffle($allbetween);
+                $n = count($allbetween);
+                for ($i = 0; $i < 20; $i++) {
+                    $tps[$i][$j] = $allbetween[$i%$n];
+                }
+            }
+        } else {
+            $dx = ($fromto[2*$j+1]-$fromto[2*$j])/20;
+            for ($i = 0; $i < 20; $i++) {
+                $tps[$i][$j] = $fromto[2*$j] + $dx*$i + $dx*rand(1,499)/500.0;
+            }
+        }
+    }
+
+    return [$variables, $tps, $flist];
+}
+
+/* do any necessary rewrite of expression (not including equation rewrite)
+   before eval
+   @param $expr  string  the expression to rewrite
+   @param $variables array  of variables
+   @param flist   string, | separated of function variables
+   return:
+   string of rewritten expression
+*/
+function numfuncPrepForEval($expr, $variables, $flist) {
+    $expr = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$expr);
+
+    for ($i = 0; $i < count($variables); $i++) {
+        if ($variables[$i]=='lambda') { //correct lamda/lambda
+            $expr = str_replace('lamda', 'lambda', $expr);
+        }
+        // front end will submit p_(left) rather than p_left; strip parens
+        if (preg_match('/^(\w+)_(\w+)$/', $variables[$i], $m)) {
+            $expr = preg_replace('/'.$m[1].'_\('.$m[2].'\)/', $m[0], $expr);
+        }
+    }
+    if ($flist != '') {
+        $expr = preg_replace('/('.$flist.')\(/',"funcvar[$1](",$expr);
+    }
+
+    return $expr;
+}
+
 
 function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 	global $rawscores,$imasroot,$staticroot;
@@ -3951,26 +4072,15 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			$stu = preg_replace('/(.*)=(.*)/','$1-($2)',$stu);
 		}
 
-		$fromto = listtoarray($domain);
-		$variables = listtoarray($vars);
+        list($variables, $tps, $flist) = numfuncGenerateTestpoints($vars, $domain);
+        $numpts = count($tps);
 		$vlist = implode(",",$variables);
+        $stu = numfuncPrepForEval($stu, $variables, $flist);
+
 		$origstu = $stu;
 		$stufunc = makeMathFunction(makepretty($stu), $vlist);
 		if ($stufunc===false) {
 			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
-		}
-
-		$numpts = 20;
-		for ($i = 0; $i < $numpts; $i++) {
-			for($j=0; $j < count($variables); $j++) {
-				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tps[$i][$j] = $GLOBALS['RND']->rand($fromto[0],$fromto[1]);
-				} else if (isset($fromto[2*$j+1])) {
-					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
-				} else {
-					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
-				}
-			}
 		}
 
 		$stupts = array();
@@ -3993,11 +4103,11 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($k=0;$k<count($partial);$k+=2) {
 			$correct = true;
-			$b = $partial[$k];
+			$b =  numfuncPrepForEval($partial[$k], $variables, $flist);
 			if ($type=='equation') {
 				if (substr_count($b, '=')!=1) {continue;}
 				$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
-			}
+			} else if (strpos($b, '=')!==false) {continue;}
 			$origb = $b;
 			$bfunc = makeMathFunction(makepretty($b), $vlist);
 			if ($bfunc === false) {
