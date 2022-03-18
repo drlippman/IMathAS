@@ -466,7 +466,8 @@
     "used_timeext": "Used a {n} minute time limit extension",
     "attemptext": "Exception given for {n} additional versions",
     "preview_files": "Preview All Files",
-    "introtexts": "Intro and between-question text"
+    "introtexts": "Intro and between-question text",
+    "floating_scoreboxes": "Floating Scoreboxes"
   },
   "work": {
     "add": "Add Work",

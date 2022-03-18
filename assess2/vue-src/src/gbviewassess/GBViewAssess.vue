@@ -254,9 +254,16 @@
                 {{ $t('gradebook.show_all_work') }}
               </button>
               <button
+                type="button"
                 @click = "previewFiles"
               >
                 {{ $t('gradebook.preview_files') }}
+              </button>
+              <button
+                type="button"
+                @click="toggleFloatingScoreboxes"
+              >
+                {{ $t('gradebook.floating_scoreboxes') }}
               </button>
             </p>
           </div>
@@ -778,6 +785,9 @@ export default {
     previewFiles () {
       window.previewallfiles();
     },
+    toggleFloatingScoreboxes () {
+      window.toggleScrollingScoreboxes();
+    },
     loadTexts () {
       if (!store.assessInfo.hasOwnProperty('intro')) {
         actions.loadGbTexts();
@@ -825,6 +835,7 @@ export default {
   right: 10px;
   bottom: 10px;
   text-align: center;
+  z-index: 10;
 }
 .bigquestionwrap {
   border: 1px solid #ccc;
@@ -834,5 +845,8 @@ export default {
 .bigquestionwrap .headerpane {
   padding: 8px;
   background-color: #eee;
+}
+.hoverbox {
+  background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);
 }
 </style>
