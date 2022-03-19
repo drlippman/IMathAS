@@ -92,16 +92,18 @@ if (!empty($_POST['makelineitem'])) {
     }
 } else if (!empty($_POST['fixbb'])) {
     $ags = $launch->get_ags();
-    $stm = $DBH->prepare("SELECT li.lticourseid,li.lineitem FROM imas_lti_lineitems AS li 
-        JOIN imas_assessments AS ia ON li.itemtype=0 AND li.typeid=ia.id WHERE ia.courseid=?");
-    $stm->execute([$localcourse->get_courseid()]);
+    $stm = $DBH->prepare("SELECT lineitem,itemtype,typeid FROM imas_lti_lineitems 
+        WHERE itemtype=0 AND lticourseid=?");
+    $stm->execute([$localcourse->get_id()]);
+    $n = 0;
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $lineitem = LTI\LTI_Lineitem::new ()
-            ->set_resource_id($itemtype . '-' . $typeid)
+            ->set_resource_id($row['itemtype'] . '-' . $row['typeid'])
             ->set_id($row['lineitem']);
         $ags->update_lineitem($lineitem);
+        $n++;
     }
-    $bbfixmsg = _('Fix attempt sent');
+    $bbfixmsg = _('Fix attempts sent:').' '.$n;
 }
 
 
