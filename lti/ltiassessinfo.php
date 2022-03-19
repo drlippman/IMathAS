@@ -187,7 +187,10 @@ if ($db->has_lineitem($link, $localcourse)) {
         echo _('Include zeros for unattempted assessments').'</label>';
         echo '<button name="resync" type="submit" value="1">';
         echo _('Resend Scores to LMS').'</button>';
-        echo '<p>'._('If you are using Blackboard, and your assessments are showing up as Needs Grading, you can try this possible fix.');
+        echo '</form>';
+        echo '<form method=post action="ltiassessinfo.php?launchid=' .
+        Sanitize::encodeStringForDisplay($launch->get_launch_id()).'" class="flexform">';
+        echo _('If you are using Blackboard, and your assessments are showing up as Needs Grading, you can try this possible fix.');
         echo ' <button name="fixbb" type="submit" value="1">';
         echo _('Attempt Blackboard Fix').'</button>';
         echo '</form>';
