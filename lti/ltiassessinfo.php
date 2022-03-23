@@ -90,21 +90,7 @@ if (!empty($_POST['makelineitem'])) {
     if (!empty($GLOBALS['CFG']['LTI']['usequeue'])) {
         $scoreresendmsg .= ' '._('It may take a couple minutes for the updates to show in the LMS.');
     }
-} else if (!empty($_POST['fixbb'])) {
-    $ags = $launch->get_ags();
-    $stm = $DBH->prepare("SELECT lineitem,itemtype,typeid FROM imas_lti_lineitems 
-        WHERE itemtype=0 AND lticourseid=?");
-    $stm->execute([$localcourse->get_id()]);
-    $n = 0;
-    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        $lineitem = LTI\LTI_Lineitem::new ()
-            ->set_resource_id($row['itemtype'] . '-' . $row['typeid'])
-            ->set_id($row['lineitem']);
-        $ags->update_lineitem($lineitem);
-        $n++;
-    }
-    $bbfixmsg = _('Fix attempts sent:').' '.$n;
-}
+} 
 
 
 //HTML Output
@@ -177,9 +163,6 @@ if (!empty($scoreresendmsg)) {
 if (!empty($lineitemmsg)) {
     echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($lineitemmsg).'</p>';
 }
-if (!empty($bbfixmsg)) {
-    echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($bbfixmsg).'</p>';
-}
 if ($db->has_lineitem($link, $localcourse)) {
     echo '<p>',sprintf(_('%s has the info necessary for passing back grades.'),$installname),'</p>';
     if ($line['ver']>1) {
@@ -189,12 +172,6 @@ if ($db->has_lineitem($link, $localcourse)) {
         echo _('Include zeros for unattempted assessments').'</label>';
         echo '<button name="resync" type="submit" value="1">';
         echo _('Resend Scores to LMS').'</button>';
-        echo '</form>';
-        echo '<form method=post action="ltiassessinfo.php?launchid=' .
-        Sanitize::encodeStringForDisplay($launch->get_launch_id()).'" class="flexform">';
-        echo _('If you are using Blackboard, and your assessments are showing up as Needs Grading, you can try this possible fix. You should only need to do this once per course.');
-        echo ' <button name="fixbb" type="submit" value="1">';
-        echo _('Attempt Blackboard Fix').'</button>';
         echo '</form>';
     }
 } else if ($launch->can_create_lineitem()) {
