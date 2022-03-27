@@ -100,7 +100,8 @@ class IntervalScorePart implements ScorePart
                     foreach ($matches[0] as $var) {
                         if (in_array($var,$mathfuncs)) { continue;}
                         if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
-                            strtolower($var) != 'var') {
+                            strtolower($var) != 'var' && $var != 'pi' && $var != 'e' 
+                            && $var != 'E') {
                             $scorePartResult->setRawScore(0);
                             return $scorePartResult;
                         }
