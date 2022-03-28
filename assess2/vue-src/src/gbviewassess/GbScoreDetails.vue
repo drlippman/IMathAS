@@ -24,6 +24,7 @@
           type="text"
           size="4"
           :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
+          pattern="N\/A|\d*\.?\d*"
           v-model="curScores[i]"
           @input="updateScore(i, $event)"
           @keyup.enter="$emit('submitform')"

@@ -370,7 +370,7 @@
 	$placeinhead .= '<style type="text/css"> 
         .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
         .hoverbox { background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);}
-        </style>';
+		</style>';
 	require("../includes/rubric.php");
 	$_SESSION['coursetheme'] = $coursetheme;
 	require("../header.php");
@@ -667,7 +667,7 @@
 
 				if ($canedit) {
 					$boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
-					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
+					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\" pattern=\"N\/A|\d*\.?\d*\">";
 					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					if ($rubric != 0) {
 						$fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);

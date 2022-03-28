@@ -790,7 +790,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
                 	echo 'X';
 			}
 			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
+			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" pattern=\"x|X|\d*\.?\d*\"/>";
 			if ($rubric != 0) {
 				echo printrubriclink($rubric,$points,"score". Sanitize::onlyint($row[0]),"feedback". Sanitize::onlyint($row[0]));
 			}
