@@ -766,7 +766,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       if ($taken) {
           $page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
           $page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";
-          $page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment2.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\"></p>\n";
+          $page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment2.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\">";
+		  $page_isTakenMsg .= " <a href=\"isolateassessgrade.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['id'])."\" target=\"_blank\">"._('View Scores')."</a></p>\n";
       } else {
           $page_isTakenMsg = "<p>&nbsp;</p>";
       }

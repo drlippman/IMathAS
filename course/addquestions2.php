@@ -522,6 +522,9 @@ if ($overwriteBody==1) {
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
 	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions2.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<a href="isolateassessgrade.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>" target="_blank">
+		<?php echo _('View Scores');?>
+	</a>
 	</p>
 <?php
 	}
