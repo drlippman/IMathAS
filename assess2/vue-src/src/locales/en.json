@@ -485,5 +485,9 @@
     "qnav": "Question navigation",
     "qvidnav": "Video and question navigation",
     "aheader": "Assessment info"
+  },
+  "links": {
+      "settings": "Settings",
+      "questions": "Questions"
   }
 }

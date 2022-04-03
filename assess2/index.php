@@ -2,7 +2,7 @@
 // IMathAS: Main launch page for assess2 assessment player
 // (c) 2019 David Lippman
 
-$lastupdate = '20220302';
+$lastupdate = '20220403';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
