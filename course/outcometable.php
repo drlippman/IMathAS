@@ -24,6 +24,7 @@ row[0][1][#][5] = assessmentid, gbitems.id, forumid
 row[0][2] category totals
 row[0][2][#][0] = "Category Name"
 row[0][2][#][1] = category color number
+row[0][2][#][2] = hidden
 
 row[1] first student data row
 row[1][0] biographical
@@ -375,6 +376,9 @@ function outcometable() {
 	//Pull Categories:  Name, scale, scaletype, chop, drop, weight
 	if (in_array(0,$category)) {  //define default category, if used
 		$cats[0] = explode(',',$defaultcat);
+        if (!isset($cats[0][6])) {
+			$cats[0][6] = ($cats[4]==0)?0:1;
+		}
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);
 		$catcolcnt++;
@@ -518,6 +522,7 @@ function outcometable() {
 	foreach($catorder as $cat) {//foreach category
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][7];
+        $gb[0][2][$pos][2] = $cats[$cat][6];
 		$pos++;
 	}
 
