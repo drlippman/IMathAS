@@ -37,7 +37,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits",
- "isset","atan2","keepif","checkanswerformat");
+ "isset","atan2","keepif","checkanswerformat","preg_match");
 
 function mergearrays() {
 	$args = func_get_args();
