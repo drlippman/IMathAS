@@ -253,6 +253,7 @@ if ($report=='overview') {
 	$itemstolist = array();
 	for ($i=1;$i<count($ot);$i++) {
 		for ($j=0;$j<count($ot[$i][1] ?? []);$j++) {
+            if ($ot[0][1][$j][3]==0) { continue;} // don't count in gb
 			if (isset($itemstolist[$j])) {continue;} //already got it
 			if ($type==0 && $ot[0][1][$j][2]==1) {continue;} //only want past items
 			if (isset($ot[$i][1][$j][1][$outcome])) { //using outcome

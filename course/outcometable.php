@@ -1002,6 +1002,9 @@ function outcometable() {
 		$pos = 0; //reset position for category totals
 
 		foreach($catorder as $cat) {//foreach category
+            if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
+				continue;
+			}
 			//add up scores for each outcome
 			if (isset($cattotpast[$ln][$cat])) {
 				foreach ($cattotpast[$ln][$cat] as $oc=>$scs) {
@@ -1086,6 +1089,7 @@ function outcometable() {
 			}
 		}
 		foreach ($gb[0][2] as $i=>$inf) {
+            if ($inf[2] == 1) { continue; } // category hidden
 			$avg = array();  $avgposs = array();
 			$avgatt = array();  $avgattposs = array();
 			for ($j=1;$j<$ln;$j++) {
