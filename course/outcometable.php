@@ -70,6 +70,37 @@ function getpts($sc) {
 	}
 }
 
+function flattenitems($items,&$addto,&$itemidsection,$sec='') {
+	global $canviewall,$secfilter,$studentinfo;
+	$now = time();
+	foreach ($items as $item) {
+		if (is_array($item)) {
+			if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+            }
+            $thissec = $sec;
+            $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+            if (!empty($item['grouplimit'])) {
+                $thissec = substr($item['grouplimit'][0],2); // trim off s-
+                if ((!$canviewall && $studentinfo['section'] != $thissec) ||
+                    ($canviewall && $secfilter != -1 && $secfilter != $thissec)
+                ) {
+                    // if a section limited block, and not in/showing that sec, hide
+                    $ishidden = true;
+                }
+            } 
+			if (!$ishidden) {
+				flattenitems($item['items'], $addto, $itemidsection, $thissec);
+			}
+		} else {
+            if ($sec != '') {
+                $itemidsection[$item] = $sec;
+            }
+			$addto[] = $item;
+		}
+	}
+}
+
 function outcometable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter;
 	global $timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
@@ -88,6 +119,32 @@ function outcometable() {
 	$outc = array();
 	$gb = array();
 	$ln = 0;
+
+    $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$courseitemorder = unserialize($stm->fetchColumn(0));
+	$courseitemsimporder = array();
+    $courseitemsassoc = array();
+    $itemidsection = array();
+    $itemsection = array();
+    // figure out which items are hidden or section-specific
+    // hidden is used; section-specific isn't yet
+	flattenitems($courseitemorder,$courseitemsimporder,$itemidsection);
+    if (count($courseitemsimporder)>0) {
+		$ph = Sanitize::generateQueryPlaceholders($courseitemsimporder);
+		$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE id IN ($ph)");
+		$stm->execute($courseitemsimporder);
+
+		$courseitemsimporder = array_flip($courseitemsimporder);
+
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
+            if (isset($itemidsection[$row[0]])) {
+                $itemsection[$row[1].$row[2]] = $itemidsection[$row[0]];
+            }
+        }
+        unset($itemidsection);
+	}
 
 	//Pull Gradebook Scheme info
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid=:courseid");
@@ -147,6 +204,9 @@ function outcometable() {
 	$sa = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (substr($line['deffeedback'],0,8)=='Practice') { continue;}
+        if (!isset($courseitemsassoc['Assessment'.$line['id']])) {
+			continue; //assess is in hidden block - skip it
+		}
 		if ($line['avail']==2) {
 			$line['startdate'] = 0;
 			$line['enddate'] = 2000000000;
@@ -271,6 +331,9 @@ function outcometable() {
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+        if (!isset($courseitemsassoc['Forum'.$line['id']])) {
+			continue; //forum is in hidden block - skip it
+		}
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
