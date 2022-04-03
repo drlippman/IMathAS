@@ -111,9 +111,12 @@ if (!$assess_record->hasRecord()) {
       list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
       if ($stugroup == 0) {
         if ($isGroup == 3) {
-          // no group yet - can't do anything
-          echo '{"error": "need_group"}';
-          exit;
+            if ($stugroupid == 0 || count($current_members) == 0) {
+                // no group yet - can't do anything
+                echo '{"error": "need_group"}';
+                exit;
+            }
+            $current_members = array_keys($current_members); // we just want the user IDs
         } else {
           $current_members = false; // just create for user if no group yet
         }
