@@ -63,6 +63,7 @@ function functoindex(match) {
 			return '@'+i+'@';
 		}
 	}
+    return match;
 }
 function indextofunc(match, contents) {
 	return funcstoindexarr[contents];

@@ -12,15 +12,15 @@
  *                            set of standard math functions.
  * @return Parser instance
  */
-function parseMath($str, $vars = '', $allowedfuncs = array()) {
-  $parser = new MathParser($vars, $allowedfuncs);
+function parseMath($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
+  $parser = new MathParser($vars, $allowedfuncs, $fvlist);
   $parser->parse($str);
   return $parser;
 }
 
-function parseMathQuiet($str, $vars = '', $allowedfuncs = array()) {
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   try {
-    $parser = new MathParser($vars, $allowedfuncs);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10) {
@@ -50,14 +50,15 @@ function parseMathQuiet($str, $vars = '', $allowedfuncs = array()) {
  * @param array $allowedfuncs  (optional) An array of function names that can
  *                            be called in math expressions.  Defaults to a
  *                            set of standard math functions.
+ * @param string $fvlist comma separated list of variables to treat as functions
  * @return function
  */
-function makeMathFunction($str, $vars = '', $allowedfuncs = array()) {
+function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   if (trim($str)=='') {
     return false;
   }
   try {
-    $parser = new MathParser($vars, $allowedfuncs);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10) {
@@ -112,6 +113,7 @@ class MathParser
 {
   private $functions = [];
   private $variables = [];
+  private $funcvariables = [];
   private $operators = [];
   private $tokens = [];
   private $operatorStack = [];
@@ -128,10 +130,14 @@ class MathParser
    * @param array $allowedfuncs  (optional) An array of function names that can
    *                            be called in math expressions.  Defaults to a
    *                            set of standard math functions.
+   * @param string $fvlist   A comma-separated list of variables to treat as functions
    */
-  function __construct($variables, $allowedfuncs = array()) {
+  function __construct($variables, $allowedfuncs = array(), $fvlist = '') {
     if ($variables != '') {
       $this->variables = array_values(array_filter(array_map('trim', explode(',', $variables)), 'strlen'));
+    }
+    if ($fvlist != '') {
+        $this->funcvariables = array_values(array_filter(array_map('trim', explode(',', $fvlist)), 'strlen'));
     }
     //treat pi and e as variables for parsing
     array_push($this->variables, 'pi', 'e');
@@ -383,7 +389,16 @@ class MathParser
         // look to see if the symbol is in our list of variables and functions
         if (preg_match($this->regex, substr($str,$n), $matches)) {
           $nextSymbol = $matches[1];
-          if (in_array($nextSymbol, $this->variables)) {
+          if (in_array($nextSymbol, $this->funcvariables)) {
+            // found a variable acting as a function 
+            $tokens[] = [
+              'type'=>'function',
+              'symbol'=>'funcvar',
+              'input'=>null,
+              'index'=>['type'=>'variable', 'symbol'=>$nextSymbol]
+            ];
+            $lastTokenType = 'function';
+          } else if (in_array($nextSymbol, $this->variables)) {
             // found a variable
             $tokens[] = [
               'type'=>'variable',

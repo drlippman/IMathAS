@@ -67,8 +67,8 @@ class FunctionExpressionScorePart implements ScorePart
 
         if (empty($variables)) { $variables = "x";}
         list($variables, $tps, $flist) = numfuncGenerateTestpoints($variables, $domain);
-        $givenans = numfuncPrepForEval($givenans, $variables, $flist);
-        $answer = numfuncPrepForEval($answer, $variables, $flist);
+        $givenans = numfuncPrepForEval($givenans, $variables);
+        $answer = numfuncPrepForEval($answer, $variables);
 
         $vlist = implode(",",$variables);
 
@@ -127,7 +127,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $toevalGivenans = $givenans;
             }
 
-            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist);
+            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist, [], $flist);
             if ($givenansfunc === false) { //parse error
                 continue;
             }
@@ -159,7 +159,7 @@ class FunctionExpressionScorePart implements ScorePart
             if (!empty($partialcredit) && !in_array('list',$ansformats)) { // partial credit only works for non-list answers
                 if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
                 for ($i=0;$i<count($partialcredit);$i+=2) {
-                    $partialcredit[$i] = numfuncPrepForEval($partialcredit[$i], $variables, $flist);
+                    $partialcredit[$i] = numfuncPrepForEval($partialcredit[$i], $variables);
                     if (!in_array($partialcredit[$i], $ansarr) || $partialcredit[$i+1]<1) {
                         $ansarr[] = $partialcredit[$i];
                         $partialpts[] = $partialcredit[$i+1];
@@ -198,7 +198,7 @@ class FunctionExpressionScorePart implements ScorePart
                     continue;
                 }
                 $origanswer = $answer;
-                $answerfunc = parseMathQuiet(makepretty($answer), $vlist);
+                $answerfunc = parseMathQuiet(makepretty($answer), $vlist, [], $flist);
                 if ($answerfunc === false) {  // parse error on $answer - can't do much
                     continue;
                 }
