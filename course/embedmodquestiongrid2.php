@@ -264,7 +264,7 @@
 <thead><tr>
 <?php
 		if (isset($_GET['modqs'])) { //modifying existing questions
-            $modqs = explode('-', $_GET['modqs']);
+            $modqs = explode(';', $_GET['modqs']);
 			$qids = array();
 			$qns = array();
 			foreach ($modqs as $k=>$v) {
@@ -288,7 +288,7 @@
 					$row['attempts'] = '';
 				}
 
-				$qrows[$row['id']] = '<tr><td>'.Sanitize::onlyInt($qns[$row['id']]).'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
+				$qrows[$row['id']] = '<tr><td>'.Sanitize::encodeStringForDisplay($qns[$row['id']]).'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
 				$qrows[$row['id']] .= '<td>';
 				if ($row['extref']!='') {
 					$extref = explode('~~',$row['extref']);
@@ -359,7 +359,7 @@
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 
         } else { //adding new questions
-            $addqs = explode('-', $_GET['toaddqs']);
+            $addqs = explode(';', $_GET['toaddqs']);
             
 			echo "<th>Description</th><th></th><th></th>";
 			echo '<th>Points<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
