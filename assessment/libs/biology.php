@@ -4,7 +4,7 @@
 //Version 0.1 April 8, 2022
 
 global $allowedmacros;
-array_push($allowedmacros,"bio_randcodon","bio_getcodonname");
+array_push($allowedmacros,"bio_randcodon","bio_getcodonname","bio_anticodon");
 
 
 // bio_randcodon
@@ -26,6 +26,31 @@ function bio_getcodonname($codonLetters){
     $out = array($bio_codons[$codon_number][1], $bio_codons[$codon_number][2]);
     return $out;
 }
+
+// bio_anticodon
+// returns the anticodon of the codon
+function bio_anticodon($DNA_string){
+    $input = trim($DNA_string);
+    $input = str_split($input);
+    $output = "";
+    foreach ($input as $letter) {
+        if ($letter == "A") {
+            $output .= "T";
+        } elseif ($letter == "T") {
+            $output .= "A";
+        } elseif ($letter == "C") {
+            $output .= "G";
+        } elseif ($letter == "G") {
+            $output .= "C";
+        } elseif ($letter == "U") {
+            $output .= "A";
+        }
+    } 
+    return $output;
+}
+
+// bio_translation
+// returns the translation of the codon
 
 // TODO: Deal with Stop Codons
 $GLOBALS['bio_codons'] = array(
