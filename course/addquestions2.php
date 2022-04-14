@@ -385,7 +385,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         var assessver = '$aver';
 		</script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=040522\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=011322\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=041422\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -643,7 +643,7 @@ if ($overwriteBody==1) {
             }
             ?>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" id="searchtypemenu">
             <li><a href="#" role="button" onclick="alllibs(); return false;">
                 <?php echo _('All Libraries'); ?>
             </a></li>
@@ -807,6 +807,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
     $(function() {
         displayQuestionList(<?php echo json_encode($search_results, JSON_INVALID_UTF8_IGNORE); ?>);
+        setlibhistory();
     });
 </script>
 </div>

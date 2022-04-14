@@ -554,6 +554,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      }
      GB_show('Library Select','libtree2.php?libtree=popup&libs='+listlibs,500,500);
  }
+
  function setlib(libs) {
      //document.getElementById("libs").value = libs;
      curlibs = libs;
@@ -562,8 +563,56 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      doQuestionSearch();
  }
  function setlibnames(libn) {
-     document.getElementById("libnames").innerHTML = libn.replace(/<span.*?<\/span.*?>/g,'');
+     document.getElementById("libnames").innerHTML = libn.replace(/\s*<span.*?<\/span.*?>/g,'').replace(/\s+/g,' ').trim();
      $("#libnames").parent().show();
+
+    // this gets called after setlib, so we'll check for and update history here
+    setlibhistory();
+ }
+
+ var recentlibs = {'ids':[], 'names':[]};
+ var cookierecentlibs = readCookie("recentlibs");
+ if (cookierecentlibs !== null) {
+     recentlibs = JSON.parse(decodeURIComponent(cookierecentlibs));
+ }
+
+ function setlibhistory() {
+    var curloc = recentlibs.ids.indexOf(curlibs);
+    if (curloc != -1) { // remove if already in list
+        recentlibs.ids.splice(curloc,1);
+        recentlibs.names.splice(curloc,1);
+    }
+    recentlibs.ids.unshift(curlibs);
+    recentlibs.names.unshift(document.getElementById("libnames").innerHTML);
+    if (recentlibs.ids.length > 6) {
+        recentlibs.ids.pop();
+        recentlibs.names.pop();
+    }
+    document.cookie = "recentlibs=" + encodeURIComponent(JSON.stringify(recentlibs));
+    if (recentlibs.ids.length > 1) {
+        $('#searchtypemenu').children(":nth-child(n+4)").remove();
+        $('#searchtypemenu').append($("<li>", {
+            text: _("Recent Libraries"),
+            class: "dropdown-header"
+        }));
+        for (var i=1; i<recentlibs.ids.length; i++) {
+            const curi = i;
+            let libname = recentlibs.names[curi].replace(/&\w+;/g,'');
+            libname = libname.length > 50 ? libname.substring(0,49) + "..." : libname;
+        
+            $('#searchtypemenu').append($("<li>").append($("<a>", {
+                click: function (e) {
+                    setlib(recentlibs.ids[curi]);
+                    setlibnames(recentlibs.names[curi]);
+                    $(document).trigger("click"); // for some reason not happening automatically
+                    return false;
+                },
+                href: "#",
+                role: "button",
+                text: libname
+            })));
+        }
+    }
  }
  function assessselect() {
      var lista = '';
