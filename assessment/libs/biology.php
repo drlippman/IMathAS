@@ -1,7 +1,7 @@
 <?php
 //A collection of biology routines
 //
-//Version 0.1 April 8, 2022
+//Version 0.2 April 15, 2022
 
 global $allowedmacros;
 array_push($allowedmacros,"bio_randcodon","bio_getcodonname","bio_anticodon","bio_translation", "bio_splitcodons");
