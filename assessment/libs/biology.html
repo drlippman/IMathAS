@@ -2,12 +2,13 @@
     <h1>Macro Library biology</h1>
     A collection of biology helps. Currently in its beginning stages.
     <BR>
-    <BR>Version 0.2 April 12, 2022
+    <BR>Version 0.2 April 15, 2022
     <BR><ul>
     <li><a href="#bio_getcodonname">bio_getcodonname</a></li>
     <li><a href="#bio_randcodon">bio_randcodon</a></li>
     <li><a href="#bio_anticodon">bio_anticodon</a></li>
     <li><a href="#bio_translation">bio_translation</a></li>
+    <li><a href="#bio_splitcodons">bio_splitcodons</a></li>
     </ul>
     <h3><a name="bio_getcodonname">bio_getcodonname</a></h3>
     bio_getcodonname(codon)
@@ -24,3 +25,6 @@
         bio_anticodon()
         <BR> Takes in a string of DNA bases, and outputs an RNA string.
         <BR> (A->U, T->A, G->C, C->C)
+    <BR><h3><a name="bio_splitcodons">bio_splitcodons</a></h3>
+        bio_splitcodons()
+        <BR> Splits a string, into an array made of sets of 3 codons.

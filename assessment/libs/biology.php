@@ -4,7 +4,7 @@
 //Version 0.1 April 8, 2022
 
 global $allowedmacros;
-array_push($allowedmacros,"bio_randcodon","bio_getcodonname","bio_anticodon","bio_translation");
+array_push($allowedmacros,"bio_randcodon","bio_getcodonname","bio_anticodon","bio_translation", "bio_splitcodons");
 
 
 // bio_randcodon
@@ -70,6 +70,25 @@ function bio_translation($DNA_string){
 }
 
 
+// bio_splitcodons
+// splits up a string into sets of 3 base codons
+function bio_splitcodons($DNA_string){
+    $input = trim($DNA_string);
+    $DNA_len = strlen($input);
+    $input = str_split($input);
+    $output= array();
+    for ($x = 0; $x <= $DNA_len; $x++) {
+        $string = "";
+        if ($x % 3 == 1) {
+            $index = $x / 3;
+            $string .= $input[$x-1];
+            $string .= $input[$x];
+            $string .= $input[$x+1];
+            $output[$index] = $string;
+        }
+    }
+    return $output;
+}
 
 // TODO: Deal with Stop Codons
 $GLOBALS['bio_codons'] = array(
