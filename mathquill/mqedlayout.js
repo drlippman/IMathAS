@@ -525,7 +525,7 @@ var myMQeditor = (function($) {
         baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
       }
     }
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|sexp)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
@@ -576,6 +576,17 @@ var myMQeditor = (function($) {
         }
     }
 
+    if (calcformat.match(/sexp/)) {
+      baselayout.tabs[0].p = "Set";
+      baselayout.tabs[0].tabcontent[0].contents = [
+          {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
+          {l:'\\cap',pr:'<span class="mq-binary-operator">∩</span>'},
+          {l:'\\oplus',pr:'<span class="mq-binary-operator">⊕</span>'}
+      ];
+      if (layoutstyle !== 'OSK') {
+          baselayout.tabs[0].tabcontent[0].s = 2;
+      }
+  }
     // for both
     if (vars.length > 0) {
         var varbtns = getVarsButtons2(vars,layoutstyle);

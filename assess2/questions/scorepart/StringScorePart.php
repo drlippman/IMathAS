@@ -105,13 +105,20 @@ class StringScorePart implements ScorePart
                 $givenans = trim($givenans);
 
                 if ($answerformat == "logic") {
-                    if (comparelogic($givenans, $answer, $variables)) {
+                    if (compareLogic($givenans, $answer, $variables)) {
                         $correct += 1;
                         $foundloc = $j;
                     } 
                     continue; // skip normal processing
                 }
 
+                if ($answerformat == "sexp") {
+                    if (compareLogic($givenans, $answer, $variables, TRUE)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } 
+                    continue; // skip normal processing
+                }
                 if (count($torem)>0) {
                     $givenans = str_replace($torem,' ',$givenans);
                 }

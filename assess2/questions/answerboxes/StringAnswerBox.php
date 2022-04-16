@@ -62,7 +62,10 @@ class StringAnswerBox implements AnswerBox
             $tip = $shorttip . _(', like [(2,3,4),(1,4,5)]');
         } else if ($answerformat == 'logic') {
             $shorttip = _('Enter a logic statement');
-            $tip = _('Enter a logic statement using the editor buttons, or use "and", "or", "implies", and "iff"');
+            $tip = _('Enter a logic statement using the editor buttons, or use "and", "or", "xor", "implies", and "iff"');
+        } else if ($answerformat == 'sexp') {
+            $shorttip = _('Enter a set expression');
+            $tip = _('Enter a set expresion using the editor buttons, or use "and", "or", "xor", "minus", "^c"');
         } else {
             $tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
             $shorttip = _('Enter text');
@@ -109,13 +112,13 @@ class StringAnswerBox implements AnswerBox
 
             $params['tip'] = $shorttip;
             $params['longtip'] = $tip;
-            if ($useeqnhelper && ($displayformat == 'usepreview' || $answerformat == 'logic')) {
+            if ($useeqnhelper && ($displayformat == 'usepreview' || $answerformat == 'logic' || $answerformat == 'sexp')) {
                 $params['helper'] = 1;
             }
             if (empty($hidepreview) && ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq')) {
                 $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
             }
-            if ($answerformat == 'logic') {
+            if ($answerformat == 'logic' || $answerformat == 'sexp') {
                 $params['vars'] = $variables;
             }
 
@@ -161,7 +164,9 @@ class StringAnswerBox implements AnswerBox
         if (strpos($strflags, 'regex') !== false) {
             $sa .= _('The answer must match a specified pattern');
         } else if ($answerformat == "logic") {
-            $sa = '`' . str_replace(['and', 'or', 'implies', 'iff'], ['^^', 'vv', '=>', '<=>'], $answer) . '`';
+            $sa = '`' . str_replace(['xor','oplus','and', 'or','ifthen','implies', 'iff'], ['oplus','oplus','^^', 'vv', '=>','=>', '<=>'], $answer) . '`';
+        } else if ($answerformat == "sexp") {
+            $sa = '`' . str_replace(['xor','oplus','and','or','minus'], ['oplus','oplus','cap', 'cup','-'], $answer) . '`';
         } else {
             $sa .= $answer;
         }
