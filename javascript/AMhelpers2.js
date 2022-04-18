@@ -1296,6 +1296,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   if (format.indexOf('inequality')!=-1) {
     fullstr = fullstr.replace(/or/g,' or ');
     var conv = ineqtointerval(fullstr, ineqvar);
+    console.log(conv);
     if (conv.length>1) { // has error
       return {
         err: (conv[1]=='wrongvar')?
@@ -1739,7 +1740,11 @@ function ineqtointerval(strw, intendedvar) {
       return ['', 'invalid'];
     }
   }
-  return [out.join("U")];
+  var outstr = out.join("U");
+  if (outstr.match(/[\(\[],|,[\)\]]/)) { // catch "x > " without a value
+    return ['', 'invalid'];
+  }
+  return [outstr];
 }
 
 function parsecomplex(v) {
