@@ -82,7 +82,7 @@ class CalculatedScorePart implements ScorePart
 
         if ($reqsigfigs !== '') {
             if (!in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
-                unset($reqsigfigs);
+                $reqsigfigs = '';
             } else {
                 list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
             }
@@ -333,7 +333,7 @@ class CalculatedScorePart implements ScorePart
                             } else if ($exactsigfig && checksigfigs($tocheck, $anans, $reqsigfigs, false, $reqsigfigoffset, $sigfigscoretype)) {
                                 //see if it'd be right aside from exact sigfigs
                                 $formatok = "nopart";  $partformatok = false; $correctanyformat++; $foundloc = $j; break 2;
-                            }
+                            } 
                         } else if ($abstolerance !== '') {
                             if (abs($anans-$numericans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
                                 if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
