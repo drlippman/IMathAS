@@ -96,6 +96,11 @@ class CalculatedScorePart implements ScorePart
 
         if (in_array("scinot",$ansformats) || in_array("scinotordec",$ansformats)) {
             $answer = str_replace('xx','*',$answer);
+            $givenans = str_replace('xx','*',$givenans);
+        }
+        if (in_array("allowxtimes",$ansformats)) {
+            $answer = str_replace('x','*',$answer);
+            $givenans = str_replace('x','*',$givenans);
         }
         if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
             $answer = str_replace(array('{','}'),'', $answer);
