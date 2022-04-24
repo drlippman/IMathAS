@@ -124,12 +124,16 @@ var MQeditor = (function($) {
 
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
-        thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
+
         if (calcformat.match(/logic/)) {
-            thisMQconfig.autoCommands += ' or and oplus implies iff';
+            // Don't have pi autocomplete, otherwise the likely more common statement 'p iff q' causes problems without spaces
+            thisMQconfig.autoCommands += ' theta not neg xor or and iff implies';
         }
-        if (calcformat.match(/sexp/)) {
-            thisMQconfig.autoCommands += ' oplus cup cap';
+        else if (calcformat.match(/sexp/)) {
+            thisMQconfig.autoCommands += ' pi theta xor cap cup';
+        }
+        else{
+          thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
         }
         var vars = el.getAttribute("data-mq-vars") || '';
         var varpts;

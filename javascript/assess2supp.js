@@ -170,7 +170,7 @@ function disableInputs(qn, disabled) {
    window.rendermathnode(qwrap);
    window.initSageCell(qwrap);
    window.initlinkmarkup(qwrap);
-   window.setInitValues(qwrap);
+   window.setInitValues(qwrap, jsparams);
 
    if (jsparams.disabled) {
      disableInputs(qn, jsparams.disabled);
@@ -214,7 +214,7 @@ function disableInputs(qn, disabled) {
    }
  }
 
- function setInitValues(qwrap) {
+ function setInitValues(qwrap, jsparams) {
    var regex = new RegExp('^(qn|tc|qs)\\d');
    window.$(qwrap).find('input,select,textarea').each(function (index, el) {
      if (el.name.match(regex)) {
@@ -223,7 +223,12 @@ function disableInputs(qn, disabled) {
            el.setAttribute('data-initval', el.value);
          }
        } else {
-         el.setAttribute('data-initval', el.value);
+         const qref = parseInt(el.name.substr(2));
+         if (jsparams[qref].qtype == 'draw' && el.value === '') {
+            el.setAttribute('data-initval', ';;;;;;;;');
+         } else {
+            el.setAttribute('data-initval', el.value);
+         }
        }
      }
    });

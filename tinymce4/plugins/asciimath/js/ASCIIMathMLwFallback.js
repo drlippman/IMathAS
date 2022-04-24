@@ -172,7 +172,7 @@ var AMsymbols = [
 {input:"zeta",   tag:"mi", output:"\u03B6", tex:null, ttype:CONST},
 
 //binary operation symbols
-{input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
+{input:"*",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
 {input:"**", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
 {input:"//", tag:"mo", output:"/",      tex:null, ttype:CONST},
 {input:"\\\\", tag:"mo", output:"\\",   tex:"backslash", ttype:CONST},
@@ -229,8 +229,8 @@ var AMsymbols = [
 {input:"=>",  tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
 {input:"implies",   tag:"mo", output:"=>", tex:null, ttype:DEFINITION},
 {input:"if",  tag:"mo", output:"if",     tex:null, ttype:SPACE},
-{input:"<=>", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
-{input:"iff",   tag:"mo", output:"<=>", tex:null, ttype:DEFINITION},
+{input:"<->", tag:"mo", output:"\u21D2", tex:"leftrightarrow", ttype:CONST},
+{input:"iff",   tag:"mo", output:"<->", tex:null, ttype:DEFINITION},
 {input:"AA",  tag:"mo", output:"\u2200", tex:"forall", ttype:CONST},
 {input:"EE",  tag:"mo", output:"\u2203", tex:"exists", ttype:CONST},
 {input:"_|_", tag:"mo", output:"\u22A5", tex:"bot", ttype:CONST},

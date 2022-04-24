@@ -4,6 +4,7 @@ namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
 require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -103,22 +104,24 @@ class StringScorePart implements ScorePart
             }
             foreach($gaarr as $j=>$givenans) {
                 $givenans = trim($givenans);
-
+                // Logic expression
                 if ($answerformat == "logic") {
-                    if (compareLogic($givenans, $answer, $variables)) {
+                    if (comparelogic($givenans, $answer, $variables)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } 
+                    continue; // skip normal processing
+                }
+                // Set expression
+                if ($answerformat == "sexp") {
+                    $givenans = str_replace('U',' or ',$givenans);
+                    if (comparelogic($givenans, $answer, $variables, TRUE)) {
                         $correct += 1;
                         $foundloc = $j;
                     } 
                     continue; // skip normal processing
                 }
 
-                if ($answerformat == "sexp") {
-                    if (compareLogic($givenans, $answer, $variables, TRUE)) {
-                        $correct += 1;
-                        $foundloc = $j;
-                    } 
-                    continue; // skip normal processing
-                }
                 if (count($torem)>0) {
                     $givenans = str_replace($torem,' ',$givenans);
                 }

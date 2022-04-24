@@ -205,6 +205,10 @@ class MathParser
         'precedence'=>8,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return ($a && $b);}],
+      '#x' => [
+        'precedence'=>7,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a xor $b);}],
       '#o' => [
         'precedence'=>7,
         'assoc'=>'right',
@@ -217,6 +221,10 @@ class MathParser
         'precedence'=>6,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return (($a && $b) || (!$a && !$b));}],
+      '#m' => [
+        'precedence'=>7,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a && !$b);}],
       '<' => [
         'precedence'=>6,
         'assoc'=>'left',
@@ -692,7 +700,6 @@ class MathParser
       $node['left'] = $left;
       return $node;
     }
-
     $right = array_pop($this->operandStack);
     $left = array_pop($this->operandStack);
     if ($left === null || $right === null) {
@@ -858,6 +865,9 @@ class MathParser
     } else if (isset($this->operators[$node['symbol']])) {
       // operator.  We'll use the evalfunc defined for the operator
       $opfunc = $this->operators[$node['symbol']]['evalfunc'];
+      if($this->operators[$node['symbol']] == '#c'){
+        return !$this->evalNode($node['left']);
+      }
       return $opfunc(
         $this->evalNode($node['left']),
         $this->evalNode($node['right'])

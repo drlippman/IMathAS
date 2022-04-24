@@ -82,9 +82,10 @@ function clearparams(paramarr) {
 function toMQwVars(str, elid) {
     var qn = elid.substr(2).split(/-/)[0];
     var qtype = allParams[qn].qtype;
-    if (qtype === 'numfunc' || (qtype === 'calcinterval' && allParams[qn].calcformat.indexOf('inequality')!=-1)) {
+    if (qtype === 'numfunc' || allParams[qn].calcformat.indexOf('sexp')!=-1 || (qtype === 'calcinterval' && allParams[qn].calcformat.indexOf('inequality')!=-1)) {
         str = AMnumfuncPrepVar(qn, str)[1];
     }
+
     return AMtoMQ(str, elid);
 }
 function fromMQwText(str, elid) {

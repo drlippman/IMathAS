@@ -566,13 +566,14 @@ var myMQeditor = (function($) {
         baselayout.tabs[0].tabcontent[0].contents = [
             {l:'\\vee',pr:'<span class="mq-binary-operator">∨</span>'},
             {l:'\\wedge',pr:'<span class="mq-binary-operator">∧</span>'},
-            {b:'~'},
+            {l:'\\neg',pr:'<span class="mq-binary-operator">¬</span>'},
+            {l:'\\oplus',pr:'<span class="mq-binary-operator">⊕</span>'},
             {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
-            {l:'\\implies',pr:'<span class="mq-binary-operator">⇒</span>'},
-            {l:'\\iff',pr:'<span class="mq-binary-operator">⇔</span>'}
+            {l:'\\to',pr:'<span class="mq-binary-operator">→</span>'},
+            {l:'\\iff',pr:'<span class="mq-binary-operator">↔</span>'}
         ];
         if (layoutstyle !== 'OSK') {
-            baselayout.tabs[0].tabcontent[0].s = 3;
+            baselayout.tabs[0].tabcontent[0].s = 4;
         }
     }
 
@@ -581,10 +582,12 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
           {l:'\\cap',pr:'<span class="mq-binary-operator">∩</span>'},
-          {l:'\\oplus',pr:'<span class="mq-binary-operator">⊕</span>'}
+          {l:'\\^c',c:"w",pr:'<span class="mq-non-leaf mq-empty"></span><sup class="mq-binary-operator">c</sup>'},
+          {l:'\\oplus',pr:'<span class="mq-binary-operator">⊕</span>'},
+          {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'}
       ];
       if (layoutstyle !== 'OSK') {
-          baselayout.tabs[0].tabcontent[0].s = 2;
+          baselayout.tabs[0].tabcontent[0].s = 3;
       }
   }
     // for both
@@ -745,5 +748,8 @@ MQ.config({
   restrictMismatchedBrackets: true,
   autoCommands: 'pi theta root sqrt ^oo degree',
   autoParenOperators: true,
-  addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
+  addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;'],
+                'xor': ['VanillaSymbol', '\\oplus ', '&oplus;'],
+                'not': ['VanillaSymbol', '\\neg ', '&not;']
+                },
 });

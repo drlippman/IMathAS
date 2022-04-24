@@ -775,6 +775,7 @@ export const actions = {
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
       store.errorMsg = 'timesup_submitting';
+      if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
       setTimeout(() => {
         const tosub = Object.keys(this.getChangedQuestions());
         this.submitQuestion(tosub, true);

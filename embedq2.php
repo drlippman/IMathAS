@@ -297,7 +297,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=111520" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=082020" type="text/javascript"></script>';
+$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css">';
 

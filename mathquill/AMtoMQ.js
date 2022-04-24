@@ -76,9 +76,10 @@ var AMQsymbols = [
 {input:"zeta",   tag:"mi", output:"\u03B6", tex:null, ttype:CONST},
 
 //binary operation symbols
-{input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
+{input:"*",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
+{input:"neg",  tag:"mo", output:"\u00AC", tex:"neg", ttype:CONST},
 {input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
 //{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", ttype:UNDEROVER},
 {input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
@@ -134,6 +135,7 @@ var AMQsymbols = [
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
+{input:"<->", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
 {input:"=>",  tag:"mo", output:"\u21D2", tex:"implies", ttype:CONST},
 {input:"<=>", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
@@ -724,7 +726,7 @@ return function(str,elid) {
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
   str = str.replace(/\bDNE\b/gi,'"DNE"');
   if (document.getElementById(elid) && 
-    document.getElementById(elid).getAttribute("data-mq").match(/interval/)
+    document.getElementById(elid).getAttribute("data-mq").match(/interval|sexp/)
   ) {
       str = str.replace(/\bU\b/g,'cup');
   }
@@ -779,7 +781,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
     tex = tex.replace(/\\cup/g,'U').replace(/\\sim/g,'~');
-    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');
+    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^').replace(/\\oplus/g,'⊕');
     tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');
 	tex = tex.replace(/\\left\\{/g,'lbrace').replace(/\\right\\}/g,'rbrace');

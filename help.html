@@ -2614,9 +2614,10 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
   Set domain to "xmin,xmax" to specify a domain for comparison, or "xmin,xmax,integers" to restrict domain to integer values.</li>
-<li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
+<li><strong>comparelogic(a,b,vars,[setexp])</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
- vars should be a list or array of variables in the statements. </li>
+ vars should be a list or array of variables in the statements. setting [setexp] to TRUE compares set expressions (such as whether (A intersect B)<sup>c</sup> = A<sup>c</sup> union B<sup>c</sup>).
+ If this option is set to true, use 'cap', 'cup', 'oplus', 'minus', '^c' for intersection, union, symmetric difference, set difference and set complement operations.</li>
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
   to see if the words in the list/array "words" appear in the student's answer. If they all appear, it redefines
@@ -3404,13 +3405,30 @@ A student is asked to enter a string (a word or list of letters).
 	<dd>"takeanything" or "takeanythingorblank" sets the problem to give full credit
 		for any answer.  "takeanythingorblank" also counts blank answers as correct.
 	  "submitblank" will cause blank answers to get submitted for scoring (new system only).</dd>
-<dt>$answerformat = "list" or "logic" </dt>
+<dt>$answerformat = "list", "logic", or "sexp" </dt>
 	<dd>"list" specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
     partial_credit flag.  Duplicates are not ignored. <br><br>
-    "logic" enables a separate grading algorithm for logic statements, ignoring $strflags.  The $answer 
-    should be given using vv for or, ^^ for and, ~ for not, =&gt; for conditional, and &lt;=&gt; for biconditional.
+    "logic" enables a separate grading algorithm for logic statements, ignoring $strflags.  The connectives in $answer can be entered using various keywords:
+	<ul>
+		<li>AND: 'and', '^^', 'wedge'</li>
+		<li>OR: 'or', 'vv', 'vee'</li>
+		<li>XOR: 'xor','oplus'</li>
+		<li>NOT: 'not', 'neg', '~', '¬'</li>
+		<li>CONDITIONAL: 'implies', '-&gt;', '=&gt;'</li>
+		<li>BICONDITIONAL: 'iff', '&lt;-&gt;', '&lt;=&gt;'</li>
+	</ul> 
     Parens are supported, but no other symbols.  The variables used in the logic expression must be declared by 
-    defining $variables.</dd>
+    defining $variables. <br><br>
+	"sexp" (set expression) enables a separate grading algorithm for expressions containing sets (and intersections, unions, complements). The connectives in $answer 
+	can be entered using various keywords:
+	<ul>
+		<li>INTERSECT: 'cap', 'nn'</li>
+		<li>UNION: 'cup', 'uu'</li>
+		<li>COMPLEMENT: '^c' or a single quote: '</li>
+		<li>SET DIFFERENCE: 'minus', '-'</li>
+	</ul>
+	Parens are supported, but no other symbols. 'and' and 'or' are not supported for set expressions. The variables used in the set expression must be declared by defining $variables.
+	</dd>
 <dt>$displayformat = "usepreview" or "typeahead" or "usepreviewnomq"</dt>
     <dd>"usepreview" enables mathquill entry for mathematical answers.<br/>
         "usepreviewnomq" adds a preview button for previewing mathematical answers in asciimath.<br/>
@@ -3418,10 +3436,10 @@ A student is asked to enter a string (a word or list of letters).
 	two letters of the word.  Provide the auto-suggest list in the variable $questions.
     </dd>
 <dt>$variables</dt>
-    <dd>When $answerformat="logic" is used, define the $variables in the logic statement, like "p,q"</dd>
+    <dd>When $answerformat="logic" or "sexp" is used, define the $variables in the logic/set statement, like "p,q"</dd>
 <dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
 	<dd>Adds format checking to the student's answer.  Usually not needed for string questions, but can 
-        be useful when the "logic" answerformat is used. The list can include multiple checks, 
+        be useful when the "logic" or "sexp" answerformats are used. The list can include multiple checks, 
         which come in pairs.  The first is the symbol to look for.  The second describes what is 
         acceptable.  For example, in the string shown above, the symbol "^" would be required to show 
         up exactly 3 times, and "cos" would be required to show up less than 2 times. </dd>

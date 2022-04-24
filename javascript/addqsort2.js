@@ -1945,7 +1945,7 @@ function addwithsettings() {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
-    GB_show('Question Settings',qsettingsaddr + '&toaddqs=' + checked.join('-') + '&lih=' + lastitemhash,900,500);
+    GB_show('Question Settings',qsettingsaddr + '&toaddqs=' + encodeURIComponent(checked.join(';')) + '&lih=' + lastitemhash,900,500);
 }
 
 function modsettings() {
@@ -1954,7 +1954,7 @@ function modsettings() {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
-    GB_show('Question Settings',qsettingsaddr + '&modqs=' + checked.join('-') + '&lih=' + lastitemhash,900,500);
+    GB_show('Question Settings',qsettingsaddr + '&modqs=' + encodeURIComponent(checked.join(';')) + '&lih=' + lastitemhash,900,500);
 }
 
 /*

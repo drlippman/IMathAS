@@ -188,14 +188,14 @@ export default {
     createPlayer () {
       const supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
       const pVarsInternal = {
-        autoplay: 0,
-        wmode: 'transparent',
-        fs: supportsFullScreen ? 1 : 0,
-        controls: 2,
-        rel: 0,
-        modestbranding: 1,
-        showinfo: 0,
-        origin: window.location.protocol + '//' + window.location.host
+        'autoplay': 0,
+        'wmode': 'transparent',
+        'fs': supportsFullScreen ? 1 : 0,
+        'controls': 2,
+        'rel': 0,
+        'modestbranding': 1,
+        'showinfo': 0,
+        'origin': window.location.protocol + '//' + window.location.host
       };
       const ar = store.assessInfo.videoar.split(':');
       const videoHeight = window.innerHeight - 50;
@@ -207,9 +207,9 @@ export default {
         videoId: store.assessInfo.videoid,
         playerVars: pVarsInternal,
         events: {
-          onReady: () => this.handlePlayerReady(),
-          onStateChange: (event) => this.handlePlayerStateChange(event),
-          onError: (event) => this.handlePlayerError(event)
+          'onReady': () => this.handlePlayerReady(),
+          'onStateChange': (event) => this.handlePlayerStateChange(event),
+          'onError': (event) => this.handlePlayerError(event)
         }
       });
     },

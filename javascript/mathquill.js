@@ -3171,7 +3171,7 @@ LatexCmds.to = bind(BinaryOperator,'\\to ','&rarr;');
 
 LatexCmds.rarr = LatexCmds.rightarrow = bind(VanillaSymbol,'\\rightarrow ','&rarr;');
 
-LatexCmds.implies = bind(BinaryOperator,'\\Rightarrow ','&rArr;');
+LatexCmds.implies = bind(BinaryOperator,'\\rightarrow ','&rarr;');
 
 LatexCmds.rArr = LatexCmds.Rightarrow = bind(VanillaSymbol,'\\Rightarrow ','&rArr;');
 
@@ -3186,7 +3186,7 @@ LatexCmds.lArr = LatexCmds.Leftarrow = bind(VanillaSymbol,'\\Leftarrow ','&lArr;
 LatexCmds.harr = LatexCmds.lrarr = LatexCmds.leftrightarrow =
   bind(VanillaSymbol,'\\leftrightarrow ','&harr;');
 
-LatexCmds.iff = bind(BinaryOperator,'\\Leftrightarrow ','&hArr;');
+LatexCmds.iff = bind(BinaryOperator,'\\leftrightarrow ','&harr;');
 
 LatexCmds.hArr = LatexCmds.lrArr = LatexCmds.Leftrightarrow =
   bind(VanillaSymbol,'\\Leftrightarrow ','&hArr;');

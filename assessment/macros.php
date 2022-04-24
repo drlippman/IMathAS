@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","compareLogic","stuansready","comparentuples","comparenumberswithunits",
+ "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match");
 
 function mergearrays() {
@@ -5149,7 +5149,68 @@ function formatcomplex($real,$imag) {
     }
 }
 
-
+// Input: Two expressions, an array of variables, and a flag to indicate whether it's a logic expression (FALSE) or a set expression (TRUE)
+// Output: a boolean indicating whether the two expressions are equivalent
+function comparelogic($a,$b,$vars,$sexp=FALSE) {
+    if (!is_array($vars)) {
+        $vars = array_map('trim', explode(',', $vars));
+    }
+    if ($a === null || $b === null || trim($a) == '' || trim($b) == '') {
+        return false;
+    }
+    $varlist = implode(',', $vars);
+	if(!$sexp){	// Is a logic expression
+		$a = str_replace(['and','^^','xor','⊕','or','vv','~','¬','neg','iff','<->','<=>','implies','->','=>'],
+						['#a', '#a','#x','#x','#o','#o','!','!','!','#b', '#b', '#b', '#i',     '#i','#i'], $a);
+		$b = str_replace(['and','^^','xor','⊕','or','vv','~','¬','neg','iff','<->','<=>','implies','->','=>'],
+						['#a', '#a','#x','#x','#o','#o','!','!','!','#b', '#b', '#b', '#i',     '#i','#i'], $b);
+	}
+	else{	// Is a set expression
+		$a = str_replace(['cap','and','nn','xor','⊕','or','cup','uu','minus','-'],
+						['#a', '#a','#a','#x','#x','#o','#o','#o','#m','#m'], $a);
+		$b = str_replace(['cap','and','nn','xor','⊕','or','cup','uu','minus','-'],
+						['#a','#a','#a','#x','#x','#o','#o','#o','#m','#m'], $b);
+		// Since complement symbols in set expresions are unary operations *after* the operand, we will shift the complement operator to before the operand here, rather than overcomplicating MathParser
+		// Remove double negations
+		$a = preg_replace('/(\'|\^c){1}\s*(\'|\^c){1}/','',$a);
+		$b = preg_replace('/(\'|\^c){1}\s*(\'|\^c){1}/','',$b);
+		// Remove any spaces before a complement symbol
+		$a = preg_replace('/\s*(\'|\^c)/','$1',$a);
+		$b = preg_replace('/\s*(\'|\^c)/','$1',$b);
+		// If symbol before a complement is not a paren or bracket, place a not symbol (!) immediately before the symbol
+		$a = preg_replace('/([^\)\]]{1})(\'|\^c)/','!$1',$a);
+		$b = preg_replace('/([^\)\]]{1})(\'|\^c)/','!$1',$b);
+		// If symbol before a complement is a paren or bracket then place the (!) before the corresponding open paren
+		$a = preg_replace('/((\(.*\))|(\[.*\]))(\'|\^c)/','!$1',$a);
+		$b = preg_replace('/((\(.*\))|(\[.*\]))(\'|\^c)/','!$1',$b);
+	}
+    $afunc = makeMathFunction($a, $varlist);
+    if ($afunc === false) {
+        return false;
+    }
+    $bfunc = makeMathFunction($b, $varlist);
+    if ($bfunc === false) {
+        return false;
+    }
+    $n = count($vars);
+    $max = pow(2,$n);
+    $map = array_combine($vars, array_fill(0,count($vars),0));
+    for ($i=0; $i<$max; $i++) {
+        $aval = $afunc($map);
+        $bval = $bfunc($map);
+        if ($aval != $bval) { 
+            return false;
+        }
+        for ($j=0;$j<$n;$j++) {
+            if ($map[$vars[$j]] == 0) { // if it's 0, add 1 and stop
+                $map[$vars[$j]] = 1; break;
+            } else {
+                $map[$vars[$j]] = 0; // if it's 1, set to 0 and continue on to the next one
+            }
+        }
+    }
+    return true;
+}
 
 function comparentuples() {
   $par = false;
