@@ -302,6 +302,9 @@ if ($preview_all) {
   $assess_info->overrideSetting('displaymethod','full');
   $assess_record->setTeacherInGb(true); // enables answers showing
   $assessInfoOut['preview_all'] = true;
+  foreach ($assessInfoOut['interquestion_text'] as $k=>$v) {
+    unset($assessInfoOut['interquestion_text'][$k]['ispage']); // hide pages on preview all
+  }
 } else {
   $assessInfoOut['preview_all'] = false;
 }
