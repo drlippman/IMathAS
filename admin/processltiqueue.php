@@ -356,7 +356,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			unset($post_data['key']);
 			unset($post_data['keytype']);
 
-			error_log("LTI update giving up:\n"
+			$logdata = "LTI update giving up:\n"
 			. "POST data\n"
 			. "---------\n"
 			. print_r($post_data, true) . "\n"
@@ -375,7 +375,9 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			. "--------\n"
 			. "Response \n"
 			. "--------\n"
-			. $response);
+			. $response;
+            $logstm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+            $logstm->execute([time(), $logdata]);
 		} else {
 			$cntfailure++;
 		}
