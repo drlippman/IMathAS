@@ -520,6 +520,9 @@ function outcometable() {
 	$pos = 0;
 	$catorder = array_keys($cats);
 	foreach($catorder as $cat) {//foreach category
+        if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
+            continue;
+        }
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][7];
         $gb[0][2][$pos][2] = $cats[$cat][6];
