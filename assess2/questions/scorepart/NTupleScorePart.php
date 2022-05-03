@@ -48,6 +48,7 @@ class NTupleScorePart implements ScorePart
 
         $givenans = normalizemathunicode($givenans);
         $givenans = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $givenans);
+        $givenans = trim($givenans," ,");
         $answer = normalizemathunicode($answer);
         
         $ansformats = array_map('trim',explode(',',$answerformat));

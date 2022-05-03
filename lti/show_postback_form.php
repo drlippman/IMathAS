@@ -6,7 +6,7 @@
  * @param  Imathas_LTI_Database $db
  */
 function show_postback_form($launch, $db, $err='') {
-  global $imasroot,$installname,$coursetheme,$CFG;
+  global $imasroot,$staticroot,$installname,$coursetheme,$CFG;
   $promptForName = false;
   $promptForAcctCreation = false;
   $promptForLogin = false;

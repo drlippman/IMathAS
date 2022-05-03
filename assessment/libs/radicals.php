@@ -252,7 +252,9 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 	if ($in==1 && !$iscomplex) {
 		$n += $a;
 		$a = 0;
-	}
+	} else if ($in == 0) {
+        $n = 0;
+    }
 	$gr = gcd($n,$d);
 	$gw = gcd($a,$d);
 	$g = gcd($gr,$gw); //gcd of a,n, and d
@@ -264,6 +266,7 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 		$n = $n*-1;
 		$d = $d*-1;
 	}
+
 	if ($format=='parts') {
 		return array($a, $n, $in*($iscomplex?-1:1), $d);
 	}
@@ -271,7 +274,7 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 	if ($format=='disp') {
 		$outstr .= '`';
 	}
-	if ($d>1) {
+	if ($d>1 && ($a != 0 && $n != 0)) {
 		$outstr .= '(';
 	}
 	if ($a != 0) {
@@ -282,7 +285,7 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 		//	$outstr .= '-';
 		}
 	}
-	if (abs($n)!=1 || $in==1) {  //  3root(2) or 1root(1)
+	if ((abs($n)!=1 || $in==1) && $n!=0) {  //  3root(2) or 1root(1)
 		$outstr .= $n;
 	} else if ($n==-1) {
 		$outstr .= '-';
@@ -294,7 +297,10 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 		$outstr .= "i";
 	}
 	if ($d>1) {
-		$outstr .= ")/$d";
+        if ($a != 0 && $n != 0) {
+            $outstr .= ')';
+        }
+		$outstr .= "/$d";
 	}
 	if ($format=='disp') {
 		$outstr .= '`';

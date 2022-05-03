@@ -44,6 +44,8 @@ if ($overwriteBody==1) {
 	echo '<li><a href="logingrid.php?cid='.$cid.'">Login Grid</a></li>';
     echo '<li><a href="report-engagement.php?cid='.$cid.'">Instructor Engagement Report</a></li>';
     echo '<li><a href="report-recentchg.php?cid='.$cid.'">Recent Submissions Report</a></li>';
+    echo '<li><a href="report-brokenq.php?cid='.$cid.'">Broken Questions Report</a></li>';
+
 	echo '</ul>';
 
 	echo '<p>&nbsp;</p>';

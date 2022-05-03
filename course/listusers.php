@@ -641,7 +641,10 @@ if ($overwriteBody==1) {
 		</form>
 
 <?php
-		$requiredrules = array('pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}');
+		$requiredrules = array(
+            'pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}',
+            'email' => 'function(el) { return $("#SID").val().substring(0,4) != "lti-" }'
+        );
 		require_once("../includes/newusercommon.php");
 		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
 	} else {

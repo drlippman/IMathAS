@@ -252,20 +252,25 @@ if ($report=='overview') {
 	$catstolist = array();
 	$itemstolist = array();
 	for ($i=1;$i<count($ot);$i++) {
-		for ($j=0;$j<count($ot[$i][1]);$j++) {
+		for ($j=0;$j<count($ot[$i][1] ?? []);$j++) {
+            if ($ot[0][1][$j][3]==0) { continue;} // don't count in gb
 			if (isset($itemstolist[$j])) {continue;} //already got it
 			if ($type==0 && $ot[0][1][$j][2]==1) {continue;} //only want past items
 			if (isset($ot[$i][1][$j][1][$outcome])) { //using outcome
 				$itemstolist[$j] = 1; //use it
 			}
 		}
-		for ($j=0;$j<count($ot[$i][2]);$j++) {
-			if (isset($ot[$i][2][$j][2*$type+1][$outcome]) && $ot[$i][2][$j][2*$type+1][$outcome]>0) { //using outcome
+		for ($j=0;$j<count($ot[$i][2] ?? []);$j++) {
+			if (isset($ot[$i][2][$j][2*$type+1][$outcome]) && $ot[$i][2][$j][2*$type+1][$outcome]>0 ) { //using outcome
 				$catstolist[$j] = 1; //use it
 			}
 		}
 	}
-
+    for ($j=0;$j<count($ot[0][2] ?? []);$j++) {
+        if ($ot[0][2][$j][2] == 1) {
+            unset($catstolist[$j]); //don't use it
+        }
+    }
 	$catstolist = array_keys($catstolist);
 	$itemstolist = array_keys($itemstolist);
 
@@ -322,6 +327,7 @@ if ($report=='overview') {
 	echo '<th>'._('Total').'</th>';
 	$n = 2;
 	for ($i=0;$i<count($ot[0][2]);$i++) {
+        if ($ot[0][2][$i][2] == 1) { continue; } // hidden
 		echo '<th class="cat'.Sanitize::encodeStringForDisplay($ot[0][2][$i][1]).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($ot[0][2][$i][0]).'</span></th>';
 		$n++;
 	}
@@ -347,6 +353,7 @@ if ($report=='overview') {
 				//$html .= '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
 				$html .= '<tr class="'.$class.'"><td><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td>';
 				for ($i=0;$i<count($ot[0][2])+1;$i++) {
+                    if ($ot[0][2][$i][2] == 1) { continue; } // hidden
 					if (count($subtots[$i])>0) {
 						$html .= '<td><b>'.round(array_sum($subtots[$i])/count($subtots[$i]),1).'%</b></td>';
 					} else {
@@ -366,6 +373,7 @@ if ($report=='overview') {
 					$html .= '<td>-</td>';
 				}
 				for ($i=0;$i<count($ot[0][2]);$i++) {
+                    if ($ot[0][2][$i][2] == 1) { continue; } // hidden
 					if (isset($ot[1][2][$i]) && isset($ot[1][2][$i][2*$type+1][$oi])) {
 						if ($ot[1][2][$i][2*$type+1][$oi]>0) {
 							$html .= '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';

@@ -287,10 +287,10 @@ switch($_GET['action']) {
 		//echo "> TA/Tutor/Proctor <BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"20\" ";
 		if ($oldrights == 20) {echo "CHECKED";}
-		echo "> Teacher <BR>\n";
+		echo "> Teacher <span class=small>(cannot create courses or edit course settings)</span><BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"40\" ";
 		if ($oldrights == 40) {echo "CHECKED";}
-		echo "> Limited Course Creator <BR>\n";
+		echo "> Course Creator <span class=small>(teacher who can create courses)</span><BR>\n";
 		if ($myrights>=75) {
 			echo "<input type=radio name=\"newrights\" value=\"75\" ";
 			if ($oldrights == 75) {echo "CHECKED";}

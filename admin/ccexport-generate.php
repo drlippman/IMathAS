@@ -372,7 +372,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 				fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 				fwrite($fp,' <title >'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
-				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res)).'</text>');
+				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res),ENT_XML1,'UTF-8',false).'</text>');
 				fwrite($fp,'</topic>');
 				fclose($fp);
 

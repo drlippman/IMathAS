@@ -48,6 +48,9 @@ class EssayScorePart implements ScorePart
         } else if (trim($givenans)=='') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
+        } else if (!empty($scoremethod) && $scoremethod=='nomanual') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         } else {
             $GLOBALS['questionmanualgrade'] = true;
             $scorePartResult->setRawScore(-2);

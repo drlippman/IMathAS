@@ -98,6 +98,7 @@ class CalculatedMatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
+        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {

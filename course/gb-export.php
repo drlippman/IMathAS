@@ -115,6 +115,7 @@
 		$gb = preg_replace('/<su(p|b)>.*?<\/su(p|b)>/', '', $gb);
 		$gb = preg_replace('/<\/tr>.*?<tr.*?>/',';;tr;;', $gb);
 		$gb = preg_replace('/<\/t(d|h)>\s*<t(d|h).*?>/',';;td;;', $gb);
+        $gb = preg_replace('/\(\w\w\)/','', $gb);
 		$gb = strip_tags($gb);
 		$gb = explode(';;tr;;', $gb);
 		foreach ($gb as $k=>$row) {

@@ -15,7 +15,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
  * @return void
  */
 function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $userid): void {
-  global $imasroot,$installname,$coursetheme,$CFG;
+  global $imasroot,$staticroot,$installname,$coursetheme,$CFG;
 
   $flexwidth = true;
 	$nologo = true;

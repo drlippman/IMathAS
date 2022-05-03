@@ -53,10 +53,10 @@ class CalculatedScorePart implements ScorePart
               $_POST["qn$qn-val"] = $givenans;
             }
         }
-
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
-          $givenansval = $_POST["qn$qn-val"];
+          $givenansval = trim($_POST["qn$qn-val"]," ,");
           $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($answer==='') {
@@ -82,7 +82,7 @@ class CalculatedScorePart implements ScorePart
 
         if ($reqsigfigs !== '') {
             if (!in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
-                unset($reqsigfigs);
+                $reqsigfigs = '';
             } else {
                 list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
             }
@@ -96,6 +96,11 @@ class CalculatedScorePart implements ScorePart
 
         if (in_array("scinot",$ansformats) || in_array("scinotordec",$ansformats)) {
             $answer = str_replace('xx','*',$answer);
+            $givenans = str_replace('xx','*',$givenans);
+        }
+        if (in_array("allowxtimes",$ansformats)) {
+            $answer = str_replace('x','*',$answer);
+            $givenans = str_replace('x','*',$givenans);
         }
         if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
             $answer = str_replace(array('{','}'),'', $answer);
@@ -333,7 +338,7 @@ class CalculatedScorePart implements ScorePart
                             } else if ($exactsigfig && checksigfigs($tocheck, $anans, $reqsigfigs, false, $reqsigfigoffset, $sigfigscoretype)) {
                                 //see if it'd be right aside from exact sigfigs
                                 $formatok = "nopart";  $partformatok = false; $correctanyformat++; $foundloc = $j; break 2;
-                            }
+                            } 
                         } else if ($abstolerance !== '') {
                             if (abs($anans-$numericans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
                                 if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {

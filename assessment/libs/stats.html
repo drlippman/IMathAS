@@ -361,7 +361,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   <p>F ratio and the corresponding P value as an array in the form [F ratio, P value].</p>
   <p>&nbsp;</p>
   
-  <p><h3><a name="anova2way"></a><strong>anova2way</strong>(arr, [replication = False])</h3></p>
+  <p><h3><a name="anova2way"></a><strong>anova2way</strong>(arr, [replication = false])</h3></p>
   <p>Function anova2way() performs two-way analysis of variance (ANOVA) and returns ANOVA table as an array with each row corresponding to Factor A, Factor B, 
      their interaction (only with replication), error (residual), and totals. </p>
   <p><em>Parameters:</em></p>
@@ -371,7 +371,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
          and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
       <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
                        (multiple observations for each group) or without replication (one observation per group)
-                       is to be performed. The default is False - without replication.</li>
+                       is to be performed. The default is false - without replication.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
@@ -380,7 +380,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
     And A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication), 
     error (residual), and total, respectively.</p>
   <p>&nbsp;</p>
-  <p><h3><a name="anova2way_f"></a><strong>anova2way_f</strong>(arr, [replication = False])</h3></p>
+  <p><h3><a name="anova2way_f"></a><strong>anova2way_f</strong>(arr, [replication = false])</h3></p>
   <p>Function anova2way_f() performs two-way analysis of variance (ANOVA) and returns F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true). </p>
   <p><em>Parameters:</em></p>
   <ul>
@@ -389,14 +389,14 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
       and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
    <li><strong>replication</strong>: Optional - boolean (true or false) it specifies whether the ANOVA with replication
                     (multiple observations for each group) or without replication (one observation per group)
-                    is to be performed. The default is False - without replication.</li>
+                    is to be performed. The default is false - without replication.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
     as an array in the form  array([F_A,P_A],[F_B,P_B],[F_I,P_I]). </p>
   <p>&nbsp;</p>
   
-  <p><h3><a name="anova_table"></a><strong>anova_table</strong>(arr, [factor = 1, replication = False, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</h3></p>
+  <p><h3><a name="anova_table"></a><strong>anova_table</strong>(arr, [factor = 1, replication = false, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</h3></p>
   <p>Function anova_table() returns ANOVA table for both oneway and twoway ANOVA - display only. The output of anova1way() and 
    anova2way() can be used as the input array for this function. </p>
   <p><em>Parameters:</em></p>
@@ -407,7 +407,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
       <li><strong>factor</strong>: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.</li>
       <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
                        (multiple observations for each group) or without replication (one observation per group)
-                       is to be performed. The default is False - without replication.</li>
+                       is to be performed. The default is false - without replication.</li>
         <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; 
           the default is 12 decimal places. </li>
         <li><strong>NameA</strong>: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A". </li>
@@ -417,13 +417,13 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   <p>ANOVA table for displaying data.</p>  
   <p>&nbsp;</p>
 
-  <p><h3><a name="student_t"></a><strong>student_t</strong>(arr1, arr2, [equalVar = False, paired = False, roundto = 12])</h3></p>
+  <p><h3><a name="student_t"></a><strong>student_t</strong>(arr1, arr2, [equalVar = false, paired = false, roundto = 12])</h3></p>
   <p>Function student_t() computes t statistic and coressponding P-value for two-sample student t-test.</p>
   <p><em>Parameters:</em></p>
   <ul>
       <li><strong>arr1, arr2</strong>: Arrays in the form [2,3,4,5,...]; unequal sample sizes are accepted for independent samples. </li>
-      <li><strong>equalVar</strong>: Optional - Boolean. Set to True for equal population variances; default is False. </li>
-      <li><strong>paired</strong>: Optional - Boolean. Set to True for paired (dependent) samples; default is False.</li>
+      <li><strong>equalVar</strong>: Optional - Boolean. Set to true for equal population variances; default is false. </li>
+      <li><strong>paired</strong>: Optional - Boolean. Set to true for paired (dependent) samples; default is false.</li>
       <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>

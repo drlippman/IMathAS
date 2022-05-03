@@ -387,6 +387,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
 	echo '<li>'._('<sup>e</sup> Has exception').'</li>';
 	echo '<li>'._('<sup>LP</sup> Used latepass').'</li>';
+    echo '<li>'._('<sup>AP</sup> Total is calculated using averaged percents').'</li>';
 	echo '</ul></div>';
 
 	require("../footer.php");
@@ -1180,6 +1181,7 @@ function gbstudisp($stu) {
 		}
 		echo '</tr>';
 		echo '</thead><tbody>';
+        
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			//$donedbltop = false;
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
@@ -1194,7 +1196,11 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]).'</span>';
+				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]);
+                if ($gbt[0][2][$i][13]==1) { //averaged percents
+                    echo '<sup>AP</sup>';
+                }
+                echo '</span>';
 				if (isset($gbt[0][2][$i][11])) {  //category weight
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}

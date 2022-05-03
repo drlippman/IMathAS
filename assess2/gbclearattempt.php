@@ -130,7 +130,7 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 $assess_record->saveRecord();
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, false);
 
 //output JSON object
 echo json_encode($assessInfoOut);

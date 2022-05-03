@@ -38,33 +38,35 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	document.getElementById("GB_window").style.margin = "0";
 	//document.getElementById("GB_overlay").style.display = "block";
 	document.getElementById("GB_loading").style.display = "block";
-	if (!hasTouch) {
-		$('#GB_caption').mousedown(function(evt) {
-			rubricbase = {left:evt.pageX, top: evt.pageY};
-			$("body").bind('mousemove',rubricmousemove);
-			$("body").mouseup(function(event) {
-				var p = $('#GB_window').offset();
-				lastrubricpos.left = p.left;
-				lastrubricpos.top = p.top;
-				$("body").unbind('mousemove',rubricmousemove);
-				$(this).unbind(event);
-			});
-		});
-	} else {
-		$('#GB_caption').bind('touchstart', function(evt) {
-			var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
+	$('#GB_caption').on('mousedown touchstart', function(evt) {
+        if (evt.target.nodeName.toLowerCase()=='input' || evt.target.nodeName.toLowerCase()=='button'
+            || evt.target.nodeName.toLowerCase()=='a') {
+            return;
+        }
+        if (evt.type == 'touchstart') {
+            var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
 			rubricbase = {left:touch.pageX, top: touch.pageY};
-			$("body").bind('touchmove',rubricmousemove);
-			$("body").bind('touchend', function(event) {
+            $("body").on('touchmove.R_move', rubrictouchmove);
+            $("body").bind('touchend', function(event) {
 				var p = $('#GB_window').offset();
 				lastrubricpos.left = p.left;
 				lastrubricpos.top = p.top;
-				$("body").unbind('touchmove',rubricmousemove);
+				$("body").off('touchmove.R_move');
 				$(this).unbind(event);
 			});
-		});
-
-	}
+        } else {
+            rubricbase = {left:evt.pageX, top: evt.pageY};
+            $("body").on('mousemove.R_move', rubricmousemove);
+            $("body").bind('mouseup', function(event) {
+				var p = $('#GB_window').offset();
+				lastrubricpos.left = p.left;
+				lastrubricpos.top = p.top;
+				$("body").off('mousemove.R_move');
+				$(this).unbind(event);
+			});
+        }
+    });
+    
 	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><tbody>";
 	if (imasrubrics[rubricid].type<2) {
 		html += '<tr><td></td><td colspan="3"><a href="#" onclick="imasrubric_fullcredit();return false;">'+_('Full Credit')+'</a></td></tr>';
@@ -125,17 +127,17 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 }
 
 function rubricmousemove(evt) {
-	$('#GB_window').css('left', (evt.pageX - rubricbase.left) + lastrubricpos.left)
-	.css('top', (evt.pageY - rubricbase.top) + lastrubricpos.top);
+    var w = document.getElementById('GB_window');
+    w.style.left = ((evt.pageX - rubricbase.left) + lastrubricpos.left) + "px";
+    w.style.top = ((evt.pageY - rubricbase.top) + lastrubricpos.top) + "px";
 	return false;
 }
 function rubrictouchmove(evt) {
 	var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
-
-	$('#GB_window').css('left', (touch.pageX - rubricbase.left) + lastrubricpos.left)
-	.css('top', (touch.pageY - rubricbase.top) + lastrubricpos.top);
+    var w = document.getElementById('GB_window');
+    w.style.left = ((touch.pageX - rubricbase.left) + lastrubricpos.left) + "px";
+    w.style.top = ((touch.pageY - rubricbase.top) + lastrubricpos.top) + "px";
 	evt.preventDefault();
-
 	return false;
 }
 

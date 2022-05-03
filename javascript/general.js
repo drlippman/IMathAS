@@ -845,7 +845,9 @@ function rewriteVideoUrl(href) {
 		} else if (href.match(/vimeo/)) {
 			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
 			var vidsrc = 'player.vimeo.com/video/';
-		} else { // not video
+		} else if (href.match(/loom/)) {
+            return href.replace('/share/','/embed/');
+        } else { // not video
 			return href;
 		}
 		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s?)?.*/);
@@ -1182,6 +1184,7 @@ function initlinkmarkup(base) {
 	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
+    $(base).find('a[href*="loom.com/share"],a[href*="loom.com/embed"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
@@ -1415,7 +1418,8 @@ jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
       var selectors = [
         "iframe[src*='player.vimeo.com']",
         "iframe[src*='youtube.com']",
-        "iframe[src*='youtube-nocookie.com']"
+        "iframe[src*='youtube-nocookie.com']",
+        "iframe[src*='loom.com']"
       ];
 
       var $allVideos = $(this).find(selectors.join(','));

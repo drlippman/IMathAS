@@ -129,7 +129,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	//entry should be cid:aid if copied from another course, but handle other just in case
 	$ancestors = explode(',', $row['ancestors']);
 	$sourceaid = explode(':', $ancestors[$coursedepth[$row['courseid']]]);
-	if (count($courseaid)>1) {
+	if (count($sourceaid)>1) {
 		$sourceaid = $sourceaid[1];
 	} else {
 		$sourceaid = $sourceaid[0];
