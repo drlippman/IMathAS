@@ -162,7 +162,7 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 //
 function formpoly3fromresults($results, $IsFraction=TRUE)
 {
-	if(is_null(results)) {
+	if(is_null($results)) {
 		echo "formpoly3fromresults - the polynomial is null - FAIL.<br/>\r\n";
         return null;
 	}
