@@ -381,7 +381,7 @@ if ($end_attempt) {
 $assess_record->saveRecord();
 
 if (($assessInfoOut['submitby'] == 'by_question' && !$in_practice) || $end_attempt) {
-    $assess_record->updateLTIscore();
+    $assess_record->updateLTIscore($end_attempt, true);
 }
 
 //prep date display

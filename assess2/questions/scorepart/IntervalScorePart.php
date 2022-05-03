@@ -57,6 +57,7 @@ class IntervalScorePart implements ScorePart
         }
 
         $givenans = normalizemathunicode($givenans);
+        $givenans = trim($givenans," ,");
 
         if (in_array('nosoln',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
@@ -70,6 +71,7 @@ class IntervalScorePart implements ScorePart
         $givenans = preg_replace('/\bu\b/', 'U', $givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
+            $givenansval = trim($givenansval," ,");
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         $formatErr = 0;
@@ -98,7 +100,8 @@ class IntervalScorePart implements ScorePart
                     foreach ($matches[0] as $var) {
                         if (in_array($var,$mathfuncs)) { continue;}
                         if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
-                            strtolower($var) != 'var') {
+                            strtolower($var) != 'var' && $var != 'pi' && $var != 'e' 
+                            && $var != 'E') {
                             $scorePartResult->setRawScore(0);
                             return $scorePartResult;
                         }

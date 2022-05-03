@@ -168,14 +168,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 					$autoscore = explode(',',$autoscore);
 					if ($autoscore[2]>0) { //assigning points
-						$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
-						$stm->execute(array($forumid, $userid));
-						if ($stm->fetchColumn(0) <= $autoscore[3]) {
-							$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
-							$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
-							$stm = $DBH->prepare($query);
-							$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
-						}
+                        $stm = $DBH->prepare("SELECT userid FROM imas_forum_posts WHERE id=?");
+                        $stm->execute([$threadid]);
+                        if ($stm->fetchColumn(0) != $userid) { // only give points for replies if not own thread
+                            $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
+                            $stm->execute(array($forumid, $userid));
+                            if ($stm->fetchColumn(0) <= $autoscore[3]) {
+                                $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+                                $query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
+                                $stm = $DBH->prepare($query);
+                                $stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
+                            }
+                        }
 					}
 				}
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {

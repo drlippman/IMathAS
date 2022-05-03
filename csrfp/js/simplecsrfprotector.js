@@ -11,7 +11,7 @@
  */
 
 var CSRFP = {
-	CSRFP_TOKEN: 'csrfp_token',
+	CSRFP_TOKEN: 'csrfp-token',
 	CSRFP_TOKEN_VALUE: 0,
 	/**
 	 * function to set CSRFP token from head

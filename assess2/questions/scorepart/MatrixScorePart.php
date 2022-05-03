@@ -66,7 +66,6 @@ class MatrixScorePart implements ScorePart
             }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
-            $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
             $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
@@ -76,6 +75,7 @@ class MatrixScorePart implements ScorePart
               return $scorePartResult;
             }
         }
+        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
@@ -90,10 +90,10 @@ class MatrixScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
+        $fullmatrix = true;
         foreach ($givenanslist as $j=>$v) {
             if (!is_numeric($v)) {
-                $scorePartResult->setRawScore(0);
-                return $scorePartResult;
+                $fullmatrix = false;
             }
         }
 
@@ -110,7 +110,7 @@ class MatrixScorePart implements ScorePart
             $answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
         }
 
-        if (in_array('scalarmult',$ansformats)) {
+        if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist
             $mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $answerlist)));
             $mag2 = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $givenanslist)));
@@ -129,7 +129,7 @@ class MatrixScorePart implements ScorePart
             }
         }
 
-        if (in_array('ref',$ansformats)) {
+        if ($fullmatrix && in_array('ref',$ansformats)) {
           // reduce correct answer to rref
           $answerlist = matrix_scorer_rref($answerlist, $N);
           $M = count($answerlist) / $N;

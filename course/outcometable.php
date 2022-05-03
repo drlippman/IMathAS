@@ -24,6 +24,7 @@ row[0][1][#][5] = assessmentid, gbitems.id, forumid
 row[0][2] category totals
 row[0][2][#][0] = "Category Name"
 row[0][2][#][1] = category color number
+row[0][2][#][2] = hidden
 
 row[1] first student data row
 row[1][0] biographical
@@ -70,6 +71,37 @@ function getpts($sc) {
 	}
 }
 
+function flattenitems($items,&$addto,&$itemidsection,$sec='') {
+	global $canviewall,$secfilter,$studentinfo;
+	$now = time();
+	foreach ($items as $item) {
+		if (is_array($item)) {
+			if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+            }
+            $thissec = $sec;
+            $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+            if (!empty($item['grouplimit'])) {
+                $thissec = substr($item['grouplimit'][0],2); // trim off s-
+                if ((!$canviewall && $studentinfo['section'] != $thissec) ||
+                    ($canviewall && $secfilter != -1 && $secfilter != $thissec)
+                ) {
+                    // if a section limited block, and not in/showing that sec, hide
+                    $ishidden = true;
+                }
+            } 
+			if (!$ishidden) {
+				flattenitems($item['items'], $addto, $itemidsection, $thissec);
+			}
+		} else {
+            if ($sec != '') {
+                $itemidsection[$item] = $sec;
+            }
+			$addto[] = $item;
+		}
+	}
+}
+
 function outcometable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter;
 	global $timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
@@ -88,6 +120,32 @@ function outcometable() {
 	$outc = array();
 	$gb = array();
 	$ln = 0;
+
+    $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$courseitemorder = unserialize($stm->fetchColumn(0));
+	$courseitemsimporder = array();
+    $courseitemsassoc = array();
+    $itemidsection = array();
+    $itemsection = array();
+    // figure out which items are hidden or section-specific
+    // hidden is used; section-specific isn't yet
+	flattenitems($courseitemorder,$courseitemsimporder,$itemidsection);
+    if (count($courseitemsimporder)>0) {
+		$ph = Sanitize::generateQueryPlaceholders($courseitemsimporder);
+		$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE id IN ($ph)");
+		$stm->execute($courseitemsimporder);
+
+		$courseitemsimporder = array_flip($courseitemsimporder);
+
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
+            if (isset($itemidsection[$row[0]])) {
+                $itemsection[$row[1].$row[2]] = $itemidsection[$row[0]];
+            }
+        }
+        unset($itemidsection);
+	}
 
 	//Pull Gradebook Scheme info
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid=:courseid");
@@ -147,6 +205,9 @@ function outcometable() {
 	$sa = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (substr($line['deffeedback'],0,8)=='Practice') { continue;}
+        if (!isset($courseitemsassoc['Assessment'.$line['id']])) {
+			continue; //assess is in hidden block - skip it
+		}
 		if ($line['avail']==2) {
 			$line['startdate'] = 0;
 			$line['enddate'] = 2000000000;
@@ -271,6 +332,9 @@ function outcometable() {
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+        if (!isset($courseitemsassoc['Forum'.$line['id']])) {
+			continue; //forum is in hidden block - skip it
+		}
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -312,6 +376,9 @@ function outcometable() {
 	//Pull Categories:  Name, scale, scaletype, chop, drop, weight
 	if (in_array(0,$category)) {  //define default category, if used
 		$cats[0] = explode(',',$defaultcat);
+        if (!isset($cats[0][6])) {
+			$cats[0][6] = ($cats[4]==0)?0:1;
+		}
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);
 		$catcolcnt++;
@@ -453,8 +520,12 @@ function outcometable() {
 	$pos = 0;
 	$catorder = array_keys($cats);
 	foreach($catorder as $cat) {//foreach category
+        if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
+            continue;
+        }
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][7];
+        $gb[0][2][$pos][2] = $cats[$cat][6];
 		$pos++;
 	}
 
@@ -934,6 +1005,9 @@ function outcometable() {
 		$pos = 0; //reset position for category totals
 
 		foreach($catorder as $cat) {//foreach category
+            if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
+				continue;
+			}
 			//add up scores for each outcome
 			if (isset($cattotpast[$ln][$cat])) {
 				foreach ($cattotpast[$ln][$cat] as $oc=>$scs) {
@@ -1018,6 +1092,7 @@ function outcometable() {
 			}
 		}
 		foreach ($gb[0][2] as $i=>$inf) {
+            if ($inf[2] == 1) { continue; } // category hidden
 			$avg = array();  $avgposs = array();
 			$avgatt = array();  $avgattposs = array();
 			for ($j=1;$j<$ln;$j++) {

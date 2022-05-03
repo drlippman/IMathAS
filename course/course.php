@@ -629,7 +629,7 @@ if ($overwriteBody==1) {
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
            echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=080521\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=011522\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';

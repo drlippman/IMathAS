@@ -110,20 +110,29 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
     if (!empty($search['terms'])) {
         $wholewords = array();
+        $haspos = false;
         foreach ($search['terms'] as $k => $v) {
-            $sgn = '+';
-            if ($v[0] == '!') {
-                $sgn = '-';
-                $v = substr($v, 1);
-            }
-            if (ctype_alnum($v) && strlen($v) > 3) {
-                $wholewords[] = $sgn . $v . '*';
-                unset($search['terms'][$k]);
+            if ($v[0] != '!' && ctype_alnum($v) && strlen($v) > 3) {
+                $haspos = true;
+                break;
             }
         }
-        if (count($wholewords) > 0) {
-            $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
-            $searchvals[] = implode(' ', $wholewords);
+        if ($haspos) {
+            foreach ($search['terms'] as $k => $v) {
+                $sgn = '+';
+                if ($v[0] == '!') {
+                    $sgn = '-';
+                    $v = substr($v, 1);
+                }
+                if (ctype_alnum($v) && strlen($v) > 3) {
+                    $wholewords[] = $sgn . $v . '*';
+                    unset($search['terms'][$k]);
+                }
+            }
+            if (count($wholewords) > 0) {
+                $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
+                $searchvals[] = implode(' ', $wholewords);
+            }
         }
         if (count($search['terms']) > 0) {
             foreach ($search['terms'] as $k => $v) {
@@ -171,6 +180,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.lastmoddate < ?';
             $searchvals[] = strtotime($lastmodparts[1]);
         }
+    }
+    if (!empty($search['mine'])) {
+        $searchand[] = 'iq.ownerid=?';
+        $searchvals[] = $userid;
     }
     if (!empty($search['res'])) {
         $helps = explode(',', $search['res']);
@@ -249,7 +262,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $groupid = $options['isgroupadmin'];
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $groupid;
             }
@@ -257,14 +270,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
                 $searchvals[] = $groupid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
                 $searchvals[] = $groupid;
             }
         } else {
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals[] = $userid;
             }
@@ -272,7 +285,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
                 $searchvals[] = $userid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
                 $searchvals[] = $userid;
             }
@@ -440,7 +453,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         });
         $out = ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
     } else {
-        $out = ['qs' => $res, 'type'=>'all'];
+        $out = ['qs' => $res, 'type'=>'all', 'names' => []];
     }
     $out['offset'] = $offset;
     if (count($res) == $max) {

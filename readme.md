@@ -118,9 +118,9 @@ These provide additional validation options beyond `$loginformat`.
 - `$CFG['acct']['emailFormaterror']`: A message to display if the email doesn't meet the custom 'emailFormat' pattern.
 
 ### Access Limits
-- `$CFG['GEN']['addteachersrights']`: Set to the minimum rights level needed to Add/Remove Teachers in a course.  Defaults to 40 (Limited Course Creator rights).
+- `$CFG['GEN']['addteachersrights']`: Set to the minimum rights level needed to Add/Remove Teachers in a course.  Defaults to 40 (Creator rights).
 - `$CFG['GEN']['noimathasexportfornonadmins']`: Set to true to prevent non-admins from exporting a course in IMathAS backup/transfer format.
-- `$CFG['coursebrowserRightsToPromote']`: Set to the minimum rights level needed to Promote a course into the course browser.  Defaults to 40 (Limited Course Creator rights).  Requires setting up the course browser.
+- `$CFG['coursebrowserRightsToPromote']`: Set to the minimum rights level needed to Promote a course into the course browser.  Defaults to 40 (Course Creator rights).  Requires setting up the course browser.
 - `$CFG['GEN']['noInstrExternalTools']`:  Set to true to prevent instructors from setting up new LTI tools (where IMathAS would be acting as consumer).  They'll still be able to use any LTI tools set up by an Admin.
 - `$CFG['GEN']['noimathasimportfornonadmins']`:  Set to true to prevent non-admins from using the "Import Course Items" feature.
 - `$CFG['GEN']['noInstrUnenroll']`: Set to true to prevent instructors from Unenrolling students; they will only be able to lock out students.
@@ -153,7 +153,7 @@ course list from the course browser options, so you must also have `$CFG['course
 - `$CFG['LTI']['noCourseLevel']`: set to true to hide course level LTI key and secret from users. Use this if you want to require use of global LTI key/secrets.
 - `$CFG['LTI']['noGlobalMsg']`: When the `noCourseLevel` option above is set, use this option to define a message that will be displayed on the export page when no global LTI is set for the group.
 - `$CFG['LTI']['showURLinSettings']`: Set to true to show the LTI launch URL on the course settings page.  Normally omitted to avoid confusion (since it's not needed in most LMSs).
-- `$CFG['LTI']['instrrights']`:  If a global LTI key is setup, and the option is enabled to allow auto-creation of instructor accounts, this option sets the rights level for those auto-created accounts.  Defaults to 40 (Limited Course Creator).
+- `$CFG['LTI']['instrrights']`:  If a global LTI key is setup, and the option is enabled to allow auto-creation of instructor accounts, this option sets the rights level for those auto-created accounts.  Defaults to 40 (Course Creator).
 - `$CFG['GEN']['addwww']`:  If your website starts with `www.`, set this to true to ensure Canvas LTI tools use the full URL.
 - `$CFG['LTI']['usequeue']`:  By default, LTI grade updates are sent immediately after the submission is scored.  Set this option to true to use a delayed queue to reduce the number of grade updates sent.  _This option requires additional setup._
     - To operate properly, the `/admin/processltiqueue.php` script needs to be called regularly, ideally once a minute.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to  `/admin/processltiqueue.php?authcode=####` using the code you define.
@@ -216,6 +216,9 @@ Automated course cleanup (unenrolling students from a course) can be enabled.  T
 If allowing guest logins:
 - `/util/deloldguests.php`:  Run about once a day (once for every 50 guests)
 
+To cleanup old unused student accounts:
+- `/util/deloldstus.php`:  Run about once a day or longer (once for 1000 accounts)
+
 If using a scheduled web call, you'll need to define:
 - `$CFG['cleanup']['authcode']`:  define this and pass it in the query string, like `runcoursecleanup.php?authcode=####`
 
@@ -227,6 +230,8 @@ Options:
 - `$CFG['cleanup']['allowoptout']`:   (default: true) set to false to prevent teachers opting out
 - `$CFG['cleanup']['groups']`: You can specify different old/delay values for different groups by defining
 `$CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));`
+- `$CFG['cleanup']['oldstu']`: a number of days of inactivity in a student account after which the account is 
+  deleted if they are not enrolled in any courses (def: 365)
 
 ## Additional Feature Setup
 ### LivePoll

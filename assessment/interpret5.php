@@ -15,7 +15,7 @@ $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$to
   '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
   '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros',
   '$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights',
-  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts');
+  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts','$teacherInGb');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
@@ -425,7 +425,8 @@ function tokenize($str,$anstype,$countcnt) {
 					$connecttolast = 2;
 				} else {
 					//not a function, so what is it?
-					if ($out=='true' || $out=='false' || $out=='null') {
+                    $outlower = strtolower($out);
+					if ($outlower=='true' || $outlower=='false' || $outlower=='null') {
 						//we like this - it's an acceptable unquoted string
 					} else {//
 						//an unquoted string!  give a warning to instructor,
@@ -684,6 +685,16 @@ function tokenize($str,$anstype,$countcnt) {
 	return $syms;
 }
 
+function testIsEscaped($str,$c) {
+    $cnt = 0;
+    $i = $c-1;
+    while ($i >= 0 && $str[$i] == '\\') {
+        $cnt++;
+        $i--;
+    }
+    return (($cnt%2)==1);
+}
+
 //handle braces and variable variables in strings and qtext
 function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	global $disallowedvar;
@@ -702,7 +713,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	$outstr = '';
 	$depth = 0;
 	for ($c=0;$c<strlen($str);$c++) {
-		if ($str[$c]=='{') {
+		if ($str[$c]=='{' && !testIsEscaped($str,$c)) {
 			if ($invarvar || $inbraces) {
 				$depth++;
 			} else { //may be starting new brace or varvar item

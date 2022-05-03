@@ -75,6 +75,9 @@ span.iteminfo {
 .warn {
     color: #C40;
 }
+input:invalid {
+	background-color: #faa;
+}
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
 }

@@ -56,8 +56,10 @@ class ComplexScorePart implements ScorePart
             }
         }
         $givenans = normalizemathunicode($givenans);
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($anstype == 'calccomplex' && $hasNumVal) {
+            $givenansval = trim($givenansval," ,");
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($givenans == null) {

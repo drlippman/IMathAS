@@ -177,9 +177,13 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  loadQuestion (qn, regen, jumptoans) {
+  loadQuestion (qn, regen, jumptoans, skipdirtycheck) {
     if (store.inTransit) {
       window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans), 20);
+      return;
+    } else if (store.somethingDirty && skipdirtycheck == null) {
+      // if somethingDirty, wait a bit for change event to add to autosavequeue first
+      window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans, true), 50);
       return;
     }
     store.inTransit = true;
@@ -771,6 +775,7 @@ export const actions = {
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
       store.errorMsg = 'timesup_submitting';
+      if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
       setTimeout(() => {
         const tosub = Object.keys(this.getChangedQuestions());
         this.submitQuestion(tosub, true);

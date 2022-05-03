@@ -19,7 +19,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
 function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
   LTI\LTI_Localcourse $localcourse, LTI\Database $db
 ): void {
-  global $imasroot,$installname,$coursetheme,$CFG;
+  global $imasroot,$staticroot,$installname,$coursetheme,$CFG;
 
   $role = standardize_role($launch->get_roles());
   if ($role !== 'Instructor') {

@@ -222,21 +222,23 @@ class AssessRecord
   /**
    * Update the LTI score for the current assessment record. 
    * Should be called after saveRecord.
+   * @param  boolean $sendnow   true to send now, false to delay
+   * @param  boolean $isstu     true if student initiated
    */
-  public function updateLTIscore() {
+  public function updateLTIscore($sendnow = true, $isstu = true) {
     $lti_sourcedid = $this->getLTIsourcedId();
     if (strlen($lti_sourcedid) > 1) {
         require_once(__DIR__ . '/../includes/ltioutcomes.php');
         $gbscore = $this->getGbScore();
         $aidposs = $this->assess_info->getSetting('points_possible');
-        calcandupdateLTIgrade($lti_sourcedid, $this->curAid, $this->curUid, $gbscore['gbscore'], true, $aidposs);
+        calcandupdateLTIgrade($lti_sourcedid, $this->curAid, $this->curUid, $gbscore['gbscore'], $sendnow, $aidposs, $isstu);
         if ($this->assessRecord['agroupid'] > 0) {
             // has group; update their scores too
             $stm = $this->DBH->prepare('SELECT userid,lti_sourcedid FROM imas_assessment_records WHERE agroupid=? AND userid<>?');
             $stm->execute(array($this->assessRecord['agroupid'], $this->curUid));
             while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
                 if (strlen($row['lti_sourcedid']) > 1) {
-                    calcandupdateLTIgrade($row['lti_sourcedid'], $this->curAid, $row['userid'], $gbscore['gbscore'], true, $aidposs);
+                    calcandupdateLTIgrade($row['lti_sourcedid'], $this->curAid, $row['userid'], $gbscore['gbscore'], $sendnow, $aidposs, $isstu);
                 }
             }
         }
@@ -682,10 +684,16 @@ class AssessRecord
         }
         // record now as lastchange on attempt if no submissions have been made
         if (!$active && $this->data['assess_versions'][$lastver]['lastchange'] === 0) {
-          $this->data['assess_versions'][$lastver]['lastchange'] = $this->now;
+          $this->data['assess_versions'][$lastver]['lastchange'] = 
+            !empty($this->data['assess_versions'][$lastver]['timelimit_end']) ? 
+            $this->data['assess_versions'][$lastver]['timelimit_end'] :
+            $this->now;
         }
         if (!$active && intval($this->assessRecord['lastchange']) === 0) {
-          $this->assessRecord['lastchange'] = $this->now;
+          $this->assessRecord['lastchange'] = 
+            !empty($this->data['assess_versions'][$lastver]['timelimit_end']) ? 
+            $this->data['assess_versions'][$lastver]['timelimit_end'] :
+            $this->now;
         }
         // if there's a time limit, set the time limit
         if ($active && $this->assess_info->getSetting('timelimit') > 0) {
@@ -1222,6 +1230,18 @@ class AssessRecord
       $lastvernum = count($this->data['assess_versions']) - 1;
       $lastver = $this->data['assess_versions'][$lastvernum];
       $returnVal = $lastver['timelimit_end'];
+      // recalc, in case timelimit has changed
+      $new_timelimit_end = $lastver['starttime'] + $this->assess_info->getAdjustedTimelimit();
+      if (isset($lastver['timelimit_ext'])) {
+          foreach ($lastver['timelimit_ext'] as $v) {
+            $new_timelimit_end += $v*60;
+          }
+      }
+      if ($new_timelimit_end > $returnVal) {
+        $this->data['assess_versions'][$lastvernum]['timelimit_end'] = $new_timelimit_end;
+        $returnVal = $new_timelimit_end;
+        $this->need_to_record = true;
+      }
       $enddate = $this->assess_info->getSetting('enddate');
       if ($returnVal > $enddate) {
         $returnVal = $enddate;
@@ -1959,7 +1979,8 @@ class AssessRecord
         ->setScoreIsCorrect($scoreiscorrect)
         ->setLastRawScores($qcolors)
         ->setSeqPartDone($seqPartDone)
-        ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat);
+        ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat)
+        ->setTeacherInGb($this->teacherInGb);
     if ($this->dispqn !== null) {
       $questionParams->setDisplayQuestionNumber($this->dispqn);
     }
@@ -3070,6 +3091,7 @@ class AssessRecord
         $out['scoreoverride'] = $qdata['scoreoverride'];
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
+      $out['ver'] = $by_question ? $qver : $aver;
       if ($showScores) {
         $out['feedback'] = $qdata['feedback'] ?? '';
       }
