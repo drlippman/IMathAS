@@ -58,6 +58,7 @@ class NumberScorePart implements ScorePart
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt ?? '');
         }
 
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if ($answer==='' && $givenans==='') {
@@ -380,6 +381,9 @@ class NumberScorePart implements ScorePart
         if ($score<0) { $score = 0; }
         if ($score==0 && !empty($partialcredit) && !$islist && is_numeric($givenans)) {
             foreach ($altanswers as $i=>$anans) {
+                if (!is_numeric($anans)) {
+                    continue; // skip invalid
+                }
                 /*  disabled until we can support array $reqsigfigs
 				if (isset($reqsigfigs)) {
 					if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {

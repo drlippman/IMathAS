@@ -252,7 +252,12 @@ class AssessStandalone {
       $jsparams['disabled'] = $disabled;
     }
 
-    return array('html' => $qout, 'jsparams' => $jsparams, 'errors'=>$question->getErrors());
+    return array(
+        'html' => $qout, 
+        'jsparams' => $jsparams, 
+        'errors'=>$question->getErrors(),
+        'soln'=>$question->getSolutionContentDetailed()
+    );
   }
 
   /*

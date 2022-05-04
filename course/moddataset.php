@@ -155,8 +155,10 @@
 					'timeout' => 1
 				    )
 				));
-				$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
-				$captioned = (strpos($t, '<track')===false)?0:1;
+				$t = @file_get_contents('https://www.youtube.com/watch?v='.$vidid, false, $ctx);
+                // auto-gen captions have vssId of "a.langcode"; manual are just ".langcode"
+                // so look for vssId that starts with .; don't care about language
+				$captioned = (preg_match('/"vssId":\s*"\./', $t))?1:0; 
             }
             $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
 			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
@@ -671,8 +673,10 @@
 					}
 				}
 				$addmod = _("Modify");
-				$query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
-				$query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid=:questionsetid AND imas_courses.ownerid<>:userid";
+				//$query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
+				//$query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid=:questionsetid AND imas_courses.ownerid<>:userid";
+				$query = "SELECT imas_questions.id FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
+				$query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid=:questionsetid AND imas_courses.ownerid<>:userid LIMIT 1";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':questionsetid'=>$_GET['id'], ':userid'=>$userid));
 				$inusecnt = $stm->fetchColumn(0);
@@ -1009,14 +1013,16 @@
 	}
 
 	if (isset($inusecnt) && $inusecnt>0 && $myq) {
+		/*
 		echo '<p class=noticetext>'._('This question is currently being used in ');
 		if ($inusecnt>1) {
 			echo Sanitize::onlyInt($inusecnt)._(' assessments that are not yours.  ');
 		} else {
 			echo _('one assessment that is not yours.  ');
 		}
+		*/
+		echo '<p class=noticetext>'._('This question is currently being used in at least one assessment that is not yours. ');
 		echo _('In consideration of the other users, if you want to make changes other than minor fixes to this question, consider creating a new version of this question instead.').'  </p>';
-
 	}
 	if (isset($_GET['qid'])) {
 		echo "<p>".sprintf(_("%sTemplate this question%s for use in this assessment.  "),"<a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">","</a>");

@@ -174,7 +174,8 @@ randinvertible(n)
 <BR>returns an array of two matrices:  M and M^-1
 <BR><h3><a name="matrixrandunreduce">matrixrandunreduce</a></h3>
 matrixrandunreduce(m,n)
-<BR>Randomizes the matrix m by applying n random row combinations
+<BR>Randomizes the matrix m by applying n random row combinations. These are sometimes multi-row 
+    combinations, and sometimes additional operations are done to avoid a row of all zeros.
 <BR><h3><a name="matrixinverse">matrixinverse</a></h3>
 matrixinverse(m)
 <BR>Finds the inverse of nxn matrices.

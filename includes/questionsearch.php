@@ -93,14 +93,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $names = preg_split('/([,\s]+)/', trim($search['author']), -1, PREG_SPLIT_DELIM_CAPTURE);
             if (count($names) == 1) {
                 $searchand[] = 'iq.author LIKE ?';
-                $searchvals[] = $names[0] . '%';
+                $searchvals[] = $names[0] . ',' . '%';
             } else if (trim($names[1]) == ',') {
                 $searchand[] = 'iq.author LIKE ?';
-                $searchvals[] = $names[0] . ',' . $names[1] . '%';
+                $searchvals[] = $names[0] . ',' . $names[2] . '%';
             } else {
                 $searchand[] = '(iq.author LIKE ? OR iq.author LIKE ?)';
-                $searchvals[] = $names[0] . ',' . $names[1] . '%';
-                $searchvals[] = $names[1] . ',' . $names[0] . '%';
+                $searchvals[] = $names[0] . ',' . $names[2] . '%';
+                $searchvals[] = $names[2] . ',' . $names[0] . '%';
             }
         }
     }
@@ -453,7 +453,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         });
         $out = ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
     } else {
-        $out = ['qs' => $res, 'type'=>'all'];
+        $out = ['qs' => $res, 'type'=>'all', 'names' => []];
     }
     $out['offset'] = $offset;
     if (count($res) == $max) {

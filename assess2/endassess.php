@@ -71,7 +71,7 @@ if ($assess_record->hasActiveAttempt()) {
 }
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, true);
 
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(

@@ -1145,6 +1145,7 @@ function AMnumfuncPrepVar(qn,str) {
 	  var reg = new RegExp("("+vltq+")","g");
 	  dispstr = dispstr.replace(reg,"\"$1\"");
   }
+  dispstr = dispstr.replace(/(@\d+@)/g, " $1");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   str = str.replace(/@(\d+)@/g, indextofunc);
   submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
@@ -1262,7 +1263,7 @@ function AMnumfuncPrepVar(qn,str) {
  }
 
 function processCalculated(fullstr, format) {
-  fullstr = fullstr.replace(/=/,'');
+  // give error instead.  fullstr = fullstr.replace(/=/,'');
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else if (format.indexOf('set')!=-1) {
@@ -1295,6 +1296,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   if (format.indexOf('inequality')!=-1) {
     fullstr = fullstr.replace(/or/g,' or ');
     var conv = ineqtointerval(fullstr, ineqvar);
+    console.log(conv);
     if (conv.length>1) { // has error
       return {
         err: (conv[1]=='wrongvar')?
@@ -1307,7 +1309,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
-    fullstr = fullstr.replace(/\s*,\s*/g,',');
+    fullstr = fullstr.replace(/\s*,\s*/g,',').replace(/(^,|,$)/g,'');
     joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
@@ -1396,7 +1398,7 @@ function processCalcNtuple(fullstr, format) {
   var res = NaN;
   var dec;
   // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
-  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
+  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',').replace(/(^,|,$)/g,'');;
   fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
@@ -1465,7 +1467,7 @@ function processCalcComplex(fullstr, format) {
         err += singlevalsyntaxcheck(cparts[1], format);
       }
     }
-    err + syntaxcheckexpr(str, format);
+    err += syntaxcheckexpr(str, format);
     prep = prepWithMath(mathjs(str,'i'));
     real = scopedeval('var i=0;'+prep);
     imag = scopedeval('var i=1;'+prep);
@@ -1649,14 +1651,14 @@ function processNumfunc(qn, fullstr, format) {
     } else if (isineq) {
         err += _("syntax error: this is not an inequality")+ '. ';
     }
-
     if (fvars.length > 0) {
         reg = new RegExp("("+fvars.join('|')+")\\(","g");
+        totesteqn = totesteqn.replace(/\w+/g, functoindex); // avoid sqrt(3) matching t() funcvar
         totesteqn = totesteqn.replace(reg,"$1*sin($1+");
+        totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
     }
 
     totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-
     successfulEvals = 0;
     for (j=0; j < 20; j++) {
         totest = 'var DNE=1;';
@@ -1738,7 +1740,11 @@ function ineqtointerval(strw, intendedvar) {
       return ['', 'invalid'];
     }
   }
-  return [out.join("U")];
+  var outstr = out.join("U");
+  if (outstr.match(/[\(\[],|,[\)\]]/)) { // catch "x > " without a value
+    return ['', 'invalid'];
+  }
+  return [outstr];
 }
 
 function parsecomplex(v) {
@@ -1903,7 +1909,9 @@ function singlevalsyntaxcheck(str,format) {
 		}
 	} else if (!onlyAscii.test(str)) {
 		return _("Your answer contains an unrecognized symbol")+". ";
-  	}
+  	} else if (str.match(/=/)) {
+        return _("You gave an equation, not an expression")+ '. ';
+    }
 	return '';
 }
 
@@ -1968,6 +1976,7 @@ function syntaxcheckexpr(str,format,vl) {
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
 	  }
+
 	  return err;
 }
 

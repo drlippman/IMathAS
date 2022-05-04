@@ -295,7 +295,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true, -1, false);
 					}
 				}
 				$DBH->commit();
@@ -339,7 +339,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true, -1, false);
 					}
 				}
 			}
@@ -384,8 +384,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=012522\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=011322\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=040522\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=041422\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -522,6 +522,9 @@ if ($overwriteBody==1) {
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
 	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions2.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<a href="isolateassessgrade.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>" target="_blank">
+		<?php echo _('View Scores');?>
+	</a>
 	</p>
 <?php
 	}
@@ -640,7 +643,7 @@ if ($overwriteBody==1) {
             }
             ?>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" id="searchtypemenu">
             <li><a href="#" role="button" onclick="alllibs(); return false;">
                 <?php echo _('All Libraries'); ?>
             </a></li>
@@ -804,6 +807,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
     $(function() {
         displayQuestionList(<?php echo json_encode($search_results, JSON_INVALID_UTF8_IGNORE); ?>);
+        setlibhistory();
     });
 </script>
 </div>

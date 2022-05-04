@@ -424,7 +424,7 @@ class S3 {
 			$rest->error['code'], $rest->error['message']), E_USER_WARNING);
 			return false;
 		}
-		return $rest->code == 200 ? $returnInfo ? $rest->headers : true : false;
+		return $rest->code == 200 ? ($returnInfo ? $rest->headers : true) : false;
 	}
 
 
@@ -674,6 +674,35 @@ class S3 {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		if ($rest->error !== false) {
 			trigger_error(sprintf("S3::deleteObject(): [%s] %s", $rest->error['code'], $rest->error['message']), E_USER_WARNING);
+			return false;
+		}
+		return true;
+	}
+
+    /**
+	* Delete multiple objects
+	*
+	* @param string $bucket Bucket name
+	* @param array $uris array of Object keys, without a leading /
+	* @return boolean
+	*/
+	public static function deleteObjects($bucket, $uris) {
+        $body = '<?xml version="1.0" encoding="UTF-8"?>
+            <Delete xmlns="http://s3.amazonaws.com/doc/2006-03-01/">';
+        foreach ($uris as $uri) {
+            $body .= '<Object><Key>'.$uri.'</Key></Object>';
+        }
+        $body .= '</Delete>';
+		$rest = new S3Request('POST', $bucket, '?delete');
+        $rest->data = $body;
+        $rest->size = strlen($body);
+        $rest->setHeader('Content-Type', 'application/xml');
+        $rest->setHeader('Content-MD5', base64_encode(md5($body,true)));
+		$rest = $rest->getResponse();
+		if ($rest->error === false && $rest->code !== 200)
+			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
+		if ($rest->error !== false) {
+			trigger_error(sprintf("S3::deleteObjects(): [%s] %s", $rest->error['code'], $rest->error['message']), E_USER_WARNING);
 			return false;
 		}
 		return true;
@@ -930,6 +959,13 @@ final class S3Request {
 			case 'DELETE':
 				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
 			break;
+            case 'POST':
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->data);
+                if ($this->size > 0) {
+					curl_setopt($curl, CURLOPT_BUFFERSIZE, $this->size);
+                }
+            break;
 			default: break;
 		}
 

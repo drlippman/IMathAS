@@ -284,7 +284,7 @@ full Admins have rights to add/remove teachers.
 <h3 id="transferingownership">Transfering Ownership</h3>
 Click the &quot;Transfer&quot; link after the course name to transfer the ownership
 of the course to another teacher/admin.  In general, course ownership is not
-highly important, but Limited Course Creators can only modify courses for which
+highly important, but Course Creators can only modify courses for which
 they have ownership.
 
 </div> <!-- h3 -->
@@ -571,7 +571,7 @@ higher level including the rights of the lower levels:
 <li><strong>Student</strong>: Can only access class materials - cannot edit anything</li>
 <li><strong>Teacher</strong>: Can edit course materials and create assessments, but only in courses
 	to which they have been assigned as a teacher</li>
-<li><strong>Limited Course Creator</strong>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
+<li><strong>Course Creator</strong>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
        that they create.</li>
 <li><strong>Diagnostic Creator</strong>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
        that they create.  Can create diagnostics.</li>
@@ -2219,7 +2219,7 @@ can be omitted.</p>
 
 <p>Array randomizers (return multiple results):</p>
 <ul>
-<li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values, but be aware there may still be duplicate values.</li>
 <li><strong>rrands(min,max,p,n,[order])</strong>:  Returns n real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
@@ -2251,7 +2251,8 @@ The following macros create graphs or tables:
 <li><strong>showarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  Alternatively you can call this function with arguments
     showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "r", or "l" to center, left-align, or right align data,
-	  or can be an array with $opts["align"] for alignment, and $opts["caption"] to add a caption to the table.  To align each column differently, provide a
+	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
+      and $opts["caption"] to add a caption to the table.  To align each column differently, provide a
 	  a string with a character for each column, like "rcc"</li>
 <li><strong>showdataarray(array,[columns])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
     in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
@@ -2458,6 +2459,7 @@ These macros help with working with strings:
 <li><strong>strtolower(string)</strong>: make all characters in the string lower case</li>
 <li><strong>substr_count(haystack,needle)</strong>: Find the number of occurrences of needle in the string haystack</li>
 <li><strong>str_replace(search,replace,string)</strong>:  Replace all occurrences of search in the string with replace.  Search and replace can be arrays.</li>
+<li><strong>preg_match(pattern,subject,[matches])</strong>: Searches subject for a match using the regular expression in pattern.</li>
 </ul>
 
 </div> <!-- h2 -->
@@ -2487,6 +2489,8 @@ These macros are for working with arrays:
 <li><strong>calconarrayif(array,calculation,ifcondition)</strong>:  Like calconarray, but allows you to specify a condition for each element for whether to
     do the calculation.  Example:  $b = calconarrayif($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
     other elements unchanged.</li>
+<li><strong>keepif(array,condition)</strong>  Filters an array, only keeping values that meet the 
+    supplied condition. Example: keepif($a,"x%3==0").</li>
 <li><strong>subarray(array,params)</strong>:  Creates a new array as a subset of the specified array.  The params can take several forms:
 	<ul>
 	<li>subarray($a,2,4,6):  creates an array from $a[2], $a[4], and $a[6]</li>
@@ -2586,7 +2590,7 @@ These macros are used to test various conditions.  They typically return true or
   if it's a single part question) and this will return the corresponding value.  Use of this 
   function is recommended over directly accessing the array, as this function accounts for 
   undefined values in a way that won't trigger errors.</li>
-<li><strong>stuansready($stuanswers, $thisq, array of part numbers, [anstypes])</strong>: Before using 
+<li><strong>stuansready($stuanswers, $thisq, array of part numbers, [anstypes, answerformat])</strong>: Before using 
     student answers, you need to check to make sure the student has actually answered them.
     Pass this function the $stuanswers or $sutanswersval arrays, $thisq for the question number,
     and an array of part numbers, and it will check to make sure a non-blank answer has been 
@@ -2594,7 +2598,9 @@ These macros are used to test various conditions.  They typically return true or
     either part is sufficient.  To allow a blank answer, prefix a part number with a tilde. 
     It is good to wrap any multipart or conditional code using student answers in an "if" block 
     using stuansready as the condition.  It is advisable to pass $anstypes as a 4th input, which 
-    allows the function to handle special cases like matrices better.</li>
+    allows the function to handle special cases like matrices better. $answerformat can be added 
+    as an optional 5th input, which will check the student answer meets the answerformat (currently 
+    only checks Calculated questions, and no lists).</li>
 <li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparenumberswithunits(a,b,[tol])</strong>:  Compares numbers-with-units a and b to see if they are equivalent to the specified tolerance. Set tol to 
@@ -2612,6 +2618,7 @@ These macros are used to test various conditions.  They typically return true or
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
+<li><strong>is_nan(val)</strong>:  Checks if the value is NAN (not a number), which results from things like sqrt(-1). Only works on calculated values, not string expressions.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
   to see if the words in the list/array "words" appear in the student's answer. If they all appear, it redefines
   $answer so the student's answer is marked correct.  $showanswer is also redefined to show the original $answer 
@@ -2622,6 +2629,8 @@ These macros are used to test various conditions.  They typically return true or
   $answer,$showanswer = scorestring($answer,"",$words,$stuanswers,$thisq)<Br/>
   Usage for multipart questions (again where $words is predefined). This is example is for part 2: <br/>
   $answer,$showanswer = scorestring($answer,$showanswer,$words,$stuanswers,$thisq,2)</li>
+<li><strong>checkanswerformat(string, answerformat)</strong>: Checks a single numerical expression 
+    string, like "3/2" for whether it meets the answerformat listed.</li>
   </ul>
 </div> <!-- h2 -->
 <div class=h2>
@@ -2910,6 +2919,10 @@ includecodefrom(1234)
 <pre>includeqtextfrom(questionid)</pre>
 <p>
 somewhere in the Question Text portion of the question.
+</p>
+<h3>Teacher Notes</h3>
+<p>In the question text, you can add a note that will only be viewable by the teacher while grading.
+    Do this by wrapping the teacher note in the [teachernote] shortcode like this: <code>[teachernote]This is the note[/teachernote]</code>
 </p>
 
 
@@ -3447,9 +3460,10 @@ None - the essay type is not computer graded.
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
 <dt>$displayformat = "editor" </dt>
 	<dd>Use the rich text editor for the essay answer box.</dd>
-<dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
-	<dd>Sets the problem to give full credit for any answer.  The latter also counts
-	blank answers as correct.</dd>
+<dt>$scoremethod = "takeanything" or "takeanythingorblank" or "nomanual"</dt>
+	<dd>The first two sets the problem to give full credit for any answer.  The second also counts
+	blank answers as correct.  The "nomanual" option will give no credit for any answer, but doesn't 
+    mark the question as needing manual grading.</dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
