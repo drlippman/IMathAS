@@ -36,7 +36,7 @@ if ($myrights <75) {
 	$body = "You need to select the course";
 }
 function formatdate($date) {
-    return tzdate("M j, Y, g:i a",strtotime($date));
+    return tzdate("M j, Y, g:i a", $date);
 }
 
 

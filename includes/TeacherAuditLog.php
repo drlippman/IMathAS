@@ -60,7 +60,7 @@ class TeacherAuditLog
     public static function findActionsByCourse($cid, ?PDO $dbhOverride = null): array
     {
         $dbh = is_null($dbhOverride) ? $GLOBALS['DBH'] : $dbhOverride;
-        $query = "SELECT id, userid, courseid, action, itemid, metadata, created_at FROM imas_teacher_audit_log "
+        $query = "SELECT id, userid, courseid, action, itemid, metadata, UNIX_TIMESTAMP(created_at) AS created_at FROM imas_teacher_audit_log "
             . "WHERE courseid=? ORDER BY created_at DESC";
         $stm = $GLOBALS['DBH']->prepare($query);
         $stm->execute([$cid]);
@@ -68,7 +68,7 @@ class TeacherAuditLog
     }
     public static function findCourseItemAction($cid, $itemid, $action)
     {
-        $query = "SELECT id, userid, courseid, action, itemid, metadata, created_at FROM imas_teacher_audit_log "
+        $query = "SELECT id, userid, courseid, action, itemid, metadata, UNIX_TIMESTAMP(created_at) AS created_at FROM imas_teacher_audit_log "
             . "WHERE courseid=? AND itemid=? AND action=? ORDER BY created_at DESC";
         $stm = $GLOBALS['DBH']->prepare($query);
         $stm->execute([
@@ -81,7 +81,7 @@ class TeacherAuditLog
     public static function findCourseAction($cid, $action, ?PDO $dbhOverride = null): array
     {
         $dbh = is_null($dbhOverride) ? $GLOBALS['DBH'] : $dbhOverride;
-        $query = "SELECT id, userid, courseid, action, itemid, metadata, created_at FROM imas_teacher_audit_log "
+        $query = "SELECT id, userid, courseid, action, itemid, metadata, UNIX_TIMESTAMP(created_at) AS created_at FROM imas_teacher_audit_log "
             . "WHERE courseid=? AND action=? ORDER BY created_at DESC";
         $stm = $GLOBALS['DBH']->prepare($query);
         $stm->execute([
@@ -96,7 +96,7 @@ class TeacherAuditLog
 
         $ph1 = \Sanitize::generateQueryPlaceholders($cid);
         $ph2 = \Sanitize::generateQueryPlaceholders($actions);
-        $query = "SELECT courseid, action, created_at, count(action) as itemcount FROM imas_teacher_audit_log "
+        $query = "SELECT courseid, action, UNIX_TIMESTAMP(created_at) AS created_at, count(action) as itemcount FROM imas_teacher_audit_log "
             . "WHERE courseid in ($ph1) AND action in ($ph2) GROUP BY courseid, action ORDER BY created_at DESC";
         $stm = $dbh->prepare($query);
         $stm->execute(array_merge($cid,$actions));

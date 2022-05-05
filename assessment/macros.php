@@ -17,7 +17,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array",
  "prettyint","prettyreal","prettysigfig","roundsigfig","arraystodots","subarray",
  "showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray",
- "array_reverse","root","getsnapwidthheight","is_numeric","sign","sgn","prettynegs",
+ "array_reverse","root","getsnapwidthheight","is_numeric","is_nan","sign","sgn","prettynegs",
  "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod",
  "numtowords","randname","randnamewpronouns","randmalename","randfemalename",
  "randnames","randmalenames","randfemalenames","randcity","randcities","prettytime",
