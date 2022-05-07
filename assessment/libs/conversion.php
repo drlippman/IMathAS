@@ -4,111 +4,52 @@
 // licensed under GPL version 2 or later
 //
 
-function detectlanguage(){
-
-    $supportedLangs = array('en', 'en-US', 'en-GB');
-    $languages = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-
-    foreach($languages as $lang)
-    {
-        if(in_array($lang, $supportedLangs))
-        {
-            // return the first language
-            return $lang;
-        }
-    }
-
-    return 'en-US';
-}
-
+// NOTE: _('word') is a call to gettext() for localization
+//
 function exponent($case) {
     if($case=="E") {
-        return "Exponent";
+        return _('Exponent');
     } else {
-        return "exponent";
+        return _('exponent');
     }
 }
 
 function deca($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
-        if($case=="D") {
-            return "Deca";
-        } else {
-            return "deca";
-        }
+    if($case=="D") {
+        return _('Deka');
     } else {
-        // en-US
-        if($case=="D") {
-            return "Deka";
-        } else {
-            return "deka";
-        }
+        return _('deka');
     }
 }
 
 function meter($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
-        if($case=="M") {
-            return "Metre";
-        } else {
-            return "metre";
-        }
+    if($case=="D") {
+        return _('Meter');
     } else {
-        // en-US
-        if($case=="M") {
-            return "Meter";
-        } else {
-            return "meter";
-        }
+        return _('meter');
     }
 }
 
 function liter($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
-        if($case=="L") {
-            return "Litre";
-        } else {
-            return "litre";
-        }
+    if($case=="D") {
+        return _('Liter');
     } else {
-        // en-US
-        if($case=="L") {
-            return "Liter";
-        } else {
-            return "liter";
-        }
+        return _('liter');
     }
 }
 
 function gram($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
-        if($case=="G") {
-            return "Gramme";
-        } else {
-            return "gramme";
-        }
+    if($case=="D") {
+        return _('Gram');
     } else {
-        // en-US
-        if($case=="G") {
-            return "Gram";
-        } else {
-            return "gram";
-        }
+        return _('gram');
     }
 }
 
 
 function conversionVer() {
 	// File version
-	return 20;
+	return 21;
 }
 
 global $allowedmacros;
