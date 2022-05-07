@@ -4,17 +4,62 @@
 // licensed under GPL version 2 or later
 //
 
-// NOTE: _('word') is a call to gettext() for localization
-//
+function conversionVer() {
+	// File version
+	return 22;
+}
+
+function detectlanguage(){
+
+    $supportedLangs = array('en', 'en-US', 'en-GB');
+    $languages = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+
+    foreach($languages as $lang)
+    {
+        if(in_array($lang, $supportedLangs))
+        {
+            // return the first language
+            return $lang;
+        }
+    }
+
+    // return a default
+    return 'en-US';
+}
+
 function exponent($case) {
     if($case=="E") {
-        return _('Exponent');
+        return "Exponent";
     } else {
-        return _('exponent');
+        return "exponent";
     }
 }
 
+// NOTE: _('word') is a call to gettext() for localization
+//
+
+// Functions for teh spelling of metric words
+// update the function
+//
 function deca($case) {
+    $lang = detectlanguage();
+
+    if($lang == 'en-GB') {
+        if($case=="D") {
+            return "Deca";
+        } else {
+            return "deca";
+        }
+    } elseif($lang == 'en-Us') {
+        if($case=="D") {
+            return "Deka";
+        } else {
+            return "deka";
+        }
+    }
+
+    //default
+    //
     if($case=="D") {
         return _('Deka');
     } else {
@@ -23,6 +68,24 @@ function deca($case) {
 }
 
 function meter($case) {
+    $lang = detectlanguage();
+
+    if($lang == 'en-GB') {
+        if($case=="M") {
+            return "Metre";
+        } else {
+            return "metre";
+        }
+    } elseif($lang == 'en-Us') {
+        if($case=="M") {
+            return "Meter";
+        } else {
+            return "meter";
+        }
+    }
+
+    //default
+    //
     if($case=="D") {
         return _('Meter');
     } else {
@@ -31,6 +94,24 @@ function meter($case) {
 }
 
 function liter($case) {
+    $lang = detectlanguage();
+
+    if($lang == 'en-GB') {
+        if($case=="L") {
+            return "Litre";
+        } else {
+            return "litre";
+        }
+    } elseif($lang == 'en-Us') {
+        if($case=="L") {
+            return "Liter";
+        } else {
+            return "liter";
+        }
+    }
+
+    //default
+    //
     if($case=="D") {
         return _('Liter');
     } else {
@@ -39,6 +120,24 @@ function liter($case) {
 }
 
 function gram($case) {
+    $lang = detectlanguage();
+
+    if($lang == 'en-GB') {
+        if($case=="G") {
+            return "Gramme";
+        } else {
+            return "gramme";
+        }
+    } elseif($lang == 'en-Us') {
+        if($case=="G") {
+            return "Gram";
+        } else {
+            return "gram";
+        }
+    }
+
+    //default
+    //
     if($case=="D") {
         return _('Gram');
     } else {
@@ -46,15 +145,9 @@ function gram($case) {
     }
 }
 
-
-function conversionVer() {
-	// File version
-	return 21;
-}
-
 global $allowedmacros;
 
-// COMMENT OUT BEFORE UPLOADING
+// USED FOR LOCAL TESTING
 if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
