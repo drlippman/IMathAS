@@ -10,6 +10,7 @@ array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_g
 //formats a compound for display in as HTML
 function chem_disp($c) {
 	$c = preg_replace('/_(\d+)/','<sub>$1</sub>',$c);
+	$c = preg_replace('/\^(\d\+|\d\-)|\^(\+|\-)/','<sup>$1</sup>',$c);
 	return str_replace(' ','',$c);
 }
 
