@@ -3508,13 +3508,12 @@ class AssessRecord
         }
       }
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
-        for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
-          $curQver = $curAver['questions'][$qn]['question_versions'][$qv];
-          // check if question is unattempted; may way to use scored_try instead?
-          if (count($curQver['tries']) == 0) {
-            $allQattempted = false;
-            break 2;
-          }
+        $latestQver = count($curAver['questions'][$qn]['question_versions']) - 1;
+        $curQver = $curAver['questions'][$qn]['question_versions'][$latestQver];
+        // check if question is unattempted; may way to use scored_try instead?
+        if (count($curQver['tries']) == 0) {
+          $allQattempted = false;
+          break;
         }
       }
       if ($allQattempted) {
