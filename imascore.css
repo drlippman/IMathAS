@@ -2,7 +2,7 @@ html {
 
 }
 body {
-
+    background-color:#FFFFFF;
 	margin: 10px;
 	padding: 0px;
 }
@@ -74,6 +74,9 @@ span.iteminfo {
 }
 .warn {
     color: #C40;
+}
+input:invalid {
+	background-color: #faa;
 }
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
@@ -1409,4 +1412,9 @@ a.dropdown-toggle.arrow-down:hover {
     position: absolute;
     border: none;
     width: 100%;
+}
+:not([class="mjx-var"][size="s"]) > [class="mjx-c2032"] {
+    vertical-align: 0.513em;
+    margin-left: 0.025em;
+    font-size: 70.7%;
 }

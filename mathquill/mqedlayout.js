@@ -18,7 +18,7 @@ var myMQeditor = (function($) {
               {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
               {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
               {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
-              {l:'\\infty',pr:'<span>∞</span>'},
+              {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
               {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
               {p:'DNE', 'sm':2},
               {l:'\\left|\\right|', c:'i', w:'||'},
@@ -191,7 +191,7 @@ var myMQeditor = (function($) {
               {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
               {p:'%'},
               {p:','},
-              {p:'*'},
+              {l:'\\infty',pr:'<span>∞</span>'},
               {p:'!'},
               {p:'?'}
             ]
@@ -445,7 +445,8 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             {'b':'.'},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            (calcformat.match(/(list|set)/) ||
+            qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
           ]
@@ -476,9 +477,11 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            (calcformat.match(/(list|set)/) ||
+             qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
-              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
+              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} :
+              (qtype.match(/complex/) ? {b:'+'} : {s:1})
           ]
         };
       } else {
@@ -522,7 +525,7 @@ var myMQeditor = (function($) {
         baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
       }
     }
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
@@ -558,6 +561,21 @@ var myMQeditor = (function($) {
         contents: [{l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']}]
       }, {s:.1});
     }
+    if (calcformat.match(/logic/)) {
+        baselayout.tabs[0].p = "Logic";
+        baselayout.tabs[0].tabcontent[0].contents = [
+            {l:'\\vee',pr:'<span class="mq-binary-operator">∨</span>'},
+            {l:'\\wedge',pr:'<span class="mq-binary-operator">∧</span>'},
+            {b:'~'},
+            {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+            {l:'\\implies',pr:'<span class="mq-binary-operator">⇒</span>'},
+            {l:'\\iff',pr:'<span class="mq-binary-operator">⇔</span>'}
+        ];
+        if (layoutstyle !== 'OSK') {
+            baselayout.tabs[0].tabcontent[0].s = 3;
+        }
+    }
+
     // for both
     if (vars.length > 0) {
         var varbtns = getVarsButtons2(vars,layoutstyle);
@@ -598,10 +616,13 @@ var myMQeditor = (function($) {
         maxlen = vars[i].length;
       }
       vars[i] = vars[i].replace(/_(\w{2,})/,"_{$1}");
+
       if (vars[i].length == 1) {
         btns.push({'b':vars[i], c:'w', v:1});
       } else {
-        btns.push({'b':vars[i], c:'w', r:1});
+        btns.push({'l':vars[i].replace(/(\\)?([a-zA-Z0-9]{2,})/g, function(m,p1,p2) {
+            return p1 ? m : "\\text{"+p2+"}";
+        }), 'w':vars[i], c:'w', r:1});
       }
     }
     var perrow = Math.min(8,Math.max(4, Math.ceil(vars.length/4)));

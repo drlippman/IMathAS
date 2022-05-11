@@ -15,7 +15,7 @@ $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$to
   '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
   '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros',
   '$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights',
-  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts');
+  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts','$teacherInGb');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
@@ -25,7 +25,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = removeDisallowedVarsString($str,$anstype,$countcnt);
+		$str = removeDisallowedVarsString($str,$anstype,$countcnt,'"');
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -34,7 +34,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
     $str = preg_replace('/&\s*\n/', ' ', $str);
-		$r =  interpretline($str.';',$anstype,$countcnt).';';
+        $r =  interpretline($str.';',$anstype,$countcnt).';';
 		return $r;
 	}
 }
@@ -66,7 +66,7 @@ function interpretline($str,$anstype,$countcnt) {
 	$closeparens = 0;
 	$symcnt = 0;
 	//get tokens from tokenizer
-	$syms = tokenize($str,$anstype,$countcnt);
+    $syms = tokenize($str,$anstype,$countcnt);
 	$k = 0;
 	$symlen = count($syms);
 	//$lines holds lines of code; $bits holds symbols for the current line.
@@ -82,7 +82,7 @@ function interpretline($str,$anstype,$countcnt) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1][0]!='=') {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -108,7 +108,7 @@ function interpretline($str,$anstype,$countcnt) {
 		}
 
 
-		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1]{0}!='=' && $syms[$k+1]{0}!='>') {
+		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
 			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
@@ -127,7 +127,8 @@ function interpretline($str,$anstype,$countcnt) {
 			}
 		} else if ($type==7) {//end of line
 			if ($lasttype=='7' || $lasttype==-1) {
-				//nothing exciting, so just continue
+                //nothing exciting, so just continue
+                $lines[] = '';
 				$k++;
 				continue;
 			}
@@ -135,7 +136,7 @@ function interpretline($str,$anstype,$countcnt) {
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
 				$j = $forloc;
-				while ($bits[$j]{0}!='{' && $j<count($bits)) {
+				while ($bits[$j][0]!='{' && $j<count($bits)) {
 					$j++;
 				}
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
@@ -151,7 +152,7 @@ function interpretline($str,$anstype,$countcnt) {
 			} else if ($ifloc == 0) {
 				//this is if at beginning of line, form:  if ($a==3) {todo}
 				$j = 0;
-				while ($bits[$j]{0}!='{' && $j<count($bits)) {
+				while ($bits[$j][0]!='{' && $j<count($bits)) {
 					$j++;
 				}
 				if ($j==count($bits)) {
@@ -167,7 +168,7 @@ function interpretline($str,$anstype,$countcnt) {
 				$out = "if ($cond) $todo";
 				for ($i=0; $i<count($elseloc); $i++) {
 					$j = $elseloc[$i][0];
-					while ($bits[$j]{0}!='{' && $j<count($bits)) {
+					while ($bits[$j][0]!='{' && $j<count($bits)) {
 						$j++;
 					}
 					if ($j==count($bits)) {
@@ -314,11 +315,15 @@ function tokenize($str,$anstype,$countcnt) {
 		$len = strlen($str);
 		if ($c=='/' && $str[$i+1]=='/') { //comment
 			while ($c!="\n" && $i<$len) {
-				$i++;
-				$c = $str[$i];
-			}
-			$i++;
-			$c = $str[$i];
+                $i++;
+                if ($i<$len) {
+                    $c = $str[$i];
+                }
+            }
+            $i++;
+            if ($i<$len) {
+                $c = $str[$i];
+            }
 			$intype = 7;
 		} else if ($c=='$') { //is var
 			$intype = 1;
@@ -360,7 +365,7 @@ function tokenize($str,$anstype,$countcnt) {
 					$out = 'elseif';
 					$i += 3;
 				}
-				if ($lastsym[1]==7) {
+				while ($lastsym[1]==7) {
 					array_pop($syms);
 					$lastsym = $syms[count($syms)-1];
 				}
@@ -420,7 +425,8 @@ function tokenize($str,$anstype,$countcnt) {
 					$connecttolast = 2;
 				} else {
 					//not a function, so what is it?
-					if ($out=='true' || $out=='false' || $out=='null') {
+                    $outlower = strtolower($out);
+					if ($outlower=='true' || $outlower=='false' || $outlower=='null') {
 						//we like this - it's an acceptable unquoted string
 					} else {//
 						//an unquoted string!  give a warning to instructor,
@@ -486,7 +492,8 @@ function tokenize($str,$anstype,$countcnt) {
 			$thisn = 1;
 			$inq = false;
 			$j = $i+1;
-			$len = strlen($str);
+            $len = strlen($str);
+            $newcnt = 0;
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
@@ -505,7 +512,10 @@ function tokenize($str,$anstype,$countcnt) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-							$inside = interpretline(substr($str,$i+1,$j-$i-1),$anstype,$countcnt+1);
+                            $toprocess = substr($str,$i+1,$j-$i-1);
+
+                            $inside = interpretline($toprocess,$anstype,$countcnt+1);
+
 							if ($inside=='error') {
 								//was an error, return error token
 								return array(array('',9));
@@ -515,8 +525,12 @@ function tokenize($str,$anstype,$countcnt) {
 							if ($rightb=='}' && $lastsym[0]!='$') {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
-								$out .= $leftb.$inside.$rightb;
-							}
+                                $out .= $leftb.$inside.$rightb;
+                            }
+                            if ($newcnt > 0) {
+                                $out .= str_repeat("\n", $newcnt);
+                            }
+                            $newcnt = 0;
 							$i= $j+1;
 							break;
 						}
@@ -527,7 +541,11 @@ function tokenize($str,$anstype,$countcnt) {
 							$d = $str[$j];
 						}
 					} else if ($d=="\n") {
-						//echo "unmatched parens/brackets - likely will cause an error";
+                        //echo "unmatched parens/brackets - likely will cause an error";
+                        if (!$inq && ($intype == 4 || $intype == 11)) {
+                            $str[$j] = ' ';
+                            $newcnt++;
+                        }
 					}
 				}
 				$j++;
@@ -553,7 +571,7 @@ function tokenize($str,$anstype,$countcnt) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt);
+				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype);
 			}
 			$i++;
 			$c = $str[$i];
@@ -567,9 +585,18 @@ function tokenize($str,$anstype,$countcnt) {
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
-			$i++;
+            $i++;
 			if ($i<$len) {
-				$c = $str[$i];
+                $c = $str[$i];
+                //eat whitespace
+                while ($c==' ') {
+                    $i++;
+                    $c = $str[$i];
+                }
+                if ($c=="\n") {
+                    $i++;
+                    $c = $str[$i];
+                }
 			}
 		} else {
 			//no type - just append string.  Could be operators
@@ -629,27 +656,56 @@ function tokenize($str,$anstype,$countcnt) {
 				$connecttolast = 0;
 				if ($c=='[') {// multidim array ref?
 					$connecttolast = 1;
-				}
+                }
+                if ($connecttolast == 0 && 
+                    (substr($syms[count($syms)-1][0],0,12) == '$stuanswers[' ||
+                    substr($syms[count($syms)-1][0],0,15) == '$stuanswersval[')
+                ) {
+                    $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? null)';
+                }
+                if ($connecttolast == 0 && 
+                    (substr($syms[count($syms)-1][0],0,16) == '$scoreiscorrect[' ||
+                    substr($syms[count($syms)-1][0],0,14) == '$scorenonzero[')
+                ) {
+                    $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? -1)';
+                }
+                if ($connecttolast == 0 && 
+                    substr($syms[count($syms)-1][0],0,14) == '$partattemptn['
+                ) {
+                    $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? 0)';
+                }
 			}
 		} else {
-			//add to symbol list, avoid repeat end-of-lines.
-			if ($intype!=7 || $lastsym[1]!=7) {
-				$lastsym = array($out,$intype);
-				$syms[] =  array($out,$intype);
-			}
+            //add to symbol list.  avoid repeat end-of-lines.
+            $lastsym = array($out,$intype);
+            $syms[] =  array($out,$intype);
 		}
 
 	}
 	return $syms;
 }
 
+function testIsEscaped($str,$c) {
+    $cnt = 0;
+    $i = $c-1;
+    while ($i >= 0 && $str[$i] == '\\') {
+        $cnt++;
+        $i--;
+    }
+    return (($cnt%2)==1);
+}
+
 //handle braces and variable variables in strings and qtext
-function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
+function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	global $disallowedvar;
 
 	//remove any blatent disallowed var
 	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str);
 	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+
+    if ($quotetype!='"') {
+        return $str;
+    }
 
 	$startmarker = 0; $lastend = 0;
 	$invarvar = false;
@@ -657,7 +713,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 	$outstr = '';
 	$depth = 0;
 	for ($c=0;$c<strlen($str);$c++) {
-		if ($str[$c]=='{') {
+		if ($str[$c]=='{' && !testIsEscaped($str,$c)) {
 			if ($invarvar || $inbraces) {
 				$depth++;
 			} else { //may be starting new brace or varvar item
@@ -690,7 +746,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 					//interpret stuff in braces as code
 					$insidebrace = interpretline(substr($str,$startmarker+1,$c-$startmarker-1),$anstype,$countcnt+1);
 					if ($insidebrace!='error') {
-						$outstr .= '{'.$insidebrace.'}';
+						$outstr .= '".('.$insidebrace.')."';
 					}
 				} else if ($invarvar) {
 					$insidebrace = substr($str,$startmarker+1,$c-$startmarker-2);

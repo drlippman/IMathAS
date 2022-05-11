@@ -83,10 +83,8 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 		//$out .= ' onclick="tipshow(this, null, true, event);"';
 		//$out .= ' onmouseover="tipshow(this);" onmouseout="tipout()"';
 	}
-	$out .= '>';
-	if ($faded) {
-		$class = 'class="faded"';
-	}
+    $out .= '>';
+    $class = ($faded ? 'class="faded"' : '');
 	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
 	if ($status>-1) {
 		switch ($status) {
@@ -130,7 +128,7 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
 	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
-	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
+	$out .= " <li><a href=\"addquestions2.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
 	$out .= " <li><a href=\"$thisaddassess?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
@@ -162,7 +160,7 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name) {
 	$out .= '</div>';
 	return $out;
 }
-function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true, $name) {
+function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats, $name) {
 	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
@@ -223,6 +221,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   	   $itemshowdata = loadItemShowData($items, true, $viewall, $inpublic, $ispublic);
 	   }
 
+       // sanitize to prevent XSS
+       $parent = implode('-', array_map('intval', explode('-', $parent)));
+
 	   $now = time();
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
@@ -261,7 +262,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$enddate = formatdate($items[$i]['enddate']);
 			}
 
-			$bnum = $i+1;
+            $bnum = $i+1;
 			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
 				$availbeh = _('Expanded');
@@ -278,7 +279,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$contentbehavior = 0;
 			}
 
-			if ($items[$i]['colors']=='') {
+			if (empty($items[$i]['colors'])) {
 				$titlebg = '';
 			} else {
 				list($titlebg,$titletxt,$bicolor) = explode(',',$items[$i]['colors']);
@@ -663,6 +664,10 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   continue;
 		   }
 
+           if (!isset($itemshowdata[$items[$i]])) {
+               // missing item?
+               continue;
+           }
 		   $line = $itemshowdata[$items[$i]];
 		   $typeid = Sanitize::onlyInt($line['id']);
 
@@ -748,7 +753,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   $nothidden = true;  $showgreyedout = false;
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
-			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
+                      && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)
+                      && empty($excused['A'. $line['reqscoreaid']])
+               ) {
 			   	   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 			   	   	   $showgreyedout = true;
 			   	   }
@@ -789,7 +796,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   $preReqNote = '';
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0) {
 			   	$preReqNote = '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
-				$preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
+                $preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename'] ?? '').'</span>';
 			   }
 
                $excusedNote = '';
@@ -2204,10 +2211,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 					 if ($line['ver']>1) {
+                         echo " <a href=\"addquestions2.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 						 echo "<a href=\"addassessment2.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 					 } else {
+                         echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 						 echo "<a href=\"addassessment.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 					 }
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";

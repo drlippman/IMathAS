@@ -60,7 +60,7 @@
 		echo "You not have access to view scores for this assessment";
 		require("../footer.php");
 		exit;
-	} else if ($isteacher || ($istutor && $tutoredit==1)) {
+	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
 	} else {
 		$canedit = 0;
@@ -292,7 +292,7 @@
 	}
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=113016"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=022622"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
@@ -494,7 +494,7 @@
 				echo '</select></p>';
 			}
 
-			echo "<p class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></p>';
+			echo "<p class=\"person\"><span class='pii-full-name'><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></span></p>';
 
 			if (!$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
@@ -551,7 +551,7 @@
 
 
 			echo "<div class=review>";
-			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
+			echo '<span class="person pii-full-name">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
 				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
 			}

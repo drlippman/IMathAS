@@ -391,7 +391,7 @@ var teach = new Array();
 
 	$sel2 = explode(';',$line['sel2list']);
 	foreach ($sel2 as $k=>$v) {
-		$sel2opts = array_map('decodeSelector', explode('~',$sel2[$k]));
+		$sel2opts = array_map('Sanitize::encodeStringForJavascript', array_map('decodeSelector', explode('~',$sel2[$k])));
 		echo "teach[$k] = new Array('".implode("','", $sel2opts)."');\n";
 	}
 ?>

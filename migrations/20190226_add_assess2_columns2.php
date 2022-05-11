@@ -12,7 +12,7 @@ if ($res===false) {
 	return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added columns for new assessplayer to imas_questions</p>";
 

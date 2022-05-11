@@ -87,7 +87,7 @@ $assess_record->loadRecord($uid);
 $assess_record->setInGb(true);
 if (!$assess_record->hasRecord()) {
   // if there's no record yet, and we're a teacher, create a record
-  if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+  if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
     $isGroup = $assess_info->getSetting('isgroup');
 
     // Check for LTI 1.3 lineitem
@@ -111,9 +111,12 @@ if (!$assess_record->hasRecord()) {
       list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
       if ($stugroup == 0) {
         if ($isGroup == 3) {
-          // no group yet - can't do anything
-          echo '{"error": "need_group"}';
-          exit;
+            if ($stugroupid == 0 || count($current_members) == 0) {
+                // no group yet - can't do anything
+                echo '{"error": "need_group"}';
+                exit;
+            }
+            $current_members = array_keys($current_members); // we just want the user IDs
         } else {
           $current_members = false; // just create for user if no group yet
         }
@@ -148,13 +151,13 @@ if (!$assess_record->hasRecord()) {
     $new_gb_score = $assess_record->getGbScore()['gbscore'];
     if ($new_gb_score != $orig_gb_score) {
         $assess_record->saveRecord();
-        $assess_record->updateLTIscore();
+        $assess_record->updateLTIscore(true, false);
     }
 }
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
-  'name', 'submitby', 'enddate', 'can_use_latepass', 'hasexception',
+  'name', 'submitby', 'enddate', 'available', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
   'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
   'scoresingb', 'viewingb', 'latepass_status', 'help_features', 'attemptext'
@@ -190,6 +193,10 @@ if ($isstudent) {
   $stm = $DBH->prepare($query);
   $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':typeid'=>$aid,
     ':type'=> $LPblockingView ? 'gbviewassess' : 'gbviewsafe', ':viewtime'=>$now));
+
+  if ($LPblockingView) {
+      $assess_info->overrideSetting('can_use_latepass', 0);
+  }
 }
 
 // indicate whether teacher/tutor can see all the answers and such
@@ -197,8 +204,9 @@ if ($isActualTeacher || $istutor) {
     $assess_record->setTeacherInGb(true);
 }
 // indicate whether teacher/tutor can edit scores or not
-if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
+  $assessInfoOut['can_make_exception'] = ($isActualTeacher || ($istutor && $tutoredit == 3));
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN

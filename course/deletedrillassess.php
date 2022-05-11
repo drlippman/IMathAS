@@ -24,7 +24,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 
-	if ($_POST['remove']=="really") {
+	if (isset($_POST['remove']) && $_POST['remove']=="really") {
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='Drill' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$daid, ':courseid'=>$cid));
 		if ($stm->rowCount()>0) {

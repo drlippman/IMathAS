@@ -9,7 +9,11 @@ if (!isset($teacherid)) {
 	exit;
 }
 $aid = Sanitize::onlyInt($_GET['aid']);
-
+if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+    $addqpage = 'addquestions2.php';
+} else {
+    $addqpage = 'addquestions.php';
+}
 //form handling
 
 if (isset($_POST['clearall'])) {
@@ -53,7 +57,7 @@ if (isset($_POST['clearall'])) {
 	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
 	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
 
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addqpage?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 	exit;
 }
 
@@ -62,7 +66,7 @@ if (isset($_POST['clearall'])) {
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
+echo "&gt; <a href=\"$addqpage?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
 $stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 $row = $stm->fetch(PDO::FETCH_NUM);

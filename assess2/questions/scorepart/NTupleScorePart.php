@@ -33,29 +33,29 @@ class NTupleScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 
+            'answerformat', 'requiretimes', 'ansprompt', 'scoremethod', 'partweights'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-        $hasNumVal = !empty($_POST["qn$qn-val"]);
+          $hasNumVal = !empty($_POST["qn$qn-val"]);
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
 
-        if (!isset($answerformat)) { $answerformat = '';}
         $givenans = normalizemathunicode($givenans);
         $givenans = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $givenans);
+        $givenans = trim($givenans," ,");
         $answer = normalizemathunicode($answer);
         
         $ansformats = array_map('trim',explode(',',$answerformat));
         $answer = str_replace(' ','',$answer);
+        if (!is_array($partweights) && $partweights !== '') {
+            $partweights = array_map('trim',explode(',',$partweights));
+        }
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -141,6 +141,17 @@ class NTupleScorePart implements ScorePart
         // parse and evaluate the answer, capturing "or"s
         $anarr = $this->parseNtuple($answer, true, true);
 
+        if (in_array('anyorder', $ansformats)) {
+            foreach ($anarr as $k=>$listans) {
+                foreach ($listans as $ork=>$orv) {
+                    sort($anarr[$k][$ork]['vals']);
+                }
+            }
+            foreach ($gaarr as $k=>$givenans) {
+                sort($gaarr[$k]['vals']);
+            }
+        }
+
         if (in_array('scalarmult',$ansformats)) {
             //normalize the vectors
             foreach ($anarr as $k=>$listans) {
@@ -185,42 +196,54 @@ class NTupleScorePart implements ScorePart
         $partialmatches = array();
         $matchedans = array();
         $matchedgivenans = array();
+
         foreach ($anarr as $ai=>$ansors) {
             $foundloc = -1;
             foreach ($ansors as $answer) {  //each of the "or" options
                 foreach ($gaarr as $j=>$givenans) {
+
                     if (isset($matchedgivenans[$j])) {continue;}
 
                     if ($answer['lb']!=$givenans['lb'] || $answer['rb']!=$givenans['rb']) {
-                        break;
+                        continue;
                     }
 
                     if (count($answer['vals'])!=count($givenans['vals'])) {
-                        break;
+                        continue;
                     }
-                    $matchedparts = 0;
+                    $matchedparts = [];
                     foreach ($answer['vals'] as $i=>$ansval) {
                         $gansval = $givenans['vals'][$i];
                         if (is_numeric($ansval) && is_numeric($gansval)) {
-                            if (isset($abstolerance)) {
+                            if ($abstolerance !== '') {
                                 if (abs($ansval-$gansval) < $abstolerance + 1E-12) {
-                                    $matchedparts++;
+                                    $matchedparts[$i] = 1;
                                 }
                             } else {
                                 if (abs($ansval-$gansval)/(abs($ansval)+.0001) < $reltolerance+ 1E-12) {
-                                    $matchedparts++;
+                                    $matchedparts[$i] = 1;
                                 }
                             }
-                        } else if (($ansval=='oo' && $gansval=='oo') || ($ansval=='-oo' && $gansval=='-oo')) {
-                            $matchedparts++;
+                        } else if (($ansval==='oo' && $gansval==='oo') || ($ansval==='-oo' && $gansval==='-oo')) {
+                            $matchedparts[$i] = 1;
                             //is ok
                         }
                     }
 
-                    if ($matchedparts==count($answer['vals'])) { //if totally correct
+                    if (count($matchedparts)==count($answer['vals'])) { //if totally correct
                         $correct += 1; $foundloc = $j; break 2;
-                    } else if ($scoremethod=='byelement' && $matchedparts>0) { //if partially correct
-                        $fraccorrect = $matchedparts/count($answer['vals']);
+                    } else if ($scoremethod=='byelement' && count($matchedparts)>0) { //if partially correct
+                        if (is_array($partweights)) {
+                            $fraccorrect = 0;
+                            foreach ($partweights as $pwi => $pwv) {
+                                if ($matchedparts[$pwi] == 1) {
+                                    $fraccorrect += $pwv;
+                                }
+                            }
+                            $fraccorrect /= array_sum($partweights);
+                        } else {
+                            $fraccorrect = count($matchedparts)/count($answer['vals']);
+                        }
                         if (!isset($partialmatches["$ai-$j"]) || $fraccorrect>$partialmatches["$ai-$j"]) {
                             $partialmatches["$ai-$j"] = $fraccorrect;
                         }

@@ -138,7 +138,12 @@ if (isset($_GET['launch'])) {
 	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
-	}
+    }
+    if ($_POST['orig_linkid'] != $_SESSION['lti_resource_link_id']) {
+        echo _('Uh oh, something went wrong.  Please go back and try again').'. ';
+        echo _('You may have launched too many assignments too quickly.');
+		exit;
+    }
 
 	require_once("$curdir/includes/userprefs.php");
 	generateuserprefs();
@@ -202,7 +207,7 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
-	echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
+    echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
 	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of "
             .Sanitize::encodeStringForJavascript($_SESSION['ltitlwrds'])
@@ -216,7 +221,8 @@ if (isset($_GET['launch'])) {
 
 	} else {
 		echo ">";
-	}
+    }
+    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
@@ -274,16 +280,33 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$stm = $DBH->prepare('SELECT password,id FROM imas_users WHERE SID=:sid');
+				$stm = $DBH->prepare('SELECT password,id,mfa FROM imas_users WHERE SID=:sid');
 				$stm->execute(array(':sid'=>$_POST['curSID']));
 				//if (mysql_num_rows($result)==0) {
 				if ($stm->rowCount()==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					list($realpw,$tmpuserid) = $stm->fetch(PDO::FETCH_NUM); //DB mysql_result($result,0,0);
+					list($realpw,$tmpuserid,$mfadata) = $stm->fetch(PDO::FETCH_NUM); //DB mysql_result($result,0,0);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
 					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
-						$userid= $tmpuserid; //DB mysql_result($result,0,1);
+                        if ($mfadata != '') {
+                            $mfadata = json_decode($mfadata, true);
+                            if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
+                                $flexwidth = true;
+                                $nologo = true;
+                                require_once(__DIR__.'/includes/mfa.php');
+                                $formaction = $imasroot."/bltilaunch.php?userinfo=set";
+                                if (!isset($_POST['mfatoken'])) {
+                                    mfa_showLoginEntryForm($formaction, '', false);
+                                    exit;
+                                } else if (mfa_verify($mfadata, $formaction, $tmpuserid, false)) {
+                                    // good to go
+                                } else {
+                                    $infoerr = "MFA verification failed";
+                                }
+                            }
+                        }
+                        $userid= $tmpuserid;
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 						unset($tmpuserid);
@@ -310,6 +333,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
 			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -359,6 +383,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
 			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -739,6 +764,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
 			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -785,6 +811,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
 			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
@@ -941,7 +968,11 @@ if ($stm->rowCount()==0) {
 						}
 						echo "	</ul>";
 						if ($sourceUIver == 1) {
-							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
+                            if (!empty($CFG['assess_upgrade_optout'])) {
+                                echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" value="1" checked /> Use new assessment interface (only applies if copying)</p>';
+                            } else {
+                                echo '<input type="hidden" name="usenewassess" value="1">';
+                            }
 						}
 						echo "<p>The first option is best if this is your first time using this $installname course.  The second option
 							may be preferrable if you have copied the course in your LMS and want your students records to
@@ -967,7 +998,11 @@ if ($stm->rowCount()==0) {
 							echo "<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />";
 						}
 						if ($sourceUIver == 1) {
-							echo '<p><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
+                            if (!empty($CFG['assess_upgrade_optout'])) {
+                                echo '<p><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
+                            } else {
+                                echo '<input type="hidden" name="usenewassess" value="1">';
+                            }
 						}
 						echo "<p><input type=\"submit\" value=\"Create a copy on $installname\"/> (this may take a few moments - please be patient)</p>";
 					}
@@ -1727,7 +1762,12 @@ if (isset($_GET['launch'])) {
 	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
-	}
+    }
+    if ($_POST['orig_linkid'] != $_SESSION['lti_resource_link_id']) {
+        echo _('Uh oh, something went wrong.  Please go back and try again').'. ';
+        echo _('You may have launched too many assignments too quickly.');
+		exit;
+    }
 
 	require_once("$curdir/includes/userprefs.php");
 	generateuserprefs();
@@ -1802,7 +1842,7 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
-	echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
+    echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
 	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".</p>";
@@ -1813,7 +1853,8 @@ if (isset($_GET['launch'])) {
 		}
 	} else {
 		echo ">";
-	}
+    }
+    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
@@ -1872,15 +1913,32 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$stm = $DBH->prepare("SELECT password,id FROM imas_users WHERE SID=:SID");
+				$stm = $DBH->prepare("SELECT password,id,mfa FROM imas_users WHERE SID=:SID");
 				$stm->execute(array(':SID'=>$_POST['curSID']));
 				if ($stm->rowCount()==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					list($realpw,$queryuserid) = $stm->fetch(PDO::FETCH_NUM);
+					list($realpw,$queryuserid,$mfadata) = $stm->fetch(PDO::FETCH_NUM);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
 					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
-						$userid = $queryuserid;
+                        $userid = $queryuserid;
+                        if ($mfadata != '') {
+                            $mfadata = json_decode($mfadata, true);
+                            if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
+                                $flexwidth = true;
+                                $nologo = true;
+                                require_once(__DIR__.'/includes/mfa.php');
+                                $formaction = $imasroot."/bltilaunch.php?userinfo=set";
+                                if (!isset($_POST['mfatoken'])) {
+                                    mfa_showLoginEntryForm($formaction, '', false);
+                                    exit;
+                                } else if (mfa_verify($mfadata, $formaction, $userid, false)) {
+                                    // good to go
+                                } else {
+                                    $infoerr = "MFA verification failed";
+                                }
+                            }
+                        }
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 					}
@@ -1910,6 +1968,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
 			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -1949,6 +2008,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
 			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -2318,6 +2378,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
+            $DBH->beginTransaction();
 			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
 			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
 			$localltiuser = $DBH->lastInsertId();
@@ -2355,6 +2416,7 @@ if (isset($_GET['launch'])) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
 			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
+            $DBH->commit();
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;

@@ -158,7 +158,7 @@ class AssessStandalone {
         }
         $showans = true;
         if (!is_array($this->state['scoreiscorrect'][$qn+1])) {
-            $showans = $showansparts[0];
+            $showans = $showansparts[0] ?? false;
         } else {
             foreach ($this->state['scoreiscorrect'][$qn+1] as $pn=>$sc) {
                 if (empty($showansparts[$pn])) {
@@ -170,9 +170,10 @@ class AssessStandalone {
       }
     }
 
-    $showans = !empty($this->getOpVal($options, 'showans', false)) || $showans;
+    $showans = (!empty($this->getOpVal($options, 'showans', false)) || $showans) &&
+        !$this->getOpVal($options, 'hideans', false);
     $showhints = $this->getOpVal($options, 'showhints', 3);
-    $rawscores = $this->state['rawscores'][$qn];
+    $rawscores = $this->state['rawscores'][$qn] ?? [];
 
     if ($hidescoremarkers) {
         $rawscores = array();
@@ -229,7 +230,6 @@ class AssessStandalone {
 
     if (!empty($options['includeans'])) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
-      $jsparams['stuans'] = $stuanswers[$qn+1];
     }
 
     if ($maxtries > 0) {
@@ -252,7 +252,12 @@ class AssessStandalone {
       $jsparams['disabled'] = $disabled;
     }
 
-    return array('html' => $qout, 'jsparams' => $jsparams, 'errors'=>$question->getErrors());
+    return array(
+        'html' => $qout, 
+        'jsparams' => $jsparams, 
+        'errors'=>$question->getErrors(),
+        'soln'=>$question->getSolutionContentDetailed()
+    );
   }
 
   /*
@@ -276,10 +281,11 @@ class AssessStandalone {
         ->setAssessmentId(0)
         ->setDbQuestionSetId($qsid)
         ->setQuestionSeed($this->state['seeds'][$qn])
-        ->setGivenAnswer($_POST['qn'.$qn])
+        ->setGivenAnswer($_POST['qn'.$qn] ?? '')
         ->setAttemptNumber($attemptn)
         ->setAllQuestionAnswers($this->state['stuanswers'])
         ->setAllQuestionAnswersAsNum($this->state['stuanswersval'])
+        ->setPartsToScore($parts_to_score)
         ->setQnpointval(1);
 
     $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
@@ -293,21 +299,23 @@ class AssessStandalone {
       if ($parts_to_score === true || !empty($parts_to_score[$k])) {
         if (empty($this->state['partattemptn'][$qn])) {
           $this->state['partattemptn'][$qn] = array($k=>1);
+        } else if (!isset($this->state['partattemptn'][$qn][$k])) {
+          $this->state['partattemptn'][$qn][$k] = 1;
         } else {
           $this->state['partattemptn'][$qn][$k]++;
         }
         if (count($partla)>1) {
-          if (!is_array($this->state['stuanswers'][$qn+1])) {
+          if (!isset($this->state['stuanswers'][$qn+1]) || !is_array($this->state['stuanswers'][$qn+1])) {
             $this->state['stuanswers'][$qn+1] = array();
           }
-          if (!is_array($this->state['stuanswersval'][$qn+1])) {
+          if (!isset($this->state['stuanswersval'][$qn+1]) || !is_array($this->state['stuanswersval'][$qn+1])) {
             $this->state['stuanswersval'][$qn+1] = array();
           }
           $this->state['stuanswers'][$qn+1][$k] = $v;
-          $this->state['stuanswersval'][$qn+1][$k] = $partlaNum[$k];
+          $this->state['stuanswersval'][$qn+1][$k] = $partlaNum[$k] ?? '';
         } else {
           $this->state['stuanswers'][$qn+1] = $v;
-          $this->state['stuanswersval'][$qn+1] = $partlaNum[$k];
+          $this->state['stuanswersval'][$qn+1] = $partlaNum[$k] ?? '';
         }
         if (!empty($scoreResult['correctAnswerWrongFormat'][$k])) {
             if (!isset($this->state['wrongfmt'])) {
@@ -321,13 +329,22 @@ class AssessStandalone {
             unset($this->state['wrongfmt'][$qn][$k]);
         }
       }
-      if ($parts_to_score === true || !empty($parts_to_score[$k]) ||
-        (isset($this->state['rawscores'][$qn][$k]) &&
-        $this->state['rawscores'][$qn][$k] >= 0)
-      ) { // rec if scored, and update existing
-        $this->state['rawscores'][$qn][$k] = $rawparts[$k];
+      if (isset($rawparts[$k])) {
+        if ($parts_to_score === true || !empty($parts_to_score[$k]) ||
+            (isset($this->state['rawscores'][$qn][$k]) &&
+            $this->state['rawscores'][$qn][$k] >= 0 && 
+            !empty($this->state['partattemptn'][$qn][$k]))
+        ) { // rec if scored, and update existing
+            $this->state['rawscores'][$qn][$k] = $rawparts[$k];
+        } else if (empty($this->state['rawscores'][$qn][$k])) {
+            // if we're not scoring this, and state doesn't have a score, 
+            // then zero out the score, since we haven't recorded it.
+            $rawparts[$k] = 0;
+            $scores[$k] = 0;
+        }
       }
     }
+
     $allPartsAns = (count($this->state['partattemptn'][$qn]) == count($scoreResult['answeights']));
     $score = array_sum($scores);
     if (count($partla) > 1) {

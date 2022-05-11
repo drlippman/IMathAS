@@ -227,7 +227,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-	}
+	} else {
+        $contentbehavior = 0;
+    }
 	//DEFAULT DISPLAY PROCESSING
 	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
 	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";
@@ -441,10 +443,10 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_SESSION['ltiitemtype'])) {
 			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
-			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
+			echo "<span id=\"myname\" class=\"pii-full-name\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
 			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a>";
 		} else {
-			echo Sanitize::encodeStringForDisplay($userfullname);
+			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($userfullname).'</span>';
 		}
 		?>
 		</span>
@@ -625,11 +627,12 @@ if ($overwriteBody==1) {
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
+           echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=011522\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
-		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
-
+		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
+		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';

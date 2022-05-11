@@ -268,7 +268,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id IN ($query_placeholders) ORDER BY LastName, FirstName");
 				$stm->execute($stulist);
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					echo Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[0]).'<br/>';
+				    echo '<span class="pii-full-name">';
+					echo Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[0]).'</span><br/>';
 					$loginfo .= $row[1].', '.$row[0].' already in group.';
 				}
 				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']) . "\">Continue</a></p>";
@@ -726,15 +727,15 @@ if ($overwriteBody==1) {
 					echo '<li>';
 					if ($hasuserimg[$uid]==1) {
 						if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-							echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
+							echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
 						} else {
-							echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
+							echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 						}
 					}
 					if ($stulocked[$uid]) {
-						echo '<span class="greystrike">'.$name.'</span>';
+						echo '<span class="greystrike pii-full-name">'.$name.'</span>';
 					} else {
-						echo $name;
+						echo '<span class="pii-full-name">'.$name.'</span>';
 					}
 					echo " <span class=linkgrp>| <a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&remove=" . Sanitize::onlyInt($uid) . "&grpid=" . Sanitize::encodeUrlParam($grpid) . "\">Remove from group</a></span></li>";
 				}
@@ -759,15 +760,15 @@ if ($overwriteBody==1) {
 				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"".Sanitize::encodeStringForDisplay($uid)."\" id=\"chk".Sanitize::encodeStringForDisplay($uid)."\"/><label for=\"chk".Sanitize::encodeStringForDisplay($uid)."\">";
 				if ($hasuserimg[$uid]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-						echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
+						echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 					} else {
-						echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
+						echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 					}
 				}
 				if ($stulocked[$uid]) {
-					echo '<span class="greystrike">'.$name.'</span>';
+					echo '<span class="greystrike pii-full-name">'.$name.'</span>';
 				} else {
-					echo $name;
+					echo '<span class="pii-full-name">'.$name.'</span>';
 				}
 				echo "<label></li>";
 			}

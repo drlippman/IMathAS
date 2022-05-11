@@ -136,6 +136,7 @@ array( 'input'=>'~=', 'tex'=>'stackrel{\sim}{=}', 'notexcopy'=>TRUE),
 array( 'input'=>'cong', 'output'=>'~=', 'definition'=>TRUE),
 array( 'input'=>'~~', 'tex'=>'approx'),
 array( 'input'=>'prop', 'tex'=>'propto'),
+array( 'input'=>'~', 'tex' => 'sim'),
 
 // Logical symbols
 array( 'input'=>'and', 'space'=>TRUE),
@@ -528,7 +529,7 @@ function AMTparseSexpr($str) {
 		$this->AMnestingDepth--;
 		$leftchop = 0;
 		if (substr($result[0],0,6)=='\\right') {
-			$st = $result[0]{6};
+			$st = $result[0][6];
 			if ($st==")" || $st=="]" || $st=="}") {
 				$leftchop = 6;
 			} else if ($st==".") {
@@ -636,7 +637,7 @@ function AMTparseSexpr($str) {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$result = $this->AMTparseExpr($str,false);
 		$this->AMnestingDepth--;
-		$st = $result[0]{strlen($result[0])-1};
+		$st = $result[0][strlen($result[0])-1];
 		if ($st == '|') {
 			$node = '{\\left|'.$result[0].'}';
 			return array($node,$result[1]);

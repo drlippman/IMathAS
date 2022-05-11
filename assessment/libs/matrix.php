@@ -11,10 +11,10 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry",
 	"matrixRandomSpan","matrixNumberOfRows","matrixNumberOfColumns",
 	"matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce",
-	"matrixnumsolutions","matrixround",
+	"matrixnumsolutions","matrixround","matrixCompare",
 	"matrixGetRank","arrayIsZeroVector","matrixFormMatrixFromEigValEigVec",
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
-	"matrixGetRowSpace","matrixGetColumnSpace",
+	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
 	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
 
@@ -728,8 +728,14 @@ function matrixrandinvertible($n) {
 function matrixrandunreduce($m,$c) {
 	$n = count($m);
 	for ($i=0;$i<$c; $i++) {
-		$r = diffrands(0,$n-1,3);
-		$m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+        if ($n == 2) {
+            $r = diffrands(0,$n-1,2);
+            $t = nonzerodiffrands(-2,2,2);
+            $m = matrixrowcombine($m,$r[0],$t[0],$r[1],$t[1],$r[0]);
+        } else {
+            $r = diffrands(0,$n-1,3);
+            $m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+        }
 	}
 	for ($i=0; $i<$c; $i++) {
 		list($sr,$er) = diffrands(0,$n-1,2);
@@ -737,9 +743,14 @@ function matrixrandunreduce($m,$c) {
 	}
 	$c = 0;
 	while (hasallzerorow($m) && $c<20) {
-		$r = diffrands(0,$n-1,3);
-		$m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
-		$c++;
+        if ($n == 2) {
+            $r = diffrands(0,$n-1,2);
+            $m = matrixrowcombine($m,$r[0],-2,$r[1],1,$r[0]);
+        } else {
+            $r = diffrands(0,$n-1,3);
+            $m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
+        }
+        $c++;
 	}
 	return $m;
 }
@@ -1421,4 +1432,157 @@ function isMatrix($m) {
 		return false;
 	}
 }
+
+function matrixFromEigenvals($values) {
+    $size = 0;
+    foreach ($values as $v) {
+        $size += is_array($v) ? 2 : 1;
+    }
+    $m = matrixidentity($size);
+    $mi = matrixidentity($size);
+    $d = [];
+    $ops = array();
+    if ($size > 2) {
+        $ord = diffrands(0,$size-2,$size-1);
+    } else {
+        $ord = [0];
+    }
+    $ord[] = $size-1;
+    $mults = nonzerodiffrands(-3,3,$size*2,'def',true);
+	for ($i=1; $i<$size; $i++) {
+        $er = $ord[$i];
+        $sr = $ord[$i-1];
+        $ops[] = array($sr, $er, $mults[$i-1]);
+		$m = matrixrowcombine($m,$sr,$mults[$i-1],$er,1,$er);
+    }
+    
+    $n = 0;
+    // real evals will get one row as evec
+    // complex evals will get one row for imag, and next for real part
+    $realrows = [];
+    foreach ($values as $i=>$v) {
+        $d[$n] = array_fill(0,$size,0);
+        if (is_array($v)) {
+            // add multiple of last row to real rows
+            if ($n+1 != $size-1) {
+                $mult = abs($mults[$size+$i]);
+                $ops[] = array($size-1, $n+1, $mult);
+                $m = matrixrowcombine($m,$size-1,$mult,$n+1,1,$n+1);
+                $realrows[] = $n+1;
+            }
+            $d[$n+1] = array_fill(0,$size,0);
+            $d[$n][$n] = $values[$i][0];
+            $d[$n][$n+1] = -$values[$i][1];
+            $d[$n+1][$n] = $values[$i][1];
+            $d[$n+1][$n+1] = $values[$i][0];
+            $n += 2;
+        } else {
+            // add multiple of last row to real rows
+            if ($n != $size-1) {
+                $mult = $mults[$size+$i];
+                $ops[] = array($size-1, $n, $mult);
+                $m = matrixrowcombine($m,$size-1,$mult,$n,1,$n);
+                $realrows[] = $n;
+            }
+            $d[$n][$n] = $values[$i];
+            $n++;
+        }
+    }
+
+    $sr = randfrom($realrows);
+    $mult = $GLOBALS['RND']->rand(-1,1);
+    if (is_array($values[count($values)-1]) && $m[$sr][$size-1]*$mult < 0) {
+        $mult *= -1;
+    }
+    $ops[] = array($sr,$size-1, $mult);
+    $m = matrixrowcombine($m,$sr,$mult,$size-1,1,$size-1);
+
+    for ($i=count($ops)-1; $i>-1; $i--) {
+        $mi = matrixrowcombine($mi,$ops[$i][0],-1*$ops[$i][2],$ops[$i][1],1,$ops[$i][1]);
+    }
+    
+    $evecs = [];
+    $r = 0;
+    foreach ($values as $v) {
+        if (!is_array($v)) { // real: use row as e-vec
+            $evecs[] = $m[$r];
+            $r++;
+        } else { // complex: use two rows as real and complex
+            $vec = [];
+            for ($i=0; $i<$size; $i++) {
+                $vec[] = [$m[$r+1][$i], $m[$r][$i]];
+            }
+            $evecs[] = $vec;
+            $r += 2;
+        }
+    }
+
+    $p = matrixtranspose($m);
+    $pinv = matrixtranspose($mi);
+    $A = matrixprod(matrixprod($p, $d), $pinv);
+    return [$A,$evecs];
+}
+
+function matrixFormatEigenvecs($evecs) {
+    $out = [];
+    foreach ($evecs as $evec) {
+        $elpts = []; $elpts2 = [];
+        $iscomplex = false;
+        foreach ($evec as $v) {
+            if (is_array($v)) {
+                $elpts[] = formatcomplex($v[0], $v[1]);
+                $elpts2[] = formatcomplex($v[0], -1*$v[1]);
+                $iscomplex = true;
+            } else {
+                $elpts[] = $v;
+                $elpts2[] = $v;
+            }
+        }
+        $out[] = '[('.implode('),(', $elpts).')]';
+        if ($iscomplex) {
+            $out[] = '[('.implode('),(', $elpts2).')]';
+        }
+    }
+    return $out;
+}
+
+function matrixCompare($m,$n,$tol='.001') {
+	// $m stu, $n correct
+	if (!is_array($m) || !is_array($n) || !is_array($m[0]) || !is_array($n[0])) {
+		return false;
+	}
+	if (count($m) != count($n) || count($m[0]) != count($n[0])) {
+		return false;
+	}
+	$toltype = 'rel';
+	if ($tol[0]=='|') {
+		$toltype = 'abs';
+		$tol = substr($tol,1);
+	}
+	$isequiv = true;
+	for ($r = 0 ; $r < count($m); $r++) {
+		for ($c = 0; $c < count($m[0]); $c++) {
+			if ($toltype == 'rel') {
+				if (abs($n[$r][$c]) < 1E-12) {
+					if (abs($m[$r][$c] - $n[$r][$c]) > $tol/1000 + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				} else {
+					if (abs($m[$r][$c] - $n[$r][$c])/(abs($n[$r][$c])+1E-12) > $tol + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				}
+			} else {
+				if (abs($m[$r][$c] - $n[$r][$c]) > $tol + 1E-12) {
+					$isequiv = false;
+					break 2;
+				}
+			}
+		}
+	}
+	return $isequiv;
+}
+
 ?>

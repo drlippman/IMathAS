@@ -1,6 +1,6 @@
 <html><body>
 <h1>Macro Library stats</h1>
-A library of Stats functions.  Version 1.20, Jan 8, 2021
+A library of Stats functions.  Version 1.30, Nov 20, 2021
 <BR><ul>
 <li><a href="#nCr">nCr</a></li>
 <li><a href="#nPr">nPr</a></li>
@@ -57,6 +57,7 @@ A library of Stats functions.  Version 1.20, Jan 8, 2021
 <li><a href="#anova2way">Two-way ANOVA: Data</a></li>
 <li><a href="#anova2way_f">Two-way ANOVA: F ratios/P values </a></li>
 <li><a href="#anova_table">ANOVA Table</a></li>
+<li><a href="#student_t">Two-sample student t-test</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -146,11 +147,13 @@ freqdist(array,label,start,classwidth)
 <BR>&nbsp;start: first lower class limit
 <BR>&nbsp;classwidth: width of the classes
 <BR><h3><a name="frequency">frequency</a></h3>
-frequency(array,start,classwidth)
+frequency(array,start,classwidth, [end])
 <BR>Returns an array of frequencies for the data grouped into classes
 <BR>&nbsp;array: array of data values
 <BR>&nbsp;start: first lower class limit
 <BR>&nbsp;classwidth: width of the classes
+<BR>&nbsp;end: end of last class. optional, but recommended to ensure the resulting array 
+    includes the last class.
 <BR><h3><a name="countif">countif</a></h3>
 countif(array,condition)
 <BR>Returns count of items in array that meet condition
@@ -284,16 +287,16 @@ chi2teststat(m)
 <BR>Computes the test stat sum((E-O)^2/E) given a matrix of values
 <BR><h3><a name="chi2cdf">chi2cdf</a></h3>
 chi2cdf(x,df)
-<BR>Computes the area to the left of x under the chi-squared disribution
+<BR>Computes the area to the left of x under the chi-squared distribution
 <BR>with df degrees of freedom
 <BR><h3><a name="invchi2cdf">invchi2cdf</a></h3>
 invchi2cdf(p,df)
-<BR>Compuates the x value with left-tail probability p under the
+<BR>Computes the x value with left-tail probability p under the
 <BR>chi-squared distribution with df degrees of freedom
 <BR><h3><a name="fcdf">fcdf</a></h3>
 fcdf(f,df1,df2)
 <BR>Returns the area to right of the F-value f for the f-distribution
-<BR>with df1 and df2 degrees of freedom (techinically it's 1-CDF)
+<BR>with df1 and df2 degrees of freedom (technically it's 1-CDF)
 <BR>Algorithm is accurate to approximately 4-5 decimals
 <BR><h3><a name="invfcdf">invfcdf</a></h3>
 invfcdf(p,df1,df2)
@@ -358,17 +361,17 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   <p>F ratio and the corresponding P value as an array in the form [F ratio, P value].</p>
   <p>&nbsp;</p>
   
-  <p><h3><a name="anova2way"></a><strong>anova2way</strong>(arr, [replication = False])</h3></p>
+  <p><h3><a name="anova2way"></a><strong>anova2way</strong>(arr, [replication = false])</h3></p>
   <p>Function anova2way() performs two-way analysis of variance (ANOVA) and returns ANOVA table as an array with each row corresponding to Factor A, Factor B, 
      their interaction (only with replication), error (residual), and totals. </p>
   <p><em>Parameters:</em></p>
   <ul>
-      <li><strong>arr</strong>: An array in the follwing form: 
-         for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factora A with three and Factor B with two levels, and there are four replicates in each group.
+      <li><strong>arr</strong>: An array in the following form: 
+         for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factor A with three and Factor B with two levels, and there are four replicates in each group.
          and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
       <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
                        (multiple observations for each group) or without replication (one observation per group)
-                       is to be performed. The default is False - without replication.</li>
+                       is to be performed. The default is false - without replication.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
@@ -377,23 +380,23 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
     And A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication), 
     error (residual), and total, respectively.</p>
   <p>&nbsp;</p>
-  <p><h3><a name="anova2way_f"></a><strong>anova2way_f</strong>(arr, [replication = False])</h3></p>
+  <p><h3><a name="anova2way_f"></a><strong>anova2way_f</strong>(arr, [replication = false])</h3></p>
   <p>Function anova2way_f() performs two-way analysis of variance (ANOVA) and returns F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true). </p>
   <p><em>Parameters:</em></p>
   <ul>
-    <li><strong>arr</strong>: An array in the follwing form: 
-      for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factora A with three and Factor B with two levels, and there are four replicates in each group.
+    <li><strong>arr</strong>: An array in the following form: 
+      for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factor A with three and Factor B with two levels, and there are four replicates in each group.
       and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
    <li><strong>replication</strong>: Optional - boolean (true or false) it specifies whether the ANOVA with replication
                     (multiple observations for each group) or without replication (one observation per group)
-                    is to be performed. The default is False - without replication.</li>
+                    is to be performed. The default is false - without replication.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
     as an array in the form  array([F_A,P_A],[F_B,P_B],[F_I,P_I]). </p>
   <p>&nbsp;</p>
   
-  <p><h3><a name="anova_table"></a><strong>anova_table</strong>(arr, [factor = 1, replication = False, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</h3></p>
+  <p><h3><a name="anova_table"></a><strong>anova_table</strong>(arr, [factor = 1, replication = false, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</h3></p>
   <p>Function anova_table() returns ANOVA table for both oneway and twoway ANOVA - display only. The output of anova1way() and 
    anova2way() can be used as the input array for this function. </p>
   <p><em>Parameters:</em></p>
@@ -404,7 +407,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
       <li><strong>factor</strong>: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.</li>
       <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
                        (multiple observations for each group) or without replication (one observation per group)
-                       is to be performed. The default is False - without replication.</li>
+                       is to be performed. The default is false - without replication.</li>
         <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; 
           the default is 12 decimal places. </li>
         <li><strong>NameA</strong>: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A". </li>
@@ -412,3 +415,18 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>ANOVA table for displaying data.</p>  
+  <p>&nbsp;</p>
+
+  <p><h3><a name="student_t"></a><strong>student_t</strong>(arr1, arr2, [equalVar = False, paired = False, roundto = 12])</h3></p>
+  <p>Function student_t() computes t statistic and corresponding P-value for two-sample student t-test.</p>
+
+  <p><em>Parameters:</em></p>
+  <ul>
+      <li><strong>arr1, arr2</strong>: Arrays in the form [2,3,4,5,...]; unequal sample sizes are accepted for independent samples. </li>
+      <li><strong>equalVar</strong>: Optional - Boolean. Set to true for equal population variances; default is false. </li>
+      <li><strong>paired</strong>: Optional - Boolean. Set to true for paired (dependent) samples; default is false.</li>
+      <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places.</li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>t statistic, corresponding P-value (area to the right of t-value -  one-tail), and degree of freedom for two sample student t-test as an array in the form [t, P-value, df].</p>
+  <p>&nbsp;</p> 

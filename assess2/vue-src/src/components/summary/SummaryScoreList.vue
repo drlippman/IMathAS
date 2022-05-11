@@ -8,6 +8,9 @@
       <td>
         <icons :name="question.status" />
         {{ $t('question_n', {n: index+1}) }}
+        <em v-if="question.extracredit" class="small subdued">
+          {{ $t('extracredit') }}
+        </em>
       </td>
       <td v-if="noTries[index]">
         {{ $t('scorelist.unattempted') }}

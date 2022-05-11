@@ -23,8 +23,6 @@ $(function() {
             advform.scrollIntoView(false);
         }
     }).on('hide.bs.dropdown', function () {
-        console.log("here");
-        console.log(datePickerDivID);
         if (datePickerDivID) {
             $("#"+datePickerDivID).css('visibility','hidden').css('display','none');
         }
@@ -147,8 +145,16 @@ function doAdvSearch() {
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
 }
-
+function startQuestionSearch(offset) {
+    if ($("#advsearchbtn").attr("aria-expanded") === 'true') {
+        doAdvSearch();
+    } else {
+        doQuestionSearch(offset);
+    }
+}
+var qsearchintransit = false;
 function doQuestionSearch(offset) {
+    if (qsearchintransit) { return; }
     offset = offset || 0;
     $("#searcherror").hide();
     var search = document.getElementById("search").value;
@@ -157,6 +163,8 @@ function doQuestionSearch(offset) {
         $("#search").focus();
         return;
     }
+    $("#searchspinner").show();
+    qsearchintransit = true;
     $.ajax({
         url: qsearchaddr,
         method: 'POST',
@@ -171,8 +179,12 @@ function doQuestionSearch(offset) {
         displayQuestionList(msg);
         document.getElementById("myTable").focus();
         document.getElementById("fullqsearchwrap").scrollIntoView();
+        $("#searchspinner").hide();
+        qsearchintransit = false;
     }).fail(function() {
         $("#searcherror").show();
+        $("#searchspinner").hide();
+        qsearchintransit = false;
     });
 }
 
@@ -375,7 +387,7 @@ function updateInAssessMarkers() {
     $("#selq tbody tr").each(function(i,el) {
         if (el.childNodes.length == 1) { return; }
         $(el.childNodes[1]).toggleClass('qinassess', 
-            existingq.indexOf(parseInt(el.childNodes[3].textContent)) !== -1);
+            existingq.indexOf(parseInt(el.childNodes[0].firstChild.value)) !== -1);
     });
 }
 
@@ -542,6 +554,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      }
      GB_show('Library Select','libtree2.php?libtree=popup&libs='+listlibs,500,500);
  }
+
  function setlib(libs) {
      //document.getElementById("libs").value = libs;
      curlibs = libs;
@@ -550,8 +563,56 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      doQuestionSearch();
  }
  function setlibnames(libn) {
-     document.getElementById("libnames").innerHTML = libn.replace(/<span.*?<\/span.*?>/g,'');
+     document.getElementById("libnames").innerHTML = libn.replace(/\s*<span.*?<\/span.*?>/g,'').replace(/\s+/g,' ').trim();
      $("#libnames").parent().show();
+
+    // this gets called after setlib, so we'll check for and update history here
+    setlibhistory();
+ }
+
+ var recentlibs = {'ids':[], 'names':[]};
+ var cookierecentlibs = readCookie("recentlibs");
+ if (cookierecentlibs !== null) {
+     recentlibs = JSON.parse(decodeURIComponent(cookierecentlibs));
+ }
+
+ function setlibhistory() {
+    var curloc = recentlibs.ids.indexOf(curlibs);
+    if (curloc != -1) { // remove if already in list
+        recentlibs.ids.splice(curloc,1);
+        recentlibs.names.splice(curloc,1);
+    }
+    recentlibs.ids.unshift(curlibs);
+    recentlibs.names.unshift(document.getElementById("libnames").innerHTML);
+    if (recentlibs.ids.length > 6) {
+        recentlibs.ids.pop();
+        recentlibs.names.pop();
+    }
+    document.cookie = "recentlibs=" + encodeURIComponent(JSON.stringify(recentlibs));
+    if (recentlibs.ids.length > 1) {
+        $('#searchtypemenu').children(":nth-child(n+4)").remove();
+        $('#searchtypemenu').append($("<li>", {
+            text: _("Recent Libraries"),
+            class: "dropdown-header"
+        }));
+        for (var i=1; i<recentlibs.ids.length; i++) {
+            const curi = i;
+            let libname = recentlibs.names[curi].replace(/&\w+;/g,'');
+            libname = libname.length > 50 ? libname.substring(0,49) + "..." : libname;
+        
+            $('#searchtypemenu').append($("<li>").append($("<a>", {
+                click: function (e) {
+                    setlib(recentlibs.ids[curi]);
+                    setlibnames(recentlibs.names[curi]);
+                    $(document).trigger("click"); // for some reason not happening automatically
+                    return false;
+                },
+                href: "#",
+                role: "button",
+                text: libname
+            })));
+        }
+    }
  }
  function assessselect() {
      var lista = '';

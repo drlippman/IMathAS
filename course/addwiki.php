@@ -53,7 +53,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$curBreadcrumb .= " &gt; Clear all Wiki Revisions\n";
 			$pagetitle = "Confirm Page Contents Delete";
 		}
-	} else if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
+	} else if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -178,7 +178,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$savetitle = _("Create Wiki");
 		}
 
-		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder'] ?? '0');
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
 		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 

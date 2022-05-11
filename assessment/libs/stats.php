@@ -10,7 +10,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
- "anova1way_f","anova1way","anova2way","anova_table","anova2way_f");
+ "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t");
 
 //nCr(n,r)
 //The Choose function
@@ -467,7 +467,7 @@ function freqdist($a,$label,$start,$cw) {
 // array: array of data values
 // start: first lower class limit
 // classwidth: width of the classes
-function frequency($a,$start,$cw) {
+function frequency($a,$start,$cw,$end=null) {
 	if (!is_array($a)) {
 		echo 'frequency expects an array';
 		return false;
@@ -476,7 +476,7 @@ function frequency($a,$start,$cw) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
-	while ($x <= $a[count($a)-1]+1e-10) {
+	while ($x <= ($end!==null ? $end : $a[count($a)-1]+1e-10)) {
 		$x += $cw;
 		$i = $curr;
 		while (($a[$i] < $x) && ($i < count($a))) {
@@ -1358,7 +1358,12 @@ function linreg($xarr,$yarr) {
 		$sxy += $xarr[$i]*$yarr[$i];
 	}
 	$n = count($xarr);
-	$r = ($n*$sxy - $sx*$sy)/(sqrt($n*$sxx-$sx*$sx)*sqrt($n*$syy-$sy*$sy));
+    $rd = (sqrt($n*$sxx-$sx*$sx)*sqrt($n*$syy-$sy*$sy));
+    if ($rd == 0) {
+        $r = 1; // perfect horizontal data
+    } else {
+	    $r = ($n*$sxy - $sx*$sy)/$rd;
+    }
 	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
 	$b = ($sy - $sx*$m)/$n;
 	return array($r,$m,$b);
@@ -2441,8 +2446,8 @@ function anova1way(... $arr){
 		if (!is_array($a)) { $a = explode(',',$a);};
 		$n[]=count($a);
 	}
-	if (count($n)<3) {
-		echo "Error: ANOVA requires three or more arrays";
+	if (count($n)<2) {
+		echo "Error: ANOVA requires two or more arrays";
 		return false;
 	}
 	$N=array_sum($n);	
@@ -2764,5 +2769,76 @@ function anova_table(array $array, int $factor = 1, $rep=False, int $roundto=12,
 	return $out;
 
 
+}
+
+//-------------------------------------------------Student t-test--------------------------------------------------
+// Function: student_t(arr1, arr2, [equalVar = False, paired = False, roundto = 12])
+// Computes t statistic and coressponding p-value for two sample student t-test 
+//
+// Parameters:
+// arr1, arr2: Arrays in the form [2,3,4,5,...]; unequal sample sizes are accepted for independent samples. 
+// equalVar: Optional - Boolean. Set to True for equal variances; default is False.
+// paired: Optional - Boolean. Set to True for paired (dependent) samples; default is False.
+// roundto: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places. 
+//  
+// Returns:
+// t statistic, coressponding p-value (area to the right of t-value -  one-tail), and degree of freedom for two sample student t-test: [t , P-value, df] 
+// where t is the t statistic, P is the P-value, and df is the degree of freedom used to evalute the P-value.
+
+function student_t($arr1, $arr2, bool $equalVar = False, bool $paired = False, int $roundto=12){
+
+	if (!is_array($arr1)) { $arr1 = explode(',',$arr1);};
+	if (!is_array($arr2)) { $arr2 = explode(',',$arr2);};
+
+	//means
+	$m1 = mean($arr1);
+	$m2 = mean($arr2);
+
+	//variances
+	$v1 = variance($arr1);
+	$v2 = variance($arr2);
+
+	//sample sizes
+	$n1=count($arr1);
+	$n2=count($arr2);
+
+	// t statistic for equal variances; independent samples
+	if ($equalVar==True && $paired==False){
+
+		$sp = sqrt((($n1-1)*$v1 + ($n2-1)*$v2)/($n1+$n2-2));  //pooled variance for equal-variance case
+		$t = round(($m1-$m2)/($sp*sqrt(1/$n1 + 1/$n2)), $roundto);
+		$df = $n1 + $n2 -2;
+
+	// t statistic for dependent samples (equal variances) 
+	} elseif ($equalVar == True && $paired == True){
+
+		if ($n1 != $n2) { echo 'error: the size of samples must be same for paired t-test'; return '';}
+
+		$diff=array();
+		for ($i=0; $i<$n1; $i++){
+			$diff[$i] = $arr1[$i] - $arr2[$i];
+		}
+
+		$mD = mean($diff); //mean of differences
+		$vD = variance($diff); //variance of differences
+		$t = round($mD/(sqrt($vD/$n1)), $roundto);
+		$df = $n1 - 1;
+
+		// t statistic for unequal variances; independent samples
+	} elseif ($equalVar == False && $paired == False) {
+
+		$t = round(($m1-$m2)/sqrt($v1/$n1 + $v2/$n2), $roundto);
+		$df_num = ($v1/$n1 + $v2/$n2)**2;
+		$df_den = ($v1/$n1)**2/($n1-1) + ($v2/$n2)**2/($n2-1);
+		$df = $df_num/$df_den;
+
+	} elseif ($equalVar == False && $paired == True){
+		echo 'error: In paired t-test, the population variances are equal, i.e., $equalVar must be set to True'; return '';
+
+	}
+
+	$p = 1- tcdf($t,$df,$roundto);
+
+	return [$t,$p,$df];//[$F_a,$p_a]
 }
 ?>

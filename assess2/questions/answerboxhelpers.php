@@ -18,13 +18,14 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}
-	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_!]+/','',$tocheck);
+	//why?  $cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_!]+/','',$tocheck);
+    $cleanans = $tocheck;
 
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
 	$cleanans = str_replace("exp","e",$cleanans);
-	$cleanans = preg_replace('/\^\((-?[\d\.]+)\)([^\d]|$)/','^$1$2', $cleanans);
-
+	$cleanans = preg_replace('/\^\((-?[\d\.]+)\)([^\d]|$)/','^$1 $2', $cleanans);
+    
 	if (is_numeric($cleanans) && $cleanans>0 && $cleanans<1) {
 		$cleanans = ltrim($cleanans,'0');
 	}
@@ -485,8 +486,8 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 		$shorttip = $islist?sprintf(_('Enter a %s of fractions or integers'), $listtype):_('Enter a fraction or integer');
 	} else if (in_array('reducedfraction',$ansformats)) {
 		if (in_array('fracordec',$ansformats)) {
-			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 or -2), or as an exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?sprintf(_('Enter a %s of reduced fractions, integers, or exact decimals'), $listtype):_('Enter a reduced fraction, integer, or exact decimal');
+			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 or -2), or as a decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?sprintf(_('Enter a %s of reduced fractions, integers, or decimals'), $listtype):_('Enter a reduced fraction, integer, or decimal');
 		} else {
 			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6) or as an integer (like 4 or -2)'), $eword);
 			$shorttip = $islist?sprintf(_('Enter a %s of reduced fractions or integers'), $listtype):_('Enter a reduced fraction or integer');
@@ -508,11 +509,11 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 		}
 	} else if (in_array('fracordec',$ansformats)) {
 		if (in_array("allowmixed",$ansformats)) {
-			$tip .= sprintf(_('Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?sprintf(_('Enter a %s of mixed numbers, fractions, or exact decimals'), $listtype):_('Enter a mixed number, fraction, or exact decimal');
+			$tip .= sprintf(_('Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer (like 4 or -2), or decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?sprintf(_('Enter a %s of mixed numbers, fractions, or decimals'), $listtype):_('Enter a mixed number, fraction, or decimal');
 		} else {
-			$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?sprintf(_('Enter a %s of fractions or exact decimals'), $listtype):_('Enter a fraction or exact decimal');
+			$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?sprintf(_('Enter a %s of fractions or decimals'), $listtype):_('Enter a fraction or decimal');
 		}
 	} else if (in_array('decimal',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as an integer or decimal value (like 5 or 3.72)'), $eword);
@@ -586,7 +587,8 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$answerbox = str_replace('<table ','<table style="display:inline-table;vertical-align:middle" ', $answerbox);
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
-	$partnum = $qn%1000;
+    $partnum = $qn%1000;
+    $out = '';
 
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
@@ -702,7 +704,7 @@ function normalizemathunicode($str) {
     $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
 	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
     $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
-	$str = preg_replace('/\bOO\b/i','oo', $str);
+	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
   if (strtoupper(trim($str))==='DNE') {
     $str = 'DNE';
   }
@@ -713,4 +715,53 @@ if (!function_exists('stripslashes_deep')) {
 	function stripslashes_deep($value) {
 		return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
 	}
+}
+
+// hasarrayval: 0 not array, 1 may be array, 2 must be array
+function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
+    if (isset($options[$key])) {
+        if ($multi) {
+            if ($hasarrayval == 2) { // the normal option value must be an array, so we have to do more logic
+                if (is_array($options[$key])) {
+                    if (isset($options[$key][$partnum]) && is_array($options[$key][$partnum])) {
+                        // we have an array at the part index
+                        return $options[$key][$partnum];
+                    } else {
+                        // no array at part index
+                        // check if entries that do exist are arrays
+                        if (is_array(current($options[$key]))) {
+                            // other entries are array, so this one just isn't defined
+                            // do nothing
+                        } else {
+                            // so array must be intended for all parts
+                            return $options[$key];
+                        }
+                    }
+                } // else invalid value - should be array
+            } else {
+                if (is_array($options[$key])) {
+                    if (isset($options[$key][$partnum])) {
+                        return $options[$key][$partnum];
+                    } 
+                } else {
+                    return $options[$key];
+                }
+            }
+        } else {
+            // single part question.
+            if (!is_array($options[$key]) || $hasarrayval > 0) {
+                // the normal option value may be an array, or option val is not array
+                // just return it
+                return $options[$key];
+            } 
+        }
+    }
+    // value not found
+    if ($key === 'answers') {
+        // common mistake to use $answer instead - look for that.
+        $altval = getOptionVal($options, 'answer', $multi, $partnum, $hasarrayval);
+        return $altval;
+    }
+    // no value - return empty string
+    return '';
 }

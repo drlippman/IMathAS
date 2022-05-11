@@ -56,19 +56,33 @@ if (!empty($_POST['makelineitem'])) {
         $iteminfo['submitby']=='by_assessment',
         $includeempty
     );
-    $lineitem = $launch->get_lineitem();
+    // $scores may include scores from multiple LMS courses, all tied to the same
+    // imathas course. So we'll need to grab all the lineitems and match them up to 
+    // users.
+    $lineitems = [];
+    $lineitems[$localcourse->get_id()] = $launch->get_lineitem();
+    $stm = $DBH->prepare("SELECT lticourseid,lineitem FROM imas_lti_lineitems WHERE itemtype=0 AND typeid=?");
+    $stm->execute([$aid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $lineitems[$row['lticourseid']] = $row['lineitem'];
+    }
+
     require(__DIR__ . '/../includes/ltioutcomes.php');
     $cnt = 0;
     foreach ($scores as $scoredata) {
+        if (!isset($lineitems[$scoredata['lticourseid']])) {
+            continue; // don't have lineitem for this course
+        }
         $sourcedid = 'LTI1.3:|:' . $scoredata['ltiuserid'] . 
-            ':|:' . $lineitem . ':|:' . $platform_id;
+            ':|:' . $lineitems[$scoredata['lticourseid']] . ':|:' . $platform_id;
         calcandupdateLTIgrade(
             $sourcedid,
             $aid,
             $scoredata['userid'],
             $scoredata['score'],
             true,
-            $iteminfo['ptsposs']
+            $iteminfo['ptsposs'],
+            false
         );
         $cnt++;
     }
@@ -76,7 +90,7 @@ if (!empty($_POST['makelineitem'])) {
     if (!empty($GLOBALS['CFG']['LTI']['usequeue'])) {
         $scoreresendmsg .= ' '._('It may take a couple minutes for the updates to show in the LMS.');
     }
-}
+} 
 
 
 //HTML Output

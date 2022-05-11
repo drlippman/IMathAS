@@ -69,6 +69,10 @@
   cursor: pointer;
   /*font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;*/
 }
+.mqed-closebtn {
+    padding: 2px 8px !important;
+    border: 0;
+}
 .mqed-btn.mq-math-mode {
   font-size: 18px;
 }

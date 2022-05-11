@@ -177,6 +177,7 @@
             if (!isset($qtotal[$questionId])) { $qtotal[$questionId] = 0; }
             if (!isset($attempts[$questionId])) { $attempts[$questionId] = 0; }
             if (!isset($timeontask[$questionId])) { $timeontask[$questionId] = 0; }
+            if (!isset($timeontaskperversion[$questionId])) { $timeontaskperversion[$questionId] = 0; }
 
             // How many times this question was displayed to all students.
             $qcnt[$questionId] += 1;
@@ -184,27 +185,29 @@
             // The number of tries on this question. Use max tries on any part.
             if (!empty($scoredQuestion['scored_try'])) {
                 $scoredTries = array_map(function($n) { return ++$n; }, $scoredQuestion['scored_try']);
-                $attempts[$questionId] += max($scoredTries);
                 // Figure out if any part of the question is incomplete.
                 // Skip if a score override is set.  TODO: actually look per-part
                 $untried = array_keys($scoredQuestion['scored_try'], -1);
-								if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride'])) {
-									$overridden = array_keys($scoredQuestion['scoreoverride']);
-									if (count(array_diff($untried, $overridden)) > 0) {
-										$qincomplete[$questionId] += 1;
-										continue;
-									}
-								} else if (count($untried) > 0) {
-									$qincomplete[$questionId] += 1;
-									continue;
-								}
+                if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride'])) {
+                    $overridden = array_keys($scoredQuestion['scoreoverride']);
+                    if (count(array_diff($untried, $overridden)) > 0) {
+                        $qincomplete[$questionId] += 1;
+                        continue;
+                    }
+                } else if (count($untried) > 0) {
+                    $qincomplete[$questionId] += 1;
+                    continue;
+                }
             } else {
-							// not even tried yet
-							$qincomplete[$questionId] += 1;
-							continue;
-						}
+                // not even tried yet
+                $qincomplete[$questionId] += 1;
+                continue;
+            }
 
-						// Total number of times this question was RE-generated for all students.
+            // number of tries on the question version
+            $attempts[$questionId] += max($scoredTries);
+
+            // Total number of times this question was RE-generated for all students.
             // Reduce by one to exclude the first generated question.
             $regens[$questionId] += count($questionData['question_versions']) - 1;
 
@@ -278,7 +281,7 @@
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
-		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail2.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
+		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail2.php?cid=$cid&aid=$aid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
@@ -308,7 +311,7 @@
 		//$qs = array_keys($qtotal);
 		$qslist = array_map('Sanitize::onlyInt',$itemarr);
 		$query_placeholders = Sanitize::generateQueryPlaceholders($qslist);
-		$query = "SELECT imas_questionset.description,imas_questions.id AS qid,imas_questions.points,imas_questionset.id AS qsid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref,imas_questions.showwork ";
+		$query = "SELECT imas_questionset.description,imas_questions.id AS qid,imas_questions.points,imas_questionset.id AS qsid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref,imas_questions.showwork,imas_questions.extracredit ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($query_placeholders)";
 		$stm = $DBH->prepare($query);
@@ -320,6 +323,7 @@
 		$needmanualgrade = array();
         $showextref = array();
         $showwork = array();
+        $extracredit = array();
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$descrips[$row['qid']] = $row['description'];
 			$points[$row['qid']] = $row['points'];
@@ -338,6 +342,7 @@
 				$showextref[$row['qid']] = false;
             }
             $showwork[$row['qid']] = (($row['showwork'] == -1 && $showworkdef > 0) || $row['showwork'] > 0);
+            $extracredit[$row['qid']] = $row['extracredit'];
 		}
 
 		$avgscore = array();
@@ -412,8 +417,12 @@
             }
             echo "</td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
+			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
+            if ($extracredit[$qid] == 1) {
+                echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
+            }
+            echo '</td>';
 			if ($submitby == 'by_question') {
 				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
@@ -433,7 +442,7 @@
 			if ($showhints) {
 				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
-                        $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])));
+                        $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
 					echo '<td class="c">N/A</td>';
 				}

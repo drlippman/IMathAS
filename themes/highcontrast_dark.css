@@ -260,6 +260,9 @@ table.stats thead tr th {
 .drawtools span {
 	color: #000;
 }
+.drawtools span, .drawtools img {
+    background-color: #fff;
+}
 div.tips {
 	color: #000;
 }
@@ -289,5 +292,17 @@ button.plain {
     background-color: #eee;
 }
 .dialog {
+    color: #000;
+}
+.bigquestionwrap .headerpane {
+    background-color: #222;
+}
+.fbbox {
+    background-color: #000;
+}
+.menubutton * {
+    color: #000;
+}
+.filealt-btn {
     color: #000;
 }

@@ -194,7 +194,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$module_meta .= '<module identifier="BLOCK'.$blockid.'">'."\n";
 					$module_meta .= '  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$module_meta .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
-					if ($item['avail'] == 1 && $item['SH']{0} == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
+					if ($item['avail'] == 1 && $item['SH'][0] == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
 						$module_meta .= '  <unlock_at>'.gmdate("Y-m-d\TH:i:s", $item['startdate']).'</unlock_at>'."\n";
 					}
 					$module_meta .= '  <items>';
@@ -372,7 +372,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 				fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 				fwrite($fp,' <title >'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
-				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res)).'</text>');
+				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res),ENT_XML1,'UTF-8',false).'</text>');
 				fwrite($fp,'</topic>');
 				fclose($fp);
 

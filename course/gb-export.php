@@ -39,7 +39,7 @@
 			echo "&emailgb=" . Sanitize::encodeUrlParam($_GET['emailgb']);
 		}
 		echo '" class="nolimit">';
-		if ($_GET['emailgb']=="ask") {
+		if (isset($_GET['emailgb']) && $_GET['emailgb']=="ask") {
 			echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
 		}
 
@@ -115,6 +115,7 @@
 		$gb = preg_replace('/<su(p|b)>.*?<\/su(p|b)>/', '', $gb);
 		$gb = preg_replace('/<\/tr>.*?<tr.*?>/',';;tr;;', $gb);
 		$gb = preg_replace('/<\/t(d|h)>\s*<t(d|h).*?>/',';;td;;', $gb);
+        $gb = preg_replace('/\(\w\w\)/','', $gb);
 		$gb = strip_tags($gb);
 		$gb = explode(';;tr;;', $gb);
 		foreach ($gb as $k=>$row) {
@@ -567,7 +568,7 @@ function gbinstrdisp() {
 						} else {
 							echo '<sup>e</sup>';
 						}
-					}
+                    }
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 
 					if (isset($gbt[$i][1][$j][0])) {
@@ -588,6 +589,9 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
+                }
+                if (!empty($gbt[$i][1][$j][14])) { //excused
+					echo '<sup>x</sup>';
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';

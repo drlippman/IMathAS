@@ -54,7 +54,7 @@ if ($type == 'qver') {
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 if ($istutor) {
   $tutoredit = $assess_info->getSetting('tutoredit');
-  if ($tutoredit != 1) { // no Access for editing scores
+  if (($tutoredit&1) != 1) { // no Access for editing scores
     echo '{"error": "no_access"}';
     exit;
   }
@@ -130,7 +130,7 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 $assess_record->saveRecord();
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, false);
 
 //output JSON object
 echo json_encode($assessInfoOut);

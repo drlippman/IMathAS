@@ -55,9 +55,9 @@
 		$secfilter = -1;
 	}
 
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,ver FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -71,7 +71,7 @@
 		echo "You not have access to view scores for this assessment";
 		require("../footer.php");
 		exit;
-	} else if ($isteacher || ($istutor && $tutoredit==1)) {
+	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
 	} else {
 		$canedit = 0;
@@ -79,7 +79,7 @@
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all', false, false);
+	$assess_info->loadQuestionSettings($qid, true, false);
 	$ptsposs = $assess_info->getQuestionSetting($qid, 'points_possible');
 
 	if (isset($_GET['update']) && $canedit) {
@@ -123,12 +123,13 @@
 		$DBH->beginTransaction();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_records.* FROM imas_users,imas_assessment_records ";
 		$query .= "WHERE imas_assessment_records.userid=imas_users.id AND imas_assessment_records.assessmentid=:assessmentid ";
-		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
-		if ($page != -1 && isset($_GET['userid'])) {
-			$query .= " AND userid=:userid";
+		if ($page != -1 && !$onepergroup && isset($_POST['userid'])) {
+			$query .= " AND imas_users.id=:userid ";
 		}
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
+		
 		$stm = $DBH->prepare($query);
-		if ($page != -1 && isset($_GET['userid'])) {
+		if ($page != -1 && !$onepergroup && isset($_POST['userid'])) {
 			$stm->execute(array(':assessmentid'=>$aid, ':userid'=>$_POST['userid']));
 		} else {
 			$stm->execute(array(':assessmentid'=>$aid));
@@ -136,6 +137,7 @@
 		$cnt = 0;
 		$updatedata = array();
 		$changesToLog = array();
+
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 
 			$GLOBALS['assessver'] = $line['ver'];
@@ -204,7 +206,7 @@
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
 					$gbscore = $assess_record->getGbScore();
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true);
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true, -1, false);
 				}
 			}
 		}
@@ -263,8 +265,12 @@
 
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
-	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-
+    $sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+    
+    $points = $assess_info->getQuestionSetting($qid, 'points_possible');
+    $rubric = $assess_info->getQuestionSetting($qid, 'rubric');
+    $qsetid = $assess_info->getQuestionSetting($qid, 'questionsetid');
+/*
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
@@ -279,8 +285,8 @@
 	if ($points==9999) {
 		$points = $defpoints;
 	}
-
-	$lastupdate = '051620';
+*/
+	$lastupdate = '030222';
 	function formatTry($try,$cnt,$pn,$tn) {
 		if (is_array($try) && $try[0] === 'draw') {
 			$id = $cnt.'-'.$pn.'-'.$tn;
@@ -307,8 +313,8 @@
 
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=121320"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=030322"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -361,7 +367,10 @@
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
 	}
-	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}</style>';
+	$placeinhead .= '<style type="text/css"> 
+        .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
+        .hoverbox { background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);}
+		</style>';
 	require("../includes/rubric.php");
 	$_SESSION['coursetheme'] = $coursetheme;
 	require("../header.php");
@@ -371,8 +380,11 @@
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h1></div>";
-	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
-	echo '<div class="cpmid">';
+	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions";
+    if ($submitby == 'by_assessment') {
+        echo '<br>Note: Only students who have submitted their assessment will show here.';
+    }
+	echo '</p><div class="cpmid">';
 	if ($page==-1) {
 		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
@@ -398,8 +410,9 @@
         echo _('Hide').':</p><ul style="list-style-type: none; margin:0; padding-left: 15px;">';
         echo '<li><label><input type=checkbox id="filter-unans" onchange="updatefilters()">'._('Unanswered Questions').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-zero" onchange="updatefilters()">'._('Score = 0').'</label></li>';
-        echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100%').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100% (before penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-perfect" onchange="updatefilters()">'._('Score = 100% (before penalties)').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-100" onchange="updatefilters()">'._('Score = 100% (after penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
         echo '</ul>';
@@ -410,6 +423,7 @@
     echo ' <button type="button" onclick="showallwork()">'._('Show All Work').'</button>';
     echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
     echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
+    echo ' <button type="button" onclick="toggleScrollingScoreboxes()">'._('Floating Scoreboxes').'</button>';
 	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
 		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
@@ -452,6 +466,9 @@
 		if ($hidelocked) {
 			$query .= "AND imas_students.locked=0 ";
 		}
+        if ($submitby == 'by_assessment') {
+            $query .= "AND (imas_assessment_records.status & 64)=64 ";
+        }
 		if ($secfilter != -1) {
 			$query .= "AND imas_students.section=:section ";
 			$qarr[':section'] = $secfilter;
@@ -478,6 +495,9 @@
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
 	}
+    if ($submitby == 'by_assessment') {
+        $query .= "AND (imas_assessment_records.status & 64)=64 ";
+    }
 	if ($secfilter != -1) {
 		$query .= "AND imas_students.section=:section ";
 		$qarr[':section'] = $secfilter;
@@ -507,7 +527,7 @@
 
 		$groupdup = false;
 		if ($line['agroupid']>0) {
-			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
+			//$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
 			if (isset($onepergroup[$line['agroupid']])) {
 				$groupdup = true;
 			} else {
@@ -518,7 +538,7 @@
 			if ($isgroup) {
 				$groupdup = true;
 			}
-			$s3asid = $asid; // TODO: revisit this
+			//$s3asid = $asid; // TODO: revisit this
 		}
 
 		// get an array of qn=>qid
@@ -528,7 +548,6 @@
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
 			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
-
 			$answeightTot = array_sum($qdata['answeights']);
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
@@ -557,6 +576,9 @@
                     $classes = 'qfilter-zero';
                 }
             }
+            if (abs($qdata['score'] - $qdata['points_possible']) < .002) {
+                $classes .= ' qfilter-100';
+            }
             if (trim($qdata['feedback']) !== '') {
                 $classes .= ' qfilter-fb';
             }
@@ -567,7 +589,7 @@
 			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
 
-			if (!$groupdup) {
+			if ($isgroup > 0 && !$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
 					echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
@@ -609,7 +631,7 @@
 			echo '</div>';
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
-			if (!$groupdup) {
+			if ($isgroup > 0 && !$groupdup) {
 				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
 			}
 			if ($isgroup) {
@@ -645,7 +667,7 @@
 
 				if ($canedit) {
 					$boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
-					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
+					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\" pattern=\"N\/A|\d*\.?\d*\">";
 					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					if ($rubric != 0) {
 						$fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);
@@ -735,11 +757,22 @@
 				echo Sanitize::outgoingHtml($qdata['feedback']);
 				echo '</div>';
 			}
-			echo '<br/>Question #'.($loc+1);
+			echo '<br/>' . _('Question').' #'.($loc+1);
+            echo ', '._('version').' '.($qdata['ver']+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
                     'to' => $line['userid'])) . "\">Use in Message</a>";
             echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
+            if (!empty($qdata['timeactive']['total']) || !empty($qdata['lastchange'])) {
+                echo '<br/>';
+                if (!empty($qdata['timeactive']['total'])) {
+                    echo _('Time spent on this version').': ';
+                    echo round($qdata['timeactive']['total']/60, 1)._(' minutes').'. ';
+                }
+                if (!empty($qdata['lastchange'])) {
+                    echo _('Last Changed').' '.$qdata['lastchange'];
+                }
+            }
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {

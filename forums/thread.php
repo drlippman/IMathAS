@@ -342,7 +342,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		    $name = sprintf("%s %s", Sanitize::encodeStringForDisplay($row[4]),
                 Sanitize::encodeStringForDisplay($row[5]));
 		}
-		printf("<br/>Posted by: %s, ", Sanitize::encodeStringForDisplay($name));
+		printf("<br/>Posted by: <span class='pii-full-name'>%s</span>, ", Sanitize::encodeStringForDisplay($name));
 		echo tzdate("F j, Y, g:i a",$row[6]);
 
 		echo "</div><div class=blockitems>";
@@ -383,7 +383,7 @@ $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/foru
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
-$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
+$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid';</script>";
 require("../header.php");
 
 
@@ -782,7 +782,7 @@ echo "</p>";
 				if ($line['lastposttime']>$now) {
 					echo '</i>';
 				}
-				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
+				printf("<td><span class='pii-full-name'>%s</span></td>\n", Sanitize::encodeStringForDisplay($name));
 
 				if ($isteacher && $groupsetid>0 && !$dofilter) {
 					echo '<td class=c>'.Sanitize::encodeStringForDisplay($groupnames[$line['stugroupid']]).'</td>';
@@ -796,7 +796,7 @@ echo "</p>";
 					echo '<td class="c">';
 				}
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']]).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
-				if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {
+				if ($lastpost=='' || !isset($lastview[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
 					echo " <span class=\"noticetext\">New</span>";
 				}
 				echo "</td></tr>\n";

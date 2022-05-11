@@ -15,9 +15,11 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Make Exception";
 $cid = Sanitize::courseId($_GET['cid']);
-$asid = Sanitize::onlyInt($_GET['asid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
+$asid = Sanitize::onlyInt($_GET['asid'] ?? 0);
 $uid = Sanitize::onlyInt($_GET['uid']);
+$rpq =  Sanitize::randomQueryStringParam();
+
 if (isset($_GET['stu'])) {
 	$stu = $_GET['stu'];
 } else {
@@ -61,7 +63,13 @@ if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 
 $curBreadcrumb .= "<a href=\"$backurl\">Assessment Detail</a> &gt Make Exception\n";
 
-if (!(isset($teacherid))) { // loaded by a NON-teacher
+if (isset($tutorid)) {
+    $stm = $DBH->prepare('SELECT tutoredit FROM imas_assessments WHERE id=?');
+    $stm->execute([$aid]);
+    $tutoredit = $stm->fetchColumn(0);
+}
+
+if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif (!(isset($_GET['cid']))) {
@@ -198,7 +206,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else if (isset($_GET['clear'])) {
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['clear']));
-		$rpq =  Sanitize::randomQueryStringParam();
 		header('Location: ' . $backurl);
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
@@ -234,6 +241,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
             $timeext = 0;
             $attemptext = 0;
+            $curwaive = 0;
+            $curepenalty = null;
         }
 		if ($isDateByLTI) {
 			$page_isExceptionMsg .= '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
@@ -291,7 +300,7 @@ if ($overwriteBody==1) {
 	<div id="headerexception" class="pagetitle"><h1>Make Start/Due Date Exception</h1></div>
 
 <?php
-	echo '<h2>'.Sanitize::encodeStringForDisplay($stuname).'</h2>';
+	echo '<h2><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($stuname).'</span></h2>';
 	echo $page_isExceptionMsg;
 	echo '<p><span class="form">Assessment:</span><span class="formright">';
 	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($_GET['aid']),"Select an assessment","", " onchange='nextpage()'");

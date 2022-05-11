@@ -167,27 +167,27 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
 
 $useeqnhelper = $eqnhelper;
-$lastupdate = '20200422';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
+$lastupdate = '20210401';
+$placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=112020" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=040322" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=040322" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=021121" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100120" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=022021" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=041822" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=112020" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
-  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=031821">
+  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=070221">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
 $placeinhead .= '<script>
   function loadNewVersion() {
@@ -366,6 +366,9 @@ if ($overwriteBody==1) {
     'showans' => true,
     'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
   ]);
+  if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
+      $disp['jsparams']['noMQ'] = true;
+  }
   if (!empty($disp['errors'])) {
     echo '<ul class="small">';
     foreach ($disp['errors'] as $err) {
@@ -420,14 +423,15 @@ if ($overwriteBody==1) {
 	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
 	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
   if ($line['ownerid'] == $userid) {
-    echo '<a href="moddataset.php?cid='. Sanitize::courseId($sendcid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
+    echo '<a href="moddataset.php?cid='. Sanitize::courseId($cid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
     echo _('Edit Question') . '</a>';
   } else {
 	  echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems");
   }
   echo '</p>';
 
-	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
+	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." <span class='pii-full-name'>%s</span></p>",
+        Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>"._("Last Modified:")." $lastmod</p>";
 	if ($line['deleted']==1) {
@@ -449,12 +453,13 @@ if ($overwriteBody==1) {
 	}
 	echo '</p>';
 
-	echo '<p>'._('Question is in these libraries:');
+	echo '<p>'._('Question is in these libraries:').'</p>';
 	echo '<ul>';
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {
-            printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+            printf(' (<span class="pii-full-name">%s, %s</span>)',
+                Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
             echo ' <a class="small" href="#" onclick="dellibitems('.Sanitize::onlyInt($row[3]).',';
             echo Sanitize::onlyInt($row[4]).',this);return false;">';
             echo _('Remove all questions in this library added by this person');
@@ -462,7 +467,7 @@ if ($overwriteBody==1) {
 		}
 		echo '</li>';
 	}
-	echo '</ul></p>';
+	echo '</ul>';
 
 	if ($line['ancestors']!='') {
 		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);

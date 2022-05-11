@@ -11,7 +11,7 @@ $DBH->beginTransaction();
 	return false;
  }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added attemptext to imas_exceptions</p>";
 

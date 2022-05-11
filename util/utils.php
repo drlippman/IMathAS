@@ -152,19 +152,19 @@ if (isset($_GET['listadmins'])) {
 	$stm = $DBH->query($query.' WHERE iu.rights=100 ORDER BY LastName,FirstName');
 	echo '<h2>Full Admins</h2><ul>';
 	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
 	echo '<h2>Group Admins</h2><ul>';
 	$stm = $DBH->query($query.' WHERE iu.rights=75 ORDER BY LastName,FirstName');
 	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
 	echo '<h2>Global Account Approvers</h2><ul>';
 	$stm = $DBH->query($query.' WHERE iu.rights>39 AND (iu.specialrights&64)=64 ORDER BY LastName,FirstName');
 	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
 	require("../footer.php");
@@ -250,10 +250,10 @@ if (isset($_GET['form'])) {
 				$teach_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
 				$lti_stm = $DBH->prepare("SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=:userid");
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
+					echo '<p><b><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</span></b></p>';
 					echo '<form method="post" action="../admin/actions.php?id='.Sanitize::encodeUrlParam($row['id']).'">';
 					echo '<input type=hidden name=action value="resetpwd" />';
-					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.Sanitize::encodeUrlParam($row['id']).'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
+					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.Sanitize::encodeUrlParam($row['id']).'"><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></a></li>';
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
 						echo '<li>Group: '.Sanitize::encodeStringForDisplay($row['name']);
@@ -269,7 +269,7 @@ if (isset($_GET['form'])) {
 						}
 					}
 					echo '<li><a href="utils.php?emulateuser='.Sanitize::encodeUrlParam($row['id']).'">Emulate User</li>';
-					echo '<li>Email: '.Sanitize::encodeStringForDisplay($row['email']).'</li>';
+					echo '<li>Email: <span class="pii-email">'.Sanitize::encodeStringForDisplay($row['email']).'</span></li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.Sanitize::encodeStringForDisplay($row['rights']).' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.Sanitize::encodeUrlParam($row['id']).'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
@@ -325,7 +325,7 @@ if (isset($_GET['form'])) {
 
 		} else {
 			echo '<form method="post" action="utils.php?form=lookup">';
-			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>, or email: <input type="text" name="email"/>';
+			echo 'Look up user:  LastName: <input type="text" class="pii-last-name" name="LastName" />, FirstName: <input type="text" class="pii-first-name" name="FirstName" />, or username: <input type="text" class="pii-username" name="SID"/>, or email: <input type="text" class="pii-email" name="email"/>';
 			echo '<input type="submit" value="Go"/>';
 			echo '</form>';
 		}

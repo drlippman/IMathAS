@@ -35,11 +35,15 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       } else {
         // need to find the assessment
         $destaid = false;
-        if ($target['refcid'] == $localcourse->get_copiedfrom()) {
+        if ($target['refcid'] === null) {
+            // if assessment has been deleted so refcid is null
+            // see if we already have a descendant of the assessment
+            $destaid = $db->find_aid_by_loose_ancestor($sourceaid, $destcid);
+        } else if ($target['refcid'] == $localcourse->get_copiedfrom()) {
           // aid is in the originally copied course - find our copy of it
           $destaid = $db->find_aid_by_immediate_ancestor($sourceaid, $destcid);
         }
-        if ($destaid === false) {
+        if ($destaid === false && $target['refcid'] !== null) {
           // try looking further back
           $destaid = $db->find_aid_by_ancestor_walkback(
             $sourceaid,
@@ -49,7 +53,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         }
         if ($destaid === false) {
           // can't find assessment - copy it
-          require(__DIR__.'/../includes/copycourse.php');
+          require_once(__DIR__.'/../includes/copycourse.php');
           $destaid = copyassess($sourceaid, $destcid);
         }
         if ($destaid !== false) {

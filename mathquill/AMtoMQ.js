@@ -79,25 +79,25 @@ var AMQsymbols = [
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
-//{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
+{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
 //{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", ttype:UNDEROVER},
-//{input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
+{input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
 //{input:"vvv", tag:"mo", output:"\u22C1", tex:"bigvee", ttype:UNDEROVER},
 {input:"nn",  tag:"mo", output:"\u2229", tex:"cap", ttype:CONST},
 //{input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
-{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
+//{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 //{input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
 {input:"xx", tex:"times", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
 //{input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
-{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
-{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+//{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
+//{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
-{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
-{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
+//{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
+//{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
 {input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 //{input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
@@ -135,6 +135,8 @@ var AMQsymbols = [
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
+{input:"=>",  tag:"mo", output:"\u21D2", tex:"implies", ttype:CONST},
+{input:"<=>", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
 //{input:"CC",  tag:"mo", output:"\u2102", tex:"mathbb{C}", ttype:CONST, notexcopy:true},
 //{input:"NN",  tag:"mo", output:"\u2115", tex:"mathbb{N}", ttype:CONST, notexcopy:true},
 //{input:"QQ",  tag:"mo", output:"\u211A", tex:"mathbb{Q}", ttype:CONST, notexcopy:true},
@@ -711,16 +713,21 @@ function AMQTparseExpr(str,rightbracket) {
 
 AMQinitSymbols();
 
-return function(str) {
+return function(str,elid) {
  AMQnestingDepth = 0;
   str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
-  str = str.replace(/^\s*<([^<].*?[^>])>\s*$/,"<<$1>>");
+  str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
   str = str.replace(/all\s+real\s+numbers/g,'"all real numbers"');
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
   str = str.replace(/\bDNE\b/gi,'"DNE"');
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/interval/)
+  ) {
+      str = str.replace(/\bU\b/g,'cup');
+  }
   if (str.match(/\S/)==null) {
 	  return "";
   }
@@ -771,7 +778,9 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
-    tex = tex.replace(/\\cup/g,'U');
+    tex = tex.replace(/\\cup/g,'U').replace(/\\sim/g,'~');
+    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');
+    tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');
 	tex = tex.replace(/\\left\\{/g,'lbrace').replace(/\\right\\}/g,'rbrace');
 	tex = tex.replace(/\\left/g,'');
@@ -785,6 +794,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');
+    
 	while ((i=tex.indexOf('frac{'))!=-1) { //found a fraction start
 		nested = 1;
 		curpos = i+5;
@@ -799,7 +809,8 @@ function MQtoAM(tex,display) {
 		} else {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
-	}
+    }
+    
     //separate un-braced subscripts using latex rules
     tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
     tex = tex.replace(/(\^|_)([+\-])([^\^])/g, '$1$2 $3');  
@@ -810,16 +821,18 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/_{(\w+)}$/g,'_($1)');
 	tex = tex.replace(/{/g,'(').replace(/}/g,')');
 	tex = tex.replace(/lbrace/g,'{').replace(/rbrace/g,'}');
-	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
+	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2 ');  //change (2)/(3) to 2/3
 	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
 	tex = tex.replace(/\(([\d\.]+)\)\//g,'$1/');  //change (3)/ to 3/
 	tex = tex.replace(/\/\(([\a-zA-Z])\)/g,'/$1');  //change /(x) to /x
 	tex = tex.replace(/\(([\a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
+  tex = tex.replace(/\^\((-?[\d\.]+)\)(\d)/g,'^$1 $2');
   tex = tex.replace(/\^\(-1\)/g,'^-1');
-	tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
-  tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2');  //change /(x^n) to /x^n
+  tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
+  tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
   tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/text\(([^)]*)\)/g, '$1');
-  return tex;
+  tex = tex.replace(/\(\s*(\w)/g,'($1').replace(/(\w)\s*\)/g,'$1)');
+  return tex.replace(/^\s+|\s+$/g,'');
 }

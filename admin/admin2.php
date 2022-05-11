@@ -125,7 +125,28 @@ if ($myrights < 75) {
   }
 
   //load group details data (shows on group admin too)
-  if ($page=='groupadmin' || $page=='groupdetails') {
+  if (isset($_POST['updaterights'])) {
+    $qarr = explode(',', $_POST['userlist']);
+    $ph = Sanitize::generateQueryPlaceholders($qarr);
+    $newrights = intval($_POST['newrights']);
+    if ($newrights != 20 && $newrights != 40) {
+      echo 'Invalid rights';
+      exit;
+    }
+    array_unshift($qarr, $newrights);
+    $query = "UPDATE imas_users SET rights=? WHERE id IN ($ph) AND rights<75";
+    if ($myrights < 100) {
+      $query .= ' AND groupid=?';
+      $qarr[] = $groupid;
+    }
+    $stm = $DBH->prepare($query);
+    $stm->execute($qarr);
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php?groupdetails=".Sanitize::encodeUrlParam($showgroup). "&r=" .Sanitize::randomQueryStringParam());
+    exit;
+  } else if (isset($_POST['checked'])) { //initiating rights change
+    $userlist = implode(',', array_map('intval', $_POST['checked']));
+    $page = 'changerights';
+  } else if ($page=='groupadmin' || $page=='groupdetails') {
     if ($showgroup==-1) {
       $stm = $DBH->query("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName,FirstName");
     } else {
@@ -286,8 +307,20 @@ if ($overwriteBody==1) {
         }
         echo '</div>';
       }
+      echo '<form method="post" id="uform">';
+      if ($showgroup>-1) {
+        echo '<p>'._('Check').': ';
+        echo '<a href="#" onclick="return chkAllNone(\'uform\',\'checked[]\',true)">'._('All').'</a> ';
+        echo '<a href="#" onclick="return chkAllNone(\'uform\',\'checked[]\',false)">'.('None').'</a> ';
+        echo _('With Selected:');
+        echo ' <button type=submit name=chgrights>'._('Change Rights').'</button>';
+        echo '</p>';
+      }
       echo '<table class=gb id="myTable">';
   		echo '<thead><tr>';
+      if ($showgroup>-1) {
+        echo '<th><span class="sr-only">Select</span></th>';
+      }
       echo '<th>'._('Name').'</th>';
       echo '<th>'._('Username').'</th>';
       echo '<th>'._('Email').'</th>';
@@ -302,6 +335,12 @@ if ($overwriteBody==1) {
       $alt = 0;
       foreach ($groupdata as $user) {
           if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+          if ($showgroup>-1) {
+            echo '<td><input type=checkbox name="checked[]" value="'.intval($user['id']).'" id="cb'.intval($user['id']).'" />';
+            echo '<label class="sr-only" for="cb'.intval($user['id']).'">';
+            echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']).'</label>';
+            echo '</td>';
+          }
           if ($page=='groupdetails') {
             echo '<td><a href="userdetails.php?group='.$showgroup.'&id='.Sanitize::encodeUrlParam($user['id']).'">';
           } else {
@@ -319,10 +358,24 @@ if ($overwriteBody==1) {
           echo '</tr>';
       }
       echo '</tbody></table>';
+      echo '</form>';
       echo '<script type="text/javascript">
   		  initSortTable("myTable",Array("S","S","S","S","D",false'.(($page != 'groupadmin')?',false':'').'),true);
   		  </script>';
 
+    } else if ($page=='changerights') {
+      if ($userlist == '') {
+        echo _('No one selected');
+        exit;
+      }
+      echo '<form method="post">';
+      echo '<input type=hidden name=updaterights value=1/>';
+      echo '<input type=hidden name=userlist value="'.Sanitize::encodeStringForDisplay($userlist).'"/>';
+      echo '<p>'._('New Rights:').'<br>';
+      echo '<label><input type=radio name=newrights value=20> '._('Teacher').'</label><br>';
+      echo '<label><input type=radio name=newrights value=40> '._('Course Creator').'</label></p>';
+      echo '<p><button type=submit>'._('Submit').'</button></p>';
+      echo '</form>';
     } else if ($page=='main') {
       //MAIN full admin view
 
@@ -359,11 +412,11 @@ if ($overwriteBody==1) {
       echo '<form method="get" action="admin2.php">';
       echo '<p>';
       echo '<span class="form"><label for="findteacher">',_('Find teacher'),'</lable>:</span>';
-      echo '<span class="formright"><input name="findteacher" id="findteacher" size=30 /> ';
+      echo '<span class="formright"><input class="pii-mixed" name="findteacher" id="findteacher" size=30 /> ';
       echo '<button type="submit">',_('Go'),'</button> </span> <br class="form" />';
 
       echo '<span class="form"><label for="finduser">',_('Find user'),'</lable>:</span>';
-      echo '<span class="formright"><input name="finduser" size=30 /> ';
+      echo '<span class="formright"><input class="pii-mixed" name="finduser" size=30 /> ';
       echo '<button type="submit">',_('Go'),'</button> ';
       echo '<input type=button value="',_('Add New User'),'" onclick="window.location=\'forms.php?from=admin2&action=newadmin\'">';
       echo '</span> <br class="form" />';

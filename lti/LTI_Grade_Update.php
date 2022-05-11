@@ -92,17 +92,18 @@ class LTI_Grade_Update {
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
    * @param  string $activityProgress default 'Submitted'
    * @param  string $gradingProgress  default 'FullyGraded'
+   * @param  int    $isstu            default 1
    * @param  string $comment          default ''
    * @return false|array  false on failure, or array with body and headers
    */
   public function send_update(string $token, string $score_url, float $score,
     string $ltiuserid, string $activityProgress='Submitted',
-    string $gradingProgress='FullyGraded', string $comment = ''
+    string $gradingProgress='FullyGraded', $isstu = 1, string $comment = ''
   ) {
     $pos = strpos($score_url, '?');
     $score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
 
-    $content = $this->get_update_body($token, $score, $ltiuserid,
+    $content = $this->get_update_body($token, $score, $ltiuserid, $isstu, null,
       $activityProgress, $gradingProgress, $comment);
     $this->debuglog('Sending update: '.$content['body']);
     // try to spawn a curl and don't wait for response
@@ -163,15 +164,24 @@ class LTI_Grade_Update {
    * @param  string $token            the token string
    * @param  float $score             the score, normalized 0-1
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
+   * @param  boolean    $isstu            default true
+   * @param  int?   $addedon          the time the submission was added (null for default)
    * @param  string $activityProgress default 'Submitted'
    * @param  string $gradingProgress  default 'FullyGraded'
    * @param  string $comment          default ''
    * @return array [body=>, header=>]
    */
-  public function get_update_body(string $token, float $score, string $ltiuserid,
+  public function get_update_body(string $token, float $score, string $ltiuserid, 
+    $isstu = true, $addedon = null,
     string $activityProgress='Submitted', string $gradingProgress='FullyGraded',
     string $comment = ''
   ) {
+    $canvasext = [
+        'new_submission' => $isstu
+    ];
+    if ($isstu && !empty($addedon)) {
+        $canvasext['submitted_at'] = date('Y-m-d\TH:i:s.uP', $addedon);
+    }
     $grade = [
       'scoreGiven' => max(0,$score),
       'scoreMaximum' => 1,
@@ -179,9 +189,12 @@ class LTI_Grade_Update {
       'userId' => $ltiuserid,
       'activityProgress' => $activityProgress,
       'gradingProgress' => $gradingProgress,
-      'comment' => $comment
+      'comment' => $comment,
+      'https://canvas.instructure.com/lti/submission' => $canvasext
     ];
-    $body = json_encode(array_filter($grade));
+    $body = json_encode(array_filter($grade, function($v) { // don't filter 0
+        return ($v !== null && $v !== '');
+    }));
 
     $headers = [
         'Authorization: Bearer ' . $token,
@@ -196,9 +209,10 @@ class LTI_Grade_Update {
    * @param  int $platform_id    imas_lti_platforms.id
    * @param  string $client_id    optional if known - the client_id
    * @param  string $token_server optional if known - the token_server_url
+   * @param  string $auth_server  optional if known - the aud for token request
    * @return false|string access token, or false on failure
    */
-  public function get_access_token(int $platform_id, string $client_id='', string $token_server='') {
+  public function get_access_token(int $platform_id, string $client_id='', string $token_server='', string $auth_server='') {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
       $this->access_tokens[$platform_id]['expires'] < time()
@@ -229,12 +243,12 @@ class LTI_Grade_Update {
 
     // Need to request a token
     if (empty($client_id)) {
-      $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
+      $stm = $this->dbh->prepare('SELECT client_id,auth_token_url,auth_server FROM imas_lti_platforms WHERE id=?');
       $stm->execute(array($platform_id));
-      list($client_id, $token_server) = $stm->fetch(PDO::FETCH_NUM);
+      list($client_id, $token_server, $auth_server) = $stm->fetch(PDO::FETCH_NUM);
     }
     $this->debuglog('requesting a token from '.$platform_id);
-    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server);
+    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server, $auth_server);
     // Make request to get auth token
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $token_server);
@@ -288,16 +302,17 @@ class LTI_Grade_Update {
    * @param  int    $platform_id
    * @param  string $client_id
    * @param  string $token_server
+   * @param  string $auth_server
    * @return string output of http_build_query
    */
   public function get_token_request_post(int $platform_id, string $client_id,
-    string $token_server
+    string $token_server, string $auth_server
   ): string {
     // Build up JWT to exchange for an auth token
     $jwt_claim = [
       "iss" => $client_id,
       "sub" => $client_id,
-      "aud" => $token_server,
+      "aud" => empty($auth_server) ? $token_server : $auth_server,
       "iat" => time() - 5,
       "exp" => time() + 60,
       "jti" => 'lti-service-token' . hash('sha256', random_bytes(64))
@@ -339,12 +354,12 @@ class LTI_Grade_Update {
   }
 
   /**
-   * Get client_id and auth_token_url for a platform
+   * Get client_id and auth_token_url and auth_server for a platform
    * @param  int   $platform_id
    * @return array
    */
   public function get_platform_info(int $platform_id): array {
-    $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
+    $stm = $this->dbh->prepare('SELECT client_id,auth_token_url,auth_server FROM imas_lti_platforms WHERE id=?');
     $stm->execute(array($platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }

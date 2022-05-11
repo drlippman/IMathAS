@@ -46,8 +46,11 @@ function hideNA() {
 	$(".notanswered").toggle();
 }
 function showallans() {
-	$("span[id^='ans']").removeClass("hidden").show();
-	$(".sabtn").replaceWith("<span>Answer: </span>");
+	$("span[id^='ans']").toggleClass("hidden", false).show();
+    $(".sabtn").replaceWith("<span>Answer: </span>");
+    $("div[id^=dsbox]").toggleClass("hidden", false).attr("aria-hidden", false)
+        .attr("aria-expanded", true);
+    $("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', true);
 }
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
@@ -60,15 +63,19 @@ function showallwork() {
 	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
-	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    if (confirm(_('Are you SURE you want to give all students full credit?'))) {
+	    $(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    }
 }
 function allvisnocred() {
-	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+    if (confirm(_('Are you SURE you want to give all students zero credit?'))) {
+    	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+    }
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
-    var filters = ['unans','zero','nonzero','perfect','fb','nowork'];
-    for (var i=0; i<6; i++) {
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork', '100'];
+    for (var i=0; i<7; i++) {
         if (document.getElementById('filter-' + filters[i]).checked) {
             $(".bigquestionwrap.qfilter-" + filters[i]).hide();
         }
@@ -234,7 +241,10 @@ function initAnswerboxHighlights() {
 	});
 };
 
+var sidebysideenabled = false;
 function sidebysidegrading() {
+    if (sidebysideenabled) { return; }
+    sidebysideenabled = true;
 	$("body").removeClass("fw1000").removeClass("fw1920");
 	$(".scrollpane").wrap('<div class="sidebyside">');
 	$(".sidebyside").append('<div class="sidepreview">');
@@ -257,4 +267,50 @@ function sidebysidegrading() {
 		$(el).css('margin','0');
 		$(el).closest(".sidebyside").find('.sidepreview').append(el);
 	});
+}
+
+var scrollingscoreboxes = false;
+function toggleScrollingScoreboxes() {
+    if (scrollingscoreboxes) {
+        $(window).off('scroll.scoreboxes');
+        $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);
+        $(".biquestionwrap .scrollpane").css("margin-bottom","0");
+    } else {
+        $(window).on('scroll.scoreboxes', updatescoreboxscroll);
+        updatescoreboxscroll();
+    }
+    scrollingscoreboxes = !scrollingscoreboxes;
+}
+
+function updatescoreboxscroll() {
+    var scroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var viewbot = scroll + document.documentElement.clientHeight;
+    var wraps = document.getElementsByClassName("bigquestionwrap");
+    var objtop, scoredet, objbot;
+    for (var i=0; i<wraps.length; i++) {
+        if (wraps[i].style.display == "none") { continue; }
+        var rect = wraps[i].childNodes[1].getBoundingClientRect();
+        objtop = rect.top + scroll; 
+        scoredet = wraps[i].childNodes[2];
+        objbot = objtop + wraps[i].childNodes[1].offsetHeight + scoredet.offsetHeight ;
+        if (viewbot > objtop + scoredet.offsetHeight + 20 && 
+            viewbot < objbot && 
+            scoredet.offsetHeight < .5*document.documentElement.clientHeight 
+        ) {
+            if (scoredet.style.position == "static") { 
+                scoredet.style.width = $(scoredet).width() + "px";
+                wraps[i].childNodes[1].style.marginBottom = scoredet.offsetHeight + "px";
+                scoredet.style.position = "fixed";
+                scoredet.style.bottom = 0;
+                scoredet.style.marginLeft = '5px';
+                scoredet.classList.add("hoverbox");
+            }
+        } else {
+            scoredet.style.position = "static";
+            scoredet.style.width = 'auto';
+            scoredet.style.marginLeft = '0';
+            wraps[i].childNodes[1].style.marginBottom = 0;
+            scoredet.classList.remove("hoverbox");
+        }
+    };
 }

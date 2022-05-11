@@ -35,6 +35,7 @@
               class="secondarybtn"
               id="qprev"
               :aria-label="$t('previous')"
+              :title="$t('previous')"
             >
               <icons name="left"/>
             </button>
@@ -54,6 +55,7 @@
               class="secondarybtn"
               id="qnext"
               :aria-label="$t('next')"
+              :title="$t('next')"
             >
               <icons name="right" />
             </button>

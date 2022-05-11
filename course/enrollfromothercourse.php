@@ -75,7 +75,7 @@ require("../header.php");
 $curBreadcrumb .= '&gt; Enroll From Another Course';
 
 /***** page body *****/
-if ($overwriteBody==1) {
+if (!empty($overwriteBody)) {
 	if (strlen($body)<2) {
 		include("./$fileToInclude");
 	} else {
@@ -105,7 +105,7 @@ if ($overwriteBody==1) {
 		echo '<p>';
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 			echo '<input type=checkbox name="checked[]" value="' . Sanitize::encodeStringForDisplay($line['id']) . '"/>';
-			printf('%s, %s<br/>', Sanitize::encodeStringForDisplay($line['LastName']),
+			printf('<span class="pii-full-name">%s, %s</span><br/>', Sanitize::encodeStringForDisplay($line['LastName']),
                 Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		echo '</p><p>Assign to section: <input type="text" name="section" />  (optional)</p>';

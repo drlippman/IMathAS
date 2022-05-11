@@ -44,8 +44,8 @@ if (!empty($_GET['from'])) {
 }
 
 //process transfer
-$ownerid = Sanitize::onlyInt($_POST['newowner']);
-if (!empty($ownerid)) {
+if (!empty($_POST['newowner'])) {
+    $ownerid = Sanitize::onlyInt($_POST['newowner']);
 	$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
 	$stm->execute(array(':ownerid'=>$ownerid, ':id'=>$cid));
 	if ($stm->rowCount()>0) {
@@ -143,7 +143,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p v-if="searchResults !== null && searchResults.length==0">No teachers found</p>
 <transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
 	<li v-for="teacher in searchResults" :key="teacher.id">
-		<input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> {{teacher.name}}
+        <input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> <span class="pii-full-name">{{teacher.name}}</span>
 	</li>
 </transition-group>
 </div>

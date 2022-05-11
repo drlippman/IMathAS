@@ -17,8 +17,7 @@ if ($caller=="posts") {
 	$returnurl = "posts.php?view=$view&cid=$cid&page=$page&forum=$forumid&thread=$threadid";
 	$returnname = "Posts";
 } else if ($caller=="byname") {
-	$threadid = Sanitize::onlyInt($_GET['thread']);
-	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid&thread=$threadid";
+	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid";
 	$returnname = "Posts by Name";
 
 } else if ($caller=='thread') {
@@ -169,14 +168,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 					$autoscore = explode(',',$autoscore);
 					if ($autoscore[2]>0) { //assigning points
-						$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
-						$stm->execute(array($forumid, $userid));
-						if ($stm->fetchColumn(0) <= $autoscore[3]) {
-							$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
-							$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
-							$stm = $DBH->prepare($query);
-							$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
-						}
+                        $stm = $DBH->prepare("SELECT userid FROM imas_forum_posts WHERE id=?");
+                        $stm->execute([$threadid]);
+                        if ($stm->fetchColumn(0) != $userid) { // only give points for replies if not own thread
+                            $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
+                            $stm->execute(array($forumid, $userid));
+                            if ($stm->fetchColumn(0) <= $autoscore[3]) {
+                                $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+                                $query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
+                                $stm = $DBH->prepare($query);
+                                $stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
+                            }
+                        }
 					}
 				}
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
@@ -350,7 +353,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$stm->execute(array(':id'=>$_GET['modify']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$replyby = $line['replyby'];
-			if ($groupsetid>0 && $isteacher && $line['parent']==0) {
+			if (!empty($groupsetid) && $isteacher && $line['parent']==0) {
 				$stm = $DBH->prepare("SELECT stugroupid FROM imas_forum_threads WHERE id=:id");
 				$stm->execute(array(':id'=>$line['threadid']));
 				$curstugroupid = $stm->fetchColumn(0);
@@ -369,8 +372,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$sub = str_replace('"','&quot;',$sub);
 				$line['subject'] = "Re: $sub";
 				$line['message'] = "";
-				$line['files'] = '';
-				$replyby = $line['replyby'];
+                $line['files'] = '';
+				$replyby = null;
 				if ($isteacher) {
 					$stm = $DBH->prepare("SELECT points FROM imas_forums WHERE id=:id");
 					$stm->execute(array(':id'=>$forumid));
@@ -466,8 +469,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 							$stm->execute($array);
 							// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 							if ($stm->rowCount()>0) {
-								$notice =  '<span class=noticetext style="font-weight:bold">This question has already been posted about.</span><br/>';
-								$notice .= 'Please read and participate in the existing discussion.';
+								$notice =  _('This question has already been posted about. Please read and participate in the existing discussion using the link below.');
 								while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread=" . Sanitize::encodeUrlParam($row[0]) . "\">".Sanitize::encodeStringForDisplay($line['subject'])."</a>";
 								}
@@ -502,10 +504,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			// $forumsettings['replyinstr'] contains HTML.
 			echo '<div class="intro">'.Sanitize::outgoingHtml($forumsettings['replyinstr']).'</div><br/>';
 		}
-		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify'])."&replyto=".Sanitize::encodeUrlParam($_GET['replyto'])."\">\n";
+        echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify']);
+        if (isset($_GET['replyto'])) {
+            echo "&replyto=".Sanitize::encodeUrlParam($_GET['replyto']);
+        }
+        echo "\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
 		if (isset($notice) && $notice!='') {
-			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
+			echo '<p>'.$notice.'</p>';
 		} else {
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
@@ -561,7 +567,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else if ($allowanon==1 && $line['isanon']==1) { //teacher editing an anonymous post, perhaps
 				echo '<input type=hidden name=postanon value=1 />';
 			}
-			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
+            if ($isteacher && 
+                ($_GET['modify']=='new' || (isset($line['userid']) && $line['userid']==$userid)) && 
+                ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))
+            ) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";
 				echo "<input type=radio name=type id=type0 value=0 ";
 				if ($line['posttype']==0) { echo "checked=1 ";}
@@ -579,16 +588,16 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 				echo "<span class=form id=allowreplieslabel>Allow replies: </span><span class=formright role=radiogroup aria-labelledby=allowreplieslabel>\n";
 				echo "<input type=radio name=replyby id=replyby0 value=\"null\" ";
-				if ($line['replyby']==null) { echo "checked=1 ";}
+				if ($replyby==null) { echo "checked=1 ";}
 				echo "/> <label for=replyby0>Use default</label><br/>";
 				echo "<input type=radio name=replyby id=replyby1 value=\"Always\" ";
-				if ($line['replyby']==2000000000) { echo "checked=1 ";}
+				if ($replyby==2000000000) { echo "checked=1 ";}
 				echo "/> <label for=replyby1>Always</label><br/>";
 				echo "<input type=radio name=replyby id=replyby2 value=\"Never\" ";
-				if ($line['replyby']==='0') { echo "checked=1 ";}
+				if ($replyby==='0') { echo "checked=1 ";}
 				echo "/> <label for=replyby2>Never</label><br/>";
 				echo "<input type=radio name=replyby id=replyby3 value=\"Date\" ";
-				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1 ";}
+				if ($replyby!==null && $replyby<2000000000 && $replyby>0) { echo "checked=1 ";}
 				echo "/> <label for=replyby3>Before:</label> ";
 				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybydate)."\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
@@ -628,7 +637,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=releasetime value=\"$releasebytime\" aria-label=\"post release time\"></span><br class=\"form\" />";
 			}
-			if ($groupsetid >0 && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {
+			if (!empty($groupsetid) && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {
                 if ($isSectionGroups) {
                     echo '<script>function onstugroupchg(el) {
                         $("#nonsectionwarn").toggle(el.value==0);
@@ -674,7 +683,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
                 }
                 echo '</span><br class="form" />';
 			}
-			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
+			if ($isteacher && !empty($haspoints) && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
 				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::encodeStringForDisplay($points).'" /></span><br class="form" />';
 			}

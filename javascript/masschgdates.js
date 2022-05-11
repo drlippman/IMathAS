@@ -230,7 +230,8 @@ Date.prototype.getWeekDays = function(d) {
 			  for (var i=st+1;i<basearr.length;i++) {
 				  if (usecb && !document.getElementById("cb"+i).checked) {
 					  continue;
-				  }
+                  }
+                  if (!document.getElementById(type+"datetype"+i)) { continue; }
 				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
 					  if (ctype==1) {
 					  	document.getElementById(type+"date"+i).value = newstartdate;

@@ -98,7 +98,7 @@ if (strpos($_SERVER['HTTP_HOST'],'localhost')!==false) {
 }
 
 //pull all lti queue items ready to send; we'll process until we're done or timeout
-$stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<7 ORDER BY sendon');
+$stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<7 ORDER BY sendon LIMIT 2000');
 $stm->execute(array(time()));
 $LTIsecrets = array();
 $cntsuccess = 0;
@@ -123,7 +123,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade'])
+						'grade' => max(0, $row['grade']),
+                        'isstu' => $row['isstu'],
+                        'addedon' => $row['addedon']
 					),
 					null, //no special callback
 					array( 	  //user-data; will get passed to response
@@ -256,7 +258,9 @@ function LTIqueuePostdataCallback($data) {
 			return [
 				'body' => $updater1p3->get_token_request_post($data['platformid'],
 										$platforminfo['client_id'],
-										$platforminfo['auth_token_url']),
+										$platforminfo['auth_token_url'],
+										$platforminfo['auth_server']
+									),
 				'header' => array()
 			];
 		} else if ($data['action'] == 'update') {
@@ -264,7 +268,7 @@ function LTIqueuePostdataCallback($data) {
                 $updater1p3->token_valid($data['platformid'])
             ) { // double check we have a valid token
 				$token = $updater1p3->get_access_token($data['platformid']);
-				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid']);
+				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['isstu'], $data['addedon']);
 			} else {
 				return false;
 			}
@@ -352,7 +356,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			unset($post_data['key']);
 			unset($post_data['keytype']);
 
-			error_log("LTI update giving up:\n"
+			$logdata = "LTI update giving up:\n"
 			. "POST data\n"
 			. "---------\n"
 			. print_r($post_data, true) . "\n"
@@ -371,7 +375,9 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			. "--------\n"
 			. "Response \n"
 			. "--------\n"
-			. $response);
+			. $response;
+            $logstm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+            $logstm->execute([time(), $logdata]);
 		} else {
 			$cntfailure++;
 		}

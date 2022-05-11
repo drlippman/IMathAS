@@ -132,10 +132,10 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 		}
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		if ($s3->putObjectFile($tmpdir.'/'.$fn,$GLOBALS['AWSbucket'],$keydir.'/'.$fn,$sec)) {
-			unlink($tmpdir.'/'.$fn);
+			@unlink($tmpdir.'/'.$fn);
 			return $fn;
 		} else {
-			unlink($tmpdir.'/'.$fn);
+			@unlink($tmpdir.'/'.$fn);
 			return false;
 		}
 	} else {
@@ -242,7 +242,7 @@ function deleteimport($key) {
 		$s3->deleteObject($GLOBALS['AWSbucket'],'import/'.$key);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
-		unlink(realpath($base.$key));
+		@unlink(realpath($base.$key));
 	}
 }
 
@@ -252,10 +252,9 @@ function downsizeimage($fileinfo) {
 		if ($imgdata === false || $imgdata[2] !== IMAGETYPE_JPEG) {
 			return;
 		}
-		try {
-			$exif = exif_read_data($fileinfo['tmp_name']);
-		} catch (Exception $exp) {
-			$exif = false;
+        $exif = false;
+        if (function_exists('exif_read_data')) {
+            $exif = @exif_read_data($fileinfo['tmp_name']);
 		}
 		$changed = false;
 		if ((min($imgdata[0],$imgdata[1])>1000 || !empty($exif['Orientation'])) &&
@@ -273,6 +272,7 @@ function downsizeimage($fileinfo) {
 				$dst = imagecreatetruecolor($neww, $newh);
 				imagecopyresampled($dst, $image, 0, 0, 0, 0, $neww, $newh, $imgdata[0], $imgdata[1]);
 				imagedestroy($image);
+                $changed = true;
 			} else {
 				$dst = imagecreatefromjpeg($fileinfo['tmp_name']);
 			}
@@ -292,8 +292,10 @@ function downsizeimage($fileinfo) {
 					    break;
 				}
 			}
-			imagejpeg($dst, $fileinfo['tmp_name'], 90);
-			imagedestroy($dst);
+            if ($changed) {
+			    imagejpeg($dst, $fileinfo['tmp_name'], 90);
+			    imagedestroy($dst);
+            }
 		}
 	}
 }
@@ -494,7 +496,7 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink($base.'/adata/'.$file)) {
+			if (@unlink($base.'/adata/'.$file)) {
 				$deled[] = $file;
 				recursiveRmdir(dirname($base.'/adata/'.$file));
 			}
@@ -578,7 +580,7 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink(realpath($base.'/adata/'.$file))) {
+			if (@unlink(realpath($base.'/adata/'.$file))) {
 				$deled[] = $file;
 				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
@@ -664,7 +666,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink(realpath($base.'/adata/'.$file))) {
+			if (@unlink(realpath($base.'/adata/'.$file))) {
 				$deled[] = $file;
 				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
@@ -711,11 +713,7 @@ function deleteallaidfiles($aid) {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"adata/$aid/");
 		if ($arr!=false) {
-			foreach ($arr as $k=>$file) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$file['name'])) {
-					$delcnt++;
-				}
-			}
+			$delcnt = deleteFilesFromGetBucketCall($s3,$arr);
 		}
 
 	} else {
@@ -783,7 +781,7 @@ function deleteuserfile($uid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ufiles/$uid/$safeFilename")) {
+		if (@unlink($base."/ufiles/$uid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -804,7 +802,7 @@ function deleteforumfile($postid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ffiles/$postid/$safeFilename")) {
+		if (@unlink($base."/ffiles/$postid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -824,13 +822,41 @@ function deletecoursefile($file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
-		if (unlink($base."/$safeFilename")) {
+		if (@unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 }
+
+function deletecoursefiles($files) {
+    if (getfilehandlertype('filehandlertypecfiles') == 's3') {
+        $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+        $fileuris = [];
+        foreach ($files as $file) {
+            $safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
+            $fileuris[] = "cfiles/$safeFilename";
+        }
+        if ($s3->deleteObjects($GLOBALS['AWSbucket'], $fileuris)) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
+        $success = true;
+        foreach ($files as $file) {
+            $safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
+            if (@unlink($base."/$safeFilename")) {
+            } else {
+                $success = false;
+            }
+        }
+        return $success;
+    }
+}
+
 function deleteqimage($file) {
 	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
@@ -843,7 +869,7 @@ function deleteqimage($file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
-		if (unlink($base."/$safeFilename")) {
+		if (@unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -863,7 +889,7 @@ function deletefilebykey($key) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/$safeFilename")) {
+		if (@unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -878,11 +904,7 @@ function deleteallpostfiles($postid) {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ffiles/$postid/");
 		if ($arr!=false) {
-			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
-					$delcnt++;
-				}
-			}
+			$delcnt = deleteFilesFromGetBucketCall($s3,$arr);
 		} else {
 			return false;
 		}
@@ -894,18 +916,35 @@ function deleteallpostfiles($postid) {
 	}
 	return $delcnt;
 }
+
+// use internally only
+function deleteFilesFromGetBucketCall($s3,$arr) {
+    $delcnt = 0;
+    $files = [];
+    foreach ($arr as $s3object) {
+        $files[] = $s3object['name'];
+        if (count($files)>500) {
+            if ($s3->deleteObjects($GLOBALS['AWSbucket'], $files)) {
+                $delcnt += count($files);
+            }
+            $files = [];
+        }
+    }
+    if (count($files)>0) {
+        if ($s3->deleteObjects($GLOBALS['AWSbucket'], $files)) {
+            $delcnt += count($files);
+        }
+    }
+    return $delcnt;
+}
+
 function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if (getfilehandlertype('filehandlertype') == 's3') {
-
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
-			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
-					$delcnt++;
-				}
-			}
+            $delcnt = deleteFilesFromGetBucketCall($s3,$arr);
 		} else {
 			return false;
 		}
@@ -916,6 +955,26 @@ function deletealluserfiles($uid) {
 		}
 	}
 	return $delcnt;
+}
+
+function getfilesize($type, $key) {
+    if ($type=='cfile') {
+        if (getfilehandlertype('filehandlertypecfiles') == 's3') {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, true)['size'];
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+			return filesize($base.$key);
+		}
+    } else {
+        if (getfilehandlertype('filehandlertype') == 's3') {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, true)['size'];
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+			return filesize($base.$key);
+		}
+    }
 }
 
 function doesfileexist($type,$key) {
@@ -1045,7 +1104,7 @@ function unlinkRecursive($dir, $deleteRootToo) {
             continue;
         }
 	if (is_file($dir . '/' . $obj)) {
-		if (unlink($dir . '/' . $obj)) {
+		if (@unlink($dir . '/' . $obj)) {
 			$cnt++;
 		}
 	} else if (is_dir($dir . '/' . $obj)) {

@@ -6,7 +6,7 @@ $DBH->beginTransaction();
 $query = 'CREATE TABLE `imas_linked_files` (
    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    `filename` VARCHAR(254) NOT NULL
- ) ENGINE=InnoDB;';
+ ) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
  $res = $DBH->query($query);
  if ($res===false) {
     echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -28,7 +28,7 @@ $query = 'CREATE TABLE `imas_linked_files` (
 	return false;
  }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added imas_linked_files</p>";
 

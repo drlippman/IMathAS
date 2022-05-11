@@ -33,16 +33,15 @@ class IntervalScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-        if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
-        if (!isset($variables)) { $variables = 'x';}
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+            'requiretimes', 'variables', 'ansprompt', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
+
+        if (empty($variables)) { $variables = 'x';}
+
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         $ansformats = array_map('trim',explode(',',$answerformat));
@@ -58,6 +57,7 @@ class IntervalScorePart implements ScorePart
         }
 
         $givenans = normalizemathunicode($givenans);
+        $givenans = trim($givenans," ,");
 
         if (in_array('nosoln',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
@@ -67,9 +67,11 @@ class IntervalScorePart implements ScorePart
         }
 
         $ansformatsHasList = in_array('list',$ansformats);
-        $givenans = str_replace('u', 'U', $givenans);
+        //$givenans = str_replace('u', 'U', $givenans);
+        $givenans = preg_replace('/\bu\b/', 'U', $givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
+            $givenansval = trim($givenansval," ,");
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         $formatErr = 0;
@@ -98,7 +100,8 @@ class IntervalScorePart implements ScorePart
                     foreach ($matches[0] as $var) {
                         if (in_array($var,$mathfuncs)) { continue;}
                         if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
-                            strtolower($var) != 'var') {
+                            strtolower($var) != 'var' && $var != 'pi' && $var != 'e' 
+                            && $var != 'E') {
                             $scorePartResult->setRawScore(0);
                             return $scorePartResult;
                         }
@@ -135,6 +138,10 @@ class IntervalScorePart implements ScorePart
                     if ($opt=='DNE') {continue;}
                     $opts = explode(',',substr($opt,1,strlen($opt)-2));
                     $formatCnt += 2;
+                    if (count($opts) != 2) {
+                        $formatErr += 2;
+                        continue;
+                    }
                     if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
                         $formatErr++;
                     }
@@ -208,7 +215,7 @@ class IntervalScorePart implements ScorePart
                         if ($anssn === $ganssn) {
                             $pairScored[$j][$k] += .3;
                         }
-                    } else if (isset($abstolerance)) {
+                    } else if ($abstolerance !== '') {
                         if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {
                           $pairScored[$j][$k] += .3;
                         }
@@ -221,7 +228,7 @@ class IntervalScorePart implements ScorePart
                         if ($ansen === $gansen) {
                             $pairScored[$j][$k] += .3;
                         }
-                    } else if (isset($abstolerance)) {
+                    } else if ($abstolerance !== '') {
                         if (abs($ansen-$gansen) < $abstolerance + 1E-12) {
                           $pairScored[$j][$k] += .3;
                         }
@@ -266,7 +273,7 @@ class IntervalScorePart implements ScorePart
         if ($formatErr > 0) {
           $correct = (1 - $formatErr/$formatCnt)*$correct;
         }
-        if ($scoremethod !== 'partialcredit') {
+        if (empty($scoremethod) || $scoremethod !== 'partialcredit') {
           if ($correct < .999) {
             $correct = 0;
           }

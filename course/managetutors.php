@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 	require("../init.php");
 	require("../includes/htmlutil.php");
-
+    require_once('../includes/TeacherAuditLog.php');
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -21,10 +21,19 @@
 	$err = '';
 	if (isset($_POST['submit'])) {
 		//remove any selected tutors
-		if (count($_POST['remove'])>0) {
+		if (!empty($_POST['remove'])) {
 			$toremove = implode(',', array_map('intval', $_POST['remove']));
 			$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE id IN ($toremove) AND courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
+            TeacherAuditLog::addTracking(
+				$cid,
+				"Roster Action",
+				null,
+				array(
+					'action' => 'Remove Tutors',
+					'ids' => array_map('intval', $_POST['remove'])
+				)
+			);
 		}
 		//update sections
 		if (count($_POST['section'])>0) {
@@ -95,6 +104,17 @@
 						}
 						$err .= '</p>';
 					}
+                    if (!empty($foundsid)) {
+                        TeacherAuditLog::addTracking(
+                            $cid,
+                            "Roster Action",
+                            null,
+                            array(
+                                'action' => 'Add Tutors',
+                                'SIDs' => $foundsid
+                            )
+                        );
+                    }
 				} else {
 					$err .= "<p>No usernames provided were found</p>";
 				}
@@ -198,7 +218,7 @@ if (count($tutorlist)==0) {
 }
 foreach ($tutorlist as $tutor) {
 	echo '<tr>';
-	echo '<td>'.Sanitize::encodeStringForDisplay($tutor['name']).'</td>';
+	echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($tutor['name']).'</span></td>';
 	echo '<td>';
 	//section
 	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']">';

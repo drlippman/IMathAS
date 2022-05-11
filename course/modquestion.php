@@ -146,11 +146,11 @@ if (!(isset($teacherid))) {
 			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($line['penalty']{0}==='L') {
+			if ($line['penalty'][0]==='L') {
 				$line['penalty'] = substr($line['penalty'],1);
 				$skippenalty = 10;
-			} else if ($line['penalty']{0}==='S') {
-				$skippenalty = $line['penalty']{1};
+			} else if ($line['penalty'][0]==='S') {
+				$skippenalty = $line['penalty'][1];
 				$line['penalty'] = substr($line['penalty'],2);
 			} else {
 				$skippenalty = 0;
@@ -204,11 +204,11 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$aid));
 		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
 		list($deffeedback,$defshowans) = explode('-',$defaults['deffeedback']);
-		if ($defaults['defpenalty']{0}==='L') {
+		if ($defaults['defpenalty'][0]==='L') {
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],1);
 			$skippenaltystr=_('on last possible attempt only');
-		} else if ($defaults['defpenalty']{0}==='S') {
-			$skippenaltystr = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty']{1});
+		} else if ($defaults['defpenalty'][0]==='S') {
+			$skippenaltystr = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty'][1]);
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],2);
 		} else {
 			$skippenaltystr = _('per missed attempt');

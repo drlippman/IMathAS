@@ -69,11 +69,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-  $assessmentId = Sanitize::onlyInt($_GET['id']);
   $cid = Sanitize::courseId($_GET['cid']);
-  $block = $_GET['block'];
+  $block = $_GET['block'] ?? '';
 
-	if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
+    if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
+        $assessmentId = Sanitize::onlyInt($_GET['id']);
 		$query = "SELECT COUNT(iar.userid) FROM imas_assessment_records AS iar,imas_students WHERE ";
 		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
 		$stm = $DBH->prepare($query);
@@ -116,7 +116,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $stm->execute(array(':assessmentid' => $assessmentId));
         // clear out time limit extensions
         $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
-        $stm->execute(array($aid));
+        $stm->execute(array($assessmentId));
         
         $DBH->commit();
         header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' . Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
@@ -273,6 +273,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			// additional display options
 			$toset['caltag'] = Sanitize::stripHtmlTags($_POST['caltag']);
+			if ($_POST['caltagradio'] == 'usename') {
+				$toset['caltag'] = 'use_name';
+			}
 			$toset['shuffle'] = Sanitize::onlyInt($_POST['shuffle']);
 			if (isset($_POST['sameseed'])) { $toset['shuffle'] += 2;}
 			if (isset($_POST['samever'])) { $toset['shuffle'] += 4;}
@@ -525,6 +528,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
                 ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
+            // update "show work after" status flags
+            AssessHelpers::updateShowWorkStatus($assessmentId, $toset['showwork'], $toset['submitby']);
+            
 			$DBH->commit();
 			$rqp = Sanitize::randomQueryStringParam();
 			if ($from=='gb') {
@@ -584,7 +590,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
       $stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
       $DBH->commit();
-      header(sprintf('Location: %s/course/addquestions.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'], $cid, $newaid));
+      header(sprintf('Location: %s/course/addquestions2.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'], $cid, $newaid));
       exit;
 		}
 
@@ -666,7 +672,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['groupsetid'] = 0;
 					$line['reqscore'] = 0;
           $line['reqscoreaid'] = 0;
-					$line['reqscoretype'] = 0;
+                    $line['reqscoretype'] = 0;
+                    $line['showcat'] = 0;
+                    $line['timelimit'] = 0;
 					$taken = false;
           $savetitle = _("Create Assessment");
 
@@ -729,21 +737,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
       /*
 			TODO: Do we need to keep supporting this?
-			if ($line['defpenalty']{0}==='L') {
+			if ($line['defpenalty'][0]==='L') {
           $line['defpenalty'] = substr($line['defpenalty'],1);
           $skippenalty=10;
       } else
 			*/
-			if ($line['defpenalty']{0}==='S') {
+			if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
 				$defattemptpenalty = substr($line['defpenalty'],2);
-				$defattemptpenalty_aftern = $line['defpenalty']{1};
+				$defattemptpenalty_aftern = $line['defpenalty'][1];
       } else {
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if ($line['defregenpenalty']{0}==='S') {
+			if (is_string($line['defpenalty']) &&$line['defregenpenalty'][0]==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
-				$defregenpenalty_aftern = $line['defregenpenalty']{1};
+				$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {
         $defregenpenalty = $line['defregenpenalty'];
 				$defregenpenalty_aftern = 1;
@@ -758,7 +766,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       if ($taken) {
           $page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
           $page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";
-          $page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment2.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\"></p>\n";
+          $page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment2.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\">";
+		  $page_isTakenMsg .= " <a href=\"isolateassessgrade.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['id'])."\" target=\"_blank\">"._('View Scores')."</a></p>\n";
       } else {
           $page_isTakenMsg = "<p>&nbsp;</p>";
       }
@@ -773,7 +782,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       if (isset($_GET['id'])) {
           $page_formActionTag .= "&id=" . Sanitize::onlyInt($_GET['id']);
       }
-      $page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder']), Sanitize::encodeUrlParam($_GET['from']));
+      $page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder'] ?? '0'), Sanitize::encodeUrlParam($_GET['from'] ?? ''));
       $page_formActionTag .= "&tb=" . Sanitize::encodeUrlParam($totb);
 
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
@@ -880,7 +889,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
  /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
-$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/vue2-6-14.min.js"></script>';
+} else {
+	$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>';
+}
 
  require("../header.php");
 
@@ -897,7 +910,7 @@ if ($overwriteBody==1) {
 
 	<?php
 	if (isset($_GET['id'])) {
-		printf('<div class="cp"><a href="addquestions.php?aid=%d&amp;cid=%s" onclick="return confirm(\''
+		printf('<div class="cp"><a href="addquestions2.php?aid=%d&amp;cid=%s" onclick="return confirm(\''
             . _('This will discard any changes you have made on this page').'\');">'
             . _('Add/Remove Questions').'</a></div>', Sanitize::onlyInt($_GET['id']), $cid);
 	}

@@ -12,15 +12,15 @@
  *                            set of standard math functions.
  * @return Parser instance
  */
-function parseMath($str, $vars = '', $allowedfuncs = array()) {
-  $parser = new MathParser($vars, $allowedfuncs);
+function parseMath($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
+  $parser = new MathParser($vars, $allowedfuncs, $fvlist);
   $parser->parse($str);
   return $parser;
 }
 
-function parseMathQuiet($str, $vars = '', $allowedfuncs = array()) {
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   try {
-    $parser = new MathParser($vars, $allowedfuncs);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10) {
@@ -50,14 +50,15 @@ function parseMathQuiet($str, $vars = '', $allowedfuncs = array()) {
  * @param array $allowedfuncs  (optional) An array of function names that can
  *                            be called in math expressions.  Defaults to a
  *                            set of standard math functions.
+ * @param string $fvlist comma separated list of variables to treat as functions
  * @return function
  */
-function makeMathFunction($str, $vars = '', $allowedfuncs = array()) {
+function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   if (trim($str)=='') {
     return false;
   }
   try {
-    $parser = new MathParser($vars, $allowedfuncs);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10) {
@@ -112,6 +113,7 @@ class MathParser
 {
   private $functions = [];
   private $variables = [];
+  private $funcvariables = [];
   private $operators = [];
   private $tokens = [];
   private $operatorStack = [];
@@ -128,10 +130,14 @@ class MathParser
    * @param array $allowedfuncs  (optional) An array of function names that can
    *                            be called in math expressions.  Defaults to a
    *                            set of standard math functions.
+   * @param string $fvlist   A comma-separated list of variables to treat as functions
    */
-  function __construct($variables, $allowedfuncs = array()) {
+  function __construct($variables, $allowedfuncs = array(), $fvlist = '') {
     if ($variables != '') {
-      $this->variables = array_map('trim', explode(',', $variables));
+      $this->variables = array_values(array_filter(array_map('trim', explode(',', $variables)), 'strlen'));
+    }
+    if ($fvlist != '') {
+        $this->funcvariables = array_values(array_filter(array_map('trim', explode(',', $fvlist)), 'strlen'));
     }
     //treat pi and e as variables for parsing
     array_push($this->variables, 'pi', 'e');
@@ -148,7 +154,7 @@ class MathParser
     $allwords = array_merge($this->functions, $this->variables, ['degree','degrees']);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',array_map('preg_quote', $allwords)).')/';
-    $this->funcregex = '/^('.implode('|',array_map('preg_quote', $this->functions)).')/i';
+    $this->funcregex = '/('.implode('|',array_map('preg_quote', $this->functions)).')/i';
     $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', array_map('preg_quote', $this->variables)).')/';
 
     //define operators
@@ -190,11 +196,43 @@ class MathParser
       '&&' => [
         'precedence'=>8,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a && $b;}],
+        'evalfunc'=>function($a,$b) {return ($a && $b);}],
       '||' => [
         'precedence'=>7,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a || $b;}],
+        'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      '#a' => [
+        'precedence'=>8,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a && $b);}],
+      '#o' => [
+        'precedence'=>7,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      '#i' => [
+        'precedence'=>6,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ((!$a) || $b);}],
+      '#b' => [
+        'precedence'=>6,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return (($a && $b) || (!$a && !$b));}],
+      '<' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a<$b)?1:0;}],
+      '>' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a>$b)?1:0;}],
+      '<=' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a<=$b)?1:0;}],
+      '>=' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a>=$b)?1:0;}],
       '(' => true,
       ')' => true
     ];
@@ -219,6 +257,8 @@ class MathParser
     );
 
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
+    // attempt to handle |x| as best as possible
+    $str = preg_replace('/(?<!\|)\|([^\|]+?)\|(?!\|)/', 'abs($1)', $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
@@ -327,15 +367,7 @@ class MathParser
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
         continue;
-      } else if (isset($this->operators[$c])) {
-        // if the symbol matches an operator
-        $tokens[] = [
-          'type'=>'operator',
-          'symbol'=>$c
-        ];
-        $lastTokenType = 'operator';
-        continue;
-      } else if (($c=='|' || $c=='&') &&
+      } else if (($c=='|' || $c=='&' || $c=='#' || $c=='<' || $c=='>') &&
         isset($this->operators[substr($str,$n,2)])
       ) {
         $tokens[] = [
@@ -345,11 +377,28 @@ class MathParser
         $n++;
         $lastTokenType = 'operator';
         continue;
+      } else if (isset($this->operators[$c])) {
+        // if the symbol matches an operator
+        $tokens[] = [
+          'type'=>'operator',
+          'symbol'=>$c
+        ];
+        $lastTokenType = 'operator';
+        continue;
       } else {
         // look to see if the symbol is in our list of variables and functions
         if (preg_match($this->regex, substr($str,$n), $matches)) {
           $nextSymbol = $matches[1];
-          if (in_array($nextSymbol, $this->variables)) {
+          if (in_array($nextSymbol, $this->funcvariables)) {
+            // found a variable acting as a function 
+            $tokens[] = [
+              'type'=>'function',
+              'symbol'=>'funcvar',
+              'input'=>null,
+              'index'=>['type'=>'variable', 'symbol'=>$nextSymbol]
+            ];
+            $lastTokenType = 'function';
+          } else if (in_array($nextSymbol, $this->variables)) {
             // found a variable
             $tokens[] = [
               'type'=>'variable',
@@ -564,6 +613,9 @@ class MathParser
             // get precedence info for the symbols
             $peekinfo = $this->operators[$peek['symbol']];
             $tokeninfo = $this->operators[$token['symbol']];
+            if (is_bool($peekinfo) || is_bool($tokeninfo)) {
+                break;
+            }
             //if lower precedence, or equal and left assoc
             if (
               $tokeninfo['precedence'] < $peekinfo['precedence'] ||
@@ -886,7 +938,9 @@ class MathParser
    */
   public function normalizeTreeString() {
     $this->removeOneTimes();
-    //return $this->normalizeNodeToString($this->AST);
+    // $this->normalizeNodeToString($this->AST);
+    //echo $this->toOutputString($this->normalizeNode($this->AST));
+    //print_r($this->normalizeNode($this->AST));
     return $this->toOutputString($this->normalizeNode($this->AST));
   }
 
@@ -941,7 +995,16 @@ class MathParser
     } else if ($node['symbol'] == '~') {
       // recurse in
       $node['left'] = $this->normalizeNode($node['left']);
-      return $node;
+      if ($node['left']['symbol'] == '*') {
+        // if we have the opposite of a product, move the negative to the first element of the product
+        $node['left']['left'] = $this->negNode($node['left']['left']);
+        return $node['left'];
+      } else if ($node['left']['type'] == 'number') {
+        $node['left']['symbol'] = -1*$node['left']['symbol'];
+        return $node['left'];
+      } else {
+        return $node;
+      }
     } else if ($node['symbol'] == '^') {
       // recurse in. We're not doing any reordering for these
       $node['left'] = $this->normalizeNode($node['left']);

@@ -36,15 +36,19 @@ class EssayScorePart implements ScorePart
 
         $givenans = myhtmLawed($givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
+
+        $scoremethod = getOptionVal($options, 'scoremethod', $multi, $partnum);
         
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
-        if (isset($scoremethod) &&
+        if (!empty($scoremethod) &&
             (($scoremethod=='takeanything'  && trim($givenans)!='') ||
                 $scoremethod=='takeanythingorblank')
         ) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else if (trim($givenans)=='') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        } else if (!empty($scoremethod) && $scoremethod=='nomanual') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         } else {

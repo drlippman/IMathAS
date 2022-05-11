@@ -83,6 +83,7 @@ class ScoreEngine
         $GLOBALS['inquestiondisplay'] = false;
         $GLOBALS['assessver'] = 2;
 
+        $GLOBALS['curqsetid'] = $scoreQuestionParams->getDbQuestionSetId();
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
         ob_start();
@@ -135,6 +136,7 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $attemptn = $scoreQuestionParams->getAttemptNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
+        $currentseed = $scoreQuestionParams->getQuestionSeed();
         try {
           eval(interpret('control', $quesData['qtype'], $quesData['control']));
           $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
@@ -264,6 +266,7 @@ class ScoreEngine
 
         restore_error_handler();
         restore_exception_handler();
+        unset($GLOBALS['curqsetid']);
         $errors = ob_get_clean();
         if ($errors != '') {
           $this->addError($errors);
@@ -395,6 +398,8 @@ class ScoreEngine
                 } else if (is_numeric($_POST["qn$partnum"])) { // number
                   $stuanswersval[$thisq][$kidx] = floatval($_POST["qn$partnum"]);
                 }
+                $stuanswers[$thisq][$kidx] = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $stuanswers[$thisq][$kidx]);
+
                 if (isset($_SESSION['choicemap'][$assessmentId][$partnum])) {
                     if (is_array($stuanswers[$thisq][$kidx])) { //multans
                         foreach ($stuanswers[$thisq][$kidx] as $k => $v) {
@@ -463,7 +468,7 @@ class ScoreEngine
               list($randqkeys, $randakeys) = $_SESSION['choicemap'][$assessmentId][$qnidx];
               $mapped = array();
               foreach ($tmp as $k=>$v) {
-                $mapped[$randqkeys[$k]] = $randakeys[$v];
+                $mapped[$randqkeys[$k]] = $randakeys[$v] ?? '';
               }
               ksort($mapped);
               $stuanswers[$thisq] = implode('|', $mapped);
@@ -574,7 +579,7 @@ class ScoreEngine
             if (!$baseIsRescore && is_array($parts_to_score) && empty($parts_to_score[$partnum])) {
                 // not scoring it, so treat as rescore, using the stuanswer
                 $scoreQuestionParams->setIsRescore(true);
-                $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum]);  
+                $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum] ?? '');  
             } else {
                 $scoreQuestionParams->setIsRescore($baseIsRescore);
                 $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
@@ -706,7 +711,7 @@ class ScoreEngine
 
         return array(
             'scores' => array(round($score, 3)),
-            'rawScores' => array(round($score, 2)),
+            'rawScores' => array(round($score, 3)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
             'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
             'correctAnswerWrongFormat' => array($scorePartResult->getCorrectAnswerWrongFormat()),
@@ -771,7 +776,7 @@ class ScoreEngine
      * @return bool
      */
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
-                                     int $errline, array $errcontext): bool
+                                     int $errline, array $errcontext = []): bool
     {
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 

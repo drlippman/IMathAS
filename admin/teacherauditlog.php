@@ -36,7 +36,7 @@ if ($myrights <75) {
 	$body = "You need to select the course";
 }
 function formatdate($date) {
-    return tzdate("M j, Y, g:i a",strtotime($date));
+    return tzdate("M j, Y, g:i a", $date);
 }
 
 
@@ -59,10 +59,12 @@ if ($overwriteBody==1) {
     echo Sanitize::encodeStringForDisplay($coursename);
     echo '</h1></div>';
 
-		$query = 'SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
-		$query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?';
+		$query = '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
+		$query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?) UNION ';
+        $query .= '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
+		$query .= 'JOIN imas_tutors AS it ON it.userid=iu.id WHERE it.courseid=?)';
 		$stm = $DBH->prepare($query);
-		$stm->execute(array($cid));
+		$stm->execute(array($cid, $cid));
 		$teacherNames = array();
 		while($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$teacherNames[$row['id']] = $row['LastName'].', '.$row['FirstName'];
@@ -83,9 +85,9 @@ if ($overwriteBody==1) {
         foreach ($teacher_actions as $action) {
             echo '<tr>';
             echo '<td>' . formatdate($action['created_at']) . '</td>';
-            echo "<td>";
+            echo "<td><span class='pii-full-name'>";
 						echo Sanitize::encodeStringForDisplay($teacherNames[$action['userid']]);
-						echo " (" . Sanitize::onlyInt($action['userid']) . ')</td>';
+						echo " (" . Sanitize::onlyInt($action['userid']) . ')</span></td>';
             echo '<td>' . Sanitize::encodeStringForDisplay($action['action']) . '</td>';
             echo '<td>' . Sanitize::onlyInt($action['itemid']) . '</td>';
             echo '<td><a href="javascript:alert(\'' . Sanitize::encodeStringForDisplay($action['metadata']) . '\')">Details</a></td>';

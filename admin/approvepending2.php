@@ -118,7 +118,25 @@ if (!empty($newStatus)) {
 
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
-		$row = $stm->fetch(PDO::FETCH_ASSOC);
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+        
+        // enroll in courses, if not already
+        if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+            $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
+            $stm->execute([$instId]);
+            $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+            $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+            if (count($toEnroll) > 0) {
+                $valbits = array();
+                $valvals = array();
+                foreach ($toEnroll as $ncid) {
+                    $valbits[] = "(?,?)";
+                    array_push($valvals, $instId, $ncid);
+                }
+                $stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+                $stm->execute($valvals);
+            }
+        }
 
 		//call hook, if defined
 		if (function_exists('getApproveMessage')) {
@@ -298,12 +316,12 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
         <span @click="toggleActiveUser(user.id, status, userindex)">
           <span v-if="activeUser==user.id">[-]</span>
           <span v-else>[+]</span>
-          {{user.name}} ({{user.school}})
+          <span class="pii-full-name">{{user.name}}</span> ({{user.school}})
         </span>
       	<ul class="userdata" v-if="activeUser==user.id">
       	  <li>Request Made: {{user.reqdate}}</li>
-          <li>Username: {{user.username}}</li>
-      	  <li>Email: {{user.email}}</li>
+          <li>Username: <span class="pii-username">{{user.username}}</span></li>
+          <li>Email: <span class="pii-email">{{user.email}}</span></li>
       	  <li v-for="(title,fieldindex) in fieldTitles">
       	    <span v-if="fieldindex=='url' || fieldindex=='search'" v-html="user[fieldindex]"></span>
       	    <span v-else>{{title}}: {{user[fieldindex]}}</span>

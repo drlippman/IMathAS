@@ -11,7 +11,7 @@ $DBH->beginTransaction();
  }
 
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added copiedfrom field to imas_lti_courses</p>";
 

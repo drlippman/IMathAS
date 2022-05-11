@@ -17,6 +17,7 @@ function getUrlParameter(name) {
 };
 var frame_id = getUrlParameter("frame_id");
 var update_id = getUrlParameter("update_id");
+var lang = getUrlParameter("lang");
 
 var observeDOM = (function(){
     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
@@ -77,6 +78,7 @@ $(function() {
 		code: code,
 		callback: initcell,
 		evalButtonText: evallabel,
+        languages: (lang == '' ? sagecell.allLanguages : [lang]),
 		hide: ["permalink", "fullScreen"]
 	});
 });

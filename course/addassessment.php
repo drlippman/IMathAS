@@ -71,19 +71,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-        $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];
 
-				if (isset($_GET['id'])) {
-					$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-					$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
-					$taken = ($stm->fetchColumn(0)>0);
-				} else {
-					$taken = false;
-				}
+        if (isset($_GET['id'])) {
+            $assessmentId = Sanitize::onlyInt($_GET['id']);
+            $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+            $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
+            $taken = ($stm->fetchColumn(0)>0);
+        } else {
+            $taken = false;
+        }
 
         $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
         $stm->execute(array($cid));
@@ -636,6 +636,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $line['ltisecret'] = '';
                 $line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
                 $line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
+                $line['istutorial'] = 0;
                 $usedeffb = false;
                 $deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
                 $gbcat = 0;
@@ -707,11 +708,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $lptime = $deftime;
             }
 
-            if ($line['defpenalty']{0}==='L') {
+            if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='L') {
                 $line['defpenalty'] = substr($line['defpenalty'],1);
                 $skippenalty=10;
-            } else if ($line['defpenalty']{0}==='S') {
-                $skippenalty = $line['defpenalty']{1};
+            } else if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
+                $skippenalty = $line['defpenalty'][1];
                 $line['defpenalty'] = substr($line['defpenalty'],2);
             } else {
                 $skippenalty = 0;
@@ -741,7 +742,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             if (isset($_GET['id'])) {
                 $page_formActionTag .= "&id=" . Sanitize::onlyInt($_GET['id']);
             }
-            $page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder']), Sanitize::encodeUrlParam($_GET['from']));
+            $page_formActionTag .= sprintf("&from=%s", Sanitize::encodeUrlParam($_GET['from'] ?? ''));
             $page_formActionTag .= "&tb=" . Sanitize::encodeUrlParam($totb);
             $stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
             $stm->execute(array(':courseid'=>$cid));

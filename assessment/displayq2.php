@@ -506,14 +506,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 
-	if ($returnqtxt===2) {
-		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
-	} else if ($returnqtxt===3) {
-		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
-	}
-	if (($qdata['solutionopts']&1)==0) {
-		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
-	}
+	
 
 	if (strpos($evaledqtext,'[AB')!==false) {
 		if (is_array($answerbox)) {
@@ -542,6 +535,14 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$evaledqtext = str_replace('[SAB]', $showanswerloc, $evaledqtext);
 			$toevalqtxt .= '$showanswerloc';
 		}
+	}
+    if ($returnqtxt===2) {
+		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
+	} else if ($returnqtxt===3) {
+		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
+	}
+	if (($qdata['solutionopts']&1)==0) {
+		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
 	}
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
@@ -2974,7 +2975,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$settings[3] = 0;
 			if (strpos($settings[4],':')!==false) {
 				$settings[4] = explode(':',$settings[4]);
-				if ($settings[4][0]{0}=='h') {
+				if ($settings[4][0][0]=='h') {
 					$sclinglbl = substr($settings[4][0],1).':0:off';
 				} else {
 					$sclinglbl = $settings[4][0];
@@ -3337,14 +3338,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if ($ans=='') { continue;}
 				$function = array_map('trim',explode(',',$ans));
 				if ($answerformat[0]=='inequality') {
-					if ($function[0]{2}=='=') {
+					if ($function[0][2]=='=') {
 						$type = 10;
 						$c = 3;
 					} else {
 						$type = 10.2;
 						$c = 2;
 					}
-					$dir = $function[0]{1};
+					$dir = $function[0][1];
 					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
 				} else {
 					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
@@ -4525,7 +4526,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if (!is_array($cpts)) {
 						return 0;
 					}
-					if ($cpts[1]{0}=='+') {
+					if ($cpts[1][0]=='+') {
 						$cpts[1] = substr($cpts[1],1);
 					}
 					if ($cpts[1]!='' && $cpts[1][strlen($cpts[1])-1]=='*') {
@@ -4654,7 +4655,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$givenans = normalizemathunicode($givenans);
 		$ansformats = array_map('trim',explode(',',$answerformat));
-
 
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -6738,11 +6738,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($adjdiff>$defpttol*$reltolerance) {
 						continue;
 					}
-					$adjdiff = abs($anscos[1]-$coss[$i][1]);
-					$adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-					if ($adjdiff>$defpttol*$reltolerance) {
-						continue;
-					}
+					// check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
+                        continue;
+                    }
 					if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
 						continue;
 					}
@@ -6794,20 +6794,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
 				$function = array_map('trim',explode(',',$function));
-				if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+				if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
 					$isxequals = true;
 					$function[0] = substr($function[0],1);
 				} else {
 					$isxequals = false;
 				}
-				if ($function[0]{1}=='=') {
+				if ($function[0][1]=='=') {
 					$type = 10;
 					$c = 2;
 				} else {
 					$type = 10.2;
 					$c = 1;
 				}
-				$dir = $function[0]{0};
+				$dir = $function[0][0];
 				if ($isxequals) {
 					$anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
 				} else {
@@ -7605,7 +7605,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		foreach ($answer as $ans) {
 			if (is_array($ans)) {
-				if ($ans[0]{0}=='!') {
+				if ($ans[0][0]=='!') {
 					$flip = true;
 					$ans[0] = substr($ans[0],1);
 				} else {
@@ -8237,7 +8237,7 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
 	$str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
-	$str = preg_replace('/\bOO\b/i','oo', $str);
+	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
 	return $str;
 }
 

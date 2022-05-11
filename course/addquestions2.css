@@ -245,3 +245,14 @@ tr.textsegmentrow td {
   td.qinassess {
       color: #999;
   }
+  #searchspinner {
+      position: fixed;
+      width: 50%;
+      left: 25%;
+      top: 25%;
+      text-align: center;
+      background-color: white;
+      z-index: 1000;
+      padding: 30px 0;
+      border: 1px solid #ccc;
+  }

@@ -34,16 +34,12 @@ class MatrixScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer']) && isset($options['answer'][$partnum])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$partnum];} else {$answersize = $options['answersize'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (!isset($answerformat)) { $answerformat = '';}
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
-        if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+            'answersize', 'answerformat', 'ansprompt', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -58,7 +54,7 @@ class MatrixScorePart implements ScorePart
 
         if ($givenans==='oo' || $givenans==='DNE') {
             $scorePartResult->setLastAnswerAsGiven($givenans);
-        } else if (isset($answersize)) {
+        } else if (!empty($answersize)) {
             $sizeparts = explode(',',$answersize);
             $N = $sizeparts[0];
             if ($isRescore) {
@@ -70,7 +66,6 @@ class MatrixScorePart implements ScorePart
             }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
-            $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
             $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
@@ -80,6 +75,7 @@ class MatrixScorePart implements ScorePart
               return $scorePartResult;
             }
         }
+        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
@@ -94,10 +90,10 @@ class MatrixScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
+        $fullmatrix = true;
         foreach ($givenanslist as $j=>$v) {
             if (!is_numeric($v)) {
-                $scorePartResult->setRawScore(0);
-                return $scorePartResult;
+                $fullmatrix = false;
             }
         }
 
@@ -114,7 +110,7 @@ class MatrixScorePart implements ScorePart
             $answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
         }
 
-        if (in_array('scalarmult',$ansformats)) {
+        if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist
             $mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $answerlist)));
             $mag2 = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $givenanslist)));
@@ -133,7 +129,7 @@ class MatrixScorePart implements ScorePart
             }
         }
 
-        if (in_array('ref',$ansformats)) {
+        if ($fullmatrix && in_array('ref',$ansformats)) {
           // reduce correct answer to rref
           $answerlist = matrix_scorer_rref($answerlist, $N);
           $M = count($answerlist) / $N;
@@ -145,11 +141,13 @@ class MatrixScorePart implements ScorePart
               }
               $c++;
             }
+            /* Removed: Not all ref defs include leading 1's
             if ($c < $M) { // if there's a first non-zero entry, should be 1
               if (abs($givenanslist[$r*$M+$c] - 1) > 1e-10) {
                 $correct = false;
               }
             }
+            */
           }
           // now reduce given answer to rref
           if ($correct) {
@@ -161,7 +159,7 @@ class MatrixScorePart implements ScorePart
             if (!is_numeric($givenanslist[$i])) {
                 $incorrect++;
                 continue;
-            } else if (isset($abstolerance)) {
+            } else if ($abstolerance !== '') {
                 if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance+1E-12) {
                   $incorrect++;
                   continue;

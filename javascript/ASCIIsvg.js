@@ -254,7 +254,7 @@ function updatePicture(obj) {
 //alert(src);
   try {
     eval(prepWithMath(src));
-  } catch(err) {alert(err+"\n"+src)}
+  } catch(err) {console.log(err+"\n"+src)}
 }
 
 
@@ -1005,6 +1005,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     svgpicture.appendChild(pnode);
   }
   pnode = myCreateElementSVG("path");
+  st="";
   if (dox) {
 	  st="M"+(fqonlyx?origin[0]:winxmin)+","+(height-origin[1])+" "+winxmax+","+
     (height-origin[1]);
@@ -1284,7 +1285,7 @@ function drawPics(base) {
 					  if (!picture.hasAttribute("data-enlarged") && !picture.hasAttribute("data-nomag")) {
 					  	  addMagGlass();
 					  }
-				  } catch(err) {alert(err+"\n"+src)}
+				  } catch(err) {console.log(err+"\n"+src)}
 			  }
 		  }
 	  } else {
