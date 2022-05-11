@@ -4,15 +4,14 @@
 // licensed under GPL version 2 or later
 //
 
-function conversionVer() {
-	// File version
-	return 22;
-}
+// NOTE: _('word') is a call to gettext() for localization
+//
 
-function detectlanguage(){
+function conversion_detectlanguage(){
 
-    $supportedLangs = array('en', 'en-US', 'en-GB');
-    $languages = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+    $supportedLangs = array('en-gb', 'en-ca', 'en-us', 'en');
+    $langstr = preg_replace('/;q=[\d\.]*/','',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+    $languages = explode(',', strtolower($langstr));
 
     foreach($languages as $lang)
     {
@@ -23,131 +22,96 @@ function detectlanguage(){
         }
     }
 
-    // return a default
-    return 'en-US';
+    return 'en-us';
 }
+
+$conversion_browser_lang = conversion_detectlanguage();
 
 function exponent($case) {
     if($case=="E") {
-        return "Exponent";
+        return _('Exponent');
     } else {
-        return "exponent";
+        return _('exponent');
     }
 }
 
-// NOTE: _('word') is a call to gettext() for localization
-//
-
-// Functions for teh spelling of metric words
-// update the function
-//
 function deca($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
+    global $conversion_browser_lang;
+    if ($conversion_browser_lang == 'en-gb' || $conversion_browser_lang == 'en-ca') {
         if($case=="D") {
-            return "Deca";
+            return 'Deca';
         } else {
-            return "deca";
+            return 'deca';
         }
-    } elseif($lang == 'en-Us') {
-        if($case=="D") {
-            return "Deka";
-        } else {
-            return "deka";
-        }
-    }
-
-    //default
-    //
-    if($case=="D") {
-        return _('Deka');
     } else {
-        return _('deka');
+        if($case=="D") {
+            return _('Deka');
+        } else {
+            return _('deka');
+        }
     }
 }
 
 function meter($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
+    global $conversion_browser_lang;
+    if ($conversion_browser_lang == 'en-gb' || $conversion_browser_lang == 'en-ca') {
         if($case=="M") {
-            return "Metre";
+            return 'Metre';
         } else {
-            return "metre";
+            return 'metre';
         }
-    } elseif($lang == 'en-Us') {
-        if($case=="M") {
-            return "Meter";
-        } else {
-            return "meter";
-        }
-    }
-
-    //default
-    //
-    if($case=="D") {
-        return _('Meter');
     } else {
-        return _('meter');
+        if($case=="M") {
+            return _('Meter');
+        } else {
+            return _('meter');
+        }
     }
 }
 
 function liter($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
+    global $conversion_browser_lang;
+    if ($conversion_browser_lang == 'en-gb' || $conversion_browser_lang == 'en-ca') {
         if($case=="L") {
-            return "Litre";
+            return 'Litre';
         } else {
-            return "litre";
+            return 'litre';
         }
-    } elseif($lang == 'en-Us') {
-        if($case=="L") {
-            return "Liter";
-        } else {
-            return "liter";
-        }
-    }
-
-    //default
-    //
-    if($case=="D") {
-        return _('Liter');
     } else {
-        return _('liter');
+        if($case=="L") {
+            return _('Liter');
+        } else {
+            return _('liter');
+        }
     }
 }
 
 function gram($case) {
-    $lang = detectlanguage();
-
-    if($lang == 'en-GB') {
+    global $conversion_browser_lang;
+    if ($conversion_browser_lang == 'en-gb') {
         if($case=="G") {
-            return "Gramme";
+            return _('Gramme');
         } else {
-            return "gramme";
+            return _('gramme');
         }
-    } elseif($lang == 'en-Us') {
-        if($case=="G") {
-            return "Gram";
-        } else {
-            return "gram";
-        }
-    }
-
-    //default
-    //
-    if($case=="D") {
-        return _('Gram');
     } else {
-        return _('gram');
+        if($case=="G") {
+            return _('Gram');
+        } else {
+            return _('gram');
+        }
     }
+}
+
+
+function conversionVer() {
+	// File version
+	return 21;
 }
 
 global $allowedmacros;
 
-// USED FOR LOCAL TESTING
+// COMMENT OUT BEFORE UPLOADING
 if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
