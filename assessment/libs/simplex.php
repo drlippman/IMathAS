@@ -7,7 +7,7 @@
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 42;
+	return 43;
 }
 
 global $allowedmacros;
@@ -16,7 +16,7 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexreadsolutionarray", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
+array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexcreatelatexinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexreadsolutionarray", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
 
 define("simplexTolerance", .001);
 
@@ -505,7 +505,7 @@ function simplexcreateanswerboxentrytable() {
 // RETURNS: an array of strings
 function simplexcreateinequalities() {
 	$simplexestring = array();  // return value
-	//  arguments lise --------------------------------------------------
+	//  arguments list --------------------------------------------------
 	//  0 = type (max,min)
 	//  1 = objectivevariable
 	//  2 = objective
@@ -708,6 +708,246 @@ function simplexcreateinequalities() {
 
 	return $simplexestring;
 }
+
+
+// function simplexcreateinlatexequalities(type, objectivevariable, objective, constraints, [headers, showfractions, includeinequalities] )
+// Creates an array of string that correspond to each line of the simple inequalities in latex form
+//
+// INPUTS:
+//
+// type:		a string that contains either "max" or "min"
+// objectivevariable: the name of the objective function, like f of g.
+// objective:   list or array of the coefficients
+// constraints: an array that contains the inequality information. Constraints are in the
+//			  form of array(array(3,1,0),"<=",35)
+//			  constraint first  part is a list or array of the coefficients in the inequality
+//			  constraint second part is the inequality *<= or >=)
+//			  constraint third  part is the number on the other side of the inequality
+//
+// OPTIONAL
+//
+// headers:	 list or array of the variables names to use
+//	  default "x1,x2,x3, ..." for max
+//	  default "y1,y2,y3, ..." for min
+//
+// showfractions: either 0 or 1
+//				0 shows decimals
+//		default 1 shows fractions
+//
+// includeinequalities: either 0 or 1
+//					  0 does append the inequality and right hand sinde number ("<=",35)
+//			  default 1 include the full inequality
+//
+// RETURNS: an array of strings
+function simplexcreatelatexinequalities() {
+	$simplexestring = array();  // return value
+	//  arguments list --------------------------------------------------
+	//  0 = type (max,min)
+	//  1 = objectivevariable
+	//  2 = objective
+	//  3 = constraints
+	//  4 = header column names, default is not to show
+	//  5 = showfractions
+	//  6 = includeinequalities
+
+	// process arguments -----------------------------------------------
+	$args = func_get_args();
+
+	if (count($args)<4) {
+		echo "simplexcreatelatexinequalities requires at least 4 aurguments (type, objectivevariable, objective, and constraints).<br/>\r\n";
+		return $simplexestring;
+	}
+
+	// type
+	if(is_null($args[0])) {
+		echo "In simplexcreatelatexinequalities - Supplied Type was null which is not valid.  Valid values are <b>'min'</b> or <b>'max'</b>.<br/>\r\n";
+		return $simplexestring;
+	}
+	else {
+		$type = verifytype("simplexcreatelatexinequalities",$args[0],null);
+		if(is_null($type)) return $simplexestring;
+	}
+
+    // objectivevariable
+	if(is_null($args[1])) {
+		$objectivevariable = "";
+	}
+	else {
+		$objectivevariable = $args[1];
+	}
+
+	// objective
+	if(is_null($args[2])) {
+		echo "In simplexcreatelatexinequalities - You must supply an objective function.<br/>\r\n";
+		return $simplexestring;
+	}
+	else {
+		$objective = $args[2];
+		if (!is_array($objective)) { $objective = explode(',',$objective); }
+	}
+
+	//constraints
+	if(is_null($args[3])) {
+		echo "In simplexcreatelatexinequalities -You must supply constraint information.<br/>\r\n";
+		return $simplexestring;
+	}
+	else {
+		$constraints =verifyconstraints($type,$args[3]);
+	}
+
+	// OPTIONAL
+	//header
+
+	if((count($args)>4)&&(!is_null($args[4]))) {
+		$headers = $args[4];
+		if (!is_array($headers)) { $headers = explode(',',$headers); }
+	}
+	else {
+		$headers=array();
+		for($j=0,$size = count($objective);$j<$size;$j++) {
+			$count = $j+1;
+			if($type=="max")
+			{
+                $headers[$j] = "x_$count";
+			}
+			else
+			{
+                $headers[$j] = "y_$count";
+			}
+		}
+	}
+
+	// showfractions
+	if((count($args)>5)&&(!is_null($args[5]))) {
+		$showfractions = verifyshowfraction("simplexcreatelatexinequalities",$args[6],1);
+	}
+	else { $showfractions=1; }
+
+	//includeinequalities in the output string flag
+	if((count($args)>6)&&(!is_null($args[6]))) {
+		$includeinequalities = $args[7];
+		if(($includeinequalities!=0)&&($includeinequalities!=1)) {
+			echo "In simplexcreatelatexinequalities the supplied inequalities flag value ($includeinequalities) is invalid.  Valid values are 0 or 1.<br/>\r\n";
+			$includeinequalities=1;
+		}
+	}
+	else {$includeinequalities = 1; }
+
+	$tick = "$";
+
+	// Done processing arguments ---------------------------------------
+	$simplexestring = array();
+	if($objectivevariable=="") {
+		$simplexestring[0] = $tick;
+	}
+	else {
+		if($type=="max") {
+            $simplexestring[0] = "Maximize ";
+		}
+		else {
+            $simplexestring[0] = "Minimize ";
+		}
+		$simplexestring[0] .= $tick.$objectivevariable." = \\displaystyle";
+	}
+
+	// objective
+	$isfirst = true;
+	for($j=0,$sizeobjective = count($objective);$j<$sizeobjective;$j++) {
+		if($objective[$j]==0) {
+			// do nothing
+		}
+		else {
+
+			// do I need to add a + sign
+			if($isfirst) {
+				$isfirst = false;
+			}
+			else {
+				if($objective[$j]>0) { $simplexestring[0] .= "+"; }
+			}
+
+			// take care of +1,-1 case
+			if($objective[$j]==-1) {
+				$simplexestring[0] .= "-";
+			}
+			elseif ($objective[$j]==1) {
+				// do nothing
+			}
+			else {
+				// add the number as a fraction display, or decimal value
+				$frac = createsimplexelement($objective[$j]);
+
+				if($showfractions==1) {
+					if($frac[1]!=1) {
+                        $simplexestring[0] .= "\\frac{".$frac[0]."}{".$frac[1]."}";
+                    } else {
+                        $simplexestring[0] .= $frac[0];
+                    }
+				}
+				else {
+                    //$simplexestring[0] .= fractiontodecimal($frac);
+					$simplexestring[0] .= $frac[0]/$frac[1];
+				}
+			}
+			$simplexestring[0] .= $headers[$j];
+		}
+	}
+	$simplexestring[0] .= $tick;
+    if($objectivevariable!="") {
+		$simplexestring[0] .= " subject to";
+	}
+
+	// now create the inequalities from the constraints
+	for($r=0,$sizeconstraints = count($constraints);$r<$sizeconstraints;$r++) {
+		// remember row 0 is the Maximize or minimize line
+		$row = $r+1;
+		$coeff = $constraints[$r][0];
+		$isfirst = true;
+		$simplexestring[$row] = $tick;
+		for($j=0,$sizeobjective = count($objective);$j<$sizeobjective;$j++) {
+			if($coeff[$j]==0) {
+				// do nothing
+			}
+			else {
+				// do I need to add a + sign
+				if($isfirst) {
+					$isfirst = false;
+				}
+				else {
+					if($coeff[$j]>0) { $simplexestring[$row] .= "+"; }
+				}
+				// take care of +1,-1 case
+				if($coeff[$j]==-1) {
+					$simplexestring[$row] .= "-";
+				}
+				elseif($coeff[$j]==1) {
+                    // do nothing
+				}
+				else {
+					// add the number as a fraction display, or decimal value
+					$frac = createsimplexelement($coeff[$j]);
+					if($showfractions==1) {
+						if($frac[1]!=1) {
+                            $simplexestring[$row] .= "\\frac{".$frac[0]."}{".$frac[1]."}";
+                        } else {
+                            $simplexestring[$row] .= $frac[0];
+                        }
+					}
+					else {
+						$simplexestring[$row] .= $frac[0]/$frac[1];
+					}
+				}
+				$simplexestring[$row] .= $headers[$j];
+			}
+		}
+		// does the user want the inequality symbol included in the output?
+		if($includeinequalities==1) {$simplexestring[$row] .= $constraints[$r][1]." ".$constraints[$r][2]; }
+		$simplexestring[$row] .= $tick;
+	}
+
+	return $simplexestring;
+}
+
 
 //function simplexconverttodecimals(simplexmatrix)
 //
@@ -3309,7 +3549,9 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change log
-// 2021-12-13 ver 42 - eliminated a logic bug in verifyASCIIticks. Eliminated simplex fraction routines and am using the 
+// 2022-05-06 ver 43 - created simplexcreatelatexinequalities for the creation of latex inequalities
+//
+// 2021-12-13 ver 42 - eliminated a logic bug in verifyASCIIticks. Eliminated simplex fraction routines and am using the
 //                     fraction.php versions.
 //
 // 2021-12-07 ver 41 - Added another saftey check into simplexsolve2()
