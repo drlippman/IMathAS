@@ -1242,7 +1242,7 @@ function AMnumfuncPrepVar(qn,str) {
                //000 noprefix, noplural, sensitive
                //var unitsregex000 = "(in|mi|yd|min|h|hr|mo|yr|ha|gal|pt|qt|tbsp|tsp|rad|deg|grad|kt|c|mph|kph|rev|lbf|atm|mmHg|umHg|cmWater|psi|ksi|Mpsi|weber|amu|me|R|AU|au|degF|degC|degK|K)";
                //100 abb, noplural, sensitive
-               var unitsregex100 = "(m|ft|s|b|cc|g|t|N|dyn|J|cal|eV|Wh|W|hp|Pa|C|V|F|A|T|G|Wb|H|lm|lx|Da|mol|Ci|sr|Bq|ls|ly|pc)";
+               var unitsregex100 = "(m|ft|s|b|cc|g|t|N|dyn|J|cal|eV|Wh|W|hp|Pa|C|V|F|A|T|G|Wb|H|lm|lx|Da|mol|M|Ci|sr|Bq|ls|ly|pc)";
                //001 noprefix, noplural, insensitive
                var unitsregex001 = "(inch|inches|lbft|ftlb|solarmass|solarradius)";
                //101 abb, noplural, insensitive
