@@ -2332,7 +2332,7 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 		}
 		$out .= convertTri(round($dec),0);
 		$out .= ' '.$placevals[$cnt];
-		if ($dec!=1) {
+		if (round($dec)!=1) {
 			$out .= 's';
 		}
 
