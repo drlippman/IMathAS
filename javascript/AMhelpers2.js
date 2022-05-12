@@ -1236,9 +1236,9 @@ function AMnumfuncPrepVar(qn,str) {
              str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
 
              if (str.length > 0) {
-               var unitsregexlongprefix = "(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)";
+               var unitsregexlongprefix = "(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deca|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)";
                var unitsregexabbprefix = "(Y|Z|E|P|T|G|M|k|h|da|d|c|m|u|n|p|f|a|z|y)";
-               var unitsregexfull = /^(m|meter|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)$/;
+               var unitsregexfull = /^(m|meter|metre|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|gramme|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)$/;
                //000 noprefix, noplural, sensitive
                //var unitsregex000 = "(in|mi|yd|min|h|hr|mo|yr|ha|gal|pt|qt|tbsp|tsp|rad|deg|grad|kt|c|mph|kph|rev|lbf|atm|mmHg|umHg|cmWater|psi|ksi|Mpsi|weber|amu|me|R|AU|au|degF|degC|degK|K)";
                //100 abb, noplural, sensitive
@@ -1252,7 +1252,7 @@ function AMnumfuncPrepVar(qn,str) {
                //011 noprefix, plural, insensitive
                var unitsregex011 = "(micron|mile|furlong|yard|minute|hour|day|week|month|year|fortnight|acre|hectare|gallon|cup|pint|quart|tablespoon|teaspoon|radian|degree|gradian|knot|revolution|cycle|kip|lb|therm|atmosphere|roentgen)";
                //211 long, plural, insensitive
-               var unitsregex211 = "(meter|angstrom|second|barn|liter|litre|arcminute|arcsecond|gram|tonne|newton|dyne|pound|ton|joule|erg|calorie|electronvolt|watt|pascal|coulomb|volt|farad|ohm|amp|ampere|tesla|weber|henry|lumen|dalton|mole|curie|steradian|becquerel|lightsecond|lightyear|parsec)";
+               var unitsregex211 = "(meter|metre|angstrom|second|barn|liter|litre|arcminute|arcsecond|gram|gramme|tonne|newton|dyne|pound|ton|joule|erg|calorie|electronvolt|watt|pascal|coulomb|volt|farad|ohm|amp|ampere|tesla|weber|henry|lumen|dalton|mole|curie|steradian|becquerel|lightsecond|lightyear|parsec)";
                
                var unitsregexfull100 = new RegExp("^" + unitsregexabbprefix + "?" + unitsregex100 + "$");
                var unitsregexfull001 = new RegExp("^" + unitsregex001 + "$", 'i');

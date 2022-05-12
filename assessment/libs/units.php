@@ -28,6 +28,7 @@ function parseunits($unitsExpression) {
     //Length
       'm' => [1,array(0,1,0,0,0,0,0,0,0,0),1,0,0],
       'meter' => [1,array(0,1,0,0,0,0,0,0,0,0),2,1,1],
+      'metre' => [1,array(0,1,0,0,0,0,0,0,0,0),2,1,1],
       'micron' => [1E-6,array(0,1,0,0,0,0,0,0,0,0),0,1,1],
       'angstrom' => [1E-10,array(0,1,0,0,0,0,0,0,0,0),2,1,1],
       'fermi' => [1E-15,array(0,1,0,0,0,0,0,0,0,0),2,0,1],
@@ -98,6 +99,7 @@ function parseunits($unitsExpression) {
     //Mass
       'g' => [0.001,array(1,0,0,0,0,0,0,0,0,0),1,0,0],
       'gram' => [0.001,array(1,0,0,0,0,0,0,0,0,0),2,1,1],
+      'gramme' => [0.001,array(1,0,0,0,0,0,0,0,0,0),2,1,1],
       't' => [1000,array(1,0,0,0,0,0,0,0,0,0),1,0,0],
       'tonne' => [1000,array(1,0,0,0,0,0,0,0,0,0),2,1,1],
     //Frequency
@@ -222,6 +224,7 @@ function parseunits($unitsExpression) {
       'kilo' => ['kilo',1E3],
       'hecto' => ['hecto',100],
       'deka' => ['deka',10],
+      'deca' => ['deka',10],
       'deci' => ['deci',0.1],
       'centi' => ['centi',0.01],
       'milli' => ['milli',1E-3],
@@ -260,7 +263,7 @@ function parseunits($unitsExpression) {
     $unitAbbPrefixKeys = array_keys($unitAbbPrefix);
     
     //Search string for metric prefixes.
-    $unitPrefixPattern = '/yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto/i';
+    $unitPrefixPattern = '/yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deca|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto/i';
     
     $unitsExpression = trim($unitsExpression);
     
