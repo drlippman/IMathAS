@@ -1186,10 +1186,22 @@ function initlinkmarkup(base) {
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
     $(base).find('a[href*="loom.com/share"],a[href*="loom.com/embed"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
-	setupToggler(base);
+	setIframeSpinner(base);
+    setupToggler(base);
 	setupToggler2(base);
 	$(base).fitVids();
     resizeResponsiveIframes(base, true);
+}
+
+function setIframeSpinner(base) {
+    jQuery(base).find('iframe').each(function(i,el) {
+        if (el.style.background == '') {
+            el.style.background = 'url('+staticroot+'/img/updating.gif) center center no-repeat';
+        }
+        $(el).on("load", function() {
+            this.style.backgroundImage = 'none';
+        });
+    });
 }
 
 function resizeResponsiveIframes(base, init) {
