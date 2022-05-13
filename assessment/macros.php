@@ -2120,7 +2120,7 @@ function makescinot($n,$d=8,$f="x") {
 	if ($n==0) { return "0";}
 	$isneg = "";
 	if ($n<0) { $isneg = "-"; $n = abs($n);}
-	$exp = floor(log10($n));
+	$exp = floor(log10($n)+1e-12);
 	if ($d==-1) {
 		$mant = round($n/pow(10,$exp),8);
 	} else {
