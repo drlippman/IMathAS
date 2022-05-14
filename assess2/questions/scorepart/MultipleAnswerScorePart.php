@@ -38,7 +38,8 @@ class MultipleAnswerScorePart implements ScorePart
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
         $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
-
+        $answers = trim($answers, ' ,');
+        
         if (!is_array($questions)) {
             $scorePartResult->addScoreMessage(_('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.'));
             $scorePartResult->setRawScore(0);

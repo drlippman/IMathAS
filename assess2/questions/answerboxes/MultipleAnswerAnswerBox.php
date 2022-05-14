@@ -46,7 +46,8 @@ class MultipleAnswerAnswerBox implements AnswerBox
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
         $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
-
+        $answers = trim($answers, ' ,');
+        
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
             $questions = array();
