@@ -32,7 +32,7 @@ function myhtmLawed($t, $NC=1, $NS='') {
 		'direct_list_nest'=>1,
 		'deny_attribute'=>'on*',
 		'cdata'=>0,
-		'comment'=>0
+		'comment'=>1
 		);
 	$S = "embed=sscr,script";
 	if (is_array($NC)) { //overwrite or append new config
