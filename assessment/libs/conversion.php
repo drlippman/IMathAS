@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 22;
+	return 23;
 }
 
 function conversion_detectlanguage(){
@@ -14,9 +14,6 @@ function conversion_detectlanguage(){
     $supportedLangs = array('en-gb', 'en-ca', 'en-us', 'en', 'de', 'de-de');
     $conversion_browser_langstr = preg_replace('/;q=[\d\.]*/','',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
     $conversion_browser_languages = explode(',', strtolower($conversion_browser_langstr));
-
-    // test for specific language
-    //$conversion_browser_languages = array('de-de');
 
     foreach($conversion_browser_languages as $conversion_browser_lang)
     {
@@ -159,6 +156,24 @@ function decaabbr($case) {
             return _('Da');
         } else {
             return _('da');
+        }
+    }
+}
+function decaabbrsr($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="D") {
+            return "D a";
+        } else {
+            return "d a";
+        }
+    } else {
+        //default
+        if($case=="D") {
+            return _('D a');
+        } else {
+            return _('d a');
         }
     }
 }
@@ -918,18 +933,36 @@ function conversionAbbreviations() {
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
-
-	$system = $args[0];
-	$temp = verifyString($args[1]);
-	if(strlen($temp)==0 ) {
-		$FirstLetter = "L";
-    } else {
-		$FirstLetter = substr($temp, 0, 1);
+	} else {
+        $system = strtoupper(substr($args[0], 0, 1));
+        if($system!='A' && $system!='M' && $system!='T' ) {
+            echo (string)$system." is not a valid type. The system type is American, Metric, or Time";
+            return "";
+        }
     }
 
-	$tick = verifyTickMarks($args[2]);
-	$fullname = verifyFullName($args[3]);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $temp = verifyString($args[1]);
+        if(strlen($temp)==0 ) {
+            $FirstLetter = "L";
+        } else {
+            $FirstLetter = strtoupper(substr($temp, 0, 1));
+        }
+    } else {
+        $FirstLetter = "L";
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $tick = verifyTickMarks($args[2]);
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $fullname = verifyFullName($args[3]);
+    } else {
+        $fullname = 0;
+    }
 
 	if($FirstLetter=="L") {$type="Length";}
 	if($FirstLetter=="C") {$type="Capacity";}
@@ -1125,14 +1158,39 @@ function conversionArea() {
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
+	} else {
+        $system = strtoupper($args[0]);
+        if($system!='A' && $system!='M' && $system!='AM' && $system!='MA' ) {
+            echo (string)$system." is not a valid type. The system type is American, Metric, or Time";
+            return "";
+        }
+    }
 
-	$system = $args[0];
-	$fullname = verifyFullName($args[1]);
-	$rounding = verifyRounding($args[2]);
-	$tick = $args[3];
-    $sign_no = verifyEqualSign($args[4],"n");
-    $sign = verifyEqualSign($args[4],$tick);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $fullname = verifyFullName($args[1]);
+    } else {
+        $fullname = 0;
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $rounding = verifyRounding($args[2]);
+    } else {
+        $rounding = 2;
+    }
+
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $tick = $args[3];
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $sign_no = verifyEqualSign($args[4],"n");
+        $sign = verifyEqualSign($args[4],$tick);
+    } else {
+        $sign_no = verifyEqualSign("=","n");
+        $sign = verifyEqualSign("=",$tick);
+    }
 
     $retval = array();
 
@@ -1232,17 +1290,41 @@ function conversionArea() {
 // use conversionCapacity("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionCapacity() {
 
-	$args = func_get_args();
+    $args = func_get_args();
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
+	} else {
+        $system = strtoupper($args[0]);
+        if($system!='A' && $system!='M' && $system!='AM' && $system!='MA' ) {
+            echo (string)$system." is not a valid type. The system type is American, Metric, or Time";
+            return "";
+        }
+    }
 
-	$system = $args[0];
-	$fullname = verifyFullName($args[1]);
-	$rounding = verifyRounding($args[2]);
-    $tick = verifyTickMarks($args[4]);
-    $sign = verifyEqualSign($args[3],$tick);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $fullname = verifyFullName($args[1]);
+    } else {
+        $fullname = 0;
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $rounding = verifyRounding($args[2]);
+    } else {
+        $rounding = 2;
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $tick = verifyTickMarks($args[4]);
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $sign = verifyEqualSign($args[3],$tick);
+    } else {
+        $sign = verifyEqualSign("=",$tick);
+    }
 
     $retval = array();
 
@@ -1591,10 +1673,9 @@ function volume($case) {
 function conversionFormulaAbbreviations() {
     $args = func_get_args();
 	if (count($args)==0) {
-		$firstPart = "C";  // Circle
+		$firstPart = "C";  // Circle is the default
 	} else {
-        $type = $args[0];
-        $firstPart = strtoupper(substr($type, 0, 1));
+        $firstPart = strtoupper(substr((string)$args[0], 0, 1));
     }
     $retval = array();
 
@@ -1713,16 +1794,24 @@ function conversionFormulaGeometry() {
 
     $args = func_get_args();
 	if (count($args)==0) {
-		$firstPart = "C";  // Circle
+		$firstPart = "C";  // Circle is the default
 	} else {
-        $type = $args[0];
-        $firstPart = strtoupper(substr($type, 0, 1));
+        $firstPart = strtoupper(substr((string)$args[0], 0, 1));
     }
-    $tick = $args[1];
-    $PI = verifyPI($args[2]);
+
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $tick = $args[1];
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $PI = verifyPI($args[2]);
+    } else {
+        $PI = " pi ";
+    }
 
     $retval = array();
-
 
     if($firstPart=="C") {$type="Circle";}
     if($firstPart=="T") {$type="Triangle";}
@@ -1773,15 +1862,20 @@ function conversionFormulaGeometry() {
 //
 // use ConversionFormulaTemperature("F") returns the formula for F = 9/5C+32
 function conversionFormulaTemperature() {
-	$args = func_get_args();
+
+    $args = func_get_args();
 	if (count($args)==0) {
 		$FirstLetter = "F";  // Fahrenheit
 	} else {
-        $type = $args[0];
-        $FirstLetter = strtoupper(substr($type, 0, 1));
+        $FirstLetter = strtoupper(substr($args[0], 0, 1));
     }
 
-    $tick = verifyTickMarks($args[1]);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $tick = verifyTickMarks($args[1]);
+    } else {
+        $tick = "";
+    }
+
 
 	if($FirstLetter=="C") {$type="Celsius";}
     if($FirstLetter=="F") {$type="Fahrenheit";}
@@ -1827,17 +1921,41 @@ function conversionFormulaTemperature() {
 // use conversionLength("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionLength() {
 
-	$args = func_get_args();
+    $args = func_get_args();
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
+	} else {
+        $system = strtoupper($args[0]);
+        if($system!='A' && $system!='M' && $system!='AM' && $system!='MA' ) {
+            echo (string)$system." is not a valid type. The system type is American, Metric, or Time";
+            return "";
+        }
+    }
 
-	$system = $args[0];
-	$fullname = verifyFullName($args[1]);
-	$rounding = verifyRounding($args[2]);
-    $tick = verifyTickMarks($args[4]);
-    $sign = verifyEqualSign($args[3],$tick);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $fullname = verifyFullName($args[1]);
+    } else {
+        $fullname = 0;
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $rounding = verifyRounding($args[2]);
+    } else {
+        $rounding = 2;
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $tick = verifyTickMarks($args[4]);
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $sign = verifyEqualSign($args[3],$tick);
+    } else {
+        $sign = verifyEqualSign("=",$tick);
+    }
 
     $retval = array();
 
@@ -1917,16 +2035,23 @@ function conversionLength() {
 // use conversionLiquid("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionLiquid() {
 
-	$args = func_get_args();
+    $args = func_get_args();
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
+	} else {
+        $system = strtoupper($args[0]);
+        if($system!='C' ) {
+            echo (string)$system." is not a valid type. The system type is Casks";
+            return "";
+        }
+    }
 
-	$system = $args[0];
-	$fullname = verifyFullName($args[1]);
-	//$rounding = verifyRounding($args[2]);
-	//$tick = verifyTickMarks($args[3]);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $fullname = verifyFullName($args[1]);
+    } else {
+        $fullname = 0;
+    }
 
     $retval = array();
 
@@ -1978,9 +2103,15 @@ function conversionPrefix() {
         $type = strtoupper($args[0]);
     }
 
+
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $ShowAbb = verifyFullName($args[1]);
+    } else {
+        $ShowAbb = 0;
+    }
+
     $retval = array();
 
-	$ShowAbb = verifyFullName($args[1]);
 	if($ShowAbb == 0) {
         $retval[0] = kilo("K");
         $retval[1] = hecto("H");
@@ -1997,20 +2128,20 @@ function conversionPrefix() {
         $retval[5] = centi("C");
         $retval[6] = milli("M");
     } else {
-        $retval[0] = kilo("K")." (k)";
-        $retval[1] = hecto("H")." (h)";
-        $retval[2] = deca("D")." (<span aria-hidden=true>da</span><span class=\"sr-only\">d a</span>)";
+        $retval[0] = kilo("K")." (".kiloabbr("k").")";
+        $retval[1] = hecto("H")." (".hectoabbr("h").")";
+        $retval[2] = deca("D")." (<span aria-hidden=true>".decaabbr("d")."</span><span class=\"sr-only\">".decaabbrsr("d")."</span>)";
         if($type == "G") {
-            $retval[3] = gram("G")." (g)";
+            $retval[3] = gram("G")." (".gramabbr("g").")";
         } elseif($type == "L") {
-            $retval[3] = liter("L")." (L)";
+            $retval[3] = liter("L")." (".literabbr("l").")";
         } else {
-            $retval[3] = meter("M")." (m)";
+            $retval[3] = meter("M")." (".meterabbr("m").")";
         }
 
-        $retval[4] = deci("D")." (d)";
-        $retval[5] = centi("C")." (c)";
-        $retval[6] = milli("M")." (m)";
+        $retval[4] = deci("D")." (".deciabbr("d").")";
+        $retval[5] = centi("C")." (".centiabbr("c").")";
+        $retval[6] = milli("M")." (".milliabbr("m").")";
     }
 
 	return $retval;
@@ -2044,14 +2175,39 @@ function conversionVolume() {
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
+	} else {
+        $system = strtoupper($args[0]);
+        if($system!='A' && $system!='M' && $system!='AM' && $system!='MA' ) {
+            echo (string)$system." is not a valid type. The system type is American, Metric, or Time";
+            return "";
+        }
+    }
 
-	$system = $args[0];
-	$fullname = verifyFullName($args[1]);
-	$rounding = verifyRounding($args[2]);
-	$tick = verifyTickMarks($args[3]);
-    $sign_no = verifyEqualSign($args[4],"n");
-    $sign = verifyEqualSign($args[4],$tick);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $fullname = verifyFullName($args[1]);
+    } else {
+        $fullname = 0;
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $rounding = verifyRounding($args[2]);
+    } else {
+        $rounding = 2;
+    }
+
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $tick = verifyTickMarks($args[3]);
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $sign_no = verifyEqualSign($args[4],"n");
+        $sign = verifyEqualSign($args[4],$tick);
+    } else {
+        $sign_no = verifyEqualSign("=","n");
+        $sign = verifyEqualSign("=",$tick);
+    }
 
     $retval = array();
 
@@ -2202,13 +2358,37 @@ function conversionWeight() {
 	if (count($args)==0) {
 		echo "Nothing to display - no system type supplied.<br/>\r\n";
 		return "";
-	}
+	} else {
+        $system = strtoupper($args[0]);
+        if($system!='A' && $system!='M' && $system!='AM' && $system!='MA' ) {
+            echo (string)$system." is not a valid type. The system type is American, Metric, or Time";
+            return "";
+        }
+    }
 
-	$system = $args[0];
-	$fullname = verifyFullName($args[1]);
-	$rounding = verifyRounding($args[2]);
-    $tick = verifyTickMarks($args[4]);
-    $sign = verifyEqualSign($args[3],$tick);
+    if ( count($args)>1 && !is_null($args[1]) ) {
+        $fullname = verifyFullName($args[1]);
+    } else {
+        $fullname = 0;
+    }
+
+    if ( count($args)>2 && !is_null($args[2]) ) {
+        $rounding = verifyRounding($args[2]);
+    } else {
+        $rounding = 2;
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $tick = verifyTickMarks($args[4]);
+    } else {
+        $tick = "";
+    }
+
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $sign = verifyEqualSign($args[3],$tick);
+    } else {
+        $sign = verifyEqualSign("=",$tick);
+    }
 
     $retval = array();
 
@@ -2261,6 +2441,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2022-05-15 ver 23 - Bug fixes for offset error when checking for function augments. Added abbreviation in functions that were missed.
 // 2022-05-11 ver 22 - Added German words to the file.
 // 2022-05-09 ver 21 - Converted to language detection with gettext _('') as a fallback.
 // 2022-05-04 ver 20 - Changed all spelling _('') to functions for easier maintance.
