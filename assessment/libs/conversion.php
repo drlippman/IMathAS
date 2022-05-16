@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 23;
+	return 24;
 }
 
 function conversion_detectlanguage(){
@@ -41,6 +41,369 @@ function exponent($case) {
     }
 }
 
+// American Prefix Functions --------------------------------------------------------------------------------
+function inch($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="I") {
+            return "Zoll";
+        } else {
+            return "zoll";
+        }
+    } else {
+        //default
+        if($case=="I") {
+            return _('Inch');
+        } else {
+            return _('inch');
+        }
+    }
+}
+function inches($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="I") {
+            return "Zoll";
+        } else {
+            return "zoll";
+        }
+    } else {
+        //default
+        if($case=="I") {
+            return _('Inches');
+        } else {
+            return _('inches');
+        }
+    }
+}
+function foot($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="F") {
+            return "Fuß";
+        } else {
+            return "fuß";
+        }
+    } else {
+        //default
+        if($case=="F") {
+            return _('Foot');
+        } else {
+            return _('foot');
+        }
+    }
+}
+function feet($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="F") {
+            return "Fuß";
+        } else {
+            return "fuß";
+        }
+    } else {
+        //default
+        if($case=="F") {
+            return _('Feet');
+        } else {
+            return _('feet');
+        }
+    }
+}
+function yard($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="Y") {
+            return "Yard";
+        } else {
+            return "yard";
+        }
+    } else {
+        //default
+        if($case=="Y") {
+            return _('Yard');
+        } else {
+            return _('yard');
+        }
+    }
+}
+function yards($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="Y") {
+            return "Yards";
+        } else {
+            return "yards";
+        }
+    } else {
+        //default
+        if($case=="Y") {
+            return _('Yards');
+        } else {
+            return _('yards');
+        }
+    }
+}
+function mile($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="M") {
+            return "Meile";
+        } else {
+            return "meile";
+        }
+    } else {
+        //default
+        if($case=="M") {
+            return _('Mile');
+        } else {
+            return _('mile');
+        }
+    }
+}
+function miles($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="M") {
+            return "Meilen";
+        } else {
+            return "meilen";
+        }
+    } else {
+        //default
+        if($case=="M") {
+            return _('Miles');
+        } else {
+            return _('miles');
+        }
+    }
+}
+function acres($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="A") {
+            return "Acres";
+        } else {
+            return "acres";
+        }
+    } else {
+        //default
+        if($case=="A") {
+            return _('Acres');
+        } else {
+            return _('acres');
+        }
+    }
+}
+function acresabbr($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="A") {
+            return "Acre";
+        } else {
+            return "acre";
+        }
+    } else {
+        //default
+        if($case=="A") {
+            return _('Acre');
+        } else {
+            return _('acre');
+        }
+    }
+}
+
+function fluidounces($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="F") {
+            return "Flüssige Unzen";
+        } else {
+            return "Flüssige Unzen";
+        }
+    } else {
+        //default
+        if($case=="F") {
+            return _('Fluid ounces');
+        } else {
+            return _('fluid ounces');
+        }
+    }
+}
+function cup($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="C") {
+            return "Tasse";
+        } else {
+            return "tasse";
+        }
+    } else {
+        //default
+        if($case=="C") {
+            return _('Cup');
+        } else {
+            return _('cup');
+        }
+    }
+}
+function cups($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="C") {
+            return "Tassen";
+        } else {
+            return "tassen";
+        }
+    } else {
+        //default
+        if($case=="C") {
+            return _('Cups');
+        } else {
+            return _('cups');
+        }
+    }
+}
+function pints($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="P") {
+            return "Pints";
+        } else {
+            return "pints";
+        }
+    } else {
+        //default
+        if($case=="P") {
+            return _('Pints');
+        } else {
+            return _('pints');
+        }
+    }
+}
+function quarts($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="Q") {
+            return "Quart";
+        } else {
+            return "quart";
+        }
+    } else {
+        //default
+        if($case=="Q") {
+            return _('Quarts');
+        } else {
+            return _('quarts');
+        }
+    }
+}
+function gallons($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="G") {
+            return "Gallonen";
+        } else {
+            return "gallonen";
+        }
+    } else {
+        //default
+        if($case=="G") {
+            return _('Gallons');
+        } else {
+            return _('gallons');
+        }
+    }
+}
+
+function ounces($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="O") {
+            return "Unzen";
+        } else {
+            return "unzen";
+        }
+    } else {
+        //default
+        if($case=="O") {
+            return _('Ounces');
+        } else {
+            return _('ounces');
+        }
+    }
+}
+function pounds($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="P") {
+            return "Pfund";
+        } else {
+            return "pfund";
+        }
+    } else {
+        //default
+        if($case=="P") {
+            return _('Pounds');
+        } else {
+            return _('pounds');
+        }
+    }
+}
+function americanton($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="T") {
+            return "Tonne";
+        } else {
+            return "Tonne";
+        }
+    } else {
+        //default
+        if($case=="T") {
+            return _('Ton');
+        } else {
+            return _('ton');
+        }
+    }
+}
+function americantons($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="T") {
+            return "Tonnen";
+        } else {
+            return "Tonnen";
+        }
+    } else {
+        //default
+        if($case=="T") {
+            return _('Tons');
+        } else {
+            return _('tons');
+        }
+    }
+}
 
 // Metric Prefix Functions --------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -59,7 +422,11 @@ function kilo($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
-        return "Kilo";
+        if($case=="K") {
+            return "Kilo";
+        } else {
+            return "kilo";
+        }
     } else {
         //default
         if($case=="K") {
@@ -92,7 +459,11 @@ function hecto($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
-        return "Hekto";
+        if($case=="H") {
+            return "Hekto";
+        } else {
+            return "hekto";
+        }
     } else {
         //default
         if($case=="H") {
@@ -131,7 +502,11 @@ function deca($case) {
             return "deca";
         }
     }  elseif($conversion_browser_lang == 'de-de') {
-        return "Deka";
+        if($case=="D") {
+            return "Deka";
+        } else {
+            return "deka";
+        }
     } else {
         //default
         if($case=="D") {
@@ -284,7 +659,11 @@ function deci($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
-        return "Dezi";
+        if($case=="D") {
+            return "Dezi";
+        } else {
+            return "dezi";
+        }
     } else {
         //default
         if($case=="D") {
@@ -317,7 +696,11 @@ function centi($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
-        return "Zenti";
+        if($case=="C") {
+            return "Zenti";
+        } else {
+            return "zenti";
+        }
     } else {
         //default
         if($case=="C") {
@@ -332,9 +715,9 @@ function centiabbr($case) {
 
     if($conversion_browser_lang == 'de-de') {
         if($case=="C") {
-            return "Z";
+            return "C";
         } else {
-            return "z";
+            return "c";
         }
     } else {
         //default
@@ -351,6 +734,11 @@ function milli($case) {
 
     if($conversion_browser_lang == 'de-de') {
         return "Milli";
+        if($case=="M") {
+            return "Milli";
+        } else {
+            return "milli";
+        }
     } else {
         //default
         if($case=="M") {
@@ -670,6 +1058,66 @@ function seconds($case) {
     }
 }
 
+//
+function hectares($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        return "Hektar";
+    } else {
+        //default
+        if($case=="H") {
+            return _('Hectares');
+        } else {
+            return _('hectares');
+        }
+    }
+}
+function hectaresabbr($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        return "ha";
+    } else {
+        //default
+        if($case=="H") {
+            return _('Ha');
+        } else {
+            return _('ha');
+        }
+    }
+}
+
+function ares($case) {
+    global $conversion_browser_lang;
+
+    if($case=="A") {
+        return _('Ares');
+    } else {
+        return _('ares');
+    }
+
+}
+function aresabbr($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="A") {
+            return "Ar";
+        } else {
+            return "ar";
+        }
+    } else {
+        //default
+        if($case=="A") {
+            return _('A');
+        } else {
+            return _('a');
+        }
+    }
+}
+
+
 global $allowedmacros;
 
 // USED FOR LOCAL TESTING
@@ -679,15 +1127,16 @@ if(!is_array($allowedmacros)) {
 
 array_push($allowedmacros, "conversionVer", "conversionAbbreviations",  "conversionArea",
     "conversionCapacity", "conversionDisplay", "conversionDisplay2HTML", "conversionDisplay2HTMLwithBorder",
-     "conversionFormulaAbbreviations", "conversionFormulaGeometry", "conversionFormulaTemperature",
-     "conversionLength", "conversionLiquid", "conversionPrefix", "conversionTime",
+    "conversionFormulaAbbreviations", "conversionFormulaGeometry", "conversionFormulaTemperature",
+    "conversionLength", "conversionLiquid", "conversionPrefix", "conversionTime",
     "conversionUnits2ScreenReader1", "conversionUnits2ScreenReader2", "conversionVolume", "conversionWeight",
     "conversion_detectlanguage", "kilo", "kiloabbr", "hecto", "hectoabbr", "meter", "meterabbr", "liter", "literabbr",
-    "gram", "gramabbr", "deci", "deciabbr",
-    "centi", "centiabbr", "milli", "milliabbr", "century", "centuryabbr", "centuries", "decade", "decades", "year",
-    "yearabbr", "years", "day", "dayabbr", "days", "hour", "hourabbr", "hours", "minute", "minuteabbr", "minutes",
-    "second", "secondabbr", "seconds", "metricTon", "metricTonabbr", "metricTons", "area", "base", "circumference",
-    "diameter", "height", "length", "perimeter", "radius", "width", "volume");
+    "gram", "gramabbr", "deci", "deciabbr", "centi", "centiabbr", "milli", "milliabbr", "century", "centuryabbr", "centuries",
+    "decade", "decades", "year", "yearabbr", "years", "day", "dayabbr", "days", "hour", "hourabbr", "hours", "minute", "minuteabbr",
+    "minutes", "second", "secondabbr", "seconds", "metricton", "metrictonabbr", "metrictons", "area", "base", "circumference",
+    "diameter", "height", "length", "perimeter", "radius", "width", "volume", "inch", "inches", "foot", "feet", "yard", "yards", 
+    "mile", "acres", "acresabbr", "fluidounces", "cup", "cups", "pints", "quarts", "gallons", "ounces", "pounds", "americanton", 
+    "americantons");
 
 // internal only  ----------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -928,6 +1377,7 @@ function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$u
 //
 // use conversionAbbreviations("A","Length") returns an array of strings that have american abbreviations of length
 function conversionAbbreviations() {
+    global $conversion_browser_lang;
 
 	$args = func_get_args();
 	if (count($args)==0) {
@@ -982,42 +1432,55 @@ function conversionAbbreviations() {
 	// -------------------------------------------------------------------------------------------------
 	if($system=="A"){
 		if($type=="Length"){
-			$retval[0] = "Inches = in";
-			$retval[1] = "Feet = ft";
-			$retval[2] = "Yards = yd";
-			$retval[3] = "Miles = mi";
+			$retval[0] = inches("I")." = in";
+			$retval[1] = feet("F")." = ft";
+			$retval[2] = yards("Y")." = yd";
+			$retval[3] = miles("M")." = mi";
         } elseif($type=="Capacity"){
-			$retval[0] = "Fluid ounces = fl oz";
-			$retval[1] = "Cups = c";
-			$retval[2] = "Pints = pt";
-			$retval[3] = "Quarts = qt";
-			$retval[4] = "Gallons = gal";
+			$retval[0] = fluidounces("F")." = fl oz";
+			$retval[1] = cups("C")." = c";
+			$retval[2] = pints("P")." = pt";
+			$retval[3] = quarts("Q")." = qt";
+			$retval[4] = gallons("G")." = gal";
         } elseif(($type=="Weight")||($type=="Mass")){
-			$retval[0] = "Ounces = oz";
-			$retval[1] = "Pounds = lbs";
-			$retval[2] = "Tons = T";
+			$retval[0] = ounces("O")." = oz";
+			$retval[1] = pounds("P")." = lbs";
+			$retval[2] = americanton("T")." = T";
         } elseif($type=="Area"){
-			if($fullname==0) {
-                $retval[0] = "Inches squared = ".conversionUnits2ScreenReader1("","in",2,$tick);
-                $retval[1] = "Feet squared = ".conversionUnits2ScreenReader1("","ft",2,$tick);
-                $retval[2] = "Yard squared = ".conversionUnits2ScreenReader1("","yd",2,$tick);
-                $retval[3] = "Mile squared = ".conversionUnits2ScreenReader1("","mi",2,$tick);
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = squared("S").inch("i")." = ".conversionUnits2ScreenReader1("","in",2,$tick);
+                $retval[1] = squared("S").feet("f")." = ".conversionUnits2ScreenReader1("","ft",2,$tick);
+                $retval[2] = squared("S").yard("y")." = ".conversionUnits2ScreenReader1("","yd",2,$tick);
+                $retval[3] = squared("S").mile("m")." = ".conversionUnits2ScreenReader1("","mi",2,$tick);
             } else {
-                $retval[0] = "Square inches = ".conversionUnits2ScreenReader1("","in",2,$tick);
-                $retval[1] = "Square feet = ".conversionUnits2ScreenReader1("","ft",2,$tick);
-                $retval[2] = "Square yard = ".conversionUnits2ScreenReader1("","yd",2,$tick);
-                $retval[3] = "Square mile = ".conversionUnits2ScreenReader1("","mi",2,$tick);
+                if($fullname==0) {
+                    $retval[0] = "Inches squared = ".conversionUnits2ScreenReader1("","in",2,$tick);
+                    $retval[1] = "Feet squared = ".conversionUnits2ScreenReader1("","ft",2,$tick);
+                    $retval[2] = "Yard squared = ".conversionUnits2ScreenReader1("","yd",2,$tick);
+                    $retval[3] = "Mile squared = ".conversionUnits2ScreenReader1("","mi",2,$tick);
+                } else {
+                    $retval[0] = "Square inches = ".conversionUnits2ScreenReader1("","in",2,$tick);
+                    $retval[1] = "Square feet = ".conversionUnits2ScreenReader1("","ft",2,$tick);
+                    $retval[2] = "Square yard = ".conversionUnits2ScreenReader1("","yd",2,$tick);
+                    $retval[3] = "Square mile = ".conversionUnits2ScreenReader1("","mi",2,$tick);
+                }
             }
 
         } elseif($type=="Volume"){
-			if($fullname==0) {
-                $retval[0] = "Inches cubed = ".conversionUnits2ScreenReader1("","in",3,$tick);
-                $retval[1] = "Feet cubed = ".conversionUnits2ScreenReader1("","ft",3,$tick);
-                $retval[2] = "Yard cubed = ".conversionUnits2ScreenReader1("","yd",3,$tick);
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = cubic("C").inch("i")." = ".conversionUnits2ScreenReader1("","in",3,$tick);
+                $retval[1] = cubic("C").feet("f")." = ".conversionUnits2ScreenReader1("","ft",3,$tick);
+                $retval[2] = cubic("C").yard("y")." = ".conversionUnits2ScreenReader1("","yd",3,$tick);
             } else {
-                $retval[0] = "Cubic inches = ".conversionUnits2ScreenReader1("","in",3,$tick);
-                $retval[1] = "Cubic feet = ".conversionUnits2ScreenReader1("","ft",3,$tick);
-                $retval[2] = "Cubic yard = ".conversionUnits2ScreenReader1("","yd",3,$tick);
+                if($fullname==0) {
+                    $retval[0] = "Inches cubed = ".conversionUnits2ScreenReader1("","in",3,$tick);
+                    $retval[1] = "Feet cubed = ".conversionUnits2ScreenReader1("","ft",3,$tick);
+                    $retval[2] = "Yard cubed = ".conversionUnits2ScreenReader1("","yd",3,$tick);
+                } else {
+                    $retval[0] = "Cubic inches = ".conversionUnits2ScreenReader1("","in",3,$tick);
+                    $retval[1] = "Cubic feet = ".conversionUnits2ScreenReader1("","ft",3,$tick);
+                    $retval[2] = "Cubic yard = ".conversionUnits2ScreenReader1("","yd",3,$tick);
+                }
             }
         }
 
@@ -1051,44 +1514,68 @@ function conversionAbbreviations() {
 			$retval[4] = deca("D").gram("g")." = ".conversionUnits2ScreenReader1("",decaabbr("d").gramabbr("g"),1,"n");
 			$retval[5] = hecto("H").gram("g")." = ".hectoabbr("h").gramabbr("g");
 			$retval[6] = kilo("K").gram("g")." = ".kiloabbr("k").gramabbr("g");
-			$retval[7] = "Metric ".metricTon("T")." = ".metricTonabbr("t");
+			$retval[7] = "Metric ".metricton("T")." = ".metrictonabbr("t");
         } elseif($type=="Area"){
-			if($fullname==0) {
-                $retval[0] = milli("M").meter("m")." squared = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),2,$tick);
-                $retval[1] = centi("C").meter("m")." squared = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),2,$tick);
-                $retval[2] = deci("D").meter("m")." squared = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),2,$tick);
-                $retval[3] = meter("M")." squared = ".conversionUnits2ScreenReader1("",meterabbr("m"),2,$tick);
-                $retval[4] = deca("D").meter("m")." squared = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),2,$tick);
-                $retval[5] = hecto("H").meter("m")." squared = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),2,$tick);
-                $retval[6] = kilo("K").meter("m")." squared = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),2,$tick);
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = squared("S").milli("m").meter("m")." = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),2,$tick);
+                $retval[1] = squared("S").centi("c").meter("m")." = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),2,$tick);
+                $retval[2] = squared("S").deci("d").meter("m")." = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),2,$tick);
+                $retval[3] = squared("S").meter("m")." = ".conversionUnits2ScreenReader1("",meterabbr("m"),2,$tick);
+                $retval[4] = squared("S").deca("d").meter("m")." = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),2,$tick);
+                $retval[5] = squared("S").hecto("h").meter("m")." = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),2,$tick);
+                $retval[6] = squared("S").kilo("k").meter("m")." = <".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),2,$tick);
+                $retval[7] = ares("A")." = ".aresabbr("A");
+                $retval[8] = centi("C")."ar = ".centiabbr("c").aresabbr("a");
+                $retval[9] = deca("D")."r = ".decaabbr("d")."a";
+                $retval[10] = hectares("H")." = ".hectaresabbr("h");
             } else {
-                $retval[0] = "Square ".milli("m").meter("m")." = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),2,$tick);
-                $retval[1] = "Square ".centi("c").meter("m")." = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),2,$tick);
-                $retval[2] = "Square ".deci("d").meter("m")." = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),2,$tick);
-                $retval[3] = "Square ".meter("m")." = ".conversionUnits2ScreenReader1("",meterabbr("m"),2,$tick);
-                $retval[4] = "Square ".deca("d").meter("m")." = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),2,$tick);
-                $retval[5] = "Square ".hecto("h").meter("m")." = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),2,$tick);
-                $retval[6] = "Square ".kilo("k").meter("m")." = <".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),2,$tick);
+                if($fullname==0) {
+                    $retval[0] = milli("M").meter("m")." squared = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),2,$tick);
+                    $retval[1] = centi("C").meter("m")." squared = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),2,$tick);
+                    $retval[2] = deci("D").meter("m")." squared = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),2,$tick);
+                    $retval[3] = meter("M")." squared = ".conversionUnits2ScreenReader1("",meterabbr("m"),2,$tick);
+                    $retval[4] = deca("D").meter("m")." squared = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),2,$tick);
+                    $retval[5] = hecto("H").meter("m")." squared = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),2,$tick);
+                    $retval[6] = kilo("K").meter("m")." squared = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),2,$tick);
+                } else {
+                    $retval[0] = squared("S")." ".milli("m").meter("m")." = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),2,$tick);
+                    $retval[1] = squared("S")." ".centi("c").meter("m")." = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),2,$tick);
+                    $retval[2] = squared("S")." ".deci("d").meter("m")." = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),2,$tick);
+                    $retval[3] = squared("S")." ".meter("m")." = ".conversionUnits2ScreenReader1("",meterabbr("m"),2,$tick);
+                    $retval[4] = squared("S")." ".deca("d").meter("m")." = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),2,$tick);
+                    $retval[5] = squared("S")." ".hecto("h").meter("m")." = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),2,$tick);
+                    $retval[6] = squared("S")." ".kilo("k").meter("m")." = <".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),2,$tick);
+                    $retval[7] = ares("A")." = ".aresabbr("a");
+                    $retval[8] = hectares("H")." = ".hectaresabbr("h");
+                }
             }
-			$retval[7] = "Ares = a";
-			$retval[8] = "Hectares = ha";
         } elseif($type=="Volume") {
-			if($fullname==0) {
-                $retval[0] = milli("M").meter("m")." cubed = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),3,$tick);
-                $retval[1] = centi("C").meter("m")." cubed = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),3,$tick);
-                $retval[2] = deci("D").meter("m")." cubed = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),3,$tick);
-                $retval[3] = meter("M")." cubed = ".conversionUnits2ScreenReader1("",meterabbr("m"),3,$tick);
-                $retval[4] = deca("D").meter("m")." cubed = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),3,$tick);
-                $retval[5] = hecto("H").meter("m")." cubed = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),3,$tick);
-                $retval[6] = kilo("K").meter("m")." cubed = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),3,$tick);
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = cubic("C").milli("m").meter("m")." = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),3,$tick);
+                $retval[1] = cubic("C").centi("C").meter("m")." = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),3,$tick);
+                $retval[2] = cubic("C").deci("d").meter("m")." = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),3,$tick);
+                $retval[3] = cubic("C").meter("m")." = ".conversionUnits2ScreenReader1("",meterabbr("m"),3,$tick);
+                $retval[4] = cubic("C").deca("d").meter("m")." = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),3,$tick);
+                $retval[5] = cubic("C").hecto("h").meter("m")." = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),3,$tick);
+                $retval[6] = cubic("C").kilo("k").meter("m")." = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),3,$tick);
             } else {
-                $retval[0] = "Cubic ".milli("m").meter("m")." = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),3,$tick);
-                $retval[1] = "Cubic ".centi("C").meter("m")." = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),3,$tick);
-                $retval[2] = "Cubic ".deci("d").meter("m")." = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),3,$tick);
-                $retval[3] = "Cubic ".meter("m")." = ".conversionUnits2ScreenReader1("",meterabbr("m"),3,$tick);
-                $retval[4] = "Cubic ".deca("d").meter("m")." = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),3,$tick);
-                $retval[5] = "Cubic ".hecto("h").meter("m")." = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),3,$tick);
-                $retval[6] = "Cubic ".kilo("k").meter("m")." = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),3,$tick);
+                if($fullname==0) {
+                    $retval[0] = milli("M").meter("m")." cubed = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),3,$tick);
+                    $retval[1] = centi("C").meter("m")." cubed = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),3,$tick);
+                    $retval[2] = deci("D").meter("m")." cubed = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),3,$tick);
+                    $retval[3] = meter("M")." cubed = ".conversionUnits2ScreenReader1("",meterabbr("m"),3,$tick);
+                    $retval[4] = deca("D").meter("m")." cubed = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),3,$tick);
+                    $retval[5] = hecto("H").meter("m")." cubed = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),3,$tick);
+                    $retval[6] = kilo("K").meter("m")." cubed = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),3,$tick);
+                } else {
+                    $retval[0] = cubic("C")." ".milli("m").meter("m")." = ".conversionUnits2ScreenReader1("",milliabbr("m").meterabbr("m"),3,$tick);
+                    $retval[1] = cubic("C")." ".centi("C").meter("m")." = ".conversionUnits2ScreenReader1("",centiabbr("c").meterabbr("m"),3,$tick);
+                    $retval[2] = cubic("C")." ".deci("d").meter("m")." = ".conversionUnits2ScreenReader1("",deciabbr("d").meterabbr("m"),3,$tick);
+                    $retval[3] = cubic("C")." ".meter("m")." = ".conversionUnits2ScreenReader1("",meterabbr("m"),3,$tick);
+                    $retval[4] = cubic("C")." ".deca("d").meter("m")." = ".conversionUnits2ScreenReader1("",decaabbr("d").meterabbr("m"),3,$tick);
+                    $retval[5] = cubic("C")." ".hecto("h").meter("m")." = ".conversionUnits2ScreenReader1("",hectoabbr("h").meterabbr("m"),3,$tick);
+                    $retval[6] = cubic("C")." ".kilo("k").meter("m")." = ".conversionUnits2ScreenReader1("",kiloabbr("k").meterabbr("m"),3,$tick);
+                }
             }
         }
 	}
@@ -1153,6 +1640,7 @@ function conversionTime() {
 //
 // use conversionArea("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionArea() {
+    global $conversion_browser_lang;
 
 	$args = func_get_args();
 	if (count($args)==0) {
@@ -1206,43 +1694,64 @@ function conversionArea() {
             $retval[3] = "1 mile squared  = 640 acre";
         }
 	} elseif($system=="M"){
-		if($fullname==0) {
+        if($fullname==0) {
             $retval[0] = conversionUnits2ScreenReader2("1 ",kiloabbr("k").meterabbr("m"),2,"100 ",hectoabbr("h").meterabbr("m"),2,"=",$tick);
             $retval[1] = conversionUnits2ScreenReader2("1 ",hectoabbr("h").meterabbr("m"),2,"100 ",decaabbr("d").meterabbr("m"),2,"=",$tick);
             $retval[2] = conversionUnits2ScreenReader2("1 ",decaabbr("d").meterabbr("m"),2,"100 ",meterabbr("m"),2,"=",$tick);
             $retval[3] = conversionUnits2ScreenReader2("1 ",meterabbr("m"),2,"100 ",deciabbr("d").meterabbr("m"),2,"=",$tick);
             $retval[4] = conversionUnits2ScreenReader2("1 ",deciabbr("d").meterabbr("m"),2,"100 ",centiabbr("c").meterabbr("m"),2,"=",$tick);
-			$retval[5] = conversionUnits2ScreenReader2("1 ",centiabbr("c").meterabbr("m"),2,"100 ",milliabbr("m").meterabbr("m"),2,"=",$tick);
-			$retval[6] = conversionUnits2ScreenReader2("1 ","\"a\"",1,"100 ",meterabbr("m"),2,"=",$tick);
-			$retval[7] = conversionUnits2ScreenReader2("1 ","\"ha\"",1,"100 ","\"a\"",1,"=",$tick);
-        } elseif($fullname==1) {
-			$retval[0] = "1 ".kilo("K").meter("m")." squared = 100 ".hecto("H").meter("m")." squared";
-            $retval[1] = "1 ".hecto("H").meter("m")." squared = 100 ".deca("D").meter("m")." squared";
-            $retval[2] = "1 ".deca("D").meter("m")." squared = 100 ".meter("M")." squared";
-            $retval[3] = "1 ".meter("M")." squared = 100 ".deci("D").meter("m")." squared";
-            $retval[4] = "1 ".deci("D").meter("m")." squared = 100 ".centi("C").meter("m")." squared";
-			$retval[5] = "1 ".centi("C").meter("m")." squared = 100 ".milli("M").meter("m")." squared";
-			$retval[6] = "1 Ares = 100 ".meter("m")." squared";
-			$retval[7] = "1 Hectares = 100 Ares";
-        } else  {
-			$retval[0] = "1 Square ".kilo("k").meter("m")." = 100 Square ".hecto("h").meter("m");
-            $retval[1] = "1 Square ".hecto("h").meter("m")." = 100 Square ".deca("d").meter("m");
-            $retval[2] = "1 Square ".deca("d").meter("m")." = 100 Square ".meter("m");
-            $retval[3] = "1 Square ".meter("m")." = 100 Square ".deci("d").meter("m");
-            $retval[4] = "1 Square ".deci("d").meter("m")." = 100 Square ".centi("c").meter("m");
-			$retval[5] = "1 Square ".centi("c").meter("m")." = 100 Square ".milli("m").meter("m");
-			$retval[6] = "1 Ares = 100 Square ".meter("m")." ";
-			$retval[7] = "1 Hectares = 100 Ares";
+            $retval[5] = conversionUnits2ScreenReader2("1 ",centiabbr("c").meterabbr("m"),2,"100 ",milliabbr("m").meterabbr("m"),2,"=",$tick);
+            $retval[6] = conversionUnits2ScreenReader2("1 ",aresabbr("a"),1,"100 ",meterabbr("m"),2,"=",$tick);
+            $retval[7] = conversionUnits2ScreenReader2("1 ",hectaresabbr("h"),1,"100 ",aresabbr("a"),1,"=",$tick);
+        } else {
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = "1 ".squared("S").kilo("k").meter("m")." = 100 ".squared("S").hecto("H").meter("m");
+                $retval[1] = "1 ".squared("S").hecto("h").meter("m")." squared = 100 ".squared("S").deca("D").meter("m");
+                $retval[2] = "1 ".squared("S").deca("d").meter("m")." squared = 100 ".squared("S").meter("M");
+                $retval[3] = "1 ".squared("S").meter("m")." squared = 100 ".squared("S").deci("D").meter("m");
+                $retval[4] = "1 ".squared("S").deci("d").meter("m")." squared = 100 ".squared("S").centi("C").meter("m");
+                $retval[5] = "1 ".squared("S").centi("c").meter("m")." squared = 100 ".squared("S").milli("M").meter("m");
+                $retval[6] = "1 ".ares("A")." = 100 ".squared("S").meter("m");
+                $retval[7] = "1 Zentiar = 0.01 ".ares("A");
+                $retval[8] = "1 Dekar = 10 ".ares("A");
+                $retval[9] = "1 ".hectares("H")." = 100 ".ares("A");
+            } else {
+                if($fullname==1) {
+                    $retval[0] = "1 ".kilo("K").meter("m")." squared = 100 ".hecto("H").meter("m")." squared";
+                    $retval[1] = "1 ".hecto("H").meter("m")." squared = 100 ".deca("D").meter("m")." squared";
+                    $retval[2] = "1 ".deca("D").meter("m")." squared = 100 ".meter("M")." squared";
+                    $retval[3] = "1 ".meter("M")." squared = 100 ".deci("D").meter("m")." squared";
+                    $retval[4] = "1 ".deci("D").meter("m")." squared = 100 ".centi("C").meter("m")." squared";
+                    $retval[5] = "1 ".centi("C").meter("m")." squared = 100 ".milli("M").meter("m")." squared";
+                    $retval[6] = "1 ".ares("A")." = 100 ".meter("m")." squared";
+                    $retval[7] = "1 ".hectares("H")." = 100 ".ares("A");
+                } else  {
+                    $retval[0] = "1 Square ".kilo("k").meter("m")." = 100 Square ".hecto("h").meter("m");
+                    $retval[1] = "1 Square ".hecto("h").meter("m")." = 100 Square ".deca("d").meter("m");
+                    $retval[2] = "1 Square ".deca("d").meter("m")." = 100 Square ".meter("m");
+                    $retval[3] = "1 Square ".meter("m")." = 100 Square ".deci("d").meter("m");
+                    $retval[4] = "1 Square ".deci("d").meter("m")." = 100 Square ".centi("c").meter("m");
+                    $retval[5] = "1 Square ".centi("c").meter("m")." = 100 Square ".milli("m").meter("m");
+                    $retval[6] = "1 ".ares("A")." = 100 Square ".meter("m")." ";
+                    $retval[7] = "1 ".hectares("H")." = 100 ".ares("A");
+                }
+            }
         }
 	} elseif($system=="AM"){
         //6.45160000 cm^2 https://www.wolframalpha.com/input/?i=convert+1+square+inch+to+mm+squared
         $CF = round(6.4516, $rounding);
 		if($fullname==0) {
 			$retval[0] = conversionUnits2ScreenReader2("1 ","in",2,"$CF ","cm",2,$sign_no,$tick);
-        } elseif($fullname==1) {
-			$retval[0] = "1 Inch squared $sign $CF ".centi("C").meter("m")." squared";
         } else {
-			$retval[0] = "1 Square inch $sign $CF Square ".centi("c").meter("m");
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = "1 ".squared("S").inch("i")." $sign $CF ".squared("S").centi("c").meter("m");
+            } else {
+                if($fullname==1) {
+                    $retval[0] = "1 Inch squared $sign $CF ".centi("C").meter("m")." squared";
+                } else {
+                    $retval[0] = "1 Square inch $sign $CF Square ".centi("c").meter("m");
+                }
+            }
         }
 	} elseif($system=="MA"){
         // 1.19599005 yd^2 https://www.wolframalpha.com/input/?i=convert+1+square+meter+to+square+feet
@@ -1251,13 +1760,20 @@ function conversionArea() {
         $CF1 = round(2.471, $rounding);
 		if($fullname==0) {
 			$retval[0] = conversionUnits2ScreenReader2("1 ","m",2,"$CF0 ","yd",2,$sign_no,$tick);
-            $retval[1] = "1 ha $sign $CF1 acres";
-        } elseif($fullname==1) {
-			$retval[0] = "1 ".meter("M")." squared $sign $CF0 Yard squared";
-            $retval[1] = "1 hectares $sign $CF1 acres";
+            $retval[1] = "1 ".hectaresabbr("h")." $sign $CF1 ".acresabbr("a");
         } else {
-			$retval[0] = "1 Square".meter("M")." $sign $CF0 Square yard";
-            $retval[1] = "1 hectares $sign $CF1 acres";
+            if($conversion_browser_lang == 'de-de') {
+                $retval[0] = "1 ".squared("S").meter("m")." $sign $CF0 ".squared("S").yard("y");
+                $retval[1] = "1 ".hectares("H")." $sign $CF1 ".acres("a");
+            } else {
+                if($fullname==1) {
+                    $retval[0] = "1 ".meter("M")." squared $sign $CF0 Yard squared";
+                    $retval[1] = "1 ".hectares("H")." $sign $CF1 ".acres("a");
+                } else {
+                    $retval[0] = "1 ".squared("S")." ".meter("m")." $sign $CF0 ".squared("S")." ".yard("y");
+                    $retval[1] = "1 ".hectares("H")." $sign $CF1 ".acres("a");
+                }
+            }
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -1531,6 +2047,24 @@ function circumference($case) {
         }
     }
 }
+function cubic($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="C") {
+            return "Kubik";
+        } else {
+            return "kubik";
+        }
+    } else {
+        //default
+        if($case=="C") {
+            return _('Cubic');
+        } else {
+            return _('cubic');
+        }
+    }
+}
 function diameter($case) {
     global $conversion_browser_lang;
 
@@ -1620,6 +2154,24 @@ function surfacearea($case) {
 
     if($conversion_browser_lang == 'de-de') {
         return htmlentities("Oberfläche",ENT_QUOTES | ENT_IGNORE | ENT_SUBSTITUTE | ENT_DISALLOWED | ENT_HTML401 | ENT_XML1 | ENT_XHTML | ENT_HTML5, "ISO-8859-1");
+    } else {
+        //default
+        if($case=="S") {
+            return _('Surface Area');
+        } else {
+            return _('surface area');
+        }
+    }
+}
+function squared($case) {
+    global $conversion_browser_lang;
+
+    if($conversion_browser_lang == 'de-de') {
+        if($case=="S") {
+            return "Quadrat";
+        } else {
+            return "quadrat";
+        }
     } else {
         //default
         if($case=="S") {
@@ -2277,11 +2829,15 @@ function conversionVolume() {
 // -------------------------------------------------------------------------------------------------
 //
 
-function metricTon($case) {
+function metricton($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
-        return "Tonne";
+        if($case=="T") {
+            return "Tonne";
+        } else {
+            return "tonne";
+        }
     } else {
         //default
         if($case=="T") {
@@ -2291,7 +2847,7 @@ function metricTon($case) {
         }
     }
 }
-function metricTonabbr($case) {
+function metrictonabbr($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
@@ -2309,7 +2865,7 @@ function metricTonabbr($case) {
         }
     }
 }
-function metricTons($case) {
+function metrictons($case) {
     global $conversion_browser_lang;
 
     if($conversion_browser_lang == 'de-de') {
@@ -2408,7 +2964,7 @@ function conversionWeight() {
             $retval[3] = "1 ".gramabbr("g")." = 10 ".deciabbr("d").gramabbr("g");
             $retval[4] = "1 ".gramabbr("g")." = 100 ".centiabbr("c").gramabbr("g");
 			$retval[5] = "1 ".gramabbr("g")." = 1000 ".milliabbr("m").gramabbr("g");
-			$retval[6] = "1 ".metricTon("T")." = 1000 ".kiloabbr("k").gramabbr("g");
+			$retval[6] = "1 ".metricton("T")." = 1000 ".kiloabbr("k").gramabbr("g");
         } else {
             $retval[0] = "1 ".kilo("k").gram("g")." = 1000 ".gram("g");
             $retval[1] = "1 ".hecto("h").gram("g")." = 100 ".gram("g");
@@ -2416,7 +2972,7 @@ function conversionWeight() {
             $retval[3] = "1 ".gram("g")." = 10 ".deci("d").gram("g");
             $retval[4] = "1 ".gram("g")." = 100 ".centi("c").gram("g");
             $retval[5] = "1 ".gram("g")." = 1000 ".milli("m").gram("g");
-			$retval[6] = "1 Metric ".metricTon("T")." = 1000".kilo("k").gram("g");
+			$retval[6] = "1 Metric ".metricton("T")." = 1000".kilo("k").gram("g");
         }
 	} elseif($system=="AM"){
 		if($fullname==0) {
@@ -2441,6 +2997,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2022-05-15 ver 24 - Bug fixes.
 // 2022-05-15 ver 23 - Bug fixes for offset error when checking for function augments. Added abbreviation in functions that were missed.
 // 2022-05-11 ver 22 - Added German words to the file.
 // 2022-05-09 ver 21 - Converted to language detection with gettext _('') as a fallback.
