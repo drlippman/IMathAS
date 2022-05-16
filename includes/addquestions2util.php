@@ -77,6 +77,11 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
             ) {
                 $extrefval += 1;
             }
+            if (($line['showhints'] == -1 && ($data['showhints'] & 4) == 4) ||
+                ($line['showhints'] > -1 && ($line['showhints'] & 4) == 4)
+            ) {
+                $extrefval += 128;
+            }
         } else {
             if (($line['showhints'] == 0 && $data['showhints'] == 1) || $line['showhints'] == 2) {
                 $extrefval += 1;

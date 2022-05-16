@@ -14,9 +14,9 @@
 	if (isset($_POST['action'])) {
 		require_once("../includes/updateptsposs.php");
 		if ($_POST['action'] == 'add') { //adding new questions
-			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints,ver FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-            list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+            list($itemorder, $viddata, $defpoints, $aver) = $stm->fetch(PDO::FETCH_NUM);
             if (!isset($_POST['lastitemhash']) || $_POST['lastitemhash'] !== md5($itemorder)) {
                 header('Content-Type: application/json; charset=utf-8');
                 echo '{"error": "Assessment content has changed since last loaded. Reload the page and try again"}';
@@ -36,7 +36,11 @@
 						$points = trim($_POST['points'.$qsetid]);
 					}
 					$attempts = trim($_POST['attempts'.$qsetid]);
-                    $showhints = intval($_POST['showhints'.$qsetid]);
+                    $showhints = !empty($_POST['showhintsusedef'.$qsetid]) ? -1 : (
+                        (empty($_POST['showhints1'.$qsetid]) ? 0 : 1) +
+                        (empty($_POST['showhints2'.$qsetid]) ? 0 : 2) +
+                        (empty($_POST['showhints4'.$qsetid]) ? 0 : 4)
+                    );
                     $showwork = intval($_POST['showwork'.$qsetid]);
 					if ($points=='' || $points==$defpoints) { $points = 9999;}
 					if ($attempts=='' || intval($attempts)==0) {$attempts = 9999;}
@@ -101,9 +105,9 @@
 			updatePointsPossible($aid, $itemorder, $defpoints);
 
 		} else if ($_POST['action'] == 'mod') { //modifying existing
-			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,defpoints,ver FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder, $defpoints, $aver) = $stm->fetch(PDO::FETCH_NUM);
             if (!isset($_POST['lastitemhash']) || $_POST['lastitemhash'] !== md5($itemorder)) {
                 header('Content-Type: application/json; charset=utf-8');
                 echo '{"error": "Assessment content has changed since last loaded. Reload the page and try again"}';
@@ -128,7 +132,11 @@
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
 				$attempts = trim($_POST['attempts'.$qid]);
-                $showhints = intval($_POST['showhints'.$qid]);
+                $showhints = !empty($_POST['showhintsusedef'.$qid]) ? -1 : (
+                    (empty($_POST['showhints1'.$qid]) ? 0 : 1) +
+                    (empty($_POST['showhints2'.$qid]) ? 0 : 2) +
+                    (empty($_POST['showhints4'.$qid]) ? 0 : 4)
+                );
                 $showwork = intval($_POST['showwork'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='' || intval($attempts)==0) {$attempts = 9999;}
@@ -194,14 +202,20 @@
         }
 
 		if ($defaults['showhints'] == 0) {
-      $defaults['showhints'] = _('No');
-    } else if ($defaults['showhints'] == 1) {
-      $defaults['showhints'] = _('Hints');
-    } else if ($defaults['showhints'] == 2) {
-      $defaults['showhints'] = _('Video buttons');
-    } else if ($defaults['showhints'] == 3) {
-      $defaults['showhints'] = _('Hints &amp; Videos');
-    }
+            $defaults['showhints'] = _('No');
+        } else {
+            $ht = [];
+            if ($defaults['showhints']&1) {
+                $ht[] = _('Hints');
+            } 
+            if ($defaults['showhints']&2) {
+                $ht[] = _('Videos');
+            } 
+            if ($defaults['showhints']&4) {
+                $ht[] = _('Examples');
+            } 
+            $defaults['showhints'] = implode(' &amp; ', $ht);
+        }
         $showworkoptions = [
             '-1' => _('Use Default'),
             '0' => _('No'),
@@ -241,6 +255,9 @@
                         window.parent.doneadding(msg);
 		                window.parent.GB_hide();
                     });
+                });
+                $(".showhintsdef").on("change", function() {
+                    $(this).closest("td").find("span").toggle(!this.checked);
                 });
             });
             </script>';
@@ -311,13 +328,17 @@
 				$qrows[$row['id']] .= '</td>';
 				$qrows[$row['id']] .= '<td><button type="button" onclick="previewq('.$row['qsid'].')">'._('Preview').'</button></td>';
 				$qrows[$row['id']] .= "<td><input type=text size=3 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
-				$qrows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
-				$qrows[$row['id']] .= '<option value="-1" '.(($row['showhints']==-1)?'selected="selected"':'').'>'._('Use Default').'</option>';
-				$qrows[$row['id']] .= '<option value="0" '.(($row['showhints']==0)?'selected="selected"':'').'>'._('No').'</option>';
-				$qrows[$row['id']] .= '<option value="1" '.(($row['showhints']==1)?'selected="selected"':'').'>'._('Hints').'</option>';
-				$qrows[$row['id']] .= '<option value="2" '.(($row['showhints']==2)?'selected="selected"':'').'>'._('Videos').'</option>';
-				$qrows[$row['id']] .= '<option value="3" '.(($row['showhints']==3)?'selected="selected"':'').'>'._('Hints &amp; Videos').'</option>';
-                $qrows[$row['id']] .= '</select></td>';
+
+                $qrows[$row['id']] .= '<td><label><input type=checkbox class=showhintsdef name="showhintsusedef'.$row['id'].'" value=1 '. 
+                                        ($row['showhints']==-1 ? 'checked':'').'> '._('Use Default').'</label>';
+                $qrows[$row['id']] .= '<span '. ($row['showhints']==-1 ? 'style="display:none"':'').'>';
+                $qrows[$row['id']] .=   '<br><label>&nbsp; <input type=checkbox name="showhints1'.$row['id'].'" value=1 '. 
+                                        ($row['showhints']&1 ? 'checked':'').'> '._('Hints').'</label>'; 
+                $qrows[$row['id']] .=   '<br><label>&nbsp; <input type=checkbox name="showhints2'.$row['id'].'" value=2 '. 
+                                        ($row['showhints']&2 ? 'checked':'').'> '._('Videos/Text').'</label>'; 
+                $qrows[$row['id']] .=   '<br><label>&nbsp; <input type=checkbox name="showhints4'.$row['id'].'" value=4 '. 
+                                        ($row['showhints']&4 ? 'checked':'').'> '._('Written Examples').'</label></span></td>'; 
+
                 $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\">";
                 foreach ($showworkoptions as $v=>$l) {
                     $qrows[$row['id']] .= '<option value="'.$v.'" '.($row['showwork']==$v ? 'selected':'').'>';
@@ -399,27 +420,28 @@
 				} else {
 					echo '<td></td>';
 				}
+                $qsid = Sanitize::encodeStringForDisplay($row[0]);
 				echo '<td><button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($row[0]).')">'._('Preview').'</button></td>';
-				echo "<td><input class=ptscol type=text size=2 name=\"points" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"\" />";
+				echo "<td><input class=ptscol type=text size=2 name=\"points" . $qsid . "\" value=\"\" />";
 				if ($first) {
 					echo '<input type=hidden name="firstqsetid" value="'.Sanitize::onlyInt($row[0]).'" />';
 					$first = false;
 				}
-				echo '<input type="hidden" name="qparts'.Sanitize::encodeStringForDisplay($row[0]).'" value="'.Sanitize::onlyInt($n).'"/></td>';
-				echo "<td><input type=text size=3 name=\"attempts" . Sanitize::encodeStringForDisplay($row[0]) ."\" value=\"\" /></td>";
-				echo "<td><select name=\"showhints" . Sanitize::encodeStringForDisplay($row[0]) . "\">";
-				echo '<option value="-1" selected="selected">'._('Use Default').'</option>';
-				echo '<option value="0">'._('No').'</option>';
-				echo '<option value="1">'._('Hints').'</option>';
-				echo '<option value="2">'._('Videos').'</option>';
-                echo '<option value="3">'._('Hints &amp; Videos').'</option></select></td>';
-                echo "<td><select name=\"showwork" . Sanitize::encodeStringForDisplay($row[0]) . "\">";
+				echo '<input type="hidden" name="qparts'.$qsid.'" value="'.Sanitize::onlyInt($n).'"/></td>';
+				echo "<td><input type=text size=3 name=\"attempts" . $qsid ."\" value=\"\" /></td>";
+                echo '<td><label><input type=checkbox class=showhintsdef name="showhintsusedef'.$qsid.'" value=1 checked> '._('Use Default').'</label>';
+                echo '<span style="display:none>';
+                echo '<br><label><input type=checkbox name="showhints1'.$qsid.'" value=1> '._('Hints').'</label>'; 
+                echo '<br><label><input type=checkbox name="showhints2'.$qsid.'" value=2> '._('Videos').'</label>'; 
+                echo '<br><label><input type=checkbox name="showhints4'.$qsid.'" value=4> '._('Written Examples').'</label></span></td>'; 
+
+                echo "<td><select name=\"showwork" . $qsid . "\">";
                 foreach ($showworkoptions as $v=>$l) {
                     echo '<option value="'.$v.'" '.($v==-1 ?'selected':'').'>';
                     echo Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 echo '</select></td>';
-				echo "<td><input type=text size=1 name=\"copies" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"1\" /></td>";
+				echo "<td><input type=text size=1 name=\"copies" . $qsid . "\" value=\"1\" /></td>";
 				echo '</tr>';
 			}
 			echo '</tbody></table>';

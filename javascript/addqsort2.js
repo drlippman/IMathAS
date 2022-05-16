@@ -1477,6 +1477,13 @@ function generateTable() {
                     var showicons = "_no";
                     var altadd = _(" disabled");
                 }
+                if ((curitems[j][7] & 128) == 128) {
+                    var showiconsWE = "";
+                    var altaddWE = "";
+                } else {
+                    var showiconsWE = "_no";
+                    var altaddWE = _(" disabled");
+                }
                 if ((curitems[j][7] & 4) == 4) {
                     if ((curitems[j][7] & 16) == 16) {
                         html += '<div class="ccvid inlinediv"';
@@ -1515,11 +1522,11 @@ function generateTable() {
                         '<img src="' +
                         staticroot +
                         "/img/assess_tiny" +
-                        showicons +
+                        showiconsWE +
                         '.png" alt="'+('Written solution') +
                         altadd +
                         '" title="'+('Written solution') +
-                        altadd +
+                        altaddWE +
                         '"/>';
                 }
                 html += "</td>";
