@@ -136,6 +136,11 @@
 		} else {
 			$sortorder = "name";
 		}
+        if (empty($tutorsection)) {
+            $stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid AND section IS NOT NULL AND section<>'' ORDER BY section");
+			$stm->execute(array(':courseid'=>$cid));
+            $sectionnames = $stm->fetchAll(PDO::FETCH_COLUMN,0);
+        }
 	} else {
 		$sortorder = "name";
 	}
@@ -163,7 +168,32 @@
 	
 	echo '<div id="headerisolateassessgrade" class="pagetitle"><h1>';
 	echo "Grades for " . Sanitize::encodeStringForDisplay($name) . "</h1></div>";
-	echo "<p>$totalpossible points possible</p>";
+
+    echo "<p>$totalpossible "._('points possible').'. ';
+    if ($hassection && empty($tutorsection)) {
+        echo _('Section').': ';
+        echo '<select id="secfiltersel" onchange="chgsecfilter(this)">';
+        echo '<option value="-1"' . ($secfilter == -1 ? ' selected' : '') . '>';
+        echo _('All') . '</option>';
+        foreach ($sectionnames as $secname) {
+            echo  '<option value="' . Sanitize::encodeStringForDisplay($secname) . '"';
+            if ($secname==$secfilter) {
+                echo  ' selected';
+            }
+            echo  '>' . Sanitize::encodeStringForDisplay($secname) . '</option>';
+        }
+        echo '</select>';
+        echo '<script type="text/javascript">
+        function chgsecfilter(el) {
+            var sec = el.value;
+            var toopen = "isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'&secfilter=" + encodeURIComponent(sec);
+            window.location = toopen;
+        }
+        </script>';
+    }
+    echo '</p>';
+
+	
 
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 //	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";

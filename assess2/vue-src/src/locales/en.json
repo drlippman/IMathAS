@@ -401,6 +401,7 @@
     "msg_owner": "Message owner to report problems",
     "had_help": "Had help available",
     "save": "Save Changes",
+    "savenext": "Save and Next Student",
     "return": "Return to Gradebook",
     "gb_score": "Score in Gradebook",
     "override": "Override score",

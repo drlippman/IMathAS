@@ -370,6 +370,15 @@
           >
             {{ $t('gradebook.save') }}
           </button>
+          <button
+            v-if = "canEdit && aData.nextstu"
+            type = "button"
+            :disabled = "!canSubmit"
+            class = "primary"
+            @click = "submitChanges(false,true)"
+          >
+            {{ $t('gradebook.savenext') }}
+          </button>
           <span v-if="savedMsg !== ''" class="noticetext">
             {{ savedMsg }}
           </span>
@@ -724,7 +733,7 @@ export default {
       }
       store.saving = '';
     },
-    submitChanges (exit) {
+    submitChanges (exit, nextstu) {
       if (!this.aData.hasOwnProperty('scoreoverride') && this.showOverride) {
         if (this.assessOverride !== '') {
           store.scoreOverrides.gen = this.assessOverride;
@@ -732,7 +741,8 @@ export default {
         this.showOverride = false;
       }
       var doexit = (exit === true);
-      actions.saveChanges(doexit);
+      var donextstu = (nextstu === true);
+      actions.saveChanges(doexit, donextstu);
     },
     submitForm () {
       this.submitChanges(true);

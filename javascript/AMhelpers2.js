@@ -2094,6 +2094,50 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
 }
 
+var seqgroupcollapsed = {};
+function setupSeqPartToggles(base) {
+    if (base.id && base.id.match(/questionwrap/)) {
+        var qn = parseInt(base.id.substr(12));
+        var seqseps = $(base).find(".seqsep");
+        if (!seqgroupcollapsed[qn] || seqseps.length == 1) {
+            seqgroupcollapsed[qn] = {};
+        }
+        if (seqseps.length > 1) {
+            for (var i=0; i < seqseps.length - 1; i++) {
+                $(seqseps[i]).next().attr("id", "seqgrp"+qn+"-"+i);
+                if (seqgroupcollapsed[qn][i]) {
+                    $(seqseps[i]).next().hide();
+                }
+                $(seqseps[i]).prepend($("<button>", {
+                    class: "plain slim",
+                    style: "color: inherit",
+                    "aria-expanded": !seqgroupcollapsed[qn][i],
+                    "aria-controls": "seqgrp"+qn+"-"+i,
+                    "aria-label": seqgroupcollapsed[qn][i] ? _('Expand') : _('Collapse'),
+                    html: seqgroupcollapsed[qn][i] ? '&#x25B6;' : '&#x25BC;',
+                    type: 'button',
+                    click: function (e) {
+                        var state = (this.getAttribute("aria-expanded") == 'true');
+                        var ctls = this.getAttribute("aria-controls");
+                        if (state) {
+                            this.setAttribute("aria-expanded", "false");
+                            this.setAttribute("aria-label", _('Expand'));
+                            this.innerHTML = '&#x25B6;'
+                        } else {
+                            this.setAttribute("aria-expanded", "true");
+                            this.setAttribute("aria-label", _('Collapse'));
+                            this.innerHTML ='&#x25BC;';
+                        }
+                        $("#"+ctls).slideToggle(300);
+                        var pts = ctls.substr(6).split("-");
+                        seqgroupcollapsed[pts[0]][pts[1]] = state;
+                    }
+                }));
+            }
+        }
+    }
+}
+
 
 /*******************************************************
 
