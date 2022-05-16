@@ -172,10 +172,11 @@ class AssessUtils
       if (strpos($outmsg,'redirectto:')!==false) {
         $redirecturl = trim(substr($outmsg,11));
         $outmsg = "<input type=\"button\" value=\"". _('Continue'). "\" onclick=\"window.location.href='$redirecturl'\"/>";
-      }
-      $outmsg = '<p>'.$outmsg.'</p>';
-      if (!empty($endmsg['commonmsg']) && $endmsg['commonmsg']!='<p></p>') {
-        $outmsg .= $endmsg['commonmsg'];
+      } else {
+        $outmsg = '<p>'.$outmsg.'</p>';
+        if (!empty($endmsg['commonmsg']) && $endmsg['commonmsg']!='<p></p>') {
+            $outmsg .= $endmsg['commonmsg'];
+        }
       }
     }
     return $outmsg;
