@@ -126,7 +126,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$qmap = $qmap + array_flip($row['itemorder']);	
 }
 // pull descendents looking at new assessment data
-$query = 'SELECT ia.id,ia.courseid,ia.itemorder,ia.ptsposs FROM imas_assessments AS ia ';
+$query = 'SELECT ia.id,ia.courseid,ia.itemorder,ia.ptsposs,ia.ancestors FROM imas_assessments AS ia ';
 $query .= 'JOIN imas_courses AS ic ON ic.id=ia.courseid ';
 $query .= 'JOIN imas_users AS iu ON ic.ownerid=iu.id ';
 $query .= 'JOIN imas_assessment_records AS iar ON ia.id=iar.assessmentid ';
@@ -135,6 +135,20 @@ $query .= 'GROUP BY ia.id HAVING MAX(iar.lastchange)>?';
 $stm = $DBH->prepare($query);
 $stm->execute(array($lookupgroup, $anregex1, $anregex2, $old));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['courseid'] == $basecourse) { continue; } // don't want to include any assess from the basecourse.
+    $ancestors = explode(',', $row['ancestors']);
+    foreach ($ancestors as $ancestor) {
+        $pts = explode(':', $ancestor);
+        if (count($pts)==2 && $pts[0] == $basecourse) {
+            // found first copy from basecourse
+            if ($pts[1] != $baseassess) {
+                // most direct ancestor from basecourse is not baseassess,
+                // so basecourse must have had copies of the assess
+                continue 2;
+            } 
+            break; // found a copy, don't need to continue loop
+        } 
+    }
 	$row['itemorder'] = explode(',', str_replace('~',',',preg_replace('/\d+\|\d+~/','',$row['itemorder'])));
 	if ($qcnt != count($row['itemorder'])) {
 		//invalid question count
