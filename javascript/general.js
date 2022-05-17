@@ -319,7 +319,7 @@ var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
 var GB_sourceel = null;
 function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
-    if (document.activeElement) {
+	if (document.activeElement) {
         GB_sourceel = document.activeElement;
         if ($(GB_sourceel).closest(".dropdown-menu").length > 0) {
             GB_sourceel = $(GB_sourceel).closest(".dropdown").find("a,button")[0];
@@ -414,22 +414,23 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
     document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 	if (url.match(/libtree/)) {
         document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setlib()">Use Libraries</button> <button type=button onclick="GB_hide()">Close</button>';
-		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
 	} else if (url.match(/assessselect/)) {
         document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setassess()">Use Assessments</button> <button type=button onclick="GB_hide()">Close</button>';
-		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
 	} else if (callback) {
         document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.'+callback.func+'()">'+callback.label+'</button> <button type=button onclick="GB_hide()">Close</button>';
-		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;		
+		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;		
 	} else {
         document.getElementById("GB_footer").innerHTML = '<button type=button class="primary" onclick="GB_hide()">Close</button>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
-			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+			var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
 		} else {
 			var h = height;
 		}
     }
+
 	document.getElementById("GB_window").style.display = "block";
     if (overlay !== false) {
         document.getElementById("GB_overlay").style.display = "block";
@@ -464,6 +465,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
                 }
             }
         }
+
         $("#GB_window").css("margin","").css("left","").css("top",inittop);
         if (posstyle.match(/left/) && document.getElementById("GB_window").style.left=='') {
             if ($("body").hasClass("fw1000") && w > 1000) {
@@ -478,13 +480,13 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
             document.getElementById("GB_window").style.width = width + "px";
         }
         
-	document.getElementById("GB_window").style.height = (h-30) + "px";
+	document.getElementById("GB_window").style.height = h + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
         var capheight = $("#GB_caption").outerHeight();
         var footheight = $("#GB_footer:visible").outerHeight();
         document.getElementById("GB_frameholder").style.height = 
-            (h - 30 - capheight - footheight)+"px";
+            (h - capheight - footheight)+"px";
 	} else {
 		document.getElementById("GB_frameholder").style.height = "auto";
 	}
