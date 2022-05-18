@@ -802,12 +802,20 @@
 		$assess_record->saveRecordIfNeeded();
 	}
 	if ($canedit) {
-		echo "<input type=\"submit\" value=\"Save Changes\"/> ";
-        if ($prevqid > -1) {
-            echo '<button type=submit name=prevqid value="'.Sanitize::onlyInt($prevqid).'">'._('Save and Prev Question').'</button>';
+		echo '<button type="submit">';
+        if ($page == -1 || $page == count($stulist)-1) {
+            echo _('Save Changes');
+        } else {
+            echo _('Save Changes and Next Student');
         }
-        if ($nextqid > -1) {
-            echo '<button type=submit name=nextqid value="'.Sanitize::onlyInt($nextqid).'">'._('Save and Next Question').'</button>';
+        echo '</button> ';
+        if ($page == -1 || $page == count($stulist)-1) {
+            if ($prevqid > -1) {
+                echo '<button type=submit name=prevqid value="'.Sanitize::onlyInt($prevqid).'">'._('Save and Prev Question').'</button>';
+            }
+            if ($nextqid > -1) {
+                echo '<button type=submit name=nextqid value="'.Sanitize::onlyInt($nextqid).'">'._('Save and Next Question').'</button>';
+            }
         }
 	}
 	} else {
