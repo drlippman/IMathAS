@@ -39,6 +39,9 @@ class StringAnswerBox implements AnswerBox
         $preview = '';
         $params = [];
 
+       
+
+
         $optionkeys = ['ansprompt', 'answerboxsize', 'answer', 'strflags', 
             'displayformat', 'answerformat', 'scoremethod', 'readerlabel', 'variables'];
         foreach ($optionkeys as $optionkey) {
@@ -62,11 +65,26 @@ class StringAnswerBox implements AnswerBox
             $tip = $shorttip . _(', like [(2,3,4),(1,4,5)]');
         } else if ($answerformat == 'logic') {
             $shorttip = _('Enter a logic statement');
-            $tip = _('Enter a logic statement using the editor buttons, or use "and", "or", "implies", and "iff"');
+            $tip = _('Enter a logic statement using the editor buttons, or use "and", "or", "xor", "neg", "implies", and "iff"');
+        } else if ($answerformat == 'setexp') {
+            $shorttip = _('Enter a set expression');
+            $tip = _('Enter a set expression using the editor buttons, or use "and", "or", "ominus", and "-"');
         } else {
             $tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
             $shorttip = _('Enter text');
         }
+
+        // If answerformat == setexp, then we need to distinguish the variable 'U' from the union symbol 'U' in $la so it displays correctly
+        if ($answerformat == 'setexp'){
+            $keywords = ['nn',	'and',	'cap',	'ominus',   'xor',	'oplus', 'uu',	'cup',	'or',	'-'];
+	        $replace = 	['#a',	'#a',	'#a',	'#x',	    '#x',	'#x',    '#o',	'#o',	'#o',	'#m'];
+            $la = str_replace($keywords,$replace,$la);
+        	while(preg_match('/((^|[^#])[A-Za-z](\s|\(|\)|\[|\]|\^c|\')*)U/',$la)){
+        		$la = preg_replace('/((^|[^#])[A-Za-z](\s|\(|\)|\[|\]|\^c|\')*)U/','$1 #o ',$la,1);
+        	}
+            $la = str_replace($replace,$keywords,$la);
+        }
+
         if ($displayformat == 'select') {
             $out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
             $out .= 'aria-label="' . $arialabel . '">';
@@ -109,13 +127,13 @@ class StringAnswerBox implements AnswerBox
 
             $params['tip'] = $shorttip;
             $params['longtip'] = $tip;
-            if ($useeqnhelper && ($displayformat == 'usepreview' || $answerformat == 'logic')) {
+            if ($useeqnhelper && ($displayformat == 'usepreview' || $answerformat == 'logic' || $answerformat == 'setexp')) {
                 $params['helper'] = 1;
             }
             if (empty($hidepreview) && ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq')) {
                 $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
             }
-            if ($answerformat == 'logic') {
+            if ($answerformat == 'logic' || $answerformat == 'setexp') {
                 $params['vars'] = $variables;
             }
 
@@ -161,7 +179,9 @@ class StringAnswerBox implements AnswerBox
         if (strpos($strflags, 'regex') !== false) {
             $sa .= _('The answer must match a specified pattern');
         } else if ($answerformat == "logic") {
-            $sa = '`' . str_replace(['and', 'or', 'implies', 'iff'], ['^^', 'vv', '=>', '<=>'], $answer) . '`';
+            $sa = '`' . str_replace(['and', 'xor', 'or', 'implies', 'iff'], ['^^', 'oplus', 'vv', '=>', '<=>'], $answer) . '`';
+        } else if ($answerformat == "setexp") {
+            $sa = '`' . str_replace(['and', 'cap', 'xor', 'oplus', 'ominus', 'or', 'cup'], ['nn', 'nn', '⊖', '⊖', '⊖', 'uu', 'uu'], $answer) . '`';
         } else {
             $sa .= $answer;
         }
@@ -172,7 +192,7 @@ class StringAnswerBox implements AnswerBox
         ) {
             $params['submitblank'] = 1;
         }
-
+    
         // Done!
         $this->answerBox = $out;
         $this->jsParams = $params;
