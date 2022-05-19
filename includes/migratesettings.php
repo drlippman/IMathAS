@@ -206,7 +206,7 @@ function migrateAssessSettings1to2($settings) {
 
   // convert showhints
   if ($settings['showhints'] > 0) {
-    $settings['showhints'] = 3;
+    $settings['showhints'] = 7;
   }
 
   // convert showtips

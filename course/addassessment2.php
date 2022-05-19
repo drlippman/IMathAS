@@ -331,6 +331,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			// help and hints
 			$toset['showhints'] = empty($_POST['showhints']) ? 0 : 1;
 			$toset['showhints'] |= empty($_POST['showextrefs']) ? 0 : 2;
+            $toset['showhints'] |= empty($_POST['showwrittenex']) ? 0 : 4;
 
 			$toset['msgtoinstr'] = empty($_POST['msgtoinstr']) ? 0 : 1;
 
@@ -655,7 +656,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['overtime_grace'] = 0;
 					$line['overtime_penalty'] = 0;
           $line['password'] = '';
-					$line['showhints']=isset($CFG['AMS2']['showhints'])?$CFG['AMS2']['showhints']:3;
+					$line['showhints']=isset($CFG['AMS2']['showhints'])?$CFG['AMS2']['showhints']:7;
 					$line['msgtoinstr'] = isset($CFG['AMS']['msgtoinstr'])?$CFG['AMS']['msgtoinstr']:0;
 					$line['posttoforum'] = 0;
           $extrefs = array();

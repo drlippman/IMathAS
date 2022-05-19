@@ -241,11 +241,11 @@ if ($isteacher) {
 		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
-			$toins[] = "(?,?,?,?,?)";
-			array_push($qarr, $id, 'offline', $stu, $val, $_POST['feedback'][$id]);
+			$toins[] = "(?,?,?,?)";
+			array_push($qarr, $id, 'offline', $stu, $val);
 		}
 		if (count($toins)>0) {
-			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
+			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score) VALUES ".implode(',',$toins);
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 		}

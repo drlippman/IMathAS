@@ -307,9 +307,11 @@ if (!(isset($teacherid))) {
 				}
 			}
 
-			if ($_POST['showhints'] !== 'DNC') {
+			if (isset($_POST['dochgshowhints'])) {
 				$sets[] = "showhints=:showhints";
-				$qarr[':showhints'] = Sanitize::onlyInt($_POST['showhints']);
+				$qarr[':showhints'] = empty($_POST['showhints']) ? 0 : 1;
+                $qarr[':showhints'] |= empty($_POST['showextrefs']) ? 0 : 2;
+                $qarr[':showhints'] |= empty($_POST['showwrittenex']) ? 0 : 4;
 			}
 
 			if ($_POST['msgtoinstr'] !== 'DNC') {

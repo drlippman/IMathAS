@@ -233,10 +233,17 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  saveChanges (exit) {
+  saveChanges (exit, nextstu) {
     if (store.inTransit) {
       window.setTimeout(() => this.saveChanges(exit), 20);
       return;
+    }
+    let nextstuurl = '';
+    if (nextstu) {
+      nextstuurl = 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.assessInfo.nextstu;
+      if (window.location.search.match(/from=/)) {
+        nextstuurl += '&from=' + window.location.search.replace(/^.*from=(\w+).*$/, '$1');
+      }
     }
     if (Object.keys(store.scoreOverrides).length === 0 &&
       Object.keys(store.feedbacks).length === 0
@@ -244,6 +251,8 @@ export const actions = {
       store.saving = 'saved';
       if (exit) {
         window.location = window.exiturl;
+      } else if (nextstu) {
+        window.location = nextstuurl;
       }
       return;
     }
@@ -277,6 +286,9 @@ export const actions = {
           store.scoreOverrides = {};
           store.feedbacks = {};
           window.location = window.exiturl;
+          return;
+        } else if (nextstu) {
+          window.location = nextstuurl;
           return;
         }
         // update store.assessInfo with the new scores so it
