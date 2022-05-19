@@ -282,15 +282,19 @@ export const actions = {
           return;
         }
         store.saving = 'saved';
-        if (exit) {
+
+        if (exit || nextstu) {
           store.scoreOverrides = {};
           store.feedbacks = {};
+        }
+        if (exit) {
           window.location = window.exiturl;
           return;
         } else if (nextstu) {
           window.location = nextstuurl;
           return;
         }
+
         // update store.assessInfo with the new scores so it
         // can tell if we change anything
         for (const key in store.scoreOverrides) {
