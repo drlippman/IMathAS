@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 23;
+	return 24;
 }
 
 global $allowedmacros;
@@ -2662,15 +2662,30 @@ function conversionArea() {
         $rounding = 2;
     }
 
+    // in the original version the sign and tick argument
+    // were reversed
     if ( count($args)>3 && !is_null($args[3]) ) {
-        $sign = verifyEqualSign($args[3]);
+        $args3input =  $args[3];
+        if ( count($args)>4 && !is_null($args[4]) ) {
+          $args4input =  $args[4];
+        } else {
+            $args4input = "";
+        }
+
+        // was args3input the tick argument and args4input the sign - if so switch
+        // should not be needed - but this wll prevent anyone that used this before
+        // the release from displaying about = signs (the default if the 3rd argument is not a = or ~)
+        if($args3input=="y" || $args3input=="n" || $args4input = "=" || $args4input = "~") {
+            $signinput = $args4input;
+            $tickinput = $args3input;
+        } else {
+            $signinput = $args3input;
+            $tickinput = $args4input;
+        }
+        $sign = verifyEqualSign($signinput);
+        $tick = verifyTickMarks($tickinput);
     } else {
         $sign = "=";
-    }
-
-    if ( count($args)>4 && !is_null($args[4]) ) {
-        $tick = verifyTickMarks($args[4]);
-    } else {
         $tick = "";
     }
 
@@ -2911,15 +2926,30 @@ function conversionVolume() {
         $rounding = 2;
     }
 
+    // in the original version the sign and tick argument
+    // were reversed
     if ( count($args)>3 && !is_null($args[3]) ) {
-        $sign = verifyEqualSign($args[3]);
+        $args3input =  $args[3];
+        if ( count($args)>4 && !is_null($args[4]) ) {
+            $args4input =  $args[4];
+        } else {
+            $args4input = "";
+        }
+
+        // was args3input the tick argument and args4input the sign - if so switch
+        // should not be needed - but this wll prevent anyone that used this before
+        // the release from displaying about = signs (the default if the 3rd argument is not a = or ~)
+        if($args3input=="y" || $args3input=="n" || $args4input = "=" || $args4input = "~") {
+            $signinput = $args4input;
+            $tickinput = $args3input;
+        } else {
+            $signinput = $args3input;
+            $tickinput = $args4input;
+        }
+        $sign = verifyEqualSign($signinput);
+        $tick = verifyTickMarks($tickinput);
     } else {
         $sign = "=";
-    }
-
-    if ( count($args)>4 && !is_null($args[4]) ) {
-        $tick = verifyTickMarks($args[4]);
-    } else {
         $tick = "";
     }
 
@@ -2995,12 +3025,16 @@ function conversionWeight() {
 
 }
 
+//  WAMAP Question ID: 201697
 
 
-// 2022-05-22 ver 23 - changed all string references to two arrays $unit and $unitabbr
-//  through
-// 2022-05-17
+// 2022-05-xx ver 25 - planning to add a make fraction converion function
 //
+// 2022-05-24 ver 24 - changed all string references to two arrays $unit and $unitabbr. Converted conversion functions to return
+//                     an array of values with the first value an array of conversion strings (equivalent to the original function) 
+//  through            added checks in conversionAreaand conversionVolume for switched sign and tick aguments and corrected them (should not be needed)
+// 2022-05-17
+// 2022-05-16 ver 23 - has conversion_detectlanguage functions that wer eliminated as they interferred with gettext function
 // 2022-05-16 ver 22 - reworking conversion to add _() to all words in file so gettext can be run for a translation file
 // 2022-05-09 ver 21 - Converted to language detection with gettext _('') as a fallback.
 // 2022-05-04 ver 20 - Changed all spelling _('') to functions for easier maintance.
