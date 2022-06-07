@@ -589,6 +589,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$infsoln = _('Infinite number of solutions');
     $partnum = $qn%1000;
     $out = '';
+    $includeinf = in_array('nosolninf',$ansformats);
 
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
@@ -619,8 +620,10 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
   }
   $out .= '>';
 	$out .= '<ul class="likelines">';
-	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
-	if ($la=='DNE' || $la=='oo') {
+	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" ' .
+        (($la!='DNE' && (!$includeinf || $la!='oo'))?'checked':'') . 
+        '><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
+	if ($la=='DNE' || ($includeinf && $la=='oo')) {
 		$laqs = $la;
 		$answerbox = str_replace('value="'.$la.'"','value=""', $answerbox);
 	} else {
@@ -633,7 +636,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '</li>';
 
 	$out .= '<li><input type="radio" id="qs'.$qn.'-d" name="qs'.$qn.'" value="DNE" '.($laqs=='DNE'?'checked':'').'><label for="qs'.$qn.'-d">'.$nosoln.'</label></li>';
-	if (in_array('nosolninf',$ansformats)) {
+	if ($includeinf) {
 		$out .= '<li><input type="radio" id="qs'.$qn.'-i" name="qs'.$qn.'" value="inf" '.($laqs=='oo'?'checked':'').'><label for="qs'.$qn.'-i">'.$infsoln.'</label></li>';
 	}
 	$out .= '</ul>';
