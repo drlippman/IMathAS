@@ -134,8 +134,9 @@ switch($_GET['action']) {
 			}
 		}
 		$_SESSION['challenge'] = uniqid();
+        $_SESSION['newuserstart'] = time();
 		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
-		echo '<span style="display:none"><input name=hval></span>';
+		echo '<span class="sr-only"><label aria-hidden=true">Do not fill this out <input name=hval tabindex="-1"></label></span>';
 		echo "<div class=submit><input type=submit value='",_('Sign Up'),"'></div>\n";
 		echo "</form>\n";
 		if (isset($studentTOS)) {
@@ -517,6 +518,10 @@ switch($_GET['action']) {
 				invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 			);
 			</script>';
+            echo '<p class="sr-only"><label aria-hidden=true>Do not fill this out <input name=terms tabindex="-1" autocomplete="off" /></label></p>';
+            $_SESSION['challenge'] = uniqid();
+            echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
+            $_SESSION['resetpwstart'] = time();    
 			echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
 			echo "</form>";
 		}
@@ -538,6 +543,11 @@ switch($_GET['action']) {
 			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 		);
 		</script>';
+        echo '<p class="sr-only"><label aria-hidden=true>Do not fill this out <input name=terms tabindex="-1" autocomplete="off" /></label></p>';
+        $_SESSION['challenge'] = uniqid();
+        echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
+        $_SESSION['lookupusernamestart'] = time();    
+
 		echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
 		echo "</form>";
 		break;
