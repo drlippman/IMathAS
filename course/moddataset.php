@@ -1206,7 +1206,7 @@ if ($line['solution']=='') {
 <br/>
 <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
-<?php echo _('Uses random variables from the question.'); ?>
+<?php echo _('Uses random variables from the question, or question is not randomized.'); ?>
  <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
    <i><?php echo _('Be sure to include the question you are solving in the text'); ?></i>
  </span><br/>
