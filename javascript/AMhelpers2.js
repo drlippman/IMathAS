@@ -1920,7 +1920,7 @@ function singlevalsyntaxcheck(str,format) {
 	} else if (format.indexOf('scinot')!=-1) {
 		  str = str.replace(/\s/g,'');
 		  str = str.replace(/(xx|x|X|\u00D7)/,"xx");
-		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
+		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\(?\-?\d+\)?\)?)$/)) {
 		  	if (format.indexOf('scinotordec')==-1) { //not scinotordec
 		  		return (_("not valid scientific notation")+". ");
 		  	} else if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
