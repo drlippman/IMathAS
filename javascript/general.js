@@ -1551,7 +1551,8 @@ function initSageCell(base) {
 					return false;
 				}
 			} else {
-				code = jQuery(ta[0]).val();
+				code = jQuery(ta[0]).val().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 				ta = ta[0];
 			}
 		}
