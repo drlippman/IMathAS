@@ -360,7 +360,7 @@ if ($overwriteBody==1) {
       echo '</tbody></table>';
       echo '</form>';
       echo '<script type="text/javascript">
-  		  initSortTable("myTable",Array("S","S","S","S","D",false'.(($page != 'groupadmin')?',false':'').'),true);
+  		  initSortTable("myTable",Array('.(($showgroup>-1)?'false,':'').'"S","S","S","S","D",false'.(($page != 'groupadmin')?',false':'').'),true);
   		  </script>';
 
     } else if ($page=='changerights') {
