@@ -590,6 +590,7 @@ function AMQTparseIexpr(str) {
   return [node,str];
 }
 
+var AMQTallowmatrices = true;
 function AMQTparseExpr(str,rightbracket) {
   var symbol, node, result, i, nodeList = [],
   newFrag = '';
@@ -620,7 +621,7 @@ function AMQTparseExpr(str,rightbracket) {
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
 //    if (AMQnestingDepth > 0) AMQnestingDepth--;
 	var len = newFrag.length;
-	if (len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
+	if (AMQTallowmatrices && len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
 		var right = newFrag.charAt(len - 2);
 		if (right==')' || right==']') {
 			var left = newFrag.charAt(6);
@@ -713,8 +714,11 @@ function AMQTparseExpr(str,rightbracket) {
 
 AMQinitSymbols();
 
-return function(str,elid) {
+return function(str,elid,nomatrices) {
  AMQnestingDepth = 0;
+ if (nomatrices === true) { 
+    AMQTallowmatrices = false;
+ }
   str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
   str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
   str = str.replace(/&gt;/g,">");
@@ -731,7 +735,8 @@ return function(str,elid) {
   if (str.match(/\S/)==null) {
 	  return "";
   }
-  return AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  var out = AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  return out;
 }
 }();
 
