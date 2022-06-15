@@ -310,15 +310,15 @@ export const actions = {
           // Update part score
           const pts = key.split(/-/);
           const qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
-          if (qdata.scoreoverride && store.scoreOverrides[key] === '') {
+          if (qdata.hasOwnProperty('scoreoverride') && store.scoreOverrides[key] === '') {
             if (typeof qdata.scoreoverride === 'number') {
               Vue.delete(qdata, 'scoreoverride');
             } else {
               Vue.delete(qdata.scoreoverride, pts[3]);
             }
           }
-          if (store.scoreOverrides[key]) { // set or re-set scoreoverride on question part
-            if (!qdata.scoreoverride) {
+          if (store.scoreOverrides.hasOwnProperty(key) && store.scoreOverrides[key] !== '') { // set or re-set scoreoverride on question part
+            if (!qdata.hasOwnProperty('scoreoverride')) {
               store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride = {};
             }
             Vue.set(store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride,
