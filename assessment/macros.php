@@ -372,13 +372,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
 			$path .= "line([$val,$thisymin],[$val,$thisymax]);";
-			$path .= "stroke=\"none\";strokedasharray=\"none\";";
-			if ($function[1]=='red' || $function[1]=='green') {
-				$path .= "fill=\"trans{$function[1]}\";";
-			} else {
-				$path .= "fill=\"transblue\";";
-			}
 			if ($isineq) {
+                $path .= "stroke=\"none\";strokedasharray=\"none\";";
+                if ($function[1]=='red' || $function[1]=='green') {
+                    $path .= "fill=\"trans{$function[1]}\";";
+                } else {
+                    $path .= "fill=\"transblue\";";
+                }
 				if ($ineqtype[0]=='<') {
 					$path .= "rect([$xxmin,$thisymin],[$val,$thisymax]);";
 					$alt .= "Shaded left";
@@ -781,7 +781,7 @@ function mergeplots($plota) {
 		} else {
             $plotb = preg_replace('/<span.*?<\/span>/','', $plotb);
             $newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
-			$plota = str_replace("' />", $newcmds."' />", $plota);
+			$plota = str_replace("' />", trim($newcmds)."' />", $plota);
 		}
 	}
 	return $plota;
