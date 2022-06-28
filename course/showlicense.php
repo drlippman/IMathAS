@@ -37,6 +37,9 @@ function getquestionlicense($row) {
 	if ($row['otherattribution']!='') {
 		$license .= '<br/>Other Attribution: '.Sanitize::encodeStringForDisplay($row['otherattribution']);
 	}
+	if (strpos($row['control'], 'geogebra')!==false || strpos($row['qtext'], 'geogebra.org')!==false) {
+		$license .= '<br/>Includes content created with Geogebra (<a href="https://geogebra.org">geogebra.org</a>).';
+	}
 	return $license;
 }
 
@@ -44,7 +47,7 @@ $ids = array_map('Sanitize::onlyInt', explode('-',$_GET['id']));
 
 $idlist_query_placeholders = Sanitize::generateQueryPlaceholders($ids);
 
-$stm = $DBH->prepare("SELECT id,uniqueid,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist_query_placeholders)");
+$stm = $DBH->prepare("SELECT id,uniqueid,author,ancestorauthors,license,otherattribution,control,qtext FROM imas_questionset WHERE id IN ($idlist_query_placeholders)");
 $stm->execute($ids);
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<p>Question ID ".Sanitize::onlyInt($row['id']).' (Universal ID '.Sanitize::onlyInt($row['uniqueid']).')</p>';
