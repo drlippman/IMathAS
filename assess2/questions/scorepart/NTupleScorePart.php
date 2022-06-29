@@ -66,11 +66,11 @@ class NTupleScorePart implements ScorePart
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($anstype=='ntuple') {
-            $gaarr = $this->parseNtuple($givenans, false, true);
+            $gaarr = $this->parseNtuple($givenans, false, false);
         } else if ($anstype=='calcntuple') {
             // parse and evaluate
             if ($hasNumVal) {
-                $gaarr = $this->parseNtuple($givenansval, false, true);
+                $gaarr = $this->parseNtuple($givenansval, false, false);
                 $scorePartResult->setLastAnswerAsNumber($givenansval);
             } else {
                 $gaarr = $this->parseNtuple($givenans, false, true);
@@ -330,16 +330,16 @@ class NTupleScorePart implements ScorePart
     						$NCdepth--;
     						if ($NCdepth==0) {
     								$thisTuple = array(
-    										'lb' => $str[$lastcut],
-    										'rb' => $str[$i],
-    										'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
+                                        'lb' => $str[$lastcut],
+                                        'rb' => $str[$i],
+                                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
     								);
     								if ($do_eval) {
-    										for ($j=0; $j < count($thisTuple['vals']); $j++) {
-    												if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
-    														$thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
-    												}
-    										}
+                                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
+                                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
+                                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
+                                            }
+                                        }
     								}
     								if ($do_or && $inor) {
     										$ntuples[count($ntuples)-1][] = $thisTuple;
