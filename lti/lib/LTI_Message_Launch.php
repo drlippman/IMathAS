@@ -282,6 +282,20 @@ class LTI_Message_Launch {
         } else {
           return $duedate;
         }
+      } else if (!empty($custom['link_end_sub_time'])) {
+        $duedate = strtotime($custom['link_end_sub_time']);
+        if ($duedate === false) {
+          return 2000000000;
+        } else {
+          return $duedate;
+        }
+      } else if (!empty($custom['link_end_avail_time'])) {
+        $duedate = strtotime($custom['link_end_avail_time']);
+        if ($duedate === false) {
+          return 2000000000;
+        } else {
+          return $duedate;
+        }
       }
       return false;
     }
