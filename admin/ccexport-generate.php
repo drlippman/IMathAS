@@ -458,6 +458,9 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$usedcats[$row[5]]++;
 					fwrite($fp,'<submission_types>external_tool</submission_types>'."\n");
 					fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>'."\n");
+					if (isset($_POST['newtab'])) {
+						fwrite($fp, '<external_tool_new_tab>true</external_tool_new_tab>');
+					}
 					fwrite($fp,'</assignment>');
 					fclose($fp);
 					$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
