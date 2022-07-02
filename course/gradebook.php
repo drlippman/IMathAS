@@ -139,6 +139,7 @@ $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
+$pagetitle = _('Gradebook');
 
 //HANDLE ANY POSTS
 if ($isteacher) {
