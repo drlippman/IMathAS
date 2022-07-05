@@ -38,7 +38,24 @@ function getquestionlicense($row) {
 		$license .= '<br/>Other Attribution: '.Sanitize::encodeStringForDisplay($row['otherattribution']);
 	}
 	if (strpos($row['control'], 'geogebra')!==false || strpos($row['qtext'], 'geogebra.org')!==false) {
-		$license .= '<br/>Includes content created with Geogebra (<a href="https://geogebra.org">geogebra.org</a>).';
+		$license .= '<br/>Includes content created with Geogebra (<a href="https://geogebra.org">geogebra.org</a>)';
+        if (preg_match('/addGeogebra\(["\'](\w+)+?["\']/', $row['control'], $matches)) {
+            $url = "https://api.geogebra.org/v1.0/worksheets/" . $matches[1] . "?embed=creator";
+            $ctx = stream_context_create(array('http'=>
+                array(
+                'timeout' => 1
+                )
+            ));
+            $data = @file_get_contents($url, false, $ctx);
+            if ($data !== false) {
+                $data = json_decode($data, true);
+                if ($data !== null) {
+                    $license .= ' by <a href="https://geogebra.org'. Sanitize::encodeStringForDisplay($data['creator']['profile']) . '">';
+                    $license .= Sanitize::encodeStringForDisplay($data['creator']['displayname']) . '</a>';
+                }
+            }
+        }
+        $license .= '.';
 	}
 	return $license;
 }
