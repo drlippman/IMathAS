@@ -593,6 +593,40 @@ function initMolecule(qn) {
       let editor = allKekule[qn].getEditor();  // suppose this.widget is a composer
       editor.scrollClientToObject(editor.getChemObj().getChildren());  // centers the current loaded molecules (childen of chemDocument)
     }, 100);
+
+
+    /*  
+    Notes:
+    
+Hi @sowiso, you can change the default size of chem document by the config object of editor:
+
+composer.getEditorConfigs().getChemSpaceConfigs().setDefScreenSize2D({x: 600, y: 400});
+composer.newDoc();
+Or using the changeChemSpaceScreenSize method to modify the screen size of an opened document:
+
+composer.getEditor().changeChemSpaceScreenSize({x: 600, y: 400});
+
+
+The following code may help to shrink the large structures to fit the client of composer:
+
+var editor = composer.getEditor();
+var objBox = editor.getObjectsContainerBox(editor.getChemSpace().getChildren());
+var visualBox = chemEditor.getVisibleClientScreenBox();
+if (objBox && visualBox)
+{
+  var sx = (visualBox.x2 - visualBox.x1) / (objBox.x2 - objBox.x1);
+  var sy = (visualBox.y2 - visualBox.y1) / (objBox.y2 - objBox.y1);
+  var ratio = Math.min(sx, sy);
+  if (ratio < 1)
+  {
+    chemEditor.setZoom(chemEditor.getCurrZoom() * ratio);
+    chemEditor.scrollClientToObject(chemEditor.getChemSpace().getChildren());
+  }
+}
+
+
+
+    */
     
   }
   var SAel = document.getElementById('chemsa' + qn);
