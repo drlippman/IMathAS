@@ -172,7 +172,7 @@ class AssessStandalone {
 
     $showans = (!empty($this->getOpVal($options, 'showans', false)) || $showans) &&
         !$this->getOpVal($options, 'hideans', false);
-    $showhints = $this->getOpVal($options, 'showhints', 3);
+    $showhints = $this->getOpVal($options, 'showhints', 7);
     $rawscores = $this->state['rawscores'][$qn] ?? [];
 
     if ($hidescoremarkers) {
