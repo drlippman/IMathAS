@@ -93,9 +93,9 @@ class DrawingAnswerBox implements AnswerBox
                         $pts = explode(':', $grid[$i]);
                         foreach ($pts as $k => $v) {
                             if ($v[0] === "h") {
-                                $pts[$k] = "h" . evalbasic(substr($v, 1));
+                                $pts[$k] = ($k<2) ? "h" . evalbasic(substr($v, 1)) : $v;
                             } else {
-                                $pts[$k] = evalbasic($v);
+                                $pts[$k] = ($k<2) ? evalbasic($v) : $v;
                             }
                         }
                         $settings[$i] = implode(':', $pts);
