@@ -80,6 +80,10 @@ var AMQsymbols = [
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
 {input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
+{input:"xor",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"oplus",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"ominus",  tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
+{input:"neg",  tag:"mo", output:"\u00AC", tex:"neg", ttype:CONST},
 //{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", ttype:UNDEROVER},
 {input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
 //{input:"vvv", tag:"mo", output:"\u22C1", tex:"bigvee", ttype:UNDEROVER},
@@ -731,7 +735,8 @@ return function(str,elid,nomatrices) {
     document.getElementById(elid).getAttribute("data-mq").match(/interval/)
   ) {
       str = str.replace(/\bU\b/g,'cup');
-  }
+  }  
+ 
   if (str.match(/\S/)==null) {
 	  return "";
   }
@@ -783,7 +788,8 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
-    tex = tex.replace(/\\cup/g,'U').replace(/\\sim/g,'~');
+    // move to intervalscorepart tex = tex.replace(/\\cup/g,'U');
+    tex = tex.replace(/\\sim/g,'~');
     tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');
     tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');

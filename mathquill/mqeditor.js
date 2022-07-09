@@ -126,7 +126,10 @@ var MQeditor = (function($) {
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
         thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
         if (calcformat.match(/logic/)) {
-            thisMQconfig.autoCommands += ' or and implies iff';
+            thisMQconfig.autoCommands += ' neg xor or and implies iff';
+        }
+        if (calcformat.match(/setexp/)) {
+            thisMQconfig.autoCommands += ' nn xor uu ominus cap cup oplus';
         }
         var vars = el.getAttribute("data-mq-vars") || '';
         var varpts;

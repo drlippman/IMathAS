@@ -1318,10 +1318,10 @@ function processCalculated(fullstr, format) {
 
 function processCalcInterval(fullstr, format, ineqvar) {
   var origstr = fullstr;
+  fullstr = fullstr.replace(/cup/g,'U');
   if (format.indexOf('inequality')!=-1) {
     fullstr = fullstr.replace(/or/g,' or ');
     var conv = ineqtointerval(fullstr, ineqvar);
-    console.log(conv);
     if (conv.length>1) { // has error
       return {
         err: (conv[1]=='wrongvar')?

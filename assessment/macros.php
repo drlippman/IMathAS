@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits",
+ "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","intval");
 
 function mergearrays() {
@@ -5164,10 +5164,12 @@ function comparelogic($a,$b,$vars) {
         return false;
     }
     $varlist = implode(',', $vars);
-    $a = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $a);
-    $b = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $b);
+
+	$keywords = ['and', '^^', 'xor', 'oplus', 'or', 'vv', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>'];
+	$replace = 	['#a',  '#a', '#x',  '#x',    '#o', '#o', '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i'];
+    $a = str_replace($keywords,$replace,$a);
+    $b = str_replace($keywords,$replace,$b);
+
     $afunc = makeMathFunction($a, $varlist);
     if ($afunc === false) {
         return false;
@@ -5196,6 +5198,81 @@ function comparelogic($a,$b,$vars) {
     return true;
 }
 
+function comparesetexp($a,$b,$vars) {
+    if (!is_array($vars)) {
+        $vars = array_map('trim', explode(',', $vars));
+    }
+    if ($a === null || $b === null || trim($a) == '' || trim($b) == '') {
+        return false;
+    }
+    $varlist = implode(',', $vars);
+	
+	$keywords = ['and', 'nn', 'cap', 'xor', 'oplus', 'ominus', 'triangle', 'or', 'cup', 'uu', '-',  '\''];
+	$replace = 	['#a',  '#a', '#a',	 '#x',  '#x',    '#x',     '#x',       '#o', '#o',  '#o', '#m',	'^c'];
+
+	$ab = [$a,$b];
+	foreach($ab as &$str){
+		$str = str_replace($keywords,$replace,$str);	
+
+		// Since complement symbols in set expresions are unary operations *after* the operand, we will shift the complement operator to before the operand here, rather than overcomplicating MathParser
+		// Remove double negations
+		$str = preg_replace('/(\'|\^c){1}\s*(\'|\^c){1}/','',$str);
+		// Remove any spaces before a complement symbol
+		$str = preg_replace('/\s*(\'|\^c)/','$1',$str);
+		// If symbol before a complement is an object from $vars, place a ! immediately before the $var
+		foreach($vars as $var){
+			$str = preg_replace("/($var)(\'|\^c)/",'!$1',$str);
+		}
+		// If symbol before a complement is a right paren/bracket, place a ! before the corresponding left paren/bracket
+		$rindex = max(strpos($str,")^c"),strpos($str,"]^c"));
+		while($rindex){
+			$str = substr_replace($str,'',$rindex+1,2);
+			$balanced = 1;
+			for($i = $rindex-1; $i >= 0; $i--){
+				if($str[$i] == ')' || $str[$i] == ']'){
+					$balanced++;
+				}
+				elseif($str[$i] == '(' || $str[$i] == '['){
+					$balanced--;
+				}
+				if($balanced==0){
+					$str = substr_replace($str,'!',$i,0);
+					break;
+				}
+			}
+			$rindex = max(strpos($str,")^c"),strpos($str,"]^c"));
+		}
+		
+	}
+	$a = $ab[0];
+	$b = $ab[1];
+    $afunc = makeMathFunction($a, $varlist);
+    if ($afunc === false) {
+        return false;
+    }
+    $bfunc = makeMathFunction($b, $varlist);
+    if ($bfunc === false) {
+        return false;
+    }
+    $n = count($vars);
+    $max = pow(2,$n);
+    $map = array_combine($vars, array_fill(0,count($vars),0));
+    for ($i=0; $i<$max; $i++) {
+        $aval = $afunc($map);
+        $bval = $bfunc($map);
+        if ($aval != $bval) { 
+            return false;
+        }
+        for ($j=0;$j<$n;$j++) {
+            if ($map[$vars[$j]] == 0) { // if it's 0, add 1 and stop
+                $map[$vars[$j]] = 1; break;
+            } else {
+                $map[$vars[$j]] = 0; // if it's 1, set to 0 and continue on to the next one
+            }
+        }
+    }
+    return true;
+}
 function comparentuples() {
   $par = false;
   $args = func_get_args();

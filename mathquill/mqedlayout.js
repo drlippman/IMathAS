@@ -445,7 +445,7 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             {'b':'.'},
-            (calcformat.match(/(list|set)/) ||
+            (calcformat.match(/(list|set\b)/) ||
             qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
@@ -477,7 +477,7 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
-            (calcformat.match(/(list|set)/) ||
+            (calcformat.match(/(list|set\b)/) ||
              qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} :
@@ -485,7 +485,7 @@ var myMQeditor = (function($) {
           ]
         };
       } else {
-        if (calcformat.match(/(list|set)/) || qtype.match(/(interval|string|ntuple)/)) {
+        if (calcformat.match(/(list|set\b)/) || qtype.match(/(interval|string|ntuple)/)) {
           baselayout.tabs[0].tabcontent[2].contents[14] = {'b':','};
         } else if (calcformat.match(/equation/)) { // replace , with =
           baselayout.tabs[0].tabcontent[2].contents[14] = {'b':'='};
@@ -525,7 +525,7 @@ var myMQeditor = (function($) {
         baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
       }
     }
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|setexp)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
@@ -542,7 +542,7 @@ var myMQeditor = (function($) {
       }
     } else if ((qtype.match(/matrix/) || calcformat.match(/matrix/)) && !calcformat.match(/matrixsized/)) {
       baselayout.tabs[5].enabled = true;
-    } else if (calcformat.match(/set/)) {
+    } else if (calcformat.match(/set\b/)) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
@@ -566,15 +566,30 @@ var myMQeditor = (function($) {
         baselayout.tabs[0].tabcontent[0].contents = [
             {l:'\\vee',pr:'<span class="mq-binary-operator">∨</span>'},
             {l:'\\wedge',pr:'<span class="mq-binary-operator">∧</span>'},
-            {b:'~'},
+            {l:'\\oplus',pr:'<span class="mq-binary-operator">⊕</span>'},
             {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+            {l:'\\neg',pr:'¬'},
+            {b:'~'},
             {l:'\\implies',pr:'<span class="mq-binary-operator">⇒</span>'},
             {l:'\\iff',pr:'<span class="mq-binary-operator">⇔</span>'}
         ];
         if (layoutstyle !== 'OSK') {
-            baselayout.tabs[0].tabcontent[0].s = 3;
+            baselayout.tabs[0].tabcontent[0].s = 4;
         }
     }
+    if (calcformat.match(/setexp/)) {
+      baselayout.tabs[0].p = "Set Exp";
+      baselayout.tabs[0].tabcontent[0].contents = [
+          {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
+          {l:'\\cap',pr:'<span class="mq-binary-operator">∩</span>'},
+          {l:'\\^c',c:"w",pr:'<span class="mq-non-leaf mq-empty"></span><sup class="mq-binary-operator">c</sup>'},
+          {l:'\\ominus',pr:'<span class="mq-binary-operator">⊖</span>'},
+          {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'}
+      ];
+      if (layoutstyle !== 'OSK') {
+          baselayout.tabs[0].tabcontent[0].s = 3;
+      }
+  }
 
     // for both
     if (vars.length > 0) {
@@ -734,5 +749,8 @@ MQ.config({
   restrictMismatchedBrackets: true,
   autoCommands: 'pi theta root sqrt ^oo degree',
   autoParenOperators: true,
-  addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
+  addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;'], 
+                'xor': ['VanillaSymbol', '\\oplus ', '&oplus;'], 
+                'uu': ['VanillaSymbol', '\\cup ', '&cup;'], 
+                'nn': ['VanillaSymbol', '\\cap ', '&cap;']},
 });

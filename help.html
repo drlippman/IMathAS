@@ -3405,13 +3405,15 @@ A student is asked to enter a string (a word or list of letters).
 	<dd>"takeanything" or "takeanythingorblank" sets the problem to give full credit
 		for any answer.  "takeanythingorblank" also counts blank answers as correct.
 	  "submitblank" will cause blank answers to get submitted for scoring (new system only).</dd>
-<dt>$answerformat = "list" or "logic" </dt>
+<dt>$answerformat = "list" or "logic" or "setexp" </dt>
 	<dd>"list" specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
     partial_credit flag.  Duplicates are not ignored. <br><br>
     "logic" enables a separate grading algorithm for logic statements, ignoring $strflags.  The $answer 
-    should be given using vv for or, ^^ for and, ~ for not, =&gt; for conditional, and &lt;=&gt; for biconditional.
+    should be given using vv for or, ^^ for and, neg for not, xor for exclusive or, =&gt; for conditional, and &lt;=&gt; for biconditional.
     Parens are supported, but no other symbols.  The variables used in the logic expression must be declared by 
-    defining $variables.</dd>
+    defining $variables.<br><br>
+	"setexp" enables a separate grading algorithm for set expression statements, ignoring $strflags. The $answer should be given using
+	 'nn' for intersection, 'uu' for union, '-' for set difference, '^c' for set complement, and 'oplus' for symmetric difference.</dd>
 <dt>$displayformat = "usepreview" or "typeahead" or "usepreviewnomq"</dt>
     <dd>"usepreview" enables mathquill entry for mathematical answers.<br/>
         "usepreviewnomq" adds a preview button for previewing mathematical answers in asciimath.<br/>
@@ -3419,10 +3421,10 @@ A student is asked to enter a string (a word or list of letters).
 	two letters of the word.  Provide the auto-suggest list in the variable $questions.
     </dd>
 <dt>$variables</dt>
-    <dd>When $answerformat="logic" is used, define the $variables in the logic statement, like "p,q"</dd>
+    <dd>When $answerformat="logic" or "setexp" is used, define the $variables in the logic statement, like "p,q"</dd>
 <dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
 	<dd>Adds format checking to the student's answer.  Usually not needed for string questions, but can 
-        be useful when the "logic" answerformat is used. The list can include multiple checks, 
+        be useful when the "logic" or "setexp" answerformat is used. The list can include multiple checks, 
         which come in pairs.  The first is the symbol to look for.  The second describes what is 
         acceptable.  For example, in the string shown above, the symbol "^" would be required to show 
         up exactly 3 times, and "cos" would be required to show up less than 2 times. </dd>
