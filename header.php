@@ -122,6 +122,7 @@ if (!isset($_SESSION['mathdisp'])) {
             var AM = MathJax.InputJax.AsciiMath.AM;
             AM.newsymbol({input: "o-", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
+            AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
         });
         </script>';
     if (!empty($CFG['GEN']['uselocaljs'])) {
@@ -173,6 +174,7 @@ if (!isset($_SESSION['mathdisp'])) {
             var AM = MathJax.InputJax.AsciiMath.AM;
             AM.newsymbol({input: "o-", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
+            AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
             MathJax.startup.defaultReady();
           }
        }

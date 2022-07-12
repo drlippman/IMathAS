@@ -235,6 +235,7 @@ var AMsymbols = [
 {input:"if",  tag:"mo", output:"if",     tex:null, ttype:SPACE},
 {input:"<=>", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
 {input:"iff",   tag:"mo", output:"<=>", tex:null, ttype:DEFINITION},
+{input:"rightleftharpoons", tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
 {input:"AA",  tag:"mo", output:"\u2200", tex:"forall", ttype:CONST},
 {input:"EE",  tag:"mo", output:"\u2203", tex:"exists", ttype:CONST},
 {input:"_|_", tag:"mo", output:"\u22A5", tex:"bot", ttype:CONST},

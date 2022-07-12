@@ -197,6 +197,7 @@ dd {
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
 		<li><a href="#calcinterval">Calculated Interval</a></li>
+        <li><a href="#chemeqn">Chemical Equation</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
         <li><a href="#conditional">Conditional</a></li>
@@ -4036,6 +4037,41 @@ or if the question type gives away critical info to the student.</dd>
 
 </div> <!-- h3 -->
 <div class=h3>
+    <h3 id="chemeqn">Chemical Equation</h3>
+    
+    <p>
+    A student is asked to enter a chemical formula, or use $answerformat="reaction"
+    to ask for a reaction equation.
+    </p>
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = a string with the answer</dt>
+        <dd>Defines the answer, like "H_2O". Spaces are ignored.
+            For reactions, use <code>-&gt;</code> for a right arrow,
+            and <code>&lt;-&gt;</code> for an equilibrium arrow, like "2H+O->H_2O".</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$answerformat = "reaction" </dt>
+        <dd>Use "reaction" if you're asking for a reaction equation.</dd>
+    <dt>$variables = a list of atoms </dt>
+        <dd>Define this to populate the equation editor with the specified atoms.</dd>
+    <dt>$answerboxsize = number </dt>
+        <dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.
+        Use this to substitute a detailed answer.</dd>
+    </dl>
+    
+    
+</div> <!-- h3 -->
+<div class=h3>
 <h3 id="fileupload">File Upload</h3>
 
 <p>
@@ -4097,6 +4133,7 @@ This type of question can contain multiple parts, where each part is one of the 
 	<li>Calculated Complex: "calccomplex"</li>
 	<li>Interval: "interval"</li>
 	<li>Calculated Interval: "calcinterval"</li>
+    <li>Chemical Equation: "chemeqn"</li>
 	<li>Essay: "essay"</li>
 	<li>File Upload: "file"</li>
 	<li>String: "string"</li>

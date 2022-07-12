@@ -525,7 +525,7 @@ var myMQeditor = (function($) {
         baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
       }
     }
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|setexp)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|setexp|chemeqn)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
@@ -589,7 +589,23 @@ var myMQeditor = (function($) {
       if (layoutstyle !== 'OSK') {
           baselayout.tabs[0].tabcontent[0].s = 3;
       }
-  }
+    }
+    if (qtype=='chemeqn') {
+        baselayout.tabs[0].tabcontent[0].contents = [
+            {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
+            {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
+            {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+        ];
+        if (calcformat.match(/reaction/)) {
+            baselayout.tabs[0].tabcontent[0].contents.push(
+                {l:'\\to',pr:'<span class="mq-binary-operator">→</span>'},
+                {l:'\\rightleftharpoons',pr:'<span class="mq-binary-operator">⇌</span>'}
+            );
+        }
+        if (layoutstyle !== 'OSK') {
+            baselayout.tabs[0].tabcontent[0].s = 3;
+        }
+    }
 
     // for both
     if (vars.length > 0) {
@@ -602,7 +618,7 @@ var myMQeditor = (function($) {
           }, {s:.1});
         } else {
           baselayout.tabs.splice(1, 0, {
-            p: 'Vars',
+            p: (qtype=='chemeqn') ? 'Atoms' : 'Vars',
             enabled: true,
             tabcontent: [{
               flow: 'row',
@@ -752,5 +768,6 @@ MQ.config({
   addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;'], 
                 'xor': ['VanillaSymbol', '\\oplus ', '&oplus;'], 
                 'uu': ['VanillaSymbol', '\\cup ', '&cup;'], 
-                'nn': ['VanillaSymbol', '\\cap ', '&cap;']},
+                'nn': ['VanillaSymbol', '\\cap ', '&cap;'],
+                'rightleftharpoons': ['BinaryOperator', '\\rightleftharpoons ', '&rlhar;']}
 });

@@ -141,6 +141,7 @@ var AMQsymbols = [
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
 {input:"=>",  tag:"mo", output:"\u21D2", tex:"implies", ttype:CONST},
 {input:"<=>", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
+{input:"rightleftharpoons", tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
 //{input:"CC",  tag:"mo", output:"\u2102", tex:"mathbb{C}", ttype:CONST, notexcopy:true},
 //{input:"NN",  tag:"mo", output:"\u2115", tex:"mathbb{N}", ttype:CONST, notexcopy:true},
 //{input:"QQ",  tag:"mo", output:"\u211A", tex:"mathbb{Q}", ttype:CONST, notexcopy:true},
@@ -788,6 +789,7 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
+    tex = tex.replace(/\\rightleftharpoons/g,'rightleftharpoons');
     // move to intervalscorepart tex = tex.replace(/\\cup/g,'U');
     tex = tex.replace(/\\sim/g,'~');
     tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');

@@ -364,6 +364,54 @@ function parsedIntervalToString($parsed, $islist) {
 	}
 }
 
+function parseChemical($string) {
+    $string = str_replace(['<->','<=>'], 'rightleftharpoons', $string);
+    $string = str_replace(['to','rarr','implies'], '->', $string);
+    $parts = preg_split('/(->|rightleftharpoons)/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $reactiontype = (count($parts) > 1) ? $parts[1] : null;
+    $sides = [];
+    for ($i=0; $i < count($parts); $i += 2) {
+        $sideparts = [];
+        $lastcut = 0;
+        $str = $parts[$i];
+        $strlen = strlen($str);
+        $depth = 0;
+        // cut by + signs, parse out coefficient and chemical
+        for ($p=1; $p < $strlen - 1; $p++) {
+            $c = $str[$p];
+            if ($c == '+' && $depth == 0 && $str[$p-1] != '^' && $str[$p-1] != '_') {
+                preg_match('/^\s*(\d+)?\s*\*?\s*(.*?)\s*$/', substr($str, $lastcut, $p-$lastcut), $matches);
+                $sideparts[] = [
+                    $matches[1] === '' ? 1 : intval($matches[1]),
+                    str_replace(' ','',$matches[2])
+                ];
+                $lastcut = $p+1;
+            } else if ($c == '(' || $c == '[') {
+                $depth++;
+            } else if ($c == ')' || $c == ']') {
+                $depth--;
+            }
+        }
+        preg_match('/^\s*(\d+)?\s*\*?\s*(.*?)\s*$/', substr($str, $lastcut), $matches);
+        $sideparts[] = [
+            $matches[1] === '' ? 1 : intval($matches[1]),
+            str_replace(' ','',$matches[2])
+        ];
+        // sort by chemical to put in standard order
+        usort($sideparts, function($a,$b) {
+            return strcmp($a[1],$b[1]);
+        });
+        $sides[] = $sideparts;
+    }
+    // if dual direction reaction, sort sides to standarize
+    if (count($sides)>1 && $reactiontype == 'rightleftharpoons') {
+        usort($sides, function($a,$b) {
+            return strcmp($a[0][1], $b[0][1]);
+        });
+    }
+    return [$sides, $reactiontype];
+}
+
 //checks the format of a value
 //tocheck:  string to check
 //ansformats:  array of answer formats.  Currently supports:

@@ -542,3 +542,7 @@
 .mq-math-mode i.mq-font {
   font-family: KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
 }
+.mq-chem var {
+    font-style: normal;
+    font-family: "Times New Roman", Symbola, serif;
+}
