@@ -140,7 +140,7 @@ export default {
       data.append('file', this.$refs.fileinput.files[0]);
       this.uploading = true;
       window.$.ajax({
-        url: store.APIbase + '../tinymce4/upload_handler.php',
+        url: store.APIbase.replace(/\/\w+\/$/, '') + '/tinymce4/upload_handler.php',
         type: 'POST',
         dataType: 'json',
         data: data,
