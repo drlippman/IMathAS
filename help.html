@@ -3518,6 +3518,7 @@ drawn line from the correct line.
 	        	<li>ray (rays)</li>
 	        	<li>parab (vertical parabolas)</li>
 	        	<li>horizparab (horizontal parabolas)</li>
+                <li>halfparab (half a vertical parabola)</li>
 	        	<li>cubic (a(x-h)^3+k style cubics)</li>
 	        	<li>abs (absolute value)</li>
 	        	<li>circle (circles)</li>
@@ -3542,6 +3543,9 @@ drawn line from the correct line.
 	        <li>For hyperbolas of form (x-h)^2/a^2-(y-k)^2/b^2=1, give $answers as "horizhyperbola,h,k,a,b"</li>
 	        <li>For hyperbolas of form (y-k)^2/a^2-(x-h)^2/b^2=1, give $answers as "verthyperbola,h,k,a,b"</li>
 	        <li>For horizontal parabolas give $answers as "x=equation", like "x=2(y-1)^2-3".</li>
+            <li>For half parabolas give $answers as "equation,>xvertex", like "(x-1)^2-3,>1". Note only half parabolas are supported, not 
+                arbitrary segments.
+            </li>
 	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
 	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
 	      </ul>

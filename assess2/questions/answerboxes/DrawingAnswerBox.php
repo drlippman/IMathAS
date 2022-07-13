@@ -332,6 +332,12 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 6.1;}
                         $out .= ' alt="Horizontal parabola"/>';
                     }
+                    if (count($answerformat) == 1 || in_array('halfparab', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tphalfparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.2\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'halfparab') {$out .= 'class="sel" ';
+                            $def = 6.2;}
+                        $out .= ' alt="Half Parabola"/>';
+                    }
                     if (in_array('cubic', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpcubic.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.3\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'cubic') {$out .= 'class="sel" ';
@@ -540,6 +546,16 @@ class DrawingAnswerBox implements AnswerBox
                 if ($function[0] == 'optional') {
                     array_shift($function);
                     $defcolor = 'grey';
+                }
+                if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
+                    $val = substr($function[1],1);
+                    if ($function[1][0]==='<') {
+                        $function[1] = '-oo';
+                        $function[2] = $val;
+                    } else {
+                        $function[1] = $val;
+                        $function[2] = 'oo';
+                    }
                 }
                 if ($answerformat[0] == 'inequality') {
                     if ($function[0][2] == '=') {
