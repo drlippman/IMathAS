@@ -1093,7 +1093,7 @@ function AMnumfuncPrepVar(qn,str) {
      return p1;
     });
   // fix display of /n!
-  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
+  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!(?!=)/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1728,6 +1728,15 @@ function ineqtointerval(strw, intendedvar) {
   }
   var pat, interval, out = [];
   var strpts = strw.split(/\s*or\s*/);
+  if (strpts.length == 1 && strw.match(/!=/)) {
+    var ineqpts = strw.split(/!=/);
+    if (ineqpts.length != 2) {
+        return ['', 'invalid'];
+    } else if (simplifyVariable(ineqpts[0]) != simpvar) {
+        return ['', 'wrongvar'];
+    }
+    return ['(-oo,' + ineqpts[1] + ')U(' + ineqpts[1] + ',oo)'];
+  }
 	for (var i=0; i<strpts.length; i++) {
 		str = strpts[i];
     if (pat = str.match(/^(.*?)(<=?|>=?)(.*?)(<=?|>=?)(.*?)$/)) {

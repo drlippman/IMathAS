@@ -121,8 +121,9 @@ var myMQeditor = (function($) {
               {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
               {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
               {p:'or', c:'w', w:'\\text{ or }'},
+              {l:'\\ne', pr:'<span class="mq-binary-operator">&ne;</span>'},
               {p:'DNE', 'sm':2},
-              {p:'all reals', c:'w', w:'\\text{all reals}', s:2}
+              {p:'all reals', c:'w', w:'\\text{all reals}', 'sm':2}
             ]
           }
         ]
@@ -314,13 +315,14 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 4,
             contents: [
-              {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
-              {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
-              {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
-              {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
-              {p:'or', c:'w', w:'\\text{ or }'},
-              {p:'DNE', 'sm':2},
-              {p:'all reals', c:'w', w:'\\text{all reals}', s:2}
+                {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
+                {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
+                {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
+                {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
+                {p:'or', c:'w', w:'\\text{ or }'},
+                {l:'\\ne', pr:'<span class="mq-binary-operator">&ne;</span>'},
+                {p:'DNE', 'sm':2},
+                {p:'all reals', c:'w', w:'\\text{all reals}', 'sm':2}  
             ]
           }
         ]

@@ -3051,6 +3051,14 @@ function ineqtointerval($str, $var) {
     $outpieces = [];
     $orpts = preg_split('/\s*or\s*/', $str);
     foreach ($orpts as $str) {
+        if (count($orpts)==1 && strpos($str, '!=') !== false) {
+            // special handling for != 
+            $pieces = explode('!=', $str);
+            if (count($pieces) != 2 || trim($pieces[0]) != $var) {
+                return false;
+            }
+            return '(-oo,' . $pieces[1] . ')U(' . $pieces[1] . ',oo)';
+        }
         $pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
         $cnt = count($pieces);
         $pieces = array_map('trim', $pieces);
@@ -3087,6 +3095,7 @@ function intervaltoineq($str,$var) {
 	}
 	$arr = explode('U',$str);
 	$out = array();
+    $mightbeineq = '';
 	foreach ($arr as $v) {
 		$v = trim($v);
 		$sm = $v[0];
@@ -3097,9 +3106,13 @@ function intervaltoineq($str,$var) {
 				$out[] = '"all real numbers"';
 			} else {
 				$out[] = $var . ($em==']'?'le':'lt') . $pts[1];
+                if ($em==')') { $mightbeineq = $pts[1]; }
 			}
 		} else if ($pts[1]=='oo') {
 			$out[] = $var . ($sm=='['?'ge':'gt') . $pts[0];
+            if ($mightbeineq!=='' && count($arr)==2 && $sm=='(' && $mightbeineq==$pts[0]) {
+                return $var . ' != ' . $pts[0];
+            }
 		} else {
 			$out[] = $pts[0] . ($sm=='['?'le':'lt') . $var . ($em==']'?'le':'lt') . $pts[1];
 		}
