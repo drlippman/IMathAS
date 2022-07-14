@@ -796,7 +796,7 @@ if ($overwriteBody==1) {
 </div>
         
 <form id="selq">
-	<table cellpadding="5" id="myTable" class="gb zebra" style="clear:both; position:relative;" tabindex="-1">
+	<table cellpadding="5" id="myTable" class="gb zebra potential-question-list" style="clear:both; position:relative;" tabindex="-1">
     </table>
     <p><span id="searchnums"><?php echo _('Showing');?> <span id="searchnumvals"></span></span>
       <a href="#" id="searchprev" style="display:none"><?php echo _('Previous Results');?></a>
