@@ -55,11 +55,11 @@ class ChemEquationAnswerBox implements AnswerBox
             (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
 
         if ($answerformat == 'reaction') {
-            $shorttip = _('Enter a chemical reaction');
-            $tip = _('Enter a chemical equation');
+            $shorttip = _('Enter a chemical equation');
+            $tip = _('Enter a chemical equation, like 2H_2+O_2->2H_2O. Answers are case sensitive.');
         } else {
             $shorttip = _('Enter a chemical formula');
-            $tip = _('Enter a chemical formula');
+            $tip = _('Enter a chemical formula, like H_2O. Answers are case sensitive.');
         }
 
         $classes = ['text'];
