@@ -1098,7 +1098,7 @@ function generateTable() {
     var html = "";
     var totalcols = 10;
 
-    html += "<table cellpadding=5 class=gb><thead><tr>";
+    html += "<table cellpadding=5 class='gb questions-in-assessment'><thead><tr>";
     if (!beentaken) {
         html += "<th></th>";
     }
