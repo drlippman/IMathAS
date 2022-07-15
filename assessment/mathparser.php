@@ -253,17 +253,6 @@ class MathParser
    * @return array  Builds syntax tree in class, but also returns it
    */
   public function parse($str) {
-    // Rewrite sin^(-1) as arcsin
-    $str = str_replace(
-      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)",
-        "sec^-1","csc^-1","cot^-1","sec^(-1)","csc^(-1)","cot^(-1)",
-        "sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
-      array("arcsin","arccos","arctan","arcsin","arccos","arctan",
-        "arcsec","arccsc","arccot","arcsec","arccsc","arccot",
-        "arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
-      $str
-    );
-
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     // attempt to handle |x| as best as possible
     $str = preg_replace('/(?<!\|)\|([^\|]+?)\|(?!\|)/', 'abs($1)', $str);
@@ -468,8 +457,8 @@ class MathParser
               }
             } else if ($peek == '^') {
               // found something like sin^2; append power to symbol for now
-              if (preg_match('/^(-?\d+)/', substr($str,$n+2), $sub)) {
-                $tokens[count($tokens)-1]['symbol'] .= '^' . $sub[1];
+              if (preg_match('/^(\-?\d+|\((\-\d+)\))/', substr($str,$n+2), $sub)) {
+                $tokens[count($tokens)-1]['symbol'] .= '^' . (isset($sub[2]) ? $sub[2] : $sub[1]);
                 $n += strlen($sub[1]) + 1;
               }
             } else if ($nextSymbol == 'root') {
