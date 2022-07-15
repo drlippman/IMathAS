@@ -1405,7 +1405,37 @@ function acsc($x) {
   return asin($inv);
 }
 function acot($x) {
-  return M_PI/2 - atan($x);
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arccot");
+    }
+    return atan(1/$x);
+}
+function asech($x) {
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arcsech");
+    }
+    $inv = round(1/$x, 12);
+    if ($inv < 1) {
+        throw new MathParserException("Invalid input for arcsech");
+    }
+    return acosh($inv);
+}
+function acsch($x) {
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arccsch");
+    }
+    $inv = round(1/$x, 12);
+    return asinh($inv);
+}
+function acoth($x) {
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arccoth");
+    }
+    $inv = round(1/$x, 12);
+    if ($inv < -1 || $inv > 1) {
+        throw new MathParserException("Invalid input for arccoth");
+    }
+    return atanh($inv);
 }
 function safeasin($x) {
   return asin(round($x,12));  
