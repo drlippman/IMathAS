@@ -2971,6 +2971,7 @@ var MathCommand = P(MathElement, function(_, super_) {
             cursor.options.autoParenOperators.hasOwnProperty(str)
         ) {
             str += cmd.letter;
+            var partofop = false;
             for (var opname in cursor.options.autoOperatorNames) {
                 if (opname.substring(0, str.length) === str) {
                     partofop = true;
