@@ -1279,7 +1279,7 @@ function getnextprev(formn,loc) {
 		} else if ($isgrpadmin) {
 			echo "<br/>(Delete and Transfer only apply to group's questions)\n";
 		}
-		echo "<table id=myTable class=gb><thead>\n";
+		echo "<table id=myTable class='gb questionset-management-list'><thead>\n";
 		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
 		if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
 		if ($searchall==1) {
