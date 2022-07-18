@@ -116,11 +116,12 @@ switch($_GET['action']) {
 			$otherusers[$row['id']] = $row['LastName'].', '.$row['FirstName'].(isset($row['name'])?' ('.$row['name'].')':'');
 		}
 
+        $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 		$stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=? and lastaccess>?");
 		$stm->execute(array($_GET['id'], time()-2*365*24*60*60));
 		$hasstu = false;
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (!isset($CFG['GEN']['enrollonnewinstructor']) || !in_array($row['courseid'], $CFG['GEN']['enrollonnewinstructor'])) {
+			if (!in_array($row['courseid'], $allInstrEnroll)) {
 				$hasstu = true;
 				break;
 			}

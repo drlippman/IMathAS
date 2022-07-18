@@ -82,7 +82,8 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['coursebrowser']`:  If you wish to use the course browser feature, copy `/javascript/coursebrowserprops.js.dist` to `/javascript/coursebrowserprops.js`, edit it, then set:
     - `$CFG['coursebrowser'] = 'coursebrowserprops.js'`.
     - `$CFG['coursebrowsermsg']`: Optionally set this to override the default "Copy a template or promoted course" message.
-- `$CFG['GEN']['enrollonnewinstructor']`:  Set to an array of course IDs that new instructors should automatically be enrolled in (like a support course or training course).
+- `$CFG['GEN']['enrollonnewinstructor']`:  Set to an array of course IDs that new instructors should automatically be enrolled in upon requesting an account (like a support course or training course).
+- `$CFG['GEN']['enrolloninstructorapproval']`:  Set to an array of course IDs that instructors should automatically be enrolled in when their account is approved.
 - `$CFG['GEN']['guesttempaccts']`: Set to true to allow logging on as `guest` with no password.  Also enables the "guest access" option in course settings, which defines which courses a guest will get auto-enrolled in.
 -  `$CFG['use_csrfp']`: Set this to true to enable cross-site request forgery protection.
 - File Storage:  By default, all user-uploaded files are stored on the webserver.  The system supports using Amazon S3 for file storage instead.  To use S3:

@@ -186,11 +186,12 @@ switch($_POST['action']) {
 
 		//if student being promoted, enroll in teacher enroll courses
 		if ($oldrights<=10 && $_POST['newrights']>=20) {
-            if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+            if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+                $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
                 $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
                 $stm->execute([$_GET['id']]);
                 $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-                $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+                $toEnroll = array_diff($allInstrEnroll, $existingEnroll);
                 if (count($toEnroll) > 0) {
                     $valbits = array();
                     $valvals = array();
@@ -227,9 +228,13 @@ switch($_POST['action']) {
 				$stm->execute(array(json_encode($reqdata), $_GET['id']));
 			}
 
-		} else if ($oldrights>10 && $_POST['newrights']<=10 && isset($CFG['GEN']['enrollonnewinstructor'])) {
+		} else if ($oldrights>10 && $_POST['newrights']<=10 && 
+            (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval']))
+        ) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
+
 			require_once("../includes/unenroll.php");
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+			foreach ($allInstrEnroll as $ncid) {
 				unenrollstu($ncid, array($_GET['id']));
 			}
 		}
@@ -421,10 +426,13 @@ switch($_POST['action']) {
 			':specialrights'=>$specialrights,
             ':jsondata'=>json_encode($jsondata)));
 		$newuserid = $DBH->lastInsertId();
-		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
+        if ($_POST['newrights']>=20 && 
+            (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval']))
+        ) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 			$valbits = array();
 			$valvals = array();
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+			foreach ($allInstrEnroll as $ncid) {
 				$valbits[] = "(?,?)";
 				array_push($valvals, $newuserid,$ncid);
 			}

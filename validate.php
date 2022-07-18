@@ -384,6 +384,9 @@ if ($hasusername) {
     $line = $stm->fetch(PDO::FETCH_ASSOC);
     $username = $line['SID'];
     $myrights = $line['rights'];
+    if ($myrights == 12) {
+        $myrights = 5; // treat pending instructors like guest users.
+    }
     $myspecialrights = $line['specialrights'];
     $userHasAdminMFA = false;
     if (($myrights > 40 || $myspecialrights > 0) && !empty($line['mfa']) && empty($_SESSION['mfaadminverified'])) {

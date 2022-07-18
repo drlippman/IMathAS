@@ -29,9 +29,11 @@ if (!empty($_POST['todel'])) {
     }
 
     // unenroll from any instructor-enroll courses
-    if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+    if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+        $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
+
         require("../includes/unenroll.php");
-        foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
+        foreach ($allInstrEnroll as $rcid) {
             unenrollstu($rcid, $todel);
         }
     }
