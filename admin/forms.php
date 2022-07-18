@@ -926,13 +926,16 @@ switch($_GET['action']) {
 
 		if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
 			echo "<span class=form>",_("Allow other instructors to copy course items"),":</span><span class=formright>";
-			echo '<input type=radio name="copyrights" value="0" ';
+			echo '<input type=radio name="copyrights" value="-1" ';
+			if ($copyrights==-1) { echo "checked=1";}
+            echo '/> ',_('No'),'<br/>';
+            echo '<input type=radio name="copyrights" value="0" ';
 			if ($copyrights==0) { echo "checked=1";}
-			echo '/> ',_('Require enrollment key from everyone'),'<br/> <input type=radio name="copyrights" value="1" ';
+			echo '/> ',_('Yes, if I have given them the enrollment key'),'<br/> <input type=radio name="copyrights" value="1" ';
 			if ($copyrights==1) { echo "checked=1";}
-			echo '/> ',_('No key required for group members, require key from others'),' <br/><input type=radio name="copyrights" value="2" ';
+			echo '/> ',_('Yes: No key required for group members, require key from others'),' <br/><input type=radio name="copyrights" value="2" ';
 			if ($copyrights==2) { echo "checked=1";}
-			echo '/> ',_('No key required from anyone'),'</span><br class=form />';
+			echo '/> ',_('Yes: No key required from anyone'),'</span><br class=form />';
 		}
 
 		echo '</div>' ; //end Availability and Access grouping

@@ -13,7 +13,7 @@ if (!isset($myrights) || $myrights<20) {
 
 if (isset($_POST['cidlookup'])) {
 	$query = "SELECT ic.id,ic.name,ic.enrollkey,ic.copyrights,ic.termsurl,iu.groupid,iu.LastName,iu.FirstName FROM imas_courses AS ic ";
-	$query .= "JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id";
+	$query .= "JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id AND ic.copyrights>-1";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['cidlookup'])));
 	if ($stm->rowCount()==0) {
@@ -43,7 +43,7 @@ if (isset($_POST['cidlookup'])) {
 } else if (isset($_GET['loadothergroup'])) {
 
 	$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu  WHERE ";
-	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
+	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 AND ic.copyrights>-1 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 	$courseGroupResults = $DBH->prepare($query);
 	$courseGroupResults->execute(array(':groupid'=>$_GET['loadothergroup'], ':userid'=>$userid));
 
@@ -62,7 +62,7 @@ if (isset($_POST['cidlookup'])) {
 	}
 
 	$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
+	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 AND ic.copyrights>-1 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 	$courseTreeResult = $DBH->prepare($query);
 	$courseTreeResult->execute(array(':groupid'=>$groupid, ':userid'=>$userid));
 	$lastteacher = 0;
