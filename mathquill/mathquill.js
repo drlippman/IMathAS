@@ -2483,7 +2483,23 @@ Controller.open(function(_, super_) {
               )
            )
         ) {
-            cursor.parent.write(cursor, '(');
+            var str = '', l = cursor[L];
+            // if sub/sup, grab base operator
+            if ((cursor[L].hasOwnProperty("sup") || cursor[L].hasOwnProperty("sub")) &&
+                cursor[L][-1].isPartOfOperator
+            ) {
+                l = cursor[L][-1];
+            }
+            while (l.isPartOfOperator && !l.jQ.hasClass("mq-last")) {
+                str = l.letter + str;
+                if (l[-1] === 0) { break; }
+                l = l[L];
+            }
+            if (cursor.options.autoParenOperators === true ||
+                cursor.options.autoParenOperators.hasOwnProperty(str)
+            ) {
+                cursor.parent.write(cursor, '(');
+            }
         }
       block.children().adopt(cursor.parent, cursor[L], cursor[R]);
       var jQ = block.jQize();

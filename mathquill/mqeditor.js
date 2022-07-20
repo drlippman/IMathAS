@@ -265,6 +265,8 @@ var MQeditor = (function($) {
     } else {
       $("#mqeditor").removeClass("fixedbottom iframeosk");
     }
+    $("#mqeditor").toggleClass('mq-chem',$(mqel).hasClass("mq-chem"));
+
     var rebuild = false;
     // see if the field has changed
     if (curMQfield === null || mqel[0] != curMQfield.el() ||
