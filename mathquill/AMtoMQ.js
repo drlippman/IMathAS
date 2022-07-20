@@ -786,6 +786,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\le(?=(\b|\d))/g,'<=');
 	tex = tex.replace(/\\ge(?=(\b|\d))/g,'>=');
   tex = tex.replace(/\\ne(?=(\b|\d))/g,'!=');
+  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
@@ -844,7 +845,6 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
   tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
-  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/text\(([^)]*)\)/g, '$1');
   tex = tex.replace(/\(\s*(\w)/g,'($1').replace(/(\w)\s*\)/g,'$1)');
   return tex.replace(/^\s+|\s+$/g,'');

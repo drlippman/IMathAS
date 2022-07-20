@@ -80,6 +80,15 @@ class CalculatedScorePart implements ScorePart
             $formatok = "nowhole";
         }
 
+        // rewrite +-
+        if (in_array('allowplusminus', $ansformats)) {
+            if (!in_array('list', $ansformats)) {
+                $ansformats[] = 'list';
+            }
+            $answer = rewritePlusMinus($answer);
+            $givenans = rewritePlusMinus($givenans);    
+        }
+
         if ($reqsigfigs !== '') {
             if (!in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
                 $reqsigfigs = '';

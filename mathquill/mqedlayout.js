@@ -496,6 +496,9 @@ var myMQeditor = (function($) {
           baselayout.tabs[0].tabcontent[2].contents[13] = {s:1};
         }
       }
+      if (calcformat.match(/allowplusminus/)) {
+        baselayout.tabs[6].tabcontent[0].contents[17] = {l:'\\pm', pr:'<span class="mq-binary-operator">&plusmn;</span>'};
+      }
     } else {
       baselayout = $.extend(true, [], underLayout3);
       if (calcformat.match(/\bdecimal/)) {

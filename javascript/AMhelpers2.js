@@ -1290,6 +1290,9 @@ function AMnumfuncPrepVar(qn,str) {
 
 function processCalculated(fullstr, format) {
   // give error instead.  fullstr = fullstr.replace(/=/,'');
+  if (format.indexOf('allowplusminus')!=-1) {
+    fullstr = fullstr.replace(/(.*?)\+\-(.*?)(,|$)/g, '$1+$2,$1-$2$3');
+  }
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else if (format.indexOf('set')!=-1) {

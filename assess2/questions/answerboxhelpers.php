@@ -816,3 +816,7 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
     // no value - return empty string
     return '';
 }
+
+function rewritePlusMinus($str) {
+    return preg_replace('/(.*?)\+\-(.*?)(,|$)/','$1+$2,$1-$2$3',$str);
+}

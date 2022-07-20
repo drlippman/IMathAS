@@ -127,6 +127,9 @@ var MQeditor = (function($) {
         if (calcformat.match(/list/)) {
             thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
         }
+        if (calcformat.match(/allowplusminus/)) {
+            thisMQconfig.quickplusminus = true;
+        }
 
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsinh arccosh arctanh arcsech arccsch arccoth argsinh argcosh argtanh argsech argcsch argcoth arsinh arcosh artanh arsech arcsch arcoth arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth';

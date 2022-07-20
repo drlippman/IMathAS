@@ -61,6 +61,13 @@ class FunctionExpressionAnswerBox implements AnswerBox
         if (!empty($ansprompt) && !in_array('nosoln', $ansformats) && !in_array('nosolninf', $ansformats)) {
             $out .= $ansprompt;
         }
+
+        if (in_array('allowplusminus', $ansformats) && !in_array('list', $ansformats)) {
+            $ansformats[] = 'list';
+            $answerformat = ($answerformat == '') ? 'list' : $answerformat . ',list';
+            $isListAnswer = true;
+        }
+
         if (in_array('list', $ansformats)) {
             if (in_array('equation', $ansformats)) {
                 $shorttip = _('Enter a list of algebraic equations');
@@ -186,7 +193,11 @@ class FunctionExpressionAnswerBox implements AnswerBox
             if ($GLOBALS['myrights'] > 10 && strpos($answer, '|') !== false) {
                 echo 'Warning: use abs(x) not |x| in $answer';
             }
-            $sa = makeprettydisp($answer);
+            $sa = $answer;
+            if (in_array('allowplusminus', $ansformats)) {
+                $sa = str_replace('+-','pm',$sa);
+            }
+            $sa = makeprettydisp($sa);
             $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
 
             for ($i = 0; $i < count($variables); $i++) {

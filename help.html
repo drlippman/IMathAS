@@ -3058,7 +3058,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 		<ul>
 		<li>allowunreduced: can be combined with "mixednumber" or "mixednumberorimproper" to allow unreduced fractional parts</li>
 		<li>allowxtimes: allows the use of x for multiplication (like 23x10^2 for 23*10^2), typically in combo with the "scinot" format</li>
-		<li>nodecimal: require an answer without decimals (also disallows 10^-2 and 3E-2)</li>
+		<li>allowplusminus: allow use of +- in the answer. Will enable the 'list' option if not already included.</li>
+        <li>nodecimal: require an answer without decimals (also disallows 10^-2 and 3E-2)</li>
 		<li>notrig: require an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>
         <li>allowmixed: will enable support for mixed numbers (like 2 1/2) in answers</li>
         <li>allowdegrees: will enable the use of the degree symbol to designate degrees, so sin(30degree)=1/2.</li>
@@ -3329,6 +3330,7 @@ A student is asked to enter a function
     values or raise numbers to very large powers.<br/>
     "scalarmult": Specifies that the answer provided by the student is allowed to differ from the specified answer by a 
     scalar multiple.<br/>
+    "allowplusminus": allow use of +- in the answer. Will enable the 'list' option if not already included.<br/>
 	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions".
 	$ansprompt can override the default statements like this:
     $ansprompt = "One function, f(x)=;No such function exists" <br/>

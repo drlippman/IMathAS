@@ -4581,7 +4581,7 @@ LatexCmds['\u00bc'] = bind(LatexFragment, '\\frac14');
 LatexCmds['\u00bd'] = bind(LatexFragment, '\\frac12');
 LatexCmds['\u00be'] = bind(LatexFragment, '\\frac34');
 
-var PlusMinus = P(BinaryOperator, function(_) {
+var PlusMinus = P(BinaryOperator, function(_, super_) {
   _.init = VanillaSymbol.prototype.init;
 
   _.contactWeld = _.siblingCreated = _.siblingDeleted = function(opts, dir) {
@@ -4609,9 +4609,21 @@ var PlusMinus = P(BinaryOperator, function(_) {
     this.jQ[0].className = determineOpClassType(this);
     return this;
   };
+  _.createLeftOf = function(cursor) {
+    if (cursor.options.quickplusminus && cursor[L] instanceof PlusMinus && cursor[L].ctrlSeq=='+' && this.ctrlSeq=='-') {
+      cursor[L].ctrlSeq = '\\pm ';
+      cursor[L].text = '\\pm ';
+      cursor[L].htmlTemplate = '<span>&plusmn;</span>';
+      cursor[L].jQ.html('&plusmn;');
+      this.bubble('reflow');
+      return;
+    }
+    super_.createLeftOf.apply(this, arguments);
+  };
 });
 
 LatexCmds['+'] = bind(PlusMinus, '+', '+');
+
 //yes, these are different dashes, I think one is an en dash and the other is a hyphen
 LatexCmds['\u2013'] = LatexCmds['-'] = bind(PlusMinus, '-', '&minus;');
 LatexCmds['\u00b1'] = LatexCmds.pm = LatexCmds.plusmn = LatexCmds.plusminus =
