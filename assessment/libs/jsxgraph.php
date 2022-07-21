@@ -1762,8 +1762,8 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 
 	$minorTicksX = $ops['minorticks'][0] !== null ? $ops['minorticks'][0] : 0;
 	$minorTicksY = $ops['minorticks'][1] !== null ? $ops['minorticks'][1] : 0;
-	$ticksDistanceX = $ops['ticksdistance'][0] !== null ? $ops['ticksdistance'][0] : floor((($xmax)-($xmin))/8);
-	$ticksDistanceY = $ops['ticksdistance'][1] !== null ? $ops['ticksdistance'][1] : floor((($ymax)-($ymin))/8);
+	$ticksDistanceX = $ops['ticksdistance'][0] !== null ? $ops['ticksdistance'][0] : max(1,floor((($xmax)-($xmin))/8));
+	$ticksDistanceY = $ops['ticksdistance'][1] !== null ? $ops['ticksdistance'][1] : max(1,floor((($ymax)-($ymin))/8));
 	
 	$showXLabels = $ops['showlabels'][0] !== null ? jsx_getbool($ops['showlabels'][0]) : 'true';
 	$showYLabels = $ops['showlabels'][1] !== null ? jsx_getbool($ops['showlabels'][1]) : 'true';
