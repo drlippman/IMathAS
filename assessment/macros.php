@@ -3960,12 +3960,34 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
     }
-	if ($stu !== null) {
-		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
-    }
+
 	if ($stu===null) {
 		return " ";
-	} else if (!is_numeric($stu)) {
+	} else {
+        $stu = trim($stu);
+        // handle DNE,oo,+-oo
+        if (strtoupper($stu)==='DNE' || $stu==='oo' || $stu==='-oo' || $stu==='+oo') {
+            if ($stu=='+oo') {
+                $stu = 'oo';
+            }
+            for ($i=0;$i<count($partial);$i+=2) {
+                if ($partial[$i]==='+oo') {
+                    $partial[$i]='oo';
+                }
+                if ($stu===$partial[$i]) {
+                    if ($partial[$i+1]<1) {
+                        return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$i/2].'</div>';
+                    } else {
+                        return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$i/2].'</div>';
+                    }
+                }
+            }
+            return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+        }
+		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
+    }
+    
+    if (!is_numeric($stu)) {
 		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
 		if (strval($tol)[0]=='|') {
@@ -3977,6 +3999,9 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		$match = -1;
 		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
+            if ($partial[$i]==='DNE' || $partial[$i]==='oo' || $partial[$i]==='-oo' || $partial[$i]==='+oo') {
+                continue;
+            }
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
