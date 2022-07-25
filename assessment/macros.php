@@ -3249,6 +3249,7 @@ function cleanbytoken($str,$funcs = array()) {
                     continue;
                 }
             }
+
             if ($i<$grplasti) { //if not last character
                 if ($tokens[$i+1][0]=='^') {
                     //1^3
@@ -3258,11 +3259,12 @@ function cleanbytoken($str,$funcs = array()) {
                     $dontuse = true;
                 } else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
                     // 1x, 1(), 1sin
-                    if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+                    if ($lastout<2 || (($out[$lastout-1] != '^' && $out[$lastout-1] != '/') || $out[$lastout] != '-')) { //exclude ^-1 case and /-1 case
                         $dontuse = true;
                     }
                 }
             }
+
             if (!$dontuse) {
                 $out[] = 1;
             } else {
