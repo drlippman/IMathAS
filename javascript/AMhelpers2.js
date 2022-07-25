@@ -1655,17 +1655,17 @@ function processNumfunc(qn, fullstr, format) {
     totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
     var remapVars = strprocess[2].split('|');
 
-    if (totesteqn.match(/(<=|>=|<|>)/)) {
+    if (totesteqn.match(/(<=|>=|<|>|!=)/)) {
         if (!isineq) {
             if (iseqn) {
                 err += _("syntax error: you gave an inequality, not an equation") + '. ';
             } else {
                 err += _("syntax error: you gave an inequality, not an expression")+ '. ';
             }
-        } else if (totesteqn.match(/(<=|>=|<|>)/g).length>1) {
+        } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length>1) {
             err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
         }
-        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>|!=)(.*)/,"$1-($3)");
     } else if (totesteqn.match(/=/)) {
         if (isineq) {
             err += _("syntax error: you gave an equation, not an inequality")+ '. ';

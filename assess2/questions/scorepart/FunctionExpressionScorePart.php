@@ -87,7 +87,7 @@ class FunctionExpressionScorePart implements ScorePart
         }
 
         if (!in_array('inequality',$ansformats) &&
-            (strpos($answer,'<')!==false || strpos($answer,'>')!==false)
+            (strpos($answer,'<')!==false || strpos($answer,'>')!==false || strpos($answer,'!=')!==false)
          ) {
             echo 'Your $answer contains an inequality sign, but you do not have $answerformat="inequality" set. This question probably will not work right.';
         } else if (!in_array('equation',$ansformats) &&
@@ -125,7 +125,7 @@ class FunctionExpressionScorePart implements ScorePart
                 }
                 $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
             } else if (in_array('inequality',$ansformats)) {
-                if (preg_match('/(.*)(<=|>=|<|>)(.*)/', $givenans, $matches)) {
+                if (preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $givenans, $matches)) {
                     $toevalGivenans = $matches[3] . '-(' . $matches[1] . ')';
                     $givenInequality = $matches[2];
                 } else {
@@ -200,7 +200,7 @@ class FunctionExpressionScorePart implements ScorePart
                 if (in_array('equation',$ansformats)) {
                     $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
                 } else if (in_array('inequality',$ansformats)) {
-                    preg_match('/(.*)(<=|>=|<|>)(.*)/', $answer, $matches);
+                    preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $answer, $matches);
                     $answer = $matches[3] . '-(' . $matches[1] . ')';
                     $answerInequality = $matches[2];
                 }

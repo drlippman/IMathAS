@@ -120,8 +120,8 @@ var myMQeditor = (function($) {
               {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
               {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
               {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
-              {p:'or', c:'w', w:'\\text{ or }'},
               {l:'\\ne', pr:'<span class="mq-binary-operator">&ne;</span>'},
+              {p:'or', c:'w', w:'\\text{ or }'},
               {p:'DNE', 'sm':2},
               {p:'all reals', c:'w', w:'\\text{all reals}', 'sm':2}
             ]
@@ -319,8 +319,8 @@ var myMQeditor = (function($) {
                 {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
                 {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
                 {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
-                {p:'or', c:'w', w:'\\text{ or }'},
                 {l:'\\ne', pr:'<span class="mq-binary-operator">&ne;</span>'},
+                {p:'or', c:'w', w:'\\text{ or }'},
                 {p:'DNE', 'sm':2},
                 {p:'all reals', c:'w', w:'\\text{all reals}', 'sm':2}  
             ]
@@ -527,7 +527,8 @@ var myMQeditor = (function($) {
       }
       if (qtype=='numfunc' && calcformat.match(/inequality/)) {
         baselayout.tabs[3].enabled = true;
-        baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
+        baselayout.tabs[3].tabcontent[0].contents.splice(5,3);
+        baselayout.tabs[3].tabcontent[0].s = 5;
       }
     }
     if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|setexp|chemeqn)/)) {
