@@ -1479,6 +1479,9 @@ function processCalcNtuple(fullstr, format) {
 }
 
 function processCalcComplex(fullstr, format) {
+  if (format.indexOf('allowplusminus')!=-1) {
+    fullstr = fullstr.replace(/(.*?)\+\-(.*?)(,|$)/g, '$1+$2,$1-$2$3');
+  }
   var err = '';
   var arr = fullstr.split(',');
   var str = '';

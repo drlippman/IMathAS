@@ -3793,7 +3793,9 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
-	$answerformat = "list" specifies that the answer will be a list of complex numbers.
+	$answerformat = "list" specifies that the answer will be a list of complex numbers.<br/>
+    allowplusminus allow use of +- in the answer. Will enable the 'list' option if not already included.<br/>
+
 	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>

@@ -95,6 +95,17 @@ class ComplexScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
+
+            // rewrite +-
+            if (in_array('allowplusminus', $ansformats)) {
+                if (!in_array('list', $ansformats)) {
+                    $ansformats[] = 'list';
+                }
+                $answer = rewritePlusMinus($answer);
+                $givenans = rewritePlusMinus($givenans);
+                $gaarr = array_map('trim', explode(',', $givenans));    
+            }
+
             foreach ($gaarr as $i => $tchk) {
 
                 if (in_array('sloppycomplex', $ansformats)) {
