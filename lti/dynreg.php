@@ -65,9 +65,7 @@ $post = [
     'response_types' => ['id_token'],
     'grant_types' => ["implict", "client_credentials"],
     "initiate_login_uri" => $basesiteurl.'/lti/login.php?u='.$uniqid,
-    "redirect_uris" =>
-      [$basesiteurl.'/lti/launch.php',
-       $basesiteurl.'/bltilaunch.php'],
+    "redirect_uris" => [$basesiteurl.'/lti/launch.php'],
     "client_name" => $installname,
     "jwks_uri" => $basesiteurl.'/lti/jwks.php',
     "token_endpoint_auth_method" => "private_key_jwt",
