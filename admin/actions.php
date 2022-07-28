@@ -41,11 +41,6 @@ if ($from=='admin') {
 }
 
 switch($_POST['action']) {
-	case "emulateuser":
-		if ($myrights < 100 ) { break;}
-		$be = $_REQUEST['uid'];
-		$_SESSION['userid'] = $be;
-		break;
 	case "chgrights":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
 			echo _("You don't have the authority for this action");
@@ -160,6 +155,9 @@ switch($_POST['action']) {
 			if (isset($_POST['doresetpw'])) {
 				$query .= ',password=:password,forcepwreset=1';
 			}
+            if ($myrights == 100 && $_GET['id'] != $userid && !isset($_SESSION['emulateuseroriginaluser']) && !empty($_POST['clearMFA'])) {
+                $query .= ",MFA=''";
+            }
 			$query .= " WHERE id=:id";
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);

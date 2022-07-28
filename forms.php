@@ -247,7 +247,7 @@ switch($_GET['action']) {
             echo '<script type="text/javascript" src="javascript/jquery.qrcode.min.js"></script>';
             echo '<script type="text/javascript">$(function(){$("#mfaqrcode").qrcode({width:128,height:128,text:"'.Sanitize::encodeStringForJavascript($mfaurl).'"})});</script>';
             echo '<input type=hidden name=mfasecret value="'.Sanitize::encodeStringForDisplay($mfasecret).'" />';
-            echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/">Authy</a> is recommended. ';
+            echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/download/">Authy</a> is recommended. ';
             echo 'Using the app, scan the QR code below, or manually enter the key code. Once it is set up, enter the token code provided in the box.</span><BR class=form>';
             echo '<span class=form>QR Code:</span><span class=formright><span id="mfaqrcode"></span></span><br class=form>';
             echo '<span class=form>Key Code:</span><span class=formright>'.Sanitize::encodeStringForDisplay($mfasecret).'</span><br class=form>';

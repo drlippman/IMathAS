@@ -158,7 +158,7 @@ switch($_GET['action']) {
             $oldrights = 10;
             $oldspecialrights = 0;
 		} else {
-			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata,mfa FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
@@ -273,6 +273,10 @@ switch($_GET['action']) {
 		} else {
 			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ';
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
+            if ($myrights == 100 && $_GET['id'] != $userid && $line['mfa'] != '') {
+                echo '<span class=form>Disable 2-Factor Authentication?</span><span class=formright><input type=checkbox name="clearMFA" value="1"/></span>';
+                echo '<br class=form />';
+            }
 		}
 
 		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
