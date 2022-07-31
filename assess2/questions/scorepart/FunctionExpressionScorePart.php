@@ -119,18 +119,23 @@ class FunctionExpressionScorePart implements ScorePart
         foreach ($givenanslist as $givenans) {
             //build values for student answer
             $givenansvals = array();
-            if (in_array('equation',$ansformats)) {
-                if (substr_count($givenans, '=')!=1) {
-                    continue;
+            if (in_array('inequality',$ansformats)) {
+                if (in_array('equation',$ansformats)) {
+                    preg_match('/(.*)(<=|>=|<|>|!=|=)(.*)/', $givenans, $matches);
+                } else {
+                    preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $givenans, $matches);
                 }
-                $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
-            } else if (in_array('inequality',$ansformats)) {
-                if (preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $givenans, $matches)) {
+                if (!empty($matches)) {
                     $toevalGivenans = $matches[3] . '-(' . $matches[1] . ')';
                     $givenInequality = $matches[2];
                 } else {
                     continue;
                 }
+            } else if (in_array('equation',$ansformats)) {
+                if (substr_count($givenans, '=')!=1) {
+                    continue;
+                }
+                $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
             } else if (preg_match('/(=|<|>)/', $givenans)) {
                 continue;
             } else {
@@ -197,13 +202,17 @@ class FunctionExpressionScorePart implements ScorePart
                 }
                 $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\'<>]+/','',$answer);
 
-                if (in_array('equation',$ansformats)) {
-                    $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
-                } else if (in_array('inequality',$ansformats)) {
-                    preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $answer, $matches);
+                if (in_array('inequality',$ansformats)) {
+                    if (in_array('equation',$ansformats)) {
+                        preg_match('/(.*)(<=|>=|<|>|!=|=)(.*)/', $answer, $matches);
+                    } else {
+                        preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $answer, $matches);
+                    }
                     $answer = $matches[3] . '-(' . $matches[1] . ')';
                     $answerInequality = $matches[2];
-                }
+                } else if (in_array('equation',$ansformats)) {
+                    $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
+                } 
                 if ($answer == '') {
                     continue;
                 }

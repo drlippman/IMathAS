@@ -1670,7 +1670,7 @@ function processNumfunc(qn, fullstr, format) {
         }
         totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>|!=)(.*)/,"$1-($3)");
     } else if (totesteqn.match(/=/)) {
-        if (isineq) {
+        if (isineq && !iseqn) {
             err += _("syntax error: you gave an equation, not an inequality")+ '. ';
         } else if (!iseqn) {
             err += _("syntax error: you gave an equation, not an expression")+ '. ';
@@ -1678,6 +1678,8 @@ function processNumfunc(qn, fullstr, format) {
             err += _("syntax error: your equation should only contain one equal sign")+ '. ';
         }
         totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
+    } else if (iseqn && isineq) {
+        err += _("syntax error: this is not an equation or inequality")+ '. ';
     } else if (iseqn) {
         err += _("syntax error: this is not an equation")+ '. ';
     } else if (isineq) {
