@@ -3782,12 +3782,12 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 <dl>
 <dt>$answer = a string containing a complex number or list of complex numbers </dt>
   <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i".  The answer <em>must</em> be given in
-  a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work)</dd>
+  a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work) unless $answerformat="sloppycomplex" is used.</dd>
 </dl>
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
 	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
 	must still only contain one i.  <br/>
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
