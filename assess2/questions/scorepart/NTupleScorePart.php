@@ -52,6 +52,8 @@ class NTupleScorePart implements ScorePart
         $answer = normalizemathunicode($answer);
         
         $ansformats = array_map('trim',explode(',',$answerformat));
+        $checkSameform = (in_array('sameform',$ansformats));
+
         $answer = str_replace(' ','',$answer);
         if (!is_array($partweights) && $partweights !== '') {
             $partweights = array_map('trim',explode(',',$partweights));
@@ -116,15 +118,23 @@ class NTupleScorePart implements ScorePart
 
             //parse the ntuple without evaluating
             $tocheck = $this->parseNtuple($givenans, false, false);
+            if ($checkSameform) {
+                $normalizedGivenAnswer = $tocheck;
+            }
 
             if ($answer != 'DNE' && $answer != 'oo') {
-                foreach($tocheck as $chkme) {
-                    foreach ($chkme['vals'] as $chkval) {
+                foreach($tocheck as $i=>$chkme) {
+                    foreach ($chkme['vals'] as $k=>$chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
                             if (!checkanswerformat($chkval,$ansformats)) {
                                 //perhaps should just elim bad answer rather than all?
                                 $scorePartResult->setRawScore(0);
                                 return $scorePartResult;
+                            }
+                            // generate normalized trees for sameform check
+                            if ($checkSameform) {
+                                $anfunc = parseMathQuiet($chkval);
+                                $normalizedGivenAnswer[$i]['vals'][$k] = $anfunc->normalizeTreeString();
                             }
                         }
                     }
@@ -140,6 +150,19 @@ class NTupleScorePart implements ScorePart
         $answer = makepretty($answer);
         // parse and evaluate the answer, capturing "or"s
         $anarr = $this->parseNtuple($answer, true, true);
+        if ($checkSameform) {
+            $normalizedAnswer = $this->parseNtuple($answer, true, false);
+            foreach($normalizedAnswer as $ai=>$chkme) {
+                foreach ($chkme as $ao=>$aval) {
+                    foreach ($aval['vals'] as $k=>$chkval) {
+                        if ($chkval != 'oo' && $chkval != '-oo') {
+                            $anfunc = parseMathQuiet($chkval);
+                            $normalizedAnswer[$ai][$ao]['vals'][$k] = $anfunc->normalizeTreeString();
+                        }
+                    }
+                }
+            }
+        }
 
         if (in_array('anyorder', $ansformats)) {
             foreach ($anarr as $k=>$listans) {
@@ -199,7 +222,7 @@ class NTupleScorePart implements ScorePart
 
         foreach ($anarr as $ai=>$ansors) {
             $foundloc = -1;
-            foreach ($ansors as $answer) {  //each of the "or" options
+            foreach ($ansors as $ao=>$answer) {  //each of the "or" options
                 foreach ($gaarr as $j=>$givenans) {
 
                     if (isset($matchedgivenans[$j])) {continue;}
@@ -228,6 +251,10 @@ class NTupleScorePart implements ScorePart
                             $matchedparts[$i] = 1;
                             //is ok
                         }
+                    }
+
+                    if ($checkSameform && $normalizedAnswer[$ai][$ao] != $normalizedGivenAnswer[$j]) {
+                        continue;
                     }
 
                     if (count($matchedparts)==count($answer['vals'])) { //if totally correct
