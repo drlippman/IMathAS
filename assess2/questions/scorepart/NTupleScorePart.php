@@ -34,7 +34,7 @@ class NTupleScorePart implements ScorePart
         $defaultreltol = .0015;
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 
-            'answerformat', 'requiretimes', 'ansprompt', 'scoremethod', 'partweights'];
+            'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt', 'scoremethod', 'partweights'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -127,9 +127,9 @@ class NTupleScorePart implements ScorePart
                     foreach ($chkme['vals'] as $k=>$chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
                             if (!checkanswerformat($chkval,$ansformats)) {
-                                //perhaps should just elim bad answer rather than all?
-                                $scorePartResult->setRawScore(0);
-                                return $scorePartResult;
+                                // eliminate answer
+                                unset($gaarr[$i]);
+                                continue 2;
                             }
                             // generate normalized trees for sameform check
                             if ($checkSameform) {
@@ -137,6 +137,11 @@ class NTupleScorePart implements ScorePart
                                 $normalizedGivenAnswer[$i]['vals'][$k] = $anfunc->normalizeTreeString();
                             }
                         }
+                    }
+                }
+                if (!empty($requiretimeslistpart)) {
+                    if (checkreqtimes($chkme['lb'].implode(',', $chkme['vals']).$chkme['rb'],$requiretimeslistpart)==0) {
+                        unset($gaarr[$i]);
                     }
                 }
             }
