@@ -293,7 +293,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -501,6 +501,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="-1:-1" ';
 		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
 		echo '>', _('Active'), '</option>';
+        echo '<option value="-2:-2" ';
+		if ($colorize == "-2:-2") { echo 'selected="selected" ';}
+		echo '>', _('NC'), '</option>';
 		echo '</select> &nbsp; ';
 		//echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
