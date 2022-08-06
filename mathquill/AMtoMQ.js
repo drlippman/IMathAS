@@ -793,7 +793,7 @@ function MQtoAM(tex,display) {
     tex = tex.replace(/\\rightleftharpoons/g,'rightleftharpoons');
     // move to intervalscorepart tex = tex.replace(/\\cup/g,'U');
     tex = tex.replace(/\\sim/g,'~');
-    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');
+    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,' ^^ ');
     tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');
 	tex = tex.replace(/\\left\\{/g,'lbrace').replace(/\\right\\}/g,'rbrace');
@@ -838,13 +838,13 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2 ');  //change (2)/(3) to 2/3
 	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
 	tex = tex.replace(/\(([\d\.]+)\)\//g,'$1/');  //change (3)/ to 3/
-	tex = tex.replace(/\/\(([\a-zA-Z])\)/g,'/$1');  //change /(x) to /x
-	tex = tex.replace(/\(([\a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
+	tex = tex.replace(/\/\(([a-zA-Z])\)/g,'/$1');  //change /(x) to /x
+	tex = tex.replace(/\(([a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
   tex = tex.replace(/\^\((-?[\d\.]+)\)(\d)/g,'^$1 $2');
   tex = tex.replace(/\^\(-1\)/g,'^-1');
   tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
-  tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
-	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
+  tex = tex.replace(/\/\(([a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
+	tex = tex.replace(/\(([a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
   tex = tex.replace(/text\(([^)]*)\)/g, '$1');
   tex = tex.replace(/\(\s*(\w)/g,'($1').replace(/(\w)\s*\)/g,'$1)');
   return tex.replace(/^\s+|\s+$/g,'');
