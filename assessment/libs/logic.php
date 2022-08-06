@@ -422,7 +422,7 @@ function logicsteps($exp){
 // Note: This will not change the value of anstypes, or questions. Use truthtableanswercount to get the total number of answerboxes used.
 function truthtable($exp, $showresult=FALSE,$showsteps=TRUE,$offset=0){
 	// Table stylesheet
-    $stylesheet = '<style type="text/css">th, td {border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;} table {border: 0px solid; margin: 3px; border-collapse:collapse; border-style: hidden;} </style>';
+    $stylesheet = '<style type="text/css">.logictable th, .logictable td {border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;} table.logictable {border: 0px solid; margin: 3px; border-collapse:collapse; border-style: hidden;} </style>';
     // Convert to postfix
     $exp = logicToPostfix($exp);
     // ID variables
@@ -444,7 +444,7 @@ function truthtable($exp, $showresult=FALSE,$showsteps=TRUE,$offset=0){
         $steps = array_merge($steps,array_map('logicPostfixMakePretty',logicPostfixSteps($exp)));
     }
     // Table header
-    $header = "<table><tr>";
+    $header = "<table class=logictable><tr>";
     foreach($steps as $step){
         $header = $header."<th>`".$step."`</th>";
     }
