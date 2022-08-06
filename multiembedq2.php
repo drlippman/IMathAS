@@ -108,7 +108,7 @@ if (isset($QS['jssubmit'])) {
 if (isset($QS['showhints'])) {
     $state['showhints'] = $QS['showhints'];
 } else {
-    $state['showhints'] = 3;
+    $state['showhints'] = 7;
 }
 
 if (isset($QS['maxtries'])) {

@@ -33,6 +33,19 @@ var CSRFP = {
 	_getAuthKey: function() {
 		return CSRFP.CSRFP_TOKEN_VALUE;
 	},
+    /** 
+	 * Returns domain name of a url.
+	 *
+	 * @param {String} url - url to check.
+	 * @return {String} domain of the input url.
+	 */
+	_getDomain: function (url) {
+		// TODO(mebjas): add support for other protocols that web supports.
+		if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+			return document.domain;
+		}
+		return /http(s)?:\/\/([^\/]+)/.exec(url)[2];
+	},
 	/**
 	 * Function to create and return a hidden input element
 	 * For storing the CSRFP_TOKEN
@@ -191,29 +204,37 @@ function csrfprotector_init() {
 	 */
 	function new_open(method, url, async, username, password) {
 		this.method = method;
+        this.url = url;
+        async = (typeof async === 'undefined') ? true : async;
+        username = (typeof username === 'undefined') ? null : username;
+        password = (typeof password === 'undefined') ? null : password;
+
 		var isAbsolute = (url.indexOf("./") === -1) ? true : false;
 		if (!isAbsolute) {
 			var base = location.protocol +'//' +location.host
 							+ location.pathname;
 			url = CSRFP._getAbsolutePath(base, url);
 		}
-
 		return this.old_open(method, url, async, username, password);
 	}
 
 	/**
 	 * Wrapper to XHR send method
-	 * Add query paramter to XHR object
+	 * Add query paramter to XHR object,
 	 *
 	 * @param: all parameters to XHR send method
 	 *
 	 * @return: object returned by default, XHR send method
 	 */
 	function new_send(data) {
-		if (this.method.toLowerCase() === 'post') {
+        // only attach to posts to the same domain
+		if (this.method.toLowerCase() === 'post' && 
+            CSRFP._getDomain(this.url).indexOf(document.domain) !== -1
+        ) {
 			// attach the token in request header
 			this.setRequestHeader(CSRFP.CSRFP_TOKEN, CSRFP._getAuthKey());
-		}
+		} 
+
 		return this.old_send(data);
 	}
 

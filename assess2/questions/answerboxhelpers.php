@@ -364,6 +364,54 @@ function parsedIntervalToString($parsed, $islist) {
 	}
 }
 
+function parseChemical($string) {
+    $string = str_replace(['<->','<=>'], 'rightleftharpoons', $string);
+    $string = str_replace(['to','rarr','implies'], '->', $string);
+    $parts = preg_split('/(->|rightleftharpoons)/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $reactiontype = (count($parts) > 1) ? $parts[1] : null;
+    $sides = [];
+    for ($i=0; $i < count($parts); $i += 2) {
+        $sideparts = [];
+        $lastcut = 0;
+        $str = $parts[$i];
+        $strlen = strlen($str);
+        $depth = 0;
+        // cut by + signs, parse out coefficient and chemical
+        for ($p=1; $p < $strlen - 1; $p++) {
+            $c = $str[$p];
+            if ($c == '+' && $depth == 0 && $str[$p-1] != '^' && $str[$p-1] != '_') {
+                preg_match('/^\s*(\d+)?\s*\*?\s*(.*?)\s*$/', substr($str, $lastcut, $p-$lastcut), $matches);
+                $sideparts[] = [
+                    $matches[1] === '' ? 1 : intval($matches[1]),
+                    str_replace(' ','',$matches[2])
+                ];
+                $lastcut = $p+1;
+            } else if ($c == '(' || $c == '[') {
+                $depth++;
+            } else if ($c == ')' || $c == ']') {
+                $depth--;
+            }
+        }
+        preg_match('/^\s*(\d+)?\s*\*?\s*(.*?)\s*$/', substr($str, $lastcut), $matches);
+        $sideparts[] = [
+            $matches[1] === '' ? 1 : intval($matches[1]),
+            str_replace(' ','',$matches[2])
+        ];
+        // sort by chemical to put in standard order
+        usort($sideparts, function($a,$b) {
+            return strcmp($a[1],$b[1]);
+        });
+        $sides[] = $sideparts;
+    }
+    // if dual direction reaction, sort sides to standarize
+    if (count($sides)>1 && $reactiontype == 'rightleftharpoons') {
+        usort($sides, function($a,$b) {
+            return strcmp($a[0][1], $b[0][1]);
+        });
+    }
+    return [$sides, $reactiontype];
+}
+
 //checks the format of a value
 //tocheck:  string to check
 //ansformats:  array of answer formats.  Currently supports:
@@ -425,7 +473,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
+		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\(?\-?\d+\)?\)?)$/',$totest)) {
 			return false;
 		}
 	}
@@ -589,6 +637,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$infsoln = _('Infinite number of solutions');
     $partnum = $qn%1000;
     $out = '';
+    $includeinf = in_array('nosolninf',$ansformats);
 
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
@@ -619,8 +668,10 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
   }
   $out .= '>';
 	$out .= '<ul class="likelines">';
-	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
-	if ($la=='DNE' || $la=='oo') {
+	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" ' .
+        (($la!='DNE' && (!$includeinf || $la!='oo'))?'checked':'') . 
+        '><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
+	if ($la=='DNE' || ($includeinf && $la=='oo')) {
 		$laqs = $la;
 		$answerbox = str_replace('value="'.$la.'"','value=""', $answerbox);
 	} else {
@@ -633,7 +684,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '</li>';
 
 	$out .= '<li><input type="radio" id="qs'.$qn.'-d" name="qs'.$qn.'" value="DNE" '.($laqs=='DNE'?'checked':'').'><label for="qs'.$qn.'-d">'.$nosoln.'</label></li>';
-	if (in_array('nosolninf',$ansformats)) {
+	if ($includeinf) {
 		$out .= '<li><input type="radio" id="qs'.$qn.'-i" name="qs'.$qn.'" value="inf" '.($laqs=='oo'?'checked':'').'><label for="qs'.$qn.'-i">'.$infsoln.'</label></li>';
 	}
 	$out .= '</ul>';
@@ -764,4 +815,8 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
     }
     // no value - return empty string
     return '';
+}
+
+function rewritePlusMinus($str) {
+    return preg_replace('/(.*?)\+\-(.*?)(,|$)/','$1+$2,$1-$2$3',$str);
 }

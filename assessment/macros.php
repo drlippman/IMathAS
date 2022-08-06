@@ -5,7 +5,7 @@
 require_once(__DIR__ . '/../includes/Rand.php');
 $GLOBALS['RND'] = new Rand();
 
-array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth","nthlog",
+array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands",
  "randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand",
  "nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands",
@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits",
+ "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","intval");
 
 function mergearrays() {
@@ -372,13 +372,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
 			$path .= "line([$val,$thisymin],[$val,$thisymax]);";
-			$path .= "stroke=\"none\";strokedasharray=\"none\";";
-			if ($function[1]=='red' || $function[1]=='green') {
-				$path .= "fill=\"trans{$function[1]}\";";
-			} else {
-				$path .= "fill=\"transblue\";";
-			}
 			if ($isineq) {
+                $path .= "stroke=\"none\";strokedasharray=\"none\";";
+                if ($function[1]=='red' || $function[1]=='green') {
+                    $path .= "fill=\"trans{$function[1]}\";";
+                } else {
+                    $path .= "fill=\"transblue\";";
+                }
 				if ($ineqtype[0]=='<') {
 					$path .= "rect([$xxmin,$thisymin],[$val,$thisymax]);";
 					$alt .= "Shaded left";
@@ -781,7 +781,7 @@ function mergeplots($plota) {
 		} else {
             $plotb = preg_replace('/<span.*?<\/span>/','', $plotb);
             $newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
-			$plota = str_replace("' />", $newcmds."' />", $plota);
+			$plota = str_replace("' />", trim($newcmds)."' />", $plota);
 		}
 	}
 	return $plota;
@@ -3051,6 +3051,14 @@ function ineqtointerval($str, $var) {
     $outpieces = [];
     $orpts = preg_split('/\s*or\s*/', $str);
     foreach ($orpts as $str) {
+        if (count($orpts)==1 && strpos($str, '!=') !== false) {
+            // special handling for != 
+            $pieces = explode('!=', $str);
+            if (count($pieces) != 2 || trim($pieces[0]) != $var) {
+                return false;
+            }
+            return '(-oo,' . $pieces[1] . ')U(' . $pieces[1] . ',oo)';
+        }
         $pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
         $cnt = count($pieces);
         $pieces = array_map('trim', $pieces);
@@ -3087,6 +3095,7 @@ function intervaltoineq($str,$var) {
 	}
 	$arr = explode('U',$str);
 	$out = array();
+    $mightbeineq = '';
 	foreach ($arr as $v) {
 		$v = trim($v);
 		$sm = $v[0];
@@ -3097,9 +3106,13 @@ function intervaltoineq($str,$var) {
 				$out[] = '"all real numbers"';
 			} else {
 				$out[] = $var . ($em==']'?'le':'lt') . $pts[1];
+                if ($em==')') { $mightbeineq = $pts[1]; }
 			}
 		} else if ($pts[1]=='oo') {
 			$out[] = $var . ($sm=='['?'ge':'gt') . $pts[0];
+            if ($mightbeineq!=='' && count($arr)==2 && $sm=='(' && $mightbeineq==$pts[0]) {
+                return $var . ' != ' . $pts[0];
+            }
 		} else {
 			$out[] = $pts[0] . ($sm=='['?'le':'lt') . $var . ($em==']'?'le':'lt') . $pts[1];
 		}
@@ -3236,6 +3249,7 @@ function cleanbytoken($str,$funcs = array()) {
                     continue;
                 }
             }
+
             if ($i<$grplasti) { //if not last character
                 if ($tokens[$i+1][0]=='^') {
                     //1^3
@@ -3245,11 +3259,12 @@ function cleanbytoken($str,$funcs = array()) {
                     $dontuse = true;
                 } else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
                     // 1x, 1(), 1sin
-                    if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+                    if ($lastout<2 || (($out[$lastout-1] != '^' && $out[$lastout-1] != '/') || $out[$lastout] != '-')) { //exclude ^-1 case and /-1 case
                         $dontuse = true;
                     }
                 }
             }
+
             if (!$dontuse) {
                 $out[] = 1;
             } else {
@@ -3947,12 +3962,34 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
     }
-	if ($stu !== null) {
-		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
-    }
+
 	if ($stu===null) {
 		return " ";
-	} else if (!is_numeric($stu)) {
+	} else {
+        $stu = trim($stu);
+        // handle DNE,oo,+-oo
+        if (strtoupper($stu)==='DNE' || $stu==='oo' || $stu==='-oo' || $stu==='+oo') {
+            if ($stu=='+oo') {
+                $stu = 'oo';
+            }
+            for ($i=0;$i<count($partial);$i+=2) {
+                if ($partial[$i]==='+oo') {
+                    $partial[$i]='oo';
+                }
+                if ($stu===$partial[$i]) {
+                    if ($partial[$i+1]<1) {
+                        return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$i/2].'</div>';
+                    } else {
+                        return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$i/2].'</div>';
+                    }
+                }
+            }
+            return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+        }
+		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
+    }
+    
+    if (!is_numeric($stu)) {
 		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
 		if (strval($tol)[0]=='|') {
@@ -3964,6 +4001,9 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		$match = -1;
 		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
+            if ($partial[$i]==='DNE' || $partial[$i]==='oo' || $partial[$i]==='-oo' || $partial[$i]==='+oo') {
+                continue;
+            }
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
@@ -5164,10 +5204,12 @@ function comparelogic($a,$b,$vars) {
         return false;
     }
     $varlist = implode(',', $vars);
-    $a = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $a);
-    $b = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $b);
+
+	$keywords = ['and', '^^', 'xor', 'oplus', 'or', 'vv', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
+	$replace = 	['#a',  '#a', '#x',  '#x',    '#o', '#o', '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
+    $a = str_replace($keywords,$replace,$a);
+    $b = str_replace($keywords,$replace,$b);
+
     $afunc = makeMathFunction($a, $varlist);
     if ($afunc === false) {
         return false;
@@ -5196,6 +5238,81 @@ function comparelogic($a,$b,$vars) {
     return true;
 }
 
+function comparesetexp($a,$b,$vars) {
+    if (!is_array($vars)) {
+        $vars = array_map('trim', explode(',', $vars));
+    }
+    if ($a === null || $b === null || trim($a) == '' || trim($b) == '') {
+        return false;
+    }
+    $varlist = implode(',', $vars);
+	
+	$keywords = ['and', 'nn', 'cap', 'xor', 'oplus', 'ominus', 'triangle', 'or', 'cup', 'uu', '-',  '\''];
+	$replace = 	['#a',  '#a', '#a',	 '#x',  '#x',    '#x',     '#x',       '#o', '#o',  '#o', '#m',	'^c'];
+
+	$ab = [$a,$b];
+	foreach($ab as &$str){
+		$str = str_replace($keywords,$replace,$str);	
+
+		// Since complement symbols in set expresions are unary operations *after* the operand, we will shift the complement operator to before the operand here, rather than overcomplicating MathParser
+		// Remove double negations
+		$str = preg_replace('/(\'|\^c){1}\s*(\'|\^c){1}/','',$str);
+		// Remove any spaces before a complement symbol
+		$str = preg_replace('/\s*(\'|\^c)/','$1',$str);
+		// If symbol before a complement is an object from $vars, place a ! immediately before the $var
+		foreach($vars as $var){
+			$str = preg_replace("/($var)(\'|\^c)/",'!$1',$str);
+		}
+		// If symbol before a complement is a right paren/bracket, place a ! before the corresponding left paren/bracket
+		$rindex = max(strpos($str,")^c"),strpos($str,"]^c"));
+		while($rindex){
+			$str = substr_replace($str,'',$rindex+1,2);
+			$balanced = 1;
+			for($i = $rindex-1; $i >= 0; $i--){
+				if($str[$i] == ')' || $str[$i] == ']'){
+					$balanced++;
+				}
+				elseif($str[$i] == '(' || $str[$i] == '['){
+					$balanced--;
+				}
+				if($balanced==0){
+					$str = substr_replace($str,'!',$i,0);
+					break;
+				}
+			}
+			$rindex = max(strpos($str,")^c"),strpos($str,"]^c"));
+		}
+		
+	}
+	$a = $ab[0];
+	$b = $ab[1];
+    $afunc = makeMathFunction($a, $varlist);
+    if ($afunc === false) {
+        return false;
+    }
+    $bfunc = makeMathFunction($b, $varlist);
+    if ($bfunc === false) {
+        return false;
+    }
+    $n = count($vars);
+    $max = pow(2,$n);
+    $map = array_combine($vars, array_fill(0,count($vars),0));
+    for ($i=0; $i<$max; $i++) {
+        $aval = $afunc($map);
+        $bval = $bfunc($map);
+        if ($aval != $bval) { 
+            return false;
+        }
+        for ($j=0;$j<$n;$j++) {
+            if ($map[$vars[$j]] == 0) { // if it's 0, add 1 and stop
+                $map[$vars[$j]] = 1; break;
+            } else {
+                $map[$vars[$j]] = 0; // if it's 1, set to 0 and continue on to the next one
+            }
+        }
+    }
+    return true;
+}
 function comparentuples() {
   $par = false;
   $args = func_get_args();

@@ -3243,6 +3243,14 @@ class AssessRecord
       } else {
         if (!isset($qdata['scoreoverride'])) {
           $qdata['scoreoverride'] = array();
+        } else if (!is_array($qdata['scoreoverride'])) {
+            // may happen if it was set by withdrawing
+            $oldOverride = $qdata['scoreoverride'];
+            $answeightTot = array_sum($qdata['answeights']);
+            $qdata['scoreoverride'] = array();
+            foreach ($qdata['answeights'] as $awk=>$awv) {
+                $qdata['scoreoverride'][$awk] = $oldOverride;
+            }
         }
         if ($score === '') {
           if (isset($qdata['scoreoverride'][$pn])) {

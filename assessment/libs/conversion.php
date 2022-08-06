@@ -20,7 +20,11 @@
 
 function conversionVer() {
 	// File version
+<<<<<<< HEAD
 	return 24;
+=======
+	return 23;
+>>>>>>> 026681cc3a4629813656a29df0db7befac59314a
 }
 
 global $allowedmacros;
@@ -2662,6 +2666,7 @@ function conversionArea() {
         $rounding = 2;
     }
 
+<<<<<<< HEAD
     // in the original version the sign and tick argument
     // were reversed
     if ( count($args)>3 && !is_null($args[3]) ) {
@@ -2686,6 +2691,17 @@ function conversionArea() {
         $tick = verifyTickMarks($tickinput);
     } else {
         $sign = "=";
+=======
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $sign = verifyEqualSign($args[3]);
+    } else {
+        $sign = "=";
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $tick = verifyTickMarks($args[4]);
+    } else {
+>>>>>>> 026681cc3a4629813656a29df0db7befac59314a
         $tick = "";
     }
 
@@ -2926,6 +2942,7 @@ function conversionVolume() {
         $rounding = 2;
     }
 
+<<<<<<< HEAD
     // in the original version the sign and tick argument
     // were reversed
     if ( count($args)>3 && !is_null($args[3]) ) {
@@ -2950,6 +2967,17 @@ function conversionVolume() {
         $tick = verifyTickMarks($tickinput);
     } else {
         $sign = "=";
+=======
+    if ( count($args)>3 && !is_null($args[3]) ) {
+        $sign = verifyEqualSign($args[3]);
+    } else {
+        $sign = "=";
+    }
+
+    if ( count($args)>4 && !is_null($args[4]) ) {
+        $tick = verifyTickMarks($args[4]);
+    } else {
+>>>>>>> 026681cc3a4629813656a29df0db7befac59314a
         $tick = "";
     }
 
@@ -3025,6 +3053,7 @@ function conversionWeight() {
 
 }
 
+<<<<<<< HEAD
 //  WAMAP Question ID: 201697
 
 
@@ -3035,6 +3064,14 @@ function conversionWeight() {
 //  through            added checks in conversionAreaand conversionVolume for switched sign and tick aguments and corrected them (should not be needed)
 // 2022-05-17
 // 2022-05-16 ver 23 - has conversion_detectlanguage functions that wer eliminated as they interferred with gettext function
+=======
+
+
+// 2022-05-22 ver 23 - changed all string references to two arrays $unit and $unitabbr
+//  through
+// 2022-05-17
+//
+>>>>>>> 026681cc3a4629813656a29df0db7befac59314a
 // 2022-05-16 ver 22 - reworking conversion to add _() to all words in file so gettext can be run for a translation file
 // 2022-05-09 ver 21 - Converted to language detection with gettext _('') as a fallback.
 // 2022-05-04 ver 20 - Changed all spelling _('') to functions for easier maintance.

@@ -57,6 +57,7 @@ class IntervalScorePart implements ScorePart
         }
 
         $givenans = normalizemathunicode($givenans);
+        $givenans = str_replace('cup', 'U', $givenans);
         $givenans = trim($givenans," ,");
 
         if (in_array('nosoln',$ansformats)) {

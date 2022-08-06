@@ -180,6 +180,9 @@
 			$solutionopts += 4;
 		}
 		$_POST['qtext'] = str_replace(array('<!--','-->'),array('&&&L!--','--&&&G'),$_POST['qtext']);
+        $_POST['qtext'] = preg_replace_callback('/(<script[^>]*>)(.*?)<\/script>/sm', function($matches) {
+            return $matches[1] . str_replace(array("<",">"),array("&&&L","&&&G"), $matches[2]) . '</script>';
+        }, $_POST['qtext']);
 		$_POST['qtext'] = preg_replace('/<(\/?\w[^<>]*?)>/',"&&&L$1&&&G",$_POST['qtext']);
 		$_POST['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
 		$_POST['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
@@ -817,7 +820,7 @@
 	*/
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=012922"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=071522"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
@@ -1153,6 +1156,7 @@ if (isset($_GET['id']) && $myq) {
 	<option value="calcinterval" <?php if ($line['qtype']=="calcinterval") {echo "SELECTED";} ?>>Calculated Interval</option>
 	<option value="complex" <?php if ($line['qtype']=="complex") {echo "SELECTED";} ?>>Complex</option>
 	<option value="calccomplex" <?php if ($line['qtype']=="calccomplex") {echo "SELECTED";} ?>>Calculated Complex</option>
+	<option value="chemeqn" <?php if ($line['qtype']=="chemeqn") {echo "SELECTED";} ?>>Chemical Equation</option>
 	<option value="file" <?php if ($line['qtype']=="file") {echo "SELECTED";} ?>>File Upload</option>
 	<option value="multipart" <?php if ($line['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
 	<option value="conditional" <?php if ($line['qtype']=="conditional") {echo "SELECTED";} ?>>Conditional</option>
@@ -1206,7 +1210,7 @@ if ($line['solution']=='') {
 <br/>
 <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
-<?php echo _('Uses random variables from the question.'); ?>
+<?php echo _('Uses random variables from the question, or question is not randomized.'); ?>
  <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
    <i><?php echo _('Be sure to include the question you are solving in the text'); ?></i>
  </span><br/>

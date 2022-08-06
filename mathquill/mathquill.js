@@ -2483,7 +2483,23 @@ Controller.open(function(_, super_) {
               )
            )
         ) {
-            cursor.parent.write(cursor, '(');
+            var str = '', l = cursor[L];
+            // if sub/sup, grab base operator
+            if ((cursor[L].hasOwnProperty("sup") || cursor[L].hasOwnProperty("sub")) &&
+                cursor[L][-1].isPartOfOperator
+            ) {
+                l = cursor[L][-1];
+            }
+            while (l.isPartOfOperator && !l.jQ.hasClass("mq-last")) {
+                str = l.letter + str;
+                if (l[-1] === 0) { break; }
+                l = l[L];
+            }
+            if (cursor.options.autoParenOperators === true ||
+                cursor.options.autoParenOperators.hasOwnProperty(str)
+            ) {
+                cursor.parent.write(cursor, '(');
+            }
         }
       block.children().adopt(cursor.parent, cursor[L], cursor[R]);
       var jQ = block.jQize();
@@ -2971,6 +2987,7 @@ var MathCommand = P(MathElement, function(_, super_) {
             cursor.options.autoParenOperators.hasOwnProperty(str)
         ) {
             str += cmd.letter;
+            var partofop = false;
             for (var opname in cursor.options.autoOperatorNames) {
                 if (opname.substring(0, str.length) === str) {
                     partofop = true;
@@ -4564,7 +4581,7 @@ LatexCmds['\u00bc'] = bind(LatexFragment, '\\frac14');
 LatexCmds['\u00bd'] = bind(LatexFragment, '\\frac12');
 LatexCmds['\u00be'] = bind(LatexFragment, '\\frac34');
 
-var PlusMinus = P(BinaryOperator, function(_) {
+var PlusMinus = P(BinaryOperator, function(_, super_) {
   _.init = VanillaSymbol.prototype.init;
 
   _.contactWeld = _.siblingCreated = _.siblingDeleted = function(opts, dir) {
@@ -4592,9 +4609,21 @@ var PlusMinus = P(BinaryOperator, function(_) {
     this.jQ[0].className = determineOpClassType(this);
     return this;
   };
+  _.createLeftOf = function(cursor) {
+    if (cursor.options.quickplusminus && cursor[L] instanceof PlusMinus && cursor[L].ctrlSeq=='+' && this.ctrlSeq=='-') {
+      cursor[L].ctrlSeq = '\\pm ';
+      cursor[L].text = '\\pm ';
+      cursor[L].htmlTemplate = '<span>&plusmn;</span>';
+      cursor[L].jQ.html('&plusmn;');
+      this.bubble('reflow');
+      return;
+    }
+    super_.createLeftOf.apply(this, arguments);
+  };
 });
 
 LatexCmds['+'] = bind(PlusMinus, '+', '+');
+
 //yes, these are different dashes, I think one is an en dash and the other is a hyphen
 LatexCmds['\u2013'] = LatexCmds['-'] = bind(PlusMinus, '-', '&minus;');
 LatexCmds['\u00b1'] = LatexCmds.pm = LatexCmds.plusmn = LatexCmds.plusminus =

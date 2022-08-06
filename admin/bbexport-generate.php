@@ -32,7 +32,7 @@ function leftpad($str) {
 function xmlstr($str) {
 	//remove newlines
 	$str = str_replace(array(">\r\n<", ">\n<", "\r\n", "\n"), array('><','><',' ',' '), $str);
-	return htmlentities($str,ENT_XML1,'UTF-8',false);
+	return htmlentities($str,ENT_QUOTES|ENT_XML1,'UTF-8',false);
 }
 function bbdate($time) {
 	return date("Y-m-d H:i:s T", $time);

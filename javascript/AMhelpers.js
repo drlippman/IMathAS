@@ -2,140 +2,140 @@
 //(c) 2006 David Lippman
 
 //define these to be overwritten later in case the corresponding options aren't used
-function updateeeddpos() {}
-function updateehpos() {}
+function updateeeddpos() { }
+function updateehpos() { }
 
 var onlyAscii = /^[\u0000-\u007f]*$/;
 
 var LivePreviews = [];
 function setupLivePreview(qn) {
 	if (!LivePreviews.hasOwnProperty(qn)) {
-		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
+		if (mathRenderer == "MathJax" || mathRenderer == "Katex") {
 			LivePreviews[qn] = {
-			  delay: (mathRenderer=="MathJax"?100:0),   // delay after keystroke before updating
-			  finaldelay: 1000,
-			  preview: null,     // filled in by Init below
-			  buffer: null,      // filled in by Init below
+				delay: (mathRenderer == "MathJax" ? 100 : 0),   // delay after keystroke before updating
+				finaldelay: 1000,
+				preview: null,     // filled in by Init below
+				buffer: null,      // filled in by Init below
 
-			  timeout: null,     // store setTimout id
-			  finaltimeout: null,  // setTimeout id for clicking preview
-			  mjRunning: false,  // true when MathJax is processing
-			  mjPending: false,  // true when a typeset has been queued
-			  oldText: null,     // used to check if an update is needed
+				timeout: null,     // store setTimout id
+				finaltimeout: null,  // setTimeout id for clicking preview
+				mjRunning: false,  // true when MathJax is processing
+				mjPending: false,  // true when a typeset has been queued
+				oldText: null,     // used to check if an update is needed
 
-			  //
-			  //  Get the preview and buffer DIV's
-			  //
-			  Init: function() {
-				$("#p"+qn).css("positive","relative")
-					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;position:absolute;"></span>')
-					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
-				this.preview = document.getElementById("lpbuf1"+qn);
-				this.buffer = document.getElementById("lpbuf2"+qn);
-			  },
+				//
+				//  Get the preview and buffer DIV's
+				//
+				Init: function () {
+					$("#p" + qn).css("positive", "relative")
+						.append('<span id="lpbuf1' + qn + '" style="visibility:hidden;position:absolute;"></span>')
+						.append('<span id="lpbuf2' + qn + '" style="visibility:hidden;position:absolute;"></span>');
+					this.preview = document.getElementById("lpbuf1" + qn);
+					this.buffer = document.getElementById("lpbuf2" + qn);
+				},
 
-			  SwapBuffers: function () {
-			    var buffer = this.preview, preview = this.buffer;
-			    this.buffer = buffer; this.preview = preview;
-			    buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
-			    preview.style.position = ""; preview.style.visibility = "";
-			  },
+				SwapBuffers: function () {
+					var buffer = this.preview, preview = this.buffer;
+					this.buffer = buffer; this.preview = preview;
+					buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+					preview.style.position = ""; preview.style.visibility = "";
+				},
 
-			  Update: function (content) {
-			    if (this.timeout) {clearTimeout(this.timeout)}
-			    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
-			    this.timeout = setTimeout(this.callback,this.delay);
-			    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
-			  },
+				Update: function (content) {
+					if (this.timeout) { clearTimeout(this.timeout) }
+					if (this.finaltimeout) { clearTimeout(this.finaltimeout) }
+					this.timeout = setTimeout(this.callback, this.delay);
+					this.finaltimeout = setTimeout(this.DoFinalPreview, this.finaldelay);
+				},
 
-			  RenderNow: function(text) {
-				  //called by preview button
-			      this.buffer.innerHTML = this.oldtext = text;
-			      this.mjRunning = true;
-			      this.RenderBuffer();
-			  },
-			  RenderBuffer: function() {
-			      if (mathRenderer=="MathJax") {
-				      MathJax.Hub.Queue(
-								["Typeset",MathJax.Hub,this.buffer],
-								["PreviewDone",this]
-				      );
-			      } else if (mathRenderer=="Katex") {
-			      	      renderMathInElement(this.buffer);
-				      if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length>0) {//has MathJax elements
-					      MathJax.Hub.Queue(["PreviewDone",this]);
-				      } else {
-					      this.PreviewDone();
-				      }
-			      }
-			  },
+				RenderNow: function (text) {
+					//called by preview button
+					this.buffer.innerHTML = this.oldtext = text;
+					this.mjRunning = true;
+					this.RenderBuffer();
+				},
+				RenderBuffer: function () {
+					if (mathRenderer == "MathJax") {
+						MathJax.Hub.Queue(
+							["Typeset", MathJax.Hub, this.buffer],
+							["PreviewDone", this]
+						);
+					} else if (mathRenderer == "Katex") {
+						renderMathInElement(this.buffer);
+						if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length > 0) {//has MathJax elements
+							MathJax.Hub.Queue(["PreviewDone", this]);
+						} else {
+							this.PreviewDone();
+						}
+					}
+				},
 
-			  DoFinalPreview: function() {
-				$("#pbtn"+qn).trigger("click");
-			  },
+				DoFinalPreview: function () {
+					$("#pbtn" + qn).trigger("click");
+				},
 
-			  preformat: function(text) {
-			  	text = normalizemathunicode(text);
-			  	if (intcalctoproc.hasOwnProperty(qn)) {
-			  		if (!calcformat[qn].match(/inequality/)) {
-			  			text = text.replace(/U/g,"uu");
-			  		} else {
-			  			text = text.replace(/<=/g,' le ').replace(/>=/g,' ge ').replace(/</g,' lt ').replace(/>/g,' gt ');
-			  			if (text.match(/all\s*real/i)) {
-			  				text = "text("+text+")";
-			  			}
-			  		}
-			  	} else if (vlist.hasOwnProperty(qn)) {
-			  		text = AMnumfuncPrepVar(qn, text)[1];
+				preformat: function (text) {
+					text = normalizemathunicode(text);
+					if (intcalctoproc.hasOwnProperty(qn)) {
+						if (!calcformat[qn].match(/inequality/)) {
+							text = text.replace(/U/g, "uu");
+						} else {
+							text = text.replace(/<=/g, ' le ').replace(/>=/g, ' ge ').replace(/</g, ' lt ').replace(/>/g, ' gt ');
+							if (text.match(/all\s*real/i)) {
+								text = "text(" + text + ")";
+							}
+						}
+					} else if (vlist.hasOwnProperty(qn)) {
+						text = AMnumfuncPrepVar(qn, text)[1];
 
-			  	} else if (ntupletoproc.hasOwnProperty(qn)) {
-			  		text = text.replace(/</g, '(:').replace(/>/g, ':)');
-			  	} else if (calcformat.hasOwnProperty(qn)) {
-			  		var format = calcformat[qn];
-			  		if (format.indexOf('list')==-1 && format.indexOf('set')==-1) {
-			  			text = text.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
-			  		}
-			  		if (format.indexOf('scinot')!=-1) {
-			  			text = text.replace(/(x|X|\u00D7)/,"xx");
-			  		}
-			  	}
-			  	text = text.replace(/[^\u0000-\u007f]/g, '?');
-			  	return text;
-			  },
+					} else if (ntupletoproc.hasOwnProperty(qn)) {
+						text = text.replace(/</g, '(:').replace(/>/g, ':)');
+					} else if (calcformat.hasOwnProperty(qn)) {
+						var format = calcformat[qn];
+						if (format.indexOf('list') == -1 && format.indexOf('set') == -1) {
+							text = text.replace(/(\d)\s*,\s*(?=\d{3}\b)/g, "$1");
+						}
+						if (format.indexOf('scinot') != -1) {
+							text = text.replace(/(x|X|\u00D7)/, "xx");
+						}
+					}
+					text = text.replace(/[^\u0000-\u007f]/g, '?');
+					return text;
+				},
 
-			  CreatePreview: function () {
-			    this.timeout = null;
-			    if (this.mjPending) return;
-			    if (document.getElementById("tc"+qn)==null) { //string preview
-			    	    var text = document.getElementById("qn"+qn).value;
-			    } else {
-			    	    var text = document.getElementById("tc"+qn).value;
-			    }
-			    if (text === this.oldtext) return;
-			    if (this.mjRunning) {
-			      this.mjPending = true;
-			      MathJax.Hub.Queue(["CreatePreview",this]);
-			    } else {
-			      this.oldtext = text;
-			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
-			      this.mjRunning = true;
-			      this.RenderBuffer();
-			    }
-			  },
+				CreatePreview: function () {
+					this.timeout = null;
+					if (this.mjPending) return;
+					if (document.getElementById("tc" + qn) == null) { //string preview
+						var text = document.getElementById("qn" + qn).value;
+					} else {
+						var text = document.getElementById("tc" + qn).value;
+					}
+					if (text === this.oldtext) return;
+					if (this.mjRunning) {
+						this.mjPending = true;
+						MathJax.Hub.Queue(["CreatePreview", this]);
+					} else {
+						this.oldtext = text;
+						this.buffer.innerHTML = "`" + this.preformat(text) + "`";
+						this.mjRunning = true;
+						this.RenderBuffer();
+					}
+				},
 
-			  PreviewDone: function () {
-			    this.mjRunning = this.mjPending = false;
-			    this.SwapBuffers();
-			    updateeeddpos();
-			    updateehpos();
-			  }
+				PreviewDone: function () {
+					this.mjRunning = this.mjPending = false;
+					this.SwapBuffers();
+					updateeeddpos();
+					updateehpos();
+				}
 
 			};
-			if (mathRenderer=="MathJax") {
-				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+			if (mathRenderer == "MathJax") {
+				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview", LivePreviews[qn]]);
 				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
 			} else {
-				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
+				LivePreviews[qn].callback = function () { LivePreviews[qn].CreatePreview(); };
 			}
 			LivePreviews[qn].Init();
 		} else {
@@ -144,19 +144,19 @@ function setupLivePreview(qn) {
 				finaltimeout: null,  // setTimeout id for clicking preview
 
 				Update: function (content) {
-				    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
-				    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
-				  },
+					if (this.finaltimeout) { clearTimeout(this.finaltimeout) }
+					this.finaltimeout = setTimeout(this.DoFinalPreview, this.finaldelay);
+				},
 
-				  RenderNow: function(text) {
-				      var outnode = document.getElementById("p"+qn);
-				      outnode.innerHTML = text;
-				      rendermathnode(outnode);
-				  },
+				RenderNow: function (text) {
+					var outnode = document.getElementById("p" + qn);
+					outnode.innerHTML = text;
+					rendermathnode(outnode);
+				},
 
-				  DoFinalPreview: function() {
-					$("#pbtn"+qn).trigger("click");
-				  }
+				DoFinalPreview: function () {
+					$("#pbtn" + qn).trigger("click");
+				}
 			}
 		}
 	}
@@ -171,139 +171,139 @@ function normalizemathunicode(str) {
 	str = str.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, "");
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
 	str = str.replace(/\u2044|\u2215/g, "/");
-	str = str.replace(/∞/g,"oo").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/∪/g,"U");
-	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
-	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
-	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
+	str = str.replace(/∞/g, "oo").replace(/≤/g, "<=").replace(/≥/g, ">=").replace(/∪/g, "U");
+	str = str.replace(/±/g, "+-").replace(/÷/g, "/").replace(/·|✕|×|⋅/g, "*");
+	str = str.replace(/√/g, "sqrt").replace(/∛/g, "root(3)");
+	str = str.replace(/²/g, "^2").replace(/³/g, "^3");
 	str = str.replace(/\u2329/g, "<").replace(/\u232a/g, ">");
-	str = str.replace(/₀/g,"_0").replace(/₁/g,"_1").replace(/₂/g,"_2").replace(/₃/g,"_3");
-	str = str.replace(/\b(OO|infty)\b/i,"oo");
-	str = str.replace(/θ/,"theta").replace(/ϕ/,"phi").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
-	str = str.replace(/α/,"alpha").replace(/β/,"beta").replace(/γ/,"gamma").replace(/δ/,"delta").replace(/ε/,"epsilon").replace(/κ/,"kappa");
-	str = str.replace(/λ/,"lambda").replace(/ρ/,"rho").replace(/τ/,"tau").replace(/χ/,"chi").replace(/ω/,"omega");
-	str = str.replace(/Ω/,"Omega").replace(/Γ/,"Gamma").replace(/Φ/,"Phi").replace(/Δ/,"Delta").replace(/Σ/,"Sigma");
+	str = str.replace(/₀/g, "_0").replace(/₁/g, "_1").replace(/₂/g, "_2").replace(/₃/g, "_3");
+	str = str.replace(/\b(OO|infty)\b/i, "oo");
+	str = str.replace(/θ/, "theta").replace(/ϕ/, "phi").replace(/φ/, "phi").replace(/π/, "pi").replace(/σ/, "sigma").replace(/μ/, "mu")
+	str = str.replace(/α/, "alpha").replace(/β/, "beta").replace(/γ/, "gamma").replace(/δ/, "delta").replace(/ε/, "epsilon").replace(/κ/, "kappa");
+	str = str.replace(/λ/, "lambda").replace(/ρ/, "rho").replace(/τ/, "tau").replace(/χ/, "chi").replace(/ω/, "omega");
+	str = str.replace(/Ω/, "Omega").replace(/Γ/, "Gamma").replace(/Φ/, "Phi").replace(/Δ/, "Delta").replace(/Σ/, "Sigma");
 	return str;
 }
 function wrapAMnotice(str) {
-	return '<span class="AMHnotice">'+str+'</span>';
+	return '<span class="AMHnotice">' + str + '</span>';
 }
 //handles preview button for calculated type
-function calculate(inputId,outputId,format) {
-  var fullstr = document.getElementById(inputId).value;
-  fullstr = normalizemathunicode(fullstr);
-  fullstr = fullstr.replace(/=/,'');
+function calculate(inputId, outputId, format) {
+	var fullstr = document.getElementById(inputId).value;
+	fullstr = normalizemathunicode(fullstr);
+	fullstr = fullstr.replace(/=/, '');
 
-  if (format.indexOf('list')!=-1) {
-	  var strarr = fullstr.split(/,/);
-  } else if (format.indexOf('set')!=-1) {
-  	  var strarr = fullstr.replace(/[\{\}]/g,'').split(/,/);
-  } else {
-	  var strarr = new Array();
-	  strarr[0] = fullstr;
-  }
-  for (var sc=0;sc<strarr.length;sc++) {
-	  str = strarr[sc];
-	  str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
-	  var err = "";
-	  if (str.match(/DNE/i)) {
-		  str = str.toUpperCase();
-	  } else if (str.match(/oo$/) || str.match(/oo\W/)) {
-		  str = "`"+str+"`";
-	  } else {
-		  err += singlevalsyntaxcheck(str,format);
-		  if (str.match(/,/)) {
-		  	  err += _("Invalid use of a comma.");
-		  }
-		  if (format.indexOf('allowxtimes')!=-1) {
-		  	  str = str.replace(/(x|X|\u00D7)/,"*");
-		  }
-		  if (format.indexOf('mixed')!=-1) {
-		  	  str = str.replace(/_/g,' ');
-		  } else if (format.indexOf('scinot')!=-1) {
-			  str = str.replace(/(x|X|\u00D7)/,"xx");
-		  } else {
-		  	  //str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
-		  	  str = str.replace(/^\s+/,'').replace(/\s+$/,'');
-		  }
-		  err += syntaxcheckexpr(str,format);
-		  try {
-			  var evalstr = str;
-			  evalstr = evalstr.replace(',','*NaN*'); //force eval error on lingering commas
-			  if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
-			  	evalstr = evalstr.replace(/%/,'') + '/100';
-			  }
-			  if (format.indexOf('mixed')!=-1) {
-				  evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
-			  }
-			  if (format.indexOf('scinot')!=-1) {
-			  	  evalstr = evalstr.replace("xx","*");
-			  }
-			  var res = scopedmatheval(evalstr);
-		  } catch(e) {
-		  	  err = _("syntax incomplete")+'. '+err;
-		  	  res = NaN;
-		  }
-		  str = str.replace(/[^\u0000-\u007f]/g, '?');
-		  if (!isNaN(res) && res!="Infinity" && res!=='') {
-			  if (format.indexOf('showval')==-1) {
-				  str = "`"+str+"` " + wrapAMnotice(err);
-			  } else {
-				  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+". "+wrapAMnotice(err);
-			  }
-		  } else if (str!="") {
-			  str = "`"+str+"` = "+_("undefined")+". "+wrapAMnotice(err);
-		  }
-	  }
-	  strarr[sc] = str+" ";
-  }
-  fullstr = strarr.join(', ');
-  if (format.indexOf('set')!=-1) {
-  	  if (!document.getElementById(inputId).value.match(/^\s*{.*?}\s*$/)) {
-  	  	  fullstr += wrapAMnotice(_("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}"));
-  	  } else {
-  	  	  fullstr = '{'+fullstr+'}';
-  	  }
-  }
-  var qn = outputId.substr(1);
-  setupLivePreview(qn);
-  LivePreviews[qn].RenderNow(fullstr);
-  /*
-  var outnode = document.getElementById(outputId);
-  var n = outnode.childNodes.length;
-  for (var i=0; i<n; i++)
-    outnode.removeChild(outnode.firstChild);
-  outnode.appendChild(document.createTextNode(fullstr));
-  if (!noMathRender) {
-	  rendermathnode(outnode);
-  }
-  */
+	if (format.indexOf('list') != -1) {
+		var strarr = fullstr.split(/,/);
+	} else if (format.indexOf('set') != -1) {
+		var strarr = fullstr.replace(/[\{\}]/g, '').split(/,/);
+	} else {
+		var strarr = new Array();
+		strarr[0] = fullstr;
+	}
+	for (var sc = 0; sc < strarr.length; sc++) {
+		str = strarr[sc];
+		str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g, "$1");
+		var err = "";
+		if (str.match(/DNE/i)) {
+			str = str.toUpperCase();
+		} else if (str.match(/oo$/) || str.match(/oo\W/)) {
+			str = "`" + str + "`";
+		} else {
+			err += singlevalsyntaxcheck(str, format);
+			if (str.match(/,/)) {
+				err += _("Invalid use of a comma.");
+			}
+			if (format.indexOf('allowxtimes') != -1) {
+				str = str.replace(/(x|X|\u00D7)/, "*");
+			}
+			if (format.indexOf('mixed') != -1) {
+				str = str.replace(/_/g, ' ');
+			} else if (format.indexOf('scinot') != -1) {
+				str = str.replace(/(x|X|\u00D7)/, "xx");
+			} else {
+				//str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
+				str = str.replace(/^\s+/, '').replace(/\s+$/, '');
+			}
+			err += syntaxcheckexpr(str, format);
+			try {
+				var evalstr = str;
+				evalstr = evalstr.replace(',', '*NaN*'); //force eval error on lingering commas
+				if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
+					evalstr = evalstr.replace(/%/, '') + '/100';
+				}
+				if (format.indexOf('mixed') != -1) {
+					evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
+				}
+				if (format.indexOf('scinot') != -1) {
+					evalstr = evalstr.replace("xx", "*");
+				}
+				var res = scopedmatheval(evalstr);
+			} catch (e) {
+				err = _("syntax incomplete") + '. ' + err;
+				res = NaN;
+			}
+			str = str.replace(/[^\u0000-\u007f]/g, '?');
+			if (!isNaN(res) && res != "Infinity" && res !== '') {
+				if (format.indexOf('showval') == -1) {
+					str = "`" + str + "` " + wrapAMnotice(err);
+				} else {
+					str = "`" + str + " =` " + (Math.abs(res) < 1e-15 ? 0 : res) + ". " + wrapAMnotice(err);
+				}
+			} else if (str != "") {
+				str = "`" + str + "` = " + _("undefined") + ". " + wrapAMnotice(err);
+			}
+		}
+		strarr[sc] = str + " ";
+	}
+	fullstr = strarr.join(', ');
+	if (format.indexOf('set') != -1) {
+		if (!document.getElementById(inputId).value.match(/^\s*{.*?}\s*$/)) {
+			fullstr += wrapAMnotice(_("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}"));
+		} else {
+			fullstr = '{' + fullstr + '}';
+		}
+	}
+	var qn = outputId.substr(1);
+	setupLivePreview(qn);
+	LivePreviews[qn].RenderNow(fullstr);
+	/*
+	var outnode = document.getElementById(outputId);
+	var n = outnode.childNodes.length;
+	for (var i=0; i<n; i++)
+	  outnode.removeChild(outnode.firstChild);
+	outnode.appendChild(document.createTextNode(fullstr));
+	if (!noMathRender) {
+		rendermathnode(outnode);
+	}
+	*/
 }
 
 //Function to convert inequalities into interval notation
 function ineqtointerval(strw) {
-	strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+	strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g, "$1");
 	var strpts = strw.split(/or/);
-	for (i=0; i<strpts.length; i++) {
+	for (i = 0; i < strpts.length; i++) {
 		str = strpts[i];
 		var out = '';
 		if (pat = str.match(/^([^<]+)\s*(<=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(<=?)([^<]+)$/)) {
-			if (pat[2]=='<=') {out += '[';} else {out += '(';}
+			if (pat[2] == '<=') { out += '['; } else { out += '('; }
 			out += pat[1] + ',' + pat[5];
-			if (pat[4]=='<=') {out += ']';} else {out += ')';}
+			if (pat[4] == '<=') { out += ']'; } else { out += ')'; }
 		} else if (pat = str.match(/^([^>]+)\s*(>=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(>=?)([^>]+)$/)) {
-			if (pat[4]=='>=') {out += '[';} else {out += '(';}
+			if (pat[4] == '>=') { out += '['; } else { out += '('; }
 			out += pat[5] + ',' + pat[1];
-			if (pat[2]=='>=') {out += ']';} else {out += ')';}
+			if (pat[2] == '>=') { out += ']'; } else { out += ')'; }
 		} else if (pat = str.match(/^([^><]+)\s*([><]=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*$/)) {
-			if (pat[2]=='>') { out = '(-oo,'+pat[1]+')';} else
-			if (pat[2]=='>=') { out = '(-oo,'+pat[1]+']';} else
-			if (pat[2]=='<') { out = '('+pat[1]+',oo)';} else
-			if (pat[2]=='<=') { out = '['+pat[1]+',oo)';}
+			if (pat[2] == '>') { out = '(-oo,' + pat[1] + ')'; } else
+				if (pat[2] == '>=') { out = '(-oo,' + pat[1] + ']'; } else
+					if (pat[2] == '<') { out = '(' + pat[1] + ',oo)'; } else
+						if (pat[2] == '<=') { out = '[' + pat[1] + ',oo)'; }
 		} else if (pat = str.match(/^\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*([><]=?)\s*([^><]+)$/)) {
-			if (pat[2]=='<') { out = '(-oo,'+pat[3]+')';} else
-			if (pat[2]=='<=') { out = '(-oo,'+pat[3]+']';} else
-			if (pat[2]=='>') { out = '('+pat[3]+',oo)';} else
-			if (pat[2]=='>=') { out = '['+pat[3]+',oo)';}
+			if (pat[2] == '<') { out = '(-oo,' + pat[3] + ')'; } else
+				if (pat[2] == '<=') { out = '(-oo,' + pat[3] + ']'; } else
+					if (pat[2] == '>') { out = '(' + pat[3] + ',oo)'; } else
+						if (pat[2] == '>=') { out = '[' + pat[3] + ',oo)'; }
 		} else if (str.match(/all\s*real/i)) {
 			out = '(-oo,oo)';
 		} else {
@@ -311,182 +311,182 @@ function ineqtointerval(strw) {
 		}
 		strpts[i] = out;
 	}
-	out =  strpts.join('U');
+	out = strpts.join('U');
 	return out;
 }
 //preview for calcinterval type
-function intcalculate(inputId,outputId,format) {
-  var fullstr = document.getElementById(inputId).value;
-  if (format.indexOf('mixed')!=-1) {
-	  fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
-  } else {
-	  fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
-  }
-  fullstr = normalizemathunicode(fullstr);
-  if (fullstr.match(/DNE/i)) {
-	  fullstr = fullstr.toUpperCase();
-  } else if (fullstr.replace(/\s+/g,'')=='') {
-	  fullstr = _("no answer given");
-  } else {
-	  var calcvals = new Array();
-	  var calcstrarr = new Array();
-	  if (format.indexOf('inequality')!=-1) {
-		fullstr = fullstr.replace(/or/g,' or ');
-		var origstr = fullstr;
-		fullstr = ineqtointerval(fullstr);
-		var pats = str.match(/\b([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+\b)/);
-		var pat = str.match(/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/);
-		var ineqvar = (pats != null)?pats[1]:((pat != null)?pat[1]:'');
-	  } else {
-	  	  var origstr = fullstr;
-	  }
-	  if (format.indexOf('list')!=-1) {
-	  	var lastpos = 0; var strarr = [];
-		for (var pos = 1; pos<fullstr.length-1; pos++) {
-			if (fullstr.charAt(pos)==',') {
-				if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
-					&& (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')) {
-					strarr.push(fullstr.substring(lastpos,pos));
-					lastpos = pos+1;
+function intcalculate(inputId, outputId, format) {
+	var fullstr = document.getElementById(inputId).value;
+	if (format.indexOf('mixed') != -1) {
+		fullstr = fullstr.replace(/_/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '');
+	} else {
+		fullstr = fullstr.replace(/^\s+/, '').replace(/\s+$/, '');
+	}
+	fullstr = normalizemathunicode(fullstr);
+	if (fullstr.match(/DNE/i)) {
+		fullstr = fullstr.toUpperCase();
+	} else if (fullstr.replace(/\s+/g, '') == '') {
+		fullstr = _("no answer given");
+	} else {
+		var calcvals = new Array();
+		var calcstrarr = new Array();
+		if (format.indexOf('inequality') != -1) {
+			fullstr = fullstr.replace(/or/g, ' or ');
+			var origstr = fullstr;
+			fullstr = ineqtointerval(fullstr);
+			var pats = str.match(/\b([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+\b)/);
+			var pat = str.match(/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/);
+			var ineqvar = (pats != null) ? pats[1] : ((pat != null) ? pat[1] : '');
+		} else {
+			var origstr = fullstr;
+		}
+		if (format.indexOf('list') != -1) {
+			var lastpos = 0; var strarr = [];
+			for (var pos = 1; pos < fullstr.length - 1; pos++) {
+				if (fullstr.charAt(pos) == ',') {
+					if ((fullstr.charAt(pos - 1) == ')' || fullstr.charAt(pos - 1) == ']')
+						&& (fullstr.charAt(pos + 1) == '(' || fullstr.charAt(pos + 1) == '[')) {
+						strarr.push(fullstr.substring(lastpos, pos));
+						lastpos = pos + 1;
+					}
+				}
+			}
+			strarr.push(fullstr.substring(lastpos));
+		} else {
+			var strarr = fullstr.split(/\s*U\s*/i);
+		}
+		var isok = true; var fullerr = "";
+		for (i = 0; i < strarr.length; i++) {
+			str = strarr[i];
+			sm = str.charAt(0);
+			em = str.charAt(str.length - 1);
+			vals = str.substring(1, str.length - 1);
+			vals = vals.split(/,/);
+			if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
+				if (format.indexOf('inequality') != -1) {
+					origstr = origstr.replace('<=', 'le').replace('>=', 'ge').replace('<', 'lt').replace('>', 'gt');
+					fullstr = "`" + origstr + "`: " + wrapAMnotice(_("invalid inequality notation"));
+				} else {
+					fullstr = "`" + origstr.replace(/U/g, "uu") + "`: " + wrapAMnotice(_("invalid interval notation"));
+				}
+				isok = false;
+				break;
+			}
+			for (j = 0; j < 2; j++) {
+				if (vals[j].match(/oo$/) || vals[j].match(/oo\W/)) {
+					calcvals[j] = vals[j];
+				} else {
+					var err = "";
+					res = NaN;
+					err += singlevalsyntaxcheck(vals[j], format);
+					if (format.indexOf('mixed') != -1) {
+						vals[j] = vals[j].replace(/_/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '');
+					} else {
+						vals[j] = vals[j].replace(/^\s+/, '').replace(/\s+$/, '');
+					}
+					err += syntaxcheckexpr(vals[j], format);
+
+					if (err == '') {
+						try {
+							toeval = vals[j];
+							if (format.indexOf('mixed') != -1) {
+								toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
+							}
+							var res = scopedmatheval(toeval);
+						} catch (e) {
+							err = _("syntax incomplete") + ". ";
+						}
+					}
+					if (!isNaN(res) && res != "Infinity" && res !== '') {
+						// if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
+						vals[j] = vals[j];
+						calcvals[j] = (Math.abs(res) < 1e-15 ? 0 : res).toString();//+wrapAMnotice(err);
+						//} else {
+						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
+						//}
+					} else {
+						calcvals[j] = _("undefined");
+					}
+					if (err != '') {
+						fullerr += err;
+					}
+
+				}
+			}
+
+			strarr[i] = sm + vals[0] + ',' + vals[1] + em;
+			if (format.indexOf('inequality') != -1) {
+				if (calcvals[0].match(/oo/)) {
+					if (calcvals[1].match(/oo/)) {
+						calcstrarr[i] = 'RR';
+					} else {
+						calcstrarr[i] = ineqvar + (em == ']' ? 'le' : 'lt') + calcvals[1];
+					}
+				} else if (calcvals[1].match(/oo/)) {
+					calcstrarr[i] = ineqvar + (sm == '[' ? 'ge' : 'gt') + calcvals[0];
+				} else {
+					calcstrarr[i] = calcvals[0] + (sm == '[' ? 'le' : 'lt') + ineqvar + (em == ']' ? 'le' : 'lt') + calcvals[1];
+				}
+				calcstrarr[i] = calcstrarr[i].replace("undefined", '"undefined"');
+			} else {
+				calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
+			}
+
+		}
+		if (isok) {
+			if (format.indexOf('inequality') != -1) {
+				if (origstr.match(/all\s*real/)) {
+					fullstr = origstr;
+				} else {
+					origstr = origstr.replace(/or/g, ' \\ "or" \\ ');
+					origstr = origstr.replace(/<=/g, 'le');
+					origstr = origstr.replace(/>=/g, 'ge');
+					origstr = origstr.replace(/</g, 'lt');
+					origstr = origstr.replace(/>/g, 'gt');
+					if (format.indexOf('showval') == -1) {
+						fullstr = '`' + origstr + '`' + ". " + wrapAMnotice(fullerr);
+					} else {
+						fullstr = '`' + origstr + '= ' + calcstrarr.join(' \\ "or" \\ ') + '`' + ". " + wrapAMnotice(fullerr);
+					}
+				}
+			} else {
+				if (format.indexOf('showval') == -1) {
+					fullstr = '`' + strarr.join('uu') + '`' + ". " + wrapAMnotice(fullerr);
+				} else {
+					if (format.indexOf('list') != -1) {
+						fullstr = '`' + strarr.join(',') + '` = ' + calcstrarr.join(' , ') + ". " + wrapAMnotice(fullerr);
+					} else {
+						fullstr = '`' + strarr.join('uu') + '` = ' + calcstrarr.join(' U ') + ". " + wrapAMnotice(fullerr);
+					}
 				}
 			}
 		}
-		strarr.push(fullstr.substring(lastpos));
-	  } else {
-	  	  var strarr = fullstr.split(/\s*U\s*/i);
-	  }
-	  var isok = true; var fullerr="";
-	  for (i=0; i<strarr.length; i++) {
-		  str = strarr[i];
-		  sm = str.charAt(0);
-		  em = str.charAt(str.length-1);
-		  vals = str.substring(1,str.length-1);
-		  vals = vals.split(/,/);
-		  if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
-		  	  if(format.indexOf('inequality')!=-1) {
-		  	  	  origstr = origstr.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
-		  	  	  fullstr = "`"+origstr+"`: " + wrapAMnotice(_("invalid inequality notation"));
-		  	  } else {
-		  	  	  fullstr = "`"+origstr.replace(/U/g,"uu")+"`: " + wrapAMnotice(_("invalid interval notation"));
-		  	  }
-			  isok = false;
-			  break;
-		  }
-		  for (j=0; j<2; j++) {
-			  if (vals[j].match(/oo$/) || vals[j].match(/oo\W/)) {
-				  calcvals[j] = vals[j];
-			  } else {
-				  var err = "";
-				  res = NaN;
-				  err += singlevalsyntaxcheck(vals[j], format);
-				  if (format.indexOf('mixed')!=-1) {
-					  vals[j] = vals[j].replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
-				  } else {
-					  vals[j] = vals[j].replace(/^\s+/,'').replace(/\s+$/,'');
-				  }
-				  err += syntaxcheckexpr(vals[j], format);
-
-				  if (err=='') {
-					  try {
-					  	toeval = vals[j];
-					  	if (format.indexOf('mixed')!=-1) {
-					  		toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
-					  	}
-					  	var res = scopedmatheval(toeval);
-					  } catch(e) {
-					  	err = _("syntax incomplete")+". ";
-					  }
-				  }
-				  if (!isNaN(res) && res!="Infinity" && res!=='') {
-					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
-						  vals[j] = vals[j];
-						  calcvals[j] = (Math.abs(res)<1e-15?0:res).toString();//+wrapAMnotice(err);
-					  //} else {
-						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
-					  //}
-				  } else {
-				  	  calcvals[j] = _("undefined");
-				  }
-				  if (err != '') {
-				  	  fullerr += err;
-				  }
-
-			  }
-		  }
-
-		  strarr[i] = sm + vals[0] + ',' + vals[1] + em;
-		  if (format.indexOf('inequality')!=-1) {
-		  	  if (calcvals[0].match(/oo/)) {
-				  if (calcvals[1].match(/oo/)) {
-					  calcstrarr[i] = 'RR';
-				  } else {
-					  calcstrarr[i] = ineqvar + (em==']'?'le':'lt') + calcvals[1];
-				  }
-			  } else if (calcvals[1].match(/oo/)) {
-				  calcstrarr[i] = ineqvar + (sm=='['?'ge':'gt') + calcvals[0];
-			  } else {
-				  calcstrarr[i] = calcvals[0] + (sm=='['?'le':'lt') + ineqvar + (em==']'?'le':'lt') + calcvals[1];
-			  }
-			  calcstrarr[i] = calcstrarr[i].replace("undefined",'"undefined"');
-		  } else {
-			calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
-		  }
-
-	 }
-	 if (isok) {
-		 if (format.indexOf('inequality')!=-1) {
-			 if (origstr.match(/all\s*real/)) {
-				 fullstr = origstr;
-			 } else {
-				 origstr = origstr.replace(/or/g,' \\ "or" \\ ');
-				 origstr = origstr.replace(/<=/g,'le');
-				 origstr = origstr.replace(/>=/g,'ge');
-				 origstr = origstr.replace(/</g,'lt');
-				 origstr = origstr.replace(/>/g,'gt');
-				 if (format.indexOf('showval')==-1) {
-				 	 fullstr = '`'+origstr + '`'+". "+wrapAMnotice(fullerr);
-				 } else {
-				 	 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`'+". "+wrapAMnotice(fullerr);
-				 }
-			 }
-		 } else {
-		 	 if (format.indexOf('showval')==-1) {
-				  fullstr = '`'+strarr.join('uu') + '`'+". "+wrapAMnotice(fullerr);
-			 } else {
-			 	 if (format.indexOf('list')!=-1) {
-			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , ')+". "+wrapAMnotice(fullerr);
-			 	 } else {
-			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ')+". "+wrapAMnotice(fullerr);
-			 	 }
-			 }
-		 }
-	 }
-  }
-  fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
-  var qn = outputId.substr(1);
-  setupLivePreview(qn);
-  LivePreviews[qn].RenderNow(fullstr);
-  /*var outnode = document.getElementById(outputId);
-  var n = outnode.childNodes.length;
-  for (var i=0; i<n; i++)
-    outnode.removeChild(outnode.firstChild);
-  outnode.appendChild(document.createTextNode(fullstr));
-  if (!noMathRender) {
-	  rendermathnode(outnode);
-  }
-  */
+	}
+	fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
+	var qn = outputId.substr(1);
+	setupLivePreview(qn);
+	LivePreviews[qn].RenderNow(fullstr);
+	/*var outnode = document.getElementById(outputId);
+	var n = outnode.childNodes.length;
+	for (var i=0; i<n; i++)
+	  outnode.removeChild(outnode.firstChild);
+	outnode.appendChild(document.createTextNode(fullstr));
+	if (!noMathRender) {
+		rendermathnode(outnode);
+	}
+	*/
 
 }
 
 //preview for calcntuple
-function ntuplecalc(inputId,outputId,format) {
+function ntuplecalc(inputId, outputId, format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = normalizemathunicode(fullstr);
 	fullstr = fullstr.replace(/\(:|<</g, '<').replace(/:\)|>>/g, '>');
-	if (format.indexOf('mixed')!=-1) {
-		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+	if (format.indexOf('mixed') != -1) {
+		fullstr = fullstr.replace(/_/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '');
 	} else {
-		fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
+		fullstr = fullstr.replace(/^\s+/, '').replace(/\s+$/, '');
 	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -504,18 +504,18 @@ function ntuplecalc(inputId,outputId,format) {
 		var notationok = true;
 		var res = NaN;
 		if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
-			notationok=false;
+			notationok = false;
 		}
-		for (var i=0; i<fullstr.length; i++) {
+		for (var i = 0; i < fullstr.length; i++) {
 			dec = false;
-			if (NCdepth==0) {
+			if (NCdepth == 0) {
 				outcalced += fullstr.charAt(i);
-				lastcut = i+1;
-				if (fullstr.charAt(i)==',') {
-					if (!fullstr.substring(i+1).match(/^\s*[\(\[\<\{]/) ||
-						!fullstr.substring(0,i).match(/[\)\]\>\}]\s*$/)
+				lastcut = i + 1;
+				if (fullstr.charAt(i) == ',') {
+					if (!fullstr.substring(i + 1).match(/^\s*[\(\[\<\{]/) ||
+						!fullstr.substring(0, i).match(/[\)\]\>\}]\s*$/)
 					) {
-						notationok=false;
+						notationok = false;
 					}
 				}
 			}
@@ -526,88 +526,88 @@ function ntuplecalc(inputId,outputId,format) {
 				dec = true;
 			}
 
-			if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
-				sub = fullstr.substring(lastcut,i);
+			if ((NCdepth == 0 && dec) || (NCdepth == 1 && fullstr.charAt(i) == ',')) {
+				sub = fullstr.substring(lastcut, i);
 				res = NaN;
-				if (sub=='oo' || sub=='-oo') {
+				if (sub == 'oo' || sub == '-oo') {
 					outcalced += sub;
 				} else {
 					err += singlevalsyntaxcheck(sub, format);
 					err += syntaxcheckexpr(sub, format);
 					try {
-						if (format.indexOf('mixed')!=-1) {
-							sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+						if (format.indexOf('mixed') != -1) {
+							sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
 						}
 						res = scopedmatheval(sub);
-					} catch(e) {
-						err += _("syntax incomplete")+". ";
+					} catch (e) {
+						err += _("syntax incomplete") + ". ";
 					}
-					if (!isNaN(res) && res!="Infinity" && res!=='') {
+					if (!isNaN(res) && res != "Infinity" && res !== '') {
 						outcalced += res;
 					} else {
 						outcalced += _("undefined");
 					}
 				}
 				outcalced += fullstr.charAt(i);
-				lastcut = i+1;
+				lastcut = i + 1;
 			}
 		}
-		if (NCdepth!=0) {
+		if (NCdepth != 0) {
 			notationok = false;
 		}
-		if (notationok==false) {
-			err += _("Invalid notation")+". ";
+		if (notationok == false) {
+			err += _("Invalid notation") + ". ";
 		}
 		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
 		fullstr = fullstr.replace(/</g, '(:').replace(/>/g, ':)');
 		//outstr = '`'+fullstr+'` = '+outcalced;
-		if (format.indexOf('showval')==-1 || notationok==false) {
-			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
+		if (format.indexOf('showval') == -1 || notationok == false) {
+			outstr = '`' + fullstr + '`' + ". " + wrapAMnotice(err);
 		} else {
-			 outstr = '`'+fullstr+'` = '+outcalced +". " + wrapAMnotice(err);
+			outstr = '`' + fullstr + '` = ' + outcalced + ". " + wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
-		 /*var outnode = document.getElementById(outputId);
-		 var n = outnode.childNodes.length;
-		 for (var i=0; i<n; i++) {
-		    outnode.removeChild(outnode.firstChild);
-		 }
-		 outnode.appendChild(document.createTextNode(outstr));
-		 if (!noMathRender) {
-			  rendermathnode(outnode);
-		 }*/
-		 var qn = outputId.substr(1);
-		 setupLivePreview(qn);
-		 LivePreviews[qn].RenderNow(outstr);
+		/*var outnode = document.getElementById(outputId);
+		var n = outnode.childNodes.length;
+		for (var i=0; i<n; i++) {
+		   outnode.removeChild(outnode.firstChild);
+		}
+		outnode.appendChild(document.createTextNode(outstr));
+		if (!noMathRender) {
+			 rendermathnode(outnode);
+		}*/
+		var qn = outputId.substr(1);
+		setupLivePreview(qn);
+		LivePreviews[qn].RenderNow(outstr);
 	}
-	 return outcalced;
+	return outcalced;
 }
 
 //preview for calccomplex
-function complexcalc(inputId,outputId,format) {
+function complexcalc(inputId, outputId, format) {
 	var fullstr = document.getElementById(inputId).value;
 	var outcalced, outstr, err;
 	fullstr = normalizemathunicode(fullstr);
-	if (format.indexOf('mixed')!=-1) {
-		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+	if (format.indexOf('mixed') != -1) {
+		fullstr = fullstr.replace(/_/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '');
 	} else {
-		fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
+		fullstr = fullstr.replace(/^\s+/, '').replace(/\s+$/, '');
 	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
 		outcalced = 'DNE';
 		outstr = 'DNE';
 	} else {
-		outcalced = ''; err='';
+		outcalced = ''; err = '';
 		var arr = fullstr.split(',');
-		for (var cnt=0; cnt<arr.length; cnt++) {
+		for (var cnt = 0; cnt < arr.length; cnt++) {
 			var prep = arr[cnt];
-			if (format.indexOf('mixed')!=-1) {
-				prep = prep.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+			if (format.indexOf('mixed') != -1) {
+				prep = prep.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
 			}
-			var prep = mathjs(prep,'i');
-			if (format.indexOf("sloppycomplex")==-1) {
+			var prep = mathjs(prep, 'i');
+			if (format.indexOf("sloppycomplex") == -1) {
 				var cparts = parsecomplex(arr[cnt]);
 				if (typeof cparts == 'string') {
 					err += cparts;
@@ -619,95 +619,95 @@ function complexcalc(inputId,outputId,format) {
 			err += syntaxcheckexpr(arr[cnt], format);
 			if (err == '') {
 				try {
-				    var real = scopedeval('var i=0;'+prepWithMath(prep));
-				    var imag = scopedeval('var i=1;'+prepWithMath(prep));
-						var imag2 = scopedeval('var i=-1;'+prepWithMath(prep));
-				} catch(e) {
-				    err += _("syntax incomplete");
+					var real = scopedeval('var i=0;' + prepWithMath(prep));
+					var imag = scopedeval('var i=1;' + prepWithMath(prep));
+					var imag2 = scopedeval('var i=-1;' + prepWithMath(prep));
+				} catch (e) {
+					err += _("syntax incomplete");
 				}
 			}
-			if (real=="synerr" || imag=="synerr") {
-			    err += _("syntax incomplete");
-			    real = NaN;
+			if (real == "synerr" || imag == "synerr") {
+				err += _("syntax incomplete");
+				real = NaN;
 			}
-			if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
+			if (!isNaN(real) && real != "Infinity" && !isNaN(imag) && !isNaN(imag2) && imag != "Infinity") {
 				imag -= real;
-				if (cnt!=0) {
+				if (cnt != 0) {
 					outcalced += ',';
 				}
-				outcalced += real+(imag>=0?'+':'')+imag+'i';
+				outcalced += real + (imag >= 0 ? '+' : '') + imag + 'i';
 			} else {
 				outcalced += _("undefined");
 				break;
 			}
 		}
 		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
-		if (format.indexOf('showval')==-1) {
-			outstr = '`'+fullstr+'`'+". "+wrapAMnotice(err);
+		if (format.indexOf('showval') == -1) {
+			outstr = '`' + fullstr + '`' + ". " + wrapAMnotice(err);
 		} else {
-			outstr = '`'+fullstr+'` = '+outcalced+". "+wrapAMnotice(err);
+			outstr = '`' + fullstr + '` = ' + outcalced + ". " + wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
-		 /*var outnode = document.getElementById(outputId);
-		 var n = outnode.childNodes.length;
-		 for (var i=0; i<n; i++) {
-		    outnode.removeChild(outnode.firstChild);
-		 }
-		 outnode.appendChild(document.createTextNode(outstr));
-		 if (!noMathRender) {
-			  rendermathnode(outnode);
-		 }*/
-		 var qn = outputId.substr(1);
-		 setupLivePreview(qn);
-		 LivePreviews[qn].RenderNow(outstr);
+		/*var outnode = document.getElementById(outputId);
+		var n = outnode.childNodes.length;
+		for (var i=0; i<n; i++) {
+		   outnode.removeChild(outnode.firstChild);
+		}
+		outnode.appendChild(document.createTextNode(outstr));
+		if (!noMathRender) {
+			 rendermathnode(outnode);
+		}*/
+		var qn = outputId.substr(1);
+		setupLivePreview(qn);
+		LivePreviews[qn].RenderNow(outstr);
 	}
-	 return outcalced;
+	return outcalced;
 }
 
 function parsecomplex(v) {
-	var real,imag,c,nd,p,R,L;
-	v = v.replace(/\s/,'');
-	v = v.replace(/\((\d+\*?i|i)\)\/(\d+)/g,'$1/$2');
-	v = v.replace(/sin/,'s$n');
-	v = v.replace(/pi/,'p$');
+	var real, imag, c, nd, p, R, L;
+	v = v.replace(/\s/, '');
+	v = v.replace(/\((\d+\*?i|i)\)\/(\d+)/g, '$1/$2');
+	v = v.replace(/sin/, 's$n');
+	v = v.replace(/pi/, 'p$');
 	var len = v.length;
 	//preg_match_all('/(\bi|i\b)/',v,matches,PREG_OFFSET_CAPTURE);
 	//if (count(matches[0])>1) {
-	if (v.split("i").length>2) {
+	if (v.split("i").length > 2) {
 		return _('error - more than 1 i in expression');
 	} else {
 		p = v.indexOf('i');
-		if (p==-1) {
+		if (p == -1) {
 			real = v;
 			imag = "0";
 		} else {
 			//look left
 			nd = 0;
-			for (L=p-1;L>0;L--) {
+			for (L = p - 1; L > 0; L--) {
 				c = v.charAt(L);
-				if (c==')') {
+				if (c == ')') {
 					nd++;
-				} else if (c=='(') {
+				} else if (c == '(') {
 					nd--;
-				} else if ((c=='+' || c=='-') && nd==0) {
+				} else if ((c == '+' || c == '-') && nd == 0) {
 					break;
 				}
 			}
-			if (L<0) {L=0;}
+			if (L < 0) { L = 0; }
 			if (nd != 0) {
 				return _('error - invalid form');
 			}
 			//look right
 			nd = 0;
 
-			for (R=p+1;R<len;R++) {
+			for (R = p + 1; R < len; R++) {
 				c = v.charAt(R);
-				if (c=='(') {
+				if (c == '(') {
 					nd++;
-				} else if (c==')') {
+				} else if (c == ')') {
 					nd--;
-				} else if ((c=='+' || c=='-') && nd==0) {
+				} else if ((c == '+' || c == '-') && nd == 0) {
 					break;
 				}
 			}
@@ -715,85 +715,85 @@ function parsecomplex(v) {
 				return _('error - invalid form');
 			}
 			//which is bigger?
-			if (p-L>0 && R-p>0 && (R==len || L==0)) {
-				if (R==len) { //real + AiB
-					real = v.substr(0,L);
-					imag = v.substr(L,p-L);
-				} else if (L==0) {
+			if (p - L > 0 && R - p > 0 && (R == len || L == 0)) {
+				if (R == len) { //real + AiB
+					real = v.substr(0, L);
+					imag = v.substr(L, p - L);
+				} else if (L == 0) {
 					real = v.substr(R);
-					imag = v.substr(0,p);
+					imag = v.substr(0, p);
 				} else {
 					return _('error - invalid form');
 				}
-				imag += '*'+v.substr(p+1+(v.charAt(p+1)=='*'?1:0),R-p-1);
-				imag = imag.replace("-*","-1*").replace("+*","+1*");
-				imag = imag.replace(/(\+|-)1\*(.+)/g,'$1$2');
-			} else if (p-L>1) {
-				imag = v.substr(L,p-L);
-				real = v.substr(0,L) + v.substr(p+1);
-			} else if (R-p>1) {
-				if (p>0) {
-					if (v.charAt(p-1)!='+' && v.charAt(p-1)!='-') {
+				imag += '*' + v.substr(p + 1 + (v.charAt(p + 1) == '*' ? 1 : 0), R - p - 1);
+				imag = imag.replace("-*", "-1*").replace("+*", "+1*");
+				imag = imag.replace(/(\+|-)1\*(.+)/g, '$1$2');
+			} else if (p - L > 1) {
+				imag = v.substr(L, p - L);
+				real = v.substr(0, L) + v.substr(p + 1);
+			} else if (R - p > 1) {
+				if (p > 0) {
+					if (v.charAt(p - 1) != '+' && v.charAt(p - 1) != '-') {
 						return _('error - invalid form');
 					}
-					imag = v.charAt(p-1)+ v.substr(p+1+(v.charAt(p+1)=='*'?1:0),R-p-1);
-					real = v.substr(0,p-1) + v.substr(R);
+					imag = v.charAt(p - 1) + v.substr(p + 1 + (v.charAt(p + 1) == '*' ? 1 : 0), R - p - 1);
+					real = v.substr(0, p - 1) + v.substr(R);
 				} else {
-					imag = v.substr(p+1,R-p-1);
-					real = v.substr(0,p) + v.substr(R);
+					imag = v.substr(p + 1, R - p - 1);
+					real = v.substr(0, p) + v.substr(R);
 				}
 			} else { //i or +i or -i or 3i  (one digit)
-				if (v.charAt(L)=='+') {
+				if (v.charAt(L) == '+') {
 					imag = "1";
-				} else if (v.charAt(L)=='-') {
+				} else if (v.charAt(L) == '-') {
 					imag = "-1";
-				} else if (p==0) {
+				} else if (p == 0) {
 					imag = "1";
 				} else {
 					imag = v.charAt(L);
 				}
-				real = (p>0?v.substr(0,L):'') + v.substr(p+1);
+				real = (p > 0 ? v.substr(0, L) : '') + v.substr(p + 1);
 			}
-			if (real=='') {
+			if (real == '') {
 				real = "0";
 			}
-			if (imag.charAt(0)=='/') {
-				imag = '1'+imag;
-			} else if ((imag.charAt(0)=='+' || imag.charAt(0)=='-') && imag.charAt(1)=='/') {
-				imag = imag.charAt(0)+'1'+imag.substr(1);
+			if (imag.charAt(0) == '/') {
+				imag = '1' + imag;
+			} else if ((imag.charAt(0) == '+' || imag.charAt(0) == '-') && imag.charAt(1) == '/') {
+				imag = imag.charAt(0) + '1' + imag.substr(1);
 			}
-			if (imag.charAt(imag.length-1)=='*') {
-				imag = imag.substr(0,imag.length-1);
+			if (imag.charAt(imag.length - 1) == '*') {
+				imag = imag.substr(0, imag.length - 1);
 			}
-			if (imag.charAt(0)=="+") {
+			if (imag.charAt(0) == "+") {
 				imag = imag.substr(1);
 			}
-			if (real.charAt(0)=="+") {
+			if (real.charAt(0) == "+") {
 				real = real.substr(1);
 			}
 		}
-		real = real.replace("s$n","sin");
-		real = real.replace("p$","pi");
-		imag = imag.replace("s$n","sin");
-		imag = imag.replace("p$","pi");
-		imag = imag.replace(/\*\//g,"/");
-		return [real,imag];
+		real = real.replace("s$n", "sin");
+		real = real.replace("p$", "pi");
+		imag = imag.replace("s$n", "sin");
+		imag = imag.replace("p$", "pi");
+		imag = imag.replace(/\*\//g, "/");
+		return [real, imag];
 	}
 }
 
-function matrixcalc(inputId,outputId,rows,cols,format) {
+function matrixcalc(inputId, outputId, rows, cols, format) {
 
 	function calced(estr) {
-		var err='';
+		var err = '';
 		try {
 			var res = scopedmatheval(estr);
-		} catch(e) {
-			err = _("syntax incomplete")+". ";
+		} catch (e) {
+			err = _("syntax incomplete") + ". ";
 		}
-		if (!isNaN(res) && res!="Infinity" && res!=='') {
-			estr = (Math.abs(res)<1e-15?0:res)+err;
-		} else if (estr!="") {
-			err = _("undefined")+". ";
+		if (!isNaN(res) && res != "Infinity" && res !== '') {
+			estr = (Math.abs(res) < 1e-15 ? 0 : res) + err;
+		} else if (estr != "") {
+			err = _("undefined") + ". ";
 			estr = err;
 		}
 		return [estr, err];
@@ -804,26 +804,26 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 		format = '';
 	}
 
-	if (rows!=null && cols!=null) {
-		var count=0;
+	if (rows != null && cols != null) {
+		var count = 0;
 		var str = "[";
 		var calcstr = "[";
-		for (var row=0; row < rows; row++) {
-			if (row>0) { str += ","; calcstr += ","}
+		for (var row = 0; row < rows; row++) {
+			if (row > 0) { str += ","; calcstr += "," }
 			str += "(";
 			calcstr += "(";
-			for (var col=0; col<cols; col++) {
-				if (col>0) {str += ","; calcstr += ",";}
-				val = normalizemathunicode(document.getElementById(inputId+'-'+count).value);
+			for (var col = 0; col < cols; col++) {
+				if (col > 0) { str += ","; calcstr += ","; }
+				val = normalizemathunicode(document.getElementById(inputId + '-' + count).value);
 				str += val;
 				//calcstr += calced(val);
 				calcout = calced(val);
 
-				calcout[1] += syntaxcheckexpr(val,format);
+				calcout[1] += syntaxcheckexpr(val, format);
 				if (calcout[1] == '') {
-					calcout[1] += singlevalsyntaxcheck(val,format);
+					calcout[1] += singlevalsyntaxcheck(val, format);
 				}
-				if (err=='') {
+				if (err == '') {
 					err = calcout[1];
 				}
 
@@ -839,33 +839,33 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 		var str = normalizemathunicode(document.getElementById(inputId).value);
 		var calcstr = str;
 		var MCdepth = 0;
-		calcstr = calcstr.replace('[','(');
-		calcstr = calcstr.replace(']',')');
-		calcstr = calcstr.replace(/\s+/g,'');
+		calcstr = calcstr.replace('[', '(');
+		calcstr = calcstr.replace(']', ')');
+		calcstr = calcstr.replace(/\s+/g, '');
 		var calclist = new Array();
-		calcstr = calcstr.substring(1,calcstr.length-1);
+		calcstr = calcstr.substring(1, calcstr.length - 1);
 		var lastcut = 0;
-		for (var i=0; i<calcstr.length; i++) {
-			if (calcstr.charAt(i)=='(') {
+		for (var i = 0; i < calcstr.length; i++) {
+			if (calcstr.charAt(i) == '(') {
 				MCdepth++;
-			} else if (calcstr.charAt(i)==')') {
+			} else if (calcstr.charAt(i) == ')') {
 				MCdepth--;
-			} else if (calcstr.charAt(i)==',' && MCdepth==0) {
-				calclist[calclist.length] = calcstr.substring(lastcut+1,i-1);
-				lastcut = i+1;
+			} else if (calcstr.charAt(i) == ',' && MCdepth == 0) {
+				calclist[calclist.length] = calcstr.substring(lastcut + 1, i - 1);
+				lastcut = i + 1;
 			}
 		}
-		calclist[calclist.length] = calcstr.substring(lastcut+1,calcstr.length-1);
-		for (var i=0; i<calclist.length; i++) {
+		calclist[calclist.length] = calcstr.substring(lastcut + 1, calcstr.length - 1);
+		for (var i = 0; i < calclist.length; i++) {
 			calclist2 = calclist[i].split(',');
-			for (var j=0; j<calclist2.length; j++) {
+			for (var j = 0; j < calclist2.length; j++) {
 				//calclist2[j] = calced(calclist2[j]);
 				calcout = calced(calclist2[j]);
-				calcout[1] += syntaxcheckexpr(calclist2[j],format);
+				calcout[1] += syntaxcheckexpr(calclist2[j], format);
 				if (calcout[1] == '') {
-					calcout[1] += singlevalsyntaxcheck(calclist2[j],format);
+					calcout[1] += singlevalsyntaxcheck(calclist2[j], format);
 				}
-				if (err=='') {
+				if (err == '') {
 					err = calcout[1];
 				}
 
@@ -873,20 +873,20 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 			}
 			calclist[i] = calclist2.join(',');
 		}
-		calcstr = '[('+calclist.join('),(')+')]';
+		calcstr = '[(' + calclist.join('),(') + ')]';
 	}
 	//calcstr = calcstr.replace(/([^\[\(\)\],]+)/g, calced);
 	str = str.replace(/[^\u0000-\u007f]/g, '?');
-	if (format.indexOf("showval")==-1) {
-		str = "`"+str+"`. "+err;
+	if (format.indexOf("showval") == -1) {
+		str = "`" + str + "`. " + err;
 	} else {
-		str = "`"+str+"` = `"+calcstr+"`. "+err;
+		str = "`" + str + "` = `" + calcstr + "`. " + err;
 	}
 
 	if (outputId != null) {
 		var outnode = document.getElementById(outputId);
 		var n = outnode.childNodes.length;
-		for (var i=0; i<n; i++)
+		for (var i = 0; i < n; i++)
 			outnode.removeChild(outnode.firstChild);
 		outnode.appendChild(document.createTextNode(str));
 		if (!noMathRender) {
@@ -896,18 +896,18 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 	return calcstr;
 }
 
-function mathjsformat(inputId,outputId) {
-  var str = document.getElementById(inputId).value;
-  var outnode = document.getElementById(outputId);
-  outnode.value = mathjs(str);
+function mathjsformat(inputId, outputId) {
+	var str = document.getElementById(inputId).value;
+	var outnode = document.getElementById(outputId);
+	outnode.value = mathjs(str);
 }
 
-function stringqpreview(inputId,outputId) {
+function stringqpreview(inputId, outputId) {
 	var str = document.getElementById(inputId).value;
 
 	var qn = outputId.substr(1);
 	setupLivePreview(qn);
-	LivePreviews[qn].RenderNow("`"+str+"`");
+	LivePreviews[qn].RenderNow("`" + str + "`");
 
 	/*var outnode = document.getElementById(outputId);
 	var n = outnode.childNodes.length;
@@ -919,336 +919,338 @@ function stringqpreview(inputId,outputId) {
 	}*/
 }
 
-function AMnumfuncPrepVar(qn,str) {
-  var vl = vlist[qn];
-  var fl = flist[qn];
-  var vars = vl.split("|");
-  vars.push("DNE");
+function AMnumfuncPrepVar(qn, str) {
+	var vl = vlist[qn];
+	var fl = flist[qn];
+	var vars = vl.split("|");
+	vars.push("DNE");
 
-  if (vl.match(/lambda/)) {
-  	  str = str.replace(/lamda/, 'lambda');
-  }
+	if (vl.match(/lambda/)) {
+		str = str.replace(/lamda/, 'lambda');
+	}
 
-  str = str.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
-  str = normalizemathunicode(str);
-  var foundaltcap = [];
-  var dispstr = str;
-  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
-  for (var i=0; i<vars.length; i++) {
-  	  if (vars[i] == "varE") {
-		  str = str.replace("E","varE");
-		  dispstr = dispstr.replace("E","varE");
-	  } else {
-	  	foundaltcap[i] = false;
-	  	for (var j=0; j<vars.length; j++) {
-	  		if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
-	  			foundaltcap[i] = true;
-	  			break;
-	  		}
-	  	}
-	  }
-  }
-  //sequentially escape variables from longest to shortest, then unescape
-  str = str.replace(new RegExp("("+vl+")","gi"), function(match,p1) {
-	 for (var i=0; i<vars.length;i++) {
-		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
-			return '@v'+i+'@';
+	str = str.replace(/,/g, "").replace(/^\s+/, '').replace(/\s+$/, '');
+	str = normalizemathunicode(str);
+	var foundaltcap = [];
+	var dispstr = str;
+	dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+	for (var i = 0; i < vars.length; i++) {
+		if (vars[i] == "varE") {
+			str = str.replace("E", "varE");
+			dispstr = dispstr.replace("E", "varE");
+		} else {
+			foundaltcap[i] = false;
+			for (var j = 0; j < vars.length; j++) {
+				if (i != j && vars[j].toLowerCase() == vars[i].toLowerCase() && vars[j] != vars[i]) {
+					foundaltcap[i] = true;
+					break;
+				}
+			}
 		}
-	 }});
-  str = str.replace(/@v(\d+)@/g, function(match,contents) {
-  	  return vars[contents];
-       });
-  dispstr = dispstr.replace(new RegExp("("+vl+")","gi"), function(match,p1) {
-	 for (var i=0; i<vars.length;i++) {
-		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
-			return '@v'+i+'@';
+	}
+	//sequentially escape variables from longest to shortest, then unescape
+	str = str.replace(new RegExp("(" + vl + ")", "gi"), function (match, p1) {
+		for (var i = 0; i < vars.length; i++) {
+			if (vars[i] == p1 || (!foundaltcap[i] && vars[i].toLowerCase() == p1.toLowerCase())) {
+				return '@v' + i + '@';
+			}
 		}
-	 }});
+	});
+	str = str.replace(/@v(\d+)@/g, function (match, contents) {
+		return vars[contents];
+	});
+	dispstr = dispstr.replace(new RegExp("(" + vl + ")", "gi"), function (match, p1) {
+		for (var i = 0; i < vars.length; i++) {
+			if (vars[i] == p1 || (!foundaltcap[i] && vars[i].toLowerCase() == p1.toLowerCase())) {
+				return '@v' + i + '@';
+			}
+		}
+	});
 	// fix display of /n!
 	dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
-  dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
-  	  return vars[contents];
-       });
+	dispstr = dispstr.replace(/@v(\d+)@/g, function (match, contents) {
+		return vars[contents];
+	});
 
-  //quote out multiletter variables
-  var varstoquote = new Array(); var regmod;
-  for (var i=0; i<vars.length; i++) {
-	  if (vars[i].length>1) {
-		  var isgreek = false;
-		  if (arraysearch(vars[i].toLowerCase(), greekletters)!=-1) {
-			  isgreek = true;
-		  }
-		  if (vars[i].match(/^\w+_\w+$/)) {
-		  	if (!foundaltcap[i]) {
-		  		regmod = "gi";
-		  	} else {
-		  		regmod = "g";
-		  	}
-		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
-		  	var varpts = new RegExp(/^(\w+)_(\w+)$/,regmod).exec(vars[i]);
-		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
-		  	dispstr = dispstr.replace(remvarparen, vars[i]);
-		  	str = str.replace(remvarparen, vars[i]);
-		  	if (varpts[1].length>1 && arraysearch(varpts[1].toLowerCase(), greekletters)==-1) {
-		  		varpts[1] = '"'+varpts[1]+'"';
-		  	}
-		  	if (varpts[2].length>1 && arraysearch(varpts[2].toLowerCase(), greekletters)==-1) {
-		  		varpts[2] = '"'+varpts[2]+'"';
-		  	}
-		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
-		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
-		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
-		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE") {
-			  varstoquote.push(vars[i]);
-		  }
-		  /*
-		  if (!isgreek && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
-		  	if (!foundaltcap[i]) {
-		  		regmod = "gi";
-		  	} else {
-		  		regmod = "g";
-		  	}
-		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
-		  	var varpts = new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod).exec(vars[i]);
-		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), '"'+varpts[1]+'"_"'+varpts[2]+'"');
-		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
-		  	str = str.replace(varpts[0], "repvars"+i);
-		  	vars[i] = "repvars"+i;
-		  }
-		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/) && vars[i]!="varE") {
-			  varstoquote.push(vars[i]);
-		  }
-		  */
-	  }
-  }
-  if (varstoquote.length>0) {
-	  vltq = varstoquote.join("|");
-	  var reg = new RegExp("("+vltq+")","g");
-	  dispstr = dispstr.replace(reg,"\"$1\"");
-  }
-  dispstr = dispstr.replace("varE","E");
-  dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
+	//quote out multiletter variables
+	var varstoquote = new Array(); var regmod;
+	for (var i = 0; i < vars.length; i++) {
+		if (vars[i].length > 1) {
+			var isgreek = false;
+			if (arraysearch(vars[i].toLowerCase(), greekletters) != -1) {
+				isgreek = true;
+			}
+			if (vars[i].match(/^\w+_\w+$/)) {
+				if (!foundaltcap[i]) {
+					regmod = "gi";
+				} else {
+					regmod = "g";
+				}
+				//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
+				var varpts = new RegExp(/^(\w+)_(\w+)$/, regmod).exec(vars[i]);
+				var remvarparen = new RegExp(varpts[1] + '_\\(' + varpts[2] + '\\)', regmod);
+				dispstr = dispstr.replace(remvarparen, vars[i]);
+				str = str.replace(remvarparen, vars[i]);
+				if (varpts[1].length > 1 && arraysearch(varpts[1].toLowerCase(), greekletters) == -1) {
+					varpts[1] = '"' + varpts[1] + '"';
+				}
+				if (varpts[2].length > 1 && arraysearch(varpts[2].toLowerCase(), greekletters) == -1) {
+					varpts[2] = '"' + varpts[2] + '"';
+				}
+				dispstr = dispstr.replace(new RegExp(varpts[0], regmod), varpts[1] + '_' + varpts[2]);
+				//this repvars was needed to workaround with mathjs confusion with subscripted variables
+				str = str.replace(new RegExp(varpts[0], "g"), "repvars" + i);
+				vars[i] = "repvars" + i;
+			} else if (!isgreek && vars[i] != "varE") {
+				varstoquote.push(vars[i]);
+			}
+			/*
+			if (!isgreek && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
+				  if (!foundaltcap[i]) {
+					  regmod = "gi";
+				  } else {
+					  regmod = "g";
+				  }
+				  //var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
+				  var varpts = new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod).exec(vars[i]);
+				  dispstr = dispstr.replace(new RegExp(varpts[0],regmod), '"'+varpts[1]+'"_"'+varpts[2]+'"');
+				  //this repvars was needed to workaround with mathjs confusion with subscripted variables
+				  str = str.replace(varpts[0], "repvars"+i);
+				  vars[i] = "repvars"+i;
+			}
+			if (!isgreek && !vars[i].match(/^(\w)_\d+$/) && vars[i]!="varE") {
+				varstoquote.push(vars[i]);
+			}
+			*/
+		}
+	}
+	if (varstoquote.length > 0) {
+		vltq = varstoquote.join("|");
+		var reg = new RegExp("(" + vltq + ")", "g");
+		dispstr = dispstr.replace(reg, "\"$1\"");
+	}
+	dispstr = dispstr.replace("varE", "E");
+	dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
 
-  //Correct rendering when f or g is a variable not a function
-  if (vl.match(/\bf\b/) && !fl.match(/\bf\b/)) {
-  	  dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
-  	  dispstr = dispstr.replace(/([^a-zA-Z])f\(/g, "$1f{::}(");
-  }
-  if (vl.match(/\bg\b/) && !fl.match(/\bg\b/)) {
-  	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
-  	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
-  }
-  return [str,dispstr,vars.join("|")];
+	//Correct rendering when f or g is a variable not a function
+	if (vl.match(/\bf\b/) && !fl.match(/\bf\b/)) {
+		dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
+		dispstr = dispstr.replace(/([^a-zA-Z])f\(/g, "$1f{::}(");
+	}
+	if (vl.match(/\bg\b/) && !fl.match(/\bg\b/)) {
+		dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
+		dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
+	}
+	return [str, dispstr, vars.join("|")];
 }
 
 //preview button for numfunc type
-function AMpreview(inputId,outputId) {
-  var qn = inputId.slice(2);
-  var strprocess = AMnumfuncPrepVar(qn, document.getElementById(inputId).value);
-  var str = strprocess[0];
-  var dispstr = strprocess[1];
-  var vl = strprocess[2];
+function AMpreview(inputId, outputId) {
+	var qn = inputId.slice(2);
+	var strprocess = AMnumfuncPrepVar(qn, document.getElementById(inputId).value);
+	var str = strprocess[0];
+	var dispstr = strprocess[1];
+	var vl = strprocess[2];
 
-  //the following does a quick syntax check of the formula
+	//the following does a quick syntax check of the formula
 
-  var fl = flist[qn];
+	var fl = flist[qn];
 
-  ptlist = pts[qn].split(",");
-  var err = '';
-  var tstpt = 0; var res = NaN; var isnoteqn = false;
-  if (iseqn[qn]==1) {
-  	if (!str.match(/=/)) {isnoteqn = true;}
-  	else if (str.match(/=/g).length>1) {isnoteqn = true;}
-	str = str.replace(/(.*)=(.*)/,"$1-($2)");
-  } else {
-  	if (!str.match(/=/)) {isnoteqn = true;}
-  }
-  if (fl!='') {
-	  reg = new RegExp("("+fl+")\\(","g");
-	  str = str.replace(reg,"$1*sin($1+");
-  }
-  vars = vl.split('|');
+	ptlist = pts[qn].split(",");
+	var err = '';
+	var tstpt = 0; var res = NaN; var isnoteqn = false;
+	if (iseqn[qn] == 1) {
+		if (!str.match(/=/)) { isnoteqn = true; }
+		else if (str.match(/=/g).length > 1) { isnoteqn = true; }
+		str = str.replace(/(.*)=(.*)/, "$1-($2)");
+	} else {
+		if (!str.match(/=/)) { isnoteqn = true; }
+	}
+	if (fl != '') {
+		reg = new RegExp("(" + fl + ")\\(", "g");
+		str = str.replace(reg, "$1*sin($1+");
+	}
+	vars = vl.split('|');
 
-  var totesteqn = prepWithMath(mathjs(str,vl));
+	var totesteqn = prepWithMath(mathjs(str, vl));
 
-  while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
-	  var totest = '';
-	  testvals = ptlist[tstpt].split("~");
+	while (tstpt < ptlist.length && (isNaN(res) || res == "Infinity")) {
+		var totest = '';
+		testvals = ptlist[tstpt].split("~");
 
-	  for (var j=0; j<vars.length; j++) {
-		totest += "var " + vars[j] + "="+testvals[j]+";";
-	  }
-	  totest += totesteqn;
-	  err =_("syntax ok");
-	  try {
-	    var res = scopedeval(totest);
-	  } catch(e) {
-	    err = _("syntax error");
-	  }
-	  if (res=="synerr") {
-	  	  err = _("syntax error");
-	  }
-	  tstpt++;
-  }
+		for (var j = 0; j < vars.length; j++) {
+			totest += "var " + vars[j] + "=" + testvals[j] + ";";
+		}
+		totest += totesteqn;
+		err = _("syntax ok");
+		try {
+			var res = scopedeval(totest);
+		} catch (e) {
+			err = _("syntax error");
+		}
+		if (res == "synerr") {
+			err = _("syntax error");
+		}
+		tstpt++;
+	}
 
-  var formaterr = syntaxcheckexpr(str,"",vl);
-  if (isNaN(res) || res=="Infinity") {
-  	  err = _("syntax error");
-  }
-  if (formaterr!='') {
-  	  if (err==_("syntax ok")) {
-  	  	  err += ". "+_("warning")+": "+formaterr;
-  	  } else {
-  	  	  err += ". "+formaterr;
-  	  }
-  }
+	var formaterr = syntaxcheckexpr(str, "", vl);
+	if (isNaN(res) || res == "Infinity") {
+		err = _("syntax error");
+	}
+	if (formaterr != '') {
+		if (err == _("syntax ok")) {
+			err += ". " + _("warning") + ": " + formaterr;
+		} else {
+			err += ". " + formaterr;
+		}
+	}
 
-  if (!onlyAscii.test(str)) {
-  	  err += ". "+_("Your answer contains an unrecognized symbol");
-  	  dispstr = dispstr.replace(/[^\u0000-\u007f]/g, '?');
-  }
+	if (!onlyAscii.test(str)) {
+		err += ". " + _("Your answer contains an unrecognized symbol");
+		dispstr = dispstr.replace(/[^\u0000-\u007f]/g, '?');
+	}
 
-  if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
-  else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
-  //outnode.appendChild(document.createTextNode(" " + err));
+	if (iseqn[qn] == 1 && isnoteqn) { err = _("syntax error: this is not an equation"); }
+	else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression"); }
+	//outnode.appendChild(document.createTextNode(" " + err));
 
-  if (dispstr=='"DNE"' || dispstr=="oo") {
-  	  err = _("syntax ok");
-  }
-  var qn = outputId.substr(1);
-  setupLivePreview(qn);
-  LivePreviews[qn].RenderNow('`'+dispstr+'` '+wrapAMnotice(err));
+	if (dispstr == '"DNE"' || dispstr == "oo") {
+		err = _("syntax ok");
+	}
+	var qn = outputId.substr(1);
+	setupLivePreview(qn);
+	LivePreviews[qn].RenderNow('`' + dispstr + '` ' + wrapAMnotice(err));
 
 }
 
 //preview for matrix type
-function AMmathpreview(inputId,outputId) {
+function AMmathpreview(inputId, outputId) {
 
-  var str = document.getElementById(inputId).value;
+	var str = document.getElementById(inputId).value;
 
-  var outnode = document.getElementById(outputId);
-  var n = outnode.childNodes.length;
-  for (var i=0; i<n; i++)
-    outnode.removeChild(outnode.firstChild);
-  //outnode.appendChild(AMparseMath(str));
-   outnode.appendChild(document.createTextNode('`'+str+'`'));
-    if (!noMathRender) {
-	rendermathnode(outnode);
-    }
+	var outnode = document.getElementById(outputId);
+	var n = outnode.childNodes.length;
+	for (var i = 0; i < n; i++)
+		outnode.removeChild(outnode.firstChild);
+	//outnode.appendChild(AMparseMath(str));
+	outnode.appendChild(document.createTextNode('`' + str + '`'));
+	if (!noMathRender) {
+		rendermathnode(outnode);
+	}
 
 }
 
-function singlevalsyntaxcheck(str,format) {
+function singlevalsyntaxcheck(str, format) {
 	if (str.match(/DNE/i)) {
-		 return '';
+		return '';
 	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
-		 return '';
-	} else if (format.indexOf('allowmixed')!=-1 &&
+		return '';
+	} else if (format.indexOf('allowmixed') != -1 &&
 		str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/)) {
 		//if allowmixed and it's mixed, stop checking
 		return '';
-	} else if (format.indexOf('fracordec')!=-1) {
-		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
-		  if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
-			return (_(" invalid entry format")+". ");
-		  }
-	} else if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
-		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
-		 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
-		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
-			return (_("not a valid fraction")+". ");
-		  }
-	} else if (format.indexOf('mixednumber')!=-1) {
-		  if (!str.match(/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/) && !str.match(/^\s*\-?\s*\d+\s*$/)) {
-			return (_("not a valid mixed number")+". ");
-		  }
-		  str = str.replace(/_/,' ');
-	} else if (format.indexOf('scinot')!=-1) {
-		  str = str.replace(/\s/g,'');
-		  str = str.replace(/(x|X|\u00D7)/,"xx");
-		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
-		  	if (format.indexOf('scinotordec')==-1) { //not scinotordec
-		  		return (_("not valid scientific notation")+". ");
-		  	} else if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
-		  		return (_("not valid decimal or scientific notation")+". ");
-		  	}
-		  }
-	} else if (format.indexOf('decimal')!=-1 && format.indexOf('nodecimal')==-1) {
+	} else if (format.indexOf('fracordec') != -1) {
+		str = str.replace(/([0-9])\s+([0-9])/g, "$1*$2").replace(/\s/g, '');
+		if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+			return (_(" invalid entry format") + ". ");
+		}
+	} else if (format.indexOf('fraction') != -1 || format.indexOf('reducedfraction') != -1) {
+		str = str.replace(/([0-9])\s+([0-9])/g, "$1*$2").replace(/\s/g, '');
+		// if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
+		if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
+			return (_("not a valid fraction") + ". ");
+		}
+	} else if (format.indexOf('mixednumber') != -1) {
+		if (!str.match(/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/) && !str.match(/^\s*\-?\s*\d+\s*$/)) {
+			return (_("not a valid mixed number") + ". ");
+		}
+		str = str.replace(/_/, ' ');
+	} else if (format.indexOf('scinot') != -1) {
+		str = str.replace(/\s/g, '');
+		str = str.replace(/(x|X|\u00D7)/, "xx");
+		if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
+			if (format.indexOf('scinotordec') == -1) { //not scinotordec
+				return (_("not valid scientific notation") + ". ");
+			} else if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+				return (_("not valid decimal or scientific notation") + ". ");
+			}
+		}
+	} else if (format.indexOf('decimal') != -1 && format.indexOf('nodecimal') == -1) {
 		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
-			return (_(" not a valid integer or decimal number")+". ");
+			return (_(" not a valid integer or decimal number") + ". ");
 		}
 	} else if (!onlyAscii.test(str)) {
-		return _("Your answer contains an unrecognized symbol")+". ";
-  	}
+		return _("Your answer contains an unrecognized symbol") + ". ";
+	}
 	return '';
 }
 
-function syntaxcheckexpr(str,format,vl) {
-	  var err = '';
-	  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/i)) {
-		  err += _("no trig functions allowed")+". ";
-	  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
-		  err += _("no decimals allowed")+". ";
-	  } else if (format.indexOf('mixed')==-1 &&
+function syntaxcheckexpr(str, format, vl) {
+	var err = '';
+	if (format.indexOf('notrig') != -1 && str.match(/(sin|cos|tan|cot|sec|csc)/i)) {
+		err += _("no trig functions allowed") + ". ";
+	} else if (format.indexOf('nodecimal') != -1 && str.indexOf('.') != -1) {
+		err += _("no decimals allowed") + ". ";
+	} else if (format.indexOf('mixed') == -1 &&
 		str.match(/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/)) {
-		err += _("mixed numbers are not allowed")+". ";
-	  }
-	  var Pdepth = 0; var Bdepth = 0; var Adepth = 0;
-	  for (var i=0; i<str.length; i++) {
-		if (str.charAt(i)=='(') {
+		err += _("mixed numbers are not allowed") + ". ";
+	}
+	var Pdepth = 0; var Bdepth = 0; var Adepth = 0;
+	for (var i = 0; i < str.length; i++) {
+		if (str.charAt(i) == '(') {
 			Pdepth++;
-		} else if (str.charAt(i)==')') {
+		} else if (str.charAt(i) == ')') {
 			Pdepth--;
-		} else if (str.charAt(i)=='[') {
+		} else if (str.charAt(i) == '[') {
 			Bdepth++;
-		} else if (str.charAt(i)==']') {
+		} else if (str.charAt(i) == ']') {
 			Bdepth--;
-		} else if (str.charAt(i)=='|') {
-			Adepth = 1-Adepth;
+		} else if (str.charAt(i) == '|') {
+			Adepth = 1 - Adepth;
 		}
-	  }
-	  if (Pdepth!=0 || Bdepth!=0) {
-		  err += " ("+_("unmatched parens")+"). ";
-	  }
-	  if (Adepth!=0) {
-	  	  err += " ("+_("unmatched absolute value bars")+"). ";
-	  }
-	  if (vl) {
-	  	  reg = new RegExp("(sqrt|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)", "i");
-	  } else {
-	  	  reg = new RegExp("(sqrt|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)", "i");
-	  }
-	  errstuff = str.match(reg);
-	  if (errstuff!=null) {
-		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
-	  }
-	  if (vl) {
-	  	  reg = new RegExp("(repvars\\d+|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
-	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
-	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
-	  	  }
-	  }
-	  if ((str.match(/\|/g)||[]).length>2) {
-	  	  var regex = /\|.*?\|\s*(.|$)/g;
-	  	  while (match = regex.exec(str)) {
-	  	  	if (match[1]!="" && match[1].match(/[^+\-\*\/\^\)]/)) {
-	  	  		err += _(" You may want to use abs(x) instead of |x| for absolute values to avoid ambiguity")+". ";
-	  	  		break;
-	  	  	}
-	  	  }
-	  }
-	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
-	  	  err += _(" Do not use the percent symbol, %")+". ";
-	  }
-	  return err;
+	}
+	if (Pdepth != 0 || Bdepth != 0) {
+		err += " (" + _("unmatched parens") + "). ";
+	}
+	if (Adepth != 0) {
+		err += " (" + _("unmatched absolute value bars") + "). ";
+	}
+	if (vl) {
+		reg = new RegExp("(sqrt|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(" + vl + "|\\d+)", "i");
+	} else {
+		reg = new RegExp("(sqrt|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)", "i");
+	}
+	errstuff = str.match(reg);
+	if (errstuff != null) {
+		err += "[" + _("use function notation") + " - " + _("use $1 instead of $2", errstuff[1] + "(" + errstuff[2] + ")", errstuff[0]) + "]. ";
+	}
+	if (vl) {
+		reg = new RegExp("(repvars\\d+|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|" + vl + ")", "ig");
+		if (str.replace(reg, '').match(/[a-zA-Z]/)) {
+			err += _(" Check your variables - you might be using an incorrect one") + ". ";
+		}
+	}
+	if ((str.match(/\|/g) || []).length > 2) {
+		var regex = /\|.*?\|\s*(.|$)/g;
+		while (match = regex.exec(str)) {
+			if (match[1] != "" && match[1].match(/[^+\-\*\/\^\)]/)) {
+				err += _(" You may want to use abs(x) instead of |x| for absolute values to avoid ambiguity") + ". ";
+				break;
+			}
+		}
+	}
+	if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
+		err += _(" Do not use the percent symbol, %") + ". ";
+	}
+	return err;
 }
 
-var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
+var greekletters = ['alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega', 'tau'];
 var calctoproc = {};
 var intcalctoproc = {};
 var calcformat = {};
-var functoproc ={};
+var functoproc = {};
 var matcalctoproc = {};
 var ntupletoproc = {};
 var complextoproc = {};
@@ -1259,11 +1261,11 @@ var flist = {};
 var pts = {};
 var iseqn = {};
 
-function doonsubmit(form,type2,skipconfirm) {
+function doonsubmit(form, type2, skipconfirm) {
 	for (var qn in callbackstack) {
 		callbackstack[qn](qn);
 	}
-	if (form!=null) {
+	if (form != null) {
 		if (form.className == 'submitted') {
 			alert(_("You have already submitted this page.  Please be patient while your submission is processed."));
 			form.className = "submitted2";
@@ -1274,10 +1276,10 @@ function doonsubmit(form,type2,skipconfirm) {
 			form.className = 'submitted';
 		}
 		if (!skipconfirm) {
-			if (type2 && $("input[name=saveforlater]").attr("data-clicked")==1) {
+			if (type2 && $("input[name=saveforlater]").attr("data-clicked") == 1) {
 				//var reallysubmit = confirmSubmit2(form);
 				var reallysubmit = true;
-				$("input[name=saveforlater]").attr("data-clicked",0);
+				$("input[name=saveforlater]").attr("data-clicked", 0);
 			} else {
 				var reallysubmit = confirmSubmit(form);
 			}
@@ -1292,104 +1294,104 @@ function doonsubmit(form,type2,skipconfirm) {
 
 	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
 		qn = parseInt(qn);
-		if (document.getElementById("tc"+qn)==null) {continue;}
-		fullstr = document.getElementById("tc"+qn).value;
+		if (document.getElementById("tc" + qn) == null) { continue; }
+		fullstr = document.getElementById("tc" + qn).value;
 		//fullstr = fullstr.replace(/^\s+/g,'').replace(/\s+$/,'');
-		if (calcformat[qn].indexOf('mixed')!=-1) {
-			fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+		if (calcformat[qn].indexOf('mixed') != -1) {
+			fullstr = fullstr.replace(/_/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '');
 		} else {
-			fullstr = fullstr.replace(/\s+/g,'');
+			fullstr = fullstr.replace(/\s+/g, '');
 		}
 		fullstr = normalizemathunicode(fullstr);
 		if (fullstr.match(/DNE/i)) {
-			  fullstr = fullstr.toUpperCase();
-		  } else {
-			  if (calcformat[qn].indexOf('inequality')!=-1) {
-				  fullstr = ineqtointerval(fullstr);
-			  }
-			  if (calcformat[qn].indexOf('list')!=-1) {
+			fullstr = fullstr.toUpperCase();
+		} else {
+			if (calcformat[qn].indexOf('inequality') != -1) {
+				fullstr = ineqtointerval(fullstr);
+			}
+			if (calcformat[qn].indexOf('list') != -1) {
 				var lastpos = 0; var strarr = [];
-				for (var pos = 1; pos<fullstr.length-1; pos++) {
-					if (fullstr.charAt(pos)==',') {
-						if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
-							&& (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')) {
-							strarr.push(fullstr.substring(lastpos,pos));
-							lastpos = pos+1;
+				for (var pos = 1; pos < fullstr.length - 1; pos++) {
+					if (fullstr.charAt(pos) == ',') {
+						if ((fullstr.charAt(pos - 1) == ')' || fullstr.charAt(pos - 1) == ']')
+							&& (fullstr.charAt(pos + 1) == '(' || fullstr.charAt(pos + 1) == '[')) {
+							strarr.push(fullstr.substring(lastpos, pos));
+							lastpos = pos + 1;
 						}
 					}
 				}
 				strarr.push(fullstr.substring(lastpos));
-			  } else {
-				  var strarr = fullstr.split(/\s*U\s*/i);
-			  }
-			  for (k=0; k<strarr.length; k++) {
-				  str = strarr[k];
-				  if (str.length>0 && str.match(/,/)) {
-					  sm = str.charAt(0);
-					  em = str.charAt(str.length-1);
-					  vals = str.substring(1,str.length-1);
-					  vals = vals.split(/,/);
-					  for (j=0; j<2; j++) {
-						  if (!vals[j].match(/oo$/) && !vals[j].match(/oo\W/)) {//(!vals[j].match(/oo/)) {
-							  var err = "";
+			} else {
+				var strarr = fullstr.split(/\s*U\s*/i);
+			}
+			for (k = 0; k < strarr.length; k++) {
+				str = strarr[k];
+				if (str.length > 0 && str.match(/,/)) {
+					sm = str.charAt(0);
+					em = str.charAt(str.length - 1);
+					vals = str.substring(1, str.length - 1);
+					vals = vals.split(/,/);
+					for (j = 0; j < 2; j++) {
+						if (!vals[j].match(/oo$/) && !vals[j].match(/oo\W/)) {//(!vals[j].match(/oo/)) {
+							var err = "";
 
-							  try {
-							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
-							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
-							  	  }
-							  	  var res = scopedmatheval(vals[j]);
-							  } catch(e) {
-							  	  err = "syntax incomplete";
-							  }
-							  if (!isNaN(res) && res!="Infinity" && res!=='') {
-								  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
-							  }
-						  }
-					  }
-					  strarr[k] = sm + vals[0] + ',' + vals[1] + em;
-				  }
-			 }
-			 if (calcformat[qn].indexOf('list')!=-1) {
-			 	 fullstr = strarr.join(',');
-			 } else {
-			 	 fullstr = strarr.join('U');
-			 }
-		  }
-		  document.getElementById("qn" + qn).value = fullstr;
+							try {
+								if (calcformat[qn].indexOf('mixed') != -1) {
+									vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
+								}
+								var res = scopedmatheval(vals[j]);
+							} catch (e) {
+								err = "syntax incomplete";
+							}
+							if (!isNaN(res) && res != "Infinity" && res !== '') {
+								vals[j] = (Math.abs(res) < 1e-15 ? 0 : res) + err;
+							}
+						}
+					}
+					strarr[k] = sm + vals[0] + ',' + vals[1] + em;
+				}
+			}
+			if (calcformat[qn].indexOf('list') != -1) {
+				fullstr = strarr.join(',');
+			} else {
+				fullstr = strarr.join('U');
+			}
+		}
+		document.getElementById("qn" + qn).value = fullstr;
 	}
 	for (var qn in calctoproc) { //i=0; i<calctoproc.length; i++) {
 		qn = parseInt(qn);
-		if (document.getElementById("tc"+qn)==null) {continue;}
-		str = document.getElementById("tc"+qn).value;
+		if (document.getElementById("tc" + qn) == null) { continue; }
+		str = document.getElementById("tc" + qn).value;
 		str = normalizemathunicode(str);
-		str = str.replace(/=/,'');
+		str = str.replace(/=/, '');
 
-		if (calcformat[qn].indexOf('list')!=-1) {
+		if (calcformat[qn].indexOf('list') != -1) {
 			strarr = str.split(/,/);
-		} else if (calcformat[qn].indexOf('set')!=-1) {
+		} else if (calcformat[qn].indexOf('set') != -1) {
 			if (!str.match(/^\s*{.*?}\s*$/)) {
 				continue;
 			} else {
-				strarr = str.replace(/^\s*{(.*?)}\s*$/,'$1').split(/,/);
+				strarr = str.replace(/^\s*{(.*?)}\s*$/, '$1').split(/,/);
 			}
 		} else {
 			var strarr = new Array();
 			strarr[0] = str;
 		}
-		for (var sc=0;sc<strarr.length;sc++) {
+		for (var sc = 0; sc < strarr.length; sc++) {
 			str = strarr[sc];
-			str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
-			str = str.replace(',','*NaN*'); //force eval error
+			str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g, "$1");
+			str = str.replace(',', '*NaN*'); //force eval error
 			//str = str.replace(/,/g,"");
-			if (calcformat[qn].indexOf('scinot')!=-1 || calcformat[qn].indexOf('allowxtimes')!=-1) {
-				str = str.replace(/(x|X|\u00D7)/,"*");
+			if (calcformat[qn].indexOf('scinot') != -1 || calcformat[qn].indexOf('allowxtimes') != -1) {
+				str = str.replace(/(x|X|\u00D7)/, "*");
 			}
 			if (str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
-				str = str.replace(/%/,'') + '/100';
+				str = str.replace(/%/, '') + '/100';
 			}
-			str = str.replace(/(\d+)\s*_\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
-			if (calcformat[qn].indexOf('mixed')!=-1) {
-				str = str.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+			str = str.replace(/(\d+)\s*_\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
+			if (calcformat[qn].indexOf('mixed') != -1) {
+				str = str.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
 			}
 			if (str.match(/^\s*$/)) {
 				var res = '';
@@ -1406,76 +1408,76 @@ function doonsubmit(form,type2,skipconfirm) {
 	}
 	for (var qn in matcalctoproc) {//i=0; i<matcalctoproc.length; i++) {
 		qn = parseInt(qn);
-		if (matsize[qn]!= null) {
-			if (document.getElementById("qn"+qn+"-0")==null) {continue;}
+		if (matsize[qn] != null) {
+			if (document.getElementById("qn" + qn + "-0") == null) { continue; }
 			msize = matsize[qn].split(",");
-			str = matrixcalc("qn"+qn,null,msize[0],msize[1]);
+			str = matrixcalc("qn" + qn, null, msize[0], msize[1]);
 		} else {
-			if (document.getElementById("tc"+qn)==null) {continue;}
-			str = matrixcalc("tc"+qn,null);
+			if (document.getElementById("tc" + qn) == null) { continue; }
+			str = matrixcalc("tc" + qn, null);
 		}
-		document.getElementById("qn" +  qn).value = str;
+		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in ntupletoproc) {//i=0; i<ntupletoproc.length; i++) {
 		qn = parseInt(qn);
-		if (document.getElementById("tc"+qn)==null) {continue;}
-		str = ntuplecalc("tc"+qn,null,calcformat[qn]);
+		if (document.getElementById("tc" + qn) == null) { continue; }
+		str = ntuplecalc("tc" + qn, null, calcformat[qn]);
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
 		qn = parseInt(qn);
-		if (document.getElementById("tc"+qn)==null) {continue;}
-		str = complexcalc("tc"+qn,null,calcformat[qn]);
+		if (document.getElementById("tc" + qn) == null) { continue; }
+		str = complexcalc("tc" + qn, null, calcformat[qn]);
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {
 		qn = parseInt(qn);
-		if (document.getElementById("tc"+qn)==null) {continue;}
-		str = document.getElementById("tc"+qn).value;
-		str = str.replace(/,/g,"");
+		if (document.getElementById("tc" + qn) == null) { continue; }
+		str = document.getElementById("tc" + qn).value;
+		str = str.replace(/,/g, "");
 		str = normalizemathunicode(str);
 		var strprocess = AMnumfuncPrepVar(qn, str);
 		str = strprocess[0];
 		varlist = strprocess[2];
 
-		if (iseqn[qn]==1) {
-			str = str.replace(/(.*)=(.*)/,"$1-($2)");
+		if (iseqn[qn] == 1) {
+			str = str.replace(/(.*)=(.*)/, "$1-($2)");
 		} else {
-			if (str.match("=")) {continue;}
+			if (str.match("=")) { continue; }
 		}
 		fl = flist[qn];
 
-		if (fl!='') {
-			reg = new RegExp("("+fl+")\\(","g");
-			str = str.replace(reg,"$1*sin($1+");
+		if (fl != '') {
+			reg = new RegExp("(" + fl + ")\\(", "g");
+			str = str.replace(reg, "$1*sin($1+");
 		}
 		vars = varlist.split("|");
 		var nh = document.getElementById("qn" + qn);
-		nh.value = mathjs(str,varlist);
+		nh.value = mathjs(str, varlist);
 		ptlist = pts[qn].split(",");
-		vals= new Array();
-		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
+		vals = new Array();
+		for (var fj = 0; fj < ptlist.length; fj++) { //for each set of inputs
 			inputs = ptlist[fj].split("~");
 			totest = '';
-			for (var fk=0; fk<inputs.length; fk++) {
+			for (var fk = 0; fk < inputs.length; fk++) {
 				//totest += varlist.charAt(k) + "=" + inputs[k] + ";";
 				totest += "var " + vars[fk] + "=" + inputs[fk] + ";";
 			}
-			if (nh.value=='') {
-				totest += Math.random()+";";
+			if (nh.value == '') {
+				totest += Math.random() + ";";
 			} else {
-				totest += prepWithMath(nh.value)+";";
+				totest += prepWithMath(nh.value) + ";";
 			}
 			try {
 				vals[fj] = scopedeval(totest);
 			} catch (e) {
 				vals[fj] = NaN;
 			}
-			if (vals[fj]=="synerr") {
+			if (vals[fj] == "synerr") {
 				vals[fj] = NaN;
 			}
 		}
-		document.getElementById("qn" + qn+"-vals").value = vals.join(",");
+		document.getElementById("qn" + qn + "-vals").value = vals.join(",");
 	}
 	return true;
 }
@@ -1483,7 +1485,7 @@ function doonsubmit(form,type2,skipconfirm) {
 function scopedeval(c) {
 	try {
 		return eval(c);
-	} catch(e) {
+	} catch (e) {
 		return "synerr";
 	}
 }
@@ -1494,34 +1496,34 @@ function scopedmatheval(c) {
 	}
 	try {
 		return eval(prepWithMath(mathjs(c)));
-	} catch(e) {
+	} catch (e) {
 		return '';
 	}
 }
 
-function arraysearch(needle,hay) {
-      for (var i=0; i<hay.length;i++) {
-            if (hay[i]==needle) {
-                  return i;
-            }
-      }
-      return -1;
-   }
-
-function toggleinlinebtn(n,p){ //n: target, p: click el
-	var btn = document.getElementById(p);
-	var el=document.getElementById(n);
-	if (el.style.display=="none") {
-		el.style.display="";
-		el.setAttribute("aria-hidden",false);
-		btn.setAttribute("aria-expanded",true);
-	} else {
-		el.style.display="none";
-		el.setAttribute("aria-hidden",true);
-		btn.setAttribute("aria-expanded",false);
+function arraysearch(needle, hay) {
+	for (var i = 0; i < hay.length; i++) {
+		if (hay[i] == needle) {
+			return i;
+		}
 	}
-	var k=btn.innerHTML;
-	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
+	return -1;
+}
+
+function toggleinlinebtn(n, p) { //n: target, p: click el
+	var btn = document.getElementById(p);
+	var el = document.getElementById(n);
+	if (el.style.display == "none") {
+		el.style.display = "";
+		el.setAttribute("aria-hidden", false);
+		btn.setAttribute("aria-expanded", true);
+	} else {
+		el.style.display = "none";
+		el.setAttribute("aria-hidden", true);
+		btn.setAttribute("aria-expanded", false);
+	}
+	var k = btn.innerHTML;
+	btn.innerHTML = k.match(/\[\+\]/) ? k.replace(/\[\+\]/, '[-]') : k.replace(/\[\-\]/, '[+]');
 
 }
 //triggered by blur, this saves the one question without scoring
@@ -1529,25 +1531,25 @@ var backgsavetimer = null;
 function assessbackgsave() {
 	var el = this;
 	window.clearTimeout(backgsavetimer);
-	backgsavetimer = window.setTimeout(function() {
-			doassessbackgsave(el);
+	backgsavetimer = window.setTimeout(function () {
+		doassessbackgsave(el);
 	}, 500);
 }
 function doassessbackgsave(el) {
 	var m = $(el).attr("name").match(/^(qs|qn|tc)(\d+)/);
 	if (m !== null && !!window.FormData) {
-		var qn = m[2]*1;
-		if (qn>=1000) {
-			qn = Math.floor(qn/1000 + .001)-1;
+		var qn = m[2] * 1;
+		if (qn >= 1000) {
+			qn = Math.floor(qn / 1000 + .001) - 1;
 		}
-		if (typeof tinyMCE != "undefined") {tinyMCE.triggerSave();}
+		if (typeof tinyMCE != "undefined") { tinyMCE.triggerSave(); }
 		doonsubmit();
 		var tosubFormData = new FormData();
-		var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
-		$("input,select,textarea").each(function(i,el) {
+		var regex = new RegExp("^(qn|tc|qs)(" + qn + "\\b|" + (qn + 1) + "\\d{3})");
+		$("input,select,textarea").each(function (i, el) {
 			if (el.name.match(regex)) {
-				if ((el.type!='radio' && el.type!='checkbox') || el.checked) {
-					if (el.type=='file') {
+				if ((el.type != 'radio' && el.type != 'checkbox') || el.checked) {
+					if (el.type == 'file') {
 						tosubFormData.append(el.name, el.files[0]);
 					} else {
 						tosubFormData.append(el.name, el.value);
@@ -1555,70 +1557,70 @@ function doassessbackgsave(el) {
 				}
 			}
 		});
-		tosubFormData.append("backgroundsaveforlater",1);
-		tosubFormData.append("tosaveqn",qn);
+		tosubFormData.append("backgroundsaveforlater", 1);
+		tosubFormData.append("tosaveqn", qn);
 		tosubFormData.append("asidverify", document.getElementById("asidverify").value);
 		tosubFormData.append("disptime", document.getElementById("disptime").value);
 		tosubFormData.append("isreview", document.getElementById("isreview").value);
 		$.ajax({
-			type:"POST",
-			url: window.location.origin+window.location.pathname,
+			type: "POST",
+			url: window.location.origin + window.location.pathname,
 			data: tosubFormData,
 			contentType: false,
 			processData: false,
 			qn: qn
-		}).done(function(msg){
-			if (assessFormIsDirty.indexOf(this.qn*1)!=-1) {
-		    	    assessFormIsDirty.splice(assessFormIsDirty.indexOf(this.qn*1),1);
-		    	}
+		}).done(function (msg) {
+			if (assessFormIsDirty.indexOf(this.qn * 1) != -1) {
+				assessFormIsDirty.splice(assessFormIsDirty.indexOf(this.qn * 1), 1);
+			}
 			//console.log(msg);
 		});
 	}
 }
 //this submits one question for grading, in Embedded display
-function assessbackgsubmit(qn,noticetgt) {
+function assessbackgsubmit(qn, noticetgt) {
 	qn = parseInt(qn);
-	if (!confirmSubmit($("#embedqwrapper"+qn)[0])) {
+	if (!confirmSubmit($("#embedqwrapper" + qn)[0])) {
 		return false;
 	}
-	if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
+	if (typeof tinyMCE != 'undefined') { tinyMCE.triggerSave(); }
 	doonsubmit();
 	var params = {};
-	var useFormData = !! window.FormData;
+	var useFormData = !!window.FormData;
 	if (useFormData) {
 		var tosubFormData = new FormData();
 	}
 
 	var els = new Array();
 	var tags = document.getElementsByTagName("input");
-	for (var i=0;i<tags.length;i++) {
+	for (var i = 0; i < tags.length; i++) {
 		els.push(tags[i]);
 	}
 	var tags = document.getElementsByTagName("select");
-	for (var i=0;i<tags.length;i++) {
+	for (var i = 0; i < tags.length; i++) {
 		els.push(tags[i]);
 	}
 	var tags = document.getElementsByTagName("textarea");
-	for (var i=0;i<tags.length;i++) {
+	for (var i = 0; i < tags.length; i++) {
 		els.push(tags[i]);
 	}
 	if (qn != null) {
-		var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
+		var regex = new RegExp("^(qn|tc|qs)(" + qn + "\\b|" + (qn + 1) + "\\d{3})");
 	} else {
 		var regex = new RegExp("^(qn|tc|qs)");
 	}
 
-	for (var i=0;i<els.length;i++) {
+	for (var i = 0; i < els.length; i++) {
 		if (els[i].name.match(regex)) {
-			if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
+			if ((els[i].type != 'radio' && els[i].type != 'checkbox') || els[i].checked) {
 				if (useFormData) {
-					if (els[i].type=='file') {
+					if (els[i].type == 'file') {
 						tosubFormData.append(els[i].name, els[i].files[0]);
 					} else {
 						tosubFormData.append(els[i].name, els[i].value);
 					}
 				} else {
-					if (els[i].type=='file') {
+					if (els[i].type == 'file') {
 						alert("File upload submissions are not supported by this browser");
 					} else {
 						params[els[i].name] = els[i].value;
@@ -1630,10 +1632,10 @@ function assessbackgsubmit(qn,noticetgt) {
 	if (qn !== null) {
 		if (useFormData) {
 			tosubFormData.append('toscore', qn);
-			tosubFormData.append('verattempts', document.getElementById("verattempts"+qn).value);
+			tosubFormData.append('verattempts', document.getElementById("verattempts" + qn).value);
 		} else {
 			params['toscore'] = qn;
-			params['verattempts'] = document.getElementById("verattempts"+qn).value;
+			params['verattempts'] = document.getElementById("verattempts" + qn).value;
 		}
 	} else {
 		if (useFormData) {
@@ -1655,7 +1657,7 @@ function assessbackgsubmit(qn,noticetgt) {
 	var options = {
 		type: "POST",
 		url: assesspostbackurl,
-		data: useFormData?tosubFormData:params,
+		data: useFormData ? tosubFormData : params,
 		dataType: "text",
 		qn: qn,
 		noticetgt: noticetgt
@@ -1664,95 +1666,95 @@ function assessbackgsubmit(qn,noticetgt) {
 		options.contentType = false;
 		options.processData = false;
 	}
-	$.ajax(options).done(function(msg) {
+	$.ajax(options).done(function (msg) {
 		if (this.noticetgt != null) {
-		    document.getElementById(this.noticetgt).innerHTML = "";
+			document.getElementById(this.noticetgt).innerHTML = "";
 		}
 		if (this.qn !== null) {
-		    var qn = this.qn;
-		    var scripts = new Array();         // Array which will store the script's code
-		    var resptxt = msg;
-		    // Strip out tags
-		    while(resptxt.indexOf("<script") > -1 || resptxt.indexOf("</script") > -1) {
-			    var s = resptxt.indexOf("<script");
-			    var s_e = resptxt.indexOf(">", s);
-			    var e = resptxt.indexOf("</script", s);
-			    var e_e = resptxt.indexOf(">", e);
+			var qn = this.qn;
+			var scripts = new Array();         // Array which will store the script's code
+			var resptxt = msg;
+			// Strip out tags
+			while (resptxt.indexOf("<script") > -1 || resptxt.indexOf("</script") > -1) {
+				var s = resptxt.indexOf("<script");
+				var s_e = resptxt.indexOf(">", s);
+				var e = resptxt.indexOf("</script", s);
+				var e_e = resptxt.indexOf(">", e);
 
-			    // Add to scripts array
-			    scripts.push(resptxt.substring(s_e+1, e));
-			    // Strip from strcode
-			    resptxt = resptxt.substring(0, s) + resptxt.substring(e_e+1);
-		    }
+				// Add to scripts array
+				scripts.push(resptxt.substring(s_e + 1, e));
+				// Strip from strcode
+				resptxt = resptxt.substring(0, s) + resptxt.substring(e_e + 1);
+			}
 
 
-		    document.getElementById("embedqwrapper"+qn).innerHTML = resptxt;
-		    if (usingASCIIMath) {
-			    rendermathnode( document.getElementById("embedqwrapper"+qn));
-		    }
-		    if (usingASCIISvg) {
-			    setTimeout("drawPics()",100);
-		    }
-		    if (usingTinymceEditor) {
-			    initeditor("textareas","mceEditor");
-		    }
+			document.getElementById("embedqwrapper" + qn).innerHTML = resptxt;
+			if (usingASCIIMath) {
+				rendermathnode(document.getElementById("embedqwrapper" + qn));
+			}
+			if (usingASCIISvg) {
+				setTimeout("drawPics()", 100);
+			}
+			if (usingTinymceEditor) {
+				initeditor("textareas", "mceEditor");
+			}
 
-		    // Loop through every script collected and eval it
-		    initstack.length = 0;
-		    for(var i=0; i<scripts.length; i++) {
-			    try {
-				    if (k=scripts[i].match(/canvases\[(\d+)\]/)) {
-					if (typeof G_vmlCanvasManager != 'undefined') {
-						scripts[i] = scripts[i] + 'G_vmlCanvasManager.initElement(document.getElementById("canvas'+k[1]+'"));';
+			// Loop through every script collected and eval it
+			initstack.length = 0;
+			for (var i = 0; i < scripts.length; i++) {
+				try {
+					if (k = scripts[i].match(/canvases\[(\d+)\]/)) {
+						if (typeof G_vmlCanvasManager != 'undefined') {
+							scripts[i] = scripts[i] + 'G_vmlCanvasManager.initElement(document.getElementById("canvas' + k[1] + '"));';
+						}
+						scripts[i] = scripts[i] + "imathasDraw.initCanvases(" + k[1] + ");";
 					}
-					scripts[i] = scripts[i] + "imathasDraw.initCanvases("+k[1]+");";
-				    }
-				    eval(scripts[i]);
-			    }
-			    catch(ex) {
-				    // do what you want here when a script fails
-			    }
-		    }
-		    for (var i=0; i<initstack.length; i++) {
-		    	    var foo = initstack[i]();
-		    }
-
-				var qnlen = (qn+1).toString().length;
-				for (i in LivePreviews) {
-					if (i==qn || (i>999 && i.toString().substr(0,qnlen)==qn+1)) {
-						LivePreviews[i].Init();
-					}
+					eval(scripts[i]);
 				}
-		    /*
-		    if (LivePreviews.hasOwnProperty(qn)) {
-		    	 LivePreviews[qn].Init();
-		    }
-				*/
-		    $(window).trigger("ImathasEmbedReload", [qn]);
-		    if (assessFormIsDirty.indexOf(qn*1)!=-1) {
-		    	    assessFormIsDirty.splice(assessFormIsDirty.indexOf(qn*1),1);
-		    }
-		    $("#embedqwrapper"+qn).find("input,textarea").on("change", trackDirty);
+				catch (ex) {
+					// do what you want here when a script fails
+				}
+			}
+			for (var i = 0; i < initstack.length; i++) {
+				var foo = initstack[i]();
+			}
 
-		    var pagescroll = 0;
-		    if(typeof window.pageYOffset!= 'undefined'){
-			//most browsers
-			pagescroll = window.pageYOffset;
-		    }
-		    else{
-			var B= document.body; //IE 'quirks'
-			var D= document.documentElement; //IE with doctype
-			D= (D.clientHeight)? D: B;
-			pagescroll = D.scrollTop;
-		    }
-		    var elpos = findPos(document.getElementById("embedqwrapper"+qn))[1];
-		    if (pagescroll > elpos) {
-		    	    setTimeout(function () {window.scroll(0,elpos);}, 150);
-		    }
+			var qnlen = (qn + 1).toString().length;
+			for (i in LivePreviews) {
+				if (i == qn || (i > 999 && i.toString().substr(0, qnlen) == qn + 1)) {
+					LivePreviews[i].Init();
+				}
+			}
+			/*
+			if (LivePreviews.hasOwnProperty(qn)) {
+				 LivePreviews[qn].Init();
+			}
+				*/
+			$(window).trigger("ImathasEmbedReload", [qn]);
+			if (assessFormIsDirty.indexOf(qn * 1) != -1) {
+				assessFormIsDirty.splice(assessFormIsDirty.indexOf(qn * 1), 1);
+			}
+			$("#embedqwrapper" + qn).find("input,textarea").on("change", trackDirty);
+
+			var pagescroll = 0;
+			if (typeof window.pageYOffset != 'undefined') {
+				//most browsers
+				pagescroll = window.pageYOffset;
+			}
+			else {
+				var B = document.body; //IE 'quirks'
+				var D = document.documentElement; //IE with doctype
+				D = (D.clientHeight) ? D : B;
+				pagescroll = D.scrollTop;
+			}
+			var elpos = findPos(document.getElementById("embedqwrapper" + qn))[1];
+			if (pagescroll > elpos) {
+				setTimeout(function () { window.scroll(0, elpos); }, 150);
+			}
 		}
-	}).fail(function(msg) {
+	}).fail(function (msg) {
 		if (this.noticetgt != null) {
-		    document.getElementById(this.noticetgt).innerHTML = _("Submission Error");
+			document.getElementById(this.noticetgt).innerHTML = _("Submission Error");
 		}
 	});
 
@@ -1760,17 +1762,17 @@ function assessbackgsubmit(qn,noticetgt) {
 }
 
 function embedEnterHandler(el) {
-	$("#"+el+" input[type=text][name^=qn]").off("keydown.embedenterhandler")
-	  .on("keydown.embedenterhandler", function(e) {
-		if (e.which==13) {
-			e.preventDefault();
-			var id = parseInt($(this).closest(".embedqwrapper").attr("id").substr(13));
-			assessbackgsubmit(id, "submitnotice"+id);
-		}
-	});
+	$("#" + el + " input[type=text][name^=qn]").off("keydown.embedenterhandler")
+		.on("keydown.embedenterhandler", function (e) {
+			if (e.which == 13) {
+				e.preventDefault();
+				var id = parseInt($(this).closest(".embedqwrapper").attr("id").substr(13));
+				assessbackgsubmit(id, "submitnotice" + id);
+			}
+		});
 }
-$(window).on("ImathasEmbedReload", function(e, qn) {
-	embedEnterHandler("embedqwrapper"+qn);
+$(window).on("ImathasEmbedReload", function (e, qn) {
+	embedEnterHandler("embedqwrapper" + qn);
 });
 
 /*******************************************************
@@ -1799,8 +1801,7 @@ email to joekepley at yahoo (dot) com
 
 *******************************************************/
 
-function AutoSuggest(elem, suggestions)
-{
+function AutoSuggest(elem, suggestions) {
 
 	//The 'me' variable allow you to access the AutoSuggest object
 	//from the elem's event handlers defined below.
@@ -1841,11 +1842,10 @@ function AutoSuggest(elem, suggestions)
 	//The browsers' own autocomplete feature can be problematic, since it will
 	//be making suggestions from the users' past input.
 	//Setting this attribute should turn it off.
-	elem.setAttribute("autocomplete","off");
+	elem.setAttribute("autocomplete", "off");
 
 	//We need to be able to reference the elem by id. If it doesn't have an id, set one.
-	if(!elem.id)
-	{
+	if (!elem.id) {
 		var id = "autosuggest" + AutoSuggestIdCounter;
 		AutoSuggestIdCounter++;
 
@@ -1859,40 +1859,36 @@ function AutoSuggest(elem, suggestions)
 	Esc key = get rid of the autosuggest dropdown
 	Up/down arrows = Move the highlight up and down in the suggestions.
 	********************************************************/
-	elem.onkeydown = function(ev)
-	{
+	elem.onkeydown = function (ev) {
 		var key = me.getKeyCode(ev);
 
-		switch(key)
-		{
+		switch (key) {
 			case TAB:
-			me.useSuggestion("tab");
-			break;
+				me.useSuggestion("tab");
+				break;
 
 			case ENTER:
-			me.useSuggestion("enter");
-			return false;
-			break;
+				me.useSuggestion("enter");
+				return false;
+				break;
 
 			case ESC:
-			me.hideDiv();
-			break;
+				me.hideDiv();
+				break;
 
 			case KEYUP:
-			if (me.highlighted > 0)
-			{
-				me.highlighted--;
-			}
-			me.changeHighlight(key);
-			break;
+				if (me.highlighted > 0) {
+					me.highlighted--;
+				}
+				me.changeHighlight(key);
+				break;
 
 			case KEYDN:
-			if (me.highlighted < (me.eligible.length - 1))
-			{
-				me.highlighted++;
-			}
-			me.changeHighlight(key);
-			break;
+				if (me.highlighted < (me.eligible.length - 1)) {
+					me.highlighted++;
+				}
+				me.changeHighlight(key);
+				break;
 		}
 	};
 
@@ -1901,43 +1897,40 @@ function AutoSuggest(elem, suggestions)
 	If the text is of sufficient length, and has been changed,
 	then display a list of eligible suggestions.
 	********************************************************/
-	elem.onkeyup = function(ev)
-	{
+	elem.onkeyup = function (ev) {
 		var key = me.getKeyCode(ev);
-		switch(key)
-		{
-		//The control keys were already handled by onkeydown, so do nothing.
-		case TAB:
-		case ESC:
-		case KEYUP:
-		case KEYDN:
-			return;
-		default:
+		switch (key) {
+			//The control keys were already handled by onkeydown, so do nothing.
+			case TAB:
+			case ESC:
+			case KEYUP:
+			case KEYDN:
+				return;
+			default:
 
-			if (this.value.length > 1) //this.value != me.inputText &&
-			{
-				me.inputText = this.value;
-				me.getEligible();
-				if (me.eligible.length>0) {
-					me.highlighted = 0;
-				} else {
-					me.highlighted = -1;
+				if (this.value.length > 1) //this.value != me.inputText &&
+				{
+					me.inputText = this.value;
+					me.getEligible();
+					if (me.eligible.length > 0) {
+						me.highlighted = 0;
+					} else {
+						me.highlighted = -1;
+					}
+					me.createDiv();
+					me.positionDiv();
+					me.showDiv();
 				}
-				me.createDiv();
-				me.positionDiv();
-				me.showDiv();
-			}
-			else
-			{
-				me.hideDiv();
-				if (this.value.length==0) {
-					me.inputText = '';
+				else {
+					me.hideDiv();
+					if (this.value.length == 0) {
+						me.inputText = '';
+					}
 				}
-			}
 		}
 	};
-	elem.onblur = function(ev) {
-		setTimeout(me.hideDiv,100);
+	elem.onblur = function (ev) {
+		setTimeout(me.hideDiv, 100);
 	}
 
 
@@ -1946,10 +1939,8 @@ function AutoSuggest(elem, suggestions)
 	Insert the highlighted suggestion into the input box, and
 	remove the suggestion dropdown.
 	********************************************************/
-	this.useSuggestion = function(how)
-	{
-		if (this.highlighted > -1)
-		{
+	this.useSuggestion = function (how) {
+		if (this.highlighted > -1) {
 			this.elem.value = this.eligible[this.highlighted];
 			this.hideDiv();
 		} else {
@@ -1961,16 +1952,14 @@ function AutoSuggest(elem, suggestions)
 	/********************************************************
 	Display the dropdown. Pretty straightforward.
 	********************************************************/
-	this.showDiv = function()
-	{
+	this.showDiv = function () {
 		this.div.style.display = 'block';
 	};
 
 	/********************************************************
 	Hide the dropdown and clear any highlight.
 	********************************************************/
-	this.hideDiv = function()
-	{
+	this.hideDiv = function () {
 		me.div.style.display = 'none';
 		me.highlighted = -1;
 	};
@@ -1978,18 +1967,14 @@ function AutoSuggest(elem, suggestions)
 	/********************************************************
 	Modify the HTML in the dropdown to move the highlight.
 	********************************************************/
-	this.changeHighlight = function()
-	{
+	this.changeHighlight = function () {
 		var lis = this.div.getElementsByTagName('LI');
-		for (i in lis)
-		{
+		for (i in lis) {
 			var li = lis[i];
-			if (this.highlighted == i)
-			{
+			if (this.highlighted == i) {
 				li.className = "selected";
 			}
-			else
-			{
+			else {
 				li.className = "";
 			}
 
@@ -1999,8 +1984,7 @@ function AutoSuggest(elem, suggestions)
 	/********************************************************
 	Position the dropdown div below the input text field.
 	********************************************************/
-	this.positionDiv = function()
-	{
+	this.positionDiv = function () {
 		var el = this.elem;
 		var pos = findPos(el);
 		pos[1] += el.offsetHeight;
@@ -2012,54 +1996,47 @@ function AutoSuggest(elem, suggestions)
 	/********************************************************
 	Build the HTML for the dropdown div
 	********************************************************/
-	this.createDiv = function()
-	{
+	this.createDiv = function () {
 		var ul = document.createElement('ul');
 
 		//Create an array of LI's for the words.
-		for (i in this.eligible)
-		{
+		for (i in this.eligible) {
 			var word = this.eligible[i];
 
 			var li = document.createElement('li');
 			var a = document.createElement('a');
-			a.href="#";//javascript:false;";
-			a.onclick= function() {return false;}
+			a.href = "#";//javascript:false;";
+			a.onclick = function () { return false; }
 			a.innerHTML = word;
 			li.appendChild(a);
 
-			if (me.highlighted == i)
-			{
+			if (me.highlighted == i) {
 				li.className = "selected";
 			}
 
 			ul.appendChild(li);
 		}
 
-		this.div.replaceChild(ul,this.div.childNodes[0]);
+		this.div.replaceChild(ul, this.div.childNodes[0]);
 
 
 		/********************************************************
 		mouseover handler for the dropdown ul
 		move the highlighted suggestion with the mouse
 		********************************************************/
-		ul.onmouseover = function(ev)
-		{
+		ul.onmouseover = function (ev) {
 			//Walk up from target until you find the LI.
 			var target = me.getEventSource(ev);
-			while (target.parentNode && target.tagName.toUpperCase() != 'LI')
-			{
+			while (target.parentNode && target.tagName.toUpperCase() != 'LI') {
 				target = target.parentNode;
 			}
 
 			var lis = me.div.getElementsByTagName('LI');
 
 
-			for (i in lis)
-			{
+			for (i in lis) {
 				var li = lis[i];
-				if(li == target)
-				{
+				if (li == target) {
 					me.highlighted = i;
 					break;
 				}
@@ -2071,15 +2048,14 @@ function AutoSuggest(elem, suggestions)
 		click handler for the dropdown ul
 		insert the clicked suggestion into the input
 		********************************************************/
-		ul.onclick = function(ev)
-		{
+		ul.onclick = function (ev) {
 			me.useSuggestion("click");
 			me.hideDiv();
 			me.cancelEvent(ev);
 			return false;
 		};
 
-		this.div.className="suggestion_list";
+		this.div.className = "suggestion_list";
 		this.div.style.position = 'absolute';
 
 	};
@@ -2087,19 +2063,16 @@ function AutoSuggest(elem, suggestions)
 	/********************************************************
 	determine which of the suggestions matches the input
 	********************************************************/
-	this.getEligible = function()
-	{
+	this.getEligible = function () {
 		this.eligible = new Array();
 		var added = ',';
 		if (this.inputText.indexOf(" ") == -1) {
-			var bndreg = new RegExp("\\b"+this.inputText.toLowerCase());
-			for (i in this.suggestions)
-			{
+			var bndreg = new RegExp("\\b" + this.inputText.toLowerCase());
+			for (i in this.suggestions) {
 				var suggestion = this.suggestions[i];
-				if(suggestion.toLowerCase().match(bndreg))
-				{
-					this.eligible[this.eligible.length]=suggestion;
-					added += i+',';
+				if (suggestion.toLowerCase().match(bndreg)) {
+					this.eligible[this.eligible.length] = suggestion;
+					added += i + ',';
 				}
 			}
 		}
@@ -2118,13 +2091,12 @@ function AutoSuggest(elem, suggestions)
 	Helper function to determine the keycode pressed in a
 	browser-independent manner.
 	********************************************************/
-	this.getKeyCode = function(ev)
-	{
-		if(ev)			//Moz
+	this.getKeyCode = function (ev) {
+		if (ev)			//Moz
 		{
 			return ev.keyCode;
 		}
-		if(window.event)	//IE
+		if (window.event)	//IE
 		{
 			return window.event.keyCode;
 		}
@@ -2134,14 +2106,13 @@ function AutoSuggest(elem, suggestions)
 	Helper function to determine the event source element in a
 	browser-independent manner.
 	********************************************************/
-	this.getEventSource = function(ev)
-	{
-		if(ev)			//Moz
+	this.getEventSource = function (ev) {
+		if (ev)			//Moz
 		{
 			return ev.target;
 		}
 
-		if(window.event)	//IE
+		if (window.event)	//IE
 		{
 			return window.event.srcElement;
 		}
@@ -2152,14 +2123,13 @@ function AutoSuggest(elem, suggestions)
 	browser-independent manner.
 	(Returning false helps too).
 	********************************************************/
-	this.cancelEvent = function(ev)
-	{
-		if(ev)			//Moz
+	this.cancelEvent = function (ev) {
+		if (ev)			//Moz
 		{
 			ev.preventDefault();
 			ev.stopPropagation();
 		}
-		if(window.event)	//IE
+		if (window.event)	//IE
 		{
 			window.event.returnValue = false;
 		}
@@ -2178,11 +2148,11 @@ function editdebit(el) {
 	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && descr.hasClass("iscredit")) {
 		if (descr.is('select')) {
-			descr.css('margin-right',20);
+			descr.css('margin-right', 20);
 		} else {
-			descr.width(descr.width()+20);
+			descr.width(descr.width() + 20);
 		}
-		descr.css('padding-left',0);
+		descr.css('padding-left', 0);
 		descr.removeClass("iscredit");
 	}
 }
@@ -2191,25 +2161,25 @@ function editcredit(el) {
 	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && !descr.hasClass("iscredit")) {
 		if (descr.is('select')) {
-			descr.css('margin-right',0);
+			descr.css('margin-right', 0);
 		} else {
-			descr.width(descr.width()-20);
+			descr.width(descr.width() - 20);
 		}
-		descr.css('padding-left',20);
+		descr.css('padding-left', 20);
 		descr.addClass("iscredit");
 	}
 }
 function initcreditboxes() {
-	$('.creditbox').each(function(i, el) {
-		if (!isBlank(el.value) && $(el).css('padding-left')!=20) {
+	$('.creditbox').each(function (i, el) {
+		if (!isBlank(el.value) && $(el).css('padding-left') != 20) {
 			//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
 			var descr = $(el).closest('tr').find("input").first();
 			if (descr.is('select')) {
-				descr.css('margin-right',0);
+				descr.css('margin-right', 0);
 			} else {
-				descr.width(descr.width()-20);
+				descr.width(descr.width() - 20);
 			}
-			descr.css('padding-left',20);
+			descr.css('padding-left', 20);
 			descr.addClass("iscredit");
 		}
 	});
@@ -2218,54 +2188,54 @@ initstack.push(initcreditboxes);
 $(window).on("ImathasEmbedReload", initcreditboxes);
 
 function initqsclickchange() {
-	$('input[id^=qs][value=spec]').each(function(i,qsel) {
+	$('input[id^=qs][value=spec]').each(function (i, qsel) {
 		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
-		 .on('keyup.qsclickchange', function(e) {
-			if (e.keyCode != 8 && e.keyCode != 46) {
-				$(qsel).prop("checked",true);
-			}
-		 });
+			.on('keyup.qsclickchange', function (e) {
+				if (e.keyCode != 8 && e.keyCode != 46) {
+					$(qsel).prop("checked", true);
+				}
+			});
 	});
 }
 $(window).on("ImathasEmbedReload", initqsclickchange);
 initstack.push(initqsclickchange);
 
 function initShowAnswer() {
-	$("input.sabtn + span.hidden").attr("aria-hidden",true);
-	$("input.sabtn").each(function() {
+	$("input.sabtn + span.hidden").attr("aria-hidden", true);
+	$("input.sabtn").each(function () {
 		var idnext = $(this).siblings("span:first-of-type").attr("id");
-		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
-		  .off("click.sashow").on("click.sashow", function() {
+		$(this).attr("aria-expanded", false).attr("aria-controls", idnext)
+			.off("click.sashow").on("click.sashow", function () {
 				if ($(this).attr("aria-expanded") == 'true') {
-					$(this).attr("aria-expanded",false)
-				  	.siblings("span:first-of-type")
-						.attr("aria-hidden",true)
+					$(this).attr("aria-expanded", false)
+						.siblings("span:first-of-type")
+						.attr("aria-hidden", true)
 						.addClass("hidden");
 				} else {
-					$(this).attr("aria-expanded",true)
-				  	.siblings("span:first-of-type")
-						.attr("aria-hidden",false)
+					$(this).attr("aria-expanded", true)
+						.siblings("span:first-of-type")
+						.attr("aria-hidden", false)
 						.removeClass("hidden");
 				}
-		});
+			});
 	});
-	$("input.dsbtn + div.hidden").attr("aria-hidden",true);
-	$("input.dsbtn").each(function() {
+	$("input.dsbtn + div.hidden").attr("aria-hidden", true);
+	$("input.dsbtn").each(function () {
 		var idnext = $(this).siblings("div:first-of-type").attr("id");
-		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
-		  .off("click.sashow").on("click.sashow", function() {
+		$(this).attr("aria-expanded", false).attr("aria-controls", idnext)
+			.off("click.sashow").on("click.sashow", function () {
 				if ($(this).attr("aria-expanded") == 'true') {
-					$(this).attr("aria-expanded",false)
-				  	.siblings("div:first-of-type")
-						.attr("aria-hidden",true)
+					$(this).attr("aria-expanded", false)
+						.siblings("div:first-of-type")
+						.attr("aria-hidden", true)
 						.addClass("hidden");
 				} else {
-					$(this).attr("aria-expanded",true)
-				  	.siblings("div:first-of-type")
-						.attr("aria-hidden",false)
+					$(this).attr("aria-expanded", true)
+						.siblings("div:first-of-type")
+						.attr("aria-hidden", false)
 						.removeClass("hidden");
 				}
-		});
+			});
 	});
 }
 $(window).on("ImathasEmbedReload", initShowAnswer);
@@ -2274,7 +2244,7 @@ initstack.push(initShowAnswer);
 function assessmentTimer(duration, timelimitkickout) {
 	var start = Date.now(), remaining, hours, minutes, seconds, countdowntimer, timestr;
 	function updatetimer() {
-		remaining = duration - Math.floor((Date.now() - start)/1000);
+		remaining = duration - Math.floor((Date.now() - start) / 1000);
 		if (remaining <= 0) {
 			remaining = 0;
 			clearInterval(countdowntimer);
@@ -2282,83 +2252,83 @@ function assessmentTimer(duration, timelimitkickout) {
 				document.getElementById('timelimitholder').className = "noticetext";
 				//document.getElementById('timelimitholder').style.color = "#f00";
 				document.getElementById('timelimitholder').innerHTML = _('Time limit expired - submitting now');
-				document.getElementById('timelimitholder').style.fontSize="300%";
+				document.getElementById('timelimitholder').style.fontSize = "300%";
 				if (document.getElementById("qform") == null) {
-					setTimeout("window.location.href='"+imasroot+"/assessment/showtest.php?action=skip&superdone=true'",2000);
+					setTimeout("window.location.href='" + imasroot + "/assessment/showtest.php?action=skip&superdone=true'", 2000);
 					return;
 				} else {
 					var theform = document.getElementById("qform");
 					var action = theform.getAttribute("action");
-					theform.setAttribute("action",action+'&superdone=true');
-					if (doonsubmit(theform,true,true)) { setTimeout('document.getElementById("qform").submit()',2000);}
+					theform.setAttribute("action", action + '&superdone=true');
+					if (doonsubmit(theform, true, true)) { setTimeout('document.getElementById("qform").submit()', 2000); }
 				}
 				return 0;
 			} else {
 				alert(_('Time Limit has elapsed'));
 			}
 		} // end remaining <= 0
-		seconds = Math.floor((remaining)%60);
-		minutes = Math.floor((remaining/60)%60);
-		hours = Math.floor(remaining/3600);
-		if (hours==0 && minutes < 5) {document.getElementById("timeremaining").className="noticetext";}
-		if (hours==0 && minutes==0 && seconds <= 5) {document.getElementById("timeremaining").style.fontSize="150%";}
-		timestr = ((hours>0)?hours+":":"") + ((hours>0 && minutes<10)?"0":"") + minutes+":" + (seconds<10?"0":"")+seconds;
+		seconds = Math.floor((remaining) % 60);
+		minutes = Math.floor((remaining / 60) % 60);
+		hours = Math.floor(remaining / 3600);
+		if (hours == 0 && minutes < 5) { document.getElementById("timeremaining").className = "noticetext"; }
+		if (hours == 0 && minutes == 0 && seconds <= 5) { document.getElementById("timeremaining").style.fontSize = "150%"; }
+		timestr = ((hours > 0) ? hours + ":" : "") + ((hours > 0 && minutes < 10) ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 		document.getElementById("timeremaining").innerHTML = timestr;
 	}
 	countdowntimer = setInterval(updatetimer, 1000);
-	$(document).ready(function() {
+	$(document).ready(function () {
 		var s = $("#timerwrap");
 		var pos = s.position();
-		$(window).scroll(function() {
-		   var windowpos = $(window).scrollTop();
-		   if (windowpos >= pos.top) {
-		     s.addClass("sticky");
-		   } else {
-		     s.removeClass("sticky");
-		   }
-		 });
+		$(window).scroll(function () {
+			var windowpos = $(window).scrollTop();
+			if (windowpos >= pos.top) {
+				s.addClass("sticky");
+			} else {
+				s.removeClass("sticky");
+			}
+		});
 	});
 }
 function toggletimer() {
-	if ($("#timerhide").text()=="[x]") {
+	if ($("#timerhide").text() == "[x]") {
 		$("#timercontent").hide();
-		$("#timerhide").text("["+_("Show Timer")+"]");
-		$("#timerhide").attr("title","["+_("Show Timer")+"]");
+		$("#timerhide").text("[" + _("Show Timer") + "]");
+		$("#timerhide").attr("title", "[" + _("Show Timer") + "]");
 	} else {
 		$("#timercontent").show();
 		$("#timerhide").text("[x]");
-		$("#timerhide").attr("title",_("Hide Timer"));
+		$("#timerhide").attr("title", _("Hide Timer"));
 	}
 }
 function toggleintroshow(n) {
-      var link = document.getElementById("introtoggle"+n);
-      var content = document.getElementById("intropiece"+n);
-      if (link.innerHTML.match("Hide")) {
-	   link.innerHTML = link.innerHTML.replace("Hide","Show");
-	   $(link).attr("aria-expanded",false);
-	   content.style.display = "none";
-	   $(content).attr("aria-hidden",true).attr("aria-expanded",false);
-      } else {
-	   link.innerHTML = link.innerHTML.replace("Show","Hide");
-	   $(link).attr("aria-expanded",true);
-	   content.style.display = "block";
-	   $(content).attr("aria-hidden",false).attr("aria-expanded",true);
-      }
+	var link = document.getElementById("introtoggle" + n);
+	var content = document.getElementById("intropiece" + n);
+	if (link.innerHTML.match("Hide")) {
+		link.innerHTML = link.innerHTML.replace("Hide", "Show");
+		$(link).attr("aria-expanded", false);
+		content.style.display = "none";
+		$(content).attr("aria-hidden", true).attr("aria-expanded", false);
+	} else {
+		link.innerHTML = link.innerHTML.replace("Show", "Hide");
+		$(link).attr("aria-expanded", true);
+		content.style.display = "block";
+		$(content).attr("aria-hidden", false).attr("aria-expanded", true);
+	}
 }
 function togglemainintroshow(el) {
 	if ($("#intro").hasClass("hidden")) {
-		$(el).html(_("Hide Intro/Instructions")).attr("aria-expanded",true);
-		$("#intro").removeClass("hidden").addClass("intro").attr("aria-hidden",false).attr("aria-expanded",true);
+		$(el).html(_("Hide Intro/Instructions")).attr("aria-expanded", true);
+		$("#intro").removeClass("hidden").addClass("intro").attr("aria-hidden", false).attr("aria-expanded", true);
 	} else {
-		$("#intro").addClass("hidden").attr("aria-hidden",true).attr("aria-expanded",false);
-		$(el).html(_("Show Intro/Instructions")).attr("aria-expanded",false);
+		$("#intro").addClass("hidden").attr("aria-hidden", true).attr("aria-expanded", false);
+		$(el).html(_("Show Intro/Instructions")).attr("aria-expanded", false);
 	}
 }
 
 function prepWithMath(str) {
 	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
-	str = str.replace(/\(E\)/g,'(Math.E)');
-	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
+	str = str.replace(/\(E\)/g, '(Math.E)');
+	str = str.replace(/\((PI|pi)\)/g, '(Math.PI)');
 	return str;
 }
 
@@ -2367,19 +2337,19 @@ function trackDirty() {
 	var name = $(this).attr("name");
 	var m = name.match(/^(qs|qn|tc)(\d+)/);
 	if (m !== null) {
-		var qn = m[2]*1;
-		if (qn>1000) {
-			qn = Math.floor(qn/1000 + .001)-1;
+		var qn = m[2] * 1;
+		if (qn > 1000) {
+			qn = Math.floor(qn / 1000 + .001) - 1;
 		}
-		if (assessFormIsDirty.indexOf(qn)==-1) {
+		if (assessFormIsDirty.indexOf(qn) == -1) {
 			assessFormIsDirty.push(qn);
 		}
 	}
 }
-$(function() {
+$(function () {
 	$("div.question").find("input,select,textarea").on("change", trackDirty);
-	$(window).on("beforeunload",function() {
-		if ($("form.submitted,form.submitted2").length==0 && assessFormIsDirty.length>0) {
+	$(window).on("beforeunload", function () {
+		if ($("form.submitted,form.submitted2").length == 0 && assessFormIsDirty.length > 0) {
 			return _('Are you sure you want to leave this assessment? You may have unsubmitted work');
 		}
 	});

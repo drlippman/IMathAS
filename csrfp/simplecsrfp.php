@@ -47,7 +47,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 				self::$config['failedAuthAction'] = 'log';
 			}
 
-			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js?v=022022";
+			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js?v=071322";
 
 			// Authorise the incoming request
 			if (isset($_SESSION[CSRFP_TOKEN])) {

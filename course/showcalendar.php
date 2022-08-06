@@ -35,6 +35,7 @@
 		$loadiconfont = true;
 	}
 
+    $pagetitle = _('Calendar');
 	require("../header.php");
 	if ($editingon) {
 	?>

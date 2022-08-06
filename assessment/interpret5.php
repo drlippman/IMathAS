@@ -5,7 +5,11 @@
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 
-$GLOBALS['mathfuncs'] = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+$GLOBALS['mathfuncs'] = array("sin","cos","tan","sec","csc","cot",
+ "sinh","cosh","tanh","sech","csch","coth",
+ "arcsin","arccos","arctan","arcsec","arccsc","arccot",
+ "arcsinh","arccosh","arctanh","arcsech","arccsch","arccoth",
+ "sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 if (!isset($GLOBALS['allowedmacros'])) {
     $GLOBALS['allowedmacros'] = $GLOBALS['mathfuncs'];
 }
@@ -412,6 +416,7 @@ function tokenize($str,$anstype,$countcnt) {
 					} else if ($out=='rand') {
 						$out = '$GLOBALS[\'RND\']->rand';
 					} else {
+                        $out = preg_replace('/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/', 'arc$2', $out);
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
 							echo sprintf(_('Eeek.. unallowed macro %s'), Sanitize::encodeStringForDisplay($out));
@@ -419,7 +424,7 @@ function tokenize($str,$anstype,$countcnt) {
 						}
 					}
 					//rewrite arctrig into atrig for PHP
-					$out = str_replace(array("arcsinh","arccosh","arctanh","arcsin","arccos","arctan"),array("asinh","acosh","atanh","safeasin","safeacos","atan"),$out);
+					$out = str_replace(array("arcsinh","arccosh","arctanh","arcsech","arccsch","arccoth","arcsin","arccos","arctan","arcsec","arccsc","arccot"),array("asinh","acosh","atanh","asech","acsch","acoth","safeasin","safeacos","atan","asec","acsc","acot"),$out);
 
 					//connect upcoming parens to function
 					$connecttolast = 2;

@@ -34,7 +34,7 @@ class NTupleScorePart implements ScorePart
         $defaultreltol = .0015;
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 
-            'answerformat', 'requiretimes', 'ansprompt', 'scoremethod', 'partweights'];
+            'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt', 'scoremethod', 'partweights'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -52,6 +52,8 @@ class NTupleScorePart implements ScorePart
         $answer = normalizemathunicode($answer);
         
         $ansformats = array_map('trim',explode(',',$answerformat));
+        $checkSameform = (in_array('sameform',$ansformats));
+
         $answer = str_replace(' ','',$answer);
         if (!is_array($partweights) && $partweights !== '') {
             $partweights = array_map('trim',explode(',',$partweights));
@@ -66,11 +68,11 @@ class NTupleScorePart implements ScorePart
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($anstype=='ntuple') {
-            $gaarr = $this->parseNtuple($givenans, false, true);
+            $gaarr = $this->parseNtuple($givenans, false, false);
         } else if ($anstype=='calcntuple') {
             // parse and evaluate
             if ($hasNumVal) {
-                $gaarr = $this->parseNtuple($givenansval, false, true);
+                $gaarr = $this->parseNtuple($givenansval, false, false);
                 $scorePartResult->setLastAnswerAsNumber($givenansval);
             } else {
                 $gaarr = $this->parseNtuple($givenans, false, true);
@@ -116,17 +118,30 @@ class NTupleScorePart implements ScorePart
 
             //parse the ntuple without evaluating
             $tocheck = $this->parseNtuple($givenans, false, false);
+            if ($checkSameform) {
+                $normalizedGivenAnswer = $tocheck;
+            }
 
             if ($answer != 'DNE' && $answer != 'oo') {
-                foreach($tocheck as $chkme) {
-                    foreach ($chkme['vals'] as $chkval) {
+                foreach($tocheck as $i=>$chkme) {
+                    foreach ($chkme['vals'] as $k=>$chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
                             if (!checkanswerformat($chkval,$ansformats)) {
-                                //perhaps should just elim bad answer rather than all?
-                                $scorePartResult->setRawScore(0);
-                                return $scorePartResult;
+                                // eliminate answer
+                                unset($gaarr[$i]);
+                                continue 2;
+                            }
+                            // generate normalized trees for sameform check
+                            if ($checkSameform) {
+                                $anfunc = parseMathQuiet($chkval);
+                                $normalizedGivenAnswer[$i]['vals'][$k] = $anfunc->normalizeTreeString();
                             }
                         }
+                    }
+                }
+                if (!empty($requiretimeslistpart)) {
+                    if (checkreqtimes($chkme['lb'].implode(',', $chkme['vals']).$chkme['rb'],$requiretimeslistpart)==0) {
+                        unset($gaarr[$i]);
                     }
                 }
             }
@@ -140,6 +155,19 @@ class NTupleScorePart implements ScorePart
         $answer = makepretty($answer);
         // parse and evaluate the answer, capturing "or"s
         $anarr = $this->parseNtuple($answer, true, true);
+        if ($checkSameform) {
+            $normalizedAnswer = $this->parseNtuple($answer, true, false);
+            foreach($normalizedAnswer as $ai=>$chkme) {
+                foreach ($chkme as $ao=>$aval) {
+                    foreach ($aval['vals'] as $k=>$chkval) {
+                        if ($chkval != 'oo' && $chkval != '-oo') {
+                            $anfunc = parseMathQuiet($chkval);
+                            $normalizedAnswer[$ai][$ao]['vals'][$k] = $anfunc->normalizeTreeString();
+                        }
+                    }
+                }
+            }
+        }
 
         if (in_array('anyorder', $ansformats)) {
             foreach ($anarr as $k=>$listans) {
@@ -199,7 +227,7 @@ class NTupleScorePart implements ScorePart
 
         foreach ($anarr as $ai=>$ansors) {
             $foundloc = -1;
-            foreach ($ansors as $answer) {  //each of the "or" options
+            foreach ($ansors as $ao=>$answer) {  //each of the "or" options
                 foreach ($gaarr as $j=>$givenans) {
 
                     if (isset($matchedgivenans[$j])) {continue;}
@@ -228,6 +256,10 @@ class NTupleScorePart implements ScorePart
                             $matchedparts[$i] = 1;
                             //is ok
                         }
+                    }
+
+                    if ($checkSameform && $normalizedAnswer[$ai][$ao] != $normalizedGivenAnswer[$j]) {
+                        continue;
                     }
 
                     if (count($matchedparts)==count($answer['vals'])) { //if totally correct
@@ -330,16 +362,16 @@ class NTupleScorePart implements ScorePart
     						$NCdepth--;
     						if ($NCdepth==0) {
     								$thisTuple = array(
-    										'lb' => $str[$lastcut],
-    										'rb' => $str[$i],
-    										'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
+                                        'lb' => $str[$lastcut],
+                                        'rb' => $str[$i],
+                                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
     								);
     								if ($do_eval) {
-    										for ($j=0; $j < count($thisTuple['vals']); $j++) {
-    												if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
-    														$thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
-    												}
-    										}
+                                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
+                                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
+                                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
+                                            }
+                                        }
     								}
     								if ($do_or && $inor) {
     										$ntuples[count($ntuples)-1][] = $thisTuple;

@@ -116,11 +116,12 @@ switch($_GET['action']) {
 			$otherusers[$row['id']] = $row['LastName'].', '.$row['FirstName'].(isset($row['name'])?' ('.$row['name'].')':'');
 		}
 
+        $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 		$stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=? and lastaccess>?");
 		$stm->execute(array($_GET['id'], time()-2*365*24*60*60));
 		$hasstu = false;
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (!isset($CFG['GEN']['enrollonnewinstructor']) || !in_array($row['courseid'], $CFG['GEN']['enrollonnewinstructor'])) {
+			if (!in_array($row['courseid'], $allInstrEnroll)) {
 				$hasstu = true;
 				break;
 			}
@@ -157,7 +158,7 @@ switch($_GET['action']) {
             $oldrights = 10;
             $oldspecialrights = 0;
 		} else {
-			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata,mfa FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
@@ -272,6 +273,10 @@ switch($_GET['action']) {
 		} else {
 			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ';
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
+            if ($myrights == 100 && $_GET['id'] != $userid && $line['mfa'] != '') {
+                echo '<span class=form>Disable 2-Factor Authentication?</span><span class=formright><input type=checkbox name="clearMFA" value="1"/></span>';
+                echo '<br class=form />';
+            }
 		}
 
 		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
@@ -925,13 +930,16 @@ switch($_GET['action']) {
 
 		if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
 			echo "<span class=form>",_("Allow other instructors to copy course items"),":</span><span class=formright>";
-			echo '<input type=radio name="copyrights" value="0" ';
+			echo '<input type=radio name="copyrights" value="-1" ';
+			if ($copyrights==-1) { echo "checked=1";}
+            echo '/> ',_('No'),'<br/>';
+            echo '<input type=radio name="copyrights" value="0" ';
 			if ($copyrights==0) { echo "checked=1";}
-			echo '/> ',_('Require enrollment key from everyone'),'<br/> <input type=radio name="copyrights" value="1" ';
+			echo '/> ',_('Yes, if I have given them the enrollment key'),'<br/> <input type=radio name="copyrights" value="1" ';
 			if ($copyrights==1) { echo "checked=1";}
-			echo '/> ',_('No key required for group members, require key from others'),' <br/><input type=radio name="copyrights" value="2" ';
+			echo '/> ',_('Yes: No key required for group members, require key from others'),' <br/><input type=radio name="copyrights" value="2" ';
 			if ($copyrights==2) { echo "checked=1";}
-			echo '/> ',_('No key required from anyone'),'</span><br class=form />';
+			echo '/> ',_('Yes: No key required from anyone'),'</span><br class=form />';
 		}
 
 		echo '</div>' ; //end Availability and Access grouping

@@ -32,11 +32,15 @@ require_once("includes/sanitize.php");
 		$init_session_start = true;
 		require_once("init_without_validate.php");
 		require_once("includes/newusercommon.php");
-		if ($_POST['challenge'] !== $_SESSION['challenge'] || !empty($_POST['hval'])) {
-			echo "Invalid submission";
-			exit;
-		}
+        if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
+            !empty($_POST['hval']) ||
+            !isset($_SESSION['newuserstart']) || (time() - $_SESSION['newuserstart']) < 5
+        ) {
+            echo "Invalid submission";
+            exit;
+        }
 		$_SESSION['challenge'] = '';
+        unset($_SESSION['newuserstart']);
 
 		$error = '';
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
@@ -269,8 +273,18 @@ require_once("includes/sanitize.php");
 			require("footer.php");
 		}
 	} else if (isset($_GET['action']) && $_GET['action']=="resetpw") {
+        $init_session_start = true;
 		require_once("init_without_validate.php");
 		if (isset($_POST['username'])) {
+            if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
+                !empty($_POST['terms']) ||
+                !isset($_SESSION['resetpwstart']) || (time() - $_SESSION['resetpwstart']) < 3
+            ) {
+                echo "Invalid submission";
+                exit;
+            }
+            $_SESSION['challenge'] = '';
+            unset($_SESSION['resetpwstart']);
 
 			$query = "SELECT id,email,rights,lastemail FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
@@ -367,7 +381,20 @@ require_once("includes/sanitize.php");
 			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code) . "&r=" . Sanitize::randomQueryStringParam());
 		}
 	} else if (isset($_GET['action']) && $_GET['action']=="lookupusername") {
+        $init_session_start = true;
 		require_once("init_without_validate.php");
+        if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
+            !empty($_POST['terms']) ||
+            !isset($_SESSION['lookupusernamestart']) || (time() - $_SESSION['lookupusernamestart']) < 3
+        ) {
+            echo ($_POST['challenge'] !== $_SESSION['challenge']) ? 'challenge bad' : 'challenge ok';
+            if ((time() - $_SESSION['lookupusernamestart']) < 5) { echo 'time blocked';}
+
+            echo "Invalid submission";
+            exit;
+        }
+        $_SESSION['challenge'] = '';
+        unset($_SESSION['lookupusernamestart']);
 
 		$query = "SELECT id,SID,lastaccess,lastemail FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
 		$stm = $DBH->prepare($query);

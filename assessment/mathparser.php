@@ -147,7 +147,7 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'funcvar,arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'funcvar,arcsinh,arccosh,arctanh,arcsech,arccsch,arccoth,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
     }
 
     //build regex's for matching symbols
@@ -205,10 +205,18 @@ class MathParser
         'precedence'=>8,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return ($a && $b);}],
+      '#x' => [
+          'precedence'=>7,
+          'assoc'=>'right',
+          'evalfunc'=>function($a,$b) {return ($a xor $b);}],
       '#o' => [
         'precedence'=>7,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      '#m' => [
+          'precedence'=>7,
+          'assoc'=>'right',
+          'evalfunc'=>function($a,$b) {return ($a && (!$b));}],
       '#i' => [
         'precedence'=>6,
         'assoc'=>'right',
@@ -245,17 +253,7 @@ class MathParser
    * @return array  Builds syntax tree in class, but also returns it
    */
   public function parse($str) {
-    // Rewrite sin^(-1) as arcsin
-    $str = str_replace(
-      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)",
-        "sec^-1","csc^-1","cot^-1","sec^(-1)","csc^(-1)","cot^(-1)",
-        "sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
-      array("arcsin","arccos","arctan","arcsin","arccos","arctan",
-        "arcsec","arccsc","arccot","arcsec","arccsc","arccot",
-        "arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
-      $str
-    );
-
+    $str = preg_replace('/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/', 'arc$2', $str);
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     // attempt to handle |x| as best as possible
     $str = preg_replace('/(?<!\|)\|([^\|]+?)\|(?!\|)/', 'abs($1)', $str);
@@ -460,8 +458,8 @@ class MathParser
               }
             } else if ($peek == '^') {
               // found something like sin^2; append power to symbol for now
-              if (preg_match('/^(-?\d+)/', substr($str,$n+2), $sub)) {
-                $tokens[count($tokens)-1]['symbol'] .= '^' . $sub[1];
+              if (preg_match('/^(\-?\d+|\((\-\d+)\))/', substr($str,$n+2), $sub)) {
+                $tokens[count($tokens)-1]['symbol'] .= '^' . (isset($sub[2]) ? $sub[2] : $sub[1]);
                 $n += strlen($sub[1]) + 1;
               }
             } else if ($nextSymbol == 'root') {
@@ -1408,7 +1406,37 @@ function acsc($x) {
   return asin($inv);
 }
 function acot($x) {
-  return M_PI/2 - atan($x);
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arccot");
+    }
+    return atan(1/$x);
+}
+function asech($x) {
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arcsech");
+    }
+    $inv = round(1/$x, 12);
+    if ($inv < 1) {
+        throw new MathParserException("Invalid input for arcsech");
+    }
+    return acosh($inv);
+}
+function acsch($x) {
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arccsch");
+    }
+    $inv = round(1/$x, 12);
+    return asinh($inv);
+}
+function acoth($x) {
+    if (abs($x)<1e-16) {
+        throw new MathParserException("Invalid input for arccoth");
+    }
+    $inv = round(1/$x, 12);
+    if ($inv < -1 || $inv > 1) {
+        throw new MathParserException("Invalid input for arccoth");
+    }
+    return atanh($inv);
 }
 function safeasin($x) {
   return asin(round($x,12));  

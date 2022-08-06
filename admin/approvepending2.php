@@ -121,11 +121,12 @@ if (!empty($newStatus)) {
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         
         // enroll in courses, if not already
-        if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+        if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
             $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
             $stm->execute([$instId]);
             $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-            $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+            $toEnroll = array_diff($allInstrEnroll, $existingEnroll);
             if (count($toEnroll) > 0) {
                 $valbits = array();
                 $valvals = array();

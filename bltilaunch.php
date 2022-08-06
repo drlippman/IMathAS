@@ -1707,6 +1707,7 @@ if ($_SESSION['lti_keytype']=='gc') {
 	$_SESSION['lti_launch_get']['cid'] = $linkparts[1];
 }
 
+$_SESSION['ltiuserid'] = $SESS['ltiuserid'];
 $_SESSION['userid'] = $userid;
 $_SESSION['time'] = $now;
 
@@ -2957,6 +2958,7 @@ if ($_SESSION['lti_keytype']=='cc-vf') {
 	$_SESSION['tzoffset'] = 0;
 }
 
+$_SESSION['ltiuserid'] = $SESS['ltiuserid'];
 $_SESSION['userid'] = $userid;
 $_SESSION['time'] = $now;
 
