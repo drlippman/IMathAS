@@ -191,7 +191,9 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
-                    <i>showResult</i>: If FALSE (default), each entry in the constructed truth table (beyond the atomic variables) will contain an answerbox [AB#]. If TRUE, the constructed truth table will be completed with T's and F's.<br />
+                    <i>showResult</i>: If FALSE (default), each entry in the constructed truth table (beyond the atomic variables) will contain an answerbox [AB#]. If TRUE, the constructed truth table will be completed with T's and F's.
+                       If 2, the truth table will be filled in, and [AB#] will be placed in the header for the expression(s).
+                       If 3, the truth table will be filled in, and a single [AB] will be placed in the header for hte expression.<br />
                     <i>showSteps</i>: If TRUE (default), the constructed truth table will have a column for each subexpression of <i>exp</i>. If FALSE only the atomic variables and <i>exp</i> will be included in the table.<br />
                     <i>offset</i>: Only applies when showResult is FALSE. Gives the index of the first answerbox to be contained in the truth table. For instance, if <i>offset</i>=3, then the first entry in the truth table will be '[AB3]'.<br />
             </tr>

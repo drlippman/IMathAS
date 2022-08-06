@@ -418,6 +418,8 @@ function logicsteps($exp){
 //      otherwise it will be filled with empty answerboxes. if showsteps=TRUE it will create a column for each preceding step to generate $exp.
 // Output: an HTML table. If showresult=FALSE then answerboxes ([AB#]) will be placed in each cell. 
 //      offset will offset the number within the answerbox (i.e. the table will start with [AB$offset] as the first answerbox)
+//      If showresults is 2, the truth table will be filled in, and [AB#] will be placed in the header for the expression(s).
+//      If showresults is 3, the truth table will be filled in, and a single [AB] will be placed in the header for hte expression.
 //      If showsteps is true then a column will be made for each step to generate the entire expression.
 // Note: This will not change the value of anstypes, or questions. Use truthtableanswercount to get the total number of answerboxes used.
 function truthtable($exp, $showresult=FALSE,$showsteps=TRUE,$offset=0){
@@ -437,6 +439,9 @@ function truthtable($exp, $showresult=FALSE,$showsteps=TRUE,$offset=0){
     sort($vars);
     // Get the column entries
     $steps = $vars;
+    if ($showresult === 3) {
+        $showsteps = false;
+    }
     if(!$showsteps){
         $steps[] = logicPostfixMakePretty($exp);
     }
@@ -445,12 +450,20 @@ function truthtable($exp, $showresult=FALSE,$showsteps=TRUE,$offset=0){
     }
     // Table header
     $header = "<table class=logictable><tr>";
-    foreach($steps as $step){
-        $header = $header."<th>`".$step."`</th>";
-    }
-    $header = $header."</tr>";
     // $abCount determines the number value for each answerbox
     $abCount = $offset;
+
+    foreach($steps as $stepcnt => $step){
+        if ($showresult === 2 && $stepcnt >= count($vars)) {
+            $header = $header . '<th>[AB'.$abCount.']</th>';
+            $abCount++;
+        } else if ($showresult === 3 && $stepcnt == count($vars)) {
+            $header = $header . '<th>[AB]</th>';
+        } else {
+            $header = $header."<th>`".$step."`</th>";
+        }
+    }
+    $header = $header."</tr>";
     // Build the rows
     for($r = 0; $r < pow(2,count($vars)); $r++){
         $row[$r] = "<tr>";
