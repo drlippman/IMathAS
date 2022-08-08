@@ -417,6 +417,8 @@ class QuestionHtmlGenerator
             // Generate answer boxes. (multipart question)
             foreach ($anstypes as $atIdx => $anstype) {
                 if (!empty($skipAnswerboxGeneration[$atIdx])) {
+                  $answerbox[$atIdx] = "";
+                  $previewloc[$atIdx] = "";
                   continue;
                 }
                 $questionColor = ($quesData['qtype'] == "multipart")
