@@ -599,6 +599,9 @@ class QuestionHtmlGenerator
                         if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
                             $_thisIsReady = false;
                             $doShowDetailedSoln = false;
+                            for ($siidx=$iidx; $siidx < $kidx; $siidx++) {
+                                $doShowAnswerParts[$siidx] = false;
+                            }
                             break;
                         } else if ($iidx < $kidx) {
                             $doShowAnswerParts[$iidx] = false;
@@ -609,6 +612,7 @@ class QuestionHtmlGenerator
                 }
                 $doShowAnswer = false; // disable automatic display of answers
             }
+            print_r($doShowAnswerParts);
         }
 
         /*
