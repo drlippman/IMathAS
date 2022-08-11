@@ -499,6 +499,10 @@ var myMQeditor = (function($) {
       if (calcformat.match(/allowplusminus/)) {
         baselayout.tabs[6].tabcontent[0].contents[17] = {l:'\\pm', pr:'<span class="mq-binary-operator">&plusmn;</span>'};
       }
+      if (calcformat.match(/inequality/)) {
+        baselayout.tabs[6].tabcontent[0].contents[8].s = 0.5;
+        baselayout.tabs[6].tabcontent[0].contents.splice(9,0,  {l:'\\ne', s:0.5, pr:'<span class="mq-binary-operator">&ne;</span>'});
+      }
     } else {
       baselayout = $.extend(true, [], underLayout3);
       if (calcformat.match(/\bdecimal/)) {
