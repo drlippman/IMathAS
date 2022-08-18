@@ -3027,7 +3027,7 @@ function conversionWeight() {
 
 //  WAMAP Question ID: 201697
 
-// 2022-xx-xx ver 26 - planning to add a make fraction converion function
+// 2022-xx-xx ver 26 - TODO: add a make fraction converion function
 //
 // 2022-08-17 ver 25 - Fixed Typos
 //
