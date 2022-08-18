@@ -124,6 +124,7 @@ require_once("includes/sanitize.php");
 			$stm->execute(array(':email'=>$_POST['email']));
 			if ($stm->rowCount()>0) {
 				$nologo = true;
+                $_SESSION['newuserstart'] = time() - 10;
 				require("header.php");
 				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
 				echo '<input type="hidden" name="SID" value="'.Sanitize::encodeStringForDisplay($_POST['SID']).'" />';

@@ -36,7 +36,7 @@ $uid = $userid;
 $newQuestion = Sanitize::onlyInt($_POST['newquestion']);
 $qn = $newQuestion - 1;
 $newState = Sanitize::onlyInt($_POST['newstate']);
-$timelimit = Sanitize::onlyInt($_POST['timelimit']);
+$timelimit = Sanitize::onlyInt($_POST['timelimit'] ?? 0);
 
 // this page is only for teachers
 if (!$isteacher) {

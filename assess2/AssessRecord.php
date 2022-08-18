@@ -1536,7 +1536,7 @@ class AssessRecord
    */
   public function getLastRawResult($qn) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    $aver = $this->getAssessVer($ver);
+    $aver = $this->getAssessVer('last');
     $question_versions = $aver['questions'][$qn]['question_versions'];
     $curq = $question_versions[count($question_versions) - 1];
     $rawscores = array();

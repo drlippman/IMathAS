@@ -209,6 +209,17 @@ function conditionalColor(table,type,low,high) {
 					} else {
 						v = tds[i].textContent;
 					}
+
+                    if (low==-2) {
+                        if (v.match(/\d/) && !v.match(/NC/)) {
+                            tds[i].style.backgroundColor = "#99ff99";
+                        } else if (v.match(/\d/)) {
+                            tds[i].style.backgroundColor = "#ff9999";
+                        } else {
+                            tds[i].style.backgroundColor = "#ffffff";
+                        }
+                        continue;
+                    }
 					if (k = v.match(/([\d\.]+)%/)) {
 						perc = parseFloat(k[1]);
 					} else if (v.match(/\d+\/\d+\/\d+/)) {

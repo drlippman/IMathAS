@@ -34,6 +34,7 @@ $showSID = (($rmode&2)==2);
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
+$placeinhead = "";
 $hasInclude = 0;
 if (!isset($CFG['GEN']['allowinstraddstus'])) {
 	$CFG['GEN']['allowinstraddstus'] = true;

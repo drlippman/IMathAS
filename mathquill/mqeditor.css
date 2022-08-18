@@ -70,7 +70,7 @@
   /*font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;*/
 }
 .mqed-closebtn {
-    padding: 2px 8px !important;
+    padding: 2px 6px !important;
     border: 0;
 }
 .mqed-btn.mq-math-mode {
@@ -110,7 +110,7 @@
 }
 .mqed-tabrow > .mqed-btn-cont > .mqed-btn {
   position: static;
-  padding: 4px 8px;
+  padding: 4px 6px;
   margin-left: 4px;
 }
 .mqed-tab.mqed-activetab {
