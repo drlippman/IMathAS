@@ -936,19 +936,20 @@ class QuestionHtmlGenerator
 
             foreach ($hints as $iidx => $hintpart) {
                 $lastkey = max(array_keys($hintpart));
-
+                $hintloc[$iidx] = '';
                 if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
                     $usenum = 10000;
                     $allcorrect = true;
+                    $maxatt = 0;
                     $showfor = array_map('intval', $hintpart[$lastkey][1]);
                     foreach ($showfor as $subpn) {
                         if (!isset($partattemptn[$subpn])) {
                             $partattemptn[$subpn] = 0;
                         }
-                        if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$subpn] == 1) {
-                           continue; // don't consider correct
+                        if (isset($scoreiscorrect[$thisq][$subpn]) && $scoreiscorrect[$thisq][$subpn] == 1) {
+                            continue; // don't consider correct
                         } else {
-                           $allcorrect = false;
+                            $allcorrect = false;
                         }
                         if ($partattemptn[$subpn] > $lastkey && $lastkey < $usenum) {
                             $usenum = $lastkey;
@@ -956,16 +957,21 @@ class QuestionHtmlGenerator
                             $usenum = $partattemptn[$subpn];
                         }
                     }
-                    if ($allcorrect || $usenum == 10000) { 
+                    if ($allcorrect) {
+                        $maxatt = min($partattemptn)-1;
+                        if ($maxatt > $lastkey) {
+                            $usenum = $lastkey;
+                        } else {
+                            $usenum = max($maxatt,0);
+                        }
+                    }
+                    if ($usenum == 10000) { 
                         continue;
                     }
                     if (is_array($hintpart[$usenum])) {
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
-                    if (!empty($scoreiscorrect[$thisq][$iidx])) {
-                        continue;
-                    }
                     if (!isset($partattemptn[$iidx])) {
                         $partattemptn[$iidx] = 0;
                     }
@@ -973,6 +979,9 @@ class QuestionHtmlGenerator
                         $usenum = $lastkey;
                     } else {
                         $usenum = $partattemptn[$iidx];
+                        if (!empty($scoreiscorrect[$thisq][$iidx]) && $scoreiscorrect[$thisq][$iidx]==1) {
+                            $usenum--;
+                        }
                     }
                 }
                 if (!empty($hintpart[$usenum])) {
@@ -1012,7 +1021,6 @@ class QuestionHtmlGenerator
                 }
             }
         }
-
         return $hintloc;
     }
 
