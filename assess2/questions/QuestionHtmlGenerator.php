@@ -987,16 +987,20 @@ class QuestionHtmlGenerator
                     }
                 }
             }
-        } else if (!isset($scoreiscorrect) || 
-            (!is_array($scoreiscorrect[$thisq]) && $scoreiscorrect[$thisq] != 1) ||
-            (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) != 1)
-        ) { //one hint for question
+        } else { //one hint for question
             if ($attemptn > $lastkey) {
                 $usenum = $lastkey;
             } else {
                 $usenum = $attemptn;
+                if (isset($scoreiscorrect) && ( 
+                    (!is_array($scoreiscorrect[$thisq]) && $scoreiscorrect[$thisq] == 1) ||
+                    (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) == 1)
+                )) {
+                    $usenum--;  // if correct, use prior hint
+                }
             }
-            if ($hints[$usenum] != '') {
+            
+            if (!empty($hints[$usenum])) {
                 if (strpos($hints[$usenum], '</div>') !== false) {
                     $hintloc = $hints[$usenum];
                 } else if (strpos($hints[$usenum], 'button"') !== false) {
