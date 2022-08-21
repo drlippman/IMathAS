@@ -929,6 +929,7 @@ class QuestionHtmlGenerator
         $hintloc = '';
 
         $lastkey = max(array_keys($hints));
+
         if ($qdata['qtype'] == "multipart" && is_array($hints[$lastkey])) { //individual part hints
             $hintloc = array();
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
@@ -986,7 +987,10 @@ class QuestionHtmlGenerator
                     }
                 }
             }
-        } else if (!isset($scoreiscorrect) || $scoreiscorrect[$thisq] != 1) { //one hint for question
+        } else if (!isset($scoreiscorrect) || 
+            (!is_array($scoreiscorrect[$thisq]) && $scoreiscorrect[$thisq] != 1) ||
+            (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) != 1)
+        ) { //one hint for question
             if ($attemptn > $lastkey) {
                 $usenum = $lastkey;
             } else {

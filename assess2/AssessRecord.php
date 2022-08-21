@@ -2242,7 +2242,11 @@ class AssessRecord
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
-      $maxpn = max(array_keys($curq['tries']));
+      if (isset($curq['answeights'])) {
+        $maxpn = count($curq['answeights']) - 1;
+      } else {
+        $maxpn = max(array_keys($curq['tries']));
+      }
       for ($pn = 0; $pn <= $maxpn; $pn++) {
         if (empty($curq['tries'][$pn])) {
           $scorenonzeroparts[$pn] = -1;
