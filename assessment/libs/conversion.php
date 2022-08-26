@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 23;
+	return 25;
 }
 
 global $allowedmacros;
@@ -402,8 +402,8 @@ function get_unit_weight_abbreviations() {
 
     // Metric
     $unitabbr["Kilogram"] = _("kg");
-    $unitabbr["Hectogram"] = _("hc");
-    $unitabbr["Dekagram"] = _("dac");
+    $unitabbr["Hectogram"] = _("hg");
+    $unitabbr["Dekagram"] = _("dag");
     $unitabbr["Gram"] = _("g");
     $unitabbr["Decigram"] = _("dg");
     $unitabbr["Centigram"] = _("cg");
@@ -894,7 +894,7 @@ function conversionAbbreviations() {
             $retval[1] = $unit["Centimeter"]." = ".$unitabbr["Centimeter"];
             $retval[2] = $unit["Decimeter"]." = ".$unitabbr["Decimeter"];
             $retval[3] = $unit["Meter"]." = ".$unitabbr["Meter"];
-            $retval[4] = $unit["Dekameter"]." = ".conversionUnits2ScreenReader1("",$unitabbr["Meter"],1,"n");
+            $retval[4] = $unit["Dekameter"]." = ".conversionUnits2ScreenReader1("",$unitabbr["Dekameter"],1,"n");
             $retval[5] = $unit["Hectometer"]." = ".$unitabbr["Hectometer"];
             $retval[6] = $unit["Kilometer"]." = ".$unitabbr["Kilometer"];
         } elseif($type=="Capacity"){
@@ -1362,7 +1362,7 @@ function conversionCapacity2() {
 		if($fullname==0) {
             $retval[0] = array("",1,$unitabbr["Kiloliter"],1000,$unitabbr["Liter"]);
             $retval[1] = array("",1,$unitabbr["Hectoliter"],100,$unitabbr["Liter"]);
-            $retval[2] = array("",1,conversionUnits2ScreenReader1("1 ",$unitabbr["Dekaliter"],1,"n"),10,$unitabbr["Liter"]);
+            $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekaliter"],1,"n"),10,$unitabbr["Liter"]);
             $retval[3] = array("",1,$unitabbr["Liter"],10,$unitabbr["Deciliter"]);
             $retval[4] = array("",1,$unitabbr["Liter"],100,$unitabbr["Centiliter"]);
             $retval[5] = array("",1,$unitabbr["Liter"],100,$unitabbr["Milliliter"]);
@@ -1837,7 +1837,7 @@ function conversionLength2() {
         if($fullname==0) {
             $retval[0] = array("",1,$unitabbr["Kilometer"],1000,$unitabbr["Meter"]);
             $retval[1] = array("",1,$unitabbr["Hectometer"],100,$unitabbr["Meter"]);
-            $retval[2] = array("",1,conversionUnits2ScreenReader1("1 ",$unitabbr["Dekameter"],1,"n"),10,$unitabbr["Meter"]);
+            $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekameter"],1,"n"),10,$unitabbr["Meter"]);
             $retval[3] = array("",1,$unitabbr["Meter"],10,$unitabbr["Decimeter"]);
             $retval[4] = array("",1,$unitabbr["Meter"],100,$unitabbr["Centimeter"]);
             $retval[5] = array("",1,$unitabbr["Meter"],1000,$unitabbr["Millimeter"]);
@@ -2541,7 +2541,7 @@ function conversionWeight2() {
         if($fullname==0) {
             $retval[0] = array("",1,$unitabbr["Kilogram"],1000,$unitabbr["Gram"]);
             $retval[1] = array("",1,$unitabbr["Hectogram"],100,$unitabbr["Gram"]);
-            $retval[2] = array("",1,conversionUnits2ScreenReader1("1 ",$unitabbr["Dekagram"],1,"n"),10,$unitabbr["Gram"]);
+            $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n"),10,$unitabbr["Gram"]);
             $retval[3] = array("",1,$unitabbr["Gram"],10,$unitabbr["Decigram"]);
             $retval[4] = array("",1,$unitabbr["Gram"],100,$unitabbr["Centigram"]);
             $retval[5] = array("",1,$unitabbr["Gram"],100,$unitabbr["Milligram"]);
@@ -2662,15 +2662,30 @@ function conversionArea() {
         $rounding = 2;
     }
 
+    // in the original version the sign and tick argument
+    // were reversed
     if ( count($args)>3 && !is_null($args[3]) ) {
-        $sign = verifyEqualSign($args[3]);
+        $args3input =  $args[3];
+        if ( count($args)>4 && !is_null($args[4]) ) {
+          $args4input =  $args[4];
+        } else {
+            $args4input = "";
+        }
+
+        // was args3input the tick argument and args4input the sign - if so switch
+        // should not be needed - but this wll prevent anyone that used this before
+        // the release from displaying about = signs (the default if the 3rd argument is not a = or ~)
+        if($args3input=="y" || $args3input=="n" || $args4input = "=" || $args4input = "~") {
+            $signinput = $args4input;
+            $tickinput = $args3input;
+        } else {
+            $signinput = $args3input;
+            $tickinput = $args4input;
+        }
+        $sign = verifyEqualSign($signinput);
+        $tick = verifyTickMarks($tickinput);
     } else {
         $sign = "=";
-    }
-
-    if ( count($args)>4 && !is_null($args[4]) ) {
-        $tick = verifyTickMarks($args[4]);
-    } else {
         $tick = "";
     }
 
@@ -2911,15 +2926,30 @@ function conversionVolume() {
         $rounding = 2;
     }
 
+    // in the original version the sign and tick argument
+    // were reversed
     if ( count($args)>3 && !is_null($args[3]) ) {
-        $sign = verifyEqualSign($args[3]);
+        $args3input =  $args[3];
+        if ( count($args)>4 && !is_null($args[4]) ) {
+            $args4input =  $args[4];
+        } else {
+            $args4input = "";
+        }
+
+        // was args3input the tick argument and args4input the sign - if so switch
+        // should not be needed - but this wll prevent anyone that used this before
+        // the release from displaying about = signs (the default if the 3rd argument is not a = or ~)
+        if($args3input=="y" || $args3input=="n" || $args4input = "=" || $args4input = "~") {
+            $signinput = $args4input;
+            $tickinput = $args3input;
+        } else {
+            $signinput = $args3input;
+            $tickinput = $args4input;
+        }
+        $sign = verifyEqualSign($signinput);
+        $tick = verifyTickMarks($tickinput);
     } else {
         $sign = "=";
-    }
-
-    if ( count($args)>4 && !is_null($args[4]) ) {
-        $tick = verifyTickMarks($args[4]);
-    } else {
         $tick = "";
     }
 
@@ -2995,12 +3025,17 @@ function conversionWeight() {
 
 }
 
+//  WAMAP Question ID: 201697
 
-
-// 2022-05-22 ver 23 - changed all string references to two arrays $unit and $unitabbr
-//  through
-// 2022-05-17
+// 2022-xx-xx ver 26 - planning to add a make fraction converion function
 //
+// 2022-08-17 ver 25 - Fixed Typos
+//
+// 2022-05-24 ver 24 - changed all string references to two arrays $unit and $unitabbr. Converted conversion functions to return
+//                     an array of values with the first value an array of conversion strings (equivalent to the original function)
+//  through            added checks in conversionAreaand conversionVolume for switched sign and tick arguments and corrected them (should not be needed)
+// 2022-05-17
+// 2022-05-16 ver 23 - has conversion_detectlanguage functions that wer eliminated as they interferred with gettext function
 // 2022-05-16 ver 22 - reworking conversion to add _() to all words in file so gettext can be run for a translation file
 // 2022-05-09 ver 21 - Converted to language detection with gettext _('') as a fallback.
 // 2022-05-04 ver 20 - Changed all spelling _('') to functions for easier maintance.
