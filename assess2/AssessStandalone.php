@@ -364,12 +364,19 @@ class AssessStandalone {
       $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
     }
 
-    return array(
+    $returnData = [
         'scores'=>$scores,
         'raw'=>$rawparts,
         'errors'=>$scoreResult['errors'],
         'allans'=>$allPartsAns
-    );
+    ];
+
+    if (isset($GLOBALS['CFG']['hooks']['assess2/assess_standalone'])) {
+        require_once($GLOBALS['CFG']['hooks']['assess2/assess_standalone']);
+        $returnData = onScoreQuestionReturn($returnData, $scoreResult);
+    }
+
+    return $returnData;
   }
 
   private function parseScripts($html) {
