@@ -153,6 +153,17 @@ function mbxfilter($str) {
 		return '<m>'.$mathexpcnt.'</m>';
 	  }, $str);
 
+    // store tags and attributes to avoid overwriting with $ent sub
+    $tags = [];
+    $tagcnt = 0;
+    $str = preg_replace_callback('/<[^\/].*?>/s', function($m) {
+        global $tags,$tagcnt;
+        $tagcnt++;
+        $tags[$tagcnt] = $m[0];
+        return '<t'.$tagcnt.'>';
+    }, $str);
+
+
 //convert entities that we don't want to disturb inside math
 	//?? What about &le; and &ge;?
 	$ent = array(
@@ -195,6 +206,12 @@ function mbxfilter($str) {
 	$str = html_entity_decode($str);
 	$str = str_replace('&','<ampersand />',$str);
 
+//restore tags
+    $str = preg_replace_callback('|<t(\d+)>|', function($m) {
+    global $tags;
+    return $tags[$m[1]];
+    }, $str);
+    
 //restore math
 	$str = preg_replace_callback('|<m>(\d+)</m>|', function($m) {
 		global $mathexp;
