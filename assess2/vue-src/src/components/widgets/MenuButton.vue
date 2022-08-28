@@ -113,7 +113,14 @@ export default {
       return !!this.$slots.default;
     },
     filteredOptions () {
-      return this.options.filter(a => (a !== null));
+      // convert to object to retain indices and filter out null
+      const out = {};
+      for (const i in this.options) {
+        if (this.options[i] !== null) {
+          out[i] = this.options[i];
+        }
+      }
+      return out;
     }
   },
   methods: {
