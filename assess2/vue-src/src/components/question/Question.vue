@@ -130,7 +130,8 @@ export default {
     return {
       work: '',
       lastWorkVal: '',
-      showWorkInput: false
+      showWorkInput: false,
+      loadingAttempted: false
     };
   },
   computed: {
@@ -243,10 +244,19 @@ export default {
   },
   methods: {
     loadQuestionIfNeeded (skiprender) {
-      if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
+      if (this.questionContentLoaded && !this.loadingAttempted) {
+        // if question content is loaded, mark it as loading attempted
+        this.loadingAttempted = this.questionContentLoaded;
+      }
+      if (!this.questionContentLoaded && !this.loadingAttempted &&
+        this.active && store.errorMsg === null
+      ) {
+        window.console.log('loading question ' + this.qn);
+        this.loadingAttempted = true;
         actions.loadQuestion(this.qn, false, false);
       } else if (this.questionContentLoaded && this.active &&
         !this.questionData.rendered && skiprender !== true) {
+        window.console.log('rendering question ' + this.qn);
         this.renderAndTrack();
       }
     },
