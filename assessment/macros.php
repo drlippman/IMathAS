@@ -5,7 +5,7 @@
 require_once(__DIR__ . '/../includes/Rand.php');
 $GLOBALS['RND'] = new Rand();
 
-array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth","nthlog",
+array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands",
  "randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand",
  "nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands",
@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples","comparenumberswithunits",
+ "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","intval");
 
 function mergearrays() {
@@ -372,13 +372,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
 			$path .= "line([$val,$thisymin],[$val,$thisymax]);";
-			$path .= "stroke=\"none\";strokedasharray=\"none\";";
-			if ($function[1]=='red' || $function[1]=='green') {
-				$path .= "fill=\"trans{$function[1]}\";";
-			} else {
-				$path .= "fill=\"transblue\";";
-			}
 			if ($isineq) {
+                $path .= "stroke=\"none\";strokedasharray=\"none\";";
+                if ($function[1]=='red' || $function[1]=='green') {
+                    $path .= "fill=\"trans{$function[1]}\";";
+                } else {
+                    $path .= "fill=\"transblue\";";
+                }
 				if ($ineqtype[0]=='<') {
 					$path .= "rect([$xxmin,$thisymin],[$val,$thisymax]);";
 					$alt .= "Shaded left";
@@ -781,7 +781,7 @@ function mergeplots($plota) {
 		} else {
             $plotb = preg_replace('/<span.*?<\/span>/','', $plotb);
             $newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
-			$plota = str_replace("' />", $newcmds."' />", $plota);
+			$plota = str_replace("' />", trim($newcmds)."' />", $plota);
 		}
 	}
 	return $plota;
@@ -2120,7 +2120,7 @@ function makescinot($n,$d=8,$f="x") {
 	if ($n==0) { return "0";}
 	$isneg = "";
 	if ($n<0) { $isneg = "-"; $n = abs($n);}
-	$exp = floor(log10($n));
+	$exp = floor(log10($n)+1e-12);
 	if ($d==-1) {
 		$mant = round($n/pow(10,$exp),8);
 	} else {
@@ -2332,7 +2332,7 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 		}
 		$out .= convertTri(round($dec),0);
 		$out .= ' '.$placevals[$cnt];
-		if ($dec!=1) {
+		if (round($dec)!=1) {
 			$out .= 's';
 		}
 
@@ -2428,8 +2428,8 @@ function fractowords($numer,$denom,$options='no') { //options can combine 'mixed
   }
 }
 
-$namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
-$namearray[1] = explode(',',"Adriana,Adrianna,Alejandra,Alexandra,Alexis,Alice,Alicia,Alma,Amanda,Amber,Amy,Andrea,Angela,Anna,April,Ariana,Ashley,Ashton,Autumn,Bianca,Bria,Brianna,Brittany,Brooke,Caitlyn,Carissa,Carolyn,Carrie,Cassandra,Catherine,Chasity,Chelsea,Chloe,Christy,Ciara,Claudia,Colleen,Courtney,Cristina,Crystal,Dana,Danielle,Delaney,Destiny,Diana,Elizabeth,Emily,Emma,Erica,Erin,Esmeralda,Gabrielle,Guadalupe,Haley,Hanna,Heather,Hillary,Holly,Jacqueline,Jamie,Jane,Jasmine,Jenna,Jennifer,Jessica,Julia,Karen,Karina,Karissa,Karla,Kathryn,Katie,Kayla,Kelly,Kelsey,Kendra,Kimberly,Kori,Kristen,Kristina,Krystal,Kylie,Laura,Lauren,Leah,Linda,Lindsey,Mackenzie,Madison,Maggie,Mariah,Marissa,Megan,Melissa,Meredith,Michelle,Mikayla,Miranda,Molly,Monique,Morgan,Naomi,Natalie,Natasha,Nicole,Nina,Noelle,Paige,Patricia,Rachael,Raquel,Rebecca,Renee,Riley,Rosa,Samantha,Sarah,Savannah,Shannon,Shantel,Sierra,Sonya,Sophia,Stacy,Stephanie,Summer,Sydney,Tatiana,Taylor,Tiana,Tiffany,Valerie,Vanessa,Victoria,Vivian,Wendy,Whitney,Zoe");
+$namearray[0] = ['Aaron','Aarón','Aarush','Abraham','Adam','Aden','Adewale','Adrian','Adriel','Agustín','Ahanu','Ahmed','Ahmod','Aidan','Aiden','Alan','Alang','Alejandro','Alex','Alexander','Alexei','Alexis','Alfonso','Alfredo','Alo','Alonso','Alonzo','Alphonso','Álvaro','Alvin','Amari','Amir','Anakin','Anderson','Andre','Andrei','Andres','Andrés','Andrew','Ángel','Angelo','Anthony','Antoine','Antonio','Arjun','Armando','Arno','Arturo','Arun','Asaad','Asher','Ashton','Atharv','Austin','Autry','Áxel','Ayden','Azarias','Bastián','Bautista','Ben','Benicio','Benjamin','Bill','Billy','Blake','Booker','Braden','Bradley','Brady','Brandon','Brayden','Brendan','Bret','Brian','Brody','Bruno','Bryan','Bryce','Bryson','Caden','Cai','Caleb','Calian','Calvin','Cameron','Canon','Carlos','Carlton','Carson','Carter','Casey','Cavanaugh','Cayden','Cesar','Chad','Chan','Chance','Charles','Chase','Cheick','Cheng','Chris','Christian','Christopher','CJ','Cody','Colan','Colby','Cole','Collin','Colton','Conner','Connor','Cooper','Corey','Cornell','Courri','Craig','Cristian','Curtis','Dajon','Dak','Dakota','Dale','Dalton','Damian','Damien','Daniel','Danny','Dante','Daran','Dario','Darius','Darnell','Darrell','Darryl','David','Daymond','Deandre','DeAndre','Deion','Demetrius','Denali','Derek','Deshawn','Devante','Devin','Devon','Devonte','Diego','Dion','Dmitry','Dominic','Dominique','Donald','Donnel','Donovan','Duan','Dustin','Dwayne','Dwight','Dylan','Edgar','Eduardo','Edward','Edwin','Eli','Elías','Elijah','Emanuel','Emiliano','Emilio','Emmanuel','Emmett','Enrique','Enzo','Eric','Erick','Erik','Ermias','Ervin','Esteban','Ethan','Evan','Facundo','Farrell','Farzad','Felipe','Fernando','Finn','Foluso','Forest','Francisco','Franco','Frank','Frederick','Furnell','Gabriel','Gael','Gage','Garlin','Garrett','Gavin','George','Gerardo','Giovanni','Gonzalo','Grant','Gregory','Guyton','Hakeem','Hampton','Hao','Harrison','Hayden','Hector','Henry','Herold','Hopi','Hu','Hudson','Hugo','Hunter','Ian','Ibrahim','Ibram','Ignacio','Iker','Isaac','Isaiah','Israel','Ivan','Izaak','Izan','Jabulani','Jace','Jack','Jackson','Jacob','Jacy','Jaden','Jahkil','Jaime','Jake','Jalen','Jamaal','Jamal','James','Jamison','Jared','Jason','Javier','Jay','Jayceon','Jayden','Jaylen','Jayson','Jeff','Jeffrey','Jeremiah','Jeremy','Jermaine','Jerome','Jerónimo','Jesse','Jessie','Jimmy','Joaquín','Joel','Joey','Johan','John','John Carlo','John Lloyd','John Mark','John Michael','John Paul','John Rey','Jon','Jonah','Jonathan','Jordan','Jorge','Jose','José','Joseph','Josh','Joshua','Josiah','Juan','Juan José','Juan Martín','Juan Pablo','Julian','Julián','Julio','Justice','Justin','Juwan','Kaden','Kai','Kaiden','Kaleb','Kareem','Karlus','Kayden','Keegan','Kehinde','Kele','Ken','Kendrick','Kenneth','Kenny','Kerel','Kevin','Keyon','Kim','King','Kirk','Kosumi','Krishna','Kwame','Kwan','Kyle','Kyrie','Lamont','Landon','LeBron','Lee','Lennon','Leo','León','Leonardo','Leonel','Lester','Levi','Lewis','Li','Lian','Lloyd','Logan','Londell','Lorenzo','Louis','Loyiso','Luan','Luca','Lucas','Luciano','Luis','Luke','Luther','Major','Malachi','Malcolm','Malik','Mamadou','Mandla','Manny','Manuel','Marcel','Marcelo','Marco','Marcos','Marcus','Mario','Mark','Marquis','Marshall','Martin','Martín','Mason','Mateo','Matías','Mato','Matt','Matthew','Maurice','Mauricio','Max','Maxim','Maximiliano','Maxwell','Mayowa','Meng','Micah','Michael','Miguel','Mika','Mikhail','Miles','Mitchell','Mohamed','Mondaire','Montana','Moussa','Nahele','Nasir','Nate','Nathan','Nathaniel','Nayati','Neel','Nicholas','Nick','Nicolás','Nihad','Noah','Nodin','Noel','Nolan','Nova','Nuka','Nyeeam','Oliver','Omar','Oscar','Otis','Owen','Pablo','Parker','Parnell','Parvez','Patrick','Paul','Paulo','Pedro','Perry','Peter','Peyton','Phillip','Pierre','Porter','Pranav','Preston','Qasim','Quan','Quinn','Rafael','Rahquez','Ramogi','Randall','Raymond','Recardo','Reggie','Reginald','Ren','Reza','Ricardo','Richard','Ricky','Riley','Rippy','Ritchie','Robert','Roberto','Rodney','Rodrigo','Roman','Roscoe','Ross','Roy','Russell','Ryan','Salvador','Sam','Samuel','Santiago','Santino','Santos','Scott','Sean','Sebastián','Seni','Sergio','Seth','Shane','Shaun','Shaurya','Shawn','Simón','Skyler','Spencer','Stacey','Stephen','Sterling','Steven','Tadeo','Takoda','Ta-Nehisi','Tanner','Tarell','Tauri','Taylor','Terrance','Terrell','Terrence','Tevin','Thiago','Thomas','Timothy','Tobias','Todd','Tokala','Tom','Tomás','Tony','Tran','Travis','Tremanie','Trent','Trenton','Trevante','Trevion','Trevon','Trevor','Trey','Treyvon','Tristan','Trymaine','Tyler','Tyrone','Valentino','Van','Vicente','Victor','Vihaan','Vincent','Wade','Walter','Warren','Wayne','Wayra','Wesley','William','Willie','Wiyot','Wyatt','Xavier','Yan','Yane','Yoni','Zach','Zachary','Zaire','Zeke','Zephan','Zhang','Zion'];
+$namearray[1] = ['Aaliyah','Abby','Abigail','Abril','Addison','Adriana','Adrianna','Agustina','Ainhoa','Aisha','Aitana','Aiyana','Akilah','Alana','Alba','Alecia','Alejandra','Aleshya','Alexa','Alexandra','Alexandria','Alexia','Alexis','Alexus','Alice','Alicia','Alina','Aliyah','Allison','Alma','Alondra','Althea','Alyce','Alyson','Alyssa','Amahle','Amanda','Amani','Amber','Amelia','Amina','Aminata','Amy','Ana','Ana Paula','Ananya','Anastasia','Andrea','Angel','Angela','Angelica','Angelina','Angeline','Anika','Aniyah','Anna','Antonella','Antonia','Anushka','Anya','Aponi','April','Ariana','Arianna','Ashley','Ashlyn','Ashton','Asia','Aubrey','Audrey','Aurora','Autumn','Ava','Averie','Avery','Avni','Bailey','Banu','Bao','Bea','Bella','Betty','Bianca','Bisa','Braelin','Breanna','Brenda','Breonna','Bria','Brianna','Brigeth','Brittany','Brooke','Brooklyn','Caitlyn','Camila','Candela','Capria','Carie','Carissa','Carla','Carlota','Carmen','Carolina','Caroline','Carolyn','Carrie','Cassandra','Cassidy','Catalina','Catherine','Catori','Cecilia','Cedrica','Charlotte','Chasity','Chee','Chelsea','Cheyenne','Chloe','Christina','Christine','Christy','Ciara','Claire','Clara','Claudia','Colleen','Constanza','Cori','Courtney','Cristina','Crystal','Daisy','Dallas','Dana','DaNeeka','Daniela','Danielle','Danna','Dawn','Daysha','Dazzline','Deborah','Deja','Delaney','Delfina','Delia','DeShuna','Destiny','Diamond','Diana','Dyani','Ebony','Edith','Elana','Elena','Elisa','Elizabeth','Ella','Ellie','Elu','Emilia','Emily','Emma','Enola','Erica','Erika','Erin','Esmeralda','Eva','Eve','Evelyn','Ezra','Faith','Fan','Fatema','Fatoumata','Fayth','Fernanda','Francesca','Gabriela','Gabriella','Gabrielle','Gail','Genesis','Gianna','Giselle','Grace','Gracie','Guadalupe','Gwen','Hailey','Haley','Halona','Hanita','Hanna','Hannah','Hazzell','Heather','Heaven','Hillary','Himari','Holly','Hope','Icema','Ida','Imani','Indigo','Isabel','Isabella','Isabelle','Isfa','Issa','Istas','Ivanna','Jacqueline','Jada','Jade','Jamie','Janai','Jane','Janelle','Janet','Janice','Jashanna','Jasmin','Jasmine','Jayla','Jazmin','Jeanette','Jenna','Jennifer','Jenny','Jessa Mae','Jessica','Jia','Jillian','Jocelyn','Johnetta','Joni','Jordan','Jordyn','Josefa','Josefina','Juana','Julia','Juliana','Julie','Julieta','Kaileika','Kaitlyn','Kamala','Karen','Karina','Karissa','Karla','Kasa','Kassandra','Kate','Katelyn','Kateri','Katherine','Kathryn','Katie','Katrice','Kayla','Kaylee','Kelly','Kelsey','Kelsi','Kendall','Kendra','Kenita','Kennedy','Keyanna','Kiana','Kiara','Kiersten','Kimani','Kimberlé','Kimberly','Kimi','Kimora','Kira','Kisha','Kizzmekia','Kori','Kristel','Kristen','Kristina','Kristyn','Krystal','Kyla','Kylee','Kylie','Lacee','Lafyette','Laia','Laila','Latasha','Lateefah','LaTosha','Laura','Lauren','Laverne','Layla','Leah','Leanne','Leilani','Leire','Lena','Leslie','Liana','Liliana','Lillian','Lily','Linda','Lindsay','Lindsey','Lola','Lomasi','London','Lu','Lucía','Luciana','Lucy','Luna','Lydia','Lynda','Mackenzie','Madelaine','Madeline','Madelyn','Madison','Maggie','Maia','Maisha','Maite','Maji','Makayla','Makenzie','Manuela','Margaret','Mari','María','María Fernanda','María Victoria','Mariah','Mariam','Mariana','Marie','Mariel','Maris','Marissa','Marley','Marsai','Martina','Mary Grace','Mary Joy','Maxine','Maya','Maylin','Maymay','Mckenzie','Megan','Mei','Melanie','Melique','Melissa','Mellody','Melynda','Meredith','Merryll','Mia','Michelle','Mika','Mikayla','Mini','Miracle','Miranda','Misty','Mitena','Molly','Monique','Morgan','Mya','Na’estse','Nadia','Nadine','Nakala','Nandi','Naomi','Natalia','Natalie','Natasha','Navaeh','Navya','Neichelle','Nevaeh','Neveah','Nia','Nicole','Nikole','Nina','Noa','Noelle','Nylah','Odina','Olivia','Opal','Orenda','Orlena','Paige','Palesa','Pamela','Pari','Paris','Patricia','Patriciana','Patrisse','Paula','Paulina','Pavati','Payton','Peyton','Pilar','Precious','Prisha','Priya','Quetta','Rachael','Rachel','Rachelle','Rafaela','Raquel','Rashida','Raven','Reagan','Rebecca','Regina','Renata','Renee','Reshanda','Rhianna','Riley','Rita','Riya','Romina','Rosa','Rosetta','Roya','Ruby','Rylee','Saada','Sabrina','Sadie','Sadiqa','Sahana','Sakari','Salomé','Samantha','Samira','Sara','Sarah','Savannah','Scarlett','Scherita','Serena','Serenity','Shani','Shania','Shanice','Shannon','Shante','Shantel','Sharlee','Shelby','Sheniqua','Sierra','Skylar','Sloane','Sofía','Sonia','Sonya','Sophia','Sophie','Soraya','Soyala','Stacey','Stacy','Stephanie','Summer','Sunny','Sybil','Sydney','Tabria','Tallulah','Tamika','Tanya','Tara','Tarana','Tatiana','Tayen','Taylor','Teresa','Teyonah','Thandiwe','Thulile','Tia','Tiana','Tiara','Tierra','Tiffany','Tiva','Tomi','Tracee','Tracey','Trashia','Treasure','Trinidad','Trinity','Umbrosia','Urika','Valentina','Valeria','Valerie','Vanessa','Veronica','Victoria','Violeta','Vivian','Wei','Wendy','Whitney','Winona','Ximena','Yara','Yolanda','Yvette','Zari','Zhao','Zheng','Zoe','Zoey','Zuri'];
 
 $cityarray_US = explode(',','Los Angeles,Dallas,Houston,Atlanta,Detroit,San Francisco,Minneapolis,St. Louis,Baltimore,Pittsburgh,Cincinnati,Cleveland,San Antonio,Las Vegas,Milwaukee,Oklahoma City,New Orleans,Tucson,New York City,Chicago,Philadelphia,Miami,Boston,Phoenix,Seattle,San Diego,Tampa,Denver,Portland,Sacramento,Orlando,Kansas City,Nashville,Memphis,Hartford,Salt Lake City');
 $cityarray_CA = explode(',','Toronto,Montreal,Calgary,Ottawa,Edmonton,Mississauga,Winnipeg,Vancouver,Brampton,Hamilton,Québec City,Surrey,Laval,Halifax,London,Gatineau,Saskatoon,Kitchener,Burnaby,Windsor,Regina,Victoria,Richmond,Fredericton,Saint John,Yellowknife,Sydney,Iqaluit,Charlottetown,Whitehorse');
@@ -2501,15 +2501,22 @@ function randnames($n=1,$gender=2) {
 		if ($gender==2) {
 			$gender = $GLOBALS['RND']->rand(0,1);
 		}
-		return $namearray[$gender][$GLOBALS['RND']->rand(0,137)];
+        $maxNameIndex = count($namearray[$gender]) - 1;
+		return $namearray[$gender][$GLOBALS['RND']->rand(0,$maxNameIndex)];
 	} else {
 		$out = array();
-		$locs = diffrands(0,137,$n);
+        $maxNameIndex = [count($namearray[0]) - 1, count($namearray[1]) - 1];
+        // use a step to avoid adjacent names to avoid too-similar names
+        $step = max(1, min(20,floor(min($maxNameIndex)/$n)));
+        $locs = [];
+		$locs[0] = diffrrands(0,$maxNameIndex[0],$step,$n);
+        $locs[1] = diffrrands(0,$maxNameIndex[1],$step,$n);
+        $thisgender = $gender;
 		for ($i=0; $i<$n;$i++) {
 			if ($gender==2) {
-				$gender = $GLOBALS['RND']->rand(0,1);
+				$thisgender = $GLOBALS['RND']->rand(0,1);
 			}
-			$out[] = $namearray[$gender][$locs[$i]];
+			$out[] = $namearray[$thisgender][$locs[$thisgender][$i]];
 		}
 		return $out;
 	}
@@ -3044,6 +3051,14 @@ function ineqtointerval($str, $var) {
     $outpieces = [];
     $orpts = preg_split('/\s*or\s*/', $str);
     foreach ($orpts as $str) {
+        if (count($orpts)==1 && strpos($str, '!=') !== false) {
+            // special handling for != 
+            $pieces = explode('!=', $str);
+            if (count($pieces) != 2 || trim($pieces[0]) != $var) {
+                return false;
+            }
+            return '(-oo,' . $pieces[1] . ')U(' . $pieces[1] . ',oo)';
+        }
         $pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
         $cnt = count($pieces);
         $pieces = array_map('trim', $pieces);
@@ -3080,6 +3095,7 @@ function intervaltoineq($str,$var) {
 	}
 	$arr = explode('U',$str);
 	$out = array();
+    $mightbeineq = '';
 	foreach ($arr as $v) {
 		$v = trim($v);
 		$sm = $v[0];
@@ -3090,9 +3106,13 @@ function intervaltoineq($str,$var) {
 				$out[] = '"all real numbers"';
 			} else {
 				$out[] = $var . ($em==']'?'le':'lt') . $pts[1];
+                if ($em==')') { $mightbeineq = $pts[1]; }
 			}
 		} else if ($pts[1]=='oo') {
 			$out[] = $var . ($sm=='['?'ge':'gt') . $pts[0];
+            if ($mightbeineq!=='' && count($arr)==2 && $sm=='(' && $mightbeineq==$pts[0]) {
+                return $var . ' != ' . $pts[0];
+            }
 		} else {
 			$out[] = $pts[0] . ($sm=='['?'le':'lt') . $var . ($em==']'?'le':'lt') . $pts[1];
 		}
@@ -3229,6 +3249,7 @@ function cleanbytoken($str,$funcs = array()) {
                     continue;
                 }
             }
+
             if ($i<$grplasti) { //if not last character
                 if ($tokens[$i+1][0]=='^') {
                     //1^3
@@ -3238,11 +3259,12 @@ function cleanbytoken($str,$funcs = array()) {
                     $dontuse = true;
                 } else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
                     // 1x, 1(), 1sin
-                    if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+                    if ($lastout<2 || (($out[$lastout-1] != '^' && $out[$lastout-1] != '/') || $out[$lastout] != '-')) { //exclude ^-1 case and /-1 case
                         $dontuse = true;
                     }
                 }
             }
+
             if (!$dontuse) {
                 $out[] = 1;
             } else {
@@ -3940,12 +3962,34 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
     }
-	if ($stu !== null) {
-		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
-    }
+
 	if ($stu===null) {
 		return " ";
-	} else if (!is_numeric($stu)) {
+	} else {
+        $stu = trim($stu);
+        // handle DNE,oo,+-oo
+        if (strtoupper($stu)==='DNE' || $stu==='oo' || $stu==='-oo' || $stu==='+oo') {
+            if ($stu=='+oo') {
+                $stu = 'oo';
+            }
+            for ($i=0;$i<count($partial);$i+=2) {
+                if ($partial[$i]==='+oo') {
+                    $partial[$i]='oo';
+                }
+                if ($stu===$partial[$i]) {
+                    if ($partial[$i+1]<1) {
+                        return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$i/2].'</div>';
+                    } else {
+                        return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$i/2].'</div>';
+                    }
+                }
+            }
+            return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+        }
+		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
+    }
+    
+    if (!is_numeric($stu)) {
 		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
 		if (strval($tol)[0]=='|') {
@@ -3957,6 +4001,9 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		$match = -1;
 		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
+            if ($partial[$i]==='DNE' || $partial[$i]==='oo' || $partial[$i]==='-oo' || $partial[$i]==='+oo') {
+                continue;
+            }
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
@@ -5157,10 +5204,12 @@ function comparelogic($a,$b,$vars) {
         return false;
     }
     $varlist = implode(',', $vars);
-    $a = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $a);
-    $b = str_replace(['and','^^','or','vv','~','iff','<->','<=>','implies','->','=>'],
-                     ['#a', '#a','#o','#o','!','#b', '#b', '#b', '#i',     '#i','#i'], $b);
+
+	$keywords = ['and', '^^', 'xor', 'oplus', 'or', 'vv', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
+	$replace = 	['#a',  '#a', '#x',  '#x',    '#o', '#o', '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
+    $a = str_replace($keywords,$replace,$a);
+    $b = str_replace($keywords,$replace,$b);
+
     $afunc = makeMathFunction($a, $varlist);
     if ($afunc === false) {
         return false;
@@ -5189,6 +5238,81 @@ function comparelogic($a,$b,$vars) {
     return true;
 }
 
+function comparesetexp($a,$b,$vars) {
+    if (!is_array($vars)) {
+        $vars = array_map('trim', explode(',', $vars));
+    }
+    if ($a === null || $b === null || trim($a) == '' || trim($b) == '') {
+        return false;
+    }
+    $varlist = implode(',', $vars);
+	
+	$keywords = ['and', 'nn', 'cap', 'xor', 'oplus', 'ominus', 'triangle', 'or', 'cup', 'uu', '-',  '\''];
+	$replace = 	['#a',  '#a', '#a',	 '#x',  '#x',    '#x',     '#x',       '#o', '#o',  '#o', '#m',	'^c'];
+
+	$ab = [$a,$b];
+	foreach($ab as &$str){
+		$str = str_replace($keywords,$replace,$str);	
+
+		// Since complement symbols in set expresions are unary operations *after* the operand, we will shift the complement operator to before the operand here, rather than overcomplicating MathParser
+		// Remove double negations
+		$str = preg_replace('/(\'|\^c){1}\s*(\'|\^c){1}/','',$str);
+		// Remove any spaces before a complement symbol
+		$str = preg_replace('/\s*(\'|\^c)/','$1',$str);
+		// If symbol before a complement is an object from $vars, place a ! immediately before the $var
+		foreach($vars as $var){
+			$str = preg_replace("/($var)(\'|\^c)/",'!$1',$str);
+		}
+		// If symbol before a complement is a right paren/bracket, place a ! before the corresponding left paren/bracket
+		$rindex = max(strpos($str,")^c"),strpos($str,"]^c"));
+		while($rindex){
+			$str = substr_replace($str,'',$rindex+1,2);
+			$balanced = 1;
+			for($i = $rindex-1; $i >= 0; $i--){
+				if($str[$i] == ')' || $str[$i] == ']'){
+					$balanced++;
+				}
+				elseif($str[$i] == '(' || $str[$i] == '['){
+					$balanced--;
+				}
+				if($balanced==0){
+					$str = substr_replace($str,'!',$i,0);
+					break;
+				}
+			}
+			$rindex = max(strpos($str,")^c"),strpos($str,"]^c"));
+		}
+		
+	}
+	$a = $ab[0];
+	$b = $ab[1];
+    $afunc = makeMathFunction($a, $varlist);
+    if ($afunc === false) {
+        return false;
+    }
+    $bfunc = makeMathFunction($b, $varlist);
+    if ($bfunc === false) {
+        return false;
+    }
+    $n = count($vars);
+    $max = pow(2,$n);
+    $map = array_combine($vars, array_fill(0,count($vars),0));
+    for ($i=0; $i<$max; $i++) {
+        $aval = $afunc($map);
+        $bval = $bfunc($map);
+        if ($aval != $bval) { 
+            return false;
+        }
+        for ($j=0;$j<$n;$j++) {
+            if ($map[$vars[$j]] == 0) { // if it's 0, add 1 and stop
+                $map[$vars[$j]] = 1; break;
+            } else {
+                $map[$vars[$j]] = 0; // if it's 1, set to 0 and continue on to the next one
+            }
+        }
+    }
+    return true;
+}
 function comparentuples() {
   $par = false;
   $args = func_get_args();

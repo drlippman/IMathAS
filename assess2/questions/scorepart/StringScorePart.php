@@ -39,6 +39,7 @@ class StringScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
+        
         if ($answerformat=='list') {
             $givenans = trim($givenans, " ,");
         }
@@ -103,7 +104,7 @@ class StringScorePart implements ScorePart
             }
             foreach($gaarr as $j=>$givenans) {
                 $givenans = trim($givenans);
-
+                
                 if ($answerformat == "logic") {
                     if (comparelogic($givenans, $answer, $variables)) {
                         $correct += 1;
@@ -111,7 +112,13 @@ class StringScorePart implements ScorePart
                     } 
                     continue; // skip normal processing
                 }
-
+                if ($answerformat == "setexp") {
+                    if (comparesetexp($givenans, $answer, $variables)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } 
+                    continue; // skip normal processing
+                }
                 if (count($torem)>0) {
                     $givenans = str_replace($torem,' ',$givenans);
                 }

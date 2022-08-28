@@ -354,6 +354,7 @@ export default {
       window.rendermathnode(this.$refs.thisqwrap);
       window.initSageCell(this.$refs.thisqwrap);
       window.initlinkmarkup(this.$refs.thisqwrap);
+      window.setupSeqPartToggles(this.$refs.thisqwrap);
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists

@@ -196,7 +196,7 @@ if ($jumpToAnswer) {
 
 // grab question settings data with HTML
 if ($assess_info->getSetting('displaymethod') === 'livepoll') {
-  $showscores = ($livepollStatus['curstate'] == 4);
+  $showscores = (($livepollStatus['curstate'] ?? 0) == 4);
 
   if ($isteacher) {
     // trigger additional jsParams for livepoll results display

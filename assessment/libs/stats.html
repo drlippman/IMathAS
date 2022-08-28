@@ -161,7 +161,7 @@ countif(array,condition)
 <BR>&nbsp;condition: a condition, using x for data values
 <BR>Example: countif($a,"x<3 && x>2")
 <BR><h3><a name="histogram">histogram</a></h3>
-histogram(array,label,start,classwidth,[labelstart,upper,width,height])
+histogram(array,label,start,classwidth,[labelstart,upper,width,height,showgrid,fill,stroke])
 <BR>display macro.  Creates a histogram from a data set
 <BR>&nbsp;array: array of data values
 <BR>&nbsp;label: name of data values
@@ -170,8 +170,11 @@ histogram(array,label,start,classwidth,[labelstart,upper,width,height])
 <BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
 <BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
 <BR>&nbsp;width,height (optional): width and height in pixels of graph
+<BR>&nbsp;showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
+<BR>&nbsp;fill (optional) = the fill color of the bins; default is blue
+<BR>&nbsp;stroke (optional) = the line color of the bins; default is black
 <BR><h3><a name="fdhistogram">fdhistogram</a></h3>
-fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
+fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height,showgrid,fill,stroke])
 <BR>display macro.  Creates a histogram from frequency array
 <BR>&nbsp;freqarray: array of frequencies
 <BR>&nbsp;label: name of data values
@@ -180,6 +183,9 @@ fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
 <BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
 <BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
 <BR>&nbsp;width,height (optional): width and height in pixels of graph
+<BR>&nbsp;showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
+<BR>&nbsp;fill (optional) = the fill color of the bins; default is blue
+<BR>&nbsp;stroke (optional) = the line color of the bins; default is black
 <BR><h3><a name="fdbargraph">fdbargraph</a></h3>
 fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>barlabels: array of labels for the bars
@@ -192,6 +198,8 @@ fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>&nbsp;&nbsp;options['vertlabel'] = label for vertical axis. Defaults to none
 <BR>&nbsp;&nbsp;options['gap'] = gap (0 &le; gap &lt; 1) between bars
 <BR>&nbsp;&nbsp;options['toplabel'] = label for top of chart
+<BR>&nbsp;&nbsp;options['fill'] = fill color of the bars; default is blue
+<BR>&nbsp;&nbsp;options['stroke'] = line color of the bars; default is black
 <BR><h3><a name="piechart">piechart</a></h3>
 piechart(percents, labels, {width, height})
 <BR>create a piechart

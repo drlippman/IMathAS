@@ -28,11 +28,16 @@
 	 }
 	 $page_newaccounterror = '';
 	 if (isset($_POST['submit']) && $_POST['submit']=="Sign Up") {
-		if ($_POST['challenge'] !== $_SESSION['challenge']) {
- 			echo "Invalid submission";
- 			exit;
- 		}
- 		$_SESSION['challenge'] = '';
+        if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
+        !empty($_POST['hval']) ||
+        !isset($_SESSION['newuserstart']) || (time() - $_SESSION['newuserstart']) < 5
+     ) {
+        echo "Invalid submission";
+        exit;
+     }
+     $_SESSION['challenge'] = '';
+     unset($_SESSION['newuserstart']);
+
 		unset($_POST['username']);
 		unset($_POST['password']);
 
@@ -190,6 +195,7 @@
 		$pagetitle = $coursename;
 		$challenge = uniqid();
 		$_SESSION['challenge'] = $challenge;
+        $_SESSION['newuserstart'] = time();
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		if (isset($CFG['locale'])) {
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
@@ -253,6 +259,7 @@ if (isset($_GET['ekey'])) {
 <input type="hidden" id="tzoffset" name="tzoffset" value="">
 <input type="hidden" id="tzname" name="tzname" value="">
 <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
+<span class="sr-only"><label aria-hidden=true">Do not fill this out <input name=hval tabindex="-1"></label></span>
 <script type="text/javascript">
 $(function() {
         var thedate = new Date();

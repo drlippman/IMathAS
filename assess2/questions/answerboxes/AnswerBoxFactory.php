@@ -20,6 +20,7 @@ require_once(__DIR__ . '/MultipleAnswerAnswerBox.php');
 require_once(__DIR__ . '/NTupleAnswerBox.php');
 require_once(__DIR__ . '/NumberAnswerBox.php');
 require_once(__DIR__ . '/StringAnswerBox.php');
+require_once(__DIR__ . '/ChemEquationAnswerBox.php');
 
 use OutOfBoundsException;
 
@@ -121,6 +122,9 @@ class AnswerBoxFactory
                 break;
             case 'string':
                 return new StringAnswerBox($answerBoxParams);
+                break;
+            case 'chemeqn':
+                return new ChemEquationAnswerBox($answerBoxParams);
                 break;
             default:
                 // This will be caught by our custom exception handler to be

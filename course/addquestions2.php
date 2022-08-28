@@ -384,7 +384,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=040522\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=062522\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=041422\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
@@ -796,7 +796,7 @@ if ($overwriteBody==1) {
 </div>
         
 <form id="selq">
-	<table cellpadding="5" id="myTable" class="gb zebra" style="clear:both; position:relative;" tabindex="-1">
+	<table cellpadding="5" id="myTable" class="gb zebra potential-question-list" style="clear:both; position:relative;" tabindex="-1">
     </table>
     <p><span id="searchnums"><?php echo _('Showing');?> <span id="searchnumvals"></span></span>
       <a href="#" id="searchprev" style="display:none"><?php echo _('Previous Results');?></a>

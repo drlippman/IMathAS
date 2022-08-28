@@ -55,9 +55,9 @@
 		$secfilter = -1;
 	}
 
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -76,6 +76,15 @@
 	} else {
 		$canedit = 0;
 	}
+    $itemorder = explode(',', str_replace('~',',',preg_replace('/\d+\|\d+~/','',$itemorder)));
+    $loc = array_search($qid, $itemorder);
+    $prevqid = -1; $nextqid = -1;
+    if ($loc > 0) {
+        $prevqid = $itemorder[$loc-1];
+    }
+    if ($loc < count($itemorder)-1) {
+        $nextqid = $itemorder[$loc+1];
+    }
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
@@ -226,9 +235,19 @@
 		if (isset($_GET['quick'])) {
 			echo "saved";
 		} else if ($page == -1 || isset($_POST['islaststu'])) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis2.php?"
-				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
-                    'r' => Sanitize::randomQueryStringParam(),)));
+            if ($page == -1 && !empty($_POST['prevqid'])) {
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq2.php?"
+                    . Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                    'qid' => intval($_POST['prevqid']), 'r' => Sanitize::randomQueryStringParam(),)));
+            } else if ($page == -1 && !empty($_POST['nextqid'])) {
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq2.php?"
+                    . Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                    'qid' => intval($_POST['nextqid']), 'r' => Sanitize::randomQueryStringParam(),)));
+            } else {
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis2.php?"
+                    . Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                        'r' => Sanitize::randomQueryStringParam(),)));
+            }
 		} else {
 			$page++;
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq2.php?"
@@ -783,7 +802,21 @@
 		$assess_record->saveRecordIfNeeded();
 	}
 	if ($canedit) {
-		echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+		echo '<button type="submit">';
+        if ($page == -1 || $page == count($stulist)-1) {
+            echo _('Save Changes');
+        } else {
+            echo _('Save Changes and Next Student');
+        }
+        echo '</button> ';
+        if ($page == -1 || $page == count($stulist)-1) {
+            if ($prevqid > -1) {
+                echo '<button type=submit name=prevqid value="'.Sanitize::onlyInt($prevqid).'">'._('Save and Prev Question').'</button>';
+            }
+            if ($nextqid > -1) {
+                echo '<button type=submit name=nextqid value="'.Sanitize::onlyInt($nextqid).'">'._('Save and Next Question').'</button>';
+            }
+        }
 	}
 	} else {
 		echo '<p><b>'._('No submission to show').'</b></p>';

@@ -2,7 +2,7 @@
 // IMathAS: Main launch page for assess2 assessment player
 // (c) 2019 David Lippman
 
-$lastupdate = '20220405';
+$lastupdate = '20220712';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -35,10 +35,10 @@ $placeinhead .= '</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=122020" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=051122" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=072022" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=081122" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=031821">
-  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=070221">';
+  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=081122">';
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';
 } else if ($isdiag) {

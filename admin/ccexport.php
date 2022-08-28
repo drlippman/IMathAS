@@ -205,8 +205,9 @@ $alt = 0;
 		<li><input type=checkbox name=includegbcats value=1 checked /> Include <?php echo $installname; ?> gradebook setup and categories</li>
 		<li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname; ?> due dates for assessments</li>
 		<li><input type=checkbox name=includestartdates value=1 /> Include <?php echo $installname; ?> start dates for assessments and blocks<br/>
-			<span class="small">Blocks will only include the start date if they are set to hide contents from students when not available.</span></li>
-		<li><input type=checkbox name=datesbylti value=1 <?php if ($datesbylti > 0) {
+			<span class="small">Blocks will only include the start date if they are set to hide contents from students when not available</span></li>
+		<li><input type=checkbox name=newtab value=1 /> Open <?php echo $installname; ?> assignments in new window/tab</li>
+        <li><input type=checkbox name=datesbylti value=1 <?php if ($datesbylti > 0) {
         echo 'checked';
     }
     ?> /> Allow Canvas to set <?php echo $installname; ?> due dates<br/>

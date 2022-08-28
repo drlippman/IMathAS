@@ -278,6 +278,7 @@ class DrawingScorePart implements ScorePart
             $ymid = ($settings[2]+$settings[3])/2;
             $ymidp = $ytopix($ymid); //$settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
             $scoretype = array();
+            $leftrightdir = '';
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
@@ -286,6 +287,10 @@ class DrawingScorePart implements ScorePart
                     array_shift($function);
                 } else {
                     $scoretype[$key] = 0;
+                }
+                if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
+                    $leftrightdir = $function[1][0];
+                    array_pop($function);
                 }
                 //curves: function
                 //    function, xmin, xmax
@@ -660,10 +665,10 @@ class DrawingScorePart implements ScorePart
                         $yatxt = $A*$xt*$xt+$B*$xt+$C;
                         if (abs($yatxt - $yv)<20) {
                             $xatyt = sign($A)*sqrt(abs(20/$A))+$xv;
-                            $ansparabs[$key] = array('x', $xv, $yv, $xatyt);
+                            $ansparabs[$key] = array('x', $xv, $yv, $xatyt, $leftrightdir);
                         } else {
                             //use vertex and y value at x of vertex + 20 pixels
-                            $ansparabs[$key] = array('y', $xv, $yv, $yatxt);
+                            $ansparabs[$key] = array('y', $xv, $yv, $yatxt, $leftrightdir);
                         }
                         //**finish me!!
                     }
@@ -715,7 +720,11 @@ class DrawingScorePart implements ScorePart
                         $vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'ls');
                     } else if ($pts[0]==5.4) {
                         $vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'v');
-                    } else if ($pts[0]==6) {
+                    } else if ($pts[0]==6 || $pts[0] == 6.2) {
+                        $leftrightdir = '';
+                        if ($pts[0] == 6.2) {
+                            $leftrightdir = ($pts[3] < $pts[1]) ? '<' : '>';
+                        }
                         //parab
                         //for y at x+20, y=a(x-h)^2+k is y=a*20^2+k
                         //for x at y+-20, y=a(x-h)^2+k
@@ -727,7 +736,7 @@ class DrawingScorePart implements ScorePart
                             $a = ($pts[4]-$pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
                             $y = $pts[2]+$a*400;
                             $x = $pts[1]+sign($a)*sqrt(abs(20/$a));
-                            $parabs[] = array($pts[1],$pts[2],$y,$x);
+                            $parabs[] = array($pts[1],$pts[2],$y,$x,$leftrightdir);
                         }
                     } else if ($pts[0]==6.1) {
                         //same as above, but swap x and y
@@ -1171,6 +1180,9 @@ class DrawingScorePart implements ScorePart
                         continue;
                     }
                     if (abs($ansparab[2]-$parabs[$i][1])>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    if ($ansparab[4] !== $parabs[$i][4]) {
                         continue;
                     }
                     if ($ansparab[0]=='x') { //compare x at yv+-20

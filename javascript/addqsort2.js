@@ -721,6 +721,15 @@ function fullungroup(loc) {
     return false;
 }
 
+function togglegroupEC(loc) {
+    var newec = 1 - itemarray[loc][2][0][9];
+    for (var i=0; i<itemarray[loc][2].length; i++) {
+        itemarray[loc][2][i][9] = newec;
+    } 
+    submitChanges();
+    return false;
+}
+
 function doremoveitem(loc) {
     if (loc.indexOf("-") > -1) {
         locparts = loc.split("-");
@@ -771,6 +780,7 @@ function groupSelected() {
     var grplist = new Array();
     var form = document.getElementById("curqform");
     var grppoints = 0;
+    var grpextracredit = 0;
     for (var e = form.elements.length - 1; e > -1; e--) {
         var el = form.elements[e];
         if (
@@ -785,6 +795,7 @@ function groupSelected() {
                 //is group
                 val = val.split("-")[0];
                 grppoints = itemarray[val][2][0][4]; //point values from first in group
+                grpextracredit = itemarray[val][2][0][9];
             } else {
             }
             isnew = true;
@@ -809,11 +820,13 @@ function groupSelected() {
         existingcnt = itemarray[to][2].length;
         if (grppoints == 0) {
             grppoints = itemarray[to][2][0][4]; //point values from first in group
+            grpextracredit = itemarray[to][2][0][9];
         }
     } else {
         var existing = itemarray[to];
         if (grppoints == 0) {
             grppoints = existing[4]; //point values from this question
+            grpextracredit = existing[9];
         }
         itemarray[to] = [1, 0, [existing], 1];
         existingcnt = 1;
@@ -834,6 +847,7 @@ function groupSelected() {
     }
     for (i = 0; i < itemarray[to][2].length; i++) {
         itemarray[to][2][i][4] = grppoints;
+        itemarray[to][2][i][9] = grpextracredit;
     }
     submitChanges();
 }
@@ -1008,7 +1022,6 @@ function generateOutput() {
     var pts = {};
     var extracredit = {};
     var qcnt = 0;
-
     for (var i = 0; i < itemarray.length; i++) {
         if (itemarray[i][0] == "text") {
             //is text item
@@ -1031,8 +1044,7 @@ function generateOutput() {
                 for (var j = 0; j < itemarray[i][2].length; j++) {
                     out += "~" + itemarray[i][2][j][0];
                     pts["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][4];
-                    itemarray[i][2][j][9] = 0;
-                    extracredit["qn" + itemarray[i][2][j][0]] = 0; // no EC in groups
+                    extracredit["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][9];
                 }
                 qcnt += itemarray[i][0];
             }
@@ -1086,7 +1098,7 @@ function generateTable() {
     var html = "";
     var totalcols = 10;
 
-    html += "<table cellpadding=5 class=gb><thead><tr>";
+    html += "<table cellpadding=5 class='gb questions-in-assessment'><thead><tr>";
     if (!beentaken) {
         html += "<th></th>";
     }
@@ -1118,9 +1130,11 @@ function generateTable() {
     var text_segment_count = 0;
     var curqnum = 0;
     var curqitemloc = 0;
+    var curgrppoints = 0;
     var badgrppoints = false;
     var badthisgrppoints = false;
     var grppoints = -1;
+    var grpextracredit = -1;
     var ECmark = ' <span onmouseover="tipshow(this,\'' + _('Extra Credit') + '\')" onmouseout="tipout()">' + _('EC') + '</span>';
     for (var i = 0; i < itemcount; i++) {
         curistext = 0;
@@ -1186,6 +1200,7 @@ function generateTable() {
                         if (itemarray[i][0] > 1) {
                             html += "ea";
                         }
+                        html += (curitems[0][9] > 0 ? ECmark : '');
                         html += "</td><td></td>";
                         html += "</tr><tr class=" + curclass + ">";
                     }
@@ -1290,6 +1305,7 @@ function generateTable() {
                         if (itemarray[i][0] > 1) {
                             html += "ea";
                         }
+                        html += (curitems[0][9] > 0 ? ECmark : '');
 
                         html +=
                             '</td><td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
@@ -1304,6 +1320,10 @@ function generateTable() {
                         html +=
                             '<li><a href="#" onclick="return fullungroup(' + i + ');">' +
                             _("Ungroup all Questions") +
+                            "</a></li>";
+                        html +=
+                            '<li><a href="#" onclick="return togglegroupEC(' + i + ');">' +
+                            _("Toggle Extra Credit") +
                             "</a></li>";
                         html += '</ul></div></tr>';
 
@@ -1477,6 +1497,13 @@ function generateTable() {
                     var showicons = "_no";
                     var altadd = _(" disabled");
                 }
+                if ((curitems[j][7] & 128) == 128) {
+                    var showiconsWE = "";
+                    var altaddWE = "";
+                } else {
+                    var showiconsWE = "_no";
+                    var altaddWE = _(" disabled");
+                }
                 if ((curitems[j][7] & 4) == 4) {
                     if ((curitems[j][7] & 16) == 16) {
                         html += '<div class="ccvid inlinediv"';
@@ -1515,11 +1542,11 @@ function generateTable() {
                         '<img src="' +
                         staticroot +
                         "/img/assess_tiny" +
-                        showicons +
+                        showiconsWE +
                         '.png" alt="'+('Written solution') +
                         altadd +
                         '" title="'+('Written solution') +
-                        altadd +
+                        altaddWE +
                         '"/>';
                 }
                 html += "</td>";
@@ -1578,6 +1605,12 @@ function generateTable() {
                         } else {
                             itemarray[i][2][j][4] = grppoints;
                         }
+                    }
+                    if (grpextracredit == -1) {
+                        grpextracredit = curitems[j][9];
+                    } else if (curitems[j][9] != grpextracredit) {
+                        //fix it
+                        itemarray[i][2][j][9] = grpextracredit;
                     }
                 }
                 if (curisgroup) {

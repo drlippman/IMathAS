@@ -16,12 +16,16 @@ if (isset($CFG['hooks']['util/utils'])) {
 if ($myrights >= 75 && isset($_GET['emulateuser'])) {
     $emu_id = Sanitize::onlyInt($_GET['emulateuser']);
 	if ($myrights<100) {
-		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT groupid,rights FROM imas_users WHERE id=?");
 		$stm->execute(array($emu_id));
-		if ($stm->fetchColumn(0) != $groupid) {
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($row['groupid'] != $groupid) {
 			echo "You can only emulate teachers from your own group";
 			exit;
-		}
+		} else if ($row['rights']>$myrights) {
+            echo "Cannot emulate a user of higher rights";
+            exit;
+        }
 	}
 	$_SESSION['emulateuseroriginaluser'] = $userid;
 	$_SESSION['userid'] = $emu_id;

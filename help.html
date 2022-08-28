@@ -197,6 +197,7 @@ dd {
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
 		<li><a href="#calcinterval">Calculated Interval</a></li>
+        <li><a href="#chemeqn">Chemical Equation</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
         <li><a href="#conditional">Conditional</a></li>
@@ -3057,7 +3058,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 		<ul>
 		<li>allowunreduced: can be combined with "mixednumber" or "mixednumberorimproper" to allow unreduced fractional parts</li>
 		<li>allowxtimes: allows the use of x for multiplication (like 23x10^2 for 23*10^2), typically in combo with the "scinot" format</li>
-		<li>nodecimal: require an answer without decimals (also disallows 10^-2 and 3E-2)</li>
+		<li>allowplusminus: allow use of +- in the answer. Will enable the 'list' option if not already included.</li>
+        <li>nodecimal: require an answer without decimals (also disallows 10^-2 and 3E-2)</li>
 		<li>notrig: require an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>
         <li>allowmixed: will enable support for mixed numbers (like 2 1/2) in answers</li>
         <li>allowdegrees: will enable the use of the degree symbol to designate degrees, so sin(30degree)=1/2.</li>
@@ -3328,6 +3330,7 @@ A student is asked to enter a function
     values or raise numbers to very large powers.<br/>
     "scalarmult": Specifies that the answer provided by the student is allowed to differ from the specified answer by a 
     scalar multiple.<br/>
+    "allowplusminus": allow use of +- in the answer. Will enable the 'list' option if not already included.<br/>
 	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions".
 	$ansprompt can override the default statements like this:
     $ansprompt = "One function, f(x)=;No such function exists" <br/>
@@ -3405,13 +3408,15 @@ A student is asked to enter a string (a word or list of letters).
 	<dd>"takeanything" or "takeanythingorblank" sets the problem to give full credit
 		for any answer.  "takeanythingorblank" also counts blank answers as correct.
 	  "submitblank" will cause blank answers to get submitted for scoring (new system only).</dd>
-<dt>$answerformat = "list" or "logic" </dt>
+<dt>$answerformat = "list" or "logic" or "setexp" </dt>
 	<dd>"list" specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
     partial_credit flag.  Duplicates are not ignored. <br><br>
     "logic" enables a separate grading algorithm for logic statements, ignoring $strflags.  The $answer 
-    should be given using vv for or, ^^ for and, ~ for not, =&gt; for conditional, and &lt;=&gt; for biconditional.
+    should be given using vv for or, ^^ for and, neg for not, xor for exclusive or, =&gt; for conditional, and &lt;=&gt; for biconditional.
     Parens are supported, but no other symbols.  The variables used in the logic expression must be declared by 
-    defining $variables.</dd>
+    defining $variables.<br><br>
+	"setexp" enables a separate grading algorithm for set expression statements, ignoring $strflags. The $answer should be given using
+	 'nn' for intersection, 'uu' for union, '-' for set difference, '^c' for set complement, and 'oplus' for symmetric difference.</dd>
 <dt>$displayformat = "usepreview" or "typeahead" or "usepreviewnomq"</dt>
     <dd>"usepreview" enables mathquill entry for mathematical answers.<br/>
         "usepreviewnomq" adds a preview button for previewing mathematical answers in asciimath.<br/>
@@ -3419,10 +3424,10 @@ A student is asked to enter a string (a word or list of letters).
 	two letters of the word.  Provide the auto-suggest list in the variable $questions.
     </dd>
 <dt>$variables</dt>
-    <dd>When $answerformat="logic" is used, define the $variables in the logic statement, like "p,q"</dd>
+    <dd>When $answerformat="logic" or "setexp" is used, define the $variables in the logic statement, like "p,q"</dd>
 <dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
 	<dd>Adds format checking to the student's answer.  Usually not needed for string questions, but can 
-        be useful when the "logic" answerformat is used. The list can include multiple checks, 
+        be useful when the "logic" or "setexp" answerformat is used. The list can include multiple checks, 
         which come in pairs.  The first is the symbol to look for.  The second describes what is 
         acceptable.  For example, in the string shown above, the symbol "^" would be required to show 
         up exactly 3 times, and "cos" would be required to show up less than 2 times. </dd>
@@ -3515,6 +3520,7 @@ drawn line from the correct line.
 	        	<li>ray (rays)</li>
 	        	<li>parab (vertical parabolas)</li>
 	        	<li>horizparab (horizontal parabolas)</li>
+                <li>halfparab (half a vertical parabola)</li>
 	        	<li>cubic (a(x-h)^3+k style cubics)</li>
 	        	<li>abs (absolute value)</li>
 	        	<li>circle (circles)</li>
@@ -3539,6 +3545,9 @@ drawn line from the correct line.
 	        <li>For hyperbolas of form (x-h)^2/a^2-(y-k)^2/b^2=1, give $answers as "horizhyperbola,h,k,a,b"</li>
 	        <li>For hyperbolas of form (y-k)^2/a^2-(x-h)^2/b^2=1, give $answers as "verthyperbola,h,k,a,b"</li>
 	        <li>For horizontal parabolas give $answers as "x=equation", like "x=2(y-1)^2-3".</li>
+            <li>For half parabolas give $answers as "equation,>xvertex", like "(x-1)^2-3,>1". Note only half parabolas are supported, not 
+                arbitrary segments.
+            </li>
 	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
 	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
 	      </ul>
@@ -3691,7 +3700,7 @@ rather than just numbers, such as (5/3, 2/3).
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list", "set", "setlist" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$answerformat = "scalarmult", "anyorder", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" </dt>
+<dt>$answerformat = "scalarmult", "anyorder", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf", "sameform" </dt>
     <dd>"scalarmult" will accept any answer that is a scalar multiple of the correct answer.  <br/>
         "anyorder" will accept elements in any order, so (2,1) would be treated equivalent to (1,2)<br/>
 	The other options require each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
@@ -3773,18 +3782,20 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 <dl>
 <dt>$answer = a string containing a complex number or list of complex numbers </dt>
   <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i".  The answer <em>must</em> be given in
-  a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work)</dd>
+  a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work) unless $answerformat="sloppycomplex" is used.</dd>
 </dl>
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
 	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
 	must still only contain one i.  <br/>
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
-	$answerformat = "list" specifies that the answer will be a list of complex numbers.
+	$answerformat = "list" specifies that the answer will be a list of complex numbers.<br/>
+    allowplusminus allow use of +- in the answer. Will enable the 'list' option if not already included.<br/>
+
 	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
@@ -4034,6 +4045,41 @@ or if the question type gives away critical info to the student.</dd>
 
 </div> <!-- h3 -->
 <div class=h3>
+    <h3 id="chemeqn">Chemical Equation</h3>
+    
+    <p>
+    A student is asked to enter a chemical formula, or use $answerformat="reaction"
+    to ask for a reaction equation.
+    </p>
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = a string with the answer</dt>
+        <dd>Defines the answer, like "H_2O". Spaces are ignored.
+            For reactions, use <code>-&gt;</code> for a right arrow,
+            and <code>&lt;-&gt;</code> for an equilibrium arrow, like "2H+O->H_2O".</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$answerformat = "reaction" </dt>
+        <dd>Use "reaction" if you're asking for a reaction equation.</dd>
+    <dt>$variables = a list of atoms </dt>
+        <dd>Define this to populate the equation editor with the specified atoms.</dd>
+    <dt>$answerboxsize = number </dt>
+        <dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.
+        Use this to substitute a detailed answer.</dd>
+    </dl>
+    
+    
+</div> <!-- h3 -->
+<div class=h3>
 <h3 id="fileupload">File Upload</h3>
 
 <p>
@@ -4095,6 +4141,7 @@ This type of question can contain multiple parts, where each part is one of the 
 	<li>Calculated Complex: "calccomplex"</li>
 	<li>Interval: "interval"</li>
 	<li>Calculated Interval: "calcinterval"</li>
+    <li>Chemical Equation: "chemeqn"</li>
 	<li>Essay: "essay"</li>
 	<li>File Upload: "file"</li>
 	<li>String: "string"</li>

@@ -98,7 +98,7 @@ var clickmightbenewcurve = false;
 var hasTouchTimer = null;
 var tpModeN = {
 	"5": 2, "5.2": 2, "5.3": 2, "5.4": 2,
-	"6": 2, "6.1": 2, "6.3": 2, "6.5": 2, "6.6": 2,
+	"6": 2, "6.1": 2, "6.2": 2, "6.3": 2, "6.5": 2, "6.6": 2,
 	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
 	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
 	"9": 2, "9.1": 2,
@@ -241,6 +241,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
 			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
 			"horizparab": [{"mode":6.1, "descr":_("Parabola opening right or left"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
+			"halfparab": [{"mode":6.2, "descr":_("Half Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the half parabola")}],
 			"cubic": [{"mode":6.3, "descr":_("Cubic"), inN: 2, "input":_("Enter the inflection point, then another point on the cubic")}],
 			"cuberoot": [{"mode":6.6, "descr":_("Cube root"), inN: 2, "input":_("Enter the inflection point of the cube root, then another point on the graph")}],
 			"abs": [{"mode":8, "descr":_("Absolute value"), inN: 2, "input":_("Enter the corner point of the absolute value, then another point on the graph")}],
@@ -931,7 +932,7 @@ function drawTarget(x,y,skipencode) {
 					}
 				}
 			}
-		} else if (tptypes[curTarget][i]==6 || tptypes[curTarget][i]==6.1) {//if a tp parabola
+		} else if (tptypes[curTarget][i]==6 || tptypes[curTarget][i]==6.1 || tptypes[curTarget][i]==6.2) {//if a tp parabola
 			var y2 = null;
 			var x2 = null;
 			if (tplines[curTarget][i].length==2) {
@@ -1006,8 +1007,39 @@ function drawTarget(x,y,skipencode) {
 						ctx.moveTo(qx,inta);
 						ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,qx,intb);
 					}
-				}
-
+				} else if (tptypes[curTarget][i]==6.2) {
+					if (y2==tplines[curTarget][i][0][1]) {
+						ctx.moveTo(tplines[curTarget][i][0][0],y2);
+						ctx.lineTo(x2 < tplines[curTarget][i][0][0] ? 0 : targets[curTarget].imgwidth,y2);
+					} else if (x2 == tplines[curTarget][i][0][0]) {
+						ctx.moveTo(x2,tplines[curTarget][i][0][1]);
+						if (y2>tplines[curTarget][i][0][1]) {
+							ctx.lineTo(x2,targets[curTarget].imgheight);
+						} else {
+							ctx.lineTo(x2,0);
+						}
+					} else {
+						var stretch = (y2 - tplines[curTarget][i][0][1])/((x2 - tplines[curTarget][i][0][0])*(x2 - tplines[curTarget][i][0][0]));
+						var xm = (x2 < tplines[curTarget][i][0][0]) ? -1 : 1;
+                        if (y2>tplines[curTarget][i][0][1]) {
+							//crosses at y=imgheight
+                            var xs = Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch);
+							var qy = targets[curTarget].imgheight;
+						} else {
+                            var xs = Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch);
+							var qy = 0;
+						}
+                        if (x2 < tplines[curTarget][i][0][0]) {
+                            xs *= -1;
+                        }
+						var cp1x = tplines[curTarget][i][0][0] + 1.0/3.0*xs;
+						var cp1y = tplines[curTarget][i][0][1];
+						var cp2x = tplines[curTarget][i][0][0] + 2.0/3.0*xs;
+						var cp2y = tplines[curTarget][i][0][1] + 1.0/3.0*stretch*xs*xs;
+						ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+						ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,tplines[curTarget][i][0][0] + xs,qy);
+					}
+                }
 			}
 		} else if (tptypes[curTarget][i]==6.5) {//if a tp sqrtt
 			var y2 = null;

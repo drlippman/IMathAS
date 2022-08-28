@@ -180,6 +180,23 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 	$assessresults[$baseassess][$assesscourse][] = $total;
 }
+// pull new assessment data
+$query = 'SELECT assessmentid,score FROM imas_assessment_records WHERE ';
+$query .= "assessmentid IN ($phcopyaids)";
+$stm = $DBH->prepare($query);
+$stm->execute(array_keys($assesscopies));
+//echo "Assess data lookup done: ".(microtime(true)-$ts).'<br>';
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	$baseassess = $assesscopies[$row['assessmentid']]['source'];
+	$assesscourse = $assesscopies[$row['assessmentid']]['course'];
+	if (!isset($assessresults[$baseassess])) {
+		$assessresults[$baseassess] = array();
+	}
+	if (!isset($assessresults[$baseassess][$assesscourse])) {
+		$assessresults[$baseassess][$assesscourse] = array();
+	}
+	$assessresults[$baseassess][$assesscourse][] = $row['score'];
+}
 
 //echo "Assess data processing done: ".(microtime(true)-$ts).'<br>';
 

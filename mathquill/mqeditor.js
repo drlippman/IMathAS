@@ -71,6 +71,8 @@ var MQeditor = (function($) {
     }
     var newstate = (typeof state == 'boolean') ? state : (el.type != 'hidden');
     var textId = el.id;
+    var calcformat = el.getAttribute("data-mq") || '';
+
     if (newstate === true) { // enable MQ
       var initval = $(el).attr("type","hidden").val();
       if (config.hasOwnProperty('toMQ')) { // convert format if needed
@@ -87,6 +89,9 @@ var MQeditor = (function($) {
         var m;
         if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
           span.addClass(m[0]);
+        }
+        if (calcformat.match(/chem/)) {
+          span.addClass("mq-chem");
         }
         var size = (el.hasAttribute("size") ? (el.size > 3 ? el.size/1.8 : el.size) : 10);
         span.css("min-width", size + "em");
@@ -113,20 +118,27 @@ var MQeditor = (function($) {
           };
           thisMQconfig.keyboardPassthrough = true;
         }
-        var calcformat = el.getAttribute("data-mq") || '';
+        
         if (calcformat.match(/chem/)) {
             thisMQconfig.charsThatBreakOutOfSupSubVar = '';
             thisMQconfig.charsThatBreakOutOfSupSubOp = '';
+            thisMQconfig.autoSubscriptNumerals = true;
         }
         if (calcformat.match(/list/)) {
             thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
         }
+        if (calcformat.match(/allowplusminus/)) {
+            thisMQconfig.quickplusminus = true;
+        }
 
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
-            'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
+            'ln log abs exp sin cos tan arcsinh arccosh arctanh arcsech arccsch arccoth argsinh argcosh argtanh argsech argcsch argcoth arsinh arcosh artanh arsech arcsch arcoth arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth';
         thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
         if (calcformat.match(/logic/)) {
-            thisMQconfig.autoCommands += ' or and implies iff';
+            thisMQconfig.autoCommands += ' neg xor or and implies iff';
+        }
+        if (calcformat.match(/setexp/)) {
+            thisMQconfig.autoCommands += ' nn xor uu ominus cap cup oplus';
         }
         var vars = el.getAttribute("data-mq-vars") || '';
         var varpts;
@@ -256,6 +268,8 @@ var MQeditor = (function($) {
     } else {
       $("#mqeditor").removeClass("fixedbottom iframeosk");
     }
+    $("#mqeditor").toggleClass('mq-chem',$(mqel).hasClass("mq-chem"));
+
     var rebuild = false;
     // see if the field has changed
     if (curMQfield === null || mqel[0] != curMQfield.el() ||

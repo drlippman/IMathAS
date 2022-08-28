@@ -56,7 +56,7 @@ function nthroot(n,base) {
 function nthlogten(n,v) {
 	return ((Math.log(v))/(Math.log(n)));
 }
-var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth".split("|");
+var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth".split("|");
 function functoindex(match) {
 	for (var i=0;i<funcstoindexarr.length;i++) {
 		if (funcstoindexarr[i]==match) {
@@ -102,6 +102,7 @@ function mathjs(st,varlist) {
   st = st.replace(/root\s*(\d+)/,"root($1)");
   st = st.replace(/\|(.*?)\|/g,"abs($1)");
   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
+  st = st.replace(/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/gi,"$2^-1");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Exp|Ln|Sqrt)/gi, matchtolower);
   //hide functions for now
   st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);

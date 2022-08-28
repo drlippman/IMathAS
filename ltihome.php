@@ -2,6 +2,7 @@
 //IMathAS: LTI instructor home page
 //(c) 2011 David Lippman
 
+$init_skip_csrfp = true;
 require("init.php");
 if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 	echo _("Not authorized to view this page");

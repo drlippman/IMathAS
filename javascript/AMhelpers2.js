@@ -85,7 +85,8 @@ function toMQwVars(str, elid) {
     if (qtype === 'numfunc' || (qtype === 'calcinterval' && allParams[qn].calcformat.indexOf('inequality')!=-1)) {
         str = AMnumfuncPrepVar(qn, str)[1];
     }
-    return AMtoMQ(str, elid);
+    var nomatrices = !(qtype === 'matrix' || qtype === 'calcmatrix' || qtype === 'string');
+    return AMtoMQ(str, elid, nomatrices);
 }
 function fromMQwText(str, elid) {
     str = MQtoAM(str);
@@ -104,13 +105,14 @@ function init(paramarr, enableMQ, baseel) {
       class: "sr-only"
     }));
   }
+
   var qn, params, i, el, str;
   for (qn in paramarr) {
     if (isNaN(parseInt(qn))) { continue; }
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix|chemeqn)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       str = params.qtype;
       if (params.calcformat) {
@@ -1051,8 +1053,8 @@ function AMnumfuncPrepVar(qn,str) {
   var foundaltcap = [];
   var dispstr = str;
 
-  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
-  str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
     // handle double parens
     if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
@@ -1091,7 +1093,7 @@ function AMnumfuncPrepVar(qn,str) {
      return p1;
     });
   // fix display of /n!
-  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
+  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!(?!=)/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1236,9 +1238,9 @@ function AMnumfuncPrepVar(qn,str) {
              str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
 
              if (str.length > 0) {
-               var unitsregexlongprefix = "(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)";
+               var unitsregexlongprefix = "(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deca|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)";
                var unitsregexabbprefix = "(Y|Z|E|P|T|G|M|k|h|da|d|c|m|u|n|p|f|a|z|y)";
-               var unitsregexfull = /^(m|meter|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)$/;
+               var unitsregexfull = /^(m|meter|metre|micron|angstrom|fermi|in|inch|inches|ft|foot|feet|mi|mile|furlong|yd|yard|s|sec|second|min|minute|h|hr|hour|day|week|mo|month|yr|year|fortnight|acre|ha|hectare|b|barn|L|liter|litre|cc|gal|gallon|cup|pt|pint|qt|quart|tbsp|tablespoon|tsp|teaspoon|rad|radian|deg|degree|arcminute|arcsecond|grad|gradian|knot|kt|c|mph|kph|g|gram|gramme|t|tonne|Hz|hertz|rev|revolution|cycle|N|newton|kip|dyn|dyne|lb|pound|lbf|ton|J|joule|erg|lbft|ftlb|cal|calorie|eV|electronvolt|Wh|Btu|therm|W|watt|hp|horsepower|Pa|pascal|atm|atmosphere|bar|Torr|mmHg|umHg|cmWater|psi|ksi|Mpsi|C|coulomb|V|volt|farad|F|ohm|amp|ampere|A|T|tesla|G|gauss|Wb|weber|H|henry|lm|lumen|lx|lux|amu|dalton|Da|me|mol|mole|Ci|curie|R|roentgen|sr|steradian|Bq|becquerel|ls|lightsecond|ly|lightyear|AU|au|parsec|pc|solarmass|solarradius|degF|degC|degK|K)$/;
                //000 noprefix, noplural, sensitive
                //var unitsregex000 = "(in|mi|yd|min|h|hr|mo|yr|ha|gal|pt|qt|tbsp|tsp|rad|deg|grad|kt|c|mph|kph|rev|lbf|atm|mmHg|umHg|cmWater|psi|ksi|Mpsi|weber|amu|me|R|AU|au|degF|degC|degK|K)";
                //100 abb, noplural, sensitive
@@ -1252,7 +1254,7 @@ function AMnumfuncPrepVar(qn,str) {
                //011 noprefix, plural, insensitive
                var unitsregex011 = "(micron|mile|furlong|yard|minute|hour|day|week|month|year|fortnight|acre|hectare|gallon|cup|pint|quart|tablespoon|teaspoon|radian|degree|gradian|knot|revolution|cycle|kip|lb|therm|atmosphere|roentgen)";
                //211 long, plural, insensitive
-               var unitsregex211 = "(meter|angstrom|second|barn|liter|litre|arcminute|arcsecond|gram|tonne|newton|dyne|pound|ton|joule|erg|calorie|electronvolt|watt|pascal|coulomb|volt|farad|ohm|amp|ampere|tesla|weber|henry|lumen|dalton|mole|curie|steradian|becquerel|lightsecond|lightyear|parsec)";
+               var unitsregex211 = "(meter|metre|angstrom|second|barn|liter|litre|arcminute|arcsecond|gram|gramme|tonne|newton|dyne|pound|ton|joule|erg|calorie|electronvolt|watt|pascal|coulomb|volt|farad|ohm|amp|ampere|tesla|weber|henry|lumen|dalton|mole|curie|steradian|becquerel|lightsecond|lightyear|parsec)";
                
                var unitsregexfull100 = new RegExp("^" + unitsregexabbprefix + "?" + unitsregex100 + "$");
                var unitsregexfull001 = new RegExp("^" + unitsregex001 + "$", 'i');
@@ -1288,6 +1290,9 @@ function AMnumfuncPrepVar(qn,str) {
 
 function processCalculated(fullstr, format) {
   // give error instead.  fullstr = fullstr.replace(/=/,'');
+  if (format.indexOf('allowplusminus')!=-1) {
+    fullstr = fullstr.replace(/(.*?)\+\-(.*?)(,|$)/g, '$1+$2,$1-$2$3');
+  }
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else if (format.indexOf('set')!=-1) {
@@ -1317,10 +1322,10 @@ function processCalculated(fullstr, format) {
 
 function processCalcInterval(fullstr, format, ineqvar) {
   var origstr = fullstr;
+  fullstr = fullstr.replace(/cup/g,'U');
   if (format.indexOf('inequality')!=-1) {
     fullstr = fullstr.replace(/or/g,' or ');
     var conv = ineqtointerval(fullstr, ineqvar);
-    console.log(conv);
     if (conv.length>1) { // has error
       return {
         err: (conv[1]=='wrongvar')?
@@ -1474,6 +1479,9 @@ function processCalcNtuple(fullstr, format) {
 }
 
 function processCalcComplex(fullstr, format) {
+  if (format.indexOf('allowplusminus')!=-1) {
+    fullstr = fullstr.replace(/(.*?)\+\-(.*?)(,|$)/g, '$1+$2,$1-$2$3');
+  }
   var err = '';
   var arr = fullstr.split(',');
   var str = '';
@@ -1650,19 +1658,19 @@ function processNumfunc(qn, fullstr, format) {
     totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
     var remapVars = strprocess[2].split('|');
 
-    if (totesteqn.match(/(<=|>=|<|>)/)) {
+    if (totesteqn.match(/(<=|>=|<|>|!=)/)) {
         if (!isineq) {
             if (iseqn) {
                 err += _("syntax error: you gave an inequality, not an equation") + '. ';
             } else {
                 err += _("syntax error: you gave an inequality, not an expression")+ '. ';
             }
-        } else if (totesteqn.match(/(<=|>=|<|>)/g).length>1) {
+        } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length>1) {
             err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
         }
-        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>|!=)(.*)/,"$1-($3)");
     } else if (totesteqn.match(/=/)) {
-        if (isineq) {
+        if (isineq && !iseqn) {
             err += _("syntax error: you gave an equation, not an inequality")+ '. ';
         } else if (!iseqn) {
             err += _("syntax error: you gave an equation, not an expression")+ '. ';
@@ -1670,6 +1678,8 @@ function processNumfunc(qn, fullstr, format) {
             err += _("syntax error: your equation should only contain one equal sign")+ '. ';
         }
         totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
+    } else if (iseqn && isineq) {
+        err += _("syntax error: this is not an equation or inequality")+ '. ';
     } else if (iseqn) {
         err += _("syntax error: this is not an equation")+ '. ';
     } else if (isineq) {
@@ -1726,6 +1736,15 @@ function ineqtointerval(strw, intendedvar) {
   }
   var pat, interval, out = [];
   var strpts = strw.split(/\s*or\s*/);
+  if (strpts.length == 1 && strw.match(/!=/)) {
+    var ineqpts = strw.split(/!=/);
+    if (ineqpts.length != 2) {
+        return ['', 'invalid'];
+    } else if (simplifyVariable(ineqpts[0]) != simpvar) {
+        return ['', 'wrongvar'];
+    }
+    return ['(-oo,' + ineqpts[1] + ')U(' + ineqpts[1] + ',oo)'];
+  }
 	for (var i=0; i<strpts.length; i++) {
 		str = strpts[i];
     if (pat = str.match(/^(.*?)(<=?|>=?)(.*?)(<=?|>=?)(.*?)$/)) {
@@ -1920,7 +1939,7 @@ function singlevalsyntaxcheck(str,format) {
 	} else if (format.indexOf('scinot')!=-1) {
 		  str = str.replace(/\s/g,'');
 		  str = str.replace(/(xx|x|X|\u00D7)/,"xx");
-		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
+		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\(?\-?\d+\)?\)?)$/)) {
 		  	if (format.indexOf('scinotordec')==-1) { //not scinotordec
 		  		return (_("not valid scientific notation")+". ");
 		  	} else if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
@@ -1981,7 +2000,7 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-          var reglist = 'degree|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
+          var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
           reglist.sort(function(x,y) { return y.length - x.length});
 	  	  reg = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
@@ -2092,6 +2111,50 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 	}
 	var k=btn.innerHTML;
 	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
+}
+
+var seqgroupcollapsed = {};
+function setupSeqPartToggles(base) {
+    if (base.id && base.id.match(/questionwrap/)) {
+        var qn = parseInt(base.id.substr(12));
+        var seqseps = $(base).find(".seqsep");
+        if (!seqgroupcollapsed[qn] || seqseps.length == 1) {
+            seqgroupcollapsed[qn] = {};
+        }
+        if (seqseps.length > 1) {
+            for (var i=0; i < seqseps.length - 1; i++) {
+                $(seqseps[i]).next().attr("id", "seqgrp"+qn+"-"+i);
+                if (seqgroupcollapsed[qn][i]) {
+                    $(seqseps[i]).next().hide();
+                }
+                $(seqseps[i]).prepend($("<button>", {
+                    class: "plain slim",
+                    style: "color: inherit",
+                    "aria-expanded": !seqgroupcollapsed[qn][i],
+                    "aria-controls": "seqgrp"+qn+"-"+i,
+                    "aria-label": seqgroupcollapsed[qn][i] ? _('Expand') : _('Collapse'),
+                    html: seqgroupcollapsed[qn][i] ? '&#x25B6;' : '&#x25BC;',
+                    type: 'button',
+                    click: function (e) {
+                        var state = (this.getAttribute("aria-expanded") == 'true');
+                        var ctls = this.getAttribute("aria-controls");
+                        if (state) {
+                            this.setAttribute("aria-expanded", "false");
+                            this.setAttribute("aria-label", _('Expand'));
+                            this.innerHTML = '&#x25B6;'
+                        } else {
+                            this.setAttribute("aria-expanded", "true");
+                            this.setAttribute("aria-label", _('Collapse'));
+                            this.innerHTML ='&#x25BC;';
+                        }
+                        $("#"+ctls).slideToggle(300);
+                        var pts = ctls.substr(6).split("-");
+                        seqgroupcollapsed[pts[0]][pts[1]] = state;
+                    }
+                }));
+            }
+        }
+    }
 }
 
 

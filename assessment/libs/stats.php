@@ -535,7 +535,11 @@ function countif($a,$ifcond) {
 // labelstart (optional): value to start axis labeling at.  Defaults to start
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
-function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
+// showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
+// fill (optional) = the fill color of the bins; default is blue
+// stroke (optional) = the color of the bin line; default is black
+
+function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200,$showgrid=true,$fill='blue',$stroke='black') {
 	if (!is_array($a)) {
 		echo 'histogram expects an array';
 		return false;
@@ -581,12 +585,19 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
 
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>9) { $step = 2; } else {$step=1;}
+	
+	if ($showgrid===true) {
+		$gdy = $step;
+	} else {
+		$gdy = 0;
+	}
+		
 	if ($startlabel===false) {
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$startlabel = $start;
 	} //else {
     $maxx = 2*max($a);
-		$outst .= "axes($maxx,$step,1,null,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+		$outst .= "axes($maxx,$step,1,null,$gdy); fill=\"$fill\"; stroke=\"$stroke\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
@@ -609,7 +620,11 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 // labelstart (optional): value to start axis labeling at.  Defaults to start
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
-function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
+// showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
+// fill (optional) = the fill color of the bins; default is blue
+// stroke (optional) = the color of the bin line; default is black
+
+function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200,$showgrid=true,$fill='blue',$stroke='black') {
 	if (!is_array($freq)) {echo "freqarray must be an array"; return 0;}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
@@ -640,11 +655,19 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	$base = $maxfreq/pow(10,$power);
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>9) {$step = 2;} else {$step=1;}
+	
+	if ($showgrid===true) {
+		$gdy = $step;
+	} else {
+		$gdy = 0;
+	}
+	
+	
 	if ($startlabel===false) {
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$startlabel = $start;
 	} //else {
-		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+		$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
@@ -671,6 +694,9 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 //  options['vertlabel'] = label for vertical axis. Defaults to none
 //  options['gap'] = gap (0 &le; gap &lt; 1) between bars
 //  options['toplabel'] = label for top of chart
+//  options['fill'] = fill color of the bars; default is blue
+//  options['stroke'] = line color of the bars; default is black
+
 function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	if (!is_array($bl) || !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
 	if (count($bl) != count($freq)) { echo "barlabels and freqarray must have same length"; return 0;}
@@ -691,6 +717,18 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		$gap = $options['gap'];
 	} else {
 		$gap = 0;
+	}
+
+	if (isset($options['fill'])) {
+		$fill = $options['fill'];
+	} else {
+		$fill = 'blue';
+	}
+
+	if (isset($options['stroke'])) {
+		$stroke = $options['stroke'];
+	} else {
+		$stroke = 'black';
 	}
 
 	$alt = "Bar graph for $label <table class=stats><thead><tr><th>Bar Label</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
@@ -738,7 +776,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		$gdy = $step;
 	}
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"blue\"; ";
+	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\";";
 	if ($label!=='') {
 		$outst .= "textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 	}

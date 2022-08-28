@@ -1,5 +1,7 @@
 <?php
 
+$defshowhints = isset($CFG['AMS2']['showhints'])?$CFG['AMS2']['showhints']:7;
+
 $vueData = array(
 	'allassess' => $page_assessSelect,
 	'gbcatOptions' => $gbcats,
@@ -53,7 +55,10 @@ $vueData = array(
 	'reqscore' => 1,
 	'reqscorecalctype' => 0,
 	'chgreqscore' => false,
-	'showhints' => 'DNC',
+    'dochgshowhints' => false,
+    'showhints' => ($defshowhints&1) > 0,
+	'showextrefs' => ($defshowhints&2) > 0,
+    'showwrittenex' => ($defshowhints&4) > 0,
 	'msgtoinstr' => 'DNC',
 	'posttoforum' => 'DNC',
 	'dochgextref' => false,
@@ -555,16 +560,32 @@ $vueData = array(
 			<?php echo _('Help and Hints'); ?>
 		</div>
 		<div class="blockitems hidden">
-			<div :class="{highlight:showhints !== 'DNC'}">
-				<label for="showhints" class=form><?php echo _('Hints and Videos'); ?></label>
+			<div :class="{highlight: dochgshowhints}">
+				<span class=form>
+                    <?php echo _('Hints and Videos'); ?>
+                </span>
 				<span class=formright>
-					<select name="showhints" id="showhints" v-model="showhints">
-						<option value="DNC"><?php echo _('Do not change'); ?></option>
-			      <option value="0"><?php echo _('No'); ?></option>
-			      <option value="1"><?php echo _('Hints'); ?></option>
-			      <option value="2"><?php echo _('Video/text buttons'); ?></option>
-			      <option value="3"><?php echo _('Hints and Video/text buttons'); ?></option>
-					</select>
+                    <label>
+						<input type="checkbox" name="dochgshowhints" v-model="dochgshowhints" />
+						<?php echo _('Change hints and videos'); ?>
+					</label>
+					<span v-show="dochgshowhints">
+                        <br/>
+                        <label>
+                            &nbsp; <input type="checkbox" name="showhints" value="1" v-model="showhints" />
+                            <?php echo _('Show hints when available?');?>
+                        </label>
+                        <br/>
+                        <label>
+                            &nbsp; <input type="checkbox" name="showextrefs" value="2" v-model="showextrefs" />
+                            <?php echo _('Show video/text buttons when available?');?>
+                        </label>
+                        <br/>
+                        <label>
+                            &nbsp; <input type="checkbox" name="showwrittenex" value="4" v-model="showwrittenex" />
+                            <?php echo _('Show written example buttons when available?');?>
+                        </label>
+                    </span>
 				</span><br class=form />
 			</div>
 

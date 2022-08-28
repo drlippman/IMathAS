@@ -122,7 +122,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
                 foreach ($anspts as $k=>$v) {
                     $anspts[$k] = '`' . intervaltoineq($v, $variables) . '`';
                 }
-                $sa = implode($anspts, ' or ');
+                $sa = implode(' or ', $anspts);
             } else {
                 $sa = '`' . str_replace('U', 'uu', $answer) . '`';
             }

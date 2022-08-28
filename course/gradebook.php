@@ -139,6 +139,7 @@ $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
+$pagetitle = _('Gradebook');
 
 //HANDLE ANY POSTS
 if ($isteacher) {
@@ -241,11 +242,11 @@ if ($isteacher) {
 		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
-			$toins[] = "(?,?,?,?,?)";
-			array_push($qarr, $id, 'offline', $stu, $val, $_POST['feedback'][$id]);
+			$toins[] = "(?,?,?,?)";
+			array_push($qarr, $id, 'offline', $stu, $val);
 		}
 		if (count($toins)>0) {
-			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
+			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score) VALUES ".implode(',',$toins);
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 		}
@@ -292,7 +293,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -500,6 +501,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="-1:-1" ';
 		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
 		echo '>', _('Active'), '</option>';
+        echo '<option value="-2:-2" ';
+		if ($colorize == "-2:-2") { echo 'selected="selected" ';}
+		echo '>', _('NC'), '</option>';
 		echo '</select> &nbsp; ';
 		//echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';

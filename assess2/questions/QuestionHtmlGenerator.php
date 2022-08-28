@@ -417,6 +417,8 @@ class QuestionHtmlGenerator
             // Generate answer boxes. (multipart question)
             foreach ($anstypes as $atIdx => $anstype) {
                 if (!empty($skipAnswerboxGeneration[$atIdx])) {
+                  $answerbox[$atIdx] = "";
+                  $previewloc[$atIdx] = "";
                   continue;
                 }
                 $questionColor = ($quesData['qtype'] == "multipart")
@@ -597,6 +599,9 @@ class QuestionHtmlGenerator
                         if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
                             $_thisIsReady = false;
                             $doShowDetailedSoln = false;
+                            for ($siidx=$iidx; $siidx < $kidx; $siidx++) {
+                                $doShowAnswerParts[$siidx] = false;
+                            }
                             break;
                         } else if ($iidx < $kidx) {
                             $doShowAnswerParts[$iidx] = false;
@@ -726,7 +731,7 @@ class QuestionHtmlGenerator
               if ($lastGroupDone) { // add html to output
                 $newqtext .= '<p class="seqsep" role="heading" tabindex="-1">';
                 $newqtext .= sprintf(_('Part %d of %d'), $k+1, count($seqParts));
-                $newqtext .= '</p>' . $seqPart;
+                $newqtext .= '</p><div>' . $seqPart . '</div>';
               }
               $lastGroupDone = $thisGroupDone;
             }
@@ -924,25 +929,27 @@ class QuestionHtmlGenerator
         $hintloc = '';
 
         $lastkey = max(array_keys($hints));
+
         if ($qdata['qtype'] == "multipart" && is_array($hints[$lastkey])) { //individual part hints
             $hintloc = array();
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
                 $lastkey = max(array_keys($hintpart));
-
+                $hintloc[$iidx] = '';
                 if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
                     $usenum = 10000;
                     $allcorrect = true;
+                    $maxatt = 0;
                     $showfor = array_map('intval', $hintpart[$lastkey][1]);
                     foreach ($showfor as $subpn) {
                         if (!isset($partattemptn[$subpn])) {
                             $partattemptn[$subpn] = 0;
                         }
-                        if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$subpn] == 1) {
-                           continue; // don't consider correct
+                        if (isset($scoreiscorrect[$thisq][$subpn]) && $scoreiscorrect[$thisq][$subpn] == 1) {
+                            continue; // don't consider correct
                         } else {
-                           $allcorrect = false;
+                            $allcorrect = false;
                         }
                         if ($partattemptn[$subpn] > $lastkey && $lastkey < $usenum) {
                             $usenum = $lastkey;
@@ -950,16 +957,21 @@ class QuestionHtmlGenerator
                             $usenum = $partattemptn[$subpn];
                         }
                     }
-                    if ($allcorrect || $usenum == 10000) { 
+                    if ($allcorrect) {
+                        $maxatt = min($partattemptn)-1;
+                        if ($maxatt > $lastkey) {
+                            $usenum = $lastkey;
+                        } else {
+                            $usenum = max($maxatt,0);
+                        }
+                    }
+                    if ($usenum == 10000) { 
                         continue;
                     }
                     if (is_array($hintpart[$usenum])) {
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
-                    if (!empty($scoreiscorrect[$thisq][$iidx])) {
-                        continue;
-                    }
                     if (!isset($partattemptn[$iidx])) {
                         $partattemptn[$iidx] = 0;
                     }
@@ -967,6 +979,9 @@ class QuestionHtmlGenerator
                         $usenum = $lastkey;
                     } else {
                         $usenum = $partattemptn[$iidx];
+                        if (!empty($scoreiscorrect[$thisq][$iidx]) && $scoreiscorrect[$thisq][$iidx]==1) {
+                            $usenum--;
+                        }
                     }
                 }
                 if (!empty($hintpart[$usenum])) {
@@ -981,13 +996,20 @@ class QuestionHtmlGenerator
                     }
                 }
             }
-        } else if (!isset($scoreiscorrect) || $scoreiscorrect[$thisq] != 1) { //one hint for question
+        } else { //one hint for question
             if ($attemptn > $lastkey) {
                 $usenum = $lastkey;
             } else {
                 $usenum = $attemptn;
+                if (isset($scoreiscorrect) && ( 
+                    (!is_array($scoreiscorrect[$thisq]) && $scoreiscorrect[$thisq] == 1) ||
+                    (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) == 1)
+                )) {
+                    $usenum--;  // if correct, use prior hint
+                }
             }
-            if ($hints[$usenum] != '') {
+            
+            if (!empty($hints[$usenum])) {
                 if (strpos($hints[$usenum], '</div>') !== false) {
                     $hintloc = $hints[$usenum];
                 } else if (strpos($hints[$usenum], 'button"') !== false) {
@@ -999,7 +1021,6 @@ class QuestionHtmlGenerator
                 }
             }
         }
-
         return $hintloc;
     }
 
@@ -1176,63 +1197,63 @@ class QuestionHtmlGenerator
         $qref = '';
 
         $externalReferences = [];
+        
+        $extrefwidth = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][0] : 700;
+        $extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][1] : 500;
+        $vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][0] : 873;
+        $vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][1] : 500;
 
-        if (($showhints&2)==2 && ($qdata['extref'] != '' || (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != ''))) {
-            $extrefwidth = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][0] : 700;
-            $extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][1] : 500;
-            $vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][0] : 873;
-            $vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][1] : 500;
-            if ($qdata['extref'] != '') {
-                $extref = explode('~~', $qdata['extref']);
 
-                if ($qid > 0 && (!isset($_SESSION['isteacher'])
-                        || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
-                    $qref = $qid . '-' . ($qnidx + 1);
-                } 
-                for ($i = 0; $i < count($extref); $i++) {
-                    $extrefpt = explode('!!', $extref[$i]);
-                    if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
-            					strpos($extrefpt[1],'youtu.be/')!==false ||
-            					strpos($extrefpt[1],'vimeo.com/')!==false
-            				) {
-                        $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
-                        $externalReferences[] = [
-                          'label' => $extrefpt[0],
-                          'url' => $extrefpt[1],
-                          'w' => $vidextrefwidth,
-                          'h' => $vidextrefheight,
-                          'ref' => $qref,
-                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
-                        ];
-                        //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
-                    } else {
-                        //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
-                        $externalReferences[] = [
-                          'label' => $extrefpt[0],
-                          'url' => $extrefpt[1],
-                          'w' => $extrefwidth,
-                          'h' => $extrefheight,
-                          'ref' => $qref,
-                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
-                        ];
-                    }
+        if (($showhints&2)==2 && $qdata['extref'] != '') {
+            $extref = explode('~~', $qdata['extref']);
+
+            if ($qid > 0 && (!isset($_SESSION['isteacher'])
+                    || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
+                $qref = $qid . '-' . ($qnidx + 1);
+            } 
+            for ($i = 0; $i < count($extref); $i++) {
+                $extrefpt = explode('!!', $extref[$i]);
+                if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
+                            strpos($extrefpt[1],'youtu.be/')!==false ||
+                            strpos($extrefpt[1],'vimeo.com/')!==false
+                        ) {
+                    $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
+                    $externalReferences[] = [
+                        'label' => $extrefpt[0],
+                        'url' => $extrefpt[1],
+                        'w' => $vidextrefwidth,
+                        'h' => $vidextrefheight,
+                        'ref' => $qref,
+                        'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
+                    ];
+                    //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
+                } else {
+                    //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
+                    $externalReferences[] = [
+                        'label' => $extrefpt[0],
+                        'url' => $extrefpt[1],
+                        'w' => $extrefwidth,
+                        'h' => $extrefheight,
+                        'ref' => $qref,
+                        'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
+                    ];
                 }
             }
-            if (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != '') {
-                $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $_SESSION['secsalt']);
-                $addr .= '&t=' . ($qdata['solutionopts'] & 1) . '&cid=' . $GLOBALS['cid'];
-                if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
-                    $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);
-                }
-                //$externalReferences .= formpopup(_("Written Example"), $addr, $extrefwidth, $extrefheight, "button", true, "soln", $qref);
-                $externalReferences[] = [
-                  'label' => 'ex',
-                  'url' => $addr,
-                  'w' => $extrefwidth,
-                  'h' => $extrefheight,
-                  'ref' => $qref
-                ];
+        }
+        if (($showhints&4)==4 && ($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != '') {
+            $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $_SESSION['secsalt']);
+            $addr .= '&t=' . ($qdata['solutionopts'] & 1) . '&cid=' . $GLOBALS['cid'];
+            if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
+                $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);
             }
+            //$externalReferences .= formpopup(_("Written Example"), $addr, $extrefwidth, $extrefheight, "button", true, "soln", $qref);
+            $externalReferences[] = [
+                'label' => 'ex',
+                'url' => $addr,
+                'w' => $extrefwidth,
+                'h' => $extrefheight,
+                'ref' => $qref
+            ]; 
         }
 
         return $externalReferences;

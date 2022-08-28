@@ -93,9 +93,9 @@ class DrawingAnswerBox implements AnswerBox
                         $pts = explode(':', $grid[$i]);
                         foreach ($pts as $k => $v) {
                             if ($v[0] === "h") {
-                                $pts[$k] = "h" . evalbasic(substr($v, 1));
+                                $pts[$k] = ($k<2) ? "h" . evalbasic(substr($v, 1)) : $v;
                             } else {
-                                $pts[$k] = evalbasic($v);
+                                $pts[$k] = ($k<2) ? evalbasic($v) : $v;
                             }
                         }
                         $settings[$i] = implode(':', $pts);
@@ -196,8 +196,8 @@ class DrawingAnswerBox implements AnswerBox
         } else {
             $plot = showplot($background, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
         }
-        if (is_array($settings[4]) && count($settings[4]) > 2) {
-            $plot = addlabel($plot, $settings[1], 0, $settings[4][2], "black", "aboveleft");
+        if (is_array($xsclgridpts) && count($xsclgridpts) > 2) {
+            $plot = addlabel($plot, $settings[1], 0, $xsclgridpts[2], "black", "aboveleft");
         }
         if (is_array($settings[5]) && count($settings[5]) > 2) {
             $plot = addlabel($plot, 0, $settings[3], $settings[5][2], "black", "belowright");
@@ -331,6 +331,12 @@ class DrawingAnswerBox implements AnswerBox
                         if (count($answerformat) > 1 && $answerformat[1] == 'horizparab') {$out .= 'class="sel" ';
                             $def = 6.1;}
                         $out .= ' alt="Horizontal parabola"/>';
+                    }
+                    if (count($answerformat) == 1 || in_array('halfparab', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tphalfparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.2\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'halfparab') {$out .= 'class="sel" ';
+                            $def = 6.2;}
+                        $out .= ' alt="Half Parabola"/>';
                     }
                     if (in_array('cubic', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpcubic.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.3\" ";
@@ -540,6 +546,16 @@ class DrawingAnswerBox implements AnswerBox
                 if ($function[0] == 'optional') {
                     array_shift($function);
                     $defcolor = 'grey';
+                }
+                if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
+                    $val = substr($function[1],1);
+                    if ($function[1][0]==='<') {
+                        $function[1] = '-oo';
+                        $function[2] = $val;
+                    } else {
+                        $function[1] = $val;
+                        $function[2] = 'oo';
+                    }
                 }
                 if ($answerformat[0] == 'inequality') {
                     if ($function[0][2] == '=') {

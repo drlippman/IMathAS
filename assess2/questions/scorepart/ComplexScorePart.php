@@ -48,6 +48,7 @@ class ComplexScorePart implements ScorePart
 
         if (empty($answerformat)) {$answerformat = '';}
         $ansformats = array_map('trim', explode(',', $answerformat));
+        $checkSameform = (in_array('sameform',$ansformats));
 
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -95,6 +96,18 @@ class ComplexScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
+
+            // rewrite +-
+            if (in_array('allowplusminus', $ansformats)) {
+                if (!in_array('list', $ansformats)) {
+                    $ansformats[] = 'list';
+                }
+                $answer = rewritePlusMinus($answer);
+                $givenans = rewritePlusMinus($givenans);
+                $gaarr = array_map('trim', explode(',', $givenans));    
+            }
+
+            $normalizedGivenAnswers = [];
             foreach ($gaarr as $i => $tchk) {
 
                 if (in_array('sloppycomplex', $ansformats)) {
@@ -124,6 +137,10 @@ class ComplexScorePart implements ScorePart
                         //return 0;
                         unset($gaarr[$i]);
                     }
+                }
+                if ($checkSameform) {
+                    $gafunc = parseMathQuiet($tchk, 'i');
+                    $normalizedGivenAnswers[$i] = $gafunc->normalizeTreeString();
                 }
             }
         } else { // if "complex"
@@ -168,6 +185,7 @@ class ComplexScorePart implements ScorePart
 
         $anarr = array_map('trim', explode(',', $answer));
         $annumarr = array();
+        $normalizedAnswers = [];
         foreach ($anarr as $i => $answer) {
             $ansparts = $this->parsesloppycomplex($answer);
             if ($ansparts === false) { //invalid - skip it
@@ -181,6 +199,10 @@ class ComplexScorePart implements ScorePart
                 }
             }
             $annumarr[] = $ansparts;
+            if ($checkSameform) {
+                $anfunc = parseMathQuiet($answer, 'i');
+                $normalizedAnswers[] = $anfunc->normalizeTreeString();
+            }
         }
 
         if (count($ganumarr) == 0) {
@@ -190,7 +212,7 @@ class ComplexScorePart implements ScorePart
         $extrapennum = count($ganumarr) + count($annumarr);
         $gaarrcnt = count($ganumarr);
         $correct = 0;
-        foreach ($annumarr as $i => $ansparts) {
+        foreach ($annumarr as $ai => $ansparts) {
             $foundloc = -1;
 
             foreach ($ganumarr as $j => $gaparts) {
@@ -205,6 +227,9 @@ class ComplexScorePart implements ScorePart
                             if (abs($ansparts[$i] - $gaparts[$i]) / (abs($ansparts[$i]) + .0001) >= $reltolerance + 1E-12) {break;}
                         }
                     }
+                }
+                if ($checkSameform && $normalizedAnswers[$ai] != $normalizedGivenAnswers[$j]) {
+                    break;
                 }
                 if ($i == count($ansparts)) {
                     $correct += 1;
