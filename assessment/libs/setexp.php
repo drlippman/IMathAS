@@ -38,12 +38,7 @@ const ALTS_SETEXP = array( "cap"=> "nn", "and" => "nn", "∩"=>"nn", "\\cap" => 
 const PRECEDENCE_SETEXP = array('!'=>0,"nn"=>1,"uu"=>1,"ominus"=>1,"-"=>2);
 // VENN2_SETEXP gives the coordinates for the 4 regions of the 2-circle Venn diagram, used in venn2diagram
 // In order: A'nB', AnB', AnB, BnA'
-/*const VENN2_SETEXP = array(
-    'path([[0,2.46],[1,2.73],[2,2.5],[2.7,1.75],[3,0.75],[2.6,-0.35],[2,-1],[1,-1.25],[0,-1],[0,-2],[4,-2],[4,4],[0,4],[0,2.46]]);path([[0,2.46],[-1,2.73],[-2,2.5],[-2.7,1.75],[-3,0.75],[-2.6,-0.35],[-2,-1],[-1,-1.25],[0,-1],[0,-2],[-4,-2],[-4,4],[0,4],[0,2.46]]);',
-    'path([[0,2.46],[-1,2.73],[-2,2.5],[-2.7,1.75],[-3,0.75],[-2.6,-0.35],[-2,-1],[-1,-1.25],[0,-1],[-0.77,-0.2],[-1,0.75],[-0.77,1.75],[0,2.46]]);',
-    'path([[0,-1],[0.77,-0.2],[1,0.75],[0.77,1.75],[0,2.46],[-0.77,1.75],[-1,0.75],[-0.77,-0.2],[0,-1]]);',
-    'path([[0,2.46],[1,2.73],[2,2.5],[2.7,1.75],[3,0.75],[2.6,-0.35],[2,-1],[1,-1.25],[0,-1],[0.77,-0.2],[1,0.75],[0.77,1.75],[0,2.46]]);');
-*/
+
 const VENN2_SETEXP = array(
     'path([[0,2.46],[0.33,2.614],[0.67,2.703],[1,2.73],[1.33,2.703],[1.67,2.614],[2,2.462],[2.33,2.224],[2.67,1.83],[2.85,1.49],[2.96,1.128],[3,0.73],[2.96,0.332],[2.85,-0.03],[2.67,-0.37],[2.33,-0.764],[2,-1.002],[1.67,-1.154],[1.33,-1.243],[1,-1.27],[0.67,-1.243],[0.33,-1.154],[0,-1],[0,-1.9],[3.4,-1.9],[3.4,3.4],[0,3.4],[0,2.46]]);path([[0,2.46],[-0.33,2.614],[-0.67,2.703],[-1,2.73],[-1.33,2.703],[-1.67,2.614],[-2,2.462],[-2.33,2.224],[-2.67,1.83],[-2.85,1.49],[-2.96,1.128],[-3,0.73],[-2.96,0.332],[-2.85,-0.03],[-2.67,-0.37],[-2.33,-0.764],[-2,-1.002],[-1.67,-1.154],[-1.33,-1.243],[-1,-1.27],[-0.67,-1.243],[-0.33,-1.154],[0,-1],[0,-1.9],[-3.4,-1.9],[-3.4,3.4],[0,3.4],[0,2.46]]);',
     'path([[0,2.46],[-0.33,2.614],[-0.66,2.703],[-1,2.73],[-1.33,2.703],[-1.67,2.614],[-2,2.462],[-2.33,2.224],[-2.67,1.83],[-2.85,1.49],[-2.96,1.128],[-3,0.75],[-2.96,0.332],[-2.85,-0.03],[-2.67,-0.37],[-2.33,-0.764],[-2,-1.002],[-1.67,-1.154],[-1.33,-1.243],[-1,-1.27],[-0.67,-1.243],[-0.33,-1.154],[0,-1],[-0.25,-0.831],[-0.54,-0.546],[-0.74,-0.256],[-0.88,0.048],[-0.97,0.385],[-1,0.75],[-0.97,1.075],[-0.88,1.412],[-0.74,1.716],[-0.54,2.006],[-0.25,2.291],[0,2.46]]);',
@@ -59,7 +54,6 @@ const VENN3_SETEXP = array(
     'path([[-1,0.73],[-0.67,0.884],[-0.33,0.973],[0,1],[0.33,0.973],[0.67,0.884],[1,0.73],[0.97,0.385],[0.90,0.106],[0.76,-0.22],[0.6,-0.47],[0.33,-0.764],[0,-1],[-0.33,-0.764],[-0.6,-0.47],[-0.76,-0.22],[-0.9,0.106],[-0.97,0.385],[-1,0.73]]);',
     'path([[1,0.73],[1.33,0.494],[1.57,0.239],[1.72,0.02],[1.85,-0.24],[1.97,-0.655],[2,-1],[1.67,-1.154],[1.33,-1.243],[1.01,-1.27],[0.67,-1.243],[0.33,-1.154],[0,-1],[0.33,-0.764],[0.6,-0.47],[0.76,-0.22],[0.9,0.106],[0.97,0.385],[1,0.73]]);',
     'path([[0,-1],[-0.33,-1.154],[-0.67,-1.243],[-1.01,-1.27],[-1.33,-1.243],[-1.67,-1.154],[-2,-1],[-1.95,-1.444],[-1.85,-1.760],[-1.72,-2.01],[-1.5,-2.323],[-1.23,-2.577],[-1,-2.73],[-0.67,-2.884],[-0.33,-2.973],[0,-3],[0.33,-2.973],[0.67,-2.884],[1,-2.73],[1.23,-2.577],[1.5,-2.323],[1.72,-2.01],[1.85,-1.760],[1.95,-1.444],[2,-1],[1.67,-1.154],[1.33,-1.243],[1.01,-1.27],[0.67,-1.243],[0.33,-1.154],[0,-1]]);');
-
 
 ///////////
 // NOTES //
@@ -796,21 +790,31 @@ function venn2diagram($vars,$shade="",$labels="",$size=200){
     $HEADER = 'initPicture(-3.5,3.5,-3.5,3.5);strokewidth="0";fill="red";';
     $LABELS = 'strokewidth="5";fill="none";rect([-3.4,-1.9],[3.4,3.4]);circle([-1,0.73],2);circle([1,0.73],2);text([-1.5,2],"'.$labelA.'");text([1.5,2],"'.$labelB.'");';
     
+    $alts = [
+        _('The region outside both sets'),
+        sprintf(_('The region only in %s'), $labelA),
+        sprintf(_('The region where %s and %s overlap'), $labelA, $labelB),
+        sprintf(_('The region only in %s'), $labelB)
+    ];
+    $alt = sprintf(_('A venn diagram with two overlapping circles labeled %s and %s.'), $labelA, $labelB);
+
     // If nothing to shade, done
     if($shade == ""){
         $script = $HEADER.$LABELS;
-        return showasciisvg($script,$size,$size);
+        return showasciisvg($script,$size,$size,$alt);
     }
     // Else let A = {1,2}, B = {2,3} and U={0,1,2,3} and compute the members of $shade, the members correspond to the regions of VENN2_SETEXP constant to shade
     $shade = setexpToPostfix($shade);
     $vars = array($A => array(1,2), $B=>array(2,3));
     $regions = setexpPostfixEvaluate($shade,$vars,array(0,1,2,3));
     $DRAW = "";
+    $alt .= _('The following regions are shaded:');
     foreach($regions as $region){
         $DRAW = $DRAW.VENN2_SETEXP[$region];
+        $alt .= ' ' . $alts[$region] . '.';
     }
     $script = $HEADER.$DRAW.$LABELS;
-    return showasciisvg($script,$size,$size);
+    return showasciisvg($script,$size,$size,$alt);
 }
 
 // VENN3_SETEXPDIAGRAM
@@ -842,20 +846,36 @@ function venn3diagram($vars,$shade="",$labels="",$size=250){
     }
     $HEADER = 'initPicture(-3.5,3.5,-3.5,3.5);strokewidth="0";fill="red";';
     $LABELS = 'strokewidth="5";fill="none";rect([-3.4,-3.4],[3.4,3.4]);circle([-1,0.73],2);circle([1,0.73],2);circle([0,-1],2);text([-1.5,2],"'.$labelA.'");text([1.5,2],"'.$labelB.'");text([0,-2.5],"'.$labelC.'");';
+    
+    $alts = [
+        _('The region outside all three sets'),
+        sprintf(_('The region only in %s'), $labelA),
+        sprintf(_('The region only in %s and %s'), $labelA, $labelB),
+        sprintf(_('The region only in %s'), $labelB),
+        sprintf(_('The region only in %s and %s'), $labelA, $labelC),
+        _('The region in all three sets'),
+        sprintf(_('The region only in %s and %s'), $labelB, $labelC),
+        sprintf(_('The region only in %s'), $labelC)
+    ];
+    $alt = sprintf(_('A venn diagram with three overlapping circles labeled %s, %s, and %s. '), $labelA, $labelB, $labelC);
+
     // If nothing to shade, done
     if($shade == ""){
         $script = $HEADER.$LABELS;
-        return showasciisvg($script,$size,$size);
+        return showasciisvg($script,$size,$size, $alt);
     }
     $shade = setexpToPostfix($shade);
     $vars = array($A => array(1,2,4,5), $B=>array(2,3,5,6), $C=>array(4,5,6,7));
     $regions = setexpPostfixEvaluate($shade,$vars,array(0,1,2,3,4,5,6,7));
     $DRAW = "";
+    $alt .= _('The following regions are shaded:');
+
     foreach($regions as $region){
         $DRAW = $DRAW.VENN3_SETEXP[$region];
+        $alt .= ' ' . $alts[$region] . '.';
     }
     $script = $HEADER.$DRAW.$LABELS;
-    return showasciisvg($script,$size,$size);
+    return showasciisvg($script,$size,$size, $alt);
     
 }
 ?>
