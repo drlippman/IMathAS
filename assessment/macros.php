@@ -37,7 +37,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
- "isset","atan2","keepif","checkanswerformat","preg_match","intval");
+ "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -5396,6 +5396,24 @@ function comparenumberswithunits($unitExp1, $unitExp2, $tol='0.001') {
       }
     }
   }
+}
+
+function comparesameform($a,$b,$vars="x") {
+    $variables = array_values(array_filter(array_map('trim', explode(",", $vars)), 'strlen'));
+    $ofunc = array();
+    for ($i = 0; $i < count($variables); $i++) {
+        //find f() function variables
+        if (strpos($variables[$i],'()')!==false) {
+            $ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
+            $variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+        }
+    }
+    $vlist = implode(',', $variables);
+    $flist = implode(',', $ofunc);
+    $afunc = parseMathQuiet($a, $vlist, [], $flist);
+    $bfunc = parseMathQuiet($b, $vlist, [], $flist);
+
+    return ($afunc->normalizeTreeString() === $bfunc->normalizeTreeString());
 }
 
 function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) {
