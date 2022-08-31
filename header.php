@@ -370,7 +370,7 @@ require_once("$curdir/filter/filter.php");
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 
-if (!isset($nologo)) {
+if (!isset($nologo) && !empty($smallheaderlogo)) {
 	echo '<div id="headerlogo" class="hideinmobile" ';
 	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
 		echo 'onclick="mopen(\'homemenu\',';
