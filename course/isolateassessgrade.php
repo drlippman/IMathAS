@@ -49,7 +49,7 @@
     if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
             $calledfrom='isolateassess';
-            $_POST['checked'] = $_POST['stus'];
+            $_POST['checked'] = $_POST['stus'] ?? [];
             $_POST['assesschk'] = array($aid);
 			include("massexception.php");
         }
