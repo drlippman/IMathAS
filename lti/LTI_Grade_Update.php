@@ -177,7 +177,7 @@ class LTI_Grade_Update {
     string $comment = ''
   ) {
     $canvasext = [
-        'new_submission' => $isstu
+        'new_submission' => ($isstu ? true : false)
     ];
     if ($isstu && !empty($addedon)) {
         $canvasext['submitted_at'] = date('Y-m-d\TH:i:s.uP', $addedon);
