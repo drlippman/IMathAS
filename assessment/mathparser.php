@@ -387,7 +387,10 @@ class MathParser
         // look to see if the symbol is in our list of variables and functions
         if (preg_match($this->regex, substr($str,$n), $matches)) {
           $nextSymbol = $matches[1];
-          if (in_array($nextSymbol, $this->funcvariables)) {
+          if (in_array($nextSymbol, $this->funcvariables) &&
+            strlen($str) > $n+strlen($nextSymbol) &&
+            $str[$n+strlen($nextSymbol)] == '('
+          ) {
             // found a variable acting as a function 
             $tokens[] = [
               'type'=>'function',
