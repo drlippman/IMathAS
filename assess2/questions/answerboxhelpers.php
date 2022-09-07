@@ -663,7 +663,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'" role="group" ';
   if (preg_match('/aria-label=".*?"/', $answerbox, $arialabel)) {
     $answerbox = preg_replace('/aria-label=".*?"/',
-      'aria-label="'.Sanitize::encodeStringForDisplay($specsoln).'"', $answerbox);
+      'aria-label="'.Sanitize::encodeStringForDisplay(str_replace('`','',$specsoln)).'"', $answerbox);
     $out .= $arialabel[0];
   }
   $out .= '>';
