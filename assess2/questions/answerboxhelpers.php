@@ -53,7 +53,12 @@ function checkreqtimes($tocheck,$rtimes) {
 			} else if ($list[$i]=='ignore_symbol') {
 				$cleanans = str_replace($list[$i+1],'',$cleanans);
 				continue;
-			}
+			} else if ($list[$i]=='ignore_spaces') {
+				if ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1') {
+					$cleanans = str_replace(' ','',$cleanans);
+				}
+				continue;
+            }
 			$comp = substr($list[$i+1],0,1);
 			if (substr($list[$i+1],1,1)==='=') { //<=, >=, ==, !=
 				if ($comp=='<' || $comp=='>') {
@@ -74,8 +79,12 @@ function checkreqtimes($tocheck,$rtimes) {
 						$all_numbers = $matches[0];
 						array_walk($all_numbers, 'ltrimzero');
 					}
-					$lookfor = ltrim(str_replace(array('-', ' '),'',substr($lookfor,1)), ' 0');
-					$nummatch = count(array_keys($all_numbers,$lookfor));
+					$lookfor = trim(substr($lookfor,1));
+                    if ($lookfor[0] == '-') {
+                        $lookfor = substr($lookfor,1);
+                    }
+                    $lookfor = ltrim($lookfor, ' 0');
+                    $nummatch = count(array_keys($all_numbers,$lookfor));
 				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
 					$regex = str_replace('/','\\/',substr($lookfor,6));
 					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);

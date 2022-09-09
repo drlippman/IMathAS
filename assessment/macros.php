@@ -2925,8 +2925,11 @@ function makenumberrequiretimes($arr) {
 	if (count($arr)==0) {
 		return "";
 	}
+    array_walk($arr, 'trim');
 	foreach ($arr as $k=>$num) {
-		$arr[$k] = str_replace(array('-', ' '),'',$num);
+        if ($num[0] == '-') {
+            $arr[$k] = substr($num,1);
+        }
 	}
 	$uniq = array_unique($arr);
 	$out = array();
