@@ -206,6 +206,8 @@ class QuestionHtmlGenerator
         }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
+        $qtextvars = $GLOBALS['interpretcurvars'];
+
         if (!$teacherInGb) {
             $toevalqtxt = preg_replace('~(<p[^>]*>\[teachernote\].*?\[/teachernote\]</p>|\[teachernote\].*?\[/teachernote\])~ms','',$toevalqtxt);
         } else {
@@ -221,6 +223,8 @@ class QuestionHtmlGenerator
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
 
         $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
+        $solnvars = $GLOBALS['interpretcurvars'];
+
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
@@ -647,15 +651,16 @@ class QuestionHtmlGenerator
          */
 
         try {
-          eval("\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
+          $prep = \genVarInit(array_unique($qtextvars));
+          eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
 
         /*
          * Eval the solution code.
          *
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
-
-         eval("\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
+         $prep = \genVarInit(array_unique($solnvars));
+         eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
        } catch (\Throwable $t) {
           $this->addError(
               _('Caught error while evaluating the text in this question: ')

@@ -24,6 +24,9 @@ $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$to
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
 {
+    if ($countcnt==1) {
+        $GLOBALS['interpretcurvars'] = [];
+    }
 	if ($blockname=="qtext") {
 		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
 		$str = str_replace('"','\"',$str);
@@ -39,6 +42,9 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
     $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt).';';
+        if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
+            $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
+        }
 		return $r;
 	}
 }
@@ -351,6 +357,9 @@ function tokenize($str,$anstype,$countcnt) {
 				echo sprintf(_('Eeek.. unallowed var %s!'), Sanitize::encodeStringForDisplay($out));
 				return array(array('',9));
 			}
+            if ($out !== '$') {
+                $GLOBALS['interpretcurvars'][] = $out;
+            }
 
 		} else if ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c=='_') { //is str
 			$intype = 2; //string like function name
@@ -708,6 +717,11 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str);
 	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
 
+    preg_match_all('/(\$\w+)/', $str, $m);
+    foreach ($m[0] as $v) {
+        $GLOBALS['interpretcurvars'][] = $v;
+    }
+
     if ($quotetype!='"') {
         return $str;
     }
@@ -814,5 +828,12 @@ function setseed($ns,$ref=0) {
 	}
 }
 
+function genVarInit($vars) {
+    $prep = '';
+    foreach ($vars as $var) {
+        $prep .= 'if (!isset('.$var.')){'.$var.'=null;}';
+    }
+    return $prep;
+}
 
 ?>
