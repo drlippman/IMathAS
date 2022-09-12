@@ -852,6 +852,11 @@ class QuestionHtmlGenerator
             $externalReferences
         );
 
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+            $onGetQuestion();
+        }
+
         return $question;
     }
 
