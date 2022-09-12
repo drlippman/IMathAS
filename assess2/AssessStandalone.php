@@ -230,6 +230,7 @@ class AssessStandalone {
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
+    $this->question = $question;
 
     list($qout,$scripts) = $this->parseScripts($question->getQuestionContent());
     $jsparams = $question->getJsParams();
