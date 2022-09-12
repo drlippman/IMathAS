@@ -22,6 +22,7 @@ class Question
     private $answerEntryTips;
     private $correctAnswersForParts;
     private $externalReferences;
+    private $extraData;
 
     private $errors = array();
 
@@ -174,5 +175,35 @@ class Question
           $out .= '</p></div>';
           return $out;
         }
+    }
+
+    /**
+     * Get extra question data.
+     *
+     * @return array|null An associative array of extra question data.
+     */
+    public function getExtraData(): ?array
+    {
+        return $this->extraData;
+    }
+
+    /**
+     * Set extra, arbitrary question data. This data will NOT be saved to the database.
+     *
+     * Note: Namespaced keys are recommended to avoid data collisions.
+     *       Example value for $extraData:
+     *                            [
+     *                              'mydomain' => [
+     *                                              'count' => 42
+     *                                            ]
+     *                            ]
+     *
+     * @param array|null $extraData An associative array of extra question data.
+     * @return Question An instance of self.
+     */
+    public function setExtraData(?array $extraData): Question
+    {
+        $this->extraData = $extraData;
+        return $this;
     }
 }
