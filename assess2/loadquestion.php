@@ -149,9 +149,12 @@ $assess_info->loadQuestionSettings($qidstoload, true, false);
 // For livepoll, verify seed and generate new question version if needed
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $curQuestionObject = $assess_record->getQuestionObject($qn, false, false, false);
-  if ($curQuestionObject['seed'] != $livepollStatus['seed']) {
+  if ($curQuestionObject['seed'] != $livepollStatus['seed'] ||
+    $qid != $livepollStatus['curqid']
+  ) {
     // teacher has changed seed. Need to generate a new question version.
-    $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $livepollStatus['seed']);
+    $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $livepollStatus['seed'], $livepollStatus['curqid']);
+    $assess_info->loadQuestionSettings([$qid], true, false);
   }
 }
 

@@ -419,11 +419,17 @@ class AssessRecord
    * @param  int     $qn          Question #
    * @param  int     $qid         Current Question ID
    * @param  int     $forceseed   (optional) Force a particular seed (-1 to not force)
+   * @param  int     $forceqid    (optional) Force a particular question (-1 to not force)
    * @return int   New question ID
    */
-  public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
-    list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
-    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
+  public function buildNewQuestionVersion($qn, $qid, $forceseed = -1, $forceqid = -1) {
+    if ($forceseed > -1 && $forceqid > -1) {
+        $question = $forceqid;
+        $seed = $forceseed;
+    } else {
+        list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
+        list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
+    }
     // build question data
     $newver = array(
       'qid' => $question,
