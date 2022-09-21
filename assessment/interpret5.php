@@ -717,7 +717,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str);
 	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
 
-    preg_match_all('/(?<!\\\\)(\$\w+)/', $str, $m);
+    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*)/', $str, $m);
     foreach ($m[0] as $v) {
         $GLOBALS['interpretcurvars'][] = $v;
     }
