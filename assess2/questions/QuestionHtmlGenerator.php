@@ -140,6 +140,10 @@ class QuestionHtmlGenerator
 
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
 
+        if ($printFormat) {
+            $GLOBALS['capturechoiceslivepoll'] = true;
+        }
+
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
           // un-array it
@@ -470,6 +474,11 @@ class QuestionHtmlGenerator
                 if ($printFormat) {
                     $answerbox[$atIdx] = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox[$atIdx]);
                     $answerbox[$atIdx] = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox[$atIdx]);
+                    
+                    if ($anstype === 'choices') {
+                        $qanskey = array_search($jsParams[$qnRef]['livepoll_ans'], $jsParams[$qnRef]['livepoll_randkeys']);
+                        $displayedAnswersForParts[$atIdx] = chr(65+$qanskey) . ': ' . $displayedAnswersForParts[$atIdx];    
+                    }
                 }
                 // enact hidetips if set
                 if (!empty($hidetips) && (!is_array($hidetips) || !empty($hidetips[$atIdx]))) {
@@ -494,7 +503,6 @@ class QuestionHtmlGenerator
               $jsParams['submitall'] = 1;
             }
         } else {
-
 
             if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10) {
                 if (isset($anstypes)) {
@@ -548,6 +556,11 @@ class QuestionHtmlGenerator
             if ($printFormat) {
                 $answerbox = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox);
                 $answerbox = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox);
+
+                if ($quesData['qtype'] == 'choices') {
+                    $qanskey = array_search($jsParams[$qnRef]['livepoll_ans'], $jsParams[$qnRef]['livepoll_randkeys']);
+                    $displayedAnswersForParts[0] = chr(65+$qanskey) . ': ' . $displayedAnswersForParts[0];
+                }
             }
 
             // enact hidetips if set

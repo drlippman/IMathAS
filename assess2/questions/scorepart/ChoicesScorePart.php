@@ -80,7 +80,7 @@ class ChoicesScorePart implements ScorePart
             $RND->shuffle($randkeys);
         }
 
-        if ($givenans==='NA' || $givenans === null || $isRescore) {
+        if ($givenans==='NA' || $givenans === null || $givenans === '' || $isRescore) {
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else {
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
@@ -96,7 +96,7 @@ class ChoicesScorePart implements ScorePart
             $anss[$k] = intval($v);
         }
         //if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
-        $adjGiven = $isRescore ? $givenans : $randkeys[$givenans];
+        $adjGiven = ($isRescore || !isset($randkeys[$givenans])) ? $givenans : $randkeys[$givenans];
 
         if (in_array($adjGiven,$anss)) {
             $scorePartResult->setRawScore(1);
