@@ -635,7 +635,7 @@ function draw_circlesector() {
         $in[2] = '';
       }
       $in[2] = preg_replace('/;/',',',$in[2]);
-      if (isset($in[2])) {
+      if (isset($in[2]) && $in[2] != '') {
         $altPointLabel = " labeled ".$in[2];
       }
       $args = $args . "text([".(1.2*$xAngPt).",".(1.2*$yAngPt)."],'$in[2]');";
