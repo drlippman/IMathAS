@@ -641,7 +641,7 @@ function draw_circlesector() {
       $args = $args . "text([".(1.2*$xAngPt).",".(1.2*$yAngPt)."],'$in[2]');";
       $hasPoint = true;
       $altNumPts = $altNumPts + 1;
-      $altPtsArray[] = [$angPt,$in[2]];
+      $altPtsArray[] = [$angPt,$in[2],$altPointLabel];
     }
     
     if ($in[0]=="center") {
@@ -802,7 +802,9 @@ function draw_circlesector() {
     
     if ($hasPoint === true) {
       foreach ($altPtsArray as $altPt) {
-        if ($altPt[0] < 90) {
+        if ($altPt[0] == 0) {
+          $altPointLoc = " at the far right point on the circle";
+        } elseif ($altPt[0] < 90) {
           $altPointLoc = " in the top right quarter of the circle";
         } elseif ($altPt[0] == 90) {
           $altPointLoc = " at the top point on the circle";
@@ -819,7 +821,7 @@ function draw_circlesector() {
         } elseif ($altPt[0] == 360) {
           $altPointLoc = " at the far right point on the circle";
         }
-        $alt = $alt.", and a point".$altPointLab.$altPointLoc.$altPointLabel;
+        $alt = $alt.", and a point".$altPointLab.$altPointLoc.$altPt[2];
       }
     }
     $alt .= ".";
