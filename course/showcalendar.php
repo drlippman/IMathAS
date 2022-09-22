@@ -113,7 +113,6 @@
 								$(".calupdatenotice").html(_("Error saving change"));
 								$(dropped).detach().css({top: 0,left: 0}).appendTo($("#"+$(dropped).data("originalParent")).find("div.center"));
 							} else {
-								console.log(msg.success);
 								$(".calupdatenotice").html("");
 								var daycaldata = caleventsarr[$(dropped).data("originalParent")].data;
 								for (var i=0; i<daycaldata.length;i++) {
@@ -135,7 +134,6 @@
 						}).fail(function() {
 								$(dropped).detach().css({top: 0,left: 0}).appendTo($("#"+$(dropped).data("originalParent")).find("div.center"));
 						});
-						console.log(ui.draggable[0].id + " dropped on " + this.id);
 					}
 
 				}
