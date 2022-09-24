@@ -1940,7 +1940,7 @@ class AssessRecord
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
       }
-      if ($tryToShow === 'scored') {
+      if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$qver['scored_try'][$pn]]['wrongfmt']);
       } else {
