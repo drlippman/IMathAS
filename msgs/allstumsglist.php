@@ -123,7 +123,7 @@ function chgfilter() {
 	<p>Filter by student: <select id="filterstu" class='pii-full-name' onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
-	if ($filtercid==0) {
+	if ($filterstu==0) {
 		echo "selected=1 ";
 	}
 	echo ">All students</option>";

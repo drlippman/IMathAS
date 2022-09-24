@@ -20,7 +20,7 @@ if (isset($teacherid)) {
 $cid = Sanitize::courseId($_GET['cid']);
 $forumid = Sanitize::onlyInt($_GET['forum']);
 $threadid = Sanitize::onlyInt($_GET['thread']);
-$page = Sanitize::onlyInt($_GET['page']);
+$page = Sanitize::onlyInt($_GET['page'] ?? 1);
 if (!empty($_GET['embed'])) {
 	$flexwidth = true;
 	$nologo = true;
