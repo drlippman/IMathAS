@@ -8,9 +8,9 @@ require_once(__DIR__."/TeacherAuditLog.php");
 //$tounenroll = array of userids
 //$delforum = delete all forum posts
 //$deloffline = delete offline items from gradebook
-//$unwithdraw = unset any withdrawn questions
+//$unwithdrawn = unset any withdrawn questions
 //$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false,$upgradeassess=false) {
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdrawn=false,$delwikirev=false,$usereplaceby=false,$upgradeassess=false) {
 	global $DBH, $userid;
 	$cid = intval($cid);
 	$stulist = implode(',', array_map('intval', $tounenroll));
@@ -197,7 +197,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	if ($deloffline) {
 		$DBH->query("DELETE FROM imas_gbitems WHERE courseid=$cid");
 	}
-	if ($withwithdraw=='unwithdraw' && count($assesses)>0) {
+	if ($withwithdrawn=='unwithdraw' && count($assesses)>0) {
 		$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid IN ($aidlist)";
 		$DBH->query($query); //values already sanitized
 		/*foreach ($assesses as $aid) {
@@ -207,7 +207,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	}
 
 	if ($withwithdrawn=='remove' || $usereplaceby) {
-		$msg = updateassess($cid, $withwithdraw=='remove', $usereplaceby);
+		$msg = updateassess($cid, $withwithdrawn=='remove', $usereplaceby);
 	}
 
 	if ($upgradeassess) {

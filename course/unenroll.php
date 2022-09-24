@@ -12,7 +12,7 @@ ini_set("max_execution_time", "600");
 		require("../footer.php");
 		exit;
 	}
-	$get_uid = Sanitize::simpleString($_GET['uid']);
+	$get_uid = Sanitize::simpleString($_GET['uid'] ?? '');
 
 	if (isset($_POST['dounenroll'])) { //do unenroll - postback
 		if ($get_uid=="selected") {
@@ -27,7 +27,7 @@ ini_set("max_execution_time", "600");
 			$tounenroll[] = $get_uid;
 		}
 
-		if (!isset($_POST['delwikirev'])) {
+		if (isset($_POST['delwikirev'])) {
 			$delwikirev = intval($_POST['delwikirev']);
 		} else {
 			$delwikirev = 0;
