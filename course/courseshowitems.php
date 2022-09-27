@@ -298,6 +298,16 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				} else {
 					$show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startdate, $enddate);
 				}
+                if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && $viewall) {
+                    $seclist = implode(', ', array_map(function($v) { return substr($v,2); }, $items[$i]['grouplimit']));
+                    $show .= '. ';
+                    if (count($items[$i]['grouplimit'])>1) {
+                        $show .= _('Limited to sections');
+                    } else {
+                        $show .= _('Limited to section');
+                    }
+                    $show .= ' ' . Sanitize::encodeStringForDisplay($seclist) . '.';
+                }
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					echo '<div class="block folder" ';
 					if ($titlebg!='') {
