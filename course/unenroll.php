@@ -76,7 +76,7 @@ ini_set("max_execution_time", "600");
 			$stm = $DBH->prepare("SELECT COUNT(imas_students.id) FROM imas_students,imas_users WHERE imas_students.userid=imas_users.id AND imas_students.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 
-			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
+			if (empty($_POST['checked']) || count($_POST['checked']) == $stm->fetchColumn(0)) {
 				$get_uid = 'all';
 			} else {
 				$get_uid = 'selected';

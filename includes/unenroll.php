@@ -13,7 +13,7 @@ require_once(__DIR__."/TeacherAuditLog.php");
 function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdrawn=false,$delwikirev=false,$usereplaceby=false,$upgradeassess=false) {
 	global $DBH, $userid;
 	$cid = intval($cid);
-	$stulist = implode(',', array_map('intval', $tounenroll));
+
 	$forums = array();
 	$threads = array();
 	$stm2 = $DBH->prepare("SELECT threadid FROM imas_forum_posts WHERE forumid=:forumid");
@@ -76,7 +76,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	if ($withwithdrawn=='remove' || $usereplaceby) {
 		require_once("$curdir/updateassess.php");
 	}
-	if (count($tounenroll)>0) {
+	if (!empty($tounenroll) && count($tounenroll)>0) {
+        $stulist = implode(',', array_map('intval', $tounenroll));
+
 		$gbitems = array();
 		$stm = $DBH->query("SELECT id FROM imas_gbitems WHERE courseid=$cid");
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -258,7 +260,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	}
 
 
-	if (count($tounenroll)>0) {
+	if (!empty($tounenroll) && count($tounenroll)>0) {
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid=$cid";
 		$DBH->query($query); //values already sanitized
 
