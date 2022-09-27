@@ -50,7 +50,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 } else {
-	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
+    echo '<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>';
 	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
