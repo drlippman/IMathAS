@@ -106,6 +106,7 @@ if ($canViewAll && $userid !== $uid) {
   }
   $userfullname = $row['LastName'] . ', ' . $row['FirstName'];
   $assessInfoOut['stu_fullname'] = $userfullname;
+  $assessInfoOut['noprint'] = 0;
 }
 
 // set userid
