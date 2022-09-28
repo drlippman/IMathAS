@@ -19,7 +19,7 @@
 	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($line == null) {
+	if ($line == false) {
 		echo "Course cannot be found";
 		exit;
 	}

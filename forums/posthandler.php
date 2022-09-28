@@ -849,7 +849,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$tochange = array();
 
 		function addchildren($b,&$tochange,$children) {
-			if (count($children[$b])>0) {
+			if (!empty($children[$b])) {
 				foreach ($children[$b] as $child) {
 					$tochange[] = $child;
 					if (isset($children[$child]) && count($children[$child])>0) {

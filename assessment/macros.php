@@ -2157,6 +2157,10 @@ function stringprepend($v,$s) {
 }
 
 function arraystodots($x,$y) {
+    if (!is_array($x) || !is_array($y)) {
+        echo "Error: inputs to arraystodots must be arrays";
+        return [];
+    }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
 		$out[] = $x[$i].','.$y[$i];
@@ -2165,6 +2169,10 @@ function arraystodots($x,$y) {
 }
 
 function arraystodoteqns($x,$y,$color='blue') {
+    if (!is_array($x) || !is_array($y)) {
+        echo "Error: inputs to arraystodoteqns must be arrays";
+        return [];
+    }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
 		$out[] = $y[$i].','.$color.','.$x[$i].','.$x[$i].','.'closed';
