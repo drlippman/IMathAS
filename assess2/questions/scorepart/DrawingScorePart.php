@@ -2016,7 +2016,11 @@ class DrawingScorePart implements ScorePart
         }
         if (empty($partweights)) {
             $scores = array_values($scores); // re-index so partweights applies right
-            $partweights = array_fill(0,count($scores),1/count($scores));
+            if (count($scores) > 0) {
+                $partweights = array_fill(0,count($scores),1/count($scores));
+            } else {
+                $partweights = [];
+            }
         } else {
             if (!is_array($partweights)) {
                 $partweights = array_map('trim',explode(',',$partweights));

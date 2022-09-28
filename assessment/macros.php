@@ -4033,7 +4033,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
-	if ($stu===null) {
+	if ($stu===null || !is_numeric($stunum)) {
 		return " ";
 	} else {
 		if (strval($tol)[0]=='|') {
