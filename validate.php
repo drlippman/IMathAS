@@ -11,12 +11,6 @@ if (isset($CFG['hooks']['validate'])) {
     require $CFG['hooks']['validate'];
 }
 
-if (isset($CFG['GEN']['randfunc'])) {
-    $randf = $CFG['GEN']['randfunc'];
-} else {
-    $randf = 'rand';
-}
-
 session_start();
 $sessionid = session_id();
 
