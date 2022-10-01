@@ -553,7 +553,7 @@
 	}
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
-	if ($stm->fetchColumn(0)>0) {
+	if ($stm->fetchColumn(0)>0 && !empty($qs) && !empty($avgscore)) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}

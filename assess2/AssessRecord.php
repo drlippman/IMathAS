@@ -3186,7 +3186,7 @@ class AssessRecord
         $qv = 0;
       }
       $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
-      if ($fb != $qdata['feedback']) {
+      if ((!isset($qdata['feedback']) && $fb != '') || (isset($qdata['feedback']) && $fb != $qdata['feedback'])) {
         $out[$av.'-'.$qn.'-'.$qv] = $fb;
       }
     }

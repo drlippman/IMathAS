@@ -335,7 +335,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=030322"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=100122"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -455,6 +455,9 @@
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
 		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
     }
+    if ($page==-1) {
+        echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button></p>';
+    }
     echo '</div>'; // filtersdiv
 	if ($page==-1 && $canedit) {
 		echo '<div class="fixedbottomright">';
@@ -535,6 +538,7 @@
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
+    echo '<div id="qlistwrap">';
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -572,9 +576,6 @@
 			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
 			$answeightTot = array_sum($qdata['answeights']);
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
-			if ($groupdup) {
-				echo '<div class="groupdup">';
-            }
             
             $classes = '';
             if ($qdata['gbrawscore']==1) {
@@ -607,7 +608,11 @@
             if (empty($qdata['work'])) {
                 $classes .= ' qfilter-nowork';
             }
-			echo "<div class=\"$classes bigquestionwrap\">";
+            if ($groupdup) {
+                $classes .= ' groupdup';
+            }
+            $lastchange = Sanitize::encodeStringForDisplay($qdata['lastchange']);
+			echo "<div class=\"$classes bigquestionwrap\" data-lastchange=\"$lastchange\">";
 			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
 
@@ -798,13 +803,12 @@
             }
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
-			if ($groupdup) {
-				echo '</div>';
-			}
+
 			$cnt++;
 		}
 		$assess_record->saveRecordIfNeeded();
 	}
+    echo '</div>'; //qlistwrap
 	if ($canedit) {
 		echo '<button type="submit">';
         if ($page == -1 || $page == count($stulist)-1) {
