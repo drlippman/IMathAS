@@ -1265,7 +1265,17 @@ function AMnumfuncPrepVar(qn,str) {
 
                  var pts = str.split(/\s*\*\s*/);
                  for (var i=0; i<pts.length; i++) {
-                     if (!unitsregexfull.test(pts[i]) && !unitsregexfull100.test(pts[i]) && !unitsregexfull001.test(pts[i]) && !unitsregexfull101.test(pts[i]) && !unitsregexfull201.test(pts[i]) && !unitsregexfull011.test(pts[i]) && !unitsregexfull211.test(pts[i])) {
+                    // get matches
+                    unitsregexmatch = pts[i].match(unitsregexfull101);
+                    // It should have three matches:  [fullmatch, prefix, unit]
+                    if (unitsregexmatch.length == 3) {
+                        // check that the prefix match is case sensitive
+                        var unitsregexabbprefixfull = new RegExp("^" + unitsregexabbprefix + "$");
+                        if (!unitsregexabbprefixfull.test(unitsregexmatch[1])) {
+                            unitsbadcase = true;
+                        }
+                     }
+                     if ((!unitsregexfull.test(pts[i]) && !unitsregexfull100.test(pts[i]) && !unitsregexfull001.test(pts[i]) && !unitsregexfull101.test(pts[i]) && !unitsregexfull201.test(pts[i]) && !unitsregexfull011.test(pts[i]) && !unitsregexfull211.test(pts[i])) || unitsbadcase) {
                          err += _('Unknown unit ')+'"'+pts[i]+'". ';
                      }
                  }
