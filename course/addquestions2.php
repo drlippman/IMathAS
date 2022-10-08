@@ -699,6 +699,7 @@ if ($overwriteBody==1) {
                             <option value="calcinterval">Calculated Interval</option>
                             <option value="complex">Complex</option>
                             <option value="calccomplex">Calculated Complex</option>
+							<option value="chemeqn">Chemical Equation</option>
                             <option value="file">File Upload</option>
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>
