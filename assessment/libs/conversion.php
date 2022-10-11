@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 25;
+	return 26;
 }
 
 global $allowedmacros;
@@ -1132,10 +1132,13 @@ function conversionArea2() {
             $retval[2] = array("",1,$quote.$unitabbr["acre"].$quote, 43560, $unitabbr["feet"]);
             $retval[3] = array("",1,$unitabbr["mile"],640,$quote.$unitabbr["acre"].$quote);
             $html = "y";
-            for($i=0;$i<4;$i+=1){
+            for($i=0;$i<2;$i+=1){
                 if($i>0) {$html = "n";}
                 $retval[$i][0] = conversionUnits2ScreenReader2($retval[$i][1],$retval[$i][2],2,number_format($retval[$i][3]),$retval[$i][4],2,"=",$tick,$html);
             }
+            $retval[2][0] = conversionUnits2ScreenReader2($retval[2][1],$retval[2][2],1,number_format($retval[2][3]),$retval[2][4],2,"=",$tick,$html);
+            $retval[3][0] = conversionUnits2ScreenReader2($retval[3][1],$retval[3][2],2,number_format($retval[3][3]),$retval[3][4],1,"=",$tick,$html);
+
         } else {
             $retval[0] = array("",1,$unit["feet squared"], 144, $unit["inches squared"]);
             $retval[1] = array("",1,$unit["yard squared"], 9, $unit["feet squared"]);
@@ -3027,7 +3030,9 @@ function conversionWeight() {
 
 //  WAMAP Question ID: 201697
 
-// 2022-xx-xx ver 26 - TODO: add a make fraction converion function
+// 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+//
+// 2022-10-10 ver 26 - Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
 //
 // 2022-08-17 ver 25 - Fixed Typos
 //

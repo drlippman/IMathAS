@@ -27,7 +27,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 	 	 continue;
 			 	 }
 			 }
-			 if (!$viewall && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
+			 if (!$viewall && !empty($studentinfo) && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
 				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
 					 continue;
 				 }

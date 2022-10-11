@@ -25,6 +25,7 @@ require_once(__DIR__ . '/questions/models/ShowAnswer.php');
 require_once(__DIR__ . '/questions/ScoreEngine.php');
 require_once(__DIR__ . '/questions/models/ScoreQuestionParams.php');
 
+use IMathAS\assess2\questions\models\Question;
 use IMathAS\assess2\questions\QuestionGenerator;
 use IMathAS\assess2\questions\models\QuestionParams;
 use IMathAS\assess2\questions\models\ShowAnswer;
@@ -37,6 +38,7 @@ class AssessStandalone {
   private $state = array();
   private $qdata = array();
   private $now = 0;
+  private $question = null;
 
   /**
    * Construct object
@@ -93,6 +95,17 @@ class AssessStandalone {
   */
   function setQuestionData($qsid, $data) {
     $this->qdata[$qsid] = $data;
+  }
+
+    /**
+     * Get the Question object.
+     *
+     * Note: This only returns a Question after calling displayQuestion().
+     *
+     * @return Question|null The Question object
+     */
+  function getQuestion(): ?Question {
+      return $this->question;
   }
 
   /*
@@ -217,6 +230,7 @@ class AssessStandalone {
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
+    $this->question = $question;
 
     list($qout,$scripts) = $this->parseScripts($question->getQuestionContent());
     $jsparams = $question->getJsParams();
@@ -364,12 +378,19 @@ class AssessStandalone {
       $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
     }
 
-    return array(
+    $returnData = [
         'scores'=>$scores,
         'raw'=>$rawparts,
         'errors'=>$scoreResult['errors'],
         'allans'=>$allPartsAns
-    );
+    ];
+
+    if (isset($GLOBALS['CFG']['hooks']['assess2/assess_standalone'])) {
+        require_once($GLOBALS['CFG']['hooks']['assess2/assess_standalone']);
+        $returnData = onScoreQuestionReturn($returnData, $scoreResult);
+    }
+
+    return $returnData;
   }
 
   private function parseScripts($html) {

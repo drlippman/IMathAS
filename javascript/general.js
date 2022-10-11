@@ -1541,7 +1541,7 @@ function initSageCell(base) {
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
                     code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {
@@ -1552,7 +1552,7 @@ function initSageCell(base) {
 				}
 			} else {
 				code = jQuery(ta[0]).val().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
 				ta = ta[0];
 			}
 		}

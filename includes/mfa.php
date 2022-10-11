@@ -6,7 +6,9 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
     if ($error !== '') {
         echo '<p class=noticetext>'._('Invalid code - try again').'</p>';
     }
-    echo '<p>'._('Enter the 2-factor authentication code from your device').'</p>';
+    echo '<p>'._('Enter the 2-factor authentication code from your device').'. ';
+    echo _('This code can be found in the Google Authenticator compatible app, like Authy, that you set up when you enabled 2-factor authentication.');
+    echo '</p>';
     echo '<form method="POST" action="'.$redir.'">';
     echo '<input type=hidden name=action value="entermfa" />';
     echo '<p>'._('Code: ').'<input size=8 name=mfatoken /></p>';

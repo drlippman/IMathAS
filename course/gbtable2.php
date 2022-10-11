@@ -1690,6 +1690,7 @@ function gbtable() {
 
 	//pull excusals
 	$excused = array();
+    $hasexcused = array();
 	$query = "SELECT userid,type,typeid FROM imas_excused WHERE courseid=?";
 	if ($limuser>0) {
 		$query .= " AND userid=?";
@@ -1703,15 +1704,24 @@ function gbtable() {
 		if (!isset($sturow[$r['userid']])) {
 			continue;
 		}
+        $refcol = -1;
 		if ($r['type']=='A') {
-			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][14] = 1;
+            $refcol = $assesscol[$r['typeid']];
+            $ci = $assessidx[$r['typeid']];
 		} else if ($r['type']=='O') {
-			$gb[$sturow[$r['userid']]][1][$gradecol[$r['typeid']]][14] = 1;
+            $refcol = $gradecol[$r['typeid']];
+            $ci = $gradeidx[$r['typeid']];
 		} else if ($r['type']=='E') {
-			$gb[$sturow[$r['userid']]][1][$exttoolcol[$r['typeid']]][14] = 1;
+            $refcol = $exttoolcol[$r['typeid']];
+            $ci = $exttoolidx[$r['typeid']];
 		} else if ($r['type']=='F') {
-			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][14] = 1;
+            $refcol = $discusscol[$r['typeid']];
+            $ci = $discussidx[$r['typeid']];
 		}
+        if ($refcol != -1) {
+			$gb[$sturow[$r['userid']]][1][$refcol][14] = 1;
+            $cats[$category[$ci]][14] = 1; // set hasexcused marker on $cats;
+        }
 	}
 
 	//fill out cattot's with zeros && remove excused from tots
@@ -1915,7 +1925,7 @@ function gbtable() {
 		$gb[0][2][$pos][10] = $cat;
 		$gb[0][2][$pos][12] = $cats[$cat][6];
 		$gb[0][2][$pos][13] = $cats[$cat][7];
-		$gb[0][2][$pos][14] = ($cats[$cat][4]!=0);
+		$gb[0][2][$pos][14] = ($cats[$cat][4]!=0 || !empty($cats[$cat][14]));
 
 		if (count($catposspast[$cat])>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past

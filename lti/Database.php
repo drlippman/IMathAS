@@ -452,19 +452,24 @@ class Imathas_LTI_Database implements LTI\Database
                 $stm->execute(array($userid, $localcourse->get_courseid()));
             }
         } else {
-            $stm = $this->dbh->prepare('SELECT id,lticourseid FROM imas_students WHERE userid=? AND courseid=?');
-            $stm->execute(array($userid, $localcourse->get_courseid()));
-            $row = $stm->fetch(PDO::FETCH_ASSOC);
-            if ($row === false || $row === null) {
-                $stm = $this->dbh->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
-                $stm->execute(array(':id'=>$localcourse->get_courseid()));
-                $deflatepass = $stm->fetchColumn(0);
+            // check to see if they're already a teacher or tutor
+            $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=? UNION SELECT id FROM imas_tutors WHERE userid=? AND courseid=?');
+            $stm->execute(array($userid, $localcourse->get_courseid(), $userid, $localcourse->get_courseid()));
+            if ($stm->fetchColumn(0) === false) {
+                $stm = $this->dbh->prepare('SELECT id,lticourseid FROM imas_students WHERE userid=? AND courseid=?');
+                $stm->execute(array($userid, $localcourse->get_courseid()));
+                $row = $stm->fetch(PDO::FETCH_ASSOC);
+                if ($row === false || $row === null) {
+                    $stm = $this->dbh->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
+                    $stm->execute(array(':id'=>$localcourse->get_courseid()));
+                    $deflatepass = $stm->fetchColumn(0);
 
-                $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,latepass,lticourseid) VALUES (?,?,?,?,?)');
-                $stm->execute(array($userid, $localcourse->get_courseid(), $section, $deflatepass, $localcourse->get_id()));
-            } else if ($row['lticourseid'] !== $localcourse->get_id()) {
-                $stm = $this->dbh->prepare('UPDATE imas_students SET lticourseid=? WHERE id=?');
-                $stm->execute(array($localcourse->get_id(), $row['id']));
+                    $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,latepass,lticourseid) VALUES (?,?,?,?,?)');
+                    $stm->execute(array($userid, $localcourse->get_courseid(), $section, $deflatepass, $localcourse->get_id()));
+                } else if ($row['lticourseid'] !== $localcourse->get_id()) {
+                    $stm = $this->dbh->prepare('UPDATE imas_students SET lticourseid=? WHERE id=?');
+                    $stm->execute(array($localcourse->get_id(), $row['id']));
+                }
             }
         }
     }

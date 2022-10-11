@@ -12,7 +12,7 @@ ini_set("max_execution_time", "600");
 		require("../footer.php");
 		exit;
 	}
-	$get_uid = Sanitize::simpleString($_GET['uid']);
+	$get_uid = Sanitize::simpleString($_GET['uid'] ?? '');
 
 	if (isset($_POST['dounenroll'])) { //do unenroll - postback
 		if ($get_uid=="selected") {
@@ -27,7 +27,7 @@ ini_set("max_execution_time", "600");
 			$tounenroll[] = $get_uid;
 		}
 
-		if (!isset($_POST['delwikirev'])) {
+		if (isset($_POST['delwikirev'])) {
 			$delwikirev = intval($_POST['delwikirev']);
 		} else {
 			$delwikirev = 0;
@@ -76,7 +76,7 @@ ini_set("max_execution_time", "600");
 			$stm = $DBH->prepare("SELECT COUNT(imas_students.id) FROM imas_students,imas_users WHERE imas_students.userid=imas_users.id AND imas_students.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 
-			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
+			if (empty($_POST['checked']) || count($_POST['checked']) == $stm->fetchColumn(0)) {
 				$get_uid = 'all';
 			} else {
 				$get_uid = 'selected';

@@ -43,7 +43,7 @@ $now = time();
 $preview_all = ($canViewAll && !empty($_POST['preview_all']));
 
 // load settings including question info
-$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all);
+$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all || $_POST['in_print'] == 1);
 $assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);

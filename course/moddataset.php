@@ -819,9 +819,9 @@
 	}
 	*/
 	$useeditor = "noinit";
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=071522"></script>';
-	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css?v=091522">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -967,7 +967,7 @@
 	   </script>';
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
-		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
+		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto; clip-path: inset(0px);}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
 		#qtbox .CodeMirror-scroll {min-height:150px; max-height:600px;}
 		.CodeMirror-selectedtext {color: #ffffff !important;background-color: #3366AA;}

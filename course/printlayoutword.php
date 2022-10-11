@@ -528,19 +528,19 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
         $showanswer[$kidx] = $shans[$kidx];
       }
 		}
-	} else {
-		if ($qdata['qtype']=='matrix' || $qdata['qtype']=='calcmatrix') {
-			unset($options['answersize']); //pandoc doesn't like nested tables
-		}
-		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
-    if ($qdata['qtype']=='choices' || $qdata['qtype']=='multans') {
-      $answerbox = str_replace(['<ul class=nomark>','</ul>'],
-        ['<ol style="list-style-type:upper-alpha">', '</ol>'],
-        $answerbox);
-    }
-    if (!isset($showanswer)) {
-      $showanswer = $shans[0];
-    }
+    } else {
+        if ($qdata['qtype']=='matrix' || $qdata['qtype']=='calcmatrix') {
+            unset($options['answersize']); //pandoc doesn't like nested tables
+        }
+        list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+        if ($qdata['qtype']=='choices' || $qdata['qtype']=='multans') {
+            $answerbox = str_replace(['<ul class=nomark>','</ul>'],
+                ['<ol style="list-style-type:upper-alpha">', '</ol>'],
+                $answerbox);
+        }
+        if (!isset($showanswer)) {
+        $showanswer = $shans[0];
+        }
 	}
 
 	$retstrout .= "<div class=q>";

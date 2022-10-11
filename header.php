@@ -19,7 +19,7 @@ if (isset($CFG['hooks']['header'])) {
 if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 } else {
-	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
+    echo '<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>';
 	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
@@ -74,7 +74,7 @@ div.breadcrumb { display:none;}
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=061022"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=091522"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -370,7 +370,7 @@ require_once("$curdir/filter/filter.php");
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 
-if (!isset($nologo)) {
+if (!isset($nologo) && !empty($smallheaderlogo)) {
 	echo '<div id="headerlogo" class="hideinmobile" ';
 	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
 		echo 'onclick="mopen(\'homemenu\',';

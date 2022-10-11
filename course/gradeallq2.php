@@ -54,6 +54,8 @@
 	} else {
 		$secfilter = -1;
 	}
+    $userprefUseMQ = (!isset($_SESSION['userprefs']['useeqed']) ||
+        $_SESSION['userprefs']['useeqed'] == 1);
 
 	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
@@ -351,6 +353,7 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=021021" type="text/javascript"></script>';
     }
+    
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
 	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
 
@@ -633,7 +636,8 @@
 			echo $qdata['html'];
 			echo '<script type="text/javascript">
 				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("questionwrap'.$cnt.'"));
+                    var useMQ = ' . ((empty($qdata['jsparams']['noMQ']) && $userprefUseMQ) ? 'true' : 'false') . ';
+					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', useMQ, document.getElementById("questionwrap'.$cnt.'"));
 				});
 				</script>';
 			echo '</div></div>';

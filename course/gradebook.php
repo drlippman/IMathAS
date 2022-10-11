@@ -1523,7 +1523,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 						} else {
 							echo $gbt[$i][2][$j][$availshow];
 						}
-					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops or attempted
+					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops/excused or attempted
 						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
 					} else {
 						echo $gbt[$i][2][$j][$availshow];

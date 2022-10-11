@@ -109,10 +109,10 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   //set status
   $query = "UPDATE imas_livepoll_status SET ";
-  $query .= "curquestion=?,curstate=?,seed=?,startt=? ";
+  $query .= "curquestion=?,curstate=?,seed=?,startt=?,curqid=? ";
   $query .= "WHERE assessmentid=?";
   $stm = $DBH->prepare($query);
-  $stm->execute(array($newQuestion, $newState, $seed, 0, $aid));
+  $stm->execute(array($newQuestion, $newState, $seed, 0, $qid, $aid));
 
   //output
   $assessInfoOut['livepoll_status'] = array(
@@ -123,18 +123,20 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   );
 } else if ($newState === 2) {
 
-  // Opening the question for student input
-  $query = "UPDATE imas_livepoll_status SET ";
-  $query .= "curquestion=?,curstate=?,startt=? ";
-  $query .= "WHERE assessmentid=?";
-  $stm = $DBH->prepare($query);
-  $stm->execute(array($newQuestion, $newState, $now, $aid));
-
   // load question seed
   list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
   $assess_info->loadQuestionSettings($qidstoload, false, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
+
+  // Opening the question for student input
+  $query = "UPDATE imas_livepoll_status SET ";
+  $query .= "curquestion=?,curstate=?,startt=?,curqid=? ";
+  $query .= "WHERE assessmentid=?";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($newQuestion, $newState, $now, $qid, $aid));
+
+  
 
   //output
   $assessInfoOut['livepoll_status'] = array(
@@ -167,18 +169,20 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     exit;
   }
 } else if ($newState === 3 || $newState === 4) {
-  // Closing the question for student input
-  $query = "UPDATE imas_livepoll_status SET ";
-  $query .= "curquestion=?,curstate=?,startt=0 ";
-  $query .= "WHERE assessmentid=?";
-  $stm = $DBH->prepare($query);
-  $stm->execute(array($newQuestion, $newState, $aid));
-
   // lookup question seed
   list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
   $assess_info->loadQuestionSettings($qidstoload, false, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
+
+  // Closing the question for student input
+  $query = "UPDATE imas_livepoll_status SET ";
+  $query .= "curquestion=?,curstate=?,startt=0,curqid=? ";
+  $query .= "WHERE assessmentid=?";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($newQuestion, $newState, $qid, $aid));
+
+
 
   //output
   $assessInfoOut['livepoll_status'] = array(

@@ -1678,7 +1678,7 @@ switch($_GET['action']) {
 		if (isset($_GET['error'])) {
 			echo '<p class=noticetext>Invalid code - try again</p>';
 		}
-		echo '<p>Enter the 2-factor authentication code from your device</p>';
+		echo '<p>Enter the 2-factor authentication code from your device. This code can be found in the Google Authenticator compatible app, like Authy, that you set up when you enabled 2-factor authentication.</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'">';
 		echo '<input type=hidden name=action value="entermfa" />';
 		echo '<p>Code: <input size=8 name=mfatoken /></p>';

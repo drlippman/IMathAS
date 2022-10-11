@@ -66,7 +66,7 @@ if ($myrights < 75) {
     $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist ";
     $query .= "FROM imas_courses JOIN imas_users ON imas_courses.ownerid=imas_users.id ";
     $query .= "JOIN imas_teachers ON imas_teachers.courseid=imas_courses.id WHERE imas_teachers.userid=:uid ";
-    $query .= " ORDER BY imas_courses.name";
+    $query .= " ORDER BY imas_courses.available>3,imas_courses.name";
     $stm = $DBH->prepare($query);
   	$stm->execute(array(':uid'=>$uid));
     $courses_teaching = array();

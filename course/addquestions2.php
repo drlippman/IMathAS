@@ -384,7 +384,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=062522\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090722\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=041422\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
@@ -699,6 +699,7 @@ if ($overwriteBody==1) {
                             <option value="calcinterval">Calculated Interval</option>
                             <option value="complex">Complex</option>
                             <option value="calccomplex">Calculated Complex</option>
+							<option value="chemeqn">Chemical Equation</option>
                             <option value="file">File Upload</option>
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>

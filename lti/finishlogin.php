@@ -182,8 +182,15 @@ if ($role == 'Instructor' && $localcourse === null) {
 } else {
 
   // enroll student in course if needed
-  $contextlabel = $launch->get_platform_context_label();
-  $db->enroll_if_needed($localuserid, $role, $localcourse, $contextlabel);
+  $sectionlabel = $launch->get_platform_context_label();
+  $custom = $launch->get_custom();
+  if (!empty($custom['canvas_sections']) && $role != 'Instructor') {
+    $canvassections = json_decode($custom['canvas_sections'], true);
+    if (is_array($canvassections)) {
+        $sectionlabel .= ' - ' . $canvassections[0];
+    }
+  }
+  $db->enroll_if_needed($localuserid, $role, $localcourse, $sectionlabel);
 
   // we have a course connection
   if ($launch->is_deep_link_launch() && $role == 'Instructor') {

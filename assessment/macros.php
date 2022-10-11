@@ -37,7 +37,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
- "isset","atan2","keepif","checkanswerformat","preg_match","intval");
+ "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -2157,6 +2157,10 @@ function stringprepend($v,$s) {
 }
 
 function arraystodots($x,$y) {
+    if (!is_array($x) || !is_array($y)) {
+        echo "Error: inputs to arraystodots must be arrays";
+        return [];
+    }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
 		$out[] = $x[$i].','.$y[$i];
@@ -2165,6 +2169,10 @@ function arraystodots($x,$y) {
 }
 
 function arraystodoteqns($x,$y,$color='blue') {
+    if (!is_array($x) || !is_array($y)) {
+        echo "Error: inputs to arraystodoteqns must be arrays";
+        return [];
+    }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
 		$out[] = $y[$i].','.$color.','.$x[$i].','.$x[$i].','.'closed';
@@ -2925,8 +2933,11 @@ function makenumberrequiretimes($arr) {
 	if (count($arr)==0) {
 		return "";
 	}
+    array_walk($arr, 'trim');
 	foreach ($arr as $k=>$num) {
-		$arr[$k] = str_replace(array('-', ' '),'',$num);
+        if ($num[0] == '-') {
+            $arr[$k] = substr($num,1);
+        }
 	}
 	$uniq = array_unique($arr);
 	$out = array();
@@ -4030,7 +4041,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
-	if ($stu===null) {
+	if ($stu===null || !is_numeric($stunum)) {
 		return " ";
 	} else {
 		if (strval($tol)[0]=='|') {
@@ -4106,7 +4117,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			$abstol =false;
 		}
 		$type = "expression";
-		if (strpos($stu, '=')!==false && strpos($stu, '=')!==false) {
+		if (strpos($stu, '=')!==false) {
 			$type = "equation";
 		}
 		$stuorig = $stu;
@@ -5396,6 +5407,24 @@ function comparenumberswithunits($unitExp1, $unitExp2, $tol='0.001') {
       }
     }
   }
+}
+
+function comparesameform($a,$b,$vars="x") {
+    $variables = array_values(array_filter(array_map('trim', explode(",", $vars)), 'strlen'));
+    $ofunc = array();
+    for ($i = 0; $i < count($variables); $i++) {
+        //find f() function variables
+        if (strpos($variables[$i],'()')!==false) {
+            $ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
+            $variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+        }
+    }
+    $vlist = implode(',', $variables);
+    $flist = implode(',', $ofunc);
+    $afunc = parseMathQuiet($a, $vlist, [], $flist);
+    $bfunc = parseMathQuiet($b, $vlist, [], $flist);
+
+    return ($afunc->normalizeTreeString() === $bfunc->normalizeTreeString());
 }
 
 function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) {

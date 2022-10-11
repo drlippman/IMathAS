@@ -1302,7 +1302,7 @@ if ($stm->rowCount()==0) {
 					$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid=:typeid");
 					$stm->execute(array(':typeid'=>$_SESSION['place_aid']));
 					if ($stm->rowCount()==0) {
-						reporterror(sprintf("Error.  Assessment ID %s not found."),"'{$_SESSION['place_aid']}'");
+						reporterror(sprintf("Error.  Assessment ID %s not found.","'{$_SESSION['place_aid']}'"));
 					}
 					$sourceitemid = $stm->fetchColumn(0);
 					$cid = $destcid;

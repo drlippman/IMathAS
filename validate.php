@@ -11,12 +11,6 @@ if (isset($CFG['hooks']['validate'])) {
     require $CFG['hooks']['validate'];
 }
 
-if (isset($CFG['GEN']['randfunc'])) {
-    $randf = $CFG['GEN']['randfunc'];
-} else {
-    $randf = 'rand';
-}
-
 session_start();
 $sessionid = session_id();
 
@@ -48,9 +42,10 @@ if (strlen($sessionid) < 10) {
     echo sprintf(_("Error.  Please %s try again%s"), "<a href=\"$imasroot/index.php\">", "<a href=\"$imasroot/index.php\">", "</a>");
     exit;
 }
+
 if (!empty($_SESSION['userid'])) { // logged in
     $userid = $_SESSION['userid'];
-    $tzoffset = $_SESSION['tzoffset'];
+    $tzoffset = $_SESSION['tzoffset'] ?? 0;
     $tzname = '';
     if (isset($_SESSION['tzname']) && $_SESSION['tzname'] != '') {
         if (date_default_timezone_set($_SESSION['tzname'])) {

@@ -300,7 +300,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	   } else {
 		   $newmsgs = '';
 	   }
-	}
+	} else {
+        $newmsgs = '';
+    }
 	/* very old
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";

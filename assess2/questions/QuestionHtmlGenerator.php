@@ -140,6 +140,10 @@ class QuestionHtmlGenerator
 
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
 
+        if ($printFormat) {
+            $GLOBALS['capturechoiceslivepoll'] = true;
+        }
+
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
           // un-array it
@@ -206,6 +210,8 @@ class QuestionHtmlGenerator
         }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
+        $qtextvars = $GLOBALS['interpretcurvars'];
+
         if (!$teacherInGb) {
             $toevalqtxt = preg_replace('~(<p[^>]*>\[teachernote\].*?\[/teachernote\]</p>|\[teachernote\].*?\[/teachernote\])~ms','',$toevalqtxt);
         } else {
@@ -221,6 +227,8 @@ class QuestionHtmlGenerator
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
 
         $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
+        $solnvars = $GLOBALS['interpretcurvars'];
+
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
@@ -466,6 +474,11 @@ class QuestionHtmlGenerator
                 if ($printFormat) {
                     $answerbox[$atIdx] = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox[$atIdx]);
                     $answerbox[$atIdx] = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox[$atIdx]);
+                    
+                    if ($anstype === 'choices') {
+                        $qanskey = array_search($jsParams[$qnRef]['livepoll_ans'], $jsParams[$qnRef]['livepoll_randkeys']);
+                        $displayedAnswersForParts[$atIdx] = chr(65+$qanskey) . ': ' . $displayedAnswersForParts[$atIdx];    
+                    }
                 }
                 // enact hidetips if set
                 if (!empty($hidetips) && (!is_array($hidetips) || !empty($hidetips[$atIdx]))) {
@@ -490,7 +503,6 @@ class QuestionHtmlGenerator
               $jsParams['submitall'] = 1;
             }
         } else {
-
 
             if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10) {
                 if (isset($anstypes)) {
@@ -544,6 +556,11 @@ class QuestionHtmlGenerator
             if ($printFormat) {
                 $answerbox = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox);
                 $answerbox = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox);
+
+                if ($quesData['qtype'] == 'choices') {
+                    $qanskey = array_search($jsParams[$qnRef]['livepoll_ans'], $jsParams[$qnRef]['livepoll_randkeys']);
+                    $displayedAnswersForParts[0] = chr(65+$qanskey) . ': ' . $displayedAnswersForParts[0];
+                }
             }
 
             // enact hidetips if set
@@ -647,15 +664,16 @@ class QuestionHtmlGenerator
          */
 
         try {
-          eval("\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
+          $prep = \genVarInit(array_unique($qtextvars));
+          eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
 
         /*
          * Eval the solution code.
          *
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
-
-         eval("\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
+         $prep = \genVarInit(array_unique($solnvars));
+         eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
        } catch (\Throwable $t) {
           $this->addError(
               _('Caught error while evaluating the text in this question: ')
@@ -852,6 +870,11 @@ class QuestionHtmlGenerator
             $externalReferences
         );
 
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+            $onGetQuestion();
+        }
+
         return $question;
     }
 
@@ -929,25 +952,27 @@ class QuestionHtmlGenerator
         $hintloc = '';
 
         $lastkey = max(array_keys($hints));
+
         if ($qdata['qtype'] == "multipart" && is_array($hints[$lastkey])) { //individual part hints
             $hintloc = array();
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
                 $lastkey = max(array_keys($hintpart));
-
+                $hintloc[$iidx] = '';
                 if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
                     $usenum = 10000;
                     $allcorrect = true;
+                    $maxatt = 0;
                     $showfor = array_map('intval', $hintpart[$lastkey][1]);
                     foreach ($showfor as $subpn) {
                         if (!isset($partattemptn[$subpn])) {
                             $partattemptn[$subpn] = 0;
                         }
-                        if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$subpn] == 1) {
-                           continue; // don't consider correct
+                        if (isset($scoreiscorrect[$thisq][$subpn]) && $scoreiscorrect[$thisq][$subpn] == 1) {
+                            continue; // don't consider correct
                         } else {
-                           $allcorrect = false;
+                            $allcorrect = false;
                         }
                         if ($partattemptn[$subpn] > $lastkey && $lastkey < $usenum) {
                             $usenum = $lastkey;
@@ -955,16 +980,21 @@ class QuestionHtmlGenerator
                             $usenum = $partattemptn[$subpn];
                         }
                     }
-                    if ($allcorrect || $usenum == 10000) { 
+                    if ($allcorrect) {
+                        $maxatt = min($partattemptn)-1;
+                        if ($maxatt > $lastkey) {
+                            $usenum = $lastkey;
+                        } else {
+                            $usenum = max($maxatt,0);
+                        }
+                    }
+                    if ($usenum == 10000) { 
                         continue;
                     }
                     if (is_array($hintpart[$usenum])) {
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
-                    if (!empty($scoreiscorrect[$thisq][$iidx])) {
-                        continue;
-                    }
                     if (!isset($partattemptn[$iidx])) {
                         $partattemptn[$iidx] = 0;
                     }
@@ -972,6 +1002,9 @@ class QuestionHtmlGenerator
                         $usenum = $lastkey;
                     } else {
                         $usenum = $partattemptn[$iidx];
+                        if (!empty($scoreiscorrect[$thisq][$iidx]) && $scoreiscorrect[$thisq][$iidx]==1) {
+                            $usenum--;
+                        }
                     }
                 }
                 if (!empty($hintpart[$usenum])) {
@@ -986,13 +1019,20 @@ class QuestionHtmlGenerator
                     }
                 }
             }
-        } else if (!isset($scoreiscorrect) || $scoreiscorrect[$thisq] != 1) { //one hint for question
+        } else { //one hint for question
             if ($attemptn > $lastkey) {
                 $usenum = $lastkey;
             } else {
                 $usenum = $attemptn;
+                if (isset($scoreiscorrect) && ( 
+                    (!is_array($scoreiscorrect[$thisq]) && $scoreiscorrect[$thisq] == 1) ||
+                    (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) == 1)
+                )) {
+                    $usenum--;  // if correct, use prior hint
+                }
             }
-            if ($hints[$usenum] != '') {
+            
+            if (!empty($hints[$usenum])) {
                 if (strpos($hints[$usenum], '</div>') !== false) {
                     $hintloc = $hints[$usenum];
                 } else if (strpos($hints[$usenum], 'button"') !== false) {
@@ -1004,7 +1044,6 @@ class QuestionHtmlGenerator
                 }
             }
         }
-
         return $hintloc;
     }
 

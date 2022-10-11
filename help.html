@@ -2615,6 +2615,10 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
   Set domain to "xmin,xmax" to specify a domain for comparison, or "xmin,xmax,integers" to restrict domain to integer values.</li>
+<li><strong>comparesameform(a,b,[vars])</strong>: Compares expresions a and b to see if they are 
+    in the "same form". This means exactly the same, except for commutation of addition and 
+    multiplication, multiplication by 1, implicit multiplication, and extra parentheses. This is picky,
+    so use with caution. Set vars to a list of variables (defaults to 'x').</li>
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
@@ -3117,7 +3121,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	You can match either of two symbols by putting || between them, like ".5||1/2,>0"<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
 	You can put "ignore_commas,true" at the beginning of the $requiretimes to ignore commas in the answer<br/>
-	You can put "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer
+	You can put "ignore_spaces,true" at the beginning of the $requiretimes to ignore spaces in the answer<br/>
+    You can put "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer
 	</dd>
 <dt>$requiretimeslistpart = a list, in the same format as $requiretimes </dt>
 	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used,
@@ -3311,7 +3316,8 @@ A student is asked to enter a function
 	use "#" in the symbol location to match any number (including decimal values); 3.2x+42y would match twice.<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
 	You can match either of two symbols by putting || between them, like "x^-3||/x^3,>0"<br/>
-	Include "ignore_case,false" to make the search case sensitive.
+	Include "ignore_case,false" to make the search case sensitive.<br/>
+    You can put "ignore_spaces,true" at the beginning of the $requiretimes to ignore spaces in the answer<br/>
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
 <dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" or "list" (can combine, like "equation,nosoln")</dt>

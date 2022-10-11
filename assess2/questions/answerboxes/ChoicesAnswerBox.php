@@ -99,11 +99,11 @@ class ChoicesAnswerBox implements AnswerBox
 
         if ($displayformat == 'inline') {
             if ($colorbox != '') {$style .= ' class="' . $colorbox . '" ';} else { $style = '';}
-            $out .= "<span $style id=\"qnwrap$qn\" role=group ";
+            $out .= "<span $style id=\"qnwrap$qn\" role=radiogroup ";
             $out .= 'aria-label="' . $arialabel . '">';
         } else if ($displayformat != 'select') {
             if ($colorbox != '') {$style .= ' class="' . $colorbox . ' clearfix" ';} else { $style = ' class="clearfix" ';}
-            $out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group ";
+            $out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=radiogroup ";
             $out .= 'aria-label="' . $arialabel . '">';
         }
         if ($displayformat == "select") {

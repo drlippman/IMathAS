@@ -419,11 +419,17 @@ class AssessRecord
    * @param  int     $qn          Question #
    * @param  int     $qid         Current Question ID
    * @param  int     $forceseed   (optional) Force a particular seed (-1 to not force)
+   * @param  int     $forceqid    (optional) Force a particular question (-1 to not force)
    * @return int   New question ID
    */
-  public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
-    list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
-    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
+  public function buildNewQuestionVersion($qn, $qid, $forceseed = -1, $forceqid = -1) {
+    if ($forceseed > -1 && $forceqid > -1) {
+        $question = $forceqid;
+        $seed = $forceseed;
+    } else {
+        list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
+        list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
+    }
     // build question data
     $newver = array(
       'qid' => $question,
@@ -1934,7 +1940,7 @@ class AssessRecord
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
       }
-      if ($tryToShow === 'scored') {
+      if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$qver['scored_try'][$pn]]['wrongfmt']);
       } else {
@@ -2242,7 +2248,11 @@ class AssessRecord
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
-      $maxpn = max(array_keys($curq['tries']));
+      if (isset($curq['answeights'])) {
+        $maxpn = count($curq['answeights']) - 1;
+      } else {
+        $maxpn = max(array_keys($curq['tries']));
+      }
       for ($pn = 0; $pn <= $maxpn; $pn++) {
         if (empty($curq['tries'][$pn])) {
           $scorenonzeroparts[$pn] = -1;

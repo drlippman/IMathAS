@@ -15,7 +15,7 @@ require_once(__DIR__.'/../lti/LTI_Grade_Update.php');
  *                          to send after the $CFG-set queuedelay.
  * @param boolean $isstu    whether it was a student initiated grade change
  */
-function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=1) {
+function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=true) {
 	global $DBH, $CFG;
 
 	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
@@ -30,7 +30,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=1) {
 		':sourcedid' => $sourcedid,
 		':grade' => $grade,
 		':sendon' => (time() + ($sendnow?0:$LTIdelay)),
-        ':isstu' => $isstu,
+        ':isstu' => $isstu ? 1 : 0,
         ':addedon' => time()
 	));
 

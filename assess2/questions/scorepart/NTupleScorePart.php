@@ -337,6 +337,7 @@ class NTupleScorePart implements ScorePart
         $ntuples = [];
         $NCdepth = 0;
         $lastcut = 0;
+        $lastend = 0;
         $inor = false;
         $str = makepretty($str);
         $matchbracket = array(
@@ -346,47 +347,56 @@ class NTupleScorePart implements ScorePart
             '{' => '}'
         );
         $closebracket = '';
-    		$openbracket = '';
-    		for ($i=0; $i<strlen($str); $i++) {
-    				$dec = false;
-    				if ($str[$i]=='(' || $str[$i]=='[' || $str[$i]=='<' || $str[$i]=='{') {
-    						if ($NCdepth==0) {
-    								$lastcut = $i;
-    								$closebracket = $matchbracket[$str[$i]];
-    								$openbracket = $str[$i];
-    						}
-    						if ($openbracket == '' || $str[$i] == $openbracket) {
-    							$NCdepth++;
-    						}
-    				} else if ($str[$i]==$closebracket) {
-    						$NCdepth--;
-    						if ($NCdepth==0) {
-    								$thisTuple = array(
-                                        'lb' => $str[$lastcut],
-                                        'rb' => $str[$i],
-                                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
-    								);
-    								if ($do_eval) {
-                                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
-                                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
-                                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
-                                            }
-                                        }
-    								}
-    								if ($do_or && $inor) {
-    										$ntuples[count($ntuples)-1][] = $thisTuple;
-    								} else if ($do_or) {
-    										$ntuples[] = array($thisTuple);
-    								} else {
-    										$ntuples[] = $thisTuple;
-    								}
-    								$inor = ($do_or && substr($str, $i+1, 2)==='or');
-    								$openbracket = '';
-    								$closebracket = '';
-    						}
-    				}
-    		}
-    		return $ntuples;
+        $openbracket = '';
+        for ($i=0; $i<strlen($str); $i++) {
+            $dec = false;
+            if ($str[$i]=='(' || $str[$i]=='[' || $str[$i]=='<' || $str[$i]=='{') {
+                if ($NCdepth==0) {
+                    if ($lastend > 0) {
+                        $between = trim(substr($str, $lastend+1, $i-$lastend-1));
+                        $inor = ($do_or && $between === 'or');
+                        if ($between !== 'or' && $between !== ',' && $between !== '') {
+                            // invalid
+                            return $ntuples;
+                        }
+                    }
+                    $lastcut = $i;
+                    $closebracket = $matchbracket[$str[$i]];
+                    $openbracket = $str[$i];
+                }
+                if ($openbracket == '' || $str[$i] == $openbracket) {
+                    $NCdepth++;
+                }
+            } else if ($str[$i]==$closebracket) {
+                $NCdepth--;
+                if ($NCdepth==0) {
+                    $thisTuple = array(
+                        'lb' => $str[$lastcut],
+                        'rb' => $str[$i],
+                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
+                    );
+                    $lastend = $i;
+                    if ($do_eval) {
+                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
+                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
+                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
+                            }
+                        }
+                    }
+                    if ($do_or && $inor) {
+                            $ntuples[count($ntuples)-1][] = $thisTuple;
+                    } else if ($do_or) {
+                            $ntuples[] = array($thisTuple);
+                    } else {
+                            $ntuples[] = $thisTuple;
+                    }
+                    //$inor = ($do_or && substr($str, $i+1, 2)==='or');
+                    $openbracket = '';
+                    $closebracket = '';
+                }
+            }
+        }
+        return $ntuples;
     }
 
     private function ntupleToString($ntuples) {
