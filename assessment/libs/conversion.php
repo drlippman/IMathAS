@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26;
+	return 26.2;
 }
 
 global $allowedmacros;
@@ -1371,7 +1371,7 @@ function conversionCapacity2() {
             $retval[5] = array("",1,$unitabbr["Liter"],1000,$unitabbr["Milliliter"]);
         } else {
             $retval[0] = array("",1,$unit["Kiloliter"],1000,$unit["Liter"]);
-            $retval[1] = array("",1,$unit["Hectoliter"],100,$unitabbr["Liter"]);
+            $retval[1] = array("",1,$unit["Hectoliter"],100,$unit["Liter"]);
             $retval[2] = array("",1,$unit["Dekaliter"],10,$unit["Liter"]);
             $retval[3] = array("",1,$unit["Liter"],10,$unit["Deciliter"]);
             $retval[4] = array("",1,$unit["Liter"],100,$unit["Centiliter"]);
@@ -1863,15 +1863,15 @@ function conversionLength2() {
         #region American to Metric Conversion
 
 		if($fullname==0) {
-			$retval[0] = array("",1,$unitabbr["inch"],round(2.54, $rounding),$unitabbr["centimeter"]);      // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
-            $retval[1] = array("",1,$unitabbr["foot"],round(0.3048, $rounding),$unitabbr["meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
-            $retval[2] = array("",1,$unitabbr["yard"],round(0.9144, $rounding),$unitabbr["meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
-            $retval[3] = array("",1,$unitabbr["mile"],round(1.60934400, $rounding),$unitabbr["kilometer"]); // 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
+			$retval[0] = array("",1,$unitabbr["inch"],round(2.54, $rounding),$unitabbr["Centimeter"]);      // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
+            $retval[1] = array("",1,$unitabbr["foot"],round(0.3048, $rounding),$unitabbr["Meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
+            $retval[2] = array("",1,$unitabbr["yard"],round(0.9144, $rounding),$unitabbr["Meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
+            $retval[3] = array("",1,$unitabbr["mile"],round(1.60934400, $rounding),$unitabbr["Kilometer"]); // 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
         } else {
-			$retval[0] = array("",1,$unit["inch"],round(2.54, $rounding),$unit["centimeter"]);
-            $retval[1] = array("",1,$unit["foot"],round(0.3048, $rounding),$unit["meter"]);
-            $retval[2] = array("",1,$unit["yard"],round(0.9144, $rounding),$unit["meter"]);
-            $retval[3] = array("",1,$unit["mile"],round(1.60934400, $rounding),$unit["kilometer"]);
+			$retval[0] = array("",1,$unit["inch"],round(2.54, $rounding),$unit["Centimeter"]);
+            $retval[1] = array("",1,$unit["foot"],round(0.3048, $rounding),$unit["Meter"]);
+            $retval[2] = array("",1,$unit["yard"],round(0.9144, $rounding),$unit["Meter"]);
+            $retval[3] = array("",1,$unit["mile"],round(1.60934400, $rounding),$unit["Kilometer"]);
         }
         for($i=0;$i<4;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign_tick {$retval[$i][3]} {$retval[$i][4]}";
