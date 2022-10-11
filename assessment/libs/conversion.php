@@ -1368,14 +1368,14 @@ function conversionCapacity2() {
             $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekaliter"],1,"n"),10,$unitabbr["Liter"]);
             $retval[3] = array("",1,$unitabbr["Liter"],10,$unitabbr["Deciliter"]);
             $retval[4] = array("",1,$unitabbr["Liter"],100,$unitabbr["Centiliter"]);
-            $retval[5] = array("",1,$unitabbr["Liter"],100,$unitabbr["Milliliter"]);
+            $retval[5] = array("",1,$unitabbr["Liter"],1000,$unitabbr["Milliliter"]);
         } else {
             $retval[0] = array("",1,$unit["Kiloliter"],1000,$unit["Liter"]);
             $retval[1] = array("",1,$unit["Hectoliter"],100,$unitabbr["Liter"]);
             $retval[2] = array("",1,$unit["Dekaliter"],10,$unit["Liter"]);
             $retval[3] = array("",1,$unit["Liter"],10,$unit["Deciliter"]);
             $retval[4] = array("",1,$unit["Liter"],100,$unit["Centiliter"]);
-            $retval[5] = array("",1,$unit["Liter"],100,$unit["Milliliter"]);
+            $retval[5] = array("",1,$unit["Liter"],1000,$unit["Milliliter"]);
         }
         for($i=0;$i<6;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign {$retval[$i][3]} {$retval[$i][4]}";
@@ -2547,7 +2547,7 @@ function conversionWeight2() {
             $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n"),10,$unitabbr["Gram"]);
             $retval[3] = array("",1,$unitabbr["Gram"],10,$unitabbr["Decigram"]);
             $retval[4] = array("",1,$unitabbr["Gram"],100,$unitabbr["Centigram"]);
-            $retval[5] = array("",1,$unitabbr["Gram"],100,$unitabbr["Milligram"]);
+            $retval[5] = array("",1,$unitabbr["Gram"],1000,$unitabbr["Milligram"]);
             $retval[6] = array("",1,$unitabbr["Metric Ton"],1000,$unitabbr["Kilogram"]);
         } else {
             $retval[0] = array("",1,$unit["Kilogram"],1000,$unit["Gram"]);
@@ -2555,7 +2555,7 @@ function conversionWeight2() {
             $retval[2] = array("",1,$unit["Dekagram"],10,$unit["Gram"]);
             $retval[3] = array("",1,$unit["Gram"],10,$unit["Decigram"]);
             $retval[4] = array("",1,$unit["Gram"],100,$unit["Centigram"]);
-            $retval[5] = array("",1,$unit["Gram"],100,$unit["Milligram"]);
+            $retval[5] = array("",1,$unit["Gram"],1000,$unit["Milligram"]);
             $retval[6] = array("",1,$unit["Metric Ton"],1000,$unit["Kilogram"]);
         }
         for($i=0;$i<7;$i+=1){
