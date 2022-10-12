@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26.2;
+	return 26.3;
 }
 
 global $allowedmacros;
@@ -914,7 +914,7 @@ function conversionAbbreviations() {
 
             $retval[0] = $unit["Milligram"]." = ".$unitabbr["Milligram"];
             $retval[1] = $unit["Centigram"]." = ".$unitabbr["Centigram"];
-            $retval[2] = $unit["Decigram"]." = ".$unit["Decigram"];
+            $retval[2] = $unit["Decigram"]." = ".$unitabbr["Decigram"];
             $retval[3] = $unit["Gram"]." = ".$unitabbr["Gram"];
             $retval[4] = $unit["Dekagram"]." = ".conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n");
             $retval[5] = $unit["Hectogram"]." = ".$unitabbr["Hectogram"];
