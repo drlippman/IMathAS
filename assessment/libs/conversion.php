@@ -1170,7 +1170,7 @@ function conversionArea2() {
                 if($i>0) {$html = "n";}
                 $retval[$i][0] = conversionUnits2ScreenReader2($retval[$i][1],$retval[$i][2],2,number_format($retval[$i][3]),$retval[$i][4],2,"=",$tick,$html);
             }
-            $retval[6][0] = "{$retval[6][1]} {$retval[6][2]} = {$retval[6][3]} {$retval[6][4]}";
+            $retval[6][0] = conversionUnits2ScreenReader2($retval[6][1],$retval[6][2],1,number_format($retval[6][3]),$retval[6][4],2,"=",$tick,$html);
             $retval[7][0] = "{$retval[7][1]} {$retval[7][2]} = {$retval[7][3]} {$retval[7][4]}";
 
         } elseif($fullname==1) {
