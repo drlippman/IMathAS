@@ -3032,7 +3032,9 @@ function conversionWeight() {
 
 // 2022-xx-xx ver 27 - TODO: add a make fraction converion function
 //
-// 2022-10-10 ver 26 - Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
+// 2022-10-10 ver26.3- Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
+//  through            100 mg, mL
+// 2022-10-12          decigram abbriavation
 //
 // 2022-08-17 ver 25 - Fixed Typos
 //
