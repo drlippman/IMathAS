@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 25;
+	return 26.2;
 }
 
 global $allowedmacros;
@@ -1132,10 +1132,13 @@ function conversionArea2() {
             $retval[2] = array("",1,$quote.$unitabbr["acre"].$quote, 43560, $unitabbr["feet"]);
             $retval[3] = array("",1,$unitabbr["mile"],640,$quote.$unitabbr["acre"].$quote);
             $html = "y";
-            for($i=0;$i<4;$i+=1){
+            for($i=0;$i<2;$i+=1){
                 if($i>0) {$html = "n";}
                 $retval[$i][0] = conversionUnits2ScreenReader2($retval[$i][1],$retval[$i][2],2,number_format($retval[$i][3]),$retval[$i][4],2,"=",$tick,$html);
             }
+            $retval[2][0] = conversionUnits2ScreenReader2($retval[2][1],$retval[2][2],1,number_format($retval[2][3]),$retval[2][4],2,"=",$tick,$html);
+            $retval[3][0] = conversionUnits2ScreenReader2($retval[3][1],$retval[3][2],2,number_format($retval[3][3]),$retval[3][4],1,"=",$tick,$html);
+
         } else {
             $retval[0] = array("",1,$unit["feet squared"], 144, $unit["inches squared"]);
             $retval[1] = array("",1,$unit["yard squared"], 9, $unit["feet squared"]);
@@ -1365,14 +1368,14 @@ function conversionCapacity2() {
             $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekaliter"],1,"n"),10,$unitabbr["Liter"]);
             $retval[3] = array("",1,$unitabbr["Liter"],10,$unitabbr["Deciliter"]);
             $retval[4] = array("",1,$unitabbr["Liter"],100,$unitabbr["Centiliter"]);
-            $retval[5] = array("",1,$unitabbr["Liter"],100,$unitabbr["Milliliter"]);
+            $retval[5] = array("",1,$unitabbr["Liter"],1000,$unitabbr["Milliliter"]);
         } else {
             $retval[0] = array("",1,$unit["Kiloliter"],1000,$unit["Liter"]);
-            $retval[1] = array("",1,$unit["Hectoliter"],100,$unitabbr["Liter"]);
+            $retval[1] = array("",1,$unit["Hectoliter"],100,$unit["Liter"]);
             $retval[2] = array("",1,$unit["Dekaliter"],10,$unit["Liter"]);
             $retval[3] = array("",1,$unit["Liter"],10,$unit["Deciliter"]);
             $retval[4] = array("",1,$unit["Liter"],100,$unit["Centiliter"]);
-            $retval[5] = array("",1,$unit["Liter"],100,$unit["Milliliter"]);
+            $retval[5] = array("",1,$unit["Liter"],1000,$unit["Milliliter"]);
         }
         for($i=0;$i<6;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign {$retval[$i][3]} {$retval[$i][4]}";
@@ -1860,15 +1863,15 @@ function conversionLength2() {
         #region American to Metric Conversion
 
 		if($fullname==0) {
-			$retval[0] = array("",1,$unitabbr["inch"],round(2.54, $rounding),$unitabbr["centimeter"]);      // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
-            $retval[1] = array("",1,$unitabbr["foot"],round(0.3048, $rounding),$unitabbr["meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
-            $retval[2] = array("",1,$unitabbr["yard"],round(0.9144, $rounding),$unitabbr["meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
-            $retval[3] = array("",1,$unitabbr["mile"],round(1.60934400, $rounding),$unitabbr["kilometer"]); // 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
+			$retval[0] = array("",1,$unitabbr["inch"],round(2.54, $rounding),$unitabbr["Centimeter"]);      // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
+            $retval[1] = array("",1,$unitabbr["foot"],round(0.3048, $rounding),$unitabbr["Meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
+            $retval[2] = array("",1,$unitabbr["yard"],round(0.9144, $rounding),$unitabbr["Meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
+            $retval[3] = array("",1,$unitabbr["mile"],round(1.60934400, $rounding),$unitabbr["Kilometer"]); // 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
         } else {
-			$retval[0] = array("",1,$unit["inch"],round(2.54, $rounding),$unit["centimeter"]);
-            $retval[1] = array("",1,$unit["foot"],round(0.3048, $rounding),$unit["meter"]);
-            $retval[2] = array("",1,$unit["yard"],round(0.9144, $rounding),$unit["meter"]);
-            $retval[3] = array("",1,$unit["mile"],round(1.60934400, $rounding),$unit["kilometer"]);
+			$retval[0] = array("",1,$unit["inch"],round(2.54, $rounding),$unit["Centimeter"]);
+            $retval[1] = array("",1,$unit["foot"],round(0.3048, $rounding),$unit["Meter"]);
+            $retval[2] = array("",1,$unit["yard"],round(0.9144, $rounding),$unit["Meter"]);
+            $retval[3] = array("",1,$unit["mile"],round(1.60934400, $rounding),$unit["Kilometer"]);
         }
         for($i=0;$i<4;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign_tick {$retval[$i][3]} {$retval[$i][4]}";
@@ -2544,7 +2547,7 @@ function conversionWeight2() {
             $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n"),10,$unitabbr["Gram"]);
             $retval[3] = array("",1,$unitabbr["Gram"],10,$unitabbr["Decigram"]);
             $retval[4] = array("",1,$unitabbr["Gram"],100,$unitabbr["Centigram"]);
-            $retval[5] = array("",1,$unitabbr["Gram"],100,$unitabbr["Milligram"]);
+            $retval[5] = array("",1,$unitabbr["Gram"],1000,$unitabbr["Milligram"]);
             $retval[6] = array("",1,$unitabbr["Metric Ton"],1000,$unitabbr["Kilogram"]);
         } else {
             $retval[0] = array("",1,$unit["Kilogram"],1000,$unit["Gram"]);
@@ -2552,7 +2555,7 @@ function conversionWeight2() {
             $retval[2] = array("",1,$unit["Dekagram"],10,$unit["Gram"]);
             $retval[3] = array("",1,$unit["Gram"],10,$unit["Decigram"]);
             $retval[4] = array("",1,$unit["Gram"],100,$unit["Centigram"]);
-            $retval[5] = array("",1,$unit["Gram"],100,$unit["Milligram"]);
+            $retval[5] = array("",1,$unit["Gram"],1000,$unit["Milligram"]);
             $retval[6] = array("",1,$unit["Metric Ton"],1000,$unit["Kilogram"]);
         }
         for($i=0;$i<7;$i+=1){
@@ -3027,7 +3030,9 @@ function conversionWeight() {
 
 //  WAMAP Question ID: 201697
 
-// 2022-xx-xx ver 26 - planning to add a make fraction converion function
+// 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+//
+// 2022-10-10 ver 26 - Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
 //
 // 2022-08-17 ver 25 - Fixed Typos
 //
