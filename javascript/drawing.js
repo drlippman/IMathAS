@@ -40,6 +40,7 @@
 	5.4:  vector
 	6: parabola
 	6.1: horiz parabola
+	6.2: half parabola
 	6.3: cubic
 	6.5: square root
 	6.6: cube root
@@ -243,6 +244,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 			"horizparab": [{"mode":6.1, "descr":_("Parabola opening right or left"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
 			"halfparab": [{"mode":6.2, "descr":_("Half Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the half parabola")}],
 			"cubic": [{"mode":6.3, "descr":_("Cubic"), inN: 2, "input":_("Enter the inflection point, then another point on the cubic")}],
+			"sqrt": [{"mode":6.5, "descr":_("Square root"), inN: 2, "input":_("Enter the starting point of the square root, then another point on the graph")}],			
 			"cuberoot": [{"mode":6.6, "descr":_("Cube root"), inN: 2, "input":_("Enter the inflection point of the cube root, then another point on the graph")}],
 			"abs": [{"mode":8, "descr":_("Absolute value"), inN: 2, "input":_("Enter the corner point of the absolute value, then another point on the graph")}],
 			"rational": [{"mode":8.2, "descr":_("Rational"), inN: 2, "input":_("Enter the point where the vertical and horizontal asymptote cross, then a point on the graph")}],
