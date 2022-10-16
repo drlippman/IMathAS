@@ -161,7 +161,7 @@
 				$captioned = (preg_match('/"vssId":\s*"\./', $t))?1:0; 
             }
             $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
-			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
+			$newextref[] = $_POST['helptype'].'!!'.trim($_POST['helpurl']).'!!'.$captioned.'!!'.$helpdescr;
 		}
 		$extref = implode('~~',$newextref);
 		if (isset($_POST['doreplaceby'])) {
