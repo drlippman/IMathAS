@@ -266,7 +266,9 @@ class ScoreEngine
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
             require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
-            $scoreResult = onScoreQuestionResult($scoreResult, $varsForScorepart, $additionalVarsForScoring);
+            if (function_exists('onScoreQuestionResult')) {
+                $scoreResult = onScoreQuestionResult($scoreResult, $varsForScorepart, $additionalVarsForScoring);
+            }
         }
 
         restore_error_handler();
@@ -632,58 +634,48 @@ class ScoreEngine
             $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
         }
 
+        $returnData = [
+            'rawScores' => $raw,
+            'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+            'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+            'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
+            'answeights' => $answeights,
+        ];
+
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            if (function_exists('onScorePartMultiPart')) {
+                $returnData = onScorePartMultiPart($returnData, $scorePartResult);
+            }
+        }
+
         if ($scoremethodwhole == "singlescore") {
-            return array(
+            return array_merge($returnData, [
                 'scores' => array(round(array_sum($scores), 3)),
-                'rawScores' => $raw,
-                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'scoreMethod' => 'singlescore',
-                'answeights' => $answeights
-            );
+            ]);
         } else if ($scoremethodwhole == "allornothing") {
             if (array_sum($scores) < .98) {
-                return array(
+                return array_merge($returnData, [
                     'scores' => array(0),
-                    'rawScores' => $raw,
-                    'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                    'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                     'scoreMethod' => 'allornothing',
-                    'answeights' => $answeights
-                );
+                ]);
             } else {
-                return array(
+                return array_merge($returnData, [
                     'scores' => array(1),
-                    'rawScores' => $raw,
-                    'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                    'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                     'scoreMethod' => 'allornothing',
-                    'answeights' => $answeights
-                );
+                ]);
             }
         } else if ($scoremethodwhole == "acct") {
             $sc = round(array_sum($scores) / $accpts, 3);
-            return (array(
+            return array_merge($returnData, [
                 'scores' => array($sc),
-                'rawScores' => $raw,
-                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'scoreMethod' => 'singlescore',
-                'answeights' => $answeights
-            ));
+            ]);
         } else {
-            return array(
+            return array_merge($returnData, [
                 'scores' => $scores,
-                'rawScores' => $raw,
-                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
-                'answeights' => $answeights
-            );
+            ]);
         }
     }
 
@@ -714,7 +706,7 @@ class ScoreEngine
             }
         }
 
-        return array(
+        $returnData = array(
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 3)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
@@ -722,6 +714,15 @@ class ScoreEngine
             'correctAnswerWrongFormat' => array($scorePartResult->getCorrectAnswerWrongFormat()),
             'answeights' => array(1)
         );
+
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            if (function_exists('onScorePartNonMultiPart')) {
+                $returnData = onScorePartNonMultiPart($returnData, $scorePartResult);
+            }
+        }
+
+        return $returnData;
     }
 
     /**
