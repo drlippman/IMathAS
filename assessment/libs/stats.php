@@ -1581,22 +1581,68 @@ function binomialpdf($N,$p,$x) {
 		echo 'invalid inputs to invtcdf';
 		return 0;
 	}
-	return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
+    return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
+    /*  based on R, but doesn't seem to work right for x=1,n=30,p=.1
+    if ($N > 15) {
+        $lc = stirlerr($N) - stirlerr($x) - stirlerr($N-$x) - bd0($x,$N*$p) - bd0($N-$x,$N*(1-$p));
+        $lf = log(2*M_PI) + log($x) + log(1 - $x/$N);
+        $alt = exp($lc - 0.5*$lf);
+        echo (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));;
+        return $alt;
+    }
+	*/
 }
 
+function stirlerr($n) {
+    // from R. Only has the part for n>15
+    $S0  = 0.083333333333333333333;
+    $S1 =0.00277777777777777777778;
+    $S2 =0.00079365079365079365079365;
+    $S3 =0.000595238095238095238095238;
+    $S4 =0.0008417508417508417508417508;
+    $nn = $n*$n;
+    if ($n > 500) {
+        return ($S0 - $S1/$nn)/$n;
+    } else if ($n > 80) {
+        return ($S0 - ($S1 - $S2/$nn)/$nn)/$n;
+    } else if ($n > 35) {
+        return ($S0 - ($S1 - ($S2 - $S3/$nn)/$nn)/$nn)/$n;
+    } else { // if n > 15
+        return (($S0-($S1-($S2-($S3-$S4/$nn)/$nn)/$nn)/$nn)/$n);
+    }
+}
+
+function bd0($x,$np) {
+    if (abs($x-$np) < 0.1*($x+$np)) {
+        $v = ($x-$np)/($x+$np);
+        $s = ($x-$np)*$v;
+        $ej = 2*$x*$v;
+        $v = $v*$v;
+        for ($j=1; $j<50;$j++) {
+            $ej *= $v;
+            $s1 = $s + $ej/(($j<<1)+1);
+            if (abs($s-$s1)<1e-9) {
+                return $s1;
+            }
+            $s = $s1;
+        }
+    }
+    return $x*log($x/$np)+$np-$x;
+}
 
 //binomialcdf(N,p,x)
 //Computes the probably of &lt;=x successes out of N trials
 //where each trial has probability p of success
 function binomialcdf($N,$p,$x) {
-	if (!is_finite($p) || !is_finite($N) || $p<0 || $p>1 || $x < 0) {
-		echo 'invalid inputs to invtcdf';
+	if (!is_finite($p) || !is_finite($N) || $p<0 || $p>1 || $x < 0 || $x>$N) {
+		echo 'invalid inputs to binomialcdf';
 		return 0;
 	}
-	$out = 0;
-	for ($i=0;$i<=$x;$i++) {
-		$out += binomialpdf($N,$p,$i);
-	}
+    $z = $p;
+    $a = $x+1;
+    $b = $N-$x;
+    $out = round(1 - beta_cdf($z, $a, $b), 10);
+
 	return $out;
 }
 
