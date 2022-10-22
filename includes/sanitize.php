@@ -221,7 +221,7 @@ class Sanitize
 	public static function url($url)
 	{
 		// Sanitize url parts
-		$parsed_url = parse_url($url);
+		$parsed_url = parse_url(trim($url));
 		$scheme = isset($parsed_url['scheme'])
 			? preg_replace('/[^a-z]/i', '', $parsed_url['scheme']) : '';
 		$user = isset($parsed_url['user']) ? rawurlencode(rawurldecode($parsed_url['user'])) : '';

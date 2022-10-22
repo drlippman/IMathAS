@@ -50,19 +50,19 @@
 	<pre>$p = jsxPoint($board, [1, 2], ['label' => '`pi`'])</pre>
 	<p>Alternatively, you can use rendering hints to make your labels display in ASCII math, just pass your label as an array with the first
 	element containing your label, and the next element containing the word: 'display'. This will wrap your label in back-ticks for you. 
-	Another rendering hint you can use is 'makepretty', this will attemp to clean up things like 1*x^2 = x^2 or 0*x+2 = 2 in your functions
+	Another rendering hint you can use is 'makepretty', this will attempt to clean up things like 1*x^2 = x^2 or 0*x+2 = 2 in your functions
 	for nicer display. Test this extensively with your function as the regular expressions cleaning these can be buggy with different kinds
 	of functions, but should work fine with polynomials, exponentials, and basic elementary functions.</p>
 	<pre>$a = jsxFunction($board, "x+$a", ['label' => ["'y = x+' + $a.Value()", 'makepretty', 'display']])</pre>
-	<p>If you need to express the deriviative of a function, it is best to write f prime (x) in your ASCII Math because writing f'(x) can 
+	<p>If you need to express the derivative of a function, it is best to write f prime (x) in your ASCII Math because writing f'(x) can 
 	confuse the system since ' is used to start and end a string</p>
 	<p>You can also	create dynamic labels by using references to jsx objects in conjunction with javascript. To reference an object 
 	during creation, use the keyword 'this'. For instance, the following code will create a point that is labeled with its coordinates:</p>
 	<pre>$p = jsxPoint($board, [1, 2], ['label' => "'(' + this.X().toFixed(2) + ', ' + this.Y().toFixed(2) + ')'"])</pre>
-	This is obviouly more of an advanced feature, but the library is written with the ability to keep things simple, but allow the 
+	This is obviously more of an advanced feature, but the library is written with the ability to keep things simple, but allow the 
 	extensibility of advanced constructs so the user can take full advantage of the power of JSX Graph.</p>
 	<p>Lastly, for grading, you can pass important aspects to an answerbox, and all the library needs to know is the question number in the assignment - and
-	the answerbox number if you happen to be using a multipart question.</p><p>You can easily pass the quetion number through the variable [$thisq] that is
+	the answerbox number if you happen to be using a multipart question.</p><p>You can easily pass the question number through the variable [$thisq] that is
 	defined for all questions in an assessment. If you pass: ["answerbox" => [thisq]] for a point object, then you will see the 
 	coordinates of the point show up in the answerbox for this question. You can then grab this data from the answerbox to check an answer.
 	</p><p>I hope you find this library useful and easy to use. I've included a lot of example code below to give you ideas on how to use it. If you create a 
@@ -100,7 +100,7 @@
 	<li><a href="#jsxSuspendUpdate">jsxSuspendUpdate</a></li>
     <li><a href="#jsxUnsuspendUpdate">jsxUnsuspendUpdate</a></li>
     <li><a href="#jsxSetChild">jsxSetChild</a></li>
-	<li><a href="$jsx_getCoords">jsx_getCoords</li>
+	<li><a href="#jsx_getCoords">jsx_getCoords</li>
 	<li><a href="#jsx_getXCoord">jsx_getXCoord</a></li>
 	<li><a href="#jsx_getYCoord">jsx_getYCoord</a></li>
 
@@ -120,7 +120,7 @@
 		polar graphs must be square, so these only use the provided width</li>
     <li><i>navbar</i> (boolean) - include navigation buttons</li>
 	<li><i>zoom</i> (boolean) - allow for zooming</li>
-	<li><i>pan</i> (boolean) - alllow for panning</li> 
+	<li><i>pan</i> (boolean) - allow for panning</li> 
 	<li><i>centered</i> (boolean) - centers the board on screen if set to true, otherwise the board left-justified</li>
 	<li><i>bounds</i> [(float) xmin, (float) xmax, (float) ymin, (float) ymax] sets the min/max coordinate bounds for the axes. These are
 		ignored in polar graphs.</li>
@@ -170,7 +170,7 @@ $board = jsxBoard('polar', $ops)
     variable, the maximum value, and what increment each change to the slider has on the value of the variable. The function returns a reference
 	object to the slider that can be used in other parts of your construction to make interactive elements. $defaultval is an optional
 	parameter and can be used to set the starting position of the slider, if it is omitted then the default value is the midrange.</p>
-  <p>An additional associative array can be provided to have futher control over the look and feel of the slider</p>
+  <p>An additional associative array can be provided to have further control over the look and feel of the slider</p>
   <ul>
     <li><i>position</i> [[(float) x1, (float) y1], [(float) x2, (float) y2]] - sets the position of the slider on the board with starting coordinates
 		of (x1, y1), and ending at (x2, y2). By default, sliders are just placed in the upper left-hand corner of the board. Sliders are fixed
@@ -226,8 +226,8 @@ $f = jsxFunction($board, "($a) * (x-3)*(x+1)")
     <li><i>color</i> (string) - A value indicating the color of the point ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>size</i> (int) - sets the size of the point, defaults to 2</li>
-    <li><i>face</i> (string) - sets the face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleUp, 
-		triangleDown, triangleLeft, triangleRight</li>
+    <li><i>face</i> (string) - sets the face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleup, 
+		triangledown, triangleleft, triangleright</li>
     <li><i>label</i> (string) - attaches a text label to a point, ASCIIMath can be used.</li>
 	<li><i>fontsize</i> (integer) - Affects the font size of the label text.</li>
 	<li><i>fontcolor</i> (string) - The color for the label text</li>
@@ -266,7 +266,7 @@ $p = jsxPoint($board, [2, 1], $ops)
   <h2><a style="color:blue" name="jsxGlider">jsxGlider($board, [[$x, $y], $obj], <i>[$options]</i>)</a></h2>
   <p>Attaches a point to another object that has already been created, and restricts the movement of the point to this object. The input variable 
 	$board should be a reference to a board returned by jsxBoard(). The input location will adjust if the coordinates [$x, $y] does not 
-	appear on the curve of $obj, so choosing an $x value of where you want the point to start is genearlly sufficient. $obj must be a reference 
+	appear on the curve of $obj, so choosing an $x value of where you want the point to start is generally sufficient. $obj must be a reference 
 	returned by another objected created by jsxgraph. Functions, parametric functions, polar graphs, circles, lines, polygons, etc. are all types 
 	of curves that a Glider can be attached to. The return is a reference to the glider object such as $g, which can be used as a reference
 	in the creation of other objects. You can also reference its individual components with calls such as $g.X() or $g.Y().</p>
@@ -275,8 +275,8 @@ $p = jsxPoint($board, [2, 1], $ops)
     <li><i>color</i> (string) - A value indicating the color of the point ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>size</i> (int) - The size of the point, default is 2</li>
-    <li><i>face</i> (string) - The face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleUp, 
-		triangleDown, triangleLeft, triangleRight</li>
+    <li><i>face</i> (string) - The face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleup, 
+		triangledown, triangleleft, triangleright</li>
 	<li><i>label</i> (string) - Attaches a text label to the point, ASCIIMath can be used.</li>
 	<li><i>fontsize</i> (integer) - Affects the font size of the label text.</li>
 	<li><i>fontcolor</i> (string) - The color for the label text</li>
@@ -291,7 +291,7 @@ $p = jsxPoint($board, [2, 1], $ops)
     <p>Additional JavaScript functions that can be used in JSX constructions and labels:</p>
   <ul>
 	<li>.X() - the x-coordinate of the point</li>
-	<li>.Y() - the y-coorindate of the point</li>
+	<li>.Y() - the y-coordinate of the point</li>
   </ul>
  <p>Note: For easier grading you can either set question type to N-Tuple, or use the function jsx_getCoords() to help read the coordinates from the answerbox.</p>
    <h4>Example</h4>
@@ -313,8 +313,8 @@ $p = jsxGlider($board, [[0, -2], $c], ['label'=>"A", 'color' => 'blue', 'trace' 
     <li><i>color</i> (string) - A value indicating the color of the point ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>size</i> (int) - sets the size of the point, defaults to 2</li>
-    <li><i>face</i> (string) - sets the face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleUp, 
-		triangleDown, triangleLeft, triangleRight</li>
+    <li><i>face</i> (string) - sets the face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleup, 
+		triangledown, triangleleft, triangleright</li>
     <li><i>label</i> (string) - attaches a text label to a point, ASCIIMath can be used.</li>
 	<li><i>fontsize</i> (integer) - Affects the font size of the label text.</li>
 	<li><i>fontcolor</i> (string) - The color for the label text</li>
@@ -397,7 +397,7 @@ $f = jsxFunction($board, "-(x-$p.X())(x-$q.X())")
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
     <li><i>inputvariable</i> (string) - Changes the variable name that your x-y functions will take as input, defaults to <i>t</i>.</li>
-    <li><i>domain</i> [(float|string) lower, (float|string) upper] - Sets the bounds for the independed variable of the functions. 
+    <li><i>domain</i> [(float|string) lower, (float|string) upper] - Sets the bounds for the independent variable of the functions. 
 		Enter a numerical value for a static bound, or a reference to another jsx object such as a slider to have a dynamic bound.</li>
     <li><i>color</i> (string) - A value indicating the color of the curve ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
@@ -425,8 +425,8 @@ $curve = jsxParametric($board, ["3sin(4t + $d)", "3sin(5t)"])
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
     <li><i>inputvariable</i> (string) - Changes variable JS will expect as the input variable for the polar function, the default is <i>t</i>.</li>
-    <li><i>domain</i> [(float|string) lower, (float|string) upper] - Sets the domain restriction for the indpendent variable <i>t</i>. 
-		This can be a number for a static bound, or a string with a refrence to another jsx object dynamic bound.</li>
+    <li><i>domain</i> [(float|string) lower, (float|string) upper] - Sets the domain restriction for the independent variable <i>t</i>. 
+		This can be a number for a static bound, or a string with a reference to another jsx object dynamic bound.</li>
 	<li><i>color</i> (string) - A value indicating the color of the curve ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>width</i> (int) - The width of the graph between 1 and 9, default is 2</li>
@@ -448,7 +448,7 @@ $graph = jsxPolar($board, "t/3 * cos(t)", [ 'domain' => [0, "$a * pi"]])
 
   <!-- Circle -->
   <h2><a style="color:blue" name="jsxCircle">jsxCircle($board, [$paramenters], <i>[$options]</i>)</a></h2>
-  <p>Adds a circle to an existing $board created by a call to jsxBoard(). The parameters can be set in differnet ways. You can call
+  <p>Adds a circle to an existing $board created by a call to jsxBoard(). The parameters can be set in different ways. You can call
 	with [[$x, $y], $r], which would create a circle centered at [$x, $y] and radius $r. The point can be a reference to a jsx point
 	that was previously created or a new point. If you send a new point, the center of the circle will be static, but if you send a 
 	reference it will be dynamic. The same is true of the radius, if you use a reference to another jsx object it will be a dynamic
@@ -576,7 +576,7 @@ $line = jsxLine($board, [[-4, 0], $p])
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
     <li><i>length</i> (float) - Sets the length of a segment, uses the two points given for direction</li>
-	<li><i>color</i> (string) - A value indicating the color of the segemnt ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
+	<li><i>color</i> (string) - A value indicating the color of the segment ('red', 'green', etc.) an RGB/RGBA value encoded in hexadecimal, or
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>width</i> (int) - The width of the segment between 1 and 9, default is 2</li>
     <li><i>dash</i> (int) - Affects the draw pattern of the segment. Set to 1 through 6 to get different dashes, no dashing by default.</li>
@@ -608,7 +608,7 @@ $s2 = jsxSegment($board, [$c, $a], ['length' => 5.8])
  <!-- Ray -->
   <h2><a style="color:blue" name="jsxRay">jsxRay($board, [[$x1, $y1], [$x2, $y2]], <i>[$options]</i>)</a></h2>
   <p>Adds a ray to a jsx $board, which is a variable returned from jsxBoard. A ray is defined a the portion of a line that 
-	begins at [$x1, $y1] and extentds through [$x2, $y2]. An arrow is drawn by default at the end of the ray indicating its diretction.
+	begins at [$x1, $y1] and extends through [$x2, $y2]. An arrow is drawn by default at the end of the ray indicating its direction.
 	This can be turned off by setting lastArrow to false in an attribute setting. Each point can either be an array of float values - 
 	which will produce a static	point, or it can be a reference to a jsx point of some sort to make a ray that can be manipulated. 
 	The return is a reference to the ray that can be used in other jsx object creations.</p>
@@ -763,11 +763,11 @@ $text = jsxText($board, [[-4.5, 4.5], "'`x = `' + $p1.X().toFixed(2)"])
   <p>Creates an integral object, which allows to shade the area trapped between a curve and the x-axis. [$x1, $x2] 
 	is an array of a starting x-value and ending x-value for the integral, these can be float values or references 
 	to other jsx objects. If float values are provided, then a static integral will be created, if jsx objects are 
-	provided, then the integral will be interactable. $param[1] is a function created by jsx to find the area under. 
+	provided, then the integral will be dynamic/interactive. $param[1] is a function created by jsx to find the area under. 
 	The return is a reference that can be used in other object creation.</p>
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
-	<li><i>color</i> (string) - A value indicating the color of the shaded redgion of the integral ('red', 'green', etc.) 
+	<li><i>color</i> (string) - A value indicating the color of the shaded region of the integral ('red', 'green', etc.) 
 		an RGB/RGBA value encoded in hexadecimal, or a value such as rbga(45, 45, 45, 28)</li>
 	<li><i>fillopacity</i> (float) - A value from 0 (invisible) to 1 (opaque) indicating how translucent the angle fill is.</i>
    	<li><i>label</i> (string) - Attaches a text label to the integral, ASCIIMath can be used.</li>
@@ -805,7 +805,7 @@ $integral = jsxIntegral($board, [["$a.X()", "$b.X()"], $f], ['label' => "'`int =
 	expected are passed in an array and are: an array containing the lower endpoint and upper endpoint of the interval and
 	the number of rectangles to use. Each of these items can be numeric that will make them static. You can also use 
 	references to other jsx objects in order to make them dynamic. The second parameter can be a single function in order to
-	create rectangles between the x-axis and the function, or an array of functions which will draw the rectanges between the 
+	create rectangles between the x-axis and the function, or an array of functions which will draw the rectangles between the 
 	functions. The return is an object reference that can be used in the creation of other jsx objects.</p>
   <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>

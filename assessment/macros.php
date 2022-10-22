@@ -4117,7 +4117,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			$abstol =false;
 		}
 		$type = "expression";
-		if (strpos($stu, '=')!==false && strpos($stu, '=')!==false) {
+		if (strpos($stu, '=')!==false) {
 			$type = "equation";
 		}
 		$stuorig = $stu;
