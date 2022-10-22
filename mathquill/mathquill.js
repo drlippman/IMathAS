@@ -4139,7 +4139,13 @@ var Digit = P(VanillaSymbol, function(_, super_) {
         && ((cursor[L] instanceof Variable && cursor[L].isItalic !== false)
             || (cursor[L] instanceof SupSub
                 && cursor[L][L] instanceof Variable
-                && cursor[L][L].isItalic !== false))) {
+                && cursor[L][L].isItalic !== false)
+            || (cursor[L] instanceof Bracket 
+                && cursor[L].sides[R].ch == ')')
+            || (cursor[L] instanceof SupSub
+                && cursor[L][L] instanceof Bracket 
+                && cursor[L][L].sides[R].ch == ')')
+    )) {
       LatexCmds._().createLeftOf(cursor);
       super_.createLeftOf.call(this, cursor);
       cursor.insRightOf(cursor.parent.parent);
