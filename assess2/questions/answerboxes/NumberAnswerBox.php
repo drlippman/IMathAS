@@ -120,7 +120,7 @@ class NumberAnswerBox implements AnswerBox
                 if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
                     $answer = implode(',', prettyreal(explode(',', $answer), $reqdecimals));
                 } else {
-                    $answer = prettyreal($answer, $reqdecimals);
+                    $answer = implode(' or ', prettyreal(explode(' or ', $answer), $reqdecimals));
                 }
             } else {
                 $tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least %d decimal places.'), $reqdecimals);

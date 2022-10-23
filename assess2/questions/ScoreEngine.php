@@ -171,7 +171,7 @@ class ScoreEngine
 
         if (isset($reqdecimals)) {
             $hasGlobalAbstol = false;
-            if (is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
+            if (isset($anstypes) && is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
                 $abstolerance = array();
             } else if (isset($anstypes) && isset($abstolerance) && !is_array($abstolerance)) {
                 $abstolerance = array_fill(0, count($anstypes), $abstolerance);
