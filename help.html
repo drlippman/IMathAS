@@ -2121,6 +2121,7 @@ Comparison operators available for &quot;if&quot; and &quot;where&quot; statemen
 <li>&lt; Less than</li>
 <li>&gt;= Greater than or equal to</li>
 <li>&lt;= Less than or equal to</li>
+<li>isset($v) Whether $v is defined</li>
 </ul>
 <p>
 To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
@@ -2622,6 +2623,7 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
+<li><strong>isset($var)</strong>: Checks to see if $var is defined</li>
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
 <li><strong>is_nan(val)</strong>:  Checks if the value is NAN (not a number), which results from things like sqrt(-1). Only works on calculated values, not string expressions.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
