@@ -40,7 +40,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("\t", ' ', $str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
-    $str = preg_replace('/&\s*\n/', ' ', $str);
+        $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt).';';
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
@@ -323,6 +323,17 @@ function tokenize($str,$anstype,$countcnt) {
 		$out = '';
 		$c = $str[$i];
 		$len = strlen($str);
+        if ($c=='/' && $str[$i+1]=='*') { //comment block
+            while ($i < $len) {
+                if ($c == '/' && $i > 0 && $str[$i-1] == '*') {
+                    $i++;
+                    $c = $str[$i];
+                    break;
+                }
+                $i++;
+                $c = $str[$i];
+            }
+        }
 		if ($c=='/' && $str[$i+1]=='/') { //comment
 			while ($c!="\n" && $i<$len) {
                 $i++;
