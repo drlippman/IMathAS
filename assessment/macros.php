@@ -454,7 +454,6 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
-				$pt = $t;
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = $evalxfunc(['t'=>$t]);

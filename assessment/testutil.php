@@ -84,7 +84,7 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 				}
 			}
 			*/
-			$line['answeights'] = getansweights($line['id'],$line['control']);
+			$line['answeights'] = getansweights($line['qid'],$line['control']);
 		}
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
@@ -183,19 +183,19 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 	$penalty = $qi['penalty'];
 	$lastonly = false;
 	$skipsome = 0;
-	if ($penalty[0]==='L') {
+	if (is_string($penalty) && $penalty[0]==='L') {
 		$lastonly = true;
 		$penalty = substr($penalty,1);
-	} else if ($penalty[0]==='S') {
+	} else if (is_string($penalty) && $penalty[0]==='S') {
 		$skipsome = $penalty[1];
 		$penalty = substr($penalty,2);
 	}
 	if ($penalty == 9999) {
 		$penalty = $testsettings['defpenalty'];
-		if ($penalty[0]==='L') {
+		if (is_string($penalty) && $penalty[0]==='L') {
 			$lastonly = true;
 			$penalty = substr($penalty,1);
-		} else if ($penalty[0]==='S') {
+		} else if (is_string($penalty) && $penalty[0]==='S') {
 			$skipsome = $penalty[1];
 			$penalty = substr($penalty,2);
 		}
@@ -525,7 +525,7 @@ function scorequestion($qn, $rectime=true, $recAsFirst=true) {
 		$qi[$questions[$qn]] = $qithis[$questions[$qn]];
 	}
 
-	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$attempts[$qn],$qi[$questions[$qn]]['points']);
+	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"] ?? '',$attempts[$qn],$qi[$questions[$qn]]['points']);
 
 	$afterpenalty = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 
