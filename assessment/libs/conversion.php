@@ -1157,12 +1157,12 @@ function conversionArea2() {
         #region Metric Conversion
 
         if($fullname==0 || $fullname==3) {
-            $retval[0] = array("",1,$unitabbr["Kilometer"],1000,$unitabbr["Hectometer"]);
+            $retval[0] = array("",1,$unitabbr["Kilometer"],100,$unitabbr["Hectometer"]);
             $retval[1] = array("",1,$unitabbr["Hectometer"],100,$unitabbr["Dekameter"]);
             $retval[2] = array("",1,$unitabbr["Dekameter"],100,$unitabbr["Meter"]);
             $retval[3] = array("",1,$unitabbr["Meter"],100,$unitabbr["Decimeter"]);
             $retval[4] = array("",1,$unitabbr["Decimeter"],100,$unitabbr["Centimeter"]);
-            $retval[5] = array("",1,$unitabbr["Centimeter"],1000,$unitabbr["Millimeter"]);
+            $retval[5] = array("",1,$unitabbr["Centimeter"],100,$unitabbr["Millimeter"]);
             $retval[6] = array("",1,$unitabbr["Ares"],100,$unitabbr["Meter"]);
             $retval[7] = array("",1,$unitabbr["Hectares"],100,$unitabbr["Ares"]);
             $html = "y";
@@ -1174,24 +1174,24 @@ function conversionArea2() {
             $retval[7][0] = "{$retval[7][1]} {$retval[7][2]} = {$retval[7][3]} {$retval[7][4]}";
 
         } elseif($fullname==1) {
-            $retval[0] = array("",1,$unit["Kilometer squared"],1000,$unit["Hectometer squared"]);
+            $retval[0] = array("",1,$unit["Kilometer squared"],100,$unit["Hectometer squared"]);
             $retval[1] = array("",1,$unit["Hectometer squared"],100,$unit["Dekameter squared"]);
             $retval[2] = array("",1,$unit["Dekameter squared"],100,$unit["Meter squared"]);
             $retval[3] = array("",1,$unit["Meter squared"],100,$unit["Decimeter squared"]);
             $retval[4] = array("",1,$unit["Decimeter squared"],100,$unit["Centimeter squared"]);
-            $retval[5] = array("",1,$unit["Centimeter squared"],1000,$unit["Millimeter squared"]);
+            $retval[5] = array("",1,$unit["Centimeter squared"],100,$unit["Millimeter squared"]);
             $retval[6] = array("",1,$unit["Ares"],100,$unit["Meter squared"]);
             $retval[7] = array("",1,$unit["Hectares"],100,$unit["Ares"]);
             for($i=0;$i<8;$i+=1){
                 $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} = ".number_format($retval[$i][3])." {$retval[$i][4]}";
             }
         } else  {
-            $retval[0] = array("",1,$unit["Square kilometer"],1000,$unit["Square hectometer"]);
+            $retval[0] = array("",1,$unit["Square kilometer"],100,$unit["Square hectometer"]);
             $retval[1] = array("",1,$unit["Square hectometer"],100,$unit["Square dekameter"]);
             $retval[2] = array("",1,$unit["Square dekameter"],100,$unit["Square meter"]);
             $retval[3] = array("",1,$unit["Square meter"],100,$unit["Square decimeter"]);
             $retval[4] = array("",1,$unit["Square decimeter"],100,$unit["Square centimeter"]);
-            $retval[5] = array("",1,$unit["Square centimeter"],1000,$unit["Square millimeter"]);
+            $retval[5] = array("",1,$unit["Square centimeter"],100,$unit["Square millimeter"]);
             $retval[6] = array("",1,$unit["Ares"],100,$unit["Meter squared"]);
             $retval[7] = array("",1,$unit["Hectares"],100,$unit["Ares"]);
             for($i=0;$i<8;$i+=1){
