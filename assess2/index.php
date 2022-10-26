@@ -52,6 +52,11 @@ require('../header.php');
 
 if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
+  if ((!isset($usernameinheader) || $usernameinheader==false) && $userfullname != ' ') {
+    echo '<span class="floatright hideinmobile">';
+    echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
+    echo '</span>';
+  }
   if ($isltilimited) {
     echo "$breadcrumbbase ", _('Assessment'), "</div>";
   } else {
