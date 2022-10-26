@@ -68,7 +68,7 @@ class MatchingScorePart implements ScorePart
         for ($i=0;$i<count($questions);$i++) {
           if ($isRescore) {
             $origla = explode('|', $givenans);
-            if ($origla[$i] !== '') {
+            if (isset($origla[$i]) && $origla[$i] !== '') {
               if (!empty($matchlist)) {
                 if ($matchlist[$i] != $origla[$i]) {
                   $score -= $deduct;

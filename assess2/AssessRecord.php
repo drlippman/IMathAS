@@ -788,15 +788,19 @@ class AssessRecord
             // matching - map back to unrandomized values
             list($randqkeys, $randakeys) = $_SESSION['choicemap'][$this->curAid][$thisref];
             $mapped = array();
+            $dosave = false;
             foreach ($tmp as $k=>$v) {
-              $mapped[$randqkeys[$k]] = $randakeys[$v];
+              if ($v !== '-') { $dosave = true;}
+              $mapped[$randqkeys[$k]] = $randakeys[$v] ?? '';
             }
+            if (!$dosave) { continue; }
             ksort($mapped);
             $val = implode('|', $mapped);
           } else { //matrix
             $val = implode('|', $tmp);
           }
         } else if (isset($_SESSION['choicemap'][$this->curAid][$thisref])) {
+          if ($val === 'NA') { continue; }
           if (is_array($val)) {
             foreach ($val as $k => $v) {
               $val[$k] = $_SESSION['choicemap'][$this->curAid][$thisref][$v];
