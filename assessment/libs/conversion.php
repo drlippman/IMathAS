@@ -1671,7 +1671,7 @@ function conversionFormulaGeometry() {
         $retval[0] = "{$tick}SA=2LW+2LH+2WH{$tick} "._("(Surface Area of a Rectangular Solid)");
         $retval[1] = "{$tick}SA=6 s^2{$tick} "._("(Surface Area of a Cube)");
         $retval[2] = "{$tick}SA=4{$PI}r^2{$tick} "._("(Surface Area of a Sphere)");
-        $retval[3] = "{$tick}SA=2{$PI}rh+4{$PI}r^2{$tick} "._("(Surface Area of a Right Circular Cylinder)");
+        $retval[3] = "{$tick}SA=2{$PI}rh+2{$PI}r^2{$tick} "._("(Surface Area of a Right Circular Cylinder)");
     } elseif($type=="Volume") {
         $retval[0] = "{$tick}V = LWH{$tick} "._("(Volume of a Rectangular Solid)");
         $retval[1] = "{$tick}V = s^3{$tick} "._("(Volume of a Cube)");
