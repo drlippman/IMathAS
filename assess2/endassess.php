@@ -54,7 +54,7 @@ if ($isTeacherPreview) {
 }
 
 // grab all questions settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', true);
 
 // if have active scored record end it
 if ($assess_record->hasActiveAttempt()) {
