@@ -86,6 +86,13 @@ class ChoicesScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
         }
 
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part']);
+            if (isset($onGetResult) && is_callable($onGetResult)) {
+                $onGetResult();
+            }
+        }
+
         if ($givenans ==='NA' || $givenans === null) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;

@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26.2;
+	return 26.3;
 }
 
 global $allowedmacros;
@@ -914,7 +914,7 @@ function conversionAbbreviations() {
 
             $retval[0] = $unit["Milligram"]." = ".$unitabbr["Milligram"];
             $retval[1] = $unit["Centigram"]." = ".$unitabbr["Centigram"];
-            $retval[2] = $unit["Decigram"]." = ".$unit["Decigram"];
+            $retval[2] = $unit["Decigram"]." = ".$unitabbr["Decigram"];
             $retval[3] = $unit["Gram"]." = ".$unitabbr["Gram"];
             $retval[4] = $unit["Dekagram"]." = ".conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n");
             $retval[5] = $unit["Hectogram"]." = ".$unitabbr["Hectogram"];
@@ -1157,12 +1157,12 @@ function conversionArea2() {
         #region Metric Conversion
 
         if($fullname==0 || $fullname==3) {
-            $retval[0] = array("",1,$unitabbr["Kilometer"],1000,$unitabbr["Hectometer"]);
+            $retval[0] = array("",1,$unitabbr["Kilometer"],100,$unitabbr["Hectometer"]);
             $retval[1] = array("",1,$unitabbr["Hectometer"],100,$unitabbr["Dekameter"]);
             $retval[2] = array("",1,$unitabbr["Dekameter"],100,$unitabbr["Meter"]);
             $retval[3] = array("",1,$unitabbr["Meter"],100,$unitabbr["Decimeter"]);
             $retval[4] = array("",1,$unitabbr["Decimeter"],100,$unitabbr["Centimeter"]);
-            $retval[5] = array("",1,$unitabbr["Centimeter"],1000,$unitabbr["Millimeter"]);
+            $retval[5] = array("",1,$unitabbr["Centimeter"],100,$unitabbr["Millimeter"]);
             $retval[6] = array("",1,$unitabbr["Ares"],100,$unitabbr["Meter"]);
             $retval[7] = array("",1,$unitabbr["Hectares"],100,$unitabbr["Ares"]);
             $html = "y";
@@ -1170,28 +1170,28 @@ function conversionArea2() {
                 if($i>0) {$html = "n";}
                 $retval[$i][0] = conversionUnits2ScreenReader2($retval[$i][1],$retval[$i][2],2,number_format($retval[$i][3]),$retval[$i][4],2,"=",$tick,$html);
             }
-            $retval[6][0] = "{$retval[6][1]} {$retval[6][2]} = {$retval[6][3]} {$retval[6][4]}";
+            $retval[6][0] = conversionUnits2ScreenReader2($retval[6][1],$retval[6][2],1,number_format($retval[6][3]),$retval[6][4],2,"=",$tick,$html);
             $retval[7][0] = "{$retval[7][1]} {$retval[7][2]} = {$retval[7][3]} {$retval[7][4]}";
 
         } elseif($fullname==1) {
-            $retval[0] = array("",1,$unit["Kilometer squared"],1000,$unit["Hectometer squared"]);
+            $retval[0] = array("",1,$unit["Kilometer squared"],100,$unit["Hectometer squared"]);
             $retval[1] = array("",1,$unit["Hectometer squared"],100,$unit["Dekameter squared"]);
             $retval[2] = array("",1,$unit["Dekameter squared"],100,$unit["Meter squared"]);
             $retval[3] = array("",1,$unit["Meter squared"],100,$unit["Decimeter squared"]);
             $retval[4] = array("",1,$unit["Decimeter squared"],100,$unit["Centimeter squared"]);
-            $retval[5] = array("",1,$unit["Centimeter squared"],1000,$unit["Millimeter squared"]);
+            $retval[5] = array("",1,$unit["Centimeter squared"],100,$unit["Millimeter squared"]);
             $retval[6] = array("",1,$unit["Ares"],100,$unit["Meter squared"]);
             $retval[7] = array("",1,$unit["Hectares"],100,$unit["Ares"]);
             for($i=0;$i<8;$i+=1){
                 $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} = ".number_format($retval[$i][3])." {$retval[$i][4]}";
             }
         } else  {
-            $retval[0] = array("",1,$unit["Square kilometer"],1000,$unit["Square hectometer"]);
+            $retval[0] = array("",1,$unit["Square kilometer"],100,$unit["Square hectometer"]);
             $retval[1] = array("",1,$unit["Square hectometer"],100,$unit["Square dekameter"]);
             $retval[2] = array("",1,$unit["Square dekameter"],100,$unit["Square meter"]);
             $retval[3] = array("",1,$unit["Square meter"],100,$unit["Square decimeter"]);
             $retval[4] = array("",1,$unit["Square decimeter"],100,$unit["Square centimeter"]);
-            $retval[5] = array("",1,$unit["Square centimeter"],1000,$unit["Square millimeter"]);
+            $retval[5] = array("",1,$unit["Square centimeter"],100,$unit["Square millimeter"]);
             $retval[6] = array("",1,$unit["Ares"],100,$unit["Meter squared"]);
             $retval[7] = array("",1,$unit["Hectares"],100,$unit["Ares"]);
             for($i=0;$i<8;$i+=1){
@@ -1671,7 +1671,7 @@ function conversionFormulaGeometry() {
         $retval[0] = "{$tick}SA=2LW+2LH+2WH{$tick} "._("(Surface Area of a Rectangular Solid)");
         $retval[1] = "{$tick}SA=6 s^2{$tick} "._("(Surface Area of a Cube)");
         $retval[2] = "{$tick}SA=4{$PI}r^2{$tick} "._("(Surface Area of a Sphere)");
-        $retval[3] = "{$tick}SA=2{$PI}rh+4{$PI}r^2{$tick} "._("(Surface Area of a Right Circular Cylinder)");
+        $retval[3] = "{$tick}SA=2{$PI}rh+2{$PI}r^2{$tick} "._("(Surface Area of a Right Circular Cylinder)");
     } elseif($type=="Volume") {
         $retval[0] = "{$tick}V = LWH{$tick} "._("(Volume of a Rectangular Solid)");
         $retval[1] = "{$tick}V = s^3{$tick} "._("(Volume of a Cube)");
@@ -3032,7 +3032,9 @@ function conversionWeight() {
 
 // 2022-xx-xx ver 27 - TODO: add a make fraction converion function
 //
-// 2022-10-10 ver 26 - Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
+// 2022-10-10 ver26.3- Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
+//  through            100 mg, mL
+// 2022-10-12          decigram abbriavation
 //
 // 2022-08-17 ver 25 - Fixed Typos
 //
