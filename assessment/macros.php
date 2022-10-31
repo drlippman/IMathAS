@@ -1866,7 +1866,7 @@ function calconarray($array,$todo) {
 }
 
 function keepif($array, $todo) {
-    $todo = mathphp($todo,'x',false,false);
+    $todo = mathphp($todo,'x',false,true);
 	$todo = str_replace('(x)','($x)',$todo);
 	return array_values(array_filter($array,my_create_function('$x','return('.$todo.');')));
 }
