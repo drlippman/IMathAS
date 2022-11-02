@@ -93,7 +93,7 @@ class ChoicesScorePart implements ScorePart
             }
         }
 
-        if ($givenans ==='NA' || $givenans === null) {
+        if ($givenans ==='NA' || $givenans === null || $givenans === '') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
