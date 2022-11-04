@@ -37,7 +37,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
- "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform");
+ "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform","splicearray");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -1744,6 +1744,14 @@ function sortarray($a) {
 			sort($a);
 		}
 	}
+	return $a;
+}
+
+function splicearray($a,$offset, $length=null, $replacement=[]) {
+	if (!is_array($a)) {
+		$a = listtoarray($a);
+	}
+	array_splice($a, $offset, $length, $replacement);
 	return $a;
 }
 
