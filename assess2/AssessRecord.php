@@ -3704,7 +3704,7 @@ class AssessRecord
         $penalties[] = array('type'=>'regen', 'pct'=>$regensOver * $regen_penalty);
       }
     }
-    if ($exceptionpenalty > 0 && $subtime > $duedate) {
+    if ($exceptionpenalty > 0 && $subtime > $duedate+10) {
       $base *= (1 - $exceptionpenalty / 100);
       $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
     }
