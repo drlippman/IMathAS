@@ -1078,12 +1078,16 @@ class DrawingScorePart implements ScorePart
                         if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
                             continue;
                         }
-
+                        
                         //compare slopes
                         $correctdx = $ansvec[3] - $ansvec[1];
                         $correctdy = $ansvec[4] - $ansvec[2];
                         $studx = $vecs[$i][2] - $vecs[$i][0];
                         $study = $vecs[$i][3] - $vecs[$i][1];
+
+                        if ($correctdx*$studx < 0) { // pointing opposite directions
+                            continue;
+                        }
 
                         //find angle between correct ray and stu ray
                         $cosang = ($studx*$correctdx+$study*$correctdy)/(sqrt($studx*$studx+$study*$study)*sqrt($correctdx*$correctdx+$correctdy*$correctdy));
