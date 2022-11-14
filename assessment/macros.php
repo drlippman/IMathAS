@@ -37,7 +37,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
- "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform");
+ "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform","splicearray");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -1747,6 +1747,14 @@ function sortarray($a) {
 	return $a;
 }
 
+function splicearray($a,$offset, $length=null, $replacement=[]) {
+	if (!is_array($a)) {
+		$a = listtoarray($a);
+	}
+	array_splice($a, $offset, $length, $replacement);
+	return $a;
+}
+
 
 function consecutive($min,$max,$step=1) {
 	$a = array();
@@ -2975,14 +2983,12 @@ function evalbasic($str) {
 
 function formhoverover($label,$tip) {
 	if (function_exists('filter')) {
-		//return '<span class="link" onmouseover="tipshow(this,\''.str_replace("'","\\'",htmlentities(filter($tip))).'\')" onmouseout="tipout()">'.$label.'</span>';
-		return '<span role="button" tabindex="0" class="link" data-tip="'.htmlentities(filter($tip)).'" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">'.$label.'</span>';
+		$tip = filter($tip);
+	} 
+	$tip = htmlentities($tip);
+	$tip = str_replace('`','&#96;', $tip);
+	return '<span role="button" tabindex="0" class="link" data-tip="'.$tip.'" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">'.$label.'</span>';
 
-	} else {
-		///return '<span class="link" onmouseover="tipshow(this,\''.str_replace("'","\\'",htmlentities($tip)).'\')" onmouseout="tipout()">'.$label.'</span>';
-		return '<span role="button" tabindex="0" class="link" data-tip="'.htmlentities($tip).'" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">'.$label.'</span>';
-
-	}
 }
 
 function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='') {
