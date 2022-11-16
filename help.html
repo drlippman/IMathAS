@@ -3758,8 +3758,10 @@ Complex questions require the student to enter a complex number in a+bi form.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "list" </dt>
-	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt>$answerformat = "list" or "allowjcomplex" </dt>
+	<dd>"list" Specifies that the answer will be a list of complex numbers.
+		"allowjcomplex" allows 2+3j instead of 2+3i
+	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3796,9 +3798,10 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
+<dt><dt>$answerformat = "sloppycomplex", "allowjcomplex" "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
 	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
 	must still only contain one i.  <br/>
+	"allowjcomplex" allows for use of j instead of i as the imaginary unit. <br/>
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>

@@ -109,7 +109,9 @@ class ComplexScorePart implements ScorePart
 
             $normalizedGivenAnswers = [];
             foreach ($gaarr as $i => $tchk) {
-
+                if (in_array('allowjcomplex', $ansformats)) {
+                    $tchk = str_replace('j','i', $tchk);
+                }
                 if (in_array('sloppycomplex', $ansformats)) {
                     $tchk = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $tchk);
                     if (substr_count($tchk, 'i') > 1) {
@@ -145,6 +147,9 @@ class ComplexScorePart implements ScorePart
             }
         } else { // if "complex"
             foreach ($gaarr as $i => $tchk) {
+                if (in_array('allowjcomplex', $ansformats)) {
+                    $tchk = str_replace('j','i', $tchk);
+                }
                 $cpts = $this->parsecomplex($tchk);
                 if (!is_array($cpts)) {
                     unset($gaarr[$i]);
@@ -158,6 +163,9 @@ class ComplexScorePart implements ScorePart
 
         $ganumarr = array();
         foreach ($gaarr as $j => $givenans) {
+            if (in_array('allowjcomplex', $ansformats)) {
+                $givenans = str_replace('j','i',$givenans);
+            }
             $gaparts = $this->parsesloppycomplex($givenans);
 
             if ($gaparts === false) { //invalid - skip it
@@ -187,6 +195,9 @@ class ComplexScorePart implements ScorePart
         $annumarr = array();
         $normalizedAnswers = [];
         foreach ($anarr as $i => $answer) {
+            if (in_array('allowjcomplex', $ansformats)) {
+                $answer = str_replace('j','i',$answer);
+            }
             $ansparts = $this->parsesloppycomplex($answer);
             if ($ansparts === false) { //invalid - skip it
                 continue;

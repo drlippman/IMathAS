@@ -1490,8 +1490,11 @@ function processCalcComplex(fullstr, format) {
   var real, imag, imag2, prep;
   for (var cnt=0; cnt<arr.length; cnt++) {
     str = arr[cnt].replace(/^\s+/,'').replace(/\s+$/,'');
+    if (format.indexOf("allowjcomplex")!=-1) {
+      str = str.replace(/j/g,'i');
+    }
     if (format.indexOf("sloppycomplex")==-1) {
-      var cparts = parsecomplex(arr[cnt]);
+      var cparts = parsecomplex(str);
       if (typeof cparts == 'string') {
         err += cparts;
       } else {
@@ -1508,6 +1511,7 @@ function processCalcComplex(fullstr, format) {
       err += _("syntax incomplete");
       real = NaN;
     }
+
     if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
       imag -= real;
       outstr = Math.abs(real)<1e-16?'':real;
