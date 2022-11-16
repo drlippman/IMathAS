@@ -105,14 +105,15 @@
 			updatePointsPossible($aid, $itemorder, $defpoints);
 
 		} else if ($_POST['action'] == 'mod') { //modifying existing
-			$stm = $DBH->prepare("SELECT itemorder,defpoints,ver FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,defpoints,ver,intro FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			list($itemorder, $defpoints, $aver) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder, $defpoints, $aver, $intro) = $stm->fetch(PDO::FETCH_NUM);
             if (!isset($_POST['lastitemhash']) || $_POST['lastitemhash'] !== md5($itemorder)) {
                 header('Content-Type: application/json; charset=utf-8');
                 echo '{"error": "Assessment content has changed since last loaded. Reload the page and try again"}';
                 exit;
             }
+			$jsonintro = json_decode($intro,true);
 
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -162,10 +163,22 @@
 						}
 						$itemorder = implode(',',$itemarr);
 					}
+					if ($jsonintro!==null) { //is json intro
+						$toadd = intval($_POST['copies'.$qid]);
+						for ($j = 1; $j < count($jsonintro); $j++) {
+							if ($jsonintro[$j]['displayBefore']>$key) {
+								$jsonintro[$j]['displayBefore'] += $toadd;
+								$jsonintro[$j]['displayUntil'] += $toadd;
+							}
+						}
+					}
+				}
+				if ($jsonintro !== null) {
+					$intro = json_encode($jsonintro);
 				}
 			}
-			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
-			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
+			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':intro'=>$intro, ':id'=>$aid));
 
 			updatePointsPossible($aid, $itemorder, $defpoints);
         }
