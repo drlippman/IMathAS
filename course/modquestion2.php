@@ -128,9 +128,9 @@ if (!(isset($teacherid))) {
         }
         require_once "../includes/updateptsposs.php";
         if (isset($_GET['qsetid'])) { //new - adding
-            $stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
+            $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id");
             $stm->execute(array(':id' => $aid));
-            list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+            list($itemorder, $defpoints, $intro) = $stm->fetch(PDO::FETCH_NUM);
             for ($i = 0; $i < $_POST['copies']; $i++) {
                 $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,showwork,questionsetid,rubric,showhints,fixedseeds,extracredit) ";
                 $query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :showwork, :questionsetid, :rubric, :showhints, :fixedseeds, :extracredit)";
@@ -153,8 +153,20 @@ if (!(isset($teacherid))) {
                     }
                 }
             }
-            $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
-            $stm->execute(array(':itemorder' => $itemorder, ':id' => $aid));
+            if (isset($_GET['id']) && $_POST['copies'] > 0) {
+                if (($jsonintro=json_decode($intro,true))!==null) { //is json intro
+                    $toadd = intval($_POST['copies']);
+                    for ($j = 1; $j < count($jsonintro); $j++) {
+                        if ($jsonintro[$j]['displayBefore']>$key) {
+                            $jsonintro[$j]['displayBefore'] += $toadd;
+                            $jsonintro[$j]['displayUntil'] += $toadd;
+                        }
+                    }
+                    $intro = json_encode($jsonintro);
+                }
+            } 
+            $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
+            $stm->execute(array(':itemorder' => $itemorder, ':intro' => $intro, ':id' => $aid));
 
             updatePointsPossible($aid, $itemorder, $defpoints);
         } else {
