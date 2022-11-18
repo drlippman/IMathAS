@@ -56,7 +56,7 @@ function nthroot(n,base) {
 function nthlogten(n,v) {
 	return ((Math.log(v))/(Math.log(n)));
 }
-var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth".split("|");
+var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|pi".split("|");
 function functoindex(match) {
 	for (var i=0;i<funcstoindexarr.length;i++) {
 		if (funcstoindexarr[i]==match) {
