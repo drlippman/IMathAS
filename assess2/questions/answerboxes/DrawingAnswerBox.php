@@ -332,7 +332,7 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 6.1;}
                         $out .= ' alt="Horizontal parabola"/>';
                     }
-                    if (count($answerformat) == 1 || in_array('halfparab', $answerformat)) {
+                    if (in_array('halfparab', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tphalfparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.2\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'halfparab') {$out .= 'class="sel" ';
                             $def = 6.2;}
