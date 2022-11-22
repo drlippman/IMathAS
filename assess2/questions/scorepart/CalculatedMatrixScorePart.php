@@ -208,6 +208,9 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($correct) {
               $givenanslistvals = matrix_scorer_rref($givenanslistvals, $N);
             }
+        } else if ($fullmatrix && in_array('anyroworder',$ansformats)) {
+            $answerlist = matrix_scorer_roworder($answerlist, $N);
+            $givenanslistvals = matrix_scorer_roworder($givenanslistvals, $N);
         }
         for ($i=0; $i<count($answerlist); $i++) {
             if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {

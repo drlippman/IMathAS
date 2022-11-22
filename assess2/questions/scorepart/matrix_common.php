@@ -48,3 +48,21 @@ function matrix_scorer_rref($A, $N)
     }
     return $A;
 }
+
+/*
+ * Sort rows in a matrix specified by the array of values $A with $N rows
+ */
+function matrix_scorer_roworder($A, $N)
+{
+    $rows = array_chunk($A, round(count($A)/$N));
+
+    usort($rows, function($a,$b) {
+        for ($i=0;$i<count($a);$i++) {
+            if ($a[$i]==$b[$i]) { continue; }
+            return ($a[$i] - $b[$i]);
+        }
+        return 0;
+    });
+
+    return array_merge(...$rows);
+}

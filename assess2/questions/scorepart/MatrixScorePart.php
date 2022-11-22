@@ -153,7 +153,11 @@ class MatrixScorePart implements ScorePart
           if ($correct) {
             $givenanslist = matrix_scorer_rref($givenanslist, $N);
           }
+        } else if ($fullmatrix && in_array('anyroworder',$ansformats)) {
+            $answerlist = matrix_scorer_roworder($answerlist, $N);
+            $givenanslist = matrix_scorer_roworder($givenanslist, $N);
         }
+
         $incorrect = 0;
         for ($i=0; $i<count($answerlist); $i++) {
             if (!is_numeric($givenanslist[$i])) {
