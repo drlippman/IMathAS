@@ -140,6 +140,9 @@ class QuestionHtmlGenerator
 
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
 
+        $thiscourseid = (isset($GLOBALS['cid']) && is_numeric($GLOBALS['cid'])) ?
+            intval($GLOBALS['cid']) : 0;
+
         if ($printFormat) {
             $GLOBALS['capturechoiceslivepoll'] = true;
         }
