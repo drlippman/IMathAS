@@ -1151,7 +1151,7 @@ function erf($x) {
   return $isneg ? $res - 1 : 1 - $res;
 }
 function normalcdf($z,$dec=4) {
-  if (!is_finite($ztest)) {
+  if (!is_finite($z)) {
 		echo 'invalid value for z';
 		return 0;
 	}
