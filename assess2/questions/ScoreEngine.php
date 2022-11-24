@@ -56,6 +56,7 @@ class ScoreEngine
     );
 
     const ADDITIONAL_VARS_FOR_SCORING = array(
+        'feedback',
         'qnpointval',
     );
 
