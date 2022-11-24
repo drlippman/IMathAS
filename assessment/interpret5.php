@@ -42,6 +42,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
         $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt).';';
+        $r = '$wherecount[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
         }

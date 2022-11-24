@@ -479,7 +479,7 @@ function frequency($a,$start,$cw,$end=null) {
 	while ($x <= ($end!==null ? $end : $a[count($a)-1]+1e-10)) {
 		$x += $cw;
 		$i = $curr;
-		while (($a[$i] < $x) && ($i < count($a))) {
+		while (($i < count($a)) && ($a[$i] < $x)) {
 			$i++;
 		}
 		$out[] = ($i-$curr);

@@ -1985,8 +1985,10 @@ function addwithsettings() {
 
 function modsettings() {
     var checked = [];
-    $("#curqform input[type=checkbox]:checked").each(function() {
-        checked.push(this.value);
+    $("#curqform input[type=checkbox][id^=qc]:checked").each(function() {
+        if (!this.value.match(/:text:/)) {
+            checked.push(this.value);
+        }
     });
     if (checked.length == 0) { return; }
     GB_show('Question Settings',qsettingsaddr + '&modqs=' + encodeURIComponent(checked.join(';')) + '&lih=' + lastitemhash,900,500);
