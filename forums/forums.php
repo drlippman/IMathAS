@@ -28,6 +28,8 @@
 		unset($_SESSION['forumsearchtype'.$cid]);
 		unset($_SESSION['forumsearchtag'.$cid]);
 		$searchtype = "none";
+        $searchstr = '';
+        $searchtag = '';
 	} else if(isset($_POST['searchsubmit'])) {
 		$searchstr = trim($_POST['search']);
 		$searchtype = $_POST['searchtype'];
@@ -42,6 +44,7 @@
 	} else {
         $searchtype = "none";
         $searchstr = "";
+        $searchtag = '';
 	}
 
 
@@ -286,10 +289,10 @@ if ($searchtype == 'thread') {
 			if ($isteacher) {
 				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&move=" . Sanitize::onlyInt($line['id']) . "\">Move</a> ";
 			}
-			if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
+			if ($isteacher) {
 				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&modify=" . Sanitize::onlyInt($line['id']) . "\">Modify</a> ";
 			}
-			if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
+			if ($isteacher) {
 				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&remove=" . Sanitize::onlyInt($line['id']) . "\">Remove</a>";
 			}
 			echo "</span>\n";

@@ -97,6 +97,7 @@ class Sanitize
 	 */
 	public static function encodeStringForDisplay($string, $doubleencode = false)
 	{
+        if ($string === null) { return '';}
 		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), $doubleencode);
 	}
 
@@ -386,14 +387,16 @@ class Sanitize
 
 	/**
 	 * Sanitize data so it only contains ASCII 32-127.
-	 * Also strips HTML tags
+	 * Also strips HTML tags and encodes quotes
 	 *
 	 * @param $data mixed A variable containing a string.
 	 * @return string A sanitized variable containing ASCII 32-127.
 	 */
 	public static function simpleASCII($data)
 	{
-		return filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+        //return filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+        // FILTER_SANITIZE_STRING is deprecated.
+        return htmlspecialchars(preg_replace('/[^\x20-\x7E]/','',strip_tags($data)));
 	}
 	/**
 	 * Sanitize a domain name without a port.

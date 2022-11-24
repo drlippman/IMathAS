@@ -463,6 +463,9 @@ if ($hasusername) {
     if (isset($_GET['graphdisp'])) {
         $_SESSION['graphdisp'] = $_GET['graphdisp'];
     }
+    if (!isset($_SESSION['secsalt'])) { // if it was lost somehow
+        $_SESSION['secsalt'] = generaterandstring();
+    }
     if (!function_exists('isDiagnostic')) {
         function isDiagnostic() {
             return isset($_SESSION['isdiag']); // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {

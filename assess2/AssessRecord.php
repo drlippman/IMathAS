@@ -1938,7 +1938,7 @@ class AssessRecord
         }
       }
       if ($showscores && $partattemptn[$pn] > 0 && !isset($autosave['stuans'][$pn])) {
-        if ($tryToShow === 'scored') {
+        if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
           $qcolors[$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['raw'];
         } else {
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
