@@ -270,8 +270,8 @@ function graphdijkstra($g,$dest=-1) {
 		}
 		$eaten[$cur] = 1; //remove vertex
 		for ($i=0; $i<$n; $i++) {
-			if (!isset($eaten[$i]) && (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i])>0) { //vertices leading to $cur
-				$alt = $dist[$cur] + (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
+			if (!isset($eaten[$i]) && ((!empty($op['digraph']) || $i<$cur)?$g[$i][$cur]:$g[$cur][$i])>0) { //vertices leading to $cur
+				$alt = $dist[$cur] + ((!empty($op['digraph']) || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
 				if ($alt<$dist[$i]) {
 					$dist[$i] = $alt;
 					$next[$i] = $cur;
@@ -673,7 +673,7 @@ function graphgetedges($g,$op) {
 	$bad = array();
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if($g[$i][$j]>0) {
 					$good[] = $lbl[$i] . $lbl[$j];
 				} else {
@@ -704,7 +704,7 @@ function graphgetedgesarray($g) {
 	$good = array();
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if($g[$i][$j]>0) {
 					$good[] = array($i,$j);
 				}
@@ -796,7 +796,7 @@ function graphadjacencytoincidence($g,$op) {
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if($g[$i][$j]>0) {
 					$list[$i][] = $j;
 				}
@@ -1077,7 +1077,7 @@ function graphprocessoptions($g,$op) {
 	$n = count($g[0]);
 
 	if (!isset($op['connected'])) {
-		if ($op['tree']) {
+		if (!empty($op['tree'])) {
 			$op['connected'] = true;
 		} else {
 			$op['connected'] = false;
@@ -1097,7 +1097,7 @@ function graphprocessoptions($g,$op) {
 				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
 					$nedg++;
 				}
-				if ($op['digraph'] && $g[$i][$j]>0 && $g[$j][$i]>0) {
+				if (!empty($op['digraph']) && $g[$i][$j]>0 && $g[$j][$i]>0) {
 					$nedg++;
 				}
 			}
@@ -1106,7 +1106,7 @@ function graphprocessoptions($g,$op) {
 		$c = 0;
 		for ($i=0; $i<$n; $i++) {
 			for ($j=$i+1; $j<$n; $j++) {
-				if ($op['digraph']) {
+				if (!empty($op['digraph'])) {
 					if ($g[$i][$j]>0) {
 						$g[$i][$j] = $rweights[$c];
 						$c++;
@@ -1127,7 +1127,7 @@ function graphprocessoptions($g,$op) {
 	if (isset($op['randedges'])) {
 		$origg = $g;
 	}
-	if ($op['tree'] || (isset($op['randedges']) && $op['connected'])) {
+	if (!empty($op['tree']) || (isset($op['randedges']) && $op['connected'])) {
 		$g = graphkruskal($g);
 	} else if (isset($op['randedges']) && !$op['connected']) {
 		$g = graphemptygraph($n);
@@ -1148,7 +1148,7 @@ function graphprocessoptions($g,$op) {
 			}
 		}
 	}
-	if ($op['tree'] && !$op['connected']) {
+	if (!empty($op['tree']) && !$op['connected']) {
 		$list = graphadjacencytoincidence($g,$op);
 		for ($i=0; $i<count($list); $i++) {
 			if (count($list[$i])>1) {
@@ -1193,14 +1193,14 @@ function graphdrawit($pos,$g,$op) {
 	$cy = ($op['ymin'] + $op['ymax'])/2;
 
 	$com .= "fontstyle='none';";
-	if ($op['digraph']) {
+	if (!empty($op['digraph'])) {
 		$com .= 'marker="arrow";';
 	} else {
 		$com .= 'marker=null;';
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if ($g[$j][$i]>0 && $g[$i][$j]==0) {
 					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
 				} else if ($g[$i][$j]>0 && $g[$j][$i]==0) {
@@ -1233,7 +1233,7 @@ function graphdrawit($pos,$g,$op) {
 		}
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		for ($j=$i+1; $j<$n; $j++) {
-			if ($op['useweights'] && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
+			if (!empty($op['useweights']) && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
 				if (($i+$j)%2==0) {
 					$mx = $pos[$j][0] + ($pos[$i][0] - $pos[$j][0])*($op['weightoffset']);
 					$my = $pos[$j][1] + ($pos[$i][1] - $pos[$j][1])*($op['weightoffset']);
