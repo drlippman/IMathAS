@@ -3173,7 +3173,7 @@ function cleanbytoken($str,$funcs = array()) {
         }
 
         if ($token[1]==12) { // separator
-            if ($out[0]=='+') {
+            if (count($out)>0 && $out[0]=='+') {
                 array_shift($out);
             }
             if (count($out)==0 && $i>0) {
@@ -3290,7 +3290,7 @@ function cleanbytoken($str,$funcs = array()) {
             $out[] = ' ';
         }
     }
-    if ($out[0]=='+') {
+    if (count($out)>0 && $out[0]=='+') {
         array_shift($out);
     }
 
