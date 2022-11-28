@@ -206,14 +206,23 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$blocktree = array_map('intval', explode('-',$_GET['folder']));
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+			if (!isset($items[$blocktree[$i]-1]['name']) || (
+                !isset($teacherid) && !isset($tutorid) && 
+                $items[$blocktree[$i]-1]['avail']<2 && 
+                $items[$blocktree[$i]-1]['SH'][0]!='S' && (
+                    $now<$items[$blocktree[$i]-1]['startdate'] || 
+                    $now>$items[$blocktree[$i]-1]['enddate'] || 
+                    $items[$blocktree[$i]-1]['avail']=='0'
+                )
+            )) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
 				unset($blocktree);
 				break;
 			}
+            $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+
 			if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
 				if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
 					echo 'Not authorized';
