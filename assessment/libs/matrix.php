@@ -140,20 +140,20 @@ function matrixdisplaytable() {
   $m = $args[0];
 
   // matrixname
-  if($args[1]!=null) {
+  if(isset($args[1])) {
     $matrixname = $args[1];
   } else {
     $matrixname = "";
   }
 
   //displayASCII
-  if($args[2]!=null) {
+  if(isset($args[2])) {
     if($args[2]==0) { $ticks = ""; } else { $ticks = "`";}
   }
   else { $ticks = ""; }
 
   //mode
-  if($args[3]!=null) {
+  if(isset($args[3])) {
     $mode = $args[3];
     if(($mode!=0)&&($mode!=1)&&($mode!=2)) {
       echo "The supplied mode ($mode) is invalid.  Valid modes are 0,1,2.<br/>";
@@ -162,7 +162,7 @@ function matrixdisplaytable() {
   } else { $mode=0; }
 
   //headernames
-  if($args[4]!=null) {
+  if(isset($args[4])) {
     $headers = $args[4];
     if (!is_array($headers)) {
       $headers = explode(',',$headers);
@@ -170,12 +170,12 @@ function matrixdisplaytable() {
   } else { $headers = null; }
 
   //tablestyle
-  if($args[5]!=null) {
+  if(isset($args[5])) {
     $tablestyle = $args[5];
   } else {$tablestyle = ""; }
 
   //rownames
-  if($args[6]!=null) {
+  if(isset($args[6])) {
       $rownames = $args[6];
       if (!is_array($rownames)) {
           $rownames = explode(',',$rownames);
@@ -183,13 +183,13 @@ function matrixdisplaytable() {
   } else { $rownames = null; }
 
   // rowheader
-  if($args[7]!=null) {
+  if(isset($args[7])) {
       $rowheader = $args[7];
   }
   else { $rowheader = ""; }
 
     // caption
-  if($args[8]!=null) {
+  if(isset($args[8])) {
       $caption = $args[8];
   }
   else { $caption = ""; }

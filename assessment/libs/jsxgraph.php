@@ -152,7 +152,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$min = is_numeric($param[0]) ? $param[0] : 0;
 		$max = is_numeric($param[1]) ? $param[1] : 10;
 		$step = is_numeric($param[2]) ? $param[2] : 1;
-		$defaultval = $param[3] !== null ? $param[3] : ($min + $max) / 2;
+		$defaultval = isset($param[3]) ? $param[3] : ($min + $max) / 2;
 		
 		// Parameters:
 		//  label, color, default value, showLabel, LabelSize, decimals, position,

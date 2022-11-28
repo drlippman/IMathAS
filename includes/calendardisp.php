@@ -690,6 +690,8 @@ foreach ($itemsimporder as $item) {
 		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
 		continue;
 	}
+    if (!isset($itemsassoc[$item])) { continue; } // itemorder error?
+    
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {

@@ -611,7 +611,7 @@
             if ($groupdup) {
                 $classes .= ' groupdup';
             }
-            $lastchange = Sanitize::encodeStringForDisplay($qdata['lastchange']);
+            $lastchange = Sanitize::encodeStringForDisplay($qdata['lastchange'] ?? '');
 			echo "<div class=\"$classes bigquestionwrap\" data-lastchange=\"$lastchange\">";
 			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';

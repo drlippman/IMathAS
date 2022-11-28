@@ -213,7 +213,7 @@ class QuestionHtmlGenerator
         }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
-        $qtextvars = $GLOBALS['interpretcurvars'];
+        $qtextvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
 
         if (!$teacherInGb) {
             $toevalqtxt = preg_replace('~(<p[^>]*>\[teachernote\].*?\[/teachernote\]</p>|\[teachernote\].*?\[/teachernote\])~ms','',$toevalqtxt);
@@ -230,7 +230,7 @@ class QuestionHtmlGenerator
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
 
         $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
-        $solnvars = $GLOBALS['interpretcurvars'];
+        $solnvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
 
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
@@ -392,7 +392,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($answeights[$_pnidx]!=0 || $quesData['qtype'] == "conditional")) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($quesData['qtype'] == "conditional" || $answeights[$_pnidx]!=0)) {
                       $_thisGroupDone = false;
                     }
                   }

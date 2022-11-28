@@ -52,6 +52,11 @@ class DrawingScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
+        if ($givenans=='') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+
         if (!empty($scoremethod) && $scoremethod=='takeanything') {
           if ($givenans==';;;;;;;;') {
               $scorePartResult->setRawScore(0);

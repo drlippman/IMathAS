@@ -2275,6 +2275,7 @@ function draw_cylinder() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);

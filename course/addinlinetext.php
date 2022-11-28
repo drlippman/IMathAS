@@ -411,7 +411,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . $gid ?>";
+	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . ($gid ?? 0) ?>";
 
 	if (to != from) {
 		$("#ms-"+from).after('<input type=hidden name=movefile value="'+from+'" />')

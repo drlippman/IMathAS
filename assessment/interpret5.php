@@ -26,6 +26,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 {
     if ($countcnt==1) {
         $GLOBALS['interpretcurvars'] = [];
+        $GLOBALS['interpretcurarrvars'] = [];
     }
 	if ($blockname=="qtext") {
 		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
@@ -688,7 +689,7 @@ function tokenize($str,$anstype,$countcnt) {
                     substr($syms[count($syms)-1][0],0,15) == '$stuanswersval[')
                 ) {
                     $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? null)';
-                }
+                } else 
                 if ($connecttolast == 0 && 
                     (substr($syms[count($syms)-1][0],0,16) == '$scoreiscorrect[' ||
                     substr($syms[count($syms)-1][0],0,14) == '$scorenonzero[')
@@ -732,6 +733,10 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
     preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*)/', $str, $m);
     foreach ($m[0] as $v) {
         $GLOBALS['interpretcurvars'][] = $v;
+    }
+    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*(\[\d+\])+)/', $str, $m);
+    foreach ($m[0] as $v) {
+        $GLOBALS['interpretcurarrvars'][] = $v;
     }
 
     if ($quotetype!='"') {

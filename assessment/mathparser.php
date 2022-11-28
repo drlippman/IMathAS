@@ -19,6 +19,9 @@ function parseMath($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
 }
 
 function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
+  if (trim($str)=='') {
+    return false;
+  }
   try {
     $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
