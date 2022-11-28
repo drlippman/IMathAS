@@ -1423,6 +1423,8 @@ if ($linkparts[0]=='cid') {
 		reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
 	}
 	$cid = $line['courseid'];
+    $GLOBALS['courseenddate'] = $line['enddate'];
+
 	if (isset($_SESSION['lti_duedate']) && ($line['date_by_lti']==1 || $line['date_by_lti']==2)) {
 		if ($_SESSION['ltirole']=='instructor') {
 			$newdatebylti = 2; //set/keep as instructor-set
@@ -1655,7 +1657,7 @@ if ($linkparts[0]=='aid') {
 	$_SESSION['ltiitemid'] = $aid;
 
 	$_SESSION['lticanuselatepass'] = false;
-	if ($_SESSION['ltirole']!='instructor' && $line['allowlate']>0) {
+	if ($SESS['ltirole']!='instructor' && $line['allowlate']>0) {
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$latepasshrs = $stm->fetchColumn(0);
@@ -1683,7 +1685,9 @@ if ($linkparts[0]=='aid') {
 }
 $_SESSION['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $_SESSION['lti_context_label'] = $SESS['lti_context_label'];
-$_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+if (isset($SESS['lti_launch_get'])) {
+    $_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+}
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];

@@ -884,7 +884,6 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
 			$a = $RND->rand(-32768,32768)/32768;
 			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
-			$count++;
 		} while ($r==0||$r>1);
         $r = sqrt(-2*log($r)/$r);
         $v1 = $sig*$a*$r + $mu;

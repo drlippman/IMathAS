@@ -21,7 +21,7 @@ class ExceptionFuncs {
 		$this->latepasses = $latepasses;
 		$this->latepasshrs = $latepasshrs;
 		$this->isstu = $isstu;  // !isset($_SESSION['stuview']) && !$actas
-		$this->courseenddate = $GLOBALS['courseenddate'];
+		$this->courseenddate = $GLOBALS['courseenddate'] ?? 2000000000;
 	}
 	public function setLatepasses($lp) {
 		$this->latepasses = $lp;
