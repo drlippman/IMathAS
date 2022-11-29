@@ -162,7 +162,7 @@ if (isset($_GET['launch'])) {
         $_SESSION['static_ok'] = 1;
     }
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
 		$aid = $_SESSION['ltiitemid'];
 		$stm = $DBH->prepare('SELECT courseid,ver FROM imas_assessments WHERE id=:aid');
@@ -252,7 +252,7 @@ if (isset($_GET['launch'])) {
 	$ltiuserid = $_SESSION['ltiuserid'];
 	$ltiorg = $_SESSION['ltiorg'];
 	$ltirole = $_SESSION['ltirole'];
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	$name_only = false;
 	if (count($keyparts)==1 && $ltirole=='learner') {
 		$name_only = true;
@@ -506,7 +506,7 @@ if (isset($_GET['launch'])) {
 			reporterror(_("No session recorded"));
 	}
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 } else if(isset($_REQUEST['custom_view_folder'])) {
 	//temporary branch for handling this deprecated feature, until it can be removed.
 	$linkparts = explode("-",$_REQUEST['custom_view_folder']);
@@ -822,7 +822,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 	}
-	$_SESSION['ltikey'] = $ltikey;
+	$_SESSION['lti_key'] = $ltikey;
 }
 
 
@@ -1792,7 +1792,7 @@ if (isset($_GET['launch'])) {
         $_SESSION['static_ok'] = 1;
     }
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
 		$aid = $_SESSION['ltiitemid'];
 		$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=:id");
@@ -1890,7 +1890,7 @@ if (isset($_GET['launch'])) {
 	$ltiuserid = $_SESSION['ltiuserid'];
 	$ltiorg = $_SESSION['ltiorg'];
 	$ltirole = $_SESSION['ltirole'];
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	$name_only = false;
 	if (count($keyparts)==1 && $ltirole=='learner') {
 		$name_only = true;
@@ -2138,7 +2138,7 @@ if (isset($_GET['launch'])) {
 		$userid = $_SESSION['userid'];
 	}
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 } else {
 	//not postback of new LTI user info, so must be fresh request
 
@@ -2432,7 +2432,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 	}
-	$_SESSION['ltikey'] = $ltikey;
+	$_SESSION['lti_key'] = $ltikey;
 }
 
 

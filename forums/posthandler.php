@@ -44,7 +44,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		if ($isteacher) {
-			$type = $_POST['type'];
+			$type = $_POST['type'] ?? 0;
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
 				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
@@ -73,7 +73,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$thisposttime = $now-1;
 		if ($isteacher) {
-			if ($_POST['releaseon']=='Date') {
+			if (isset($_POST['releaseon']) && $_POST['releaseon']=='Date') {
 				require_once("../includes/parsedatetime.php");
 				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
