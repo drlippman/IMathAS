@@ -37,8 +37,12 @@ function ineqplot($funcs) {
 				$of[0] = '<='.$f[0];
 			}
 		}
-		$of[1] = $f[2];
-		$of[6] = $f[5];
+        if (isset($f[2])) { 
+		    $of[1] = $f[2];
+        }
+        if (isset($f[5])) {
+		    $of[6] = $f[5];
+        }
 		$outstr[] = implode(',', $of);
 	}
 	return showplot($outstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);

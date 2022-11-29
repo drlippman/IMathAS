@@ -551,7 +551,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line===false) { continue; } //this should never happen, but avoid issues if it does
 		$existingq[] = $line['questionsetid'];
 		//output item array
-		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
+		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || !empty($adminasteacher)) { //can edit without template?
 			$canedit = 1;
 		} else {
 			$canedit = 0;

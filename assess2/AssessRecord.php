@@ -3215,7 +3215,7 @@ class AssessRecord
         unset($this->data['scoreoverride']);
         $doRetotal = true;
       } else {
-        $changes['gen'] = ['old'=>$this->data['scoreoverride'], 'new'=>$scores['gen']];
+        $changes['gen'] = ['old'=> ($this->data['scoreoverride'] ?? ''), 'new'=>$scores['gen']];
         $this->data['scoreoverride'] = floatval($scores['gen']);
         $this->assessRecord['score'] = floatval($scores['gen']);
         // mark assessment as having a submitted take, so grade will show in GB

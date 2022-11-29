@@ -1738,7 +1738,7 @@ function sortarray($a) {
 			rsort($a);
 		}
 	} else {
-		if (is_numeric($a[0])) {
+		if (isset($a[0]) && is_numeric($a[0])) {
 			sort($a, SORT_NUMERIC);
 		} else {
 			sort($a);

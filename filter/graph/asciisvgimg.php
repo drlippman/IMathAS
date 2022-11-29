@@ -83,7 +83,9 @@ function AStoIMG($w=200, $h=200) {
 
 	if ($w<=0) {$w=200;}
 	if ($h<=0) {$h=200;}
-
+	$w = (int) round($w);
+	$h = (int) round($h);
+	
 	if ($this->usegd2) {
 		$this->img = imagecreatetruecolor($w,$h);
 		$this->colors['transblue'] = imagecolorallocatealpha($this->img, 0,0,255,90);
@@ -133,7 +135,7 @@ function processShortScript($script) {
 			$this->stroke = $sa[$inx+7];
 			$this->strokewidth = $sa[$inx+8];
 			if ($this->usegd2) {
-				imagesetthickness($this->img,$this->strokewidth);
+				imagesetthickness($this->img,(int) round($this->strokewidth > 0.5 ? $this->strokewidth : 1));
 			}
 			if ($sa[$inx+9] != "") {
 				$this->ASsetdash($sa[$inx+9]);
@@ -205,7 +207,7 @@ function processScript($script) {
 					$this->ASsetdash($matches[2]);
 					break;
 				case 'strokewidth':
-					$this->strokewidth = $matches[2];
+					$this->strokewidth = (int) round($matches[2] > 0.5 ? $matches[2] : 1);
 					if ($this->usegd2) {
 						imagesetthickness($this->img,$this->strokewidth);
 					}
@@ -291,7 +293,7 @@ function ASsetdash() {
 	} else {
 		$dash = $this->curdash;
 	}
-	if ($dash=='none' || !preg_match('/\d/',$dash)) {
+	if ($dash=='none' || !preg_match('/\d/',$dash) || $this->stroke=='none') {
 		$this->isdashed = false;
 	} else {
 		$dash = preg_replace('/\s+/',',',$dash);
@@ -434,9 +436,9 @@ function AStextInternal($p,$st,$pos,$angle) {
 			$maxX = max(array($bb[0],$bb[2],$bb[4],$bb[6]));
 			$minY = min(array($bb[1],$bb[3],$bb[5],$bb[7]));
 			$maxY = max(array($bb[1],$bb[3],$bb[5],$bb[7]));
-			imagefilledrectangle($this->img,$p[0]+$minX-2,$p[1]+$minY-1,$p[0]+$maxX+2,$p[1]+$maxY+1,$this->colors[$this->fontbackground]);
+			imagefilledrectangle($this->img, (int) round($p[0]+$minX-2), (int) round($p[1]+$minY-1), (int) round($p[0]+$maxX+2), (int) round($p[1]+$maxY+1), $this->colors[$this->fontbackground]);
 		}
-		imagettftext($this->img,$this->fontsize,$angle,$p[0],$p[1],$this->colors[$color],$this->fontfile,$st);
+		imagettftext($this->img,$this->fontsize,$angle, (int) round($p[0]), (int) round($p[1]),$this->colors[$color],$this->fontfile,$st);
 	} else {
 		if ($this->fontsize<9) {
 			$fs = 1;
@@ -474,12 +476,12 @@ function AStextInternal($p,$st,$pos,$angle) {
 			$color = $this->stroke;
 		}
 		if ($this->fontbackground != '' && $this->fontbackground != 'none') {
-			imagefilledrectangle($this->img,$p[0]-2,$p[1]-2,$p[0]+$bb[0]+2,$p[1]+$bb[1]+2,$this->colors[$this->fontbackground]);
+			imagefilledrectangle($this->img, (int) round($p[0]-2), (int) round($p[1]-2), (int) round($p[0]+$bb[0]+2), (int) round($p[1]+$bb[1]+2), $this->colors[$this->fontbackground]);
 		}
 		if ($angle==90 || $angle==270) {
-			imagestringup($this->img,$fs,$p[0],$p[1],$st,$this->colors[$color]);
+			imagestringup($this->img,$fs,(int) round($p[0]), (int) round($p[1]),$st,$this->colors[$color]);
 		} else {
-			imagestring($this->img,$fs,$p[0],$p[1],$st,$this->colors[$color]);
+			imagestring($this->img,$fs,(int) round($p[0]), (int) round($p[1]),$st,$this->colors[$color]);
 		}
 	}
 }
@@ -653,13 +655,13 @@ function ASaxes($arg) {
 		if ($dox && $xgrid>0) {
 			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
 				if ($x>=$this->winxmin) {
-					imageline($this->img,$x,$this->winymin,$x,($fqonlyy?$this->height-$this->origin[1]:$this->winymax),$this->colors[$gc]);
+					imageline($this->img, (int) round($x), (int) round($this->winymin), (int) round($x), (int) round(($fqonlyy?$this->height-$this->origin[1]:$this->winymax)), $this->colors[$gc]);
 				}
 			}
 			if (!$fqonlyx) {
 				for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
 					if ($x<=$this->winxmax) {
-						imageline($this->img,$x,$this->winymin,$x,($fqonlyy?$this->height-$this->origin[1]:$this->winymax),$this->colors[$gc]);
+						imageline($this->img, (int) round($x), (int) round($this->winymin), (int) round($x), (int) round(($fqonlyy?$this->height-$this->origin[1]:$this->winymax)), $this->colors[$gc]);
 					}
 				}
 			}
@@ -668,13 +670,13 @@ function ASaxes($arg) {
 			if (!$fqonlyy) {
 				for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
 					if ($y>=$this->winymin) {
-						imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxmin),$y,$this->winxmax,$y,$this->colors[$gc]);
+						imageline($this->img, (int) round(($fqonlyx?$this->origin[0]:$this->winxmin)), (int) round($y), (int) round($this->winxmax), (int) round($y), $this->colors[$gc]);
 					}
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
 				if ($y<=$this->winymax) {
-					imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxmin),$y,$this->winxmax,$y,$this->colors[$gc]);
+					imageline($this->img, (int) round(($fqonlyx?$this->origin[0]:$this->winxmin)), (int) round($y), (int) round($this->winxmax), (int) round($y), $this->colors[$gc]);
 				}
 			}
 		}
@@ -684,24 +686,24 @@ function ASaxes($arg) {
 		if ($dox && $xgrid>0) {
 			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
 				if ($x>=$this->winxmin) {
-					imageline($this->img,$x,$this->height-$this->origin[1]-.5*$this->ticklength,$x,$this->height-$this->origin[1]+.5*$this->ticklength,$this->colors[$ac]);
+					imageline($this->img, (int) round($x), (int) round($this->height-$this->origin[1]-.5*$this->ticklength), (int) round($x), (int) round($this->height-$this->origin[1]+.5*$this->ticklength), $this->colors[$ac]);
 				}
 			}
 			for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
 				if ($x<=$this->winxmax) {
-					imageline($this->img,$x,$this->height-$this->origin[1]-.5*$this->ticklength,$x,$this->height-$this->origin[1]+.5*$this->ticklength,$this->colors[$ac]);
+					imageline($this->img, (int) round($x), (int) round($this->height-$this->origin[1]-.5*$this->ticklength), (int) round($x), (int) round($this->height-$this->origin[1]+.5*$this->ticklength), $this->colors[$ac]);
 				}
 			}
 		}
 		if ($doy && $ygrid>0) {
 			for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
 				if ($y>=$this->winymin) {
-					imageline($this->img,$this->origin[0]-.5*$this->ticklength,$y,$this->origin[0]+.5*$this->ticklength,$y,$this->colors[$ac]);
+					imageline($this->img, (int) round($this->origin[0]-.5*$this->ticklength), (int) round($y), (int) round($this->origin[0]+.5*$this->ticklength), (int) round($y), $this->colors[$ac]);
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
 				if ($y<=$this->winymax) {
-					imageline($this->img,$this->origin[0]-.5*$this->ticklength,$y,$this->origin[0]+.5*$this->ticklength,$y,$this->colors[$ac]);
+					imageline($this->img, (int) round($this->origin[0]-.5*$this->ticklength), (int) round($y), (int) round($this->origin[0]+.5*$this->ticklength), (int) round($y), $this->colors[$ac]);
 				}
 			}
 		}
@@ -710,35 +712,35 @@ function ASaxes($arg) {
 	$ac = $this->axescolor;
 	if ($doy && $yscl>0) {
 		if ($this->origin[0]>=$this->winxmin && $this->origin[0]<=$this->winxmax) {
-			imageline($this->img,$this->origin[0],$this->winymin,$this->origin[0],($fqonlyy?$this->height-$this->origin[1]:$this->winymax),$this->colors[$ac]);
+			imageline($this->img, (int) round($this->origin[0]), (int) round($this->winymin), (int) round($this->origin[0]), (int) round(($fqonlyy?$this->height-$this->origin[1]:$this->winymax)), $this->colors[$ac]);
 			//ticks
 			if (!$fqonlyy) {
 				for ($y=$this->height - $this->origin[1]; $y<=$this->winymax; $y += $yscl) {
 					if ($y>=$this->winymin) {
-						imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->colors[$ac]);
+						imageline($this->img, (int) round($this->origin[0]-$this->ticklength), (int) round($y), (int) round($this->origin[0]+$this->ticklength), (int) round($y), $this->colors[$ac]);
 					}
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$yscl; $y>=$this->winymin; $y -= $yscl) {
 				if ($y<=$this->winymax) {
-					imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->colors[$ac]);
+					imageline($this->img, (int) round($this->origin[0]-$this->ticklength), (int) round($y), (int) round($this->origin[0]+$this->ticklength), (int) round($y), $this->colors[$ac]);
 				}
 			}
 		}
 	}
 	if ($dox && $xscl>0) {
 		if ($this->origin[1]>=$this->winymin && $this->origin[1]<=$this->winymax) {
-			imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxmin),$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->colors[$ac]);
+			imageline($this->img, (int) round(($fqonlyx?$this->origin[0]:$this->winxmin)), (int) round($this->height-$this->origin[1]), (int) round($this->winxmax), (int) round($this->height-$this->origin[1]), $this->colors[$ac]);
 			//ticks
 			for ($x=$this->origin[0]; $x<=$this->winxmax; $x += $xscl) {
 				if ($x>=$this->winxmin) {
-					imageline($this->img,$x,$this->height- $this->origin[1] -$this->ticklength,$x,$this->height- $this->origin[1] +$this->ticklength,$this->colors[$ac]);
+					imageline($this->img, (int) round($x), (int) round($this->height- $this->origin[1] -$this->ticklength), (int) round($x), (int) round($this->height- $this->origin[1] +$this->ticklength), $this->colors[$ac]);
 				}
 			}
 			if (!$fqonlyx) {
 				for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
 					if ($x<=$this->winxmax) {
-						imageline($this->img,$x,$this->height-$this->origin[1]-$this->ticklength,$x,$this->height-$this->origin[1]+$this->ticklength,$this->colors[$ac]);
+						imageline($this->img, (int) round($x), (int) round($this->height-$this->origin[1]-$this->ticklength), (int) round($x), (int) round($this->height-$this->origin[1]+$this->ticklength), $this->colors[$ac]);
 					}
 				}
 			}
@@ -796,7 +798,7 @@ function ASaxes($arg) {
 		$this->stroke = $backupstroke;
 	}
 	if ($this->usegd2) {
-		imagesetthickness($this->img,$this->strokewidth);
+		imagesetthickness($this->img, (int) round($this->strokewidth > 0.5 ? $this->strokewidth : 1));
 	}
 }
 
@@ -807,10 +809,10 @@ function ASline($arg) {
 	$p = $this->pt2arr($arg[0]);
 	$q = $this->pt2arr($arg[1]);
 	if ($this->isdashed) {
-		imageline($this->img,$p[0],$p[1],$q[0],$q[1],IMG_COLOR_STYLED);
+		imageline($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($q[0]), (int) round($q[1]), IMG_COLOR_STYLED);
 	} else {
 		$color = $this->stroke;
-		imageline($this->img,$p[0],$p[1],$q[0],$q[1],$this->colors[$color]);
+		imageline($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($q[0]), (int) round($q[1]), $this->colors[$color]);
 	}
 	if ($this->marker=='dot' || $this->marker=='arrowdot') {
 		$this->ASdot($p,8);
@@ -830,13 +832,13 @@ function ASpath($arg) {
 		$pt = array();
 		for ($i=0;$i<count($arg);$i++) {
 			if ($i%2==0) { //x coord
-				$pt[$i] = $this->evalifneeded($arg[$i])*$this->xunitlength + $this->origin[0];
+				$pt[$i] = (int) round($this->evalifneeded($arg[$i])*$this->xunitlength + $this->origin[0]);
 			} else {
-				$pt[$i] = $this->height - $this->evalifneeded($arg[$i])*$this->yunitlength - $this->origin[1];
+				$pt[$i] = (int) round($this->height - $this->evalifneeded($arg[$i])*$this->yunitlength - $this->origin[1]);
 			}
 		}
 		$color = $this->fill;
-		imagefilledpolygon($this->img,$pt,count($pt)/2,$this->colors[$color]);
+		imagefilledpolygon($this->img,$pt,$this->colors[$color]);
 	}
 	if ($this->stroke != 'none') {
 		for ($i=0; $i<count($arg)-2; $i += 2) {
@@ -861,14 +863,14 @@ function ASellipse($arg) {
 	if ($this->fill != 'none') {
 		$color = $this->fill;
 		if ($this->usegd2) {
-			imagefilledellipse($this->img,$p[0],$p[1],$arg[1]*2,$arg[2]*2,$this->colors[$color]);
+			imagefilledellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), $this->colors[$color]);
 		}
 	}
 	if ($this->isdashed) {
-		imageellipse($this->img,$p[0],$p[1],$arg[1]*2,$arg[2]*2,IMG_COLOR_STYLED);
+		imageellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), IMG_COLOR_STYLED);
 	} else {
 		$color = $this->stroke;
-		imageellipse($this->img,$p[0],$p[1],$arg[1]*2,$arg[2]*2,$this->colors[$color]);
+		imageellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), $this->colors[$color]);
 	}
 }
 function ASrect($arg) {
@@ -880,15 +882,15 @@ function ASrect($arg) {
 	$sy = min($p[1],$q[1]); $by = max($p[1],$q[1]);
 	if ($this->fill != 'none') {
 		$color = $this->fill;
-		imagefilledrectangle($this->img,$sx,$sy,$bx,$by,$this->colors[$color]);
+		imagefilledrectangle($this->img, (int) round($sx), (int) round($sy), (int) round($bx), (int) round($by), $this->colors[$color]);
 	}
 
 	if ($this->isdashed) {
-		imagerectangle($this->img,$sx,$sy,$bx,$by,IMG_COLOR_STYLED);
+		imagerectangle($this->img, (int) round($sx), (int) round($sy), (int) round($bx), (int) round($by), IMG_COLOR_STYLED);
 	} else {
 		$color = $this->stroke;
 		if ($color != 'none') {
-			imagerectangle($this->img,$sx,$sy,$bx,$by,$this->colors[$color]);
+			imagerectangle($this->img, (int) round($sx), (int) round($sy), (int) round($bx), (int) round($by), $this->colors[$color]);
 		}
 	}
 }
@@ -912,15 +914,15 @@ function ASsector($arg) {
 
 	if ($this->fill != 'none') {
 		$color = $this->fill;
-		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->colors[$color],IMG_ARC_PIE);
+		imagefilledarc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$color], IMG_ARC_PIE);
 	}
 	$color = $this->stroke;
 	if ($this->isdashed) {
-		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,IMG_COLOR_STYLED,IMG_ARC_PIE|IMG_ARC_NOFILL|IMG_ARC_EDGED);
+		imagefilledarc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), IMG_COLOR_STYLED, IMG_ARC_PIE|IMG_ARC_NOFILL|IMG_ARC_EDGED);
 
 	} else {
 		if ($color != 'none') {
-			imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->colors[$color],IMG_ARC_PIE|IMG_ARC_NOFILL|IMG_ARC_EDGED);
+			imagefilledarc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$color], IMG_ARC_PIE|IMG_ARC_NOFILL|IMG_ARC_EDGED);
 		}
 	}
 
@@ -949,15 +951,15 @@ function ASarc($arg) {
 	$ydiam = 2*$r*$this->yunitlength;
 	if ($this->fill != 'none') {
 		$color = $this->fill;
-		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->colors[$color],IMG_ARC_PIE);
+		imagefilledarc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$color], IMG_ARC_PIE);
 	}
 
 	if ($this->isdashed) {
-		imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,IMG_COLOR_STYLED);
+		imagearc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), IMG_COLOR_STYLED);
 	} else {
 		$color = $this->stroke;
 		if ($color != 'none') {
-			imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->colors[$color]);
+			imagearc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$color]);
 		}
 	}
 }
@@ -967,13 +969,13 @@ function ASdot($pt,$r) {
 	if ($this->markerfill!='none') {
 		$color = $this->markerfill;
 		if ($this->usegd2) {
-			imagefilledellipse($this->img,$pt[0],$pt[1],$r,$r,$this->colors[$color]);
+			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($r), (int) round($r), $this->colors[$color]);
 		} else {
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors[$color]);
 		}
 	}
 	$color = $this->stroke;
-	imageellipse($this->img,$pt[0],$pt[1],$r,$r,$this->colors[$color]);
+	imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($r), (int) round($r), $this->colors[$color]);
 }
 function ASdot2($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
@@ -981,19 +983,19 @@ function ASdot2($arg) {
 	$color = $this->stroke;
 	if (isset($arg[1]) && $arg[1]=='closed') {
 		if ($this->usegd2) {
-			imagefilledellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->colors[$color]);
+			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
 		} else {
 			$r = $this->dotradius;
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors[$color]);
 		}
 	} else {
 		if ($this->usegd2) {
-			imagefilledellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->colors['white']);
+			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors['white']);
 		} else {
 			$r = $this->dotradius;
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors['white']);
 		}
-		imageellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->colors[$color]);
+		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
 	}
 	if (isset($arg[2])) {
 		if (isset($arg[3])) {
@@ -1006,9 +1008,9 @@ function ASdot2($arg) {
 	if (preg_match('/\s*\[(.*?)\]\s*,\s*[\'"](.*?)[\'"]\s*(.*)/',$arg,$m)) {
 		$pt = $this->pt2arr($m[1]);
 		if ($m[2]=='closed') {
-			imagefilledellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->$color);
+			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
 		} else {
-			imageellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->$color);
+			imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
 		}
 
 		if (strlen($m[3])>0) {
@@ -1016,13 +1018,13 @@ function ASdot2($arg) {
 		}
 	} else if (preg_match('/\s*\[(.*?)\]\s*,\s*,\s*(.*)/',$arg,$m)) {
 		$pt = $this->pt2arr($m[1]);
-		imageellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->$color);
+		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
 		if (strlen($m[3])>0) {
 			$this->AStext('['.$m[1].']'.$m[2]);
 		}
 	} else {
 		$pt = $this->pt2arr($arg);
-		imageellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->$color);
+		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
 	}
 	*/
 }
@@ -1036,9 +1038,15 @@ function ASarrowhead($p,$q) {
 	if ($d > 0.00000001) {
 		$u = array($u[0]/$d, $u[1]/$d);
 		$up = array(-$u[1],$u[0]);
-		$arr = array(($w[0]-15*$u[0]-4*$up[0]),($w[1]-15*$u[1]-4*$up[1]),($w[0]-3*$u[0]),($w[1]-3*$u[1]),($w[0]-15*$u[0]+4*$up[0]),($w[1]-15*$u[1]+4*$up[1]));
+		$arr = array(
+			(int) round($w[0]-15*$u[0]-4*$up[0]),
+			(int) round($w[1]-15*$u[1]-4*$up[1]),
+			(int) round($w[0]-3*$u[0]),
+			(int) round($w[1]-3*$u[1]),
+			(int) round($w[0]-15*$u[0]+4*$up[0]),
+			(int) round($w[1]-15*$u[1]+4*$up[1]));
 		$color = $this->stroke;
-		imagefilledpolygon($this->img,$arr,count($arr)/2,$this->colors[$color]);
+		imagefilledpolygon($this->img,$arr,$this->colors[$color]);
 	}
 }
 function ASslopefield($arg) {

@@ -847,10 +847,10 @@ class AssessInfo
           $unused = array_diff($group, array($oldquestion));
         }
         $newq = $unused[array_rand($unused,1)];
-        if (!isset($this->questionData[$newq])) {
-            $this->loadQuestionSettings([$newq], true);
-        }
       }
+    }
+    if (!isset($this->questionData[$newq])) {
+        $this->loadQuestionSettings([$newq], true);
     }
 
     if ($this->assessData['shuffle']&2) {

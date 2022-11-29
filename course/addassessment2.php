@@ -233,13 +233,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
 			$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
-			$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
+			$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern'] ?? 0);
+            $defregenpenalty = Sanitize::onlyInt($_POST['defregenpenalty'] ?? 0);
 			if ($toset['defregens'] == 1) {
 				$toset['defregenpenalty'] = 0;
-			} else if ($defregenpenalty_aftern > 1 && $_POST['defregenpenalty'] > 0) {
-				$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
+			} else if ($defregenpenalty_aftern > 1 && $defregenpenalty > 0) {
+				$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . $defregenpenalty;
 			} else {
-				$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
+				$toset['defregenpenalty'] = $defregenpenalty;
 			}
 			if (isset($_POST['keepscore'])) {
 				$toset['keepscore'] = Sanitize::simpleString($_POST['keepscore']);
@@ -247,13 +248,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 			$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
-			$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern']);
+			$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern'] ?? 0);
+            $defattemptpenalty = Sanitize::onlyInt($_POST['defattemptpenalty'] ?? 0);
 			if ($toset['defattempts'] == 1) {
 				$toset['defpenalty'] = 0;
-			} else if ($defattemptpenalty_aftern > 1 && $_POST['defattemptpenalty'] > 0) {
-				$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . Sanitize::onlyInt($_POST['defattemptpenalty']);
+			} else if ($defattemptpenalty_aftern > 1 && $defattemptpenalty > 0) {
+				$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . $defattemptpenalty;
 			} else {
-				$toset['defpenalty'] = Sanitize::onlyInt($_POST['defattemptpenalty']);
+				$toset['defpenalty'] = $defattemptpenalty;
 			}
 
 			$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);

@@ -330,7 +330,7 @@
 		}
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
-		if ($isnewitem && isset($_POST['doupload'])) {
+		if (!empty($isnewitem) && isset($_POST['doupload'])) {
 			header(sprintf('Location: %s/course/uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
                 Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem)));
 		} else if ($from == 'gbtesting') {
