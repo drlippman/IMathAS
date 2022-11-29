@@ -178,13 +178,14 @@ if ($haslogin && !$hasusername) {
         $stm = $DBH->prepare("SELECT id,password,rights,groupid,jsondata,mfa FROM imas_users WHERE SID=:SID");
         $stm->execute(array(':SID' => $_POST['username']));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
-        $json_data = json_decode($line['jsondata'], true);
-        if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
-            echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');
-            exit;
+        if ($line != false) {
+            $json_data = json_decode($line['jsondata'], true);
+            if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
+                echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');
+                exit;
+            }
         }
     }
-    // if (($line != null) && ($line['password'] == md5($_POST['password']))) {
     if (isset($CFG['GEN']['newpasswords'])) {
         require_once "includes/password.php";
     }
@@ -199,7 +200,7 @@ if ($haslogin && !$hasusername) {
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);    
     }
 
-    if (($line != null) && (
+    if (($line != false) && (
         ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords'] != 'only') && ((md5($line['password'] . $_SESSION['challenge']) == $_POST['password']) || ($line['password'] == md5($_POST['password']))))
         || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'], $line['password']))
     )) {
@@ -333,16 +334,17 @@ if ($haslogin && !$hasusername) {
             $badsession = false;
         }
 
-        if (!isset($json_data['login_errors'])) {
-            $json_data['login_errors'] = 0;
+        if ($line != false) {
+            if (!isset($json_data['login_errors'])) {
+                $json_data['login_errors'] = 0;
+            }
+            $json_data['login_errors']++;
+            if ($json_data['login_errors'] > 3) {
+                $json_data['login_blockuntil'] = time() + 60;
+            }
+            $stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
+            $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
         }
-        $json_data['login_errors']++;
-        if ($json_data['login_errors'] > 3) {
-            $json_data['login_blockuntil'] = time() + 60;
-        }
-        $stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
-        $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
-
         /*  For login error tracking - requires add'l table
     if ($line==null) {
     $err = "Bad SID";
@@ -578,7 +580,7 @@ if ($hasusername) {
         $stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess,lticourseid FROM imas_students WHERE userid=:userid AND courseid=:courseid");
         $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
-        if ($line != null) {
+        if ($line != false) {
             $studentid = $line['id'];
             $studentinfo['timelimitmult'] = $line['timelimitmult'];
             $studentinfo['section'] = $line['section'];
@@ -610,7 +612,7 @@ if ($hasusername) {
             $stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
             $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
             $line = $stm->fetch(PDO::FETCH_ASSOC);
-            if ($line != null) {
+            if ($line != false) {
                 if ($myrights > 19) {
                     $teacherid = $line['id'];
                     if (isset($_GET['stuview'])) {
@@ -634,7 +636,7 @@ if ($hasusername) {
                 $stm = $DBH->prepare("SELECT id,section FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
                 $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
                 $line = $stm->fetch(PDO::FETCH_ASSOC);
-                if ($line != null) {
+                if ($line != false) {
                     $tutorid = $line['id'];
                     $tutorsection = trim($line['section']);
                 } else if ($myrights == 5 && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {

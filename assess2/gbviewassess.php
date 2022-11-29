@@ -31,7 +31,7 @@ if ($from=='isolate') {
 }
 
 $isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
-$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader') !== false);
 $isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
   $diagid = Sanitize::onlyInt($_SESSION['isdiag']);

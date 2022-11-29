@@ -17,7 +17,7 @@ $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 
 $isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
-$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader') !== false);
 $isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
   $diagid = Sanitize::onlyInt($_SESSION['isdiag']);

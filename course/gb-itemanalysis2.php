@@ -313,7 +313,7 @@
 	}
 
 	$notstarted = $totstucnt - $studentsStartedAssessment;
-	$nonstartedper = round(100*$notstarted/$totstucnt,1);
+	$nonstartedper = ($totstucnt>0) ? round(100*$notstarted/$totstucnt,1) : 0;
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
