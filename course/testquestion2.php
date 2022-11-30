@@ -75,6 +75,8 @@ if ($myrights<20) {
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
+    $isquestionauthor = ($line['ownerid'] == $userid);
+
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
 

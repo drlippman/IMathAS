@@ -101,6 +101,9 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
 if ($in_practice) {
     $assess_info->overridePracticeSettings();
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // if livepoll, look up status and verify
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {

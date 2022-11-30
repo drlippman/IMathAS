@@ -83,6 +83,9 @@ if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // check password, if needed
 if (!$in_practice && !$canViewAll &&

@@ -52,6 +52,9 @@ $assess_record->loadRecord($uid);
 if ($isTeacherPreview) {
     $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // grab all questions settings
 $assess_info->loadQuestionSettings('all', true);

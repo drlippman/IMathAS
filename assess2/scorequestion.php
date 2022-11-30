@@ -143,6 +143,9 @@ if ($preview_all) {
 if ($isTeacherPreview) {
     $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // get settings for LTI if needed
 $assess_info->loadLTIMsgPosts($userid, $canViewAll);

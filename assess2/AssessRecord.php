@@ -43,6 +43,7 @@ class AssessRecord
   private $dispqn = null;
   private $inTransaction = false;
   private $new_excusals = [];
+  private $include_errors = false;
 
   /**
    * Construct object
@@ -134,6 +135,14 @@ class AssessRecord
    */
   public function setIsTeacherPreview($val) {
     $this->teacherPreview = $val;
+  }
+
+  /**
+   * Set if errors should be included
+   * @param bool $val true to show errors
+   */
+  public function setIncludeErrors($val) {
+    $this->include_errors = $val;
   }
 
   /**
@@ -2016,7 +2025,7 @@ class AssessRecord
         'usedautosave' => $usedAutosave,
         'work' => $work,
         'worktime' => $worktime,
-        'errors' => $question->getErrors()
+        'errors' => ($this->include_errors ? $question->getErrors() : [])
     ];
 
   }
@@ -2158,8 +2167,11 @@ class AssessRecord
     if (!empty($data)) {
       $this->recordTry($qn, $data, $singlescore);
     }
-
-    return $scoreResult['errors'];
+    if ($this->include_errors) {
+        return $scoreResult['errors'];
+    } else {
+        return [];
+    }
   }
 
   /**
