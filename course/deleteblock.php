@@ -16,7 +16,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".$cid."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Block";
 
 
-if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
+if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
@@ -68,7 +68,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('Sanitize::onlyInt',$obarr)));
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=". $cid.$btf . "&r=" . Sanitize::randomQueryStringParam());
-
+        exit;
 	} else {
 		$blocktree = explode('-',$_GET['id']);
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index

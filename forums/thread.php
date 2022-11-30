@@ -709,7 +709,7 @@ echo "</p>";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
 			if ($stm->rowCount()==0) {
-				echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
+				echo '<tr><td colspan='.(($isteacher && $groupsetid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 			}
 			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if (isset($postcount[$line['id']])) {

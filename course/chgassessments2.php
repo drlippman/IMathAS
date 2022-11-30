@@ -378,7 +378,7 @@ if (!(isset($teacherid))) {
 				$qarr[':exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
 			}
 
-			if ($_POST['defoutcome'] !== 'DNC') {
+			if (isset($_POST['defoutcome']) && $_POST['defoutcome'] !== 'DNC') {
 				$sets[] = "defoutcome=:defoutcome";
 				$qarr[':defoutcome'] = Sanitize::onlyInt($_POST['defoutcome']);
 			}

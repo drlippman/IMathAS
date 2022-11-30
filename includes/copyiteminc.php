@@ -44,8 +44,14 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
     if (!isset($outcomes)) {
         $outcomes = array();
     }
-    if (strlen($_POST['append']) > 0 && $_POST['append'][0] != ' ') {
+    if (!isset($_POST['ctc'])) {
+        $_POST['ctc'] = $cid;
+    }
+    if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
+    }
+    if (!isset($_POST['append'])) {
+        $_POST['append'] = '';
     }
     $now = time();
     $stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
@@ -472,6 +478,9 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
 function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = false)
 {
     global $checked, $blockcnt;
+    if (!isset($_POST['append'])) {
+        $_POST['append'] = '';
+    }
     foreach ($items as $k => $item) {
         if (is_array($item)) {
             if (array_search($parent . '-' . ($k + 1), $checked) !== false) { //copy block
@@ -613,8 +622,12 @@ function removeGrouplimits(&$items)
 function copyallsub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = false)
 {
     global $blockcnt, $reqscoretrack, $assessnewid;
-    if (strlen($_POST['append']) > 0 && $_POST['append'][0] != ' ') {
+    
+    if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
+    }
+    if (!isset($_POST['append'])) {
+        $_POST['append'] = '';
     }
     foreach ($items as $k => $item) {
         if (is_array($item)) {
