@@ -507,7 +507,7 @@ class QuestionHtmlGenerator
             }
         } else {
 
-            if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10) {
+            if (!empty($GLOBALS['isquestionauthor'])) {
                 if (isset($anstypes)) {
                     $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
                 } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
