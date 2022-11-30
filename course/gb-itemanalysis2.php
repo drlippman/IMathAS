@@ -365,10 +365,14 @@
 			$points[$row['qid']] = $row['points'];
 			$qsetids[$row['qid']] = $row['qsid'];
 			$withdrawn[$row['qid']] = $row['withdrawn'];
-			if ($row['qtype']=='essay' || $row['qtype']=='file') {
+			if ($row['qtype']=='essay' || $row['qtype']=='file' || 
+                ($row['qtype']=='draw' && preg_match('/answerformat.*?freehand/', $row['control']))
+            ) {
 				$needmanualgrade[$row['qid']] = true;
 			} else if ($row['qtype']=='multipart') {
-				if (preg_match('/anstypes.*?(essay|file)/', $row['control'])) {
+				if (preg_match('/anstypes.*?(essay|file)/', $row['control']) ||
+                    (preg_match('/anstypes.*?(draw)/', $row['control']) && preg_match('/answerformat.*?freehand/', $row['control']))
+                ) {
 					$needmanualgrade[$row['qid']] = true;
 				}
 			}
