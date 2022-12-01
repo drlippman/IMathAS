@@ -247,7 +247,7 @@ if (count($qns) > 0) {
   $assess_record->reTotalAssess($qns);
 
 } else {
-  $assess_info->loadQuestionSettings('all', false, false);
+  $assess_info->loadQuestionSettings('all', $end_attempt, false);
 }
 
 // save autosaves, if set 

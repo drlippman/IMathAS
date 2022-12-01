@@ -381,7 +381,7 @@
 			$UA = 0;
 		}
 
-		if ($line['starttime']==null) {
+		if ($line['starttime']===null) {
 			if ($aver > 1) {
 				$querymap = array(
 					'gbmode' => $gbmode,
