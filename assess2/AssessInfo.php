@@ -778,7 +778,7 @@ class AssessInfo
     } else {
       if ($this->assessData['shuffle']&4) { //all students same seed
         foreach ($qout as $i=>$qid) {
-          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
             //using fixed seed list
             $n = count($this->questionData[$qid]['fixedseeds']);
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
@@ -789,7 +789,7 @@ class AssessInfo
         }
       } else { //regular selection
         foreach ($qout as $i=>$qid) {
-          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
             //using fixed seed list
             if ($oldseeds !== false && count($this->questionData[$qid]['fixedseeds']) > 1) {
               //if we have oldseeds, remove it from selection
@@ -857,7 +857,7 @@ class AssessInfo
       //all questions same seed - don't regen
       $newseed = $oldseeds[0];
     } else {
-      if ($this->questionData[$newq]['fixedseeds'] !== null) {
+      if (!empty($this->questionData[$newq]['fixedseeds'])) {
         //using fixed seed list. find any unused seeds
         if (count($this->questionData[$newq]['fixedseeds']) == 1) {
           //only one seed so use it
