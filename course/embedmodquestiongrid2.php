@@ -182,6 +182,18 @@
 
 			updatePointsPossible($aid, $itemorder, $defpoints);
         }
+
+        // Delete any teacher or tutor attempts on this assessment
+        $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+            imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array($cid, $aid));
+        $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+            imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array($cid, $aid));
         
         require('../includes/addquestions2util.php');
         list($jsarr,$existingqs) = getQuestionsAsJSON($cid, $aid);
