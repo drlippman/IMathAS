@@ -330,21 +330,28 @@ class QuestionHtmlGenerator
             // Calculate answer weights.
             // $answeights - question writer defined
             if ($quesData['qtype'] == "multipart") {
-              if (isset($answeights)) {
-        				if (!is_array($answeights)) {
+                if (isset($answeights)) {
+        			if (!is_array($answeights)) {
         					$answeights = explode(",",$answeights);
-        				}
-        				$answeights = array_map('trim', $answeights);
-        				if (count($answeights) != count($anstypes)) {
-        					$answeights = array_fill(0, count($anstypes), 1);
-        				}
-        			} else {
-        				if (count($anstypes)>1) {
-        					$answeights = array_fill(0, count($anstypes), 1);
-        				} else {
-        					$answeights = array(1);
-        				}
-        			}
+                    }
+                    $answeights = array_map('trim', $answeights);
+                    if (count($answeights) != count($anstypes)) {
+                        $answeights = array_fill(0, count($anstypes), 1);
+                    }
+                    $answeights = array_map(function($v) {
+                        if (is_numeric($v)) { 
+                            return $v;
+                        } else {
+                            return evalbasic($v);
+                        }
+                    }, $answeights);
+                } else {
+                    if (count($anstypes)>1) {
+                        $answeights = array_fill(0, count($anstypes), 1);
+                    } else {
+                        $answeights = array(1);
+                    }
+                }    
             }
 
             // Get the answers to all parts of this question.
@@ -616,7 +623,7 @@ class QuestionHtmlGenerator
                 foreach ($showanswer as $kidx=>$atIdx) {
                     $_thisIsReady = true;
                     for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
-                        if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
+                        if (empty($doShowAnswerParts[$iidx]) && !$doShowAnswer) {
                             $_thisIsReady = false;
                             $doShowDetailedSoln = false;
                             for ($siidx=$iidx; $siidx < $kidx; $siidx++) {

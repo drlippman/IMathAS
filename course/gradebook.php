@@ -1913,7 +1913,7 @@ function gbinstrdisp() {
 
 							echo '</span>';
 						}
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 					} else {

@@ -575,20 +575,27 @@ class ScoreEngine
         $partLastAnswerAsNumber = array();
         $partCorrectAnswerWrongFormat = array();
         if (isset($answeights)) {
-  				if (!is_array($answeights)) {
-  					$answeights = explode(",",$answeights);
-  				}
-  				$answeights = array_map('trim', $answeights);
-  				if (count($answeights) != count($anstypes)) {
-  					$answeights = array_fill(0, count($anstypes), 1);
-  				}
-  			} else {
-  				if (count($anstypes)>1) {
-  					$answeights = array_fill(0, count($anstypes), 1);
-  				} else {
-  					$answeights = array(1);
-  				}
-  			}
+            if (!is_array($answeights)) {
+                $answeights = explode(",",$answeights);
+            }
+            $answeights = array_map('trim', $answeights);
+            if (count($answeights) != count($anstypes)) {
+                $answeights = array_fill(0, count($anstypes), 1);
+            }
+            $answeights = array_map(function($v) {
+                if (is_numeric($v)) { 
+                    return $v;
+                } else {
+                    return evalbasic($v);
+                }
+            }, $answeights);
+        } else {
+            if (count($anstypes)>1) {
+                $answeights = array_fill(0, count($anstypes), 1);
+            } else {
+                $answeights = array(1);
+            }
+        }
         $scores = array();
         $raw = array();
         $accpts = 0;

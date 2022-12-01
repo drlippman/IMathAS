@@ -520,10 +520,14 @@ if ($hasusername) {
                 exit;
             }
         } else if ($_SESSION['ltiitemtype'] == 0 && $_SESSION['ltirole'] == 'learner') {
-            if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
-                $breadcrumbbase = "<a href=\"$imasroot/assess2/?cid=" . Sanitize::courseId($cid) . "&aid={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+            if (isset($_GET['cid'])) {
+                if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
+                    $breadcrumbbase = "<a href=\"$imasroot/assess2/?cid=" . Sanitize::courseId($_GET['cid']) . "&aid={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+                } else {
+                    $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=" . Sanitize::courseId($_GET['cid']) . "&id={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+                }
             } else {
-                $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+                $breadcrumbbase = '';
             }
             $urlparts = parse_url($_SERVER['PHP_SELF']);
             $allowedinLTI = array('showtest.php', 'printtest.php', 'msglist.php', 'sentlist.php', 'viewmsg.php', 'msghistory.php',

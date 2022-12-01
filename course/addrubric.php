@@ -17,7 +17,7 @@ $from = $_GET['from'] ?? '';
 $fromstr = '';
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-if ($from=='modq') {
+if ($from=='modq' && !empty($_GET['qid'])) {
 	$fromstr = '&amp;' . Sanitize::generateQueryStringFromMap(array('from' => 'modq', 'aid' => $_GET['aid'],
 			'qid' => $_GET['qid']));
 	$returnstr = 'modquestion.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,

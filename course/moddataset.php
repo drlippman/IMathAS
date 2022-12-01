@@ -97,7 +97,7 @@
 
 	$outputmsg = '';
 	$errmsg = '';
-	if (isset($_POST['qtext'])) {
+	if (isset($_POST['qtext']) && isset($_POST['control'])) {
 		require_once("../includes/filehandler.php");
 		$now = time();
 		foreach (array('qcontrol','answer','solution') as $v) {

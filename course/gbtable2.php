@@ -1706,15 +1706,19 @@ function gbtable() {
 		}
         $refcol = -1;
 		if ($r['type']=='A') {
+            if (!isset($assesscol[$r['typeid']])) { continue; }
             $refcol = $assesscol[$r['typeid']];
             $ci = $assessidx[$r['typeid']];
 		} else if ($r['type']=='O') {
+            if (!isset($gradecol[$r['typeid']])) { continue; }
             $refcol = $gradecol[$r['typeid']];
             $ci = $gradeidx[$r['typeid']];
 		} else if ($r['type']=='E') {
+            if (!isset($exttoolcol[$r['typeid']])) { continue; }
             $refcol = $exttoolcol[$r['typeid']];
             $ci = $exttoolidx[$r['typeid']];
 		} else if ($r['type']=='F') {
+            if (!isset($discusscol[$r['typeid']])) { continue; }
             $refcol = $discusscol[$r['typeid']];
             $ci = $discussidx[$r['typeid']];
 		}
@@ -2161,6 +2165,7 @@ function gbtable() {
 							if ($ntodrop>0) {
 								$ndropcnt = 0;
 								foreach ($cattotstu[$stype][$cat] as $col=>$v) {
+                                    if (!isset($gb[$ln][1][$col][5])) { $gb[$ln][1][$col][5] = 0; }
 									$gb[$ln][1][$col][5] += pow(2,$stype);// 8; //mark as dropped
 									unset($catpossstu[$stype][$cat][$col]); //remove from category possible
 									$ndropcnt++;
@@ -2214,6 +2219,7 @@ function gbtable() {
 								arsort($dropbenefit, SORT_NUMERIC);
 								$ndropcnt = 0;
 								foreach ($dropbenefit as $col=>$v) {
+                                    if (!isset($gb[$ln][1][$col][5])) { $gb[$ln][1][$col][5] = 0; }
 									$gb[$ln][1][$col][5] += pow(2,$stype); //mark as dropped
 									unset($catpossstu[$stype][$cat][$col]); //remove from category possible
 									unset($cattotstu[$stype][$cat][$col]); //remove from category total

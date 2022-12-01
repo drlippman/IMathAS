@@ -228,10 +228,11 @@ if (!(isset($teacherid))) {
         $stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
         $stm->execute(array(':id' => $qsetid));
         $qdescrip = $stm->fetchColumn(0);
+        $qingroup = false;
         if (isset($_GET['loc'])) {
             $qdescrip = $_GET['loc'] . ': ' . $qdescrip;
+            $qingroup = (strpos($_GET['loc'],'-') !== false);
         }
-        $qingroup = (strpos($_GET['loc'],'-') !== false);
 
         $rubric_vals = array(0);
         $rubric_names = array('None');
@@ -418,8 +419,8 @@ if (!isset($_GET['id']) || $beentaken) {
 <span class=form><?php echo _('Use Scoring Rubric'); ?></span><span class=formright>
 <?php
 writeHtmlSelect('rubric', $rubric_vals, $rubric_names, $line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Add new rubric") . "</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Edit rubrics") . "</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id'] ?? '') . "\">" . _("Add new rubric") . "</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id'] ?? '') . "\">" . _("Edit rubrics") . "</a> ";
     ?>
     </span><br class="form"/>
 <?php

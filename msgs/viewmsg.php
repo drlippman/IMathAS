@@ -29,7 +29,7 @@
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$page = Sanitize::onlyInt($_GET['page'] ?? 0);
-	$type = $_GET['type'];
+	$type = $_GET['type'] ?? '';
 
 	$teacherof = array();
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE userid=:userid");
