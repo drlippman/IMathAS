@@ -24,6 +24,7 @@
             }
 
 			$newitemorder = '';
+            $points = '';
 			if (isset($_POST['addasgroup'])) {
 				$newitemorder = '1|0';
 			}
@@ -139,7 +140,6 @@
                     (empty($_POST['showhints4'.$qid]) ? 0 : 4)
                 );
                 $showwork = intval($_POST['showwork'.$qid]);
-				if ($points=='') { $points = 9999;}
 				if ($attempts=='' || intval($attempts)==0) {$attempts = 9999;}
 				$stm = $DBH->prepare("UPDATE imas_questions SET attempts=:attempts,showhints=:showhints,showwork=:showwork WHERE id=:id");
 				$stm->execute(array(':attempts'=>$attempts, ':showhints'=>$showhints, ':showwork'=>$showwork, ':id'=>$qid));
