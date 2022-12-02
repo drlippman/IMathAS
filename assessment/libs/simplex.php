@@ -271,7 +271,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                         $dec2 = $stuanswer[$LastStuColumn];
                     }
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -297,7 +297,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                         $dec2 = $stuanswer[$c];
                     }
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -332,7 +332,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     }
 
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -360,7 +360,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     }
 
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
