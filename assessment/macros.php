@@ -1687,6 +1687,7 @@ function listtoarray($l) {
 	if (func_num_args()>1 && ($_SESSION['isteacher'] || isset($GLOBALS['teacherid']))) {
 		echo "Warning:  listtoarray expects one argument, more than one provided";
 	}
+    if (empty($l)) { return []; }
 	return array_map('trim',explode(',',$l));
 }
 

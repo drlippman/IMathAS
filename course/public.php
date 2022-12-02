@@ -38,10 +38,6 @@
 		$blocktree = explode('-',$_GET['folder']);
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!empty($items[$blocktree[$i]-1]['public'])) {
-				$blockispublic = true;
-			}
 			if (!is_array($items[$blocktree[$i]-1])) { //invalid blocktree
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
@@ -55,6 +51,10 @@
 				unset($backtrack);
 				unset($blocktree);
 				break;
+			}
+            $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+			if (!empty($items[$blocktree[$i]-1]['public'])) {
+				$blockispublic = true;
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
