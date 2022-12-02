@@ -2183,7 +2183,7 @@ function arraystodoteqns($x,$y,$color='blue') {
     }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
-		$out[] = $y[$i].','.$color.','.$x[$i].','.$x[$i].','.'closed';
+        $out[] = "dot,".$x[$i].','.$y[$i].',closed,'.$color;
 	}
 	return $out;
 }
