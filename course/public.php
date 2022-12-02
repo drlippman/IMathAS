@@ -38,7 +38,7 @@
 		$blocktree = explode('-',$_GET['folder']);
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			if (!is_array($items[$blocktree[$i]-1])) { //invalid blocktree
+			if (!is_numeric($blocktree[$i]) || !is_array($items[$blocktree[$i]-1])) { //invalid blocktree
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
