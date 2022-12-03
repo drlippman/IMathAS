@@ -15,6 +15,7 @@
 
 	$ispublic = true;
 	$cid = Sanitize::courseId($_GET['cid']);
+    $myrights = 5;
 
 	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));

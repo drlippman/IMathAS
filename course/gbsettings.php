@@ -103,7 +103,7 @@
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
 		if (!isset($_POST['gbmode100000'])) {$defgbmode += 100000;}
 		if (!isset($_POST['gbmode200000'])) {$defgbmode += 200000;}
-		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
+		$stugbmode = ($_POST['stugbmode1'] ?? 0) + ($_POST['stugbmode2'] ?? 0) + ($_POST['stugbmode4'] ?? 0) + ($_POST['stugbmode8'] ?? 0);
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
 		if (isset($_POST['submit'])) {

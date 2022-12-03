@@ -1653,6 +1653,7 @@ class AssessRecord
     $submissions = $this->data['submissions'];
     if ($this->is_practice) {
       $assessver = $this->data['assess_versions'][0];
+      $regen = 0;
     } else if ($by_question || !is_numeric($ver)) {
       $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       if (!$by_question) {
@@ -3629,12 +3630,12 @@ class AssessRecord
       }
       for ($tn = 0; $tn < count($parttrydata); $tn++) {
         if ($qtype == 'choices') {
-          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']];
+          $out[$pn][] = ($parttrydata[$tn]['stuans']=='') ? '' : $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']];
         } else if ($qtype == 'multans') {
           $pts = explode('|',$parttrydata[$tn]['stuans']);
           $outstr = '';
           foreach ($pts as $ptval) {
-            $outstr .= $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
+            $outstr .= ($ptval=="") ? "" : $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
           }
           $out[$pn][] = $outstr;
         } else if ($qtype == 'matching') {
@@ -3642,7 +3643,7 @@ class AssessRecord
           $qrefarr = array_flip($GLOBALS['choicesdata'][$partref][0]);
           $outptarr = array();
           foreach ($pts as $k=>$ptval) {
-            $outptarr[$qrefarr[$k]] = $ptval=="" ? "" : $GLOBALS['choicesdata'][$partref][1][$ptval];
+            $outptarr[$qrefarr[$k]] = ($ptval=="") ? "" : $GLOBALS['choicesdata'][$partref][1][$ptval];
           }
           ksort($outptarr);
           $out[$pn][] = implode('<br/>',$outptarr);
@@ -3991,8 +3992,11 @@ class AssessRecord
     $subsUsed = array();
     $answeightTot = array_sum($qdata['answeights']);
 
-    for ($pn = 0; $pn < count($qdata['tries']); $pn++) {
-      $firstTry = $qdata['tries'][$pn][0];
+    foreach ($qdata['tries'] as $pn=>$parttries) {
+      if (!isset($parttries[0]['raw'])) { // no scored try on this part; don't record
+        return;
+      }
+      $firstTry = $parttries[0];
       $scoreonfirst += max($firstTry['raw'],0) * $qdata['answeights'][$pn]/$answeightTot;
       $scoredet[$pn] = $firstTry['raw'];
       if (!isset($subsUsed[$firstTry['sub']])) {

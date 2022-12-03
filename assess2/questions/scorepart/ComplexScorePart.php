@@ -373,11 +373,11 @@ class ComplexScorePart implements ScorePart
                     }
                 } else { //i or +i or -i or 3i  (one digit)
                     if ($v[$L] == '+') {
-                        $imag = 1;
+                        $imag = '1';
                     } else if ($v[$L] == '-') {
-                        $imag = -1;
+                        $imag = '-1';
                     } else if ($p == 0) {
-                        $imag = 1;
+                        $imag = '1';
                     } else {
                         $imag = $v[$L];
                     }

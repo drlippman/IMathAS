@@ -4622,6 +4622,7 @@ function getineqdata($str,$type='linear',$xmin=null,$xmax=null,$ymin=null,$ymax=
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
     }
+    if (trim($str)=='') { return []; } // invalid
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
@@ -4653,6 +4654,7 @@ function getdotsdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
     }
+    if (trim($str)=='') { return []; } // invalid
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
@@ -4671,6 +4673,7 @@ function getopendotsdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=nul
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
     }
+    if (trim($str)=='') { return []; } // invalid
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
@@ -4689,6 +4692,7 @@ function getlinesdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
     }
+    if (trim($str)=='') { return []; } // invalid
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);

@@ -1737,11 +1737,17 @@ function draw_triangle() {
   }
     
   // PLACE SIDE TICK MARKS
+  $markNum = ["|" => 1, "||" => 2, "|||" => 3];
+  $markType = array_slice($argsArray[$sideKey],4,3);
+  for ($i=0;$i<3;$i++) {
+    if (!isset($markNum[$markType[$i]])) { // invalid mark
+        $hasMarks = false; 
+    }
+  }
   if ($hasMarks === true) {
     // Half the length of the tick mark
     $markRat = $xyDiff/25;
-    $markType = array_slice($argsArray[$sideKey],4,3);
-    $markNum = ["|" => 1, "||" => 2, "|||" => 3];
+  
     // Distances between tick marks
     $rMark = array(0,-$xyDiff/25,$xyDiff/25);
     for ($i=0;$i<3;$i++) {
@@ -1868,8 +1874,11 @@ function draw_triangle() {
         }
         $altVerLab[$i] = (!empty($verLab[$i])) ? " at vertex ".$verLab[$i] : "";
         $altVerLabNoAngle[$i] = (!empty($verLab[$i])) ? " and its opposite vertex is labeled ".$verLab[$i] : "";
-        $altMark[$i] = ($hasAltMark[$i] === true) ? " with ".$markNum[$markType[$i]]." hash mark" : "";
-        $altMark[$i] .= ($markNum[$markType[$i]] > 1) ? "s" : "";
+        $altMark[$i] = '';
+        if ($hasMarks === true) {
+            $altMark[$i] = (!empty($hasAltMark[$i])) ? " with ".$markNum[$markType[$i]]." hash mark" : "";
+            $altMark[$i] .= ($markNum[$markType[$i]] > 1) ? "s" : "";
+        }
         $altSidLab[$i] = (!empty($sidLab[$i])) ? " is labeled ".$sidLab[$i] : " is unlabeled";
     } 
     if ($hasAltAngLab === true || $hasAltArcs === true) {
@@ -1877,14 +1886,14 @@ function draw_triangle() {
         if (!empty($angLab[$i])) {
           $alt .= ($i==0) ? " an " : " An ";
           $alt .= "angle".$altVerLab[$i].$altArc[$i]." is labeled ".$angLab[$i].$altDegSymbol[$i];
-          if (!empty($sidLab[$i]) || $hasAltMark[$i] === true) {
+          if (!empty($sidLab[$i]) || !empty($hasAltMark[$i])) {
             $alt .= " and its opposite side".$altMark[$i].$altSidLab[$i];
           }
         } else if (empty($angLab[$i])) {
           $alt .= ($i==0) ? " an " : " An ";
           $alt .= "angle".$altVerLab[$i].$altArc[$i];
           $alt .= ($i == $perpKey && empty($arcTypeTmp[$perpKey])) ? " has a right angle symbol" : " is unlabeled";
-          if (!empty($sidLab[$i]) || $hasAltMark[$i] === true) {
+          if (!empty($sidLab[$i]) || !empty($hasAltMark[$i])) {
             $alt .= " and its opposite side".$altMark[$i].$altSidLab[$i];
           }
         }

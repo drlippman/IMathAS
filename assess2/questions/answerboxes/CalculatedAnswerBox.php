@@ -113,10 +113,10 @@ class CalculatedAnswerBox implements AnswerBox
                 $tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs + $reqsigfigoffset);
                 $shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs + $reqsigfigoffset);
             } else {
-                if ($answer != 0) {
+                if (is_numeric($answer) && $answer != 0) {
                     $v = -1 * floor(-log10(abs($answer)) - 1e-12) - $reqsigfigs;
                 }
-                if ($answer != 0 && $v < 0 && strlen($answer) - strpos($answer, '.') - 1 + $v < 0) {
+                if (is_numeric($answer) && $answer != 0 && $v < 0 && strlen($answer) - strpos($answer, '.') - 1 + $v < 0) {
                     if ($isListAnswer) {
                         $answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs, '', false, in_array("scinot", $ansformats) || in_array("scinotordec", $ansformats)));
                     } else {

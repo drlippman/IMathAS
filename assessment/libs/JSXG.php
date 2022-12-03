@@ -231,7 +231,7 @@ function JSXG_addSlider($board, $sname, $ops=array()){
   $precision = isset($ops['precision']) ? $ops['precision'] : 2;
 
   // Create the slider.
-  $out .= "var param{$label}_{$sname} = board_{$label}.create('slider', [
+  $out = "var param{$label}_{$sname} = board_{$label}.create('slider', [
             [function(){
               return board_{$label}.getBoundingBox()[0]+{$x1}*(board_{$label}.getBoundingBox()[2]-(board_{$label}.getBoundingBox()[0]));
             }, function(){
@@ -326,7 +326,7 @@ function JSXG_addFunction($board, $ops=array(), $ref=null){
 
   // Determine if bounds are properly set for the function (setting domain of func)
   $isBounds = (isset($ops['bounds']) && count($ops['bounds'])==2) ? true : false;
-
+  $out = '';
   // If $ref provided, then give the function a name
   if ($ref!==null){
 	$out .= "var func_{$label}_{$ref} = ";
@@ -425,7 +425,7 @@ function JSXG_addParametric($board, $ops=array()){
   $tEnd = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 1; // end value of t
 
 
-  $out .= "board_{$label}.create('curve', [function({$inpVar}){";
+  $out = "board_{$label}.create('curve', [function({$inpVar}){";
   ###### Handle x-rule ######
   // If slider value is used...
   if (isset($ops['slider-names']) && strpos($xRule, "%")>-1){
@@ -520,7 +520,7 @@ function JSXG_addText($board, $ops=array()){
 
   $useMathJax = strpos($text, "`")>-1 ? "true" : "false";
 
-  $out .= "board_{$label}.create('text', [";
+  $out = "board_{$label}.create('text', [";
   // x-position. Handle slider values first, if present
   if (isset($ops['slider-names']) && strpos($xPos, "%")>-1){
     $out .= "function(){
@@ -920,7 +920,7 @@ function JSXG_createBlankBoard($label, $ops){
   $centered = isset($ops['centered']) ? false : true;
 
   // Create the board
-  $out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
+  $out = "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
            boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
            axis: false,
            showCopyright: false,
@@ -975,7 +975,7 @@ function JSXG_createBlankBoard($label, $ops){
       }
       $ref = ($ref!==null ? $ref : $box);
     }
-
+    $out = '';
     if ($ref!==null){
       // name point, which is used in persistence
       $out .= "
@@ -1086,6 +1086,7 @@ function JSXG_createBlankBoard($label, $ops){
     $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If reference provided...
     if ($ref!==null){
@@ -1195,6 +1196,7 @@ function JSXG_createBlankBoard($label, $ops){
     $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     if ($ref!==null){
       $out .= "
@@ -1306,6 +1308,7 @@ function JSXG_createBlankBoard($label, $ops){
     $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If reference provided...
     if ($ref!==null){
@@ -1415,6 +1418,7 @@ function JSXG_createBlankBoard($label, $ops){
     $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If reference provided...
     if ($ref!==null){
@@ -1527,6 +1531,7 @@ function JSXG_createBlankBoard($label, $ops){
     $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // initial ray
     // If reference provided...
@@ -1726,6 +1731,7 @@ function JSXG_createBlankBoard($label, $ops){
     $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     if ($ref!==null){
       $out = "
@@ -1851,6 +1857,7 @@ function JSXG_createBlankBoard($label, $ops){
 
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     if ($ref!==null){
       $out = "
@@ -1949,6 +1956,7 @@ function JSXG_createBlankBoard($label, $ops){
 
     $dash = isset($ops['dash']) ? $ops['dash'] : 0;
     $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If answerbox option provided, set up box number
     if(isset($ops['answerbox']) ){
@@ -2042,7 +2050,8 @@ function JSXG_createBlankBoard($label, $ops){
 		
 		// You must have a glider to attach a tangent to, if this isn't set then exit
 	    $obj = isset($ops['glider']) ? $ops['glider'] : '';
-	
+        $out = '';
+
 		if($obj !== '') {
 				
 			// If $ref provided, then give the object a name
@@ -2092,7 +2101,7 @@ function JSXG_createBlankBoard($label, $ops){
 		$labEnd = strpos($board, "'", $labStart);
 		$label = substr($board, $labStart, $labEnd - $labStart);
 			
-		$out .= "{$obj}.setAttribute( ".$parameters." );";
+		$out = "{$obj}.setAttribute( ".$parameters." );";
 	
 		// Append new output string to the board string{
 		return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
