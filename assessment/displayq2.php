@@ -595,14 +595,13 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize'])?$GLOBALS['CFG']['GEN']['extrefsize'][1]:500;
 		$vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize'])?$GLOBALS['CFG']['GEN']['vidextrefsize'][0]:873;
 		$vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize'])?$GLOBALS['CFG']['GEN']['vidextrefsize'][1]:500;
-		if ($qdata['extref']!= '') {
+		$qref = '';
+        if ($qdata['extref']!= '') {
 			$extref = explode('~~',$qdata['extref']);
 
 			if (isset($GLOBALS['questions']) && (!isset($_SESSION['isteacher']) || $_SESSION['isteacher']==false) && !isset($_SESSION['stuview'])) {
 				$qref = $GLOBALS['questions'][$qnidx].'-'.($qnidx+1);
-			} else {
-				$qref = '';
-			}
+			} 
 			for ($i=0;$i<count($extref);$i++) {
 				$extrefpt = explode('!!',$extref[$i]);
 				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}

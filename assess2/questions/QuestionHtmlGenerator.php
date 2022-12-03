@@ -688,6 +688,8 @@ class QuestionHtmlGenerator
           $this->addError(
               _('Caught error while evaluating the text in this question: ')
               . $t->getMessage());
+          $evaledqtext = '';
+          $evaledsoln = '';
         }
         $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
 

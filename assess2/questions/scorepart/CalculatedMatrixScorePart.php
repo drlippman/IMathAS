@@ -71,7 +71,7 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
               foreach ($givenanslist as $i=>$v) {
-                $givenanslistvals[$i] = evalMathParser($v);
+                    $givenanslistvals[$i] = evalMathParser($v);
               }
             } else {
               for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
@@ -126,7 +126,7 @@ class CalculatedMatrixScorePart implements ScorePart
         }
         if (!empty($answersize)) {
             for ($i=0; $i<count($answerlist); $i++) {
-                if (!checkanswerformat($givenanslist[$i],$ansformats)) {
+                if (isset($givenanslist[$i]) && !checkanswerformat($givenanslist[$i],$ansformats)) {
                     //perhaps should just elim bad answer rather than all?
                     if ($scoremethod == 'byelement') {
                       $incorrect[$i] = 1;

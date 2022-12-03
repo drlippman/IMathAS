@@ -222,6 +222,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		if ($function=='') { continue;}
         $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
+        if (empty($function[0])) { continue; }
 		//correct for parametric
 		$isparametric = false;
 		$isineq = false;
@@ -2696,6 +2697,7 @@ function getstuans($v,$q,$i=0,$blankasnull=true) {
 }
 
 function evalnumstr($str) {
+    if (trim($str) === '') { return ''; }
     return evalMathParser($str);
 }
 

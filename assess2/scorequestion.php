@@ -275,11 +275,11 @@ if (!empty($_POST['autosave-tosaveqn'])) {
                 $ok_to_save = $assess_record->isSubmissionAllowed($qn, $autosave_qids[$qn], $parts);
                 foreach ($parts as $part) {
                     if ($ok_to_save === true || $ok_to_save[$part]) {
-                     $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, $part);
+                     $assess_record->setAutoSave($now, $autosave_timeactive[$qn] ?? 0, $qn, $part);
                     }
                 }
                 if (isset($_POST['sw' . $qn])) {  //autosaving work
-                    $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, 'work');
+                    $assess_record->setAutoSave($now, $autosave_timeactive[$qn] ?? 0, $qn, 'work');
                 }
             }
             $assessInfoOut['saved_autosaves'] = true;

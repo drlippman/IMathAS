@@ -763,7 +763,7 @@ function gbtable() {
 					$gb[0][1][$pos][7] = $exttools[$k];
 					$exttoolcol[$exttools[$k]] = $pos;
 				}
-				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || $allowlate[$k]>0) {
+				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || !empty($allowlate[$k])) {
 					$gb[0][1][$pos][11] = $enddate[$k];
 				}
 				if (!empty($allowlate[$k]) && $allowlate[$k]>0) {
@@ -866,7 +866,7 @@ function gbtable() {
 			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true|| $allowlate[$k]>0) {
 				$gb[0][1][$pos][11] = $enddate[$k];
 			}
-			if ($allowlate[$k]>0) {
+			if (!empty($allowlate[$k])) {
 				$gb[0][1][$pos][12] = $allowlate[$k];
 			}
 			if (isset($LPcutoff[$k])) {

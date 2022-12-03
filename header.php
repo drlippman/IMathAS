@@ -28,11 +28,11 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
 ?>
 <link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=072922";?>" type="text/css" />
 <?php
+$isfw = false;
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$coursetheme);
 	}
-	$isfw = false;
 	if (strpos($coursetheme,'_fw1920')!==false) {
 		$isfw = 1920;
 		$coursetheme = str_replace('_fw1920','',$coursetheme);
@@ -40,7 +40,7 @@ if (isset($coursetheme)) {
 		$isfw = 1000;
 		$coursetheme = str_replace(array('_fw1000','_fw'),'',$coursetheme);
 	}
-}
+} 
 if (isset($CFG['GEN']['favicon'])) {
 	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
 } else {

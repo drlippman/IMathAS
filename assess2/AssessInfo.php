@@ -939,6 +939,7 @@ class AssessInfo
     $now = time();
     if ($this->assessData['can_use_latepass'] > 0) {
       $LPneeded = $this->assessData['can_use_latepass'];
+      $LPcutoff = $this->assessData['LPcutoff'];
       $stm = $this->DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
       $stm->execute(array(
         ':lps'=>$LPneeded,
@@ -1131,6 +1132,9 @@ class AssessInfo
     $settings['deftries'] = $settings['defattempts'];
 
     //break apara defpenalty, defregenpenalty
+    if ($settings['defpenalty'] === '') {
+        $settings['defpenalty'] = 0;
+    }
     if ($settings['defpenalty'][0]==='L') {
       $settings['defpenalty_after'] = 'last';
       $settings['defpenalty'] = intval(substr($settings['defpenalty'], 1));
@@ -1141,6 +1145,9 @@ class AssessInfo
       $settings['defpenalty_after'] = 1;
     }
 
+    if ($settings['defregenpenalty'] === '') {
+        $settings['defregenpenalty'] = 0;
+    }
     if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);
       $settings['defregenpenalty'] = intval(substr($settings['defregenpenalty'], 2));

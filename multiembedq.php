@@ -27,6 +27,7 @@ unset($init_skip_csrfp);
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $_SESSION = array();
+$myrights = 5;
 /*
 if (isset($_GET['graphdisp'])) {
 	$_SESSION['graphdisp'] = intval($_GET['graphdisp']);
@@ -45,7 +46,7 @@ $prefdefaults = array(
 	'useed'=>1,
 	'livepreview'=>1);
 
-$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"] ?? '', true);
 $_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {

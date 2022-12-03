@@ -62,7 +62,7 @@ if ($enablebasiclti!=true) {
 }
 
 function reporterror($err) {
-	global $imasroot;
+	global $imasroot,$staticroot;
 	require("header.php");
 	printf('<p>%s</p>', Sanitize::encodeStringForDisplay($err));
 	require("footer.php");
@@ -656,8 +656,8 @@ if (isset($_GET['launch'])) {
         $_SESSION['lti_context_label'] = $_REQUEST['context_id'];
     }
     $_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
-	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
-	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
+	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'] ?? '';
+	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'] ?? '';
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
@@ -2303,8 +2303,8 @@ if (isset($_GET['launch'])) {
         $_SESSION['lti_context_label'] = $_REQUEST['context_id'];
     }
 	$_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
-	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
-	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
+	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'] ?? '';
+	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'] ?? '';
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
@@ -2903,7 +2903,7 @@ if ($keyparts[0]=='aid') {
 	$_SESSION['ltiitemid'] = $aid;
 
 	$_SESSION['lticanuselatepass'] = false;
-	if ($_SESSION['ltirole']!='instructor' && $line['allowlate']>0) {
+	if ($SESS['ltirole']!='instructor' && $line['allowlate']>0) {
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$latepasshrs = $stm->fetchColumn(0);

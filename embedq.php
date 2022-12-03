@@ -24,7 +24,7 @@ $prefdefaults = array(
 	'drawentry'=>1,
 	'useed'=>1,
 	'livepreview'=>1);
-$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"] ?? '', true);
 $_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {

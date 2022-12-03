@@ -642,7 +642,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name'],$status);
 	}
-	$tag = substr($row[1],0,8);
+	$tag = substr($row['caltag'],0,8);
 	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
 		$json = array(
 			"type"=>"FS",

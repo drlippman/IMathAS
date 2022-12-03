@@ -183,7 +183,7 @@ class ScoreEngine
                     if (substr((string)$vval, 0, 1) == '=') {
                         continue;
                     } //skip '=2' style $reqdecimals
-                    if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
+                    if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
                         $abstolerance[$kidx] = 0.5 / (pow(10, $vval));
                     }
                 }

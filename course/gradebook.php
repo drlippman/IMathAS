@@ -135,7 +135,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessUrl = "../assess2/";
 }
 
-$curBreadcrumb = $breadcrumbbase;
+$curBreadcrumb = $breadcrumbbase ?? '';
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }

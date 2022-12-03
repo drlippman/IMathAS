@@ -251,7 +251,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
 
-	$curBreadcrumb = $breadcrumbbase;
+	$curBreadcrumb = $breadcrumbbase ?? '';
 	if (isset($backtrack) && count($backtrack)>0) {
 		if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 			array_unshift($backtrack, array($coursename, '0'));

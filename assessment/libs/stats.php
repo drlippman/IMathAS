@@ -557,7 +557,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		$dx = $upper - $start;
 		$dxdiff = $cw-$dx;
 	}
-
+    $st = '';
 	while ($x <= $a[count($a)-1]) {
 		$alt .= "<tr><td>$x</td>";
 		$st .= "rect([$x,0],";
@@ -637,6 +637,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 		$dx = $upper - $start;
 		$dxdiff = $cw-$dx;
 	}
+    $st = '';
 	for ($curr=0; $curr<count($freq); $curr++) {
 		$alt .= "<tr><td>$x</td><td>{$freq[$curr]}</td></tr>";
 		$st .= "rect([$x,0],";

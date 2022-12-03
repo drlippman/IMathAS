@@ -553,7 +553,7 @@ if ($hasusername) {
                 exit;
             }
         } else if ($_SESSION['ltirole'] == 'instructor') {
-            if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver'] == '1.3')) {
+            if (!empty($_SESSION['ltiver']) && $_SESSION['ltiver'] == '1.3') {
                 $breadcrumbbase = '<div class="dropdown inlinediv"><a href="#"
                   role="button"
                   id="ltimenubutton"
