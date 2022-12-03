@@ -135,6 +135,8 @@ function fractiontomixed($fp) {
 
 //fractiontodecimal(f)
 function fractiontodecimal($f) {
+    if ($f === '') { return ''; } // bypass on empty values
+    else if (is_numeric($f)) { return $f; } // don't parse if already a number
 	if (!is_array($f)) {
 		$f = fractionparse($f);
 	}
