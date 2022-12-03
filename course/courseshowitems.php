@@ -1119,6 +1119,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   foreach ($matches as $k=>$m) {
 			   	   	if ($m[1]=='youtube.com') {
 			   	   		$p = explode('v=',$m[2]);
+                        if (count($p)<2) { continue; } // missing id
 			   	   		$p2 = preg_split('/[#&]/',$p[1]);
 			   	   	} else if ($m[1]=='youtu.be') {
 			   	   		$p2 = preg_split('/[#&?]/',substr($m[2],1));

@@ -158,6 +158,7 @@ if (isset($_POST['record'])) {
 		$("#rescoreform").submit();
 	});
 	</script>';
+    $useeqnhelper = 0;
 	require("../assessment/header.php");
 	echo '<h1>'._('Regrade Question').'</h1>';
 	echo '<p>'._('Please be patient - this page will auto-submit when it is done loading').'</p>';

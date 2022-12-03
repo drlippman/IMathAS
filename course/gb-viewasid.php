@@ -549,6 +549,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
 		}
+        $useeqnhelper = 0;
 		require("../assessment/header.php");
 		echo "<style type=\"text/css\">p.tips {	display: none;} .pseudohidden {visibility:hidden;position:absolute;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {

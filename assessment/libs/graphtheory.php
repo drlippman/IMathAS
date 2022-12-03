@@ -141,7 +141,7 @@ function graphcircle($n,$op=array()) {
 //connected to the center vertex
 //returns array(pic,g)
 function graphcircledstar($n,$op=array()) {
-	$g = graphemptygraph($n);
+	$g = graphemptygraph($n+1);
 	for ($i = 1; $i<=$n; $i++) {
 		$g[0][$i] = 1;
 		if ($i==1) {
@@ -452,15 +452,20 @@ function graphsortededges($g) {
 //returns # of dups if covers all edges with duplications
 function graphsequenceeuleredgedups($g,$op,$seq) {
 	$n = count($g[0]);
-	if ($op['labels'] != 'letters') {
+    $seq = trim($seq);
+	if (isset($op['labels']) && $op['labels'] != 'letters') {
 		$lbl = $op['labels'];
 	} else {
 		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $seq = strtoupper($seq); // account for lowercase sequence
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
+        if (!isset($lblrev[$seq[$i]])) { // invalid entry
+            return -1;
+        }
 		$vseq[$i] = $lblrev[$seq[$i]];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
@@ -882,10 +887,10 @@ function graphisconnected($g) {
 
 //graphmaketable(g,[op])
 //makes a weights table based on a given graph
-function graphmaketable($g,$o=array()) {
+function graphmaketable($g,$op=array()) {
 	$n = count($g[0]);
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-	if (!is_array($op['labels'])) {
+	if (!isset($op['labels']) || !is_array($op['labels'])) {
 		$op['labels'] = array_slice($lettersarray,0,$n);
 	}
 	$table = '<table class="stats"><thead>';

@@ -35,7 +35,7 @@ class CalculatedMatrixScorePart implements ScorePart
         $defaultreltol = .0015;
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
-            'answersize', 'scoremethod'];
+            'answersize', 'scoremethod', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }

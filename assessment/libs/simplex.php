@@ -2392,7 +2392,7 @@ function simplexreadsolution($sm,$type,$showfractions=1,$ismixed=FALSE,$debug=0)
 	return simplexreadsolutionarray($sma,$type,$showfractions,$ismixed,$debug);
 }
 
-function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0) {
+function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$debug=0) {
 
 	if($debug==1) { echo "starting simplexreadsolutionarray<br/>"; }
 
@@ -2819,7 +2819,7 @@ function simplexsolve2() {
 
 		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
-        if(is_null($simplexsets[$rows])) {
+        if(!isset($simplexsets[$rows])) {
             $simplexsets[$rows] = array();
         }
 

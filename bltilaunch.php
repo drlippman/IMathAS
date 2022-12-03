@@ -2655,7 +2655,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	}
 } else if ($keyparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($keyparts[1]);
-	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,LPcutoff,avail,ltisecret,allowlate,date_by_lti FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT id,courseid,startdate,enddate,reviewdate,LPcutoff,avail,ltisecret,allowlate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line===false) {
@@ -2933,7 +2933,9 @@ if ($keyparts[0]=='aid') {
 }
 $_SESSION['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $_SESSION['lti_context_label'] = $SESS['lti_context_label'];
-$_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+if (isset($SESS['lti_launch_get'])) {
+    $_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+}
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];

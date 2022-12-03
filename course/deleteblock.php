@@ -22,7 +22,10 @@ if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missin
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+} elseif (!isset($_REQUEST['remove'])) {
+    $overwriteBody = 1;
+	$body = "Invalid request";
+} else {// a valid delete request loaded the page
 	if (isset($_POST['remove']) && $_POST['remove']=="really") { // the request has been confirmed, delete the block
 		$blocktree = explode('-',$_GET['id']);
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -83,7 +86,6 @@ if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missin
 		}
 		$itemname =  $sub[$blockid]['name'];
 	}
-
 }
 /******* begin html output ********/
 require("../header.php");

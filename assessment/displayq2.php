@@ -11,7 +11,8 @@ require_once("mathparser.php");
 require("interpret5.php");
 require("macros.php");
 require_once(__DIR__ . "/../includes/sanitize.php");
-
+// This script is no longer officially supported, so don't bother recording errors
+error_reporting(0);
 
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
@@ -8163,7 +8164,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 			$infsoln = $anspromptp[2];
 		}
 	}
-	$out .= '<div class="'.$colorbox.'">';
+	$out = '<div class="'.$colorbox.'">';
 	$out .= '<ul class="likelines">';
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
 	if ($la=='DNE' || $la=='oo') {

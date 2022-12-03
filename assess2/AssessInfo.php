@@ -137,7 +137,7 @@ class AssessInfo
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 
-    if ($this->exception !== false && $this->exception[4] !== null) {
+    if ($this->exception !== false && isset($this->exception[4]) && $this->exception[4] !== null) {
       //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
     } 
@@ -153,10 +153,10 @@ class AssessInfo
     }
 
     // use time limit extension even if rest of exception isn't used
-    if ($this->exception !== false && $this->exception[6] != 0) {
+    if ($this->exception !== false && !empty($this->exception[6])) {
         $this->assessData['timeext'] = intval($this->exception[6]);
     }
-    if ($this->exception !== false && $this->exception[7] != 0) {
+    if ($this->exception !== false && !empty($this->exception[7])) {
         $this->assessData['attemptext'] = intval($this->exception[7]);
         // apply additional attempts
         if ($this->assessData['submitby'] == 'by_assessment') {

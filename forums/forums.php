@@ -89,6 +89,7 @@
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype,assessmentid FROM imas_exceptions WHERE assessmentid in ($ph) AND userid=? AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 		$stm->execute(array_merge(array_keys($forumdata), array($userid)));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            if (!isset($forumdata[$row[5]])) { continue; } // lingering exception for nonexistant forum
 			$exceptionresult = $exceptionfuncs->getCanUseLatePassForums($row, $forumdata[$row[5]]);
 			$forumdata[$row[5]]['enddate'] = $exceptionresult[7];
 		}
@@ -136,7 +137,7 @@
 	//construct tag list selector
 	$taginfo = array();
 	foreach ($itemsimporder as $item) {
-		if (!isset($itemsassoc[$item])) { continue; }
+		if (!isset($itemsassoc[$item]) || !isset($forumdata[$itemsassoc[$item]])) { continue; }
 		$taglist = $forumdata[$itemsassoc[$item]]['taglist'];
 		if ($taglist=='') { continue;}
 		$p = strpos($taglist,':');
@@ -538,7 +539,7 @@ if ($searchtype == 'thread') {
 	}
 	*/
 	foreach ($itemsimporder as $item) {
-		if (!isset($itemsassoc[$item])) { continue; }
+		if (!isset($itemsassoc[$item]) || !isset($forumdata[$itemsassoc[$item]])) { continue; }
 		$line = $forumdata[$itemsassoc[$item]];
 
 		if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {

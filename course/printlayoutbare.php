@@ -96,6 +96,7 @@ if ($overwriteBody==1) {
 	echo '<div class="submit"><input type=submit value="Continue"></div></form>';
 
 } else {
+    $useeqnhelper = 0;
 	require("../assessment/header.php");
 	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));

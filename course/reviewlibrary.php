@@ -312,6 +312,7 @@ $_SESSION['coursetheme'] = $coursetheme;
 if ($showtips==2) {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/eqntips.js?v=012810\"></script>";
 }
+$useeqnhelper = 0;
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {

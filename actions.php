@@ -461,7 +461,7 @@ require_once("includes/sanitize.php");
 	if (isset($_GET['action']) && $_GET['action']=="logout") {
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
-			setcookie(session_name(), '', time()-42000, '/', null, false, true);
+			setcookie(session_name(), '', time()-42000, '/', '', false, true);
 		}
 		session_destroy();
 	} else if (isset($_GET['action']) && ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd")) {

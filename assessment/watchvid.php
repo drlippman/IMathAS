@@ -66,8 +66,7 @@ if ($isyoutube) {
 		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
 	}
 
-	if (strpos($url,'end=')!==false) {
-		preg_match('/end=(\d+)/',$url,$m);
+	if (preg_match('/end=(\d+)/',$url,$m)) {
 		$timestart .= '&'.$m[0];
 	}
 	$doembed = true;

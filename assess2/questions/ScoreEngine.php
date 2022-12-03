@@ -433,9 +433,11 @@ class ScoreEngine
                         sort($stuanswers[$thisq][$kidx]);
                         $stuanswers[$thisq][$kidx] = implode('|', $stuanswers[$thisq][$kidx]);
                     } else { // choices
-                        $stuanswers[$thisq][$kidx] = $_SESSION['choicemap'][$assessmentId][$partnum][$stuanswers[$thisq][$kidx]];
                         if ($stuanswers[$thisq][$kidx] === null) {
                             $stuanswers[$thisq][$kidx] = 'NA';
+                        }
+                        if (is_numeric($stuanswers[$thisq][$kidx])) {
+                            $stuanswers[$thisq][$kidx] = $_SESSION['choicemap'][$assessmentId][$partnum][$stuanswers[$thisq][$kidx]];
                         }
                     }
                 }

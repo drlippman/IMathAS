@@ -629,7 +629,7 @@ function JSXG_createPolarAxes($label, $ops=array()){
    ";
    //$out .= "JXG.Options.text.useMathJax = true;";
    // Create the board
-   $defaultAxis = $ops['tickDistance'] ? "false" : "true";
+   $defaultAxis = !empty($ops['tickDistance']) ? "false" : "true";
    $out .= "
    window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
      boundingbox: [-{$rMaxBoard}, {$yMax}, {$rMaxBoard}, -{$rMaxBoard}],
@@ -809,7 +809,7 @@ function JSXG_addPolar($board, $ops=array()){
   $tStart = isset($ops['bounds'][0]) ? $ops['bounds'][0] : 0; // start value of t
   $tEnd = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 6.283185307; // end value of t
 
-  $out .="
+  $out ="
   board_{$label}.create('curve', [
     function({$inpVar}){";
   // If slider value present

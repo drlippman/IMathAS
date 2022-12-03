@@ -564,7 +564,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		$x += $dx;
 		$st .= "[$x,";
 		$i = $curr;
-		while (($a[$i] < $x) && ($i < count($a))) {
+		while (($i < count($a)) && ($a[$i] < $x)) {
 			$i++;
 		}
 		if (($i-$curr)>$maxfreq) { $maxfreq = $i-$curr;}
@@ -733,7 +733,8 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	}
 
 	$alt = "Bar graph for $label <table class=stats><thead><tr><th>Bar Label</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
-	$start = 0;
+	$st = '';
+    $start = 0;
 	$x = $start+1;
 	$maxfreq = 0;
 	for ($curr=0; $curr<count($bl); $curr++) {
@@ -2434,6 +2435,8 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
 	
 	// 
 	$dx = $dotspace;
+
+    $st = '';
 
     // Create the stack of dots 
 	while ($i < count($a)) {

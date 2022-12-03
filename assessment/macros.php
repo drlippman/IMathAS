@@ -4321,6 +4321,7 @@ function gettwopointlinedata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w
 	return gettwopointdata($str,'line',$xmin,$xmax,$ymin,$ymax,$w,$h);
 }
 function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
+    if (trim($str)=='') { return []; }
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
     } else {

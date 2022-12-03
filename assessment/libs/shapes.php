@@ -1858,17 +1858,20 @@ function draw_triangle() {
       }
     }
     $alt .= $altAngStart;
-    if ($hasArcs === true) {
-      for ($i=0;$i<3;$i++) {
-        $altArc[$i] = ($hasAltArc[$i] === true) ? " with ".$arcNum[$arcType[$i]]." hash mark" : "";
-        $altArc[$i] .= ($arcNum[$arcType[$i]] > 1) ? "s" : "";
+    
+    for ($i=0;$i<3;$i++) {
+        if ($hasArcs === true) {
+            $altArc[$i] = ($hasAltArc[$i] === true) ? " with ".$arcNum[$arcType[$i]]." hash mark" : "";
+            $altArc[$i] .= ($arcNum[$arcType[$i]] > 1) ? "s" : "";
+        } else {
+            $altArc[$i] = '';
+        }
         $altVerLab[$i] = (!empty($verLab[$i])) ? " at vertex ".$verLab[$i] : "";
         $altVerLabNoAngle[$i] = (!empty($verLab[$i])) ? " and its opposite vertex is labeled ".$verLab[$i] : "";
         $altMark[$i] = ($hasAltMark[$i] === true) ? " with ".$markNum[$markType[$i]]." hash mark" : "";
         $altMark[$i] .= ($markNum[$markType[$i]] > 1) ? "s" : "";
         $altSidLab[$i] = (!empty($sidLab[$i])) ? " is labeled ".$sidLab[$i] : " is unlabeled";
-      }
-    }
+    } 
     if ($hasAltAngLab === true || $hasAltArcs === true) {
       for ($i=0;$i<3;$i++) {
         if (!empty($angLab[$i])) {

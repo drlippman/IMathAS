@@ -182,11 +182,11 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
-if ($_SESSION['graphdisp']==1) {
+if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==0) {
+    echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
+} else {
 	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=052520\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
-} else {
-	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 ?>
 <!--[if lte IE 6]>
