@@ -423,7 +423,10 @@ if (!(isset($teacherid))) {
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
 			//contained in coursecopylist.php
 		}
-	}
+	} else {
+        $overwriteBody = 1;
+        $body = 'Unable to copy this course';
+    }
 }
 
 /******* begin html output ********/

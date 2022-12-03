@@ -392,7 +392,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$flexwidth = true;
 		$nologo = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
@@ -440,7 +440,7 @@ if (isset($_GET['launch'])) {
 			if (count($ltiorgparts)>2) {
 				array_shift($ltiorgparts);
 				$ltiorgname = implode(':',$ltiorgparts);
-			} else {
+			} else if (count($ltiorgparts)>1) {
 				$ltiorgname = $ltiorgparts[1];
 			}
 
@@ -655,7 +655,7 @@ if (isset($_GET['launch'])) {
     } else {
         $_SESSION['lti_context_label'] = $_REQUEST['context_id'];
     }
-    $_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
+    $_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'] ?? '';
 	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'] ?? '';
 	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'] ?? '';
 	$_SESSION['lti_key'] = $ltikey;
@@ -2022,7 +2022,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$nologo = true;
 		$flexwidth = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';

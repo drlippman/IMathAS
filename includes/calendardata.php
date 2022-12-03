@@ -173,8 +173,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 	if (isset($itemlist['InlineText'])) {
 		$typeids = implode(',', array_keys($itemlist['InlineText']));
 		if (isset($teacherid) && !$stuview) {
-			$stm = $DBH->prepare("SELECT id,title,enddate,startdate,oncal,text FROM imas_inlinetext WHERE ((oncal=2 AND enddate>0 AND enddate<2000000000) OR (oncal=1 AND startdate<2000000000 AND startdate>0)) AND (avail=1 OR (avail=2 AND startdate>0)) AND id IN ($typeids)");
-			$stm->execute(array(':courseid'=>$cid));
+			$stm = $DBH->query("SELECT id,title,enddate,startdate,oncal,text FROM imas_inlinetext WHERE ((oncal=2 AND enddate>0 AND enddate<2000000000) OR (oncal=1 AND startdate<2000000000 AND startdate>0)) AND (avail=1 OR (avail=2 AND startdate>0)) AND id IN ($typeids)");
 		} else {
 			$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,text FROM imas_inlinetext WHERE ";
 			$query .= "((avail=1 AND ((oncal=2 AND enddate>0 AND enddate<2000000000 AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>0))) OR ";

@@ -170,7 +170,7 @@ class ScoreEngine
             $anstypes = array_map('trim', $anstypes);
         }
 
-        if (isset($reqdecimals)) {
+        if (!empty($reqdecimals)) {
             $hasGlobalAbstol = false;
             if (isset($anstypes) && is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
                 $abstolerance = array();
@@ -183,17 +183,43 @@ class ScoreEngine
                     if (substr((string)$vval, 0, 1) == '=') {
                         continue;
                     } //skip '=2' style $reqdecimals
+                    list($vval, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($vval);
                     if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
-                        $abstolerance[$kidx] = 0.5 / (pow(10, $vval));
+                        if (count($reqdecscoretype)==2) {
+                            if ($reqdecscoretype[0]=='abs') {
+                                $abstolerance[$kidx] = $reqdecscoretype[1];
+                            } else {
+                                $reltolerance[$kidx] = $reqdecscoretype[1];
+                            }
+                        } else {
+                            $abstolerance[$kidx] = 0.5 / (pow(10, $vval));
+                        }
                     }
                 }
             } else if (substr((string)$reqdecimals, 0, 1) != '=') { //skip '=2' style $reqdecimals
+                list($parsedreqdec, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs((string)$reqdecimals);
                 if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
-                    $abstolerance = 0.5 / (pow(10, $reqdecimals));
+                    if (count($reqdecscoretype)==2) {
+                        if ($reqdecscoretype[0]=='abs') {
+                            $abstolerance = $reqdecscoretype[1];
+                        } else {
+                            $reltolerance = $reqdecscoretype[1];
+                        }
+                    } else {
+                        $abstolerance = 0.5 / (pow(10, $parsedreqdec));
+                    }
                 } else if (isset($anstypes) && !isset($reltolerance)) {
                     foreach ($anstypes as $kidx => $vval) {
                         if (!isset($abstolerance[$kidx]) && $vval != 'draw' && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
-                            $abstolerance[$kidx] = 0.5 / (pow(10, $reqdecimals));
+                            if (count($reqdecscoretype)==2) {
+                                if ($reqdecscoretype[0]=='abs') {
+                                    $abstolerance[$kidx] = $reqdecscoretype[1];
+                                } else {
+                                    $reltolerance[$kidx] = $reqdecscoretype[1];
+                                }
+                            } else {
+                                $abstolerance[$kidx] = 0.5 / (pow(10, $parsedreqdec));
+                            }
                         }
                     }
                 }

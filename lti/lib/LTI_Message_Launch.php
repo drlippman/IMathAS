@@ -390,7 +390,7 @@ class LTI_Message_Launch {
         } catch(\Exception $e) {
           continue;
         }
-        $newkeys[$key['kid']] = array('alg'=>$key['alg'], 'pub'=>$pubkey['key']);
+        $newkeys[$key['kid']] = array('alg'=> $key['alg'] ?? 'RS256', 'pub'=>$pubkey['key']);
       }
       // record keys
       $this->db->record_keys($key_set_url, $newkeys);
@@ -446,11 +446,10 @@ class LTI_Message_Launch {
     }
 
     private function validate_jwt_format() {
-        $jwt = $this->request['id_token'];
-
-        if (empty($jwt)) {
+        if (empty($this->request['id_token'])) {
             throw new LTI_Exception("Missing id_token", 1);
         }
+        $jwt = $this->request['id_token'];
 
         // Get parts of JWT.
         $jwt_parts = explode('.', $jwt);

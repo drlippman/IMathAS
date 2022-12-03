@@ -44,7 +44,7 @@ class FileScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
+        $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name'] ?? ''));
         $filename = preg_replace('/[^\w\.]/','',$filename);
         $hasfile = false;
         require_once(dirname(__FILE__)."/../../../includes/filehandler.php");

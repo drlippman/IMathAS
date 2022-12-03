@@ -17,7 +17,7 @@
 	$cid = Sanitize::courseId($_GET['cid']);
     $myrights = 5;
 
-	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset,UIver FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == false) {
@@ -27,7 +27,9 @@
 	$coursename = $line['name'];
 	$coursetheme = $line['theme'];
 	$pagetitle = $line['name'];
+    $courseUIver = $line['UIver'];
 	$items = unserialize($line['itemorder']);
+    $breadcrumbbase = '';
 
 	if (!isset($_GET['folder']) || $_GET['folder']=='') {
 		$_GET['folder'] = '0';

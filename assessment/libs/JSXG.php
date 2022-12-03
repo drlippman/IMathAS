@@ -109,7 +109,7 @@ function JSXG_createAxes($label, $ops=array()){
              curve: 5, turtle: 5, polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, grid: 1, image: 0, trace: 0};";
    //$out .= "JXG.Options.text.useMathJax = true;";
    // Create the board
-   $defaultAxis = $ops['tickDistance'] ? "false" : "true";
+   $defaultAxis = !empty($ops['tickDistance']) ? "false" : "true";
    $out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
              boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
              axis: false,

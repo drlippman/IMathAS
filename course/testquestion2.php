@@ -128,7 +128,7 @@ if ($myrights<20) {
 		$page_scoreMsg = "";
 		$_SESSION['choicemap'] = array();
 	}
-  $cid = Sanitize::courseId($_GET['cid']);
+  $cid = Sanitize::courseId($_GET['cid'] ?? 0);
 	$page_formAction = "testquestion2.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($qsetid);
 
 	if (isset($_POST['usecheck'])) {

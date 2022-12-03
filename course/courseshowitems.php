@@ -9,9 +9,9 @@ if ($courseUIver>1) {
 	$addassess = 'addassessment.php';
 }
 
-if (isset ( $studentid ) && ! isset ( $_SESSION ['stuview'] )) {
+if (isset ( $studentid ) && !isset ( $_SESSION ['stuview'] )) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
-} else {
+} else if (isset($userid)) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, false );
 }
 function beginitem($canedit,$aname='',$greyed=false) {

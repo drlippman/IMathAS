@@ -26,7 +26,7 @@ array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeacct
 //$statement[#]['totaltotalops'] = array of options for totaltotal.  If not set, totaltotal title is fixed
 //$statement[#]['totalindent'] = number of indent for totaltotal entry.  0 if not set
 //$statement[#]['dblunder'] = true if double-underline under the totaltotal entry
-function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat,  &$answerformat,  &$answerboxsize) {
+function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat,  &$answerformat,  &$answerboxsize) {
 	$debug = false;
 	if ($anstypes === null) { $anstypes = array();}
 	if ($questions === null) { $questions = array();}
@@ -683,7 +683,7 @@ function scorejournal($stua, $answer, $j, $sn) {
 				}
 			}
 		}
-		$sn += (3+$offset)*(count($jd['debits']) + count($jd['credits']))/(2+$offset) + (3+$offset)*$jd['extrarows'];
+		$sn += (3+$offset)*(count($jd['debits']) + count($jd['credits']))/(2+$offset) + (3+$offset)*($jd['extrarows'] ?? 0);
 	}
 	return $answer;
 }

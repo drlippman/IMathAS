@@ -78,7 +78,7 @@ if ($_SESSION['ltiitemtype']==0) {
 }
 
 //handle form postbacks
-$createcourse = Sanitize::onlyInt($_POST['createcourse']);
+$createcourse = Sanitize::onlyInt($_POST['createcourse'] ?? 0);
 if (!empty($createcourse)) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
 	$stm->execute(array(':courseid'=>$createcourse, ':userid'=>$userid));
