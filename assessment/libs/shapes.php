@@ -21,6 +21,8 @@ array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_s
 function draw_angle() {
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -247,6 +249,7 @@ function draw_circle() {
   $altAngForPt = [];
   $hasPointLabel = [];
   $altPointLab = [];
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -563,6 +566,8 @@ function draw_circlesector() {
   $degSymbol = "&deg;";
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -844,6 +849,8 @@ function draw_square() {
   
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -946,6 +953,8 @@ function draw_square() {
 function draw_rectangle() {
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -1135,10 +1144,14 @@ function draw_triangle() {
   $hasPoints = false;
   $rotateTriangle = false;
   $hasArcs = false;
+  $hasAltArcs = false;
   $hasMarks = false;
+  $hasAltMarks = false;
   $hasAltitude = false;
   $hasSize = false;
+  $hasUserAltText = false;
   $size = 350;
+  $args = '';
   
   foreach ($argsArray as $in) {
     if ($in[0]=="angles") {
@@ -1418,6 +1431,7 @@ function draw_triangle() {
     }
   }
   
+  $hasPerp = false;
   foreach ($ang as $key => $angle) {
     if ($angle <= 0) {
       echo "Eek! Angles must be positive numbers.";
@@ -1543,7 +1557,7 @@ function draw_triangle() {
   for ($i=0;$i<3;$i++) {
     $degSymbol[$i] = "&deg;";
     $altDegSymbol[$i] = " degrees";
-    if (preg_match('/rad/',$angLab[$i]) || ($i == $perpKey && $hasPerp === true && empty($arcTypeTmp[$i])) || $angLab[$i] == '') {
+    if (preg_match('/rad/',$angLab[$i]) || ($hasPerp === true && $i == $perpKey && empty($arcTypeTmp[$i])) || $angLab[$i] == '') {
       $angLab[$i] = preg_replace('/rad/','',$angLab[$i]);
       $degSymbol[$i] = '';
       $altDegSymbol[$i] = '';
@@ -1731,9 +1745,8 @@ function draw_triangle() {
     // Distances between tick marks
     $rMark = array(0,-$xyDiff/25,$xyDiff/25);
     for ($i=0;$i<3;$i++) {
-      if (is_numeric($markNum[$markType[$i]])) {
-        $hasAltMark[$i] = true;
-      }
+      $hasAltMark[$i] = is_numeric($markNum[$markType[$i]]);
+
       // Unit vector along side (perpendicular to tick mark)
       $markVecSide[$i] = [($x[$i]-$xMid[$i])/sqrt(pow($x[$i]-$xMid[$i],2)+pow($y[$i]-$yMid[$i],2)),($y[$i]-$yMid[$i])/sqrt(pow($x[$i]-$xMid[$i],2)+pow($y[$i]-$yMid[$i],2))];
       // Unit vector in direction of tick mark, pointed away from triangle center
@@ -1790,6 +1803,7 @@ function draw_triangle() {
     
     $getBack = $angRad[0] + $angRad[1] - M_PI/2 + $rndNum;
     
+    $hasAltArc = [false,false,false];
     // Draw arc(s) for angle 0
     if (is_numeric($arcNum[$arcType[0]])) {
       $hasAltArc[0] = true;
@@ -1844,14 +1858,16 @@ function draw_triangle() {
       }
     }
     $alt .= $altAngStart;
-    for ($i=0;$i<3;$i++) {
-      $altArc[$i] = ($hasAltArc[$i] === true) ? " with ".$arcNum[$arcType[$i]]." hash mark" : "";
-      $altArc[$i] .= ($arcNum[$arcType[$i]] > 1) ? "s" : "";
-      $altVerLab[$i] = (!empty($verLab[$i])) ? " at vertex ".$verLab[$i] : "";
-      $altVerLabNoAngle[$i] = (!empty($verLab[$i])) ? " and its opposite vertex is labeled ".$verLab[$i] : "";
-      $altMark[$i] = ($hasAltMark[$i] === true) ? " with ".$markNum[$markType[$i]]." hash mark" : "";
-      $altMark[$i] .= ($markNum[$markType[$i]] > 1) ? "s" : "";
-      $altSidLab[$i] = (!empty($sidLab[$i])) ? " is labeled ".$sidLab[$i] : " is unlabeled";
+    if ($hasArcs === true) {
+      for ($i=0;$i<3;$i++) {
+        $altArc[$i] = ($hasAltArc[$i] === true) ? " with ".$arcNum[$arcType[$i]]." hash mark" : "";
+        $altArc[$i] .= ($arcNum[$arcType[$i]] > 1) ? "s" : "";
+        $altVerLab[$i] = (!empty($verLab[$i])) ? " at vertex ".$verLab[$i] : "";
+        $altVerLabNoAngle[$i] = (!empty($verLab[$i])) ? " and its opposite vertex is labeled ".$verLab[$i] : "";
+        $altMark[$i] = ($hasAltMark[$i] === true) ? " with ".$markNum[$markType[$i]]." hash mark" : "";
+        $altMark[$i] .= ($markNum[$markType[$i]] > 1) ? "s" : "";
+        $altSidLab[$i] = (!empty($sidLab[$i])) ? " is labeled ".$sidLab[$i] : " is unlabeled";
+      }
     }
     if ($hasAltAngLab === true || $hasAltArcs === true) {
       for ($i=0;$i<3;$i++) {
@@ -1970,9 +1986,11 @@ function draw_polygon() {
   $noRotate = false;
   $size = 300;
   $rotatePolygon = false;
+  $hasUserAltText = false;
   
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2148,6 +2166,9 @@ function draw_prismcubes() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
+
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2276,6 +2297,7 @@ function draw_cylinder() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2414,6 +2436,8 @@ function draw_cone() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2628,6 +2652,8 @@ function draw_sphere() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2771,6 +2797,8 @@ function draw_pyramid() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -3074,6 +3102,8 @@ function draw_rectprism() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $args = '';
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -3195,6 +3225,7 @@ function draw_polyomino() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -3337,6 +3368,7 @@ function draw_polyomino() {
   //$used = array_values($used);
   $xused = [];
   $yused = [];
+  $ptcode = '';
   for ($i=0; $i<count($used); $i++) {
     $ptcode .= "rect([{$used[$i][0]},{$used[$i][1]}],[{$used[$i][0]}+1,{$used[$i][1]}+1]);";
     $xused[] = $used[$i][0];

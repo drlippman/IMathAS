@@ -178,7 +178,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
                     $sa .= '<br/><em>' . _('or') . '</em>';
                 }
                 foreach ($akeys as $akey) {
-                    $sa .= '<br/>' . $questions[$akey];
+                    if (isset($questions[$akey])) {
+                        $sa .= '<br/>' . $questions[$akey];
+                    } else {
+                        echo "Invalid answer key $akey";
+                    }
                 }
             }
         }

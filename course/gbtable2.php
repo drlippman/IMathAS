@@ -868,10 +868,14 @@ function gbtable() {
 			}
 			if (!empty($allowlate[$k])) {
 				$gb[0][1][$pos][12] = $allowlate[$k];
-			}
+			} else {
+                $gb[0][1][$pos][12] = 0;
+            }
 			if (isset($LPcutoff[$k])) {
 				$gb[0][1][$pos][14] = $LPcutoff[$k];
-			}
+			} else {
+                $gb[0][1][$pos][14] = 0;
+            }
 			if (isset($uiver[$k])) {
 				$gb[0][1][$pos][15] = $uiver[$k];
 			}

@@ -1036,8 +1036,8 @@ function graphgridlayout($g,$op=array()) {
 	}
 	$gd = 10/$sn;
 	for ($i=0; $i<$n; $i++) {
-		$pos[$i][0] = floor($i/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
-		$pos[$i][1] = ($i%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+		$pos[$i][0] = floor($i/$sn)*$gd  + (!empty($op['wiggle'])?$gd/5*sin(3*$i):0);
+		$pos[$i][1] = ($i%$sn)*$gd + (!empty($op['wiggle'])?$gd/5*sin(4*$i):0);
 	}
 	return graphdrawit($pos,$g,$op);
 }
@@ -1063,7 +1063,7 @@ function graphpathlayout($g,$op=array()) {
 	for ($i=0; $i<$n; $i++) {
 		if ($dist[$i]<0) { $dist[$i] = 0;}
 		$pos[$i][0] = 1-$dh*$dist[$i];
-		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ ($op['wiggle']?$dv/5*sin(4*$dist[$i]):0);
+		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ (!empty($op['wiggle'])?$dv/5*sin(4*$dist[$i]):0);
 		$loccnt[$dist[$i]]++;
 	}
 
@@ -1308,8 +1308,8 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 	$pos[$tot-1][0] = $m*$gd;
 	$pos[$tot-1][1] = $gd*(($n-1)/2);
 	for ($i=0; $i<$tot-1; $i++) {
-		$pos[$i][0] = floor(($i)/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
-		$pos[$i][1] = $sn-1-(($i)%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+		$pos[$i][0] = floor(($i)/$sn)*$gd  + (!empty($op['wiggle'])?$gd/5*sin(3*$i):0);;
+		$pos[$i][1] = $sn-1-(($i)%$sn)*$gd + (!empty($op['wiggle'])?$gd/5*sin(4*$i):0);
 	}
 	//connections to start and end
 	for ($i = 1; $i<$n+1; $i++) {

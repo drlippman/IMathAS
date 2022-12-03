@@ -12,6 +12,7 @@ if ($_GET['cid']==="embedq") {
 	if (isset($_GET['theme'])) {
 		$coursetheme = 	$_GET['theme'];
 	}
+    $myrights = 5;
 } else {
 	require("../init.php");
 }

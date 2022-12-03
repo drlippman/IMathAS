@@ -248,7 +248,7 @@ class AssessInfo
    * @return boolean true if prereq is waived
    */
   private function waiveReqScore () {
-      if ($this->exception === null) {
+      if ($this->exception === null || $this->exception === false) {
         return false;
       } else {
         return $this->exception[5];
@@ -1133,7 +1133,7 @@ class AssessInfo
 
     //break apara defpenalty, defregenpenalty
     if ($settings['defpenalty'] === '') {
-        $settings['defpenalty'] = 0;
+        $settings['defpenalty'] = '0';
     }
     if ($settings['defpenalty'][0]==='L') {
       $settings['defpenalty_after'] = 'last';
@@ -1146,7 +1146,7 @@ class AssessInfo
     }
 
     if ($settings['defregenpenalty'] === '') {
-        $settings['defregenpenalty'] = 0;
+        $settings['defregenpenalty'] = '0';
     }
     if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);

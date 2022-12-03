@@ -162,6 +162,7 @@ $seeds = array_map('Sanitize::onlyInt',$seeds);
 
 require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 2;
+$showhints = true;
 
 if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	//load filter
@@ -269,7 +270,6 @@ if (count($qids)>1) {
 } else {
 	echo _('Try Another Version of This Question').'</a></p>';
 }
-$showhints = true;
 
 //preload qsdata
 $placeholders = Sanitize::generateQueryPlaceholders($qids);

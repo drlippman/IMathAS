@@ -94,6 +94,7 @@ function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '
  * @return float
  */
 function evalMathParser($str) {
+  if (trim($str) === '') { return sqrt(-1); } // avoid errors on blank
   try {
     $parser = new MathParser('');
     $parser->parse($str);

@@ -601,7 +601,9 @@ function tokenize($str,$anstype,$countcnt) {
 				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype);
 			}
 			$i++;
-			$c = $str[$i];
+            if ($i<$len) {
+				$c = $str[$i];
+			}
 		} else if ($c=="\n") {
 			//end of line
 			$intype = 7;

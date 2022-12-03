@@ -276,6 +276,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	//pack options
 
+    $optionsPack = [];
 	if (isset($ansprompt)) {$optionsPack['ansprompt'] = $ansprompt;}
 	if (isset($displayformat)) {$optionsPack['displayformat'] = $displayformat;}
 	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $optionsPack['answerformat'] = $answerformat;}
@@ -986,6 +987,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 
 	$RND->srand($seed+2);
 	//pack options from eval
+    $optionsPack = [];
 	if (isset($answer)) {$optionsPack['answer'] = $answer;}
 	if (isset($reltolerance)) {$optionsPack['reltolerance'] = $reltolerance;}
 	if (isset($abstolerance)) {$optionsPack['abstolerance'] = $abstolerance;}
@@ -2679,7 +2681,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}} else {$answerformat = '';}
 
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
@@ -5383,6 +5385,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}}
 		if (!isset($variables)) { $variables = 'x';}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
+        if (!isset($answerformat)) { $answerformat = '';}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 

@@ -62,7 +62,7 @@ if ($enablebasiclti!=true) {
 }
 
 function reporterror($err) {
-	global $imasroot,$staticroot;
+	global $imasroot,$staticroot,$installname;
 	require("header.php");
 	printf('<p>%s</p>', Sanitize::encodeStringForDisplay($err));
 	require("footer.php");
@@ -1409,7 +1409,7 @@ if ($linkparts[0]=='cid') {
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($_SESSION['ltirole']!='instructor') {
-		if (!($line['avail']==0 || $line['avail']==2)) {
+		if (!($line['available']==0 || $line['available']==2)) {
 			reporterror(_("This course is not available"));
 		}
 	}
@@ -2649,7 +2649,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($_SESSION['ltirole']!='instructor') {
-		if (!($line['avail']==0 || $line['avail']==2)) {
+		if (!($line['available']==0 || $line['available']==2)) {
 			reporterror(_("This course is not available"));
 		}
 	}
@@ -2699,20 +2699,20 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		}
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-		$row = $stm2->fetch(PDO::FETCH_NUM);
+		$exceptionrow = $stm2->fetch(PDO::FETCH_NUM);
 		$useexception = false;
-		if ($row!=null) {
-            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$row[1]) {
+		if ($exceptionrow!=null) {
+            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow[1]) {
 				//if new due date is later, or no latepass used, then update
-				if ($row[2]==0 || $_SESSION['lti_duedate']>$row[1]) {
+				if ($exceptionrow[2]==0 || $_SESSION['lti_duedate']>$exceptionrow[1]) {
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $row[0]),
+					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow[0]),
 						':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
 				}
 			}
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
-			$useexception = $exceptionfuncs->getCanUseAssessException($row, $line, true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
 		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
 			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
@@ -2721,8 +2721,8 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
 			$useexception = true;
 		}
-		if ($row!=null && $useexception) {
-			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+		if ($exceptionrow!=null && $useexception) {
+			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
@@ -2733,7 +2733,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 					$inexception = true; //only trigger if past due date for penalty
 				}
 			}
-			$exceptionduedate = $row[1];
+			$exceptionduedate = $exceptionrow[1];
 		} else { //has no exception
 			if ($now < $line['startdate'] || $line['enddate'] < $now) { //outside normal dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
@@ -2808,7 +2808,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 		}
 		$timelimitmult = 1;
 	} else {
-		$stm = $DBH->prepare("SELECT id,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT timelimitmult,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		if ($stm->rowCount() == 0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
@@ -2831,7 +2831,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 			}
 			$timelimitmult = 1;
 		} else {
-			$timelimitmult = $stm->fetchColumn(1);
+            list($timelimitmult,$latepasses) = $stm->fetch(PDO::FETCH_NUM);
 		}
 	}
 }
@@ -2903,7 +2903,7 @@ if ($keyparts[0]=='aid') {
 	$_SESSION['ltiitemid'] = $aid;
 
 	$_SESSION['lticanuselatepass'] = false;
-	if ($SESS['ltirole']!='instructor' && $line['allowlate']>0) {
+	if ($SESS['ltirole']!='instructor' && $line['allowlate']>0 && isset($latepasses) && isset($exceptionrow)) {
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$latepasshrs = $stm->fetchColumn(0);

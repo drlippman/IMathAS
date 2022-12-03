@@ -44,6 +44,7 @@ $_SESSION['drill']['cid'] = 0;
 $_SESSION['drill']['sa'] = 0;
 $_SESSION['secsalt'] = "12345";
 $cid = "embedq";
+$myrights = 5;
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;

@@ -1341,7 +1341,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('drill', 'Drill', false);
 
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
+				   echo "<b><a href=\"$alink\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1397,7 +1397,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('drill', 'Drill', true);
 
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';

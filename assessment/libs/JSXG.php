@@ -2038,8 +2038,7 @@ function JSXG_createBlankBoard($label, $ops){
 		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
 		$width = isset($ops['width']) ? $ops['width'] : 2;
 
-		!isset($ops['visible'] = $ops['visible']) ?  'true' : $ops['visible'];
-		$visible = $ops['visible'] ? 'true' : 'false';
+		$visible = !isset($ops['visible']) ?  'true' : $ops['visible'];
 		
 		// You must have a glider to attach a tangent to, if this isn't set then exit
 	    $obj = isset($ops['glider']) ? $ops['glider'] : '';

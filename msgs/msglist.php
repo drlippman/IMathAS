@@ -561,7 +561,7 @@ If deleted on both ends, delete from DB
 	}
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-
+   
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";

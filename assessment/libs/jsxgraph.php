@@ -2271,7 +2271,7 @@ function jsx_getslidercount($board) {
 function jsx_pointToJS($point) {
 	
 	if (is_array($point)) {
-		$js .= "[".jsx_valueToJS($point[0]).", ".jsx_valueToJS($point[1])."]";
+		$js = "[".jsx_valueToJS($point[0]).", ".jsx_valueToJS($point[1])."]";
 	} else if(is_jsxpointref($point)) {
 		$js = $point;
 	}

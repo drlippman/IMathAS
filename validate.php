@@ -519,6 +519,7 @@ if ($hasusername) {
                 echo "<a href=\"$imasroot/course/course.php?cid={$_SESSION['ltiitemid']}\">Return to course page</a>";
                 exit;
             }
+            $breadcrumbbase = '';
         } else if ($_SESSION['ltiitemtype'] == 0 && $_SESSION['ltirole'] == 'learner') {
             if (isset($_GET['cid'])) {
                 if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
