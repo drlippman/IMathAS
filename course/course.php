@@ -201,6 +201,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		buildBlockLeftNav($items, '0', $stuLeftNavBlocks);
 	}
 
+    $contentbehavior = 0;
 	if ($_GET['folder']!='0') {
 		$now = time();
 		$blocktree = array_map('intval', explode('-',$_GET['folder']));
@@ -236,9 +237,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-	} else {
-        $contentbehavior = 0;
-    }
+	}
 	//DEFAULT DISPLAY PROCESSING
 	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
 	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";

@@ -461,6 +461,9 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
+    if ($len < 2) {
+        return -1; //not long enough
+    }
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
         if (!isset($lblrev[$seq[$i]])) { // invalid entry
@@ -512,6 +515,9 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
+    if ($len != $n+1) {
+		return false; //doesn't return to start or not long enough
+	}
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
         if (!isset($lblrev[$seq[$i]])) { // invalid entry
@@ -522,9 +528,7 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	if ($vseq[0] != $vseq[$len-1]) {
 		return false;
 	}
-	if ($len != $n+1) {
-		return false; //doesn't return to start or not long enough
-	}
+	
 	$notvis = array_fill(0,$n,1);
 	for ($i=1; $i<$len; $i++) {
 		if ($g[$vseq[$i]][$vseq[$i-1]]>0 || $g[$vseq[$i-1]][$vseq[$i]]>0) {
@@ -1224,7 +1228,7 @@ function graphdrawit($pos,$g,$op) {
 				}
 
 			} else {
-				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+				if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
 				}
 			}
@@ -1556,7 +1560,7 @@ function graphlistprocessing($g,$t,$L,$p,$op=array()) {
 		//mark done tasks
 		if ($curtime > 0) {
 			for ($i=0;$i<$p;$i++) {
-				if ($proc[$i]<=$curtime) { //if processor is done
+				if ($proc[$i]<=$curtime && count($out[$i])>0) { //if processor is done
 					$done[$out[$i][count($out[$i])-1][0]] = 1; //mark this proc's last task as done
 					//echo "marking".$out[$i][count($out[$i])-1][0]." done<br/>";
 				}
@@ -1565,6 +1569,7 @@ function graphlistprocessing($g,$t,$L,$p,$op=array()) {
 		//get ready tasks
 		$ready = array();
 		for ($i=0;$i<$n;$i++) {
+            if (!isset($L[$i])) { continue;} // "End" node not included in priority list
 			if (isset($started[$L[$i]])) {continue; } //skip if done
 			$isready = true;
 			foreach ($prereqs[$L[$i]] as $j) { //foreach prereq check if done
@@ -1627,6 +1632,7 @@ function graphscheduletaskinfo($sc,$n) {
 function graphschedulecompletion($sc) {
 	$time = 0;
 	foreach ($sc as $pl) {
+        if (count($pl)==0) { continue; } // processsor did nothing
 		$ptime = $pl[count($pl)-1][1] + $pl[count($pl)-1][2];
 		if ($ptime>$time) {
 			$time = $ptime;

@@ -396,6 +396,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		if (isset($function[2]) && $function[2]!='') {
 			$xmin = evalbasic($function[2]);
 			$domainlimited = true;
+            if (!is_numeric($xmin)) {
+                echo "Invalid function xmin";
+                continue;
+            }
 		} else {$xmin = $winxmin;}
 		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
@@ -404,6 +408,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			} else {
 				$xmax = $winxmax;
 			}
+            if (!is_numeric($xmax)) {
+                echo "Invalid function xmin";
+                continue;
+            }
 			if (count($xmaxarr)>1) {
 				$avoid = array_slice($xmaxarr,1);
 				sort($avoid);
@@ -4935,7 +4943,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 	foreach ($swap as $sw) {
 		//for ($i=0;$i<count($sw);$i++) {
         for ($i=count($sw)-1;$i>=0;$i--) {
-            if (!isset($stua[$sw[$i][0]])) { continue; }
+            if (!isset($sw[$i][0]) || !isset($stua[$sw[$i][0]])) { continue; }
 			$tofind = $stua[$sw[$i][0]];
 			$loc = -1;
 			//for ($k=0;$k<count($sw);$k++) {

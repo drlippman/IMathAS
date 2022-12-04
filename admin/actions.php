@@ -561,7 +561,7 @@ switch($_POST['action']) {
 			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-reord']);
 		}
 
-		$avail = 1 - $_POST['stuavail'];
+		$avail = isset($_POST['stuavail']) ? 0 : 1;//1 - $_POST['stuavail'];
 
 		$istemplate = 0;
 		if (($myspecialrights&1)==1 || $myrights==100) {
@@ -625,6 +625,7 @@ switch($_POST['action']) {
 
 			$browserdata = array();
 			foreach ($browserprops as $propname=>$propvals) {
+                if (!empty($propvals['fixed'])) { continue; }
 				if (!empty($propvals['required']) && trim($_POST['browser'.$propname]) == '' &&
 					!($propvals['required']==2 && ($istemplate&3)>0)) {
 					$isok = false;
@@ -639,7 +640,7 @@ switch($_POST['action']) {
 				} else { //single val
 					$browserdata[$propname] = Sanitize::stripHtmlTags($_POST['browser'.$propname]);
 				}
-				if ($_POST['browser'.$propname]=='other') {
+				if (isset($_POST['browser'.$propname]) && $_POST['browser'.$propname]=='other') {
 					$browserdata[$propname.'other'] = Sanitize::stripHtmlTags($_POST['browser'.$propname.'other']);
 				}
 			}

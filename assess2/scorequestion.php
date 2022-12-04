@@ -197,7 +197,7 @@ if (count($qns) > 0) {
     if ($v === 'file-autosave') {
       $qref = substr($k,2);
       if ($qref >= 1000) {
-        $qn = Math.floor($qref/1000) - 1;
+        $qn = floor($qref/1000) - 1;
         $pn = $qref % 1000;
       } else {
         $qn = $qref;

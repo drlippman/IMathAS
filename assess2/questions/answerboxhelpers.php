@@ -327,6 +327,7 @@ function ntupleToString($ntuples) {
 }
 
 function parseInterval($str, $islist = false) {
+    if (strlen($str)<5) { return false; }
 	if ($islist) {
 		$ints = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/',$str);
 	} else {

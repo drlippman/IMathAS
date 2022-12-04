@@ -476,6 +476,10 @@ class LTI_Message_Launch {
 
     private function validate_registration() {
         // Find registration.
+        if (empty($this->jwt['body']['aud'])) {
+            echo "Unable to find registration. Missing client_id; no aud in JWT";
+            throw new LTI_Exception("Missing aud in JWT.", 1);
+        }
         $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
 
         $this->registration = $this->db->find_registration_by_issuer($this->jwt['body']['iss'], $client_id);

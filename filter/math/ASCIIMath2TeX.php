@@ -651,7 +651,7 @@ function AMTparseSexpr($str) {
 	} else {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$texsymbol = $this->AMTgetTeXsymbol($symbol);
-		if ($texsymbol[0]=='\\' || (isset($symbol['isop']) && $symbol['isop']==true)) {
+		if ((strlen($texsymbol)>0 && $texsymbol[0]=='\\') || (isset($symbol['isop']) && $symbol['isop']==true)) {
 			return array($texsymbol,$str);
 		} else {
 			return array('{'.$texsymbol.'}',$str);
