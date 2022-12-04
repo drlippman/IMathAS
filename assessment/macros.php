@@ -1353,6 +1353,10 @@ function randfrom($lst) {
 	if (!is_array($lst)) {
 		$lst = listtoarray($lst);
 	}
+    if (count($lst) == 0) {
+        echo 'cannot pick randfrom empty list';
+        return '';
+    }
 	return $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 }
 
@@ -3399,7 +3403,7 @@ function cleantokenize($str,$funcs) {
 					}
 				}
 			}
-		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str[$i+1]>='0' && $str[$i+1]<='9')) ) { //is num
+		} else if (($c>='0' && $c<='9') || ($c=='.'  && (isset($str[$i+1]) && $str[$i+1]>='0' && $str[$i+1]<='9')) ) { //is num
 			$intype = 3; //number
 			$cont = true;
 			//handle . 3 which needs to act as concat
@@ -3412,9 +3416,9 @@ function cleantokenize($str,$funcs) {
 				$i++;
 				if ($i==$len) {break;}
 				$c= $str[$i];
-				if (($c>='0' && $c<='9') || ($c=='.' && $str[$i+1]!='.' && $lastc!='.')) {
+				if (($c>='0' && $c<='9') || ($c=='.' && (!isset($str[$i+1]) || $str[$i+1]!='.') && $lastc!='.')) {
 					//is still num
-				} else if ($c=='e' || $c=='E') {
+				} else if (($c=='e' || $c=='E') && isset($str[$i+1])) {
 					//might be scientific notation:  5e6 or 3e-6
 					$d = $str[$i+1];
 					if ($d>='0' && $d<='9') {
@@ -3422,7 +3426,7 @@ function cleantokenize($str,$funcs) {
 						$i++;
 						if ($i==$len) {break;}
 						$c= $str[$i];
-					} else if (($d=='-'||$d=='+') && ($str[$i+2]>='0' && $str[$i+2]<='9')) {
+					} else if (($d=='-'||$d=='+') && (isset($str[$i+2]) && $str[$i+2]>='0' && $str[$i+2]<='9')) {
 						$out .= $c.$d;
 						$i+= 2;
 						if ($i>=$len) {break;}
@@ -3617,6 +3621,8 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 
 	$cntnana = 0;
 	$cntnanb = 0;
+    $cntbothzero = 0;
+    $cntzero = 0;
     $diffnan = 0;
 	$correct = true;
 	$ratios = array();

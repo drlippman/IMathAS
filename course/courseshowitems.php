@@ -1126,7 +1126,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   	}
 			   	   	$vidid = $p2[0];
 			   	   	if (preg_match('/.*[^r]t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
-			   	   		$start = ($tm[2]?$tm[2]*60:0) + ($tm[4]?$tm[4]*1:0);
+			   	   		$start = (!empty($tm[2])?$tm[2]*60:0) + (!empty($tm[4])?$tm[4]*1:0);
 			   	   	} else if (preg_match('/start=(\d+)/',$m[2],$tm)) {
 			   	   		$start = $tm[1];
 			   	   	} else {

@@ -166,6 +166,7 @@ if ($haslogin && !$hasusername) {
         $line['id'] = $userid;
         $line['rights'] = 5;
         $line['groupid'] = 0;
+        $line['jsondata'] = '';
         $_POST['password'] = 'temp';
         if (isset($CFG['GEN']['newpasswords'])) {
             require_once "includes/password.php";
@@ -246,7 +247,6 @@ if ($haslogin && !$hasusername) {
                 $_SESSION['tzname'] = $_POST['tzname'];
             }
 
-            $json_data = json_decode($line['jsondata'], true);
             if (isset($json_data['login_errors'])) {
                 unset($json_data['login_errors']);
                 unset($json_data['login_blockuntil']);

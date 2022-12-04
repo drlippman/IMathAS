@@ -233,7 +233,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 
 	if (isset($itemlist['Forum'])) {
 		$typeids = implode(',', array_keys($itemlist['Forum']));
-		$query = "SELECT id,name,postby,replyby,startdate,enddate FROM imas_forums WHERE enddate>0 AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000)) AND avail>0 AND id IN ($typeids) ORDER BY name";
+		$query = "SELECT id,name,postby,replyby,startdate,enddate,allowlate FROM imas_forums WHERE enddate>0 AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000)) AND avail>0 AND id IN ($typeids) ORDER BY name";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['startdate']>$now && (!isset($teacherid) || $stuview)) {

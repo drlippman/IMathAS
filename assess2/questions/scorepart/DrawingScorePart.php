@@ -1947,7 +1947,7 @@ class DrawingScorePart implements ScorePart
                     $minerr = $settings[7];
                     $minerrkey = -1;
                     foreach ($anslines as $key=>$answerline) {
-                        if (abs($answerline[$k]-$linedata[$k][$i])<$minerr) {
+                        if (isset($answerline[$k]) && abs($answerline[$k]-$linedata[$k][$i])<$minerr) {
                             $minerr = abs($answerline[$k]-$linedata[$k][$i]);
                             $minerrkey = $key;
                         }

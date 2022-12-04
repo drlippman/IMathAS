@@ -240,7 +240,7 @@ if (!empty($_POST['autosave-tosaveqn'])) {
                 }
                 $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
                 foreach ($parts as $part) {
-                    if ($ok_to_save === true || $ok_to_save[$part]) {
+                    if ($ok_to_save === true || !empty($ok_to_save[$part])) {
                      $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
                     }
                 }
