@@ -44,7 +44,8 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function gc($maxLifetime): int|false
+    #[\ReturnTypeWillChange]
+	public function gc($maxLifetime) 
 	{
 		$oldTimestamp = time() - $maxLifetime;
 
@@ -73,7 +74,8 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function read($sessionId): string|false
+    #[\ReturnTypeWillChange]
+	public function read($sessionId)
 	{
 		$stm = $this->db->prepare('SELECT `data`,`access` FROM php_sessions WHERE id = :id');
 		$stm->bindParam(':id', $sessionId);
