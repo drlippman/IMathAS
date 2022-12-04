@@ -59,7 +59,7 @@ if (!empty($_SESSION['userid'])) { // logged in
         unset($userid);
         $_SESSION = array();
         if ($wasLTI) {
-            require 'header.php';
+            require __DIR__."/header.php";
             echo _('Your session has expired. Please go back to your LMS and open this assignment again.');
             require 'footer.php';
             exit;
@@ -68,7 +68,7 @@ if (!empty($_SESSION['userid'])) { // logged in
 }
 
 $hasusername = isset($userid);
-$haslogin = isset($_POST['password']);
+$haslogin = isset($_POST['password']) && isset($_POST['username']);
 
 if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
     if (empty($_SERVER['HTTP_REFERER'])) {
@@ -85,15 +85,15 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
             $cid = 0;
         }
 
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+        $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
         if (isset($_SERVER['QUERY_STRING'])) {
             $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . '&guestaccess=true';
         } else {
             $querys = '?guestaccess=true';
         }
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
-    
-        require "header.php";
+        
+        require __DIR__."/header.php";
         echo '<form method=post action="' . $formAction . '">';
         echo '<p>' . _('You have requested guest access to a course.') . '</p>';
         echo '<p><button type=button onclick="location.href=\'' . $imasroot . '/index.php\'">', _('Nevermind'), '</button> ';
@@ -106,7 +106,7 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
      });
      </script>';
         echo '</form>';
-        require "footer.php";
+        require __DIR__ . '/footer.php';
         exit;
     }
     $haslogin = true;
@@ -129,7 +129,7 @@ $now = time();
 //Just put in username and password, trying to log in
 if ($haslogin && !$hasusername) {
 
-    if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username'] == 'guest') { // create a temp account when someone logs in w/ username: guest
+    if (isset($CFG['GEN']['guesttempaccts']) && isset($_POST['username']) && $_POST['username'] == 'guest') { // create a temp account when someone logs in w/ username: guest
         $stm = $DBH->query('SELECT ver FROM imas_dbschema WHERE id=2');
         $guestcnt = $stm->fetchColumn(0);
         $stm = $DBH->query('UPDATE imas_dbschema SET ver=ver+1 WHERE id=2');
@@ -218,9 +218,9 @@ if ($haslogin && !$hasusername) {
         // }
         //
         if ($line['rights'] == 0) {
-            require "header.php";
+            require __DIR__."/header.php";
             echo _("You have not yet confirmed your registration.  You must respond to the email that was sent to you by IMathAS.");
-            require "footer.php";
+            require __DIR__ . '/footer.php';
             exit;
         }
 
@@ -594,10 +594,10 @@ if ($hasusername) {
                 $studentinfo['lticourseid'] = $line['lticourseid'];
             }
             if ($line['locked'] > 0) {
-                require "header.php";
+                require __DIR__."/header.php";
                 echo "<p>", _("You have been locked out of this course by your instructor.  Please see your instructor for more information."), "</p>";
                 echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
-                require "footer.php";
+                require __DIR__ . '/footer.php';
                 exit;
             } else {
                 $now = time();
@@ -703,7 +703,7 @@ if ($hasusername) {
                     ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'], 'assess2/') === false ||
                         strpos($_SERVER['QUERY_STRING'], '&aid=' . $lockaid) === false))
                 ) {
-                    require "header.php";
+                    require __DIR__."/header.php";
                     echo '<p>', _('This course is currently locked for another assessment'), '</p>';
 
                     if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0) {
@@ -713,7 +713,7 @@ if ($hasusername) {
                     } else {
                         echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=" . Sanitize::encodeUrlParam($lockaid) . "\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">", _("Go Back"), "</a></p>";
                     }
-                    require "footer.php";
+                    require __DIR__ . '/footer.php';
                     //header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
                     exit;
                 }

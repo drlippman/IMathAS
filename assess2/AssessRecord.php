@@ -1458,7 +1458,7 @@ class AssessRecord
             $lastsub = $curq['tries'][$pn][$parttry-1]['sub'];
         }
         if ($include_scores && $answeights[$pn] > 0) {
-          if ($status != 'unattempted') {
+          if ($status != 'unattempted' && isset($parts[$pn]['rawscore'])) {  // TODO: not sure why this isset check is needed; investigate
             if ($parts[$pn]['rawscore'] > .99) {
               $status = ($status === 'incorrect' || $status === 'partial') ? 'partial': 'correct';
             } else if ($parts[$pn]['rawscore'] < .01) {

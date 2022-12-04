@@ -333,7 +333,9 @@ function tokenize($str,$anstype,$countcnt) {
                     break;
                 }
                 $i++;
-                $c = $str[$i];
+                if ($i<$len) {
+                    $c = $str[$i];
+                }
             }
         }
 		if ($c=='/' && $str[$i+1]=='/') { //comment

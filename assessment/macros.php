@@ -1858,6 +1858,10 @@ function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 
 //use: calconarray($a,"x^$p")
 function calconarray($array,$todo) {
+    if (!is_array($array)) { 
+        echo "Error - First argument to calconarray must be an array";
+        return $array; 
+    }
 	/*global $disallowedwords,$allowedmacros;
 	$todo = str_replace($disallowedwords,"",$todo);
 	$todo = clean($todo);
@@ -1931,6 +1935,10 @@ function multicalconarray() {
 
 //use: calconarray($a,"x + .01","floor(x)==x")
 function calconarrayif($array,$todo,$ifcond) {
+    if (!is_array($array)) { 
+        echo "Error - First argument to calconarrayif must be an array";
+        return $array; 
+    }
 	/*global $disallowedwords,$allowedmacros;
 	$todo = str_replace($disallowedwords,"",$todo);
 	$todo = clean($todo);

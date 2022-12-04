@@ -542,7 +542,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 
 	$colors = makecolor2($row[3],$row[2],$now);
-	if ($row[7]==2) {
+	if ($row[5]==2) {
 		$colors = "#0f0";
 	}
 	if ($editingon) {$colors='';}
