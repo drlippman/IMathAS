@@ -10,9 +10,6 @@
 	/*** master php includes *******/
 	require("../init_without_validate.php");
 
-	require("courseshowitems.php");
-
-
 	$ispublic = true;
 	$cid = Sanitize::courseId($_GET['cid']);
     $myrights = 5;
@@ -30,6 +27,8 @@
     $courseUIver = $line['UIver'];
 	$items = unserialize($line['itemorder']);
     $breadcrumbbase = '';
+
+    require("courseshowitems.php");
 
 	if (!isset($_GET['folder']) || $_GET['folder']=='') {
 		$_GET['folder'] = '0';

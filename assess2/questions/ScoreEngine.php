@@ -548,7 +548,7 @@ class ScoreEngine
                     sort($stuanswers[$thisq]);
                     $stuanswers[$thisq] = implode('|', $stuanswers[$thisq]);
                 } else { // choices
-                    $stuanswers[$thisq] = $_SESSION['choicemap'][$assessmentId][$qnidx][$stuanswers[$thisq]];
+                    $stuanswers[$thisq] = $_SESSION['choicemap'][$assessmentId][$qnidx][$stuanswers[$thisq]] ?? 'NA';
                     if ($stuanswers[$thisq] === null) {
                         $stuanswers[$thisq] = 'NA';
                     }

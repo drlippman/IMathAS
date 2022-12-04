@@ -1248,17 +1248,23 @@ class AssessRecord
       //grab value from last (current) assess attempt
       $lastvernum = count($this->data['assess_versions']) - 1;
       $lastver = $this->data['assess_versions'][$lastvernum];
-      $returnVal = $lastver['timelimit_end'];
-      // recalc, in case timelimit has changed
-      $new_timelimit_end = $lastver['starttime'] + $this->assess_info->getAdjustedTimelimit();
-      if (isset($lastver['timelimit_ext'])) {
-          foreach ($lastver['timelimit_ext'] as $v) {
-            $new_timelimit_end += $v*60;
-          }
-      }
-      if ($new_timelimit_end > $returnVal) {
-        $this->data['assess_versions'][$lastvernum]['timelimit_end'] = $new_timelimit_end;
-        $returnVal = $new_timelimit_end;
+      $returnVal = $lastver['timelimit_end'] ?? 0;
+      // recalc, in case timelimit has changed, if there's a time limit
+      if ($this->assess_info->getSetting('timelimit') > 0) {
+        $new_timelimit_end = $lastver['starttime'] + $this->assess_info->getAdjustedTimelimit();
+        if (isset($lastver['timelimit_ext'])) {
+            foreach ($lastver['timelimit_ext'] as $v) {
+                $new_timelimit_end += $v*60;
+            }
+        }
+        if ($new_timelimit_end > $returnVal) {
+            $this->data['assess_versions'][$lastvernum]['timelimit_end'] = $new_timelimit_end;
+            $returnVal = $new_timelimit_end;
+            $this->need_to_record = true;
+        }
+      } else if ($returnVal > 0) { //had timelimit, none now; unset timelimit_end
+        unset($this->data['assess_versions'][$lastvernum]['timelimit_end']);
+        $returnVal = 0;
         $this->need_to_record = true;
       }
       $enddate = $this->assess_info->getSetting('enddate');

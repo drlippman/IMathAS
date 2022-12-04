@@ -4,7 +4,7 @@
 
 require_once("../includes/exceptionfuncs.php");
 
-if ($GLOBALS['canviewall']) {
+if ($GLOBALS['canviewall'] || !isset($studentinfo)) {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, false);
 } else {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);

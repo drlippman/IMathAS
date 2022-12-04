@@ -731,7 +731,7 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 	if (preg_match('/^no\s*solution/',$answer) || $answer===$nosoln) {
 		$answer = 'DNE';
 	}
-	$qs = $_POST["qs$qn"];
+	$qs = $_POST["qs$qn"] ?? '';
 	if ($qs=='DNE') {
 		$givenans = "DNE";
 	} else if ($qs=='inf') {

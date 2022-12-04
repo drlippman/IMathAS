@@ -3,7 +3,6 @@
 //(c) 2006 David Lippman
 
    require("../init_without_validate.php");
-   require("courseshowitems.php");
    $ispublic = true;
 
    $cid = Sanitize::courseId($_GET['cid']);
@@ -19,6 +18,8 @@
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
    $courseUIver = $line['UIver'];
+
+   require("courseshowitems.php");
 
    //if ($_GET['folder']!='0') {
    $blockispublic = false;

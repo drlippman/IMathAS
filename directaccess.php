@@ -131,7 +131,7 @@
 	 }
 	//check for session
 	$origquerys = $querys;
-	if ($_POST['ekey']!='') {
+	if (!empty($_POST['ekey'])) {
 		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
 	$init_session_start = true;

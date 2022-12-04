@@ -1679,6 +1679,10 @@ function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 	if (!is_array($a2)) {
 		$a2 = listtoarray($a2);
 	}
+    if (count($a1) != count($a2)) {
+        echo "jointshuffle should be called with two arrays of equal length";
+        return [$a1,$a2];
+    }
 	$r = $GLOBALS['RND']->array_rand($a1,count($a1));
 	$GLOBALS['RND']->shuffle($r);
 	for ($j=0;$j<count($r);$j++) {
@@ -2224,7 +2228,7 @@ function subarray($a) {
 			$p = explode(':',$args[$i]);
 			array_splice($out,count($out),0,array_slice($a,$p[0],$p[1]-$p[0]+1));
 		} else {
-			$out[] = $a[$args[$i]];
+			$out[] = $a[$args[$i]] ?? '';
 		}
 	}
 	return $out;
