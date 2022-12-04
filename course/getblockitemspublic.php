@@ -9,7 +9,7 @@
    $cid = Sanitize::courseId($_GET['cid']);
    require("../filter/filter.php");
 
-   $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
+   $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,UIver FROM imas_courses WHERE id=:id");
    $stm->execute(array(':id'=>$cid));
    $line = $stm->fetch(PDO::FETCH_ASSOC);
    if ($line == null) {
@@ -18,7 +18,7 @@
    }
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
-
+   $courseUIver = $line['UIver'];
 
    //if ($_GET['folder']!='0') {
    $blockispublic = false;

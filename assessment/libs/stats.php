@@ -937,13 +937,13 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 //       Excel: A method based on (n-1), with some linear interpolation
 //For backwards compatability, options can also just be an array of datalabels
 function boxplot($arr,$label="",$options = array()) {
-	if (is_array($arr[0]) && count($options)==count($arr) && isset($options[0])) {
+	if (isset($arr[0]) && is_array($arr[0]) && count($options)==count($arr) && isset($options[0])) {
 		$dlbls = $options;
 		$options = array();
 	} else if (isset($options['datalabels'])) {
 		$dlbls = $options['datalabels'];
 	}
-	if (is_array($arr[0])) { $multi = count($arr);} else {$multi = 1;}
+	if (isset($arr[0]) && is_array($arr[0])) { $multi = count($arr);} else {$multi = 1;}
 	$qmethod = 'quartile';
 	if (isset($options['qmethod'])) {
 		if ($options['qmethod']=='TI') {

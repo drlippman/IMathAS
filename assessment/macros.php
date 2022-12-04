@@ -2975,7 +2975,7 @@ function evalbasic($str) {
 	$str = clean($str);
 	if (is_numeric($str)) {
 		return $str;
-	} else if (preg_match('/[^\d+\-\/\*\.]/',$str)) {
+	} else if (preg_match('/[^\d+\-\/\*\.\(\)]/',$str)) {
 		return $str;
 	} else if ($str === '') {
     return 0;

@@ -262,7 +262,9 @@
 		if ($aver > 1 && ($line['status']&1)>0) {
 			// identify as unsubmitted if past due, or time limit is expired
 			$data = json_decode(gzdecode($line['scoreddata']), true);
-			$time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            if (abs($timelimit) > 0) {
+			    $time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            }
 			if ($now > $line['thisenddate'] ||
 				(abs($timelimit) > 0 && $now > $time_exp + $overtime_grace * $line['timelimitmult'])
 			) {

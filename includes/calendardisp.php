@@ -938,6 +938,7 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 			$folderholder[$item] = $folder;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
+                $greyitems[$item] = 0;
 			} else {
 				$greyitems[$item] = $curblockgrey;
 			}

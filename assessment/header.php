@@ -5,6 +5,9 @@
 } else {
 	echo '<html lang="en">';
 }
+if (!isset($myrights)) { 
+    $myrights = 0; // avoid errors in headercontent if not defined
+}
 ?>
 <head>
 

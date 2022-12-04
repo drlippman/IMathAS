@@ -171,7 +171,9 @@ class NumberScorePart implements ScorePart
             sort($tmp);
             $anarr = array($tmp[0]);
             for ($i=1;$i<count($tmp);$i++) {
-                if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+                if (!is_numeric($tmp[$i]) || !is_numeric($tmp[$i-1]) || 
+                    $tmp[$i]-$tmp[$i-1]>1E-12
+                ) {
                     $anarr[] = $tmp[$i];
                 }
             }

@@ -5,6 +5,9 @@
 } else {
 	echo '<html lang="en">';
 }
+if (!isset($myrights)) { 
+    $myrights = 0; // avoid errors in headercontent if not defined
+}
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['header'])) {
     require_once($CFG['hooks']['header']);

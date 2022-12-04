@@ -3632,14 +3632,14 @@ class AssessRecord
         if ($qtype == 'choices') {
           $out[$pn][] = ($parttrydata[$tn]['stuans']=='') ? '' : $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']];
         } else if ($qtype == 'multans') {
-          $pts = explode('|',$parttrydata[$tn]['stuans']);
+          $pts = explode('|',$parttrydata[$tn]['stuans'] ?? '');
           $outstr = '';
           foreach ($pts as $ptval) {
             $outstr .= ($ptval=="") ? "" : $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
           }
           $out[$pn][] = $outstr;
         } else if ($qtype == 'matching') {
-          $pts = explode('|',$parttrydata[$tn]['stuans']);
+          $pts = explode('|',$parttrydata[$tn]['stuans'] ?? '');
           $qrefarr = array_flip($GLOBALS['choicesdata'][$partref][0]);
           $outptarr = array();
           foreach ($pts as $k=>$ptval) {
@@ -3650,11 +3650,11 @@ class AssessRecord
         } else if ($qtype == 'draw') {
           $out[$pn][] = array(
             'draw',
-            $parttrydata[$tn]['stuans'],
+            $parttrydata[$tn]['stuans'] ?? '',
             $GLOBALS['drawinitdata'][$partref]
           );
         } else if ($qtype == 'file' && strpos($parttrydata[$tn]['stuans'], '@FILE')!==false) {
-          $file = preg_replace('/@FILE:(.+?)@/',"$1",$parttrydata[$tn]['stuans']);
+          $file = preg_replace('/@FILE:(.+?)@/',"$1",$parttrydata[$tn]['stuans'] ?? '');
           $url = getasidfileurl($file);
           $extension = substr($url,strrpos($url,'.')+1,3);
           $filename = basename($file);
@@ -3665,15 +3665,15 @@ class AssessRecord
           }*/
           $out[$pn][] = $outstr;
         } else if ($qtype == 'essay') {
-          $out[$pn][] = $parttrydata[$tn]['stuans'];
+          $out[$pn][] = $parttrydata[$tn]['stuans'] ?? '';
         } else if (($qtype == 'matrix' || $qtype == 'calcmatrix') && isset($GLOBALS['answersize'][$partref])) {
-          $chunks = array_chunk(explode('|', $parttrydata[$tn]['stuans']), $GLOBALS['answersize'][$partref][1]);
+          $chunks = array_chunk(explode('|', $parttrydata[$tn]['stuans'] ?? ''), $GLOBALS['answersize'][$partref][1]);
           foreach ($chunks as $k=>$v) {
               $chunks[$k] = implode(',', $v);
           }
           $out[$pn][] = Sanitize::encodeStringForDisplay('`[(' . implode('),(', $chunks) . ')]`');
         } else {
-          $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans']);
+          $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans'] ?? '');
         }
       }
     }

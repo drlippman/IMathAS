@@ -43,15 +43,14 @@ function reduceradical($in,$root=2,$format="string") {
 	$root = intval($root);
 
     $iscomplex = false;
+    $sign = '';
 	if ($in<0) {
         if ($root == 2) {
             $iscomplex = true;
         } else {
             $sign = '-';
         }
-	} else {
-		$sign = '';
-	}
+	} 
 
 	$in = abs($in);
 	$max = 	pow($in,1/$root);
