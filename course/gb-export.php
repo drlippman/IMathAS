@@ -575,9 +575,6 @@ function gbinstrdisp() {
 
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						}
 					} else {
 						echo '-';
 					}

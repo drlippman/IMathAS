@@ -86,7 +86,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
 function logout() {
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
-		setcookie(session_name(), '', time()-42000, '/', null, false, true);
+		setcookie(session_name(), '', time()-42000, '/', '', false, true);
 	}
 	session_destroy();
 }

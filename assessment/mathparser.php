@@ -735,6 +735,9 @@ class MathParser
         $node = array_pop($this->operatorStack); //this is the function node
         $operand = array_pop($this->operandStack);
         if ($node['symbol'] == 'log_') {
+          if ($operand === null) {
+            throw new MathParserException("Syntax error - missing index");
+          }
           $node['symbol'] = 'log';
           $node['index'] = $operand;
           $this->operatorStack[] = $node;
@@ -743,6 +746,9 @@ class MathParser
           };
           return;
         } else {
+          if ($operand === null) {
+            throw new MathParserException("Syntax error - missing function input");
+          }
           $node['input'] = $operand;  // assign argument to function
         }
         if (strpos($node['symbol'], '^') !== false) { // if it's sin^2, transform now

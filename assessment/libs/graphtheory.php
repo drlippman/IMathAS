@@ -514,6 +514,9 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	$len = strlen($seq);
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
+        if (!isset($lblrev[$seq[$i]])) { // invalid entry
+            return false;
+        }
 		$vseq[$i] = $lblrev[$seq[$i]];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
@@ -557,8 +560,14 @@ function graphgetpathlength($g,$op,$seq) {
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
 	$pathlen = 0;
+    if (!isset($lblrev[$seq[0]])) { // invalid entry
+        return -1;
+    }
     $last = $lblrev[$seq[0]];
 	for ($i=1; $i<$len; $i++) {
+        if (!isset($lblrev[$seq[$i]])) { // invalid entry
+            return -1;
+        }
 		$cur = $lblrev[$seq[$i]];
 		$pathlen += max($g[$last][$cur],$g[$cur][$last]);
 		$last = $cur;
