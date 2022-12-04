@@ -987,6 +987,7 @@ function gbtable() {
 		$stm2 = $DBH->prepare("SELECT userid,count(*) FROM imas_login_log WHERE courseid=:courseid GROUP BY userid");
 		$stm2->execute(array(':courseid'=>$cid));
 		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
+            if (!isset($sturow[$r[0]])) { continue; }
 			$gb[$sturow[$r[0]]][0][] = $r[1];
 		}
 	}
