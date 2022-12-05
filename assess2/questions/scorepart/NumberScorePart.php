@@ -212,8 +212,12 @@ class NumberScorePart implements ScorePart
                     $v = 'DNE';
                 } else {
                     $givenansUnits = parseunits($v);
-                    $v = evalMathParser($givenansUnits[0]);
-                    $gaunitsarr[$k] = $givenansUnits;
+                    if (is_array($givenansUnits)) {
+                        $v = $givenansUnits[0];
+                        $gaunitsarr[$k] = $givenansUnits;
+                    } else { // handle invalid
+                        $gaunitsarr[$k] = [0,'invalid',0,0];
+                    }
                 }
             }
 
@@ -256,8 +260,13 @@ class NumberScorePart implements ScorePart
                         $anans = 'DNE';
                     } else {
                         $anssUnits = parseunits($anans);
-                        $anss[$k] = evalMathParser($anssUnits[0]);
-                        $anssunits[$k] = $anssUnits;
+                        if (is_array($anssUnits)) {
+                            $anss[$k] = $anssUnits[0];
+                            $anssunits[$k] = $anssUnits;
+                        } else {
+                            echo "Invalid answer $anans";
+                            $anssunits[$j] = [0,'invalidans',0,0];
+                        }
                     }
                 }
             }

@@ -2449,7 +2449,7 @@ class AssessRecord
         $allAssessVerScores[$av] = $aVerScore;
       }
     } // end loop over assessment versions
-    if (!$by_question) {
+    if (!$by_question && count($allAssessVerScores) > 0) {
       if ($keepscore == 'best') {
         $this->data['scored_version'] = $aScoredVer;
       } else { // last or average, show last version as scored version
@@ -3270,8 +3270,8 @@ class AssessRecord
           }
           unset($qdata['scoreoverride']);
         } else {
-          if (floatval($score) != $qdata['scoreoverride']) {
-            $changes[$chgkey] = ['old'=>$qdata['scoreoverride'], 'new'=>$score];
+          if (!isset($qdata['scoreoverride']) || floatval($score) != $qdata['scoreoverride']) {
+            $changes[$chgkey] = ['old'=>$qdata['scoreoverride'] ?? '', 'new'=>$score];
           }
           $qdata['scoreoverride'] = floatval($score);
         }
@@ -3293,8 +3293,8 @@ class AssessRecord
           }
           unset($qdata['scoreoverride'][$pn]);
         } else {
-          if (isset($qdata['scoreoverride'][$pn]) && floatval($score) != $qdata['scoreoverride'][$pn]) {
-            $changes[$chgkey] = ['old'=>$qdata['scoreoverride'][$pn], 'new'=>$score];
+          if (!isset($qdata['scoreoverride'][$pn]) || floatval($score) != $qdata['scoreoverride'][$pn]) {
+            $changes[$chgkey] = ['old'=>$qdata['scoreoverride'][$pn] ?? '', 'new'=>$score];
           }
           $qdata['scoreoverride'][$pn] = floatval($score);
         }

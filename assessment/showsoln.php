@@ -25,6 +25,7 @@ $_SESSION['coursetheme'] = $coursetheme;
 $flexwidth = true;
 $isdiag = false;
 $useeqnhelper = false;
+$useeditor = 0;
 $isfw = false;
 require("header.php");
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';

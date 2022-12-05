@@ -755,11 +755,13 @@ class DrawingScorePart implements ScorePart
                         }
                     } else if ($pts[0]==6.5) {//sqrt
                         $flip = ($pts[3] < $pts[1])?-1:1;
-                        $stretch = ($pts[4] - $pts[2])/sqrt($flip*($pts[3]-$pts[1]));
+                        if ($pts[3]!=$pts[1]) {
+                            $stretch = ($pts[4] - $pts[2])/sqrt($flip*($pts[3]-$pts[1]));
 
-                        $secxp = $pts[1] + ($x4p-$x0p)/5*$flip;  //over 1/5 of grid width
-                        $secyp = $stretch*sqrt($flip*($secxp - $pts[1]))+($pts[2]);
-                        $sqrts[] = array($pts[1],$pts[2],$secyp,$flip);
+                            $secxp = $pts[1] + ($x4p-$x0p)/5*$flip;  //over 1/5 of grid width
+                            $secyp = $stretch*sqrt($flip*($secxp - $pts[1]))+($pts[2]);
+                            $sqrts[] = array($pts[1],$pts[2],$secyp,$flip);
+                        }
                     } else if ($pts[0]==6.3) {
                         //cubic
                         if ($pts[4]==$pts[2]) {

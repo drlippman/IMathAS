@@ -305,11 +305,10 @@ function fractiondivide() {
 //fractionneg(frac)
 //change the sign of a fraction
 function fractionneg($f) {
+    $fracarr = false;
 	if (!is_array($f)) {
 		$f = fractionparse($f);
-	}
-	$fracarr = false;
-	if (is_array($args[0])) {
+	} else {
 		$fracarr = true;
 	}
 	return fractionreduce(-1*$f[0],$f[1],$fracarr);
@@ -318,13 +317,13 @@ function fractionneg($f) {
 //fractionpower(frac, power)
 //raises a fraction to a power
 function fractionpower($f,$p) {
+    $fracarr = false;
 	if (!is_array($f)) {
 		$f = fractionparse($f);
-	}
-	$fracarr = false;
-	if (is_array($args[0])) {
+	} else {
 		$fracarr = true;
 	}
+	
 	$num = pow($f[0], $p);
 	$denom = pow($f[1], $p);
 	return fractionreduce($num,$denom,$fracarr);
