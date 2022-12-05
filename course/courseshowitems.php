@@ -817,7 +817,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
                }
 				 if ($line['ver'] > 1) {
 					 $thisaddassess = "addassessment2.php";
-					 	if ($assessUseVueDev) {
+					 	if ($assessUseVueDev && isset($CFG['assess2-use-vue-dev-address'])) {
 							$assessUrl = sprintf("%s/?cid=%s&aid=%s",
 								$CFG['assess2-use-vue-dev-address'], $cid, $typeid);
 						} else {
