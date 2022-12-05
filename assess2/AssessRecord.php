@@ -1856,8 +1856,11 @@ class AssessRecord
     }
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
+    // separate numpartautosave, since in conditional, answeights tells us 1 part, and we want to
+    // continue to use that for qcolor and such
+    $numPartsAutosave = $numParts;
     if (!empty($autosave['stuans'])) {
-      $numParts = max($numParts, max(array_keys($autosave['stuans']))+1);
+      $numPartsAutosave = max($numPartsAutosave, max(array_keys($autosave['stuans']))+1);
     }
     $partattemptn = array();
     $qcolors = array();
@@ -1882,10 +1885,7 @@ class AssessRecord
     $seqPartDone = array();
     $correctAnswerWrongFormat = array();
 
-    for ($pn = 0; $pn < $numParts; $pn++) {
-      // figure out try #
-      $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
-
+    for ($pn = 0; $pn < $numPartsAutosave; $pn++) {
       if ($clearans) {
         $stuanswers[$qn+1][$pn] = '';
         $stuanswersval[$qn+1][$pn] = '';
@@ -1907,6 +1907,11 @@ class AssessRecord
         }
         $usedAutosave[] = $pn;
       }
+    }
+    for ($pn = 0; $pn < $numParts; $pn++) {
+      // figure out try #
+      $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
+
       /* These cases should already be handled in $stuanswers grab
       else if ($tryToShow === 'scored' && $qver['scored_try'][$pn] > -1) {
         $stuanswers[$qn+1][$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['stuans'];
