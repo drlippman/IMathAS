@@ -14,7 +14,7 @@
 	}
 	$istutor = isset($tutorid);
 
-	$stu = intval($_GET['stu']);
+	$stu = intval($_GET['stu'] ?? 0);
 
 	if ($isteacher || $istutor) {
 		$uid = intval($_GET['uid']);

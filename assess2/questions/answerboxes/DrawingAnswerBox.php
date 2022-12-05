@@ -558,14 +558,6 @@ class DrawingAnswerBox implements AnswerBox
                     }
                 }
                 if ($answerformat[0] == 'inequality') {
-                    if ($function[0][2] == '=') {
-                        $type = 10;
-                        $c = 3;
-                    } else {
-                        $type = 10.2;
-                        $c = 2;
-                    }
-                    $dir = $function[0][1];
                     $saarr[$k] = makepretty($function[0]) . ',' . $ineqcolors[$k % 3];
                 } else {
                     if (count($function) == 2 || (count($function) == 3 && ($function[2] == 'open' || $function[2] == 'closed'))) { //is dot

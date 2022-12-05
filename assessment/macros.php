@@ -657,7 +657,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
                 $pathstr .= ']);';
 			}
-			if ($function[1]=='red' || $function[1]=='green') {
+			if (isset($function[1]) && ($function[1]=='red' || $function[1]=='green')) {
 				$path .= "fill=\"trans{$function[1]}\";";
 			} else {
 				$path .= "fill=\"transblue\";";
@@ -1704,7 +1704,7 @@ function listtoarray($l) {
 	if (func_num_args()>1 && ($_SESSION['isteacher'] || isset($GLOBALS['teacherid']))) {
 		echo "Warning:  listtoarray expects one argument, more than one provided";
 	}
-    if (empty($l)) { return []; }
+    if ($l==='') { return []; }
 	return array_map('trim',explode(',',$l));
 }
 
@@ -4200,6 +4200,8 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				continue;
 			}
 			$cntnanb = 0;
+            $cntbothzero = 0;
+            $cntzero = 0;
             $diffnan = 0;
 			$ratios = array();
 			for ($i = 0; $i < $numpts; $i++) {
@@ -4944,6 +4946,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 			$swap[$k][$i] = listtoarray($s);
 		}
     }
+
 	foreach ($swap as $sw) {
 		//for ($i=0;$i<count($sw);$i++) {
         for ($i=count($sw)-1;$i>=0;$i--) {

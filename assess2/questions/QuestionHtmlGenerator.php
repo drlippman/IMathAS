@@ -754,7 +754,7 @@ class QuestionHtmlGenerator
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
-                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && $answeights[$pn]!=0) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && !empty($answeights[$pn])) {
                   $thisGroupDone = false;
                 }
               }

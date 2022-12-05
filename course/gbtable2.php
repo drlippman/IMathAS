@@ -618,7 +618,14 @@ function gbtable() {
 			$catcolcnt++;
 		}
 	}
-	//create item headers
+
+    foreach ($category as $k=>$catv) {
+        if (!isset($cats[$catv])) { // item has invalid category
+            $category[$k] = 0; // move to default
+        }
+    }
+
+    //create item headers
 	$pos = 0;
 	$catposspast = array();
 	$catposspastec = array();

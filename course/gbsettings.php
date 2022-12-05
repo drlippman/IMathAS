@@ -22,6 +22,9 @@
 		$stm->execute(array(':gbcategory'=>$_POST['remove']));
 		$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
 		$stm->execute(array(':gbcategory'=>$_POST['remove']));
+        $oldgbref = '~~'.intval($_POST['remove']).'~~'; // a bit hacky, but OK
+        $stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text, '$oldgbref', '~~0~~') WHERE courseid=:courseid AND text LIKE 'exttool:%'");
+        $stm->execute(array(':courseid'=>$cid));
 		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id");
 		$stm->execute(array(':id'=>$_POST['remove']));
 		if ($stm->rowCount()>0) {

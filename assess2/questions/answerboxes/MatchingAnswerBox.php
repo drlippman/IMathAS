@@ -62,7 +62,12 @@ class MatchingAnswerBox implements AnswerBox
             echo _('Eeek!  $answers is not defined or needs to be an array');
             $answers = array();
         }
-        if (!empty($matchlist)) {$matchlist = array_map('trim', explode(',', $matchlist));}
+        if (!empty($matchlist)) {
+            $matchlist = array_map('trim', explode(',', $matchlist));
+            if (count($matchlist) != count($questions)) {
+                echo _('$questions and $matchlist should have the same number of entries');
+            }
+        }
         if ($noshuffle == "questions" || $noshuffle == 'all') {
             $randqkeys = array_keys($questions);
         } else {

@@ -121,7 +121,7 @@ if (isset($_POST['checked'])) { //form submitted
 $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 $i=0;
-$page_gbcatSelect = array();
+$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 if ($stm->rowCount()>0) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_gbcatSelect['val'][$i] = $row[0];

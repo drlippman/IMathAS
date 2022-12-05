@@ -311,7 +311,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                 $match = 1;  // found a possible solution
 				// Check Objective
                 if($HasObjective==1) {
-                    if (is_array($solutionlistarray)) {
+                    if (is_array($solutionlist[$r][$OptimizedValuecol])) {
                         // not checking for division by zero as this is instructor supplied
                         $dec1 = $solutionlist[$r][$OptimizedValuecol][0]/$solutionlist[$r][$OptimizedValuecol][1];
                     } else {

@@ -73,7 +73,7 @@ class AssessHelpers
                     $gbscore = $assess_record->getGbScore();
                     if ($orig_gb_score['gbscore'] != $gbscore['gbscore']) {
                         $aidposs = $assess_info->getSetting('points_possible');
-                        calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs, false);
+                        calcandupdateLTIgrade($lti_sourcedid, $aid, $row['userid'], $gbscore['gbscore'], true, $aidposs, false);
                     }
                 }
             }

@@ -412,7 +412,7 @@ if (!(isset($teacherid))) {
 			getsubinfo($items,'0','',false,' ');
 
 			$i=0;
-			$page_blockSelect = array();
+			$page_blockSelect = array('val'=>[], 'label'=>[]);
 
 			foreach ($existblocks as $k=>$name) {
 				$page_blockSelect['val'][$i] = $k;
