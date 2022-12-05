@@ -2495,9 +2495,9 @@ function gbtable() {
 				if (isset($reqscores[$k]) && $reqscores[$k]['aid']>0 && isset($assesscol[$reqscores[$k]['aid']])) {
                     $colofprereq = $assesscol[$reqscores[$k]['aid']];
                     if (empty($gb[1][1][$colofprereq][14])) {
-                        if (!isset($gb[1][1][$colofprereq][0]) ||
-                        ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
-                        ($reqscores[$k]['calctype']==2 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score'])) {
+                        if (!isset($gb[1][1][$colofprereq][0]) || is_numeric($gb[1][1][$colofprereq][0]) && (
+                         ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
+                         ($reqscores[$k]['calctype']==2 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score']))) {
                             $gb[1][1][$col][13] = 0;
                         }
                     }

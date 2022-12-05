@@ -12,8 +12,8 @@ if (empty($_GET['id'])) {
 function getquestionlicense($row) {
 	global $CFG, $sendfrom;
 	$license = 'This question was written by '.Sanitize::encodeStringForDisplay($row['author']);
-	if ($row['authorancestors']!='') {
-		$license .= ', derived from work by '.Sanitize::encodeStringForDisplay($row['authorancestors']);
+	if ($row['ancestorauthors']!='') {
+		$license .= ', derived from work by '.Sanitize::encodeStringForDisplay($row['ancestorauthors']);
 	}
 	if ($row['license']==0) {
 		$license .= '. This work is copyrighted, or contains copyright material. ';

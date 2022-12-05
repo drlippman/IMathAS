@@ -2453,7 +2453,9 @@ class AssessRecord
       if ($keepscore == 'best') {
         $this->data['scored_version'] = $aScoredVer;
       } else { // last or average, show last version as scored version
-        $this->data['scored_version'] = count($this->data['assess_versions']) - 1;
+        //$this->data['scored_version'] = count($this->data['assess_versions']) - 1;
+        // only want to use ones that are submitted, so only look at these ones
+        $this->data['scored_version'] = max(array_keys($allAssessVerScores));
       }
     } else { // by_question has only one version
       $this->data['scored_version'] = 0;
@@ -3636,7 +3638,7 @@ class AssessRecord
       }
       for ($tn = 0; $tn < count($parttrydata); $tn++) {
         if ($qtype == 'choices') {
-          $out[$pn][] = ($parttrydata[$tn]['stuans']=='') ? '' : $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']];
+          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']] ?? $parttrydata[$tn]['stuans'];
         } else if ($qtype == 'multans') {
           $pts = explode('|',$parttrydata[$tn]['stuans'] ?? '');
           $outstr = '';

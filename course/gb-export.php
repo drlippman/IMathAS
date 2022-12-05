@@ -611,9 +611,9 @@ function gbinstrdisp() {
 				}
 				if ($includetimes>0 && $gbt[0][1][$j][6]==0) {
 					if ($includetimes==1) {
-						echo '<td>'.$gbt[$i][1][$j][7].'</td>';
+						echo '<td>'.($gbt[$i][1][$j][7] ?? '').'</td>';
 					} else if ($includetimes==2) {
-						echo '<td>'.$gbt[$i][1][$j][8].'</td>';
+						echo '<td>'.($gbt[$i][1][$j][8] ?? '').'</td>';
 					}
 					$n++;
 				}

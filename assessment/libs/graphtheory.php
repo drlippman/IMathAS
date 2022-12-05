@@ -873,7 +873,7 @@ function graphmakesymmetric($g) {
 	$n = count($g[0]);
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
-			$m = max($g[$i][$j],$g[$j][$i]);
+			$m = max($g[$i][$j] ?? 0,$g[$j][$i] ?? 0);
 			if ($m>0) {
 				$g[$i][$j] = $m;
 				$g[$j][$i] = $m;

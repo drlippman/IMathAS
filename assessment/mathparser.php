@@ -127,6 +127,7 @@ class MathParser
   private $funcregex = '';
   private $numvarregex = '';
   private $variableValues = [];
+  private $origstr = '';
 
   /**
    * Construct the parser
@@ -257,6 +258,7 @@ class MathParser
    * @return array  Builds syntax tree in class, but also returns it
    */
   public function parse($str) {
+    $this->origstr = $str;
     $str = preg_replace('/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/', 'arc$2', $str);
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     // attempt to handle |x| as best as possible
@@ -781,6 +783,11 @@ class MathParser
    * @return float Value of the node
    */
   private function evalNode($node) {
+    if (empty($node)) {
+        error_log("evaluate empty node error on str " . $this->origstr);
+        throw new MathParserException("Cannot evaluate an empty expression");
+        return;
+    }
     if ($node['type'] === 'number') {
       return floatval($node['symbol']);
     } else if ($node['type'] === 'variable') {

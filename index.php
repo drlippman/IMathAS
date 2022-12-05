@@ -661,7 +661,7 @@ function printMessagesGadget() {
 			$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 		}
 		echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($line['fullname']).'</span></td>';
-		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']] ?? '').'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
 		echo '</tr>';
 	}
