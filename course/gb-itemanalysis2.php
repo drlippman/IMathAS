@@ -394,7 +394,7 @@
 			if ($pts==9999) {
 				$pts = $defpoints;
 			}
-			if ($qcnt[$qid]>0) {
+			if (isset($qcnt[$qid]) && $qcnt[$qid]>0) {
 				$avg = $qtotal[$qid]/$qcnt[$qid];
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avg2 = $qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]); //avg adjusted for not attempted
