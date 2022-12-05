@@ -259,7 +259,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 
 			$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
-			if ($toset['showscores'] == 'none') {
+			if ($toset['showscores'] == 'none' || $toset['showscores'] == 'total') {
 				$toset['showans'] = 'never';
 			} else {
 				$toset['showans'] = Sanitize::simpleString($_POST['showans']);
@@ -745,6 +745,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $skippenalty=10;
       } else
 			*/
+            if ($line['defpenalty'] === '') {
+                $line['defpenalty'] = '0';
+            }
 			if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
 				$defattemptpenalty = substr($line['defpenalty'],2);
 				$defattemptpenalty_aftern = $line['defpenalty'][1];

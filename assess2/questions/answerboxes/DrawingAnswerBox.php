@@ -662,7 +662,9 @@ class DrawingAnswerBox implements AnswerBox
                             $y2 = $func(['x' => $x2]);
                             $y3 = $func(['x' => $x3]);
 
-                            $va = ($x1 * $x2 * $y1 - $x1 * $x2 * $y2 - $x1 * $x3 * $y1 + $x1 * $x3 * $y3 + $x2 * $x3 * $y2 - $x2 * $x3 * $y3) / (-$x1 * $y2 + $x1 * $y3 + $x2 * $y1 - $x2 * $y3 - $x3 * $y1 + $x3 * $y2);
+                            $denom = -$x1 * $y2 + $x1 * $y3 + $x2 * $y1 - $x2 * $y3 - $x3 * $y1 + $x3 * $y2;
+                            if ($denom == 0) { continue; }
+                            $va = ($x1 * $x2 * $y1 - $x1 * $x2 * $y2 - $x1 * $x3 * $y1 + $x1 * $x3 * $y3 + $x2 * $x3 * $y2 - $x2 * $x3 * $y3) / ($denom);
                             $ha = (($x1 * $y1 - $x2 * $y2) - $va * ($y1 - $y2)) / ($x1 - $x2);
 
                             $k++;

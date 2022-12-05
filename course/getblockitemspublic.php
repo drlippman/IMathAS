@@ -4,7 +4,8 @@
 
    require("../init_without_validate.php");
    $ispublic = true;
-
+   $_SESSION = ['mathdisp'=>1, 'graphdisp'=>1, 'useed'=>1];
+   
    $cid = Sanitize::courseId($_GET['cid']);
    require("../filter/filter.php");
 

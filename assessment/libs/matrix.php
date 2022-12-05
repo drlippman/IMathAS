@@ -299,7 +299,7 @@ $Tableau .= "<tbody>\r\n";
             if($rows==1)  {
                 // only 1 row
                 if ($cloop==0) { // R1C1
-                    $Tableau.= "<td $onerowleftborder>&nbsp;</td>\r\n<td $pivotsyle>$TableElement</td>\r\n";
+                    $Tableau.= "<td $onerowleftborder>&nbsp;</td>\r\n<td>$TableElement</td>\r\n";
                     if($cloop==$lastcol) {
                         $Tableau.= "<td $onerowrightborder>&nbsp;</td>\r\n";
                     }
@@ -808,6 +808,7 @@ function matrixsolve($A, $b, $silenterror=false) {
     // number of rows
     $N  = count($b);
     $M = count($b[0]); //number of cols in $b
+    
     if ($N>10) {
 	global $myrights;
 	if ($myrights>10) {

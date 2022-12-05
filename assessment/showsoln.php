@@ -9,6 +9,7 @@ if ($_GET['cid']==="embedq") {
 	$_SESSION['secsalt'] = "12345";
 	$_SESSION['graphdisp'] = 1;
 	$_SESSION['mathdisp'] = 1;
+    $_SESSION['useed'] = 0;
 	if (isset($_GET['theme'])) {
 		$coursetheme = 	$_GET['theme'];
 	}

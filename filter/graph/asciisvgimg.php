@@ -278,7 +278,7 @@ function addcolor($origcolor) {
 	} else {
 		$alpha = 0;
 	}
-	if ($color[0]=='#') {
+	if (strlen($color)>0 && $color[0]=='#') {
 		$r = hexdec(substr($color,1,2));
 		$g = hexdec(substr($color,3,2));
 		$b = hexdec(substr($color,5,2));

@@ -1281,28 +1281,32 @@ class AssessInfo
     $itemorder = json_decode($settings['itemorder'], true);
     //temp handling of old format
     if ($itemorder === null) {
-      $order = explode(',', $settings['itemorder']);
-      foreach ($order as $k=>$v) {
-        $sub = explode('~', $v);
-        if (count($sub)>1) {
-          $pts = explode('|', $sub[0]);
-          if (count($pts)==1) { //really old assessment format
-            $order[$k] = array(
-              'type' => 'pool',
-              'n' => 1,
-              'replace' => 0,
-              'qids' => array_map('intval', $sub)
-            );
-          } else {
-            $order[$k] = array(
-              'type' => 'pool',
-              'n' => $pts[0],
-              'replace' => ($pts[1]==1),
-              'qids' => array_map('intval', array_slice($sub, 1))
-            );
-          }
-        } else {
-          $order[$k] = intval($v);
+      if ($settings['itemorder'] === '') {
+        $order = [];
+      } else {
+        $order = explode(',', $settings['itemorder']);
+        foreach ($order as $k=>$v) {
+            $sub = explode('~', $v);
+            if (count($sub)>1) {
+            $pts = explode('|', $sub[0]);
+            if (count($pts)==1) { //really old assessment format
+                $order[$k] = array(
+                'type' => 'pool',
+                'n' => 1,
+                'replace' => 0,
+                'qids' => array_map('intval', $sub)
+                );
+            } else {
+                $order[$k] = array(
+                'type' => 'pool',
+                'n' => $pts[0],
+                'replace' => ($pts[1]==1),
+                'qids' => array_map('intval', array_slice($sub, 1))
+                );
+            }
+            } else {
+            $order[$k] = intval($v);
+            }
         }
       }
       $settings['itemorder'] = $order;

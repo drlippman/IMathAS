@@ -584,7 +584,7 @@ class MathParser
         if ($unary) { //treat as logical not
           $token['symbol'] = 'not';
           $this->operatorStack[] = $token;
-          if ($this->tokens[$tokenindex+1]['symbol']=='*') {
+          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol']=='*') {
             //remove implicit multiplication
             unset($this->tokens[$tokenindex+1]);
           }

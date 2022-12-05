@@ -3062,6 +3062,8 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 }
 
 function forminlinebutton($label,$content,$style='button',$outstyle='block') {
+    if (!is_string($content)) { echo "invalid content in forminlinebutton"; return ''; }
+    if (!is_string($style)) { echo "invalid style in forminlinebutton"; return ''; }
 	$r = uniqid();
 	$label = str_replace('"','',$label);
 	$common = 'id="inlinebtn'.$r.'" aria-controls="inlinebtnc'.$r.'" aria-expanded="false" onClick="toggleinlinebtn(\'inlinebtnc'.$r.'\', \'inlinebtn'.$r.'\');return false;"';
@@ -3132,7 +3134,9 @@ function ineqtointerval($str, $var) {
 function intervaltoineq($str,$var) {
 	if ($str=='DNE') {
 		return 'DNE';
-	}
+	} else if (trim($str)=='') { 
+        return '';
+    }
 	$arr = explode('U',$str);
 	$out = array();
     $mightbeineq = '';
@@ -3141,6 +3145,10 @@ function intervaltoineq($str,$var) {
 		$sm = $v[0];
 		$em = $v[strlen($v)-1];
 		$pts = explode(',',substr($v,1,strlen($v)-2));
+        if (count($pts) !== 2) {
+            echo 'Invalid interval notation';
+            return '';
+        }
 		if ($pts[0]=='-oo') {
 			if ($pts[1]=='oo') {
 				$out[] = '"all real numbers"';
@@ -3850,6 +3858,7 @@ function numfuncGenerateTestpoints($variables,$domain='') {
         $flist = implode(",",$ofunc);
     }
 
+    $tps = [];
     for($j=0; $j < count($variables); $j++) {
         if ($fromto[2*$j+1]==$fromto[2*$j]) {
             for ($i = 0; $i < 20; $i++) {

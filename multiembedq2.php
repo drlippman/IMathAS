@@ -170,6 +170,9 @@ if (isset($_POST['toscoreqn'])) {
     $qns = array_keys($toscoreqn);
     if (count($qns)>1) {
         echo "Error - can only handle submitting one question at a time";
+    } else if (count($qns)==0) {
+        echo 'Error - nothing submitted';
+        exit;
     }
     $qn = $qns[0];
     $parts_to_score = array();
@@ -195,7 +198,7 @@ if (isset($_POST['toscoreqn'])) {
         'errors' => $res['errors'],
         'state' => JWT::encode($a2->getState(), $statesecret)
     );
-    $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
+    $out = array('jwt'=>JWT::encode($jwtcontents, ''));
 
     if ($state['showscoredonsubmit'] || !$res['allans']) {
         $disp = $a2->displayQuestion($qn);

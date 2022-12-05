@@ -563,6 +563,7 @@ function graphgetpathlength($g,$op,$seq) {
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
+    if ($len == 0) { return 0; }
 	$pathlen = 0;
     if (!isset($lblrev[$seq[0]])) { // invalid entry
         return -1;

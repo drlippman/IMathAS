@@ -1664,7 +1664,7 @@ class AssessRecord
       $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       if (!$by_question) {
         $regen = count($this->data['assess_versions']) - 1;
-      }
+      } 
     } else {
       $assessver = $this->data['assess_versions'][$ver];
       $regen = $ver;
@@ -1681,7 +1681,8 @@ class AssessRecord
       }
     } else if ($ver === 'scored') {
       // get scored version when by_question
-      $qver = $question_versions[$assessver['questions'][$qn]['scored_version']];
+      $regen = $assessver['questions'][$qn]['scored_version'];
+      $qver = $question_versions[$regen];
     } else {
       $qver = $question_versions[$ver];
       $regen = $ver;

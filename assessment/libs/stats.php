@@ -452,7 +452,7 @@ function freqdist($a,$label,$start,$cw) {
 		$x += $cw;
 		$out .= "$x`</td><td>";
 		$i = $curr;
-		while (($a[$i] < $x) && ($i < count($a))) {
+		while (($i < count($a) && ($a[$i] < $x))) {
 			$i++;
 		}
 		$out .= ($i-$curr) . "</td></tr>\n";

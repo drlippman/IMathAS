@@ -342,7 +342,6 @@
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						$qrows[$row['id']] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
@@ -435,7 +434,6 @@
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						echo "<td><img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}

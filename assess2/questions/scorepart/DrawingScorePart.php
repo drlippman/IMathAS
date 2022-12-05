@@ -636,15 +636,21 @@ class DrawingScorePart implements ScorePart
                         $ansexps[$key] = array($str, $base, $asy);
 
                     } else if (strpos($function[0],'/x')!==false || preg_match('|/\s*\([^\)]*x|', $function[0])) {
-                        $h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
-                        $k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
-                        $c = ($y1-$k)*($x1-$h) * $pixelspery/$pixelsperx; // adjust for scaling
+                        $denom = round(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2, 10);
+                        if ($denom == 0) {
+                            $y = (($x1*$y1-$x2*$y2))/($x1-$x2);
+                            $anslines[$key] = array('y',0,$y);
+                        } else {
+                            $h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/($denom);
+                            $k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
+                            $c = ($y1-$k)*($x1-$h) * $pixelspery/$pixelsperx; // adjust for scaling
 
-                        $hp = ($h - $settings[0])*$pixelsperx + $imgborder;
-                        $kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
-                        //eval at point on graph closest to (h,k), at h+sqrt(c)
-                        $np = $settings[7] - (@$func(['x'=>$h+sqrt(abs($c))])-$settings[2])*$pixelspery - $imgborder;
-                        $ansrats[$key] = array($hp,$kp,$np);
+                            $hp = ($h - $settings[0])*$pixelsperx + $imgborder;
+                            $kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
+                            //eval at point on graph closest to (h,k), at h+sqrt(c)
+                            $np = $settings[7] - (@$func(['x'=>$h+sqrt(abs($c))])-$settings[2])*$pixelspery - $imgborder;
+                            $ansrats[$key] = array($hp,$kp,$np);
+                        }
 
                     } else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
                         //colinear

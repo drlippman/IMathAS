@@ -43,7 +43,7 @@ $now = time();
 $preview_all = ($canViewAll && !empty($_POST['preview_all']));
 
 // load settings including question info
-$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all || $_POST['in_print'] == 1);
+$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all || !empty($_POST['in_print']));
 $assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
@@ -63,7 +63,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || $_POST['in_print'] == 1);
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || !empty($_POST['in_print']));
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -231,7 +231,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
     // for practice, if we don't have unsubmitted attempt, then
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
-  } else if (!($canViewAll && $_POST['in_print'] == 1)) { // only mark as started if student
+  } else if (!($canViewAll && !empty($_POST['in_print']))) { // only mark as started if student
     if ($assess_record->hasUnstartedAttempt()) {
       // has an assessment attempt they haven't started yet
       $assess_record->setStatus(true, true);
@@ -323,7 +323,7 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = ($assess_record->hasActiveAttempt() ||
-    ($canViewAll && $_POST['in_print'] == 1)  // for GB print view, fake an active attempt
+    ($canViewAll && !empty($_POST['in_print']))  // for GB print view, fake an active attempt
   );
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
@@ -366,7 +366,7 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
 
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
-$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || $_POST['in_print'] == 1);
+$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || !empty($_POST['in_print']));
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
 
 // if practice, add that
