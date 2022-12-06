@@ -218,6 +218,7 @@ class DrawingAnswerBox implements AnswerBox
             $out .= $plot;
         } else {
             if ($_SESSION['userprefs']['drawentry'] == 0) { //accessible entry
+                $def = 0;
                 $a11yinfo = implode(',', $answerformat);
                 if ($_SESSION['graphdisp'] == 0) {
                     $a11yinfo .= ',noprev';

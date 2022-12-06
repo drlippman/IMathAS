@@ -53,13 +53,13 @@ class MatchingScorePart implements ScorePart
         if ($noshuffle=="questions" || $noshuffle=='all') {
             $randqkeys = array_keys($questions);
         } else {
-            $randqkeys = $RND->array_rand($questions,count($questions));
+            $randqkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randqkeys);
         }
         if ($noshuffle=="answers" || $noshuffle=='all') {
             $randakeys = array_keys($answers);
         } else {
-            $randakeys = $RND->array_rand($answers,count($answers));
+            $randakeys = (array) $RND->array_rand($answers,count($answers));
             $RND->shuffle($randakeys);
         }
         if (!empty($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}

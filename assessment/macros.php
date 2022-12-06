@@ -222,7 +222,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		if ($function=='') { continue;}
         $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
-        if (empty($function[0])) { continue; }
+        if (!isset($function[0]) || $function[0]==='') { continue; }
 		//correct for parametric
 		$isparametric = false;
 		$isineq = false;
@@ -4967,7 +4967,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             for ($k=count($sw)-1;$k>=0;$k--) {
 				if ($type=='string' && preg_replace('/\s+/','',strtolower($tofind))==preg_replace('/\s+/','',strtolower($newans[$sw[$k][0]]))) {
 					$loc = $k; break;
-				} else if ($type=='number' && is_numeric($tofind) && abs($tofind - $newans[$sw[$k][0]])<0.01) {
+				} else if ($type=='number' && is_numeric($tofind) && is_numeric($newans[$sw[$k][0]]) && abs($tofind - $newans[$sw[$k][0]])<0.01) {
 					$loc = $k; break;
 				} else if ($type=='calculated' && is_numeric($tofind) && abs($tofind - $newansval[$sw[$k][0]])<0.01) {
                     $loc = $k; break;
@@ -5027,6 +5027,7 @@ function lensort($a,$b) {
 }
 
 function parsereqsigfigs($reqsigfigs) {
+    $origstr = $reqsigfigs;
     $reqsigfigs = str_replace('+/-','+-',$reqsigfigs);
 	$reqsigfigoffset = 0;
 	$reqsigfigparts = explode('+-',$reqsigfigs);
@@ -5034,9 +5035,9 @@ function parsereqsigfigs($reqsigfigs) {
 	$sigfigscoretype = array('abs',0,'def');
 	if (count($reqsigfigparts)>1) {
 		if (substr($reqsigfigparts[1], -1)=='%') {
-			$sigfigscoretype = array('rel', substr($reqsigfigparts[1], 0, -1));
+			$sigfigscoretype = array('rel', floatval(substr($reqsigfigparts[1], 0, -1)));
 		} else {
-			$sigfigscoretype = array('abs',$reqsigfigparts[1]);
+			$sigfigscoretype = array('abs', floatval($reqsigfigparts[1]));
 		}
 	}
 	if ($reqsigfigs[0]=='=') {
@@ -5050,7 +5051,10 @@ function parsereqsigfigs($reqsigfigs) {
 	} else {
 		$exactsigfig = false;
 	}
-	return array($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype);
+    if (!is_numeric($reqsigfigs)) {
+        echo "Invalid reqsigfigs/reqdecimals string $origstr";
+    }
+	return array(intval($reqsigfigs), $exactsigfig, $reqsigfigoffset, $sigfigscoretype);
 }
 
 function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) {

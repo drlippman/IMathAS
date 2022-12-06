@@ -800,6 +800,10 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 //labels: array of labels for each pie piece
 //uses Google Charts API
 function piechart($pcts,$labels,$w=250,$h=130) {
+    if (!is_array($pcts) || !is_array($labels) || count($pcts) != count($labels)) {
+        echo "piechart: percents and labels must be arrays with same number of elements";
+        return '';
+    }
 	if ($_SESSION['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
 		$out .= '<tr><th>'._('Label').'</th>';

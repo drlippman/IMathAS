@@ -50,6 +50,7 @@ function formpoly($coef,$deg) {
 //multiplicites (optional): an array of multiplicites of the roots.  Assumed to
 //  be all 1 if not provided
 function formpolyfromroots($a,$roots,$mult=1) {
+    if (count($roots)==0) { return [[$a,0]]; }
 	for($i=0; $i<count($roots); $i++) {
         if (is_array($roots[$i])) { // complex a+bi as [a,b]
             $newpoly = formpoly(array(1,-2*$roots[$i][0],($roots[$i][0])**2 + ($roots[$i][1])**2),2);

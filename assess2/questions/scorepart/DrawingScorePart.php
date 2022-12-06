@@ -1755,13 +1755,14 @@ class DrawingScorePart implements ScorePart
                 }
                 //remove duplicate odots, and dots below odots
                 for ($k=count($odots)-1;$k>=0;$k--) {
-                    for ($j=0;$j<count($dots);$j++) {
-                        if (abs($odots[$k][0]-$dots[$j][0])<$defpttol && abs($odots[$k][1]==$dots[$j][1])<$defpttol) {
+                    foreach ($dots as $j=>$thisdot) {
+                        if (abs($odots[$k][0]-$thisdot[0])<$defpttol && abs($odots[$k][1]==$thisdot[1])<$defpttol) {
                             unset($dots[$j]);
                             break;
                         }
                     }
                     for ($j=0;$j<$k;$j++) {
+                        if (!isset($odots[$j])) { continue; }
                         if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]==$odots[$j][1])<$defpttol) {
                             unset($odots[$k]);
                             continue 2;
@@ -1779,8 +1780,8 @@ class DrawingScorePart implements ScorePart
 
             foreach ($ansdots as $key=>$ansdot) {
                 $scores[$key] = 0;
-                for ($i=0; $i<count($dots); $i++) {
-                    if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
+                foreach ($dots as $i=>$gdot) {
+                    if (($gdot[0]-$ansdot[0])*($gdot[0]-$ansdot[0]) + ($gdot[1]-$ansdot[1])*($gdot[1]-$ansdot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
                         $scores[$key] = 1-$extradots;
                         break;
                     }
@@ -1788,8 +1789,8 @@ class DrawingScorePart implements ScorePart
             }
             foreach ($ansodots as $key=>$ansodot) {
                 $scores[$key] = 0;
-                for ($i=0; $i<count($odots); $i++) {
-                    if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
+                foreach ($odots as $i=>$godot) {
+                    if (($godot[0]-$ansodot[0])*($godot[0]-$ansodot[0]) + ($godot[1]-$ansodot[1])*($godot[1]-$ansodot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
                         $scores[$key] = 1-$extradots;
                         break;
                     }
