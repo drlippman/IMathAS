@@ -90,7 +90,7 @@ function flattenitems($items,&$addto,&$itemidsection,$sec='') {
                     $ishidden = true;
                 }
             } 
-			if (!$ishidden) {
+			if (!$ishidden && !empty($item['items'])) {
 				flattenitems($item['items'], $addto, $itemidsection, $thissec);
 			}
 		} else {

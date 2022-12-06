@@ -932,7 +932,9 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
                 (!empty($item['grouplimit']) && isset($studentinfo['section']) &&
                     substr($item['grouplimit'][0],2) != $studentinfo['section'])
             );
-			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
+            if (!empty($item['items'])) {
+			    flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
+            }
 		} else {
 			$addto[] = $item;
 			$folderholder[$item] = $folder;

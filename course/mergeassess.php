@@ -202,7 +202,9 @@ if (isset($_POST['mergefrom'])) {
 		global $itemsimporder;
 		foreach ($items as $item) {
 			if (is_array($item)) {
-				flattenitems($item['items'],$addto);
+                if (!empty($item['items'])) {
+				    flattenitems($item['items'],$addto);
+                }
 			} else {
 				$addto[] = $item;
 			}

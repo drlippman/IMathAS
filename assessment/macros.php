@@ -3021,6 +3021,7 @@ function formhoverover($label,$tip) {
 function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='') {
 	global $urlmode;
 	$labelSanitized = Sanitize::encodeStringForDisplay($label);
+    if (!is_string($content)) { echo "invalid content in formpopup"; return ''; }
 	if ($scroll != null) {
 		$scroll = ','.$scroll;
 	}
@@ -4825,6 +4826,9 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	if (!is_array($words)) {
 		$words = listtoarray($words);
 	}
+    if ($answer === null || $stu === null) {
+        return [$answer, $showanswer];
+    }
 	/*
 	foreach ($words as $w) {
 		if (!isset($wc[$w])) {

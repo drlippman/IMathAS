@@ -274,7 +274,9 @@ function flattenitems($items,&$addto,$viewall, $studentinfo) {
 			}
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 				($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
-				flattenitems($item['items'],$addto,$viewall, $studentinfo);
+                if (!empty($item['items'])) {
+				    flattenitems($item['items'],$addto,$viewall, $studentinfo);
+                }
 			}
 		} else {
 			$addto[] = $item;

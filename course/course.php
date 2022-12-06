@@ -20,7 +20,9 @@ function buildBlockLeftNav($items, $parent, &$blocklist) {
 					$blocklist[] = array($item['name'], $parent.'-'.($k+1), $item['SH'][1]);
 				}
 			}
-			buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            if (!empty($item['items'])) {
+			    buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            }
 		}
 	}
 }

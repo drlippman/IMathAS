@@ -898,7 +898,9 @@ if ($stm->rowCount()==0) {
 				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
 				$stm->execute(array(':aidsourcecid'=>$aidsourcecid));
 				list($aidsourcejsondata,$sourceUIver) = $stm->fetch(PDO::FETCH_NUM);
-				$aidsourcejsondata = json_decode($aidsourcejsondata, true);
+                if ($aidsourcejsondata!==null) {
+				    $aidsourcejsondata = json_decode($aidsourcejsondata, true);
+                }
 				$blockLTICopyOfCopies = ($aidsourcejsondata!==null && !empty($aidsourcejsondata['blockLTICopyOfCopies']));
 
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {

@@ -294,6 +294,7 @@ function upsendexceptions(&$items) {
 	   $maxedate = 0;
 	   foreach ($items as $k=>$item) {
 		   if (is_array($item)) {
+              if (empty($item['items'])) { continue; }
 			  $hasexc = upsendexceptions($items[$k]['items']);
 			  if ($hasexc!=FALSE) {
 				  if ($hasexc[0]<$items[$k]['startdate']) {

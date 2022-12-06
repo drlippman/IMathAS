@@ -144,6 +144,7 @@ class NumberAnswerBox implements AnswerBox
         foreach ($ansarr as $i=>$anans) {
             $ansors = explode(' or ', $anans);
             foreach ($ansors as $k=>$ans) {
+                if (!is_numeric($ans)) { continue; } // skip interval $answers and such
                 if ($reqdecimals !== '' && $exactreqdec) {
                     $ansors[$k] = prettyreal($ans, $reqdecimals);
                 } else if ($reqsigfigs !== '') {
