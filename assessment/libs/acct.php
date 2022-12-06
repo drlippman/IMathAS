@@ -509,8 +509,8 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
         $dateset = false;
         if (isset($jd['debits'])) {
             for ($i=0;$i<count($jd['debits']);$i+=$colinc) {
-                $out .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').$jd['date'].($dateset?'</span>':'').'</th>';
-                $sa .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').$jd['date'].($dateset?'</span>':'').'</th>';
+                $out .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').($jd['date'] ?? '').($dateset?'</span>':'').'</th>';
+                $sa .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').($jd['date'] ?? '').($dateset?'</span>':'').'</th>';
                 $dateset = true;
                 $out .= '<td>[AB'.$sn.']</td><td>[AB'.($sn+1).']</td><td>[AB'.($sn+2).']</td>';
                 if ($usePostRefs) {
@@ -542,8 +542,8 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
         }
         if (isset($jd['credits'])) {
             for ($i=0;$i<count($jd['credits']);$i+=$colinc) {
-                $out .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').$jd['date'].($dateset?'</span>':'').'</th>';
-                $sa .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').$jd['date'].($dateset?'</span>':'').'</th>';
+                $out .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').($jd['date'] ?? '').($dateset?'</span>':'').'</th>';
+                $sa .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').($jd['date'] ?? '').($dateset?'</span>':'').'</th>';
                 $dateset = true;
 
                 $out .= '<td>[AB'.$sn.']</td><td>[AB'.($sn+1).']</td><td>[AB'.($sn+2).']</td>';
@@ -570,7 +570,7 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
         }
 		if (isset($jd['extrarows'])) {
 			for ($i=0;$i<$jd['extrarows'];$i++) {
-				$out .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').$jd['date'].($dateset?'</span>':'').'</th>';
+				$out .= '<tr><th scope=row>'.($dateset?'<span class="sr-only">':'').($jd['date'] ?? '').($dateset?'</span>':'').'</th>';
 			    $dateset = true;
 
 				$out .= '<td>[AB'.$sn.']</td><td>[AB'.($sn+1).']</td><td>[AB'.($sn+2).']</td>';
@@ -588,11 +588,11 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 			}
 		}
 		if (isset($jd['note'])) {
-			$out .= '<tr><th scope=row><span class="sr-only">'.$jd['date'].'</span></th><td colspan="'.($colspan-1).'">'.$jd['note'].'</td></tr>';
-			$sa .= '<tr><th scope=row><span class="sr-only">'.$jd['date'].'</span></th><td colspan="'.($colspan-1).'">'.$jd['note'].'</td></tr>';
+			$out .= '<tr><th scope=row><span class="sr-only">'.($jd['date'] ?? '').'</span></th><td colspan="'.($colspan-1).'">'.$jd['note'].'</td></tr>';
+			$sa .= '<tr><th scope=row><span class="sr-only">'.($jd['date'] ?? '').'</span></th><td colspan="'.($colspan-1).'">'.$jd['note'].'</td></tr>';
 		}
 		if (isset($jd['explanation'])) {
-			$sa .= '<tr><th scope=row><span class="sr-only">'.$jd['date'].'</span></th><td colspan="'.($colspan-1).'">'.$jd['explanation'].'</td></tr>';
+			$sa .= '<tr><th scope=row><span class="sr-only">'.($jd['date'] ?? '').'</span></th><td colspan="'.($colspan-1).'">'.$jd['explanation'].'</td></tr>';
 		}
 	}
 	$out .= '</tbody></table>';
@@ -1417,7 +1417,9 @@ function makeledgerfromjournal($j, $start, $order, $types, $sn, &$anstypes, &$an
 	$hasdecimals = false;
 	$maxsizeentry = 1;
 	foreach ($j as $jd) {
-		$dates[] = $jd['date'];
+        if (isset($jd['date'])) {
+		    $dates[] = $jd['date'];
+        }
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
 			if ($jd['debits'][$i+1]=='') {continue;}
 			if (!isset($acts[$jd['debits'][$i]])) { $acts[$jd['debits'][$i]] = array();}

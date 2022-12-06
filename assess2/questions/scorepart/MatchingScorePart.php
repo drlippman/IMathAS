@@ -82,7 +82,7 @@ class MatchingScorePart implements ScorePart
               $score -= $deduct;
             }
           } else {
-            if ($_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
+            if (isset($_POST["qn$qn-$i"]) && $_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
                 if (!empty($matchlist)) {

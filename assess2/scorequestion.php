@@ -375,7 +375,7 @@ if ($end_attempt) {
   foreach ($qns as $qn) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
   }
-  if (count($scoreErrors)>0) {
+  if (!empty($scoreErrors)) {
     $assessInfoOut['scoreerrors'] = $scoreErrors;
   }
 }

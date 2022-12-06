@@ -815,6 +815,8 @@ class AssessRecord
               $val[$k] = $_SESSION['choicemap'][$this->curAid][$thisref][$v];
             }
             $val = implode('|', $val);
+          } else if (!isset($_SESSION['choicemap'][$this->curAid][$thisref][$val])) {
+            continue;
           } else {
             $val = $_SESSION['choicemap'][$this->curAid][$thisref][$val];
           }

@@ -1893,7 +1893,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	//$out .= "JXG.Options.text.useMathJax = true;";
    
 	// Create the board
-	$defaultAxis = $ops['ticksdistance'] ? "false" : "true";
+	$defaultAxis = !empty($ops['ticksdistance']) ? "false" : "true";
 	$out .= "
 		window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
 			boundingbox: [-{$rMaxBoard}, {$yMax}, {$rMaxBoard}, -{$rMaxBoard}],
