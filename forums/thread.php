@@ -310,7 +310,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		$query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid=? ";
 		$array[] = $cid;
 	} else {
-		$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
+		$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,1,imas_forum_posts.isanon ";
 		$query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid=? AND imas_users.id=imas_forum_posts.userid ";
 		$array = array($forumid);
 	}

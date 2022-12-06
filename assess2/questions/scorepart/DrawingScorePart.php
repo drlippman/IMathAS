@@ -233,7 +233,11 @@ class DrawingScorePart implements ScorePart
                 $vals = (count($matchstu))/max(count($line),count($ansdots));
             }
 
-            $adjv = $correctadj/$totaladj;
+            if ($totaladj > 0) {
+                $adjv = $correctadj/$totaladj;
+            } else {
+                $adjv = 0;
+            }
 
             $totscore = ($vals+$adjv)/2;
             if ($extrapolys>0) {
@@ -2045,7 +2049,10 @@ class DrawingScorePart implements ScorePart
         }
         $totscore = 0;
         foreach ($scores as $key=>$score) {
-            $totscore += $score*$partweights[$key];
+            if (!isset($partweights[$key])) {
+                echo "Missing \$partweights for key $key. ";
+            }
+            $totscore += $score*($partweights[$key] ?? 0);
         }
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);

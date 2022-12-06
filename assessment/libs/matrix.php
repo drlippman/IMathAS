@@ -606,6 +606,7 @@ function matrixprod($m,$n) {
 	}
 	$o = array();
 	$o = array();
+
 	for ($i=0;$i<count($m); $i++) {
 		for ($j=0;$j<count($n[0]); $j++) {
 			$v = 0;
@@ -1427,7 +1428,16 @@ function matrixParseStuans($stu) {
 }
 
 function isMatrix($m) {
-	if (is_array($m) && is_array($m[0])) {
+	if (isset($m) && is_array($m) && isset($m[0]) && is_array($m[0])) {
+        $rcnt = count($m);
+        $ccnt = count($m[0]);
+        if ($rcnt == 0 || $ccnt == 0) { return false; }
+        for ($r=0;$r<$rcnt;$r++) {
+            if (!isset($m[$r]) || !is_array($m[$r]) || count($m[$r]) != $ccnt) { return false;}
+            for ($c=0;$c<$ccnt;$c++) {
+                if (!isset($m[$r][$c]) || $m[$r][$c] === '' || $m[$r][$c] === null) { return false;}
+            }
+        }
 		return true;
 	} else {
 		return false;

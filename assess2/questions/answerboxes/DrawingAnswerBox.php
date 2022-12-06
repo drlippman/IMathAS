@@ -265,6 +265,7 @@ class DrawingAnswerBox implements AnswerBox
                 //}
                 $out .= _('Draw:') . " ";
                 if ($answerformat[0] == 'inequality') {
+                    $def = 10;
                     if (in_array('both', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
                         $out .= "<img src=\"$staticroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
@@ -295,6 +296,7 @@ class DrawingAnswerBox implements AnswerBox
                     }
 
                 } else if ($answerformat[0] == 'twopoint') {
+                    $def = 5;
                     if (count($answerformat) == 1 || in_array('line', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpline.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5\" ";
                         if (count($answerformat) == 1 || $answerformat[1] == 'line') {$out .= 'class="sel" ';
@@ -435,6 +437,7 @@ class DrawingAnswerBox implements AnswerBox
                         $out .= ' alt="Open dot"/>';
                     }
                 } else if ($answerformat[0] == 'numberline') {
+                    $def = 0.5;
                     if (in_array('lineseg', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/numlines.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"0.5\" ";
                         if (count($answerformat) == 1 || $answerformat[1] == 'lineseg') {$out .= 'class="sel" ';
@@ -496,6 +499,8 @@ class DrawingAnswerBox implements AnswerBox
                     } else if ($answerformat[0] == 'opendot') {
                         $def = 2;
                     } else if ($answerformat[0] == 'polygon') {
+                        $def = 0;
+                    } else {
                         $def = 0;
                     }
                 }

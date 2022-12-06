@@ -136,10 +136,14 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['aid'])) {
 		$aid = Sanitize::onlyInt($_POST['aid']);
-		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+		$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 		$stm->execute(array($aid));
-		$destcid = $stm->fetchColumn(0);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+		list($destcid,$aver) = $stm->fetch(PDO::FETCH_NUM);
+        if ($aver > 1) {
+		    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment2.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+        } else {
+		    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+        }
 	} else if (!empty($_POST['pqid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion2.php?qsetid=".Sanitize::onlyInt($_POST['pqid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['eqid'])) {

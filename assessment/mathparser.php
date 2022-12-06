@@ -1231,7 +1231,7 @@ class MathParser
         // add node to collection.
         $node['left'] = $this->normalizeNode($node['left']);
         // build string for comparison
-        $node['left']['string'] = $this->toString($node['left']);
+        $node['left']['string'] = (string) $this->toString($node['left']);
         $collection[] = $node['left'];
       }
       if ($node['right']['symbol'] == $sym1 || $node['right']['symbol'] == $sym2) {
@@ -1240,7 +1240,7 @@ class MathParser
       } else {
         // add node to collection
         $node['right']= $this->normalizeNode($node['right']);
-        $node['right']['string'] = $this->toString($node['right']);
+        $node['right']['string'] = (string) $this->toString($node['right']);
         $collection[] = $node['right'];
       }
     }

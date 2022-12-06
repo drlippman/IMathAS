@@ -1176,7 +1176,7 @@ class QuestionHtmlGenerator
             foreach ($shanspt as $k=>$v) {
                 if ($v === null) {continue;}
                 $shanspt[$k] = $this->fixDegrees($v, 
-                    is_array($procanstypes) ? $procanstypes[$k] : $procanstypes);
+                    is_array($procanstypes) ? ($procanstypes[$k] ?? '') : $procanstypes);
             }
         }
         

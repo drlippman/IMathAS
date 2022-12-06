@@ -2072,7 +2072,7 @@ function roundsigfig($val, $sigfig) {
 }
 
 function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=false,$sigfigbar=false) {
-	if (!is_array($aarr)) {
+    if (!is_array($aarr)) {
 		$arrayout = false;
 		$aarr = array($aarr);
 	} else {
@@ -2223,12 +2223,12 @@ function subarray($a) {
 	}
 	if (count($args)<1) {return array();}
 	$out = array();
-	for ($i=0;$i<count($args);$i++) {
-		if (strpos($args[$i],':')!==false) {
-			$p = explode(':',$args[$i]);
+    foreach ($args as $k=>$v) {
+		if (strpos($v,':')!==false) {
+			$p = explode(':',$v);
 			array_splice($out,count($out),0,array_slice($a,$p[0],$p[1]-$p[0]+1));
 		} else {
-			$out[] = $a[$args[$i]] ?? '';
+			$out[] = $a[$v] ?? '';
 		}
 	}
 	return $out;
@@ -5027,6 +5027,7 @@ function lensort($a,$b) {
 }
 
 function parsereqsigfigs($reqsigfigs) {
+    $reqsigfigs = str_replace('+/-','+-',$reqsigfigs);
 	$reqsigfigoffset = 0;
 	$reqsigfigparts = explode('+-',$reqsigfigs);
 	$reqsigfigs = $reqsigfigparts[0];

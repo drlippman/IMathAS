@@ -79,7 +79,10 @@ function ineqbetweenplot($funcs) {
 	$shadedir = array();
 	foreach ($funcs as $k=>$function) {
 		$function = explode(",",$function);
-		$filltype = $function[1];
+        if (!isset($function[1])) { 
+            echo "Missing filltype in ineqbetweenplot";
+        }
+		$filltype = $function[1] ?? '';
 		$shadedir[$k] = $filltype;
 		if (!isset($function[2])) {$function[2] = '';}
 		if (!isset($function[4])) {$function[4] = 1;}

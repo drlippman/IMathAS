@@ -72,7 +72,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
         $cid = Sanitize::courseId($_GET['cid']);
-        $block = $_GET['block'];
+        $block = $_GET['block'] ?? '';
 
         if (isset($_GET['id'])) {
             $assessmentId = Sanitize::onlyInt($_GET['id']);
