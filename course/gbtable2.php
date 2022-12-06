@@ -2065,7 +2065,7 @@ function gbtable() {
 						unset($catpossstuec[$k][$category[$i]][$col]);
 					}
 				}
-				if ($gb[0][1][$col][3]==1) { //need extra unset for attempted if was cur
+				if ($gb[0][1][$col][3]==1 && $availstu[$ln][$aid]>1) { //need extra unset for attempted if was cur
 					if ($gb[0][1][$col][4]==1) {
 						unset($catpossstu[3][$category[$i]][$col]);
 					} else if ($gb[0][1][$col][4]==2) {
@@ -2093,6 +2093,7 @@ function gbtable() {
 				}
 			}
 		}
+
 		foreach($gradeidx as $aid=>$i) {
 			$col = $gradecol[$aid];
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
