@@ -329,7 +329,7 @@
                   :class = "{'inactive':!showQuestion[qn]}"
                   :qdata = "qdata[curQver[qn]]"
                   :qn = "qn"
-                  :disabled = "!canedit"
+                  :disabled = "!canEdit"
                 />
                 <gb-showwork
                   :work = "qdata[curQver[qn]].work"
