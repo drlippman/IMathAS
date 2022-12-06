@@ -867,6 +867,10 @@ function connectthedots($xarray,$yarray,$color='black',$thick=1,$startdot='',$en
 }
 
 function showasciisvg($script, $width=200, $height=200, $alt="") {
+    if (is_array($width)) {
+        echo "second argument to showasciisvg should be an integer, not an array";
+        $width = 200; $height = 200; $alt = '';
+    }
     $script = preg_replace('~//.*?$~m','', $script); //remove comments
     $script = preg_replace('~/\*.*?\*/~s', '', $script);
     $script = str_replace(["\r\n","\r"], "\n", $script); // normalize line endings
@@ -927,7 +931,7 @@ function showarrays() {
             if (isset($opts['tablealign'])) {
 				$tablealign = $opts['tablealign'];
 			}
-		} else {
+		} else if (is_string($alist[count($alist)-1])) {
 			$format = $alist[count($alist)-1];
 		}
 	}
@@ -3022,6 +3026,8 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 	global $urlmode;
 	$labelSanitized = Sanitize::encodeStringForDisplay($label);
     if (!is_string($content)) { echo "invalid content in formpopup"; return ''; }
+    if (!is_string($label)) { echo "invalid label in formpopup"; return ''; }
+
 	if ($scroll != null) {
 		$scroll = ','.$scroll;
 	}
@@ -3065,6 +3071,8 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 function forminlinebutton($label,$content,$style='button',$outstyle='block') {
     if (!is_string($content)) { echo "invalid content in forminlinebutton"; return ''; }
     if (!is_string($style)) { echo "invalid style in forminlinebutton"; return ''; }
+    if (!is_string($label)) { echo "invalid label in forminlinebutton"; return ''; }
+
 	$r = uniqid();
 	$label = str_replace('"','',$label);
 	$common = 'id="inlinebtn'.$r.'" aria-controls="inlinebtnc'.$r.'" aria-expanded="false" onClick="toggleinlinebtn(\'inlinebtnc'.$r.'\', \'inlinebtn'.$r.'\');return false;"';

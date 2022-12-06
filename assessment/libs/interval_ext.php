@@ -829,8 +829,9 @@ function calculateIntersectionSet($values) {
                 }
             }
         } // foreach value
-
-        $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
+        if (!empty($z1)) {
+            $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
+        }
 
     } // for values
 

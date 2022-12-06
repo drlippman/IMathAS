@@ -796,7 +796,7 @@ echo "</p>";
 					echo '<td class="c">';
 				}
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']]).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
-				if ($lastpost=='' || !isset($lastview[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
+				if ($lastpost=='' || !isset($lastview[$line['id']]) || !isset($maxdate[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
 					echo " <span class=\"noticetext\">New</span>";
 				}
 				echo "</td></tr>\n";

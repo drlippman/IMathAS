@@ -1216,6 +1216,7 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 	$out = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><caption>'.$title.'</caption><thead><tr><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Debit</span></th><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Credit</span></th></tr></thead><tbody>';
 	$sa = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><caption>'.$title.'</caption><thead><tr><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Debit</span></th><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Credit</span></th></tr></thead><tbody>';
 	$maxsize = 0;
+    $hasdecimals = false;
 	for ($i=0;$i<count($leftentries);$i+=2) {
 		if (strlen($leftentries[$i])>$maxsize) {
 			$maxsize = strlen($leftentries[$i]);

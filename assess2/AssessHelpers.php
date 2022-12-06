@@ -50,6 +50,9 @@ class AssessHelpers
   		$assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            if (!isset($timelimitmults[$row['userid']])) {
+                continue; // skip instructor records or other lingering ones
+            }
             $assess_info->setException(
                 $row['userid'],
                 isset($exceptions[$row['userid']]) ? $exceptions[$row['userid']] : false,

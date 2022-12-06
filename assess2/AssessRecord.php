@@ -2412,16 +2412,16 @@ class AssessRecord
           if (isset($curQver['scoreoverride']) && !is_array($curQver['scoreoverride'])) {
             // calc part scores to set $scoreTry
             list($qScore, $qRawscore, $parts, $scoredTry) =
-              $this->getQuestionPartScores($qn, max($av,$qv), 'all');
+              $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all');
             // override score total
             $qScore = $curQver['scoreoverride'] * $points[$curQver['qid']];
             $qRawscore = $curQver['scoreoverride'];
           } else if (isset($curQver['scoreoverride']) && is_array($curQver['scoreoverride'])) {
             list($qScore, $qRawscore, $parts, $scoredTry) =
-              $this->getQuestionPartScores($qn, max($av,$qv), 'all', $curQver['scoreoverride']);
+              $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all', $curQver['scoreoverride']);
           } else {
             list($qScore, $qRawscore, $parts, $scoredTry) =
-              $this->getQuestionPartScores($qn, max($av,$qv), 'all');
+              $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all');
           }
 
           $totalQtime += $this->calcTimeActive($curQver)['total'];

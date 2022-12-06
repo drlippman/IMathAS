@@ -743,7 +743,7 @@ class MathParser
           $node['symbol'] = 'log';
           $node['index'] = $operand;
           $this->operatorStack[] = $node;
-          if ($this->tokens[$tokenindex+1]['symbol'] == '*') {
+          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol'] == '*') {
             unset($this->tokens[$tokenindex+1]); // remove implicit mult
           };
           return;

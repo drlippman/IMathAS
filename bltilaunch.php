@@ -1479,7 +1479,7 @@ if ($linkparts[0]=='cid') {
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
-		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
+		} else if ($line['date_by_lti']==3 && isset($_SESSION['lti_duedate']) && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
 			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
 			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);

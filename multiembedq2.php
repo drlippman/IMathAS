@@ -37,6 +37,8 @@ if (empty($QS['id'])) {
 if (!is_array($QS['id'])) {
     $QS['id'] = explode('-', $QS['id']);
 }
+$QS['id'] = array_map('trim', $QS['id']);
+
 // set user preferences
 $prefdefaults = array(
     'mathdisp' => 6, //default is katex
