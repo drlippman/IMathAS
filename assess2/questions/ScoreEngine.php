@@ -662,12 +662,13 @@ class ScoreEngine
 
             try {
               $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+              $scorePartResult = $scorePart->getResult();
             } catch (\Throwable $t) {
               $this->addError(
                   _('Caught error while evaluating the code in this question: ')
                   . $t->getMessage());
             }
-            $scorePartResult = $scorePart->getResult();
+            
             $raw[$partnum] = $scorePartResult->getRawScore();
 
             if ($scoremethodwhole == 'acct') {

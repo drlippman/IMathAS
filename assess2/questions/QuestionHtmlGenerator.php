@@ -464,14 +464,13 @@ class QuestionHtmlGenerator
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                  $answerBoxGenerator->generate();
                 } catch (\Throwable $t) {
                   $this->addError(
                        _('Caught error while generating this question: ')
                        . $t->getMessage());
                   continue;
                 }
-
-                $answerBoxGenerator->generate();
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
