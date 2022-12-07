@@ -144,6 +144,7 @@ function interpretline($str,$anstype,$countcnt) {
 				$k++;
 				continue;
 			}
+    
 			//check for for, if, where and rearrange bits if needed
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
@@ -293,12 +294,12 @@ function interpretline($str,$anstype,$countcnt) {
 			$closeparens++;
 		}
 
-
 		$lastsym = $sym;
 		$lasttype = $type;
 		$cnt++;
 		$k++;
 	}
+    
 	//if no explicit end-of-line at end of bits
 	if (count($bits)>0) {
 		$lines[] = implode('',$bits);
@@ -385,7 +386,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word, and set type appropriately if it is
-			if ($out=='if' || $out=='where' || $out=='for') {
+			if ($out=='if' || $out=='where' || $out=='for' || $out=='break' || $out=='continue') {
 				$intype = 8;
 			} else if ($out=='else' || $out=='elseif') {
 				$intype = 8;
