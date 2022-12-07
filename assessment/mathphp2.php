@@ -593,8 +593,8 @@ function my_create_function($args, $code) {
 			echo '<p>Caught error in evaluating a function in this question: ';
 			echo Sanitize::encodeStringForDisplay($t->getMessage());
 			echo '</p>';
-			return function(){};
 		}
+        return function(){};
 	}
 
 	if ($res===false) {
@@ -602,15 +602,15 @@ function my_create_function($args, $code) {
 			$error = error_get_last();
 			echo '<p>Caught error in evaluating a function in this question: ',Sanitize::encodeStringForDisplay($error['message']);
 			echo '</p>';
-			return function(){};
 		}
+        return function(){};
 	} else {
 		$error = error_get_last();
 		if ($error && $error!=$preevalerror && $error['type']==E_ERROR && $myrights>10) {
 			echo '<p>Caught error in evaluating a function in this question: ',Sanitize::encodeStringForDisplay($error['message']);
 			echo '</p>';
-			return function(){};
 		}
+        return function(){};
 	}
 	return $res;
 }

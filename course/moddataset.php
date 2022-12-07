@@ -62,10 +62,10 @@
 		return Sanitize::simpleString($vidid);
  	}
 
- 	$cid = Sanitize::courseId($_GET['cid']);
+ 	$cid = Sanitize::courseId($_GET['cid'] ?? '0');
 	$isadmin = false;
 	$isgrpadmin = false;
-	if ($_GET['cid']=='admin') {
+	if ($cid==='admin') {
 		if ($myrights==100) {
 			$isadmin = true;
 		} else if ($myrights==75) {
@@ -989,7 +989,7 @@
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">"._("Add Drill Assessment")."</a> &gt; "._("Modify Questions")."</div>";
 	} else {
-		if ($_GET['cid']=="admin") {
+		if ($cid==="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a> ";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
 		} else {

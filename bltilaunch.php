@@ -2427,8 +2427,8 @@ if (isset($_GET['launch'])) {
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
-			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'];
-			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
+			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'] ?? '';
+			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'] ?? '';
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
 			}

@@ -264,6 +264,7 @@ function flattenitems($items,&$addto,$viewall, $studentinfo) {
 	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
+            if (empty($item['items'])) { continue; } // skip empty blocks
 			if (!isset($item['avail'])) { //backwards compat
 				$item['avail'] = 1;
 			}

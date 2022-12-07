@@ -3027,7 +3027,7 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 	$labelSanitized = Sanitize::encodeStringForDisplay($label);
     if (!is_string($content)) { echo "invalid content in formpopup"; return ''; }
     if (!is_string($label)) { echo "invalid label in formpopup"; return ''; }
-    if (is_array($width)) { echo "width should not be array in formpopup"; $wdith = 600; }
+    if (is_array($width)) { echo "width should not be array in formpopup"; $width = 600; }
 
 	if ($scroll != null) {
 		$scroll = ','.$scroll;
@@ -4850,7 +4850,9 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	*/
 	if ($part === null) {
 		$ans = $answer;
-	} else {
+	} else if (!isset($answer[$part])) {
+        return [$answer, $showanswer];
+    } else {
 		$ans = $answer[$part];
 	}
 	if ($highlight) {

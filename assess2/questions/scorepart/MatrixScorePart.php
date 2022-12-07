@@ -101,7 +101,7 @@ class MatrixScorePart implements ScorePart
         $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
         $answerlist = explode(',',$ansr);
 
-        if (count($answerlist) != count($givenanslist)) {
+        if (count($answerlist) != count($givenanslist) || $answerlist[0]==='' || $givenanslist[0]==='') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }

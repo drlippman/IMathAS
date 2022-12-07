@@ -36,6 +36,8 @@ $body = "";
 $pagetitle = "";
 $placeinhead = "";
 $hasInclude = 0;
+$istutor = isset($tutorid);
+$isteacher = isset($teacherid);
 if (!isset($CFG['GEN']['allowinstraddstus'])) {
 	$CFG['GEN']['allowinstraddstus'] = true;
 }

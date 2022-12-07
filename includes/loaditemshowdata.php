@@ -19,6 +19,10 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 	 $now = time();
 	 foreach ($items as $item) {
 		 if (is_array($item)) { //only add content from open blocks
+            if (empty($item['items'])) { continue; } // skip empty blocks
+            if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+			}
 			 $turnonpublic = false;
 			 if ($ispublic && !$inpublic) {
 			 	 if (isset($item['public']) && $item['public']==1) {
