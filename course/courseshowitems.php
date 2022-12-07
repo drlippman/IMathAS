@@ -234,6 +234,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   if ($canedit) {echo generateadditem($parent,'t');}
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
+            if (!isset($items[$i]['items'])) {
+                continue; // invalid block - no items
+            }
 			   $turnonpublic = false;
 			   if ($ispublic && !$inpublic) {
 				   if (isset($items[$i]['public']) && $items[$i]['public']==1) {

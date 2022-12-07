@@ -1548,8 +1548,8 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	$answers = array();
 	$showanswer = null;
 	list($r,$m,$b) = linreg($xarr,$yarr);
-	if ($line!='') {
-		$lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3],$grid[6],$grid[7]);
+    $lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3],$grid[6],$grid[7]);
+	if (isset($lines[0])) {
 		if ($lines[0][0]==$lines[0][2]) {
 			$stum = 100000;
 		} else {

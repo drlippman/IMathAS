@@ -465,7 +465,8 @@ class Sanitize
 				return '';
 			}
 			$displayname = str_replace(array('\\','"'),'',trim($match[1]));
-			$displayname = filter_var($displayname, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_NO_ENCODE_QUOTES);
+			//$displayname = filter_var($displayname, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_NO_ENCODE_QUOTES);
+            $displayname = self::simpleASCII($displayname);
 			$email = filter_var($match[2], FILTER_SANITIZE_EMAIL);
 			return '"'.$displayname.'" <'.$email.'>';
 		} else if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
