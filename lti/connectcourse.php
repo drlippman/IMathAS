@@ -32,6 +32,10 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
         echo sprintf(_("No courses found. Create a course on %s first."), $installname);
         exit;
     }
+  } else if ($target['refcid'] === null) {
+    // assessment ID existed, but wasn't able to find the course.
+    echo sprintf(_("This link referenced assessment ID %d, but that assessment no longer exists on %s, making it impossible to know which course to copy or associate with. Try another link in your LMS course. If none work, you may need to do a fresh export/import."), $target['refaid'], $installname);
+    exit;
   } else {
     $sourcecid = $target['refcid'];
     $last_copied_cid = $target['refcid'];
