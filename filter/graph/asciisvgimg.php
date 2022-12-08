@@ -64,12 +64,14 @@ var $stroke = 'black', $fill = 'none', $curdash='', $isdashed=false, $marker='no
 var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black';
 var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
 var $fontsize = 12, $fontfile, $fontfill='', $fontbackground='';
+var $isphp8 = false;
 
 var $AScom;
 
 function __construct() {
 	$this->usegd2 = function_exists('imagesetthickness');
 	$this->usettf = function_exists('imagettftext');
+    $this->isphp8 = (defined('PHP_VERSION_ID') && PHP_VERSION_ID >= 80000);
 }
 
 function AStoIMG($w=200, $h=200) {
@@ -838,7 +840,11 @@ function ASpath($arg) {
 			}
 		}
 		$color = $this->fill;
-		imagefilledpolygon($this->img,$pt,$this->colors[$color]);
+        if ($this->isphp8) {
+		    imagefilledpolygon($this->img,$pt,$this->colors[$color]);
+        } else {
+            imagefilledpolygon($this->img,$pt,count($pt)/2,$this->colors[$color]);
+        }
 	}
 	if ($this->stroke != 'none') {
 		for ($i=0; $i<count($arg)-2; $i += 2) {
@@ -1046,7 +1052,11 @@ function ASarrowhead($p,$q) {
 			(int) round($w[0]-15*$u[0]+4*$up[0]),
 			(int) round($w[1]-15*$u[1]+4*$up[1]));
 		$color = $this->stroke;
-		imagefilledpolygon($this->img,$arr,$this->colors[$color]);
+        if ($this->isphp8) {
+		    imagefilledpolygon($this->img,$arr,$this->colors[$color]);
+        } else {
+		    imagefilledpolygon($this->img,$arr,count($arr)/2,$this->colors[$color]);
+        }
 	}
 }
 function ASslopefield($arg) {
@@ -1071,6 +1081,7 @@ function ASslopefield($arg) {
 	}
 	*/
 	$efunc = makeMathFunction($func, "x,y");
+    if ($efunc === false) { return; }
 	$dz = sqrt($dx*$dx + $dy*$dy)/6;
 	$x_min = $dx*ceil($this->xmin/$dx);
 	$y_min = $dy*ceil($this->ymin/$dy);
@@ -1109,9 +1120,15 @@ function ASplot($function) {
 		$exfunc = makeMathFunction($xfunc, "t");
 		$yfunc = str_replace("]","",$funcp[1]);
 		$eyfunc = makeMathFunction($yfunc, "t");
+        if ($exfunc === false || $eyfunc === false) {
+            return;
+        }
 	} else {
 		$isparametric = false;
 		$efunc = makeMathFunction($function[0], "x");
+        if ($efunc === false) {
+            return;
+        }
 	}
 	$avoid = array();
 	if (isset($function[1]) && $function[1]!='' && $function[1]!='null') {

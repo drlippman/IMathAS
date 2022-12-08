@@ -290,6 +290,10 @@ class MathParser
       }
     }
     $this->variableValues = $variableValues;
+    if (empty($this->AST)) {
+        echo "Likely error - evaluating empty expression";
+        return '';
+    }
     return $this->evalNode($this->AST);
   }
 

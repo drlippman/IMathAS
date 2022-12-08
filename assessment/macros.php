@@ -3820,7 +3820,7 @@ function numfuncGenerateTestpoints($variables,$domain='') {
     if (!empty($domain)) {
         $fromto = array_map('trim',explode(",",$domain));
         for ($i=0; $i < count($fromto); $i++) {
-            if ($fromto[$i] === 'integers') { continue; }
+            if ($fromto[$i] === 'integers' && $i%3==2) { continue; }
             else if (!is_numeric($fromto[$i])) {
                 $fromto[$i] = evalbasic($fromto[$i]);
             }
