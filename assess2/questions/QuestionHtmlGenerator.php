@@ -209,7 +209,13 @@ class QuestionHtmlGenerator
         } catch (\Throwable $t) {
           $this->addError(
               _('Caught error while evaluating the code in this question: ')
-              . $t->getMessage());
+              . $t->getMessage()
+              . ' on line '
+              . $t->getLine()
+              . ' of '
+              . $t->getFile()
+          );
+
         }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
@@ -986,6 +992,7 @@ class QuestionHtmlGenerator
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
+                if (!is_array($hintpart)) { continue; } // mixed formats
                 $lastkey = max(array_keys($hintpart));
                 $hintloc[$iidx] = '';
                 if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"

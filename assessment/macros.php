@@ -3824,6 +3824,11 @@ function numfuncGenerateTestpoints($variables,$domain='') {
             else if (!is_numeric($fromto[$i])) {
                 $fromto[$i] = evalbasic($fromto[$i]);
             }
+            if (!is_numeric($fromto[$i])) {
+                echo "domain values must be numbers or elementary calculations";
+                $fromto = [1];
+                break;
+            }
         }
     } else {
         $fromto = array(-10, 10);

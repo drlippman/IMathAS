@@ -34,7 +34,8 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 	if ($showanswer === null) { $showanswer = '';}
 	if ($displayformat === null) { $displayformat = array();}
 	if ($answerformat === null) { $answerformat = array();}
-
+    if ($ops === null) { $ops = array(); }
+ 
 	if (isset($ops[0]) && $ops[0] == 'pulldowns') {
 		array_shift($ops);
 		$disptype = 'select';
@@ -161,7 +162,7 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 			$tot = 0;
 			for ($i=0;$i<count($sg['elements']);$i+=2) {
 				if (isset($sg['fixed']) && in_array($i, $sg['fixed'])) {
-					if (!isset($sg['header']) && count($sg['elements']==2)) {
+					if (!isset($sg['header']) && count($sg['elements'])==2) {
 						$out .= '<tr><td style="padding-left:'.($ind+.5).'em;"><b>'.$sg['elements'][$i].'</b></td>';
 					} else {
 						$out .= '<tr><td style="padding-left:'.($ind+.5).'em;">'.$sg['elements'][$i].'</td>';

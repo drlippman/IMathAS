@@ -1643,6 +1643,9 @@ function binomialcdf($N,$p,$x) {
 		echo 'invalid inputs to binomialcdf';
 		return 0;
 	}
+    if ($x == $N) {
+        return 1;
+    }
     $z = $p;
     $a = $x+1;
     $b = $N-$x;
