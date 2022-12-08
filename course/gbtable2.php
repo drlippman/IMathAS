@@ -1742,7 +1742,6 @@ function gbtable() {
 
 	//fill out cattot's with zeros && remove excused from tots
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
-
 		$cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
 		$cattotattemptedec[$ln] = $cattotcurec[$ln];
 		foreach($assessidx as $aid=>$i) {
@@ -1754,20 +1753,20 @@ function gbtable() {
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) {
 				if ($cntingb[$i] == 1) {
-					if ($gb[0][1][$col][3]<1) { //past
+					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
 						$cattotattempted[$ln][$category[$i]][$col] = 0;
 					}
-					if ($gb[0][1][$col][3]<2) { //past or cur
+					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
 					}
 					$cattotfuture[$ln][$category[$i]][$col] = 0;
 				} else if ($cntingb[$i]==2) {
-					if ($gb[0][1][$col][3]<1) { //past
+					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
 						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
 					}
-					if ($gb[0][1][$col][3]<2) { //past or cur
+					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
 					}
 					$cattotfutureec[$ln][$category[$i]][$col] = 0;
@@ -2003,7 +2002,6 @@ function gbtable() {
 
 	//create category totals
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
-
 		$pos = 0; //reset position for category totals
 
 		//update attempted for this student
@@ -2040,6 +2038,7 @@ function gbtable() {
                 $availstu[$ln][$aid] = 4;
             }
 			if (isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]!=$gb[0][1][$col][3]) {
+				echo "aid $aid col $col changing from def {$gb[0][1][$col][3]} to stu {$availstu[$ln][$aid]}.";
 				//if we have a per-stu override of avail
 				//add to correct ones, when availstu < original
 				for ($k=$availstu[$ln][$aid]; $k<$gb[0][1][$col][3]; $k++) {
