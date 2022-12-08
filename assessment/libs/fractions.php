@@ -145,7 +145,9 @@ function fractiontodecimal($f) {
 			echo "Error: fraction with denominator 0";
 		}
 		return 0;
-	}
+	} else if (!is_numeric($f[0])) {
+        return $f;
+    }
 	return $f[0]/$f[1];
 }
 

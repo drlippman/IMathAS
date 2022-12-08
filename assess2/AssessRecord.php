@@ -2602,7 +2602,7 @@ class AssessRecord
         // loop through the question versions
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
-          if ($curQver['qid'] != $qid) {
+          if ($curQver['qid'] != $qid || !isset($curQver['answeights'])) {
             continue;
           }
           $qnsAffected[] = $qn;
