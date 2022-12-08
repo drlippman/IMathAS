@@ -1344,6 +1344,9 @@ function safepow($base,$power) {
       return 0;
     }
   }
+  if (!is_numeric($base) || !is_numeric($power)) {
+    throw new MathParserException("cannot evaluate powers with nonnumeric values");
+  }
 	if ($base<0 && floor($power)!=$power) {
 		for ($j=3; $j<50; $j+=2) {
 			if (abs(round($j*$power)-($j*$power))<.000001) {

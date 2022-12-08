@@ -158,6 +158,7 @@ function outcometable() {
 	}
 
 	//Build user ID headers
+    $gb[0][0] = [];
 	$gb[0][0][0] = "Name";
 	$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL");
 	$stm->execute(array(':courseid'=>$cid));
@@ -167,6 +168,7 @@ function outcometable() {
 		$hassection = false;
 	}
 	//Pull Assessment Info
+    $gb[0][1] = [];
 	$now = time();
 	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome,allowlate,viewingb,scoresingb,ver FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 	$query .= "AND cntingb>0 AND cntingb<3 ";
@@ -519,6 +521,7 @@ function outcometable() {
 	//create category headers
 	$pos = 0;
 	$catorder = array_keys($cats);
+    $gb[0][2] = [];
 	foreach($catorder as $cat) {//foreach category
         if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
             continue;

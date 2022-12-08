@@ -58,6 +58,10 @@ function stringlen($str) {
 	return strlen($str);
 }
 function stringpos($n,$h) {
+    if (!is_scalar($h) || !is_scalar($n)) {
+        echo "inputs to stringpos must be strings";
+        return -1;
+    }
 	$p = strpos($h,$n);
 	if ($p===false) {
 		$p = -1;
@@ -1914,18 +1918,26 @@ function multicalconarray() {
 	foreach ($vars as $k=>$v) {
 		$vars[$k] = preg_replace('/[^\w]/','',$v);
 		if ($vars[$k]=='') {
-			echo "Invalid variable";
+			echo "multicalconarray: Invalid variable";
 			return false;
 		}
 	}
 	if ($nargs-2 != count($vars)) {
-		echo "incorrect number of data arrays";
+		echo "multicalconarray: incorrect number of data arrays";
 		return false;
 	}
+    if (!is_array($args[0])) {
+        echo "multicalconarray: value array must be an array";
+        return false;
+    }
 	$cnt = count($args[0]);
 	for ($i=1; $i<count($args); $i++) {
+        if (!is_array($args[$i])) {
+            echo "multicalconarray: value array must be an array";
+            return false;
+        }
 		if (count($args[$i]) != $cnt) {
-			echo "Unequal array lengths";
+			echo "multicalconarray: Unequal array lengths";
 			return false;
 		}
 	}
@@ -2006,6 +2018,10 @@ function calconarrayif($array,$todo,$ifcond) {
 }
 
 function sumarray($array) {
+    if (!is_array($array)) {
+        echo "sumarray: input must be an array";
+        return '';
+    }
 	return array_sum($array);
 }
 
@@ -3989,7 +4005,7 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
-	if ($stu===null) {
+	if ($stu===null || !is_scalar($stu) || !is_scalar($ans)) {
 		return " ";
 	} else if ($stu==='NA') {
 		return '<div class="feedbackwrap"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("No answer selected. Try again.") . '</div>';

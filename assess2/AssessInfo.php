@@ -600,12 +600,12 @@ class AssessInfo
 			} else {
         $isBlocked = false;
         if ($this->assessData['reqscoretype']&2) { //using percent-based
-					if (round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
-						$isBlocked = true;
-					}
-				} else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
-					$isBlocked = true;
-				}
+            if ($reqscoreptsposs>0 && round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
+                $isBlocked = true;
+            }
+        } else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
+            $isBlocked = true;
+        }
       }
       if ($isBlocked) {
         $this->assessData['available'] = 'needprereq';

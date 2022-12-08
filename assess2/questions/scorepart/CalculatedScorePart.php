@@ -208,7 +208,7 @@ class CalculatedScorePart implements ScorePart
                             }
                         }
                         $numvalarr[$j] = evalMathParser($v);
-                        if (!is_finite($numvalarr[$j])) {
+                        if (!is_numeric($numvalarr[$j]) || !is_finite($numvalarr[$j])) {
                           $numvalarr[$j] = '';
                         }
                     }

@@ -46,6 +46,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
         $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        if (is_array($answers)) {
+            echo 'Eek! $answers in multans should be a list, not an array';
+            $answers = implode(',', $answers);
+        }
         $answers = trim($answers, ' ,');
         
         if (!is_array($questions)) {

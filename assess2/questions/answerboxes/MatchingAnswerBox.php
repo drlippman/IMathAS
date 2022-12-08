@@ -122,7 +122,7 @@ class MatchingAnswerBox implements AnswerBox
             $out .= "<p class=\"centered\">$questiontitle</p>\n";
         }
         $out .= "<ul class=\"nomark\">\n";
-        if ($la == '') {
+        if ($la == '' || is_array($la)) { // no reason for $la to be array, but catch case
             $las = array();
         } else {
             $las = explode("|", $la);
