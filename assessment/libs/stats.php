@@ -970,6 +970,7 @@ function boxplot($arr,$label="",$options = array()) {
 	$ybase = 2;
 	for ($i=0;$i<$multi;$i++) {
 		if ($multi==1) { $a = $arr;} else {$a = $arr[$i];}
+        $a = arrayremovenull($a);
 		sort($a,SORT_NUMERIC);
 		$min = $a[0]*1;
 		$max = $a[count($a)-1]*1;

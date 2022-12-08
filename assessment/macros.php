@@ -1909,6 +1909,12 @@ function keepif($array, $todo) {
 	return array_values(array_filter($array,my_create_function('$x','return('.$todo.');')));
 }
 
+function arrayremovenull($array) {
+    return array_values(array_filter($array, function ($v) {
+        return (!is_null($v) && $v !== '');
+    }));
+}
+
 function multicalconarray() {
 	$args = func_get_args();
 	$nargs = count($args);
@@ -4789,12 +4795,13 @@ function getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$width,$height,$snaptogrid) 
 	} else {
 		$snapparts = array($snaptogrid,$snaptogrid);
 	}
-	if ($xmax - $xmin>0) {
+	$snapparts = array_map('floatval', $snapparts);
+	if ($xmax - $xmin>0 && !empty($snapparts[0])) {
 		$newwidth = ($xmax - $xmin)*(round($snapparts[0]*($width-2*$imgborder)/($xmax - $xmin))/$snapparts[0]) + 2*$imgborder;
 	} else {
 		$newwidth = $width;
 	}
-	if ($ymax - $ymin>0) {
+	if ($ymax - $ymin>0 && !empty($snapparts[1])) {
 		$newheight = ($ymax - $ymin)*(round($snapparts[1]*($height-2*$imgborder)/($ymax - $ymin))/$snapparts[1]) + 2*$imgborder;
 	} else {
 		$newheight = $height;
