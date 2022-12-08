@@ -2038,7 +2038,6 @@ function gbtable() {
                 $availstu[$ln][$aid] = 4;
             }
 			if (isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]!=$gb[0][1][$col][3]) {
-				echo "aid $aid col $col changing from def {$gb[0][1][$col][3]} to stu {$availstu[$ln][$aid]}.";
 				//if we have a per-stu override of avail
 				//add to correct ones, when availstu < original
 				for ($k=$availstu[$ln][$aid]; $k<$gb[0][1][$col][3]; $k++) {
