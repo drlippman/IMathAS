@@ -101,7 +101,7 @@ class MatrixScorePart implements ScorePart
         $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
         $answerlist = explode(',',$ansr);
 
-        if (count($answerlist) != count($givenanslist)) {
+        if (count($answerlist) != count($givenanslist) || $answerlist[0]==='' || $givenanslist[0]==='') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
@@ -153,7 +153,11 @@ class MatrixScorePart implements ScorePart
           if ($correct) {
             $givenanslist = matrix_scorer_rref($givenanslist, $N);
           }
+        } else if ($fullmatrix && in_array('anyroworder',$ansformats)) {
+            $answerlist = matrix_scorer_roworder($answerlist, $N);
+            $givenanslist = matrix_scorer_roworder($givenanslist, $N);
         }
+
         $incorrect = 0;
         for ($i=0; $i<count($answerlist); $i++) {
             if (!is_numeric($givenanslist[$i])) {

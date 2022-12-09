@@ -378,7 +378,7 @@ if (!(isset($teacherid))) {
 				$qarr[':exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
 			}
 
-			if ($_POST['defoutcome'] !== 'DNC') {
+			if (isset($_POST['defoutcome']) && $_POST['defoutcome'] !== 'DNC') {
 				$sets[] = "defoutcome=:defoutcome";
 				$qarr[':defoutcome'] = Sanitize::onlyInt($_POST['defoutcome']);
 			}
@@ -497,7 +497,7 @@ if (!(isset($teacherid))) {
                 //update points possible
                 updatePointsPossible($aid);
                 // re-total existing assessment attempts to adjust scores
-                if ($coreOK && $submitby!==$cursumitby[$aid]) {
+                if ($coreOK && $submitby!==$cursubmitby[$aid]) {
 					// convert data format
                     AssessHelpers::retotalAll($cid, $aid, true, false, $submitby);
 				} else {
@@ -509,7 +509,7 @@ if (!(isset($teacherid))) {
             require_once("../assess2/AssessHelpers.php");
             // update "show work after" status flags
             foreach ($checked as $aid) {
-                $thissubby = $coreOK ? $submitby : $cursumitby[$aid];
+                $thissubby = $coreOK ? $submitby : $cursubmitby[$aid];
                 AssessHelpers::updateShowWorkStatus($aid, $_POST['showwork'], $thissubby);
             }
         }

@@ -62,17 +62,22 @@ class MatchingAnswerBox implements AnswerBox
             echo _('Eeek!  $answers is not defined or needs to be an array');
             $answers = array();
         }
-        if (!empty($matchlist)) {$matchlist = array_map('trim', explode(',', $matchlist));}
+        if (!empty($matchlist)) {
+            $matchlist = array_map('trim', explode(',', $matchlist));
+            if (count($matchlist) != count($questions)) {
+                echo _('$questions and $matchlist should have the same number of entries');
+            }
+        }
         if ($noshuffle == "questions" || $noshuffle == 'all') {
             $randqkeys = array_keys($questions);
         } else {
-            $randqkeys = $RND->array_rand($questions, count($questions));
+            $randqkeys = (array) $RND->array_rand($questions, count($questions));
             $RND->shuffle($randqkeys);
         }
         if ($noshuffle == "answers" || $noshuffle == 'all') {
             $randakeys = array_keys($answers);
         } else {
-            $randakeys = $RND->array_rand($answers, count($answers));
+            $randakeys = (array) $RND->array_rand($answers, count($answers));
             $RND->shuffle($randakeys);
         }
         $_SESSION['choicemap'][$assessmentId][$qn] = array($randqkeys, $randakeys);
@@ -117,7 +122,7 @@ class MatchingAnswerBox implements AnswerBox
             $out .= "<p class=\"centered\">$questiontitle</p>\n";
         }
         $out .= "<ul class=\"nomark\">\n";
-        if ($la == '') {
+        if ($la == '' || is_array($la)) { // no reason for $la to be array, but catch case
             $las = array();
         } else {
             $las = explode("|", $la);

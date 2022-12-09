@@ -1,7 +1,7 @@
 <?php
 
 function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
-    global $imasroot;
+    global $imasroot, $staticroot, $installname;
     require(__DIR__.'/../header.php');
     if ($error !== '') {
         echo '<p class=noticetext>'._('Invalid code - try again').'</p>';
@@ -25,7 +25,7 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
 }
 
 function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
-    global $DBH;
+    global $DBH, $imasroot;
     $error = '';
     require(__DIR__.'/GoogleAuthenticator.php');
     $MFA = new GoogleAuthenticator();

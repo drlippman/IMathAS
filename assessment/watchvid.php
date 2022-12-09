@@ -1,6 +1,9 @@
 <?php
 require_once(__DIR__ . '/../includes/sanitize.php');
 
+if (!isset($_GET['url'])) {
+    exit;
+}
 $url = $_GET['url'];
 $doembed = false;
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -63,8 +66,7 @@ if ($isyoutube) {
 		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
 	}
 
-	if (strpos($url,'end=')!==false) {
-		preg_match('/end=(\d+)/',$url,$m);
+	if (preg_match('/end=(\d+)/',$url,$m)) {
 		$timestart .= '&'.$m[0];
 	}
 	$doembed = true;

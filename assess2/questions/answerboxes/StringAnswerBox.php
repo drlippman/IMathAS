@@ -85,7 +85,7 @@ class StringAnswerBox implements AnswerBox
             $la = str_replace($replace,$keywords,$la);
         }
 
-        if ($displayformat == 'select') {
+        if ($displayformat == 'select' && is_array($questions)) {
             $out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
             $out .= 'aria-label="' . $arialabel . '">';
             $out .= '<option value=""> </option>';

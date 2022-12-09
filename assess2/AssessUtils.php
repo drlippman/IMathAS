@@ -154,7 +154,11 @@ class AssessUtils
     if ($endmsg === '') {
       return '';
     }
-    $average = round(100*$score/$possible,1);
+    if ($possible > 0) {
+        $average = round(100*$score/$possible,1);
+    } else {
+        $average = 0;
+    }
 
     $endmsg = unserialize($endmsg);
     $redirecturl = '';

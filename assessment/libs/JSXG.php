@@ -84,32 +84,32 @@ function JSXG_setUpBoard($label, $width=350, $height=350, $centered=true){
 # creates a set of axes, and a board to construct on.
 function JSXG_createAxes($label, $ops=array()){
     // Add some default values
-   $width = $ops['size'][0]!==null ? $ops['size'][0] : 350; // board width
-   $height = $ops['size'][1]!==null ? $ops['size'][1] : 350; // board height
+   $width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
+   $height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
    //set the min and max x-values if provided, else default to [-5, 5]
-   $xmin = $ops['bounds'][0]!==null ? $ops['bounds'][0] : -5;
-   $xmax = $ops['bounds'][1]!==null ? $ops['bounds'][1] : 5;
-   $ymin = $ops['bounds'][2]!==null ? $ops['bounds'][2] : -5;
-   $ymax = $ops['bounds'][3]!==null ? $ops['bounds'][3] : 5;
+   $xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
+   $xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
+   $ymin = isset($ops['bounds'][2]) ? $ops['bounds'][2] : -5;
+   $ymax = isset($ops['bounds'][3]) ? $ops['bounds'][3] : 5;
 
-   $minorTicksX = $ops['minorTicks'][0]!==null ? $ops['minorTicks'][0] : 1;
-   $minorTicksY = $ops['minorTicks'][1]!==null ? $ops['minorTicks'][1] : 1;
-   $ticksDistanceX = $ops['ticksDistance'][0]!==null ? $ops['ticksDistance'][0] : floor((($xmax)-($xmin))/8);
-   $ticksDistanceY = $ops['ticksDistance'][1]!==null ? $ops['ticksDistance'][1] : floor((($ymax)-($ymin))/8);
+   $minorTicksX = isset($ops['minorTicks'][0]) ? $ops['minorTicks'][0] : 1;
+   $minorTicksY = isset($ops['minorTicks'][1]) ? $ops['minorTicks'][1] : 1;
+   $ticksDistanceX = isset($ops['ticksDistance'][0]) ? $ops['ticksDistance'][0] : floor((($xmax)-($xmin))/8);
+   $ticksDistanceY = isset($ops['ticksDistance'][1]) ? $ops['ticksDistance'][1] : floor((($ymax)-($ymin))/8);
 
-   $navBar = ($ops['controls']!==null && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
-   $zoom = ($ops['controls']!==null && in_array('zoom', $ops['controls'])) ? "true" : "false";
-   $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
-   $centered = $ops['centered']!==null ? false : true;
+   $navBar = (isset($ops['controls']) && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
+   $zoom = (isset($ops['controls']) && in_array('zoom', $ops['controls'])) ? "true" : "false";
+   $pan = (isset($ops['controls']) && in_array('no-pan', $ops['controls'])) ? "false" : "true";
+   $centered = isset($ops['centered']) ? false : true;
 
-   $useMathJax = ($ops['axisLabel']!==null && (strpos($ops['axisLabel'][0], "`")>-1 || strpos($ops['axisLabel'][1], "`")>-1)) ? "true" : "false";
+   $useMathJax = (isset($ops['axisLabel']) && (strpos($ops['axisLabel'][0], "`")>-1 || strpos($ops['axisLabel'][1], "`")>-1)) ? "true" : "false";
 
     // Start output
    $out = "JXG.Options.layer = {numlayers: 20, text: 9, point: 9, glider: 9, arc: 8, line: 7, circle: 6,
              curve: 5, turtle: 5, polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, grid: 1, image: 0, trace: 0};";
    //$out .= "JXG.Options.text.useMathJax = true;";
    // Create the board
-   $defaultAxis = $ops['tickDistance'] ? "false" : "true";
+   $defaultAxis = !empty($ops['tickDistance']) ? "false" : "true";
    $out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
              boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
              axis: false,
@@ -135,7 +135,7 @@ function JSXG_createAxes($label, $ops=array()){
                strokeColor:'black',
                strokeWidth: 2,
                highlight:false,
-               name:'" . ($ops['axisLabel'][0]!=null ? $ops['axisLabel'][0] : "") . "',
+               name:'" . (isset($ops['axisLabel'][0]) ? $ops['axisLabel'][0] : "") . "',
                withLabel:true,
                label: {position:'rt', offset:[-15,15], highlight:false, useMathJax:{$useMathJax}}
              });";
@@ -157,7 +157,7 @@ function JSXG_createAxes($label, $ops=array()){
                strokeColor:'black',
                strokeWidth: 2,
                highlight:false,
-               name:'" . ($ops['axisLabel'][1]!=null ? $ops['axisLabel'][1] : "") . "',
+               name:'" . (isset($ops['axisLabel'][1]) ? $ops['axisLabel'][1] : "") . "',
                withLabel:true,
                label: {position:'rt', offset:[10,-15], highlight:false, useMathJax:{$useMathJax}}
              });";
@@ -215,23 +215,23 @@ function JSXG_addSlider($board, $sname, $ops=array()){
   $label = substr($board, $labStart, $labEnd - $labStart);
 
   // Some position values
-  $x1 = $ops['position'][0]!==null ? $ops['position'][0] : 0.05;
-  $y1 = $ops['position'][1]!==null ? $ops['position'][1] : 0.05;
-  $x2 = $ops['position'][2]!==null ? $ops['position'][2] : 0.25;
-  $y2 = $ops['position'][3]!==null ? $ops['position'][3] : 0.05;
+  $x1 = isset($ops['position'][0]) ? $ops['position'][0] : 0.05;
+  $y1 = isset($ops['position'][1]) ? $ops['position'][1] : 0.05;
+  $x2 = isset($ops['position'][2]) ? $ops['position'][2] : 0.25;
+  $y2 = isset($ops['position'][3]) ? $ops['position'][3] : 0.05;
   // Defaults for slider range/default value
-  $min = $ops['range'][0]!==null ? $ops['range'][0] : 1;
-  $max = $ops['range'][1]!==null ? $ops['range'][1] : 10;
-  $default = $ops['range'][2]!==null ? $ops['range'][2] : ((($min)+($max))/2);
+  $min = isset($ops['range'][0]) ? $ops['range'][0] : 1;
+  $max = isset($ops['range'][1]) ? $ops['range'][1] : 10;
+  $default = isset($ops['range'][2]) ? $ops['range'][2] : ((($min)+($max))/2);
   // Defaults for visual apperance/name
-  $name = $ops['name']!==null ? $ops['name'] : '';
-  $snapWidth = $ops['snapWidth']!==null ? $ops['snapWidth'] : -1;
-  $withLabel = $ops['withLabel']!==null ? $ops['withLabel'] : "true";
-  $color = $ops['color']!==null ? $ops['color'] : 'purple';
-  $precision = $ops['precision']!==null ? $ops['precision'] : 2;
+  $name = isset($ops['name']) ? $ops['name'] : '';
+  $snapWidth = isset($ops['snapWidth']) ? $ops['snapWidth'] : -1;
+  $withLabel = isset($ops['withLabel']) ? $ops['withLabel'] : "true";
+  $color = isset($ops['color']) ? $ops['color'] : 'purple';
+  $precision = isset($ops['precision']) ? $ops['precision'] : 2;
 
   // Create the slider.
-  $out .= "var param{$label}_{$sname} = board_{$label}.create('slider', [
+  $out = "var param{$label}_{$sname} = board_{$label}.create('slider', [
             [function(){
               return board_{$label}.getBoundingBox()[0]+{$x1}*(board_{$label}.getBoundingBox()[2]-(board_{$label}.getBoundingBox()[0]));
             }, function(){
@@ -255,12 +255,12 @@ function JSXG_addSlider($board, $sname, $ops=array()){
             strokeColor: '{$color}',
             label: {color:'{$color}'}
           })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']})";
     }
 
     // If answerbox option provided, link the point to the answerbox
-    if($ops['answerbox']!==null ){
+    if(isset($ops['answerbox']) ){
       if (count($ops['answerbox'])==1){
         $box = $ops['answerbox'][0] - 1;
       } else {
@@ -318,15 +318,15 @@ function JSXG_addFunction($board, $ops=array(), $ref=null){
   $label = substr($board, $labStart, $labEnd - $labStart);
 
   // Make some default values
-  $inpVar = $ops['inputVariable']!==null ? $ops['inputVariable'] : "x"; // input variable
-  $rule = $ops['rule']!==null ? $ops['rule'] : "x"; // function rule
-  $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : "blue"; // color of graph
-  $width = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2; // Width of graph
-  $dash = $ops['dash']!==null ? $ops['dash'] : 0; // Dash for the graph
+  $inpVar = isset($ops['inputVariable']) ? $ops['inputVariable'] : "x"; // input variable
+  $rule = isset($ops['rule']) ? $ops['rule'] : "x"; // function rule
+  $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : "blue"; // color of graph
+  $width = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2; // Width of graph
+  $dash = isset($ops['dash']) ? $ops['dash'] : 0; // Dash for the graph
 
   // Determine if bounds are properly set for the function (setting domain of func)
-  $isBounds = ($ops['bounds']!== null && count($ops['bounds'])==2) ? true : false;
-
+  $isBounds = (isset($ops['bounds']) && count($ops['bounds'])==2) ? true : false;
+  $out = '';
   // If $ref provided, then give the function a name
   if ($ref!==null){
 	$out .= "var func_{$label}_{$ref} = ";
@@ -335,7 +335,7 @@ function JSXG_addFunction($board, $ops=array(), $ref=null){
   // Start the output string
   $out .= "board_{$label}.create('functiongraph', [function({$inpVar}){";
   // First, handle case when slider value(s) being used via % in func rule
-  if ($ops['slider-names']!==null && strpos($rule, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($rule, "%")>-1){
     $out .= "var rule = '{$rule}';";
     // Loop through each variable name, add a JS statement if necessary to swap %a with a.Value()
     foreach ($ops['slider-names'] as $sn){
@@ -354,7 +354,7 @@ function JSXG_addFunction($board, $ops=array(), $ref=null){
   //Handle bounds, if provided
   if ($isBounds){
     // First, start with lower bound. If a slider value is being used...
-    if ($ops['bounds'][0]!==null && strpos($ops['bounds'][0], "%")>-1){
+    if (isset($ops['bounds'][0]) && strpos($ops['bounds'][0], "%")>-1){
       $out .= ",function(){
                 var lbs = '{$ops['bounds'][0]}';";
       foreach($ops['slider-names'] as $sn){
@@ -370,7 +370,7 @@ function JSXG_addFunction($board, $ops=array(), $ref=null){
       $out .= "," . $ops['bounds'][0] . ",";
     }
     // Upper bounds -- same process as for lower bound
-    if ($ops['bounds'][1]!==null && strpos($ops['bounds'][1], "%")>-1){
+    if (isset($ops['bounds'][1]) && strpos($ops['bounds'][1], "%")>-1){
       $out .= "function(){
                 var ubs = '{$ops['bounds'][1]}';";
       foreach($ops['slider-names'] as $sn){
@@ -394,9 +394,9 @@ function JSXG_addFunction($board, $ops=array(), $ref=null){
             dash: {$dash},
             fixed: true,
             highlight: false,
-            name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
           })";
-  if ($ops['attributes']!==null){
+  if (isset($ops['attributes'])){
     $out .= ".setAttribute({$ops['attributes']});";
   } else {
     $out .= ";";
@@ -416,19 +416,19 @@ function JSXG_addParametric($board, $ops=array()){
   $label = substr($board, $labStart, $labEnd - $labStart);
 
   // Make some default values
-  $inpVar = $ops['inputVariable']!==null ? $ops['inputVariable'] : "t"; // input variable
-  $xRule = $ops['rule'][0]!==null ? $ops['rule'][0] : "Math.cos(t)"; // rule for x(t)
-  $yRule = $ops['rule'][1]!==null ? $ops['rule'][1] : "Math.sin(t)"; // rule for y(t)
-  $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : "blue"; // color of graph
-  $width = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2; // width of graph
-  $tStart = $ops['bounds'][0]!==null ? $ops['bounds'][0] : 0; // start value of t
-  $tEnd = $ops['bounds'][1]!==null ? $ops['bounds'][1] : 1; // end value of t
+  $inpVar = isset($ops['inputVariable']) ? $ops['inputVariable'] : "t"; // input variable
+  $xRule = isset($ops['rule'][0]) ? $ops['rule'][0] : "Math.cos(t)"; // rule for x(t)
+  $yRule = isset($ops['rule'][1]) ? $ops['rule'][1] : "Math.sin(t)"; // rule for y(t)
+  $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : "blue"; // color of graph
+  $width = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2; // width of graph
+  $tStart = isset($ops['bounds'][0]) ? $ops['bounds'][0] : 0; // start value of t
+  $tEnd = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 1; // end value of t
 
 
-  $out .= "board_{$label}.create('curve', [function({$inpVar}){";
+  $out = "board_{$label}.create('curve', [function({$inpVar}){";
   ###### Handle x-rule ######
   // If slider value is used...
-  if ($ops['slider-names']!==null && strpos($xRule, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($xRule, "%")>-1){
     $out .= "var xrs = '{$xRule}';";
     // Replace %a with a.Value for each slider name that applies
     foreach($ops['slider-names'] as $sn){
@@ -443,7 +443,7 @@ function JSXG_addParametric($board, $ops=array()){
   }
   ###### Handle y-rule <-- same process as x-rule ######
   $out .= "function({$inpVar}){";
-  if ($ops['slider-names']!==null && strpos($yRule, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($yRule, "%")>-1){
     $out .= "var yrs = '{$yRule}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($yRule, "%{$sn}")>-1){
@@ -456,7 +456,7 @@ function JSXG_addParametric($board, $ops=array()){
   }
 
   ###### Handle Lower bounds <-- similar process as for rules ######
-  if ($ops['slider-names']!==null && strpos($tStart, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($tStart, "%")>-1){
     $out .= "function(){var lbs = '{$tStart}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($tStart, "%{$sn}")>-1){
@@ -468,7 +468,7 @@ function JSXG_addParametric($board, $ops=array()){
     $out .= "{$tStart},";
   }
   ###### Handle Upper bounds
-  if ($ops['slider-names']!==null && strpos($tEnd, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($tEnd, "%")>-1){
     $out .= "function(){var ubs = '{$tEnd}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($tEnd, "%{$sn}")>-1){
@@ -485,9 +485,9 @@ function JSXG_addParametric($board, $ops=array()){
             strokeColor: '{$color}',
             strokeWidth: {$width},
             highlight:false,
-            name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
           })";
-  if ($ops['attributes']!==null){
+  if (isset($ops['attributes'])){
     $out .= ".setAttribute({$ops['attributes']})";
   } else {
     $out .= ";";
@@ -506,23 +506,23 @@ function JSXG_addText($board, $ops=array()){
   $label = substr($board, $labStart, $labEnd - $labStart);
 
   // Make some default values
-  $text = $ops['text']!==null ? $ops['text'] : "Something happened..."; // text to display
-  $xPos = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-  $yPos = $ops['position'][1]!==null ? $ops['position'][1] : 0;
+  $text = isset($ops['text']) ? $ops['text'] : "Something happened..."; // text to display
+  $xPos = isset($ops['position'][0]) ? $ops['position'][0] : 0;
+  $yPos = isset($ops['position'][1]) ? $ops['position'][1] : 0;
   // attributes
-  $anchorX = $ops['anchor'][0]!==null ? $ops['anchor'][0] : "middle";
-  $anchorY = $ops['anchor'][1]!==null ? $ops['anchor'][1] : "middle";
-  $fontSize = $ops['fontSize']!==null ? $ops['fontSize'] : 16;
-  $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-  $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-  $rotate = $ops['rotate']!==null ? $ops['rotate'] : 0;
-  $color = $ops['color']!==null ? $ops['color'] : 'black';
+  $anchorX = isset($ops['anchor'][0]) ? $ops['anchor'][0] : "middle";
+  $anchorY = isset($ops['anchor'][1]) ? $ops['anchor'][1] : "middle";
+  $fontSize = isset($ops['fontSize']) ? $ops['fontSize'] : 16;
+  $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+  $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+  $rotate = isset($ops['rotate']) ? $ops['rotate'] : 0;
+  $color = isset($ops['color']) ? $ops['color'] : 'black';
 
   $useMathJax = strpos($text, "`")>-1 ? "true" : "false";
 
-  $out .= "board_{$label}.create('text', [";
+  $out = "board_{$label}.create('text', [";
   // x-position. Handle slider values first, if present
-  if ($ops['slider-names']!==null && strpos($xPos, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($xPos, "%")>-1){
     $out .= "function(){
               var xps = '{$xPos}';";
     foreach($ops['slider-names'] as $sn){
@@ -536,7 +536,7 @@ function JSXG_addText($board, $ops=array()){
     $out .= "{$xPos},";
   }
   // y-position. Handle slider values first, if present
-  if ($ops['slider-names']!==null && strpos($yPos, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($yPos, "%")>-1){
     $out .= "function(){
               var yps = '{$yPos}';";
     foreach($ops['slider-names'] as $sn){
@@ -550,7 +550,7 @@ function JSXG_addText($board, $ops=array()){
     $out .= "{$yPos},";
   }
   // Text
-  if ($ops['slider-names']!==null && strpos($text, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($text, "%")>-1){
     $out .= "function(){
       var ts = '{$text}';";
     foreach($ops['slider-names'] as $sn){
@@ -574,9 +574,9 @@ function JSXG_addText($board, $ops=array()){
             fixed: {$fixed},
             rotate: {$rotate},
             color: '{$color}',
-            name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
           })";
-  if ($ops['attributes']!==null){
+  if (isset($ops['attributes'])){
     $out .= ".setAttribute({$ops['attributes']});";
   } else {
     $out .= ";";
@@ -599,25 +599,25 @@ function JSXG_addText($board, $ops=array()){
 # creates a set of axes, and a board to construct on.
 function JSXG_createPolarAxes($label, $ops=array()){
     // Add some default values
-   $size = $ops['size']!==null ? $ops['size'] : 350;
+   $size = isset($ops['size']) ? $ops['size'] : 350;
    //set the min and max x-values if provided, else default to [-5, 5]
-   $rmax = $ops['r'][0]!==null ? (float) $ops['r'][0] : 5;
-   $rInc = $ops['r'][1]!==null ? (float) $ops['r'][1] : 1;
-   $thetaType = $ops['theta'][0]!==null ? $ops['theta'][0] : "radian";
-   $thetaInc = $ops['theta'][1]!==null ? (float) $ops['theta'][1] : 1;
+   $rmax = isset($ops['r'][0]) ? (float) $ops['r'][0] : 5;
+   $rInc = isset($ops['r'][1]) ? (float) $ops['r'][1] : 1;
+   $thetaType = isset($ops['theta'][0]) ? $ops['theta'][0] : "radian";
+   $thetaInc = isset($ops['theta'][1]) ? (float) $ops['theta'][1] : 1;
 
    $rMaxBoard = 1.2 * $rmax;
    $rMaxLabel = 1.1 * $rmax;
 
-   $boardYScale = $ops['pad-top']!==null ? 1.1 : 1;
+   $boardYScale = isset($ops['pad-top']) ? 1.1 : 1;
    $boardHeight = $boardYScale * $size;
    $yMax = (1+2*($boardYScale-1))*$rMaxBoard;
 
 
-   $navBar = ($ops['controls']!==null && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
-   $zoom = ($ops['controls']!==null && in_array('zoom', $ops['controls'])) ? "true" : "false";
-   $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
-   $centered = $ops['centered']!==null ? false : true;
+   $navBar = (isset($ops['controls']) && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
+   $zoom = (isset($ops['controls']) && in_array('zoom', $ops['controls'])) ? "true" : "false";
+   $pan = (isset($ops['controls']) && in_array('no-pan', $ops['controls'])) ? "false" : "true";
+   $centered = isset($ops['centered']) ? false : true;
 
 
    // Layering options. Push the axis in front of ticks
@@ -629,7 +629,7 @@ function JSXG_createPolarAxes($label, $ops=array()){
    ";
    //$out .= "JXG.Options.text.useMathJax = true;";
    // Create the board
-   $defaultAxis = $ops['tickDistance'] ? "false" : "true";
+   $defaultAxis = !empty($ops['tickDistance']) ? "false" : "true";
    $out .= "
    window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
      boundingbox: [-{$rMaxBoard}, {$yMax}, {$rMaxBoard}, -{$rMaxBoard}],
@@ -802,18 +802,18 @@ function JSXG_addPolar($board, $ops=array()){
   $label = substr($board, $labStart, $labEnd - $labStart);
 
   // Make some default values
-  $inpVar = $ops['inputVariable']!==null ? $ops['inputVariable'] : "t"; // input variable
-  $rule = $ops['rule']!==null ? $ops['rule'] : "t"; // rule for x(t)
-  $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : "red"; // color of graph
-  $width = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2; // width of graph
-  $tStart = $ops['bounds'][0]!==null ? $ops['bounds'][0] : 0; // start value of t
-  $tEnd = $ops['bounds'][1]!==null ? $ops['bounds'][1] : 6.283185307; // end value of t
+  $inpVar = isset($ops['inputVariable']) ? $ops['inputVariable'] : "t"; // input variable
+  $rule = isset($ops['rule']) ? $ops['rule'] : "t"; // rule for x(t)
+  $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : "red"; // color of graph
+  $width = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2; // width of graph
+  $tStart = isset($ops['bounds'][0]) ? $ops['bounds'][0] : 0; // start value of t
+  $tEnd = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 6.283185307; // end value of t
 
-  $out .="
+  $out ="
   board_{$label}.create('curve', [
     function({$inpVar}){";
   // If slider value present
-  if ($ops['slider-names']!==null && strpos($rule, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($rule, "%")>-1){
     $out .= "
         var rs = '{$rule}';";
     foreach($ops['slider-names'] as $sn){
@@ -838,7 +838,7 @@ function JSXG_addPolar($board, $ops=array()){
   $out .="
      [0,0],";
   // Start value for theta
-  if ($ops['slider-names']!==null && strpos($tStart, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($tStart, "%")>-1){
     $out .= "
     function(){
       var tss = '{$tStart}';";
@@ -856,7 +856,7 @@ function JSXG_addPolar($board, $ops=array()){
     $out .= "{$tStart},";
   }
   // End value for theta
-  if ($ops['slider-names']!==null && strpos($tEnd, "%")>-1){
+  if (isset($ops['slider-names']) && strpos($tEnd, "%")>-1){
     $out .= "
     function(){
       var tes = '{$tEnd}';";
@@ -884,7 +884,7 @@ function JSXG_addPolar($board, $ops=array()){
     }
   )
   ";
-  if ($ops['attributes']!==null){
+  if (isset($ops['attributes'])){
     $out .= ".setAttribute({$ops['attributes']});";
   } else {
     $out .= ";";
@@ -906,21 +906,21 @@ function JSXG_addPolar($board, $ops=array()){
 # creates a board with no axes
 function JSXG_createBlankBoard($label, $ops){
   // Add some default values
-  $width = $ops['size'][0]!==null ? $ops['size'][0] : 350; // board width
-  $height = $ops['size'][1]!==null ? $ops['size'][1] : 350; // board height
+  $width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
+  $height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
   //set the min and max x-values if provided, else default to [-5, 5]
-  $xmin = $ops['bounds'][0]!==null ? $ops['bounds'][0] : -5;
-  $xmax = $ops['bounds'][1]!==null ? $ops['bounds'][1] : 5;
-  $ymin = $ops['bounds'][2]!==null ? $ops['bounds'][2] : -5;
-  $ymax = $ops['bounds'][3]!==null ? $ops['bounds'][3] : 5;
+  $xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
+  $xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
+  $ymin = isset($ops['bounds'][2]) ? $ops['bounds'][2] : -5;
+  $ymax = isset($ops['bounds'][3]) ? $ops['bounds'][3] : 5;
 
-  $navBar = ($ops['controls']!==null && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
-  $zoom = ($ops['controls']!==null && in_array('zoom', $ops['controls'])) ? "true" : "false";
-  $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
-  $centered = $ops['centered']!==null ? false : true;
+  $navBar = (isset($ops['controls']) && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
+  $zoom = (isset($ops['controls']) && in_array('zoom', $ops['controls'])) ? "true" : "false";
+  $pan = (isset($ops['controls']) && in_array('no-pan', $ops['controls'])) ? "false" : "true";
+  $centered = isset($ops['centered']) ? false : true;
 
   // Create the board
-  $out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
+  $out = "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
            boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
            axis: false,
            showCopyright: false,
@@ -954,20 +954,20 @@ function JSXG_createBlankBoard($label, $ops){
     $label = substr($board, $labStart, $labEnd - $labStart);
 
     // Make some default values
-    $x = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-    $y = $ops['position'][1]!==null ? $ops['position'][1] : 0;
+    $x = isset($ops['position'][0]) ? $ops['position'][0] : 0;
+    $y = isset($ops['position'][1]) ? $ops['position'][1] : 0;
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "true";
-    $draggable = ($ops['draggable']!==null || $ops['answerbox']!==null) ? "true" : "false";
-    $fixed = $ops['fixed']!==null ? "true" : "false";
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "true";
+    $draggable = (isset($ops['draggable']) || isset($ops['answerbox'])) ? "true" : "false";
+    $fixed = isset($ops['fixed']) ? "true" : "false";
 
-    $color = $ops['color']!==null ? $ops['color'] : 'purple';
-    $size = $ops['size']!==null ? $ops['size'] : 2;
-    $face = $ops['face']!==null ? $ops['face'] : 'circle';
+    $color = isset($ops['color']) ? $ops['color'] : 'purple';
+    $size = isset($ops['size']) ? $ops['size'] : 2;
+    $face = isset($ops['face']) ? $ops['face'] : 'circle';
 
     // If answerbox option provided, set up box number
-    if($ops['answerbox']!==null ){
+    if(isset($ops['answerbox']) ){
       if (count($ops['answerbox'])==1){
         $box = $ops['answerbox'][0] - 1;
       } else {
@@ -975,7 +975,7 @@ function JSXG_createBlankBoard($label, $ops){
       }
       $ref = ($ref!==null ? $ref : $box);
     }
-
+    $out = '';
     if ($ref!==null){
       // name point, which is used in persistence
       $out .= "
@@ -984,7 +984,7 @@ function JSXG_createBlankBoard($label, $ops){
 
     $out .= "board_{$label}.create('point', [";
     // x value
-    if ($ops['slider-names']!=null && strpos($x, "%")>-1){
+    if (isset($ops['slider-names']) && strpos($x, "%")>-1){
       $out .= "function(){
         var xs = '{$x}';";
       foreach($ops['slider-names'] as $sn){
@@ -997,7 +997,7 @@ function JSXG_createBlankBoard($label, $ops){
       $out .= "{$x},";
     }
     // y value
-    if ($ops['slider-names']!=null && strpos($y, "%")>-1){
+    if (isset($ops['slider-names']) && strpos($y, "%")>-1){
       $out .= "function(){
         var ys = '{$y}';";
       foreach($ops['slider-names'] as $sn){
@@ -1019,13 +1019,13 @@ function JSXG_createBlankBoard($label, $ops){
               size: {$size},
               face: '{$face}',
               label: {color:'{$color}', useMathJax:true},
-              name: '" . ($ops['name']!==null ? $ops['name'] : "") . "'
+              name: '" . (isset($ops['name']) ? $ops['name'] : "") . "'
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']})";
     }
     // If answerbox option provided, link the point to the answerbox
-    if($ops['answerbox']!==null ){
+    if(isset($ops['answerbox']) ){
       $out .= ".on('up',function(){
         $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')')
             .trigger('change').trigger('input');
@@ -1075,17 +1075,18 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [0,0];
-    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [3,3];
+    $p1 = isset($ops['position'][0]) ? $ops['position'][0] : [0,0];
+    $p2 = isset($ops['position'][1]) ? $ops['position'][1] : [3,3];
 
     // Make some default values
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If reference provided...
     if ($ref!==null){
@@ -1099,7 +1100,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x1 = $p1[0]; $y1 = $p1[1];
       $out .= "[";
       // x1 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
         $out .= "function(){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1112,7 +1113,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x1},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1131,7 +1132,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1144,7 +1145,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y2, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1165,9 +1166,9 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               dash: {$dash},
               strokeWidth: {$strokeWidth},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1186,15 +1187,16 @@ function JSXG_createBlankBoard($label, $ops){
     $label = substr($board, $labStart, $labEnd - $labStart);
 
     // Make some default values
-    $p1 = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-    $p2 = $ops['position'][1]!==null ? $ops['position'][1] : 1;
+    $p1 = isset($ops['position'][0]) ? $ops['position'][0] : 0;
+    $p2 = isset($ops['position'][1]) ? $ops['position'][1] : 1;
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     if ($ref!==null){
       $out .= "
@@ -1209,7 +1211,7 @@ function JSXG_createBlankBoard($label, $ops){
        $x1 = $p1[0]; $y1 = $p1[1];
        $out .= "[";
       // x1 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
         $out .= "function(){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1222,7 +1224,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x1},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1241,7 +1243,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1254,7 +1256,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y2, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1275,9 +1277,9 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               strokeWidth: {$strokeWidth},
               dash: {$dash},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out.=";";
@@ -1295,17 +1297,18 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [0,0];
-    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [3,3];
+    $p1 = isset($ops['position'][0]) ? $ops['position'][0] : [0,0];
+    $p2 = isset($ops['position'][1]) ? $ops['position'][1] : [3,3];
 
     // Make some default values
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If reference provided...
     if ($ref!==null){
@@ -1319,7 +1322,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x1 = $p1[0]; $y1 = $p1[1];
       $out .= "[";
       // x1 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
         $out .= "function(){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1332,7 +1335,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x1},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1351,7 +1354,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1364,7 +1367,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y2, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1385,9 +1388,9 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               dash: {$dash},
               strokeWidth: {$strokeWidth},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1404,17 +1407,18 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [0,0];
-    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [3,3];
+    $p1 = isset($ops['position'][0]) ? $ops['position'][0] : [0,0];
+    $p2 = isset($ops['position'][1]) ? $ops['position'][1] : [3,3];
 
     // Make some default values
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If reference provided...
     if ($ref!==null){
@@ -1428,7 +1432,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x1 = $p1[0]; $y1 = $p1[1];
       $out .= "[";
       // x1 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
         $out .= "function(){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1441,7 +1445,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x1},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1460,7 +1464,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1473,7 +1477,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y2, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1494,11 +1498,11 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               dash: {$dash},
               strokeWidth: {$strokeWidth},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . ",
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . ",
               lastArrow: true,
               straightFirst: false
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1515,18 +1519,19 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [3,0];
-    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [0,0];
-    $p3 = $ops['position'][2] !== null ? $ops['position'][2] : [0,3];
+    $p1 = isset($ops['position'][0]) ? $ops['position'][0] : [3,0];
+    $p2 = isset($ops['position'][1]) ? $ops['position'][1] : [0,0];
+    $p3 = isset($ops['position'][2]) ? $ops['position'][2] : [0,3];
 
     // Make some default values
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // initial ray
     // If reference provided...
@@ -1541,7 +1546,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1554,7 +1559,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1573,7 +1578,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x1 = $p1[0]; $y1 = $p1[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
         $out .= "function(){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1586,7 +1591,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x1},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1606,11 +1611,11 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               dash: {$dash},
               strokeWidth: {$strokeWidth},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . ",
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . ",
               lastArrow: true,
               straightFirst: false
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1629,7 +1634,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1642,7 +1647,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1661,7 +1666,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x3 = $p3[0]; $y3 = $p3[1];
       $out .= "[";
       // x3 value
-      if ($ops['slider-names']!=null && strpos($x3, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x3, "%")>-1){
         $out .= "function(){
           var x3s = '{$x3}';";
         foreach($ops['slider-names'] as $sn){
@@ -1674,7 +1679,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x3},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y3s = '{$y3}';";
         foreach($ops['slider-names'] as $sn){
@@ -1694,11 +1699,11 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               dash: {$dash},
               strokeWidth: {$strokeWidth},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . ",
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . ",
               lastArrow: true,
               straightFirst: false
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1715,17 +1720,18 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [3,0];
-    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [0,0];
+    $p1 = isset($ops['position'][0]) ? $ops['position'][0] : [3,0];
+    $p2 = isset($ops['position'][1]) ? $ops['position'][1] : [0,0];
 
     // Make some default values
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     if ($ref!==null){
       $out = "
@@ -1738,7 +1744,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x1 = $p1[0]; $y1 = $p1[1];
       $out .= "[";
       // x1 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
         $out .= "function(){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1751,7 +1757,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x1},";
       }
       // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
         $out .= "function(){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
@@ -1784,7 +1790,7 @@ function JSXG_createBlankBoard($label, $ops){
       $x2 = $p2[0]; $y2 = $p2[1];
       $out .= "[";
       // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($x2, "%")>-1){
         $out .= "function(){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1797,7 +1803,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y2, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
@@ -1818,9 +1824,9 @@ function JSXG_createBlankBoard($label, $ops){
               strokeColor: '{$color}',
               dash: {$dash},
               strokeWidth: {$strokeWidth},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+              name: " . (isset($ops['name']) ? $ops['name'] : "''") . "
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1838,19 +1844,20 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $points = $ops['position'] !== null ? $ops['position'] : [[-1,-1],[1,-1],[1,1],[-1,1]];
+    $points = isset($ops['position']) ? $ops['position'] : [[-1,-1],[1,-1],[1,1],[-1,1]];
 
     // Make some default values
 
     // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $fillColor = $ops['fillColor']!==null ? $ops['fillColor'] : 'white';
-    $fillOpacity = $ops['fillOpacity']!==null ? $ops['fillOpacity'] : 0;
+    $highlight = isset($ops['highlight']) ? $ops['highlight'] : "false";
+    $fixed = isset($ops['fixed']) ? $ops['fixed'] : "true";
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'black';
+    $fillColor = isset($ops['fillColor']) ? $ops['fillColor'] : 'white';
+    $fillOpacity = isset($ops['fillOpacity']) ? $ops['fillOpacity'] : 0;
 
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     if ($ref!==null){
       $out = "
@@ -1866,7 +1873,7 @@ function JSXG_createBlankBoard($label, $ops){
         $x1 = $point[0]; $y1 = $point[1];
         $out .= "[";
         // x1 value
-        if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        if (isset($ops['slider-names']) && strpos($x1, "%")>-1){
           $out .= "function(){
             var x1s = '{$x1}';";
           foreach($ops['slider-names'] as $sn){
@@ -1879,7 +1886,7 @@ function JSXG_createBlankBoard($label, $ops){
           $out .= "{$x1},";
         }
         // y1 value
-        if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
           $out .= "function(){
             var y1s = '{$y1}';";
           foreach($ops['slider-names'] as $sn){
@@ -1919,7 +1926,7 @@ function JSXG_createBlankBoard($label, $ops){
                 dash: {$dash}
               }
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
@@ -1936,22 +1943,23 @@ function JSXG_createBlankBoard($label, $ops){
     $labEnd = strpos($board, "'", $labStart);
     $label = substr($board, $labStart, $labEnd - $labStart);
 
-    $x = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-    $y = $ops['position'][1]!==null ? $ops['position'][1] : 0;
-    $obj = $ops['position'][2]!==null ? $ops['position'][2] : '';
+    $x = isset($ops['position'][0]) ? $ops['position'][0] : 0;
+    $y = isset($ops['position'][1]) ? $ops['position'][1] : 0;
+    $obj = isset($ops['position'][2]) ? $ops['position'][2] : '';
 
     // Make some default values
 
     // attributes
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'purple';
-    $size = $ops['size']!==null ? $ops['size'] : 2;
-    $face = $ops['face']!==null ? $ops['face'] : 'circle';
+    $color = isset($ops['strokeColor']) ? $ops['strokeColor'] : 'purple';
+    $size = isset($ops['size']) ? $ops['size'] : 2;
+    $face = isset($ops['face']) ? $ops['face'] : 'circle';
 
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $strokeWidth = isset($ops['strokeWidth']) ? $ops['strokeWidth'] : 2;
+    $out = '';
 
     // If answerbox option provided, set up box number
-    if($ops['answerbox']!==null ){
+    if(isset($ops['answerbox']) ){
       if (count($ops['answerbox'])==1){
         $box = $ops['answerbox'][0] - 1;
       } else {
@@ -1976,14 +1984,14 @@ function JSXG_createBlankBoard($label, $ops){
               size: {$size},
               face: '{$face}',
               label: {color:'{$color}', useMathJax:true},
-              name: '" . ($ops['name']!==null ? $ops['name'] : "") . "'
+              name: '" . (isset($ops['name']) ? $ops['name'] : "") . "'
             })";
-    if ($ops['attributes']!==null){
+    if (isset($ops['attributes'])){
       $out .= ".setAttribute({$ops['attributes']})";
     }
 
       // // If answerbox option provided, link the point to the answerbox
-      if($ops['answerbox']!==null ){
+      if(isset($ops['answerbox']) ){
         $out .= ".on('up',function(){
           $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')')
             .trigger('change').trigger('input');
@@ -2034,16 +2042,16 @@ function JSXG_createBlankBoard($label, $ops){
 		$label = substr($board, $labStart, $labEnd - $labStart);
 	
 		 // Defaults for visual apperance/name
-		$color = $ops['color'] !== null ? $ops['color'] : 'blue';
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
+		$color = isset($ops['color']) ? $ops['color'] : 'blue';
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
 
-		$ops['visible'] = $ops['visible'] === null ?  'true' : $ops['visible'];
-		$visible = $ops['visible'] ? 'true' : 'false';
+		$visible = !isset($ops['visible']) ?  'true' : $ops['visible'];
 		
 		// You must have a glider to attach a tangent to, if this isn't set then exit
-	    $obj = $ops['glider'] !== null ? $ops['glider'] : '';
-	
+	    $obj = isset($ops['glider']) ? $ops['glider'] : '';
+        $out = '';
+
 		if($obj !== '') {
 				
 			// If $ref provided, then give the object a name
@@ -2058,7 +2066,7 @@ function JSXG_createBlankBoard($label, $ops){
 			
 			// -- The name field is a bit more complex so that math 
 			//    notation can be used; f'(x) needs wrapped in "f'(x)" for instance
-			$out .= 'name: "' . ($ops['label']!==null ? $ops['label'] : "") . '",';
+			$out .= 'name: "' . (isset($ops['label']) ? $ops['label'] : "") . '",';
 			
 			$out .= "
 				strokeColor: '{$color}',
@@ -2070,7 +2078,7 @@ function JSXG_createBlankBoard($label, $ops){
 				highlight: false,
 				label: { color:'{$color}', useMathJax: true }
 			})";
-			if ($ops['attributes'] !== null) {
+			if (isset($ops['attributes'])) {
 				$out .= ".setAttribute({$ops['attributes']});";
 			} else {
 				$out .= ";";
@@ -2093,7 +2101,7 @@ function JSXG_createBlankBoard($label, $ops){
 		$labEnd = strpos($board, "'", $labStart);
 		$label = substr($board, $labStart, $labEnd - $labStart);
 			
-		$out .= "{$obj}.setAttribute( ".$parameters." );";
+		$out = "{$obj}.setAttribute( ".$parameters." );";
 	
 		// Append new output string to the board string{
 		return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);

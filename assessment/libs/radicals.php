@@ -43,15 +43,14 @@ function reduceradical($in,$root=2,$format="string") {
 	$root = intval($root);
 
     $iscomplex = false;
+    $sign = '';
 	if ($in<0) {
         if ($root == 2) {
             $iscomplex = true;
         } else {
             $sign = '-';
         }
-	} else {
-		$sign = '';
-	}
+	} 
 
 	$in = abs($in);
 	$max = 	pow($in,1/$root);
@@ -245,13 +244,17 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 	} else {
 		$iscomplex = false;
 	}
+	if ($n == 0 || $rootnum == 0) {
+		$n = 0;
+		$rootnum = 0;
+	}
 	$root = 2;
 	//reduce to (a+n sqrt(in))/d
 	list($rootA,$in) = reduceradical($rootnum,$root,"parts");
 	$n *= $rootA;
 	if ($in==1 && !$iscomplex) {
-		$n += $a;
-		$a = 0;
+		$a += $n;
+		$n = 0;
 	} else if ($in == 0) {
         $n = 0;
     }
@@ -274,10 +277,10 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 	if ($format=='disp') {
 		$outstr .= '`';
 	}
-	if ($d>1 && ($a != 0 && $n != 0)) {
+	if ($d>1 && (($a != 0 && $n != 0) || ($n !=0 && abs($n) != 1))) {
 		$outstr .= '(';
 	}
-	if ($a != 0) {
+	if ($a != 0 || $n == 0) {
 		$outstr .= $a;
 		if ($n>0) {
 			$outstr .= '+';
@@ -290,14 +293,14 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 	} else if ($n==-1) {
 		$outstr .= '-';
 	}
-	if ($in>1) {
+	if ($in>1 && $n!=0) {
 		$outstr .= "sqrt($in)";
 	}
 	if ($iscomplex) {
 		$outstr .= "i";
 	}
 	if ($d>1) {
-        if ($a != 0 && $n != 0) {
+        if (($a != 0 && $n != 0) || ($n != 0 && abs($n) != 1)) {
             $outstr .= ')';
         }
 		$outstr .= "/$d";

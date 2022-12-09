@@ -142,7 +142,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
 			require_once("../includes/updateptsposs.php");
-			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			updatePointsPossible($aid, $itemorder, $row[2]);
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
@@ -551,7 +551,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line===false) { continue; } //this should never happen, but avoid issues if it does
 		$existingq[] = $line['questionsetid'];
 		//output item array
-		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
+		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || !empty($adminasteacher)) { //can edit without template?
 			$canedit = 1;
 		} else {
 			$canedit = 0;
@@ -946,7 +946,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_useavgtimes = true;
 							$page_questionTable[$i]['meantime'] = round($line['meantime']/60,1);
 							$page_questionTable[$i]['qdata'] = array($line['meanscore'],$line['meantime'],$line['meantimen']);
-						}
+						} 
 
 						$page_questionTable[$i]['broken'] = intval($line['broken']);
 
@@ -1445,10 +1445,9 @@ if ($overwriteBody==1) {
 					if (isset($page_questionTable[$qid]['qdata'])) {
 						echo '<span onmouseenter="tipshow(this,\''._('Avg score on first try: ').round($page_questionTable[$qid]['qdata'][0]).'%';
 						echo '<br/>'._('Avg time on first try: ').round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseleave="tipout()">';
-					} else {
-						echo '<span>';
+                        echo $page_questionTable[$qid]['meantime'].'</span>';
 					}
-					echo $page_questionTable[$qid]['meantime'].'</span>'; ?></td> <?php }?>
+					?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td><div class="dropdown">
 					  <a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

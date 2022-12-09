@@ -255,7 +255,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 						// not checking for division by zero as this is instructor supplied
 					    $dec1 = $solutionlistarray[0]/$solutionlistarray[1];
 				    } else {
-                        $dec1 = $solutionlistarray;
+                        $dec1 = fractiontodecimal($solutionlistarray);
 					}
 
 					// verify it is an array.
@@ -268,10 +268,10 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                             break;
                         }
                     } else {
-                        $dec2 = $stuanswer[$LastStuColumn];
+                        $dec2 = fractiontodecimal($stuanswer[$LastStuColumn]);
                     }
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -288,16 +288,16 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                         // not checking for division by zero as this is instructor supplied
 						$dec1 = $solutionlist[$r][$c][0]/$solutionlist[$r][$c][1];
                     } else {
-                        $dec1 = $solutionlist[$r][$c];
+                        $dec1 = fractiontodecimal($solutionlist[$r][$c]);
                     }
 
                     if(is_array($stuanswer[$LastStuColumn])) {
                         $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
                     } else {
-                        $dec2 = $stuanswer[$c];
+                        $dec2 = fractiontodecimal($stuanswer[$c]);
                     }
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -311,11 +311,11 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                 $match = 1;  // found a possible solution
 				// Check Objective
                 if($HasObjective==1) {
-                    if (is_array($solutionlistarray)) {
+                    if (is_array($solutionlist[$r][$OptimizedValuecol])) {
                         // not checking for division by zero as this is instructor supplied
                         $dec1 = $solutionlist[$r][$OptimizedValuecol][0]/$solutionlist[$r][$OptimizedValuecol][1];
                     } else {
-                        $dec1 = $solutionlist[$r][$OptimizedValuecol];
+                        $dec1 = fractiontodecimal($solutionlist[$r][$OptimizedValuecol]);
                     }
 
 
@@ -328,11 +328,11 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                             break;
                         }
                     } else {
-                        $dec2 = $stuanswer[$LastStuColumn];
+                        $dec2 = fractiontodecimal($stuanswer[$LastStuColumn]);
                     }
 
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -349,18 +349,18 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                         // not checking for division by zero as this is instructor supplied
                         $dec1 = $solutionlist[$r][$j][0]/$solutionlist[$r][$j][1];
                     } else {
-                        $dec1 = $solutionlist[$r][$j];
+                        $dec1 = fractiontodecimal($solutionlist[$r][$j]);
                     }
 
 					if (is_array($stuanswer[$c])) {
                         // not checking for division by zero as this is instructor supplied
                         $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
                     } else {
-                        $dec2 = $stuanswer[$c];
+                        $dec2 = fractiontodecimal($stuanswer[$c]);
                     }
 
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -1265,7 +1265,7 @@ function simplexdisplaycolortable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if(!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -2392,7 +2392,7 @@ function simplexreadsolution($sm,$type,$showfractions=1,$ismixed=FALSE,$debug=0)
 	return simplexreadsolutionarray($sma,$type,$showfractions,$ismixed,$debug);
 }
 
-function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0) {
+function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$debug=0) {
 
 	if($debug==1) { echo "starting simplexreadsolutionarray<br/>"; }
 
@@ -2819,7 +2819,7 @@ function simplexsolve2() {
 
 		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
-        if(is_null($simplexsets[$rows])) {
+        if(!isset($simplexsets[$rows])) {
             $simplexsets[$rows] = array();
         }
 

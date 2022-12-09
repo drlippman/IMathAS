@@ -9,6 +9,7 @@ global $allowedmacros;
 array_push($allowedmacros, 'parseunits');
 
 function parseunits($unitsExpression) {
+    $origExpression = $unitsExpression;
     //A unit expression should be of the form [decimal number]*[unit]^[power]*[unit]^[power]... / [unit]^[power]*[unit]^[power]...
     //Factors can also be numerical, including scientific notation.
     //All factors after division symbol are contained in denominator.
@@ -678,6 +679,11 @@ function parseunits($unitsExpression) {
           $unitArray[$i]=$unitArray[$i]-$factor*$units[$k][1][$i];
         }
       }
+    }
+    if (!is_numeric($baseNumber) || !is_numeric($numerical)) {
+        echo 'Eek! Was unable to parse units';
+        error_log("Units nonnumeric on basenum $baseNumber, numerical $numerical, orig $origExpression");
+        return '';
     }
     //At this point, $numerical is the number and $unitArray is the array of factors of fundamental units: e.g. [0,1,-2,0,0,0,0,0,1,0] would mean meter*amp/sec^2 
     //Code block below converts expression in terms of fundamental metric units.

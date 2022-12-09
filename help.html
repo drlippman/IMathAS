@@ -2121,6 +2121,7 @@ Comparison operators available for &quot;if&quot; and &quot;where&quot; statemen
 <li>&lt; Less than</li>
 <li>&gt;= Greater than or equal to</li>
 <li>&lt;= Less than or equal to</li>
+<li>isset($v) Whether $v is defined</li>
 </ul>
 <p>
 To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
@@ -2195,6 +2196,11 @@ for ($i=0..4) {
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 {for ($i=1..5) {$a = $a+$i} } if ($a>2)    WORKS
 </pre>
+
+<p>Inside a for loop, <code>break</code> can be used to break out of the loop, and 
+   <code>continue</code> can be used to move on to the next iteration without executing 
+   any further clode in the block.
+</p>
 
 
 </div> <!-- h2 -->
@@ -2500,6 +2506,7 @@ These macros are for working with arrays:
 	    would return $a[2], $a[4], and $a[6]</li>
 	 </ul>
 	 </li>
+<li><strong>splicearray(array,offset,length,[replacement])</strong>: Removes the elements designated by offset and length from the given array, and replaces them with the elements of the replacement array, if supplied.</li>
 <li><strong>joinarray(array,symbol)</strong>:  Convert an array to a string, joining elements with the given symbol</li>
 <li><strong>mergearrays(array,array,[array,...])</strong>:  Combines two or more arrays into one long array</li>
 <li><strong>unionarrays(array,array)</strong>:  Unions two arrays, preventing duplicates, into a new array</li>
@@ -2622,6 +2629,7 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
+<li><strong>isset($var)</strong>: Checks to see if $var is defined</li>
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
 <li><strong>is_nan(val)</strong>:  Checks if the value is NAN (not a number), which results from things like sqrt(-1). Only works on calculated values, not string expressions.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
@@ -3755,8 +3763,10 @@ Complex questions require the student to enter a complex number in a+bi form.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "list" </dt>
-	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt>$answerformat = "list" or "allowjcomplex" </dt>
+	<dd>"list" Specifies that the answer will be a list of complex numbers.
+		"allowjcomplex" allows 2+3j instead of 2+3i
+	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3793,9 +3803,10 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
+<dt><dt>$answerformat = "sloppycomplex", "allowjcomplex" "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
 	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
 	must still only contain one i.  <br/>
+	"allowjcomplex" allows for use of j instead of i as the imaginary unit. <br/>
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
@@ -3843,9 +3854,10 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult" or "ref"</dt>
+<dt>$answerformat = "scalarmult" or "ref" or "anyroworder"</dt>
 	<dd>If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
-	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.</dd>
+	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
+    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3895,12 +3907,13 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult","ref","fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt>$answerformat = "scalarmult","ref","anyroworder",fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
 	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
-	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.</dd>
+	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
+    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>

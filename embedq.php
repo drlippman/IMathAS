@@ -24,7 +24,7 @@ $prefdefaults = array(
 	'drawentry'=>1,
 	'useed'=>1,
 	'livepreview'=>1);
-$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"] ?? '', true);
 $_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {
@@ -44,6 +44,7 @@ $_SESSION['drill']['cid'] = 0;
 $_SESSION['drill']['sa'] = 0;
 $_SESSION['secsalt'] = "12345";
 $cid = "embedq";
+$myrights = 5;
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;

@@ -381,7 +381,9 @@ function gbinstrdisp() {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$gbt = gbtable();
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
@@ -511,7 +513,7 @@ function gbinstrdisp() {
 		echo $gbt[$i][0][0];
 		echo '</td>';
 		for ($j=1;$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
+			echo '<td class="c">'.($gbt[$i][0][$j] ?? '').'</td>';  // most empty on averages row
 		}
 		if ($totonleft && !$hidepast) {
 			gbInstrCatCols($gbt, $i);
@@ -541,15 +543,20 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][1][$j][0])) {
 
 						echo $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						} else if ($gbt[$i][1][$j][3]==2) {
-							echo ' (IP)';
-						} else if ($gbt[$i][1][$j][3]==3) {
-							echo ' (OT)';
-						} else if ($gbt[$i][1][$j][3]==4) {
-							echo ' (PT)';
-						}
+						if (isset($gbt[$i][1][$j][3])) { // unset on averages row
+                            if ($gbt[$i][1][$j][3]>9) {
+                                $gbt[$i][1][$j][3] -= 10;
+                            }
+                            if ($gbt[$i][1][$j][3]==1) {
+                                echo ' (NC)';
+                            } else if ($gbt[$i][1][$j][3]==2) {
+                                echo ' (IP)';
+                            } else if ($gbt[$i][1][$j][3]==3) {
+                                echo ' (OT)';
+                            } else if ($gbt[$i][1][$j][3]==4) {
+                                echo ' (PT)';
+                            }
+                        }
 
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
@@ -573,14 +580,11 @@ function gbinstrdisp() {
 
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						}
 					} else {
 						echo '-';
 					}
 
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
@@ -607,9 +611,9 @@ function gbinstrdisp() {
 				}
 				if ($includetimes>0 && $gbt[0][1][$j][6]==0) {
 					if ($includetimes==1) {
-						echo '<td>'.$gbt[$i][1][$j][7].'</td>';
+						echo '<td>'.($gbt[$i][1][$j][7] ?? '').'</td>';
 					} else if ($includetimes==2) {
-						echo '<td>'.$gbt[$i][1][$j][8].'</td>';
+						echo '<td>'.($gbt[$i][1][$j][8] ?? '').'</td>';
 					}
 					$n++;
 				}

@@ -427,7 +427,7 @@
 			} else {
 				unset($_SESSION['actas']);
 			}
-			if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
+			if (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader')!==false) {
 				$_SESSION['intreereader'] = true;
 			} else {
 				$_SESSION['intreereader'] = false;
@@ -1184,7 +1184,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			.LPshowcorrect .LPresbar, .LPshowwrong  .LPresbar {background-color: #FFFFFF;}
 			</style>';
 	}
-	if ($_SESSION['intreereader']) {
+	if (!empty($_SESSION['intreereader'])) {
 		$flexwidth = true;
 	}
 	require("header.php");
@@ -1192,7 +1192,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
 
-	if (!$isdiag && !$isltilimited && !$_SESSION['intreereader']) {
+	if (!$isdiag && !$isltilimited && empty($_SESSION['intreereader'])) {
 		if (isset($_SESSION['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$_SESSION['coursename']}</a> ";
 			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$_SESSION['actas']}\">", _('Gradebook Detail'), "</a> ";
@@ -2354,7 +2354,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			showqinfobar($qn,true,false,true);
 
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
-			if ($introhaspages || $_SESSION['intreereader']) {
+			if ($introhaspages || !empty($_SESSION['intreereader'])) {
 				echo 'embedattemptedtrack["q'.$qn.'"][1]=0;';
 				if (false && $showeachscore) {
 					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn) ? "1":"0") . ';';
@@ -3744,7 +3744,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo ' '._('or').' ';
 			}
 			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a>\n";
-		} else if ($isltilimited || $_SESSION['intreereader']) {
+		} else if ($isltilimited || !empty($_SESSION['intreereader'])) {
 
 		} else {
 			if ($or != '') {

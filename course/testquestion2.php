@@ -75,6 +75,8 @@ if ($myrights<20) {
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
+    $isquestionauthor = ($line['ownerid'] == $userid);
+
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
 
@@ -126,7 +128,7 @@ if ($myrights<20) {
 		$page_scoreMsg = "";
 		$_SESSION['choicemap'] = array();
 	}
-  $cid = Sanitize::courseId($_GET['cid']);
+  $cid = Sanitize::courseId($_GET['cid'] ?? 0);
 	$page_formAction = "testquestion2.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($qsetid);
 
 	if (isset($_POST['usecheck'])) {
@@ -167,12 +169,12 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
 
 $useeqnhelper = $eqnhelper;
-$lastupdate = '20210401';
+$lastupdate = '20221027';
 $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=071122" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=112822" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=071122" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
@@ -181,8 +183,8 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=021121" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=071122" type="text/javascript"></script>';
 } else {
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=072022" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=101322" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112822" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=111622" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';

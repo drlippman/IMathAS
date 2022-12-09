@@ -118,6 +118,10 @@ class NTupleScorePart implements ScorePart
 
             //parse the ntuple without evaluating
             $tocheck = $this->parseNtuple($givenans, false, false);
+            if (!is_array($tocheck)) {
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
             if ($checkSameform) {
                 $normalizedGivenAnswer = $tocheck;
             }
@@ -147,7 +151,7 @@ class NTupleScorePart implements ScorePart
             }
         }
 
-        if (count($gaarr)==0) {
+        if (!is_array($gaarr) || count($gaarr)==0) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }

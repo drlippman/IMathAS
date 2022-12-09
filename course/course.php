@@ -20,7 +20,9 @@ function buildBlockLeftNav($items, $parent, &$blocklist) {
 					$blocklist[] = array($item['name'], $parent.'-'.($k+1), $item['SH'][1]);
 				}
 			}
-			buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            if (!empty($item['items'])) {
+			    buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            }
 		}
 	}
 }
@@ -201,19 +203,29 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		buildBlockLeftNav($items, '0', $stuLeftNavBlocks);
 	}
 
+    $contentbehavior = 0;
 	if ($_GET['folder']!='0') {
 		$now = time();
 		$blocktree = array_map('intval', explode('-',$_GET['folder']));
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+			if (!isset($items[$blocktree[$i]-1]['name']) || (
+                !isset($teacherid) && !isset($tutorid) && 
+                $items[$blocktree[$i]-1]['avail']<2 && 
+                $items[$blocktree[$i]-1]['SH'][0]!='S' && (
+                    $now<$items[$blocktree[$i]-1]['startdate'] || 
+                    $now>$items[$blocktree[$i]-1]['enddate'] || 
+                    $items[$blocktree[$i]-1]['avail']=='0'
+                )
+            )) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
 				unset($blocktree);
 				break;
 			}
+            $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+
 			if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
 				if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
 					echo 'Not authorized';
@@ -227,9 +239,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-	} else {
-        $contentbehavior = 0;
-    }
+	}
 	//DEFAULT DISPLAY PROCESSING
 	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
 	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";
@@ -242,7 +252,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
 
-	$curBreadcrumb = $breadcrumbbase;
+	$curBreadcrumb = $breadcrumbbase ?? '';
 	if (isset($backtrack) && count($backtrack)>0) {
 		if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 			array_unshift($backtrack, array($coursename, '0'));

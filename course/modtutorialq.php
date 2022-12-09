@@ -43,6 +43,7 @@ if (!isset($_GET['aid'])) {
 }
 $now = time();
 $editmsg = '';
+$frompot = 0;
 
 if (isset($_POST['text'])) {
 	if (!isset($_GET['id'])) {
@@ -1027,7 +1028,7 @@ echo '<div id="headermoddataset" class="pagetitle">';
 echo "<h1>$addmod Tutorial Question</h1>\n";
 echo '</div>';
 
-if ($editmsg != '' || $_GET['id']!='new') {
+if ($editmsg != '' || $id!='new') {
 	echo '<p>'.$editmsg;
 	if ($id!='new') {
 		echo ' <a href="moddataset.php?cid='.$cid.'&id='.$id.'">Open in the regular question editor</a>';
@@ -1369,7 +1370,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'num" ';
 	if ($qtype[$n]!='number') {echo ' style="display:none;"';};
 	echo '> values that will receive feedback. Use a(n) ';
-	writeHtmlSelect("qtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	writeHtmlSelect("qtol$n",$qtolval,$qtollbl, $qtol[$n] ?? 'abs');
 
 	echo ' tolerance of <input autocomplete="off" name="tol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="numboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):5).'"/>.';
@@ -1379,7 +1380,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'calc" ';
 	if ($qtype[$n]!='calculated') {echo ' style="display:none;"';};
 	echo '> numeric expressions that will receive feedback. Use a(n) ';
-	writeHtmlSelect("calcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	writeHtmlSelect("calcqtol$n",$qtolval,$qtollbl, $qtol[$n] ?? 'abs');
 	echo ' tolerance of <input autocomplete="off" name="calctol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="calcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
 	echo ' Answer format: ';// <select name="answerformat'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?$variables[$n]:'x').'"/>.';
@@ -1390,7 +1391,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'func" ';
 	if ($qtype[$n]!='numfunc') {echo ' style="display:none;"';};
 	echo '> algebraic expressions that will receive feedback. Use a(n) ';
-	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n] ?? 'abs');
 	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
 	echo ' Variables: <input autocomplete="off" name="variables'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?Sanitize::encodeStringForDisplay($variables[$n]):'x').'"/>.';

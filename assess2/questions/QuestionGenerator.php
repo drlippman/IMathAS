@@ -187,7 +187,16 @@ class QuestionGenerator
     {
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
-        if (E_WARNING == $errno || E_ERROR == $errno) {
+        $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
+        if (E_ERROR == $errno || (E_WARNING == $errno &&
+            (
+                ($showallerrors || $errstr != 'Trying to access array offset on value of type null') &&
+                ($showallerrors || empty($GLOBALS['CFG']['suppress_question_warning_display']))
+            )
+        )) {
+          if ($errstr == 'Trying to access array offset on value of type null') {
+            $errstr = 'Trying to access array offset of undefined variable';
+          }
           $this->addError(sprintf(
               _('Caught warning in the question code: %s on line %d in file %s'),
               $errstr, $errline, $errfile));
@@ -209,8 +218,12 @@ class QuestionGenerator
         ErrorHandler::evalExceptionHandler($t);
 
         $this->addError(
-            _('<p>Caught error while evaluating this question: ')
-            . Sanitize::encodeStringForDisplay($t->getMessage())
-            . '</p>');
+            _('Caught error while evaluating this question: ')
+            . $t->getMessage()
+            . ' on line '
+            . $t->getLine()
+            . ' of '
+            . $t->getFile()
+          );
     }
 }

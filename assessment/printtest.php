@@ -25,6 +25,7 @@
 			</script>';
 	}
 	$_SESSION['coursetheme'] = $coursetheme;
+    $useeqnhelper = 0;
 	require("header.php");
 	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn, button.btn {display: none;}\n textarea {display: none;}\n .question, .review {background-color:#fff;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;} input.sabtn,input.dsbtn {display: none;}</style>\n";

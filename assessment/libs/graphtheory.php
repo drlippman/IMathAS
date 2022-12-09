@@ -141,7 +141,7 @@ function graphcircle($n,$op=array()) {
 //connected to the center vertex
 //returns array(pic,g)
 function graphcircledstar($n,$op=array()) {
-	$g = graphemptygraph($n);
+	$g = graphemptygraph($n+1);
 	for ($i = 1; $i<=$n; $i++) {
 		$g[0][$i] = 1;
 		if ($i==1) {
@@ -270,8 +270,8 @@ function graphdijkstra($g,$dest=-1) {
 		}
 		$eaten[$cur] = 1; //remove vertex
 		for ($i=0; $i<$n; $i++) {
-			if (!isset($eaten[$i]) && (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i])>0) { //vertices leading to $cur
-				$alt = $dist[$cur] + (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
+			if (!isset($eaten[$i]) && ((!empty($op['digraph']) || $i<$cur)?$g[$i][$cur]:$g[$cur][$i])>0) { //vertices leading to $cur
+				$alt = $dist[$cur] + ((!empty($op['digraph']) || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
 				if ($alt<$dist[$i]) {
 					$dist[$i] = $alt;
 					$next[$i] = $cur;
@@ -452,15 +452,23 @@ function graphsortededges($g) {
 //returns # of dups if covers all edges with duplications
 function graphsequenceeuleredgedups($g,$op,$seq) {
 	$n = count($g[0]);
-	if ($op['labels'] != 'letters') {
+    $seq = trim($seq);
+	if (isset($op['labels']) && $op['labels'] != 'letters') {
 		$lbl = $op['labels'];
 	} else {
 		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $seq = strtoupper($seq); // account for lowercase sequence
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
+    if ($len < 2) {
+        return -1; //not long enough
+    }
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
+        if (!isset($lblrev[$seq[$i]])) { // invalid entry
+            return -1;
+        }
 		$vseq[$i] = $lblrev[$seq[$i]];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
@@ -507,16 +515,20 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
+    if ($len != $n+1) {
+		return false; //doesn't return to start or not long enough
+	}
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
+        if (!isset($lblrev[$seq[$i]])) { // invalid entry
+            return false;
+        }
 		$vseq[$i] = $lblrev[$seq[$i]];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
 		return false;
 	}
-	if ($len != $n+1) {
-		return false; //doesn't return to start or not long enough
-	}
+	
 	$notvis = array_fill(0,$n,1);
 	for ($i=1; $i<$len; $i++) {
 		if ($g[$vseq[$i]][$vseq[$i-1]]>0 || $g[$vseq[$i-1]][$vseq[$i]]>0) {
@@ -551,9 +563,16 @@ function graphgetpathlength($g,$op,$seq) {
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
+    if ($len == 0) { return 0; }
 	$pathlen = 0;
+    if (!isset($lblrev[$seq[0]])) { // invalid entry
+        return -1;
+    }
     $last = $lblrev[$seq[0]];
 	for ($i=1; $i<$len; $i++) {
+        if (!isset($lblrev[$seq[$i]])) { // invalid entry
+            return -1;
+        }
 		$cur = $lblrev[$seq[$i]];
 		$pathlen += max($g[$last][$cur],$g[$cur][$last]);
 		$last = $cur;
@@ -673,7 +692,7 @@ function graphgetedges($g,$op) {
 	$bad = array();
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if($g[$i][$j]>0) {
 					$good[] = $lbl[$i] . $lbl[$j];
 				} else {
@@ -704,7 +723,7 @@ function graphgetedgesarray($g) {
 	$good = array();
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if($g[$i][$j]>0) {
 					$good[] = array($i,$j);
 				}
@@ -796,7 +815,7 @@ function graphadjacencytoincidence($g,$op) {
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if($g[$i][$j]>0) {
 					$list[$i][] = $j;
 				}
@@ -855,7 +874,7 @@ function graphmakesymmetric($g) {
 	$n = count($g[0]);
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
-			$m = max($g[$i][$j],$g[$j][$i]);
+			$m = max($g[$i][$j] ?? 0,$g[$j][$i] ?? 0);
 			if ($m>0) {
 				$g[$i][$j] = $m;
 				$g[$j][$i] = $m;
@@ -882,10 +901,10 @@ function graphisconnected($g) {
 
 //graphmaketable(g,[op])
 //makes a weights table based on a given graph
-function graphmaketable($g,$o=array()) {
+function graphmaketable($g,$op=array()) {
 	$n = count($g[0]);
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-	if (!is_array($op['labels'])) {
+	if (!isset($op['labels']) || !is_array($op['labels'])) {
 		$op['labels'] = array_slice($lettersarray,0,$n);
 	}
 	$table = '<table class="stats"><thead>';
@@ -1036,8 +1055,8 @@ function graphgridlayout($g,$op=array()) {
 	}
 	$gd = 10/$sn;
 	for ($i=0; $i<$n; $i++) {
-		$pos[$i][0] = floor($i/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
-		$pos[$i][1] = ($i%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+		$pos[$i][0] = floor($i/$sn)*$gd  + (!empty($op['wiggle'])?$gd/5*sin(3*$i):0);
+		$pos[$i][1] = ($i%$sn)*$gd + (!empty($op['wiggle'])?$gd/5*sin(4*$i):0);
 	}
 	return graphdrawit($pos,$g,$op);
 }
@@ -1063,7 +1082,7 @@ function graphpathlayout($g,$op=array()) {
 	for ($i=0; $i<$n; $i++) {
 		if ($dist[$i]<0) { $dist[$i] = 0;}
 		$pos[$i][0] = 1-$dh*$dist[$i];
-		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ ($op['wiggle']?$dv/5*sin(4*$dist[$i]):0);
+		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ (!empty($op['wiggle'])?$dv/5*sin(4*$dist[$i]):0);
 		$loccnt[$dist[$i]]++;
 	}
 
@@ -1077,7 +1096,7 @@ function graphprocessoptions($g,$op) {
 	$n = count($g[0]);
 
 	if (!isset($op['connected'])) {
-		if ($op['tree']) {
+		if (!empty($op['tree'])) {
 			$op['connected'] = true;
 		} else {
 			$op['connected'] = false;
@@ -1097,7 +1116,7 @@ function graphprocessoptions($g,$op) {
 				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
 					$nedg++;
 				}
-				if ($op['digraph'] && $g[$i][$j]>0 && $g[$j][$i]>0) {
+				if (!empty($op['digraph']) && $g[$i][$j]>0 && $g[$j][$i]>0) {
 					$nedg++;
 				}
 			}
@@ -1106,7 +1125,7 @@ function graphprocessoptions($g,$op) {
 		$c = 0;
 		for ($i=0; $i<$n; $i++) {
 			for ($j=$i+1; $j<$n; $j++) {
-				if ($op['digraph']) {
+				if (!empty($op['digraph'])) {
 					if ($g[$i][$j]>0) {
 						$g[$i][$j] = $rweights[$c];
 						$c++;
@@ -1127,7 +1146,7 @@ function graphprocessoptions($g,$op) {
 	if (isset($op['randedges'])) {
 		$origg = $g;
 	}
-	if ($op['tree'] || (isset($op['randedges']) && $op['connected'])) {
+	if (!empty($op['tree']) || (isset($op['randedges']) && $op['connected'])) {
 		$g = graphkruskal($g);
 	} else if (isset($op['randedges']) && !$op['connected']) {
 		$g = graphemptygraph($n);
@@ -1148,7 +1167,7 @@ function graphprocessoptions($g,$op) {
 			}
 		}
 	}
-	if ($op['tree'] && !$op['connected']) {
+	if (!empty($op['tree']) && !$op['connected']) {
 		$list = graphadjacencytoincidence($g,$op);
 		for ($i=0; $i<count($list); $i++) {
 			if (count($list[$i])>1) {
@@ -1193,14 +1212,14 @@ function graphdrawit($pos,$g,$op) {
 	$cy = ($op['ymin'] + $op['ymax'])/2;
 
 	$com .= "fontstyle='none';";
-	if ($op['digraph']) {
+	if (!empty($op['digraph'])) {
 		$com .= 'marker="arrow";';
 	} else {
 		$com .= 'marker=null;';
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
-			if ($op['digraph']) {
+			if (!empty($op['digraph'])) {
 				if ($g[$j][$i]>0 && $g[$i][$j]==0) {
 					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
 				} else if ($g[$i][$j]>0 && $g[$j][$i]==0) {
@@ -1210,7 +1229,7 @@ function graphdrawit($pos,$g,$op) {
 				}
 
 			} else {
-				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+				if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
 				}
 			}
@@ -1233,7 +1252,7 @@ function graphdrawit($pos,$g,$op) {
 		}
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		for ($j=$i+1; $j<$n; $j++) {
-			if ($op['useweights'] && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
+			if (!empty($op['useweights']) && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
 				if (($i+$j)%2==0) {
 					$mx = $pos[$j][0] + ($pos[$i][0] - $pos[$j][0])*($op['weightoffset']);
 					$my = $pos[$j][1] + ($pos[$i][1] - $pos[$j][1])*($op['weightoffset']);
@@ -1308,8 +1327,8 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 	$pos[$tot-1][0] = $m*$gd;
 	$pos[$tot-1][1] = $gd*(($n-1)/2);
 	for ($i=0; $i<$tot-1; $i++) {
-		$pos[$i][0] = floor(($i)/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
-		$pos[$i][1] = $sn-1-(($i)%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+		$pos[$i][0] = floor(($i)/$sn)*$gd  + (!empty($op['wiggle'])?$gd/5*sin(3*$i):0);;
+		$pos[$i][1] = $sn-1-(($i)%$sn)*$gd + (!empty($op['wiggle'])?$gd/5*sin(4*$i):0);
 	}
 	//connections to start and end
 	for ($i = 1; $i<$n+1; $i++) {
@@ -1542,7 +1561,7 @@ function graphlistprocessing($g,$t,$L,$p,$op=array()) {
 		//mark done tasks
 		if ($curtime > 0) {
 			for ($i=0;$i<$p;$i++) {
-				if ($proc[$i]<=$curtime) { //if processor is done
+				if ($proc[$i]<=$curtime && count($out[$i])>0) { //if processor is done
 					$done[$out[$i][count($out[$i])-1][0]] = 1; //mark this proc's last task as done
 					//echo "marking".$out[$i][count($out[$i])-1][0]." done<br/>";
 				}
@@ -1551,6 +1570,7 @@ function graphlistprocessing($g,$t,$L,$p,$op=array()) {
 		//get ready tasks
 		$ready = array();
 		for ($i=0;$i<$n;$i++) {
+            if (!isset($L[$i])) { continue;} // "End" node not included in priority list
 			if (isset($started[$L[$i]])) {continue; } //skip if done
 			$isready = true;
 			foreach ($prereqs[$L[$i]] as $j) { //foreach prereq check if done
@@ -1613,6 +1633,7 @@ function graphscheduletaskinfo($sc,$n) {
 function graphschedulecompletion($sc) {
 	$time = 0;
 	foreach ($sc as $pl) {
+        if (count($pl)==0) { continue; } // processsor did nothing
 		$ptime = $pl[count($pl)-1][1] + $pl[count($pl)-1][2];
 		if ($ptime>$time) {
 			$time = $ptime;

@@ -542,7 +542,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 
 	$colors = makecolor2($row[3],$row[2],$now);
-	if ($row[7]==2) {
+	if ($row[5]==2) {
 		$colors = "#0f0";
 	}
 	if ($editingon) {$colors='';}
@@ -642,7 +642,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name'],$status);
 	}
-	$tag = substr($row[1],0,8);
+	$tag = substr($row['caltag'],0,8);
 	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
 		$json = array(
 			"type"=>"FS",
@@ -690,6 +690,8 @@ foreach ($itemsimporder as $item) {
 		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
 		continue;
 	}
+    if (!isset($itemsassoc[$item])) { continue; } // itemorder error?
+    
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
@@ -739,7 +741,7 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='InlineText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['I'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['I'.$datetype.$itemsassoc[$item][5]]>0 && !isset($teacherid)) { //if not available, skip
+				if ($byid['I'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['I'.$datetype.$itemsassoc[$item][1]][0];
@@ -762,7 +764,7 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['L'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['L'.$datetype.$itemsassoc[$item][5]]>0 && !isset($teacherid)) { //if not available, skip
+				if ($byid['L'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['L'.$datetype.$itemsassoc[$item][1]][0];
@@ -930,12 +932,15 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
                 (!empty($item['grouplimit']) && isset($studentinfo['section']) &&
                     substr($item['grouplimit'][0],2) != $studentinfo['section'])
             );
-			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
+            if (!empty($item['items'])) {
+			    flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
+            }
 		} else {
 			$addto[] = $item;
 			$folderholder[$item] = $folder;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
+                $greyitems[$item] = 0;
 			} else {
 				$greyitems[$item] = $curblockgrey;
 			}

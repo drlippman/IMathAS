@@ -72,7 +72,7 @@ if (isset($tutorid)) {
 if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (!(isset($_GET['cid']))) {
+} elseif (!(isset($_GET['cid'])) || !(isset($_GET['aid']))) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
@@ -202,11 +202,12 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
         $DBH->commit();
 
 		header('Location: ' . $backurl);
-
+        exit;
 	} else if (isset($_GET['clear'])) {
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['clear']));
 		header('Location: ' . $backurl);
+        exit;
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$uid));
@@ -249,7 +250,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 			$page_isExceptionMsg .=  'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
 			$page_isExceptionMsg .= 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
 		}
-	}
+	} 
 	//DEFAULT LOAD DATA MANIPULATION
 	$address = $GLOBALS['basesiteurl'] . "/course/exception.php?" . Sanitize::generateQueryStringFromMap(array(
 			'cid' => $_GET['cid'], 'uid' => $_GET['uid'], 'asid' => $asid, 'stu' => $stu, 'from' => $from));

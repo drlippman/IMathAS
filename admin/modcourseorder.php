@@ -56,9 +56,11 @@ if (isset($_POST['order'])) {
 				 }
 				 if (substr($id,0,3)=='new') {
 				 	 $name = $_POST['newg'.substr($id,6)];
-				 } else {
+				 } else if (substr($id,0,3)=='grp') {
 				 	 $name = $_POST['g'.substr($id,3)];
-				 }
+				 } else {
+                    $name = $id;
+                 }
 				 $block['name'] = Sanitize::stripHtmlTags($name);
 				 $outarr[] = $block;
 			 } else { //is a course

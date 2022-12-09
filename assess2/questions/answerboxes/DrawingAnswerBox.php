@@ -218,6 +218,7 @@ class DrawingAnswerBox implements AnswerBox
             $out .= $plot;
         } else {
             if ($_SESSION['userprefs']['drawentry'] == 0) { //accessible entry
+                $def = 0;
                 $a11yinfo = implode(',', $answerformat);
                 if ($_SESSION['graphdisp'] == 0) {
                     $a11yinfo .= ',noprev';
@@ -265,6 +266,7 @@ class DrawingAnswerBox implements AnswerBox
                 //}
                 $out .= _('Draw:') . " ";
                 if ($answerformat[0] == 'inequality') {
+                    $def = 10;
                     if (in_array('both', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
                         $out .= "<img src=\"$staticroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
@@ -295,6 +297,7 @@ class DrawingAnswerBox implements AnswerBox
                     }
 
                 } else if ($answerformat[0] == 'twopoint') {
+                    $def = 5;
                     if (count($answerformat) == 1 || in_array('line', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpline.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5\" ";
                         if (count($answerformat) == 1 || $answerformat[1] == 'line') {$out .= 'class="sel" ';
@@ -332,7 +335,7 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 6.1;}
                         $out .= ' alt="Horizontal parabola"/>';
                     }
-                    if (count($answerformat) == 1 || in_array('halfparab', $answerformat)) {
+                    if (in_array('halfparab', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tphalfparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.2\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'halfparab') {$out .= 'class="sel" ';
                             $def = 6.2;}
@@ -435,6 +438,7 @@ class DrawingAnswerBox implements AnswerBox
                         $out .= ' alt="Open dot"/>';
                     }
                 } else if ($answerformat[0] == 'numberline') {
+                    $def = 0.5;
                     if (in_array('lineseg', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/numlines.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"0.5\" ";
                         if (count($answerformat) == 1 || $answerformat[1] == 'lineseg') {$out .= 'class="sel" ';
@@ -497,6 +501,8 @@ class DrawingAnswerBox implements AnswerBox
                         $def = 2;
                     } else if ($answerformat[0] == 'polygon') {
                         $def = 0;
+                    } else {
+                        $def = 0;
                     }
                 }
                 $out .= '</span></div>';
@@ -558,14 +564,6 @@ class DrawingAnswerBox implements AnswerBox
                     }
                 }
                 if ($answerformat[0] == 'inequality') {
-                    if ($function[0][2] == '=') {
-                        $type = 10;
-                        $c = 3;
-                    } else {
-                        $type = 10.2;
-                        $c = 2;
-                    }
-                    $dir = $function[0][1];
                     $saarr[$k] = makepretty($function[0]) . ',' . $ineqcolors[$k % 3];
                 } else {
                     if (count($function) == 2 || (count($function) == 3 && ($function[2] == 'open' || $function[2] == 'closed'))) { //is dot
@@ -670,7 +668,9 @@ class DrawingAnswerBox implements AnswerBox
                             $y2 = $func(['x' => $x2]);
                             $y3 = $func(['x' => $x3]);
 
-                            $va = ($x1 * $x2 * $y1 - $x1 * $x2 * $y2 - $x1 * $x3 * $y1 + $x1 * $x3 * $y3 + $x2 * $x3 * $y2 - $x2 * $x3 * $y3) / (-$x1 * $y2 + $x1 * $y3 + $x2 * $y1 - $x2 * $y3 - $x3 * $y1 + $x3 * $y2);
+                            $denom = -$x1 * $y2 + $x1 * $y3 + $x2 * $y1 - $x2 * $y3 - $x3 * $y1 + $x3 * $y2;
+                            if ($denom == 0) { continue; }
+                            $va = ($x1 * $x2 * $y1 - $x1 * $x2 * $y2 - $x1 * $x3 * $y1 + $x1 * $x3 * $y3 + $x2 * $x3 * $y2 - $x2 * $x3 * $y3) / ($denom);
                             $ha = (($x1 * $y1 - $x2 * $y2) - $va * ($y1 - $y2)) / ($x1 - $x2);
 
                             $k++;

@@ -45,6 +45,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	$urnd = max(floor(-log10($du)-1e-12)+3,2);
 	$vrnd = max(floor(-log10($dv)-1e-12)+3,2);
 	$zrnd = max($urnd,$vrnd);
+    $verts = '';
 	for ($i=0; $i<$disc;$i++) {
 		  for ($j=0;$j<$disc;$j++) {
 			  if ($count > 0) { $verts .= '~';}
@@ -65,6 +66,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		  }
 	  }
 	  $count = 0;
+      $faces = '';
 	  for ($i=0; $i<$disc-1;$i++) {
 		  for ($j=0;$j<$disc-1;$j++) {
 			  if ($count > 0) { $faces .= '~';}
@@ -77,7 +79,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		  }
 	  }
 
-	  $useragent = $_SERVER['HTTP_USER_AGENT'];
+	  $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 	  $oldschool = false;
 	  if (isset($_SESSION['useflash'])) {
 		$oldschool = true;
@@ -86,7 +88,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 			$oldschool =true;
 		}
 	  }
-
+      $html = '';
 	  if ($oldschool || isset($_SESSION['useflash'])) {
 	  	$r = uniqid();
 		  $GLOBALS['3dplotcnt'] = $r;
@@ -190,6 +192,7 @@ function spacecurve($func,$tmin,$tmax) {
 
 		$count = 0;
 		$dt = ($tmax-$tmin)/($disc-1);
+        $verts = '';
 		for ($i=0; $i<4;$i++) {
 			  for ($j=0;$j<$disc;$j++) {
 				  if ($count > 0) { $verts .= '~';}
@@ -205,6 +208,7 @@ function spacecurve($func,$tmin,$tmax) {
 			  }
 		  }
 		  $count = 0;
+          $faces = '';
 		  for ($i=0; $i<3;$i++) {
 			  for ($j=0;$j<$disc-1;$j++) {
 				  if ($count > 0) { $faces .= '~';}
@@ -218,6 +222,7 @@ function spacecurve($func,$tmin,$tmax) {
 		  }
 		  $r = uniqid();
 		  $GLOBALS['3dplotcnt'] = $r;
+          $html = '';
 		  $html .= "<div id=\"plot3d$r\">";
 		  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
 		  $html .= '</div>';
@@ -239,6 +244,7 @@ function spacecurve($func,$tmin,$tmax) {
 
 		$count = 0;
 		$dt = ($tmax-$tmin)/($disc-1);
+        $verts = '';
 		for ($j=0;$j<$disc;$j++) {
 			  if ($count > 0) { $verts .= '~';}
 			  $t = $tmin+$dt*$j;
@@ -252,6 +258,7 @@ function spacecurve($func,$tmin,$tmax) {
 		 }
 
 	   $r = uniqid();
+       $html = '';
 		 if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
 			 $html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js"></script>';
 		 }

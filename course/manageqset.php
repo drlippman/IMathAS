@@ -994,7 +994,7 @@ function doaction(todo,id) {
 	window.location = addr;
 }
 
-var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>';
+var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs ?? ''); ?>';
 
 function libselect() {
 	window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));

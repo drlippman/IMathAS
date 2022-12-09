@@ -42,14 +42,14 @@
 	deleted: 0 not deleted, 1 deleted by sender, 2 deleted by reader  (ordered this way so we can use < 2)
 	tagged: 0 no, 1 yes
 	*/
-	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
+	if (isset($_POST['remove']) && !empty($_POST['checked'])) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND deleted=2 AND msgfrom=?");
 		$stm->execute(array($userid));
 		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE id IN ($checklist) AND msgfrom=?");
 		$stm->execute(array($userid));
 	}
-	if (isset($_POST['unsend']) && count($_POST['checked'])>0 && $isteacher) {
+	if (isset($_POST['unsend']) && !empty($_POST['checked']) && $isteacher) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND msgfrom=?");
 		$stm->execute(array($userid));

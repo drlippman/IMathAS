@@ -57,7 +57,7 @@ if (isset($_POST['remove'])) {
         $temp['name'] = str_replace('.dat','.svg', $temp['name']);
         $extension = 'svg';
     }
-    if ($_POST['type'] == 'attach') {
+    if (isset($_POST['type']) && $_POST['type'] == 'attach') {
       // already checked for blacklisted earlier
     } else if (!in_array($extension, array("gif", "jpg", "png", "jpeg", "svg"))) {
         header("HTTP/1.0 500 Invalid extension.");

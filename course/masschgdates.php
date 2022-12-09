@@ -529,7 +529,9 @@ if ($overwriteBody==1) {
 				if (is_array($item)) {
 					$addto[] = 'Block'.$parent.'-'.($k+1);
 					$prefix['Block'.$parent.'-'.($k+1)] = $pre;
-					flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.' ');
+                    if (!empty($item['items'])) {
+					    flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.' ');
+                    }
 				} else {
 					$addto[] = $itemsassoc[$item];
 					$prefix[$itemsassoc[$item]] = $pre;

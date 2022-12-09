@@ -996,12 +996,16 @@ final class SimpleEmailServiceRequest
 	/**
 	* CURL write callback
 	*
-	* @param resource &$curl CURL resource
-	* @param string &$data Data
+	* @param resource $curl CURL resource
+	* @param string $data Data
 	* @return integer
 	*/
-	private function __responseWriteCallback(&$curl, &$data) {
-		$this->response->body .= $data;
+	private function __responseWriteCallback($curl, $data) {
+        if (isset($this->response->body)) {
+            $this->response->body .= $data;
+        } else {
+            $this->response->body = $data;
+        }
 		return strlen($data);
 	}
 

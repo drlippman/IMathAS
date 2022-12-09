@@ -469,7 +469,8 @@
     "attemptext": "Exception given for {n} additional versions",
     "preview_files": "Preview All Files",
     "introtexts": "Intro and between-question text",
-    "floating_scoreboxes": "Floating Scoreboxes"
+    "floating_scoreboxes": "Floating Scoreboxes",
+    "no_edit": "You are in the gradebook. You cannot edit answers or submit questions from here."
   },
   "work": {
     "add": "Add Work",

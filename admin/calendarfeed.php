@@ -89,6 +89,8 @@ echo 'DESCRIPTION:'.calencode($installname.': '.$coursename).$EOL;
 echo 'X-WR-CALNAME:'.calencode($coursename).$EOL;
 echo 'X-WR-CALDESC:'.calencode($installname.': '.$coursename).$EOL;
 
+$now = time();
+
 foreach ($calevents as $event) {
 	echo 'BEGIN:VEVENT'.$EOL;
 	echo 'UID:'.$event[0].'@'.$installname.'.imathas.com'.$EOL;

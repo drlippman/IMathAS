@@ -112,6 +112,7 @@ $placeinhead = ' <style type="text/css">
 
 }
 </style>';
+$useeqnhelper = 0;
 require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";

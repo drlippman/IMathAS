@@ -252,7 +252,7 @@ if ($report=='overview') {
 	$catstolist = array();
 	$itemstolist = array();
 	for ($i=1;$i<count($ot);$i++) {
-		for ($j=0;$j<count($ot[$i][1] ?? []);$j++) {
+        foreach ($ot[$i][1] ?? [] as $j=>$odata) {
             if ($ot[0][1][$j][3]==0) { continue;} // don't count in gb
 			if (isset($itemstolist[$j])) {continue;} //already got it
 			if ($type==0 && $ot[0][1][$j][2]==1) {continue;} //only want past items
@@ -260,13 +260,13 @@ if ($report=='overview') {
 				$itemstolist[$j] = 1; //use it
 			}
 		}
-		for ($j=0;$j<count($ot[$i][2] ?? []);$j++) {
+        foreach ($ot[$i][2] ?? [] as $j=>$odata) {
 			if (isset($ot[$i][2][$j][2*$type+1][$outcome]) && $ot[$i][2][$j][2*$type+1][$outcome]>0 ) { //using outcome
 				$catstolist[$j] = 1; //use it
 			}
 		}
 	}
-    for ($j=0;$j<count($ot[0][2] ?? []);$j++) {
+    foreach ($ot[0][2] ?? [] as $j=>$odata) {
         if ($ot[0][2][$j][2] == 1) {
             unset($catstolist[$j]); //don't use it
         }
@@ -301,7 +301,7 @@ if ($report=='overview') {
 			}
 		}
 		foreach ($itemstolist as $col) {
-			if (isset($ot[$i][1][$col]) && isset($ot[$i][1][$col][0][$outcome])) {
+			if (isset($ot[$i][1][$col]) && isset($ot[$i][1][$col][0][$outcome]) && $ot[$i][1][$col][1][$outcome] > 0) {
 				echo '<td>'.round(100*$ot[$i][1][$col][0][$outcome]/$ot[$i][1][$col][1][$outcome],1).'%</td>';
 			} else {
 				echo '<td>-</td>';
@@ -326,7 +326,7 @@ if ($report=='overview') {
 
 	echo '<th>'._('Total').'</th>';
 	$n = 2;
-	for ($i=0;$i<count($ot[0][2]);$i++) {
+    foreach ($ot[0][2] as $i=>$odata) {
         if ($ot[0][2][$i][2] == 1) { continue; } // hidden
 		echo '<th class="cat'.Sanitize::encodeStringForDisplay($ot[0][2][$i][1]).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($ot[0][2][$i][0]).'</span></th>';
 		$n++;

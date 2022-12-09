@@ -73,9 +73,20 @@ class StringScorePart implements ScorePart
             $strflags = explode(",",$strflags);
             foreach($strflags as $flag) {
                 $pc = array_map('trim',explode('=',$flag,2));
+                if (!isset($pc[1])) {
+                    if ($pc[0]=='ignore_symbol' || $pc[0] == 'allow_diff' || $pc[0] == 'regex') {
+                        echo "Missing = in strflag";
+                        continue;
+                    } else {
+                        $pc[1] = 1;
+                    }
+                }
                 if ($pc[0]=='ignore_symbol') {
                     $torem[] = $pc[1];
                     continue;
+                }
+                if (!isset($pc[1])) {  // if val not specified, turn on
+                    $pc[1] = true;
                 }
                 if ($pc[0] == 'allow_diff') {
                     $pc[1] = intval($pc[1]);

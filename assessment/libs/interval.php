@@ -44,6 +44,7 @@ function linegraph($intvs) {
 		$commands .= 'line([';
 		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
+        if (count($parts) != 2) { continue; } // invalid
 		$ssym = $parts[0][0];
 		$min = substr($parts[0],1);
 		$esym = substr($parts[1],-1);

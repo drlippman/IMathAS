@@ -222,6 +222,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $libquery = '';
+    $libnames = [];
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $libquery = "ili.libid IN ($llist)";

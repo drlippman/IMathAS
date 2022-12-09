@@ -21,11 +21,11 @@ Fraction operations library
 fractionrand(denom) 
 <BR>returns a proper reduced fraction with the given denominator
 <BR><h3><a name="fractiondiffdrands">fractiondiffdrands</a></h3>
-fractiondiffdrands(min,max,n) {
-<BR>returns n fractions with different denominators from min to max
+fractiondiffdrands(min,max,n,[order]) {
+<BR>returns n fractions with different denominators from min to max. Can set order to 'inc' or 'dec' to sort the values
 <BR><h3><a name="fractiondiffdrandsfrom">fractiondiffdrandsfrom</a></h3>
-fractiondiffdrandsfrom(list,n) {
-<BR>returns n fractions with different denominators from the list
+fractiondiffdrandsfrom(list,n,[order]) {
+<BR>returns n fractions with different denominators from the list. Can set order to 'inc' or 'dec' to sort the values
 <BR><h3><a name="fractionparse">fractionparse</a></h3>
 fractionparse(fraction)
 <BR>converts a fraction into an array(num, denom)

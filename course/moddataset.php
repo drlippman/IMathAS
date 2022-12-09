@@ -62,10 +62,10 @@
 		return Sanitize::simpleString($vidid);
  	}
 
- 	$cid = Sanitize::courseId($_GET['cid']);
+ 	$cid = Sanitize::courseId($_GET['cid'] ?? '0');
 	$isadmin = false;
 	$isgrpadmin = false;
-	if ($_GET['cid']=='admin') {
+	if ($cid==='admin') {
 		if ($myrights==100) {
 			$isadmin = true;
 		} else if ($myrights==75) {
@@ -93,11 +93,11 @@
         $addq = 'addquestions';
         $from = 'addq';
     }
-	$testqpage = ($courseUIver>1 || $cid == 0) ? 'testquestion2.php' : 'testquestion.php';
+	$testqpage = ($cid == 0 || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
 	$errmsg = '';
-	if (isset($_POST['qtext'])) {
+	if (isset($_POST['qtext']) && isset($_POST['control'])) {
 		require_once("../includes/filehandler.php");
 		$now = time();
 		foreach (array('qcontrol','answer','solution') as $v) {
@@ -161,7 +161,7 @@
 				$captioned = (preg_match('/"vssId":\s*"\./', $t))?1:0; 
             }
             $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
-			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
+			$newextref[] = $_POST['helptype'].'!!'.trim($_POST['helpurl']).'!!'.$captioned.'!!'.$helpdescr;
 		}
 		$extref = implode('~~',$newextref);
 		if (isset($_POST['doreplaceby'])) {
@@ -703,14 +703,15 @@
 			$line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
 	} else {
 			$myq = true;
+            $line = array();
 			$line['description'] = _("Enter description here");
 			$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
             $stm->execute(array(':id'=>$userid));
             $qrightsdef = $stm->fetchColumn(0);
 			$line['userights'] = 0;
-
+            $line['author'] = '';
 			$line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:1;
-
+            $line['otherattribution'] = '';
 			$line['qtype'] = "number";
 			$line['control'] = '';
 			$line['qcontrol'] = '';
@@ -988,8 +989,8 @@
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">"._("Add Drill Assessment")."</a> &gt; "._("Modify Questions")."</div>";
 	} else {
-		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
+		if ($cid==="admin") {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a> ";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
 		} else {
 			echo "<div class=breadcrumb><a href=\"../index.php\">"._("Home")."</a> ";
@@ -1405,7 +1406,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		});
 	}
 	quickSaveQuestion.url = "<?php echo $formAction; // Sanitized near line 806 ?>&quick=1";
-	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'] ?? 0); ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
 		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");

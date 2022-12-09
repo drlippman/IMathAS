@@ -22,7 +22,7 @@ function updatePointsPossible($aid, $itemorder = null, $defpoints = null) {
         $questionecdata[$row['id']] = $row['extracredit'];
 	}
 	$poss = calcPointsPossible($itemorder, $questionpointdata, $questionecdata, $defpoints);
-	
+
 	$stm = $DBH->prepare("UPDATE imas_assessments SET ptsposs=? WHERE id=?");
 	$stm->execute(array($poss, $aid));
 	return $poss;
@@ -31,7 +31,9 @@ function updatePointsPossible($aid, $itemorder = null, $defpoints = null) {
 function calcPointsPossible($itemorder, $questionpointdata, $questionecdata, $defpoints) {
 	if (is_array($itemorder)) {
 		$aitems = $itemorder;
-	} else {
+	} else if ($itemorder === '') {
+        return 0;
+    } else {
 		$aitems = explode(',', $itemorder);
 	}
 	

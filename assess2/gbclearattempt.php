@@ -70,6 +70,7 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
+$replacedDeleted = false;
 if ($type == 'all' && $keepver == 0) {
   $stm = $DBH->prepare('SELECT score FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));

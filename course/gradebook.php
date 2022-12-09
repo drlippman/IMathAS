@@ -135,7 +135,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessUrl = "../assess2/";
 }
 
-$curBreadcrumb = $breadcrumbbase;
+$curBreadcrumb = $breadcrumbbase ?? '';
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
@@ -1913,7 +1913,7 @@ function gbinstrdisp() {
 
 							echo '</span>';
 						}
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 					} else {
@@ -1927,7 +1927,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==3) { //exttool
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							if ($gbt[0][1][$j][2]>0) {
+							if (isset($gbt[$i][1][$j][0]) && $gbt[0][1][$j][2]>0) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
 								$avgtip = '';
@@ -1958,7 +1958,7 @@ function gbinstrdisp() {
 					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				}

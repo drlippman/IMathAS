@@ -564,7 +564,7 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
-        contents: [{b:'i', v:1}]
+        contents: [{b: calcformat.match(/allowjcomplex/)?'j':'i', v:1}]
       }, {s:.1});
     } else if (calcformat.match(/vector/)) {
       baselayout.tabs[0].tabcontent.unshift({

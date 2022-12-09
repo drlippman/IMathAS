@@ -48,13 +48,13 @@ class MultipleAnswerScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         
         if ($noshuffle == "last") {
-            $randqkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+            $randqkeys = (array) $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
             $RND->shuffle($randqkeys);
             array_push($randqkeys,count($questions)-1);
         } else if ($noshuffle == "all" || count($questions)==1) {
             $randqkeys = array_keys($questions);
         } else {
-            $randqkeys = $RND->array_rand($questions,count($questions));
+            $randqkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randqkeys);
         }
         $qcnt = count($questions);
@@ -128,6 +128,14 @@ class MultipleAnswerScorePart implements ScorePart
         }
 
         $scorePartResult->setRawScore($bestscore);
+
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part']);
+            if (isset($onGetResult) && is_callable($onGetResult)) {
+                $onGetResult();
+            }
+        }
+
         return $scorePartResult;
     }
 }

@@ -26,6 +26,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 {
     if ($countcnt==1) {
         $GLOBALS['interpretcurvars'] = [];
+        $GLOBALS['interpretcurarrvars'] = [];
     }
 	if ($blockname=="qtext") {
 		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
@@ -40,8 +41,9 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("\t", ' ', $str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
-    $str = preg_replace('/&\s*\n/', ' ', $str);
+        $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt).';';
+        $r = '$wherecount[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
         }
@@ -142,6 +144,7 @@ function interpretline($str,$anstype,$countcnt) {
 				$k++;
 				continue;
 			}
+    
 			//check for for, if, where and rearrange bits if needed
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
@@ -152,7 +155,8 @@ function interpretline($str,$anstype,$countcnt) {
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
 				$todo = implode('',array_slice($bits,$j));
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
-				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
+				//if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
+                if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]}),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=round(floatval({$forcond[2]}),0) && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) ".$todo."}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
@@ -291,12 +295,12 @@ function interpretline($str,$anstype,$countcnt) {
 			$closeparens++;
 		}
 
-
 		$lastsym = $sym;
 		$lasttype = $type;
 		$cnt++;
 		$k++;
 	}
+    
 	//if no explicit end-of-line at end of bits
 	if (count($bits)>0) {
 		$lines[] = implode('',$bits);
@@ -323,6 +327,19 @@ function tokenize($str,$anstype,$countcnt) {
 		$out = '';
 		$c = $str[$i];
 		$len = strlen($str);
+        if ($c=='/' && $str[$i+1]=='*') { //comment block
+            while ($i < $len) {
+                if ($c == '/' && $i > 0 && $str[$i-1] == '*') {
+                    $i++;
+                    $c = $str[$i];
+                    break;
+                }
+                $i++;
+                if ($i<$len) {
+                    $c = $str[$i];
+                }
+            }
+        }
 		if ($c=='/' && $str[$i+1]=='/') { //comment
 			while ($c!="\n" && $i<$len) {
                 $i++;
@@ -370,7 +387,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word, and set type appropriately if it is
-			if ($out=='if' || $out=='where' || $out=='for') {
+			if ($out=='if' || $out=='where' || $out=='for' || $out=='break' || $out=='continue') {
 				$intype = 8;
 			} else if ($out=='else' || $out=='elseif') {
 				$intype = 8;
@@ -588,7 +605,9 @@ function tokenize($str,$anstype,$countcnt) {
 				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype);
 			}
 			$i++;
-			$c = $str[$i];
+            if ($i<$len) {
+				$c = $str[$i];
+			}
 		} else if ($c=="\n") {
 			//end of line
 			$intype = 7;
@@ -676,7 +695,7 @@ function tokenize($str,$anstype,$countcnt) {
                     substr($syms[count($syms)-1][0],0,15) == '$stuanswersval[')
                 ) {
                     $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? null)';
-                }
+                } else 
                 if ($connecttolast == 0 && 
                     (substr($syms[count($syms)-1][0],0,16) == '$scoreiscorrect[' ||
                     substr($syms[count($syms)-1][0],0,14) == '$scorenonzero[')
@@ -720,6 +739,10 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
     preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*)/', $str, $m);
     foreach ($m[0] as $v) {
         $GLOBALS['interpretcurvars'][] = $v;
+    }
+    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*(\[\d+\])+)/', $str, $m);
+    foreach ($m[0] as $v) {
+        $GLOBALS['interpretcurarrvars'][] = $v;
     }
 
     if ($quotetype!='"') {

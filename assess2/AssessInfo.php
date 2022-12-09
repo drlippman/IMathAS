@@ -137,7 +137,7 @@ class AssessInfo
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 
-    if ($this->exception !== false && $this->exception[4] !== null) {
+    if ($this->exception !== false && isset($this->exception[4]) && $this->exception[4] !== null) {
       //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
     } 
@@ -153,10 +153,10 @@ class AssessInfo
     }
 
     // use time limit extension even if rest of exception isn't used
-    if ($this->exception !== false && $this->exception[6] != 0) {
+    if ($this->exception !== false && !empty($this->exception[6])) {
         $this->assessData['timeext'] = intval($this->exception[6]);
     }
-    if ($this->exception !== false && $this->exception[7] != 0) {
+    if ($this->exception !== false && !empty($this->exception[7])) {
         $this->assessData['attemptext'] = intval($this->exception[7]);
         // apply additional attempts
         if ($this->assessData['submitby'] == 'by_assessment') {
@@ -248,7 +248,7 @@ class AssessInfo
    * @return boolean true if prereq is waived
    */
   private function waiveReqScore () {
-      if ($this->exception === null) {
+      if ($this->exception === null || $this->exception === false) {
         return false;
       } else {
         return $this->exception[5];
@@ -600,12 +600,12 @@ class AssessInfo
 			} else {
         $isBlocked = false;
         if ($this->assessData['reqscoretype']&2) { //using percent-based
-					if (round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
-						$isBlocked = true;
-					}
-				} else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
-					$isBlocked = true;
-				}
+            if ($reqscoreptsposs>0 && round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
+                $isBlocked = true;
+            }
+        } else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
+            $isBlocked = true;
+        }
       }
       if ($isBlocked) {
         $this->assessData['available'] = 'needprereq';
@@ -778,7 +778,7 @@ class AssessInfo
     } else {
       if ($this->assessData['shuffle']&4) { //all students same seed
         foreach ($qout as $i=>$qid) {
-          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
             //using fixed seed list
             $n = count($this->questionData[$qid]['fixedseeds']);
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
@@ -789,7 +789,7 @@ class AssessInfo
         }
       } else { //regular selection
         foreach ($qout as $i=>$qid) {
-          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
             //using fixed seed list
             if ($oldseeds !== false && count($this->questionData[$qid]['fixedseeds']) > 1) {
               //if we have oldseeds, remove it from selection
@@ -847,17 +847,17 @@ class AssessInfo
           $unused = array_diff($group, array($oldquestion));
         }
         $newq = $unused[array_rand($unused,1)];
-        if (!isset($this->questionData[$newq])) {
-            $this->loadQuestionSettings([$newq], true);
-        }
       }
+    }
+    if (!isset($this->questionData[$newq])) {
+        $this->loadQuestionSettings([$newq], true);
     }
 
     if ($this->assessData['shuffle']&2) {
       //all questions same seed - don't regen
       $newseed = $oldseeds[0];
     } else {
-      if ($this->questionData[$newq]['fixedseeds'] !== null) {
+      if (!empty($this->questionData[$newq]['fixedseeds'])) {
         //using fixed seed list. find any unused seeds
         if (count($this->questionData[$newq]['fixedseeds']) == 1) {
           //only one seed so use it
@@ -939,6 +939,7 @@ class AssessInfo
     $now = time();
     if ($this->assessData['can_use_latepass'] > 0) {
       $LPneeded = $this->assessData['can_use_latepass'];
+      $LPcutoff = $this->assessData['LPcutoff'];
       $stm = $this->DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
       $stm->execute(array(
         ':lps'=>$LPneeded,
@@ -1131,6 +1132,9 @@ class AssessInfo
     $settings['deftries'] = $settings['defattempts'];
 
     //break apara defpenalty, defregenpenalty
+    if ($settings['defpenalty'] === '') {
+        $settings['defpenalty'] = '0';
+    }
     if ($settings['defpenalty'][0]==='L') {
       $settings['defpenalty_after'] = 'last';
       $settings['defpenalty'] = intval(substr($settings['defpenalty'], 1));
@@ -1141,6 +1145,9 @@ class AssessInfo
       $settings['defpenalty_after'] = 1;
     }
 
+    if ($settings['defregenpenalty'] === '') {
+        $settings['defregenpenalty'] = '0';
+    }
     if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);
       $settings['defregenpenalty'] = intval(substr($settings['defregenpenalty'], 2));
@@ -1274,28 +1281,32 @@ class AssessInfo
     $itemorder = json_decode($settings['itemorder'], true);
     //temp handling of old format
     if ($itemorder === null) {
-      $order = explode(',', $settings['itemorder']);
-      foreach ($order as $k=>$v) {
-        $sub = explode('~', $v);
-        if (count($sub)>1) {
-          $pts = explode('|', $sub[0]);
-          if (count($pts)==1) { //really old assessment format
-            $order[$k] = array(
-              'type' => 'pool',
-              'n' => 1,
-              'replace' => 0,
-              'qids' => array_map('intval', $sub)
-            );
-          } else {
-            $order[$k] = array(
-              'type' => 'pool',
-              'n' => $pts[0],
-              'replace' => ($pts[1]==1),
-              'qids' => array_map('intval', array_slice($sub, 1))
-            );
-          }
-        } else {
-          $order[$k] = intval($v);
+      if ($settings['itemorder'] === '') {
+        $order = [];
+      } else {
+        $order = explode(',', $settings['itemorder']);
+        foreach ($order as $k=>$v) {
+            $sub = explode('~', $v);
+            if (count($sub)>1) {
+            $pts = explode('|', $sub[0]);
+            if (count($pts)==1) { //really old assessment format
+                $order[$k] = array(
+                'type' => 'pool',
+                'n' => 1,
+                'replace' => 0,
+                'qids' => array_map('intval', $sub)
+                );
+            } else {
+                $order[$k] = array(
+                'type' => 'pool',
+                'n' => $pts[0],
+                'replace' => ($pts[1]==1),
+                'qids' => array_map('intval', array_slice($sub, 1))
+                );
+            }
+            } else {
+            $order[$k] = intval($v);
+            }
         }
       }
       $settings['itemorder'] = $order;

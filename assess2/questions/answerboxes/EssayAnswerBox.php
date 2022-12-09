@@ -52,13 +52,16 @@ class EssayAnswerBox implements AnswerBox
             $cols = 50;
         } else if (strpos($answerboxsize, ',') > 0) {
             list($rows, $cols) = explode(',', $answerboxsize);
+            $rows = intval($rows);
+            $cols = intval($cols);
         } else {
             $cols = 50;
-            $rows = $answerboxsize;
+            $rows = intval($answerboxsize);
         }
         if ($displayformat == 'editor') {
             $rows += 5;
         }
+
         if ($GLOBALS['useeditor'] == 'review' || ($GLOBALS['useeditor'] == 'reviewifneeded' && trim($la) == '')) {
             $la = str_replace('&quot;', '"', $la);
 

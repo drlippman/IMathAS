@@ -140,6 +140,9 @@ class QuestionHtmlGenerator
 
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
 
+        $thiscourseid = (isset($GLOBALS['cid']) && is_numeric($GLOBALS['cid'])) ?
+            intval($GLOBALS['cid']) : 0;
+
         if ($printFormat) {
             $GLOBALS['capturechoiceslivepoll'] = true;
         }
@@ -206,11 +209,17 @@ class QuestionHtmlGenerator
         } catch (\Throwable $t) {
           $this->addError(
               _('Caught error while evaluating the code in this question: ')
-              . $t->getMessage());
+              . $t->getMessage()
+              . ' on line '
+              . $t->getLine()
+              . ' of '
+              . $t->getFile()
+          );
+
         }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
-        $qtextvars = $GLOBALS['interpretcurvars'];
+        $qtextvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
 
         if (!$teacherInGb) {
             $toevalqtxt = preg_replace('~(<p[^>]*>\[teachernote\].*?\[/teachernote\]</p>|\[teachernote\].*?\[/teachernote\])~ms','',$toevalqtxt);
@@ -227,7 +236,7 @@ class QuestionHtmlGenerator
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
 
         $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
-        $solnvars = $GLOBALS['interpretcurvars'];
+        $solnvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
 
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
@@ -317,7 +326,7 @@ class QuestionHtmlGenerator
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
-            if (!isset($anstypes)) {
+            if (empty($anstypes) || $anstypes[0]==='') {
               if ($GLOBALS['myrights'] > 10) {
                 $this->addError('Error in question: missing $anstypes for multipart or conditional question');
               }
@@ -327,21 +336,28 @@ class QuestionHtmlGenerator
             // Calculate answer weights.
             // $answeights - question writer defined
             if ($quesData['qtype'] == "multipart") {
-              if (isset($answeights)) {
-        				if (!is_array($answeights)) {
+                if (isset($answeights)) {
+        			if (!is_array($answeights)) {
         					$answeights = explode(",",$answeights);
-        				}
-        				$answeights = array_map('trim', $answeights);
-        				if (count($answeights) != count($anstypes)) {
-        					$answeights = array_fill(0, count($anstypes), 1);
-        				}
-        			} else {
-        				if (count($anstypes)>1) {
-        					$answeights = array_fill(0, count($anstypes), 1);
-        				} else {
-        					$answeights = array(1);
-        				}
-        			}
+                    }
+                    $answeights = array_map('trim', $answeights);
+                    if (count($answeights) != count($anstypes)) {
+                        $answeights = array_fill(0, count($anstypes), 1);
+                    }
+                    $answeights = array_map(function($v) {
+                        if (is_numeric($v)) { 
+                            return $v;
+                        } else {
+                            return evalbasic($v);
+                        }
+                    }, $answeights);
+                } else {
+                    if (count($anstypes)>1) {
+                        $answeights = array_fill(0, count($anstypes), 1);
+                    } else {
+                        $answeights = array(1);
+                    }
+                }    
             }
 
             // Get the answers to all parts of this question.
@@ -389,7 +405,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($answeights[$_pnidx]!=0 || $quesData['qtype'] == "conditional")) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($quesData['qtype'] == "conditional" || !empty($answeights[$_pnidx]))) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -454,14 +470,13 @@ class QuestionHtmlGenerator
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                  $answerBoxGenerator->generate();
                 } catch (\Throwable $t) {
                   $this->addError(
                        _('Caught error while generating this question: ')
                        . $t->getMessage());
                   continue;
                 }
-
-                $answerBoxGenerator->generate();
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
@@ -504,7 +519,7 @@ class QuestionHtmlGenerator
             }
         } else {
 
-            if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10) {
+            if (!empty($GLOBALS['isquestionauthor'])) {
                 if (isset($anstypes)) {
                     $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
                 } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
@@ -595,7 +610,7 @@ class QuestionHtmlGenerator
          * Possibly adjust the showanswer if it doesn't look right
          */
         $doShowDetailedSoln = false;
-        if (isset($showanswer) && is_array($showanswer) && count($showanswer) < count($answerbox)) {
+        if (isset($showanswer) && is_array($showanswer) && is_array($answerbox) && count($showanswer) < count($answerbox)) {
             $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
             if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
                 // not enough showanswerloc boxes for all the parts.  
@@ -613,7 +628,7 @@ class QuestionHtmlGenerator
                 foreach ($showanswer as $kidx=>$atIdx) {
                     $_thisIsReady = true;
                     for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
-                        if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
+                        if (empty($doShowAnswerParts[$iidx]) && !$doShowAnswer) {
                             $_thisIsReady = false;
                             $doShowDetailedSoln = false;
                             for ($siidx=$iidx; $siidx < $kidx; $siidx++) {
@@ -678,6 +693,8 @@ class QuestionHtmlGenerator
           $this->addError(
               _('Caught error while evaluating the text in this question: ')
               . $t->getMessage());
+          $evaledqtext = '';
+          $evaledsoln = '';
         }
         $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
 
@@ -731,7 +748,7 @@ class QuestionHtmlGenerator
             $newqtext = '';
             $lastGroupDone = true;
             foreach ($seqParts as $k=>$seqPart) {
-              $thisGroupDone = $seqGroupDone[$k];
+              $thisGroupDone = !empty($seqGroupDone[$k]);
               preg_match_all('/<(input|select|textarea)[^>]*name="?qn(\d+)/', $seqPart, $matches);
               foreach ($matches[2] as $qnrefnum) {
                 $pn = $qnrefnum % 1000;
@@ -742,7 +759,7 @@ class QuestionHtmlGenerator
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
-                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && $answeights[$pn]!=0) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && !empty($answeights[$pn])) {
                   $thisGroupDone = false;
                 }
               }
@@ -875,6 +892,23 @@ class QuestionHtmlGenerator
             $onGetQuestion();
         }
 
+        if (!empty($GLOBALS['CFG']['logquestionerrors']) && 
+            count($this->errors) > 0 &&
+            (time() - $quesData['lastmoddate']) > 10000
+        ) {
+            // only log if hasn't been edited in a few hours
+            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
+                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
+            $stm = $this->dbh->prepare($query);
+            $stm->execute([
+                $this->questionParams->getDbQuestionSetId(),
+                $this->questionParams->getQuestionSeed(),
+                0,
+                time(),
+                implode('; ', $this->errors)
+            ]);
+        }
+
         return $question;
     }
 
@@ -958,6 +992,7 @@ class QuestionHtmlGenerator
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
+                if (!is_array($hintpart)) { continue; } // mixed formats
                 $lastkey = max(array_keys($hintpart));
                 $hintloc[$iidx] = '';
                 if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
@@ -991,7 +1026,7 @@ class QuestionHtmlGenerator
                     if ($usenum == 10000) { 
                         continue;
                     }
-                    if (is_array($hintpart[$usenum])) {
+                    if (!empty($hintpart[$usenum]) && is_array($hintpart[$usenum])) {
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
@@ -1032,8 +1067,11 @@ class QuestionHtmlGenerator
                 }
             }
             
+          
             if (!empty($hints[$usenum])) {
-                if (strpos($hints[$usenum], '</div>') !== false) {
+                if (!is_string($usenum)) { // shouldn't be, but a hack to get old bad code from throwing errors.
+                    $hintloc = $hints[$usenum]; 
+                } else if (strpos($hints[$usenum], '</div>') !== false) {
                     $hintloc = $hints[$usenum];
                 } else if (strpos($hints[$usenum], 'button"') !== false) {
                     $hintloc = "<p>{$hints[$usenum]}</p>\n";
@@ -1134,7 +1172,7 @@ class QuestionHtmlGenerator
             $showanswer = $this->fixDegrees($showanswer, $procanstypes);
         } else if (isset($showanswer)) {
             foreach ($showanswer as $k=>$v) {
-                if ($v === null) {continue;}
+                if ($v === null || !isset($procanstypes[$k])) {continue;}
                 $showanswer[$k] = $this->fixDegrees($v, $procanstypes[$k]);
             }
         }
@@ -1144,7 +1182,7 @@ class QuestionHtmlGenerator
             foreach ($shanspt as $k=>$v) {
                 if ($v === null) {continue;}
                 $shanspt[$k] = $this->fixDegrees($v, 
-                    is_array($procanstypes) ? $procanstypes[$k] : $procanstypes);
+                    is_array($procanstypes) ? ($procanstypes[$k] ?? '') : $procanstypes);
             }
         }
         

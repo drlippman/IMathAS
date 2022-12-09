@@ -262,7 +262,9 @@
 		if ($aver > 1 && ($line['status']&1)>0) {
 			// identify as unsubmitted if past due, or time limit is expired
 			$data = json_decode(gzdecode($line['scoreddata']), true);
-			$time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            if (abs($timelimit) > 0) {
+			    $time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            }
 			if ($now > $line['thisenddate'] ||
 				(abs($timelimit) > 0 && $now > $time_exp + $overtime_grace * $line['timelimitmult'])
 			) {
@@ -381,7 +383,7 @@
 			$UA = 0;
 		}
 
-		if ($line['starttime']==null) {
+		if ($line['starttime']===null) {
 			if ($aver > 1) {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -572,12 +574,18 @@
     }
     echo "<td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
+	
+	if ($includeduedate) {
+        $duedatesort = ",'D'";
+    } else {
+        $duedatesort = '';
+    }
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
-		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	} else if ($hassection && !$hidesection) {
-		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	} else {
-		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";

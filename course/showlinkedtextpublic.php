@@ -28,6 +28,7 @@
 	}
 
 	function findinpublic($items,$id) {
+        if (!is_array($items)) { return false; }
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
 				if ($item['public']==1) {
@@ -40,6 +41,7 @@
 		return false;
 	}
 	function finditeminblock($items,$id) {
+        if (!is_array($items)) { return false; }
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
 				if (finditeminblock($item['items'],$id)) {

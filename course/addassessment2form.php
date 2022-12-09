@@ -169,7 +169,7 @@ $vueData = array(
 		</span><br class=form />
 	</div>
 
-	<div v-show="avail==1 && edatetype=='edate'">
+	<div v-show="avail==1 && (edatetype=='edate' || datesbylti==1 || (datesbylti>0 && enddate<2000000000))">
 		<span class=form><?php echo _('Practice mode');?>:</span>
 		<span class=formright>
 			<label>

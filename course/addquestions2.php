@@ -129,7 +129,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
 			require_once("../includes/updateptsposs.php");
-			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			updatePointsPossible($aid, $itemorder, $row[2]);
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
@@ -384,7 +384,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090722\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=112422\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=041422\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";

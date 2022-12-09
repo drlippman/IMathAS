@@ -313,7 +313,7 @@
 	}
 
 	$notstarted = $totstucnt - $studentsStartedAssessment;
-	$nonstartedper = round(100*$notstarted/$totstucnt,1);
+	$nonstartedper = ($totstucnt>0) ? round(100*$notstarted/$totstucnt,1) : 0;
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
@@ -365,10 +365,14 @@
 			$points[$row['qid']] = $row['points'];
 			$qsetids[$row['qid']] = $row['qsid'];
 			$withdrawn[$row['qid']] = $row['withdrawn'];
-			if ($row['qtype']=='essay' || $row['qtype']=='file') {
+			if ($row['qtype']=='essay' || $row['qtype']=='file' || 
+                ($row['qtype']=='draw' && preg_match('/answerformat.*?freehand/', $row['control']))
+            ) {
 				$needmanualgrade[$row['qid']] = true;
 			} else if ($row['qtype']=='multipart') {
-				if (preg_match('/anstypes.*?(essay|file)/', $row['control'])) {
+				if (preg_match('/anstypes.*?(essay|file)/', $row['control']) ||
+                    (preg_match('/anstypes.*?(draw)/', $row['control']) && preg_match('/answerformat.*?freehand/', $row['control']))
+                ) {
 					$needmanualgrade[$row['qid']] = true;
 				}
 			}
@@ -390,7 +394,7 @@
 			if ($pts==9999) {
 				$pts = $defpoints;
 			}
-			if ($qcnt[$qid]>0) {
+			if (isset($qcnt[$qid]) && $qcnt[$qid]>0) {
 				$avg = $qtotal[$qid]/$qcnt[$qid];
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avg2 = $qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]); //avg adjusted for not attempted
@@ -553,7 +557,7 @@
 	}
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
-	if ($stm->fetchColumn(0)>0) {
+	if ($stm->fetchColumn(0)>0 && !empty($qs) && !empty($avgscore)) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}

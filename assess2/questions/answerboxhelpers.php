@@ -327,6 +327,7 @@ function ntupleToString($ntuples) {
 }
 
 function parseInterval($str, $islist = false) {
+    if (strlen($str)<5) { return false; }
 	if ($islist) {
 		$ints = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/',$str);
 	} else {
@@ -335,7 +336,8 @@ function parseInterval($str, $islist = false) {
 
 	$out = array();
 	foreach ($ints as $int) {
-    $int = trim($int);
+        $int = trim($int);
+        if (strlen($int) < 5) { return false;}
 		$i = array();
 		$i['lb'] = $int[0];
 		$i['rb'] = $int[strlen($int)-1];
@@ -730,7 +732,7 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 	if (preg_match('/^no\s*solution/',$answer) || $answer===$nosoln) {
 		$answer = 'DNE';
 	}
-	$qs = $_POST["qs$qn"];
+	$qs = $_POST["qs$qn"] ?? '';
 	if ($qs=='DNE') {
 		$givenans = "DNE";
 	} else if ($qs=='inf') {

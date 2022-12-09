@@ -260,17 +260,17 @@
             if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			} else if ($calledfrom=='itemsearch') {
 				echo "Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			}
 		}
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No users selected.  ";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try again</a>\n";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Try again</a>\n";
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."\">Try again</a>\n";
 			}
 			require("../footer.php");
 			exit;
@@ -281,7 +281,7 @@
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
+			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='itemsearch') {
 			echo "<form method=post action=\"itemsearch.php?masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='embed') {
@@ -292,7 +292,7 @@
 			echo "\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
+		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"\"></span><br class=form>\n";
 		echo "<span class=form><label for=\"message\">Message:</label></span>";
 		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70> </textarea></div></span><br class=form>\n";
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";

@@ -35,7 +35,7 @@ class CalculatedMatrixScorePart implements ScorePart
         $defaultreltol = .0015;
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
-            'answersize', 'scoremethod'];
+            'answersize', 'scoremethod', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -71,7 +71,7 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
               foreach ($givenanslist as $i=>$v) {
-                $givenanslistvals[$i] = evalMathParser($v);
+                    $givenanslistvals[$i] = evalMathParser($v);
               }
             } else {
               for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
@@ -126,7 +126,7 @@ class CalculatedMatrixScorePart implements ScorePart
         }
         if (!empty($answersize)) {
             for ($i=0; $i<count($answerlist); $i++) {
-                if (!checkanswerformat($givenanslist[$i],$ansformats)) {
+                if (isset($givenanslist[$i]) && !checkanswerformat($givenanslist[$i],$ansformats)) {
                     //perhaps should just elim bad answer rather than all?
                     if ($scoremethod == 'byelement') {
                       $incorrect[$i] = 1;
@@ -163,7 +163,7 @@ class CalculatedMatrixScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        $fullmatrix = !in_array("",  $givenanslist, true);
+        $fullmatrix = !in_array("",  $givenanslist, true) && !in_array("NaN",  $givenanslistvals, true);
 
         if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist
@@ -208,6 +208,9 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($correct) {
               $givenanslistvals = matrix_scorer_rref($givenanslistvals, $N);
             }
+        } else if ($fullmatrix && in_array('anyroworder',$ansformats)) {
+            $answerlist = matrix_scorer_roworder($answerlist, $N);
+            $givenanslistvals = matrix_scorer_roworder($givenanslistvals, $N);
         }
         for ($i=0; $i<count($answerlist); $i++) {
             if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {

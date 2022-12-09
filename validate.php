@@ -59,7 +59,7 @@ if (!empty($_SESSION['userid'])) { // logged in
         unset($userid);
         $_SESSION = array();
         if ($wasLTI) {
-            require 'header.php';
+            require __DIR__."/header.php";
             echo _('Your session has expired. Please go back to your LMS and open this assignment again.');
             require 'footer.php';
             exit;
@@ -68,7 +68,7 @@ if (!empty($_SESSION['userid'])) { // logged in
 }
 
 $hasusername = isset($userid);
-$haslogin = isset($_POST['password']);
+$haslogin = isset($_POST['password']) && isset($_POST['username']);
 
 if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
     if (empty($_SERVER['HTTP_REFERER'])) {
@@ -85,15 +85,15 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
             $cid = 0;
         }
 
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+        $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
         if (isset($_SERVER['QUERY_STRING'])) {
             $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . '&guestaccess=true';
         } else {
             $querys = '?guestaccess=true';
         }
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
-    
-        require "header.php";
+        
+        require __DIR__."/header.php";
         echo '<form method=post action="' . $formAction . '">';
         echo '<p>' . _('You have requested guest access to a course.') . '</p>';
         echo '<p><button type=button onclick="location.href=\'' . $imasroot . '/index.php\'">', _('Nevermind'), '</button> ';
@@ -106,7 +106,7 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
      });
      </script>';
         echo '</form>';
-        require "footer.php";
+        require __DIR__ . '/footer.php';
         exit;
     }
     $haslogin = true;
@@ -129,7 +129,7 @@ $now = time();
 //Just put in username and password, trying to log in
 if ($haslogin && !$hasusername) {
 
-    if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username'] == 'guest') { // create a temp account when someone logs in w/ username: guest
+    if (isset($CFG['GEN']['guesttempaccts']) && isset($_POST['username']) && $_POST['username'] == 'guest') { // create a temp account when someone logs in w/ username: guest
         $stm = $DBH->query('SELECT ver FROM imas_dbschema WHERE id=2');
         $guestcnt = $stm->fetchColumn(0);
         $stm = $DBH->query('UPDATE imas_dbschema SET ver=ver+1 WHERE id=2');
@@ -166,6 +166,7 @@ if ($haslogin && !$hasusername) {
         $line['id'] = $userid;
         $line['rights'] = 5;
         $line['groupid'] = 0;
+        $line['jsondata'] = '';
         $_POST['password'] = 'temp';
         if (isset($CFG['GEN']['newpasswords'])) {
             require_once "includes/password.php";
@@ -178,13 +179,14 @@ if ($haslogin && !$hasusername) {
         $stm = $DBH->prepare("SELECT id,password,rights,groupid,jsondata,mfa FROM imas_users WHERE SID=:SID");
         $stm->execute(array(':SID' => $_POST['username']));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
-        $json_data = json_decode($line['jsondata'], true);
-        if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
-            echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');
-            exit;
+        if ($line != false) {
+            $json_data = json_decode($line['jsondata'], true);
+            if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
+                echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');
+                exit;
+            }
         }
     }
-    // if (($line != null) && ($line['password'] == md5($_POST['password']))) {
     if (isset($CFG['GEN']['newpasswords'])) {
         require_once "includes/password.php";
     }
@@ -199,7 +201,7 @@ if ($haslogin && !$hasusername) {
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);    
     }
 
-    if (($line != null) && (
+    if (($line != false) && (
         ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords'] != 'only') && ((md5($line['password'] . $_SESSION['challenge']) == $_POST['password']) || ($line['password'] == md5($_POST['password']))))
         || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'], $line['password']))
     )) {
@@ -216,9 +218,9 @@ if ($haslogin && !$hasusername) {
         // }
         //
         if ($line['rights'] == 0) {
-            require "header.php";
+            require __DIR__."/header.php";
             echo _("You have not yet confirmed your registration.  You must respond to the email that was sent to you by IMathAS.");
-            require "footer.php";
+            require __DIR__ . '/footer.php';
             exit;
         }
 
@@ -245,7 +247,6 @@ if ($haslogin && !$hasusername) {
                 $_SESSION['tzname'] = $_POST['tzname'];
             }
 
-            $json_data = json_decode($line['jsondata'], true);
             if (isset($json_data['login_errors'])) {
                 unset($json_data['login_errors']);
                 unset($json_data['login_blockuntil']);
@@ -333,16 +334,17 @@ if ($haslogin && !$hasusername) {
             $badsession = false;
         }
 
-        if (!isset($json_data['login_errors'])) {
-            $json_data['login_errors'] = 0;
+        if ($line != false) {
+            if (!isset($json_data['login_errors'])) {
+                $json_data['login_errors'] = 0;
+            }
+            $json_data['login_errors']++;
+            if ($json_data['login_errors'] > 3) {
+                $json_data['login_blockuntil'] = time() + 60;
+            }
+            $stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
+            $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
         }
-        $json_data['login_errors']++;
-        if ($json_data['login_errors'] > 3) {
-            $json_data['login_blockuntil'] = time() + 60;
-        }
-        $stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
-        $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
-
         /*  For login error tracking - requires add'l table
     if ($line==null) {
     $err = "Bad SID";
@@ -463,6 +465,9 @@ if ($hasusername) {
     if (isset($_GET['graphdisp'])) {
         $_SESSION['graphdisp'] = $_GET['graphdisp'];
     }
+    if (!isset($_SESSION['secsalt'])) { // if it was lost somehow
+        $_SESSION['secsalt'] = generaterandstring();
+    }
     if (!function_exists('isDiagnostic')) {
         function isDiagnostic() {
             return isset($_SESSION['isdiag']); // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
@@ -514,11 +519,16 @@ if ($hasusername) {
                 echo "<a href=\"$imasroot/course/course.php?cid={$_SESSION['ltiitemid']}\">Return to course page</a>";
                 exit;
             }
+            $breadcrumbbase = '';
         } else if ($_SESSION['ltiitemtype'] == 0 && $_SESSION['ltirole'] == 'learner') {
-            if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
-                $breadcrumbbase = "<a href=\"$imasroot/assess2/?cid=" . Sanitize::courseId($_GET['cid']) . "&aid={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+            if (isset($_GET['cid'])) {
+                if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
+                    $breadcrumbbase = "<a href=\"$imasroot/assess2/?cid=" . Sanitize::courseId($_GET['cid']) . "&aid={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+                } else {
+                    $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=" . Sanitize::courseId($_GET['cid']) . "&id={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+                }
             } else {
-                $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=" . Sanitize::courseId($_GET['cid']) . "&id={$_SESSION['ltiitemid']}\">Assignment</a> &gt; ";
+                $breadcrumbbase = '';
             }
             $urlparts = parse_url($_SERVER['PHP_SELF']);
             $allowedinLTI = array('showtest.php', 'printtest.php', 'msglist.php', 'sentlist.php', 'viewmsg.php', 'msghistory.php',
@@ -544,7 +554,7 @@ if ($hasusername) {
                 exit;
             }
         } else if ($_SESSION['ltirole'] == 'instructor') {
-            if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver'] == '1.3')) {
+            if (!empty($_SESSION['ltiver']) && $_SESSION['ltiver'] == '1.3') {
                 $breadcrumbbase = '<div class="dropdown inlinediv"><a href="#"
                   role="button"
                   id="ltimenubutton"
@@ -575,7 +585,7 @@ if ($hasusername) {
         $stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess,lticourseid FROM imas_students WHERE userid=:userid AND courseid=:courseid");
         $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
-        if ($line != null) {
+        if ($line != false) {
             $studentid = $line['id'];
             $studentinfo['timelimitmult'] = $line['timelimitmult'];
             $studentinfo['section'] = $line['section'];
@@ -584,10 +594,10 @@ if ($hasusername) {
                 $studentinfo['lticourseid'] = $line['lticourseid'];
             }
             if ($line['locked'] > 0) {
-                require "header.php";
+                require __DIR__."/header.php";
                 echo "<p>", _("You have been locked out of this course by your instructor.  Please see your instructor for more information."), "</p>";
                 echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
-                require "footer.php";
+                require __DIR__ . '/footer.php';
                 exit;
             } else {
                 $now = time();
@@ -607,7 +617,7 @@ if ($hasusername) {
             $stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
             $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
             $line = $stm->fetch(PDO::FETCH_ASSOC);
-            if ($line != null) {
+            if ($line != false) {
                 if ($myrights > 19) {
                     $teacherid = $line['id'];
                     if (isset($_GET['stuview'])) {
@@ -631,7 +641,7 @@ if ($hasusername) {
                 $stm = $DBH->prepare("SELECT id,section FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
                 $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
                 $line = $stm->fetch(PDO::FETCH_ASSOC);
-                if ($line != null) {
+                if ($line != false) {
                     $tutorid = $line['id'];
                     $tutorsection = trim($line['section']);
                 } else if ($myrights == 5 && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
@@ -693,7 +703,7 @@ if ($hasusername) {
                     ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'], 'assess2/') === false ||
                         strpos($_SERVER['QUERY_STRING'], '&aid=' . $lockaid) === false))
                 ) {
-                    require "header.php";
+                    require __DIR__."/header.php";
                     echo '<p>', _('This course is currently locked for another assessment'), '</p>';
 
                     if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0) {
@@ -703,7 +713,7 @@ if ($hasusername) {
                     } else {
                         echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=" . Sanitize::encodeUrlParam($lockaid) . "\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">", _("Go Back"), "</a></p>";
                     }
-                    require "footer.php";
+                    require __DIR__ . '/footer.php';
                     //header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
                     exit;
                 }

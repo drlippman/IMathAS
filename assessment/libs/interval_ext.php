@@ -28,7 +28,7 @@ function testPointVsInterval($point, $x1, $x2)
   return $res;
 }
 
-$emptySet = array( "left-border" => 0,
+$GLOBALS['interval_ext_emptySet'] = array( "left-border" => 0,
 		   "right-border" => 0,
 		   "is-open-left" => true,
 		   "is-open-right" => true );
@@ -735,11 +735,11 @@ function traverseIntersection($border_left, $border_right, $isOpenLeft, $isOpenR
 }
 
 function calculateMostCommonIntersection($border_left, $border_right, $isOpenLeft, $isOpenRight) {
-  global $emptySet;
+  global $interval_ext_emptySet;
 
   // case empy input
   if (count($border_left) == 0) {
-    return $emptySet;
+    return $interval_ext_emptySet;
   }
 
   // start condition
@@ -765,7 +765,7 @@ function calculateMostCommonIntersection($border_left, $border_right, $isOpenLef
       	  break;
 	case DONOTINTERSECT_CONTINIUE:
 	case DONOTINTERSECT_STOP:
-	  return $emptySet;
+	  return $interval_ext_emptySet;
 
 	  break;
 	default:
@@ -780,11 +780,11 @@ function calculateMostCommonIntersection($border_left, $border_right, $isOpenLef
 }
 
 function calculateIntersectionSet($values) {
-    global $emptySet;
+    global $interval_ext_emptySet;
 
      // case empy input
      if (count($values) == 0) {
-        return $emptySet;
+        return $interval_ext_emptySet;
      }
 
      // start condition
@@ -829,8 +829,9 @@ function calculateIntersectionSet($values) {
                 }
             }
         } // foreach value
-
-        $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
+        if (!empty($z1)) {
+            $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
+        }
 
     } // for values
 
@@ -865,7 +866,7 @@ function parseString($input) {
 }
 
 function parseParts($parts) {
-  global $emptySet;
+  global $interval_ext_emptySet;
 
   $hasError = false;
 
@@ -927,10 +928,10 @@ function parseParts($parts) {
 
   if (count($borderLeft) == 0) {
     return array("has-error" => false,
-  	    "left-border" => array($emptySet["left-border"]),
-  	    "right-border" => array($emptySet["right-border"]),
-  	    "is-open-left" => array($emptySet["is-open-left"]),
-  	    "is-open-right" => array($emptySet["is-open-right"]),
+  	    "left-border" => array($interval_ext_emptySet["left-border"]),
+  	    "right-border" => array($interval_ext_emptySet["right-border"]),
+  	    "is-open-left" => array($interval_ext_emptySet["is-open-left"]),
+  	    "is-open-right" => array($interval_ext_emptySet["is-open-right"]),
   	    "index" => $index);
   } else {
     return array("has-error" => false,
@@ -959,10 +960,10 @@ function toString($borderLeft, $borderRight, $isOpenLeft, $isOpenRight, $index) 
 }
 
 function toStringPart($borderLeft, $borderRight, $isOpenLeft, $isOpenRight, $index) {
-  global $emptySet;
+  global $interval_ext_emptySet;
 
-  if ($borderLeft == $emptySet["left-border"] && $borderRight == $emptySet["right-border"] &&
-      $isOpenLeft == $emptySet["is-open-left"] && $isOpenRight == $emptySet["is-open-right"]) {
+  if ($borderLeft == $interval_ext_emptySet["left-border"] && $borderRight == $interval_ext_emptySet["right-border"] &&
+      $isOpenLeft == $interval_ext_emptySet["is-open-left"] && $isOpenRight == $interval_ext_emptySet["is-open-right"]) {
      return EMPTY_SET;
   }
 

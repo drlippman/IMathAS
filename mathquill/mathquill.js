@@ -2498,7 +2498,7 @@ Controller.open(function(_, super_) {
             if (cursor.options.autoParenOperators === true ||
                 cursor.options.autoParenOperators.hasOwnProperty(str)
             ) {
-                cursor.parent.write(cursor, '(');
+                cursor.parent.write(cursor, '(', true);
             }
         }
       block.children().adopt(cursor.parent, cursor[L], cursor[R]);
@@ -2995,7 +2995,7 @@ var MathCommand = P(MathElement, function(_, super_) {
                 }
             }
             if (AutoOpNames._maxLength == 0 || !partofop || issubsup) {
-                cursor.parent.write(cursor, '(');
+                cursor.parent.write(cursor, '(', true);
             }
         }
       }
@@ -4139,7 +4139,13 @@ var Digit = P(VanillaSymbol, function(_, super_) {
         && ((cursor[L] instanceof Variable && cursor[L].isItalic !== false)
             || (cursor[L] instanceof SupSub
                 && cursor[L][L] instanceof Variable
-                && cursor[L][L].isItalic !== false))) {
+                && cursor[L][L].isItalic !== false)
+            || (cursor[L] instanceof Bracket 
+                && cursor[L].sides[R].ch == ')')
+            || (cursor[L] instanceof SupSub
+                && cursor[L][L] instanceof Bracket 
+                && cursor[L][L].sides[R].ch == ')')
+    )) {
       LatexCmds._().createLeftOf(cursor);
       super_.createLeftOf.call(this, cursor);
       cursor.insRightOf(cursor.parent.parent);
@@ -4898,7 +4904,7 @@ var SupSub = P(MathCommand, function(_, super_) {
   };
   Options.p.charsThatBreakOutOfSupSub = '';
   _.finalizeTree = function() {
-    this.ends[L].write = function(cursor, ch) {
+    this.ends[L].write = function(cursor, ch, nobreaksubsup) {
       if (cursor.options.autoSubscriptNumerals && this === this.parent.sub) {
         if (ch === '_') return;
         var cmd = this.chToCmd(ch, cursor.options);
@@ -4906,7 +4912,7 @@ var SupSub = P(MathCommand, function(_, super_) {
         else cursor.clearSelection().insRightOf(this.parent);
         return cmd.createLeftOf(cursor.show());
       }
-      if (cursor[L] && !cursor[R] && !cursor.selection
+      if (cursor[L] && !cursor[R] && !cursor.selection && !nobreaksubsup
           && cursor.options.charsThatBreakOutOfSupSub.indexOf(ch) > -1) {
         cursor.insRightOf(this.parent);
         // if using space to escape, don't write character
@@ -4914,7 +4920,7 @@ var SupSub = P(MathCommand, function(_, super_) {
           return;
         }
       }
-      if (cursor[L] && !cursor[R] && !cursor.selection
+      if (cursor[L] && !cursor[R] && !cursor.selection && !nobreaksubsup
           && this.parent[L] instanceof Variable
       ) {
           if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e' 

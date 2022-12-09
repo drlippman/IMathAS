@@ -50,6 +50,9 @@ if (isset($_POST['checked'])) { //form submitted
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id IN ($ph)");
 			$stm->execute($checked);
 
+            $stm = $DBH->prepare("DELETE FROM imas_excused WHERE type='O' AND typeid IN ($ph)");
+            $stm->execute($checked);
+
 		} else {
 			$checkedlist = implode(',', $checked);
 
@@ -118,7 +121,7 @@ if (isset($_POST['checked'])) { //form submitted
 $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 $i=0;
-$page_gbcatSelect = array();
+$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 if ($stm->rowCount()>0) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_gbcatSelect['val'][$i] = $row[0];
@@ -129,7 +132,7 @@ if ($stm->rowCount()>0) {
 
 $sdate = tzdate("m/d/Y",time());
 $stime = tzdate("g:i a",time());
-$line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
+$tutoreditdef = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
 
 //HTML output
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
@@ -224,7 +227,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 <?php
 $page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 $page_tutorSelect['val'] = array(2,0,1);
-writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
+writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoreditdef);
 
 ?>
 	</td>

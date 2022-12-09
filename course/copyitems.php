@@ -87,7 +87,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
-			if (isset($_POST['checked']) && count($_POST['checked'])>0) {
+			if (isset($_POST['checked']) && !empty($_POST['checked'])) {
 				$checked = $_POST['checked'];
 				$chklist = implode(',', array_map('intval',$checked));
 				$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid=:courseid");
@@ -412,7 +412,7 @@ if (!(isset($teacherid))) {
 			getsubinfo($items,'0','',false,' ');
 
 			$i=0;
-			$page_blockSelect = array();
+			$page_blockSelect = array('val'=>[], 'label'=>[]);
 
 			foreach ($existblocks as $k=>$name) {
 				$page_blockSelect['val'][$i] = $k;
@@ -423,7 +423,10 @@ if (!(isset($teacherid))) {
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
 			//contained in coursecopylist.php
 		}
-	}
+	} else {
+        $overwriteBody = 1;
+        $body = 'Unable to copy this course';
+    }
 }
 
 /******* begin html output ********/

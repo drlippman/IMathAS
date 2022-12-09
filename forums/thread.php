@@ -310,7 +310,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		$query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid=? ";
 		$array[] = $cid;
 	} else {
-		$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
+		$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,1,imas_forum_posts.isanon ";
 		$query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid=? AND imas_users.id=imas_forum_posts.userid ";
 		$array = array($forumid);
 	}
@@ -709,7 +709,7 @@ echo "</p>";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
 			if ($stm->rowCount()==0) {
-				echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
+				echo '<tr><td colspan='.(($isteacher && $groupsetid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 			}
 			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if (isset($postcount[$line['id']])) {
@@ -796,7 +796,7 @@ echo "</p>";
 					echo '<td class="c">';
 				}
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']]).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
-				if ($lastpost=='' || !isset($lastview[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
+				if ($lastpost=='' || !isset($lastview[$line['id']]) || !isset($maxdate[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
 					echo " <span class=\"noticetext\">New</span>";
 				}
 				echo "</td></tr>\n";

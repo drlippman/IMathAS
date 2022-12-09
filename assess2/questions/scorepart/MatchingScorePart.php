@@ -53,13 +53,13 @@ class MatchingScorePart implements ScorePart
         if ($noshuffle=="questions" || $noshuffle=='all') {
             $randqkeys = array_keys($questions);
         } else {
-            $randqkeys = $RND->array_rand($questions,count($questions));
+            $randqkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randqkeys);
         }
         if ($noshuffle=="answers" || $noshuffle=='all') {
             $randakeys = array_keys($answers);
         } else {
-            $randakeys = $RND->array_rand($answers,count($answers));
+            $randakeys = (array) $RND->array_rand($answers,count($answers));
             $RND->shuffle($randakeys);
         }
         if (!empty($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}
@@ -68,7 +68,7 @@ class MatchingScorePart implements ScorePart
         for ($i=0;$i<count($questions);$i++) {
           if ($isRescore) {
             $origla = explode('|', $givenans);
-            if ($origla[$i] !== '') {
+            if (isset($origla[$i]) && $origla[$i] !== '') {
               if (!empty($matchlist)) {
                 if ($matchlist[$i] != $origla[$i]) {
                   $score -= $deduct;
@@ -82,7 +82,7 @@ class MatchingScorePart implements ScorePart
               $score -= $deduct;
             }
           } else {
-            if ($_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
+            if (isset($_POST["qn$qn-$i"]) && $_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
                 if (!empty($matchlist)) {

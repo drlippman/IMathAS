@@ -128,9 +128,9 @@ if (!(isset($teacherid))) {
         }
         require_once "../includes/updateptsposs.php";
         if (isset($_GET['qsetid'])) { //new - adding
-            $stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
+            $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id");
             $stm->execute(array(':id' => $aid));
-            list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+            list($itemorder, $defpoints, $intro) = $stm->fetch(PDO::FETCH_NUM);
             for ($i = 0; $i < $_POST['copies']; $i++) {
                 $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,showwork,questionsetid,rubric,showhints,fixedseeds,extracredit) ";
                 $query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :showwork, :questionsetid, :rubric, :showhints, :fixedseeds, :extracredit)";
@@ -153,8 +153,20 @@ if (!(isset($teacherid))) {
                     }
                 }
             }
-            $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
-            $stm->execute(array(':itemorder' => $itemorder, ':id' => $aid));
+            if (isset($_GET['id']) && $_POST['copies'] > 0) {
+                if (($jsonintro=json_decode($intro,true))!==null) { //is json intro
+                    $toadd = intval($_POST['copies']);
+                    for ($j = 1; $j < count($jsonintro); $j++) {
+                        if ($jsonintro[$j]['displayBefore']>$key) {
+                            $jsonintro[$j]['displayBefore'] += $toadd;
+                            $jsonintro[$j]['displayUntil'] += $toadd;
+                        }
+                    }
+                    $intro = json_encode($jsonintro);
+                }
+            } 
+            $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
+            $stm->execute(array(':itemorder' => $itemorder, ':intro' => $intro, ':id' => $aid));
 
             updatePointsPossible($aid, $itemorder, $defpoints);
         } else {
@@ -163,13 +175,13 @@ if (!(isset($teacherid))) {
 
         // Delete any teacher or tutor attempts on this assessment
         $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
-      imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
-      WHERE iar.assessmentid=?';
+            imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
         $stm = $DBH->prepare($query);
         $stm->execute(array($cid, $aid));
         $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
-      imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
-      WHERE iar.assessmentid=?';
+            imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
         $stm = $DBH->prepare($query);
         $stm->execute(array($cid, $aid));
 
@@ -216,10 +228,11 @@ if (!(isset($teacherid))) {
         $stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
         $stm->execute(array(':id' => $qsetid));
         $qdescrip = $stm->fetchColumn(0);
+        $qingroup = false;
         if (isset($_GET['loc'])) {
             $qdescrip = $_GET['loc'] . ': ' . $qdescrip;
+            $qingroup = (strpos($_GET['loc'],'-') !== false);
         }
-        $qingroup = (strpos($_GET['loc'],'-') !== false);
 
         $rubric_vals = array(0);
         $rubric_names = array('None');
@@ -406,8 +419,8 @@ if (!isset($_GET['id']) || $beentaken) {
 <span class=form><?php echo _('Use Scoring Rubric'); ?></span><span class=formright>
 <?php
 writeHtmlSelect('rubric', $rubric_vals, $rubric_names, $line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Add new rubric") . "</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Edit rubrics") . "</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id'] ?? '') . "\">" . _("Add new rubric") . "</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id'] ?? '') . "\">" . _("Edit rubrics") . "</a> ";
     ?>
     </span><br class="form"/>
 <?php

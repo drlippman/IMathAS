@@ -62,7 +62,7 @@ if ($enablebasiclti!=true) {
 }
 
 function reporterror($err) {
-	global $imasroot;
+	global $imasroot,$staticroot,$installname;
 	require("header.php");
 	printf('<p>%s</p>', Sanitize::encodeStringForDisplay($err));
 	require("footer.php");
@@ -162,7 +162,7 @@ if (isset($_GET['launch'])) {
         $_SESSION['static_ok'] = 1;
     }
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
 		$aid = $_SESSION['ltiitemid'];
 		$stm = $DBH->prepare('SELECT courseid,ver FROM imas_assessments WHERE id=:aid');
@@ -252,7 +252,7 @@ if (isset($_GET['launch'])) {
 	$ltiuserid = $_SESSION['ltiuserid'];
 	$ltiorg = $_SESSION['ltiorg'];
 	$ltirole = $_SESSION['ltirole'];
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	$name_only = false;
 	if (count($keyparts)==1 && $ltirole=='learner') {
 		$name_only = true;
@@ -392,7 +392,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$flexwidth = true;
 		$nologo = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
@@ -440,7 +440,7 @@ if (isset($_GET['launch'])) {
 			if (count($ltiorgparts)>2) {
 				array_shift($ltiorgparts);
 				$ltiorgname = implode(':',$ltiorgparts);
-			} else {
+			} else if (count($ltiorgparts)>1) {
 				$ltiorgname = $ltiorgparts[1];
 			}
 
@@ -506,7 +506,7 @@ if (isset($_GET['launch'])) {
 			reporterror(_("No session recorded"));
 	}
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 } else if(isset($_REQUEST['custom_view_folder'])) {
 	//temporary branch for handling this deprecated feature, until it can be removed.
 	$linkparts = explode("-",$_REQUEST['custom_view_folder']);
@@ -655,9 +655,9 @@ if (isset($_GET['launch'])) {
     } else {
         $_SESSION['lti_context_label'] = $_REQUEST['context_id'];
     }
-    $_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
-	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
-	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
+    $_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'] ?? '';
+	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'] ?? '';
+	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'] ?? '';
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
@@ -822,7 +822,7 @@ if (isset($_GET['launch'])) {
 			}
 		}
 	}
-	$_SESSION['ltikey'] = $ltikey;
+	$_SESSION['lti_key'] = $ltikey;
 }
 
 
@@ -898,7 +898,9 @@ if ($stm->rowCount()==0) {
 				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
 				$stm->execute(array(':aidsourcecid'=>$aidsourcecid));
 				list($aidsourcejsondata,$sourceUIver) = $stm->fetch(PDO::FETCH_NUM);
-				$aidsourcejsondata = json_decode($aidsourcejsondata, true);
+                if ($aidsourcejsondata!==null) {
+				    $aidsourcejsondata = json_decode($aidsourcejsondata, true);
+                }
 				$blockLTICopyOfCopies = ($aidsourcejsondata!==null && !empty($aidsourcejsondata['blockLTICopyOfCopies']));
 
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
@@ -1409,7 +1411,7 @@ if ($linkparts[0]=='cid') {
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($_SESSION['ltirole']!='instructor') {
-		if (!($line['avail']==0 || $line['avail']==2)) {
+		if (!($line['available']==0 || $line['available']==2)) {
 			reporterror(_("This course is not available"));
 		}
 	}
@@ -1423,6 +1425,8 @@ if ($linkparts[0]=='cid') {
 		reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
 	}
 	$cid = $line['courseid'];
+    $GLOBALS['courseenddate'] = $line['enddate'];
+
 	if (isset($_SESSION['lti_duedate']) && ($line['date_by_lti']==1 || $line['date_by_lti']==2)) {
 		if ($_SESSION['ltirole']=='instructor') {
 			$newdatebylti = 2; //set/keep as instructor-set
@@ -1475,7 +1479,7 @@ if ($linkparts[0]=='cid') {
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
-		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
+		} else if ($line['date_by_lti']==3 && isset($_SESSION['lti_duedate']) && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
 			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
 			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);
@@ -1655,7 +1659,7 @@ if ($linkparts[0]=='aid') {
 	$_SESSION['ltiitemid'] = $aid;
 
 	$_SESSION['lticanuselatepass'] = false;
-	if ($_SESSION['ltirole']!='instructor' && $line['allowlate']>0) {
+	if ($SESS['ltirole']!='instructor' && $line['allowlate']>0) {
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$latepasshrs = $stm->fetchColumn(0);
@@ -1683,7 +1687,9 @@ if ($linkparts[0]=='aid') {
 }
 $_SESSION['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $_SESSION['lti_context_label'] = $SESS['lti_context_label'];
-$_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+if (isset($SESS['lti_launch_get'])) {
+    $_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+}
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
@@ -1788,7 +1794,7 @@ if (isset($_GET['launch'])) {
         $_SESSION['static_ok'] = 1;
     }
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
 		$aid = $_SESSION['ltiitemid'];
 		$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=:id");
@@ -1886,7 +1892,7 @@ if (isset($_GET['launch'])) {
 	$ltiuserid = $_SESSION['ltiuserid'];
 	$ltiorg = $_SESSION['ltiorg'];
 	$ltirole = $_SESSION['ltirole'];
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 	$name_only = false;
 	if (count($keyparts)==1 && $ltirole=='learner') {
 		$name_only = true;
@@ -2018,7 +2024,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$nologo = true;
 		$flexwidth = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
@@ -2134,7 +2140,7 @@ if (isset($_GET['launch'])) {
 		$userid = $_SESSION['userid'];
 	}
 
-	$keyparts = explode('_',$_SESSION['ltikey']);
+	$keyparts = explode('_',$_SESSION['lti_key']);
 } else {
 	//not postback of new LTI user info, so must be fresh request
 
@@ -2298,9 +2304,9 @@ if (isset($_GET['launch'])) {
     } else {
         $_SESSION['lti_context_label'] = $_REQUEST['context_id'];
     }
-	$_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
-	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
-	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
+	$_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'] ?? '';
+	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'] ?? '';
+	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'] ?? '';
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
@@ -2421,14 +2427,14 @@ if (isset($_GET['launch'])) {
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
-			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'];
-			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
+			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'] ?? '';
+			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'] ?? '';
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
 			}
 		}
 	}
-	$_SESSION['ltikey'] = $ltikey;
+	$_SESSION['lti_key'] = $ltikey;
 }
 
 
@@ -2645,13 +2651,13 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($_SESSION['ltirole']!='instructor') {
-		if (!($line['avail']==0 || $line['avail']==2)) {
+		if (!($line['available']==0 || $line['available']==2)) {
 			reporterror(_("This course is not available"));
 		}
 	}
 } else if ($keyparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($keyparts[1]);
-	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,LPcutoff,avail,ltisecret,allowlate,date_by_lti FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT id,courseid,startdate,enddate,reviewdate,LPcutoff,avail,ltisecret,allowlate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line===false) {
@@ -2695,20 +2701,20 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		}
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-		$row = $stm2->fetch(PDO::FETCH_NUM);
+		$exceptionrow = $stm2->fetch(PDO::FETCH_NUM);
 		$useexception = false;
-		if ($row!=null) {
-            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$row[1]) {
+		if ($exceptionrow!=null) {
+            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow[1]) {
 				//if new due date is later, or no latepass used, then update
-				if ($row[2]==0 || $_SESSION['lti_duedate']>$row[1]) {
+				if ($exceptionrow[2]==0 || $_SESSION['lti_duedate']>$exceptionrow[1]) {
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $row[0]),
+					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow[0]),
 						':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
 				}
 			}
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
-			$useexception = $exceptionfuncs->getCanUseAssessException($row, $line, true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
 		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
 			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
@@ -2717,8 +2723,8 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
 			$useexception = true;
 		}
-		if ($row!=null && $useexception) {
-			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+		if ($exceptionrow!=null && $useexception) {
+			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
@@ -2729,7 +2735,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 					$inexception = true; //only trigger if past due date for penalty
 				}
 			}
-			$exceptionduedate = $row[1];
+			$exceptionduedate = $exceptionrow[1];
 		} else { //has no exception
 			if ($now < $line['startdate'] || $line['enddate'] < $now) { //outside normal dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
@@ -2804,7 +2810,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 		}
 		$timelimitmult = 1;
 	} else {
-		$stm = $DBH->prepare("SELECT id,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT timelimitmult,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		if ($stm->rowCount() == 0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
@@ -2827,7 +2833,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 			}
 			$timelimitmult = 1;
 		} else {
-			$timelimitmult = $stm->fetchColumn(1);
+            list($timelimitmult,$latepasses) = $stm->fetch(PDO::FETCH_NUM);
 		}
 	}
 }
@@ -2899,7 +2905,7 @@ if ($keyparts[0]=='aid') {
 	$_SESSION['ltiitemid'] = $aid;
 
 	$_SESSION['lticanuselatepass'] = false;
-	if ($_SESSION['ltirole']!='instructor' && $line['allowlate']>0) {
+	if ($SESS['ltirole']!='instructor' && $line['allowlate']>0 && isset($latepasses) && isset($exceptionrow)) {
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$latepasshrs = $stm->fetchColumn(0);
@@ -2929,7 +2935,9 @@ if ($keyparts[0]=='aid') {
 }
 $_SESSION['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $_SESSION['lti_context_label'] = $SESS['lti_context_label'];
-$_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+if (isset($SESS['lti_launch_get'])) {
+    $_SESSION['lti_launch_get'] = $SESS['lti_launch_get'];
+}
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];

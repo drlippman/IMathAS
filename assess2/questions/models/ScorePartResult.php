@@ -13,6 +13,7 @@ class ScorePartResult
     private $lastAnswerAsNumber = '';       // Orig: $givenansval
     private $correctAnswerWrongFormat = false; // Orig: $GLOBALS['partlastanswer'] .= '$f$1'
     private $scoreMessages = '';            // Orig:
+    private $extraData;
 
     /**
      * The student's raw score.
@@ -179,6 +180,36 @@ class ScorePartResult
     {
         $this->scoreMessages .=
             empty($this->scoreMessage) ? $scoreMessage : '<br/>' . $scoreMessage;
+        return $this;
+    }
+
+    /**
+     * Get extra question data.
+     *
+     * @return array|null An associative array of extra question data.
+     */
+    public function getExtraData(): ?array
+    {
+        return $this->extraData;
+    }
+
+    /**
+     * Set extra, arbitrary question data. This data will NOT be saved to the database.
+     *
+     * Note: Namespaced keys are recommended to avoid data collisions.
+     *       Example value for $extraData:
+     *                            [
+     *                              'mydomain' => [
+     *                                              'count' => 42
+     *                                            ]
+     *                            ]
+     *
+     * @param array|null $extraData An associative array of extra question data.
+     * @return ScorePartResult An instance of self.
+     */
+    public function setExtraData(?array $extraData): ScorePartResult
+    {
+        $this->extraData = $extraData;
         return $this;
     }
 }

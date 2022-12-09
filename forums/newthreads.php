@@ -44,7 +44,7 @@ foreach ($result  as $line) {
 }
 $lastforum = '';
 
-if (isset($_GET['markread']) && isset($_POST['checked']) && count($_POST['checked'])>0) {
+if (isset($_GET['markread']) && isset($_POST['checked']) && !empty($_POST['checked'])) {
 	$checked = array_map('Sanitize::onlyInt', $_POST['checked']);
 	$toupdate = array();
 	$threadids_query_placeholders = Sanitize::generateQueryPlaceholders($checked);

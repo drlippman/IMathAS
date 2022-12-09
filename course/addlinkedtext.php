@@ -312,6 +312,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else {
 		$toolcustom = '';
+        $toolcustomurl = '';
 		$selectedtool = 0;
 		$filename = '';
 		$webaddr = '';
@@ -346,9 +347,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$toolcustom = $toolparts[1];
 				if (isset($toolparts[2])) {
 					$toolcustomurl = $toolparts[2];
-				} else {
-					$toolcustomurl = '';
-				}
+				} 
 				if (isset($toolparts[3])) {
 					$gbcat = $toolparts[3];
 					$cntingb = $toolparts[4];
@@ -387,7 +386,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$gbcat = 0;
 			$tutoredit = 0;
             $gradesecret = uniqid();
-            $toolcustomurl = '';
 		}
 
 		$hr = floor($coursedeftime/60)%12;
@@ -435,7 +433,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
-		$page_gbcatSelect = array();
+		$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 		$i=0;
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {

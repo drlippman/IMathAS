@@ -189,7 +189,6 @@ require_once("includes/sanitize.php");
 			echo _("Registration recorded.  You should shortly receive an email with confirmation instructions.");
 			echo "<a href=\"$imasroot/index.php\">",_("Back to main login page"),"</a>\n";
 			require("footer.php");
-			exit;
 
 		} else {
 			$pagetitle = _('Account Created');
@@ -267,12 +266,12 @@ require_once("includes/sanitize.php");
 			require("header.php");
 			echo sprintf(_("Confirmed.  Please %s Log In %s"),"<a href=\"index.php\">","</a>\n");
 			require("footer.php");
-			exit;
 		} else {
 			require("header.php");
 			echo _("Error").".\n";
 			require("footer.php");
 		}
+        exit;
 	} else if (isset($_GET['action']) && $_GET['action']=="resetpw") {
         $init_session_start = true;
 		require_once("init_without_validate.php");
@@ -376,11 +375,11 @@ require_once("includes/sanitize.php");
 			} else {
 				echo _('Invalid user');
 			}
-			exit;
 		} else if (isset($_GET['code'])) {
 			//moved to forms.php - keep redirect for to keep old links working for now.
 			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code) . "&r=" . Sanitize::randomQueryStringParam());
 		}
+        exit;
 	} else if (isset($_GET['action']) && $_GET['action']=="lookupusername") {
         $init_session_start = true;
 		require_once("init_without_validate.php");
@@ -428,7 +427,6 @@ require_once("includes/sanitize.php");
 			$ids = implode(',', $ids); // database values, so safe
 			$stm = $DBH->prepare("UPDATE imas_users SET lastemail=? WHERE id IN ($ids)");
 			$stm->execute(array(time()));
-			exit;
 		} else {
 
 			$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID LIKE 'lti-%'";
@@ -439,8 +437,8 @@ require_once("includes/sanitize.php");
 			} else {
 				echo _("No usernames match this email address, or the email address provided is invalid.")," <a href=\"index.php\">",_("Return to login page"),"</a>";
 			}
-			exit;
 		}
+        exit;
 	} else if (isset($_GET['action']) && $_GET['action']=="checkusername") {
 		require_once("init_without_validate.php");
 		if (isset($_GET['originalSID']) && $_GET['originalSID']==$_GET['SID']) {
@@ -461,7 +459,7 @@ require_once("includes/sanitize.php");
 	if (isset($_GET['action']) && $_GET['action']=="logout") {
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
-			setcookie(session_name(), '', time()-42000, '/', null, false, true);
+			setcookie(session_name(), '', time()-42000, '/', '', false, true);
 		}
 		session_destroy();
 	} else if (isset($_GET['action']) && ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd")) {
@@ -748,7 +746,6 @@ require_once("includes/sanitize.php");
 		} else {
 			$chguserimg = '';
 		}
-		$_POST['theme'] = str_replace(array('/','..'), '', $_POST['theme']);
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
@@ -803,7 +800,7 @@ require_once("includes/sanitize.php");
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':FirstName'=>$_POST['firstname'],
 			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$layoutstr, ':qrightsdef'=>$qrightsdef,
-			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>$_POST['theme'], ':listperpage'=>$perpage, ':uid'=>$userid));
+			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>'', ':listperpage'=>$perpage, ':uid'=>$userid));
 
 		$pwchanged = false;
 		if (isset($_POST['dochgpw'])) {

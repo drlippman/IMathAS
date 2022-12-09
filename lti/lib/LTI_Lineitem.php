@@ -6,6 +6,7 @@ class LTI_Lineitem {
     private $score_maximum;
     private $label;
     private $resource_id;
+    private $resource_link_id;
     private $tag;
     private $start_date_time;
     private $end_date_time;
@@ -18,10 +19,12 @@ class LTI_Lineitem {
         $this->id = $lineitem["id"];
         $this->score_maximum = $lineitem["scoreMaximum"];
         $this->label = $lineitem["label"];
-        $this->resource_id = $lineitem["resourceId"];
-        $this->tag = $lineitem["tag"];
-        $this->start_date_time = $lineitem["startDateTime"];
-        $this->end_date_time = $lineitem["endDateTime"];
+        $this->resource_id = $lineitem["resourceId"] ?? null;
+        $this->tag = $lineitem["tag"] ?? null;
+        $this->start_date_time = $lineitem["startDateTime"] ?? null;
+        $this->end_date_time = $lineitem["endDateTime"] ?? null;
+        $this->resource_link_id = $lineitem["resourceLinkId"] ?? null;
+        
     }
 
     /**

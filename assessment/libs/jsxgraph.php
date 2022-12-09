@@ -94,7 +94,7 @@ function jsxObject (&$board, $param, $ops=array()) {
 
 		})";
 		
-		if ($ops['attributes'] !== null) { 
+		if (!empty($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -152,22 +152,22 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$min = is_numeric($param[0]) ? $param[0] : 0;
 		$max = is_numeric($param[1]) ? $param[1] : 10;
 		$step = is_numeric($param[2]) ? $param[2] : 1;
-		$defaultval = $param[3] !== null ? $param[3] : ($min + $max) / 2;
+		$defaultval = isset($param[3]) ? $param[3] : ($min + $max) / 2;
 		
 		// Parameters:
 		//  label, color, default value, showLabel, LabelSize, decimals, position,
 		//  answerbox
 	
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$color = $ops['color'] !== null ? $ops['color'] : 'purple';
-		$showlabel = $ops['showlabel'] !== null ? jsx_getbool($ops['showlabel']) : 'true';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$name = $ops['name'] !== null ? $ops['name'] : '';
-		$decimals = $ops['decimals'] !== null ? $ops['decimals'] : 0;
+		$haslabel = !empty($ops['label']) ? 'true' : 'false';
+		$label = !empty($ops['label']) ? $ops['label'] : '';
+		$color = !empty($ops['color']) ? $ops['color'] : 'purple';
+		$showlabel = !empty($ops['showlabel']) ? jsx_getbool($ops['showlabel']) : 'true';
+		$fontsize = !empty($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = !empty($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$name = !empty($ops['name']) ? $ops['name'] : '';
+		$decimals = !empty($ops['decimals']) ? $ops['decimals'] : 0;
 		
-		if ($ops['position'] === null) {
+		if (!isset($ops['position'])) {
 			
 			$relpos = true;
 			$x1 = 0.05;
@@ -178,10 +178,10 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		} else {
 			
 			$relpos = false;
-			$x1 = $ops['position'][0][0] !== null ? $ops['position'][0][0] : 1;
-			$y1 = $ops['position'][0][1] !== null ? $ops['position'][0][1] : 1 * $nSliders;
-			$x2 = $ops['position'][1][0] !== null ? $ops['position'][1][0] : 5;
-			$y2 = $ops['position'][1][1] !== null ? $ops['position'][1][1] : 1 * $nSliders;
+			$x1 = isset($ops['position'][0][0]) ? $ops['position'][0][0] : 1;
+			$y1 = isset($ops['position'][0][1]) ? $ops['position'][0][1] : 1 * $nSliders;
+			$x2 = isset($ops['position'][1][0]) ? $ops['position'][1][0] : 5;
+			$y2 = isset($ops['position'][1][1]) ? $ops['position'][1][1] : 1 * $nSliders;
 			
 		}
 		
@@ -212,11 +212,11 @@ function jsxSlider (&$board, $param, $ops=array()) {
 			})";
 			
 		// Set any remaining paramenters specified by user
-		$out .= $ops['attributes'] !== null ? ".setAttribute( {$ops['attributes']} )" : "";
+		$out .= isset($ops['attributes']) ? ".setAttribute( {$ops['attributes']} )" : "";
 			
 		// Now handle the answerbox communication
 
-		if ($ops['answerbox'] !== null) {
+		if (isset($ops['answerbox'])) {
 			if (count($ops['answerbox']) == 1) { 
 				$box = $ops['answerbox'][0] - 1;
 			} else {
@@ -254,20 +254,20 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		
 		// Parameter: $fixed, $color, $size, $face, $label, $visible
 				
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'false';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$size = $ops['size'] !== null ? $ops['size'] : 2;
-		$face = $ops['face'] !== null ? $ops['face'] : 'circle';
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
-		$snapSizeX = $ops['xsnapsize'] !== null ? $ops['xsnapsize'] : 1;
-		$snapSizeY = $ops['ysnapsize'] !== null ? $ops['ysnapsize'] : 1;
-		$trace = $ops['trace'] !== null ? jsx_getbool($ops['trace']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'false';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$size = isset($ops['size']) ? $ops['size'] : 2;
+		$face = isset($ops['face']) ? $ops['face'] : 'circle';
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
+		$snapSizeX = isset($ops['xsnapsize']) ? $ops['xsnapsize'] : 1;
+		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
+		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
 		
-		if (($ops['xsnapsize'] !== null) || ($ops['ysnapsize'] !== null)) {
+		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
 			$snapToGrid = 'false';
@@ -295,10 +295,10 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		})";
 		
 		// Set any remaining paramenters specified by user
-		$out .= $ops['attributes'] !== null ? ".setAttribute( {$ops['attributes']} )" : "";
+		$out .= isset($ops['attributes']) ? ".setAttribute( {$ops['attributes']} )" : "";
 		
 		// If answerbox option provided, set up box number
-		if ($ops['answerbox'] !== null) {
+		if (isset($ops['answerbox'])) {
 			
 			if (count($ops['answerbox']) == 1) { 
 				$box = $ops['answerbox'][0] - 1;
@@ -347,19 +347,19 @@ function jsxGlider (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'false';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$size = $ops['size'] !== null ? $ops['size'] : 2;
-		$face = $ops['face'] !== null ? $ops['face'] : 'circle';
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$snapSizeX = $ops['xsnapsize'] !== null ? $ops['xsnapsize'] : 1;
-		$snapSizeY = $ops['ysnapsize'] !== null ? $ops['ysnapsize'] : 1;
-		$trace = $ops['trace'] !== null ? jsx_getbool($ops['trace']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'false';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$size = isset($ops['size']) ? $ops['size'] : 2;
+		$face = isset($ops['face']) ? $ops['face'] : 'circle';
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$snapSizeX = isset($ops['xsnapsize']) ? $ops['xsnapsize'] : 1;
+		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
+		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
 		
-		if (($ops['xsnapsize'] !== null) || ($ops['ysnapsize'] !== null)) {
+		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
 			$snapToGrid = 'false';
@@ -387,12 +387,12 @@ function jsxGlider (&$board, $param, $ops=array()) {
 			snapToGrid: {$snapToGrid}
         })";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']})";
 		} 
 		
 		// If answerbox option provided, link the point to the answerbox
-		if ($ops['answerbox'] !== null) {
+		if (isset($ops['answerbox'])) {
 			
 			if (count($ops['answerbox']) == 1) {
 				$box = $ops['answerbox'][0] - 1;
@@ -431,16 +431,16 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 	
 	if (is_array($param) && (is_jsxcircleref($param[0]) || is_jsxcircleref($param[1]) || is_jsxlineref($param[0]) || is_jsxlineref($param[1]))) {
 		
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$size = $ops['size'] !== null ? $ops['size'] : 2;
-		$face = $ops['face'] !== null ? $ops['face'] : 'circle';
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
-		$trace = $ops['trace'] !== null ? jsx_getbool($ops['trace']) : 'false';
-		$negativeroot = $ops['negativeroot'] !== null ? jsx_getbool($ops['negativeroot']) : 'false';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$size = isset($ops['size']) ? $ops['size'] : 2;
+		$face = isset($ops['face']) ? $ops['face'] : 'circle';
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
+		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
+		$negativeroot = isset($ops['negativeroot']) ? jsx_getbool($ops['negativeroot']) : 'false';
 			
 		// Start making the point
 		$out = "window.{$id} = board_{$boardID}.create('intersection', [{$param[0]}, {$param[1]}, ";
@@ -461,10 +461,10 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 		})";
 		
 		// Set any remaining paramenters specified by user
-		$out .= $ops['attributes'] !== null ? ".setAttribute( {$ops['attributes']} )" : "";
+		$out .= isset($ops['attributes']) ? ".setAttribute( {$ops['attributes']} )" : "";
 		
 		// If answerbox option provided, set up box number
-		if ($ops['answerbox'] !== null) {
+		if (isset($ops['answerbox'])) {
 			
 			if (count($ops['answerbox']) == 1) { 
 				$box = $ops['answerbox'][0] - 1;
@@ -503,18 +503,18 @@ function jsxCircle(&$board, $param, $ops=array()) {
 	$is_error = false;
 
     // attributes
-    $highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-    $fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-    $color = $ops['color'] !== null ? $ops['color'] : 'black';
-    $dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-    $width = $ops['width'] !== null ? $ops['width'] : 2;
-	$haslabel = $ops['label'] !== null ? 'true' : 'false';
-	$label = $ops['label'] !== null ? $ops['label'] : '';
-	$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-	$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-	$fillcolor = $ops['fillcolor'] !== null ? $ops['fillcolor'] : null;
-	$fillopacity = $ops['fillopacity'] !== null ? $ops['fillopacity'] : 0.3;
-	$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+    $highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+    $fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+    $color = isset($ops['color']) ? $ops['color'] : 'black';
+    $dash = isset($ops['dash']) ? $ops['dash'] : 0;
+    $width = isset($ops['width']) ? $ops['width'] : 2;
+	$haslabel = isset($ops['label']) ? 'true' : 'false';
+	$label = isset($ops['label']) ? $ops['label'] : '';
+	$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+	$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+	$fillcolor = isset($ops['fillcolor']) ? $ops['fillcolor'] : null;
+	$fillopacity = isset($ops['fillopacity']) ? $ops['fillopacity'] : 0.3;
+	$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 
 	if (count($param) == 3 && is_jsxpoint($param[0]) && is_jsxpoint($param[1]) && is_jsxpoint($param[2])) {
 		// Circle through three points
@@ -556,7 +556,7 @@ function jsxCircle(&$board, $param, $ops=array()) {
         } else {
 			$out .= '})';
 		}
-		if ($ops['attributes'] !== null) {
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -600,20 +600,20 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 
 		// Set default values
 		
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'blue';
-		$fillcolor = $ops['fillcolor'] !== null ? $ops['fillcolor'] : 'blue';
-		$fillopacity = $ops['fillopacity'] !== null ? $ops['fillopacity'] : 0.4;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'blue';
+		$fillcolor = isset($ops['fillcolor']) ? $ops['fillcolor'] : 'blue';
+		$fillopacity = isset($ops['fillopacity']) ? $ops['fillopacity'] : 0.4;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
 		
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
 
 		// Begin object creation
 
@@ -654,7 +654,7 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -698,16 +698,16 @@ function jsxLine (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 
 		// Begin object creation
 
@@ -728,7 +728,7 @@ function jsxLine (&$board, $param, $ops=array()) {
 			visible: {$visible}
 		})";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -771,17 +771,17 @@ function jsxSegment (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
-		$length = $ops['length'] !== null ? $ops['length'] : -1;
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
+		$length = isset($ops['length']) ? $ops['length'] : -1;
 
 		// Begin object creation
 
@@ -804,7 +804,7 @@ function jsxSegment (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -847,16 +847,16 @@ function jsxRay (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 
 		// Begin object creation
 
@@ -879,7 +879,7 @@ function jsxRay (&$board, $param, $ops=array()) {
             straightFirst: false
         })";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -915,7 +915,7 @@ function jsxVector (&$board, $param, $ops=array()) {
 	} else if (is_jsxvalue($param[0]) && is_jsxvalue($param[1])) {
 		$r = $param[0];
 		$t = $param[1];
-		$offset = $ops['offset'] !== null ? $ops['offset'] : 'false';
+		$offset = isset($ops['offset']) ? $ops['offset'] : 'false';
 		if ($offset !== 'false') {
 			$point0 = ["$offset[0]", "$offset[1]"]; 
 			$point1 = ["$offset[0] + $r * Math.cos($t)", "$offset[1] + $r * Math.sin($t)"];
@@ -930,15 +930,15 @@ function jsxVector (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('arrow', [";
@@ -956,7 +956,7 @@ function jsxVector (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";		
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -988,14 +988,14 @@ function jsxTangent(&$board, $param, $ops=array()) {
 	if (strpos($param, "glider_") !== false) { 
 
 		// Set default values
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$width = $ops['width'] !== null ? $ops['width'] : 2;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label']!==null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$width = isset($ops['width']) ? $ops['width'] : 2;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = !empty($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 		
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('tangent', [ {$param} ], { ";
@@ -1012,7 +1012,7 @@ function jsxTangent(&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
 		
-		if ($ops['attributes'] !== null) {
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1052,12 +1052,12 @@ function jsxIntegral (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$color = $ops['color'] !== null ? $ops['color'] : 'blue';
-		$fillopacity = $ops['fillopacity'] !== null ? $ops['fillopacity'] : 0.4;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label']!==null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$color = isset($ops['color']) ? $ops['color'] : 'blue';
+		$fillopacity = isset($ops['fillopacity']) ? $ops['fillopacity'] : 0.4;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('integral', [";
@@ -1076,7 +1076,7 @@ function jsxIntegral (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1122,15 +1122,15 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$type = $ops['type'] !== null ? $ops['type'] : 'left';
-		$inputvariable = $ops['inputvariable'] !== null ? $ops['inputvariable'] : 'x';
-		$color = $ops['color'] !== null ? $ops['color'] : 'blue';
-		$fillcolor = $ops['fillcolor'] !== null ? $ops['fillcolor'] : $color;
-		$fillopacity = $ops['fillopacity'] !== null ? $ops['fillopacity'] : 0.4;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label']!==null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$type = isset($ops['type']) ? $ops['type'] : 'left';
+		$inputvariable = isset($ops['inputvariable']) ? $ops['inputvariable'] : 'x';
+		$color = isset($ops['color']) ? $ops['color'] : 'blue';
+		$fillcolor = isset($ops['fillcolor']) ? $ops['fillcolor'] : $color;
+		$fillopacity = isset($ops['fillopacity']) ? $ops['fillopacity'] : 0.4;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
 
@@ -1174,7 +1174,7 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1209,13 +1209,13 @@ function jsxText (&$board, $param, $ops=array()) {
 	if (is_jsxpoint($param[0]) && (is_jsxvalue($param[1]) || is_array($param[1]))) {
 			
 		// Set default values
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'black';
-		$anchor = $ops['anchor'] !== null ? $ops['anchor'] : false;
-		$anchorX = $ops['anchorX'] !== null ? $ops['anchorX'] : false;
-		$anchorY = $ops['anchorY'] !== null ? $ops['anchorY'] : false;
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'black';
+		$anchor = isset($ops['anchor']) ? $ops['anchor'] : false;
+		$anchorX = isset($ops['anchorX']) ? $ops['anchorX'] : false;
+		$anchorY = isset($ops['anchorY']) ? $ops['anchorY'] : false;
 		
 		// Begin object creation
 
@@ -1298,7 +1298,7 @@ function jsxText (&$board, $param, $ops=array()) {
 		}
         $out .= "})";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1340,15 +1340,15 @@ function jsxAngle (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		$highlight = $ops['highlight'] !== null ? jsx_getbool($ops['highlight']) : 'false';
-		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'true';
-		$color = $ops['color'] !== null ? $ops['color'] : 'orange';
-		$fillcolor = $ops['fillcolor'] !== null ? $ops['fillcolor'] : 'orange';
-		$fillopacity = $ops['fillopacity'] !== null ? $ops['fillopacity'] : 0.5;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$color = isset($ops['color']) ? $ops['color'] : 'orange';
+		$fillcolor = isset($ops['fillcolor']) ? $ops['fillcolor'] : 'orange';
+		$fillopacity = isset($ops['fillopacity']) ? $ops['fillopacity'] : 0.5;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('angle', [";
@@ -1367,7 +1367,7 @@ function jsxAngle (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";
 		
-		if ($ops['attributes'] !== null) { 
+		if (isset($ops['attributes'])) { 
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1399,16 +1399,16 @@ function jsxFunction(&$board, $f, $ops=array()) {
 	//  inputvariable, color, width, dash, domain, label
 	
 	// Make some default values
-	$inpVar = $ops['inputvariable'] !== null ? $ops['inputvariable'] : 'x'; 
-	$color = $ops['color'] !== null ? $ops['color'] : 'blue';
-	$width = $ops['width'] !== null ? $ops['width'] : 2;
-	$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-	$haslabel = $ops['label'] !== null ? 'true' : 'false';
-	$label = $ops['label'] !== null ? $ops['label'] : '';
-	$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-	$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : '16';
-	$isBounds = ($ops['domain'] !== null && count($ops['domain']) == 2) ? true : false;
-	$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+	$inpVar = isset($ops['inputvariable']) ? $ops['inputvariable'] : 'x'; 
+	$color = isset($ops['color']) ? $ops['color'] : 'blue';
+	$width = isset($ops['width']) ? $ops['width'] : 2;
+	$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+	$haslabel = isset($ops['label']) ? 'true' : 'false';
+	$label = isset($ops['label']) ? $ops['label'] : '';
+	$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+	$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : '16';
+	$isBounds = (isset($ops['domain']) && count($ops['domain']) == 2) ? true : false;
+	$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
   
 	$objects = jsx_getobjectreferences($f);
   
@@ -1440,7 +1440,7 @@ function jsxFunction(&$board, $f, $ops=array()) {
 		withLabel: {$haslabel}
 	})";
   
-	if ($ops['attributes'] !== null) {
+	if (isset($ops['attributes'])) {
 		$out .= ".setAttribute({$ops['attributes']});";
 	} else {
 		$out .= ";";
@@ -1470,17 +1470,17 @@ function jsxParametric (&$board, $param, $ops=array()) {
 	if (is_jsxpoint($param)) {
 
 		// Set default values
-		$inpVar = $ops['inputvariable'] !== null ? $ops['inputvariable'] : 't'; // input variable
-		$tStart = $ops['domain'][0] !== null ? $ops['domain'][0] :-10; // start value of t
-		$tEnd = $ops['domain'][1] !== null ? $ops['domain'][1] : 10; // end value of t
-		$color = $ops['color'] !== null ? $ops['color'] : 'blue'; // color of graph
-		$width = $ops['width'] !== null ? $ops['width'] : 2; // width of graph
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$inpVar = isset($ops['inputvariable']) ? $ops['inputvariable'] : 't'; // input variable
+		$tStart = isset($ops['domain'][0]) ? $ops['domain'][0] :-10; // start value of t
+		$tEnd = isset($ops['domain'][1]) ? $ops['domain'][1] : 10; // end value of t
+		$color = isset($ops['color']) ? $ops['color'] : 'blue'; // color of graph
+		$width = isset($ops['width']) ? $ops['width'] : 2; // width of graph
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 		
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('curve', [";
@@ -1501,7 +1501,7 @@ function jsxParametric (&$board, $param, $ops=array()) {
 			label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";
 		
-		if ($ops['attributes'] !== null) {
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']})";
 		} else {
 			$out .= ";";
@@ -1536,17 +1536,17 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 	if (is_string($rule)) {
 
 		// Set default values
-		$var = $ops['inputvariable'] !== null ? $ops['inputvariable'] : 't'; // input variable
-		$color = $ops['color'] !== null ? $ops['color'] : 'blue'; // color of graph
-		$width = $ops['width'] !== null ? $ops['width'] : 2; // width of graph
-		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
-		$tStart = $ops['domain'][0] !== null ? $ops['domain'][0] : 0; // start value of t
-		$tEnd = $ops['domain'][1] !== null ? $ops['domain'][1] : 6.283185307; // end value of t
-		$haslabel = $ops['label'] !== null ? 'true' : 'false';
-		$label = $ops['label'] !== null ? $ops['label'] : '';
-		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
-		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : 'black';
-		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$var = isset($ops['inputvariable']) ? $ops['inputvariable'] : 't'; // input variable
+		$color = isset($ops['color']) ? $ops['color'] : 'blue'; // color of graph
+		$width = isset($ops['width']) ? $ops['width'] : 2; // width of graph
+		$dash = isset($ops['dash']) ? $ops['dash'] : 0;
+		$tStart = isset($ops['domain'][0]) ? $ops['domain'][0] : 0; // start value of t
+		$tEnd = isset($ops['domain'][1]) ? $ops['domain'][1] : 6.283185307; // end value of t
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : 'black';
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('curve', [";
@@ -1569,7 +1569,7 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
 		
-		if ($ops['attributes'] !== null) {
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1705,18 +1705,18 @@ function jsx_setupboard ($label, $width, $height, $centered) {
 function jsx_creategeometryboard($label, $ops) {
   
 	// Set default values
-	$width = $ops['size'][0] !== null ? $ops['size'][0] : 350; // board width
-	$height = $ops['size'][1] !== null ? $ops['size'][1] : 350; // board height
-	$navBar = $ops['navbar'] !== null ? jsx_getbool($ops['navbar']) : 'true';
-	$zoom = $ops['zoom'] !== null ? jsx_getbool($ops['zoom']) : 'true';
-	$pan = $ops['pan'] !== null ? jsx_getbool($ops['pan']) : 'true';
-	$centered = $ops['centered'] !== null ? jsx_getbool($ops['centered']) : 'false';
+	$width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
+	$height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
+	$navBar = isset($ops['navbar']) ? jsx_getbool($ops['navbar']) : 'true';
+	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'true';
+	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
+	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
   
 	//set the min and max x-values if provided, else default to [-5, 5]
-	$xmin = $ops['bounds'][0] !== null ? $ops['bounds'][0] : -5;
-	$xmax = $ops['bounds'][1] !== null ? $ops['bounds'][1] : 5;
-	$ymin = $ops['bounds'][2] !== null ? $ops['bounds'][2] : -5;
-	$ymax = $ops['bounds'][3] !== null ? $ops['bounds'][3] : 5;
+	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
+	$xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
+	$ymin = isset($ops['bounds'][2]) ? $ops['bounds'][2] : -5;
+	$ymax = isset($ops['bounds'][3]) ? $ops['bounds'][3] : 5;
 
 	// Create the board
 	$out = "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
@@ -1747,34 +1747,34 @@ function jsx_creategeometryboard($label, $ops) {
 function jsx_createrectangularboard ($label, $ops = array()) {
 	
 	// Set default values
-	$width = $ops['size'][0] !== null ? $ops['size'][0] : 350; // board width
-	$height = $ops['size'][1] !== null ? $ops['size'][1] : 350; // board height
-	$navBar = $ops['navbar'] !== null ? jsx_getbool($ops['navbar']) : 'true';
-	$zoom = $ops['zoom'] !== null ? jsx_getbool($ops['zoom']) : 'true';
-	$pan = $ops['pan'] !== null ? jsx_getbool($ops['pan']) : 'true';
-	$centered = $ops['centered'] !== null ? jsx_getbool($ops['centered']) : 'false';
+	$width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
+	$height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
+	$navBar = isset($ops['navbar']) ? jsx_getbool($ops['navbar']) : 'true';
+	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'true';
+	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
+	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
    
 	//set the min and max x-values if provided, else default to [-5, 5]
-	$xmin = $ops['bounds'][0] !== null ? $ops['bounds'][0] : -5;
-	$xmax = $ops['bounds'][1] !== null ? $ops['bounds'][1] : 5;
-	$ymin = $ops['bounds'][2] !== null ? $ops['bounds'][2] : -5;
-	$ymax = $ops['bounds'][3] !== null ? $ops['bounds'][3] : 5;
+	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
+	$xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
+	$ymin = isset($ops['bounds'][2]) ? $ops['bounds'][2] : -5;
+	$ymax = isset($ops['bounds'][3]) ? $ops['bounds'][3] : 5;
 
-	$minorTicksX = $ops['minorticks'][0] !== null ? $ops['minorticks'][0] : 0;
-	$minorTicksY = $ops['minorticks'][1] !== null ? $ops['minorticks'][1] : 0;
-	$ticksDistanceX = $ops['ticksdistance'][0] !== null ? $ops['ticksdistance'][0] : max(1,floor((($xmax)-($xmin))/8));
-	$ticksDistanceY = $ops['ticksdistance'][1] !== null ? $ops['ticksdistance'][1] : max(1,floor((($ymax)-($ymin))/8));
+	$minorTicksX = isset($ops['minorticks'][0]) ? $ops['minorticks'][0] : 0;
+	$minorTicksY = isset($ops['minorticks'][1]) ? $ops['minorticks'][1] : 0;
+	$ticksDistanceX = isset($ops['ticksdistance'][0]) ? $ops['ticksdistance'][0] : max(1,floor((($xmax)-($xmin))/8));
+	$ticksDistanceY = isset($ops['ticksdistance'][1]) ? $ops['ticksdistance'][1] : max(1,floor((($ymax)-($ymin))/8));
 	
-	$showXLabels = $ops['showlabels'][0] !== null ? jsx_getbool($ops['showlabels'][0]) : 'true';
-	$showYLabels = $ops['showlabels'][1] !== null ? jsx_getbool($ops['showlabels'][1]) : 'true';
+	$showXLabels = isset($ops['showlabels'][0]) ? jsx_getbool($ops['showlabels'][0]) : 'true';
+	$showYLabels = isset($ops['showlabels'][1]) ? jsx_getbool($ops['showlabels'][1]) : 'true';
 	
-	$gridHeightX = $ops['gridheight'][0] !== null ? $ops['gridheight'][0] : -1;
-	$gridHeightY = $ops['gridheight'][1] !== null ? $ops['gridheight'][1] : -1;
+	$gridHeightX = isset($ops['gridheight'][0]) ? $ops['gridheight'][0] : -1;
+	$gridHeightY = isset($ops['gridheight'][1]) ? $ops['gridheight'][1] : -1;
 	
-	$minorTickHeightX = $ops['minortickheight'][0] !== null ? $ops['minortickheight'][0] : 10;
-	$minorTickHeightY = $ops['minortickheight'][1] !== null ? $ops['minortickheight'][1] : 10;
+	$minorTickHeightX = isset($ops['minortickheight'][0]) ? $ops['minortickheight'][0] : 10;
+	$minorTickHeightY = isset($ops['minortickheight'][1]) ? $ops['minortickheight'][1] : 10;
 
-	$useMathJax = ($ops['axislabel'] !== null && (strpos($ops['axislabel'][0], "`") > -1 || strpos($ops['axislabel'][1], "`") > -1)) ? "true" : "false";
+	$useMathJax = (isset($ops['axislabel']) && (strpos($ops['axislabel'][0], "`") > -1 || strpos($ops['axislabel'][1], "`") > -1)) ? "true" : "false";
 
 	// Start output
 	$out = "JXG.Options.layer = { numlayers: 20, text: 9, point: 9, glider: 9, arc: 8, line: 7, circle: 6,
@@ -1807,7 +1807,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 				strokeColor:'black',
 				strokeWidth: 2,
 				highlight:false,
-				name:'" . ($ops['axislabel'][0] != null ? $ops['axislabel'][0] : "") . "',
+				name:'" . (isset($ops['axislabel'][0]) ? $ops['axislabel'][0] : "") . "',
 				label: { 
 					position: 'rt', 
 					offset: [-15,15], 
@@ -1836,7 +1836,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
                strokeColor:'black',
                strokeWidth: 2,
                highlight:false,
-               name:'" . ($ops['axislabel'][1] != null ? $ops['axislabel'][1] : "") . "',
+               name:'" . (isset($ops['axislabel'][1]) ? $ops['axislabel'][1] : "") . "',
                withLabel:true,
                label: {position:'rt', offset:[10,-15], highlight:false, useMathJax:{$useMathJax}},
 			   ticks: {
@@ -1864,22 +1864,22 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 function jsx_createpolarboard ($label, $ops=array()) {
 
 	// Add some default values
-	$size = $ops['size'][0] !== null ? $ops['size'][0] : 350;
-	$navBar = $ops['navbar'] !== null ? jsx_getbool($ops['navbar']) : 'true';
-	$zoom = $ops['zoom'] !== null ? jsx_getbool($ops['zoom']) : 'false';
-	$pan = $ops['pan'] !== null ? jsx_getbool($ops['pan']) : 'false';
-	$centered = $ops['centered'] !== null ? jsx_getbool($ops['centered']) : 'false';
+	$size = isset($ops['size'][0]) ? $ops['size'][0] : 350;
+	$navBar = isset($ops['navbar']) ? jsx_getbool($ops['navbar']) : 'true';
+	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'false';
+	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'false';
+	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
    
 	//set the min and max x-values if provided, else default to [-5, 5]
-	$rmax = $ops['r'][0] !== null ? (float) $ops['r'][0] : 5;
-	$rInc = $ops['r'][1] !== null ? (float) $ops['r'][1] : 1;
-	$thetaType = $ops['theta'][0] !== null ? $ops['theta'][0] : 'radian';
-	$thetaInc = $ops['theta'][1] !== null ? (float) $ops['theta'][1] : 1;
+	$rmax = isset($ops['r'][0]) ? (float) $ops['r'][0] : 5;
+	$rInc = isset($ops['r'][1]) ? (float) $ops['r'][1] : 1;
+	$thetaType = isset($ops['theta'][0]) ? $ops['theta'][0] : 'radian';
+	$thetaInc = isset($ops['theta'][1]) ? (float) $ops['theta'][1] : 1;
 
 	$rMaxBoard = 1.2 * $rmax;
 	$rMaxLabel = 1.1 * $rmax;
 
-	$boardYScale = $ops['padtop'] !== null ? 1.1 : 1;
+	$boardYScale = isset($ops['padtop']) ? 1.1 : 1;
 	$boardHeight = $boardYScale * $size;
 	$yMax = (1 + 2*($boardYScale - 1)) * $rMaxBoard;
 
@@ -1893,7 +1893,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	//$out .= "JXG.Options.text.useMathJax = true;";
    
 	// Create the board
-	$defaultAxis = $ops['ticksdistance'] ? "false" : "true";
+	$defaultAxis = !empty($ops['ticksdistance']) ? "false" : "true";
 	$out .= "
 		window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
 			boundingbox: [-{$rMaxBoard}, {$yMax}, {$rMaxBoard}, -{$rMaxBoard}],
@@ -2271,7 +2271,7 @@ function jsx_getslidercount($board) {
 function jsx_pointToJS($point) {
 	
 	if (is_array($point)) {
-		$js .= "[".jsx_valueToJS($point[0]).", ".jsx_valueToJS($point[1])."]";
+		$js = "[".jsx_valueToJS($point[0]).", ".jsx_valueToJS($point[1])."]";
 	} else if(is_jsxpointref($point)) {
 		$js = $point;
 	}

@@ -9,9 +9,9 @@ if ($courseUIver>1) {
 	$addassess = 'addassessment.php';
 }
 
-if (isset ( $studentid ) && ! isset ( $_SESSION ['stuview'] )) {
+if (isset ( $studentid ) && !isset ( $_SESSION ['stuview'] )) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
-} else {
+} else if (isset($userid)) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, false );
 }
 function beginitem($canedit,$aname='',$greyed=false) {
@@ -234,6 +234,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   if ($canedit) {echo generateadditem($parent,'t');}
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
+            if (!isset($items[$i]['items'])) {
+                continue; // invalid block - no items
+            }
 			   $turnonpublic = false;
 			   if ($ispublic && !$inpublic) {
 				   if (isset($items[$i]['public']) && $items[$i]['public']==1) {
@@ -817,7 +820,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
                }
 				 if ($line['ver'] > 1) {
 					 $thisaddassess = "addassessment2.php";
-					 	if ($assessUseVueDev) {
+					 	if ($assessUseVueDev && isset($CFG['assess2-use-vue-dev-address'])) {
 							$assessUrl = sprintf("%s/?cid=%s&aid=%s",
 								$CFG['assess2-use-vue-dev-address'], $cid, $typeid);
 						} else {
@@ -1119,13 +1122,14 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   foreach ($matches as $k=>$m) {
 			   	   	if ($m[1]=='youtube.com') {
 			   	   		$p = explode('v=',$m[2]);
+                        if (count($p)<2) { continue; } // missing id
 			   	   		$p2 = preg_split('/[#&]/',$p[1]);
 			   	   	} else if ($m[1]=='youtu.be') {
 			   	   		$p2 = preg_split('/[#&?]/',substr($m[2],1));
 			   	   	}
 			   	   	$vidid = $p2[0];
 			   	   	if (preg_match('/.*[^r]t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
-			   	   		$start = ($tm[2]?$tm[2]*60:0) + ($tm[4]?$tm[4]*1:0);
+			   	   		$start = (!empty($tm[2])?$tm[2]*60:0) + (!empty($tm[4])?$tm[4]*1:0);
 			   	   	} else if (preg_match('/start=(\d+)/',$m[2],$tm)) {
 			   	   		$start = $tm[1];
 			   	   	} else {
@@ -1341,7 +1345,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('drill', 'Drill', false);
 
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
+				   echo "<b><a href=\"$alink\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1397,7 +1401,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('drill', 'Drill', true);
 
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';

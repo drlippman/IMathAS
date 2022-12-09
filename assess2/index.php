@@ -2,7 +2,7 @@
 // IMathAS: Main launch page for assess2 assessment player
 // (c) 2019 David Lippman
 
-$lastupdate = '20220712';
+$lastupdate = '20221027';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -17,7 +17,7 @@ $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 
 $isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
-$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader') !== false);
 $isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
   $diagid = Sanitize::onlyInt($_SESSION['isdiag']);
@@ -35,8 +35,8 @@ $placeinhead .= '</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=072022" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=101322" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112822" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=111622" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=031821">
   <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=081122">';
 if ($isltilimited || $inTreeReader) {
@@ -52,6 +52,11 @@ require('../header.php');
 
 if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
+  if ((!isset($usernameinheader) || $usernameinheader==false) && $userfullname != ' ') {
+    echo '<span class="floatright hideinmobile">';
+    echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
+    echo '</span>';
+  }
   if ($isltilimited) {
     echo "$breadcrumbbase ", _('Assessment'), "</div>";
   } else {

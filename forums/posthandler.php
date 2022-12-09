@@ -44,7 +44,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		if ($isteacher) {
-			$type = $_POST['type'];
+			$type = $_POST['type'] ?? 0;
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
 				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
@@ -73,7 +73,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$thisposttime = $now-1;
 		if ($isteacher) {
-			if ($_POST['releaseon']=='Date') {
+			if (isset($_POST['releaseon']) && $_POST['releaseon']=='Date') {
 				require_once("../includes/parsedatetime.php");
 				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
@@ -360,6 +360,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			echo '<div id="headerposthandler" class="pagetitle"><h1>Modify Post</h1></div>';
 		} else {
+            $line['subject'] = "";
+            $line['message'] = "";
+            $line['posttype'] = 0;
+            $line['files'] = '';
+            $line['tag'] = '';
+            $line['isanon'] = 0;
+            $replyby = null;
 			if ($_GET['modify']=='reply') {
 
 					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
@@ -371,9 +378,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 				$sub = str_replace('"','&quot;',$sub);
 				$line['subject'] = "Re: $sub";
-				$line['message'] = "";
-                $line['files'] = '';
-				$replyby = null;
+				
 				if ($isteacher) {
 					$stm = $DBH->prepare("SELECT points FROM imas_forums WHERE id=:id");
 					$stm->execute(array(':id'=>$forumid));
@@ -387,11 +392,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						exit;
 					}
 				}
-				$line['subject'] = "";
-				$line['message'] = "";
-				$line['posttype'] = 0;
-				$line['files'] = '';
-                $line['tag'] = '';
+
                 if (isset($_SESSION['ffilter'.$forumid])) {
                     $curstugroupid = $_SESSION['ffilter'.$forumid];
                     if ($curstugroupid == -1) {
@@ -400,7 +401,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
                 } else {
                     $curstugroupid = 0;
                 }
-				$replyby = null;
+
 				echo "<h1>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
 					$showa = false;

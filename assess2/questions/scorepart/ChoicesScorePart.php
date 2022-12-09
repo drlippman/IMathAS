@@ -60,7 +60,7 @@ class ChoicesScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if ($noshuffle == "last") {
-            $randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+            $randkeys = (array) $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
             $RND->shuffle($randkeys);
             array_push($randkeys,count($questions)-1);
         } else if ($noshuffle == "all") {
@@ -70,13 +70,13 @@ class ChoicesScorePart implements ScorePart
             if ($n>count($questions)) {
                 $n = count($questions);
             }
-            $randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
+            $randkeys = (array) $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
             $RND->shuffle($randkeys);
             for ($i=count($questions)-$n;$i<count($questions);$i++) {
                 array_push($randkeys,$i);
             }
         } else {
-            $randkeys = $RND->array_rand($questions,count($questions));
+            $randkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randkeys);
         }
 
@@ -86,7 +86,14 @@ class ChoicesScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
         }
 
-        if ($givenans ==='NA' || $givenans === null) {
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part']);
+            if (isset($onGetResult) && is_callable($onGetResult)) {
+                $onGetResult();
+            }
+        }
+
+        if ($givenans ==='NA' || $givenans === null || $givenans === '') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }

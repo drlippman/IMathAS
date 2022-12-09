@@ -14,7 +14,7 @@
 	}
 	$istutor = isset($tutorid);
 
-	$stu = intval($_GET['stu']);
+	$stu = intval($_GET['stu'] ?? 0);
 
 	if ($isteacher || $istutor) {
 		$uid = intval($_GET['uid']);
@@ -104,7 +104,7 @@
 	$pagetitle = "View Forum Grade";
 	if ($caneditscore && $_SESSION['useed']!=0) {
 		$useeditor = "noinit";
-		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
+		$placeinhead = '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 		$placeinhead .= '<style type="text/css">
 		 .fbbox {
 		 	min-width: 15em;
@@ -191,7 +191,7 @@
 				echo "</textarea></td>";
 			} else {
 				echo '<td><div class="fbbox" id="feedback'.$postid.'">';
-				if ($scores[$row[0]][1]!==null) {
+				if (!empty($scores[$row[0]][1])) {
 					echo Sanitize::outgoingHtml($scores[$row[0]][1]);
 				}
 				echo '</div></td>';
@@ -199,10 +199,11 @@
 		} else {
 			if (isset($scores[$row[0]])) {
 				echo '<td>'.Sanitize::encodeStringForDisplay($scores[$row[0]][0]).'</td>';
+                echo '<td>'.Sanitize::outgoingHtml($scores[$row[0]][1]).'</td>';
 			} else {
-				echo "<td>-</td>";
+				echo "<td>-</td><td></td>";
 			}
-			echo '<td>'.Sanitize::outgoingHtml($scores[$row[0]][1]).'</td>';
+			
 		}
 		echo "</tr>";
 	}
@@ -219,13 +220,13 @@
 			//echo "<td><textarea cols=40 rows=1 id=\"feedback0\" name=\"feedback[0]\">".Sanitize::encodeStringForDisplay($scores[0][1])."</textarea></td>";
 			if ($_SESSION['useed']==0) {
 				echo "<td><textarea class=scorebox cols=\"40\" rows=\"1\" name=\"feedback0\" id=\"feedback0\">";
-				if ($scores[0][1]!==null) {
+				if (isset($scores[0][1])) {
 					echo Sanitize::encodeStringForDisplay($scores[0][1]);
 				}
 				echo "</textarea></td>";
 			} else {
 				echo '<td><div class="fbbox" id="feedback0">';
-				if ($scores[0][1]!==null) {
+				if (isset($scores[0][1])) {
 					echo Sanitize::outgoingHtml($scores[0][1]);
 				}
 				echo '</div></td>';

@@ -119,7 +119,7 @@ function quicksave() {
 function hidegroupdup(el) {  //el.checked = one per group
 	 var divs = document.getElementsByTagName("div");
 	 for (var i=0;i<divs.length;i++) {
-		 if (divs[i].className=="groupdup") {
+		 if (divs[i].className.match(/groupdup/)) {
 				 if (el.checked) {
 							 divs[i].style.display = "none";
 				 } else { divs[i].style.display = "block"; }
@@ -141,6 +141,14 @@ function hidegroupdup(el) {  //el.checked = one per group
 				spans[i].style.display = el.checked?"":"none";
 			 }
 		}
+}
+function sortByLastChange() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return Date.parse(b.getAttribute('data-lastchange')) - Date.parse(a.getAttribute('data-lastchange'));
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
 }
 function clearfeedback() {
 	var els=document.getElementsByTagName("textarea");

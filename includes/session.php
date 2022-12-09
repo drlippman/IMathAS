@@ -21,7 +21,7 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function close()
+	public function close(): bool
 	{
 		return true;
 	}
@@ -29,7 +29,7 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function destroy($sessionId)
+	public function destroy($sessionId): bool
 	{
 		$stm = $this->db->prepare('DELETE FROM php_sessions WHERE id = :sessionId');
 		$stm->bindParam(':sessionId', $sessionId);
@@ -44,7 +44,8 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function gc($maxLifetime)
+    #[\ReturnTypeWillChange]
+	public function gc($maxLifetime) 
 	{
 		$oldTimestamp = time() - $maxLifetime;
 
@@ -61,7 +62,7 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function open($savePath, $sessionName)
+	public function open($savePath, $sessionName): bool
 	{
 		if ($this->db) {
 			return true;
@@ -73,6 +74,7 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
+    #[\ReturnTypeWillChange]
 	public function read($sessionId)
 	{
 		$stm = $this->db->prepare('SELECT `data`,`access` FROM php_sessions WHERE id = :id');
@@ -91,7 +93,7 @@ class SessionDBHandler implements SessionHandlerInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function write($sessionId, $sessionData)
+	public function write($sessionId, $sessionData): bool
 	{
 		if ($sessionData == '') {
 			return true; // skip write if no data

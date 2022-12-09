@@ -27,7 +27,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id ";
       $query .= "WHERE (iu.LastName LIKE ? OR iu.FirstName Like ? OR iu.SID LIKE ?)";
       if ($limitToTeacher) {
-        $query .= " AND iu.rights>11";
+        $query .= " AND iu.rights>19";
       }
       $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);
@@ -48,7 +48,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id ";
       $query .= "WHERE ((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
       if ($limitToTeacher) {
-        $query .= " AND iu.rights>11";
+        $query .= " AND iu.rights>19";
       }
       $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);
@@ -86,7 +86,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
 function logout() {
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
-		setcookie(session_name(), '', time()-42000, '/', null, false, true);
+		setcookie(session_name(), '', time()-42000, '/', '', false, true);
 	}
 	session_destroy();
 }
