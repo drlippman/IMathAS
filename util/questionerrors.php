@@ -45,10 +45,11 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     if ($qsetid != $lastqsetid) {
         if ($lastqsetid > 0) { echo '</ul></li>'; }
         echo '<li><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
-        echo 'Question <a href="../course/moddataset.php?cid=0&id='.$qsetid.'">#'.$qsetid.'</a>';
+        echo 'Question <a target="_blank" href="../course/moddataset.php?cid=0&id='.$qsetid.'">#'.$qsetid.'</a>';
         echo '<ul>';
     }
-    echo '<li>Seed '.intval($row['seed']).': ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
+    echo '<li><a target="_blank" href="../course/testquestion2.php?cid=0&qsetid='.$qsetid.'&seed='.intval($row['seed']).'">';
+    echo 'Seed '.intval($row['seed']).'</a>: ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
     $lastqsetid = $qsetid;
 }
 if ($lastqsetid > 0) { echo '</ul></li>'; }

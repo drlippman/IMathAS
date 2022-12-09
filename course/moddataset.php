@@ -93,7 +93,7 @@
         $addq = 'addquestions';
         $from = 'addq';
     }
-	$testqpage = ($courseUIver>1 || $cid == 0) ? 'testquestion2.php' : 'testquestion.php';
+	$testqpage = ($cid == 0 || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
 	$errmsg = '';

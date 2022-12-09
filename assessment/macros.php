@@ -3055,8 +3055,8 @@ function formhoverover($label,$tip) {
 function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='') {
 	global $urlmode;
 	$labelSanitized = Sanitize::encodeStringForDisplay($label);
-    if (!is_string($content)) { echo "invalid content in formpopup"; return ''; }
-    if (!is_string($label)) { echo "invalid label in formpopup"; return ''; }
+    if (!is_scalar($content)) { echo "invalid content in formpopup"; return ''; }
+    if (!is_scalar($label)) { echo "invalid label in formpopup"; return ''; }
     if (is_array($width)) { echo "width should not be array in formpopup"; $width = 600; }
 
 	if ($scroll != null) {
@@ -3100,9 +3100,9 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 }
 
 function forminlinebutton($label,$content,$style='button',$outstyle='block') {
-    if (!is_string($content)) { echo "invalid content in forminlinebutton"; return ''; }
-    if (!is_string($style)) { echo "invalid style in forminlinebutton"; return ''; }
-    if (!is_string($label)) { echo "invalid label in forminlinebutton"; return ''; }
+    if (!is_scalar($content)) { echo "invalid content in forminlinebutton"; return ''; }
+    if (!is_scalar($style)) { echo "invalid style in forminlinebutton"; return ''; }
+    if (!is_scalar($label)) { echo "invalid label in forminlinebutton"; return ''; }
 
 	$r = uniqid();
 	$label = str_replace('"','',$label);

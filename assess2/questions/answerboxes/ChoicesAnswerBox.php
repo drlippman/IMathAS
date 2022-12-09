@@ -186,9 +186,7 @@ class ChoicesAnswerBox implements AnswerBox
             foreach ($anss as $v) {
                 if (isset($questions[intval($v)])) {
                     $sapt[] = $questions[intval($v)];
-                } else {
-                    echo "Invalid answer index $v";
-                }
+                } 
             }
             $sa = implode(' or ', $sapt); //$questions[$answer];
         }
