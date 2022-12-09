@@ -143,9 +143,14 @@ class ScoreEngine
           $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
           eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
         } catch (\Throwable $t) {
-          $this->addError(
-              _('Caught error while evaluating the code in this question: ')
-              . $t->getMessage());
+            $this->addError(
+                _('Caught error while evaluating the code in this question: ')
+                . $t->getMessage()
+                . ' on line '
+                . $t->getLine()
+                . ' of '
+                . $t->getFile()
+              );
         }
 
         /*
@@ -664,9 +669,14 @@ class ScoreEngine
               $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
               $scorePartResult = $scorePart->getResult();
             } catch (\Throwable $t) {
-              $this->addError(
-                  _('Caught error while evaluating the code in this question: ')
-                  . $t->getMessage());
+                $this->addError(
+                    _('Caught error while evaluating the code in this question: ')
+                    . $t->getMessage()
+                    . ' on line '
+                    . $t->getLine()
+                    . ' of '
+                    . $t->getFile()
+                  );
             }
             
             $raw[$partnum] = $scorePartResult->getRawScore();

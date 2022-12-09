@@ -218,8 +218,12 @@ class QuestionGenerator
         ErrorHandler::evalExceptionHandler($t);
 
         $this->addError(
-            _('<p>Caught error while evaluating this question: ')
-            . Sanitize::encodeStringForDisplay($t->getMessage())
-            . '</p>');
+            _('Caught error while evaluating this question: ')
+            . $t->getMessage()
+            . ' on line '
+            . $t->getLine()
+            . ' of '
+            . $t->getFile()
+          );
     }
 }
