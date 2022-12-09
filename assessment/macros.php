@@ -851,8 +851,13 @@ function addfractionaxislabels($plot,$step) {
 }
 
 function connectthedots($xarray,$yarray,$color='black',$thick=1,$startdot='',$enddot='') {
+    if (!is_array($xarray) || !is_array($yarray)) {
+        echo "Error: x array and y array need to be arrays";
+        return [];
+    }
 	if (count($xarray)!=count($yarray)) {
 		echo "Error: x array and y array need to have the same number of elements";
+        return [];
 	}
 	$outarr = array();
 	for ($i=1; $i<count($xarray); $i++) {
@@ -2049,6 +2054,9 @@ function unionarrays($a1,$a2) {
 }
 
 function prettyint($n) {
+    if (!is_numeric($n)) {
+        return $n;
+    }
 	return number_format($n);
 }
 function prettyreal($aarr,$d=0,$comma=',') {
@@ -3626,6 +3634,9 @@ function cleantokenize($str,$funcs) {
 	return $syms;
 }
 
+function is_nicenumber($x) {
+    return (is_numeric($x) && is_finite($x));
+}
 
 function comparenumbers($a,$b,$tol='.001') {
 	if (strval($tol)[0]=='|') {
@@ -4038,7 +4049,7 @@ function getfeedbacktxtessay($stu,$fbtxt) {
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
-	if ($stu==null || trim($stu)=='') {
+	if ($stu===null || !is_scalar($stu) || trim($stu)=='') {
 		return '';
 	} else {
 		return '<div class="feedbackwrap correct">'.$fbtxt.'</div>';
@@ -4051,7 +4062,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		return '';
     }
 
-	if ($stu===null) {
+	if ($stu===null || !is_scalar($stu)) {
 		return " ";
 	} else {
         $stu = trim($stu);

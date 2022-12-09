@@ -163,7 +163,7 @@ class CalculatedMatrixScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        $fullmatrix = !in_array("",  $givenanslist, true);
+        $fullmatrix = !in_array("",  $givenanslist, true) && !in_array("NaN",  $givenanslistvals, true);
 
         if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist

@@ -30,6 +30,13 @@
 	   $blocktree = explode('-',$_GET['folder']);
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
+        if (!isset($items[$blocktree[$i]-1])) {
+            $_GET['folder'] = 0;
+			$items = unserialize($line['itemorder']);
+			unset($backtrack);
+			unset($blocktree);
+			break;
+        }
 		$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
 		if ($items[$blocktree[$i]-1]['public']==1) {
 			$blockispublic = true;
