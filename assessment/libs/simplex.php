@@ -7,7 +7,7 @@
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 43;
+	return 44;
 }
 
 global $allowedmacros;
@@ -234,7 +234,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
         $LastStuColumn = count($stuanswer)-1; // set to the last column and check seperately
         $LastAnswer = $LastStuColumn;
     } else {
-        $LastStuColumn = -1;
+        $LastStuColumn = count($stuanswer);
         $LastAnswer = count($stuanswer);
     }
 
@@ -247,7 +247,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                 $match = 1;  // found a possible solution
 
 				// Check Objective
-                if($HasObjective==1) {
+                if(($HasObjective==1)) {
                     $solutionlistarray = $solutionlist[$r][$OptimizedValuecol];
 
 					// verify it is an array.
@@ -271,7 +271,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                         $dec2 = fractiontodecimal($stuanswer[$LastStuColumn]);
                     }
 
-                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+                    if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -291,15 +291,18 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                         $dec1 = fractiontodecimal($solutionlist[$r][$c]);
                     }
 
-                    if(is_array($stuanswer[$LastStuColumn])) {
-                        $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
-                    } else {
-                        $dec2 = fractiontodecimal($stuanswer[$c]);
-                    }
+					if(array_key_exists($LastStuColumn, $stuanswer)) {
+                        if(is_array($stuanswer[$LastStuColumn])) {
+                            $dec2 = $stuanswer[$c][0]/$stuanswer[$c][1];
+                        } else {
+                            $dec2 = fractiontodecimal($stuanswer[$c]);
+                        }
 
-                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
-                        $match = 0;  // not a solution
-                        break;
+						// since the key exist see if the difference is greater than the tolerance
+                        if(abs($dec1-$dec2)>simplexTolerance) {
+                            $match = 0;  // not a solution
+                            break;
+                        }
                     }
                 }
                 if($match==1) break;
@@ -311,7 +314,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                 $match = 1;  // found a possible solution
 				// Check Objective
                 if($HasObjective==1) {
-                    if (is_array($solutionlist[$r][$OptimizedValuecol])) {
+                    if (is_array($solutionlistarray)) {
                         // not checking for division by zero as this is instructor supplied
                         $dec1 = $solutionlist[$r][$OptimizedValuecol][0]/$solutionlist[$r][$OptimizedValuecol][1];
                     } else {
@@ -332,7 +335,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     }
 
 
-                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+                    if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -360,7 +363,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     }
 
 
-                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+                    if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -1265,7 +1268,7 @@ function simplexdisplaycolortable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if(!empty($headers[$cloop])) {
+                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -2819,11 +2822,18 @@ function simplexsolve2() {
 
 		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
-        if(!isset($simplexsets[$rows])) {
-            $simplexsets[$rows] = array();
+        if(array_key_exists($rows, $simplexsets)) {
+			if(is_null($simplexsets[$rows])) {
+				$simplexsets[] = array();
+            }
+        } else {
+            $simplexsets[] = array();
         }
 
-		$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
+		$simplexsets[$rows][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
+
+		// add one to the rows
+		$rows++;
 
 		#endregion
 
@@ -3549,6 +3559,8 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change log
+// 2022-12-09 ver 44 - Added code to check for created array_key_exists to eliminate warnings.
+//
 // 2022-05-06 ver 43 - created simplexcreatelatexinequalities for the creation of latex inequalities
 //
 // 2021-12-13 ver 42 - eliminated a logic bug in verifyASCIIticks. Eliminated simplex fraction routines and am using the
