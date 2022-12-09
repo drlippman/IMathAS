@@ -3851,28 +3851,43 @@ function numfuncGenerateTestpoints($variables,$domain='') {
         }
     }
     if (!empty($domain)) {
-        $fromto = array_map('trim',explode(",",$domain));
-        for ($i=0; $i < count($fromto); $i++) {
-            if ($fromto[$i] === 'integers' && $i%3==2) { continue; }
-            else if (!is_numeric($fromto[$i])) {
-                $fromto[$i] = evalbasic($fromto[$i]);
-            }
-            if (!is_numeric($fromto[$i])) {
-                echo "domain values must be numbers or elementary calculations";
-                $fromto = [1];
-                break;
-            }
-        }
+        $fromto = array_map('trim', explode(',', $domain));
     } else {
-        $fromto = array(-10, 10);
-    }
-    if (count($fromto)==1) {
         $fromto = array(-10, 10);
     }
 
     $domaingroups = array();
     $i=0;
+    $haderr = false;
     while ($i<count($fromto)) {
+        if (!isset($fromto[$i+1])) {
+            if (!$haderr) {
+                echo "domain values must be include min,max";
+                $haderr = true;
+            }
+            $fromto[$i] = -10;
+            $fromto[$i+1] = 10;
+        }
+        if (!is_numeric($fromto[$i])) {
+            $fromto[$i] = evalbasic($fromto[$i]);
+            if (!is_numeric($fromto[$i])) {
+                if (!$haderr) {
+                    echo "domain values must be numbers or elementary calculations";
+                    $haderr = true;
+                }
+                $fromto[$i] = -10;
+            }
+        }
+        if (!is_numeric($fromto[$i+1])) {
+            $fromto[$i] = evalbasic($fromto[$i+1]);
+            if (!is_numeric($fromto[$i+1])) {
+                if (!$haderr) {
+                    echo "domain values must be numbers or elementary calculations";
+                    $haderr = true;
+                }
+                $fromto[$i+1] = 10;
+            }
+        }
         if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
             $domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
             $i += 3;
