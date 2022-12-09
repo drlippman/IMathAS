@@ -339,7 +339,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$tolist = intval($_GET['uid']);
 		$formtag .= "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
 	} else {
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "<p>No students selected.</p>";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";

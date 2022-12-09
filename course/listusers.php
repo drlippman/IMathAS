@@ -195,7 +195,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
 			$ulist = implode(',', array_map('intval', $_POST['checked']));
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
 			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid AND imas_users.id IN ($ulist) ";
@@ -583,7 +583,7 @@ if ($overwriteBody==1) {
 		require_once("../includes/newusercommon.php");
 		showNewUserValidation("pageform");
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
 		} else {
 			echo '<textarea id="emails" rows="30" cols="60">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';

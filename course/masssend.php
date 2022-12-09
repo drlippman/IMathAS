@@ -265,7 +265,7 @@
 				echo "Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			}
 		}
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No users selected.  ";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try again</a>\n";

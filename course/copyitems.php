@@ -87,7 +87,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
-			if (isset($_POST['checked']) && count($_POST['checked'])>0) {
+			if (isset($_POST['checked']) && !empty($_POST['checked'])) {
 				$checked = $_POST['checked'];
 				$chklist = implode(',', array_map('intval',$checked));
 				$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid=:courseid");
