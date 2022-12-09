@@ -234,7 +234,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
         $LastStuColumn = count($stuanswer)-1; // set to the last column and check seperately
         $LastAnswer = $LastStuColumn;
     } else {
-        $LastStuColumn = -1;
+        $LastStuColumn = count($stuanswer);
         $LastAnswer = count($stuanswer);
     }
 
