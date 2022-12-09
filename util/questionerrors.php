@@ -49,6 +49,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         echo '<ul>';
     }
     echo '<li>Seed '.intval($row['seed']).': ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
+    $lastqsetid = $qsetid;
 }
 if ($lastqsetid > 0) { echo '</ul></li>'; }
 echo '</ul>';
