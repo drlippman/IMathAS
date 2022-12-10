@@ -283,7 +283,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     $dec1 = $solutionlistdecimal[$r][$OptimizedValuecol];
 					$dec2 = $stuanswerdecimal[$LastStuCol];
 
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -295,7 +295,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 					$dec2 = $stuanswerdecimal[$c];
 
 					// since the difference is greater than the tolerance
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
