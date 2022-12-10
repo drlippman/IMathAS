@@ -5098,7 +5098,7 @@ function parsereqsigfigs($reqsigfigs) {
     $origstr = $reqsigfigs;
     $reqsigfigs = str_replace('+/-','+-',$reqsigfigs);
 	$reqsigfigoffset = 0;
-	$reqsigfigparts = explode('+-',$reqsigfigs);
+	$reqsigfigparts = array_map('trim', explode('+-',$reqsigfigs));
 	$reqsigfigs = $reqsigfigparts[0];
 	$sigfigscoretype = array('abs',0,'def');
 	if (count($reqsigfigparts)>1) {
