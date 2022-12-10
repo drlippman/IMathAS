@@ -1246,7 +1246,7 @@ function simplexdisplaycolortable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if(!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3362,7 +3362,7 @@ function simplexdisplaytable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if(!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
