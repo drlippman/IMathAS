@@ -7,7 +7,7 @@
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 45;
+	return 44;
 }
 
 global $allowedmacros;
@@ -252,12 +252,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             $studec = $stuanswer[$r];
         }
 		// this will contain the deciaml values for each student answer
-		if(is_numeric($studec)) {
-            $stuanswerdecimal[] = $studec;
-        } else {
-			// fail - not a number
-            return $match;
-        }
+		$stuanswerdecimal[] = $studec;
     }
 
     // convert all $solutionlist answer array values into decimals
@@ -269,12 +264,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             } else {
                 $answerdec = fractiontodecimal($solutionlist[$r][$c]);
             }
-			if(is_numeric($answerdec)) {
-                $solutionlistdecimal[$r][] = $answerdec;
-            } else {
-                // fail - not a number
-                return $match;
-            }
+    			$solutionlistdecimal[$r][] = $answerdec;
         }
     }
 
@@ -305,7 +295,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 					$dec2 = $stuanswerdecimal[$c];
 
 					// since the difference is greater than the tolerance
-                    if(abs($dec1-$dec2)>simplexTolerance) {
+          if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -318,7 +308,6 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
         for($r=0; $r< count($solutionlist); $r++) {
             if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
                 $match = 1;  // found a possible solution
-
 				// Check Objective
                 if(($HasObjective==1)) {
 					// reset to adjust for objective value
@@ -3367,7 +3356,7 @@ function simplexdisplaytable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if(!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3554,9 +3543,7 @@ function simplexsolve($sm,$type,$showfractions=1) {
 }
 
 
-//Change log
-// 2022-12-09 ver 45 - Bug fixes and division by zero checks
-//
+// Change log
 // 2022-12-09 ver 44 - Added code to check for created array_key_exists to eliminate warnings.
 //
 // 2022-05-06 ver 43 - created simplexcreatelatexinequalities for the creation of latex inequalities

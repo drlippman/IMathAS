@@ -6,7 +6,7 @@
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$fid = Sanitize::onlyInt($_GET['fid']);
-	$from = $_GET['from'];
+	$from = $_GET['from'] ?? '';
 
 	require("../includes/exceptionfuncs.php");
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {

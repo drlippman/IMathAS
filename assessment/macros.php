@@ -3879,7 +3879,7 @@ function numfuncGenerateTestpoints($variables,$domain='') {
             }
         }
         if (!is_numeric($fromto[$i+1])) {
-            $fromto[$i] = evalbasic($fromto[$i+1]);
+            $fromto[$i+1] = evalbasic($fromto[$i+1]);
             if (!is_numeric($fromto[$i+1])) {
                 if (!$haderr) {
                     echo "domain values must be numbers or elementary calculations";
@@ -3898,7 +3898,6 @@ function numfuncGenerateTestpoints($variables,$domain='') {
             break;
         }
     }
-
     uasort($variables,'lensort');
     $newdomain = array();
     $restrictvartoint = array();
@@ -5099,7 +5098,7 @@ function parsereqsigfigs($reqsigfigs) {
     $origstr = $reqsigfigs;
     $reqsigfigs = str_replace('+/-','+-',$reqsigfigs);
 	$reqsigfigoffset = 0;
-	$reqsigfigparts = explode('+-',$reqsigfigs);
+	$reqsigfigparts = array_map('trim', explode('+-',$reqsigfigs));
 	$reqsigfigs = $reqsigfigparts[0];
 	$sigfigscoretype = array('abs',0,'def');
 	if (count($reqsigfigparts)>1) {
