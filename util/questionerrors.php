@@ -4,6 +4,7 @@ require("../init.php");
 if ($myrights<20) {exit;}
 
 $isadmin = (isset($_GET['cid']) && $_GET['cid']=='admin' && $myrights==100);
+$qcid = ($isadmin ? 'admin' : 0);
 
 if (!empty($_POST['checked'])) {
     $data = array_map('intval', $_POST['checked']);
@@ -45,7 +46,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     if ($qsetid != $lastqsetid) {
         if ($lastqsetid > 0) { echo '</ul></li>'; }
         echo '<li><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
-        echo 'Question <a target="_blank" href="../course/moddataset.php?cid=0&id='.$qsetid.'">#'.$qsetid.'</a>';
+        echo 'Question <a target="_blank" href="../course/moddataset.php?cid='.$qcid.'&id='.$qsetid.'">#'.$qsetid.'</a>';
         echo '<ul>';
     }
     echo '<li><a target="_blank" href="../course/testquestion2.php?cid=0&qsetid='.$qsetid.'&seed='.intval($row['seed']).'">';

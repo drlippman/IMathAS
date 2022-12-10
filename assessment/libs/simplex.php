@@ -7,7 +7,11 @@
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
+<<<<<<< HEAD
 	return 45;
+=======
+	return 44;
+>>>>>>> 22ca81f753f5211fd03daa24a794ee755d01a999
 }
 
 global $allowedmacros;
@@ -252,12 +256,16 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             $studec = $stuanswer[$r];
         }
 		// this will contain the deciaml values for each student answer
+<<<<<<< HEAD
 		if(is_numeric($studec)) {
             $stuanswerdecimal[] = $studec;
         } else {
 			// fail - not a number
             return $match;
         }
+=======
+		$stuanswerdecimal[] = $studec;
+>>>>>>> 22ca81f753f5211fd03daa24a794ee755d01a999
     }
 
     // convert all $solutionlist answer array values into decimals
@@ -269,12 +277,16 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             } else {
                 $answerdec = fractiontodecimal($solutionlist[$r][$c]);
             }
+<<<<<<< HEAD
 			if(is_numeric($answerdec)) {
                 $solutionlistdecimal[$r][] = $answerdec;
             } else {
                 // fail - not a number
                 return $match;
             }
+=======
+			$solutionlistdecimal[$r][] = $answerdec;
+>>>>>>> 22ca81f753f5211fd03daa24a794ee755d01a999
         }
     }
 
@@ -293,7 +305,11 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     $dec1 = $solutionlistdecimal[$r][$OptimizedValuecol];
 					$dec2 = $stuanswerdecimal[$LastStuCol];
 
+<<<<<<< HEAD
                     if(abs($dec1-$dec2)>simplexTolerance) {
+=======
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+>>>>>>> 22ca81f753f5211fd03daa24a794ee755d01a999
                         $match = 0;  // not a solution
                         break;
                     }
@@ -305,7 +321,11 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 					$dec2 = $stuanswerdecimal[$c];
 
 					// since the difference is greater than the tolerance
+<<<<<<< HEAD
                     if(abs($dec1-$dec2)>simplexTolerance) {
+=======
+                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+>>>>>>> 22ca81f753f5211fd03daa24a794ee755d01a999
                         $match = 0;  // not a solution
                         break;
                     }
@@ -3367,7 +3387,7 @@ function simplexdisplaytable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if(!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3554,9 +3574,13 @@ function simplexsolve($sm,$type,$showfractions=1) {
 }
 
 
+<<<<<<< HEAD
 //Change log
 // 2022-12-09 ver 45 - Bug fixes and division by zero checks
 //
+=======
+// Change log
+>>>>>>> 22ca81f753f5211fd03daa24a794ee755d01a999
 // 2022-12-09 ver 44 - Added code to check for created array_key_exists to eliminate warnings.
 //
 // 2022-05-06 ver 43 - created simplexcreatelatexinequalities for the creation of latex inequalities
