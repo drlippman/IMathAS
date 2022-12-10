@@ -7,7 +7,7 @@
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 44;
+	return 45;
 }
 
 global $allowedmacros;
@@ -252,7 +252,12 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             $studec = $stuanswer[$r];
         }
 		// this will contain the deciaml values for each student answer
-		$stuanswerdecimal[] = $studec;
+		if(is_numeric($studec)) {
+            $stuanswerdecimal[] = $studec;
+        } else {
+			// failed - not a number return
+            return $match;
+        }
     }
 
     // convert all $solutionlist answer array values into decimals
@@ -264,7 +269,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             } else {
                 $answerdec = fractiontodecimal($solutionlist[$r][$c]);
             }
-			$solutionlistdecimal[$r][] = $answerdec;
+			$solutionlistdecimal[$r][] = $answerdec;            
         }
     }
 
@@ -283,7 +288,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
                     $dec1 = $solutionlistdecimal[$r][$OptimizedValuecol];
 					$dec2 = $stuanswerdecimal[$LastStuCol];
 
-                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+                    if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -295,7 +300,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 					$dec2 = $stuanswerdecimal[$c];
 
 					// since the difference is greater than the tolerance
-                    if(!is_numeric($dec2) || abs($dec1-$dec2)>simplexTolerance) {
+                    if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -1241,7 +1246,7 @@ function simplexdisplaycolortable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if(!empty($headers[$cloop])) {
+                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -2427,8 +2432,10 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
 						// Don't use fraction parse - if the denominator is 1 it returns a digit not an array
                         $f = $sma[$zerorow][$lastcol];
                         $g = gcd($f[0],$f[1]);
-                        $f[0] /= $g;
-                        $f[1] /= $g;
+						if($g!=0) {
+                            $f[0] /= $g;
+                            $f[1] /= $g;
+                        }  // if you get a division by zero then just return the input
 
 						$solution[$c] = $f; // fractionreduce($sma[$zerorow][$lastcol]);
                     } else {
@@ -2445,8 +2452,10 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
 				// Don't use fraction parse - if the denominator is 1 it returns a digit not an array
                 $f = $sma[$lastrow][$c];
                 $g = gcd($f[0],$f[1]);
-                $f[0] /= $g;
-                $f[1] /= $g;
+                if($g!=0) {
+                    $f[0] /= $g;
+                    $f[1] /= $g;
+                }  // if you get a division by zero then just return the input
 
 				$solution[$c] = $f; // fractionreduce($sma[$lastrow][$c]);
 			}
@@ -2477,8 +2486,10 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
 						// Don't use fraction parse - if the denominator is 1 it returns a digit not an array
                         $f = $sma[$zerorow][$lastcol];
                         $g = gcd($f[0],$f[1]);
-                        $f[0] /= $g;
-                        $f[1] /= $g;
+                        if($g!=0) {
+                            $f[0] /= $g;
+                            $f[1] /= $g;
+                        }  // if you get a division by zero then just return the input
 
 						$solution[$c] = $f; //fractionreduce($sma[$zerorow][$lastcol]);
 					}
@@ -2500,8 +2511,15 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
 
 	// Don't use fraction parse - if the denominator is 1 it returns a digit not an array
 	$g = gcd($optimizetop,$optimizebot);
-    $optimizetop /= $g;
-    $optimizebot /= $g;
+	if($g!=0) {
+        $optimizetop /= $g;
+        $optimizebot /= $g;
+    }  else {
+		// if you get a division by zero then define it as zero!
+		$optimizetop = 0;
+        $optimizebot = 1;
+    }
+
 	$optimizefrac = array($optimizetop,$optimizebot);
 
 	if($showfractions==1) {
@@ -3344,7 +3362,7 @@ function simplexdisplaytable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if(!empty($headers[$cloop])) {
+                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3531,7 +3549,9 @@ function simplexsolve($sm,$type,$showfractions=1) {
 }
 
 
-// Change log
+//Change log
+// 2022-12-09 ver 45 - Bug fixes and division by zero checks
+//
 // 2022-12-09 ver 44 - Added code to check for created array_key_exists to eliminate warnings.
 //
 // 2022-05-06 ver 43 - created simplexcreatelatexinequalities for the creation of latex inequalities
