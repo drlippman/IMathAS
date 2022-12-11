@@ -366,7 +366,11 @@ if ($myrights==100) {
 		$brokencnt[$row[0]] = $row[1];
 	}
 }
-
+if (!empty($CFG['logquestionerrors']) && $myrights >= 20) {
+    $stm = $DBH->prepare('SELECT count(DISTINCT iqe.qsetid) FROM imas_questionerrors AS iqe JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id WHERE iqs.ownerid=?');
+    $stm->execute([$userid]);
+    $qerrcnt = $stm->fetchColumn(0);
+}
 /*** done pulling stuff.  Time to display something ***/
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
@@ -419,6 +423,9 @@ if (isset($_SESSION['emulateuseroriginaluser'])) {
 
 if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
+}
+if (!empty($CFG['logquestionerrors']) && $myrights>=20 && $qerrcnt>0) {
+    echo '<div><span class="noticetext">'.Sanitize::onlyInt($qerrcnt).'</span> of your questions have logged errors. <a target="_blank" href="util/questionerrors.php">View errors</a></div>';
 }
 if ($myrights<75 && ($myspecialrights&(16+32))!=0) {
 	echo '<div>';
