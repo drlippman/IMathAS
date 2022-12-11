@@ -109,7 +109,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	$settings = array(-5,5,-5,5,1,1,200,200);
 	for ($i = 1; $i < func_num_args(); $i++) {
-		$settings[$i-1] = func_get_arg($i);
+        $v = func_get_arg($i);
+        if (!is_scalar($v)) {
+            echo 'Invalid input '.$i.' to showplot';
+        } else {
+            $settings[$i-1] = $v;
+        }
 	}
 	$fqonlyx = false; $fqonlyy = false;
 	if (strpos($settings[0],'0:')!==false) {
@@ -401,7 +406,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xmin = evalbasic($function[2]);
 			$domainlimited = true;
             if (!is_numeric($xmin)) {
-                echo "Invalid function xmin";
+                echo "Invalid function xmin $xmin";
                 continue;
             }
 		} else {$xmin = $winxmin;}
@@ -413,7 +418,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$xmax = $winxmax;
 			}
             if (!is_numeric($xmax)) {
-                echo "Invalid function xmin";
+                echo "Invalid function xmax $xmax";
                 continue;
             }
 			if (count($xmaxarr)>1) {

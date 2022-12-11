@@ -3562,7 +3562,7 @@ class AssessRecord
         $latestQver = count($curAver['questions'][$qn]['question_versions']) - 1;
         $curQver = $curAver['questions'][$qn]['question_versions'][$latestQver];
         // check if question is unattempted; may way to use scored_try instead?
-        if (count($curQver['tries']) == 0) {
+        if (!isset($curQver['tries']) || count($curQver['tries']) == 0) {
           $allQattempted = false;
           break;
         }
