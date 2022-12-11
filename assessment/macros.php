@@ -1812,10 +1812,10 @@ function consecutive($min,$max,$step=1) {
 
 
 function gcd($n,$m){ //greatest common divisor
-	$m = round(abs($m));
-	$n = round(abs($n));
-	if(!$m)return$n;
-	if(!$n)return$m;
+	$m = (int) round(abs($m));
+	$n = (int) round(abs($n));
+	if($m==0)return$n;
+	if($n==0)return$m;
 	return $m<$n?gcd($m,$n%$m):gcd($n,$m%$n);
 }
 function lcm($n, $m) //least common multiple
@@ -5588,8 +5588,9 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
             }
             //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
-                isset($stu[$qn][$v]) && (strpos($stu[$qn][$v],'||')!==false || 
-                $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v])-1] === '|')
+                isset($stu[$qn][$v]) && ($stu[$qn][$v]==='' || strpos($stu[$qn][$v],'||')!==false || 
+                $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v])-1] === '|' ||
+                strpos($stu[$qn][$v],'NaN')!==false)
             ) {
                 // empty looking matrix entry
                 continue;
