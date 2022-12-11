@@ -250,6 +250,11 @@ function draw_circle() {
   $hasPointLabel = [];
   $altPointLab = [];
   $hasUserAltText = false;
+  $angleBlock = false;
+  $numPts = 0;
+  $hasAxes = false;
+  $hasCenter = false;
+  $hasDiameter = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -303,6 +308,7 @@ function draw_circle() {
     
     if ($in[0]=="radius") {
       $hasRadius = true;
+      $hasRadiusLabel = false;
       $lab = "";
       if (isset($in[1])) {
         $hasRadiusLabel = true;
@@ -318,6 +324,7 @@ function draw_circle() {
     
     if ($in[0]=="diameter") {
       $hasDiameter = true;
+      $hasDiameterLabel = false;
       if (!isset($in[1])) {
         $in[1] = '';
       } elseif (isset($in[1])) {
@@ -329,6 +336,7 @@ function draw_circle() {
     
     if ($in[0]=="angle") {
       $hasAngle = true;
+      $hasAngleLabel = false;
       $angleKey = $key;
       $lab = "";
       if (!isset($in[1])) {
@@ -453,11 +461,22 @@ function draw_circle() {
   
   // Build alt text
   if ($hasUserAltText !== true) {
+    $altAxes = '';
+    $altCenter = '';
+    $altCenterLabel = '';
+    $altRadius = '';
+    $altRadiusLabel = '';
+    $altDiameter = '';
+    $altDiameterLabel = '';
+    $altAngle = '';
+    $altAngleLabel = '';
+    $altPointAndLabel = '';
     $altAnd = ", and";
     $unlabeled = " unlabeled";
     if ($degSymbol == "&deg;") {
       $altDegSymbol = " degrees";
     }
+    $hasAnd = false;
     if ($hasAxes === true) {
       $altAxes = " centered at the origin of the coordinate axes";
       $hasAnd = true;
@@ -471,24 +490,26 @@ function draw_circle() {
         $altCenter = $altAnd.$altCenter;
       }
       $hasAnd = true;
+      if ($hasCenterLabel === true) {
+        $altCenterLabel = " labeled $centerLab";
+      }
     }
-    if ($hasCenterLabel === true) {
-      $altCenterLabel = " labeled $centerLab";
-    }
+    
     if ($hasRadius === true) {
       $unlabeled = " unlabeled";
       if ($hasRadiusLabel === true) {
         $unlabeled = "";
       }
-      $altRadius = $andCenter." with$unlabeled radius drawn from the center to the right";
+      $altRadius = " with$unlabeled radius drawn from the center to the right";
       if ($hasAnd === true) {
         $altRadius = $altAnd.$altRadius;
       }
       $hasAnd = true;
+      if ($hasRadiusLabel === true) {
+        $altRadiusLabel = " labeled $radiusLab";
+      }
     }
-    if ($hasRadiusLabel === true) {
-      $altRadiusLabel = " labeled $radiusLab";
-    }
+    
     if ($hasDiameter === true) {
       $unlabeled = " unlabeled";
       if ($hasDiameterLabel === true) {
@@ -499,10 +520,11 @@ function draw_circle() {
         $altDiameter = $altAnd.$altDiameter;
       }
       $hasAnd = true;
+      if ($hasDiameterLabel === true) {
+        $altDiameterLabel = " labeled $diameterLab";
+      }
     }
-    if ($hasDiameterLabel === true) {
-      $altDiameterLabel = " labeled $diameterLab";
-    }
+    
     if ($hasAngle === true) {
       $unlabeled = " unlabeled";
       $quadrant = ["pointed directly to the right with zero rotation","less than one quarter of a rotation counterclockwise from the right","equal to one quarter of a rotation counterclockwise from the right","between one quarter and one half of a rotation counterclockwise from the right","equal to one half of a rotation counterclockwise from the right","between one half and three quarters of a rotation counterclockwise from the right","equal to three quarters of a rotation counterclockwise from the right","between three quarters and one full rotation counterclockwise from the right","of one full rotation counterclockwise from the right"];
@@ -518,11 +540,11 @@ function draw_circle() {
         $altAngle = $altAnd.$altAngle;
       }
       $hasAnd = true;
+      if ($hasAngleLabel === true) {
+        $altAngleLabel = " labeled $altAngleLab$altDegSymbol";
+      }
     }
-    if ($hasAngleLabel === true) {
-      $altAngleLabel = " labeled $altAngleLab$altDegSymbol";
-    }
-
+    
     for ($i=0;$i<$numPts;$i++) {
       
       $unlabeled = " unlabeled";
@@ -581,6 +603,7 @@ function draw_circlesector() {
   $ys = [];
   $numAngles = 0;
   $size = 300;
+  $angleBlock = false;
   
   foreach ($argsArray as $key => $in) {
     if ($in[0]=="angle") {
@@ -609,7 +632,8 @@ function draw_circlesector() {
     echo 'Eek! "circlesector" must include "angle, no. of degrees".';
     return '';
   }
-  
+  $altNumPts = 0;
+  $hasAxes = false;
   foreach ($argsArray as $key => $in) {
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
@@ -658,9 +682,9 @@ function draw_circlesector() {
       } elseif (isset($in[1])) {
         $altCenterLabel = $in[1];
       }
-      if ($ang <= 180) {
+      if (max($angs) <= 180) {
         $lab = "text([0,0],'".$in[1]."',below);";
-      } elseif ($ang > 180) {
+      } elseif (max($angs) > 180) {
         $lab = "text([0,0],'".$in[1]."',above);";
       }
       $args = $args."dot([0,0]);".$lab;
@@ -826,7 +850,7 @@ function draw_circlesector() {
         } elseif ($altPt[0] == 360) {
           $altPointLoc = " at the far right point on the circle";
         }
-        $alt = $alt.", and a point".$altPointLab.$altPointLoc.$altPt[2];
+        $alt = $alt.", and a point".$altPointLoc.$altPt[2];
       }
     }
     $alt .= ".";
@@ -1035,15 +1059,16 @@ function draw_rectangle() {
       }
     }
     $argsArray[$pointKey] = preg_replace('/;/',',',$argsArray[$pointKey]);
+    for ($i=0;$i<4;$i++) {
+      $pointLab[$i] = $argsArray[$pointKey][$i+1];
+    }
   }
 
   $base = $argsArray[$baseKey][1];
   $baseLab = $argsArray[$baseKey][2];
   $height = $argsArray[$heightKey][1];
   $heightLab = $argsArray[$heightKey][2];
-  for ($i=0;$i<4;$i++) {
-    $pointLab[$i] = $argsArray[$pointKey][$i+1];
-  }
+  
 
   $maxLen = max($base,$height);
   
@@ -1071,9 +1096,10 @@ function draw_rectangle() {
   $args = $args."rect([".$xmin.",".$ymin."],[".$xmax.",".$ymax."]);";
   
   // Build alt text
+  $altPoint = '';
   if ($hasUserAltText !== true) {
     $alt = "A rectangle";
-    $usedLab = array_filter($pointLab,'strlen');
+    $usedLab = array_filter($pointLab ?? [],'strlen');
     $countLab = count($usedLab);
     if ($countLab > 0) {
       $alt .= " with";
@@ -1143,6 +1169,7 @@ function draw_triangle() {
   $hasMedian = false;
   $hasPoints = false;
   $rotateTriangle = false;
+  $rotateTriangleBy = false;
   $hasArcs = false;
   $hasAltArcs = false;
   $hasMarks = false;
@@ -1379,9 +1406,8 @@ function draw_triangle() {
       for ($i=7;$i<10;$i++) {
         if (!isset($argsArray[$sideKey][$i])) {
           $argsArray[$sideKey][$i] = '';
-        } else {
-          $sideMarkTmp[$i] = $argsArray[$sideKey][$i];
-        }
+        } 
+        $sideMarkTmp[$i] = $argsArray[$sideKey][$i];
       }
       if (($sid[0]+$sid[1]<=$sid[2]) || ($sid[1]+$sid[2]<=$sid[0]) || ($sid[2]+$sid[0]<=$sid[1])) {
         echo 'Eek! No triangle possible with these side lengths.';
@@ -1811,7 +1837,7 @@ function draw_triangle() {
     
     $hasAltArc = [false,false,false];
     // Draw arc(s) for angle 0
-    if (is_numeric($arcNum[$arcType[0]])) {
+    if (isset($arcNum[$arcType[0]]) && is_numeric($arcNum[$arcType[0]])) {
       $hasAltArc[0] = true;
       for ($j=0;$j<$arcNum[$arcType[0]];$j++) {
         $arcStart = [$xf[2] + $rArc[$j],$yf[2]];
@@ -1822,7 +1848,7 @@ function draw_triangle() {
       }
     }
     // Draw arc(s) for angle 1
-    if (is_numeric($arcNum[$arcType[1]])) {
+    if (isset($arcNum[$arcType[1]]) && is_numeric($arcNum[$arcType[1]])) {
       $hasAltArc[1] = true;
       for ($j=0;$j<$arcNum[$arcType[1]];$j++) {
         $arcStart = [$xf[0] - $rArc[$j]*cos($angRad[1]),$yf[0] + $rArc[$j]*sin($angRad[1])];
@@ -1833,7 +1859,7 @@ function draw_triangle() {
       }
     }
     // Draw arc(s) for angle 2
-    if (is_numeric($arcNum[$arcType[2]])) {
+    if (isset($arcNum[$arcType[2]]) && is_numeric($arcNum[$arcType[2]])) {
       $hasAltArc[2] = true;
       for ($j=0;$j<$arcNum[$arcType[2]];$j++) {
         $arcStart = [$xf[1] - $rArc[$j]*cos($angRad[0]),$yf[1] - $rArc[$j]*sin($angRad[0])];
@@ -1851,6 +1877,7 @@ function draw_triangle() {
   if ($hasUserAltText !== true) {
     $alt = "A triangle.";
     $altAngStart = "";
+    $hasAltAngLab = false;
     foreach ($angLab as $lab) {
       if (!empty($lab) || $hasAltArcs === true) {
         $altAngStart = " Going around counterclockwise,";
@@ -1866,7 +1893,7 @@ function draw_triangle() {
     $alt .= $altAngStart;
     
     for ($i=0;$i<3;$i++) {
-        if ($hasArcs === true) {
+        if ($hasArcs === true && !empty($arcNum[$arcType[$i]])) {
             $altArc[$i] = ($hasAltArc[$i] === true) ? " with ".$arcNum[$arcType[$i]]." hash mark" : "";
             $altArc[$i] .= ($arcNum[$arcType[$i]] > 1) ? "s" : "";
         } else {
@@ -1892,7 +1919,7 @@ function draw_triangle() {
         } else if (empty($angLab[$i])) {
           $alt .= ($i==0) ? " an " : " An ";
           $alt .= "angle".$altVerLab[$i].$altArc[$i];
-          $alt .= ($i == $perpKey && empty($arcTypeTmp[$perpKey])) ? " has a right angle symbol" : " is unlabeled";
+          $alt .= ($hasPerp && $i == $perpKey && empty($arcTypeTmp[$perpKey])) ? " has a right angle symbol" : " is unlabeled";
           if (!empty($sidLab[$i]) || !empty($hasAltMark[$i])) {
             $alt .= " and its opposite side".$altMark[$i].$altSidLab[$i];
           }
@@ -2450,6 +2477,10 @@ function draw_cone() {
   $argsArray = [];
   $args = '';
   $hasUserAltText = false;
+  $hasRadius = false;
+  $hasDiameter = false;
+  $hasHeight = false;
+  $hasSlant = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2476,7 +2507,7 @@ function draw_cone() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
-      if (!is_numeric($in[1])) {
+      if (!isset($in[1]) || !is_numeric($in[1])) {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
       } elseif (is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
@@ -2666,6 +2697,8 @@ function draw_sphere() {
   $argsArray = [];
   $args = '';
   $hasUserAltText = false;
+  $hasFill = false;
+  $hasDiameter = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2811,6 +2844,9 @@ function draw_pyramid() {
   $argsArray = [];
   $args = '';
   $hasUserAltText = false;
+  $inverted = false;
+  $hasFill = false;
+
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2975,6 +3011,8 @@ function draw_pyramid() {
     line([$blx,$bly],[$ptx,$pty]); strokewidth=$bFloorStroke; strokedasharray='4 $hStroke[2]'; line([$blx,$bly],[$brx,$bry]); strokewidth=$brSlantStroke; strokedasharray='4 $hStroke[3]';
     line([$ptx,$pty],[$brx,$bry]); strokewidth=$flSlantStroke; strokedasharray='4 $hStroke[4]'; line([$ptx,$pty],[$flx,$fly]); strokewidth=$frSlantStroke; strokedasharray='4 $hStroke[5]';
     line([$ptx,$pty],[$frx,$fry]);";
+  $hasSlant1 = false;
+  $hasSlant2 = false;
   foreach ($argsArray as $in) {
     if ($in[0] == "length") {
       if (isset($in[1]) && !empty($in[1])) {
