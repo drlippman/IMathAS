@@ -22,7 +22,13 @@ if (!empty($_POST['checked'])) {
 }
 
 if ($isadmin) {
-    $query = 'SELECT * FROM imas_questionerrors GROUP BY qsetid,error ORDER BY qsetid';
+    if (!empty($_GET['public'])) {
+        $query = 'SELECT iqe.* FROM imas_questionerrors AS iqe
+            JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
+            WHERE iqs.userights>0 GROUP BY iqe.qsetid,iqe.error ORDER BY iqe.qsetid';
+    } else {
+        $query = 'SELECT * FROM imas_questionerrors GROUP BY qsetid,error ORDER BY qsetid';
+    }
 
     $stm = $DBH->query($query);
 } else {
@@ -36,7 +42,15 @@ if ($isadmin) {
 
 require('../header.php');
 
+echo '<div class=breadcrumb><a href="../index.php">'._('Home').'</a> &gt; '._('Question Errors').'</div>';
 echo '<h2>'._('Question Errors').'</h2>';
+if ($isadmin) {
+    if (!empty($_GET['public'])) {
+        echo '<p>All public questions</p>';
+    } else {
+        echo '<p>All questions</p>';
+    }
+}
 echo '<form method=post>';
 echo '<p>'._('With selected:').'<button type=submit>'._('Clear error').'</button></p>';
 echo '<ul>';
