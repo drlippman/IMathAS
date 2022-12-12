@@ -28,6 +28,7 @@ class MatchingAnswerBox implements AnswerBox
         $anstype = $this->answerBoxParams->getAnswerType();
         $qn = $this->answerBoxParams->getQuestionNumber();
         $multi = $this->answerBoxParams->getIsMultiPartQuestion();
+        $isConditional = $this->answerBoxParams->getIsConditional();
         $partnum = $this->answerBoxParams->getQuestionPartNumber();
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
@@ -202,18 +203,19 @@ class MatchingAnswerBox implements AnswerBox
         } else {
             $tip = _('In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column');
         }
-        for ($i = 0; $i < count($randqkeys); $i++) {
-            if (!empty($matchlist)) {
-                $akey = array_search($matchlist[$randqkeys[$i]], $randakeys);
-            } else {
-                $akey = array_search($randqkeys[$i], $randakeys);
+        if (!$isConditional) {
+            for ($i = 0; $i < count($randqkeys); $i++) {
+                if (!empty($matchlist)) {
+                    $akey = array_search($matchlist[$randqkeys[$i]], $randakeys);
+                } else {
+                    $akey = array_search($randqkeys[$i], $randakeys);
+                }
+                if ($displayformat == "select") {
+                    $sa .= '<br/>' . $answers[$randakeys[$akey]];
+                } else {
+                    $sa .= chr($akey + 97) . " ";
+                }
             }
-            if ($displayformat == "select") {
-                $sa .= '<br/>' . $answers[$randakeys[$akey]];
-            } else {
-                $sa .= chr($akey + 97) . " ";
-            }
-
         }
 
         // Done!

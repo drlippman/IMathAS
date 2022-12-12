@@ -461,6 +461,7 @@ class QuestionHtmlGenerator
                     ->setAnswerType($anstype)
                     ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                     ->setIsMultiPartQuestion($this->isMultipart())
+                    ->setIsConditional($quesData['qtype'] == "conditional")
                     ->setQuestionPartNumber($atIdx)
                     ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
@@ -553,6 +554,7 @@ class QuestionHtmlGenerator
                 ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                 ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
+                ->setIsConditional(false)
                 ->setStudentLastAnswers($lastAnswer)
                 ->setColorboxKeyword($questionColor)
                 ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0] ?? false);
