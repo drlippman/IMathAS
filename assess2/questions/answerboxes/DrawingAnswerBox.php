@@ -620,7 +620,7 @@ class DrawingAnswerBox implements AnswerBox
                             $saarr[$k] = '[' . substr(str_replace('y', 't', $function[0]), 2) . ',t],' . $defcolor . ',' . ($settings[2] - 1) . ',' . ($settings[3] + 1);
                         }
                     } else { //is function
-                        if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
+                        if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^\d\(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
                             echo "Invalid notation on " . Sanitize::encodeStringForDisplay($function[0]) . ": missing function parens";
                             continue;
                         }
