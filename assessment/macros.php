@@ -109,7 +109,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	$settings = array(-5,5,-5,5,1,1,200,200);
 	for ($i = 1; $i < func_num_args(); $i++) {
-		$settings[$i-1] = func_get_arg($i);
+        $v = func_get_arg($i);
+        if (!is_scalar($v)) {
+            echo 'Invalid input '.$i.' to showplot';
+        } else {
+            $settings[$i-1] = $v;
+        }
 	}
 	$fqonlyx = false; $fqonlyy = false;
 	if (strpos($settings[0],'0:')!==false) {
@@ -401,7 +406,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xmin = evalbasic($function[2]);
 			$domainlimited = true;
             if (!is_numeric($xmin)) {
-                echo "Invalid function xmin";
+                echo "Invalid function xmin $xmin";
                 continue;
             }
 		} else {$xmin = $winxmin;}
@@ -413,7 +418,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$xmax = $winxmax;
 			}
             if (!is_numeric($xmax)) {
-                echo "Invalid function xmin";
+                echo "Invalid function xmax $xmax";
                 continue;
             }
 			if (count($xmaxarr)>1) {
@@ -1807,10 +1812,10 @@ function consecutive($min,$max,$step=1) {
 
 
 function gcd($n,$m){ //greatest common divisor
-	$m = round(abs($m));
-	$n = round(abs($n));
-	if(!$m)return$n;
-	if(!$n)return$m;
+	$m = (int) round(abs($m));
+	$n = (int) round(abs($n));
+	if($m==0)return$n;
+	if($n==0)return$m;
 	return $m<$n?gcd($m,$n%$m):gcd($n,$m%$n);
 }
 function lcm($n, $m) //least common multiple
@@ -5583,8 +5588,9 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
             }
             //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
-                isset($stu[$qn][$v]) && (strpos($stu[$qn][$v],'||')!==false || 
-                $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v])-1] === '|')
+                isset($stu[$qn][$v]) && ($stu[$qn][$v]==='' || strpos($stu[$qn][$v],'||')!==false || 
+                $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v])-1] === '|' ||
+                strpos($stu[$qn][$v],'NaN')!==false)
             ) {
                 // empty looking matrix entry
                 continue;

@@ -615,6 +615,8 @@ function scorejournal($stua, $answer, $j, $sn) {
 	}
 	//$newans = $answer;
 	foreach ($j as $ix=>$jd) {
+        if (!isset($jd['debits'])) { $jd['debits'] = []; }
+        if (!isset($jd['credits'])) { $jd['credits'] = []; }
 		$offset = !empty($jd['haspostrefs'])?1:0;
 		$n = (count($jd['debits']) + count($jd['credits']))/(2+$offset);
 		$usedans = array();
@@ -1422,6 +1424,8 @@ function makeledgerfromjournal($j, $start, $order, $types, $sn, &$anstypes, &$an
         if (isset($jd['date'])) {
 		    $dates[] = $jd['date'];
         }
+        if (!isset($jd['debits'])) { $jd['debits'] = []; }
+        if (!isset($jd['credits'])) { $jd['credits'] = []; }
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
 			if ($jd['debits'][$i+1]=='') {continue;}
 			if (!isset($acts[$jd['debits'][$i]])) { $acts[$jd['debits'][$i]] = array();}
@@ -1746,6 +1750,8 @@ function maketrialbalancefromjournal($j, $groups, $sn, $numrows, $ops, $bigtitle
 	$out = '';
 	$totals = array();
 	foreach ($j as $jd) {
+        if (!isset($jd['debits'])) { $jd['debits'] = []; }
+        if (!isset($jd['credits'])) { $jd['credits'] = []; }
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
 			if ($jd['debits'][$i+1]=='') {continue;}
 			if (!isset($totals[$jd['debits'][$i]])) { $totals[$jd['debits'][$i]] = 0;}
@@ -1784,6 +1790,8 @@ function scoretrialbalancefromjournal($stua, $answer, $j, $groups, $numrows, $sn
 	$out = '';
 	$totals = array();
 	foreach ($j as $jd) {
+        if (!isset($jd['debits'])) { $jd['debits'] = []; }
+        if (!isset($jd['credits'])) { $jd['credits'] = []; }
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
 			if ($jd['debits'][$i+1]=='') {continue;}
 			if (!isset($totals[$jd['debits'][$i]])) { $totals[$jd['debits'][$i]] = 0;}
@@ -1968,6 +1976,8 @@ function scoretrialbalance($stua, $answer, $data, $numrows, $sn) {
 function totalsfromjournal($j) {
 	$totals = array();
 	foreach ($j as $jd) {
+        if (!isset($jd['debits'])) { $jd['debits'] = []; }
+        if (!isset($jd['credits'])) { $jd['credits'] = []; }
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
 			if ($jd['debits'][$i+1]=='') {continue;}
 			if (!isset($totals[$jd['debits'][$i]])) { $totals[$jd['debits'][$i]] = 0;}

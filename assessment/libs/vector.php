@@ -8,8 +8,12 @@ array_push($allowedmacros,"dotp","crossp","vecnorm","vecsum","vecdiff","vecprod"
 //dot product of vectors a and b
 //a,b arrays (1+ elements)
 function dotp($a,$b) {
+    if (!is_array($a) || !is_array($b)) {
+        echo 'dotp: inputs must be arrays';
+        return false;
+    }
 	if (count($a)!=count($b)) {
-		echo "vectors must be same length";
+		echo "dotp: vectors must be same length";
 		return false;
 	}
 	$dotp = 0;
@@ -23,8 +27,12 @@ function dotp($a,$b) {
 //cross product of vectors a and b
 //a,b arrays (3 elements).  Returns array.
 function crossp($a,$b) {
+    if (!is_array($a) || !is_array($b)) {
+        echo 'crossp: inputs must be arrays';
+        return false;
+    }
 	if (count($a)!=3 || count($b)!=3) {
-		echo "vectors must have 3 elements";
+		echo "crossp: vectors must have 3 elements";
 		return false;
 	}
 	$crossp[0] = $a[1]*$b[2]-$a[2]*$b[1];
@@ -37,6 +45,10 @@ function crossp($a,$b) {
 //returns magnitude of vector a
 //a array (1+ elements)
 function vecnorm($a) {
+    if (!is_array($a)) {
+        echo 'vecnorm: input must be array';
+        return false;
+    }
 	$nrm = 0;
 	for ($i=0;$i<count($a);$i++) {
 		$nrm += $a[$i]*$a[$i];
@@ -48,8 +60,12 @@ function vecnorm($a) {
 //returns sum a+b
 //a,b arrays same length
 function vecsum($a,$b) {
+    if (!is_array($a) || !is_array($b)) {
+        echo 'vecsum: inputs must be arrays';
+        return false;
+    }
 	if (count($a)!=count($b)) {
-		echo "vectors must be same length";
+		echo "vecsum: inputs must be same length";
 		return false;
 	}
 	for ($i=0;$i<count($a);$i++) {
@@ -62,8 +78,12 @@ function vecsum($a,$b) {
 //returns difference a-b
 //a,b arrays same length
 function vecdiff($a,$b) {
+    if (!is_array($a) || !is_array($b)) {
+        echo 'vecdiff: inputs must be arrays';
+        return false;
+    }
 	if (count($a)!=count($b)) {
-		echo "vectors must be same length";
+		echo "vecdiff: vectors must be same length";
 		return false;
 	}
 	for ($i=0;$i<count($a);$i++) {
@@ -76,6 +96,10 @@ function vecdiff($a,$b) {
 //returns product c*a
 //a array, c scalar
 function vecprod($a,$c) {
+    if (!is_array($a) || !is_scalar($c)) {
+        echo 'vecprod: invalid inputs';
+        return false;
+    }
 	for ($i=0;$i<count($a);$i++) {
 		$prod[$i] = $c*$a[$i];
 	}
@@ -88,6 +112,10 @@ function vecprod($a,$c) {
 //returns a value between 0 (no overlap) and 1 (sets are equivalent)
 //calculated as n(a intersect b)/max(n(a),n(b))
 function veccompareset($a,$b) {
+    if (!is_array($a) || !is_array($b)) {
+        echo 'veccompareset: inputs must be arrays';
+        return false;
+    }
 	if ($b===null) { return 0;}
 	foreach ($b as $k=>$bv) {
 		if (is_array($bv)) {continue;}
@@ -122,6 +150,10 @@ function veccompareset($a,$b) {
 //  transpose the matrix 
 //Returns true or false
 function veccomparesamespan($a,$b) {
+    if (!is_array($a) || !is_array($b)) {
+        echo 'veccomparesamespan: inputs must be arrays';
+        return false;
+    }
 	if (count($a)!=count($b)) {return false;}
 	include_once("matrix.php");
 	if ($b===null) { return 0;}

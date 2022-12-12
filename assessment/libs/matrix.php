@@ -1500,14 +1500,15 @@ function matrixFromEigenvals($values) {
         }
     }
 
-    $sr = randfrom($realrows);
-    $mult = $GLOBALS['RND']->rand(-1,1);
-    if (is_array($values[count($values)-1]) && $m[$sr][$size-1]*$mult < 0) {
-        $mult *= -1;
+    if (count($realrows)>0) {
+        $sr = randfrom($realrows);
+        $mult = $GLOBALS['RND']->rand(-1,1);
+        if (is_array($values[count($values)-1]) && $m[$sr][$size-1]*$mult < 0) {
+            $mult *= -1;
+        }
+        $ops[] = array($sr,$size-1, $mult);
+        $m = matrixrowcombine($m,$sr,$mult,$size-1,1,$size-1);
     }
-    $ops[] = array($sr,$size-1, $mult);
-    $m = matrixrowcombine($m,$sr,$mult,$size-1,1,$size-1);
-
     for ($i=count($ops)-1; $i>-1; $i--) {
         $mi = matrixrowcombine($mi,$ops[$i][0],-1*$ops[$i][2],$ops[$i][1],1,$ops[$i][1]);
     }

@@ -334,7 +334,7 @@ function AStext($arg) {
 			$pos = func_get_arg(2);
 		}
 		if (func_num_args()>3) {
-			$angle = func_get_arg(3);
+			$angle = floatval(func_get_arg(3));
 		}
 	} else {
 		$p = $this->pt2arr($arg[0]);
@@ -343,7 +343,7 @@ function AStext($arg) {
 			$pos = $arg[2];
 		}
 		if (isset($arg[3])) {
-			$angle = $arg[3];
+			$angle = floatval($arg[3]);
 		}
 	}
 	$this->AStextInternal($p,$st,$pos,$angle);
@@ -358,7 +358,7 @@ function AStextAbs($arg) {
 			$pos = func_get_arg(2);
 		}
 		if (func_num_args()>3) {
-			$angle = func_get_arg(3);
+			$angle = floatval(func_get_arg(3));
 		}
 	} else {
 		$pt = $arg[0];
@@ -367,7 +367,7 @@ function AStextAbs($arg) {
 			$pos = $arg[2];
 		}
 		if (isset($arg[3])) {
-			$angle = $arg[3];
+			$angle = floatval($arg[3]);
 		}
 	}
 	$pt = str_replace(array('[',']'),'',$pt);
