@@ -22,7 +22,18 @@ if (!empty($_POST['checked'])) {
 }
 
 if ($isadmin) {
-    if (!empty($_GET['public'])) {
+    if (!empty($_GET['limited'])) {
+        if (isset($CFG['GEN']['qerroronold'])) {
+            $old = time() - 60*60*24*$CFG['GEN']['qerroronold'][0];
+        } else {
+            $old = time() - 60*60*24*30;
+        }
+        $query = 'SELECT iqe.* FROM imas_questionerrors AS iqe
+            JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
+            JOIN imas_users AS iu ON iqs.ownerid=iu.id
+            WHERE iqs.userights>0 AND iu.lastaccess<'.$old.'
+            GROUP BY iqe.qsetid,iqe.error ORDER BY iqe.qsetid';
+    } else if (!empty($_GET['public'])) {
         $query = 'SELECT iqe.* FROM imas_questionerrors AS iqe
             JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
             WHERE iqs.userights>0 GROUP BY iqe.qsetid,iqe.error ORDER BY iqe.qsetid';
