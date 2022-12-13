@@ -1246,7 +1246,7 @@ function simplexdisplaycolortable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if (!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3173,13 +3173,13 @@ function simplexfindsolutioninlist($solutionlist,$solution) {
         $match = 1;
 
         for($c=0,$sizecol = count($solutionlist[0])-1;$c<$sizecol;$c++) {
-			if(is_numeric($solutionlist[$r][$c][0])&&is_numeric($solutionlist[$r][$c][1])) {
+			if(is_numeric($solutionlist[$r][$c][0]) && is_numeric($solutionlist[$r][$c][1]) && $solutionlist[$r][$c][1]!=0) {
                 $dec1 = $solutionlist[$r][$c][0]/$solutionlist[$r][$c][1];
             } else {
                 $match = 0;  // failed - not a number return
                 break;
             }
-			if(is_numeric($solution[$c][0])&&is_numeric($solution[$c][1])) {
+			if(is_numeric($solution[$c][0]) && is_numeric($solution[$c][1]) && $solution[$c][1] != 0) {
                 $dec2 = $solution[$c][0]/$solution[$c][1];
             } else {
                 $match = 0;  // failed - not a number return
@@ -3371,7 +3371,7 @@ function simplexdisplaytable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
+                    if (!empty($headers[$cloop])) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
