@@ -953,7 +953,8 @@ function showarrays() {
 	if ($format !== 'default' && strlen($format) < $ncol) {
 		$format = str_repeat($format[0], $ncol);
 	}
-	if (count($alist)<4 && is_array($alist[0])) {
+	if (count($alist)<4 && is_array($alist[0]) && is_array($alist[1]) && is_array($alist[1][0])) {
+        // alt input syntax of showarrays(array of headers, array of data arrays)
 		for ($i=0;$i<count($alist[0]);$i++) {
 			$newalist[] = $alist[0][$i];
 			$newalist[] = $alist[1][$i];
@@ -971,6 +972,10 @@ function showarrays() {
 	$hashdr = false;
 	$maxlength = 0;
 	for ($i = 0; $i<$ncol; $i++) {
+        if (!is_scalar($alist[2*$i])) {
+            echo 'showarrays: column headers should be strings';
+            $alist[2*$i] = '';
+        }
 		if ($alist[2*$i]!='') {
 			$hashdr = true;
 		}
