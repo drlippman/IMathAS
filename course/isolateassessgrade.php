@@ -355,7 +355,8 @@
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = round($line['timeontask']/60,1);
-            $isOvertime = ($line['status']&4) == 4;
+            // don't display OT marker anymore for new assess
+            //$isOvertime = ($line['status']&4) == 4;
             $IP = 0;
             $UA = 0;
             if (($line['status']&1)>0 && ($line['thisenddate']<$now ||  //unsubmitted by-assess, and due date passed

@@ -383,27 +383,6 @@ class DrawingScorePart implements ScorePart
                             $anslines[$key] = array('x',10000, $xp);
                         }
                     }
-                } else if (count($function)==3) { //line segment or ray
-                    $func = makeMathFunction(makepretty($function[0]), 'x');
-                    if ($func === false) { continue; }
-                    if ($function[1]=='-oo') { //ray to left
-                        $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
-                        $y2p = $ytopix($func(['x'=>floatval($function[2])]));
-                        $ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
-                    } else if ($function[2]=='oo') { //ray to right
-                        $y1p = $ytopix($func(['x'=>floatval($function[1])]));
-                        $y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
-                        $ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
-                    } else { //line seg
-                        if ($function[1]>$function[2]) {  //if xmin>xmax, swap
-                            $tmp = $function[2];
-                            $function[2] = $function[1];
-                            $function[1] = $tmp;
-                        }
-                        $y1p = $ytopix($func(['x'=>floatval($function[1])]));
-                        $y2p = $ytopix($func(['x'=>floatval($function[2])]));
-                        $ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
-                    }
                 } else {
                     $func = makeMathFunction(makepretty($function[0]), 'x');
                     if ($func === false) { continue; }
@@ -612,7 +591,7 @@ class DrawingScorePart implements ScorePart
                         $h = $x2p - $invstr*safepow($y2p-$k,3);
                         //$str = 1/safepow($invstr,1/3);
                         $anscuberoots[$key] = array($h, $k, 1/$invstr);
-                    } else if (preg_match('/\^(\(|x)/',$function[0])) { //exponential
+                    } else if (preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
                         /*
             To do general exponential, we'll need 3 points.
             Need to solve y = ab^x + c for a, b, c
@@ -627,7 +606,6 @@ class DrawingScorePart implements ScorePart
 
             y = ab^x
             */
-
                         $base = safepow(($y3p-$y2p)/($y2p-$y1p), 1/($x3p-$x2p));
                         $str = ($y1p - $y2p)/(safepow($base, $x2p-$xop) - safepow($base, $x1p-$xop));
                         $asy = $y1p + $str*safepow($base, $x1p-$xop);
@@ -658,13 +636,34 @@ class DrawingScorePart implements ScorePart
 
                     } else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
                         //colinear
-                        $slope = ($y2p-$y1p)/($x2p-$x1p);
-                        if (abs($slope)>1.4) {
-                            //use x value at ymid
-                            $anslines[$key] = array('x',$slope,$x1p+($ymidp-$y1p)/$slope);
+                        if (count($function)==3) { //line segment or ray
+                            if ($function[1]=='-oo') { //ray to left
+                                $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
+                                $y2p = $ytopix($func(['x'=>floatval($function[2])]));
+                                $ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
+                            } else if ($function[2]=='oo') { //ray to right
+                                $y1p = $ytopix($func(['x'=>floatval($function[1])]));
+                                $y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
+                                $ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
+                            } else { //line seg
+                                if ($function[1]>$function[2]) {  //if xmin>xmax, swap
+                                    $tmp = $function[2];
+                                    $function[2] = $function[1];
+                                    $function[1] = $tmp;
+                                }
+                                $y1p = $ytopix($func(['x'=>floatval($function[1])]));
+                                $y2p = $ytopix($func(['x'=>floatval($function[2])]));
+                                $ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
+                            }
                         } else {
-                            //use y value at x2
-                            $anslines[$key] = array('y',$slope,$y2p);
+                            $slope = ($y2p-$y1p)/($x2p-$x1p);
+                            if (abs($slope)>1.4) {
+                                //use x value at ymid
+                                $anslines[$key] = array('x',$slope,$x1p+($ymidp-$y1p)/$slope);
+                            } else {
+                                //use y value at x2
+                                $anslines[$key] = array('y',$slope,$y2p);
+                            }
                         }
                     } else {
                         //assume parabolic for now
@@ -689,6 +688,7 @@ class DrawingScorePart implements ScorePart
                     }
                 }
             }
+            
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
             $lines = array();
             $parabs = array();
@@ -923,6 +923,7 @@ class DrawingScorePart implements ScorePart
                     }
                 }
             }
+
             $deftol = .1;
             $defpttol = 5;
 
@@ -1328,6 +1329,7 @@ class DrawingScorePart implements ScorePart
                 }
             }
             $usedexp = [];
+
             foreach ($ansexps as $key=>$ansexp) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($exps); $i++) {
