@@ -18,7 +18,7 @@ function parseMath($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   return $parser;
 }
 
-function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false) {
   if (trim($str)=='') {
     return false;
   }
@@ -26,13 +26,13 @@ function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '')
     $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
-    if ($GLOBALS['myrights'] > 10) {
+    if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
       echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
       echo ". Error: ".$t->getMessage();
     }
     return false;
   } catch (Exception $t) { //fallback for PHP5
-    if ($GLOBALS['myrights'] > 10) {
+    if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
       echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
       echo ". Error: ".$t->getMessage();
     }
@@ -56,7 +56,7 @@ function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '')
  * @param string $fvlist comma separated list of variables to treat as functions
  * @return function
  */
-function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
+function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false) {
   if (trim($str)=='') {
     return false;
   }
@@ -64,13 +64,13 @@ function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '
     $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
-    if ($GLOBALS['myrights'] > 10) {
+    if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
       echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
       echo ". Error: ".$t->getMessage();
     }
     return false;
   } catch (Exception $t) { //fallback for PHP5
-    if ($GLOBALS['myrights'] > 10) {
+    if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
       echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
       echo ". Error: ".$t->getMessage();
     }

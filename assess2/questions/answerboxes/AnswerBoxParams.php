@@ -15,6 +15,7 @@ class AnswerBoxParams
     private $answerType;
     private $questionNumber;
     private $isMultiPartQuestion;
+    private $isConditional;
     private $questionPartNumber;
     private $questionPartCount = 1;
     private $assessmentId = 0;
@@ -172,6 +173,29 @@ class AnswerBoxParams
     public function setIsMultiPartQuestion(?bool $isMultiPartQuestion)
     {
         $this->isMultiPartQuestion = $isMultiPartQuestion;
+        return $this;
+    }
+
+    /**
+     * Get the question conditional status. (true = yes, false = no)
+     *
+     * @return bool
+     */
+    public function getIsConditional(): ?bool
+    {
+        return $this->isConditional;
+    }
+
+    /**
+     * Set the question conditional status. (true = yes, false = no)
+     *
+     *
+     * @param bool $isConditional
+     * @return AnswerBoxParams
+     */
+    public function setIsConditional(?bool $isConditional)
+    {
+        $this->isConditional = $isConditional;
         return $this;
     }
 

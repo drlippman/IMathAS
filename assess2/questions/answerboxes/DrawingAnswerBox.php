@@ -28,6 +28,7 @@ class DrawingAnswerBox implements AnswerBox
         $anstype = $this->answerBoxParams->getAnswerType();
         $qn = $this->answerBoxParams->getQuestionNumber();
         $multi = $this->answerBoxParams->getIsMultiPartQuestion();
+        $isConditional = $this->answerBoxParams->getIsConditional();
         $partnum = $this->answerBoxParams->getQuestionPartNumber();
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
@@ -540,7 +541,7 @@ class DrawingAnswerBox implements AnswerBox
             $_SESSION['graphdisp'] = 0;
         }
         $tip = _('Enter your answer by drawing on the graph.');
-        if (is_array($answers) && (count($answers)>1 || $answers[0] !== '')) {
+        if (is_array($answers) && !$isConditional && (count($answers)>1 || $answers[0] !== '')) {
             $saarr = array();
             $ineqcolors = array("blue", "red", "green");
             $k = 0;

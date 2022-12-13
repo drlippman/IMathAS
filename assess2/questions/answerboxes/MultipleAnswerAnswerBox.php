@@ -28,6 +28,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $anstype = $this->answerBoxParams->getAnswerType();
         $qn = $this->answerBoxParams->getQuestionNumber();
         $multi = $this->answerBoxParams->getIsMultiPartQuestion();
+        $isConditional = $this->answerBoxParams->getIsConditional();
         $partnum = $this->answerBoxParams->getQuestionPartNumber();
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
@@ -174,7 +175,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
             $out .= "</div>";
         }
         $tip = _('Select all correct answers');
-        if ($answers !== '') {
+        if ($answers !== '' && !$isConditional) {
             $ansor = explode(' or ', $answers);
             foreach ($ansor as $k => $answers) {
                 $akeys = array_map('trim', explode(',', $answers));
