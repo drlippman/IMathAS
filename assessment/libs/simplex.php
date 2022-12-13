@@ -7,7 +7,7 @@
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 45;
+	return 46;
 }
 
 global $allowedmacros;
@@ -269,7 +269,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
             } else {
                 $answerdec = fractiontodecimal($solutionlist[$r][$c]);
             }
-			$solutionlistdecimal[$r][] = $answerdec;            
+			$solutionlistdecimal[$r][] = $answerdec;
         }
     }
 
@@ -1246,7 +1246,7 @@ function simplexdisplaycolortable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if(!empty($headers[$cloop])) {
+                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3173,13 +3173,18 @@ function simplexfindsolutioninlist($solutionlist,$solution) {
         $match = 1;
 
         for($c=0,$sizecol = count($solutionlist[0])-1;$c<$sizecol;$c++) {
-            // now check to see if this solution matches the student
-            // need to evaluate  $solutionlist[$r][$c] to a decimal
-            //if(fractiontodecimal($solutionlist[$r][$c])!=fractiontodecimal($solution[$c])) {
-			// fixed division by zero bug - I didn't substract 1 from the column legth.
-			// The last column is the word Yes/No
-			$dec1 = $solutionlist[$r][$c][0]/$solutionlist[$r][$c][1];
-            $dec2 = $solution[$c][0]/$solution[$c][1];
+			if(is_numeric($solutionlist[$r][$c][0])&&is_numeric($solutionlist[$r][$c][1])) {
+                $dec1 = $solutionlist[$r][$c][0]/$solutionlist[$r][$c][1];
+            } else {
+                $match = 0;  // failed - not a number return
+                break;
+            }
+			if(is_numeric($solution[$c][0])&&is_numeric($solution[$c][1])) {
+                $dec2 = $solution[$c][0]/$solution[$c][1];
+            } else {
+                $match = 0;  // failed - not a number return
+                break;
+            }
             if(abs($dec1-$dec2)>simplexTolerance) {
                 $match = 0;  // not a solution
                 break;
@@ -3366,7 +3371,7 @@ function simplexdisplaytable() {
                         // R1C(Last)
                         if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column
                     }
-                    if(!empty($headers[$cloop])) {
+                    if((!is_null($headers[$cloop]))&&($headers[$cloop]!="")) {
                         $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
                     }
                     else {
@@ -3554,6 +3559,8 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 //Change log
+// 2022-12-12 ver 46 - Division by zero in simplexfindsolutioninlist
+//
 // 2022-12-09 ver 45 - Bug fixes and division by zero checks
 //
 // 2022-12-09 ver 44 - Added code to check for created array_key_exists to eliminate warnings.
