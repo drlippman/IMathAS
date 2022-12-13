@@ -149,7 +149,7 @@ class ScoreEngine
                 . ' on line '
                 . $t->getLine()
                 . ' of '
-                . $t->getFile()
+                . basename($t->getFile())
               );
         }
 
@@ -675,7 +675,7 @@ class ScoreEngine
                     . ' on line '
                     . $t->getLine()
                     . ' of '
-                    . $t->getFile()
+                    . basename($t->getFile())
                   );
             }
             

@@ -142,7 +142,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $toevalGivenans = $givenans;
             }
 
-            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist, [], $flist);
+            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist, [], $flist, true);
             if ($givenansfunc === false) { //parse error
                 continue;
             }

@@ -213,7 +213,7 @@ class QuestionHtmlGenerator
               . ' on line '
               . $t->getLine()
               . ' of '
-              . $t->getFile()
+              . basename($t->getFile())
           );
 
         }

@@ -3686,8 +3686,8 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
 	}
 
-	$afunc = makeMathFunction($a, $vlist, [], $flist);
-	$bfunc= makeMathFunction($b, $vlist, [], $flist);
+	$afunc = makeMathFunction($a, $vlist, [], $flist, true);
+	$bfunc= makeMathFunction($b, $vlist, [], $flist, true);
 	if ($afunc === false || $bfunc === false) {
 		if (isset($GLOBALS['teacherid'])) {
 			echo "<p>Debug info: one function failed to compile.</p>";
