@@ -591,7 +591,7 @@ class DrawingScorePart implements ScorePart
                         $h = $x2p - $invstr*safepow($y2p-$k,3);
                         //$str = 1/safepow($invstr,1/3);
                         $anscuberoots[$key] = array($h, $k, 1/$invstr);
-                    } else if (preg_match('/\^(\(|x)/',$function[0])) { //exponential
+                    } else if (preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
                         /*
             To do general exponential, we'll need 3 points.
             Need to solve y = ab^x + c for a, b, c
@@ -606,7 +606,6 @@ class DrawingScorePart implements ScorePart
 
             y = ab^x
             */
-
                         $base = safepow(($y3p-$y2p)/($y2p-$y1p), 1/($x3p-$x2p));
                         $str = ($y1p - $y2p)/(safepow($base, $x2p-$xop) - safepow($base, $x1p-$xop));
                         $asy = $y1p + $str*safepow($base, $x1p-$xop);
@@ -1330,6 +1329,7 @@ class DrawingScorePart implements ScorePart
                 }
             }
             $usedexp = [];
+
             foreach ($ansexps as $key=>$ansexp) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($exps); $i++) {
