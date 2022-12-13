@@ -82,7 +82,7 @@ function fractiondiffdrandsfrom($list,$n, $order = 'any') {
 //converts a fraction into an array(num, denom)
 function fractionparse($f) {
 	if (is_array($f)) {return $f;}
-	$p = explode('/',trim($f));
+	$p = array_map('trim', explode('/',$f));
 	if (trim($p[0])=='') {
 		if ($GLOBALS['myrights']>10) {
 			echo "Error in fraction: undefined numerator";
@@ -98,7 +98,7 @@ function fractionparse($f) {
 			}
 			$p[1]=1;
 		}
-		$wp = explode(' ',$p[0]);
+		$wp = array_map('trim', explode(' ',$p[0]));
 		if (count($wp)==1) {
 			return array($p[0],$p[1]);
 		} else {
