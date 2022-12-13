@@ -2427,7 +2427,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
 					}
                 }
 
-                if($columnsolutionfound) {
+                if($columnsolutionfound && $zerorow != -1) {
                     if($showfractions==1) {
 						// Don't use fraction parse - if the denominator is 1 it returns a digit not an array
                         $f = $sma[$zerorow][$lastcol];
@@ -2475,13 +2475,17 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
 				for($r=0;$r<$lastrow;$r++) {
 					if(($sma[$r][$c][0]!=0)&&($sma[$r][$c][0]!=1)) {
 						$columnsolutionfound = false;
+                        break; // This should break out of the for r loop
 					}
 					if($sma[$r][$c][0]==$sma[$r][$c][1]) {
-						if($zerorow != -1) { $columnsolutionfound = false; } else { $zerorow = $r; }
+						if($zerorow != -1) { 
+                            $columnsolutionfound = false; 
+                            break; // This should break out of the for r loop
+                        } else { $zerorow = $r; }
 					}
 				}
 
-				if($columnsolutionfound) {
+				if($columnsolutionfound && $zerorow != -1) {
 					if($showfractions==1) {
 						// Don't use fraction parse - if the denominator is 1 it returns a digit not an array
                         $f = $sma[$zerorow][$lastcol];
