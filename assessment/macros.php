@@ -293,9 +293,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else if ($function[0][0]=='[') { //strpos($function[0],"[")===0) {
 			$isparametric = true;
 			$xfunc = makepretty(str_replace("[","",$function[0]));
-			$evalxfunc = makeMathFunction($xfunc, "t");
+			$evalxfunc = makeMathFunction($xfunc, "t", [], '', true);
 			$yfunc = makepretty(str_replace("]","",$function[1]));
-			$evalyfunc = makeMathFunction($yfunc, "t");
+			$evalyfunc = makeMathFunction($yfunc, "t", [], '', true);
 			array_shift($function);
 			if ($evalxfunc===false || $evalyfunc===false) {continue;}
 		} else if ($function[0][0]=='<' || $function[0][0]=='>') {
@@ -307,7 +307,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$ineqtype = $function[0][0];
 				$func = makepretty(substr($function[0],1));
 			}
-			$evalfunc = makeMathFunction($func, "x");
+			$evalfunc = makeMathFunction($func, "x", [], '', true);
 			if ($evalfunc===false) {continue;}
 		} else if (strlen($function[0])>1 && $function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>' || $function[0][1]=='=')) {
 			$isxequals = true;
@@ -320,7 +320,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$yfunc = "t";
 					$evalyfunc = makeMathFunction("t", "t");
 					$xfunc = makepretty(str_replace('y','t',$val));
-					$evalxfunc = makeMathFunction($xfunc, "t");
+					$evalxfunc = makeMathFunction($xfunc, "t", [], '', true);
 					if ($evalxfunc===false || $evalyfunc===false) {continue;}
 				}
 			} else {
@@ -335,7 +335,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 		} else {
 			$func = makepretty($function[0]);
-			$evalfunc = makeMathFunction($func, "x");
+			$evalfunc = makeMathFunction($func, "x", [], '', true);
 			if ($evalfunc===false) {continue;}
 		}
 
@@ -1915,13 +1915,23 @@ function calconarray($array,$todo) {
 	*/
 	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
-	return array_map(my_create_function('$x','return('.$todo.');'),$array);
+    $todo = tryWrapEvalTodo('return('.$todo.');', 'calconarray');
+	return array_map(my_create_function('$x',$todo),$array);
+}
+
+function tryWrapEvalTodo($todo, $func='') {
+    return 'try { '. $todo .'} catch(Throwable $t) {
+        if ($GLOBALS[\'myrights\'] > 10 && !empty($GLOBALS[\'inQuestionTesting\'])) {
+            echo "Parse error in '.$func.': ".$t->getMessage().". ";
+        }
+    }';
 }
 
 function keepif($array, $todo) {
     $todo = mathphp($todo,'x',false,true);
 	$todo = str_replace('(x)','($x)',$todo);
-	return array_values(array_filter($array,my_create_function('$x','return('.$todo.');')));
+    $todo = tryWrapEvalTodo('return('.$todo.');', 'keepif');
+	return array_values(array_filter($array,my_create_function('$x',$todo)));
 }
 
 function arrayremovenull($array) {
@@ -1969,7 +1979,7 @@ function multicalconarray() {
 		$todo = str_replace('('.$vars[$i].')','($'.$vars[$i].')',$todo);
 	}
 	$varlist = '$'.implode(',$',$vars);
-	$func = my_create_function($varlist, 'return('.$todo.');');
+	$func = my_create_function($varlist, tryWrapEvalTodo('return('.$todo.');', 'multicalconarray'));
 	$out = array();
 	for ($j=0;$j<count($args[0]);$j++) {
 		$inputs = array();
@@ -2027,9 +2037,9 @@ function calconarrayif($array,$todo,$ifcond) {
 	//$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
 
-	$iffunc = my_create_function('$x','return('.$ifcond.');');
+	$iffunc = my_create_function('$x',tryWrapEvalTodo('return('.$ifcond.');', 'calconarrayif'));
 
-	$tmpfunc = my_create_function('$x','return('.$todo.');');
+	$tmpfunc = my_create_function('$x',tryWrapEvalTodo('return('.$todo.');', 'calconarrayif'));
 	foreach($array as $k=>$x) {
 		if ($iffunc($x)) {
 			$array[$k] = $tmpfunc($x);
@@ -2805,7 +2815,7 @@ function evalfunc($farr) {
 	$toparen = implode('|',$vars);
 
 	if ($isnum) {
-        $func = makeMathFunction($func, implode(',', $vars));
+        $func = makeMathFunction($func, implode(',', $vars), [], '', true);
         if ($func === false) {
             return '';
         }
@@ -4244,7 +4254,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
         $stu = numfuncPrepForEval($stu, $variables);
 
 		$origstu = $stu;
-		$stufunc = makeMathFunction(makepretty($stu), $vlist, [], $flist);
+		$stufunc = makeMathFunction(makepretty($stu), $vlist, [], $flist, true);
 		if ($stufunc===false) {
 			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
@@ -4275,7 +4285,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
 			} else if (strpos($b, '=')!==false) {continue;}
 			$origb = $b;
-			$bfunc = makeMathFunction(makepretty($b), $vlist, [], $flist);
+			$bfunc = makeMathFunction(makepretty($b), $vlist, [], $flist, true);
 			if ($bfunc === false) {
 				//parse error - skip it
 				continue;
@@ -4964,7 +4974,7 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 }
 
 function parsesloppycomplex($v) {
-    $func = makeMathFunction($v, 'i');
+    $func = makeMathFunction($v, 'i', [], '', true);
     if ($func===false) {
         return false;
     }
@@ -5353,11 +5363,11 @@ function comparelogic($a,$b,$vars) {
     $a = str_replace($keywords,$replace,$a);
     $b = str_replace($keywords,$replace,$b);
 
-    $afunc = makeMathFunction($a, $varlist);
+    $afunc = makeMathFunction($a, $varlist, [], '', true);
     if ($afunc === false) {
         return false;
     }
-    $bfunc = makeMathFunction($b, $varlist);
+    $bfunc = makeMathFunction($b, $varlist, [], '', true);
     if ($bfunc === false) {
         return false;
     }
@@ -5429,11 +5439,11 @@ function comparesetexp($a,$b,$vars) {
 	}
 	$a = $ab[0];
 	$b = $ab[1];
-    $afunc = makeMathFunction($a, $varlist);
+    $afunc = makeMathFunction($a, $varlist, [], '', true);
     if ($afunc === false) {
         return false;
     }
-    $bfunc = makeMathFunction($b, $varlist);
+    $bfunc = makeMathFunction($b, $varlist, [], '', true);
     if ($bfunc === false) {
         return false;
     }

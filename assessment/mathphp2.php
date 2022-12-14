@@ -588,7 +588,7 @@ function my_create_function($args, $code) {
 	$preevalerror = error_get_last();
 	try {
 		$res = eval('return function('.$args.'){'.$code.'};');
-	} catch (Throwable $t) {
+	} catch (\Throwable $t) {
 		if ($myrights>10) {
 			echo '<p>Caught error in evaluating a function in this question: ';
 			echo Sanitize::encodeStringForDisplay($t->getMessage());

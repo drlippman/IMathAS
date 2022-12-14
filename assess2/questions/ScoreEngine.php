@@ -670,7 +670,7 @@ class ScoreEngine
               $scorePartResult = $scorePart->getResult();
             } catch (\Throwable $t) {
                 $this->addError(
-                    _('Caught error while evaluating the code in this question: ')
+                    _('Caught error while scoring parts in this question: ')
                     . $t->getMessage()
                     . ' on line '
                     . $t->getLine()

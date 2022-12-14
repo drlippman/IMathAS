@@ -64,13 +64,13 @@ function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '
     $parser = new MathParser($vars, $allowedfuncs, $fvlist);
     $parser->parse($str);
   } catch (Throwable $t) {
-    if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
+    if ($GLOBALS['myrights'] > 10 && (!empty($GLOBALS['inQuestionTesting']) || !$hideerrors)) {
       echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
       echo ". Error: ".$t->getMessage();
     }
     return false;
   } catch (Exception $t) { //fallback for PHP5
-    if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
+    if ($GLOBALS['myrights'] > 10 && (!empty($GLOBALS['inQuestionTesting']) || !$hideerrors)) {
       echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
       echo ". Error: ".$t->getMessage();
     }
