@@ -293,7 +293,7 @@ Date.prototype.getWeekDays = function(d) {
 				  if (usecb && !document.getElementById("cb"+i).checked) {
 					  continue;
 				  }
-				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
+				  if (basearr[i]!="NA" && basearr[i]!="-1" && document.getElementById(type+"datetype"+i).value==1) {
 					 curdate = document.getElementById(type+"date"+i).value;
 					 if (curdate!=0 && curdate!=2000000000) {
 						 d.setTime(basearr[i]*1000);
