@@ -330,13 +330,13 @@ Date.prototype.getWeekDays = function(d) {
 	 /* if (baserdates[st]!="NA") {
 		  senddownsub('r',baserdates,st,usebusdays,usecb);
 	  }*/
-	  if (baselpdates[st]!="NA") {
+	  if (includeassess && baselpdates[st]!="NA" && baselpdates[st]!="-1") {
 		  senddownsub('lp',baselpdates,st,usebusdays,usecb);
 	  }
-	  if (basefpdates[st]!="NA") {
+	  if (includeforums && basefpdates[st]!="NA" && basefpdates[st]!="-1") {
 		  senddownsub('fp',basefpdates,st,usebusdays,usecb);
 	  }
-	  if (basefrdates[st]!="NA") {
+	  if (includeforums && basefrdates[st]!="NA" && basefrdates[st]!="-1") {
 		  senddownsub('fr',basefrdates,st,usebusdays,usecb);
 	  }
   }
