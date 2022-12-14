@@ -5586,6 +5586,9 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
                 $blankok = true;
                 $v = substr($v,1);
             }
+            if (!isset($stu[$qn][$v])) { 
+                continue;
+            }
             if ($anstypes !== null && $answerformat !== null && $stu[$qn][$v] !== '') {
                 $thisaf = '';
                 if (is_array($answerformat) && !empty($answerformat[$v])) {
@@ -5593,12 +5596,16 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
                 } else if (!is_array($answerformat)) {
                     $thisaf = $answerformat;
                 }
-                if ($thisaf !== '') {
+                if (($anstypes[$v] == 'calculated' || $anstypes[$v]=='number') && strpos($thisaf,'checknumeric')!==false) {
+                    if (!is_numeric($stu[$qn][$v])) {
+                        continue;
+                    }
+                } else if ($thisaf !== '') {
                     if ($anstypes[$v] == 'calculated' && !checkanswerformat($stu[$qn][$v],$thisaf)) {
                         continue;
                     }
                 }
-            }
+            } 
             //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
                 isset($stu[$qn][$v]) && ($stu[$qn][$v]==='' || strpos($stu[$qn][$v],'||')!==false || 
