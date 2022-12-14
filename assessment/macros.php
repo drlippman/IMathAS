@@ -5560,8 +5560,16 @@ function comparesameform($a,$b,$vars="x") {
 }
 
 function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) {
-    if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
+    if (!isset($stu[$qn])) {
         return false;
+    }
+    if (!is_array($stu[$qn])) {
+        if ($parts === null) { // if not multipart, change it so it looks like one
+            $stu[$qn] = [$stu[$qn]];
+            $parts = [0];
+        } else {
+            return false;
+        }
     }
     if (!is_array($parts) && is_numeric($parts)) {
         $parts = [$parts];
