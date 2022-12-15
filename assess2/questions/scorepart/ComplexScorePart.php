@@ -67,7 +67,7 @@ class ComplexScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
-        $answer = str_replace(' ', '', makepretty($answer));
+        $answer = str_replace(' ', '', $answer);
         $givenans = trim($givenans);
 
         if ($answer == 'DNE') {
@@ -190,7 +190,7 @@ class ComplexScorePart implements ScorePart
             $givenansval = implode(',', $givenansval);
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
-
+        $answer = makepretty($answer);
         $anarr = array_map('trim', explode(',', $answer));
         $annumarr = array();
         $normalizedAnswers = [];

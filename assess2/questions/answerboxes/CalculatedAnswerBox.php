@@ -174,7 +174,11 @@ class CalculatedAnswerBox implements AnswerBox
 
         if ($answer !== '' && !is_array($answer)) {
             if (!is_numeric($answer)) {
-                $sa = '`' . $answer . '`';
+                //$sa = '`' . $answer . '`';
+                if (in_array('allowplusminus', $ansformats)) {
+                    $answer = str_replace('+-','pm',$answer);
+                }
+                $sa = makeprettydisp($answer);
             } else if (in_array('mixednumber', $ansformats) || in_array("sloppymixednumber", $ansformats) || in_array("mixednumberorimproper", $ansformats)) {
                 $sa = '`' . decimaltofraction($answer, "mixednumber") . '`';
             } else if (in_array("fraction", $ansformats) || in_array("reducedfraction", $ansformats)) {
