@@ -221,12 +221,12 @@ if (isset($_POST['options'])) {
         }
     }
 
-	//header('Content-type: text/csv');
-	//header("Content-Disposition: attachment; filename=\"aexport-$aid.csv\"");
+	header('Content-type: text/csv');
+	header("Content-Disposition: attachment; filename=\"aexport-$aid.csv\"");
 	foreach ($gb as $gbline) {
 		$line = '';
         if (empty($gbline)) { 
-            echo "empty line";
+            continue;
         }
 		foreach ($gbline as $val) {
             if (is_null($val)) {
