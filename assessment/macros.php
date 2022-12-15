@@ -4855,6 +4855,7 @@ function getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$width,$height,$snaptogrid) 
 }
 
 function mod($p,$n) {
+    if ($n==0) { return false; }
 	return (($p % $n) + $n)%$n;
 }
 
