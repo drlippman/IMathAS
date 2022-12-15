@@ -476,7 +476,7 @@ class MathParser
               }
             } else if ($nextSymbol == 'root') {
               // found a root.  Parse the index
-              if (preg_match('/^[\(\[]?(\d+)[\)\]]?/', substr($str,$n+1), $sub)) {
+              if (preg_match('/^[\(\[]?(-?\d+)[\)\]]?/', substr($str,$n+1), $sub)) {
                 // replace the last node with an nthroot node
                 $tokens[count($tokens)-1] = [
                   'type' => 'function',
@@ -1322,8 +1322,10 @@ function factorial($x) {
 
 function nthroot($x,$n) {
 	if ($n%2==0 && $x<0) { //if even root and negative base
-    throw new MathParserException("Can't take even root of negative value");
-	} else if ($x<0) { //odd root of negative base - negative result
+      throw new MathParserException("Can't take even root of negative value");
+	} else if ($n==0) {
+      throw new MathParserException("Can't take 0th root");
+    } else if ($x<0) { //odd root of negative base - negative result
 		return -1*exp(1/$n*log(abs($x)));
 	} else { //root of positive base
 		return exp(1/$n*log(abs($x)));
