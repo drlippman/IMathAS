@@ -317,6 +317,13 @@ class QuestionHtmlGenerator
             $varsForAnswerBoxGenerator[$vargenKey] = ${$vargenKey};
         }
 
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+            if (isset($onBeforeAnswerBoxGenerator) && is_callable($onBeforeAnswerBoxGenerator)) {
+                $onBeforeAnswerBoxGenerator();
+            }
+        }
+
         /*
          * Calculate answer weights and generate answer boxes.
          */
@@ -889,8 +896,7 @@ class QuestionHtmlGenerator
             $externalReferences
         );
 
-        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+        if (isset($onGetQuestion) && is_callable($onGetQuestion)) {
             $onGetQuestion();
         }
 
