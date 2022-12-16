@@ -592,11 +592,11 @@ function gbtable() {
 
 	$cats = array();
 	$catcolcnt = 0;
-	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, calctype
+	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, hidden, calctype
 	if (in_array(0,$category)) {  //define default category, if used
 		$cats[0] = explode(',',$defaultcat);
 		if (!isset($cats[0][6])) {
-			$cats[0][6] = ($cats[0][4]==0)?0:1;
+			$cats[0][6] = ($cats[0][3]==0)?0:1;
 		}
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);

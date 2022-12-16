@@ -111,7 +111,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	for ($i = 1; $i < func_num_args(); $i++) {
         $v = func_get_arg($i);
         if (!is_scalar($v)) {
-            echo 'Invalid input '.$i.' to showplot';
+            echo 'Invalid input '.($i+1).' to showplot';
         } else {
             $settings[$i-1] = $v;
         }
@@ -3704,7 +3704,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	$afunc = makeMathFunction($a, $vlist, [], $flist, true);
 	$bfunc= makeMathFunction($b, $vlist, [], $flist, true);
 	if ($afunc === false || $bfunc === false) {
-		if (isset($GLOBALS['teacherid'])) {
+		if (!empty($GLOBALS['inQuestionTesting'])) {
 			echo "<p>Debug info: one function failed to compile.</p>";
 		}
 		return false;
