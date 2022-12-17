@@ -5574,6 +5574,9 @@ function comparesameform($a,$b,$vars="x") {
     $flist = implode(',', $ofunc);
     $afunc = parseMathQuiet($a, $vlist, [], $flist);
     $bfunc = parseMathQuiet($b, $vlist, [], $flist);
+    if ($afunc === false || $bfunc === false) {
+        return false;
+    }
 
     return ($afunc->normalizeTreeString() === $bfunc->normalizeTreeString());
 }
