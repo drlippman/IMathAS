@@ -323,21 +323,21 @@ function parseunits($unitsExpression) {
       return 0;
     }
     if (preg_match($unitsBadSymbols,$unitsExpression)) {
-      if ($GLOBALS['myrights']>10) { echo $unitsSymbolMessage; }
+      if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsSymbolMessage; }
       return '';
     }
     if (preg_match($unitsBadSyntax,$unitsExpression)) {
-      if ($GLOBALS['myrights']>10) { echo $unitsFormatMessage; }
+      if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsFormatMessage; }
       return '';
     }
     if (preg_match($unitsStartLike,$unitsExpression)==0 || preg_match($unitsEndLike,$unitsExpression)==0) {
-      if ($GLOBALS['myrights']>10) { echo $unitsFormatMessage; }
+      if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsFormatMessage; }
       return '';
     }
 
     $parts=explode('/',$unitsExpression);
     if (count($parts)>2) {
-      if ($GLOBALS['myrights']>10) { echo $unitsDivisionMessage; }
+      if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsDivisionMessage; }
       return '';
     } elseif (count($parts)==1) {
       $numerator=$parts[0];
@@ -357,7 +357,7 @@ function parseunits($unitsExpression) {
           if ($baseNumber == '') {
               $baseNumber = $part;
           } else {
-              if ($GLOBALS['myrights']>10) { echo $unitsFormatMessage; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsFormatMessage; }
               return '';
           }
       } else {
@@ -369,7 +369,7 @@ function parseunits($unitsExpression) {
     $denomPartsTmp=[];
     foreach($denomParts as $k => $part) {
       if (is_numeric($part)) {
-        if ($GLOBALS['myrights']>10) { echo $unitsFormatMessage; }
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsFormatMessage; }
         return '';
       } else if ($part !== ''){
         array_push($denomPartsTmp,$part);
@@ -383,7 +383,7 @@ function parseunits($unitsExpression) {
     if (!empty($numerParts)) {
       foreach ($numerParts as $k=>$part) { //Expand all factors from numerator, put in numer or denom array.
         if (preg_match('/\^[^\d\.\-]/',$part)) {
-          if ($GLOBALS['myrights']>10) { echo 'Eek! Exponents can only be numbers.'; }
+          if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Exponents can only be numbers.'; }
           return '';
         }
         if (preg_match('/^[a-zA-Z]+$/',$part)) {
@@ -393,7 +393,7 @@ function parseunits($unitsExpression) {
         if (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9\.\-]+$/',$part)) {
           $pow=substr($part,strpos($part,'^')+1);
           if (floor(evalMathParser($pow))!=evalMathParser($pow)||isNaN(evalMathParser($pow))) {
-            if ($GLOBALS['myrights']>10) { echo 'Eek! Exponents on units must be integers.'; }
+            if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Exponents on units must be integers.'; }
             return '';
           }
           $part = substr($part,0,strpos($part,'^')); //Now $part only has letters.
@@ -431,7 +431,7 @@ function parseunits($unitsExpression) {
             $part = substr($part,$prefixLength); //Now $part is just the unit.
 
             if ($part == '' || empty($part)) {
-              if ($GLOBALS['myrights']>10) { echo 'Eek! The prefix \''.$partPrefix[$prefixCount].'\' must be followed by a unit.'; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! The prefix \''.$partPrefix[$prefixCount].'\' must be followed by a unit.'; }
               return '';
             }
           }
@@ -442,11 +442,11 @@ function parseunits($unitsExpression) {
             $partLowNos = strtolower($partNos);
             if (isset($units[$unitReverse[$partLowNos]])) {
               if ($units[$unitReverse[$partLowNos]][3] != 1) {
-                if ($GLOBALS['myrights']>10) { echo 'Eek! Unit \''.$partNos.'\' cannot be pluralized with an \'s\'.'; }
+                if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unit \''.$partNos.'\' cannot be pluralized with an \'s\'.'; }
                 return '';
               }
             } else {
-              if ($GLOBALS['myrights']>10) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
               return '';
             }
             $part = $partNos;
@@ -455,7 +455,7 @@ function parseunits($unitsExpression) {
             
           if ($prefixCount > -1 && $partLow != '') {
             if (!in_array($partLow,$unitKeysLow)) {
-              if ($GLOBALS['myrights']>10) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
               return '';
             }
           }
@@ -463,12 +463,12 @@ function parseunits($unitsExpression) {
           if ($prefixCount > -1) {
             if ($prefixWasAbb) {
               if (($units[$unitReverse[$partLow]][2])%2 == 0) {
-                if ($GLOBALS['myrights']>10) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$abbCheck.'\'.'; }
+                if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$abbCheck.'\'.'; }
                 return '';
               }
             } elseif (!$prefixWasAbb) {
               if (($units[$unitReverse[$partLow]][2]) < 2) {
-                if ($GLOBALS['myrights']>10) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$partPrefix[0].'\'.'; }
+                if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$partPrefix[0].'\'.'; }
                 return '';
               }
             }
@@ -502,7 +502,7 @@ function parseunits($unitsExpression) {
             }
           }  
         } else {
-        if ($GLOBALS['myrights']>10) { echo 'Eek! Error in the numerator.'; }
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Error in the numerator.'; }
         return '';
         }
       }
@@ -513,7 +513,7 @@ function parseunits($unitsExpression) {
     if (!empty($denomParts)) {
       foreach ($denomParts as $k=>$part) { //Expand all factors from denominator, put in numer or denom array.
         if (preg_match('/\^[^\d\.\-]/',$part)) {
-          if ($GLOBALS['myrights']>10) { echo 'Eek! Exponents can only be numbers.'; }
+          if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Exponents can only be numbers.'; }
           return '';
         }
         if (preg_match('/^[a-zA-Z]+$/',$part)) {
@@ -523,7 +523,7 @@ function parseunits($unitsExpression) {
         if (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9\.\-]+$/',$part)) {
           $pow=substr($part,strpos($part,'^')+1);
           if (floor(evalMathParser($pow))!=evalMathParser($pow)||isNaN(evalMathParser($pow))) {
-            if ($GLOBALS['myrights']>10) { echo 'Eek! Exponents on units must be integers.'; }
+            if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Exponents on units must be integers.'; }
             return '';
           }
           $part = substr($part,0,strpos($part,'^')); //Now $part is the prefix-and-unit.
@@ -561,7 +561,7 @@ function parseunits($unitsExpression) {
             $part = substr($part,$prefixLength); //Now $part is just the unit.
 
             if ($part == '' || empty($part)) {
-              if ($GLOBALS['myrights']>10) { echo 'Eek! The prefix \''.$partPrefix[$prefixCount].'\' must be followed by a unit.'; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! The prefix \''.$partPrefix[$prefixCount].'\' must be followed by a unit.'; }
               return '';
             }
           }
@@ -573,11 +573,11 @@ function parseunits($unitsExpression) {
             $partLowNos = strtolower($partNos);
             if (isset($units[$unitReverse[$partLowNos]])) {
               if ($units[$unitReverse[$partLowNos]][3] != 1) {
-                if ($GLOBALS['myrights']>10) { echo 'Eek! Unit \''.$partNos.'\' cannot be pluralized with an \'s\'.'; }
+                if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unit \''.$partNos.'\' cannot be pluralized with an \'s\'.'; }
                 return '';
               }
             } else {
-              if ($GLOBALS['myrights']>10) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
               return '';
             }
             $part = $partNos;
@@ -586,7 +586,7 @@ function parseunits($unitsExpression) {
 
           if ($prefixCount > -1 && $partLow != '') {
             if (!in_array($partLow,$unitKeysLow)) {
-              if ($GLOBALS['myrights']>10) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
+              if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unknown unit \''.$part.'\'.'; }
               return '';
             }
           }
@@ -594,12 +594,12 @@ function parseunits($unitsExpression) {
           if ($prefixCount > -1) {
             if ($prefixWasAbb) {
               if (($units[$unitReverse[$partLow]][2])%2 == 0) {
-                if ($GLOBALS['myrights']>10) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$abbCheck.'\'.'; }
+                if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$abbCheck.'\'.'; }
                 return '';
               }
             } elseif (!$prefixWasAbb) {
               if (($units[$unitReverse[$partLow]][2]) < 2) {
-                if ($GLOBALS['myrights']>10) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$partPrefix[0].'\'.'; }
+                if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unit \''.$part.'\' cannot use prefix \''.$partPrefix[0].'\'.'; }
                 return '';
               }
             }
@@ -633,7 +633,7 @@ function parseunits($unitsExpression) {
             }
           }
         } else {
-        if ($GLOBALS['myrights']>10) { echo 'Eek! Error in the denominator.'; }
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Error in the denominator.'; }
         return '';
         }
       }
@@ -656,7 +656,7 @@ function parseunits($unitsExpression) {
   //This simplifies all matching fundamental units in numerator and denominator, and it builds the numerical factor
     foreach ($numerUnitFactors as $k => $factor) {
       if (!isset($units[$k])) {
-        if ($GLOBALS['myrights']>10) { echo 'Eek! Unknown units: '.$k; }
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unknown units: '.$k; }
         return '';
       } elseif (isset($units[$k])) {
         for ($i=0;$i<$factor;$i++) {
@@ -669,7 +669,7 @@ function parseunits($unitsExpression) {
     }
     foreach ($denomUnitFactors as $k => $factor) {
       if (!isset($units[$k])) {
-        if ($GLOBALS['myrights']>10) { echo 'Eek! Unknown units: '.$k; }
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Unknown units: '.$k; }
         return '';
       } elseif (isset($units[$k])) {
         for ($i=0;$i<$factor;$i++) {
@@ -681,8 +681,7 @@ function parseunits($unitsExpression) {
       }
     }
     if (!is_numeric($baseNumber) || !is_numeric($numerical)) {
-        if ($GLOBALS['myrights']>10) { echo 'Eek! Was unable to parse units'; }
-        error_log("Units nonnumeric on basenum $baseNumber, numerical $numerical, orig $origExpression");
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'Eek! Was unable to parse units'; }
         return '';
     }
     //At this point, $numerical is the number and $unitArray is the array of factors of fundamental units: e.g. [0,1,-2,0,0,0,0,0,1,0] would mean meter*amp/sec^2 
@@ -713,7 +712,7 @@ function parseunits($unitsExpression) {
       }
     }
   //Uncomment next line to show simplified answer written in terms of fundamental metric units. Not sure how/if this functionality will be used in problems.
-  // if ($GLOBALS['myrights']>10) { echo $unitsExpressionSimple." "; }
+  // if (!empty($GLOBALS['inQuestionTesting'])) { echo $unitsExpressionSimple." "; }
   //return array($numerical,$unitArray);
   return array($baseNumber*$numerical, $unitArray, $baseNumber, $numerical);
 }
