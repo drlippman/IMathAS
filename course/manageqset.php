@@ -11,7 +11,9 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Question Sets";
 $helpicon = "";
-
+if (!isset($courseUIver)) {
+    $courseUIver = 2;
+}
 //data manipulation here
 $isadmin = false;
 $isgrpadmin = false;
