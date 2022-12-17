@@ -88,6 +88,12 @@ require('../header.php');
 
 echo '<div class=breadcrumb><a href="../index.php">'._('Home').'</a> &gt; '._('Question Errors').'</div>';
 echo '<h2>'._('Question Errors').'</h2>';
+
+echo '<p>'._('The questions listed below have logged an error. Some error may occur on display, some on scoring, and some may only occur on invalid student inputs. ');
+echo _('Click the Seed to test that particular version of the question. Click the question number to edit the question. ');
+echo _('Once you have fixed the issue or determined it does not need fixing, clear the log entry. ');
+echo '</p>';
+
 if ($isadmin) {
     if (!empty($_GET['public'])) {
         echo '<p>All public questions</p>';
