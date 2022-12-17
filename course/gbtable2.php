@@ -1752,6 +1752,11 @@ function gbtable() {
 				unset($cattotcur[$ln][$category[$i]][$col]);
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) {
+				if (!empty($sectionlimit[$col]) && 
+					(empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
+				) {
+                    continue; // don't zero out section limited
+                }
 				if ($cntingb[$i] == 1) {
 					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
@@ -1839,6 +1844,11 @@ function gbtable() {
 				unset($cattotcur[$ln][$category[$i]][$col]);
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0])) {
+                if (!empty($sectionlimit[$col]) && 
+					(empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
+				) {
+                    continue; // don't zero out section limited
+                }
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;

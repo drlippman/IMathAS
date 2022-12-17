@@ -1321,7 +1321,9 @@ function factorial($x) {
 }
 
 function nthroot($x,$n) {
-	if ($n%2==0 && $x<0) { //if even root and negative base
+	if ($x==0) {
+      return 0;
+    } else if ($n%2==0 && $x<0) { //if even root and negative base
       throw new MathParserException("Can't take even root of negative value");
 	} else if ($n==0) {
       throw new MathParserException("Can't take 0th root");
