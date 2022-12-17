@@ -616,6 +616,7 @@ class ScoreEngine
         $partLastAnswerAsGiven = array();
         $partLastAnswerAsNumber = array();
         $partCorrectAnswerWrongFormat = array();
+
         if (isset($answeights)) {
             if (!is_array($answeights)) {
                 $answeights = explode(",",$answeights);
@@ -631,6 +632,9 @@ class ScoreEngine
                     return evalbasic($v);
                 }
             }, $answeights);
+            if (array_sum($answeights)==0) {
+                $answeights = array_fill(0, count($anstypes), 1);
+            }
         } else {
             if (count($anstypes)>1) {
                 $answeights = array_fill(0, count($anstypes), 1);
@@ -638,7 +642,7 @@ class ScoreEngine
                 $answeights = array(1);
             }
         }
-        
+
         $scoremethodwhole = '';
         if (isset($scoremethod)) {
             if (!is_array($scoremethod)) {
