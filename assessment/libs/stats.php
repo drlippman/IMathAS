@@ -77,6 +77,7 @@ function variance($a,$w=null) {
 		echo 'stdev/variance expects an array';
 		return false;
 	}
+    if (count($a)<2) { return 0; }
   $useW = false;
   if (is_array($w)) {
     if (count($a) != count($w)) {

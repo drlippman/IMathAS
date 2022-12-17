@@ -1819,6 +1819,7 @@ function consecutive($min,$max,$step=1) {
 function gcd($n,$m){ //greatest common divisor
 	$m = (int) round(abs($m));
 	$n = (int) round(abs($n));
+    if($m==0 && $n==0) {return 1;} // not technically correct, but will avoid divide by 0 issues in the case of bad input
 	if($m==0)return$n;
 	if($n==0)return$m;
 	return $m<$n?gcd($m,$n%$m):gcd($n,$m%$n);
@@ -1834,9 +1835,12 @@ function dispreducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 
 function makereducedmixednumber($n,$d) {
 	if ($n==0) {return '0';}
+    if ($d==0) {return 'undefined';}
 	$g = gcd($n,$d);
-	$n = $n/$g;
-	$d = $d/$g;
+    if ($g > 1) {
+        $n = $n/$g;
+        $d = $d/$g;
+    }
 	if ($d<0) {
 		$n = $n*-1;
 		$d = $d*-1;
@@ -1857,9 +1861,12 @@ function makereducedmixednumber($n,$d) {
 
 function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 	if ($n==0) {return '0';}
+    if ($d==0) {return 'undefined';}
 	$g = gcd($n,$d);
-	$n = $n/$g;
-	$d = $d/$g;
+	if ($g > 1) {
+        $n = $n/$g;
+        $d = $d/$g;
+    }
 	if ($d<0) {
 		$n = $n*-1;
 		$d = $d*-1;
