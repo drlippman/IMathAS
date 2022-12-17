@@ -19,6 +19,8 @@ if (!empty($_POST['checked'])) {
     }
     $stm = $DBH->prepare($query);
     $stm->execute($data);
+    echo "saved";
+    exit;
 }
 
 if ($isadmin) {
@@ -51,6 +53,37 @@ if ($isadmin) {
     $stm->execute([$userid]);
 }
 
+$placeinhead = '<style type="text/css"> 
+.fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
+.fixedonscroll[data-fixed=true] {
+	z-index: 50;
+	margin-top: -5px;
+	padding: 5px 0px;;
+	background-color: #fff;
+	width: 100%;
+}
+</style>
+<script type="text/javascript">
+function quicksave() {
+    if ($("input:checked").length == 0) { return; }
+	$("#quicksavenotice").html(_("Saving...") + \' <img src="\'+staticroot+\'/img/updating.gif"/>\');
+	$.ajax({
+		url: window.location.href,
+		type: "POST",
+		data: $("#mainform").serialize()
+	}).done(function(msg) {
+		if (msg=="saved") {
+            $("input:checked").closest("li").slideUp();
+			$("#quicksavenotice").html(_("Saved"));
+			setTimeout(function() {$("#quicksavenotice").html("&nbsp;");}, 2000);
+		} else {
+			$("#quicksavenotice").html(msg);
+		}
+	}).fail(function(jqXHR, textStatus) {
+		$("#quicksavenotice").html(textStatus);
+	});
+}
+</script>';
 require('../header.php');
 
 echo '<div class=breadcrumb><a href="../index.php">'._('Home').'</a> &gt; '._('Question Errors').'</div>';
@@ -62,9 +95,13 @@ if ($isadmin) {
         echo '<p>All questions</p>';
     }
 }
-echo '<form method=post>';
-echo '<p>'._('With selected:').'<button type=submit>'._('Clear error').'</button></p>';
-echo '<ul>';
+echo '<form id=mainform method=post>';
+//echo '<p>'._('With selected:').'<button type=submit>'._('Clear error').'</button></p>';
+echo '<div class="fixedonscroll">';
+echo 'With selected: <button type="button" id="quicksavebtn" onclick="quicksave()">'._('Clear log').'</button> ';
+echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
+echo '</div>';
+echo '<ul class="nomark">';
 $lastqsetid = 0;
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $qsetid = intval($row['qsetid']);
