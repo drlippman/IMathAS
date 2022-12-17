@@ -46,6 +46,9 @@ function discretenewtons($func,$xmin,$xmax,$guess=null) {
 	if ($guess==null) {
 		$guess = ($xmin+$xmax)/2;
 	}
+    if ($xmin==$xmax) {
+        return $xmin;
+    }
 	$cnt = 0;
 	$eps = 1e-7;
 	$x = $guess;

@@ -2798,6 +2798,7 @@ function evalfunc($farr) {
 		array_pop($args);
 	} else if (count($vars)!=count($args)) {
 		echo "Number of inputs to function doesn't match number of variables";
+        return false;
 	}
 	$isnum = true;
 	for ($i=0;$i<count($args);$i++) {
