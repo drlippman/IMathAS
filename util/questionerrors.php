@@ -53,6 +53,28 @@ if ($isadmin) {
     $stm->execute([$userid]);
 }
 
+$allrows = [];
+$allids = [];
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if (!isset($allrows[$row['qsetid']])) {
+        $allrows[$row['qsetid']] = [];
+    }
+    $allrows[$row['qsetid']][] = $row;
+}
+$timesused = [];
+$allids = array_keys($allrows);
+if (count($allids)>0) {
+    $allqids = implode(',', array_unique($allids));
+    $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allqids) GROUP BY questionsetid");
+    $timesused = [];
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+        $timesused[$row[0]] = $row[1];
+    }
+}
+arsort($timesused);
+$qorder = array_keys($timesused);
+$qorder = array_merge($qorder, array_diff($allids,$qorder));
+
 $placeinhead = '<style type="text/css"> 
 .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
 .fixedonscroll[data-fixed=true] {
@@ -109,19 +131,17 @@ echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
 echo '</div>';
 echo '<ul class="nomark">';
 $lastqsetid = 0;
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    $qsetid = intval($row['qsetid']);
-    if ($qsetid != $lastqsetid) {
-        if ($lastqsetid > 0) { echo '</ul></li>'; }
-        echo '<li><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
-        echo 'Question <a target="_blank" href="../course/moddataset.php?cid='.$qcid.'&id='.$qsetid.'">#'.$qsetid.'</a>';
-        echo '<ul>';
+foreach ($qorder as $qsetid) {
+    echo '<li><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
+    echo 'Question <a target="_blank" href="../course/moddataset.php?cid='.$qcid.'&id='.$qsetid.'">#'.$qsetid.'</a>';
+    echo ' ('.($timesused[$qsetid] ?? 0).')';
+    echo '<ul>';
+    foreach ($allrows[$qsetid] as $row) {
+        echo '<li><a target="_blank" href="../course/testquestion2.php?cid=0&qsetid='.$qsetid.'&seed='.intval($row['seed']).'">';
+        echo 'Seed '.intval($row['seed']).'</a>: ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
     }
-    echo '<li><a target="_blank" href="../course/testquestion2.php?cid=0&qsetid='.$qsetid.'&seed='.intval($row['seed']).'">';
-    echo 'Seed '.intval($row['seed']).'</a>: ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
-    $lastqsetid = $qsetid;
+    echo '</ul></li>';
 }
-if ($lastqsetid > 0) { echo '</ul></li>'; }
 echo '</ul>';
 echo '</form>';
 
