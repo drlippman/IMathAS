@@ -378,6 +378,9 @@ function parsedIntervalToString($parsed, $islist) {
 function parseChemical($string) {
     $string = str_replace(['<->','<=>'], 'rightleftharpoons', $string);
     $string = str_replace(['to','rarr','implies'], '->', $string);
+    $string = preg_replace('/\^{(.*?)}/', '^($1)', $string);
+    $string = preg_replace('/\(\(([^\(\)])*\)\)/', '($1)', $string);
+    $string = str_replace('^+','^(+)', $string);
     $parts = preg_split('/(->|rightleftharpoons)/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
     $reactiontype = (count($parts) > 1) ? $parts[1] : null;
     $sides = [];
