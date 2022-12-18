@@ -210,7 +210,10 @@ class QuestionGenerator
         $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
         if (E_ERROR == $errno || (E_WARNING == $errno &&
             (
-                ($showallerrors || $errstr != 'Trying to access array offset of undefined variable') &&
+                ($showallerrors || 
+                    ($errstr != 'Trying to access array offset of undefined variable' &&
+                    strpos($errstr, 'Undefined array key') === false
+                    )) &&
                 ($showallerrors || empty($GLOBALS['CFG']['suppress_question_warning_display']))
             )
         )) {
