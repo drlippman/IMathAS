@@ -30,22 +30,22 @@ if ($isadmin) {
         } else {
             $old = time() - 60*60*24*30;
         }
-        $query = 'SELECT iqe.* FROM imas_questionerrors AS iqe
+        $query = 'SELECT iqe.*,count(iqe.seed) as errcnt FROM imas_questionerrors AS iqe
             JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
             JOIN imas_users AS iu ON iqs.ownerid=iu.id
             WHERE iqs.userights>0 AND iu.lastaccess<'.$old.'
             GROUP BY iqe.qsetid,iqe.error ORDER BY iqe.qsetid';
     } else if (!empty($_GET['public'])) {
-        $query = 'SELECT iqe.* FROM imas_questionerrors AS iqe
+        $query = 'SELECT iqe.*,count(iqe.seed) as errcnt FROM imas_questionerrors AS iqe
             JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
             WHERE iqs.userights>0 GROUP BY iqe.qsetid,iqe.error ORDER BY iqe.qsetid';
     } else {
-        $query = 'SELECT * FROM imas_questionerrors GROUP BY qsetid,error ORDER BY qsetid';
+        $query = 'SELECT *,count(seed) AS errcnt FROM imas_questionerrors GROUP BY qsetid,error ORDER BY qsetid';
     }
 
     $stm = $DBH->query($query);
 } else {
-    $query = 'SELECT iqe.* FROM imas_questionerrors AS iqe
+    $query = 'SELECT iqe.*,count(iqe.seed) as errcnt FROM imas_questionerrors AS iqe
         JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
         WHERE iqs.ownerid=? GROUP BY iqe.qsetid,iqe.error ORDER BY iqe.qsetid';
 
@@ -134,11 +134,15 @@ $lastqsetid = 0;
 foreach ($qorder as $qsetid) {
     echo '<li><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
     echo 'Question <a target="_blank" href="../course/moddataset.php?cid='.$qcid.'&id='.$qsetid.'">#'.$qsetid.'</a>';
-    echo ' ('.($timesused[$qsetid] ?? 0).')';
+    echo ' <span class="small grey">(Used '.($timesused[$qsetid] ?? 0).' times)</span>';
     echo '<ul>';
     foreach ($allrows[$qsetid] as $row) {
         echo '<li><a target="_blank" href="../course/testquestion2.php?cid=0&qsetid='.$qsetid.'&seed='.intval($row['seed']).'">';
-        echo 'Seed '.intval($row['seed']).'</a>: ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
+        echo 'Seed '.intval($row['seed']).'</a>';
+        if ($row['errcnt'] > 1) {
+            echo '<span class="small grey">(and '.($row['errcnt']-1).' other)</span>';
+        }
+        echo ': ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
     }
     echo '</ul></li>';
 }
