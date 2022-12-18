@@ -39,6 +39,7 @@ class QuestionGenerator
     private $questionParams;
 
     private $errors = array();  // Populated by this class' error handlers.
+    private $silenterrors = array(); 
 
     /**
      * Question constructor.
@@ -95,6 +96,23 @@ class QuestionGenerator
         restore_error_handler();
         restore_exception_handler();
         unset($GLOBALS['curqsetid']);
+
+        if (!empty($GLOBALS['CFG']['logquestionerrors']) && 
+            (count($question->getErrors()) > 0 || count($this->silenterrors) > 0) &&
+            (time() - $question->getQuestionLastMod()) > 10000
+        ) {
+            // only log if hasn't been edited in a few hours
+            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
+                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
+            $stm = $this->dbh->prepare($query);
+            $stm->execute([
+                $this->questionParams->getDbQuestionSetId(),
+                $this->questionParams->getQuestionSeed(),
+                0,
+                time(),
+                implode('; ', $question->getErrors()) . '; ' . implode('; ', $this->silenterrors)
+            ]);
+        }
 
         return $question;
     }
@@ -185,21 +203,27 @@ class QuestionGenerator
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
                                      int $errline, array $errcontext = []): bool
     {
-        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+        if ($errstr == 'Trying to access array offset on value of type null') {
+            $errstr = 'Trying to access array offset of undefined variable';
+        }
 
         $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
         if (E_ERROR == $errno || (E_WARNING == $errno &&
             (
-                ($showallerrors || $errstr != 'Trying to access array offset on value of type null') &&
+                ($showallerrors || $errstr != 'Trying to access array offset of undefined variable') &&
                 ($showallerrors || empty($GLOBALS['CFG']['suppress_question_warning_display']))
             )
         )) {
-          if ($errstr == 'Trying to access array offset on value of type null') {
-            $errstr = 'Trying to access array offset of undefined variable';
-          }
+          ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+
           $this->addError(sprintf(
               _('Caught warning in the question code: %s on line %d in file %s'),
-              $errstr, $errline, $errfile));
+              $errstr, $errline, basename($errfile)));
+        } else if (E_WARNING == $errno) {
+            // log warnings that have been silenced
+            $this->silenterrors[] = sprintf(
+                _('Caught warning in the question code: %s on line %d in file %s'),
+                $errstr, $errline, basename($errfile));
         }
 
         // True = Don't execute the PHP internal error handler.

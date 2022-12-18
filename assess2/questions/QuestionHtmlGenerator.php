@@ -896,25 +896,10 @@ class QuestionHtmlGenerator
             $externalReferences
         );
 
+        $question->setQuestionLastMod($quesData['lastmoddate']);
+
         if (isset($onGetQuestion) && is_callable($onGetQuestion)) {
             $onGetQuestion();
-        }
-
-        if (!empty($GLOBALS['CFG']['logquestionerrors']) && 
-            count($this->errors) > 0 &&
-            (time() - $quesData['lastmoddate']) > 10000
-        ) {
-            // only log if hasn't been edited in a few hours
-            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
-                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
-            $stm = $this->dbh->prepare($query);
-            $stm->execute([
-                $this->questionParams->getDbQuestionSetId(),
-                $this->questionParams->getQuestionSeed(),
-                0,
-                time(),
-                implode('; ', $this->errors)
-            ]);
         }
 
         return $question;
