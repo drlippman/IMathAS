@@ -592,11 +592,11 @@ function gbtable() {
 
 	$cats = array();
 	$catcolcnt = 0;
-	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, calctype
+	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, hidden, calctype
 	if (in_array(0,$category)) {  //define default category, if used
 		$cats[0] = explode(',',$defaultcat);
 		if (!isset($cats[0][6])) {
-			$cats[0][6] = ($cats[0][4]==0)?0:1;
+			$cats[0][6] = ($cats[0][3]==0)?0:1;
 		}
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);
@@ -1752,6 +1752,11 @@ function gbtable() {
 				unset($cattotcur[$ln][$category[$i]][$col]);
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) {
+				if (!empty($sectionlimit[$col]) && 
+					(empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
+				) {
+                    continue; // don't zero out section limited
+                }
 				if ($cntingb[$i] == 1) {
 					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
@@ -1839,6 +1844,11 @@ function gbtable() {
 				unset($cattotcur[$ln][$category[$i]][$col]);
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0])) {
+                if (!empty($sectionlimit[$col]) && 
+					(empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
+				) {
+                    continue; // don't zero out section limited
+                }
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;

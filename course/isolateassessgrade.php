@@ -457,7 +457,7 @@
 				echo "&nbsp;(IP)";
 			} else 	if ($UA==1) {
 				echo "&nbsp;(UA)";
-			} else	if ($isOvertime) {
+			} else	if (!empty($isOvertime)) {
 				echo "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo "&nbsp;(PT)";

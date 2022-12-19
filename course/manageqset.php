@@ -11,7 +11,9 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Question Sets";
 $helpicon = "";
-
+if (!isset($courseUIver)) {
+    $courseUIver = 2;
+}
 //data manipulation here
 $isadmin = false;
 $isgrpadmin = false;
@@ -513,12 +515,12 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; "._("Change Question License/Attribution");
 
-			$clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
-
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
-			}
+			} else {
+                $clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+            }
 		}
 
 	} else if (isset($_POST['chgrights'])) {
@@ -740,6 +742,7 @@ if ($myrights<20) {
 		$llist = implode(',', array_map('intval', explode(',',$searchlibs)));
 
 		$libsortorder = array();
+        $lnamesarr = array();
 		if (substr($searchlibs,0,1)=="0") {
 			$lnamesarr[0] = "Unassigned";
 			$libsortorder[0] = 0;

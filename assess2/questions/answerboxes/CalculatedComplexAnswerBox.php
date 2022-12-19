@@ -114,7 +114,10 @@ class CalculatedComplexAnswerBox implements AnswerBox
         }
 
         if ($answer !== '' && !is_array($answer)) {
-            $sa = makeprettydisp( $answer);
+            if (in_array('allowplusminus', $ansformats)) {
+                $answer = str_replace('+-','pm',$answer);
+            }
+            $sa = makeprettydisp($answer);
         }
 
         // Done!

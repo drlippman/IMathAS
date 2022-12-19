@@ -1561,14 +1561,16 @@ class DrawingScorePart implements ScorePart
                             }
                         }
                     } else if($pts[0]<10.5){//quadratic
-                        $aUser = ($pts[4] - $pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
-                        $yatpt5 = $aUser*($pts[5]-$pts[1])*($pts[5]-$pts[1])+$pts[2];
-                        if($yatpt5 < $pts[6]){
-                            $dir = '<';
-                        } else {
-                            $dir = '>';
+                        if ($pts[3]!=$pts[1]) {
+                            $aUser = ($pts[4] - $pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
+                            $yatpt5 = $aUser*($pts[5]-$pts[1])*($pts[5]-$pts[1])+$pts[2];
+                            if($yatpt5 < $pts[6]){
+                                $dir = '<';
+                            } else {
+                                $dir = '>';
+                            }
+                            $ineqlines[$k] = array('y',$dir,$pts[0],$aUser,$pts[1],$pts[2]);
                         }
-                        $ineqlines[$k] = array('y',$dir,$pts[0],$aUser,$pts[1],$pts[2]);
                     } else { //abs 
                         if ($pts[3]!=$pts[1]) {
                             $slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);

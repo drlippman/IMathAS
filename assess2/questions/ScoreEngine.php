@@ -148,8 +148,6 @@ class ScoreEngine
                 . $t->getMessage()
                 . ' on line '
                 . $t->getLine()
-                . ' of '
-                . basename($t->getFile())
               );
         }
 
@@ -268,6 +266,13 @@ class ScoreEngine
             $additionalVarsForScoring[$optionKey] = ${$optionKey};
         }
 
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            if (isset($onBeforeScoreQuestion) && is_callable($onBeforeScoreQuestion)) {
+                $onBeforeScoreQuestion();
+            }
+        }
+
         /*
          * Score the student's answers.
          *
@@ -296,11 +301,8 @@ class ScoreEngine
             }
         }
 
-        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
-            if (function_exists('onScoreQuestionResult')) {
-                $scoreResult = onScoreQuestionResult($scoreResult, $varsForScorepart, $additionalVarsForScoring);
-            }
+        if (function_exists('onScoreQuestionResult')) {
+            $scoreResult = onScoreQuestionResult($scoreResult, $varsForScorepart, $additionalVarsForScoring);
         }
 
         restore_error_handler();
@@ -612,6 +614,7 @@ class ScoreEngine
         $partLastAnswerAsGiven = array();
         $partLastAnswerAsNumber = array();
         $partCorrectAnswerWrongFormat = array();
+
         if (isset($answeights)) {
             if (!is_array($answeights)) {
                 $answeights = explode(",",$answeights);
@@ -627,6 +630,9 @@ class ScoreEngine
                     return evalbasic($v);
                 }
             }, $answeights);
+            if (array_sum($answeights)==0) {
+                $answeights = array_fill(0, count($anstypes), 1);
+            }
         } else {
             if (count($anstypes)>1) {
                 $answeights = array_fill(0, count($anstypes), 1);
@@ -634,7 +640,7 @@ class ScoreEngine
                 $answeights = array(1);
             }
         }
-        
+
         $scoremethodwhole = '';
         if (isset($scoremethod)) {
             if (!is_array($scoremethod)) {
@@ -670,7 +676,7 @@ class ScoreEngine
               $scorePartResult = $scorePart->getResult();
             } catch (\Throwable $t) {
                 $this->addError(
-                    _('Caught error while evaluating the code in this question: ')
+                    _('Caught error while scoring parts in this question: ')
                     . $t->getMessage()
                     . ' on line '
                     . $t->getLine()

@@ -23,6 +23,7 @@ class Question
     private $correctAnswersForParts;
     private $externalReferences;
     private $extraData;
+    private $questionLastMod;
 
     private $errors = array();
 
@@ -205,5 +206,24 @@ class Question
     {
         $this->extraData = $extraData;
         return $this;
+    }
+
+    /**
+     * Get last date question was modified.
+     *
+     * @return int timestamp.
+     */
+    public function getQuestionLastMod(): int
+    {
+        return $this->questionLastMod;
+    }
+
+    /**
+     * Set last date question was modified.
+     * @param int timestamp
+     */
+    public function setQuestionLastMod($time): void
+    {
+        $this->questionLastMod = $time;
     }
 }

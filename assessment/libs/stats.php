@@ -77,6 +77,7 @@ function variance($a,$w=null) {
 		echo 'stdev/variance expects an array';
 		return false;
 	}
+    if (count($a)<2) { return 0; }
   $useW = false;
   if (is_array($w)) {
     if (count($a) != count($w)) {
@@ -1811,7 +1812,7 @@ function invchi2cdf($cdf,$a) {
 	  $s5 = ($c13 + $c21 + $a2 + $c * ($c18 + $c26 * $a2))/$c37;
 	  $s6 = ($c16 + $c*($c23 + $c16*$c))/$c38;
 	  $ch = $ch + $t*(1.0 + 0.5*$t*$s1 - $b*$c * ($s1-$b*($s2-$b*($s3-$b*($s4-$b*($s5-$b*$s6))))));
-	  if ($e < abs($q/$ch - 1.0)) {
+	  if ($e > abs($q/$ch - 1.0)) {
 		  $x = $ch;
 		  return ($x);
 	  }

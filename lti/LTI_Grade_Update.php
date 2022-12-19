@@ -59,7 +59,7 @@ class LTI_Grade_Update {
         $this->failures[$platform_id] = intval(substr($row['token'],6));
       }
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
-      $stm->execute(array($platform_id, $scope));
+      $stm->execute(array($platform_id, $scopehash));
       return false;
     } else {
       $row['failed'] = (substr($row['token'],0,6)==='failed');
@@ -267,7 +267,7 @@ class LTI_Grade_Update {
     $error = curl_error($ch);
     curl_close ($ch);
 
-    if (isset($token_data['access_token'])) {
+    if (!empty($token_data['access_token'])) {
       $this->store_access_token($platform_id, $token_data);
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
