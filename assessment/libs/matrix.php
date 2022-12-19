@@ -138,7 +138,17 @@ function matrixdisplaytable() {
     return "";
   }
   $m = $args[0];
+	
+  if(!is_array($m)) {
+      echo "First argument is not a matrix.<br/>";
+      return "";
+  }
 
+  if(!is_array($m[0])) {
+      echo "First row is not an array.<br/>";
+      return "";
+  }
+	
   // matrixname
   if(isset($args[1])) {
     $matrixname = $args[1];
