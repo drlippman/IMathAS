@@ -104,6 +104,7 @@ $LTIsecrets = array();
 $cntsuccess = 0;
 $cntfailure = 0;
 $cntgiveup = 0;
+$tokensQueued = [];
 $round2 = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "reading record ".$row['hash'].'<br/>';
@@ -138,23 +139,26 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$updater1p3->update_sendon($row['hash'], $platformid);
 			}
 		} else {
-			debuglog('queing token request for '.$row['hash']. ' on platform '.$platformid);
-			// we need to get a token, so add a token request
-			$platforminfo = $updater1p3->get_platform_info($platformid);
-			$RCX->addRequest(
-				$platforminfo['auth_token_url'],  //url to request
-				array( 		//post data; will get transformed before send
-					'ver' => 'LTI1.3',
-					'action' => 'gettoken',
-					'platformid' => $platformid,
-					'platforminfo' => $platforminfo
-				),
-				null, //no special callback
-				array( 	  //user-data; will get passed to response
-					'action' => 'gettoken',
-					'platformid' => $platformid
-				)
-			);
+			if (!in_array($platformid, $tokensQueued)) { // only request token once per platform
+				debuglog('queing token request for '.$row['hash']. ' on platform '.$platformid);
+				// we need to get a token, so add a token request
+				$platforminfo = $updater1p3->get_platform_info($platformid);
+				$RCX->addRequest(
+					$platforminfo['auth_token_url'],  //url to request
+					array( 		//post data; will get transformed before send
+						'ver' => 'LTI1.3',
+						'action' => 'gettoken',
+						'platformid' => $platformid,
+						'platforminfo' => $platforminfo
+					),
+					null, //no special callback
+					array( 	  //user-data; will get passed to response
+						'action' => 'gettoken',
+						'platformid' => $platformid
+					)
+				);
+				$tokensQueued[] = $platformid;
+			}
 			// add original ltiqueue to round 2, to process after first round is done
 			$round2[] = $row;
 		}
