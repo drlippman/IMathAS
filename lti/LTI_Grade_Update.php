@@ -267,7 +267,7 @@ class LTI_Grade_Update {
     $error = curl_error($ch);
     curl_close ($ch);
 
-    if (isset($token_data['access_token'])) {
+    if (!empty($token_data['access_token'])) {
       $this->store_access_token($platform_id, $token_data);
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];

@@ -216,7 +216,9 @@ if (count($round2)>0 &&  $timeused < 40) {
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade'])
+						'grade' => max(0, $row['grade']),
+                        'isstu' => $row['isstu'],
+                        'addedon' => $row['addedon']
 					),
 					null, //no special callback
 					array( 	  //user-data; will get passed to response
