@@ -60,7 +60,7 @@ if ($istutor) {
   }
 }
 // get question point values for retotal later
-$assess_info->loadQuestionSettings('all', false, false);
+$assess_info->loadQuestionSettings('all', true, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
