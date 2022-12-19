@@ -235,14 +235,23 @@ Class RollingCurlX {
         curl_multi_add_handle($multi_handle, $ch);
 
         //add curl handle of a new request to the request map
-        $ch_hash = (string) $ch;
+        if (is_resource($ch)) { //php7
+            $ch_hash = (string) $ch;
+        } else { // php 8
+            $ch_hash = spl_object_id($ch);
+        }
+        
         $requests_map[$ch_hash] = $request_num;
     }
 
 
     private function process_request($completed, $multi_handle, array &$requests_map) {
         $ch = $completed['handle'];
-        $ch_hash = (string) $ch;
+        if (is_resource($ch)) { //php7
+            $ch_hash = (string) $ch;
+        } else { // php 8
+            $ch_hash = spl_object_id($ch);
+        }
         $request =& $this->requests[$requests_map[$ch_hash]]; //map handler to request index to get request info
 
         $request_info = curl_getinfo($ch);

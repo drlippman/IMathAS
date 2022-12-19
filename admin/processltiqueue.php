@@ -160,30 +160,33 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 	} else {
 		// LTI 1.1 update
-		list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:', $row['sourcedid']);
-		$secret = '';
-		if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
-			debuglog('queing 1.1 request for '.$row['hash']);
-			$grade = min(1, max(0, $row['grade']));
-			$RCX->addRequest(
-				$ltiurl,  //url to request
-				array( 		//post data; will get transformed before send
-					'ver' => 'LTI1.1',
-					'action' => 'update',
-					'key' => $ltikey,
-					'keytype' => $keytype,
-					'url' => $ltiurl,
-					'sourcedid' => $lti_sourcedid,
-					'grade' => $grade
-				),
-				null, //no special callback
-				array( 	  //user-data; will get passed to response
-					'hash' => $row['hash'],
-					'sendon' => $row['sendon'],
-					'lasttry' => ($row['failures']>=6)
-				)
-			);
-		}
+        $sourcedid_parts = explode(':|:', $row['sourcedid']);
+        if (count($sourcedid_parts)==4) {
+		    list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = $sourcedid_parts;
+            $secret = '';
+            if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
+                debuglog('queing 1.1 request for '.$row['hash']);
+                $grade = min(1, max(0, $row['grade']));
+                $RCX->addRequest(
+                    $ltiurl,  //url to request
+                    array( 		//post data; will get transformed before send
+                        'ver' => 'LTI1.1',
+                        'action' => 'update',
+                        'key' => $ltikey,
+                        'keytype' => $keytype,
+                        'url' => $ltiurl,
+                        'sourcedid' => $lti_sourcedid,
+                        'grade' => $grade
+                    ),
+                    null, //no special callback
+                    array( 	  //user-data; will get passed to response
+                        'hash' => $row['hash'],
+                        'sendon' => $row['sendon'],
+                        'lasttry' => ($row['failures']>=6)
+                    )
+                );
+            }
+        }
 	}
 }
 
