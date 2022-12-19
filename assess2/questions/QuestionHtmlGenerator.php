@@ -212,6 +212,8 @@ class QuestionHtmlGenerator
               . $t->getMessage()
               . ' on line '
               . $t->getLine()
+              . ' of '
+              . basename($t->getFile())
           );
 
         }

@@ -2140,6 +2140,7 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 		$arrayout = true;
 	}
 	$out = array();
+
 	foreach ($aarr as $a) {
         $a = str_replace(',','',$a);
         if ($a === 'DNE') {
@@ -2158,7 +2159,8 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 		} else {
 			$scinot = '';
 		}
-		if ($a==0) { return 0;}
+		if ($a==0) { $out[] = 0; continue;}
+        if (!is_numeric($a)) { $out[] = $a; continue;}
 		if ($a < 0 ) {
 			$sign = '-';
 			$a *= -1;
