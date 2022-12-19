@@ -267,13 +267,13 @@ class LTI_Grade_Update {
     $error = curl_error($ch);
     curl_close ($ch);
 
-    if (!empty($token_data['access_token']) && !empty($token_data['scope']) && !empty($token_data['expires_in'])) {
+    if (!empty($token_data['access_token']) && !empty($token_data['expires_in'])) {
       $this->store_access_token($platform_id, $token_data);
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
     } else {
         // record failure
-      $this->token_request_failure($platform_id, implode(' ', $scopes));
+      $this->token_request_failure($platform_id);
       $this->debuglog('token request error '.$error);
       return false;
     }
@@ -286,9 +286,12 @@ class LTI_Grade_Update {
    * @return void
    */
   public function store_access_token(int $platform_id, array $token_data): void {
+    /*  we know what the scope is here, so skip this
     $scopes = explode(' ', $token_data['scope']);
     sort($scopes);
     $scopehash = md5(implode('|',$scopes));
+    */
+    $scopehash = md5('https://purl.imsglobal.org/spec/lti-ags/scope/score');
     $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
     $stm->execute(array($platform_id, $scopehash, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
     $this->access_tokens[$platform_id] = array(
@@ -340,7 +343,7 @@ class LTI_Grade_Update {
    * @param  int    $platform_id
    * @param  string $scopes
    */
-  public function token_request_failure(int $platform_id, string $scopes) {
+  public function token_request_failure(int $platform_id) {
         if (isset($this->failures[$platform_id])) {
             $failures = $this->failures[$platform_id]++;
         } else {
@@ -348,7 +351,7 @@ class LTI_Grade_Update {
         }
         $token_data = [
             'access_token' => 'failed'.$failures,
-            'scope' => $scopes,
+            'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score',
             'expires_in' => min(pow(3, $failures-1), 24*60*60)
         ];
         // store failure
