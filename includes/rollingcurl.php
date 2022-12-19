@@ -139,7 +139,7 @@ Class RollingCurlX {
                 while(
                     $num_outstanding < $this->_maxConcurrent && //under the limit
                     $i < count($this->requests) && isset($this->requests[$i]) && //have requests
-                    ($this->_stopAddingTimetime==0 || time() - $startexectime < $this->_stopAddingTime) // within time constrains
+                    ($this->_stopAddingTime==0 || time() - $startexectime < $this->_stopAddingTime) // within time constrains
                 ) {
                     $this->init_request($i, $multi_handle, $requests_map);
                     $num_outstanding++;
