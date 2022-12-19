@@ -119,7 +119,7 @@ function draw_angle() {
   $labAng = ($labAngArray[$GLOBALS['RND']->rand(0,count($labAngArray)-1)]*90-45)*M_PI/180;
   [$xLabLoc,$yLabLoc] = [$labFact*cos($labAng),$labFact*sin($labAng)];
 
-  $altAngleLab = numtowords($lab);
+  $altAngleLab = $lab;
   $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
   $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
   $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
@@ -1011,6 +1011,12 @@ function draw_square() {
   $hasBase = false;
   $hasHeight = false;
   $hasUserAltText = false;
+  $baseKey = "";
+  $heightKey = "";
+  $pointKey = "";
+  $altPoint = "";
+  $altBase = "";
+  $altHeight = "";
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -1021,6 +1027,9 @@ function draw_square() {
   $hasPoints = false;
   $size = 300;
   foreach ($argsArray as $key => $in) {
+    if (empty($in) || count($in) == 0) {
+      $in = ["",""];
+    }
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -1044,10 +1053,11 @@ function draw_square() {
     }
   }
   
-  if ($hasBase === true || !isset($argsArray[$baseKey][1])) {
+  //echo $baseKey . $argsArray[$baseKey][1];
+  if (!isset($argsArray[$baseKey][1])) {
     $argsArray[$baseKey][1] = "";
   }
-  
+  //echo $baseKey . $argsArray[$baseKey][1];
   if (!isset($argsArray[$heightKey][1])) {
     $argsArray[$heightKey][1] = "";
   }
@@ -1320,7 +1330,6 @@ function draw_triangle() {
   foreach ($argsArray as &$row) {
     $row = preg_replace(['/(angle)$/','/(side)$/','/(point)$/','/(median)$/','/(bisector)$/','/(altitude)$/'],'$1s',$row);
   }
-  
   $noAngles = true;
   $noSides = true;
   $rotateTriangleBy = 0;
@@ -1335,10 +1344,21 @@ function draw_triangle() {
   $hasAltMarks = false;
   $hasAltitude = false;
   $hasSize = false;
+  $sideKey = "";
+  $bisectorKey = "";
+  $pointKey = "";
+  $medianKey = "";
+  $altitudeKey = "";
+  $hasAltSidLab = false;
   $hasUserAltText = false;
   $size = 350;
   $args = '';
   
+  foreach ($argsArray as $key => $in) {
+    if (empty($in) || count($in) == 0) {
+      unset($argsArray[$key]);
+    }
+  }
   foreach ($argsArray as $in) {
     if ($in[0]=="angles") {
       $noAngles = false;
@@ -1451,10 +1471,10 @@ function draw_triangle() {
       
       /////// Important: Indices must be changed because unshift was used. ///////
       $sideKey = $sideKey + 1;
-      $bisectorKey = $bisectorKey + 1;
-      $pointKey = $pointKey + 1;
-      $medianKey = $medianKey + 1;
-      $altitudeKey = $altitudeKey + 1;
+      if (is_numeric($bisectorKey)) {$bisectorKey = $bisectorKey + 1;}
+      if (is_numeric($pointKey)) {$pointKey = $pointKey + 1;}
+      if (is_numeric($medianKey)) {$medianKey = $medianKey + 1;}
+      if (is_numeric($altitudeKey)) {$altitudeKey = $altitudeKey + 1;}
       $noAngles = false;
     }
     if ($rotateTriangle === true) {
@@ -1520,6 +1540,8 @@ function draw_triangle() {
           }
           // Get the side mark symbols
           $sideMarkTmp = array_slice($argsArray[$sideKey],7,3);
+        } else {
+          $sideMarkTmp = ["","",""];
         }
         if (isset($argsArray[$angleKey][4])) {
           $hasArcs = true;
@@ -1533,6 +1555,11 @@ function draw_triangle() {
         }
         // These are the side lengths from which to build the angles
         $sid = array_slice($argsArray[$sideKey],1,3);
+        for ($i=1; $i<4; $i++) {
+          if (!isset($argsArray[$sideKey][$i]) || !is_numeric($argsArray[$sideKey][$i])) {
+            $sid[$i-1] = 0;
+          }
+        }
         $sidLabTmp = array_slice($argsArray[$sideKey],4,3);
         $hasSidLabTmp = true;
         $angTmp = array_slice($argsArray[$angleKey],1,3);
@@ -1552,6 +1579,11 @@ function draw_triangle() {
     // Has sides, but no angles
     if ($noSides === false && $noAngles === true) {
       $sid = array_slice($argsArray[$sideKey],1,3);
+      for ($i=1; $i<4; $i++) {
+        if (!isset($argsArray[$sideKey][$i]) || !is_numeric($argsArray[$sideKey][$i])) {
+          $sid[$i-1] = 0;
+        }
+      }
       if (isset($argsArray[$sideKey][7])) {
         $hasMarks = true;
       }
@@ -1564,7 +1596,8 @@ function draw_triangle() {
       }
       for ($i=7;$i<10;$i++) {
         if (!isset($argsArray[$sideKey][$i])) {
-          $argsArray[$sideKey][$i] = '';
+          //$argsArray[$sideKey][$i] = '';
+          $sideMarkTmp[$i] = '';
         } else {
           $sideMarkTmp[$i] = $argsArray[$sideKey][$i];
         }
@@ -1776,7 +1809,7 @@ function draw_triangle() {
   if ($hasBisector === true) {
     $bisectors = array_slice($argsArray[$bisectorKey],1,9);
     for ($i=1;$i<10;$i++) {
-      if (!isset($bisectors[$i])) {
+      if (!isset($bisectors[$i]) || empty($bisectors[$i])) {
         $bisectors[$i] = "";
       }
     }
@@ -1809,11 +1842,12 @@ function draw_triangle() {
   // DRAW MEDIANS
   if ($hasMedian === true) {
     $medians = array_slice($argsArray[$medianKey],1,9);
-    for ($i=1;$i<10;$i++) {
-      if (!isset($medians[$i])) {
+    for ($i=0;$i<9;$i++) {
+      if (!isset($medians[$i]) || empty($medians[$i])) {
         $medians[$i] = "";
       }
     }
+
     $medRat = $xyDiff/5;
     for ($i=0;$i<3;$i++) {
       if ($medians[$i]==1) {
@@ -1833,7 +1867,9 @@ function draw_triangle() {
     // Labels endpoints of medians
     for ($i=0;$i<3;$i++) {
       $medians[$i+6] = preg_replace('/;/',',',$medians[$i+6]);
-      $args = $args."text([{$medPtLabLoc[$i][0]},{$medPtLabLoc[$i][1]}],'".$medians[($i+6)]."');";
+      if (!empty($medPtLabLoc[$i])) {
+        $args = $args."text([{$medPtLabLoc[$i][0]},{$medPtLabLoc[$i][1]}],'".$medians[($i+6)]."');";
+      }
     }
   } else {
     $medians = [0,0,0,0,0,0,0,0,0];
@@ -1930,13 +1966,20 @@ function draw_triangle() {
   }
     
   // PLACE SIDE TICK MARKS
-  $markNum = ["|" => 1, "||" => 2, "|||" => 3];
-  $markType = array_slice($argsArray[$sideKey],4,3);
-  for ($i=0;$i<3;$i++) {
-    if (!isset($markNum[$markType[$i]])) { // invalid mark
-        $hasMarks = false; 
+  $markNum = ["|" => 1, "||" => 2, "|||" => 3, "none" => "no"];
+  if ($hasMarks === true) {
+    for ($i=4; $i<7; $i++) {
+      if (!isset($argsArray[$sideKey][$i]) || !in_array($argsArray[$sideKey][$i], array_keys($markNum))) {
+        $argsArray[$sideKey][$i] = "none";
+      }
     }
   }
+  $markType = array_slice($argsArray[$sideKey],4,3);
+  //for ($i=0;$i<3;$i++) {
+    //if (!isset($markNum[$markType[$i]])) { // invalid mark
+      //  $hasMarks = false; 
+    //}
+  //}
   if ($hasMarks === true) {
     // Half the length of the tick mark
     $markRat = $xyDiff/25;
@@ -1985,10 +2028,19 @@ function draw_triangle() {
   }
   
   // PLACE ANGLE ARCS
+  $arcNum = ["(" => 1, ")" => 1, "((" => 2, "))" => 2, "(((" => 3, ")))" => 3, "none" => "no"];
   if ($hasArcs === true) {
-    $arcType = array_slice($argsArray[$angleKey],7,3);
+    for ($i=7; $i<10; $i++) {
+      if (!isset($argsArray[$angleKey][$i]) || !in_array($argsArray[$angleKey][$i], array_keys($arcNum))) {
+        $argsArray[$angleKey][$i] = "none";
+      }
+    }
+  }
+  $arcType = array_slice($argsArray[$angleKey],7,3);
+  
+  if ($hasArcs === true) {
     $rArc = [0.18*$xyDiff,0.14*$xyDiff,0.10*$xyDiff];
-    $arcNum = ["(" => 1, "((" => 2, "(((" => 3];
+    
     
     // Rotate to make one side flat
     $flatAng = M_PI/2 - $angRad[0] - $angRad[1];
@@ -2148,7 +2200,9 @@ function draw_triangle() {
             if ($medians[$i] == 1) {
               $altMedLab[$i] = (!empty($medians[$i+3])) ? " labeled ".$medians[$i+3]." " : "";
               $altMedPtLab[$i] = (!empty($medians[$i+6])) ? " at point ".$medians[$i+6] : "";
-              $alt .= ($altitudes[$i] == 1) ? " a" : " A";
+              if ($hasAltitude === true) {
+                $alt .= ($altitudes[$i] == 1) ? " a" : " A";
+              }
               $alt .= " median".$altMedLab[$i]." is drawn from that side".$altMedPtLab[$i]." to its opposite vertex";
               $alt .= ($bisectors[$i] == 1) ? ", and" : ".";
             }
@@ -2190,6 +2244,8 @@ function draw_polygon() {
   $hasPoints = false;
   $hasSides = false;
   $noRotate = false;
+  $hasSideLab = false;
+  $hasPointLab = false;
   $size = 300;
   $rotatePolygon = false;
   $hasUserAltText = false;
@@ -2303,7 +2359,7 @@ function draw_polygon() {
       // Midpoint of ith side
       $midPt[$i] = [($x[$i]+$x[($i+1)%$n])/2,($y[$i]+$y[($i+1)%$n])/2];
       $sidLabLoc[$i] = [$midPt[$i][0]-0.15*($y[$i]-$y[($i+1)%$n])/sqrt(pow($x[$i]-$x[($i+1)%$n],2)+pow($y[$i]-$y[($i+1)%$n],2)),$midPt[$i][1]+0.15*($x[$i]-$x[($i+1)%$n])/sqrt(pow($x[$i]-$x[($i+1)%$n],2)+pow($y[$i]-$y[($i+1)%$n],2))];
-      $args = $args . "text([{$sidLabLoc[$i][0]},{$sidLabLoc[$i][1]}],'".$sidLab[$i]."');";
+      $args .= (isset($sidLab[$i])) ? "text([{$sidLabLoc[$i][0]},{$sidLabLoc[$i][1]}],'".$sidLab[$i]."');" : "";
     }
   }
   if ($hasPoints === true) {
@@ -2373,6 +2429,8 @@ function draw_prismcubes() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $labels = ["","",""];
+  $hasLabels = false;
   $hasUserAltText = false;
 
   foreach ($input as $list) {
@@ -2418,14 +2476,23 @@ function draw_prismcubes() {
       $size = $in[1];
     }
     if ($in[0]=="labels") {
+      //for ($i=1; $i<4; $i++) {
+        //if (empty($in[$i]) || !isset($in[$i])) {
+          //$in[$i] = "";
+        //}
+      //}
       $labels = array_slice($in,1,3);
-      $edgeDescription = ["the front bottom edge of the prism from left to right is labeled ","the rear vertical edge from top to bottom is labeled ","the right bottom edge from front to back is labeled "];
+      $edgeDescription = ["the front bottom edge of the prism from left to right is ","the rear vertical edge from top to bottom is ","the right bottom edge from front to back is "];
+      $altLab = ["","",""];
       for ($i=0;$i<3;$i++) {
         if (!isset($labels[$i])) {
           $labels[$i] = '';
         }
+        
         if (!empty($labels[$i])) {
-          $altLab[$i] .= $edgeDescription[$i].$labels[$i];
+          $altLab[$i] .= $edgeDescription[$i] . "labeled " . $labels[$i];
+        } else {
+          $altLab[$i] .= $edgeDescription[$i] . "unlabeled";
         }
       }
       if (!empty($altLab)) {
@@ -3067,6 +3134,13 @@ function draw_pyramid() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  [$hasSlant1,$hasSlant2] = [false,false];
+  $inverted = false;
+  $hasLengthLab = false;
+  $hasHeight = false;
+  $hasWidthLab = false;
+  $hasFill = false;
+  $fillPercent = 0;
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -3094,9 +3168,9 @@ function draw_pyramid() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
-      if (!is_numeric($in[1])) {
+      if (isset($in[1]) && !is_numeric($in[1])) {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
-      } elseif (is_numeric($in[1])) {
+      } elseif (isset($in[1]) && is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
           echo 'Eek! Fill percent must be between 0 and 100.';
           return '';
@@ -3105,16 +3179,17 @@ function draw_pyramid() {
       }
     }
   }
-  if ((is_numeric($argsArray[0][0]) && !(is_numeric($argsArray[1][0]) && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[1][0]) && !(is_numeric($argsArray[0][0]) 
-  && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[2][0]) && !(is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0])))) {
-    echo 'Warning! Must give length, width and height.';
-  }
-  if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0 && is_numeric($argsArray[2][0]) && $argsArray[2][0]>0) {
-    $length = $argsArray[0][0];
-    $width = $argsArray[1][0];
-    $height = $argsArray[2][0];
-  } else {
-    [$length,$width,$height] = diffrands(3,8,3);
+  [$length,$width,$height] = diffrands(3,8,3);
+  if (array_key_exists(0,$argsArray) && array_key_exists(1,$argsArray) && array_key_exists(2,$argsArray)) {
+    if ((is_numeric($argsArray[0][0]) && !(is_numeric($argsArray[1][0]) && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[1][0]) && !(is_numeric($argsArray[0][0]) 
+    && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[2][0]) && !(is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0])))) {
+      echo 'Warning! Must give length, width and height.';
+    }
+    if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0 && is_numeric($argsArray[2][0]) && $argsArray[2][0]>0) {
+      $length = $argsArray[0][0];
+      $width = $argsArray[1][0];
+      $height = $argsArray[2][0];
+    }
   }
   // Set the window dimensions
   // Check for a good view angle with visAng
@@ -3506,6 +3581,7 @@ function draw_polyomino() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $getdata = false;
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -3540,7 +3616,7 @@ function draw_polyomino() {
       }
     }
   }
-  if (is_numeric($argsArray[0][0])) {
+  if (isset($argsArray[0][0]) && is_numeric($argsArray[0][0])) {
     $squares = $argsArray[0][0]-1;
     if ($squares > 99 || $squares < 0 || !is_int($squares)) {
       echo "Number of squares should be an integer in the range [1,100].";
@@ -3593,7 +3669,9 @@ function draw_polyomino() {
   }
   $emptycount = count($empty)-1;
   // $knownempty contains the empty squares that are connected to the rectangular boundary
-  $knownempty = [$empty[0]];
+  if (count($empty) > 0) {
+    $knownempty = [$empty[0]];
+  }
   for ($i=0; $i <= $emptycount; $i++) {
     // $check contains the points up, down, left and right of $empty[$i]
     $check = [[$empty[$i][0]+1,$empty[$i][1]],[$empty[$i][0]-1,$empty[$i][1]],[$empty[$i][0],$empty[$i][1]+1],[$empty[$i][0],$empty[$i][1]-1]];
