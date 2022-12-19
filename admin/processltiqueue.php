@@ -324,6 +324,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 				// record failure. in round 2 token will be read as not valid
 				$updater1p3->token_request_failure($user_data['platformid']);
 				debuglog('token request failure t1 '.$user_data['platformid']);
+                return;
 			}
 			$token_data = json_decode($response, true);
 			if (isset($token_data['access_token'])) {
