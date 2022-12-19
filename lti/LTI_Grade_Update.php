@@ -273,12 +273,8 @@ class LTI_Grade_Update {
       return $token_data['access_token'];
     } else {
         // record failure
-      $this->token_request_failure($platform_id);
+      $this->token_request_failure($platform_id, implode(' ', $scopes));
       $this->debuglog('token request error '.$error);
-      if (isset($token_data['access_token'])) {
-        $this->debuglog('malformed access token: ' . print_r($token_data, true));
-        error_log('malformed access token: ' . print_r($token_data, true));
-      }
       return false;
     }
   }
@@ -342,8 +338,9 @@ class LTI_Grade_Update {
   /**
    * Handle token request failure.  Store failure.
    * @param  int    $platform_id
+   * @param  string $scopes
    */
-  public function token_request_failure(int $platform_id) {
+  public function token_request_failure(int $platform_id, string $scopes) {
         if (isset($this->failures[$platform_id])) {
             $failures = $this->failures[$platform_id]++;
         } else {
@@ -351,7 +348,8 @@ class LTI_Grade_Update {
         }
         $token_data = [
             'access_token' => 'failed'.$failures,
-            'expires' => time() + min(pow(3, $failures-1), 24*60*60)
+            'scope' => $scopes,
+            'expires_in' => min(pow(3, $failures-1), 24*60*60)
         ];
         // store failure
         $this->store_access_token($platform_id, $token_data);

@@ -78,7 +78,7 @@ class LTI_Service_Connector {
           // record the failure in the token store
           $token_data = [
             'access_token' => 'failed'.$failures,
-            'expires' => time() + min(pow(3, $failures-1), 24*60*60)
+            'expires_in' => min(pow(3, $failures-1), 24*60*60)
           ];
           $this->db->record_token($this->registration->get_id(), $scope_key, $token_data);
           return false;
