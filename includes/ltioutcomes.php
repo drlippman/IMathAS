@@ -81,6 +81,9 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
 function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$isstu=true) {
 	global $CFG;
 
+    if (empty($uid) || empty($sourcedid) || is_array($sourcedid)) {
+        return false;
+    }
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
 		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k

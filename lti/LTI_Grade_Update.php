@@ -147,12 +147,12 @@ class LTI_Grade_Update {
         $this->debuglog('Grade update Error:' . curl_error($ch));
         return false;
     }
-    $this->debuglog('Grade update success:' . $resp_body);
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     curl_close ($ch);
 
     $resp_headers = substr($response, 0, $header_size);
     $resp_body = substr($response, $header_size);
+    $this->debuglog('Grade update success:' . $resp_body);
     return [
         'headers' => array_filter(explode("\r\n", $resp_headers)),
         'body' => json_decode($resp_body, true),
@@ -234,7 +234,7 @@ class LTI_Grade_Update {
         $this->failures[$platform_id] = intval(substr($row['token'],6));
       }
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
-      $stm->execute(array($platform_id, $scope));
+      $stm->execute(array($platform_id, $scopehash));
     } else {
       $row['failed'] = (substr($row['token'],0,6)==='failed');
       $this->access_tokens[$platform_id] = $row;
@@ -267,14 +267,18 @@ class LTI_Grade_Update {
     $error = curl_error($ch);
     curl_close ($ch);
 
-    if (!empty($token_data['access_token'])) {
+    if (!empty($token_data['access_token']) && !empty($token_data['scope']) && !empty($token_data['expires_in'])) {
       $this->store_access_token($platform_id, $token_data);
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
     } else {
         // record failure
-        $this->token_request_failure($platform_id);
+      $this->token_request_failure($platform_id);
       $this->debuglog('token request error '.$error);
+      if (isset($token_data['access_token'])) {
+        $this->debuglog('malformed access token: ' . print_r($token_data, true));
+        error_log('malformed access token: ' . print_r($token_data, true));
+      }
       return false;
     }
   }
