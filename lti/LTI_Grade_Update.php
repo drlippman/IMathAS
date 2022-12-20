@@ -345,10 +345,11 @@ class LTI_Grade_Update {
    */
   public function token_request_failure(int $platform_id) {
         if (isset($this->failures[$platform_id])) {
-            $failures = $this->failures[$platform_id]++;
+            $this->failures[$platform_id]++;
         } else {
-            $failures = 1;
+            $this->failures[$platform_id] = 1;
         }
+        $failures = $this->failures[$platform_id];
         $token_data = [
             'access_token' => 'failed'.$failures,
             'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score',
