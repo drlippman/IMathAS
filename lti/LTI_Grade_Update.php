@@ -353,7 +353,7 @@ class LTI_Grade_Update {
         $token_data = [
             'access_token' => 'failed'.$failures,
             'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score',
-            'expires_in' => min(pow(3, $failures-1), 24*60*60)
+            'expires_in' => min(300*$failures*$failures, 24*60*60)
         ];
         // store failure
         $this->store_access_token($platform_id, $token_data);
