@@ -479,7 +479,7 @@ if (!(isset($teacherid))) {
 			$metadata['perq'] = "Removed per-question settings";
 			$updated_settings = true;
 		}
-		if ($updated_settings === true) {
+		if (!empty($updated_settings)) {
 			TeacherAuditLog::addTracking(
 				$cid,
 				"Mass Assessment Settings Change",

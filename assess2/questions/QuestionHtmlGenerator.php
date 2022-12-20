@@ -329,7 +329,8 @@ class QuestionHtmlGenerator
          */
 
         // $answerbox must not be renamed, it is expected in eval'd code.
-        $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewloc = null;
+        $answerbox = $previewloc = null;
+        $entryTips = $displayedAnswersForParts = $jsParams = [];
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.

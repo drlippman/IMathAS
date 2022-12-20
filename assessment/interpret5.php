@@ -680,7 +680,7 @@ function tokenize($str,$anstype,$countcnt) {
 					$syms[] = array('',7); //end of line;
 					$lastsym = array('',7);
 				}
-			} else if ($out[0]=='{' && $lastsym[0]=='$') { //var var
+			} else if (strlen($out)>0 && $out[0]=='{' && $lastsym[0]=='$') { //var var
 				//conditional value based on if allowed
 				$syms[count($syms)-1][0] = '((checkvarvarisallowed('.substr($out,1,-1).'))?$'.$out.':0)';
 				$connecttolast = 0;
