@@ -20,8 +20,22 @@ array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_s
 // "axes" Draws xy axes.
 function draw_angle() {
   $input = func_get_args();
+  if (empty($input)) {
+    echo "Eek! Must include an angle to draw.";
+    return '';
+  }
   $argsArray = [];
   $args = '';
+  $size = 300;
+  $rot = 0;
+  $ang = 0;
+  $hasArc = false;
+  $lab = "";
+  $direction = "";
+  $altLabel = "";
+  $altTurnsLabel = "";
+  $altAnother = "";
+  $altDegSymbol = "";
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -30,7 +44,18 @@ function draw_angle() {
     $list = array_map('trim', $list);
     $argsArray[]=$list;
   }
-  $size = 300;
+  if (is_array($argsArray[0])) {
+    if (!array_key_exists(0, $argsArray[0]) || !is_numeric($argsArray[0][0])) {
+      echo "Eek! Must include an angle to draw.";
+      return '';
+    }
+  } else {
+    if (!is_numeric($argsArray[0])) {
+      echo "Eek! Must include an angle to draw.";
+      return '';
+    }
+  }
+
   foreach ($argsArray as $in) {
     if ($in[0] == "rotate") {
       if (isset($in[1])) {
@@ -40,7 +65,11 @@ function draw_angle() {
       }
     }
     if ($in[0] == "size") {
+      if (array_key_exists(1,$in)) {
+        if (is_numeric($in[1])) {
       $size = $in[1];
+    }
+      }
     }
     if (in_array("axes",$in)) {
       $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
@@ -90,7 +119,7 @@ function draw_angle() {
   $labAng = ($labAngArray[$GLOBALS['RND']->rand(0,count($labAngArray)-1)]*90-45)*M_PI/180;
   [$xLabLoc,$yLabLoc] = [$labFact*cos($labAng),$labFact*sin($labAng)];
 
-  $altAngleLab = numtowords($lab);
+  $altAngleLab = $lab;
   $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
   $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
   $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
@@ -242,19 +271,40 @@ function draw_angle() {
 // All arguments are optional and may be used in any order
 function draw_circle() {
   $args = "circle([0,0],1);";
+  $size = 350;
   $degSymbol = "&deg;";
   $input = func_get_args();
   $argsArray = [];
+  $numPts = 0;
+  $rotAng = 0;
+  $hasAxes = false;
+  $hasAnd = false;
+  $hasCenterLabel = false;
+  $hasRadiusLabel = false;
+  $hasDiameterLabel = false;
+  $hasAngleLabel = false;
+  $hasCenter = false;
+  $hasAngle = false;
+  $hasRadius = false;
+  $hasDiameter = false;
   $hasPoint = [];
   $altAngForPt = [];
   $hasPointLabel = [];
   $altPointLab = [];
+  $altDegSymbol = "";
+  $altPointAndLabel = "";
+  $altAxes = "";
+  $altCenterLabel = "";
+  $altRadius = "";
+  $altRadiusLabel = "";
+  $altDiameter = "";
+  $altDiameterLabel = "";
+  $altAngle = "";
+  $altAngleLabel = "";
+  $altCenter = "";
   $hasUserAltText = false;
   $angleBlock = false;
-  $numPts = 0;
-  $hasAxes = false;
-  $hasCenter = false;
-  $hasDiameter = false;
+  $ang = 0;
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -263,14 +313,34 @@ function draw_circle() {
     $argsArray[]=$list;
   }
   foreach ($argsArray as $key => $in) {
-    if ($in[0]=="size" && isset($in[1])) {
-      $size = $in[1];
-    } else {
-      $size = 350;
+    if (!array_key_exists(0,$in) || trim($in[0]) === "") {
+      echo "Eek! draw_circle cannot start with an empty argument.";
+      return '';
+    }
+    
+    if ($in[0] == "size") {
+      if (array_key_exists(1,$in)) {
+        if (is_numeric($in[1])) {
+            $size = $in[1];
+        }
+      }
+    }
+
+    if ($in[0]=="angle") {
+      if (array_key_exists(1,$in)) {
+        if (is_numeric($in[1])) {
+          $ang = $in[1];
+        } else {
+            echo "Eek! Angle must be followed by a number.";
+            return '';
+        }
+      } else {
+        echo "Eek! Angle must be followed by a number.";
+        return '';
+      }
     }
     if ($in[0]=="angle" && $in[1]%360 > 315) {
       $angleBlock = true;
-      $ang = $in[1];
     }
     if (in_array("axes",$in)) {
       $hasAxes = true;
@@ -308,7 +378,6 @@ function draw_circle() {
     
     if ($in[0]=="radius") {
       $hasRadius = true;
-      $hasRadiusLabel = false;
       $lab = "";
       if (isset($in[1])) {
         $hasRadiusLabel = true;
@@ -324,7 +393,6 @@ function draw_circle() {
     
     if ($in[0]=="diameter") {
       $hasDiameter = true;
-      $hasDiameterLabel = false;
       if (!isset($in[1])) {
         $in[1] = '';
       } elseif (isset($in[1])) {
@@ -336,7 +404,6 @@ function draw_circle() {
     
     if ($in[0]=="angle") {
       $hasAngle = true;
-      $hasAngleLabel = false;
       $angleKey = $key;
       $lab = "";
       if (!isset($in[1])) {
@@ -403,22 +470,19 @@ function draw_circle() {
       $args = $args."line([0,0],[1,0]);line([0,0],[$x,$y]);";
     }
     if ($in[0]=="point") {
-      $numPts += 1;
-      $hasPoint[] = true;
-      if (!isset($in[1])) {
-        echo 'Warning! "point" must be followed by an angle in degrees.';
-      }
-      if (isset($in[1]) && is_numeric($in[1])) {
-        if ($in[1] > 360 || $in[1] < 0) {
+      if (array_key_exists(1,$in)) {
+        if (is_numeric($in[1])) {
+          $angForPt = $in[1];
+          if ($angForPt > 360 || $angForPt < 0) {
           echo 'Eek! Point angle must be between 0 and 360.';
           return '';
         }
-        $angForPt = $in[1];
+          $numPts += 1;
+          $hasPoint[] = true;
         $altAngForPt[] = $in[1];
         $xPtLoc = cos(M_PI*$angForPt/180);
         $yPtLoc = sin(M_PI*$angForPt/180);
         $args = $args."dot([$xPtLoc,$yPtLoc]);";
-      }
       $minDiff = 7;
       if (isset($in[2])) {
         $hasPointLabel[] = true;
@@ -456,6 +520,68 @@ function draw_circle() {
         $altPointLab[] = '';
         $hasPointLabel[] = false;
       }
+        } else {
+          echo "Eek! Point must be followed by a number of degrees.";
+          return '';
+    }
+      } else {
+        echo "Eek! Point must be followed by a number of degrees.";
+        return '';
+  }
+  
+      
+      
+      //if (!isset($in[1])) {
+        //echo 'Warning! "point" must be followed by an angle in degrees.';
+      //}
+      //if (isset($in[1]) && is_numeric($in[1])) {
+        //if ($in[1] > 360 || $in[1] < 0) {
+          //echo 'Eek! Point angle must be between 0 and 360.';
+          //return '';
+        //}
+        //$angForPt = $in[1];
+        //$altAngForPt[] = $in[1];
+        //$xPtLoc = cos(M_PI*$angForPt/180);
+        //$yPtLoc = sin(M_PI*$angForPt/180);
+        //$args = $args."dot([$xPtLoc,$yPtLoc]);";
+      //}
+      //$minDiff = 7;
+      //if (isset($in[2])) {
+        //$hasPointLabel[] = true;
+        //$in[2] = str_replace(';',',',$in[2]);
+        //$altPointLab[] = $in[2];
+        //if (abs($angForPt%360) < $minDiff || abs($angForPt%360-360) < $minDiff) {
+          //if ($angForPt%360 < 2*$minDiff) {
+            //$rotAng = 5;
+          //} else {
+            //$rotAng = -5;
+          //}
+        //} elseif (abs($angForPt%360-90) < $minDiff) {
+          //if ($angForPt%360>90) {
+            //$rotAng = 7;
+          //} else {
+            //$rotAng = -7;
+          //}
+        //} elseif (abs($angForPt%360-180) < $minDiff) {
+          //if ($angForPt%360>180) {
+            //$rotAng = 5;
+          //} else {
+            //$rotAng = -5;
+          //}
+        //} elseif (abs($angForPt%360-270) < $minDiff) {
+          //if ($angForPt%360>270) {
+            //$rotAng = 7;
+          //} else {
+            //$rotAng = -7;
+          //}
+        //}
+        //$xLabLoc = 1.25*cos(M_PI*($angForPt+$rotAng)/180);
+        //$yLabLoc = 1.25*sin(M_PI*($angForPt+$rotAng)/180);
+        //$args = $args . "text([$xLabLoc,$yLabLoc],'$in[2]');";
+      //} elseif (!isset($in[2])) {
+        //$altPointLab[] = '';
+        //$hasPointLabel[] = false;
+      //}
     }
   }
   
@@ -515,7 +641,7 @@ function draw_circle() {
       if ($hasDiameterLabel === true) {
         $unlabeled = "";
       }
-      $altDiameter = $andRadius." with$unlabeled diameter drawn horizontally";
+      $altDiameter = " with$unlabeled diameter drawn horizontally";
       if ($hasAnd === true) {
         $altDiameter = $altAnd.$altDiameter;
       }
@@ -587,8 +713,16 @@ function draw_circle() {
 function draw_circlesector() {
   $degSymbol = "&deg;";
   $input = func_get_args();
+  if (empty($input)) {
+    echo "Eek! draw_circlesector cannot have an empty argument.";
+    return '';
+  }
   $argsArray = [];
   $args = '';
+  $hasAxes = false;
+  $hasPoint = false;
+  $altNumPts = 0;
+  $altPointLab = "";
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -597,7 +731,6 @@ function draw_circlesector() {
     $list = array_map('trim', $list);
     $argsArray[]=$list;
   }
-  
   $angs = [];
   $xs = [];
   $ys = [];
@@ -606,8 +739,25 @@ function draw_circlesector() {
   $angleBlock = false;
   
   foreach ($argsArray as $key => $in) {
+    if (!array_key_exists(0,$in)) {
+      echo "Eek! draw_circlesector cannot start with an empty argument.";
+      return '';
+    }
+    if (array_key_exists(0,$in) && trim($in[0]) === "") {
+      echo "Eek! draw_circlesector cannot start with an empty argument.";
+      return '';
+    }
     if ($in[0]=="angle") {
       $angleKey = $key;
+      if (!array_key_exists(1,$in)) {
+        echo "Eek! \"angle\" must be followed by a number.";
+        return '';
+      } else {
+        if (!is_numeric($in[1])) {
+          echo "Eek! \"angle\" must be followed by a number.";
+          return '';
+        }
+      }
       $angs[] = $in[1];
     }
   }
@@ -632,8 +782,7 @@ function draw_circlesector() {
     echo 'Eek! "circlesector" must include "angle, no. of degrees".';
     return '';
   }
-  $altNumPts = 0;
-  $hasAxes = false;
+
   foreach ($argsArray as $key => $in) {
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
@@ -874,7 +1023,15 @@ function draw_square() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $hasBase = false;
+  $hasHeight = false;
   $hasUserAltText = false;
+  $baseKey = "";
+  $heightKey = "";
+  $pointKey = "";
+  $altPoint = "";
+  $altBase = "";
+  $altHeight = "";
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -885,6 +1042,9 @@ function draw_square() {
   $hasPoints = false;
   $size = 300;
   foreach ($argsArray as $key => $in) {
+    if (empty($in) || count($in) == 0) {
+      $in = ["",""];
+    }
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -908,10 +1068,11 @@ function draw_square() {
     }
   }
   
+  //echo $baseKey . $argsArray[$baseKey][1];
   if (!isset($argsArray[$baseKey][1])) {
     $argsArray[$baseKey][1] = "";
   }
-  
+  //echo $baseKey . $argsArray[$baseKey][1];
   if (!isset($argsArray[$heightKey][1])) {
     $argsArray[$heightKey][1] = "";
   }
@@ -978,6 +1139,11 @@ function draw_rectangle() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $altPoint = "";
+  $hasBaseLab = false;
+  $hasHeightLab = false;
+  $altBase = "";
+  $altHeight = "";
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -991,6 +1157,7 @@ function draw_rectangle() {
   $hasHeight = false;
   $size = 300;
   foreach ($argsArray as $key => $in) {
+    if (array_key_exists(0,$in)) {
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -1011,6 +1178,10 @@ function draw_rectangle() {
       $hasHeight = true;
       $hasHeightLab = (!empty($in[2])) ? true : false;
     }
+    } else {
+      echo "Eek! Cannot use an empty argument for draw_rectangle.";
+      return '';
+  }
   }
   
   [$rndBase,$rndHeight] = diffrands(2,8,2);
@@ -1065,10 +1236,21 @@ function draw_rectangle() {
   }
 
   $base = $argsArray[$baseKey][1];
+  if (isset($argsArray[$baseKey][2])) {
   $baseLab = $argsArray[$baseKey][2];
+  } else {
+    $baseLab = "";
+  }
   $height = $argsArray[$heightKey][1];
+  if (isset($argsArray[$heightKey][2])) {
   $heightLab = $argsArray[$heightKey][2];
+  } else {
+    $heightLab = "";
+  }
   
+  //for ($i=0;$i<4;$i++) {
+    //$pointLab[$i] = $argsArray[$pointKey][$i+1];
+  //}
 
   $maxLen = max($base,$height);
   
@@ -1099,7 +1281,8 @@ function draw_rectangle() {
   $altPoint = '';
   if ($hasUserAltText !== true) {
     $alt = "A rectangle";
-    $usedLab = array_filter($pointLab ?? [],'strlen');
+    if ($hasPoints ===  true) {
+      $usedLab = array_filter($pointLab,'strlen');
     $countLab = count($usedLab);
     if ($countLab > 0) {
       $alt .= " with";
@@ -1112,6 +1295,8 @@ function draw_rectangle() {
         }
       }
     }
+    }
+
     if ($hasBaseLab === true) {
       $altBase = ($hasPoints === true && $hasHeightLab === false) ? ", and" : (($hasPoints === true && $hasHeightLab === true) ? "," : "");
       $altBase .= " with base labeled $baseLab";
@@ -1161,25 +1346,35 @@ function draw_triangle() {
   foreach ($argsArray as &$row) {
     $row = preg_replace(['/(angle)$/','/(side)$/','/(point)$/','/(median)$/','/(bisector)$/','/(altitude)$/'],'$1s',$row);
   }
-  
   $noAngles = true;
   $noSides = true;
+  $rotateTriangleBy = 0;
   $randomTriangle = false;
   $hasBisector = false;
   $hasMedian = false;
   $hasPoints = false;
   $rotateTriangle = false;
-  $rotateTriangleBy = false;
   $hasArcs = false;
   $hasAltArcs = false;
   $hasMarks = false;
   $hasAltMarks = false;
   $hasAltitude = false;
   $hasSize = false;
+  $sideKey = "";
+  $bisectorKey = "";
+  $pointKey = "";
+  $medianKey = "";
+  $altitudeKey = "";
+  $hasAltSidLab = false;
   $hasUserAltText = false;
   $size = 350;
   $args = '';
   
+  foreach ($argsArray as $key => $in) {
+    if (empty($in) || count($in) == 0) {
+      unset($argsArray[$key]);
+    }
+  }
   foreach ($argsArray as $in) {
     if ($in[0]=="angles") {
       $noAngles = false;
@@ -1292,10 +1487,10 @@ function draw_triangle() {
       
       /////// Important: Indices must be changed because unshift was used. ///////
       $sideKey = $sideKey + 1;
-      $bisectorKey = $bisectorKey + 1;
-      $pointKey = $pointKey + 1;
-      $medianKey = $medianKey + 1;
-      $altitudeKey = $altitudeKey + 1;
+      if (is_numeric($bisectorKey)) {$bisectorKey = $bisectorKey + 1;}
+      if (is_numeric($pointKey)) {$pointKey = $pointKey + 1;}
+      if (is_numeric($medianKey)) {$medianKey = $medianKey + 1;}
+      if (is_numeric($altitudeKey)) {$altitudeKey = $altitudeKey + 1;}
       $noAngles = false;
     }
     if ($rotateTriangle === true) {
@@ -1361,6 +1556,8 @@ function draw_triangle() {
           }
           // Get the side mark symbols
           $sideMarkTmp = array_slice($argsArray[$sideKey],7,3);
+        } else {
+          $sideMarkTmp = ["","",""];
         }
         if (isset($argsArray[$angleKey][4])) {
           $hasArcs = true;
@@ -1374,6 +1571,11 @@ function draw_triangle() {
         }
         // These are the side lengths from which to build the angles
         $sid = array_slice($argsArray[$sideKey],1,3);
+        for ($i=1; $i<4; $i++) {
+          if (!isset($argsArray[$sideKey][$i]) || !is_numeric($argsArray[$sideKey][$i])) {
+            $sid[$i-1] = 0;
+          }
+        }
         $sidLabTmp = array_slice($argsArray[$sideKey],4,3);
         $hasSidLabTmp = true;
         $angTmp = array_slice($argsArray[$angleKey],1,3);
@@ -1393,6 +1595,11 @@ function draw_triangle() {
     // Has sides, but no angles
     if ($noSides === false && $noAngles === true) {
       $sid = array_slice($argsArray[$sideKey],1,3);
+      for ($i=1; $i<4; $i++) {
+        if (!isset($argsArray[$sideKey][$i]) || !is_numeric($argsArray[$sideKey][$i])) {
+          $sid[$i-1] = 0;
+        }
+      }
       if (isset($argsArray[$sideKey][7])) {
         $hasMarks = true;
       }
@@ -1405,7 +1612,8 @@ function draw_triangle() {
       }
       for ($i=7;$i<10;$i++) {
         if (!isset($argsArray[$sideKey][$i])) {
-          $argsArray[$sideKey][$i] = '';
+          //$argsArray[$sideKey][$i] = '';
+          $sideMarkTmp[$i] = '';
         } 
         $sideMarkTmp[$i] = $argsArray[$sideKey][$i];
       }
@@ -1458,6 +1666,7 @@ function draw_triangle() {
   }
   
   $hasPerp = false;
+  $perpKey = "";
   foreach ($ang as $key => $angle) {
     if ($angle <= 0) {
       echo "Eek! Angles must be positive numbers.";
@@ -1615,7 +1824,7 @@ function draw_triangle() {
   if ($hasBisector === true) {
     $bisectors = array_slice($argsArray[$bisectorKey],1,9);
     for ($i=1;$i<10;$i++) {
-      if (!isset($bisectors[$i])) {
+      if (!isset($bisectors[$i]) || empty($bisectors[$i])) {
         $bisectors[$i] = "";
       }
     }
@@ -1641,16 +1850,19 @@ function draw_triangle() {
         $args = $args."text([{$abLabLoc[$i][0]},{$abLabLoc[$i][1]}],'".$bisectors[$i+3]."');";
       }
     }
+  } else {
+    $bisectors = [0,0,0,0,0,0,0,0,0];
   }
   
   // DRAW MEDIANS
   if ($hasMedian === true) {
     $medians = array_slice($argsArray[$medianKey],1,9);
-    for ($i=1;$i<10;$i++) {
-      if (!isset($medians[$i])) {
+    for ($i=0;$i<9;$i++) {
+      if (!isset($medians[$i]) || empty($medians[$i])) {
         $medians[$i] = "";
       }
     }
+
     $medRat = $xyDiff/5;
     for ($i=0;$i<3;$i++) {
       if ($medians[$i]==1) {
@@ -1670,8 +1882,12 @@ function draw_triangle() {
     // Labels endpoints of medians
     for ($i=0;$i<3;$i++) {
       $medians[$i+6] = preg_replace('/;/',',',$medians[$i+6]);
+      if (!empty($medPtLabLoc[$i])) {
       $args = $args."text([{$medPtLabLoc[$i][0]},{$medPtLabLoc[$i][1]}],'".$medians[($i+6)]."');";
     }
+  }
+  } else {
+    $medians = [0,0,0,0,0,0,0,0,0];
   }
   
   // DRAW ALTITUDES
@@ -1698,6 +1914,8 @@ function draw_triangle() {
       // "Midpoint" of altitude
       $altMid[$i] = [($altStart[$i][0]+2*$altEnd[$i][0])/3,($altStart[$i][1]+2*$altEnd[$i][1])/3];
       
+      $startAltDash = ["",""];
+      $endAltDash = ["",""];
       if ($altitudes[$i] == 1) {
         $args = $args . "line([{$altStart[$i][0]},{$altStart[$i][1]}],[{$altEnd[$i][0]},{$altEnd[$i][1]}]);";
         $args = $args . "dot([{$altEnd[$i][0]},{$altEnd[$i][1]}]);";
@@ -1763,13 +1981,20 @@ function draw_triangle() {
   }
     
   // PLACE SIDE TICK MARKS
-  $markNum = ["|" => 1, "||" => 2, "|||" => 3];
-  $markType = array_slice($argsArray[$sideKey],4,3);
-  for ($i=0;$i<3;$i++) {
-    if (!isset($markNum[$markType[$i]])) { // invalid mark
-        $hasMarks = false; 
+  $markNum = ["|" => 1, "||" => 2, "|||" => 3, "none" => "no"];
+  if ($hasMarks === true) {
+    for ($i=4; $i<7; $i++) {
+      if (!isset($argsArray[$sideKey][$i]) || !in_array($argsArray[$sideKey][$i], array_keys($markNum))) {
+        $argsArray[$sideKey][$i] = "none";
     }
   }
+  }
+  $markType = array_slice($argsArray[$sideKey],4,3);
+  //for ($i=0;$i<3;$i++) {
+    //if (!isset($markNum[$markType[$i]])) { // invalid mark
+      //  $hasMarks = false; 
+    //}
+  //}
   if ($hasMarks === true) {
     // Half the length of the tick mark
     $markRat = $xyDiff/25;
@@ -1818,10 +2043,19 @@ function draw_triangle() {
   }
   
   // PLACE ANGLE ARCS
+  $arcNum = ["(" => 1, ")" => 1, "((" => 2, "))" => 2, "(((" => 3, ")))" => 3, "none" => "no"];
   if ($hasArcs === true) {
+    for ($i=7; $i<10; $i++) {
+      if (!isset($argsArray[$angleKey][$i]) || !in_array($argsArray[$angleKey][$i], array_keys($arcNum))) {
+        $argsArray[$angleKey][$i] = "none";
+      }
+    }
+  }
     $arcType = array_slice($argsArray[$angleKey],7,3);
+  
+  if ($hasArcs === true) {
     $rArc = [0.18*$xyDiff,0.14*$xyDiff,0.10*$xyDiff];
-    $arcNum = ["(" => 1, "((" => 2, "(((" => 3];
+    
     
     // Rotate to make one side flat
     $flatAng = M_PI/2 - $angRad[0] - $angRad[1];
@@ -1874,6 +2108,7 @@ function draw_triangle() {
     }
   }
   // build the alt text
+  $hasAltAngLab = false;
   if ($hasUserAltText !== true) {
     $alt = "A triangle.";
     $altAngStart = "";
@@ -1981,7 +2216,9 @@ function draw_triangle() {
             if ($medians[$i] == 1) {
               $altMedLab[$i] = (!empty($medians[$i+3])) ? " labeled ".$medians[$i+3]." " : "";
               $altMedPtLab[$i] = (!empty($medians[$i+6])) ? " at point ".$medians[$i+6] : "";
+              if ($hasAltitude === true) {
               $alt .= ($altitudes[$i] == 1) ? " a" : " A";
+              }
               $alt .= " median".$altMedLab[$i]." is drawn from that side".$altMedPtLab[$i]." to its opposite vertex";
               $alt .= ($bisectors[$i] == 1) ? ", and" : ".";
             }
@@ -2023,6 +2260,8 @@ function draw_polygon() {
   $hasPoints = false;
   $hasSides = false;
   $noRotate = false;
+  $hasSideLab = false;
+  $hasPointLab = false;
   $size = 300;
   $rotatePolygon = false;
   $hasUserAltText = false;
@@ -2136,7 +2375,7 @@ function draw_polygon() {
       // Midpoint of ith side
       $midPt[$i] = [($x[$i]+$x[($i+1)%$n])/2,($y[$i]+$y[($i+1)%$n])/2];
       $sidLabLoc[$i] = [$midPt[$i][0]-0.15*($y[$i]-$y[($i+1)%$n])/sqrt(pow($x[$i]-$x[($i+1)%$n],2)+pow($y[$i]-$y[($i+1)%$n],2)),$midPt[$i][1]+0.15*($x[$i]-$x[($i+1)%$n])/sqrt(pow($x[$i]-$x[($i+1)%$n],2)+pow($y[$i]-$y[($i+1)%$n],2))];
-      $args = $args . "text([{$sidLabLoc[$i][0]},{$sidLabLoc[$i][1]}],'".$sidLab[$i]."');";
+      $args .= (isset($sidLab[$i])) ? "text([{$sidLabLoc[$i][0]},{$sidLabLoc[$i][1]}],'".$sidLab[$i]."');" : "";
     }
   }
   if ($hasPoints === true) {
@@ -2206,6 +2445,8 @@ function draw_prismcubes() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $labels = ["","",""];
+  $hasLabels = false;
   $hasUserAltText = false;
 
   foreach ($input as $list) {
@@ -2251,14 +2492,23 @@ function draw_prismcubes() {
       $size = $in[1];
     }
     if ($in[0]=="labels") {
+      //for ($i=1; $i<4; $i++) {
+        //if (empty($in[$i]) || !isset($in[$i])) {
+          //$in[$i] = "";
+        //}
+      //}
       $labels = array_slice($in,1,3);
-      $edgeDescription = ["the front bottom edge of the prism from left to right is labeled ","the rear vertical edge from top to bottom is labeled ","the right bottom edge from front to back is labeled "];
+      $edgeDescription = ["the front bottom edge of the prism from left to right is ","the rear vertical edge from top to bottom is ","the right bottom edge from front to back is "];
+      $altLab = ["","",""];
       for ($i=0;$i<3;$i++) {
         if (!isset($labels[$i])) {
           $labels[$i] = '';
         }
+        
         if (!empty($labels[$i])) {
-          $altLab[$i] .= $edgeDescription[$i].$labels[$i];
+          $altLab[$i] .= $edgeDescription[$i] . "labeled " . $labels[$i];
+        } else {
+          $altLab[$i] .= $edgeDescription[$i] . "unlabeled";
         }
       }
       if (!empty($altLab)) {
@@ -2336,7 +2586,14 @@ function draw_cylinder() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $hasFill = false;
+  $hasDiameter = false;
+  $hasRadius = false;
+  $hasRadiusLab = false;
+  $hasHeight = false;
+  $hasHeightLab = false;
   $hasUserAltText = false;
+  $altFill = "";
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2345,6 +2602,11 @@ function draw_cylinder() {
     $argsArray[]=$list;
   }
   foreach ($argsArray as $in) {
+    if (array_key_exists(0,$in)) {
+      if (empty($in[0])) {
+        echo "Eek! Cannot use an empty argument for draw_cylinder.";
+        return '';
+      }
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -2352,7 +2614,7 @@ function draw_cylinder() {
       }
     }
     if ($in[0] == "size") {
-      if (is_numeric($in[1])) {
+        if (isset($in[1]) && is_numeric($in[1])) {
         $size = $in[1];
       }
     }
@@ -2370,16 +2632,37 @@ function draw_cylinder() {
         $altFill = ($fillPercent > 0) ? true : false;
       }
     }
+    } else {
+        echo "Eek! Cannot have empty arguments for draw_cylinder.";
+        return '';
   }
+  }
+  if (isset($argsArray[0]) && isset($argsArray[0][0]) && isset($argsArray[1]) && isset($argsArray[1][0])) {
   if ((is_numeric($argsArray[0][0]) && !is_numeric($argsArray[1][0])) || (!is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0]))) {
-    echo 'Warning! Gave diameter without height.';
+      echo 'Warning! Diameter and height must both be numeric.';
+      return '';
   }
   if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0) {
     $diameter = $argsArray[0][0];
     $height = $argsArray[1][0];
+    }
+    if (!is_numeric($argsArray[0][0])) {
+      [$diameter,$height] = diffrands(3,6,2);
+    }
   } else {
     [$diameter,$height] = diffrands(3,8,2);
   }
+  
+  
+  //if ((is_numeric($argsArray[0][0]) && !is_numeric($argsArray[1][0])) || (!is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0]))) {
+    //echo 'Warning! Gave diameter without height.';
+  //}
+  //if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0) {
+    //$diameter = $argsArray[0][0];
+    //$height = $argsArray[1][0];
+  //} else {
+    //[$diameter,$height] = diffrands(3,8,2);
+  //}
   // Set the window dimensions
   $af = 4;
   $dim = max(1.5*$diameter/2,1.5*($height/2+$diameter/$af));
@@ -2476,11 +2759,18 @@ function draw_cone() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
-  $hasUserAltText = false;
-  $hasRadius = false;
+  $inverted = false;
+  $hasFill = false;
   $hasDiameter = false;
+  $hasDiameterLab = false;
+  $hasRadius = false;
+  $hasRadiusLab = false;
   $hasHeight = false;
+  $hasHeightLab = false;
   $hasSlant = false;
+  $fillPercent = 0;
+  $hasUserAltText = false;
+
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2490,6 +2780,11 @@ function draw_cone() {
   }
   $inv = 1;
   foreach ($argsArray as $in) {
+    if (array_key_exists(0,$in)) {
+      if (empty($in[0])) {
+        echo "Eek! Cannot start with an empty argument.";
+        return '';
+      }
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -2501,7 +2796,7 @@ function draw_cone() {
       $inverted = true;
     }
     if ($in[0] == "size") {
-      if (is_numeric($in[1])) {
+        if (isset($in[1]) && is_numeric($in[1])) {
         $size = $in[1];
       }
     }
@@ -2517,16 +2812,27 @@ function draw_cone() {
         $fillPercent = $in[1];
       }
     }
+    } else {
+      echo "Eek! Cannot have empty arguments for draw_cone.";
+      return '';
   }
+  }
+  if (isset($argsArray[0]) && isset($argsArray[0][0]) && isset($argsArray[1]) && isset($argsArray[1][0])) {
   if ((is_numeric($argsArray[0][0]) && !is_numeric($argsArray[1][0])) || (!is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0]))) {
-    echo 'Warning! Gave diameter without height.';
+      echo 'Warning! Diameter and height must both be numeric.';
+      return '';
   }
   if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0) {
     $diameter = $argsArray[0][0];
     $height = $argsArray[1][0];
+    }
+    if (!is_numeric($argsArray[0][0])) {
+      [$diameter,$height] = diffrands(3,6,2);
+    }
   } else {
     [$diameter,$height] = diffrands(3,6,2);
   }
+  
   // Set the window dimensions
   $af = 4;
   $dim = max(1.5*$diameter/2,1.5*($height/2));
@@ -2696,9 +3002,13 @@ function draw_sphere() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
-  $hasUserAltText = false;
-  $hasFill = false;
   $hasDiameter = false;
+  $hasDiameterLab = false;
+  $hasRadius = false;
+  $hasRadiusLab = false;
+  $hasFill = false;
+  $hasUserAltText = false;
+
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2707,6 +3017,10 @@ function draw_sphere() {
     $argsArray[]=$list;
   }
   foreach ($argsArray as $in) {
+    if (!array_key_exists(0,$in)) {
+      echo "Eek! Cannot use empty arguments with draw_sphere.";
+      return "";
+    }
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -2736,29 +3050,24 @@ function draw_sphere() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
+      if (isset($in[1])) {
       if (!is_numeric($in[1])) {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
       } elseif (is_numeric($in[1])) {
-        if ($in[1]<0 || $in[1]>100) {
-          echo 'Eek! Fill percent must be between 0 and 100.';
-          return '';
-        }
+          if ($in[1]<0) {
+            $fillPercent = 0;
+          } elseif ($in[1]>100) {
+            $fillPercent = 100;
+          } else {
         $fillPercent = $in[1];
       }
     }
-    if ($in[0] == "fill") {
-      $hasFill = true;
-      if (!is_numeric($in[1])) {
+      } else {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
-      } elseif (is_numeric($in[1])) {
-        if ($in[1] < 0 && $in[1] > 100) {
-          echo 'Eek! Fill percent must be between 0 and 100.';
-          return '';
         }
-        $fillPercent = $in[1];
-      }
       $fillHeight = -1 + 2*$fillPercent/100;
     }
+    
   }
   // Fill the sphere
   if ($hasFill === true) {
@@ -2843,9 +3152,15 @@ function draw_pyramid() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
-  $hasUserAltText = false;
+  [$hasSlant1,$hasSlant2] = [false,false];
   $inverted = false;
+  $hasLengthLab = false;
+  $hasHeight = false;
+  $hasWidthLab = false;
   $hasFill = false;
+  $fillPercent = 0;
+  $hasUserAltText = false;
+
 
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -2873,9 +3188,9 @@ function draw_pyramid() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
-      if (!is_numeric($in[1])) {
+      if (isset($in[1]) && !is_numeric($in[1])) {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
-      } elseif (is_numeric($in[1])) {
+      } elseif (isset($in[1]) && is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
           echo 'Eek! Fill percent must be between 0 and 100.';
           return '';
@@ -2884,6 +3199,8 @@ function draw_pyramid() {
       }
     }
   }
+  [$length,$width,$height] = diffrands(3,8,3);
+  if (array_key_exists(0,$argsArray) && array_key_exists(1,$argsArray) && array_key_exists(2,$argsArray)) {
   if ((is_numeric($argsArray[0][0]) && !(is_numeric($argsArray[1][0]) && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[1][0]) && !(is_numeric($argsArray[0][0]) 
   && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[2][0]) && !(is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0])))) {
     echo 'Warning! Must give length, width and height.';
@@ -2892,8 +3209,7 @@ function draw_pyramid() {
     $length = $argsArray[0][0];
     $width = $argsArray[1][0];
     $height = $argsArray[2][0];
-  } else {
-    [$length,$width,$height] = diffrands(3,8,3);
+  }
   }
   // Set the window dimensions
   // Check for a good view angle with visAng
@@ -3153,6 +3469,9 @@ function draw_rectprism() {
   $input = func_get_args();
   $argsArray = [];
   $args = '';
+  $hasFill = false;
+  $hasLabels = false;
+  $altFillText = "";
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -3161,18 +3480,22 @@ function draw_rectprism() {
     $list = array_map('trim', $list);
     $argsArray[]=$list;
   }
-  if ((is_numeric($argsArray[0][0]) && !(is_numeric($argsArray[1][0]) && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[1][0]) && !(is_numeric($argsArray[0][0]) 
-  && is_numeric($argsArray[2][0]))) || (is_numeric($argsArray[2][0]) && !(is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0])))) {
-    echo 'Warning! Must give length, width and height.';
+  if (!isset($argsArray[0]) || !isset($argsArray[1]) || !isset($argsArray[1])) {
+    [$length,$depth,$height] = diffrands(3,8,3);
   }
-  if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0 && is_numeric($argsArray[2][0]) && $argsArray[2][0]>0) {
+  if (array_key_exists(0,$argsArray)) {
+    if (isset($argsArray[0][0]) && is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && isset($argsArray[1][0]) && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0 && isset($argsArray[2][0]) && is_numeric($argsArray[2][0]) && $argsArray[2][0]>0) {
     $length = $argsArray[0][0];
     $depth = $argsArray[1][0];
     $height = $argsArray[2][0];
   } else {
+      //echo "Warning! Must include length, depth and height.";
     [$length,$depth,$height] = diffrands(3,8,3);
   }
+  }
+  
   foreach ($argsArray as $in) {
+    if (array_key_exists(0,$in)) {
     if ($in[0] == "alttext") {
       if (isset($in[1])) {
         $hasUserAltText = true;
@@ -3180,8 +3503,10 @@ function draw_rectprism() {
       }
     }
     if ($in[0] == "size") {
+        if (isset($in[1]) && is_numeric($in[1])) {
       $size = $in[1];
     }
+      }
     if ($in[0]=="fill") {
       $hasFill = true;
       if (isset($in[1]) && !empty($in[1])) {
@@ -3197,6 +3522,8 @@ function draw_rectprism() {
       $altFillText = " partially filled with colored material.";
     }
   }
+  }
+  $labels = ["","",""];
   foreach ($argsArray as $key => $in) {
     if ($in[0]=="labels") {
       $labels = array_slice($in,1,3);
@@ -3205,6 +3532,7 @@ function draw_rectprism() {
         if (!isset($labels[$i])) {
           $labels[$i] = '';
         }
+        $altLab[$i] = "";
         if (!empty($labels[$i])) {
           $altLab[$i] .= $edgeDescription[$i].$labels[$i];
         }
@@ -3275,6 +3603,7 @@ function draw_polyomino() {
   $size = 300;
   $input = func_get_args();
   $argsArray = [];
+  $getdata = false;
   $hasUserAltText = false;
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -3309,7 +3638,7 @@ function draw_polyomino() {
       }
     }
   }
-  if (is_numeric($argsArray[0][0])) {
+  if (isset($argsArray[0][0]) && is_numeric($argsArray[0][0])) {
     $squares = $argsArray[0][0]-1;
     if ($squares > 99 || $squares < 0 || !is_int($squares)) {
       echo "Number of squares should be an integer in the range [1,100].";
@@ -3362,7 +3691,9 @@ function draw_polyomino() {
   }
   $emptycount = count($empty)-1;
   // $knownempty contains the empty squares that are connected to the rectangular boundary
+  if (count($empty) > 0) {
   $knownempty = [$empty[0]];
+  }
   for ($i=0; $i <= $emptycount; $i++) {
     // $check contains the points up, down, left and right of $empty[$i]
     $check = [[$empty[$i][0]+1,$empty[$i][1]],[$empty[$i][0]-1,$empty[$i][1]],[$empty[$i][0],$empty[$i][1]+1],[$empty[$i][0],$empty[$i][1]-1]];
