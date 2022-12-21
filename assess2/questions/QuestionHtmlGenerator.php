@@ -689,7 +689,7 @@ class QuestionHtmlGenerator
          */
 
         try {
-          $prep = \genVarInit(array_unique($qtextvars));
+          $prep = \genVarInit($qtextvars);
           eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
 
         /*
@@ -697,7 +697,7 @@ class QuestionHtmlGenerator
          *
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
-         $prep = \genVarInit(array_unique($solnvars));
+         $prep = \genVarInit($solnvars);
          eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
        } catch (\Throwable $t) {
           $this->addError(

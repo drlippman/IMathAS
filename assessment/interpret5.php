@@ -740,9 +740,9 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
     foreach ($m[0] as $v) {
         $GLOBALS['interpretcurvars'][] = $v;
     }
-    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*(\[\d+\])+)/', $str, $m);
-    foreach ($m[0] as $v) {
-        $GLOBALS['interpretcurarrvars'][] = $v;
+    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*)((\[\d+\])+)/', $str, $m, PREG_SET_ORDER);
+    foreach ($m as $v) {
+        $GLOBALS['interpretcurarrvars'][] = $v; // will be an array of set matches
     }
 
     if ($quotetype!='"') {
@@ -853,8 +853,19 @@ function setseed($ns,$ref=0) {
 
 function genVarInit($vars) {
     $prep = '';
+    $done = [];
     foreach ($vars as $var) {
-        $prep .= 'if (!isset('.$var.')){'.$var.'=null;}';
+        if (is_array($var)) { 
+            if (in_array($var[0], $done)) { continue; }
+            // is array ref from qtext
+            // [whole match, var, whole array ref, last array ref]
+            $prep .= 'if (!isset('.$var[1].') || (is_array('.$var[1].') && !isset('.$var[0].'))){'.$var[0].'=null;}';
+            $done[] = $var[0];
+        } else {
+            if (in_array($var, $done)) { continue; }
+            $prep .= 'if (!isset('.$var.')){'.$var.'=null;}';
+            $done[] = $var;
+        }
     }
     return $prep;
 }
