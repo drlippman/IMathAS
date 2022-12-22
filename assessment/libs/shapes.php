@@ -1614,8 +1614,9 @@ function draw_triangle() {
         if (!isset($argsArray[$sideKey][$i])) {
           //$argsArray[$sideKey][$i] = '';
           $sideMarkTmp[$i] = '';
-        } 
-        $sideMarkTmp[$i] = $argsArray[$sideKey][$i];
+        } else {
+          $sideMarkTmp[$i] = $argsArray[$sideKey][$i];
+        }
       }
       if (($sid[0]+$sid[1]<=$sid[2]) || ($sid[1]+$sid[2]<=$sid[0]) || ($sid[2]+$sid[0]<=$sid[1])) {
         echo 'Eek! No triangle possible with these side lengths.';
