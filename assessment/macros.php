@@ -88,6 +88,12 @@ function jointsort() {
 		return array();
 	}
 	$a = array_shift($in);
+    for($i=0;$i<count($in);$i++) {
+        if (!is_array($in[$i]) || count($in[$i]) !== count($a)) {
+            echo "inputs to jointsort need to be arrays of same length";
+            return $in;
+        }
+    }
 	asort($a);
 	$out = array();
 	foreach ($a as $k=>$v) {
@@ -239,6 +245,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		//has y= when it shouldn't
 		if ($function[0][0] == 'y') {
 			$function[0] = preg_replace('/^\s*y\s*=?/', '', $function[0]);
+            if ($function[0]==='') { continue; }
 		}
 
 		if ($function[0]=='dot') {  //dot,x,y,[closed,color,label,labelloc]
@@ -679,17 +686,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else if (isset($function[5]) && $function[5]=='closed') {
 			$path .= "dot([$x,$y],\"closed\");";
 			$alt .= "Closed dot at ($x,$y).). ";
-		} else if (isset($function[5]) && $function[5]=='arrow') {
+		} else if (isset($function[5]) && $function[5]=='arrow' && $stopat>1) {
 			$path .= "arrowhead([{$fx[$stopat-2]},{$fy[$stopat-2]}],[$x,$y]);";
 			$alt .= "Arrow at ($x,$y). ";
 		}
-		if (isset($function[4]) && $function[4]=='open') {
+		if (isset($function[4]) && $function[4]=='open' && isset($fx[0])) {
 			$path .= "dot([{$fx[0]},{$fy[0]}],\"open\");";
 			$alt .= "Open dot at ({$fx[0]},{$fy[0]}). ";
-		} else if (isset($function[4]) && $function[4]=='closed') {
+		} else if (isset($function[4]) && $function[4]=='closed' && isset($fx[0])) {
 			$path .= "dot([{$fx[0]},{$fy[0]}],\"closed\");";
 			$alt .= "Closed dot at ({$fx[0]},{$fy[0]}). ";
-		} else if (isset($function[4]) && $function[4]=='arrow') {
+		} else if (isset($function[4]) && $function[4]=='arrow' && isset($fx[1])) {
 			$path .= "arrowhead([{$fx[1]},{$fy[1]}],[{$fx[0]},{$fy[0]}]);";
 			$alt .= "Arrow at ({$fx[0]},{$fy[0]}). ";
 		}
@@ -820,6 +827,10 @@ function addfractionaxislabels($plot,$step) {
 		if ($num=='') { $num = 1;}
 	}
 	preg_match('/initPicture\(([\-\d\.]+),([\-\d\.]+),([\-\d\.]+),([\-\d\.]+)\)/',$plot,$matches);
+    if (!isset($matches[4])) {
+        echo "addfractionaxislabels: input must be a plot";
+        return $plot;
+    }
 	$xmin = $matches[1];
 	$xmax = $matches[2];
 	$yrange = $matches[4] - $matches[3];
@@ -868,6 +879,10 @@ function connectthedots($xarray,$yarray,$color='black',$thick=1,$startdot='',$en
 	for ($i=1; $i<count($xarray); $i++) {
 		if ($i==1) {$ed = $startdot;} else {$ed = '';}
 		if ($i==count($xarray)-1) {$sd = $enddot;} else {$sd = '';}
+        if (!isset($xarray[$i]) || !isset($xarray[$i-1]) || !isset($yarray[$i]) || !isset($yarray[$i-1])) {
+            echo "error: connectthedots needs arrays without missing elements";
+            return [];
+        }
 		if ($xarray[$i-1]==$xarray[$i]) {
 			//vertical line
 			$outarr[] = "[{$xarray[$i]},t],$color,{$yarray[$i]},{$yarray[$i-1]},$sd,$ed,$thick";
@@ -997,7 +1012,7 @@ function showarrays() {
 	for ($j = 0; $j<$maxlength; $j++) {
 		$out .="<tr>";
 		for ($i = 0; $i<floor(count($alist)/2); $i++) {
-			if ($format == 'default') {
+			if ($format == 'default' || !isset($format[$i])) {
 				$out .= '<td>';
 			} else if ($format[$i]=='c' || $format[$i]=='C') {
 				$out .= '<td class="c">';
@@ -1104,7 +1119,7 @@ function xclean($exp) {
 	$exp = preg_replace('/\^1([^\d])/',"$1",$exp); //3x^1+4 =>3x+4
 	$exp = preg_replace('/\^1$/','',$exp);  //4x^1 -> 4x
 	$exp = clean($exp);
-	if ($exp[0]=='+') {
+	if (isset($exp[0]) && $exp[0]=='+') {
 		$exp = substr($exp,1);
 	}
 	return $exp;
@@ -1610,14 +1625,15 @@ function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
     $r = $out;
 	} else {
 		$r = range(0,$maxi);
-		while ($n>count($r)) {
-			$r = array_merge($r,$r);
-		}
-		if ($nonzero) {
+        if ($nonzero) {
 			if ($min <= 0 && $max >= 0) {
 				array_splice($r,-1*$min/$p,1);
 			}
 		}
+		while ($n>count($r)) {
+			$r = array_merge($r,$r);
+		}
+		
 		$GLOBALS['RND']->shuffle($r);
 		$r = array_slice($r,0,$n);
 		for ($i=0;$i<$n;$i++) {
@@ -1820,6 +1836,10 @@ function consecutive($min,$max,$step=1) {
 
 
 function gcd($n,$m){ //greatest common divisor
+    if (!is_numeric($n) || !is_numeric($m)) {
+        echo "gcd requires numeric inputs";
+        return 1;
+    }
 	$m = (int) round(abs($m));
 	$n = (int) round(abs($n));
     if($m==0 && $n==0) {return 1;} // not technically correct, but will avoid divide by 0 issues in the case of bad input
@@ -1865,6 +1885,10 @@ function makereducedmixednumber($n,$d) {
 function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 	if ($n==0) {return '0';}
     if ($d==0) {return 'undefined';}
+    if (!is_numeric($n) || !is_numeric($d)) {
+        echo "makereducedfraction requires numeric inputs";
+        return $n.'/'.$d;
+    }
 	$g = gcd($n,$d);
 	if ($g > 1) {
         $n = $n/$g;
@@ -2272,9 +2296,14 @@ function arraystodoteqns($x,$y,$color='blue') {
         echo "Error: inputs to arraystodoteqns must be arrays";
         return [];
     }
+    if (count($x) != count($y)) {
+        echo "arraystodoteqns x and y should have same length";
+    }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
-        $out[] = "dot,".$x[$i].','.$y[$i].',closed,'.$color;
+        if (isset($y[$i])) {
+            $out[] = "dot,".$x[$i].','.$y[$i].',closed,'.$color;
+        }
 	}
 	return $out;
 }
@@ -2292,6 +2321,11 @@ function subarray($a) {
     foreach ($args as $k=>$v) {
 		if (strpos($v,':')!==false) {
 			$p = explode(':',$v);
+            $p = array_map('evalbasic', $p);
+            if (!is_numeric($p[0]) || !is_numeric($p[1])) {
+                echo "subarray index ranges need to be numeric or simple calculations";
+                continue;
+            }
 			array_splice($out,count($out),0,array_slice($a,$p[0],$p[1]-$p[0]+1));
 		} else {
 			$out[] = $a[$v] ?? '';
@@ -3852,6 +3886,7 @@ function htmldisp($str,$var='') {
 function stringtopolyterms($str) {
 	$out = array();
 	$str = str_replace(' ','',$str);
+    if ($str=='') { return []; }
 	$arr = preg_split('/(?<!\^)([-+])/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	if ($arr[0]=='') {  //string started -3x or something; skip 0 index
 		$out[] = (($arr[1]=='-')?'-':'').$arr[2];
@@ -5154,7 +5189,9 @@ function parsereqsigfigs($reqsigfigs) {
 		$exactsigfig = false;
 		$reqsigfigparts = listtoarray(substr($reqsigfigs,1,-1));
 		$reqsigfigs = $reqsigfigparts[0];
-		$reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
+        if (isset($reqsigfigparts[1])) {
+		    $reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
+        } 
 	} else {
 		$exactsigfig = false;
 	}

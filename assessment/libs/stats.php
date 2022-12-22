@@ -2456,14 +2456,14 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
 	$dx = $dotspace;
 
     $st = '';
-
+    $i = 0;
     // Create the stack of dots 
 	while ($i < count($a)) {
 		$alt .= "<tr><td>$x</td>";
 		$i = $curr;
 		$j = 0.1;
   
-		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
+		while (($i < count($a)) && ($a[$i] < $x+.5*$dx)) {
 			$i++;
 			$j = $j + 0.6;
 			$st .= "dot([$x,$j]);";
