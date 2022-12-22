@@ -1365,6 +1365,7 @@ function rrands($min,$max,$p=0,$n=0,$ord='def') {
 	list($min,$max) = checkMinMax($min, $max, false, 'rrands');
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
+    $n = floor($n);
 	$maxi = floor(($max-$min)/$p + 1e-12);
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
@@ -1397,6 +1398,7 @@ function randsfrom($lst,$n,$ord='def') {
 	if (!is_array($lst)) {
 		$lst = listtoarray($lst);
 	}
+    $n = floor($n);
 	for ($i=0; $i<$n;$i++) {
 		$r[$i] = $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 	}
@@ -1484,7 +1486,7 @@ function nonzerorands($min,$max,$n=0,$ord='def') {
 	if (func_num_args()<3) { echo "nonzerorands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerorands');
 	if ($min == 0 && $max == 0) { return 0; }
-
+    $n = floor($n);
 	for ($i = 0; $i < $n; $i++) {
 		do {
 			$r[$i] = $GLOBALS['RND']->rand($min,$max);
@@ -1511,7 +1513,7 @@ function nonzerorrands($min,$max,$p=0,$n=0,$ord='def') {
 	}
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
-
+    $n = floor($n);
 	for ($i = 0; $i < $n; $i++) {
     $cnt = 0;
 		do {
@@ -1636,6 +1638,7 @@ function nonzerodiffrands($min,$max,$n=0,$ord='def',$nowarn=false) {
 	if (func_num_args()<3) { echo "nonzerodiffrands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerodiffrands');
 	if ($max == $min) {echo "nonzerodiffrands: Need min&lt;max"; return array_fill(0,$n,$min);}
+    $n = floor($n);
 	if ($n > $max-$min+1 || ($min*$max<=0 && $n>$max-$min)) {
 		if ($GLOBALS['myrights']>10 && !$nowarn) {
 			echo "nonzerodiffrands: min-max not far enough for n requested";
@@ -2301,7 +2304,7 @@ function showdataarray($a,$n=1,$format='table') {
 	if (!is_array($a)) {
 		return '';
 	}
-
+    $n = floor($n);
 	if ($format == 'pre') {
 		$maxwidth = 1; $cnt = 0;
 		foreach ($a as $v) {
@@ -2601,6 +2604,7 @@ function randcountry() {
 
 function randnames($n=1,$gender=2) {
 	global $namearray;
+    $n = floor($n);
 	if ($n==1) {
 		if ($gender==2) {
 			$gender = $GLOBALS['RND']->rand(0,1);
@@ -2931,6 +2935,7 @@ function today($str = "F j, Y") {
 }
 
 function numtoroman($n,$uc=true) {
+    $n = intval($n);
 	if ($uc) {
 		$lookup = array('M'=>1000,'CM'=>900,'D'=>500,'CD'=>400,'C'=>100,'XC'=>90,'L'=>50,'XL'=>40,'X'=>10,'IX'=>9,'V'=>5,'IV'=>4,'I'=>1,'<span style="border-top:1px solid;">SS</span>'=>0.5);
 	} else {
@@ -3410,6 +3415,7 @@ function cleanbytoken($str,$funcs = array()) {
 
 
 function cleantokenize($str,$funcs) {
+    $str = (string) $str;
 	$knownfuncs = array_merge($funcs,array("sin","cos","sec","csc","tan","csc","cot","sinh","cosh","sech","csch","tanh","coth","arcsin","arccos","arcsec","arccsc","arctan","arccot","arcsinh","arccosh","arctanh","sqrt","ceil","floor","root","log","ln","abs","max","min"));
 
 	$lookfor = array("e","pi");
@@ -4907,6 +4913,8 @@ function getiscorrect() {
 }
 
 function ABarray($s,$n) {
+    $s = (int) $s;
+    $n = (int) $n;
 	$out = array();
 	for ($i=$s;$i<$s+$n;$i++) {
 		$out[] = '[AB'.$i.']';

@@ -2048,7 +2048,7 @@ function draw_triangle() {
   }
   
   // PLACE ANGLE ARCS
-  $arcNum = ["(" => 1, ")" => 1, "((" => 2, "))" => 2, "(((" => 3, ")))" => 3, "none" => "no"];
+  $arcNum = ["(" => 1, ")" => 1, "((" => 2, "))" => 2, "(((" => 3, ")))" => 3, "none" => 0];
   if ($hasArcs === true) {
     for ($i=7; $i<10; $i++) {
       if (!isset($argsArray[$angleKey][$i]) || !in_array($argsArray[$angleKey][$i], array_keys($arcNum))) {
