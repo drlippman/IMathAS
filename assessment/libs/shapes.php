@@ -1884,9 +1884,9 @@ function draw_triangle() {
     for ($i=0;$i<3;$i++) {
       $medians[$i+6] = preg_replace('/;/',',',$medians[$i+6]);
       if (!empty($medPtLabLoc[$i])) {
-      $args = $args."text([{$medPtLabLoc[$i][0]},{$medPtLabLoc[$i][1]}],'".$medians[($i+6)]."');";
+        $args = $args."text([{$medPtLabLoc[$i][0]},{$medPtLabLoc[$i][1]}],'".$medians[($i+6)]."');";
+      }
     }
-  }
   } else {
     $medians = [0,0,0,0,0,0,0,0,0];
   }
@@ -1982,13 +1982,13 @@ function draw_triangle() {
   }
     
   // PLACE SIDE TICK MARKS
-  $markNum = ["|" => 1, "||" => 2, "|||" => 3, "none" => "no"];
+  $markNum = ["|" => 1, "||" => 2, "|||" => 3, "none" => 0];
   if ($hasMarks === true) {
     for ($i=4; $i<7; $i++) {
       if (!isset($argsArray[$sideKey][$i]) || !in_array($argsArray[$sideKey][$i], array_keys($markNum))) {
         $argsArray[$sideKey][$i] = "none";
+      }
     }
-  }
   }
   $markType = array_slice($argsArray[$sideKey],4,3);
   //for ($i=0;$i<3;$i++) {
@@ -1996,6 +1996,9 @@ function draw_triangle() {
       //  $hasMarks = false; 
     //}
   //}
+
+  
+
   if ($hasMarks === true) {
     // Half the length of the tick mark
     $markRat = $xyDiff/25;
@@ -2019,6 +2022,7 @@ function draw_triangle() {
       $hasAltMarks = true;
     }
   }
+  
   
   // PLACE VERTEX POINTS AND LABELS
   if ($hasPoints === true) {
