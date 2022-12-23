@@ -194,7 +194,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 	$cnt = 0;
 	$len = strlen($str);
 	$syms = array();
-	$lastsym = array();
+	$lastsym = array('',-1);
 	while ($i<$len) {
 		$cnt++;
 		if ($cnt>100) {
