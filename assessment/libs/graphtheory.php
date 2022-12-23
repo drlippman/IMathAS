@@ -1193,7 +1193,7 @@ function graphdrawit($pos,$g,$op) {
 	if (!isset($op['weightoffset'])) { $op['weightoffset'] = .5; }
     if (isset($op['labels']) && is_array($op['labels']) && count($op['labels']) < count($g)) {
         echo "insufficient labels for all vertices";
-        unset($op['labels']);
+        $op['labels'] = "letters";
     }
 	$n = count($pos);
 	if (!isset($op['xmin'])) {
