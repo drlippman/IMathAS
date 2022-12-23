@@ -686,7 +686,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else if (isset($function[5]) && $function[5]=='closed') {
 			$path .= "dot([$x,$y],\"closed\");";
 			$alt .= "Closed dot at ($x,$y).). ";
-		} else if (isset($function[5]) && $function[5]=='arrow' && $stopat>1) {
+		} else if (isset($function[5]) && $function[5]=='arrow' && isset($fx[$stopat-2])) {
 			$path .= "arrowhead([{$fx[$stopat-2]},{$fy[$stopat-2]}],[$x,$y]);";
 			$alt .= "Arrow at ($x,$y). ";
 		}
@@ -823,9 +823,13 @@ function addfractionaxislabels($plot,$step) {
 	$ispi = false;
 	if (strpos($num,'pi')!==false) {
 		$ispi = true;
-		$num = str_replace('pi','',$num);
+		$num = str_replace(['*pi','pi'],'',$num);
 		if ($num=='') { $num = 1;}
 	}
+    if (!is_numeric($num) || !is_numeric($den)) {
+        echo 'invalid step in addfractionaxislabels';
+        return $plot;
+    }
 	preg_match('/initPicture\(([\-\d\.]+),([\-\d\.]+),([\-\d\.]+),([\-\d\.]+)\)/',$plot,$matches);
     if (!isset($matches[4])) {
         echo "addfractionaxislabels: input must be a plot";
@@ -2895,6 +2899,10 @@ function evalfunc($farr) {
 			  $func= preg_replace($reg,"($1)",$func);
 		}
 		foreach ($vars as $i=>$var) {
+            if (is_array($args[$i]) || !is_numeric($args[$i])) {
+                echo 'invalid input to evalfunc';
+                return false;
+            }
 			$func = str_replace("($var)","({$args[$i]})",$func);
 		}
 
@@ -3004,6 +3012,10 @@ function ifthen($c,$t,$f) {
 
 //adapted from http://www.mindspring.com/~alanh/fracs.html
 function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
+    if (!is_numeric($d)) {
+        echo 'decimaltofraction expects numeric input';
+        return $d;
+    }
 	if (abs(floor($d)-$d)<1e-12) {
 		return floor($d);
 	}
@@ -3071,6 +3083,10 @@ function makenumberrequiretimes($arr) {
 		return "";
 	}
 	foreach ($arr as $k=>$num) {
+        if (!is_numeric($num)) {
+            echo 'inputs to makenumberrequirestimes must be numeric';
+            continue;
+        }
         $arr[$k] = abs($num);
 	}
 	$uniq = array_unique($arr);
