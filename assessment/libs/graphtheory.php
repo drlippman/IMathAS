@@ -1191,7 +1191,7 @@ function graphdrawit($pos,$g,$op) {
 	if (!isset($op['width'])) {$op['width'] = 360;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
 	if (!isset($op['weightoffset'])) { $op['weightoffset'] = .5; }
-    if (isset($op['labels']) && count($op['labels']) < count($g)) {
+    if (isset($op['labels']) && is_array($op['labels']) && count($op['labels']) < count($g)) {
         echo "insufficient labels for all vertices";
         unset($op['labels']);
     }
