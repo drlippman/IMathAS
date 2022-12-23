@@ -924,7 +924,7 @@ function cx_is_ok(&$v) {
             return false;
         }
     } else if (count($v)==1) {
-        $v = [$v,0];
+        $v = [$v[0],0];
         return true;
     } else if (count($v)==2 && !is_array($v[0]) && !is_array($v[1])) {
         return true;
