@@ -110,7 +110,9 @@ class QuestionGenerator
                 $this->questionParams->getQuestionSeed(),
                 0,
                 time(),
-                implode('; ', $question->getErrors()) . '; ' . implode('; ', $this->silenterrors)
+                implode('; ', $question->getErrors()) . 
+                    ((count($question->getErrors())>0 && count($this->silenterrors)>0) ? '; ' : '') . 
+                    implode('; ', $this->silenterrors)
             ]);
         }
 

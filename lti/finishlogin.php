@@ -32,6 +32,8 @@ $migration_claim = $launch->get_migration_claim();
 $localuserid = $db->get_local_userid($launch, $role);
 $localcourse = $db->get_local_course($contextid, $launch);
 
+$err = '';
+
 // no local user yet.  Parse submitted info.
 if ($localuserid === false) {
   // see if we're trying to login

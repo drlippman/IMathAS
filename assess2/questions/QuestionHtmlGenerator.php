@@ -212,6 +212,8 @@ class QuestionHtmlGenerator
               . $t->getMessage()
               . ' on line '
               . $t->getLine()
+              . ' of '
+              . basename($t->getFile())
           );
 
         }
@@ -327,7 +329,8 @@ class QuestionHtmlGenerator
          */
 
         // $answerbox must not be renamed, it is expected in eval'd code.
-        $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewloc = null;
+        $answerbox = $previewloc = null;
+        $entryTips = $displayedAnswersForParts = $jsParams = [];
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
@@ -686,7 +689,7 @@ class QuestionHtmlGenerator
          */
 
         try {
-          $prep = \genVarInit(array_unique($qtextvars));
+          $prep = \genVarInit($qtextvars);
           eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
 
         /*
@@ -694,7 +697,7 @@ class QuestionHtmlGenerator
          *
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
-         $prep = \genVarInit(array_unique($solnvars));
+         $prep = \genVarInit($solnvars);
          eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
        } catch (\Throwable $t) {
           $this->addError(

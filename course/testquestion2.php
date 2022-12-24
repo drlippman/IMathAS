@@ -473,6 +473,7 @@ if ($overwriteBody==1) {
 	echo '</ul>';
 
 	if ($line['ancestors']!='') {
+        $line['ancestors'] = str_replace(',',', ',$line['ancestors']);
 		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);
 		if ($line['ancestorauthors']!='') {
 			echo '<br/>'._('Created by: ').Sanitize::encodeStringForDisplay($line['ancestorauthors']);

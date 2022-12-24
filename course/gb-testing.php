@@ -6,6 +6,7 @@ require("../init.php");
 
 
 $cid = Sanitize::courseId($_GET['cid']);
+$stu = 0;
 if (isset($teacherid)) {
 	$isteacher = true;
 }
@@ -167,7 +168,7 @@ require("../footer.php");
 
 
 function gbinstrdisp() {
-	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$staticroot,
 		$tutorsection,$includeendmsg,$assessGbUrl;
 	$hidenc = 1;
 	$includeendmsg = true;

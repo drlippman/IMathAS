@@ -139,6 +139,7 @@ function matrixdisplaytable() {
   }
   $m = $args[0];
 	
+<<<<<<< HEAD
   if(!is_array($m)) {
       echo "First argument is not a matrix.<br/>";
       return "";
@@ -147,6 +148,11 @@ function matrixdisplaytable() {
   if(!is_array($m[0])) {
       echo "First row is not an array.<br/>";
       return "";
+=======
+  if (!isMatrix($m)) {
+    if ($GLOBALS['myrights']>10) { echo 'error: matrixdisplaytable input not a matrix'; } 
+    return '';
+>>>>>>> b280711d1cd1413be25824a656394d603c0f1c29
   }
 	
   // matrixname

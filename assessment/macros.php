@@ -88,6 +88,12 @@ function jointsort() {
 		return array();
 	}
 	$a = array_shift($in);
+    for($i=0;$i<count($in);$i++) {
+        if (!is_array($in[$i]) || count($in[$i]) !== count($a)) {
+            echo "inputs to jointsort need to be arrays of same length";
+            return $in;
+        }
+    }
 	asort($a);
 	$out = array();
 	foreach ($a as $k=>$v) {
@@ -239,6 +245,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		//has y= when it shouldn't
 		if ($function[0][0] == 'y') {
 			$function[0] = preg_replace('/^\s*y\s*=?/', '', $function[0]);
+            if ($function[0]==='') { continue; }
 		}
 
 		if ($function[0]=='dot') {  //dot,x,y,[closed,color,label,labelloc]
@@ -679,17 +686,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else if (isset($function[5]) && $function[5]=='closed') {
 			$path .= "dot([$x,$y],\"closed\");";
 			$alt .= "Closed dot at ($x,$y).). ";
-		} else if (isset($function[5]) && $function[5]=='arrow') {
+		} else if (isset($function[5]) && $function[5]=='arrow' && isset($fx[$stopat-2])) {
 			$path .= "arrowhead([{$fx[$stopat-2]},{$fy[$stopat-2]}],[$x,$y]);";
 			$alt .= "Arrow at ($x,$y). ";
 		}
-		if (isset($function[4]) && $function[4]=='open') {
+		if (isset($function[4]) && $function[4]=='open' && isset($fx[0])) {
 			$path .= "dot([{$fx[0]},{$fy[0]}],\"open\");";
 			$alt .= "Open dot at ({$fx[0]},{$fy[0]}). ";
-		} else if (isset($function[4]) && $function[4]=='closed') {
+		} else if (isset($function[4]) && $function[4]=='closed' && isset($fx[0])) {
 			$path .= "dot([{$fx[0]},{$fy[0]}],\"closed\");";
 			$alt .= "Closed dot at ({$fx[0]},{$fy[0]}). ";
-		} else if (isset($function[4]) && $function[4]=='arrow') {
+		} else if (isset($function[4]) && $function[4]=='arrow' && isset($fx[1])) {
 			$path .= "arrowhead([{$fx[1]},{$fy[1]}],[{$fx[0]},{$fy[0]}]);";
 			$alt .= "Arrow at ({$fx[0]},{$fy[0]}). ";
 		}
@@ -816,10 +823,18 @@ function addfractionaxislabels($plot,$step) {
 	$ispi = false;
 	if (strpos($num,'pi')!==false) {
 		$ispi = true;
-		$num = str_replace('pi','',$num);
+		$num = str_replace(['*pi','pi'],'',$num);
 		if ($num=='') { $num = 1;}
 	}
+    if (!is_numeric($num) || !is_numeric($den)) {
+        echo 'invalid step in addfractionaxislabels';
+        return $plot;
+    }
 	preg_match('/initPicture\(([\-\d\.]+),([\-\d\.]+),([\-\d\.]+),([\-\d\.]+)\)/',$plot,$matches);
+    if (!isset($matches[4])) {
+        echo "addfractionaxislabels: input must be a plot";
+        return $plot;
+    }
 	$xmin = $matches[1];
 	$xmax = $matches[2];
 	$yrange = $matches[4] - $matches[3];
@@ -868,6 +883,10 @@ function connectthedots($xarray,$yarray,$color='black',$thick=1,$startdot='',$en
 	for ($i=1; $i<count($xarray); $i++) {
 		if ($i==1) {$ed = $startdot;} else {$ed = '';}
 		if ($i==count($xarray)-1) {$sd = $enddot;} else {$sd = '';}
+        if (!isset($xarray[$i]) || !isset($xarray[$i-1]) || !isset($yarray[$i]) || !isset($yarray[$i-1])) {
+            echo "error: connectthedots needs arrays without missing elements";
+            return [];
+        }
 		if ($xarray[$i-1]==$xarray[$i]) {
 			//vertical line
 			$outarr[] = "[{$xarray[$i]},t],$color,{$yarray[$i]},{$yarray[$i-1]},$sd,$ed,$thick";
@@ -997,7 +1016,7 @@ function showarrays() {
 	for ($j = 0; $j<$maxlength; $j++) {
 		$out .="<tr>";
 		for ($i = 0; $i<floor(count($alist)/2); $i++) {
-			if ($format == 'default') {
+			if ($format == 'default' || !isset($format[$i])) {
 				$out .= '<td>';
 			} else if ($format[$i]=='c' || $format[$i]=='C') {
 				$out .= '<td class="c">';
@@ -1104,7 +1123,7 @@ function xclean($exp) {
 	$exp = preg_replace('/\^1([^\d])/',"$1",$exp); //3x^1+4 =>3x+4
 	$exp = preg_replace('/\^1$/','',$exp);  //4x^1 -> 4x
 	$exp = clean($exp);
-	if ($exp[0]=='+') {
+	if (isset($exp[0]) && $exp[0]=='+') {
 		$exp = substr($exp,1);
 	}
 	return $exp;
@@ -1365,6 +1384,7 @@ function rrands($min,$max,$p=0,$n=0,$ord='def') {
 	list($min,$max) = checkMinMax($min, $max, false, 'rrands');
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
+    $n = floor($n);
 	$maxi = floor(($max-$min)/$p + 1e-12);
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
@@ -1397,6 +1417,7 @@ function randsfrom($lst,$n,$ord='def') {
 	if (!is_array($lst)) {
 		$lst = listtoarray($lst);
 	}
+    $n = floor($n);
 	for ($i=0; $i<$n;$i++) {
 		$r[$i] = $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 	}
@@ -1484,7 +1505,7 @@ function nonzerorands($min,$max,$n=0,$ord='def') {
 	if (func_num_args()<3) { echo "nonzerorands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerorands');
 	if ($min == 0 && $max == 0) { return 0; }
-
+    $n = floor($n);
 	for ($i = 0; $i < $n; $i++) {
 		do {
 			$r[$i] = $GLOBALS['RND']->rand($min,$max);
@@ -1511,7 +1532,7 @@ function nonzerorrands($min,$max,$p=0,$n=0,$ord='def') {
 	}
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
-
+    $n = floor($n);
 	for ($i = 0; $i < $n; $i++) {
     $cnt = 0;
 		do {
@@ -1608,14 +1629,15 @@ function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
     $r = $out;
 	} else {
 		$r = range(0,$maxi);
-		while ($n>count($r)) {
-			$r = array_merge($r,$r);
-		}
-		if ($nonzero) {
+        if ($nonzero) {
 			if ($min <= 0 && $max >= 0) {
 				array_splice($r,-1*$min/$p,1);
 			}
 		}
+		while ($n>count($r)) {
+			$r = array_merge($r,$r);
+		}
+		
 		$GLOBALS['RND']->shuffle($r);
 		$r = array_slice($r,0,$n);
 		for ($i=0;$i<$n;$i++) {
@@ -1636,6 +1658,7 @@ function nonzerodiffrands($min,$max,$n=0,$ord='def',$nowarn=false) {
 	if (func_num_args()<3) { echo "nonzerodiffrands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerodiffrands');
 	if ($max == $min) {echo "nonzerodiffrands: Need min&lt;max"; return array_fill(0,$n,$min);}
+    $n = floor($n);
 	if ($n > $max-$min+1 || ($min*$max<=0 && $n>$max-$min)) {
 		if ($GLOBALS['myrights']>10 && !$nowarn) {
 			echo "nonzerodiffrands: min-max not far enough for n requested";
@@ -1817,6 +1840,10 @@ function consecutive($min,$max,$step=1) {
 
 
 function gcd($n,$m){ //greatest common divisor
+    if (!is_numeric($n) || !is_numeric($m)) {
+        echo "gcd requires numeric inputs";
+        return 1;
+    }
 	$m = (int) round(abs($m));
 	$n = (int) round(abs($n));
     if($m==0 && $n==0) {return 1;} // not technically correct, but will avoid divide by 0 issues in the case of bad input
@@ -1862,6 +1889,10 @@ function makereducedmixednumber($n,$d) {
 function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 	if ($n==0) {return '0';}
     if ($d==0) {return 'undefined';}
+    if (!is_numeric($n) || !is_numeric($d)) {
+        echo "makereducedfraction requires numeric inputs";
+        return $n.'/'.$d;
+    }
 	$g = gcd($n,$d);
 	if ($g > 1) {
         $n = $n/$g;
@@ -2140,6 +2171,7 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 		$arrayout = true;
 	}
 	$out = array();
+
 	foreach ($aarr as $a) {
         $a = str_replace(',','',$a);
         if ($a === 'DNE') {
@@ -2158,36 +2190,37 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 		} else {
 			$scinot = '';
 		}
-		if ($a==0) { return 0;}
+		if ($a==0) { $out[] = 0; continue;}
+        if (!is_numeric($a)) { $out[] = $a; continue;}
 		if ($a < 0 ) {
 			$sign = '-';
 			$a *= -1;
 		} else {
 			$sign = '';
 		}
-
-		$v = floor(-log10($a)-1e-12);
+        $loga = log10($a);
+		$v = floor(-$loga-1e-12);
 		if ($v+$sigfig <= 0) {
-      $multof3 = floor(-($v+$sigfig)/3);
-      $tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
-      $a = number_format($tmp,0,'.',$comma).str_repeat($comma.'000',$multof3);
-      if ($sigfigbar) {
-        //number of digits before first comma
-        $digbc = floor((log10($a)+1)%3)+3*((log10($a)+1)%3==0);
-        $anums = preg_replace('/[^\d]/','',$a);
-        if ($comma != '') {
-          //number of commas before sigfig digit
-          $acom = ($sigfig>$digbc)+floor(($sigfig-1-$digbc)/3)*($sigfig>$digbc);
-        } else {
-          $acom = 0;
-        }
-        if (isset($anums[$sigfig]) && $anums[$sigfig] === '0' && $anums[$sigfig-1] === '0') {
-          $a = substr_replace($a, 'overline(0)', $sigfig-1+$acom*strlen($comma), 1);
-        } elseif ($anums[$sigfig-1] === '0' && !isset($anums[$sigfig])) {
-          $a = $a.".";
-        }
-      }
-      $out[] = $sign.$a.$scinot;
+            $multof3 = floor(-($v+$sigfig)/3);
+            $tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
+            $a = number_format($tmp,0,'.',$comma).str_repeat($comma.'000',$multof3);
+            if ($sigfigbar) {
+                //number of digits before first comma
+                $digbc = floor(($loga+1)%3)+3*(($loga+1)%3==0);
+                $anums = preg_replace('/[^\d]/','',$a);
+                if ($comma != '') {
+                    //number of commas before sigfig digit
+                    $acom = ($sigfig>$digbc)+floor(($sigfig-1-$digbc)/3)*($sigfig>$digbc);
+                } else {
+                    $acom = 0;
+                }
+                if (isset($anums[$sigfig]) && $anums[$sigfig] === '0' && $anums[$sigfig-1] === '0') {
+                    $a = substr_replace($a, 'overline(0)', $sigfig-1+$acom*strlen($comma), 1);
+                } elseif ($anums[$sigfig-1] === '0' && !isset($anums[$sigfig])) {
+                    $a = $a.".";
+                }
+            }
+            $out[] = $sign.$a.$scinot;
 		} else {
 			$nv = round($a, $v+$sigfig);
 			$n = number_format($a,$v+$sigfig,'.',$comma);
@@ -2267,9 +2300,14 @@ function arraystodoteqns($x,$y,$color='blue') {
         echo "Error: inputs to arraystodoteqns must be arrays";
         return [];
     }
+    if (count($x) != count($y)) {
+        echo "arraystodoteqns x and y should have same length";
+    }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
-        $out[] = "dot,".$x[$i].','.$y[$i].',closed,'.$color;
+        if (isset($y[$i])) {
+            $out[] = "dot,".$x[$i].','.$y[$i].',closed,'.$color;
+        }
 	}
 	return $out;
 }
@@ -2287,6 +2325,11 @@ function subarray($a) {
     foreach ($args as $k=>$v) {
 		if (strpos($v,':')!==false) {
 			$p = explode(':',$v);
+            $p = array_map('evalbasic', $p);
+            if (!is_numeric($p[0]) || !is_numeric($p[1])) {
+                echo "subarray index ranges need to be numeric or simple calculations";
+                continue;
+            }
 			array_splice($out,count($out),0,array_slice($a,$p[0],$p[1]-$p[0]+1));
 		} else {
 			$out[] = $a[$v] ?? '';
@@ -2299,7 +2342,7 @@ function showdataarray($a,$n=1,$format='table') {
 	if (!is_array($a)) {
 		return '';
 	}
-
+    $n = floor($n);
 	if ($format == 'pre') {
 		$maxwidth = 1; $cnt = 0;
 		foreach ($a as $v) {
@@ -2599,6 +2642,7 @@ function randcountry() {
 
 function randnames($n=1,$gender=2) {
 	global $namearray;
+    $n = floor($n);
 	if ($n==1) {
 		if ($gender==2) {
 			$gender = $GLOBALS['RND']->rand(0,1);
@@ -2855,6 +2899,10 @@ function evalfunc($farr) {
 			  $func= preg_replace($reg,"($1)",$func);
 		}
 		foreach ($vars as $i=>$var) {
+            if (is_array($args[$i]) || !is_numeric($args[$i])) {
+                echo 'invalid input to evalfunc';
+                return false;
+            }
 			$func = str_replace("($var)","({$args[$i]})",$func);
 		}
 
@@ -2929,6 +2977,7 @@ function today($str = "F j, Y") {
 }
 
 function numtoroman($n,$uc=true) {
+    $n = intval($n);
 	if ($uc) {
 		$lookup = array('M'=>1000,'CM'=>900,'D'=>500,'CD'=>400,'C'=>100,'XC'=>90,'L'=>50,'XL'=>40,'X'=>10,'IX'=>9,'V'=>5,'IV'=>4,'I'=>1,'<span style="border-top:1px solid;">SS</span>'=>0.5);
 	} else {
@@ -2963,6 +3012,10 @@ function ifthen($c,$t,$f) {
 
 //adapted from http://www.mindspring.com/~alanh/fracs.html
 function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
+    if (!is_numeric($d)) {
+        echo 'decimaltofraction expects numeric input';
+        return $d;
+    }
 	if (abs(floor($d)-$d)<1e-12) {
 		return floor($d);
 	}
@@ -3030,6 +3083,10 @@ function makenumberrequiretimes($arr) {
 		return "";
 	}
 	foreach ($arr as $k=>$num) {
+        if (!is_numeric($num)) {
+            echo 'inputs to makenumberrequirestimes must be numeric';
+            continue;
+        }
         $arr[$k] = abs($num);
 	}
 	$uniq = array_unique($arr);
@@ -3408,6 +3465,7 @@ function cleanbytoken($str,$funcs = array()) {
 
 
 function cleantokenize($str,$funcs) {
+    $str = (string) $str;
 	$knownfuncs = array_merge($funcs,array("sin","cos","sec","csc","tan","csc","cot","sinh","cosh","sech","csch","tanh","coth","arcsin","arccos","arcsec","arccsc","arctan","arccot","arcsinh","arccosh","arctanh","sqrt","ceil","floor","root","log","ln","abs","max","min"));
 
 	$lookfor = array("e","pi");
@@ -3844,6 +3902,7 @@ function htmldisp($str,$var='') {
 function stringtopolyterms($str) {
 	$out = array();
 	$str = str_replace(' ','',$str);
+    if ($str=='') { return []; }
 	$arr = preg_split('/(?<!\^)([-+])/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	if ($arr[0]=='') {  //string started -3x or something; skip 0 index
 		$out[] = (($arr[1]=='-')?'-':'').$arr[2];
@@ -4905,6 +4964,8 @@ function getiscorrect() {
 }
 
 function ABarray($s,$n) {
+    $s = (int) $s;
+    $n = (int) $n;
 	$out = array();
 	for ($i=$s;$i<$s+$n;$i++) {
 		$out[] = '[AB'.$i.']';
@@ -5144,7 +5205,9 @@ function parsereqsigfigs($reqsigfigs) {
 		$exactsigfig = false;
 		$reqsigfigparts = listtoarray(substr($reqsigfigs,1,-1));
 		$reqsigfigs = $reqsigfigparts[0];
-		$reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
+        if (isset($reqsigfigparts[1])) {
+		    $reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
+        } 
 	} else {
 		$exactsigfig = false;
 	}

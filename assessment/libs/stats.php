@@ -2394,16 +2394,26 @@ function csvdownloadlink() {
     echo "invalid arguments to csvdownloadlink";
     return '';
   }
+  $maxlength = 0;
+  for ($i=1;$i<count($alist);$i+=2) {
+    if (count($alist[$i]) > $maxlength) {
+        $maxlength = count($alist[$i]);
+    }
+  }
   $rows = array();
   for ($i=0;$i<count($alist);$i+=2) {
 	if (!isset($rows[0])) { $rows[0] = ''; }
     $rows[0] .= '"'.str_replace('"','',$alist[$i]).'",';
-    for ($j=0;$j<count($alist[$i+1]);$j++) {
+    for ($j=0;$j<$maxlength;$j++) {
 	  if (!isset($rows[$j+1])) { $rows[$j+1] = ''; }
-      $rows[$j+1] .= (is_numeric($alist[$i+1][$j]) ?
-        floatval($alist[$i+1][$j]) :
-        '"'.str_replace('"','',$alist[$i+1][$j]).'"')
-        . ',';
+      if (!isset($alist[$i+1][$j])) {
+        $rows[$j+1] .= ',';
+      } else {
+        $rows[$j+1] .= (is_numeric($alist[$i+1][$j]) ?
+            floatval($alist[$i+1][$j]) :
+            '"'.str_replace('"','',$alist[$i+1][$j]).'"')
+            . ',';
+      }
     }
   }
   foreach ($rows as $i=>$row) {
@@ -2446,14 +2456,14 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
 	$dx = $dotspace;
 
     $st = '';
-
+    $i = 0;
     // Create the stack of dots 
 	while ($i < count($a)) {
 		$alt .= "<tr><td>$x</td>";
 		$i = $curr;
 		$j = 0.1;
   
-		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
+		while (($i < count($a)) && ($a[$i] < $x+.5*$dx)) {
 			$i++;
 			$j = $j + 0.6;
 			$st .= "dot([$x,$j]);";

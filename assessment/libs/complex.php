@@ -38,8 +38,7 @@ array_push($allowedmacros,"cx_add","cx_arg", "cx_conj","cx_cubicRoot", "cx_div",
 
 function cx_modul(array $num, int $roundto=12) {
 
-    if (count($num)==1) { $num = [$num[0],0];}
-    if (count($num)!=2) { echo "cx_modul expects 1 complex number as an input in the form [Re, Im]"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_modul expects 1 complex number as an input in the form [Re, Im]"; return "";}
     
     $sq=$num[0]**2+$num[1]**2;
     $r= round(sqrt($sq),$roundto);
@@ -63,8 +62,7 @@ function cx_modul(array $num, int $roundto=12) {
 
 function cx_arg(array $num, string $argin="rad", int $roundto=12) {
 
-    if (count($num)==1) { $num = [$num[0],0];}
-    if (count($num)!=2) { echo "cx_arg expects 1 complex number as an input"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_arg expects 1 complex number as an input"; return "";}
     
     $re=$num[0];
     $im=$num[1];
@@ -115,8 +113,7 @@ function cx_arg(array $num, string $argin="rad", int $roundto=12) {
 
 function cx_conj(array $num, int $roundto=12) {
 
-    if (count($num)==1) { $num = [$num[0],0];}
-    if (count($num)!=2) { echo "cx_conj expects 1 complex number as an input"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_conj expects 1 complex number as an input"; return "";}
     
     $re=$num[0];
     $im=$num[1];
@@ -142,8 +139,7 @@ function cx_conj(array $num, int $roundto=12) {
 
 function cx_std2pol(array $num, string $argin="rad", int $roundto= 12) {
     
-    if (count($num)==1) { $num = [$num[0],0];}
-    if (count($num)!=2) { echo "cx_std2pol expects 1 complex number as an input"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_std2pol expects 1 complex number as an input"; return "";}
     
     $r= round(cx_modul($num),$roundto);
     if ($argin=="deg"){
@@ -178,7 +174,10 @@ function cx_polEu(array $num, string $argin="rad", int $roundto=12) {
     if (!is_array($num[0])) {
         $num = array($num);
       }
-    
+    for ($i=0;$i<count($num);$i++){
+        if (!cx_is_ok($num[$i])) { echo 'cx_polEu invalid input'; return '';}
+    }
+
     if (!function_exists('reduceradical')) {
         require_once(__DIR__.'/radicals.php');
       }
@@ -234,7 +233,7 @@ function cx_polEu(array $num, string $argin="rad", int $roundto=12) {
 // The real and imaginary parts as a paired value in an array: [Re, Im].
 
 function cx_pol2std(array $num, string $argin="rad", int $roundto= 12) {
-    if (count($num)!=2) { echo "cx_pol2std expects 1 complex number as an input"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_pol2std expects 1 complex number as an input"; return "";}
 
     $mod=$num[0];
     $arg=$num[1];
@@ -271,8 +270,7 @@ function cx_add(array $num, int $roundto=12) {
     $counter=count($num);
     for ($i=0; $i < $counter; $i++){
 
-        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
-        if (count($num[$i])!=2) { echo "cx_add expects complex numbers in the form [Re,Im]"; return "";}
+        if (!cx_is_ok($num[$i])) { echo "cx_add expects complex numbers in the form [Re,Im]"; return "";}
         
         $re=$num[$i][0];
         $im=$num[$i][1];
@@ -301,16 +299,14 @@ function cx_add(array $num, int $roundto=12) {
 
 function cx_sub(array $num, int $roundto=12) {
     
-    if (count($num[0])==1) { $num[0] = [$num[0][0],0];}
-    if (count($num[0])!=2) { echo "cx_sub expects complex numbers in the form [Re,Im]"; return "";}
+    if (!cx_is_ok($num[0])) { echo "cx_sub expects complex numbers in the form [Re,Im]"; return "";}
     
     $ret=0;
     $imt=0;
     $counter=count($num);
     for ($i=1; $i < $counter; $i++){
 
-        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
-        if (count($num[$i])!=2) { echo "cx_sub expects complex numbers in the form [Re,Im]"; return "";}
+        if (!cx_is_ok($num[$i])) { echo "cx_sub expects complex numbers in the form [Re,Im]"; return "";}
         
         $re=$num[$i][0];
         $im=$num[$i][1];
@@ -345,8 +341,7 @@ function cx_mul(array $num, int $roundto=12) {
     $counter=count($num);
     for ($i=0; $i < $counter; $i++){
 
-        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
-        if (count($num[$i])!=2) { echo "cx_mul expects complex numbers in the form [Re,Im]"; return "";}
+        if (!cx_is_ok($num[$i])) { echo "cx_mul expects complex numbers in the form [Re,Im]"; return "";}
         
         $rt = $rt*cx_modul($num[$i]);
         $tht += cx_arg($num[$i]);
@@ -376,8 +371,7 @@ function cx_mul(array $num, int $roundto=12) {
 
 function cx_pow(array $num, $pow, int $roundto=12) {
     
-    if (count($num)==1) { $num = [$num[0],0];}
-    if (count($num)!=2) { echo "cx_pow expects 1 complex number as an input in the form [Re,Im]"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_pow expects 1 complex number as an input in the form [Re,Im]"; return "";}
     
     $r1= cx_modul($num);
     $th1=cx_arg($num);
@@ -408,8 +402,7 @@ function cx_pow(array $num, $pow, int $roundto=12) {
 
 function cx_root(array $num, int $root, int $roundto=12) {
     
-    if (count($num)==1) { $num = [$num[0],0];}
-    if (count($num)!=2) { echo "cx_root expects 1 complex number as an input in the form [Re,Im]"; return "";}
+    if (!cx_is_ok($num)) { echo "cx_root expects 1 complex number as an input in the form [Re,Im]"; return "";}
     
     $r1= cx_modul($num);
     $th1= cx_arg($num);
@@ -441,11 +434,10 @@ function cx_root(array $num, int $root, int $roundto=12) {
 // The quotient of two complex numbers in standard form an array: [Re, Im]
 
 function cx_div(array $num, int $roundto=12) {
-    
+    if (count($num)!=2) { echo "cx_Div expects 2 complex numbers in the form [Re,Im]"; return "";}
+
     for ($i=0; $i<count($num); $i++){
-        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
-        if (count($num[$i])!=2) { echo "cx_Div expects complex numbers in the form [Re,Im]"; return "";}
-        if (count($num)!=2) { echo "cx_Div expects 2 complex numbers in the form [Re,Im]"; return "";}
+        if (!cx_is_ok($num[$i])) { echo "cx_Div expects complex numbers in the form [Re,Im]"; return "";}
     }
         
     $rt=1;
@@ -527,7 +519,6 @@ function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12, $disp = Fa
 
 #internal function: long devision of a cubic function by x-a; used for cx_cubicRoot()
 function cubicdivide($divident, $divisor){
-
 	$q = [$divident[0],$divident[1]+$divisor[1]*$divident[0],$divident[2]+($divisor[1]*($divident[1]+$divisor[1]*$divident[0]))];
 	$r = $divident[3]+($divisor[1]*($divident[2]+$divisor[1]*($divident[1]+$divisor[1]*$divident[0])));
 	if (abs($r)<1e-9) {$r=0;}
@@ -627,13 +618,13 @@ function cx_cubicRoot( array $poly, $disp = False, int $roundto = 12){
 
 function cx_format2std(array $num,int $roundto=3) {
     
-    if (!is_array($num[0])) {
+    if (!is_array($num[0]) && count($num)==2) { // only gave one number
         $num = array($num);
       }
 
     $A=array();
     for ($i=0;$i<count($num);$i++){
-        
+        if (!cx_is_ok($num[$i])) { echo 'invalid input to cx_format2std'; return '';}
         $re=round($num[$i][0],$roundto);
         $im=round($num[$i][1],$roundto);
 
@@ -669,12 +660,14 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
         require_once(__DIR__.'/radicals.php');
       }
 
-    if (!is_array($num[0])) {
+    if (!is_array($num[0]) && count($num)==2) {
         $num = array($num);
       }
     
     $A=array();
     for ($i=0;$i<count($num);$i++){
+        if (!cx_is_ok($num[$i])) { echo 'invalid input to cx_format2pol'; return '';}
+
         $num1=$num[$i];
         $sq=round($num[$i][0]**2+$num[$i][1]**2,12);
         $r= reduceradical($sq);
@@ -916,5 +909,27 @@ function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
 	}
 		
     return ($A); 
-}	       
+}	  
+
+// this function checks whether $v is a valid [a,b] complex number
+// return is boolean, true if ok
+// value is passed by reference, so will rewrite if it's not in the
+// right format but is salvagable.
+function cx_is_ok(&$v) {
+    if (!is_array($v)) {
+        if (is_numeric($v)) {
+            $v = [$v,0];
+            return true;
+        } else {
+            return false;
+        }
+    } else if (count($v)==1) {
+        $v = [$v[0],0];
+        return true;
+    } else if (count($v)==2 && is_numeric($v[0]) && is_numeric($v[1])) {
+        return true;
+    } else {
+        return false;
+    }
+}
 ?>
