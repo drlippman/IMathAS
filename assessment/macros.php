@@ -2872,6 +2872,10 @@ function evalfunc($farr) {
             return '';
         }
 		foreach ($vars as $i=>$var) {
+			if (is_array($args[$i]) || !is_numeric($args[$i])) {
+                echo 'invalid input to evalfunc';
+                return false;
+            }
 			$varvals[$var] = $args[$i];
 		}
 		return $func($varvals);
@@ -2899,7 +2903,7 @@ function evalfunc($farr) {
 			  $func= preg_replace($reg,"($1)",$func);
 		}
 		foreach ($vars as $i=>$var) {
-            if (is_array($args[$i]) || !is_numeric($args[$i])) {
+            if (is_array($args[$i])) {
                 echo 'invalid input to evalfunc';
                 return false;
             }
