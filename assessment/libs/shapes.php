@@ -1568,6 +1568,8 @@ function draw_triangle() {
           }
           // Get the arc symbols
           $angArcTmp = array_slice($argsArray[$angleKey],4,3);
+        } else {
+            $angArcTmp = ["","",""];
         }
         // These are the side lengths from which to build the angles
         $sid = array_slice($argsArray[$sideKey],1,3);
