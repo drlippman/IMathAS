@@ -5705,7 +5705,7 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
                 // empty looking matrix entry
                 continue;
             }
-            if (isset($stu[$qn][$v]) && ($blankok || trim($stu[$qn][$v]) !== '')) {
+            if (isset($stu[$qn][$v]) && ($blankok || (trim($stu[$qn][$v]) !== '' && $stu[$qn][$v] !== ';;;;;;;;'))) {
                 $partok = true; 
                 break;
             }
