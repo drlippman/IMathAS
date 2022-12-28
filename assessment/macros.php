@@ -5694,6 +5694,9 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
                         continue;
                     }
                 }
+            }
+            if ($anstypes !== null && $anstypes[$v] === 'draw' && str_replace(';','',$stu[$qn][$v]) === '') {
+              return false;
             } 
             //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
