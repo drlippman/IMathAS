@@ -177,7 +177,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
         $params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
         $params['vars'] = $variables;

@@ -131,7 +131,7 @@ class StringAnswerBox implements AnswerBox
                 $params['helper'] = 1;
             }
             if (empty($hidepreview) && ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq')) {
-                $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+                $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
             }
             if ($answerformat == 'logic' || $answerformat == 'setexp') {
                 $params['vars'] = $variables;

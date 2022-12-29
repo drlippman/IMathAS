@@ -81,7 +81,7 @@ class ChemEquationAnswerBox implements AnswerBox
         if ($useeqnhelper) {
             $params['helper'] = 1;
         }
-        $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+        $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         $params['vars'] = $variables;
 
         $params['calcformat'] = $answerformat . ($answerformat==''?'':',') . 'chem';
