@@ -271,6 +271,10 @@ class ScoreEngine
             if (isset($onBeforeScoreQuestion) && is_callable($onBeforeScoreQuestion)) {
                 $onBeforeScoreQuestion();
             }
+            if (function_exists('onBeforeScoreQuestion')) {
+                onBeforeScoreQuestion($scoreQuestionParams,
+                    $varsForScorepart, $additionalVarsForScoring);
+            }
         }
 
         /*
