@@ -268,9 +268,6 @@ class ScoreEngine
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
             require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
-            if (isset($onBeforeScoreQuestion) && is_callable($onBeforeScoreQuestion)) {
-                $onBeforeScoreQuestion();
-            }
             if (function_exists('onBeforeScoreQuestion')) {
                 onBeforeScoreQuestion($scoreQuestionParams,
                     $varsForScorepart, $additionalVarsForScoring);
