@@ -3063,7 +3063,7 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 
 		$d2 = 1/($d2-$L2);
     }
-	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-12) {
+	if ($i<1000 && abs($numerators[$i]/$denominators[$i] - $d)>1e-12) {
 		return $d;
     }
 	if ($format=="mixednumber") {
