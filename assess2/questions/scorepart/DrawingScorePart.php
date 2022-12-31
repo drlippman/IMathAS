@@ -286,6 +286,12 @@ class DrawingScorePart implements ScorePart
             $x4p = $xtopix($x4); //($x4 - $settings[0])*$pixelsperx + $imgborder;
             $ymid = ($settings[2]+$settings[3])/2;
             $ymidp = $ytopix($ymid); //$settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
+            $yop = $imgborder + $settings[3]*$pixelspery;
+            if ($settings[0]<0 && $settings[1]>0) {
+                $xop = $xtopix(0);
+            } else {
+                $xop = $x2p;
+            }
             $scoretype = array();
             $leftrightdir = '';
             foreach ($answers as $key=>$function) {
@@ -394,13 +400,7 @@ class DrawingScorePart implements ScorePart
                     $y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
                     $y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
                     $y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-                    $yop = $imgborder + $settings[3]*$pixelspery;
-
-                    if ($settings[0]<0 && $settings[1]>0) {
-                        $xop = $xtopix(0);
-                    } else {
-                        $xop = $x2p;
-                    }
+                    
                     if (($logloc = strpos($function[0],'log'))!==false ||
                         ($lnloc = strpos($function[0],'ln'))!==false) { //is log
 

@@ -206,9 +206,9 @@ if ($overwriteBody==1) {
       if (count($possible_users)==0) {
         echo '<p>'._('No users found').'</p>';
       } else {
-      	if ($hasp1) {
-      		echo '<style type="text/css"> tr.p0 {color:#999;} tr.p2 {color:#060;}</style>';
-      	}
+      	//if ($hasp1) {
+      	//	echo '<style type="text/css"> tr.p0 {color:#999;} tr.p2 {color:#060;}</style>';
+      	//}
         echo '<table class="gb" id="myTable">';
         echo '<thead><tr>';
         echo '<th>'._('Name').'</th>';

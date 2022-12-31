@@ -339,9 +339,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$toset['eqnhelper'] = 2;
 
-			if (!isset($_POST['doposttoforum'])) {
-	      $toset['posttoforum'] = 0;
-	    } else {
+			if (!isset($_POST['doposttoforum']) || empty($_POST['posttoforum'])) {
+				$toset['posttoforum'] = 0;
+			} else {
 				$toset['posttoforum'] = Sanitize::onlyInt($_POST['posttoforum']);
 			}
 
