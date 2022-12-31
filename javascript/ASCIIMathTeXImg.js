@@ -205,6 +205,7 @@ var AMsymbols = [
 {input:"oint", tag:"mo", output:"\u222E", tex:null, ttype:CONST},
 {input:"del",  tag:"mo", output:"\u2202", tex:"partial", ttype:CONST},
 {input:"grad", tag:"mo", output:"\u2207", tex:"nabla", ttype:CONST},
+{input:"hbar", tag:"mi", output:"\u210F", tex:null, ttype:CONST},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm", ttype:CONST},
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
