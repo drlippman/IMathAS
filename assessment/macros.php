@@ -31,7 +31,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp",
  "getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt",
  "getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc",
- "getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata",
+ "getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","getntupleparts",
  "getopendotsdata","gettwopointdata","gettwopointformulas","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
@@ -5423,6 +5423,30 @@ function formatcomplex($real,$imag) {
             return "$real+{$imag}i";
         }
     }
+}
+
+function getntupleparts($string, $expected=null, $checknumeric=false) {
+    if (empty($string) || !is_scalar($string) || strlen($string)<5) {
+        return false;
+    }
+    if (!preg_match('/^\s*[\[\({<].*[\]\)}>]\s*$/', $string)) {
+        return false;
+    }
+    $ntuples = parseNtuple($string,false,false);
+    if (!is_array($ntuples) || !isset($ntuples[0])) {
+        return false;
+    }
+    if (is_numeric($expected) && $expected != count($ntuples[0]['vals'])) {
+        return false;
+    }
+    if ($checknumeric) {
+        foreach ($ntuples[0]['vals'] as $v) {
+            if (!is_numeric($v)) {
+                return false;
+            }
+        }
+    }
+    return $ntuples[0]['vals'];
 }
 
 function comparelogic($a,$b,$vars) {

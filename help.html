@@ -2542,6 +2542,12 @@ These macros are fairly general purpose:
   start is the first value used, and num indicates the number of entries to create.
   ABarray(5,2) will output array("[AB5]","[AB6]").
   This macro is often used in conjunction with the showarrays macro.</li>
+<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: 
+  If fed a string from $stuanswers or $stuanswersval of an N-tuple or Calculted N-tuple question,
+  this will extract the components of the n-tuple, returning them as an array.  It is recommended to
+  provide a second argument of the number of components expected, and if the values are expected to
+  be numeric, put true as the third argument.  This function will return false if the input is 
+  not a valid ntuple.  This function only works for a single n-tuple, not a list of them.</li>
 <li><strong>scoremultiorder(stua, answer, swap, type, [weights])</strong>: In a multipart question, allows questions or groups 
   of questions to be scored in any order.  Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 
   'ntuple', and 'calcntuple'.  <em>Note:</em> Use of the "list" option for individual question types is <b>strongly</b> recommended over 
