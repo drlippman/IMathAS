@@ -441,7 +441,7 @@ if (isset($_GET['launch'])) {
 				array_shift($ltiorgparts);
 				$ltiorgname = implode(':',$ltiorgparts);
 			} else if (count($ltiorgparts)>1) {
-				$ltiorgname = $ltiorgparts[1];
+				$ltiorgname = $ltiorgparts[1] ?? '';
 			}
 
 			//tying LTI to IMAthAS account
@@ -815,8 +815,8 @@ if (isset($_GET['launch'])) {
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
-			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'];
-			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
+			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'] ?? '';
+			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'] ?? '';
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
 			}
@@ -871,11 +871,12 @@ if ($stm->rowCount()==0) {
 	if (isset($_SESSION['place_aid'])) {
 		$stm = $DBH->prepare('SELECT courseid,name FROM imas_assessments WHERE id=:aid');
 		$stm->execute(array(':aid'=>$_SESSION['place_aid']));
-		list($aidsourcecid,$aidsourcename) = $stm->fetch(PDO::FETCH_NUM);
-		if ($aidsourcecid===false) {
+        $row = $stm->fetch(PDO::FETCH_NUM);
+		if ($row===false) {
 			$diaginfo = "(Debug info: 2-{$_SESSION['place_aid']})";
 			reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
 		}
+        list($aidsourcecid,$aidsourcename) = $row;
 
 		//look to see if we've already linked this context_id with a course
 		$stm = $DBH->prepare('SELECT courseid,copiedfrom FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org');
@@ -2073,7 +2074,7 @@ if (isset($_GET['launch'])) {
 				array_shift($ltiorgparts);
 				$ltiorgname = implode(':',$ltiorgparts);
 			} else {
-				$ltiorgname = $ltiorgparts[1];
+				$ltiorgname = $ltiorgparts[1] ?? '';
 			}
 
 			//tying LTI to IMAthAS account

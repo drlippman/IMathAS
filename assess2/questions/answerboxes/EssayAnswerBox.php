@@ -101,7 +101,9 @@ class EssayAnswerBox implements AnswerBox
             }
         }
         $tip .= _('Enter your answer as text.  This question is not automatically graded.');
-        $sa .= $answer;
+        if (is_scalar($answer)) {
+            $sa .= $answer;
+        }
 
         if ($scoremethod == 'takeanythingorblank' && trim($la) == '') {
             $params['submitblank'] = 1;
