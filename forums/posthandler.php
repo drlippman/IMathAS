@@ -570,7 +570,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
             if ($isteacher && 
                 ($_GET['modify']=='new' || (isset($line['userid']) && $line['userid']==$userid)) && 
-                ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))
+                ($_GET['modify']=='new' || $_GET['modify']==$threadid || ($_GET['modify']!='reply' && $line['parent']==0))
             ) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";
 				echo "<input type=radio name=type id=type0 value=0 ";

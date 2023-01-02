@@ -87,7 +87,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
-			if (isset($_POST['checked']) && !empty($_POST['checked'])) {
+			if (!empty($_POST['checked'])) {
 				$checked = $_POST['checked'];
 				$chklist = implode(',', array_map('intval',$checked));
 				$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid=:courseid");
@@ -289,7 +289,7 @@ if (!(isset($teacherid))) {
 			}
 
 			if (isset($_POST['checked']) || $_POST['whattocopy']=='all') {
-				$checked = $_POST['checked'];
+				$checked = $_POST['checked'] ?? [];
 				$stm = $DBH->prepare("SELECT blockcnt,dates_by_lti FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
 				list($blockcnt,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);

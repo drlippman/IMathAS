@@ -383,7 +383,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			// group assessmentid
 	    $toset['isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
 			if ($toset['isgroup'] > 0) {
-				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid']);
+				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid'] ?? 0);
 				$toset['groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
 			} else {
 				$toset['groupsetid'] = 0;

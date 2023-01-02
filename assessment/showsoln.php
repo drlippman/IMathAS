@@ -1,7 +1,7 @@
 <?php
 require_once("../includes/sanitize.php");
 
-if ($_GET['cid']==="embedq") {
+if (!isset($_GET['cid']) || $_GET['cid']==="embedq") {
 	$_SESSION = array();
 	require("../init_without_validate.php");
 

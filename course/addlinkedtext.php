@@ -54,7 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = _("You need to access this page from the course page menu");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$block = $_GET['block'];
+	$block = $_GET['block'] ?? '0';
 	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => ($_GET['folder'] ?? '0')));
 	$page_formActionTag .= (!empty($linkid)) ? "&id=" . $linkid : "";

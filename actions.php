@@ -387,8 +387,8 @@ require_once("includes/sanitize.php");
             !empty($_POST['terms']) ||
             !isset($_SESSION['lookupusernamestart']) || (time() - $_SESSION['lookupusernamestart']) < 3
         ) {
-            echo ($_POST['challenge'] !== $_SESSION['challenge']) ? 'challenge bad' : 'challenge ok';
-            if ((time() - $_SESSION['lookupusernamestart']) < 5) { echo 'time blocked';}
+            echo (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge']) ? 'challenge bad' : 'challenge ok';
+            if (isset($_SESSION['lookupusernamestart']) && (time() - $_SESSION['lookupusernamestart']) < 5) { echo 'time blocked';}
 
             echo "Invalid submission";
             exit;

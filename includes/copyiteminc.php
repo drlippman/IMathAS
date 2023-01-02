@@ -493,7 +493,7 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['avail'] = $sethidden ? 0 : $item['avail'];
                 $newblock['SH'] = $item['SH'];
                 $newblock['colors'] = $item['colors'];
-                $newblock['public'] = $item['public'];
+                $newblock['public'] = $item['public'] ?? 0;
                 $newblock['fixedheight'] = $item['fixedheight'];
                 $newblock['grouplimit'] = $item['grouplimit'];
                 $newblock['items'] = array();

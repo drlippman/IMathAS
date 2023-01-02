@@ -8,10 +8,10 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 	global $DBH;
 
 	$studentinfo = array();
-	$stm = $DBH->prepare("SELECT id,section,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+	$stm = $DBH->prepare("SELECT id,section,latepass,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 	$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($line != null) {
+	if ($line != false) {
 		$studentid = $line['id'];
 		$studentinfo['timelimitmult'] = $line['timelimitmult'];
 		$studentinfo['section'] = $line['section'];
@@ -21,7 +21,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		if ($line != null) {
+		if ($line != false) {
 			$teacherid = $line['id'];
 		} else {
 			$stm = $DBH->prepare("SELECT id,section FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");

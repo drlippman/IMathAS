@@ -131,6 +131,10 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	$theme = $JWTsess->theme;
 	$targetid = $JWTsess->targetid;
 } else {
+    if (empty($_GET['id'])) {
+        echo 'Need to supply an id';
+        exit;
+    }
 	$qids = explode("-",$_GET['id']);
 
 	if (isset($_GET['sameseed']) && $_GET['sameseed']==1) {
