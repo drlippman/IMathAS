@@ -173,7 +173,7 @@ class ScoreEngine
             $anstypes = array_map('trim', $anstypes);
         }
 
-        if (!empty($reqdecimals)) {
+        if (isset($reqdecimals) && $reqdecimals !== '') {
             $hasGlobalAbstol = false;
             if (isset($anstypes) && is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
                 $abstolerance = array();
