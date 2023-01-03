@@ -104,6 +104,7 @@
 		if ($urlmode == 'https://') {
 			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
 		}
+        $str = str_replace('"http://quietube.com/v.php/http','"http', $str);
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}
