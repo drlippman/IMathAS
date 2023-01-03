@@ -121,17 +121,18 @@ function writeCourseInfo($line, $skipcopyright=2) {
 
 function writeOtherGrpTemplates($grptemplatelist) {
 	if (count($grptemplatelist)==0) { return;}
+    $uniqid = uniqid();
 	?>
 	<li class=lihdr>
 	<span class=dd>-</span>
-	<span class=hdr onClick="toggle('OGT<?php echo $line['groupid'] ?>')">
-		<span class=btn id="bOGT<?php echo $line['groupid'] ?>">+</span>
+	<span class=hdr onClick="toggle('OGT<?php echo $uniqid; ?>')">
+		<span class=btn id="bOGT<?php echo $uniqid; ?>">+</span>
 	</span>
-	<span class=hdr onClick="toggle('OGT<?php echo $line['groupid'] ?>')">
-		<span id="nOGT<?php echo $line['groupid'] ?>" ><?php echo _('Group Templates') . "\n" ?>
+	<span class=hdr onClick="toggle('OGT<?php echo $uniqid; ?>')">
+		<span id="nOGT<?php echo $uniqid; ?>" ><?php echo _('Group Templates') . "\n" ?>
 		</span>
 	</span>
-	<ul class=hide id="OGT<?php echo $line['groupid'] ?>">
+	<ul class=hide id="OGT<?php echo $uniqid; ?>">
 	<?php
 	$showncourses = array();
 	foreach ($grptemplatelist as $gt) {

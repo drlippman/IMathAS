@@ -60,6 +60,9 @@ function showitemtree($items,$parent,$greyitems=0) {
 					 continue;
 				 }
 			}
+            if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+			}
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 						($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
 				if ($item['SH'][1]=='T') { //just link to treereader item

@@ -184,7 +184,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
 		// Core options
-		if ($_POST['copyfrom'] > 0) { // copy options from another assessment
+		if (!empty($_POST['copyfrom'])) { // copy options from another assessment
 			$fields = array('displaymethod','submitby','defregens','defregenpenalty',
 									'keepscore','defattempts','defpenalty','showscores','showans',
 									'viewingb','scoresingb','ansingb','gbcategory','caltag','shuffle',
@@ -259,7 +259,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 
 			$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
-			if ($toset['showscores'] == 'none' || $toset['showscores'] == 'total') {
+			if ($toset['showscores'] == 'none' || $toset['showscores'] == 'total' || !isset($_POST['showans'])) {
 				$toset['showans'] = 'never';
 			} else {
 				$toset['showans'] = Sanitize::simpleString($_POST['showans']);

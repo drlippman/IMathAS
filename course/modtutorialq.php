@@ -760,9 +760,9 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	} else {
 		$author = implode(", mb ",$namelist);
 	}
-	foreach ($line as $k=>$v) {
+	/*foreach ($line as $k=>$v) {
 		$line[$k] = str_replace('&','&amp;',$v);
-	}
+	}*/
 
 	$inlibs = array();
 
@@ -870,20 +870,22 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$partial = array();
 	for ($n=0;$n<$nparts;$n++) {
 		$partial[$n] = array();
-		for ($i=0;$i<count($partialcredit[$n]);$i+=2) {
-			if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
-				$questions[$n][floor($i/2)] = $partialcredit[$n][$i];
-				if ($partialcredit[$n][$i]==$answer[$n]) {
-					$answerloc[$n] = floor($i/2);
-				}
-				$partial[$n][floor($i/2)] = $partialcredit[$n][$i+1];
-			} else if ($qtype[$n]=="choices") {
-				$partial[$n][$partialcredit[$n][$i]] = $partialcredit[$n][$i+1];
-			}
-		}
-		if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
-			$answer[$n] = $answerloc[$n];
-		}
+        if (isset($partialcredit[$n])) {
+            for ($i=0;$i<count($partialcredit[$n]);$i+=2) {
+                if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
+                    $questions[$n][floor($i/2)] = $partialcredit[$n][$i];
+                    if ($partialcredit[$n][$i]==$answer[$n]) {
+                        $answerloc[$n] = floor($i/2);
+                    }
+                    $partial[$n][floor($i/2)] = $partialcredit[$n][$i+1];
+                } else if ($qtype[$n]=="choices") {
+                    $partial[$n][$partialcredit[$n][$i]] = $partialcredit[$n][$i+1];
+                }
+            }
+            if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
+                $answer[$n] = $answerloc[$n];
+            }
+        }
 	}
 	if ($nhints>0) { //strip out hints para
 		$qtext = substr($qtext, strpos($qtext,'</p>')+4);
@@ -1339,7 +1341,7 @@ parts.</p>
 
 <?php
 for ($n=0;$n<10;$n++) {
-	if (!isset($qparts[$n])) { $qparts[$n] = 4;}
+	if (!isset($qparts[$n])) { $qparts[$n] = 4; $qtype[$n] = 'choices';}
 	echo '<div id="partwrapper'.$n.'"';
 	if ($n>=$nparts) {echo ' style="display:none;"';};
 	echo '>';
@@ -1362,9 +1364,9 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'mc" ';
 	if (isset($qtype[$n]) && $qtype[$n]!='choices') {echo ' style="display:none;"';};
 	echo '> choices.  Display those ';
-	writeHtmlSelect("qdisp$n",$dispval,$displbl, $qdisp[$n]);
+	writeHtmlSelect("qdisp$n",$dispval,$displbl, $qdisp[$n] ?? 'vert');
 	echo '. Shuffle: ';
-	writeHtmlSelect("qshuffle$n",$shuffleval,$shufflelbl, $qshuffle[$n]);
+	writeHtmlSelect("qshuffle$n",$shuffleval,$shufflelbl, $qshuffle[$n] ?? 'all');
 	echo '</span>';
 	//numeric
 	echo '<span id="qti'.$n.'num" ';
@@ -1428,7 +1430,7 @@ for ($n=0;$n<10;$n++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};
 		echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
-		if (($qtype[$n]=='choices' && $i==$answer[$n]) || ($qtype[$n]!='choices' && isset($partial[$n][$i]) && $partial[$n][$i]==1)) {echo 'checked="checked"';}
+		if (($qtype[$n]=='choices' && isset($answer[$n]) && $i==$answer[$n]) || ($qtype[$n]!='choices' && isset($partial[$n][$i]) && $partial[$n][$i]==1)) {echo 'checked="checked"';}
 		echo '/></td>';
 		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?Sanitize::encodeStringForDisplay($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?Sanitize::encodeStringForDisplay($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';

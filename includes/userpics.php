@@ -61,8 +61,8 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
 	imagedestroy( $temp );
 	*/
 	//nocrop version
-	$tmpw = $w*($th/$h);
-	$imT = imagecreatetruecolor( $tmpw, $th );
+	$tmpw = round($w*($th/$h));
+	$imT = imagecreatetruecolor( (int) $tmpw, (int) $th );
 	imagecopyresampled( $imT, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
     }
     if ($type=='jpeg') {

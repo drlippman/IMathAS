@@ -82,7 +82,7 @@
 
 	//pull exceptions, as they may extend the enddate
 	$exceptions = array();
-	if (isset($studentid) && count($forumdata)>0) {
+	if (isset($studentid) && !$inInstrStuView && count($forumdata)>0) {
 		require_once("../includes/exceptionfuncs.php");
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 		$ph = Sanitize::generateQueryPlaceholders($forumdata);

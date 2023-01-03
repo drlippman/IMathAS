@@ -157,10 +157,12 @@ function storeUserPrefs() {
 		}
 	}
 	//use timezone from form - either browser reported or set val
-    $tzname = Sanitize::stripHtmlTags($_POST['settimezone']);
-	if (date_default_timezone_set($_POST['settimezone'])) {
-		$_SESSION['tzname'] = $tzname;
-	}
+    if (isset($_POST['settimezone'])) {
+        $tzname = Sanitize::stripHtmlTags($_POST['settimezone']);
+        if (date_default_timezone_set($_POST['settimezone'])) {
+            $_SESSION['tzname'] = $tzname;
+        }
+    }
 	if ($_POST['tztype']==2) { //using a permanant fixed timezone - record it
 		$_SESSION['userprefs']['tzname'] = $tzname;
 		if (isset($currentuserprefs['tzname'])) {

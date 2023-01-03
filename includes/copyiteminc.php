@@ -494,8 +494,8 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['SH'] = $item['SH'];
                 $newblock['colors'] = $item['colors'];
                 $newblock['public'] = $item['public'] ?? 0;
-                $newblock['fixedheight'] = $item['fixedheight'];
-                $newblock['grouplimit'] = $item['grouplimit'];
+                $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
+                $newblock['grouplimit'] = $item['grouplimit'] ?? [];
                 $newblock['items'] = array();
                 if (count($item['items']) > 0) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);

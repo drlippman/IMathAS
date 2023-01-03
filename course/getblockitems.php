@@ -68,6 +68,8 @@
 		}
 		$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	   }
+   } else {
+    $contentbehavior = 0;
    }
 
    $openblocks = Array(0);

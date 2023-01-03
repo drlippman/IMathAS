@@ -236,8 +236,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			list($titlebg,$titletxt,$bi) = explode(',',$blockitems[$existingid]['colors']);
 			$usedef = 0;
 		}
-		$fixedheight = $blockitems[$existingid]['fixedheight'];
-		$grouplimit = $blockitems[$existingid]['grouplimit'];
+		$fixedheight = $blockitems[$existingid]['fixedheight'] ?? 0;
+		$grouplimit = $blockitems[$existingid]['grouplimit'] ?? [];
 		$savetitle = _("Save Changes");
 
 

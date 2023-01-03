@@ -53,7 +53,7 @@ if (!empty($_SESSION['userid'])) { // logged in
         }
     }
 
-    $lastSessionTime = isset($GLOBALS['sessionLastAccess']) ? $GLOBALS['sessionLastAccess'] : $_SESSION['time'];
+    $lastSessionTime = isset($GLOBALS['sessionLastAccess']) ? $GLOBALS['sessionLastAccess'] : ($_SESSION['time'] ?? 0);
     if ((time() - $lastSessionTime) > 24 * 60 * 60 && (!isset($_POST) || count($_POST) == 0)) {
         $wasLTI = isset($_SESSION['ltiitemtype']);
         unset($userid);

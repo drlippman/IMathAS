@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__)."/filehandler.php");
 
 function convertdatauris($in) {
+    if (empty($in)) { return $in; }
 	global $CFG,$userid;
 	$okext = array('jpeg'=>'.jpg','gif'=>'.gif','png'=>'.png');
 	if (strpos($in,'data:image')===false) {return $in;}

@@ -1185,7 +1185,9 @@ if ($stm->rowCount()==0) {
 				copyrubrics();
 				$DBH->commit();
 				$copiedfromcid = $sourcecid;
-			}
+			} else {
+                $copiedfromcid = 0;
+            }
 			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid,copiedfrom,contextlabel) VALUES ";
 			$query .= "(:org, :contextid, :courseid, :copiedfrom, :contextlabel)";
 			$stm = $DBH->prepare($query);

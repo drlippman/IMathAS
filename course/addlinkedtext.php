@@ -38,7 +38,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_linkedtext WHERE id=?");
 	$stm->execute(array($linkid));
 	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
@@ -300,7 +300,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<p><a href=\"addlinkedtext.php?cid=" . $cid;
 			if (!empty($linkid)) {
 				$body .= "&id=" . $linkid;
-			} else {
+			} else if (isset($newtextid)) {
 				$body .= "&id=$newtextid";
 			}
 			$body .= "\">Try Again</a></p>\n";

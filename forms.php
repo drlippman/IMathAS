@@ -2,7 +2,7 @@
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
 require_once("includes/newusercommon.php");
-
+if (!isset($_GET['action'])) { exit; }
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("init.php");
 } else {
