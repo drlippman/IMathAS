@@ -1458,7 +1458,7 @@ function graphgetcriticalpath($g,$w) {
 	$path = array();
 	$cur = $maxs[0];
 	$time = $dist[$cur];
-	while ($dist[$cur]>0) {
+	while (isset($dist[$cur]) && $dist[$cur]>0) {
 		$path[] = $cur;
 		$cur = $next[$cur];
 	}
