@@ -148,6 +148,7 @@ if (!(isset($teacherid))) {
 				$row[':id'] = $cid;
 				$stm->execute($row);
 			}
+            $gbcats = array();
 			if (isset($_POST['copygbsetup'])) {
 				$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$ctc));
@@ -184,7 +185,6 @@ if (!(isset($teacherid))) {
 					}
 				}
 			} else {
-				$gbcats = array();
 				$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid=:courseid AND ";
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);

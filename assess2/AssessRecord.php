@@ -2789,7 +2789,7 @@ class AssessRecord
       } else {
         $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
       }
-      if ($regen !== $qdata['regen']) {
+      if (!isset($qdata['regen']) || $regen !== $qdata['regen']) {
         //echo "regen failed: $regen vs ".$qdata['regen'].". ";
         return false;
       }

@@ -7,12 +7,9 @@ require("../init.php");
 
 $cid = Sanitize::courseId($_GET['cid']);
 $stu = 0;
-if (isset($teacherid)) {
-	$isteacher = true;
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
+
 if ($isteacher || $istutor) {
 	$canviewall = true;
 } else {
@@ -346,7 +343,7 @@ function gbinstrdisp() {
 				if ($isteacher) {
 					echo '</a>';
 				}
-				if ($gbt[$i][1][$j][1]==1) {
+				if (!empty($gbt[$i][1][$j][1])) {
 					echo '<sup>*</sup>';
 				}
 			} else if ($gbt[0][1][$j][6]==2) { //discuss

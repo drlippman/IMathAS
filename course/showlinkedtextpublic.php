@@ -6,6 +6,7 @@
 		echo "Need course id";
 		exit;
 	}
+    if (!isset($_GET['id'])) { exit; }
 	$cid = intval($_GET['cid']);
 
 	if (isset($_GET['from'])) {

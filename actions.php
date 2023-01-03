@@ -378,17 +378,17 @@ require_once("includes/sanitize.php");
 			}
 		} else if (isset($_GET['code'])) {
 			//moved to forms.php - keep redirect for to keep old links working for now.
-			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code) . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($_GET['code']) . "&r=" . Sanitize::randomQueryStringParam());
 		}
         exit;
 	} else if (isset($_GET['action']) && $_GET['action']=="lookupusername") {
         $init_session_start = true;
 		require_once("init_without_validate.php");
-        if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
+        if (!isset($_SESSION['challenge']) || !isset($_POST['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
             !empty($_POST['terms']) ||
             !isset($_SESSION['lookupusernamestart']) || (time() - $_SESSION['lookupusernamestart']) < 3
         ) {
-            echo (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge']) ? 'challenge bad' : 'challenge ok';
+            echo (!isset($_SESSION['challenge']) || !isset($_POST['challenge']) || $_POST['challenge'] !== $_SESSION['challenge']) ? 'challenge bad' : 'challenge ok';
             if (isset($_SESSION['lookupusernamestart']) && (time() - $_SESSION['lookupusernamestart']) < 5) { echo 'time blocked';}
 
             echo "Invalid submission";
@@ -524,7 +524,7 @@ require_once("includes/sanitize.php");
 			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">"._("Home")."</a> &gt; "._("Enroll in a Course")."</div>\n";
 		}
 		$pagetopper .= '<div id="headerforms" class="pagetitle"><h1>'._('Enroll in a Course').'</h1></div>';
-		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
+		if (empty($_POST['cid']) || !is_numeric($_POST['cid'])) {
 			require("header.php");
 			echo $pagetopper;
 			echo _("Please include Course ID."),"  <a href=\"forms.php?action=enroll$gb\">",_("Try Again"),"</a>\n";

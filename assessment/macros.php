@@ -391,7 +391,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$path .= "line([$val,$thisymin],[$val,$thisymax]);";
 			if ($isineq) {
                 $path .= "stroke=\"none\";strokedasharray=\"none\";";
-                if ($function[1]=='red' || $function[1]=='green') {
+                if (isset($function[1]) && ($function[1]=='red' || $function[1]=='green')) {
                     $path .= "fill=\"trans{$function[1]}\";";
                 } else {
                     $path .= "fill=\"transblue\";";

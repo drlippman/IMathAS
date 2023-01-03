@@ -454,7 +454,7 @@ If deleted on both ends, delete from DB
             }
       			$query .= "ORDER BY imas_users.LastName";
       			$stm = $DBH->prepare($query);
-            if (!$isteacher && !$istutor && $studentinfo['section']!=null) {
+            if (!$isteacher && !$istutor && !empty($studentinfo['section'])) {
       			   $stm->execute(array(':courseid'=>$cid, ':section'=>$studentinfo['section']));
             } else {
                $stm->execute(array(':courseid'=>$cid));

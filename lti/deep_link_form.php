@@ -28,7 +28,6 @@ function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
   }
   $contextid = $launch->get_platform_context_id();
   $platform_id = $launch->get_platform_id();
-  $resource_link = $launch->get_resource_link();
 
   $assessments = $db->get_assessments($localcourse->get_courseid());
 

@@ -3,7 +3,7 @@
 // (c) 2007 David Lippman
 require_once ('../includes/loaditemshowdata.php');
 require_once ("../includes/exceptionfuncs.php");
-if ($courseUIver>1) {
+if (!isset($courseUIver) || $courseUIver>1) {
 	$addassess = 'addassessment2.php';
 } else {
 	$addassess = 'addassessment.php';

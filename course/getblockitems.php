@@ -41,6 +41,7 @@
     }
 
    //if ($_GET['folder']!='0') {
+   $contentbehavior = 0;
    if (strpos($_GET['folder'],'-')!==false) {
 	   $now = time();
 	   $blocktree = explode('-',$_GET['folder']);
@@ -68,8 +69,6 @@
 		}
 		$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	   }
-   } else {
-    $contentbehavior = 0;
    }
 
    $openblocks = Array(0);

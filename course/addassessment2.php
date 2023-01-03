@@ -832,18 +832,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
               global $page_outcomes, $outcomeOptions;
               foreach ($ar as $v) {
                   if (is_array($v)) { //outcome group
-										$outcomeOptions[] = array(
-											'value' => '',
-											'text' => $v['name'],
-											'isgroup' => true
-										);
+                    $outcomeOptions[] = array(
+                        'value' => '',
+                        'text' => $v['name'],
+                        'isgroup' => true
+                    );
                     flattenarr($v['outcomes']);
-                  } else {
-										$outcomeOptions[] = array(
-											'value' => $v,
-											'text' => $page_outcomes[$v],
-											'isgroup' => false
-										);
+                  } else if (isset($page_outcomes[$v])) {
+                    $outcomeOptions[] = array(
+                        'value' => $v,
+                        'text' => $page_outcomes[$v],
+                        'isgroup' => false
+                    );
                   }
               }
           }

@@ -243,6 +243,7 @@ function migrateAssessSettings1to2($settings) {
 
 function getBasePenalty($pen) {
   $pen = (string) $pen;
+  if ($pen === '') { $pen = '0'; }
   if ($pen[0]=='S') {
     return substr($pen,2);
   } else if ($pen[0]=='L') {
