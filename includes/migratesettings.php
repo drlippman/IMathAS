@@ -264,6 +264,7 @@ function migrateQuestionSettings1to2($settings, $defaults) {
   } else {
     $refattempts = $settings['attempts'];
   }
+  if ($settings['penalty'] === '') { $settings['penalty'] = '0'; }
   if ($settings['penalty'][0] == 'S') {
     $after = $settings['penalty'][1] + 1;
     if ($after < $refattempts) {

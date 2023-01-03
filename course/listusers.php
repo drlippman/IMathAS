@@ -70,7 +70,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$pagetitle = "Assign Section/Code Numbers";
 
 		if (isset($_POST['submit'])) {
-			$keys = array_keys($_POST['sec']);
+			$keys = array_keys($_POST['sec'] ?? []);
 			foreach ($keys as $stuid) {
 				if ($_POST['sec'][$stuid]=='') {
 					$_POST['sec'][$stuid] = null;

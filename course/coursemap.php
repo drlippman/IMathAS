@@ -24,7 +24,7 @@ $stm->execute(array(':id'=>$cid));
 $items = unserialize($stm->fetchColumn(0));
 
 $exceptions = array();
-if (!$viewall) {
+if (!$viewall && isset($studentinfo['latepasses'])) {
 	$exceptions = loadExceptions($cid, $userid);
 	require_once("../includes/exceptionfuncs.php");
 	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);

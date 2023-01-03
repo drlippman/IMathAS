@@ -449,7 +449,7 @@ If deleted on both ends, delete from DB
       			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
       			$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
       			$query .= "imas_tutors.courseid=:courseid ";
-            if (!$isteacher && !$istutor && $studentinfo['section']!=null) {
+            if (!$isteacher && !$istutor && !empty($studentinfo['section'])) {
       			     $query .= "AND (imas_tutors.section=:section OR imas_tutors.section='') ";
             }
       			$query .= "ORDER BY imas_users.LastName";

@@ -261,7 +261,7 @@ function showresults($q,$qtype) {
 	}
 }
 
-function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
+function disp($q,$qtype,$part=-1,$answer='',$questions=array()) {
 	global $qdata,$qsdata,$qsids,$scorebarwidth;
 	$res = array();
 	$correct = array();

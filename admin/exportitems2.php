@@ -507,7 +507,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$output_qid = $qsmap[$line['id']];
 			//handle qimages
 			if ($line['hasimg']==1) {
-				$line['qimgs'] = $qimgmap[$line['id']];
+                if (isset($qimgmap[$line['id']])) {
+				    $line['qimgs'] = $qimgmap[$line['id']];
+                } else {
+                    $line['hasimg'] = 0;
+                }
 			}
 			if (isset($dependencies[$line['id']])) {
 				foreach ($dependencies[$line['id']] as $k=>$v) {

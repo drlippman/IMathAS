@@ -1038,6 +1038,7 @@ class AssessInfo
       $settings['retry_penalty'] = $defaults['defpenalty'];
       $settings['retry_penalty_after'] = $defaults['defpenalty_after'];
     } else {
+      if ($settings['penalty'] === '') { $settings['penalty'] = '0'; }
       if ($settings['penalty'][0]==='L') {
         $settings['retry_penalty_after'] = 'last';
         $settings['retry_penalty'] = intval(substr($settings['penalty'], 1));

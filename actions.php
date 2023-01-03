@@ -32,7 +32,8 @@ require_once("includes/sanitize.php");
 		$init_session_start = true;
 		require_once("init_without_validate.php");
 		require_once("includes/newusercommon.php");
-        if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
+        if (!isset($_SESSION['challenge']) || !isset($_POST['challenge']) || 
+            $_POST['challenge'] !== $_SESSION['challenge'] ||
             !empty($_POST['hval']) ||
             !isset($_SESSION['newuserstart']) || (time() - $_SESSION['newuserstart']) < 5
         ) {

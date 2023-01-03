@@ -1747,7 +1747,7 @@ function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 
 
 function listtoarray($l) {
-	if (func_num_args()>1 && ($_SESSION['isteacher'] || isset($GLOBALS['teacherid']))) {
+	if (func_num_args()>1) {
 		echo "Warning:  listtoarray expects one argument, more than one provided";
 	}
     if ($l==='') { return []; }
