@@ -815,7 +815,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			$headers = array($headers);
 		}
         $out = '<table class="'.$tblclass.'">';
-        if (abs($headers[0][1]) == count($cols)) {
+        if (is_numeric($headers[0][1]) && abs($headers[0][1]) == count($cols)) {
             $out .= '<caption '.($headers[0][1] < 0 ?'class="sr-only"':'').'>'.$headers[0][0].'</caption>';
             array_shift($headers);
         }
