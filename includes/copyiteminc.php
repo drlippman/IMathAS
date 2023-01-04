@@ -44,9 +44,14 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
     if (!isset($outcomes)) {
         $outcomes = array();
     }
-    if (!isset($_POST['ctc'])) {
-        $_POST['ctc'] = $cid;
+    if (empty($sourcecid)) {
+        if (!empty($_POST['ctc'])) {
+            $sourcecid = intval($_POST['ctc']);
+        } else {
+            $sourcecid = $cid;
+        }
     }
+
     if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
     }
@@ -109,7 +114,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $tool = explode('~~', substr($row['text'], 8));
             if (isset($tool[3]) && isset($gbcats[$tool[3]])) {
                 $tool[3] = $gbcats[$tool[3]];
-            } else if ($_POST['ctc'] != $cid) {
+            } else if ($sourcecid != $cid) {
                 $tool[3] = 0;
             }
             $row['text'] = 'exttool:' . implode('~~', $tool);
@@ -143,10 +148,10 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($sethidden) {$row['avail'] = 0;}
         if (isset($gbcats[$row['gbcategory']])) {
             $row['gbcategory'] = $gbcats[$row['gbcategory']];
-        } else if ($_POST['ctc'] != $cid) {
+        } else if ($sourcecid != $cid) {
             $row['gbcategory'] = 0;
         }
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $row['groupsetid'] = 0;
         }
         $rubric = $row['rubric']; //array_pop($row);
@@ -172,7 +177,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             ':groupsetid' => $row['groupsetid'], ':tutoredit' => $row['tutoredit'],
             ':sortby' => $row['sortby'], ':autoscore' => $row['autoscore']));
         $newtypeid = $DBH->lastInsertId();
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $forumtrack[$typeid] = $newtypeid;
         }
         if ($rubric != 0) {
@@ -254,7 +259,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($sethidden) {$row['avail'] = 0;}
         if (isset($gbcats[$row['gbcategory']])) {
             $row['gbcategory'] = $gbcats[$row['gbcategory']];
-        } else if ($_POST['ctc'] != $cid) {
+        } else if ($sourcecid != $cid) {
             $row['gbcategory'] = 0;
         }
         if (isset($outcomes[$row['defoutcome']])) {
@@ -272,7 +277,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         } else {
             $row['ancestors'] = $newancestor . ',' . $row['ancestors'];
         }
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $forumtopostto = $row['posttoforum'];
             unset($row['posttoforum']);
             if ($row['isgroup'] > 0) {
@@ -336,7 +341,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($reqscoreaid > 0) {
             $reqscoretrack[$newtypeid] = $reqscoreaid;
         }
-        if ($_POST['ctc'] != $cid && $forumtopostto > 0) {
+        if ($sourcecid != $cid && $forumtopostto > 0) {
             $posttoforumtrack[$newtypeid] = $forumtopostto;
         }
         if ($autoexcuse !== null && $autoexcuse !== '' && $cid != $sourcecid) {

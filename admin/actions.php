@@ -925,6 +925,7 @@ switch($_POST['action']) {
 				$newitems = array();
 				require("../includes/copyiteminc.php");
 				$convertAssessVer = $destUIver;
+                $_POST['ctc'] = $_POST['usetemplate'];
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate'], $newitems);
 				$itemorder = serialize($newitems);

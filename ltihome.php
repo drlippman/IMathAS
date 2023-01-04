@@ -151,6 +151,7 @@ if (!empty($createcourse)) {
 		$stm->execute(array(':id'=>$createcourse));
 		$items = unserialize($stm->fetchColumn(0));
 		$newitems = array();
+        $_POST['ctc'] = $createcourse;
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
 		$itemorder = serialize($newitems);

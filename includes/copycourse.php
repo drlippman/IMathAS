@@ -156,6 +156,7 @@ function copycourse($sourcecid, $name, $newUIver) {
   $usereplaceby = "all";
   $newitems = array();
   $cid = $destcid; //needed for copyiteminc
+  $_POST['ctc'] = $sourcecid;
   copyallsub($items,'0',$newitems,$gbcats);
   doaftercopy($sourcecid, $newitems);
 

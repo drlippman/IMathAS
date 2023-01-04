@@ -2146,7 +2146,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			if ($showlinks) {
 				echo '<span class="links">';
                 echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
-                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."remove=ask\">", _('Delete'), "</a>";
+                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."&remove=ask\">", _('Delete'), "</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
 				echo '</span>';
