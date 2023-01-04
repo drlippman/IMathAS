@@ -62,6 +62,10 @@ class EssayAnswerBox implements AnswerBox
             $rows += 5;
         }
 
+        if (!isset($GLOBALS['useeditor'])) { // should be defined, but avoid errors if not
+            $GLOBALS['useeditor'] = 1;
+        }
+
         if ($GLOBALS['useeditor'] == 'review' || ($GLOBALS['useeditor'] == 'reviewifneeded' && trim($la) == '')) {
             $la = str_replace('&quot;', '"', $la);
 
