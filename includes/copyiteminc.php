@@ -35,7 +35,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid, $gbcats = false, $sethidden = false)
 {
     global $DBH;
-    global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+    global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
     global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti, $convertAssessVer, $autoexcusetrack;
     if (!isset($copystickyposts)) {$copystickyposts = false;}
     if ($gbcats === false) {
@@ -44,14 +44,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
     if (!isset($outcomes)) {
         $outcomes = array();
     }
-    if (empty($sourcecid)) {
-        if (!empty($_POST['ctc'])) {
-            $sourcecid = intval($_POST['ctc']);
-        } else {
-            $sourcecid = $cid;
-        }
-    }
-
+    
     if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
     }
@@ -59,10 +52,10 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         $_POST['append'] = '';
     }
     $now = time();
-    $stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+    $stm = $DBH->prepare("SELECT itemtype,typeid,courseid FROM imas_items WHERE id=:id");
     $stm->execute(array(':id' => $itemid));
     if ($stm->rowCount() == 0) {return false;}
-    list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
+    list($itemtype, $typeid, $sourcecid) = $stm->fetch(PDO::FETCH_NUM);
     if ($itemtype == "InlineText") {
         //$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
         //$query .= "SELECT '$cid',title,text,startdate,enddate FROM imas_inlinetext WHERE id='$typeid'";
