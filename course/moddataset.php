@@ -899,7 +899,7 @@
 	   function setupQtextEditor(id) {
 	   	var qtextbox = document.getElementById(id);
 	   	if (!qtextbox) { return; }
-		qtextbox.value = qtextbox.value.replace(/\s*<br\s*\/>\s*<br\s*\/>\s*/g, "\n<br /><br />\n");
+		qtextbox.value = qtextbox.value.replace(/\s*((<br\s*\/>\s*){2,})\s*/g, "\n$1\n");
 	   	qEditor[id] = CodeMirror.fromTextArea(qtextbox, {
 			matchTags: true,
 			mode: "imathasqtext",

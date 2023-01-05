@@ -5690,6 +5690,11 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
     }
     if ($anstypes !== null && !is_array($anstypes)) {
         $anstypes = array_map('trim', explode(',', $anstypes));
+        if (count($parts)==1 && count($anstypes)==1) {
+            // string given as anstypes, and only one part indicated, so use that string as
+            // anstype for that part
+            $anstypes[$parts[0]] = $anstypes[0];
+        }
     }
     foreach ($parts as $part) {
         $ors = array_map('trim', explode(' or ', $part));

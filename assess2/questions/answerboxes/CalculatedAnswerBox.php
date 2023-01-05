@@ -33,6 +33,7 @@ class CalculatedAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -172,7 +173,7 @@ class CalculatedAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if (!is_numeric($answer)) {
                 //$sa = '`' . $answer . '`';
                 if (in_array('allowplusminus', $ansformats)) {

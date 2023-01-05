@@ -33,6 +33,7 @@ class ChoicesAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $assessmentId = $this->answerBoxParams->getAssessmentId();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -180,7 +181,7 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         $tip = _('Select the best answer');
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $anss = explode(' or ', $answer);
             $sapt = array();
             foreach ($anss as $v) {

@@ -38,6 +38,7 @@ class FileUploadAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $assessmentId = $this->answerBoxParams->getAssessmentId();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -107,7 +108,7 @@ class FileUploadAnswerBox implements AnswerBox
             $out .= _('No file submitted');
         }
         $tip .= _('Select a file to upload');
-        if ($scoremethod != 'filesize') {
+        if ($scoremethod != 'filesize' && !$isConditional) {
             $sa .= $answer;
         }
 

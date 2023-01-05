@@ -32,6 +32,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -116,7 +117,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality', $ansformats) ? 'inequality' : 'interval');
         }
 
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !$isConditional && !is_array($answer)) {
             if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
                 $anspts = explode('or', $answer);
                 foreach ($anspts as $k=>$v) {

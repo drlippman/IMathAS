@@ -32,6 +32,7 @@ class StringAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -176,14 +177,16 @@ class StringAnswerBox implements AnswerBox
                 $preview .= "<span id=p$qn></span> ";
             }
         }
-        if (strpos($strflags, 'regex') !== false) {
-            $sa .= _('The answer must match a specified pattern');
-        } else if ($answerformat == "logic") {
-            $sa = '`' . str_replace(['and', 'xor', 'or', 'implies', 'iff'], ['^^', 'oplus', 'vv', '=>', '<=>'], $answer) . '`';
-        } else if ($answerformat == "setexp") {
-            $sa = '`' . str_replace(['and', 'cap', 'xor', 'oplus', 'ominus', 'or', 'cup'], ['nn', 'nn', '⊖', '⊖', '⊖', 'uu', 'uu'], $answer) . '`';
-        } else {
-            $sa .= $answer;
+        if (!$isConditional && !is_array($answer)) {
+            if (strpos($strflags, 'regex') !== false) {
+                $sa .= _('The answer must match a specified pattern');
+            } else if ($answerformat == "logic") {
+                $sa = '`' . str_replace(['and', 'xor', 'or', 'implies', 'iff'], ['^^', 'oplus', 'vv', '=>', '<=>'], $answer) . '`';
+            } else if ($answerformat == "setexp") {
+                $sa = '`' . str_replace(['and', 'cap', 'xor', 'oplus', 'ominus', 'or', 'cup'], ['nn', 'nn', '⊖', '⊖', '⊖', 'uu', 'uu'], $answer) . '`';
+            } else {
+                $sa .= $answer;
+            }
         }
 
         if (($scoremethod == 'takeanythingorblank' && trim($la) == '') ||

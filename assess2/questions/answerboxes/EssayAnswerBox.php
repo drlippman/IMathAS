@@ -32,6 +32,7 @@ class EssayAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -105,7 +106,7 @@ class EssayAnswerBox implements AnswerBox
             }
         }
         $tip .= _('Enter your answer as text.  This question is not automatically graded.');
-        if (is_scalar($answer)) {
+        if (is_scalar($answer) && !$isConditional) {
             $sa .= $answer;
         }
 
