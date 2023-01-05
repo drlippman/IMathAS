@@ -292,7 +292,7 @@ if (!(isset($teacherid))) {
 				}
 				$sets[] = "reqscoreaid=:reqscoreaid";
 				$qarr[':reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
-				if ($_POST['reqscorecalctype']==1) {
+				if (!empty($_POST['reqscorecalctype'])) {
 					$sets[] = "reqscoretype=(reqscoretype | 2)";
 				} else {
 					$sets[] = "reqscoretype=(reqscoretype & ~2)";

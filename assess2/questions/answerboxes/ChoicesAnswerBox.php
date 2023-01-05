@@ -53,7 +53,7 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
-        if ($noshuffle == "last") {
+        if ($noshuffle == "last" && count($questions)>0) {
             $randkeys = (array) $RND->array_rand(array_slice($questions, 0, count($questions) - 1), count($questions) - 1);
             $RND->shuffle($randkeys);
             array_push($randkeys, count($questions) - 1);

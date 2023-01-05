@@ -755,7 +755,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if (is_string($line['defpenalty']) &&$line['defregenpenalty'][0]==='S') {
+      if ($line['defpenalty'] === '') { $line['defpenalty'] = '0'; }
+			if (is_string($line['defpenalty']) && $line['defregenpenalty'][0]==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
 				$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {

@@ -569,7 +569,9 @@ function tokenize($str,$anstype,$countcnt) {
 						//comment inside brackers
 						while ($d!="\n" && $j<$len) {
 							$j++;
-							$d = $str[$j];
+                            if ($j < $len) {
+							    $d = $str[$j];
+                            }
 						}
 					} else if ($d=="\n") {
                         //echo "unmatched parens/brackets - likely will cause an error";

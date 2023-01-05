@@ -246,7 +246,7 @@ class ScoreEngine
                 continue;
             }
 
-            if ('answerformat' == $optionKey) {
+            if ('answerformat' == $optionKey && is_scalar($answerformat)) {
                 $answerformat = str_replace(' ', '', $answerformat);
             }
 
@@ -861,8 +861,6 @@ class ScoreEngine
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
                                      int $errline, array $errcontext = []): bool
     {
-        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
-
         $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
         if (E_ERROR == $errno || (E_WARNING == $errno &&
             (
@@ -873,6 +871,8 @@ class ScoreEngine
             if ($errstr == 'Trying to access array offset on value of type null') {
               $errstr = 'Trying to access array offset of undefined variable';
             }
+            ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+            
             $this->addError(sprintf('Caught %s in the question code: %s on line %s in file %s',
                 ErrorHandler::ERROR_CODES[$errno],
                 $errstr, $errline, $errfile));

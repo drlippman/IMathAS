@@ -297,7 +297,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
 				$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['newfile-'.$i]['name'])));
-				if (trim($_POST['newfiledesc-'.$i])=='') {
+				if (trim($_POST['newfiledesc-'.$i] ?? '')=='') {
 					$_POST['newfiledesc-'.$i] = $userfilename;
 				}
 				$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);

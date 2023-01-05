@@ -121,7 +121,7 @@ Class RollingCurlX {
             $this->init_request($i, $multi_handle, $requests_map);
             $num_outstanding++;
         }
-
+        $active = 1;
         do{
             do{
                 $mh_status = curl_multi_exec($multi_handle, $active);

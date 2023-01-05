@@ -2233,7 +2233,7 @@ class AssessRecord
           } else if ($try === 'scored' && isset($curq['scored_try'][$pn])) {
             $tryn = $curq['scored_try'][$pn];
           } else { // last
-            $tryn = count($curq['tries'][$pn]) - 1;
+            $tryn = max(0, count($curq['tries'][$pn]) - 1);
           }
           $lasttry = $curq['tries'][$pn][$tryn];
           $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];

@@ -322,7 +322,7 @@ function outcometable() {
 	}
 
 		//Pull Discussion Grade info
-	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid=:courseid AND points>0 AND avail>0 ";
+	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail,outcomes FROM imas_forums WHERE courseid=:courseid AND points>0 AND avail>0 ";
 	$query .= "AND startdate<:now AND outcomes<>'' ";
 	$qarr = array(':courseid'=>$cid, ':now'=>$now);
 

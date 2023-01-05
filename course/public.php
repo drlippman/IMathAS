@@ -11,7 +11,7 @@
 	require("../init_without_validate.php");
 
 	$ispublic = true;
-	$cid = Sanitize::courseId($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid'] ?? 0);
     $myrights = 5;
 
 	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset,UIver FROM imas_courses WHERE id=:id");

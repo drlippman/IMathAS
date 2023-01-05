@@ -53,6 +53,10 @@ function chem_isotopedisp($el,$sup,$sub,$noitalic=false) {
 //returns the chemical symbol given the atomic number
 function chem_getsymbol($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getsymbol: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][0];
 }
 
@@ -60,13 +64,20 @@ function chem_getsymbol($n) {
 //returns the atomic number given the chemical symbol
 function chem_getnumber($s) {
 	global $chem_numberbyatom;
-	return $chem_numberbyatom[$s];
+    if (!isset($chem_numberbyatom[$s])) {
+        echo "chem_getnumber: unknown symbol $s";
+    }
+	return ($chem_numberbyatom[$s] ?? 0);
 }
 
 //chem_getname(atomic number)
 //returns the chemical name given the atomic number
 function chem_getname($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getname: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][1];
 }
 
@@ -74,6 +85,10 @@ function chem_getname($n) {
 //returns the chemical standard atomic weight given the atomic number
 function chem_getweight($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getweight: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][3];
 }
 
@@ -82,6 +97,10 @@ function chem_getweight($n) {
 //beware: some elements return weird non-numeric values
 function chem_getmeltingpoint($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getmeltingpoint: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][4];
 }
 
@@ -90,6 +109,10 @@ function chem_getmeltingpoint($n) {
 //beware: some elements return weird non-numeric values
 function chem_getboilingpoint($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getboilingpoint: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][5];
 }
 
@@ -99,6 +122,10 @@ function chem_getboilingpoint($n) {
 //    "Transition Metal", "Lanthanide",  or "Actinide"
 function chem_getfamily($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getfamily: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][6];
 }
 
@@ -329,7 +356,9 @@ function chem_makeioniccompound($cation,$anion) {
 			echo "Anion not found.";
 		}
 	}
-
+    if (!isset($cation) || !isset($anion)) {
+        return false;
+    }
 	$lcm = lcm($cation[1],$anion[1]);
 	$catsub = $lcm/$cation[1];
 	if ($catsub==1) {

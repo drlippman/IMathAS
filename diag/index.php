@@ -150,6 +150,9 @@ if (isset($_POST['SID'])) {
 		echo "<html><body>", Sanitize::encodeStringForDisplay(sprintf(_('Please make selections for "%1$s" and "%2$s".'), $line['sel1name'], $line['sel2name'])), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 			exit;
 	}
+    if (!isset($_POST['teachers'])) {
+        $_POST['teachers'] = '';
+    }
 	$pws = explode(';',$line['pws']);
 	if (trim($pws[0])!='') {
 		$basicpw = explode(',',$pws[0]);

@@ -4217,7 +4217,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 				if (abs($stu - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
-		if ($match>-1) {
+		if ($match>-1 && isset($fbtxt[$match/2])) {
 			if ($partial[$i+1]<1) {
 				return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
 			} else {
@@ -5223,7 +5223,7 @@ function parsereqsigfigs($reqsigfigs) {
 }
 
 function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) {
-	if ($givenans*$anans < 0) { return false;} //move on if opposite signs
+	if (!is_numeric($givenans) || !is_numeric($anans) || $givenans*$anans < 0) { return false;} //move on if opposite signs
 	if ($anans!=0) {
 		$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
 	}

@@ -1655,9 +1655,9 @@ class DrawingScorePart implements ScorePart
 
         } else if ($answerformat[0]=='numberline') {
             foreach ($answers as $key=>$function) {
-                if ($function=='') { continue; }
-                $function = array_map('trim',explode(',',$function));
-                if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+               if ($function=='') { continue; }
+               $function = array_map('trim',explode(',',$function));
+               if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
                 $pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
                 $pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;
                 $newdot = array($pixx, $pixy);
@@ -1671,6 +1671,10 @@ class DrawingScorePart implements ScorePart
                   }
                 }
               } else {
+                if (!isset($function[1]) || !isset($function[2])) {
+                    echo "Need min and max for numberline line";
+                    continue;
+                }
                 if (trim($function[1])==='-oo') {
                     $xminpix = 1;
                 } else {

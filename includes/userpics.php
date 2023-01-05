@@ -48,7 +48,7 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
         $tmpw =round($w*($th/$h));
         $temp = imagecreatetruecolor( (int) $tmpw, (int) $th );
         imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
-        imagecopyresampled( $imT, $temp, 0, 0, $tmpw/2-$tw/2,0, $tw, $th, $tw, $th ); // crop
+        imagecopyresampled( $imT, $temp, 0, 0, (int) round($tmpw/2-$tw/2),0, $tw, $th, $tw, $th ); // crop
         imagedestroy( $temp );
     }else
     { // taller

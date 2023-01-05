@@ -10,6 +10,8 @@ if (isset($CFG['hooks']['admin/actions'])) {
 	require($CFG['hooks']['admin/actions']);
 }
 
+if (!isset($_POST['action'])) { exit; }
+
 $from = 'admin';
 if (isset($_GET['from'])) {
 	if ($_GET['from']=='home') {
