@@ -4600,6 +4600,7 @@ function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,
 function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
   $args = func_get_args();
   $eqnvars = [];
+  $showequation = false;
   foreach ($args as $key => $arg) {
     if (strpos($arg,'showequation') !== false) {
       $showequation = true;
