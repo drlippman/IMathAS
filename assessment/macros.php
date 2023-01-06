@@ -4094,7 +4094,7 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 		if ($res > 0 && $res < 1) {
 			$res = 0;
 		}
-	} else {
+	} else if (isset($rawscores[$qn])) {
 		$qn = $thisq-1;
 		if (strpos($rawscores[$qn],'~')===false) {
 			$res = ($rawscores[$qn]<0)?-1:(($rawscores[$qn]==1)?1:0);
@@ -4112,7 +4112,9 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 				$res = ($sp[$partn]==1)?1:0;
 			}
 		}
-	}
+	} else {
+        return '';
+    }
 	if ($res==-1) {
 		return '';
 	} else if ($res==1) {

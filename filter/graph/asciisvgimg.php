@@ -117,6 +117,7 @@ function AStoIMG($w=200, $h=200) {
 	$this->colors['blue'] = imagecolorallocate($this->img, 0,0,255);
 	$this->colors['cyan'] = imagecolorallocate($this->img, 0,255,255);
 	$this->colors['purple'] = imagecolorallocate($this->img, 128,0,128);
+    $this->colors['brown'] = imagecolorallocate($this->img, 165, 42, 42);
 	imagefill($this->img,0,0,$this->colors['white']);
 }
 
@@ -191,16 +192,16 @@ function processScript($script) {
 				case 'markerfill':
 				case 'fontbackground':
 				case 'fontfill':
-					$this->{$matches[1]} = $matches[2];
 					if (!isset($this->colors[$matches[2]])) {
 						$this->addcolor($matches[2]);
 					}
+                    $this->{$matches[1]} = $matches[2];
 					break;
 				case 'stroke':
-					$this->stroke = $matches[2];
 					if (!isset($this->colors[$matches[2]])) {
 						$this->addcolor($matches[2]);
 					}
+                    $this->stroke = $matches[2];
 					if ($this->isdashed) {
 						$this->ASsetdash();
 					}
@@ -272,7 +273,7 @@ function processScript($script) {
 	}
 }
 
-function addcolor($origcolor) {
+function addcolor(&$origcolor) {
 	$color = $origcolor;
 	if (substr($color,0,5)=='trans') {
 		$alpha = 90;
@@ -285,7 +286,9 @@ function addcolor($origcolor) {
 		$g = hexdec(substr($color,3,2));
 		$b = hexdec(substr($color,5,2));
 		$this->colors[$origcolor] = imagecolorallocatealpha($this->img, $r, $g, $b, $alpha);
-	}
+	} else {
+        $origcolor = 'black';
+    }
 }
 function ASsetdash() {
 	if (!$this->isinit) {$this->ASinitPicture();}
