@@ -1061,9 +1061,8 @@ class QuestionHtmlGenerator
                 }
             }
             
-          
             if (!empty($hints[$usenum])) {
-                if (!is_string($usenum)) { // shouldn't be, but a hack to get old bad code from throwing errors.
+                if (!is_string($hints[$usenum])) { // shouldn't be, but a hack to get old bad code from throwing errors.
                     $hintloc = $hints[$usenum]; 
                 } else if (strpos($hints[$usenum], '</div>') !== false) {
                     $hintloc = $hints[$usenum];
