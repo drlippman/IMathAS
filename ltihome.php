@@ -14,6 +14,8 @@ if (isset($CFG['hooks']['ltihome'])) {
 	require($CFG['hooks']['ltihome']);
 }
 
+$hasplacement = false;
+
 //decide what we need to display
 if ($_SESSION['ltiitemtype']==0) {
 	$hascourse = true;

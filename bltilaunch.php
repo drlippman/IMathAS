@@ -1145,8 +1145,12 @@ if ($stm->rowCount()==0) {
 						}
 					}
 					$outcomesarr = unserialize($outcomesarr);
-					updateoutcomes($outcomesarr);
-					$newoutcomearr = serialize($outcomesarr);
+                    if ($outcomesarr !== false) {
+					    updateoutcomes($outcomesarr);
+					    $newoutcomearr = serialize($outcomesarr);
+                    } else {
+                        $newoutcomearr = '';
+                    }
 				} else {
 					$newoutcomearr = '';
 				}
@@ -1766,7 +1770,7 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
-	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+	if (empty($_POST['tzname']) || $_POST['tzoffset']=='') {
 		echo _('Uh oh, something went wrong.  Please go back and try again');
 		exit;
 	}
@@ -2950,10 +2954,10 @@ if (isset($SESS['lti_duedate'])) {
 }
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
-	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];
+	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'] ?? '';
 	$_SESSION['lti_selection_return_format'] = $SESS['selection_return_format'];
 	$_SESSION['lti_selection_type'] = $SESS['selection_type'];
-	$_SESSION['lti_selection_data'] = $SESS['selection_data'];
+	$_SESSION['lti_selection_data'] = $SESS['selection_data'] ?? '';
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {

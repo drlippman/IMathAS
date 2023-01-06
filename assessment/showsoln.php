@@ -20,7 +20,7 @@ if (!isset($_GET['cid']) || $_GET['cid']==="embedq") {
 
 $id = Sanitize::onlyInt($_GET['id']);
 $sig = $_GET['sig'];
-$t = Sanitize::onlyInt($_GET['t']);
+//$t = Sanitize::onlyInt($_GET['t']);
 $_SESSION['coursetheme'] = $coursetheme;
 
 $flexwidth = true;

@@ -23,7 +23,7 @@ class Question
     private $correctAnswersForParts;
     private $externalReferences;
     private $extraData;
-    private $questionLastMod;
+    private $questionLastMod = 0;
 
     private $errors = array();
 

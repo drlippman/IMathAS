@@ -52,6 +52,7 @@ if (!(isset($teacherid))) {
 
 		$sets = array();
 		$qarr = array();
+        $coreOK = true;
 		if ($_POST['copyopts'] != 'DNC') {
             $copyreqscore = !empty($_POST['copyreqscore']);
 			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
@@ -118,7 +119,6 @@ if (!(isset($teacherid))) {
 			}
 
 			// check the core settings for consistency
-			$coreOK = true;
 			if ($_POST['subtype'] === 'DNC') {
 				$coreOK = false;
 			} else {

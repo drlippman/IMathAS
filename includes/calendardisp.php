@@ -748,7 +748,7 @@ foreach ($itemsimporder as $item) {
 				$itemidref[$k] = 'I'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][2];
-				if (isset($itemfolder[$item])) {
+				if (isset($itemfolder[$item]) && isset($byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'])) {
 					$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'] = str_replace('@@@',$itemfolder[$item],$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder']);
 				}
 				$assess[$moday][$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][3];
