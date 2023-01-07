@@ -61,7 +61,9 @@
 	$itemid = $stm->fetchColumn(0);
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	list($itemorder,$itemcoursename,$itemcoursetheme) = $stm->fetch(PDO::FETCH_NUM);
+	$row = $stm->fetch(PDO::FETCH_NUM);
+    if ($row === false) { exit; }
+    list($itemorder,$itemcoursename,$itemcoursetheme) = $row;
 	$items = unserialize($itemorder);
 	if ($fcid==0) {
 		$coursename = $itemcoursename;

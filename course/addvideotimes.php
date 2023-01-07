@@ -49,7 +49,7 @@ if (isset($_POST['clearall'])) {
 	ksort($data);
 	$data = array_values($data);
 	array_unshift($data, array($vidid, $vidar));
-	if (trim($_POST['finalseg'])!='') {
+	if (trim($_POST['finalseg'] ?? '')!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
 
@@ -426,7 +426,7 @@ for ($i=0;$i<$n;$i++) {
 		echo '<input type="hidden" name="qn'.$i.'" value="' . Sanitize::encodeStringForDisplay($qn[$i]) . '"/>';
 		echo '<br/>';
 		echo _('Has followup?').' <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
-		if ($hasfollowup[$i]) {
+		if (!empty($hasfollowup[$i])) {
 			echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
 		} else {
 			echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
@@ -435,7 +435,7 @@ for ($i=0;$i<$n;$i++) {
 		echo _('Ends at:').' <input type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="' . Sanitize::encodeStringForDisplay($followupendtime[$i]) . '"/> ';
 		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',1);"/> ';
 		echo _('Show link in navigation?').' <input type="checkbox" name="showlink'.$i.'" value="1" ';
-		if ($showlink[$i]) {
+		if (!empty($showlink[$i])) {
 			echo 'checked="checked"';
 		}
 		echo '/></span>';

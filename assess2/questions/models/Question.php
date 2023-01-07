@@ -224,6 +224,6 @@ class Question
      */
     public function setQuestionLastMod($time): void
     {
-        $this->questionLastMod = $time;
+        $this->questionLastMod = intval($time);
     }
 }

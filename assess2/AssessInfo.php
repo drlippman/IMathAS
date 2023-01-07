@@ -1168,6 +1168,13 @@ class AssessInfo
       $settings['submitby'] = 'by_question';
     }
 
+    //if video cued but no viddata, override
+    if ($settings['displaymethod'] === 'video_cued' &&
+        $settings['viddata'] == ''
+    ) {
+        $settings['displaymethod'] = 'skip';
+    }
+
     //if by-assessment, define attempt values
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];

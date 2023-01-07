@@ -37,6 +37,3 @@ function lineboundarycoord($xmin,$xmax,$ymin,$ymax,$m,$b,$order=array("right","t
 	}
 }
 
-?>
-		
-		

@@ -237,6 +237,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
             if (!isset($items[$i]['items'])) {
                 continue; // invalid block - no items
             }
+            if (!isset($items[$i]['id'])) { // hack fix
+                $items[$i]['id'] = 'tmpid'.$i;
+            }
 			   $turnonpublic = false;
 			   if ($ispublic && !$inpublic) {
 				   if (isset($items[$i]['public']) && $items[$i]['public']==1) {

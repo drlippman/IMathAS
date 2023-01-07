@@ -145,7 +145,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        	$assessName = _('Unnamed Assessment');
 	        }
 	        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-	        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
+	        $defpoints = Sanitize::onlyInt($_POST['defpoints'] ?? 0);
 	        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
 	        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
 	        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);

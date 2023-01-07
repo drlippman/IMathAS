@@ -38,7 +38,7 @@ ini_set("max_execution_time", "600");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
@@ -102,7 +102,7 @@ ini_set("max_execution_time", "600");
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "'\">";
 			}
 ?>
 		</p>

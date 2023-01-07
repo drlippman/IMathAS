@@ -55,7 +55,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
                 $answerformat = ($answerformat == '') ? 'list' : $answerformat . ',list';
                 $isListAnswer = true;
             }
-        } else if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10 && strpos($answer,'+-')!==false) {
+        } else if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10 && is_string($answer) && strpos($answer,'+-')!==false) {
             echo _('Warning: For +- in an $answer to score correctly, use $answerformat="allowplusminus"');
         }
 

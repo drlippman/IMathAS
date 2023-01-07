@@ -137,7 +137,7 @@ class NumberAnswerBox implements AnswerBox
                 $shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
             }
         }
-        if (is_array($answer)) {
+        if (!$isConditional && is_array($answer)) {
             echo 'for number question, $answer should be a number or string, not an array';
             $answer = (string)$answer;
         }

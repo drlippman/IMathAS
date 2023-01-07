@@ -149,7 +149,7 @@ function interpretline($str,$anstype,$countcnt) {
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
 				$j = $forloc;
-				while ($bits[$j][0]!='{' && $j<count($bits)) {
+				while ($j<count($bits) && $bits[$j][0]!='{') {
 					$j++;
 				}
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
@@ -166,7 +166,7 @@ function interpretline($str,$anstype,$countcnt) {
 			} else if ($ifloc == 0) {
 				//this is if at beginning of line, form:  if ($a==3) {todo}
 				$j = 0;
-				while ($bits[$j][0]!='{' && $j<count($bits)) {
+				while ($j<count($bits) && $bits[$j][0]!='{') {
 					$j++;
 				}
 				if ($j==count($bits)) {
@@ -182,7 +182,7 @@ function interpretline($str,$anstype,$countcnt) {
 				$out = "if ($cond) $todo";
 				for ($i=0; $i<count($elseloc); $i++) {
 					$j = $elseloc[$i][0];
-					while ($bits[$j][0]!='{' && $j<count($bits)) {
+					while ($j<count($bits) && $bits[$j][0]!='{') {
 						$j++;
 					}
 					if ($j==count($bits)) {

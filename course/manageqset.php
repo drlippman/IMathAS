@@ -307,7 +307,7 @@ if ($myrights<20) {
 							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
-						if ($_SESSION['lastsearchlibs'.$cid]!='') {
+						if (!empty($_SESSION['lastsearchlibs'.$cid])) {
 							$listedlibs = explode(',', $_SESSION['lastsearchlibs'.$cid]);
 						} else {
 							$listedlibs = array();

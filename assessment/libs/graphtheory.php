@@ -574,6 +574,7 @@ function graphgetpathlength($g,$op,$seq) {
             return -1;
         }
 		$cur = $lblrev[$seq[$i]];
+        if (!isset($g[$last][$cur]) && !isset($g[$cur][$last])) { return -1; }
 		$pathlen += max($g[$last][$cur],$g[$cur][$last]);
 		$last = $cur;
 	}
