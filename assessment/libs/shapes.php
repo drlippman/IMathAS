@@ -193,6 +193,7 @@ function draw_angle() {
   
   // Build alt text
   if ($hasUserAltText !== true) {
+    $altRefAngle = "";
     $angRef = abs($ang)%360;
     $angTurns = floor(abs($ang)/360);
     if ($angTurns > 0) {
@@ -227,6 +228,7 @@ function draw_angle() {
     }
     
     if (abs($angTurns) > 0) {
+      $altTurnsAnd = "";
       if ($angRef > 0) {
         $altTurnsAnd = " and also ";
       }
