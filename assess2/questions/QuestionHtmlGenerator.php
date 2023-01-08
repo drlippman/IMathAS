@@ -207,13 +207,17 @@ class QuestionHtmlGenerator
           eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol']));
           eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
         } catch (\Throwable $t) {
+          $errsource = basename($t->getFile());
+          if (strpos($errsource, 'QuestionHtmlGenerator.php') !== -1) {
+            $errsource = _('Common Control');
+          }
           $this->addError(
               _('Caught error while evaluating the code in this question: ')
               . $t->getMessage()
               . ' on line '
               . $t->getLine()
               . ' of '
-              . basename($t->getFile())
+              . $errsource
           );
 
         }
@@ -687,7 +691,7 @@ class QuestionHtmlGenerator
          *
          * Question content (raw HTML) is stored in: $evaledqtext
          */
-
+        $GLOBALS['qgenbreak1'] = __LINE__;
         try {
           $prep = \genVarInit($qtextvars);
           eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
@@ -697,6 +701,7 @@ class QuestionHtmlGenerator
          *
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
+         $GLOBALS['qgenbreak2'] = __LINE__;
          $prep = \genVarInit($solnvars);
          eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
        } catch (\Throwable $t) {

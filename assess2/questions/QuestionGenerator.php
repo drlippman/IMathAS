@@ -221,14 +221,24 @@ class QuestionGenerator
         )) {
           ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
+          $errsource = basename($errfile);
+          if (preg_match('/QuestionHtmlGenerator\.php\((\d+)\)\s*:\s*eval/', $errsource, $m)) {
+            if (!isset($GLOBALS['qgenbreak1']) || $m[1] < $GLOBALS['qgenbreak1']) {
+                $errsource = _('Common Control');
+            } else if (!isset($GLOBALS['qgenbreak2']) || $m[1] < $GLOBALS['qgenbreak2']) {
+                $errsource = _('Question Text');
+            } else {
+                $errsource = _('Detailed Solution');
+            }
+          }
           $this->addError(sprintf(
-              _('Caught warning in the question code: %s on line %d in file %s'),
-              $errstr, $errline, basename($errfile)));
+              _('Caught warning in the question code: %s on line %d in %s'),
+              $errstr, $errline, $errsource));
         } else if (E_WARNING == $errno) {
             // log warnings that have been silenced
             $this->silenterrors[] = sprintf(
-                _('Caught warning in the question code: %s on line %d in file %s'),
-                $errstr, $errline, basename($errfile));
+                _('Caught warning in the question code: %s on line %d in %s'),
+                $errstr, $errline, $errsource);
         }
 
         // True = Don't execute the PHP internal error handler.

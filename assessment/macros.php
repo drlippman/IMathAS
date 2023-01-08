@@ -5353,7 +5353,7 @@ function getRoundNumber($val) {
 	if (($s = strpos($str,'.'))===false) { //no decimal places
 		return 0;
 	} else if (($p = strpos($str,'E'))!==false) { //scientific notation
-		$exp = ceil(-log10($val));
+		$exp = ceil(-log10(abs($val)));
 		if ($p-$s == 2 && $str[$s+1]=='0') { //is 3.0E-5 type
 			return ($exp);
 		} else {
