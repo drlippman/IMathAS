@@ -1841,7 +1841,7 @@ function consecutive($min,$max,$step=1) {
 
 function gcd($n,$m){ //greatest common divisor
     if (!is_numeric($n) || !is_numeric($m)) {
-        echo "gcd requires numeric inputs";
+        echo "gcd requires numeric inputs.";
         return 1;
     }
 	$m = (int) round(abs($m));

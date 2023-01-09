@@ -1591,8 +1591,8 @@ function draw_triangle() {
         $angS2 = 180*acos((pow($sid[1],2)-pow($sid[0],2)-pow($sid[2],2))/(-2*$sid[0]*$sid[2]))/(M_PI);
         $angS3 = 180*acos((pow($sid[2],2)-pow($sid[1],2)-pow($sid[0],2))/(-2*$sid[1]*$sid[0]))/(M_PI);
 
-        $argsArray[$angleKey] = ["angles",$angS1,$angS2,$angS3,$angTmp[0],$angTmp[1],$angTmp[2],$angArcTmp[0],$angArcTmp[1],$angArcTmp[2]];
-        $argsArray[$sideKey] = ["sides",$sidLabTmp[0],$sidLabTmp[1],$sidLabTmp[2],$sideMarkTmp[0],$sideMarkTmp[1],$sideMarkTmp[2]];
+        $argsArray[$angleKey] = ["angles",$angS1,$angS2,$angS3,$angTmp[0]??'',$angTmp[1]??'',$angTmp[2]??'',$angArcTmp[0]??'',$angArcTmp[1]??'',$angArcTmp[2]??''];
+        $argsArray[$sideKey] = ["sides",$sidLabTmp[0]??'',$sidLabTmp[1]??'',$sidLabTmp[2]??'',$sideMarkTmp[0]??'',$sideMarkTmp[1]??'',$sideMarkTmp[2]??''];
       }
     }
     
