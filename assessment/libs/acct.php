@@ -345,6 +345,7 @@ function scorestatement($stua, $answer, $s, $sn) {
 					$i += 1;
 					continue; //don't need to swap since only one answer
 				}
+                if (!isset($stua[$i]) || !isset($stua[$i+1])) { continue; }
 				$matchtype = -1;  $matchval = -1;
 				$stua[$i+1] = floatval(str_replace(array('$',',',' '), '', $stua[$i+1]));
 				//for ($k=$sn;$k<$sn+2*$n;$k+=2) {
@@ -622,6 +623,7 @@ function scorejournal($stua, $answer, $j, $sn) {
 		$usedans = array();
 		for ($i=$sn;$i<$sn+(3+$offset)*$n;$i+=3+$offset) {
 			$matchtype = -1;  $matchval = -1;
+            if (!isset($stua[$i]) || !isset($stua[$i+1+$offset]) || !isset($stua[$i+2+$offset])) { continue; }
 			for ($k=$sn;$k<$sn+(3+$offset)*$n;$k+=3+$offset) {
 				if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) {
 					$matchtype = $k;
@@ -663,11 +665,13 @@ function scorejournal($stua, $answer, $j, $sn) {
 		//mark wrong the less harmful ones
 		$debaftercred = array();  $firstcred = false;
 		for ($i=$sn;$i<$sn+(3+$offset)*$n;$i+=3+$offset) {
+            if (!isset($stua[$i]) || !isset($stua[$i+1+$offset]) || !isset($stua[$i+2+$offset])) { continue; }
 			if ($stua[$i+1+$offset]!='' && $stua[$i+2+$offset]=='' && $firstcred) { $debaftercred[] = $i;}
 			if ($stua[$i+1+$offset]=='' && $stua[$i+2+$offset]!='') { $firstcred = true; }
 		}
 		$credbeforedeb = array();  $firstdeb = false;
 		for ($i=$sn+(3+$offset)*$n-3-$offset;$i>=$sn;$i-=(3+$offset)) {
+            if (!isset($stua[$i]) || !isset($stua[$i+1+$offset]) || !isset($stua[$i+2+$offset])) { continue; }
 			if ($stua[$i+1+$offset]!='' && $stua[$i+2+$offset]=='') { $firstdeb = true;}
 			if ($stua[$i+1+$offset]=='' && $stua[$i+2+$offset]!='' && $firstdeb) { $credbeforedeb[] = $i; }
 		}
@@ -1357,6 +1361,8 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 	$cntright = count($rightentries);
 	//change blanks to zeros
 	for ($i=0;$i<$numrows;$i++) {
+        if (!isset($stua[$sn+2*$i])) { $stua[$sn+2*$i] = 0; }
+        if (!isset($stua[$sn+2*$i+1])) { $stua[$sn+2*$i+1] = 0; }
 		$stua[$sn+2*$i] = str_replace(array('$',','),'',$stua[$sn+2*$i]);
 		$stua[$sn+2*$i+1] = str_replace(array('$',','),'',$stua[$sn+2*$i+1]);
 		if (trim($stua[$sn+2*$i])=='') {
@@ -1516,7 +1522,7 @@ function scoreinventory($stua, $answer, $invs, $rowper, $sn) {
 		} else {
 			$sn += 3; //skip past purch
 			for ($i=$sn+3;$i<$sn+$rowper*6;$i+=6) {  //start on inventory
-				if ($stua[$i]=='') {continue;}
+				if (!isset($stua[$i]) || $stua[$i]=='') {continue;}
 				$foundmatch = false;
 				for ($j=$sn+3;$j<$sn+$rowper*6;$j+=6) {
 					if (trim($stua[$i])==$answer[$j] && trim($stua[$i+1])==$answer[$j+1]) {
@@ -1540,7 +1546,7 @@ function scoreinventory($stua, $answer, $invs, $rowper, $sn) {
 			}
 			if ($inv[0]=='sale') {
 				for ($i=$sn;$i<$sn+$rowper*6;$i+=6) {  //do cogs
-					if ($stua[$i]=='') {continue;}
+					if (!isset($stua[$i]) || $stua[$i]=='') {continue;}
 					$foundmatch = false;
 					for ($j=$sn;$j<$sn+$rowper*6;$j+=6) {
 						if (trim($stua[$i])==$answer[$j] && trim($stua[$i+1])==$answer[$j+1]) {
@@ -1936,7 +1942,7 @@ function scoretrialbalance($stua, $answer, $data, $numrows, $sn) {
 	}
 	//now score by groups.  We know stua is in the right order
 	for ($j=$sn;$j<$sn+$numrows*3;$j+=3) {
-		if ($stua[$j]=='') {continue;}
+		if (!isset($stua[$j]) || $stua[$j]=='') {continue;}
 		$foundmatch = false;
 		for ($i=$sn;$i<$sn+$nq*3;$i+=3) {
 			if (trim(strtolower($stua[$j]))==trim(strtolower($answer[$i]))) {
