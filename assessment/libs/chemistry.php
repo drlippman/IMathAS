@@ -397,7 +397,254 @@ function chem_makeioniccompound($cation,$anion) {
 	return array($formula,$name);
 }
 
+//chem_getsolubility(cation, anion)
+//	takes a cation array and anion array
+//	returns the solubility state using Wikipedia's Solubility Chart https://en.wikipedia.org/wiki/Solubility_chart
+//		ex. array('soluble', '(aq)') 
+//returns array(stateName, abbreviation)
+function chem_getsolubility($receive_cation, $receive_anion){
+	[$cation, $cat_charge] = $receive_cation;
+	[$anion, $an_charge] = $receive_anion;
+	// possible state arrays
+	$state_aq = array('soluble', '(aq)');
+	$state_i = array('insoluble', '(s)');
+	$state_sS = array('slightly soluble', '(aq)');
+	$state_r = array('reaction', '(l)');
+	$state_unknown = array('unavailable', '(?)');
+	$state_missing = array('This info is missing from MOM', '(TODO)');
 
+	// Rule 0: Unknown States
+	// Currently Missing Cations: Cd, Fr, Ra, Cr 2+, Mn 3+, Co 3+, Ni 3+, Cu 1+, Au 1+, Sn 4+, Pb 4+, Hg_2
+	$unknown_cations = array('Cd', 'Fr', 'Ra', 'Hg_2');
+	if (in_array($cation, $unknown_cations)){
+		return $state_unknown;
+	}
+	if ($cat_charge > 3) {
+		return $state_unknown;
+	}
+	if ($cat_charge == 3){
+		if ($cation == 'Mn' or $cation == 'Co' or $cation == 'Ni'){
+			return $state_unknown;
+		}
+	}
+	if ($cat_charge == 2 and $cation == 'Cr'){
+		return $state_unknown;
+	}
+	if ($cat_charge == 1 and $cation == 'Au'){
+		return $state_unknown;
+	}
+	// Currently Missing Anions: N, P, C, Se, ClO, ClO_2, ClO_3, HCO_3, H_2PO_4, HSO_3, HSO_4, IO_3, MnO_4, NO_2, CrO_4, Cr_2O_7, HPO_4, SO_3, SiO_3, AsO_4, PO_3, O_2
+	$unknown_anions = array('N', 'P', 'C', 'Se', 'Cl O', 'Cl O_2', 'Cl O_3', 'H C O_3', 'H_2 P O_4', 'H S O_3', 'H S O_4', 'I O_3', 'Mn O_4', 'N O_2', 'Cr O_4', 'Cr_2 O_7', 'H P O_4', 'S O_3', 'Si O_3', 'As O_4', 'P O_4', 'O_2');
+
+	// Rule 1: Nitrate is always soluble
+	if ($anion == 'N O_3'){
+		return $state_aq;
+	}
+	// Rule 1.1: Ammonium and Hydrogen are mostly soluble (Hopefully speed up computing)
+	if ($cation == 'N H_4' or $cation == 'H'){
+		if ($anion == 'S'){
+			if ($cation == 'N H_4'){
+				return $state_r;
+			} else {
+				return $state_sS;
+			}
+		}
+		else {
+			return $state_aq;
+		}
+	}
+
+	// Rule 2: Bromide and Chloride are mostly soluble
+	if ($anion == 'Cl' or $anion == 'Br'){
+		if ($cation == 'Pb') {
+			return $state_sS;
+		}
+		if ($cation == 'Cr' and $anion == 'Br') {
+			return $state_sS;
+		}
+		if ($cation == 'Au' and $anion == 'Br') {
+			return $state_sS;
+		}
+		if ($cation == 'Ag') {
+			return $state_i;
+		}
+		return $state_aq;
+	}
+	// Rule 3: Iodide is mostly soluble
+	if ($anion == 'I'){
+		if ($cation == 'Be' or $cation == 'Ga'){
+			return $state_r;
+		}
+		elseif($cation == 'Fe' and $cat_charge == 3){
+			return $state_r;
+		}
+		elseif ($cation == 'Cu'){
+			return $state_unknown;
+		}
+		elseif ($cation == 'Ag' or $cation == 'Hg' or $cation == 'Au'){
+			return $state_i;
+		}
+		else{return $state_aq;}
+	}
+	// Rule 4: Fluoride is mostly soluble
+	if ($anion == 'F'){
+		$f_slightlySoluble = array('Li', 'Mg', 'Sr', 'Ba', 'Al', 'Mn', 'Co', 'Cu', 'Zn', 'Pb', 'Cr');
+		$f_insoluble = array('Ca', 'Ga', 'V', 'Au');
+		if (in_array($cation, $f_slightlySoluble)){
+			return $state_sS;
+		}
+		elseif (in_array($cation, $f_insoluble)){
+			return $state_i;
+		}
+		elseif ($cation == 'Hg'){
+			return $state_r;
+		}
+		elseif($cation == 'Fe' and $cat_charge == 2){
+			return $state_sS;
+		}
+		return $state_aq;
+	}
+	// Rule 5: Sulfide and Oxide mostly insoluble
+	if ($anion == 'O' or $anion == 'S'){
+		$s_and_o_reactive = array('Li', 'Na', 'K', 'Rb', 'Cs', 'Ca', 'Sr', 'Ba');
+		if (in_array($cation, $s_and_o_reactive)){
+			return $state_r;
+		}
+		elseif ($cation == 'N H_4'){
+			if ($anion == 'O'){
+				return $state_aq;
+			} else {
+				return $state_r;
+			}
+		}
+		elseif ($cation == 'H'){
+			if ($anion == 'O'){
+				return $state_aq;
+			} else {
+				return $state_sS;
+			}
+		}
+		elseif ($cation == 'Be' or $cation == 'Mg' or $cation == 'Al' or $cation == 'Ga'){
+			if ($anion == 'O'){
+				return $state_i;
+			} else {
+				return $state_r;
+			}
+		}
+		return $state_i;
+	}
+	// Rule 6: Hydroxide is mostly insoluble
+	if ($anion == 'O H'){
+		$hydroxide_solubility = array('N H_4', 'H', 'Li', 'Na', 'K', 'Rb', 'Cs', 'Ba');
+		if (in_array($cation, $hydroxide_solubility)){
+			return $state_aq;
+		}
+		elseif ($cation == 'Ca' or $cation == 'Sr' or $cation == 'Pb'){
+			return $state_sS;
+		}
+		elseif ($cation == 'V'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	// Rule 7: Cyanide is mostly soluble
+	if ($anion == 'C N'){
+		// check reactive
+		if ($cation == 'Be' or $cation == 'Mg' or $cation == 'Ca' or $cation == 'Al'){
+			return $state_r;
+		} elseif ($cation == 'Ga' or $cation == 'Sn' or $cation == 'V'){
+			return $state_unknown;
+		} elseif ($cation == 'Pb'){
+			return $state_sS;
+		} elseif ($cation == 'Co' or $cation == 'Ni' or $cation == 'Cu' or $cation == 'Zn' or $cation == 'Ag'){
+			return $state_i;
+		}
+		return $state_aq;
+	}
+	// Rule 8: Thiocyanate (SCN) is mostly soluble
+	if ($anion == 'S C N'){
+		if ($cation == 'Mn' or $cation == 'Cu' or $cation == 'Sn' or $cation == 'Ag'){
+			return $state_i;
+		} elseif ($cation == 'Hg' or $cation == 'Pb'){
+			return $state_sS;
+		} elseif ($cation == 'Au'){
+			return $state_unknown;
+		}
+		return $state_aq;
+	}
+	// Rule 9: Perchlorate and Acetate are mostly soluble
+	if ($anion == 'Cl O_4' or $anion == 'C_2 H_3 O_2'){
+		if ($anion == 'Cl O_4'){
+			if ($cation == 'K' or $cation == 'Rb' or $cation == 'Cs'){
+				return $state_sS;
+			} elseif ($cation == 'Au'){
+				return $state_unknown;
+			}
+		} else {
+			if ($cation == 'Sn'){
+				return $state_r;
+			} elseif ($cation == 'V'){
+				return $state_unknown;
+			} elseif ($cation == 'Fe' and $cat_charge == 3){
+				return $state_i;
+			} elseif ($cation == 'Ag'){
+				return $state_sS;
+			}
+		}
+		return $state_aq;
+	}
+	// Rule 10: Carbonate is mostly insoluble
+	if ($anion == 'C O_3'){
+		if ($cation == 'N H_4' or $cation == 'H' or $cation == 'Na' or $cation == 'K' or $cation == 'Rb' or $cation == 'Cs'){
+			return $state_aq;
+		} elseif ($cation == 'Li' or $cation == 'Be' or $cation == 'Mg' or $cation == 'Sr'){
+			return $state_sS;
+		} elseif ($cation == 'Al' or $cation == 'Ga' or $cation == 'Cu'){
+			return $state_r;
+		} elseif ($cation == 'Fe' and $cat_charge == 3){
+			return $state_r;
+		} elseif ($cation == 'V'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	// Rule 11: Sulfate is mostly soluble
+	if ($anion == 'S O_4'){
+		if ($cation == 'Ca' or $cation == 'Sr' or $cation == 'Ga' or $cation == 'V' or $cation == 'Ag'){
+			return $state_sS;
+		} elseif ($cation == 'Ba' or $cation == 'Pb'){
+			return $state_i;
+		} elseif ($cation == 'Hg'){
+			return $state_r;
+		}
+		return $state_aq;
+	}
+	// Rule 12: Oxalate is mostly insoluble
+	if ($anion == 'C_2 O_4'){
+		if ($cation == 'N H_4' or $cation == 'H' or $cation == 'Li' or $cation == 'Na' or $cation == 'K'){
+			return $state_aq;
+		} elseif ($cation == 'Mg' or $cation == 'Ca' or $cation == 'Fe' or $cation == 'Sn' or $cation == 'Hg'){// Both Fe work!
+			return $state_sS;
+		} elseif ($cation == 'Ga' or $cation == 'V' or $cation == 'Cr' or $cation == 'Au'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	// Rule 13: Phosphate is mostly insoluble
+	if ($anion == 'P O_4'){
+		if ($cation == 'Na' or $cation == 'K' or $cation == 'Rb' or $cation == 'Cs' or $cation == 'Be'){
+			return $state_aq;
+		} elseif ($cation == 'Li' or $cation == 'Sr'){
+			return $state_sS;
+		} elseif ($cation == 'Fe' and $cat_charge == 3){
+			return $state_sS;
+		} elseif ($cation == 'Au'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	return $state_missing;
+}
 $GLOBALS['chem_periodic_table'] = array(
 	1=>array("H", "Hydrogen", 1,1.0079, "-255.34", "-252.87", ""),
         2=>array("He", "Helium", 2,4.00260, "< -272.2", "-268.934", "Noble gas"),
