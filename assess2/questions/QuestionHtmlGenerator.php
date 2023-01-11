@@ -208,7 +208,7 @@ class QuestionHtmlGenerator
           eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
         } catch (\Throwable $t) {
           $errsource = basename($t->getFile());
-          if (strpos($errsource, 'QuestionHtmlGenerator.php') !== -1) {
+          if (strpos($errsource, 'QuestionHtmlGenerator.php') !== false) {
             $errsource = _('Common Control');
           }
           $this->addError(
