@@ -89,7 +89,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1][0]!='=') {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && (!isset($syms[$k+1][0]) || $syms[$k+1][0]!='=')) {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -415,7 +415,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 							}
 							//if curly, make sure we have a ;, unless preceeded by a $ which
 							//would be a variable variable
-							if ($rightb=='}' && $lastsym[0]!='$') {
+							if ($rightb=='}' && (!isset($lastsym[0]) || $lastsym[0]!='$')) {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
 								$out .= $leftb.$inside.$rightb;
@@ -450,7 +450,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			$out .= $c;
 			if (!$ignorestrings) {
 				$inside = mathphpinterpretline(substr($out,1,strlen($out)-2),$vars,$ignorestrings);
-				if ($inside[0]=='\'' && $inside[strlen($inside)-1]=='\'') {
+				if ($inside != '' && $inside[0]=='\'' && $inside[strlen($inside)-1]=='\'') {
 					$inside = substr($inside,1,strlen($inside)-2);
 				}
 				$out= $qtype . $inside . $qtype;
