@@ -571,10 +571,17 @@ function previewq(formn,loc,qn,docheck,onlychk) {
  }
 
  var recentlibs = {'ids':[], 'names':[]};
- var cookierecentlibs = readCookie("recentlibs");
- if (cookierecentlibs !== null) {
-     recentlibs = JSON.parse(decodeURIComponent(cookierecentlibs));
- }
+ if (isLocalStorageAvailable()) {
+    var storagerecentlibs = window.localStorage.getItem('recentlibs');
+    if (storagerecentlibs !== null) {
+        recentlibs = JSON.parse(storagerecentlibs);
+    }
+ } else {
+    var cookierecentlibs = readCookie("recentlibs");
+    if (cookierecentlibs !== null) {
+        recentlibs = JSON.parse(decodeURIComponent(cookierecentlibs));
+    }
+}
 
  function setlibhistory() {
     var curloc = recentlibs.ids.indexOf(curlibs);
@@ -583,12 +590,19 @@ function previewq(formn,loc,qn,docheck,onlychk) {
         recentlibs.names.splice(curloc,1);
     }
     recentlibs.ids.unshift(curlibs);
-    recentlibs.names.unshift(document.getElementById("libnames").innerHTML);
+    let curnames = document.getElementById("libnames").innerHTML.replace(/&\w+;/g,'');
+    curnames = curnames.length > 50 ? curnames.substring(0,49) + "..." : curnames;
+    recentlibs.names.unshift(curnames);
+    
     if (recentlibs.ids.length > 6) {
         recentlibs.ids.pop();
         recentlibs.names.pop();
     }
-    document.cookie = "recentlibs=" + encodeURIComponent(JSON.stringify(recentlibs));
+    if (isLocalStorageAvailable()) {
+        window.localStorage.setItem('recentlibs', JSON.stringify(recentlibs));
+    } else {
+        document.cookie = "recentlibs=" + encodeURIComponent(JSON.stringify(recentlibs));
+    }
     if (recentlibs.ids.length > 1) {
         $('#searchtypemenu').children(":nth-child(n+4)").remove();
         $('#searchtypemenu').append($("<li>", {
@@ -597,8 +611,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
         }));
         for (var i=1; i<recentlibs.ids.length; i++) {
             const curi = i;
-            let libname = recentlibs.names[curi].replace(/&\w+;/g,'');
-            libname = libname.length > 50 ? libname.substring(0,49) + "..." : libname;
+            let libname = recentlibs.names[curi];
         
             $('#searchtypemenu').append($("<li>").append($("<a>", {
                 click: function (e) {
@@ -638,4 +651,15 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      } else {
          return true;
      }
+ }
+
+ function isLocalStorageAvailable(){
+    var test = 'test';
+    try {
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+    } catch(e) {
+        return false;
+    }
  }
