@@ -197,8 +197,8 @@ class CalculatedScorePart implements ScorePart
             $numvalarr = array();
             foreach ($gaarr as $j=>$v) {
                 if ($v!='DNE' && $v!='oo' && $v!='+oo' && $v!='-oo') {
-                    if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
-                        $numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
+                    if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?)\s*(\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
+                        $numvalarr[$j] = ($mnmatches[1]=='-'?-1:1)*($mnmatches[2] + ($mnmatches[4]/$mnmatches[5]));
                     } else {
                         if ($v[strlen($v)-1]=='%') {//single percent
                             $val = substr($v,0,-1);
