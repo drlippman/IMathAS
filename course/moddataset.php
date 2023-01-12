@@ -907,6 +907,7 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+            viewportMargin: 500,
 			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
 		  });
@@ -923,6 +924,7 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+            viewportMargin: 500,
 			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
 		      });
