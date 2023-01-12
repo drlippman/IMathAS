@@ -32,7 +32,7 @@ replace3dalttext(plot, alttext)
 
 
 <h3><a name="CalcPlot3Dembed">CalcPlot3Dembed</a></h3>
-<p>CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])</p>
+<p>CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax, showbox])</p>
 <p>Embeds a dynamic figure using <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
 to draw the graph.  The dynamic figure does not show the CalcPlot3D control panel,
 so if you want that, use the CalcPlot3Dlink function instead.</p>
@@ -67,6 +67,11 @@ so if you want that, use the CalcPlot3Dlink function instead.</p>
     	<br/>width: default 2
     	<br/>x0,y0,z0: base point of vector, default 0,0,0
     	</li>
+    <li>Point: <code>point, x, y, z, [color, size]</code>
+        <br/>Example: "point,1,3,-2,ff0000"
+        <br/>Defaults: color: hex color string like "FF0000", default "000000" (black)
+        <br/>size: default 4
+        </li>
   </ul></li>
   <li>width, height: the size for the embed. Defaults to 500 by 500</li>
   <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>
@@ -74,7 +79,7 @@ so if you want that, use the CalcPlot3Dlink function instead.</p>
   <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin)</li>
 </ul>
 <h3><a name="CalcPlot3Dlink">CalcPlot3Dlink</a></h3>
-<p>CalcPlot3Dlink(functions, linktext, [xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])</p>
+<p>CalcPlot3Dlink(functions, linktext, [xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax, showbox])</p>
 <p>Creates a custom link to <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
 to draw the graph.  This view will include the CalcPlot3D control panel for exploring the
 graph.</p>
