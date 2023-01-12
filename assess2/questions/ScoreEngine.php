@@ -672,6 +672,7 @@ class ScoreEngine
                 $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"] ?? '');
             }
 
+            $raw[$partnum] = 0;
             try {
               $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
               $scorePartResult = $scorePart->getResult();
@@ -685,8 +686,10 @@ class ScoreEngine
                     . basename($t->getFile())
                   );
             }
+            if (isset($scorePartResult)) {
+                $raw[$partnum] = $scorePartResult->getRawScore();
+            }
             
-            $raw[$partnum] = $scorePartResult->getRawScore();
 
             if ($scoremethodwhole == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
@@ -706,9 +709,15 @@ class ScoreEngine
             }
 
             $raw[$partnum] = round($raw[$partnum], 2);
-            $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
-            $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
-            $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
+            if (isset($scorePartResult)) {
+                $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
+                $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
+                $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
+            } else {
+                $partLastAnswerAsGiven[$partnum] = '';
+                $partLastAnswerAsNumber[$partnum] = '';
+                $partCorrectAnswerWrongFormat[$partnum] = false;
+            }
         }
 
         $returnData = [
