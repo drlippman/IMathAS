@@ -177,10 +177,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$alt = '';
 	if (strpos($settings[4],':')) {
 		$lbl = explode(':',$settings[4]);
-        $lbl[0] = evalbasic($lbl[0]);
-        $lbl[1] = evalbasic($lbl[1]);
+        $lbl[0] = evalbasic($lbl[0], true);
+        $lbl[1] = evalbasic($lbl[1], true);
 	} else {
-        $settings[4] = evalbasic($settings[4]);
+        $settings[4] = evalbasic($settings[4], true);
         $lbl = [];
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
@@ -208,7 +208,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$grid = explode(':',$settings[5]);
 		$grid = array_map('evalbasic', $grid);
 	} else {
-		$settings[5] = evalbasic($settings[5]);
+		$settings[5] = evalbasic($settings[5], true);
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) {
 		$commands .= ','.$settings[5].','.$settings[5];
@@ -410,7 +410,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$avoid = array();
 		$domainlimited = false;
 		if (isset($function[2]) && $function[2]!='') {
-			$xmin = evalbasic($function[2]);
+			$xmin = evalbasic($function[2], true);
 			$domainlimited = true;
             if (!is_numeric($xmin)) {
                 echo "Invalid function xmin $xmin";
@@ -420,7 +420,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
 			if ($xmaxarr[0] != '') {
-				$xmax = evalbasic($xmaxarr[0]);
+				$xmax = evalbasic($xmaxarr[0], true);
 			} else {
 				$xmax = $winxmax;
 			}
@@ -459,8 +459,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xrnd = 6;
 			$yrnd = 6;
 		} else {
-			$xrnd = max(0,intval(floor(-log10(abs($xmax-$xmin))-1e-12))+4);
-			$yrnd = max(0,intval(floor(-log10(abs($ymax-$ymin))-1e-12))+4);
+			$xrnd = max(0,intval(floor(-log10(abs($xmax-$xmin))-1e-12))+5);
+			$yrnd = max(0,intval(floor(-log10(abs($ymax-$ymin))-1e-12))+5);
 		}
 
 		$lasty = 0;
@@ -3102,7 +3102,7 @@ function makenumberrequiretimes($arr) {
 	return implode(',',$out);
 }
 
-function evalbasic($str) {
+function evalbasic($str, $doextra = false) {
 	global $myrights;
     $str = str_replace(',','',$str);
     $str = preg_replace('/(\d)pi/', '$1*pi', $str);
@@ -3111,7 +3111,11 @@ function evalbasic($str) {
 	if (is_numeric($str)) {
 		return $str;
 	} else if (preg_match('/[^\d+\-\/\*\.\(\)]/',$str)) {
-		return $str;
+        if ($doextra) {
+            return evalnumstr($str);
+        } else {
+		    return $str;
+        }
 	} else if ($str === '') {
     return 0;
   } else {
@@ -3316,7 +3320,7 @@ function cleanbytoken($str,$funcs = array()) {
     $finalout = array();
     if (trim($str)=='') {return '';}
     $tokens = cleantokenize(trim($str),$funcs);
-    //print_r($tokens);
+
     $out = array();
     $lasti = count($tokens)-1;
     $grplasti = -2;
@@ -3960,7 +3964,7 @@ function numfuncGenerateTestpoints($variables,$domain='') {
             $fromto[$i+1] = 10;
         }
         if (!is_numeric($fromto[$i])) {
-            $fromto[$i] = evalbasic($fromto[$i]);
+            $fromto[$i] = evalbasic($fromto[$i], true);
             if (!is_numeric($fromto[$i])) {
                 if (!$haderr) {
                     echo "domain values must be numbers or elementary calculations";
@@ -3970,7 +3974,7 @@ function numfuncGenerateTestpoints($variables,$domain='') {
             }
         }
         if (!is_numeric($fromto[$i+1])) {
-            $fromto[$i+1] = evalbasic($fromto[$i+1]);
+            $fromto[$i+1] = evalbasic($fromto[$i+1], true);
             if (!is_numeric($fromto[$i+1])) {
                 if (!$haderr) {
                     echo "domain values must be numbers or elementary calculations";

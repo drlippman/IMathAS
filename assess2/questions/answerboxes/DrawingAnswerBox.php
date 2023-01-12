@@ -579,13 +579,14 @@ class DrawingAnswerBox implements AnswerBox
                         }
                     } else if ($function[0] == 'vector') {
                         if (count($function) > 4) {
-                            $dx = $function[3] - $function[1];
-                            $dy = $function[4] - $function[2];
-                            $xs = $function[1];
-                            $ys = $function[2];
+                            $xs = evalbasic($function[1],true);
+                            $ys = evalbasic($function[2],true);
+                            $dx = evalbasic($function[3],true) - $xs;
+                            $dy = evalbasic($function[4],true) - $ys;
+                            
                         } else {
-                            $dx = $function[1];
-                            $dy = $function[2];
+                            $dx = evalbasic($function[1],true);
+                            $dy = evalbasic($function[2],true);
                             $xs = 0;
                             $ys = 0;
                         }

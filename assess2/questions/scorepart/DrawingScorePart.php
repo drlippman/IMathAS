@@ -88,11 +88,11 @@ class DrawingScorePart implements ScorePart
                     if (strpos($grid[$i],':')!==false) {
                         $pts = explode(':',$grid[$i]);
                         foreach ($pts as $k=>$v) {
-                            $pts[$k] = evalbasic($v);
+                            $pts[$k] = evalbasic($v,true);
                         }
                         $settings[$i] = implode(':',$pts);
                     } else {
-                        $settings[$i] = evalbasic($grid[$i]);
+                        $settings[$i] = evalbasic($grid[$i],true);
                     }
                 }
             }
@@ -153,8 +153,8 @@ class DrawingScorePart implements ScorePart
         if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
             foreach ($answers as $key=>$function) {
                 $function = array_map('trim',explode(',',$function));
-                $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                 $ansdots[$key] = array($pixx,$pixy);
             }
 
@@ -313,8 +313,8 @@ class DrawingScorePart implements ScorePart
                 //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                    $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                    $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
                     } else {
@@ -323,9 +323,9 @@ class DrawingScorePart implements ScorePart
                     continue;
                 } else if ($function[0]=='vector') {
                     if (count($function)>4) { // form "vector, x_start, y_start, x_end, y_end"
-                        $ansvecs[$key] = array('p', $xtopix($function[1]), $ytopix($function[2]), $xtopix($function[3]), $ytopix($function[4]));
+                        $ansvecs[$key] = array('p', $xtopix(evalbasic($function[1],true)), $ytopix(evalbasic($function[2],true)), $xtopix(evalbasic($function[3],true)), $ytopix(evalbasic($function[4],true)));
                     } else if (count($function)>2) {  //form "vector, dx, dy"
-                        $ansvecs[$key] = array('d', $function[1]*$pixelsperx, -1*$function[2]*$pixelspery);
+                        $ansvecs[$key] = array('d', evalbasic($function[1],true)*$pixelsperx, -1*evalbasic($function[2],true)*$pixelspery);
                     }
                 } else if ($function[0]=='circle') {  // form "circle,x_center,y_center,radius"
                     //$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
@@ -1833,8 +1833,8 @@ class DrawingScorePart implements ScorePart
                 //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                    $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                    $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
                     } else {
