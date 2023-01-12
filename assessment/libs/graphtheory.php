@@ -628,12 +628,20 @@ function graphcircuittostringans($gs, $lbl='', $start=0) {
 	$out = array();
 	foreach ($gs as $g) {
 		$n = count($g[0]);
+        if (!isset($lbl[$start])) {
+            echo "insufficient labels for all vertices";
+            continue;
+        }
 		$order = array($lbl[$start]);
 		$cur = $start;
 		$last = -1;
 		while (count($order)<$n) {
 			for ($i=0;$i<$n;$i++) {
 				if ((!empty($g[$cur][$i]) || !empty($g[$i][$cur]))&& $i!=$last) {
+                    if (!isset($lbl[$i])) {
+                        echo "insufficient labels for all vertices";
+                        continue;
+                    }
 					$order[] = $lbl[$i];
 					$last = $cur;
 					$cur = $i;
