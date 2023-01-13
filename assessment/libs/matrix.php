@@ -271,7 +271,7 @@ $Tableau .= "<tbody>\r\n";
                 if  ($cloop==$lastcol) { // R1C(Last)
                     if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column filler
                 }
-                if(($headers[$cloop]!=null)&&($headers[$cloop]!=""))
+                if(isset($headers[$cloop])&&($headers[$cloop]!=""))
                 {
                     // Accessible option added
                     $Tableau.= "<th scope=\"col\">".$headers[$cloop]."</th>\r\n";

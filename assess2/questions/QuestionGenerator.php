@@ -210,6 +210,16 @@ class QuestionGenerator
         }
 
         $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
+        $errsource = basename($errfile);
+        if (preg_match('/QuestionHtmlGenerator\.php\((\d+)\)\s*:\s*eval/', $errsource, $m)) {
+            if (!isset($GLOBALS['qgenbreak1']) || $m[1] < $GLOBALS['qgenbreak1']) {
+                $errsource = _('Common Control');
+            } else if (!isset($GLOBALS['qgenbreak2']) || $m[1] < $GLOBALS['qgenbreak2']) {
+                $errsource = _('Question Text');
+            } else {
+                $errsource = _('Detailed Solution');
+            }
+        }
         if (E_ERROR == $errno || (E_WARNING == $errno &&
             (
                 ($showallerrors || 
@@ -221,16 +231,6 @@ class QuestionGenerator
         )) {
           ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
-          $errsource = basename($errfile);
-          if (preg_match('/QuestionHtmlGenerator\.php\((\d+)\)\s*:\s*eval/', $errsource, $m)) {
-            if (!isset($GLOBALS['qgenbreak1']) || $m[1] < $GLOBALS['qgenbreak1']) {
-                $errsource = _('Common Control');
-            } else if (!isset($GLOBALS['qgenbreak2']) || $m[1] < $GLOBALS['qgenbreak2']) {
-                $errsource = _('Question Text');
-            } else {
-                $errsource = _('Detailed Solution');
-            }
-          }
           $this->addError(sprintf(
               _('Caught warning in the question code: %s on line %d in %s'),
               $errstr, $errline, $errsource));

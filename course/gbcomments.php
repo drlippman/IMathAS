@@ -186,7 +186,7 @@
 		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
 
 	} else if ($comtype=='instr') {
-		echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=stu\">View/Edit Student comments</a></div>";
 		echo '<h1>Modify Instructor Notes</h1>';
 		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";
