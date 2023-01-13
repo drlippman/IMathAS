@@ -1543,9 +1543,9 @@ function generateTable() {
                         staticroot +
                         "/img/assess_tiny" +
                         showiconsWE +
-                        '.png" alt="'+('Written solution') +
+                        '.png" alt="'+('Written example') +
                         altadd +
-                        '" title="'+('Written solution') +
+                        '" title="'+('Written example') +
                         altaddWE +
                         '"/>';
                 }
