@@ -116,6 +116,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$settings = array(-5,5,-5,5,1,1,200,200);
 	for ($i = 1; $i < func_num_args(); $i++) {
         $v = func_get_arg($i);
+        if ($v === null) { $v = 0; }
         if (!is_scalar($v)) {
             echo 'Invalid input '.($i+1).' to showplot';
         } else {
