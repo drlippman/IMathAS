@@ -193,13 +193,13 @@ function processScript($script) {
 				case 'markerfill':
 				case 'fontbackground':
 				case 'fontfill':
-					if (!isset($this->colors[$matches[2]])) {
+					if ($matches[2] != 'none' && !isset($this->colors[$matches[2]])) {
 						$this->addcolor($matches[2]);
 					}
                     $this->{$matches[1]} = $matches[2];
 					break;
 				case 'stroke':
-					if (!isset($this->colors[$matches[2]])) {
+					if ($matches[2] != 'none' && !isset($this->colors[$matches[2]])) {
 						$this->addcolor($matches[2]);
 					}
                     $this->stroke = $matches[2];
