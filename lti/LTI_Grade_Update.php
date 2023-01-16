@@ -391,7 +391,7 @@ class LTI_Grade_Update {
     if (!empty($this->private_key)) {
       return $this->private_key;
     }
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_keys WHERE key_set_url=? ORDER BY created_at DESC LIMIT 1');
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_keys WHERE key_set_url=? AND privatekey != "" ORDER BY created_at DESC LIMIT 1');
     $stm->execute(array(TOOL_HOST.'/lti/jwks.php'));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     $this->private_key = $row;
