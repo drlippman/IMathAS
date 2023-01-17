@@ -4103,7 +4103,7 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 		if ($res > 0 && $res < 1) {
 			$res = 0;
 		}
-	} else if (isset($rawscores[$qn])) {
+	} else if (isset($rawscores[$thisq-1])) {
 		$qn = $thisq-1;
 		if (strpos($rawscores[$qn],'~')===false) {
 			$res = ($rawscores[$qn]<0)?-1:(($rawscores[$qn]==1)?1:0);
