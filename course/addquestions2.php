@@ -450,6 +450,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         } else {
             $searchin = [$userdeflib];
         }
+        $_SESSION['searchin'.$aid] = $searchin;
+        $_SESSION['lastsearchlibs'.$aid] = implode(',', $searchin);
     } else {
         $searchin = [];
     }

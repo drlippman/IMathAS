@@ -2245,6 +2245,10 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 }
 
 function makescinot($n,$d=8,$f="x") {
+    if (!is_numeric($n)) {
+        echo "makescinot needs numeric input; $n given.";
+        return $n;
+    }
 	if ($n==0) { return "0";}
 	$isneg = "";
 	if ($n<0) { $isneg = "-"; $n = abs($n);}
