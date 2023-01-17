@@ -532,12 +532,12 @@ if (!(isset($teacherid))) {
 
 		$stm = $DBH->prepare("SELECT id,name,gbcategory FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
+        $page_assessSelect = array();
 		if ($stm->rowCount()==0) {
 			$page_assessListMsg = "<li>No Assessments to change</li>\n";
 		} else {
 			$page_assessListMsg = "";
 			$i=0;
-			$page_assessSelect = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_assessSelect[] = array(
 					'val' => $row[0],

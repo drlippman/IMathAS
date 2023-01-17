@@ -2217,6 +2217,7 @@ if (isset($_GET['launch'])) {
 
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['ltiorigkey'] = $ltikey;
+    unset($_SESSION['place_aid']); // make sure only set if for current launch
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {  //cid:org

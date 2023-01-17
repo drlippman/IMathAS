@@ -686,9 +686,11 @@
 					}
 				} else if (count($qdata['parts'])==1 && $qdata['parts'][0]['try']==0) {
 					$pts = 'N/A';
-				} else {
+				} else if (isset($qdata['parts'][$pn]['score'])) {
 					$pts = $qdata['parts'][$pn]['score'];
-				}
+				} else {
+                    $pts = 0;
+                }
 
 				// get possible on this part
 				$ptposs = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);

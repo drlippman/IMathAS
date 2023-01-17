@@ -22,7 +22,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$asid = Sanitize::onlyInt($_GET['asid']);
 	}
 
-	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
+	if (!isset($_GET['uid']) || (!$isteacher && !$istutor)) {
 		$get_uid = $userid;
 	} else {
 		$get_uid = Sanitize::onlyInt($_GET['uid']);
