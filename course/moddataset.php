@@ -563,6 +563,10 @@
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
+            if ($line === false) {
+                echo _('Invalid question ID');
+                exit;
+            }
 
 			$myq = ($line['ownerid']==$userid);
 			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || ($line['userights']==3 && $line['groupid']==$groupid) || $line['userights']>3) {

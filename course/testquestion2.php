@@ -75,7 +75,10 @@ if ($myrights<20) {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-
+    if ($line === false) {
+        echo _('Invalid question ID');
+        exit;
+    }
     $isquestionauthor = ($line['ownerid'] == $userid);
 
   $a2 = new AssessStandalone($DBH);

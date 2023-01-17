@@ -44,6 +44,10 @@
 	$stm = $DBH->prepare("SELECT * from imas_diags WHERE id=:id");
 	$stm->execute(array(':id'=>$diagid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line===false) {
+        echo 'Invalid diagnostic id';
+        exit;
+    }
 	$pcid = $line['cid'];
 	$diagid = $line['id'];
 	if ($line['term']=='*mo*') {
