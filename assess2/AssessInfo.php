@@ -940,6 +940,10 @@ class AssessInfo
     if ($this->assessData['can_use_latepass'] > 0) {
       $LPneeded = $this->assessData['can_use_latepass'];
       $LPcutoff = $this->assessData['LPcutoff'];
+      $enddate = $this->getSetting('original_enddate');
+      if ($LPcutoff < $enddate) { 
+        $LPcutoff = 0; // ignore nonsensical cutoff
+      }
       $stm = $this->DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
       $stm->execute(array(
         ':lps'=>$LPneeded,
