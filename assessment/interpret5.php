@@ -439,7 +439,9 @@ function tokenize($str,$anstype,$countcnt) {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
-					} else if ($out=='rand') {
+					} else if ($out=='is_numeric') {
+                        $out = 'is_nicenumber';  
+                    } else if ($out=='rand') {
 						$out = '$GLOBALS[\'RND\']->rand';
 					} else {
                         $out = preg_replace('/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/', 'arc$2', $out);
