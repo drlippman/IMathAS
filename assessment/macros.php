@@ -1075,17 +1075,21 @@ function horizshowarrays() {
 
 	$maxlength = 0;
 	for ($i=0; $i<count($alist)/2; $i++) {
-		if (!is_array($alist[2*$i+1])) {
+		if (!isset($alist[2*$i+1])) {
+            $alist[2*$i+1] = [];
+        } else if (!is_array($alist[2*$i+1])) {
 			$alist[2*$i+1] = listtoarray($alist[2*$i+1]);
 		}
 		if (count($alist[2*$i+1])>$maxlength) {
 			$maxlength = count($alist[2*$i+1]);
 		}
 	}
-		$out = '<table class=stats>';
+	$out = '<table class=stats>';
 	for ($i=0; $i<count($alist)/2; $i++) {
 		$out .= "<tr><th scope=\"row\"><b>{$alist[2*$i]}</b></th>";
-		$out .= "<td>" . implode("</td><td>",$alist[2*$i+1]) . "</td>";
+        if (count($alist[2*$i+1]) > 0) {
+		    $out .= "<td>" . implode("</td><td>",$alist[2*$i+1]) . "</td>";
+        }
 		if (count($alist[2*$i+1])<$maxlength) {
 			$out .= str_repeat('<td></td>', $maxlength - count($alist[2*$i+1]));
 		}
