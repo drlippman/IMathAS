@@ -270,7 +270,7 @@ function graphdijkstra($g,$dest=-1) {
 		}
 		$eaten[$cur] = 1; //remove vertex
 		for ($i=0; $i<$n; $i++) {
-			if (!isset($eaten[$i]) && (!empty($op['digraph']) || $i<$cur)?!empty($g[$i][$cur]):!empty($g[$cur][$i])) { //vertices leading to $cur
+			if (!isset($eaten[$i]) && (!empty($op['digraph']) || $i<$cur)?(isset($g[$i][$cur]) && $g[$i][$cur]>0):(isset($g[$cur][$i]) && $g[$cur][$i]>0)) { //vertices leading to $cur
 				$alt = $dist[$cur] + ((!empty($op['digraph']) || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
 				if ($alt<$dist[$i]) {
 					$dist[$i] = $alt;
@@ -296,8 +296,8 @@ function graphkruskal($g) {
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
-				$edgelist[$c] = max($g[$i][$j],$g[$j][$i]);
+			if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
+				$edgelist[$c] = max($g[$i][$j] ?? -1, $g[$j][$i] ?? -1);
 				$edges[$c] = array($i,$j);
 				$c++;
 			}
@@ -407,8 +407,8 @@ function graphsortededges($g) {
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
-				$edgelist[$c] = max($g[$i][$j],$g[$j][$i]);
+            if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
+				$edgelist[$c] = max($g[$i][$j] ?? -1, $g[$j][$i] ?? -1);
 				$edges[$c] = array($i,$j);
 				$c++;
 			}
@@ -476,7 +476,7 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 	}
 	$dup = 0;
 	for ($i=1; $i<$len; $i++) {
-		if (!empty($g[$vseq[$i]][$vseq[$i-1]]) || !empty($g[$vseq[$i-1]][$vseq[$i]])) {
+        if ((isset($g[$vseq[$i]][$vseq[$i-1]]) && $g[$vseq[$i]][$vseq[$i-1]]>0) || (isset($g[$vseq[$i-1]][$vseq[$i]]) && $g[$vseq[$i-1]][$vseq[$i]]>0)) {
 			//edge exists
 			$g[$vseq[$i]][$vseq[$i-1]] = -1;
 			$g[$vseq[$i-1]][$vseq[$i]] = -1;
@@ -492,7 +492,7 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
-			if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+            if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 				//unused edge
 				return -1;
 			}
@@ -531,7 +531,7 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	
 	$notvis = array_fill(0,$n,1);
 	for ($i=1; $i<$len; $i++) {
-		if (!empty($g[$vseq[$i]][$vseq[$i-1]]) || !empty($g[$vseq[$i-1]][$vseq[$i]])) {
+        if ((isset($g[$vseq[$i]][$vseq[$i-1]]) && $g[$vseq[$i]][$vseq[$i-1]]>0) || (isset($g[$vseq[$i-1]][$vseq[$i]]) && $g[$vseq[$i-1]][$vseq[$i]]>0)) {
 			//edge exists
 			if ($notvis[$vseq[$i]]==1) {
 				$notvis[$vseq[$i]] = 0;
@@ -637,7 +637,7 @@ function graphcircuittostringans($gs, $lbl='', $start=0) {
 		$last = -1;
 		while (count($order)<$n) {
 			for ($i=0;$i<$n;$i++) {
-				if ((!empty($g[$cur][$i]) || !empty($g[$i][$cur]))&& $i!=$last) {
+				if (((isset($g[$cur][$i]) && $g[$cur][$i]>0) || (isset($g[$i][$cur]) && $g[$i][$cur]>0)) && $i!=$last) {
                     if (!isset($lbl[$i])) {
                         echo "insufficient labels for all vertices";
                         continue;
@@ -672,7 +672,7 @@ function graphcircuittoarray($g,$start=0) {
 	$last = -1;
 	while (count($order)<$n) {
 		for ($i=0;$i<$n;$i++) {
-			if ((!empty($g[$cur][$i]) || !empty($g[$i][$cur]))&& $i!=$last) {
+			if (((isset($g[$cur][$i]) && $g[$cur][$i]>0) || (isset($g[$i][$cur]) && $g[$i][$cur]>0)) && $i!=$last) {
 				$order[] = $i;
 				$last = $cur;
 				$cur = $i;
@@ -702,18 +702,18 @@ function graphgetedges($g,$op) {
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
 			if (!empty($op['digraph'])) {
-				if(!empty($g[$i][$j])) {
+				if(isset($g[$i][$j]) && $g[$i][$j]>0) {
 					$good[] = $lbl[$i] . $lbl[$j];
 				} else {
 					$bad[] = $lbl[$i] . $lbl[$j];
 				}
-				if(!empty($g[$j][$i])) {
+				if(isset($g[$j][$i]) && $g[$j][$i]>0) {
 					$good[] = $lbl[$j] . $lbl[$i];
 				} else {
 					$bad[] = $lbl[$j] . $lbl[$i];
 				}
 			} else {
-				if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+                if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$good[] = $lbl[$i] . $lbl[$j];
 				} else {
 					$bad[] = $lbl[$i] . $lbl[$j];
@@ -733,14 +733,14 @@ function graphgetedgesarray($g) {
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
 			if (!empty($op['digraph'])) {
-				if(!empty($g[$i][$j])) {
+				if(isset($g[$i][$j]) && $g[$i][$j]>0) {
 					$good[] = array($i,$j);
 				}
-				if(!empty($g[$j][$i])) {
+				if(isset($g[$j][$i]) && $g[$j][$i]>0) {
 					$good[] = array($j,$i);
 				}
 			} else {
-				if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+				if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$good[] = array($i,$j);
 				}
 			}
@@ -775,10 +775,10 @@ function graphadjacencytoprereqs($g,$op) {
 	}
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
-			if(!empty($g[$i][$j])) {
+			if(isset($g[$i][$j]) && $g[$i][$j]>0) {
 				$list[$j][] = $i;
 			}
-			if(!empty($g[$j][$i])) {
+			if(isset($g[$j][$i]) && $g[$j][$i]>0) {
 				$list[$i][] = $j;
 			}
 		}
@@ -825,14 +825,14 @@ function graphadjacencytoincidence($g,$op) {
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
 			if (!empty($op['digraph'])) {
-				if(!empty($g[$i][$j])) {
+				if(isset($g[$i][$j]) && $g[$i][$j]>0) {
 					$list[$i][] = $j;
 				}
-				if(!empty($g[$j][$i])) {
+				if(isset($g[$j][$i]) && $g[$j][$i]>0) {
 					$list[$j][] = $i;
 				}
 			} else {
-				if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+				if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$list[$i][] = $j;
 					$list[$j][] = $i;
 				}
@@ -866,11 +866,11 @@ function graphgetvalence($g,$vert,$dir=2) {
 	$n = count($g[0]);
 	$cnt = 0;
 	for ($i=0; $i<$n; $i++) {
-		if ($dir==2 && (!empty($g[$i][$vert]) || !empty($g[$vert][$i]))) {
+		if ($dir==2 && ((isset($g[$i][$vert]) && $g[$i][$vert]>0) || (isset($g[$vert][$i]) && $g[$vert][$i]>0))) {
 			$cnt++;
-		} else if ($dir==0 && !empty($g[$i][$vert])) {
+		} else if ($dir==0 && (isset($g[$i][$vert]) && $g[$i][$vert]>0)) {
 			$cnt++;
-		} else if ($dir==1 && !empty($g[$vert][$i])) {
+		} else if ($dir==1 && (isset($g[$vert][$i]) && $g[$vert][$i]>0)) {
 			$cnt++;
 		}
 	}
@@ -982,7 +982,7 @@ function graphspringlayout($g,$op=array()) {
 				//repel
 				$force = $k*$k/$square_dist;
 				//if neighbors, attract
-				if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+                if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$force -= sqrt($square_dist)/$k;
 				}
 				for ($x = 0; $x<$dim; $x++) {
@@ -1122,10 +1122,10 @@ function graphprocessoptions($g,$op) {
 		$nedg = 0;
 		for ($i=0; $i<$n; $i++) {
 			for ($j=$i+1; $j<$n; $j++) {
-				if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+                if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$nedg++;
 				}
-				if (!empty($op['digraph']) && !empty($g[$i][$j]) && !empty($g[$j][$i])) {
+				if (!empty($op['digraph']) && (isset($g[$i][$j]) && $g[$i][$j]>0) && (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$nedg++;
 				}
 			}
@@ -1135,16 +1135,16 @@ function graphprocessoptions($g,$op) {
 		for ($i=0; $i<$n; $i++) {
 			for ($j=$i+1; $j<$n; $j++) {
 				if (!empty($op['digraph'])) {
-					if (!empty($g[$i][$j])) {
+					if (isset($g[$i][$j]) && $g[$i][$j]>0) {
 						$g[$i][$j] = $rweights[$c];
 						$c++;
 					}
-					if (!empty($g[$j][$i])) {
+					if (isset($g[$j][$i]) && $g[$j][$i]>0) {
 						$g[$j][$i] = $rweights[$c];
 						$c++;
 					}
 				} else {
-					if (!empty($g[$i][$j]) || !empty($g[$j][$i])) {
+					if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 						$g[$i][$j] = $rweights[$c];
 						$c++;
 					}
@@ -1230,19 +1230,19 @@ function graphdrawit($pos,$g,$op) {
 	} else {
 		$com .= 'marker=null;';
 	}
+ 
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
 			if (!empty($op['digraph'])) {
-				if (!empty($g[$j][$i]) && $g[$i][$j]==0) {
+				if ((isset($g[$j][$i]) && $g[$j][$i]>0) && (!isset($g[$i][$j]) || $g[$i][$j]<=0)) {
 					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
-				} else if (!empty($g[$i][$j]) && $g[$j][$i]==0) {
+				} else if ((isset($g[$i][$j]) && $g[$i][$j]>0) && (!isset($g[$j][$i]) || $g[$j][$i]<=0)) {
 					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
-				} else if (!empty($g[$j][$i]) && !empty($g[$i][$j])) {
-					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
+				} else if ((isset($g[$i][$j]) && $g[$i][$j]>0) && (isset($g[$j][$i]) && $g[$j][$i]>0)) {
+					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
 				}
-
 			} else {
-				if ((isset($g[$i][$j]) && !empty($g[$i][$j])) || (isset($g[$j][$i]) && !empty($g[$j][$i]))) {
+				if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
 					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
 				}
 			}
@@ -1265,7 +1265,7 @@ function graphdrawit($pos,$g,$op) {
 		}
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		for ($j=$i+1; $j<$n; $j++) {
-			if (!empty($op['useweights']) && (!empty($g[$i][$j]) || !empty($g[$j][$i]))) {
+			if (!empty($op['useweights']) && ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0))) {
 				if (($i+$j)%2==0) {
 					$mx = $pos[$j][0] + ($pos[$i][0] - $pos[$j][0])*($op['weightoffset']);
 					$my = $pos[$j][1] + ($pos[$i][1] - $pos[$j][1])*($op['weightoffset']);
@@ -1512,7 +1512,7 @@ function graphbackflow($g,$w=array()) {
 		for ($k=0; $k<count($toprocess); $k++) {
 			$cur = $toprocess[$k];
 			for ($i=0; $i<$n; $i++) {
-				if (!isset($eaten[$i]) && !empty($g[$i][$cur])) { //vertices leading to $cur
+				if (!isset($eaten[$i]) && isset($g[$i][$cur]) && $g[$i][$cur]>0) { //vertices leading to $cur
 					if (count($w)>0) {
 						$alt = $dist[$cur] + $w[$i];
 					} else {
@@ -1527,7 +1527,7 @@ function graphbackflow($g,$w=array()) {
 						$douse = true;
 						//don't use if not terminal
 						for ($j=0; $j<$n; $j++) {
-							if (!empty($g[$i][$j]) && !isset($eaten[$j]) && $j!=$cur) {
+							if (isset($g[$i][$j]) && $g[$i][$j]>0 && !isset($eaten[$j]) && $j!=$cur) {
 								$douse = false; break;
 							}
 						}
