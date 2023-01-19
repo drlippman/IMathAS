@@ -480,7 +480,7 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 			//edge exists
 			$g[$vseq[$i]][$vseq[$i-1]] = -1;
 			$g[$vseq[$i-1]][$vseq[$i]] = -1;
-		} else if ($g[$vseq[$i]][$vseq[$i-1]]<0) {
+		} else if (isset($g[$vseq[$i]][$vseq[$i-1]]) && $g[$vseq[$i]][$vseq[$i-1]]<0) {
 			//used this edge before.  naughty naughty
 			$g[$vseq[$i]][$vseq[$i-1]]--;
 			$g[$vseq[$i-1]][$vseq[$i]]--;
