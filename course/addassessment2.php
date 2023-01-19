@@ -541,7 +541,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($from=='mcd') {
 				header(sprintf('Location: %s/course/masschgdates.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
 			} else if ($from=='lti') {
-				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+                if (!empty($_SESSION['ltiver']) && $_SESSION['ltiver'] == '1.3') {
+				    header(sprintf('Location: %s/assess2/?cid=%s&aid=%s', $GLOBALS['basesiteurl'], $cid, $assessmentId));
+                } else {
+				    header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+                }
 			} else {
 				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, $rqp));
