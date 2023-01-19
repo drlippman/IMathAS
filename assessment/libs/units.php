@@ -380,6 +380,7 @@ function parseunits($unitsExpression) {
     $numerExpand=[]; //Initiates the expanded array of units.
     $denomExpand=[];
     
+    $prefixWasAbb = false;
     if (!empty($numerParts)) {
       foreach ($numerParts as $k=>$part) { //Expand all factors from numerator, put in numer or denom array.
         if (preg_match('/\^[^\d\.\-]/',$part)) {
