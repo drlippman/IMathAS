@@ -100,6 +100,7 @@ function mathjs(st,varlist) {
   st = st.replace(/(\+\s*-|-\s*\+)/g,'-').replace(/-\s*-/g,'+');
   st = st.replace("[","(");
   st = st.replace("]",")");
+  st = st.replace(/\b00+\./g,'0.');
   st = st.replace(/root\s*(\d+)/,"root($1)");
   st = st.replace(/\|(.*?)\|/g,"abs($1)");
   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
