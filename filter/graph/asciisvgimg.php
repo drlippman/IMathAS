@@ -1054,8 +1054,8 @@ function ASarrowhead($p,$q) {
 		$arr = array(
 			(int) round($w[0]-15*$u[0]-4*$up[0]),
 			(int) round($w[1]-15*$u[1]-4*$up[1]),
-			(int) round($w[0]-3*$u[0]),
-			(int) round($w[1]-3*$u[1]),
+			(int) round($w[0]-1*$u[0]),
+			(int) round($w[1]-1*$u[1]),
 			(int) round($w[0]-15*$u[0]+4*$up[0]),
 			(int) round($w[1]-15*$u[1]+4*$up[1]));
 		$color = $this->stroke;

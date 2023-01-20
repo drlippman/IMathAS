@@ -846,7 +846,7 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
     up = [-u[1],u[0]];
     var node = myCreateElementSVG("path");
     node.setAttribute("d","M "+(w[0]-15*u[0]-4*up[0])+" "+
-      (w[1]-15*u[1]-4*up[1])+" L "+(w[0]-3*u[0])+" "+(w[1]-3*u[1])+" L "+
+      (w[1]-15*u[1]-4*up[1])+" L "+(w[0]-markerstrokewidth*u[0])+" "+(w[1]-markerstrokewidth*u[1])+" L "+
       (w[0]-15*u[0]+4*up[0])+" "+(w[1]-15*u[1]+4*up[1])+" z");
     node.setAttribute("stroke-width", markerstrokewidth);
     node.setAttribute("stroke", stroke); /*was markerstroke*/
