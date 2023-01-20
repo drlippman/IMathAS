@@ -61,7 +61,7 @@ var $img;
 var $winxmax,$winxmin,$winymin,$winymax;
 var $white,$black,$red,$orange,$yellow,$green,$blue,$cyan,$purple,$gray;
 var $stroke = 'black', $fill = 'none', $curdash='', $isdashed=false, $marker='none';
-var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black';
+var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black', $arrowrelsize = 1, $arrowoffset = 0;
 var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
 var $fontsize = 12, $fontfile, $fontfill='', $fontbackground='';
 var $isphp8 = false;
@@ -187,6 +187,8 @@ function processScript($script) {
 				case 'ymin':
 				case 'ymax':
 				case 'marker':
+                case 'arrowrelsize':
+                case 'arrowoffset':
 					$this->{$matches[1]} = $matches[2];
 					break;
 				case 'fill':
@@ -1048,16 +1050,18 @@ function ASarrowhead($p,$q) {
 	$w = $this->pt2arr($q);
 	$u = array($w[0]-$v[0],$w[1]-$v[1]);
 	$d = sqrt($u[0]*$u[0]+$u[1]*$u[1]);
+    $rs = $this->arrowrelsize;
+    $off = $this->arrowoffset;
 	if ($d > 0.00000001) {
 		$u = array($u[0]/$d, $u[1]/$d);
 		$up = array(-$u[1],$u[0]);
 		$arr = array(
-			(int) round($w[0]-15*$u[0]-4*$up[0]),
-			(int) round($w[1]-15*$u[1]-4*$up[1]),
-			(int) round($w[0]-1*$u[0]),
-			(int) round($w[1]-1*$u[1]),
-			(int) round($w[0]-15*$u[0]+4*$up[0]),
-			(int) round($w[1]-15*$u[1]+4*$up[1]));
+			(int) round($w[0]-$rs*15*$u[0]-$rs*4*$up[0]-$off*$u[0]),
+			(int) round($w[1]-$rs*15*$u[1]-$rs*4*$up[1]-$off*$u[1]),
+			(int) round($w[0]-1*$u[0]-$off*$u[0]),
+			(int) round($w[1]-1*$u[1]-$off*$u[1]),
+			(int) round($w[0]-$rs*15*$u[0]+$rs*4*$up[0]-$off*$u[0]),
+			(int) round($w[1]-$rs*15*$u[1]+$rs*4*$up[1]-$off*$u[1]));
 		$color = $this->stroke;
         if ($this->isphp8) {
 		    imagefilledpolygon($this->img,$arr,$this->colors[$color]);
