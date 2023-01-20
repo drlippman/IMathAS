@@ -267,7 +267,11 @@ function vmsetupnumberline($state,$qn,$part=null,$snap="true") {
 //vmnumberlinegetvals(stuans)
 //return array(scale, value of dot)
 function vmnumberlinegetvals($state) {
-        return explode(',',$state);
+        $out = explode(',',$state);
+        if (count($out) != 2) {
+            $out = [1,0];
+        }
+        return $out;
 }
 
 //vmsetupnumberlineinterval(stuans,qn,[part])
