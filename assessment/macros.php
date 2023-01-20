@@ -5750,6 +5750,9 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
                 // empty looking matrix entry
                 continue;
             }
+            if ($anstypes !== null && $anstypes[$v] === 'choices' && !$blankok && $stu[$qn][$v] === 'NA') {
+                continue;
+            }
             if (isset($stu[$qn][$v]) && ($blankok || (trim($stu[$qn][$v]) !== '' && $stu[$qn][$v] !== ';;;;;;;;'))) {
                 $partok = true; 
                 break;
