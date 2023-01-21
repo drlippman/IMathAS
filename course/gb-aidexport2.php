@@ -133,7 +133,7 @@ if (isset($_POST['options'])) {
 			$gb[$r][1] = $row[3];
 		}
         if ($doemail) {
-            $gb[$r][2] = $row[4];
+            $gb[$r][$hassection? 2 : 1] = $row[4];
         }
 		$sturow[$row[0]] = $r;
 		$r++;
