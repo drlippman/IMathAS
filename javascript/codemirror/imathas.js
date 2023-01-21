@@ -168,6 +168,8 @@
     imathasBuiltin += " dotp crossp vecnorm vecsum vecdiff vecprod veccompareset veccomparesamespan";
     // virtmanip
     imathasBuiltin += " vmsetup vmgetlistener vmgetparam vmparamtoarray vmsetupchipmodel vmchipmodelgetcount vmsetupnumbertiles vmnumbertilesgetcount vmsetupitemsort vmitemsortgetcontainers vmsetupnumberlineaddition vmnumberlineadditiongetvals vmsetupnumberline vmnumberlinegetvals vmsetupnumberlineinterval vmnumberlineintervalgetvals vmsetupfractionline vmgetfractionlinevals vmsetupfractionmult vmgetfractionmultvals vmsetupfractioncompare vmgetfractioncompareval vmdrawinchruler vmdrawcmruler vmdrawclock";
+    // diffeq 
+    imathasBuiltin += " diffeq_slopefield";
 
   var imathasSpecialVars = keywords("$abstolerance $ansprompt $anstypes $answeights $answer $answerbox $answerboxsize $answerformat $answers $answersize $answertitle $background $displayformat $domain $formatfeedbackon $grid $hidepreview $hidetips $matchlist $noshuffle $partialcredit $partweights $previewloc $questions $questiontitle $reltolerance $reqdecimals $reqsigfigs $requiretimes $requiretimeslistpart $scoremethod $showanswer $showanswerloc $snaptogrid $strflags $variables");
   var imathasDisallowedVars = keywords("$link $qidx $qnidx $seed $qdata $toevalqtxt $la $laarr $shanspt $GLOBALS $laparts $anstype $kidx $iidx $tips $optionsPack $partla $partnum $score $disallowedvar $allowedmacros $wherecount $countcnt $myrights $myspecialrights");
