@@ -1578,6 +1578,7 @@ function processCalcMatrix(fullstr, format) {
     okformat = false;
   }
   fullstr = fullstr.substring(1,fullstr.length-1);
+ 
   var err = '';
   var blankerr = '';
   var rowlist = [];
@@ -1593,7 +1594,11 @@ function processCalcMatrix(fullstr, format) {
       lastcut = i+1;
     }
   }
-  rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  if (lastcut == 0 && fullstr.charAt(0) != '(') {
+    rowlist.push(fullstr);
+  } else {
+    rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  }
   var lastnumcols = -1;
   if (MCdepth !== 0) {
     okformat = false;

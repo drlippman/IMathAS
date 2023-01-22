@@ -96,8 +96,11 @@ class MatrixScorePart implements ScorePart
                 $fullmatrix = false;
             }
         }
-
-        $ansr = substr($answer,2,-2);
+        if (strlen($answer)>1 && $answer[1] != '(') {
+            $ansr = substr($answer,1,-1);
+        } else {
+            $ansr = substr($answer,2,-2);
+        }
         $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
         $answerlist = explode(',',$ansr);
 
