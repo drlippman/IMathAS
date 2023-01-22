@@ -236,7 +236,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$staticroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg.js?ver=011923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=011923\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {
