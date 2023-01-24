@@ -873,15 +873,20 @@ if ($stm->rowCount()==0) {
 		$stm->execute(array(':aid'=>$_SESSION['place_aid']));
         $row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row===false) {
-			$diaginfo = "(Debug info: 2-{$_SESSION['place_aid']})";
-			reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
-		}
-        list($aidsourcecid,$aidsourcename) = $row;
+            $aidsourcecid = -1; // assessment doesn't exist anymore
+            $aidsourcename = '';
+		} else {
+            list($aidsourcecid,$aidsourcename) = $row;
+        }
 
 		//look to see if we've already linked this context_id with a course
 		$stm = $DBH->prepare('SELECT courseid,copiedfrom FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org');
 		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
 		if ($stm->rowCount()==0) {
+            if ($aidsourcecid == -1) { // not enough info to proceed
+                $diaginfo = "(Debug info: 2a-{$_SESSION['place_aid']})";
+			    reporterror(_("The originally linked assignment does not appear to exist anymore.")." $diaginfo");
+            }
 			//if instructor, see if the source course is ours
 			/***TODO:  check rights to see if they have course creation rights or not */
 			if ($_SESSION['ltirole']=='instructor') {
@@ -1234,7 +1239,7 @@ if ($stm->rowCount()==0) {
 					//exit;
 				}
 			}
-			if (!$foundaid) { //do course ancestor walk-back
+			if (!$foundaid && $aidsourcecid != -1) { //do course ancestor walk-back
 				//need to look up ancestor depth
 				$stm = $DBH->prepare("SELECT ancestors FROM imas_courses WHERE id=?");
 				$stm->execute(array($destcid));
@@ -1274,7 +1279,7 @@ if ($stm->rowCount()==0) {
 					//echo "found 3";
 					//exit;
 				}
-				if (!$foundaid && count($res)>0) { //multiple results - look for the identical name
+				if (!$foundaid && count($res)>0 && $aidsourcename != '') { //multiple results - look for the identical name
 					foreach ($res as $k=>$row) {
 						$res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
 						if ($row['name']==$aidsourcename) {
@@ -1297,6 +1302,10 @@ if ($stm->rowCount()==0) {
 				}
 			}
 			if (!$foundaid) {
+                if ($aidsourcecid == -1) { // can't proceed further in this case
+                    $diaginfo = "(Debug info: 2b-{$_SESSION['place_aid']})";
+                    reporterror(_("The originally linked assignment does not appear to exist anymore.")." $diaginfo");    
+                }
 				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 				//this handles cases where an assessment was linked in from elsewhere and manually copied
 
