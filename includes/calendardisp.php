@@ -572,7 +572,11 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+if ($editingon) {
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND avail>0 AND courseid=:courseid ORDER BY name";
+} else {
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+}
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
