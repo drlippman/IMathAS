@@ -130,7 +130,9 @@ function vmsetupchipmodel($state,$qn,$part=null) {
 //return an array array(poscount,negcount) of the count of positive and
 //negative chips in the drop region.
 function vmchipmodelgetcount($state) {
-	list($initbasestr,$initobjstr,$cont) = explode('|',$state);
+    $parts = explode('|',$state);
+    if (count($parts)!=3) { return [0,0]; }
+	list($initbasestr,$initobjstr,$cont) = $parts; 
 	$pos = substr_count($cont,"pos");
 	$neg = substr_count($cont,"neg");
 	return array($pos,$neg);
