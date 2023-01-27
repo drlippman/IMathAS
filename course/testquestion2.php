@@ -367,11 +367,12 @@ if ($overwriteBody==1) {
 
   // DO DISPLAY
   echo '<hr/>';
-
+  $starttime = microtime(true);
   $disp = $a2->displayQuestion($qn, [
     'showans' => true,
     'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
   ]);
+  $gentime = microtime(true) - $starttime;
   if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
       $disp['jsparams']['noMQ'] = true;
   }
@@ -428,6 +429,7 @@ if ($overwriteBody==1) {
 
 	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
 	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
+    echo '<span class="small subdued">'._('Generated in ').round(1000*$gentime).'ms</span> ';
   if ($line['ownerid'] == $userid) {
     echo '<a href="moddataset.php?cid='. Sanitize::courseId($cid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
     echo _('Edit Question') . '</a>';
