@@ -271,7 +271,12 @@ function spacecurve($func,$tmin,$tmax) {
 
 		 $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
 	  	 $html .= "</canvas>";
-			 $init = "var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height', showaxes:$axes}, 'plot3d$r');";
+        if (isset($bounds)) {
+            $bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
+        } else {
+              $bndtxt='';
+        }
+			 $init = "var plot3d$r = new Viewer3D({verts: '$verts', curves: true, $bndtxt width: '$width', height:'$height', showaxes:$axes}, 'plot3d$r');";
 			 if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 				 $html .= "<script type=\"text/javascript\"> $init </script>";
 			 } else {
