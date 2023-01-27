@@ -170,6 +170,9 @@ class QuestionHtmlGenerator
             if (isset($scorenonzero[$thisq]) && !is_array($scorenonzero[$thisq])) {
                 $scorenonzero[$thisq] = array($scorenonzero[$thisq]);
             }
+        } else if ($quesData['qtype'] == "conditional" && is_array($scoreiscorrect[$thisq])) {
+            $scoreiscorrect[$thisq] = $scoreiscorrect[$thisq][0];
+            $scorenonzero[$thisq] = $scorenonzero[$thisq][0];
         }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
