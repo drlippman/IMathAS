@@ -3260,6 +3260,10 @@ of choices is automatically randomized.
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" </dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
+<dt>$answerformat = "addnone" </dt>
+	<dd>Adds "None of these" to the options. This is added automatically if <code>$answers=""</code>, and you can 
+        add "None of these" yourselv to <code>$questions</code>, but this provides another way to always include the 
+        "None of these" option.</dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
