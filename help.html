@@ -2100,6 +2100,14 @@ different numbers that are not opposites:
 </p>
 <pre>$a,$b = diffrands(-5,5,2) where ($a+$b!=0)</pre>
 <p>
+<p>Beware that the system will give up if it's unable to meet the specified conditions after 200 tries, 
+    so be sure your <code>where</code> condition has fairly high probability of success, ideally at least 10%.  If it doesn't,
+    you should consider where there are other ways to generate your values.  Alternatively, you can 
+    specify a fallback value to use if the condition fails using <code>else</code>:
+</p>
+</p>
+<pre>$a = rand(1,100) where (gcd($a,$b)==1) else ($a = 7)</pre>
+<p>
 &quot;if&quot; is used to make an assignment conditional.  For example:
 </p>
 <pre>
@@ -2169,6 +2177,16 @@ if ($a==0) {
   $a = rand(-5,-1)
   $b = rand(1,5)
 } where ($a+$b !==0)
+</pre>
+<p>or with a fallback</p>
+<pre>
+{
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0) else {
+  $a = -3
+  $b = 5
+}
 </pre>
 
 <h3 id="loops">Loops</h3>
