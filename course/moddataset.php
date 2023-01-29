@@ -859,7 +859,7 @@
 	        qtextbox.rows += 3;
 	        qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
-	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>\n");
+	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>");
 
 	        var toinit = [];
 	        if ((el=="qtext" && editoron==0) || (el!="qtext" && editoron==1)) {
@@ -905,7 +905,7 @@
 	   function setupQtextEditor(id) {
 	   	var qtextbox = document.getElementById(id);
 	   	if (!qtextbox) { return; }
-		qtextbox.value = qtextbox.value.replace(/\s*((<br\s*\/>\s*){2,})\s*/g, "\n$1\n");
+		qtextbox.value = qtextbox.value.replace(/\s*((<br\s*\/>\s*){1,}<br\s*\/>)\s*/g, "\n$1\n");
 	   	qEditor[id] = CodeMirror.fromTextArea(qtextbox, {
 			matchTags: true,
 			mode: "imathasqtext",
