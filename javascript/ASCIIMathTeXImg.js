@@ -886,6 +886,7 @@ function AMTparseAMtoTeX(str) {
   str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
+  str = str.replace(/⁰/g,"^0").replace(/¹/g,"^1").replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9");
   if (str.match(/\S/)==null) {
 	  return "";
   }

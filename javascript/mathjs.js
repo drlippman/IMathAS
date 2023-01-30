@@ -162,7 +162,7 @@ function mathjs(st,varlist) {
   st = st.replace(/root\s*\((\d+)\)\s*\(/g,"nthroot($1,");
 
   //add implicit mult for "3 4"
-  st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
+  st = st.replace(/([0-9]\.?)\s+([0-9])/g,"$1*$2");
 
   //clean up
   st = st.replace(/#/g,"");
@@ -176,7 +176,7 @@ function mathjs(st,varlist) {
   }
 
   //add implicit multiplication
-  st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
+  st = st.replace(/([0-9]\.?)([\(a-zA-Z])/g,"$1*$2");
   st = st.replace(/(!)([0-9\(a-zA-Z])/g,"$1*$2");
   st = st.replace(/\)([\(0-9a-zA-Z]|\.\d+)/g,"\)*$1");
 
@@ -191,7 +191,7 @@ function mathjs(st,varlist) {
     if (i==0) return "Error: missing argument";
     j = i-1;
     ch = st.charAt(j);
-    if (ch>="0" && ch<="9") {// look for (decimal) number
+    if ((ch>="0" && ch<="9") || ch=='.') {// look for (decimal) number
       j--;
       while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
       if (ch==".") {
@@ -225,7 +225,7 @@ function mathjs(st,varlist) {
     if (i==0) return "Error: missing argument";
     j = i-1;
     ch = st.charAt(j);
-    if (ch>="0" && ch<="9") {// look for (decimal) number
+    if ((ch>="0" && ch<="9") || ch=='.') {// look for (decimal) number
       j--;
       while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
       if (ch==".") {
