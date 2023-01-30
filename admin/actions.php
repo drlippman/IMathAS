@@ -28,7 +28,10 @@ if (isset($_GET['from'])) {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
 		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
-	}
+	} else if ($_GET['from']=='unhide') {
+		$from = 'unhide';
+		$backloc = 'unhidefromcourselist.php?type=teach';
+	} 
 }
 if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
@@ -40,6 +43,8 @@ if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='gd') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
+} else if ($from == 'unhide') {
+    $breadcrumbbase .= '<a href="'.$backloc.'">'._('Unhide Courses').'</a> &gt; ';
 }
 
 switch($_POST['action']) {
@@ -1311,7 +1316,7 @@ if ($myrights<75 || $from=='home') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if ($from=='userreports') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php");
-} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
+} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd' || $from=='unhide') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");

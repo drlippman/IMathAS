@@ -101,7 +101,7 @@ if ($stm->rowCount()==0) {
 				echo ' <li><a href="forms.php?from=home&action=modify&id='.$row['id'].'">'._('Settings').'</a></li>';
 				echo '<li><a href="addremoveteachers.php?from=home&id='.$row['id'].'">'._('Add/remove teachers').'</a></li>';
 				echo ' <li><a href="transfercourse.php?from=home&id='.$row['id'].'">'._('Transfer ownership').'</a></li>';
-				echo ' <li><a href="forms.php?from=home&action=delete&id='.$row['id'].'">'._('Delete').'</a></li>';
+				echo ' <li><a href="forms.php?from=unhide&action=delete&id='.$row['id'].'">'._('Delete').'</a></li>';
 			} else if ($row['ownerid']!==$userid) {
 				echo '<li><a href="#" onclick="removeSelfAsCoteacher(this,'.$row['id'].');return false;">'._('Remove yourself as a co-teacher').'</a></li>';
 			}

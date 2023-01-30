@@ -41,7 +41,10 @@ if (!empty($_GET['from'])) {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
 		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
-	}
+	} else if ($_GET['from']=='unhide') {
+		$from = 'unhide';
+		$backloc = 'unhidefromcourselist.php?type=teach';
+	} 
 }
 if (!isset($_GET['cid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -55,6 +58,8 @@ if (!isset($_GET['cid'])) {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='gd') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
+	} else if ($from == 'unhide') {
+		echo '<a href="'.$backloc.'">'._('Unhide Courses').'</a> &gt; ';
 	}
 	echo "Form</div>\n";
 }

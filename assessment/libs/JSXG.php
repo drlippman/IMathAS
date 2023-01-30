@@ -36,11 +36,11 @@ function loadJSX() {
 }
 function getJSXscript () {
   if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
-		return '<script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsxgraph@1.4.5/distrib/jsxgraphcore.js"></script>';
+		return '<script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraphcore.js"></script>';
   } else {
 		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
 			var jsxgloadscript = document.createElement("script");
-      jsxgloadscript.src = "//cdn.jsdelivr.net/npm/jsxgraph@1.4.5/distrib/jsxgraphcore.js";
+      jsxgloadscript.src = "//cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraphcore.js";
 			document.getElementsByTagName("head")[0].appendChild(jsxgloadscript);
       JXGscriptloaded = true;
 		}</script>';
