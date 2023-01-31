@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26.3;
+	return 26.4;
 }
 
 global $allowedmacros;
@@ -624,6 +624,11 @@ function get_unit_times() {
     $unit["days"] = _("days");
     $unit["day"] = _("day");
 
+    $unit["Months"] = _("Months");
+    $unit["Month"] = _("Month");
+    $unit["months"] = _("months");
+    $unit["month"] = _("month");
+
     $unit["Years"] = _("Years");
     $unit["Year"] = _("Year");
     $unit["years"] = _("years");
@@ -660,6 +665,11 @@ function get_unit_time_abbreviations() {
     $unitabbr["Day"] = _("d");
     $unitabbr["days"] = _("d");
     $unitabbr["day"] = _("d");
+
+    $unitabbr["Months"] = _("mths");
+    $unitabbr["Month"] = _("mth");
+    $unitabbr["months"] = _("mths");
+    $unitabbr["month"] = _("mth");
 
     $unitabbr["Years"] = _("yrs");
     $unitabbr["Year"] = _("yr");
@@ -992,9 +1002,10 @@ function conversionAbbreviations() {
         $retval[1] = $unit["Minutes"]." = ".$unitabbr["Minutes"];
         $retval[2] = $unit["Hours"]." = ".$unitabbr["Hours"];
         $retval[3] = $unit["Days"]." = ".$unitabbr["Days"];
-        $retval[4] = $unit["Years"]." = ".$unitabbr["Years"];
-        $retval[5] = $unit["Decade"]." = ".$unitabbr["Decade"];
-        $retval[6] = $unit["Century"]." = ".$unitabbr["Century"];
+        $retval[4] = $unit["Months"]." = ".$unitabbr["Months"];
+        $retval[5] = $unit["Years"]." = ".$unitabbr["Years"];
+        $retval[6] = $unit["Decade"]." = ".$unitabbr["Decade"];
+        $retval[7] = $unit["Century"]." = ".$unitabbr["Century"];
     }
 
     #endregion
@@ -2099,18 +2110,20 @@ function conversionTime2() {
 		$retval[1] = array("",1,$unitabbr["hour"], 60, $unitabbr["minutes"]);
 		$retval[2] = array("",1,$unitabbr["day"], 24, $unitabbr["hours"]);
 		$retval[3] = array("",1,$unitabbr["year"], 365, $unitabbr["days"]);
-		$retval[4] = array("",1,$unitabbr["decade"], 10, $unitabbr["years"]);
-		$retval[5] = array("",1,$unitabbr["century"], 100, $unitabbr["years"]);
+        $retval[4] = array("",1,$unitabbr["year"], 12, $unitabbr["months"]);
+		$retval[5] = array("",1,$unitabbr["decade"], 10, $unitabbr["years"]);
+		$retval[6] = array("",1,$unitabbr["century"], 100, $unitabbr["years"]);
     } else {
         $retval[0] = array("",1,$unit["minute"], 60, $unit["seconds"]);
 		$retval[1] = array("",1,$unit["hour"], 60, $unit["minutes"]);
 		$retval[2] = array("",1,$unit["day"], 24, $unit["hours"]);
 		$retval[3] = array("",1,$unit["year"], 365, $unit["days"]);
-		$retval[4] = array("",1,$unit["decade"], 10, $unit["years"]);
-		$retval[5] = array("",1,$unit["century"], 100, $unit["years"]);
+        $retval[4] = array("",1,$unit["year"], 12, $unit["months"]);
+		$retval[5] = array("",1,$unit["decade"], 10, $unit["years"]);
+		$retval[6] = array("",1,$unit["century"], 100, $unit["years"]);
     }
 
-    for($i=0;$i<6;$i+=1){
+    for($i=0;$i<7;$i+=1){
         //$retval[$i][0] = sprintf("%d %s = %d %s",$retval[$i][1], $retval[$i][2], $retval[$i][3], $retval[$i][4]);
         $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} = {$retval[$i][3]} {$retval[$i][4]}";
     }
@@ -3031,6 +3044,8 @@ function conversionWeight() {
 //  WAMAP Question ID: 201697
 
 // 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+//
+// 2022-10-10 ver26.4- Added 1 year = 12 months to time conversion
 //
 // 2022-10-10 ver26.3- Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
 //  through            100 mg, mL
