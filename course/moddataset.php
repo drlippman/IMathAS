@@ -190,7 +190,19 @@
 		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
 		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
 
-        $isrand = preg_match('/(shuffle|rand[a-zA-Z]*)\(/',$_POST['control']) ? 1 : 0;
+        $isrand = preg_match('/(shuffle|getprimes?|rand[a-zA-Z]*)\(/',$_POST['control']) ? 1 : 0;
+        if (!$isrand) { // check any included code
+            preg_match_all('/includecodefrom\(\s*(\d+)\s*\)/',$_POST['control'],$matches,PREG_PATTERN_ORDER);
+            if (!empty($matches[1])) {
+                $ph = Sanitize::generateQueryPlaceholders($matches[1]);
+                $stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id IN ($ph)");
+                $stm->execute($matches[1]);
+                while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                    $isrand = preg_match('/(shuffle|getprimes?|rand[a-zA-Z]*)\(/',$row['control']) ? 1 : 0;
+                    if ($isrand) { break; }
+                }
+            }
+        }
 
 		if (isset($_GET['id'])) { //modifying existing
 			$qsetid = intval($_GET['id']);
