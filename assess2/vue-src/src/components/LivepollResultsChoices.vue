@@ -1,5 +1,5 @@
 <template>
-  <table class="LPres">
+  <table class="LPres" ref="main">
     <thead>
       <tr>
         <th>{{ $t('livepoll.answer') }}</th>
