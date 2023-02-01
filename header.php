@@ -162,7 +162,7 @@ if (!isset($_SESSION['mathdisp'])) {
       },
       options: {
         ignoreHtmlClass: "skipmathrender",'.
-        (($_SESSION['mathdisp']==8) ? 'enrichSpeech: "shallow",' : '')
+        (($_SESSION['mathdisp']==8) ? 'sre:{speech:"shallow"},' : '')
         .'renderActions: {
             addattr: [150,
                 function (doc) {for (math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
