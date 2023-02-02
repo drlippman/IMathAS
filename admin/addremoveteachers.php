@@ -75,7 +75,7 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	$ph = Sanitize::generateQueryPlaceholders($existing);
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id NOT IN ($ph) AND groupid=? AND rights>19 ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName,rights FROM imas_users WHERE id NOT IN ($ph) AND groupid=? AND rights>19 ORDER BY LastName,FirstName");
 	$existing[] = $coursegroupid;
 	$stm->execute($existing);
 	$out = array();

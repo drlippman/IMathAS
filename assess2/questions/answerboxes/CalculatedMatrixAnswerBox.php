@@ -32,6 +32,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -159,7 +160,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = '`' . $answer . '`';
         }
 

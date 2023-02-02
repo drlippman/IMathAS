@@ -2838,7 +2838,7 @@ function simplexsolve2() {
 			//								   , all pivot points
 			//								   , simplex matrix
 			//								   , soluiton
-            if(is_null($simplexsets[$rows])) {
+            if(!isset($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 			//2021-03-29 fixed typo row-->rows
@@ -2853,7 +2853,7 @@ function simplexsolve2() {
 
 		if(count($pivotpoints) > 1) {
 			// add the multiple pivot point matrix to the output
-			if(is_null($simplexsets[$rows])) {
+			if(!isset($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 
@@ -3763,5 +3763,3 @@ function simplexsolve($sm,$type,$showfractions=1) {
 //     simplexdisplaycolortable
 //     simplexsolutionconverttofraction
 
-
-?>

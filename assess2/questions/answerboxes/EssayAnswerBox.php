@@ -32,6 +32,7 @@ class EssayAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -60,6 +61,10 @@ class EssayAnswerBox implements AnswerBox
         }
         if ($displayformat == 'editor') {
             $rows += 5;
+        }
+
+        if (!isset($GLOBALS['useeditor'])) { // should be defined, but avoid errors if not
+            $GLOBALS['useeditor'] = 1;
         }
 
         if ($GLOBALS['useeditor'] == 'review' || ($GLOBALS['useeditor'] == 'reviewifneeded' && trim($la) == '')) {
@@ -101,7 +106,9 @@ class EssayAnswerBox implements AnswerBox
             }
         }
         $tip .= _('Enter your answer as text.  This question is not automatically graded.');
-        $sa .= $answer;
+        if (is_scalar($answer) && !$isConditional) {
+            $sa .= $answer;
+        }
 
         if ($scoremethod == 'takeanythingorblank' && trim($la) == '') {
             $params['submitblank'] = 1;

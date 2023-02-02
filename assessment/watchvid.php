@@ -78,7 +78,7 @@ if (strpos($url,'vimeo.com/')!==false) {
 	$vidid = substr($url,strpos($url,'.com/')+5);
   $vidid = preg_replace('/[^0-9]/','',$vidid);
 	$doembed = true;
-	$videoUrl = 'http://player.vimeo.com/video/'.$vidid;
+	$videoUrl = 'https://player.vimeo.com/video/'.$vidid;
 	$out = '<iframe width="853" height="480" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if ($doembed) {

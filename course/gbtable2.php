@@ -1313,8 +1313,8 @@ function gbtable() {
 		$row = $sturow[$l['userid']];
 		$col = $assesscol[$l['assessmentid']];
 
-		//if two asids for same stu/assess, skip or overright one with higher ID. Shouldn't happen
-		if (isset($gb[$row][1][$col][4]) && $gb[$row][1][$col][4]<$l['id']) { continue;}
+		//if two asids for same stu/assess, skip or overright one with higher ID. Shouldn't happen, and can't in assess2
+		//if (isset($gb[$row][1][$col][4]) && $gb[$row][1][$col][4]<$l['id']) { continue;}
 
 		$gb[$row][1][$col][4] = $l['userid'];; //assessment session userid
 

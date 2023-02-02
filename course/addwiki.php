@@ -78,7 +78,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$revisedate = parsedatetime($_POST['rdate'],$_POST['rtime'],2000000000);
 		}
 
-		$settings = intval($_POST['settings']);
+		$settings = intval($_POST['settings'] ?? 0);
 		$_POST['name'] = Sanitize::stripHtmlTags($_POST['name']);
 
         $_POST['description'] = Sanitize::trimEmptyPara($_POST['description']);

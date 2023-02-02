@@ -44,6 +44,10 @@
 	$stm = $DBH->prepare("SELECT * from imas_diags WHERE id=:id");
 	$stm->execute(array(':id'=>$diagid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line===false) {
+        echo 'Invalid diagnostic id';
+        exit;
+    }
 	$pcid = $line['cid'];
 	$diagid = $line['id'];
 	if ($line['term']=='*mo*') {
@@ -150,6 +154,9 @@ if (isset($_POST['SID'])) {
 		echo "<html><body>", Sanitize::encodeStringForDisplay(sprintf(_('Please make selections for "%1$s" and "%2$s".'), $line['sel1name'], $line['sel2name'])), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 			exit;
 	}
+    if (!isset($_POST['teachers'])) {
+        $_POST['teachers'] = '';
+    }
 	$pws = explode(';',$line['pws']);
 	if (trim($pws[0])!='') {
 		$basicpw = explode(',',$pws[0]);
@@ -238,7 +245,7 @@ if (isset($_POST['SID'])) {
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 		}
 		$allowreentry = ($line['public']&4);
-		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
+		if (!in_array(strtolower($_POST['passwd'] ?? ''),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$d = null;
 			$stm2 = $DBH->prepare("SELECT id,starttime FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 			$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));

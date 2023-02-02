@@ -57,8 +57,8 @@ function show_postback_form($launch, $db, $err='') {
   $deflast = '';
   $defemail = '';
   if (!empty($name)) {
-    $deffirst = $name['first'];
-    $deflast = $name['last'];
+    $deffirst = $name['first'] ?? '';
+    $deflast = $name['last'] ?? '';
     if (!empty($launch->get_launch_data()['email'])) {
       $defemail = $launch->get_launch_data()['email'];
     }

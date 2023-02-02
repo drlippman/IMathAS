@@ -41,12 +41,13 @@
     }
 
    //if ($_GET['folder']!='0') {
+   $contentbehavior = 0;
    if (strpos($_GET['folder'],'-')!==false) {
 	   $now = time();
 	   $blocktree = explode('-',$_GET['folder']);
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
-        if (!isset($items[$blocktree[$i]-1])) {
+        if (!isset($items[$blocktree[$i]-1]) || !is_array($items[$blocktree[$i]-1])) {
             $_GET['folder'] = 0;
 			$items = unserialize($line['itemorder']);
 			unset($backtrack);

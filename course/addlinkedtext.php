@@ -38,7 +38,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_linkedtext WHERE id=?");
 	$stm->execute(array($linkid));
 	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
@@ -54,7 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = _("You need to access this page from the course page menu");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$block = $_GET['block'];
+	$block = $_GET['block'] ?? '0';
 	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => ($_GET['folder'] ?? '0')));
 	$page_formActionTag .= (!empty($linkid)) ? "&id=" . $linkid : "";
@@ -300,7 +300,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<p><a href=\"addlinkedtext.php?cid=" . $cid;
 			if (!empty($linkid)) {
 				$body .= "&id=" . $linkid;
-			} else {
+			} else if (isset($newtextid)) {
 				$body .= "&id=$newtextid";
 			}
 			$body .= "\">Try Again</a></p>\n";

@@ -33,6 +33,7 @@ class ChoicesAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $assessmentId = $this->answerBoxParams->getAssessmentId();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -53,7 +54,7 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
-        if ($noshuffle == "last") {
+        if ($noshuffle == "last" && count($questions)>0) {
             $randkeys = (array) $RND->array_rand(array_slice($questions, 0, count($questions) - 1), count($questions) - 1);
             $RND->shuffle($randkeys);
             array_push($randkeys, count($questions) - 1);
@@ -180,7 +181,7 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         $tip = _('Select the best answer');
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $anss = explode(' or ', $answer);
             $sapt = array();
             foreach ($anss as $v) {

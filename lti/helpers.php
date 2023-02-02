@@ -66,7 +66,11 @@ function parse_name_from_launch(array $data) {
  * @return array  ('type'=>, 'refcid'=> ) and possibly others
  */
 function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): array {
-  parse_str(parse_url($targetlink, PHP_URL_QUERY), $param);
+  $linkquery = parse_url($targetlink, PHP_URL_QUERY);
+  if ($linkquery === null) {
+    return [];
+  }
+  parse_str($linkquery, $param);
 
   if (!empty($param['refaid'])) {
     $out = ['type'=>'aid', 'refaid'=>$param['refaid'], 'refcid'=>$param['refcid']];

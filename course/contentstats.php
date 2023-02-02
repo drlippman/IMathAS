@@ -117,6 +117,7 @@ if ($overwritebody) {
 	echo '</div>';
 
 	$idents = array_keys($descrips);
+    $cid = Sanitize::courseId($cid);
 
 	if (count($idents)==0) {
 		if ($stype=='I') {
@@ -170,13 +171,13 @@ if ($overwritebody) {
 			if (!isset($didview[$i])) {
 				echo '<td></td><td style="border-right:1px solid"></td>';
 			} else {
-				echo '<td>'.$didview[$i][0].'</td>';
+				echo '<td><a href="viewactionlog.php?cid='.$cid.'&uid='.$didviewIDs[$i].'">'.$didview[$i][0].'</a></td>';
 				echo '<td style="border-right:1px solid">'.$didview[$i][1].'</td>';
 			}
 			if (!isset($notview[$i])) {
 				echo '<td></td>';
 			} else {
-				echo '<td>'.$notview[$i].'</td>';
+				echo '<td><a href="viewactionlog.php?cid='.$cid.'&uid='.$notviewIDs[$i].'">'.$notview[$i].'</td>';
 			}
 			echo '</tr>';
 		}

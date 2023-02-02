@@ -3,7 +3,7 @@
 // (c) 2007 David Lippman
 require_once ('../includes/loaditemshowdata.php');
 require_once ("../includes/exceptionfuncs.php");
-if ($courseUIver>1) {
+if (!isset($courseUIver) || $courseUIver>1) {
 	$addassess = 'addassessment2.php';
 } else {
 	$addassess = 'addassessment.php';
@@ -236,6 +236,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		   if (is_array($items[$i])) { //if is a block
             if (!isset($items[$i]['items'])) {
                 continue; // invalid block - no items
+            }
+            if (!isset($items[$i]['id'])) { // hack fix
+                $items[$i]['id'] = 'tmpid'.$i;
             }
 			   $turnonpublic = false;
 			   if ($ispublic && !$inpublic) {
@@ -2146,7 +2149,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			if ($showlinks) {
 				echo '<span class="links">';
                 echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
-                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."remove=ask\">", _('Delete'), "</a>";
+                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."&remove=ask\">", _('Delete'), "</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
 				echo '</span>';

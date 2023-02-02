@@ -33,6 +33,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -177,7 +178,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
         $params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
         $params['vars'] = $variables;
@@ -199,7 +200,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if ($GLOBALS['myrights'] > 10 && strpos($answer, '|') !== false) {
                 echo 'Warning: use abs(x) not |x| in $answer';
             }

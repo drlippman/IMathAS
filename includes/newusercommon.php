@@ -93,7 +93,7 @@ function checkFormatAgainstRegex($val, $regexs) {
 }
 
 function checkNewUserValidation($required = array('SID','firstname','lastname','email','pw1','pw2')) {
-  global $loginformat, $CFG, $DBH;
+  global $loginformat, $loginprompt, $CFG, $DBH;
 
   $errors = array();
   foreach ($required as $v) {

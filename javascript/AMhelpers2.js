@@ -785,6 +785,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/α/g,"alpha").replace(/β/g,"beta").replace(/γ/g,"gamma").replace(/δ/g,"delta").replace(/ε/g,"epsilon").replace(/κ/g,"kappa");
 	str = str.replace(/λ/g,"lambda").replace(/ρ/g,"rho").replace(/τ/g,"tau").replace(/χ/g,"chi").replace(/ω/g,"omega");
 	str = str.replace(/Ω/g,"Omega").replace(/Γ/g,"Gamma").replace(/Φ/g,"Phi").replace(/Δ/g,"Delta").replace(/Σ/g,"Sigma");
+    str = str.replace(/&(ZeroWidthSpace|nbsp);/g, ' ');
 	return str;
 }
 
@@ -1427,7 +1428,7 @@ function processCalcNtuple(fullstr, format) {
   var res = NaN;
   var dec;
   // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
-  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',').replace(/(^,|,$)/g,'');;
+  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/g, ',').replace(/(^,|,$)/g,'');
   fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
@@ -1578,6 +1579,7 @@ function processCalcMatrix(fullstr, format) {
     okformat = false;
   }
   fullstr = fullstr.substring(1,fullstr.length-1);
+ 
   var err = '';
   var blankerr = '';
   var rowlist = [];
@@ -1593,7 +1595,11 @@ function processCalcMatrix(fullstr, format) {
       lastcut = i+1;
     }
   }
-  rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  if (lastcut == 0 && fullstr.charAt(0) != '(') {
+    rowlist.push(fullstr);
+  } else {
+    rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  }
   var lastnumcols = -1;
   if (MCdepth !== 0) {
     okformat = false;

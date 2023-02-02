@@ -16,10 +16,12 @@ $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
+$from = '';
 if (isset($teacherid)) {
 	if (isset($_GET['from']) && $_GET['from']=='gb') {
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> &gt; ";
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid&stu=$uid\">Student Detail</a> &gt; ";
+        $from = '&from=gb';
 	} else {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; ";
 	}
@@ -32,7 +34,7 @@ echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 
 
 echo '<div id="headerloginlog" class="pagetitle"><h1>'.$pagetitle. '</h1></div>';
-echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.'">View Activity Log</a></div>';
+echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.$from.'">View Activity Log</a></div>';
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);

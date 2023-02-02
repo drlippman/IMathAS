@@ -2100,6 +2100,14 @@ different numbers that are not opposites:
 </p>
 <pre>$a,$b = diffrands(-5,5,2) where ($a+$b!=0)</pre>
 <p>
+<p>Beware that the system will give up if it's unable to meet the specified conditions after 200 tries, 
+    so be sure your <code>where</code> condition has fairly high probability of success, ideally at least 10%.  If it doesn't,
+    you should consider where there are other ways to generate your values.  Alternatively, you can 
+    specify a fallback value to use if the condition fails using <code>else</code>:
+</p>
+</p>
+<pre>$a = rand(1,100) where (gcd($a,$b)==1) else ($a = 7)</pre>
+<p>
 &quot;if&quot; is used to make an assignment conditional.  For example:
 </p>
 <pre>
@@ -2169,6 +2177,16 @@ if ($a==0) {
   $a = rand(-5,-1)
   $b = rand(1,5)
 } where ($a+$b !==0)
+</pre>
+<p>or with a fallback</p>
+<pre>
+{
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0) else {
+  $a = -3
+  $b = 5
+}
 </pre>
 
 <h3 id="loops">Loops</h3>
@@ -2542,6 +2560,12 @@ These macros are fairly general purpose:
   start is the first value used, and num indicates the number of entries to create.
   ABarray(5,2) will output array("[AB5]","[AB6]").
   This macro is often used in conjunction with the showarrays macro.</li>
+<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: 
+  If fed a string from $stuanswers or $stuanswersval of an N-tuple or Calculted N-tuple question,
+  this will extract the components of the n-tuple, returning them as an array.  It is recommended to
+  provide a second argument of the number of components expected, and if the values are expected to
+  be numeric, put true as the third argument.  This function will return false if the input is 
+  not a valid ntuple.  This function only works for a single n-tuple, not a list of them.</li>
 <li><strong>scoremultiorder(stua, answer, swap, type, [weights])</strong>: In a multipart question, allows questions or groups 
   of questions to be scored in any order.  Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 
   'ntuple', and 'calcntuple'.  <em>Note:</em> Use of the "list" option for individual question types is <b>strongly</b> recommended over 
@@ -3236,6 +3260,10 @@ of choices is automatically randomized.
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" </dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
+<dt>$answerformat = "addnone" </dt>
+	<dd>Adds "None of these" to the options. This is added automatically if <code>$answers=""</code>, and you can 
+        add "None of these" yourselv to <code>$questions</code>, but this provides another way to always include the 
+        "None of these" option.</dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
@@ -3567,7 +3595,9 @@ drawn line from the correct line.
                 arbitrary segments.
             </li>
 	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
-	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
+	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors. 
+                Note you can use $scoremethod to change how vectors are scored.
+            </li>
 	      </ul>
 	    <p>$answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.</p>
 	    <p> $answerformat = "closedpolygon" can be used for drawing a single polygon that is closed; the enclosed area will be shaded and the drawing terminate when the shape is

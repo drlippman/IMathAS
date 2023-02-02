@@ -88,11 +88,11 @@ class DrawingScorePart implements ScorePart
                     if (strpos($grid[$i],':')!==false) {
                         $pts = explode(':',$grid[$i]);
                         foreach ($pts as $k=>$v) {
-                            $pts[$k] = evalbasic($v);
+                            $pts[$k] = evalbasic($v,true);
                         }
                         $settings[$i] = implode(':',$pts);
                     } else {
-                        $settings[$i] = evalbasic($grid[$i]);
+                        $settings[$i] = evalbasic($grid[$i],true);
                     }
                 }
             }
@@ -153,8 +153,8 @@ class DrawingScorePart implements ScorePart
         if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
             foreach ($answers as $key=>$function) {
                 $function = array_map('trim',explode(',',$function));
-                $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                 $ansdots[$key] = array($pixx,$pixy);
             }
 
@@ -286,6 +286,12 @@ class DrawingScorePart implements ScorePart
             $x4p = $xtopix($x4); //($x4 - $settings[0])*$pixelsperx + $imgborder;
             $ymid = ($settings[2]+$settings[3])/2;
             $ymidp = $ytopix($ymid); //$settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
+            $yop = $imgborder + $settings[3]*$pixelspery;
+            if ($settings[0]<0 && $settings[1]>0) {
+                $xop = $xtopix(0);
+            } else {
+                $xop = $x2p;
+            }
             $scoretype = array();
             $leftrightdir = '';
             foreach ($answers as $key=>$function) {
@@ -307,8 +313,8 @@ class DrawingScorePart implements ScorePart
                 //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                    $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                    $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
                     } else {
@@ -317,9 +323,9 @@ class DrawingScorePart implements ScorePart
                     continue;
                 } else if ($function[0]=='vector') {
                     if (count($function)>4) { // form "vector, x_start, y_start, x_end, y_end"
-                        $ansvecs[$key] = array('p', $xtopix($function[1]), $ytopix($function[2]), $xtopix($function[3]), $ytopix($function[4]));
+                        $ansvecs[$key] = array('p', $xtopix(evalbasic($function[1],true)), $ytopix(evalbasic($function[2],true)), $xtopix(evalbasic($function[3],true)), $ytopix(evalbasic($function[4],true)));
                     } else if (count($function)>2) {  //form "vector, dx, dy"
-                        $ansvecs[$key] = array('d', $function[1]*$pixelsperx, -1*$function[2]*$pixelspery);
+                        $ansvecs[$key] = array('d', evalbasic($function[1],true)*$pixelsperx, -1*evalbasic($function[2],true)*$pixelspery);
                     }
                 } else if ($function[0]=='circle') {  // form "circle,x_center,y_center,radius"
                     //$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
@@ -394,13 +400,7 @@ class DrawingScorePart implements ScorePart
                     $y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
                     $y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
                     $y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-                    $yop = $imgborder + $settings[3]*$pixelspery;
-
-                    if ($settings[0]<0 && $settings[1]>0) {
-                        $xop = $xtopix(0);
-                    } else {
-                        $xop = $x2p;
-                    }
+                    
                     if (($logloc = strpos($function[0],'log'))!==false ||
                         ($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
@@ -1655,9 +1655,9 @@ class DrawingScorePart implements ScorePart
 
         } else if ($answerformat[0]=='numberline') {
             foreach ($answers as $key=>$function) {
-                if ($function=='') { continue; }
-                $function = array_map('trim',explode(',',$function));
-                if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+               if ($function=='') { continue; }
+               $function = array_map('trim',explode(',',$function));
+               if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
                 $pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
                 $pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;
                 $newdot = array($pixx, $pixy);
@@ -1671,6 +1671,10 @@ class DrawingScorePart implements ScorePart
                   }
                 }
               } else {
+                if (!isset($function[1]) || !isset($function[2])) {
+                    echo "Need min and max for numberline line";
+                    continue;
+                }
                 if (trim($function[1])==='-oo') {
                     $xminpix = 1;
                 } else {
@@ -1829,8 +1833,8 @@ class DrawingScorePart implements ScorePart
                 //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                    $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                    $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
                     } else {

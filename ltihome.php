@@ -14,6 +14,13 @@ if (isset($CFG['hooks']['ltihome'])) {
 	require($CFG['hooks']['ltihome']);
 }
 
+$hasplacement = false;
+
+if (!isset($_SESSION['ltiitemtype'])) {
+    echo _('Missing assessment information. Try opening from the LMS again');
+    exit;
+}
+
 //decide what we need to display
 if ($_SESSION['ltiitemtype']==0) {
 	$hascourse = true;
@@ -151,6 +158,7 @@ if (!empty($createcourse)) {
 		$stm->execute(array(':id'=>$createcourse));
 		$items = unserialize($stm->fetchColumn(0));
 		$newitems = array();
+        $_POST['ctc'] = $createcourse;
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
 		$itemorder = serialize($newitems);
@@ -436,6 +444,10 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line === false) {
+        echo 'Invalid assessment ID';
+        exit;
+    }
 	echo "<h2>".sprintf(_("LTI Placement of %s"), Sanitize::encodeStringForDisplay($line['name'])) . "</h2>";
 	if ($line['ver'] > 1) {
 		echo "<p><a href=\"assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a> | ";

@@ -20,7 +20,7 @@ if (isset($_GET['tb'])) {
 } else {
 	$totb = 'b';
 }
-$block = $_GET['block'];
+$block = $_GET['block'] ?? '0';
 if (isset($_GET['daid'])) {
     $daid = Sanitize::onlyInt($_GET['daid']);
     $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");

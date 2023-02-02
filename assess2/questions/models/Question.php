@@ -23,7 +23,7 @@ class Question
     private $correctAnswersForParts;
     private $externalReferences;
     private $extraData;
-    private $questionLastMod;
+    private $questionLastMod = 0;
 
     private $errors = array();
 
@@ -224,6 +224,6 @@ class Question
      */
     public function setQuestionLastMod($time): void
     {
-        $this->questionLastMod = $time;
+        $this->questionLastMod = intval($time);
     }
 }

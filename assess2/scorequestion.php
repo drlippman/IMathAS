@@ -31,7 +31,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('toscoreqn', 'lastloaded'));
+check_for_required('POST', array('lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isActualTeacher && isset($_GET['uid'])) {
@@ -43,7 +43,7 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 $isTeacherPreview = ($canViewAll && $uid == $userid);
 
 // if toscoreqn is not an array, make it into one
-if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
+if (!isset($_POST['toscoreqn']) || $_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $qns = array();
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
   $timeactive = array();

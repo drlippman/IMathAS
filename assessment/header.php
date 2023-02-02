@@ -235,7 +235,7 @@ if ((isset($useeditor) && $_SESSION['useed']==1) || isset($loadiconfont)) {
 	echo '<link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
 	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
-if (!isset($usereqnhelper)) { $useeqnhelper = 0; }
+if (!isset($useeqnhelper)) { $useeqnhelper = 0; }
 
 if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';

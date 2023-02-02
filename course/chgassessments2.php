@@ -52,6 +52,7 @@ if (!(isset($teacherid))) {
 
 		$sets = array();
 		$qarr = array();
+        $coreOK = true;
 		if ($_POST['copyopts'] != 'DNC') {
             $copyreqscore = !empty($_POST['copyreqscore']);
 			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
@@ -74,6 +75,7 @@ if (!(isset($teacherid))) {
                     $sets[] = "$item=:$item";
                 }
             }
+            $submitby = $qarr['submitby'];
 		} else {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
@@ -118,7 +120,6 @@ if (!(isset($teacherid))) {
 			}
 
 			// check the core settings for consistency
-			$coreOK = true;
 			if ($_POST['subtype'] === 'DNC') {
 				$coreOK = false;
 			} else {
@@ -292,7 +293,7 @@ if (!(isset($teacherid))) {
 				}
 				$sets[] = "reqscoreaid=:reqscoreaid";
 				$qarr[':reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
-				if ($_POST['reqscorecalctype']==1) {
+				if (!empty($_POST['reqscorecalctype'])) {
 					$sets[] = "reqscoretype=(reqscoretype | 2)";
 				} else {
 					$sets[] = "reqscoretype=(reqscoretype & ~2)";
@@ -531,12 +532,12 @@ if (!(isset($teacherid))) {
 
 		$stm = $DBH->prepare("SELECT id,name,gbcategory FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
+        $page_assessSelect = array();
 		if ($stm->rowCount()==0) {
 			$page_assessListMsg = "<li>No Assessments to change</li>\n";
 		} else {
 			$page_assessListMsg = "";
 			$i=0;
-			$page_assessSelect = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_assessSelect[] = array(
 					'val' => $row[0],

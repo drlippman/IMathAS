@@ -292,7 +292,7 @@
 	}
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=022622"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';

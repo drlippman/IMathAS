@@ -353,7 +353,7 @@ if ($report=='overview') {
 				//$html .= '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
 				$html .= '<tr class="'.$class.'"><td><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td>';
 				for ($i=0;$i<count($ot[0][2])+1;$i++) {
-                    if ($ot[0][2][$i][2] == 1) { continue; } // hidden
+                    if (!empty($ot[0][2][$i][2])) { continue; } // hidden
 					if (count($subtots[$i])>0) {
 						$html .= '<td><b>'.round(array_sum($subtots[$i])/count($subtots[$i]),1).'%</b></td>';
 					} else {

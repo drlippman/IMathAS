@@ -165,6 +165,7 @@ array( 'input'=>'dt', 'output'=>'{:d t:}', 'definition'=>TRUE),
 array( 'input'=>'oint'),
 array( 'input'=>'del', 'tex'=>'partial'),
 array( 'input'=>'grad', 'tex'=>'nabla'),
+array( 'input'=>'hbar'),
 array( 'input'=>'+-', 'tex'=>'pm'),
 array( 'input'=>'O/', 'tex'=>'emptyset'),
 array( 'input'=>'oo', 'tex'=>'infty'),
@@ -571,11 +572,11 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
-		if ($st[0]== " ") {
+		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$newFrag .= '\\text{'.$st.'}';
-		if ($st[strlen($st)-1]== " ") {
+		if (strlen($st)>0 && $st[strlen($st)-1]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$str = $this->AMremoveCharsAndBlanks($str,$i+1);

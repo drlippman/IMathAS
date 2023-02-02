@@ -39,8 +39,8 @@ if (!$isRealStudent) {
  */
 function check_for_required($method, $required) {
   foreach ($required as $r) {
-    if (($method == 'POST' && !isset($_POST[$r]) && $_POST[$r] !== '') ||
-      ($method == 'GET' && !isset($_GET[$r]) && $_GET[$r] !== '')
+    if (($method == 'POST' && (!isset($_POST[$r]) || $_POST[$r] === '')) ||
+      ($method == 'GET' && (!isset($_GET[$r]) || $_GET[$r] === ''))
     ) {
       echo '{"error": "missing_param", "error_details": "Missing parameter '.sanitize::encodeStringForJavascript($r).'"}';
       exit;

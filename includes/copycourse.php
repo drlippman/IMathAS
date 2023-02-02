@@ -137,10 +137,14 @@ function copycourse($sourcecid, $name, $newUIver) {
       foreach ($arr as $k=>$v) {
         if (is_array($v)) {
           updateoutcomes($arr[$k]['outcomes']);
+        } else if (!isset($outcomes[$v])) {
+            // outcome exists in outcomesarr, but doesn't actually exist; must not have updated properly
+          unset($arr[$k]);
         } else {
           $arr[$k] = $outcomes[$v];
         }
       }
+      $arr = array_values($arr);
     }
     $outcomesarr = unserialize($outcomesarr);
     updateoutcomes($outcomesarr);
@@ -152,6 +156,7 @@ function copycourse($sourcecid, $name, $newUIver) {
   $usereplaceby = "all";
   $newitems = array();
   $cid = $destcid; //needed for copyiteminc
+  $_POST['ctc'] = $sourcecid;
   copyallsub($items,'0',$newitems,$gbcats);
   doaftercopy($sourcecid, $newitems);
 

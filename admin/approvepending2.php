@@ -10,12 +10,12 @@ if (isset($CFG['hooks']['admin/approvepending'])) {
 	require($CFG['hooks']['admin/approvepending']);
 }
 
-$newStatus = Sanitize::onlyInt($_POST['newstatus']);
-$instId = Sanitize::onlyInt($_POST['userid']);
 $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
 
 //handle ajax postback
-if (!empty($newStatus)) {
+if (!empty($_POST['newstatus'])) {
+    $newStatus = Sanitize::onlyInt($_POST['newstatus']);
+    $instId = Sanitize::onlyInt($_POST['userid']);
 	$stm = $DBH->prepare("SELECT status,reqdata FROM imas_instr_acct_reqs WHERE userid=?");
     $stm->execute(array($instId));
     list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
@@ -264,7 +264,7 @@ if (empty($reqFields)) {
     }
 }
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
 //$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}

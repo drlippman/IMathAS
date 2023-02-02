@@ -33,7 +33,7 @@
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
-	$placeinhead .= '<script type="text/javascript">
+	$placeinhead = '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
 			return false;

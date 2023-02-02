@@ -193,6 +193,7 @@ function draw_angle() {
   
   // Build alt text
   if ($hasUserAltText !== true) {
+    $altRefLabel = "";
     $angRef = abs($ang)%360;
     $angTurns = floor(abs($ang)/360);
     if ($angTurns > 0) {
@@ -227,6 +228,7 @@ function draw_angle() {
     }
     
     if (abs($angTurns) > 0) {
+      $altTurnsAnd = "";
       if ($angRef > 0) {
         $altTurnsAnd = " and also ";
       }
@@ -1568,6 +1570,8 @@ function draw_triangle() {
           }
           // Get the arc symbols
           $angArcTmp = array_slice($argsArray[$angleKey],4,3);
+        } else {
+            $angArcTmp = ["","",""];
         }
         // These are the side lengths from which to build the angles
         $sid = array_slice($argsArray[$sideKey],1,3);
@@ -1587,8 +1591,8 @@ function draw_triangle() {
         $angS2 = 180*acos((pow($sid[1],2)-pow($sid[0],2)-pow($sid[2],2))/(-2*$sid[0]*$sid[2]))/(M_PI);
         $angS3 = 180*acos((pow($sid[2],2)-pow($sid[1],2)-pow($sid[0],2))/(-2*$sid[1]*$sid[0]))/(M_PI);
 
-        $argsArray[$angleKey] = ["angles",$angS1,$angS2,$angS3,$angTmp[0],$angTmp[1],$angTmp[2],$angArcTmp[0],$angArcTmp[1],$angArcTmp[2]];
-        $argsArray[$sideKey] = ["sides",$sidLabTmp[0],$sidLabTmp[1],$sidLabTmp[2],$sideMarkTmp[0],$sideMarkTmp[1],$sideMarkTmp[2]];
+        $argsArray[$angleKey] = ["angles",$angS1,$angS2,$angS3,$angTmp[0]??'',$angTmp[1]??'',$angTmp[2]??'',$angArcTmp[0]??'',$angArcTmp[1]??'',$angArcTmp[2]??''];
+        $argsArray[$sideKey] = ["sides",$sidLabTmp[0]??'',$sidLabTmp[1]??'',$sidLabTmp[2]??'',$sideMarkTmp[0]??'',$sideMarkTmp[1]??'',$sideMarkTmp[2]??''];
       }
     }
     

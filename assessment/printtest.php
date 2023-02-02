@@ -1,6 +1,6 @@
 <?php
 	require("../init.php");
-	$isteacher = (isset($teacherid) || $_SESSION['isteacher']==true);
+	$isteacher = (isset($teacherid) || !empty($_SESSION['isteacher']));
 	if (!isset($_SESSION['sessiontestid']) && !$isteacher) {
 		echo "<html><body>Error. </body></html>\n";
 		exit;

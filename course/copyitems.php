@@ -87,7 +87,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
-			if (isset($_POST['checked']) && !empty($_POST['checked'])) {
+			if (!empty($_POST['checked'])) {
 				$checked = $_POST['checked'];
 				$chklist = implode(',', array_map('intval',$checked));
 				$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid=:courseid");
@@ -148,6 +148,7 @@ if (!(isset($teacherid))) {
 				$row[':id'] = $cid;
 				$stm->execute($row);
 			}
+            $gbcats = array();
 			if (isset($_POST['copygbsetup'])) {
 				$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$ctc));
@@ -184,7 +185,6 @@ if (!(isset($teacherid))) {
 					}
 				}
 			} else {
-				$gbcats = array();
 				$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid=:courseid AND ";
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
@@ -289,7 +289,7 @@ if (!(isset($teacherid))) {
 			}
 
 			if (isset($_POST['checked']) || $_POST['whattocopy']=='all') {
-				$checked = $_POST['checked'];
+				$checked = $_POST['checked'] ?? [];
 				$stm = $DBH->prepare("SELECT blockcnt,dates_by_lti FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
 				list($blockcnt,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);

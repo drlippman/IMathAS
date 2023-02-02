@@ -297,7 +297,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
 				$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['newfile-'.$i]['name'])));
-				if (trim($_POST['newfiledesc-'.$i])=='') {
+				if (trim($_POST['newfiledesc-'.$i] ?? '')=='') {
 					$_POST['newfiledesc-'.$i] = $userfilename;
 				}
 				$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
@@ -570,7 +570,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
             if ($isteacher && 
                 ($_GET['modify']=='new' || (isset($line['userid']) && $line['userid']==$userid)) && 
-                ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))
+                ($_GET['modify']=='new' || $_GET['modify']==$threadid || ($_GET['modify']!='reply' && $line['parent']==0))
             ) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";
 				echo "<input type=radio name=type id=type0 value=0 ";

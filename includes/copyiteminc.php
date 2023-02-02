@@ -35,7 +35,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid, $gbcats = false, $sethidden = false)
 {
     global $DBH;
-    global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+    global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
     global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti, $convertAssessVer, $autoexcusetrack;
     if (!isset($copystickyposts)) {$copystickyposts = false;}
     if ($gbcats === false) {
@@ -44,9 +44,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
     if (!isset($outcomes)) {
         $outcomes = array();
     }
-    if (!isset($_POST['ctc'])) {
-        $_POST['ctc'] = $cid;
-    }
+    
     if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
     }
@@ -54,10 +52,10 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         $_POST['append'] = '';
     }
     $now = time();
-    $stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+    $stm = $DBH->prepare("SELECT itemtype,typeid,courseid FROM imas_items WHERE id=:id");
     $stm->execute(array(':id' => $itemid));
     if ($stm->rowCount() == 0) {return false;}
-    list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
+    list($itemtype, $typeid, $sourcecid) = $stm->fetch(PDO::FETCH_NUM);
     if ($itemtype == "InlineText") {
         //$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
         //$query .= "SELECT '$cid',title,text,startdate,enddate FROM imas_inlinetext WHERE id='$typeid'";
@@ -109,7 +107,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $tool = explode('~~', substr($row['text'], 8));
             if (isset($tool[3]) && isset($gbcats[$tool[3]])) {
                 $tool[3] = $gbcats[$tool[3]];
-            } else if ($_POST['ctc'] != $cid) {
+            } else if ($sourcecid != $cid) {
                 $tool[3] = 0;
             }
             $row['text'] = 'exttool:' . implode('~~', $tool);
@@ -143,10 +141,10 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($sethidden) {$row['avail'] = 0;}
         if (isset($gbcats[$row['gbcategory']])) {
             $row['gbcategory'] = $gbcats[$row['gbcategory']];
-        } else if ($_POST['ctc'] != $cid) {
+        } else if ($sourcecid != $cid) {
             $row['gbcategory'] = 0;
         }
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $row['groupsetid'] = 0;
         }
         $rubric = $row['rubric']; //array_pop($row);
@@ -172,7 +170,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             ':groupsetid' => $row['groupsetid'], ':tutoredit' => $row['tutoredit'],
             ':sortby' => $row['sortby'], ':autoscore' => $row['autoscore']));
         $newtypeid = $DBH->lastInsertId();
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $forumtrack[$typeid] = $newtypeid;
         }
         if ($rubric != 0) {
@@ -254,7 +252,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($sethidden) {$row['avail'] = 0;}
         if (isset($gbcats[$row['gbcategory']])) {
             $row['gbcategory'] = $gbcats[$row['gbcategory']];
-        } else if ($_POST['ctc'] != $cid) {
+        } else if ($sourcecid != $cid) {
             $row['gbcategory'] = 0;
         }
         if (isset($outcomes[$row['defoutcome']])) {
@@ -272,7 +270,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         } else {
             $row['ancestors'] = $newancestor . ',' . $row['ancestors'];
         }
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $forumtopostto = $row['posttoforum'];
             unset($row['posttoforum']);
             if ($row['isgroup'] > 0) {
@@ -336,7 +334,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($reqscoreaid > 0) {
             $reqscoretrack[$newtypeid] = $reqscoreaid;
         }
-        if ($_POST['ctc'] != $cid && $forumtopostto > 0) {
+        if ($sourcecid != $cid && $forumtopostto > 0) {
             $posttoforumtrack[$newtypeid] = $forumtopostto;
         }
         if ($autoexcuse !== null && $autoexcuse !== '' && $cid != $sourcecid) {
@@ -493,9 +491,9 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['avail'] = $sethidden ? 0 : $item['avail'];
                 $newblock['SH'] = $item['SH'];
                 $newblock['colors'] = $item['colors'];
-                $newblock['public'] = $item['public'];
-                $newblock['fixedheight'] = $item['fixedheight'];
-                $newblock['grouplimit'] = $item['grouplimit'];
+                $newblock['public'] = $item['public'] ?? 0;
+                $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
+                $newblock['grouplimit'] = $item['grouplimit'] ?? [];
                 $newblock['items'] = array();
                 if (count($item['items']) > 0) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
@@ -644,7 +642,7 @@ function copyallsub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = f
             $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
             $newblock['grouplimit'] = $item['grouplimit'] ?? [];
             $newblock['items'] = array();
-            if (count($item['items']) > 0) {
+            if (isset($item['items']) && count($item['items']) > 0) {
                 copyallsub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
             }
             $addtoarr[] = $newblock;

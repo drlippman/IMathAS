@@ -770,6 +770,7 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
     $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
 	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
+    $str = str_replace('&ZeroWidthSpace;', '', $str);
   if (strtoupper(trim($str))==='DNE') {
     $str = 'DNE';
   }

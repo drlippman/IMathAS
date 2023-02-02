@@ -32,6 +32,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -54,7 +55,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
                 $answerformat = ($answerformat == '') ? 'list' : $answerformat . ',list';
                 $isListAnswer = true;
             }
-        } else if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10 && strpos($answer,'+-')!==false) {
+        } else if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10 && is_string($answer) && strpos($answer,'+-')!==false) {
             echo _('Warning: For +- in an $answer to score correctly, use $answerformat="allowplusminus"');
         }
 
@@ -93,7 +94,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
         $params['calcformat'] = $answerformat;
 
@@ -113,7 +114,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
             list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if (in_array('allowplusminus', $ansformats)) {
                 $answer = str_replace('+-','pm',$answer);
             }

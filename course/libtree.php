@@ -102,7 +102,7 @@ END;
 	//if parent has lower userights, up them to match child library
 	function setparentrights($alibid) {
 		global $rights,$parents;
-		if ($parents[$alibid]>0) {
+		if (!empty($parents[$alibid])) {
 			if ($rights[$parents[$alibid]] < $rights[$alibid]) {
 			//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
 

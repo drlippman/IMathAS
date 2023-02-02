@@ -20,6 +20,7 @@
 */
 
 function diff($old, $new){
+    $maxlen = 0;
 	foreach($old as $oindex => $ovalue){
 		$nkeys = array_keys($new, $ovalue);
 		foreach($nkeys as $nindex){

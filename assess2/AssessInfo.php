@@ -940,6 +940,10 @@ class AssessInfo
     if ($this->assessData['can_use_latepass'] > 0) {
       $LPneeded = $this->assessData['can_use_latepass'];
       $LPcutoff = $this->assessData['LPcutoff'];
+      $enddate = $this->getSetting('original_enddate');
+      if ($LPcutoff < $enddate) { 
+        $LPcutoff = 0; // ignore nonsensical cutoff
+      }
       $stm = $this->DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
       $stm->execute(array(
         ':lps'=>$LPneeded,
@@ -1038,6 +1042,7 @@ class AssessInfo
       $settings['retry_penalty'] = $defaults['defpenalty'];
       $settings['retry_penalty_after'] = $defaults['defpenalty_after'];
     } else {
+      if ($settings['penalty'] === '') { $settings['penalty'] = '0'; }
       if ($settings['penalty'][0]==='L') {
         $settings['retry_penalty_after'] = 'last';
         $settings['retry_penalty'] = intval(substr($settings['penalty'], 1));
@@ -1165,6 +1170,13 @@ class AssessInfo
     if ($settings['displaymethod'] === 'livepoll') {
       $settings['shuffle'] = $settings['shuffle'] | 4;
       $settings['submitby'] = 'by_question';
+    }
+
+    //if video cued but no viddata, override
+    if ($settings['displaymethod'] === 'video_cued' &&
+        $settings['viddata'] == ''
+    ) {
+        $settings['displaymethod'] = 'skip';
     }
 
     //if by-assessment, define attempt values

@@ -48,7 +48,7 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 $allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
-	return "//cdn.jsdelivr.net/npm/jsxgraph@1.4.5/distrib/jsxgraphcore.js";
+	return "//cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraphcore.js";
 }
 
 function jsx_idlen() {

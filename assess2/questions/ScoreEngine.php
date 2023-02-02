@@ -173,7 +173,7 @@ class ScoreEngine
             $anstypes = array_map('trim', $anstypes);
         }
 
-        if (!empty($reqdecimals)) {
+        if (isset($reqdecimals) && $reqdecimals !== '') {
             $hasGlobalAbstol = false;
             if (isset($anstypes) && is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
                 $abstolerance = array();
@@ -246,7 +246,7 @@ class ScoreEngine
                 continue;
             }
 
-            if ('answerformat' == $optionKey) {
+            if ('answerformat' == $optionKey && is_scalar($answerformat)) {
                 $answerformat = str_replace(' ', '', $answerformat);
             }
 
@@ -268,8 +268,9 @@ class ScoreEngine
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
             require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
-            if (isset($onBeforeScoreQuestion) && is_callable($onBeforeScoreQuestion)) {
-                $onBeforeScoreQuestion();
+            if (function_exists('onBeforeScoreQuestion')) {
+                onBeforeScoreQuestion($scoreQuestionParams,
+                    $varsForScorepart, $additionalVarsForScoring);
             }
         }
 
@@ -671,6 +672,7 @@ class ScoreEngine
                 $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"] ?? '');
             }
 
+            $raw[$partnum] = 0;
             try {
               $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
               $scorePartResult = $scorePart->getResult();
@@ -684,8 +686,10 @@ class ScoreEngine
                     . basename($t->getFile())
                   );
             }
+            if (isset($scorePartResult)) {
+                $raw[$partnum] = $scorePartResult->getRawScore();
+            }
             
-            $raw[$partnum] = $scorePartResult->getRawScore();
 
             if ($scoremethodwhole == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
@@ -705,9 +709,15 @@ class ScoreEngine
             }
 
             $raw[$partnum] = round($raw[$partnum], 2);
-            $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
-            $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
-            $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
+            if (isset($scorePartResult)) {
+                $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
+                $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
+                $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
+            } else {
+                $partLastAnswerAsGiven[$partnum] = '';
+                $partLastAnswerAsNumber[$partnum] = '';
+                $partCorrectAnswerWrongFormat[$partnum] = false;
+            }
         }
 
         $returnData = [
@@ -860,8 +870,6 @@ class ScoreEngine
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
                                      int $errline, array $errcontext = []): bool
     {
-        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
-
         $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
         if (E_ERROR == $errno || (E_WARNING == $errno &&
             (
@@ -872,6 +880,8 @@ class ScoreEngine
             if ($errstr == 'Trying to access array offset on value of type null') {
               $errstr = 'Trying to access array offset of undefined variable';
             }
+            ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+            
             $this->addError(sprintf('Caught %s in the question code: %s on line %s in file %s',
                 ErrorHandler::ERROR_CODES[$errno],
                 $errstr, $errline, $errfile));

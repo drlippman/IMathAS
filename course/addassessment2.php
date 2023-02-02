@@ -184,7 +184,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
 		// Core options
-		if ($_POST['copyfrom'] > 0) { // copy options from another assessment
+		if (!empty($_POST['copyfrom'])) { // copy options from another assessment
 			$fields = array('displaymethod','submitby','defregens','defregenpenalty',
 									'keepscore','defattempts','defpenalty','showscores','showans',
 									'viewingb','scoresingb','ansingb','gbcategory','caltag','shuffle',
@@ -259,7 +259,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 
 			$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
-			if ($toset['showscores'] == 'none' || $toset['showscores'] == 'total') {
+			if ($toset['showscores'] == 'none' || $toset['showscores'] == 'total' || !isset($_POST['showans'])) {
 				$toset['showans'] = 'never';
 			} else {
 				$toset['showans'] = Sanitize::simpleString($_POST['showans']);
@@ -339,9 +339,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$toset['eqnhelper'] = 2;
 
-			if (!isset($_POST['doposttoforum'])) {
-	      $toset['posttoforum'] = 0;
-	    } else {
+			if (!isset($_POST['doposttoforum']) || empty($_POST['posttoforum'])) {
+				$toset['posttoforum'] = 0;
+			} else {
 				$toset['posttoforum'] = Sanitize::onlyInt($_POST['posttoforum']);
 			}
 
@@ -383,7 +383,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			// group assessmentid
 	    $toset['isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
 			if ($toset['isgroup'] > 0) {
-				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid']);
+				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid'] ?? 0);
 				$toset['groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
 			} else {
 				$toset['groupsetid'] = 0;
@@ -541,7 +541,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($from=='mcd') {
 				header(sprintf('Location: %s/course/masschgdates.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
 			} else if ($from=='lti') {
-				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+                if (!empty($_SESSION['ltiver']) && $_SESSION['ltiver'] == '1.3') {
+				    header(sprintf('Location: %s/assess2/?cid=%s&aid=%s', $GLOBALS['basesiteurl'], $cid, $assessmentId));
+                } else {
+				    header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+                }
 			} else {
 				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, $rqp));
@@ -755,7 +759,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if (is_string($line['defpenalty']) &&$line['defregenpenalty'][0]==='S') {
+      if ($line['defpenalty'] === '') { $line['defpenalty'] = '0'; }
+			if (is_string($line['defpenalty']) && $line['defregenpenalty'][0]==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
 				$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {
@@ -832,18 +837,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
               global $page_outcomes, $outcomeOptions;
               foreach ($ar as $v) {
                   if (is_array($v)) { //outcome group
-										$outcomeOptions[] = array(
-											'value' => '',
-											'text' => $v['name'],
-											'isgroup' => true
-										);
+                    $outcomeOptions[] = array(
+                        'value' => '',
+                        'text' => $v['name'],
+                        'isgroup' => true
+                    );
                     flattenarr($v['outcomes']);
-                  } else {
-										$outcomeOptions[] = array(
-											'value' => $v,
-											'text' => $page_outcomes[$v],
-											'isgroup' => false
-										);
+                  } else if (isset($page_outcomes[$v])) {
+                    $outcomeOptions[] = array(
+                        'value' => $v,
+                        'text' => $page_outcomes[$v],
+                        'isgroup' => false
+                    );
                   }
               }
           }

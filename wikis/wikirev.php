@@ -17,7 +17,7 @@ $body = "";
 
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
-$groupid = intval($_GET['grp']);
+$groupid = intval($_GET['grp'] ?? 0);
 
 if ($cid==0) {
 	$overwriteBody=1;

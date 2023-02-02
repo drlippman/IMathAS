@@ -272,6 +272,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 
 	//get imas_questions
+    $qmap = array();
+    $qsmap = array();
+    $qscnt = 0; $qcnt = 0;
 	if (isset($itemtypebackref['Assessment'])) {
 		$toget = array_keys($itemtypebackref['Assessment']);
 		$ph = Sanitize::generateQueryPlaceholders($toget);
@@ -286,9 +289,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$query .= "WHERE imas_assessments.id IN ($ph)";
 		$stm = $DBH->prepare($query);
 		$stm->execute($toget);
-		$qmap = array();
-		$qsmap = array();
-		$qscnt = 0; $qcnt = 0;
 		$output['questions'] = array();
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$qid = $line['id'];
@@ -507,7 +507,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$output_qid = $qsmap[$line['id']];
 			//handle qimages
 			if ($line['hasimg']==1) {
-				$line['qimgs'] = $qimgmap[$line['id']];
+                if (isset($qimgmap[$line['id']])) {
+				    $line['qimgs'] = $qimgmap[$line['id']];
+                } else {
+                    $line['hasimg'] = 0;
+                }
 			}
 			if (isset($dependencies[$line['id']])) {
 				foreach ($dependencies[$line['id']] as $k=>$v) {

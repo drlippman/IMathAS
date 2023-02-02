@@ -572,7 +572,11 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+if ($editingon) {
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND avail>0 AND courseid=:courseid ORDER BY name";
+} else {
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+}
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -748,7 +752,7 @@ foreach ($itemsimporder as $item) {
 				$itemidref[$k] = 'I'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][2];
-				if (isset($itemfolder[$item])) {
+				if (isset($itemfolder[$item]) && isset($byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'])) {
 					$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'] = str_replace('@@@',$itemfolder[$item],$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder']);
 				}
 				$assess[$moday][$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][3];

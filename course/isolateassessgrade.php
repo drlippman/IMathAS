@@ -53,6 +53,10 @@
             $_POST['assesschk'] = array($aid);
 			include("massexception.php");
         }
+        if (isset($_GET['masssend'])) {
+            $calledfrom='isolateassess';
+            include('masssend.php');
+        }
 	}
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {

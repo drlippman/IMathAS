@@ -471,6 +471,7 @@ function encodea11ydraw(qn) {
 		$("#a11ydraw"+tarnum).find(".a11ydrawrow").each(function(i,el) {
             var input = $(el).find("input").val();
             var mode = el.getAttribute('data-mode');
+            var expectedn = $(el).find("input").attr('data-n');
 			saveinput.push("["+mode+',"'+input+'"]');
 			input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
 			var outpts = [];
@@ -491,6 +492,9 @@ function encodea11ydraw(qn) {
 				outpts.push(Math.round(input[i-1])+','+Math.round(input[i]));
                 outptsraw.push([input[i-1], input[i]]);
 			}
+            if (expectedn !== 'list' && expectedn != outpts.length) {
+                return;
+            }
 			if (mode==1) {
 				encdots.push('('+outpts.join('),(')+')');
                 dots[tarnum].push(outptsraw);
@@ -500,11 +504,11 @@ function encodea11ydraw(qn) {
 			} else if (mode<1) {
 				enclines.push('('+outpts.join('),(')+')');
                 lines[tarnum].push(outptsraw);
-			} else if (mode>=5 && mode<10 && outpts.length==2) {
+			} else if (mode>=5 && mode<10) {
 				enctplines.push('('+mode+','+outpts.join(',')+')');
                 tplines[tarnum].push(outptsraw);
                 tptypes[tarnum].push(mode);
-			} else if (mode>=10 && outpts.length==3) {
+			} else if (mode>=10) {
 				enctpineq.push('('+mode+','+outpts.join(',')+')');
                 ineqlines[tarnum].push(outptsraw);
                 ineqtypes[tarnum].push(mode);

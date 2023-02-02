@@ -441,7 +441,7 @@ if (isset($_GET['launch'])) {
 				array_shift($ltiorgparts);
 				$ltiorgname = implode(':',$ltiorgparts);
 			} else if (count($ltiorgparts)>1) {
-				$ltiorgname = $ltiorgparts[1];
+				$ltiorgname = $ltiorgparts[1] ?? '';
 			}
 
 			//tying LTI to IMAthAS account
@@ -815,8 +815,8 @@ if (isset($_GET['launch'])) {
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
-			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'];
-			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
+			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'] ?? '';
+			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'] ?? '';
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
 			}
@@ -871,16 +871,22 @@ if ($stm->rowCount()==0) {
 	if (isset($_SESSION['place_aid'])) {
 		$stm = $DBH->prepare('SELECT courseid,name FROM imas_assessments WHERE id=:aid');
 		$stm->execute(array(':aid'=>$_SESSION['place_aid']));
-		list($aidsourcecid,$aidsourcename) = $stm->fetch(PDO::FETCH_NUM);
-		if ($aidsourcecid===false) {
-			$diaginfo = "(Debug info: 2-{$_SESSION['place_aid']})";
-			reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
-		}
+        $row = $stm->fetch(PDO::FETCH_NUM);
+		if ($row===false) {
+            $aidsourcecid = -1; // assessment doesn't exist anymore
+            $aidsourcename = '';
+		} else {
+            list($aidsourcecid,$aidsourcename) = $row;
+        }
 
 		//look to see if we've already linked this context_id with a course
 		$stm = $DBH->prepare('SELECT courseid,copiedfrom FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org');
 		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
 		if ($stm->rowCount()==0) {
+            if ($aidsourcecid == -1) { // not enough info to proceed
+                $diaginfo = "(Debug info: 2a-{$_SESSION['place_aid']})";
+			    reporterror(_("The originally linked assignment does not appear to exist anymore.")." $diaginfo");
+            }
 			//if instructor, see if the source course is ours
 			/***TODO:  check rights to see if they have course creation rights or not */
 			if ($_SESSION['ltirole']=='instructor') {
@@ -1144,8 +1150,12 @@ if ($stm->rowCount()==0) {
 						}
 					}
 					$outcomesarr = unserialize($outcomesarr);
-					updateoutcomes($outcomesarr);
-					$newoutcomearr = serialize($outcomesarr);
+                    if ($outcomesarr !== false) {
+					    updateoutcomes($outcomesarr);
+					    $newoutcomearr = serialize($outcomesarr);
+                    } else {
+                        $newoutcomearr = '';
+                    }
 				} else {
 					$newoutcomearr = '';
 				}
@@ -1184,7 +1194,9 @@ if ($stm->rowCount()==0) {
 				copyrubrics();
 				$DBH->commit();
 				$copiedfromcid = $sourcecid;
-			}
+			} else {
+                $copiedfromcid = 0;
+            }
 			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid,copiedfrom,contextlabel) VALUES ";
 			$query .= "(:org, :contextid, :courseid, :copiedfrom, :contextlabel)";
 			$stm = $DBH->prepare($query);
@@ -1227,7 +1239,7 @@ if ($stm->rowCount()==0) {
 					//exit;
 				}
 			}
-			if (!$foundaid) { //do course ancestor walk-back
+			if (!$foundaid && $aidsourcecid != -1) { //do course ancestor walk-back
 				//need to look up ancestor depth
 				$stm = $DBH->prepare("SELECT ancestors FROM imas_courses WHERE id=?");
 				$stm->execute(array($destcid));
@@ -1267,7 +1279,7 @@ if ($stm->rowCount()==0) {
 					//echo "found 3";
 					//exit;
 				}
-				if (!$foundaid && count($res)>0) { //multiple results - look for the identical name
+				if (!$foundaid && count($res)>0 && $aidsourcename != '') { //multiple results - look for the identical name
 					foreach ($res as $k=>$row) {
 						$res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
 						if ($row['name']==$aidsourcename) {
@@ -1290,6 +1302,10 @@ if ($stm->rowCount()==0) {
 				}
 			}
 			if (!$foundaid) {
+                if ($aidsourcecid == -1) { // can't proceed further in this case
+                    $diaginfo = "(Debug info: 2b-{$_SESSION['place_aid']})";
+                    reporterror(_("The originally linked assignment does not appear to exist anymore.")." $diaginfo");    
+                }
 				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 				//this handles cases where an assessment was linked in from elsewhere and manually copied
 
@@ -1699,10 +1715,10 @@ if (isset($SESS['lti_duedate'])) {
 }
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
-	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];
+	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'] ?? '';
 	$_SESSION['lti_selection_return_format'] = $SESS['selection_return_format'];
-	$_SESSION['lti_selection_type'] = $SESS['selection_type'];
-	$_SESSION['lti_selection_data'] = $SESS['selection_data'];
+	$_SESSION['lti_selection_type'] = $SESS['selection_type'] ?? '';
+	$_SESSION['lti_selection_data'] = $SESS['selection_data'] ?? '';
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {
@@ -1763,7 +1779,7 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
-	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+	if (empty($_POST['tzname']) || $_POST['tzoffset']=='') {
 		echo _('Uh oh, something went wrong.  Please go back and try again');
 		exit;
 	}
@@ -2073,7 +2089,7 @@ if (isset($_GET['launch'])) {
 				array_shift($ltiorgparts);
 				$ltiorgname = implode(':',$ltiorgparts);
 			} else {
-				$ltiorgname = $ltiorgparts[1];
+				$ltiorgname = $ltiorgparts[1] ?? '';
 			}
 
 			//tying LTI to IMAthAS account
@@ -2210,6 +2226,7 @@ if (isset($_GET['launch'])) {
 
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['ltiorigkey'] = $ltikey;
+    unset($_SESSION['place_aid']); // make sure only set if for current launch
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {  //cid:org
@@ -2947,10 +2964,10 @@ if (isset($SESS['lti_duedate'])) {
 }
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
-	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];
+	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'] ?? '';
 	$_SESSION['lti_selection_return_format'] = $SESS['selection_return_format'];
-	$_SESSION['lti_selection_type'] = $SESS['selection_type'];
-	$_SESSION['lti_selection_data'] = $SESS['selection_data'];
+	$_SESSION['lti_selection_type'] = $SESS['selection_type'] ?? '';
+	$_SESSION['lti_selection_data'] = $SESS['selection_data'] ?? '';
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {

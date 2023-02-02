@@ -32,6 +32,7 @@ class NumberAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -136,7 +137,7 @@ class NumberAnswerBox implements AnswerBox
                 $shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
             }
         }
-        if (is_array($answer)) {
+        if (!$isConditional && is_array($answer)) {
             echo 'for number question, $answer should be a number or string, not an array';
             $answer = (string)$answer;
         }
@@ -219,7 +220,7 @@ class NumberAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt ?? '', $colorbox);
             $answer = str_replace('"', '', $answer);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if (in_array('parenneg', $ansformats) && is_numeric($answer) && $answer < 0) {
                 $sa = '(' . (-1 * $answer) . ')';
             } else if (is_numeric($answer) && $answer != 0 && abs($answer) < .001 && abs($answer) > 1e-9) {

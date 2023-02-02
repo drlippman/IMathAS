@@ -233,6 +233,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				$page_sampleImport[$i]['col2'] = $arr[1];
 				$page_sampleImport[$i]['col3'] = $arr[2];
 				$page_sampleImport[$i]['col4'] = $arr[3];
+                $page_sampleImport[$i]['col5'] = '';
 				if ($_POST['codetype']==1) {
 					$page_sampleImport[$i]['col5'] = $arr[4];
 				}

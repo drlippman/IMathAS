@@ -173,6 +173,16 @@ class NTupleScorePart implements ScorePart
             }
         }
 
+        // ensure values are numbers
+        foreach ($gaarr as $k=>$givenans) {
+            foreach ($givenans['vals'] as $v) {
+                if (!is_numeric($v)) {
+                    unset($gaarr[$k]);
+                    continue 2;
+                }
+            }
+        }
+        
         if (in_array('anyorder', $ansformats)) {
             foreach ($anarr as $k=>$listans) {
                 foreach ($listans as $ork=>$orv) {
