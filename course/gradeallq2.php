@@ -458,7 +458,10 @@
 		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
     }
     if ($page==-1) {
-        echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button></p>';
+        echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button>';
+        echo ' <button type=button onclick="sortByName()">'._('Name').'</button>';
+        echo ' <button type=button onclick="sortByRand()">'._('Random').'</button>';
+        echo '</p>';
     }
     echo '</div>'; // filtersdiv
 	if ($page==-1 && $canedit) {

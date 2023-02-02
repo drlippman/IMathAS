@@ -151,6 +151,22 @@ function sortByLastChange() {
         wrap.appendChild( elem );
     });
 }
+function sortByName() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return $(a).children(".headerpane").text().localeCompare($(b).children(".headerpane").text());
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
+}
+function sortByRand() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return 0.5 - Math.random();
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
+}
 function clearfeedback() {
 	var els=document.getElementsByTagName("textarea");
 	for (var i=0;i<els.length;i++) {
