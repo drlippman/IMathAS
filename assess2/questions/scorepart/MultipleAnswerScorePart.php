@@ -33,7 +33,7 @@ class MultipleAnswerScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answers', 'noshuffle', 'scoremethod'];
+        $optionkeys = ['answers', 'noshuffle', 'scoremethod', 'answerformat'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -58,12 +58,14 @@ class MultipleAnswerScorePart implements ScorePart
             $RND->shuffle($randqkeys);
         }
         $qcnt = count($questions);
-        if ($qcnt > 1 && trim($answers) == "") {
+        if (($qcnt > 1 && trim($answers) == "") || $answerformat == 'addnone') {
           $qstr = strtolower(implode(' ', $questions));
           if (strpos($qstr, 'none of') === false) {
             $questions[] = _('None of these');
             array_push($randqkeys, $qcnt);
-            $answers = $qcnt;
+            if ($qcnt > 1 && trim($answers) == "") {
+                $answers = $qcnt;
+            }
           }
         }
         $ansor = explode(' or ', $answers);

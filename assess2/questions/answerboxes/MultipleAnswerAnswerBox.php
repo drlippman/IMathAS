@@ -76,7 +76,9 @@ class MultipleAnswerAnswerBox implements AnswerBox
             if (strpos($qstr, 'none of') === false) {
                 $questions[] = _('None of these');
                 array_push($randkeys, count($questions) - 1);
-                $answers = count($questions) - 1;
+                if (count($questions) > 1 && trim($answers) == "") {
+                    $answers = count($questions) - 1;
+                }
             }
             $hasNoneOfThese = 'data-multans="hasnone"';
         } else if (count($questions) > 1 && ($noshuffle == 'all' || $noshuffle == 'last')) {
