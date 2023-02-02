@@ -335,7 +335,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=100122"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=020223"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -437,6 +437,8 @@
         echo '<li><label><input type=checkbox id="filter-100" onchange="updatefilters()">'._('Score = 100% (after penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-work" onchange="updatefilters()">'._('Questions with Work').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-names" onchange="updatefilters()">'._('Names').'</label></li>';
         echo '</ul>';
         echo '<p>';
 		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
@@ -607,6 +609,8 @@
             }
             if (empty($qdata['work'])) {
                 $classes .= ' qfilter-nowork';
+            } else {
+                $classes .= ' qfilter-work';
             }
             if ($groupdup) {
                 $classes .= ' groupdup';

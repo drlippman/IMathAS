@@ -74,12 +74,13 @@ function allvisnocred() {
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
-    var filters = ['unans','zero','nonzero','perfect','fb','nowork', '100'];
-    for (var i=0; i<7; i++) {
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork', 'work', '100'];
+    for (var i=0; i<filters.length; i++) {
         if (document.getElementById('filter-' + filters[i]).checked) {
             $(".bigquestionwrap.qfilter-" + filters[i]).hide();
         }
     }
+    $(".bigquestionwrap .headerpane,.scoredetails .person").toggle(!document.getElementById('filter-names').checked);
 }
 function toggleWork(el) {
 	var next = $(el).next();
