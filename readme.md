@@ -106,6 +106,7 @@ where days is the number of days since last login to consider old, and userid is
 - `$CFG['assess_upgrade_optout']`: Set to true to allow users to opt out of an upgrade
 to the new assessment interface.
 - `$CFG['reqadminmfa']`: Require admins to enable two-factor authentication.
+- `$CFG['logquestionerrors']`: Enable logging of question errors.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
