@@ -1910,7 +1910,7 @@ class DrawingScorePart implements ScorePart
             //interp the lines
             $linedata = array();
             $totinterp = 0;
-            foreach ($lines as $k=>$line) {
+            foreach ($lines as $line) {
                 for ($i=1;$i<count($line);$i++) {
                     $leftx = round(max(min($line[$i][0],$line[$i-1][0]), 2*$imgborder));
                     $rightx = round(min(max($line[$i][0],$line[$i-1][0]), $settings[6]-2*$imgborder));
@@ -1920,16 +1920,18 @@ class DrawingScorePart implements ScorePart
                         $m = ($line[$i][1] - $line[$i-1][1])/($line[$i][0]-$line[$i-1][0]);
                     }
                     for ($k = ceil($leftx/$step); $k*$step<=$rightx; $k++) {
+                        if (!isset($linedata[$k])) { $linedata[$k] = []; }
                         $x = $k*$step;
-                        $y = $line[$i-1][1] + $m*($x-$line[$i-1][0]);
+                        $y = round($line[$i-1][1] + $m*($x-$line[$i-1][0]),10);
                         if ($y>$imgborder && $y<($settings[7]-$imgborder)) {
-                            $linedata[$k][] = $y;
-                            $totinterp++;
+                            if ($scoremethod != 'ignoreoverlap' || !in_array($y,$linedata[$k])) {
+                                $linedata[$k][] = $y;
+                                $totinterp++;
+                            }
                         }
                     }
                 }
             }
-
             $stdevs = array();
             $stcnts = array();
             $scores = array();

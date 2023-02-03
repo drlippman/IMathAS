@@ -3650,7 +3650,7 @@ drawn line from the correct line.
 	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is
 	between 0 and 1).  Otherwise
 	the student will receive full credit.  Not set by default.</dd>
-<dt>$scoremethod = "takeanything", "direction", "relativelength"</dt>
+<dt>$scoremethod = "takeanything", "direction", "relativelength", "ignoreoverlap"</dt>
 		<dd>When "takeanything" is used, this will give full credit for any non-blank answer.  This might be of use with the freehand drawing option.
             <br>
             "direction" and "relativelength" are only used for vectors.  
@@ -3658,6 +3658,8 @@ drawn line from the correct line.
               will only score direction for displacement vectors.
             "relativelength" will score like "direction", but will also check that the drawn vectors have 
               correct lengths relative to each other.
+              <br>
+            "ignoreoverlap" only works with $answerformat="line", and will not deduct for overlapped lines.
         </dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
