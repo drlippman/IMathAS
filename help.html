@@ -3258,8 +3258,10 @@ of choices is automatically randomized.
     if $scoremethod="takeanything", full credit will be given for any response.</dd>
 <dt>$displayformat = "horiz", "2column, "3column", or "inline" </dt>
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
-<dt>$noshuffle = "all" </dt>
-	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
+<dt>$noshuffle = "all" or "last" </dt>
+	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled). 
+        If $noshuffle="last", then the last element of $questions will not be randomized (shuffled) but the others will.
+    </dd>
 <dt>$answerformat = "addnone" </dt>
 	<dd>Adds "None of these" to the options. This is added automatically if <code>$answers=""</code>, and you can 
         add "None of these" yourselv to <code>$questions</code>, but this provides another way to always include the 
