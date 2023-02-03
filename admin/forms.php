@@ -107,8 +107,12 @@ switch($_GET['action']) {
 		break;
 	case "deladmin":
 		if ($myrights < 75) { echo _("You don't have the authority for this action"); break;}
+        $stm = $DBH->prepare("SELECT FirstName,LastName,SID,rights FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($myrights==100) {
-			$stm = $DBH->query("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
+			$stm = $DBH->prepare("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE (iu.rights=100 OR iu.groupid=?) AND iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
+            $stm->execute(array($groupid));
 		} else {
 			$stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE groupid=? AND rights>12 AND rights<>76 AND rights<>77 ORDER BY LastName,FirstName");
 			$stm->execute(array($groupid));
@@ -131,9 +135,7 @@ switch($_GET['action']) {
 				break;
 			}
 		}
-		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		
 		echo "<p>Are you sure you want to delete this user, <b>";
 		printf("<span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)",
             Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
@@ -143,9 +145,11 @@ switch($_GET['action']) {
 			echo 'be deleting any important data before deleting this user.</p>';
 		}
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
-		echo '<p>Any questions or libraries owned by this user need to be transfered to another user. <br/>Select user to transfer them to: ';
-		writeHtmlSelect('transferto',array_keys($otherusers),array_values($otherusers), $userid);
-		echo '</p>';
+        if ($line['rights']>10) {
+            echo '<p>Any questions or libraries owned by this user need to be transfered to another user. <br/>Select user to transfer them to: ';
+            writeHtmlSelect('transferto',array_keys($otherusers),array_values($otherusers), $userid);
+            echo '</p>';
+        }
 		echo '<p><button type=submit name="action" value="deladmin">'._('Delete').'</button>';
 		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
