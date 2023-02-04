@@ -2275,12 +2275,15 @@ The following macros create graphs or tables:
 <ul>
 <li><strong>showarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  Alternatively you can call this function with arguments
-    showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "r", or "l" to center, left-align, or right align data,
+    showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
 	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
       and $opts["caption"] to add a caption to the table.  To align each column differently, provide a
 	  a string with a character for each column, like "rcc"</li>
-<li><strong>showdataarray(array,[columns])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
-    in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
+<li><strong>showdataarray(array,[columns,options])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
+    in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.
+    Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
+    or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
+    and $opts["caption"] to add a caption to the table.</li>
 <li><strong>horizshowarrays(string,array,[string,array]...)</strong>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
     as row labels.  Does not text wrap, so only use for small data sets.</li>
 <li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[format])</strong>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.

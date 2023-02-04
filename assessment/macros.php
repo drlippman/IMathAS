@@ -2357,11 +2357,36 @@ function subarray($a) {
 	return $out;
 }
 
-function showdataarray($a,$n=1,$format='table') {
+function showdataarray($a,$n=1,$opts=null) {
 	if (!is_array($a)) {
 		return '';
 	}
     $n = floor($n);
+    $format = 'table';
+    $align = "default";
+	$caption = "";
+    $tablealign = '';
+    if (is_array($opts)) {
+        if (isset($opts['format'])) {
+            $format = $opts['format'];
+        }
+        if (isset($opts['align'])) {
+            $align = strtolower($opts['align']);
+        }
+        if (isset($opts['caption'])) {
+            $caption = $opts['caption'];
+        }
+        if (isset($opts['tablealign'])) {
+            $tablealign = $opts['tablealign'];
+        }
+    } else if (is_string($opts)) {
+        if ($opts == 'pre') {
+            $format = 'pre';
+        } else {
+            $align = strtolower($opts);
+        }
+    }
+
 	if ($format == 'pre') {
 		$maxwidth = 1; $cnt = 0;
 		foreach ($a as $v) {
@@ -2379,13 +2404,25 @@ function showdataarray($a,$n=1,$format='table') {
 		}
 		$out .= '</pre>';
 	} else {
-		$out = '<table class=stats><tbody>';
+        $cellclass = '';
+        if ($align=='c' || $align=='r' || $align=='l') {
+            $cellclass = 'class='.$align;
+        }
+		$out = '<table class=stats';
+        if ($tablealign == 'center') {
+            $out .= ' style="margin:0 auto;"';
+        }
+        $out .= '>';
+        if ($caption != '') {
+            $out .= '<caption>'.Sanitize::encodeStringForDisplay($caption).'</caption>';
+        }
+        $out .= '<tbody>';
 		$cnt = 0;
 		while ($cnt<count($a)) {
 			$out .= '<tr>';
 			for ($i=0;$i<$n;$i++) {
 				if (isset($a[$cnt])) {
-					$out .= '<td>'.$a[$cnt].'</td>';
+					$out .= '<td '.$cellclass.'>'.$a[$cnt].'</td>';
 				} else {
 					$out .= '<td></td>';
 				}
