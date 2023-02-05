@@ -2366,6 +2366,74 @@ class AssessRecord
   }
 
   /**
+   * Gets the question locations
+   * @param  array  $qid          A question id (imas_questions.id, 'qid')
+   * @param  string $ver          'scored', 'last', 'all', or numeric version
+   * @return array(ver=>array of qns, ver=>array of qns).
+   * 
+   * For quiz-style, this skips unsubmitted versions
+   * For HW-style, it includes unanswered questions, since there may be autosave data that can be scored
+   */
+  public function getQuestionLocs($qid, $ver='scored') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $this->parseData();
+    if (!$by_question && $ver !== 'all') {
+        if ($ver === 'scored') {
+            $ver = $this->data['scored_version'];
+            // check if is submitted
+            if (($this->data['assess_versions'][$ver]['status'] ?? 0) < 1) { // not started or unsubmitted
+                return [];
+            }
+        } else if ($ver === 'last') {
+            $ver = count($this->data['assess_versions'])-1;
+            if ($ver==-1) { return [];} // no versions yet
+            if ($this->data['assess_versions'][$ver]['status'] < 1) { // last is unsubmitted 
+                if ($ver>0) { // if there's an earlier version, use it; it will be submitted
+                    $ver--;
+                } else { // otherwise no submitted versions
+                    return [];
+                }
+            }
+        }
+        $assessvers = [$ver=>$this->getAssessVer($ver)];
+    } else {
+        $assessvers = $this->data['assess_versions'];
+    }
+    $out = array();
+    foreach ($assessvers as $avernum=>$aver) {
+        if (!$by_question && $aver['status']<1) { continue; } // skip unsubmitted
+
+        for ($qn=0; $qn < count($aver['questions']); $qn++) {
+            $question_versions = $aver['questions'][$qn]['question_versions'];
+            if (!$by_question || $ver === 'last') {
+                $lastver = count($question_versions) - 1;
+                $curq = $question_versions[$lastver];
+                if ($curq['qid'] == $qid) {
+                    if ($by_question) {
+                        $out[$lastver][] = $qn;
+                    } else {
+                        $out[$avernum][] = $qn;
+                    }
+                }
+            } else if ($ver === 'scored') {
+                $scoredver = $aver['questions'][$qn]['scored_version'];
+                $curq = $question_versions[$scoredver];
+                if ($curq['qid'] == $qid) {
+                    $out[$scoredver][] = $qn;
+                }
+            } else { // doing all versions
+                foreach ($question_versions as $qvernum=>$qver) {
+                    if ($qver['qid'] == $qid) {
+                        $out[$qvernum][] = $qn;
+                    }
+                }
+            }
+        }
+    }
+    return $out;
+  }
+
+  /**
    * Recalculate the assessment total score, updating the record
    * @param  mixed  $rescoreQs   'all' to rescore all, or array of question numbers to re-score
    * @return float   The final assessment total
@@ -3169,12 +3237,24 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $out = array();
     foreach ($scores as $key=>$score) {
-      list($qn,$pn) = array_map('intval', explode('-', $key));
+      list($ver,$qn,$pn) = array_map('intval', explode('-', $key));
       if ($by_question) {
         $av = 0;
-        $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+        if ($ver=='scored') {
+            $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+        } else if ($ver=='last') {
+            $qv = count($this->data['assess_versions'][$av]['questions'][$qn]['question_versions'])-1;
+        } else {
+            $qv = $ver;
+        }
       } else {
-        $av = $this->data['scored_version'];
+        if ($ver=='scored') {
+            $av = $this->data['scored_version'];
+        } else if ($ver=='last') {
+            $av = count($this->data['assess_versions'])-1;
+        } else {
+            $av = $ver;
+        }
         $qv = 0;
       }
       $qdata = $this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
@@ -3210,12 +3290,13 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $this->parseData();
     $out = array();
-    foreach ($feedbacks as $qn=>$fb) {
+    foreach ($feedbacks as $loc=>$fb) {
+      list($ver,$qn) = explode('-',$loc);
       if ($by_question) {
         $av = 0;
-        $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+        $qv = $ver; 
       } else {
-        $av = $this->data['scored_version'];
+        $av = $ver;
         $qv = 0;
       }
       $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
