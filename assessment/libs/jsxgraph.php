@@ -1711,6 +1711,8 @@ function jsx_creategeometryboard($label, $ops) {
 	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'true';
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
+    $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
+    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
   
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
@@ -1735,7 +1737,9 @@ function jsx_creategeometryboard($label, $ops) {
         pan: {
             enabled: {$pan},
             needshift: false
-        }
+        },
+        title: '$title',
+        description: '$description'
     });";
 
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
@@ -1753,7 +1757,9 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'true';
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
-   
+    $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
+    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
+
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
 	$xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
@@ -1797,7 +1803,9 @@ function jsx_createrectangularboard ($label, $ops = array()) {
              pan: {
 				enabled: {$pan},
 				needshift: false
-			 }
+			 },
+             title: '$title',
+             description: '$description'
            });";
 
 	$out .= "var xTicks{$label}, yTicks{$label};";
@@ -1869,7 +1877,9 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'false';
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'false';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
-   
+    $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
+    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
+
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$rmax = isset($ops['r'][0]) ? (float) $ops['r'][0] : 5;
 	$rInc = isset($ops['r'][1]) ? (float) $ops['r'][1] : 1;
@@ -1911,7 +1921,9 @@ function jsx_createpolarboard ($label, $ops=array()) {
 			pan: {
 				enabled: {$pan},
 				needshift: false
-			}
+			},
+            title: '$title',
+            description: '$description'
 		});
 	";
 
