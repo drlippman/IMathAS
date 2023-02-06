@@ -49,7 +49,7 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/as
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=012923" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=020623" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/rubric_min.js?v=022622" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=071022">

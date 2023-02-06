@@ -114,6 +114,7 @@ class FunctionExpressionScorePart implements ScorePart
         }
 
         $givenanslistvals = array();
+        $givenanslistineq = array();
         $givenanslistnormalized = array();
         $givenansused = array();
         foreach ($givenanslist as $givenans) {
@@ -154,6 +155,9 @@ class FunctionExpressionScorePart implements ScorePart
                 $givenansvals[] = $givenansfunc->evaluateQuiet($varvals);
             }
             $givenanslistvals[] = $givenansvals;
+            if (isset($givenInequality)) {
+                $givenanslistineq[] = $givenInequality;
+            }
             if (in_array('sameform',$ansformats)) {
                 $givenanslistnormalized[] = $givenansfunc->normalizeTreeString();
             }
@@ -295,11 +299,11 @@ class FunctionExpressionScorePart implements ScorePart
                                 $meanratio = array_sum($ratios)/count($ratios);
                                 if (in_array('inequality',$ansformats)) {
                                     if ($meanratio > 0) {
-                                        if ($answerInequality != $givenInequality) {
+                                        if ($answerInequality != $givenanslistineq[$gaidx]) {
                                             $correct = false; continue;
                                         }
                                     } else {
-                                        $flippedIneq = strtr($givenInequality, ['<'=>'>', '>'=>'<']);
+                                        $flippedIneq = strtr($givenanslistineq[$gaidx], ['<'=>'>', '>'=>'<']);
                                         if ($answerInequality != $flippedIneq) {
                                             $correct = false; continue;
                                         }
