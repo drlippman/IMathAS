@@ -78,14 +78,25 @@
 	} else {
 		$canedit = 0;
 	}
-    $itemorder = explode(',', str_replace('~',',',preg_replace('/\d+\|\d+~/','',$itemorder)));
-    $loc = array_search($qid, $itemorder);
-    $prevqid = -1; $nextqid = -1;
-    if ($loc > 0) {
-        $prevqid = $itemorder[$loc-1];
-    }
-    if ($loc < count($itemorder)-1) {
-        $nextqid = $itemorder[$loc+1];
+    $itemorder = explode(',',preg_replace('/\d+\|\d+~/','',$itemorder));
+    $prevqid = -1; $nextqid = -2;
+    foreach ($itemorder as $i=>$item) {
+        $sub = explode('~',$item);
+        foreach ($sub as $k=>$subitem) {
+            if ($subitem == $qid) {
+                if (count($sub)==1) {
+                    $curqloc = $i+1;
+                } else {
+                    $curqloc = ($i+1).'-'.($k+1);
+                }
+                $nextqid = -1;
+            } else if ($nextqid == -1) {
+                $nextqid = $subitem;
+                break 2;
+            } else {
+                $prevqid = $subitem;
+            }
+        }
     }
 
 	// Load new assess info class
@@ -403,8 +414,10 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
-	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h1></div>";
-    
+	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>";
+    echo sprintf(_('Grading Question %s in %s'), $curqloc, Sanitize::encodeStringForDisplay($aname));
+    echo "</h1></div>";
+
 	echo '<div class="cpmid">';
     $qsmap = ['stu'=>$stu, 'gbmode'=>$gbmode, 'cid'=>$cid, 'aid'=>$aid, 'qid'=>$qid, 'page'=>$page, 'ver'=>$ver];
 	if ($page==-1) {
@@ -833,6 +846,8 @@
 	}
     echo '</div>'; //qlistwrap
 	if ($canedit) {
+        echo '<p>'.sprintf(_('Grading Question %s in %s'), $curqloc, Sanitize::encodeStringForDisplay($aname)).'</p>';
+
 		echo '<button type="submit">';
         if ($page == -1 || $page == count($stulist)-1) {
             echo _('Save Changes');

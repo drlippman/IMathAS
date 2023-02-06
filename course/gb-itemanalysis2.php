@@ -441,7 +441,8 @@
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
 
-			echo "<td>" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
+			echo '<td title="'._('Question ID').' '. Sanitize::onlyInt($qsetids[$qid]) . '">'; 
+            echo Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
@@ -481,7 +482,7 @@
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
 			if ($showhints) {
-				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
+				if ($showextref[$qid] && isset($qcnt[$qid]) && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
