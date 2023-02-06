@@ -327,7 +327,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$useeditor = "message";
 		$loadgraphfilter = true;
 		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-
+        if (!empty($_GET['embed'])) {
+            $placeinhead .= '<script>function submitpost() { document.getElementsByTagName("form")[0].submit();}</script>';
+        }
 		require("../header.php");
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
