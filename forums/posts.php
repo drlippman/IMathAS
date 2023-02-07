@@ -16,6 +16,7 @@ if (isset($teacherid)) {
 } else {
 	$isteacher = false;
 }
+$istutor = isset($tutorid);
 
 $cid = Sanitize::courseId($_GET['cid']);
 $forumid = Sanitize::onlyInt($_GET['forum']);
@@ -104,7 +105,11 @@ if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 	exit;
 }
 
-$allowreply = ($isteacher || (time()<$replyby));
+$canviewall = (isset($teacherid) || isset($tutorid));
+$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
+$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
+
+$allowreply = ($canviewall || (time()<$replyby));
 $allowanon = (($forumsettings&1)==1);
 $allowmod = ($isteacher || (($forumsettings&2)==2));
 $allowdel = ($isteacher || (($forumsettings&4)==4));
@@ -113,9 +118,7 @@ $postbeforeview = (($forumsettings&16)==16);
 $haspoints =  ($pointsposs > 0);
 $groupid = 0;
 
-$canviewall = (isset($teacherid) || isset($tutorid));
-$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
-$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
+
 
 if ($groupsetid>0) {
 	if (!isset($_GET['grp'])) {
@@ -556,7 +559,7 @@ function printchildren($base,$restricttoowner=false) {
 		//if ($isteacher && $ownerid[$child]!=0) {
 		//	echo "<a href=\"mailto:{$email[$child]}\">";
 		//} else if ($allowmsg && $ownerid[$child]!=0) {
-		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
+		if (($canviewall || $allowmsg) && $ownerid[$child]!=0) {
 			echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\" ";
 			if ($section[$child]!='') {
 				echo 'title="Section: '.$section[$child].'"';
@@ -564,7 +567,7 @@ function printchildren($base,$restricttoowner=false) {
 			echo ">";
 		}
 		echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($poster[$child]).'</span>'; // This is the user's first and last name.
-		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
+		if (($canviewall || $allowmsg) && $ownerid[$child]!=0) {
 			echo "</a>";
 		}
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {

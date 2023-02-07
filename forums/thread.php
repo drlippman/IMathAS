@@ -14,6 +14,7 @@ if (isset($teacherid)) {
 } else {
 	$isteacher = false;
 }
+$istutor = isset($tutorid);
 
 $threadsperpage = $listperpage;
 
@@ -201,7 +202,8 @@ if ($groupsetid>0) {
 	if (isset($_GET['ffilter'])) {
 		$_SESSION['ffilter'.$forumid] = $_GET['ffilter'];
 	}
-	if (!$isteacher) {
+	// TODO: if isSectionGroups, restrict tutor to section group
+    if (!$canviewall) {
 		$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 		$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 		$stm = $DBH->prepare($query);
@@ -223,7 +225,7 @@ if ($groupsetid>0) {
 	}
 	if ($dofilter) {
 		$limthreads = array();
-		if ($isteacher || $groupid==0) {
+		if ($canviewall || $groupid==0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE stugroupid=:stugroupid AND forumid=:forumid AND lastposttime<:now");
 			$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
 		} else {
@@ -544,7 +546,7 @@ echo "<input type=hidden name=forum value=\"$forumid\"/>";
 <input type="submit" value="Search"/>
 </form>
 <?php
-if ($isteacher && $groupsetid>0) {
+if ($canviewall && $groupsetid>0) {
 	if (isset( $_SESSION['ffilter'.$forumid])) {
 		$curfilter = $_SESSION['ffilter'.$forumid];
 	} else {
@@ -602,7 +604,7 @@ if ($isteacher && $groupsetid>0) {
 }
 echo '<p>';
 $toshow = array();
-if (($myrights > 5 && time()<$postby) || $isteacher) {
+if (($myrights > 5 && time()<$postby) || $canviewall) {
 	$toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=". Sanitize::onlyInt($page)."&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button>";
 }
 //if ($isteacher || isset($tutorid)) {
@@ -653,7 +655,7 @@ echo "</p>";
 	<thead>
 		<tr><th>Topic</th><th>Started By</th>
 			<?php
-			if ($isteacher && $groupsetid>0 && !$dofilter) {
+			if ($canviewall && $groupsetid>0 && !$dofilter) {
                 if ($isSectionGroups) {
                     echo '<th>Section</th>';
                 } else {
@@ -707,9 +709,9 @@ echo "</p>";
 			}
 			// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
+			$stm->execute(array(':forumid'=>$forumid, ':now'=>$canviewall?2000000000:$now));
 			if ($stm->rowCount()==0) {
-				echo '<tr><td colspan='.(($isteacher && $groupsetid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
+				echo '<tr><td colspan='.(($canviewall && $groupsetid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 			}
 			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if (isset($postcount[$line['id']])) {
@@ -744,7 +746,7 @@ echo "</p>";
 				} else {
 					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
 				}
-				if ($isteacher) {
+				if ($canviewall) {
 					if ($line['posttype']==2) {
 						echo "<img class=mida src=\"$staticroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
 					} else if ($line['posttype']==3) {
@@ -784,7 +786,7 @@ echo "</p>";
 				}
 				printf("<td><span class='pii-full-name'>%s</span></td>\n", Sanitize::encodeStringForDisplay($name));
 
-				if ($isteacher && $groupsetid>0 && !$dofilter) {
+				if ($canviewall && $groupsetid>0 && !$dofilter) {
 					echo '<td class=c>'.Sanitize::encodeStringForDisplay($groupnames[$line['stugroupid']]).'</td>';
 				}
 
@@ -805,7 +807,7 @@ echo "</p>";
 		</tbody>
 	</table>
 	<?php
-	if (($myrights > 5 && time()<$postby) || $isteacher) {
+	if (($myrights > 5 && time()<$postby) || $canviewall) {
 		echo "<p><button type=\"button\" onclick=\"window.location.href='thread.php?page=".Sanitize::onlyInt($page)."&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button></p>\n";
 	}
 	if ($prevnext!='') {
