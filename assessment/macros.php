@@ -178,15 +178,15 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$alt = '';
 	if (strpos($settings[4],':')) {
 		$lbl = explode(':',$settings[4]);
-        $lbl[0] = evalbasic($lbl[0], true);
-        $lbl[1] = evalbasic($lbl[1], true);
+        $lbl[0] = evalbasic($lbl[0], true, true);
+        $lbl[1] = evalbasic($lbl[1], true, true);
 	} else {
-        $settings[4] = evalbasic($settings[4], true);
+        $settings[4] = evalbasic($settings[4], true, true);
         $lbl = [];
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
 		$commands .= 'axes('.$settings[4].','.$settings[4].',1';
-	} else if (isset($lbl[0]) && is_numeric($lbl[0])) {
+	} else if (isset($lbl[0]) && is_nicenumber($lbl[0])) {
         if ($lbl[0]==0) {
             $lbl[0] = 1;
             $noxaxis = true;
@@ -207,9 +207,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	if (strpos($settings[5],':')) {
 		$settings[5] = str_replace(array('(',')'),'',$settings[5]);
 		$grid = explode(':',$settings[5]);
-		$grid = array_map('evalbasic', $grid);
+        foreach ($grid as $i=>$v) {
+            $grid[$i] = evalbasic($v, true, true);
+        }
 	} else {
-		$settings[5] = evalbasic($settings[5], true);
+		$settings[5] = evalbasic($settings[5], true, true);
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) {
 		$commands .= ','.$settings[5].','.$settings[5];
@@ -411,7 +413,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$avoid = array();
 		$domainlimited = false;
 		if (isset($function[2]) && $function[2]!='') {
-			$xmin = evalbasic($function[2], true);
+			$xmin = evalbasic($function[2], true, true);
 			$domainlimited = true;
             if (!is_numeric($xmin)) {
                 echo "Invalid function xmin $xmin";
@@ -421,7 +423,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
 			if ($xmaxarr[0] != '') {
-				$xmax = evalbasic($xmaxarr[0], true);
+				$xmax = evalbasic($xmaxarr[0], true, true);
 			} else {
 				$xmax = $winxmax;
 			}
@@ -1766,6 +1768,9 @@ function listtoarray($l) {
 		echo "Warning:  listtoarray expects one argument, more than one provided";
 	}
     if ($l==='') { return []; }
+	if (is_array($l)) {
+		return $l;
+	}
 	return array_map('trim',explode(',',$l));
 }
 
@@ -1853,7 +1858,7 @@ function consecutive($min,$max,$step=1) {
 	return $a;
 }
 
-
+/*
 function gcd($n,$m){ //greatest common divisor
     if (!is_numeric($n) || !is_numeric($m)) {
         echo "gcd requires numeric inputs.";
@@ -1866,11 +1871,51 @@ function gcd($n,$m){ //greatest common divisor
 	if($n==0)return$m;
 	return $m<$n?gcd($m,$n%$m):gcd($n,$m%$n);
 }
-function lcm($n, $m) //least common multiple
+*/
+function gcd(...$args) {
+    if (count($args)==1 && is_array($args[0])) {
+        $args = $args[0];
+    }
+    $g = null;
+    foreach ($args as $v) {
+        if (!is_numeric($v)) {
+            echo "gcd requires numeric inputs.";
+            return 1;
+        } else if ($g === null) {
+            $g = (int) round(abs($v));
+        } else {
+            $n = (int) round(abs($v));
+            if($g==0 && $n==0) {return 1;} // not technically correct, but will avoid divide by 0 issues in the case of bad input
+            while ($n > 0) {
+                $t = $n;
+                $n = $g%$n;
+                $g = $t;
+            }
+        }
+    }
+    return $g;
+}
+/*function lcm($n, $m) //least common multiple
 {
    return round($m*($n/gcd($n,$m)));
 }
-
+*/
+function lcm(...$args) 
+{
+    $g = null;
+    foreach ($args as $v) {
+        if (!is_numeric($v)) {
+            echo "lcm requires numeric inputs.";
+            return 1;
+        } else if ($g === null) {
+            $g = (int) round($v);
+        } else {
+            $v = (int) round($v);
+            $g = round($g*($v/gcd($g,$v)));
+        }
+    }
+    return $g;
+}
 function dispreducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 	return '`'.makereducedfraction($n,$d,$dblslash,$varinnum).'`';
 }
@@ -3158,7 +3203,7 @@ function makenumberrequiretimes($arr) {
 	return implode(',',$out);
 }
 
-function evalbasic($str, $doextra = false) {
+function evalbasic($str, $doextra = false, $zerofornan = false) {
 	global $myrights;
     $str = str_replace(',','',$str);
     $str = preg_replace('/(\d)pi/', '$1*pi', $str);
@@ -3168,7 +3213,11 @@ function evalbasic($str, $doextra = false) {
 		return $str;
 	} else if (preg_match('/[^\d+\-\/\*\.\(\)]/',$str)) {
         if ($doextra) {
-            return evalnumstr($str);
+            $ret = evalnumstr($str);
+            if ($zerofornan && !is_nicenumber($ret)) {
+                return 0;
+            }
+            return $ret;
         } else {
 		    return $str;
         }
@@ -3183,10 +3232,13 @@ function evalbasic($str, $doextra = false) {
 				echo Sanitize::encodeStringForDisplay($t->getMessage());
 				echo '</p>';
 			}
-			if (!isset($ret) || !is_numeric($ret)) {
-				return 0;
-			}
+            if (!isset($ret) || !is_nicenumber($ret)) {
+                return 0;
+            }
 		}
+        if ($zerofornan && !is_nicenumber($ret)) {
+            return 0;
+        }
 		return $ret;
 	}
 }
