@@ -4039,7 +4039,7 @@ function numfuncGenerateTestpoints($variables,$domain='') {
                 $fromto[$i+1] = 10;
             }
         }
-        if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
+        if (isset($fromto[$i+2]) && ($fromto[$i+2]=='integers' || $fromto[$i+2]=='integer')) {
             $domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
             $i += 3;
         } else if (isset($fromto[$i+1])) {
