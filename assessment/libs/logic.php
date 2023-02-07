@@ -678,13 +678,15 @@ function logicrand($vars,$ops,$bnum,$unum){
         $negPos[$rand] = $rand;         // Ensures no duplicates
     }
     */
-    $rndpos = diffrands(1, strlen($skeleton), $unum);
-    foreach ($rndpos as $rand) {
-        $negPos[$rand] = $rand;
-    }
-    rsort($negPos);
-    foreach($negPos as $k => $v){
-        $skeleton = substr_replace($skeleton,'-',$v,0);
+    if ($unum > 0) {
+        $rndpos = diffrands(1, strlen($skeleton), $unum);
+        foreach ($rndpos as $rand) {
+            $negPos[$rand] = $rand;
+        }
+        rsort($negPos);
+        foreach($negPos as $k => $v){
+            $skeleton = substr_replace($skeleton,'-',$v,0);
+        }
     }
     $skeleton = str_split($skeleton);
 	// 3. REPLACE * with vars and # with ops intelligently //
