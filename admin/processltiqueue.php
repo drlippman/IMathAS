@@ -385,7 +385,8 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			. "--------\n"
 			. "Response \n"
 			. "--------\n"
-			. $response;
+			. $response
+            . $request_info['response_text'];
             $logstm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
             $logstm->execute([time(), $logdata]);
 		} else {
