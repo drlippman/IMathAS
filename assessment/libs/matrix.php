@@ -46,7 +46,7 @@ function matrix($vals,$rows,$cols) {
 //matrixformat(matrix)
 //Formats a matrix item into an ASCIIMath string for display or $answer
 function matrixformat($m, $bracket='[', $asfraction=false) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixformat input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixformat input not a valid matrix'; } return '';}
 	if ($bracket == '(') {
 		$rb = ')';
 	} else if ($bracket == '|') {
@@ -140,7 +140,7 @@ function matrixdisplaytable() {
   $m = $args[0];
 	
   if (!isMatrix($m)) {
-    if ($GLOBALS['myrights']>10) { echo 'error: matrixdisplaytable input not a matrix'; } 
+    if ($GLOBALS['myrights']>10) { echo 'error: matrixdisplaytable input not a valid matrix'; } 
     return '';
   }
 	
@@ -396,7 +396,7 @@ $Tableau .= "<tbody>\r\n";
 //variables is optional array of variables to use
 //leftbracket determines if left bracket is shown (def true)
 function matrixsystemdisp($m,$v=null,$leftbracket=true) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsystemdisp input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsystemdisp input not a valid matrix'; } return '';}
 
 	if ($leftbracket) {
 		$out = '{';
@@ -458,7 +458,7 @@ function matrixsystemdisp($m,$v=null,$leftbracket=true) {
 //get entry from a matrix at given row and col
 //rows and cols are 0 indexed (first row is row 0)
 function matrixgetentry($m,$r,$c) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetentry input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetentry input not a valid matrix'; } return '';}
 	if ($r<0 || $c<0 || $r>=count($m) || $c>=count($m[0])) {
 		echo 'invalid row or column';
 		return 0;
@@ -472,7 +472,7 @@ function matrixgetentry($m,$r,$c) {
 //  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
 function matrixgetrow($m,$r, $asArray=false) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetrow input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetrow input not a valid matrix'; } return '';}
 	if ($r<0 || $r>=count($m)) {
 		echo 'invalid row';
 	} else {
@@ -489,7 +489,7 @@ function matrixgetrow($m,$r, $asArray=false) {
 //  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
 function matrixgetcol($m,$c, $asArray=false) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetcol input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetcol input not a valid matrix'; } return '';}
 	if ($c<0 || $c>=count($m[0])) {
 		echo 'invalid col';
 	} else {
@@ -509,7 +509,7 @@ function matrixgetcol($m,$c, $asArray=false) {
 //gets submatrix.  rowselector and colselector are strings
 //with format:  "start:end".  ":" to select all
 function matrixgetsubmatrix($m,$rs,$cs) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetsubmatrix input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetsubmatrix input not a valid matrix'; } return '';}
 	$rsp = explode(':',$rs);
 	if (count($rsp)<2) {
 		$rstart = 0;  $rend = count($m)-1;
@@ -553,7 +553,7 @@ function matrixgetsubmatrix($m,$rs,$cs) {
 //matrixsum(matrix,matrix)
 //Adds two matrices
 function matrixsum($m,$n) {
-	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsum input not a matrix'; } return '';}
+	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsum input not a valid matrix'; } return '';}
 	if (count($m)!=count($n) || count($m[0])!=count($n[0])) {
 		echo 'matrix size does not match: cannot add';
 		return $m;
@@ -569,7 +569,7 @@ function matrixsum($m,$n) {
 //matrixdiff(matrix1,matrix2)
 //Subtracts matrix1-matrix2
 function matrixdiff($m,$n) {
-	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixdiff input not a matrix'; } return '';}
+	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixdiff input not a valid matrix'; } return '';}
 
 	if (count($m)!=count($n) || count($m[0])!=count($n[0])) {
 		echo 'matrix size does not match: cannot subtract';
@@ -586,7 +586,7 @@ function matrixdiff($m,$n) {
 //matrixscalar(matrix,n)
 //Multiplies the matrix times the number n
 function matrixscalar($m,$n) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixscalar input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixscalar input not a valid matrix'; } return '';}
 	for ($i=0; $i<count($m); $i++) {
 		for ($j=0; $j<count($m[0]); $j++) {
 			$m[$i][$j] *= $n;
@@ -598,7 +598,7 @@ function matrixscalar($m,$n) {
 //matrixprod(matrix1,matrix2)
 //Calculates the matrix product matrix1*matrix2
 function matrixprod($m,$n) {
-	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixprod input not a matrix'; } return '';}
+	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixprod input not a valid matrix'; } return '';}
 	if (count($m[0])!=count($n)) {
 		echo 'matrix sizes do not allow product';
 		return $m;
@@ -627,7 +627,7 @@ function matrixprod($m,$n) {
 //matrixaugment(matrix1,matrix2)
 //Augments matrix2 to the right side of matrix1
 function matrixaugment($m,$n) {
-	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixaugment input not a matrix'; } return '';}
+	if (!isMatrix($m) || !isMatrix($n)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixaugment input not a valid matrix'; } return '';}
 	if (count($m)!=count($n)) {
 		echo 'row count does not match: cannot augment';
 		return $m;
@@ -642,7 +642,7 @@ function matrixaugment($m,$n) {
 //Multiplies row of matrix by n
 //matrix rows are 0-indexed; first row is row 0
 function matrixrowscale($m,$r,$n) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixrowscale input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixrowscale input not a valid matrix'; } return '';}
 	for ($j=0; $j<count($m[$r]); $j++) {
 		$m[$r][$j] *= $n;
 	}
@@ -664,7 +664,7 @@ function matrixrowswap($m,$r,$t) {
 //replaces endrow in matrix with a*row1 + b*row2
 //matrix rows are 0-indexed; first row is row 0
 function matrixrowcombine($m,$r1,$a,$r2,$b,$s) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixrowcombine input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixrowcombine input not a valid matrix'; } return '';}
 	for ($j=0; $j<count($m[$s]); $j++) {
 		$m[$s][$j] = $a*$m[$r1][$j] + $b*$m[$r2][$j];
 	}
@@ -699,7 +699,7 @@ function matrixidentity($n) {
 //matrixtranspose(m)
 //Calculates the transpose of the matrix m
 function matrixtranspose($m) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixtranspose input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixtranspose input not a valid matrix'; } return '';}
 	$n = array();
 	for ($c=0; $c<count($m[0]); $c++) {
 		$n[$c] = array();
@@ -777,7 +777,7 @@ function hasallzerorow($m) {
 //matrixinverse(m)
 //Finds the inverse of nxn matrices.
 function matrixinverse($m) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixinverse input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixinverse input not a valid matrix'; } return '';}
 	if (count($m[0])!=count($m)) {
 		echo 'matrix must be square';
 		return $m;
@@ -790,7 +790,7 @@ function matrixinverse($m) {
 //the fraction entries are strings, so do NOT try to use the result of this
 //for calculations.
 function matrixinversefrac($m) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixinversefrac input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixinversefrac input not a valid matrix'; } return '';}
 	if (count($m[0])!=count($m)) {
 		echo 'matrix must be square';
 		return $m;
@@ -804,7 +804,7 @@ function matrixinversefrac($m) {
 //A is nxn, b is nxm
 //returns nxm matrix x so Ax = b
 function matrixsolve($A, $b, $silenterror=false) {
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsolve input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsolve input not a valid matrix'; } return '';}
 	if (count($A) != count($A[0])) {
 		echo "can only solve for square matrices A, sorry";  return $b;
 	}
@@ -877,7 +877,7 @@ function matrixsolve($A, $b, $silenterror=false) {
 //entries may be fractions (as strings), so don't
 //try to use the result in calculations.
 function matrixsolvefrac($A, $b, $asString=true) {
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsolvefrac input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsolvefrac input not a valid matrix'; } return '';}
 	if (count($A) != count($A[0])) {
 		echo "can only solve for square matrices A, sorry";  return $b;
 	}
@@ -967,7 +967,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
 //  try to use the result in calculations.
 //NOTE:  In most cases, using matrixrandunreduce is a better option than using this!
 function matrixreduce($A, $rref = false, $frac = false) {
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixreduce input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixreduce input not a valid matrix'; } return '';}
 	include_once("fractions.php");
     // number of rows
     $N  = count($A);
@@ -1076,7 +1076,7 @@ function matrixreduce($A, $rref = false, $frac = false) {
 // being row reduced to reduced echelon form (see matrixreduce)
 //Returns the number of Ax=b equations that have at least one solution
 function matrixnumsolutions($A,$n=0) {
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixnumsolutions input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixnumsolutions input not a valid matrix'; } return '';}
 	$c = count($A[0]);
 	$Ac = $c - $n;
 	$r = count($A);
@@ -1100,7 +1100,7 @@ function matrixnumsolutions($A,$n=0) {
 //matrixround(matrix, decimal places)
 //rounds each entry of the matrix the specified decimal places
 function matrixround($m,$d) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixround input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixround input not a valid matrix'; } return '';}
 	$c = count($m[0]);
 	$r = count($m);
 	for ($i=0; $i<$r; $i++) {
@@ -1149,7 +1149,7 @@ function arrayIsZeroVector($v){
 //returns the rank of a matrix
 //column rank = row rank (https://www.maa.org/sites/default/files/3004418139737.pdf.bannered.pdf)
 function matrixGetRank($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetRank input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetRank input not a valid matrix'; } return '';}
 	$rowRank = 0;
 
 	$refM = matrixreduce($m,false,false);
@@ -1196,7 +1196,7 @@ function matrixIsRowsLinInd($m){
 //matrixIsColsLinInd(matrix)
 //matrix: returns true if the columns of the matrix are linearly independent
 function matrixIsColsLinInd($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixIsColsLinInd input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixIsColsLinInd input not a valid matrix'; } return '';}
 	if(matrixGetRank($m) == count($m[0])){
 		return (true);
 	}
@@ -1210,7 +1210,7 @@ function matrixIsColsLinInd($m){
 //eigenvector:  the possible eigenvector that we are checking.  It is an array, not a matrix.
 // returns true is eigenvector is an eigenvector of matrix.  Otherwise it returns false
 function matrixIsEigVec($m,$v){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixIsEigVec input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixIsEigVec input not a valid matrix'; } return '';}
 	if(count($m)!=count($m[0])){
 		echo("The matrix must be a square matrix");
         return false;
@@ -1233,7 +1233,7 @@ function matrixIsEigVec($m,$v){
 //matrix:  the matrix that we are testing
 //eigenvalue a real number that we are testing to see if it is an eigenvalue of matrix.
 function matrixIsEigVal($m,$L){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixIsEigVal input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixIsEigVal input not a valid matrix'; } return '';}
 	if(count($m)!=count($m[0])){
 		echo("The matrix must be a square matrix");
         return false;
@@ -1254,7 +1254,7 @@ function matrixIsEigVal($m,$L){
 //matrix:  the matrix that we are finding the row space
 //returns a matrix whose rows are a basis of the row space of matrix
 function matrixGetRowSpace($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetRowSpace input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetRowSpace input not a valid matrix'; } return '';}
 	$m = matrixreduce($m,true,false);
 
 	$retMatrix = array();
@@ -1272,7 +1272,7 @@ function matrixGetRowSpace($m){
 //matrix:  the matrix that we are finding the column space
 //returns a matrix whose columns are a basis of the column space of matrix
 function matrixGetColumnSpace($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetColumnSpace input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetColumnSpace input not a valid matrix'; } return '';}
 	return(matrixtranspose(matrixGetRowSpace(matrixtranspose($m))));
 }
 
@@ -1280,7 +1280,7 @@ function matrixGetColumnSpace($m){
 //A is a marix and b is a mx1 matrix.
 //returns true if there is a solution and false if there isn't one
 function matrixAxbHasSolution($A,$b){
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixAxbHasSolution input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixAxbHasSolution input not a valid matrix'; } return '';}
 	if(count($A)!=count($b)){
 		echo("The number of entries of b must equal the number of rows of A.  A not b:  ".count($A). " not ".count($b));
 	}
@@ -1308,7 +1308,7 @@ function matrixAxbHasSolution($A,$b){
 //A is the possible spanning set
 //This tests if the rows of A span the row space of B
 function matrixAspansB($A,$B){
-	if (!isMatrix($A) || !isMatrix($B)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixAspansB input not a matrix'; } return '';}
+	if (!isMatrix($A) || !isMatrix($B)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixAspansB input not a valid matrix'; } return '';}
 	$C = matrixaugment(matrixtranspose($A),matrixtranspose($B));
 
 	if(matrixGetRank($A) != matrixGetRank($B) || matrixGetRank($A) != matrixGetRank($C)){
@@ -1319,7 +1319,7 @@ function matrixAspansB($A,$B){
 //matrixAbasisForB(matrix A, matrix B)
 //tests if the rows of A are a basis for the row space of B
 function matrixAbasisForB($A,$B){
-	if (!isMatrix($A) || !isMatrix($B)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixAbasisForB input not a matrix'; } return '';}
+	if (!isMatrix($A) || !isMatrix($B)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixAbasisForB input not a valid matrix'; } return '';}
 	if(count($A[0])!=count($B[0])){
 		echo("The number of columns of A must equal to the number of columns of B");
 	}
@@ -1335,7 +1335,7 @@ function matrixAbasisForB($A,$B){
 //matrixGetMinor(matrix,rowNo,colNo)
 //returns the n-1 by n-1 matrix minor obtained by removing the rowNo row and colNo column.  Only works for a square matrix.
 function matrixGetMinor($A,$rowNo,$colNo){
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetMinor input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetMinor input not a valid matrix'; } return '';}
 	if(count($A[0])<$colNo){
 		echo("The number of columns of A must at least as large as the column selected"); 
 	}
@@ -1366,7 +1366,7 @@ function matrixGetMinor($A,$rowNo,$colNo){
 //det(matrix)
 //returns the determinant of a matrix
 function matrixDet($A){
-	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixDet input not a matrix'; } return '';}
+	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixDet input not a valid matrix'; } return '';}
 	if(count($A)!=count($A[0])){
 		echo("A must be a square matrix");
 	}
@@ -1397,7 +1397,7 @@ function matrixRandomMatrix($min,$max,$rows,$cols){
 //returns a matrix of rows that span the row space of matrix
 //the number of rows of the spanning matrix will either be the same or one larger than the original matrix's number of rows.
 function matrixRandomSpan($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixRandomSpan input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixRandomSpan input not a valid matrix'; } return '';}
 	$ranCols = $GLOBALS['RND']->rand(count($m),count($m)+1);
 	if($ranCols == count($m)){
 		return matrixrandunreduce($m,5);
@@ -1413,13 +1413,13 @@ function matrixRandomSpan($m){
 //matrixNumberOfRows(matrix)
 // returns the number of rows of a matrix
 function matrixNumberOfRows($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixNumberOfRows input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixNumberOfRows input not a valid matrix'; } return '';}
 	return(count($m));
 }
 //matrixNumberOfColumns(matrix)
 // returns the number of columns of a matrix
 function matrixNumberOfColumns($m){
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixNumberOfColumns input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixNumberOfColumns input not a valid matrix'; } return '';}
 	return(count($m[0]));
 }
 
