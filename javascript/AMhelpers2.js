@@ -785,7 +785,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/α/g,"alpha").replace(/β/g,"beta").replace(/γ/g,"gamma").replace(/δ/g,"delta").replace(/ε/g,"epsilon").replace(/κ/g,"kappa");
 	str = str.replace(/λ/g,"lambda").replace(/ρ/g,"rho").replace(/τ/g,"tau").replace(/χ/g,"chi").replace(/ω/g,"omega");
 	str = str.replace(/Ω/g,"Omega").replace(/Γ/g,"Gamma").replace(/Φ/g,"Phi").replace(/Δ/g,"Delta").replace(/Σ/g,"Sigma");
-    str = str.replace(/&(ZeroWidthSpace|nbsp);/g, ' ');
+    str = str.replace(/&(ZeroWidthSpace|nbsp);/g, ' ').replace(/\u200B/g, ' ');
 	return str;
 }
 
