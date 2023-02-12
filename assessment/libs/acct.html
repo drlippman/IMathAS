@@ -104,9 +104,9 @@ makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $
 <br>&nbsp;&nbsp;&nbsp;&nbsp;can also do row=>[style, column] or row=>[style, [column, column]]
 <br>&nbsp;&nbsp;$opts['questions'][n] = array of pull-down options for column n
 <BR><h3><a name="makeTchartsfromjournal">makeTchartsfromjournal</a></h3>
-makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize)
+makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [showtotal])
 <BR><h3><a name="scoreTchartsfromjournal">scoreTchartsfromjournal</a></h3>
- scoreTchartsfromjournal($stua,$answer,$j,$order,$sn)
+ scoreTchartsfromjournal($stua,$answer,$j,$order,$sn, [showtotal])
 <BR><h3><a name="makeTchart">makeTchart</a></h3>
 makeTchart(title,numrows,leftentries,rightentries, start number, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [dofloat, showtotal])
 <BR>num rows, leftentries, and rightentries should not include the total - that will be automatically added
