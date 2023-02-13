@@ -253,7 +253,7 @@
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?"
 				. Sanitize::generateQueryStringFromMap(array('cid' => $line['courseid'], 'stu' => $line['msgfrom']))
-			."\">Gradebook</a>";
+			."\" target=\"_blank\">Gradebook</a>";
 		}
 
 	} else if ($type=='sent' && $type!='allstu') {

@@ -412,7 +412,7 @@ If deleted on both ends, delete from DB
 				}
 				if ($ismsgsrcteacher) {
 					echo " <a class=\"pii-email\" href=\"mailto:".Sanitize::emailAddress($row[2])."\"><span class='pii-safe'>email</span></a> | ";
-					echo " <a href=\"$imasroot/course/gradebook.php?cid=".Sanitize::courseId($courseid)."&stu=". Sanitize::onlyInt($to)."\" target=\"_popoutgradebook\">gradebook</a>";
+					echo " <a href=\"$imasroot/course/gradebook.php?cid=".Sanitize::courseId($courseid)."&stu=". Sanitize::onlyInt($to)."\" target=\"_blank\">gradebook</a>";
 					if ($row[3]!=null) {
 						echo " | Last login ".tzdate("F j, Y, g:i a",$row[3]);
 					}
