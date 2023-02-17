@@ -27,6 +27,7 @@ if (!isset($teacherid)) {
   $array[':userid2']=$userid;
 }
 $query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))";
+$query .= " LIMIT 300";
 $stm = $DBH->prepare($query);
 $stm->execute($array);
 $result = $stm->fetchALL(PDO::FETCH_ASSOC);
@@ -77,7 +78,7 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && !empty($_POST['check
 		 $stm = $DBH->prepare($query);
 		 $stm->execute($qarray);
 	}
-	if (count($forumids)==count($checked)) { //marking all read
+	if (count($forumids)==count($checked) && count($checked)<300) { //marking all read
 		if ($from=='home') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 		} else {
@@ -128,6 +129,9 @@ if (count($lastpost)>0) {
   echo '</tbody></table>';
   echo '<script type="text/javascript">	initSortTable("newthreads",Array("S","S","S","D"),true);</script>';
   echo '</form>';
+  if (count($lastpost)==300) {
+    echo '<p><i>'._('Results cut off at the 300 most recent posts').'</i></p>';
+  }
 } else {
   echo "No new posts";
 }
