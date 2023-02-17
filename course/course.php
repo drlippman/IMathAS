@@ -404,7 +404,7 @@ if ($overwriteBody==1) {
 		//	}
 		//}
 		function moveDialog(block,item) {
-			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto");
+			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto", true, '', null, {'label':_('Move'),'func':'moveitem'});
 			return false;
 		}
 		function additem(blk,tb) {
