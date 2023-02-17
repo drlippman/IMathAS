@@ -184,6 +184,8 @@ if (!$skip) {
 	if (count($stus)>0) {
 		$DBH->beginTransaction();
 		unenrollstu($cidtoclean, $stus, true, false, true, 2);
+        $stm = $DBH->prepare("DELETE FROM imas_tutors WHERE courseid=?");
+	    $stm->execute(array($cidtoclean));
 		$DBH->commit();
 	}
 } else {

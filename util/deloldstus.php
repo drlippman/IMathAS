@@ -40,7 +40,8 @@ if (isset($CFG['cleanup']['oldstu'])) {
 }
 // select students who aren't enrolled in any courses, and haven't logged in within $olddays days
 $query = "SELECT iu.id FROM imas_users AS iu LEFT JOIN imas_students AS istu ";
-$query .= "ON iu.id=istu.userid WHERE istu.id IS NULL AND iu.rights<11 AND iu.lastaccess<? ";
+$query .= "ON iu.id=istu.userid LEFT JOIN imas_tutors AS itut ON iu.id=itut.userid ";
+$query .= "WHERE istu.id IS NULL AND itut.id IS NULL AND iu.rights<11 AND iu.lastaccess<? ";
 $query .= "LIMIT $batchsize ";
 $stm = $DBH->prepare($query);
 $stm->execute(array(time()-$olddays*24*60*60)); //a week old
