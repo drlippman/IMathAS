@@ -442,6 +442,7 @@ function encodea11ydraw(qn) {
     if (typeof qn == 'undefined') {
         qn = -1;
     }
+    var oldCurTarget = curTarget;
 	for (var tarnum in targets) {  
         if (qn > -1 && qn != tarnum) { continue; }
         var thistarg = targets[tarnum];
@@ -512,7 +513,7 @@ function encodea11ydraw(qn) {
     if (qn > -1 && targets[qn].vispreview) {
         drawTarget(null,null,true);
     }
-    curTarget = null;
+    curTarget = oldCurTarget;
 }
 
 function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky,snaptogrid) {
@@ -2212,6 +2213,7 @@ function drawMouseMove(ev) {
 			}
 		}
 	//}
+
 	if (tempTarget!=null) {
         if (targetOuts[tempTarget].disabled) { return; }
 		mouseintarget = tempTarget;
@@ -2254,6 +2256,7 @@ function drawMouseMove(ev) {
 	$("#temptarget").text(tempTarget);
 	$("#mouseintarget").text(mouseintarget);
 	*/
+
 	if (curTarget!=null) {
 		if (ev.originalEvent.touches && ev.originalEvent.touches.length>1) {
 			didMultiTouch = true;

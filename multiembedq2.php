@@ -378,6 +378,9 @@ for ($qn=0; $qn < $numq; $qn++) {
 echo '<input type=hidden name=toscoreqn id=toscoreqn value=""/>';
 echo '<input type=hidden name=state id=state value="'.Sanitize::encodeStringForDisplay(JWT::encode($a2->getState(), $statesecret)).'" />';
 
+echo '<div class="mce-content-body" style="text-align:right;font-size:70%;margin-right:5px;"><a style="color:#666" target="_blank" href="course/showlicense.php?id='.Sanitize::encodeUrlParam(implode('-', $QS['id'])).'">'._('License').'</a></div>';
+
+
 if ($state['jssubmit']) {
     echo '<div id="embedspacer" style="display:none;height:200px">&nbsp;</div>';
 } else {

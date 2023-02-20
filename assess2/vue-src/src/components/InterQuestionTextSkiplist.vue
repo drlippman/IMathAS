@@ -43,8 +43,9 @@ export default {
       const out = [];
       for (const i in store.assessInfo.interquestion_text) {
         const textObj = store.assessInfo.interquestion_text[i];
-        if ((this.pos === 'before' && textObj.displayBefore <= this.lastQuestion) ||
-          (this.pos === 'after' && textObj.displayBefore > this.lastQuestion)
+        if (((this.pos === 'before' && textObj.displayBefore <= this.lastQuestion) ||
+          (this.pos === 'after' && textObj.displayBefore > this.lastQuestion)) &&
+          textObj.text !== ''
         ) {
           out.push({
             html: textObj.text,

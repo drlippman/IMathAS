@@ -36,10 +36,11 @@ class FileScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'answerformat', 'scoremethod'];
+        $optionkeys = ['answerformat', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
+        $answer = getOptionVal($options, 'answer', $multi, $partnum, 1);
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -52,8 +53,18 @@ class FileScorePart implements ScorePart
                 $scorePartResult->setLastAnswerAsGiven($givenans);
                 if ($answerformat=='excel') {
                   // TODO if we want to resurrect this
-                    /*$zip = new ZipArchive;
-                    if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
+                    $filepath = getasidfilepath(substr($givenans,6,-1));
+                    $fileloc = 'local';
+                    if (substr($filepath,0,4)=='http') {
+                        $fileloc = 'remote';
+                        //remote file; make temp local copy
+                        $tempFile = tempnam(sys_get_temp_dir(), 'excelfile');
+                        copy($filepath, $tempFile);
+                        $filepath = $tempFile;
+                    }
+                    
+                    $zip = new ZipArchive;
+                    if ($zip->open($filepath)) {
                         $doc = new DOMDocument();
                         $doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
                         $zip->close();
@@ -61,7 +72,10 @@ class FileScorePart implements ScorePart
                         $scorePartResult->addScoreMessage(_(' Unable to open Excel file'));
                         $scorePartResult->setRawScore(0);
                         return $scorePartResult;
-                    }*/
+                    }
+                    if ($fileloc == 'remote') {
+                        unlink($filepath);
+                    }
                 }
                 $hasfile = true;
                 if ($scoremethod == 'filesize') {
@@ -126,10 +140,10 @@ class FileScorePart implements ScorePart
                 if ($answerformat=='excel') {
                     $zip = new ZipArchive;
                     if ($zip->open($_FILES["qn$qn"]['tmp_name'])) {
-                        echo "opened excel";
+                        //echo "opened excel";
                         $doc = new DOMDocument();
                         if ($doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'))) {
-                            echo "read into doc";
+                            //echo "read into doc";
                         }
 
                         $zip->close();
@@ -176,14 +190,13 @@ class FileScorePart implements ScorePart
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else {
-            if ($answerformat=='excel') {
+            if ($answerformat=='excel' && is_array($answer) && !empty($doc)) {
                 $doccells = array();
                 $els = $doc->getElementsByTagName('c');
                 foreach ($els as $el) {
                     $doccells[$el->getAttribute('r')] = $el->getElementsByTagName('v')->item(0)->nodeValue;
                 }
                 $pts = 0;
-
                 foreach ($answer as $cell=>$val) {
                     if (!isset($doccells[$cell])) {continue;}
                     if (is_numeric($val)) {

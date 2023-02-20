@@ -185,27 +185,29 @@
             // The number of tries on this question. Use max tries on any part.
             if (!empty($scoredQuestion['scored_try'])) {
                 $scoredTries = array_map(function($n) { return ++$n; }, $scoredQuestion['scored_try']);
-                $attempts[$questionId] += max($scoredTries);
                 // Figure out if any part of the question is incomplete.
                 // Skip if a score override is set.  TODO: actually look per-part
                 $untried = array_keys($scoredQuestion['scored_try'], -1);
-								if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride'])) {
-									$overridden = array_keys($scoredQuestion['scoreoverride']);
-									if (count(array_diff($untried, $overridden)) > 0) {
-										$qincomplete[$questionId] += 1;
-										continue;
-									}
-								} else if (count($untried) > 0) {
-									$qincomplete[$questionId] += 1;
-									continue;
-								}
+                if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride'])) {
+                    $overridden = array_keys($scoredQuestion['scoreoverride']);
+                    if (count(array_diff($untried, $overridden)) > 0) {
+                        $qincomplete[$questionId] += 1;
+                        continue;
+                    }
+                } else if (count($untried) > 0) {
+                    $qincomplete[$questionId] += 1;
+                    continue;
+                }
             } else {
-							// not even tried yet
-							$qincomplete[$questionId] += 1;
-							continue;
-						}
+                // not even tried yet
+                $qincomplete[$questionId] += 1;
+                continue;
+            }
 
-						// Total number of times this question was RE-generated for all students.
+            // number of tries on the question version
+            $attempts[$questionId] += max($scoredTries);
+
+            // Total number of times this question was RE-generated for all students.
             // Reduce by one to exclude the first generated question.
             $regens[$questionId] += count($questionData['question_versions']) - 1;
 

@@ -458,7 +458,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 /******* begin html output ********/
 if (empty($fileToInclude)) {
 
-$placeinhead = "<script type=\"text/javascript\">";
+$placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
 $address = $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid";

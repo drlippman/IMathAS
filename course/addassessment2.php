@@ -273,6 +273,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			// additional display options
 			$toset['caltag'] = Sanitize::stripHtmlTags($_POST['caltag']);
+			if ($_POST['caltagradio'] == 'usename') {
+				$toset['caltag'] = 'use_name';
+			}
 			$toset['shuffle'] = Sanitize::onlyInt($_POST['shuffle']);
 			if (isset($_POST['sameseed'])) { $toset['shuffle'] += 2;}
 			if (isset($_POST['samever'])) { $toset['shuffle'] += 4;}
@@ -885,7 +888,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
  /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
-$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/vue2-6-10.min.js"></script>';
+} else {
+	$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
+}
 
  require("../header.php");
 

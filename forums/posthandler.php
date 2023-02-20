@@ -465,8 +465,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 							$stm->execute($array);
 							// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 							if ($stm->rowCount()>0) {
-								$notice =  '<span class=noticetext style="font-weight:bold">This question has already been posted about.</span><br/>';
-								$notice .= 'Please read and participate in the existing discussion.';
+								$notice =  _('This question has already been posted about. Please read and participate in the existing discussion using the link below.');
 								while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread=" . Sanitize::encodeUrlParam($row[0]) . "\">".Sanitize::encodeStringForDisplay($line['subject'])."</a>";
 								}
@@ -508,7 +507,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
         echo "\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
 		if (isset($notice) && $notice!='') {
-			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
+			echo '<p>'.$notice.'</p>';
 		} else {
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";

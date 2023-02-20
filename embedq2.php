@@ -396,6 +396,7 @@ echo '</div>';
 echo '<input type=hidden name=toscoreqn id=toscoreqn value=""/>';
 echo '<input type=hidden name=state id=state value="'.Sanitize::encodeStringForDisplay(JWT::encode($a2->getState(), $statesecret)).'" />';
 
+echo '<div class="mce-content-body" style="text-align:right;font-size:70%;margin-right:5px;"><a style="color:#666" target="_blank" href="course/showlicense.php?id='.$qsid.'">'._('License').'</a></div>';
 echo '<script>
     $(function() {
         showandinit('.$qn.','.json_encode($disp).');

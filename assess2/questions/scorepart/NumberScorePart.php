@@ -205,9 +205,13 @@ class NumberScorePart implements ScorePart
         $gaunitsarr = [];
         foreach ($gaarr as $k=>$v) {
             if ($hasUnits) {
-                $givenansUnits = parseunits($v);
-                $v = evalMathParser($givenansUnits[0]);
-                $gaunitsarr[$k] = $givenansUnits; 
+                if (strtoupper($v)=='DNE') {
+                    $v = 'DNE';
+                } else {
+                    $givenansUnits = parseunits($v);
+                    $v = evalMathParser($givenansUnits[0]);
+                    $gaunitsarr[$k] = $givenansUnits;
+                }
             }
 
             $gaarr[$k] = trim(str_replace(array('$',',',' ','/','^','*'),'',$v));
@@ -245,9 +249,13 @@ class NumberScorePart implements ScorePart
             foreach ($anss as $k=>$anans) {
                 if ($anans === 'DNE') { continue; }
                 if ($hasUnits) {
-                    $anssUnits = parseunits($anans);
-                    $anss[$k] = evalMathParser($anssUnits[0]);
-                    $anssunits[$k] = $anssUnits; 
+                    if (strtoupper($anans)=='DNE') {
+                        $anans = 'DNE';
+                    } else {
+                        $anssUnits = parseunits($anans);
+                        $anss[$k] = evalMathParser($anssUnits[0]);
+                        $anssunits[$k] = $anssUnits;
+                    }
                 }
             }
             foreach($gaarr as $j=>$givenans) {

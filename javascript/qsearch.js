@@ -147,16 +147,19 @@ function doAdvSearch() {
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
 }
-
+var qsearchintransit = false;
 function doQuestionSearch(offset) {
+    if (qsearchintransit) { return; }
     offset = offset || 0;
     $("#searcherror").hide();
+    $("#searchspinner").show();
     var search = document.getElementById("search").value;
     if (cursearchtype == 'all' && search.trim()=='') {
         $("#searcherror").html(_('You must provide a search term when searching All Libraries')).show();
         $("#search").focus();
         return;
     }
+    qsearchintransit = true;
     $.ajax({
         url: qsearchaddr,
         method: 'POST',
@@ -171,8 +174,12 @@ function doQuestionSearch(offset) {
         displayQuestionList(msg);
         document.getElementById("myTable").focus();
         document.getElementById("fullqsearchwrap").scrollIntoView();
+        $("#searchspinner").hide();
+        qsearchintransit = false;
     }).fail(function() {
         $("#searcherror").show();
+        $("#searchspinner").hide();
+        qsearchintransit = false;
     });
 }
 
@@ -375,7 +382,7 @@ function updateInAssessMarkers() {
     $("#selq tbody tr").each(function(i,el) {
         if (el.childNodes.length == 1) { return; }
         $(el.childNodes[1]).toggleClass('qinassess', 
-            existingq.indexOf(parseInt(el.childNodes[3].textContent)) !== -1);
+            existingq.indexOf(parseInt(el.childNodes[0].firstChild.value)) !== -1);
     });
 }
 

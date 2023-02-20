@@ -59,10 +59,12 @@ if ($overwriteBody==1) {
     echo Sanitize::encodeStringForDisplay($coursename);
     echo '</h1></div>';
 
-		$query = 'SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
-		$query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?';
+		$query = '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
+		$query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?) UNION ';
+        $query .= '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
+		$query .= 'JOIN imas_tutors AS it ON it.userid=iu.id WHERE it.courseid=?)';
 		$stm = $DBH->prepare($query);
-		$stm->execute(array($cid));
+		$stm->execute(array($cid, $cid));
 		$teacherNames = array();
 		while($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$teacherNames[$row['id']] = $row['LastName'].', '.$row['FirstName'];

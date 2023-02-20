@@ -3,24 +3,22 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 37
-
-global $allowedmacros;
-
-// COMMENT OUT BEFORE UPLOADING
-if(!is_array($allowedmacros)) {
-	$allowedmacros = array();
-}
-
-array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
-
-define("simplexTolerance", .001);
 
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 37;
+	return 42;
 }
+
+global $allowedmacros;
+
+if(!is_array($allowedmacros)) {
+	$allowedmacros = array();
+}
+
+array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexreadsolutionarray", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
+
+define("simplexTolerance", .001);
 
 // function simplex(type, objective, constraints)
 // Creates and returns a new simplex matrix. elements are fractions
@@ -216,7 +214,7 @@ function simplex($type,$objective,$constraints) {
 //			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
 //			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
 //			etc.
-//			This is returned from simplexsolve
+//			This is returned from simplexsolve2
 //
 // stuanswer: the answer the student submitted
 //
@@ -711,7 +709,6 @@ function simplexcreateinequalities() {
 	return $simplexestring;
 }
 
-
 //function simplexconverttodecimals(simplexmatrix)
 //
 // simplexmatrix: a valid simplex matrix.
@@ -722,7 +719,6 @@ function simplexconverttodecimals($sm){
 
     for($r=0,$size = count($sm);$r<$size;$r++) {
         for($c=0;$c<count($sm[0]);$c++) {
-            //$sm[$r][$c] = fractiontodecimal($sm[$r][$c]);
 			$sm[$r][$c] = $sm[$r][$c][0]/$sm[$r][$c][1];
         }
     }
@@ -818,7 +814,6 @@ function simplexdefaultheaders($sm, $type){
 
 	return $headers;
 }
-
 
 //simplexdisplaycolortable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), tabletextcolor = "black", ShowObjectiveColumn=1])
 //
@@ -1058,7 +1053,6 @@ function simplexdisplaycolortable() {
                 $Element = fractionreduce($sm[$rloop][$cloop]);   // convert to fraction
             }
             else {
-                //$Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
 				$Element = $sm[$rloop][$cloop][0]/$sm[$rloop][$cloop][1]; // convert to decimal
             }
 
@@ -1259,7 +1253,6 @@ function simplexdisplaylatex() {
 				}
 
 			} else {
-				//$Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
 				$Element = $sm[$rloop][$cloop][0]/$sm[$rloop][$cloop][1]; // convert to decimal
 			}
 
@@ -1313,7 +1306,6 @@ function simplexdisplaylatex() {
 
 	return $Tableau;
 }
-
 
 //simplexdisplaylatex2(simplex solution sets [, show$pivot=1, showentriesfractions=1, ShowObjectiveColumn=1])
 //
@@ -1431,7 +1423,6 @@ function simplexdisplaylatex2() {
 
     return $solutionsetsreturn;
 }
-
 
 //simplexdisplaytable2(simplex solution sets[, ASCII tick marks,mode,show fractions,header column names,CSS tabletextcolor=black, multiple solution pivot border color=red, multiple solution pivot text color=blue, pivot border color=blue, pivot text color=black, ShowObjectiveColumn=1])
 //
@@ -2041,7 +2032,6 @@ function simplexgetentry($sm,$r,$c) {
     return $f; // fractionreduce($sm[$r][$c]);
 }
 
-
 // simplexpivot(simplexmatrix,pivotpoint)
 //
 // this function pivots the simplex matrix on the given point
@@ -2329,7 +2319,6 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed,$debug=0)
 	return $solution;
 }
 
-
 //simplexsetentry(simplexmatrix,row,col,numerator,denominator)
 //
 // set entry for the simplex matrix at the given row and col with the given numerator and denominator.
@@ -2366,7 +2355,6 @@ function simplexsetentry($sm,$r,$c,$n,$d) {
     return 1;
 }
 
-
 // simplexsolutiontolatex(solution)
 //
 // This function converts all fractions in the solution into latex fractions
@@ -2401,14 +2389,13 @@ function simplexsolutionconverttofraction($objectivereached){
 
     for($r=0;$r<$sizerow;$r++) {
         for($c=0;$c<$sizecol;$c++) {
-          $sol[$r][$c] = fractionreduce($objectivereached[$r][$c]);
+            $sol[$r][$c] = fractionreduce($objectivereached[$r][$c]);
         }
 		$sol[$r][$c] = "Yes";
     }
 
     return $sol;
 }
-
 
 //simplexsolve2(simplexmatrix,type,[showfractions=1])
 //
@@ -2454,7 +2441,8 @@ function simplexsolve2() {
 	// save start time -------------------------------------------------
 	$starttime = microtime(true);  //  for function timing
 
-	// process arguments -----------------------------------------------
+#region  process arguments -----------------------------------------------
+
 	$args = func_get_args();
 	if (count($args)==0) {
 		echo "Nothing to solve - no simplex matrix supplied.<br/>\r\n";
@@ -2482,6 +2470,8 @@ function simplexsolve2() {
         $showfractions = 1;
 	}
 
+#endregion
+
 	// Done processing arguments ---------------------------------------
 	$simplexstack = array();		// a stack of simplexset object that need to be pivoted on
 	$simplexsets = array();			// simplex list of matricies
@@ -2490,7 +2480,7 @@ function simplexsolve2() {
 	$rows = 0;						// set to the initial simplex matrix row
 	$simplexsets[$rows] = null;     // set initial condition
 	$columns = 0;					// set to the initial simplex matrix column
-	$parentcolumn = 0;				// set to the current active column
+	$parentcolumn = $columns;		// set to the current active column
 	$exitwhile = FALSE;				// flag to exit loop
 	$popstack = FALSE;				// flag to get an item from the stack
 
@@ -2500,8 +2490,7 @@ function simplexsolve2() {
 	// step 1
 	$solution = simplexreadsolutionarray($sm,$type,$showfractions,$ismixed);
 
-	// step 2
-	// is this a objective reached?
+	// step 2-  is this a objective reached?
 	if($solution[(count($solution)-1)]=="Yes") {
 		$objectivereached[] = $solution;
 	}
@@ -2510,14 +2499,15 @@ function simplexsolve2() {
 		// check for mixed constraints
         $hasmixedconstraints = simplexhasmixedconstrants($sm);
 
-		// step 3
+		#region  step 3 - get pivot points
+
 		$pivots = NULL;
 
-		if($parentcolumn==$columns) {
+		if((!$popstack)&&($parentcolumn==$columns)) {
             // Need to find all pivot(s) for the simplex matrix
             $pivotpoint = NULL;
 
-			// step 1 - See if this is a mixed constraint simplex matrix
+			//  See if this is a mixed constraint simplex matrix
             if($hasmixedconstraints)
 			{
 				$pivotpointList	  = simplexfindpivotpointmixed($sm);
@@ -2532,11 +2522,13 @@ function simplexsolve2() {
             }
         }
 		else {
-			// from the stack - has not been processed
-			// do not find a pivot this round
+			// use the pivot point from the stack
+			$pivotpoint = $pivotpoints[0];
         }
 
-		// step 4
+		#endregion
+
+		#region step 4 - test for no solution
 		if ($PivotPointCondition == PivotPointNoSolution) {
 			//								   parent column
 			//								   , Pivot Point Condition
@@ -2553,19 +2545,20 @@ function simplexsolve2() {
 			break;
 		}
 
-		// step 5
-		// count the number of pivots points
+		#endregion
+
+		#region step 5 - count the number of pivots points and add to stack if needed
+
 		if(count($pivotpoints) > 1) {
 			// add the multiple pivot point matrix to the output
 			if(is_null($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 
-			// step 7
 			//  parent column, pivot, all pivot points, simplex matrix, soluiton
 			$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, NULL, $pivotpoints, $sm, $solution);
 
-			// push all extra pivot points to the stack
+			// push all extra pivot points to the stack the zero number will be processes this round
 			$i = 1;
 			while ($i <count($pivotpoints)):
                 // might need to keep all possible pivot points on the stack?
@@ -2582,9 +2575,9 @@ function simplexsolve2() {
 			}
 		}
 
-		// step 6
-		//  parent column, pivot, all pivot points, simplex matrix, solution
-		//$rowflag = count($simplexsets);
+		#endregion
+
+		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
         if(is_null($simplexsets[$rows])) {
             $simplexsets[$rows] = array();
@@ -2592,26 +2585,30 @@ function simplexsolve2() {
 
 		$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
 
-		// step 7
-		//if($rowflag<$rows) {
-		//	$simplexsets[$rows] = array();
-		//}
+		#endregion
 
-		// step 8
+		// step 7 - set the $parentcolumn to the current column
 		$parentcolumn = $columns;
 
-		// step 9
-		// pivot if possible
+		#region step 8 - pivot if possible
+
 		if (!is_null($pivotpoint)) {
 			$sm = simplexpivot($sm,$pivotpoint);
 			$solution = simplexreadsolutionarray($sm,$type,$showfractions,$ismixed);
 		}
 
-		// step 10
+		#endregion
+
+		// step 9 - set to not pop off the stack
 		$popstack = FALSE;
 
-		// step 11
+		#region step 10 test pivot point type (Multiple solutions, one solution, or no solutions)
+
 		if ($PivotPointCondition == PivotPointFoundMultipleSolutionList) {
+
+			// add the result of the pivot
+			$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
+
 			// compare the new solution found in step 8 above to all previous solutions
 			// and see if it is unique
 			if(simplexfindsolutioninlist($objectivereached,$solution)==1) {
@@ -2626,32 +2623,45 @@ function simplexsolve2() {
 			// is this a objective reached?
 			if($solution[(count($solution)-1)]=="Yes") {
 				if(simplexfindsolutioninlist($objectivereached,$solution)==1) {
-					// solution is already in the list return the results
-					// don't save it'
+					// solution is already in the list return the results - don't save it'
 				} else {
 					$objectivereached[count($objectivereached)] = $solution;
 				}
 			}
 		}
 
+		#endregion
+
+		#region step 11 - do we need to pop the stack?
+
 		if($popstack) {
 			// is there any item in the stack?
 			if(count($simplexstack) > 0) {
-				$columns++;
 
 				// pop the Stack and set the variables
 				$stack = array_pop($simplexstack);
 				$rows = $stack[0];
 				$parentcolumn = $stack[1];
 				$PivotPointCondition = $stack[2];
+				$pivotpoints = array();  // clear
+				$pivotpoints[0] = $stack[3];
 				$pivotpoint = $stack[3];
 				$sm= $stack[4];
 				$solution = $stack[5];
 
+				$columns++;
 			} else {
 				$exitwhile = TRUE;
 			}
 		}
+
+		#endregion
+
+		// this is here to prevent a run away loop
+		if(($rows > 30)||($columns>30)) {
+			// failsafe - tripped
+			$exitwhile = TRUE;
+        }
 
 	} while (!$exitwhile);
 
@@ -2787,15 +2797,15 @@ function verifyshowfraction($from,$showfractions,$default,$override=0) {
 }
 
 function verifyASCIIticks($from,$displayASCII,$default) {
-	if(($displayASCII!=0)&&($displayASCII!=1)) {
-		echo "In $from - the supplied displayASCII value ($displayASCII) is invalid.  Valid values are 0 or 1.<br/>\r\n";
+	if(($displayASCII!=0)&&($displayASCII!=1)&&($displayASCII!="`")&&($displayASCII!="")) {
+		//echo "In $from - the supplied displayASCII value ($displayASCII) is invalid.  Valid values are 0 or 1.<br/>\r\n";
 		return $default;
 	}
 	else {
-		if($displayASCII==0) {
+		if(($displayASCII==0)||($displayASCII=="")) {
             return "";
 		}
-		else {
+        {
             return "`";
 		}
 	}
@@ -2950,7 +2960,6 @@ function simplexhasmixedconstrants($sm){
     // now loop throught the last column and check for negatives
     for($i=0;$i<$lastrow;$i++)
     {
-        //if(fractiontodecimal($sm[$i][$lastcol]) < 0 ) {
 		if(($sm[$i][$lastcol][0]/$sm[$i][$lastcol][1]) < 0 ) {
             return true;
         }
@@ -3299,7 +3308,18 @@ function simplexsolve($sm,$type,$showfractions=1) {
 }
 
 
-// Change Log
+// Change log
+// 2021-12-13 ver 42 - eliminated a logic bug in verifyASCIIticks. Eliminated simplex fraction routines and am using the 
+//                     fraction.php versions.
+//
+// 2021-12-07 ver 41 - Added another saftey check into simplexsolve2()
+//
+// 2021-12-06 ver 40 - Fixed bug in simplexsolve2()
+//
+// 2021-xx-xx ver 39 - added simplexreadsolutionarray to the allowed callable functions
+//
+// 2021-10-06 ver 38 - renamed fractionparse to fractionparse as it was included in the file.  Added fractionreduce
+//                     to replace fractionreduce
 //
 // 2021-08-22 ver 37 - Fixed division by 0 bugs and added checks for array/vaules in the simplexchecksolution function
 //
@@ -3375,5 +3395,20 @@ function simplexsolve($sm,$type,$showfractions=1) {
 // 2014-09-18 Added simplexsetentry and correct help file typos.
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
+
+
+// NOTES:
+// uses fractionparse for
+//     createsimplexelement
+//     simplextoarray
+//     simplexsolutiontolatex
+
+
+// uses fractionreduce for
+//     simplexcreateinequalities
+//     simplexconverttofraction
+//     simplexdisplaycolortable
+//     simplexsolutionconverttofraction
+
 
 ?>

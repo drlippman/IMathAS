@@ -32,10 +32,12 @@ export default {
       const out = [];
       for (const i in this.textlist) {
         const textObj = this.textlist[i];
-        out.push({
-          html: textObj.text,
-          expanded: (textObj.forntype === true || this.qn === textObj.displayBefore)
-        });
+        if (textObj.text !== '') {
+          out.push({
+            html: textObj.text,
+            expanded: (textObj.forntype === true || this.qn === textObj.displayBefore)
+          });
+        }
       }
       return out;
     },
@@ -43,8 +45,9 @@ export default {
       const out = [];
       for (const i in this.textlist) {
         const textObj = this.textlist[i];
-        if ((this.pos === 'beforeexact' && this.qn === textObj.displayBefore) ||
-          (this.pos !== 'beforeexact' && this.qn >= textObj.displayBefore && this.qn <= textObj.displayUntil)
+        if (((this.pos === 'beforeexact' && this.qn === textObj.displayBefore) ||
+          (this.pos !== 'beforeexact' && this.qn >= textObj.displayBefore && this.qn <= textObj.displayUntil)) &&
+          textObj.text !== ''
         ) {
           out.push({
             html: textObj.text,
@@ -60,7 +63,7 @@ export default {
         // only show post text if last question
         for (const i in this.textlist) {
           const textObj = this.textlist[i];
-          if (this.qn < textObj.displayBefore) {
+          if (this.qn < textObj.displayBefore && textObj.text !== '') {
             out.push({
               html: textObj.text,
               expanded: (textObj.forntype === 1 || this.qn === textObj.displayBefore)

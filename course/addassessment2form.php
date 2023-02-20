@@ -31,7 +31,8 @@ $vueData = array(
 	'ansingb' => $line['ansingb'],
 	'gbcategory' => $line['gbcategory'],
 	'gbcatOptions' => $gbcats,
-	'caltag' => $line['caltag'],
+	'caltag' => ($line['caltag'] === 'use_name' ? '?' : $line['caltag']),
+	'caltagradio' => ($line['caltag'] === 'use_name' ? 'usename' : 'usetext'),
 	'shuffle' => ($line['shuffle']&(1+16+32)),
 	'noprint' => $line['noprint'] > 0,
 	'sameseed' => ($line['shuffle']&2) > 0,
@@ -295,7 +296,7 @@ $vueData = array(
 					<?php echo _('per try');?>
 					<span v-show="defattemptpenalty>0">
 						<?php echo _('after');?>
-						<input type=number min=1 :max="Math.min(defattempts,9)" size=3 id="defattemptpenaltyaftern"
+						<input type=number min=1 :max="defattemptpenalty>0 ? Math.min(defattempts,9) : 9" size=3 id="defattemptpenaltyaftern"
 							name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern" />
 						<?php echo _('full-credit tries');?>
 					</span>
@@ -383,9 +384,9 @@ $vueData = array(
 		<div class="blockitems hidden">
 			<label class="form" for="caltag"><?php echo _('Calendar icon');?>:</label>
 			<span class="formright">
-                <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>><?php echo _('Use Text');?>:</label>
-                 <input aria-label="<?php echo _('Calendar icon text');?>" name="caltag" id="caltag" v-model="caltag" type=text size=8 <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /> <br />
-				<label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>><?php echo _('Use Assessment Name');?></label>
+                <label><input name="caltagradio" type="radio" value="usetext" v-model="caltagradio"><?php echo _('Use Text');?>:</label>
+                 <input aria-label="<?php echo _('Calendar icon text');?>" v-show="caltagradio=='usetext'" name="caltag" id="caltag" v-model="caltag" type=text size=8  /> <br />
+				<label><input name="caltagradio" type="radio" value="usename" v-model="caltagradio"><?php echo _('Use Assessment Name');?></label>
 			</span><br class="form" />
 
 			<label class=form for="shuffle"><?php echo _('Shuffle item order');?>:</label>
@@ -973,27 +974,6 @@ var app = new Vue({
 		}
 	},
 	methods: {
-		initCalTagRadio: function() {
-			// bind to caltagradio controls
-            // this is a hacky non-Vue approach, but sufficient
-            $('input[type=radio][name=caltagradio]').change(function() {
-                if (this.value == 'usename') {
-                    $('input[type=text][name=caltag]')
-                        .attr('data-prev', function() {return this.value;})
-                        .prop('readonly', true)
-                        .css({'color':'#FFFFFF', 'opacity':'0.6'})
-                        .val('use_name');
-                }
-                else if (this.value == 'usetext') {
-                    $('input[type=text][name=caltag]')
-                        .prop('readonly', false)
-                        .css({'color':'inherit', 'opacity':'1.0'})
-                        .val(function() {
-                            return this.getAttribute('data-prev') || '?';
-                        });
-                }
-            });
-		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -1023,10 +1003,6 @@ var app = new Vue({
 			this.showDisplayDialog = false;
 			$("#dispdetails").focus();
 		}
-	},
-    mounted: function() {
-    	// call init method
-        this.initCalTagRadio();
-    },
+	}
 });
 </script>
