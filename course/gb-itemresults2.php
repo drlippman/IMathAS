@@ -99,7 +99,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $scorebarwidth = 60;
 $placeinhead = ' <style type="text/css">
-
 .scorebarinner {
 	height:10px;
 	font-size:80%;
@@ -111,6 +110,7 @@ $placeinhead = ' <style type="text/css">
 
 }
 </style>';
+$useeqnhelper = 0;
 require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -261,7 +261,7 @@ function showresults($q,$qtype) {
 	}
 }
 
-function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
+function disp($q,$qtype,$part=-1,$answer='',$questions=array()) {
 	global $qdata,$qsdata,$qsids,$scorebarwidth;
 	$res = array();
 	$correct = array();

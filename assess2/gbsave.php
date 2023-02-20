@@ -97,7 +97,7 @@ if (!empty($changes)) {
 }
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, false);
 
 //prep date display
 prepDateDisp($assessInfoOut);

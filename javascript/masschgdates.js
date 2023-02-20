@@ -293,7 +293,7 @@ Date.prototype.getWeekDays = function(d) {
 				  if (usecb && !document.getElementById("cb"+i).checked) {
 					  continue;
 				  }
-				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
+				  if (basearr[i]!="NA" && basearr[i]!="-1" && document.getElementById(type+"datetype"+i).value==1) {
 					 curdate = document.getElementById(type+"date"+i).value;
 					 if (curdate!=0 && curdate!=2000000000) {
 						 d.setTime(basearr[i]*1000);
@@ -330,13 +330,13 @@ Date.prototype.getWeekDays = function(d) {
 	 /* if (baserdates[st]!="NA") {
 		  senddownsub('r',baserdates,st,usebusdays,usecb);
 	  }*/
-	  if (baselpdates[st]!="NA") {
+	  if (includeassess && baselpdates[st]!="NA" && baselpdates[st]!="-1") {
 		  senddownsub('lp',baselpdates,st,usebusdays,usecb);
 	  }
-	  if (basefpdates[st]!="NA") {
+	  if (includeforums && basefpdates[st]!="NA" && basefpdates[st]!="-1") {
 		  senddownsub('fp',basefpdates,st,usebusdays,usecb);
 	  }
-	  if (basefrdates[st]!="NA") {
+	  if (includeforums && basefrdates[st]!="NA" && basefrdates[st]!="-1") {
 		  senddownsub('fr',basefrdates,st,usebusdays,usecb);
 	  }
   }

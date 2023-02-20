@@ -71,10 +71,12 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     $newuserid = $DBH->lastInsertId();
 
     //enroll as stu if needed
-		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+        if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
+
 			$valbits = array();
 			$valvals = array();
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+			foreach ($allInstrEnroll as $ncid) {
 				$valbits[] = "(?,?)";
 				array_push($valvals, $newuserid,$ncid);
 			}

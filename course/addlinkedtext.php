@@ -38,7 +38,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_linkedtext WHERE id=?");
 	$stm->execute(array($linkid));
 	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
@@ -54,7 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = _("You need to access this page from the course page menu");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$block = $_GET['block'];
+	$block = $_GET['block'] ?? '0';
 	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => ($_GET['folder'] ?? '0')));
 	$page_formActionTag .= (!empty($linkid)) ? "&id=" . $linkid : "";
@@ -300,7 +300,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<p><a href=\"addlinkedtext.php?cid=" . $cid;
 			if (!empty($linkid)) {
 				$body .= "&id=" . $linkid;
-			} else {
+			} else if (isset($newtextid)) {
 				$body .= "&id=$newtextid";
 			}
 			$body .= "\">Try Again</a></p>\n";
@@ -312,6 +312,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else {
 		$toolcustom = '';
+        $toolcustomurl = '';
 		$selectedtool = 0;
 		$filename = '';
 		$webaddr = '';
@@ -346,9 +347,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$toolcustom = $toolparts[1];
 				if (isset($toolparts[2])) {
 					$toolcustomurl = $toolparts[2];
-				} else {
-					$toolcustomurl = '';
-				}
+				} 
 				if (isset($toolparts[3])) {
 					$gbcat = $toolparts[3];
 					$cntingb = $toolparts[4];
@@ -387,7 +386,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$gbcat = 0;
 			$tutoredit = 0;
             $gradesecret = uniqid();
-            $toolcustomurl = '';
 		}
 
 		$hr = floor($coursedeftime/60)%12;
@@ -435,7 +433,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
-		$page_gbcatSelect = array();
+		$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 		$i=0;
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {

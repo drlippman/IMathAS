@@ -13,22 +13,25 @@ require_once(__DIR__.'/../lti/LTI_Grade_Update.php');
  * @param float  $grade     The grade to send, between 0 and 1
  * @param boolean $sendnow   true to send in the next update, false (default)
  *                          to send after the $CFG-set queuedelay.
+ * @param boolean $isstu    whether it was a student initiated grade change
  */
-function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
+function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=true) {
 	global $DBH, $CFG;
 
 	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
 
-	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon) ';
-	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon) ON DUPLICATE KEY UPDATE ';
-	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0 ';
+	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon, isstu, addedon) ';
+	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon, :isstu, :addedon) ON DUPLICATE KEY UPDATE ';
+	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0,isstu=GREATEST(isstu,VALUES(isstu)) ';
 
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
 		':hash' => $key,
 		':sourcedid' => $sourcedid,
 		':grade' => $grade,
-		':sendon' => (time() + ($sendnow?0:$LTIdelay))
+		':sendon' => (time() + ($sendnow?0:$LTIdelay)),
+        ':isstu' => $isstu ? 1 : 0,
+        ':addedon' => time()
 	));
 
 	return ($stm->rowCount()>0);
@@ -36,7 +39,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
 
 $aidtotalpossible = array();
 //use this if we don't know the total possible
-function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1) {
+function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1,$isstu=true) {
 	global $DBH, $aidtotalpossible;
   if ($aidposs == -1) {
     if (isset($aidtotalpossible[$aid])) {
@@ -65,15 +68,22 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
     // new assesses
     $total = $scores;
   }
-	$grade = min(1, max(0,$total/$aidposs));
+    if ($aidposs > 0) {
+	    $grade = max(0,$total/$aidposs);
+    } else {
+        $grade = 0;
+    }
 	$grade = number_format($grade,8);
-	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow);
+	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow,$isstu);
 }
 
 //use this if we know the grade, or want to delete
-function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
+function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$isstu=true) {
 	global $CFG;
 
+    if (empty($uid) || empty($sourcedid) || is_array($sourcedid)) {
+        return false;
+    }
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
 		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
@@ -85,8 +95,8 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 		fclose($logFile);
 	}
 	//if we're using the LTI message queue, and it's an update, queue it
-	if (isset($CFG['LTI']['usequeue']) && $action=='update') {
-		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $sendnow);
+	if (!empty($CFG['LTI']['usequeue']) && $action=='update') {
+		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $sendnow, $isstu);
 	}
 
   $sourcedidparts = explode(':|:',$sourcedid);
@@ -101,7 +111,8 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
       $action == 'delete' ? 0 : $grade, // score
       $ltiparts[1], // ltiuserid
       $action == 'delete' ? 'Initialized' : 'Submitted', // activityProgress
-      $action == 'delete' ? 'NotReady' : 'FullyGraded' // gradingProgress
+      $action == 'delete' ? 'NotReady' : 'FullyGraded', // gradingProgress
+      $isstu
     );
   } else {
     updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade,$sendnow);

@@ -6,7 +6,7 @@
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$fid = Sanitize::onlyInt($_GET['fid']);
-	$from = $_GET['from'];
+	$from = $_GET['from'] ?? '';
 
 	require("../includes/exceptionfuncs.php");
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
@@ -300,9 +300,7 @@
 		} else if ($canuselatepasspost || $canuselatepassreply) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h1>Redeem LatePass</h1></div>';
 			echo "<form method=post action=\"redeemlatepassforum.php?cid=".Sanitize::courseId($cid)."&fid=".Sanitize::onlyInt($fid)."&from=".Sanitize::encodeUrlParam($from)."\">";
-			if ($allowlaten>1) {
-				echo '<p>You may use up to '.Sanitize::onlyInt($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';
-			}
+
 			echo "<p>You have ".Sanitize::onlyInt($numlatepass)." LatePass(es) remaining.</p>";
 
 			$extendwhat = '';

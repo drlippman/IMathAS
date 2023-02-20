@@ -33,13 +33,12 @@ if ($isRealStudent || empty($_GET['uid'])) {
 }
 $viewfull = true;
 if ($isteacher || $istutor) {
+  $stm = $DBH->prepare("SELECT defgbmode,usersort FROM imas_gbscheme WHERE courseid=:courseid");
+  $stm->execute(array(':courseid'=>$cid));
+  list($gbmode,$usersort) = $stm->fetch(PDO::FETCH_NUM);
   if (isset($_SESSION[$cid.'gbmode'])) {
     $gbmode =  $_SESSION[$cid.'gbmode'];
-  } else {
-    $stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-    $stm->execute(array(':courseid'=>$cid));
-    $gbmode = $stm->fetchColumn(0);
-  }
+  } 
   if (((floor($gbmode/100)%10)&1) == 1) {
     $viewfull = false;
   }
@@ -111,9 +110,12 @@ if (!$assess_record->hasRecord()) {
       list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
       if ($stugroup == 0) {
         if ($isGroup == 3) {
-          // no group yet - can't do anything
-          echo '{"error": "need_group"}';
-          exit;
+            if ($stugroupid == 0 || count($current_members) == 0) {
+                // no group yet - can't do anything
+                echo '{"error": "need_group"}';
+                exit;
+            }
+            $current_members = array_keys($current_members); // we just want the user IDs
         } else {
           $current_members = false; // just create for user if no group yet
         }
@@ -148,7 +150,7 @@ if (!$assess_record->hasRecord()) {
     $new_gb_score = $assess_record->getGbScore()['gbscore'];
     if ($new_gb_score != $orig_gb_score) {
         $assess_record->saveRecord();
-        $assess_record->updateLTIscore();
+        $assess_record->updateLTIscore(true, false);
     }
 }
 
@@ -269,6 +271,46 @@ prepDateDisp($assessInfoOut);
 
 // whether to show full gb detail or just summary
 $assessInfoOut['viewfull'] = $viewfull;
+
+if ($isActualTeacher || $istutor) {
+    // get next student
+    if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else {
+		if (isset($_GET['secfilter'])) {
+			$secfilter = $_GET['secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
+		} else {
+			$secfilter = -1;
+		}
+	}
+    $query = "SELECT istu.userid FROM imas_students AS istu JOIN imas_users AS iu ON istu.userid=iu.id ";
+    $query .= "JOIN imas_assessment_records AS iar ON iar.userid=istu.userid AND iar.assessmentid=? ";
+    $query .= "WHERE istu.courseid=? ";
+    $qarr = [$aid,$cid];
+    if ($secfilter != -1) {
+		$query .= " AND istu.section=? ";
+        $qarr[] = $secfilter;
+	}
+    $hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	if ($hidelocked) {
+		$query .= ' AND istu.locked=0 ';
+	}
+	if ($usersort==0) {
+		 $query .= " ORDER BY istu.section,iu.LastName,iu.FirstName";
+	} else {
+		 $query .= " ORDER BY iu.LastName,iu.FirstName";
+	}
+    $stm = $DBH->prepare($query);
+    $stm->execute($qarr);
+    $stuarr = $stm->fetchAll(PDO::FETCH_COLUMN,0);
+    $loc = array_search($uid, $stuarr);
+    if ($loc < count($stuarr) - 1) {
+        $assessInfoOut['nextstu'] = $stuarr[$loc+1];
+    }
+}
 
 //output JSON object
 echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

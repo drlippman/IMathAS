@@ -205,8 +205,9 @@ $alt = 0;
 		<li><input type=checkbox name=includegbcats value=1 checked /> Include <?php echo $installname; ?> gradebook setup and categories</li>
 		<li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname; ?> due dates for assessments</li>
 		<li><input type=checkbox name=includestartdates value=1 /> Include <?php echo $installname; ?> start dates for assessments and blocks<br/>
-			<span class="small">Blocks will only include the start date if they are set to hide contents from students when not available.</span></li>
-		<li><input type=checkbox name=datesbylti value=1 <?php if ($datesbylti > 0) {
+			<span class="small">Blocks will only include the start date if they are set to hide contents from students when not available</span></li>
+		<li><input type=checkbox name=newtab value=1 /> Open <?php echo $installname; ?> assignments in new window/tab</li>
+        <li><input type=checkbox name=datesbylti value=1 <?php if ($datesbylti > 0) {
         echo 'checked';
     }
     ?> /> Allow Canvas to set <?php echo $installname; ?> due dates<br/>
@@ -227,16 +228,12 @@ $alt = 0;
 		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button></p>
 		<p><a href="../help.php?section=ltibb" target="_blank">BlackBoard Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
-		<ul>
-		<?php echo $keyInfo; ?>
-		</ul>
 	</div>
 	<div id="lmsmoodle" style="display:none" class="lmsblock">
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=ltimoodle" target="_blank">Moodle Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
 		<ul>
-		<?php echo $keyInfo; ?>
 		<li>Tool Base URL: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?> </li>
 		</ul>
 	</div>
@@ -245,7 +242,6 @@ $alt = 0;
 		<p><a href="../help.php?section=ltid2l" target="_blank">Brightspace Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
 		<ul>
-		<?php echo $keyInfo; ?>
 		<li>Launch Point: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?> </li>
 		</ul>
 	</div>
@@ -254,7 +250,6 @@ $alt = 0;
 		<p><a href="../help.php?section=ltiother" target="_blank">LMS Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
 		<ul>
-		<?php echo $keyInfo; ?>
 		<li>Launch URL: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?> </li>
 		</ul>
 

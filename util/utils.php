@@ -16,12 +16,16 @@ if (isset($CFG['hooks']['util/utils'])) {
 if ($myrights >= 75 && isset($_GET['emulateuser'])) {
     $emu_id = Sanitize::onlyInt($_GET['emulateuser']);
 	if ($myrights<100) {
-		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT groupid,rights FROM imas_users WHERE id=?");
 		$stm->execute(array($emu_id));
-		if ($stm->fetchColumn(0) != $groupid) {
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($row['groupid'] != $groupid) {
 			echo "You can only emulate teachers from your own group";
 			exit;
-		}
+		} else if ($row['rights']>$myrights) {
+            echo "Cannot emulate a user of higher rights";
+            exit;
+        }
 	}
 	$_SESSION['emulateuseroriginaluser'] = $userid;
 	$_SESSION['userid'] = $emu_id;
@@ -132,10 +136,14 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['aid'])) {
 		$aid = Sanitize::onlyInt($_POST['aid']);
-		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+		$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 		$stm->execute(array($aid));
-		$destcid = $stm->fetchColumn(0);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+		list($destcid,$aver) = $stm->fetch(PDO::FETCH_NUM);
+        if ($aver > 1) {
+		    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment2.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+        } else {
+		    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+        }
 	} else if (!empty($_POST['pqid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion2.php?qsetid=".Sanitize::onlyInt($_POST['pqid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['eqid'])) {

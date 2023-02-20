@@ -182,6 +182,7 @@ var AMsymbols = [
 {input:"divide",   tag:"mo", output:"-:", tex:null, ttype:DEFINITION},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
 {input:"o+", tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"o-", tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
 {input:"ox", tag:"mo", output:"\u2297", tex:"otimes", ttype:CONST},
 {input:"o.", tag:"mo", output:"\u2299", tex:"odot", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
@@ -224,6 +225,7 @@ var AMsymbols = [
 
 //logical symbols
 {input:"and", tag:"mtext", output:"and", tex:null, ttype:SPACE},
+{input:"xor",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
 {input:"or",  tag:"mtext", output:"or",  tex:null, ttype:SPACE},
 {input:"not", tag:"mo", output:"\u00AC", tex:"neg", ttype:CONST},
 {input:"=>",  tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},

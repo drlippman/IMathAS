@@ -156,7 +156,7 @@ function apportion_info($pop, $seats, $method) {
 		$moddivs = array_values($tolowerdown);
 		//if the next value is the same, then the divisor that adds $tosub additional
 		//seats would add $tosub+1 additional seats, so the method fails.
-		if ($toadd==0) {
+		if ($tosub==0) {
 			$toraiseup = array();
 			foreach ($quotas as $s=>$q) {
 				$luq[$s] = ceil($q);

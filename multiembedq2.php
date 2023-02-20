@@ -16,6 +16,9 @@ $assessUIver = 2;
 $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
+$cid = 'embedq';
+$_SESSION['secsalt'] = "12345";
+$myrights = 5;
 
 $issigned = false;
 // Get basic settings from JWT or query string
@@ -34,6 +37,8 @@ if (empty($QS['id'])) {
 if (!is_array($QS['id'])) {
     $QS['id'] = explode('-', $QS['id']);
 }
+$QS['id'] = array_map('trim', $QS['id']);
+
 // set user preferences
 $prefdefaults = array(
     'mathdisp' => 6, //default is katex
@@ -50,7 +55,7 @@ $_SESSION['userprefs'] = array();
 foreach ($prefdefaults as $key => $def) {
     if (isset($QS[$key])) { // can overwrite via JWT
         $_SESSION['userprefs'][$key] = filter_var($QS[$key], FILTER_SANITIZE_NUMBER_INT);
-    } else if ($prefcookie !== null && isset($prefcookie[$key])) {
+    } else if (!empty($prefcookie) && isset($prefcookie[$key])) {
         $_SESSION['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
     } else {
         $_SESSION['userprefs'][$key] = $def;
@@ -106,7 +111,7 @@ if (isset($QS['jssubmit'])) {
 if (isset($QS['showhints'])) {
     $state['showhints'] = $QS['showhints'];
 } else {
-    $state['showhints'] = 3;
+    $state['showhints'] = 7;
 }
 
 if (isset($QS['maxtries'])) {
@@ -167,6 +172,9 @@ if (isset($_POST['toscoreqn'])) {
     $qns = array_keys($toscoreqn);
     if (count($qns)>1) {
         echo "Error - can only handle submitting one question at a time";
+    } else if (count($qns)==0) {
+        echo 'Error - nothing submitted';
+        exit;
     }
     $qn = $qns[0];
     $parts_to_score = array();
@@ -192,7 +200,7 @@ if (isset($_POST['toscoreqn'])) {
         'errors' => $res['errors'],
         'state' => JWT::encode($a2->getState(), $statesecret)
     );
-    $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
+    $out = array('jwt'=>JWT::encode($jwtcontents, ''));
 
     if ($state['showscoredonsubmit'] || !$res['allans']) {
         $disp = $a2->displayQuestion($qn);
@@ -233,16 +241,16 @@ if (isset($_POST['toscoreqn'])) {
 $ph = Sanitize::generateQueryPlaceholders($QS['id']);
 $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
 $stm->execute($QS['id']);
-$line = $stm->fetch(PDO::FETCH_ASSOC);
 $qsdata = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $qsdata[$row['id']] = $row;
 }
 
 $disps = array();
+
 for ($qn=0; $qn < $numq; $qn++) {
     $qsid = $QS['id'][$qn];
-    $a2->setQuestionData($qsid, $qsdata[$qn]);
+    $a2->setQuestionData($qsid, $qsdata[$qsid]);
     $disps[$qn] = $a2->displayQuestion($qn);
     // force submitall
     if ($state['submitall']) {
@@ -261,7 +269,7 @@ if (isset($_GET['theme'])) {
 }
 
 $lastupdate = '20200422';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastupdate . '" />';
+$placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/chunk-common.css?v=' . $lastupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastupdate . '" media="print">';
 $placeinhead .= '<script src="' . $staticroot . '/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
@@ -274,11 +282,11 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
-    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=111520" type="text/javascript"></script>';
+    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=021123" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css">
+$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=021823">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css">';
 
 // setup resize message sender

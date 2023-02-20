@@ -10,12 +10,12 @@ if (isset($CFG['hooks']['admin/approvepending'])) {
 	require($CFG['hooks']['admin/approvepending']);
 }
 
-$newStatus = Sanitize::onlyInt($_POST['newstatus']);
-$instId = Sanitize::onlyInt($_POST['userid']);
 $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
 
 //handle ajax postback
-if (!empty($newStatus)) {
+if (!empty($_POST['newstatus'])) {
+    $newStatus = Sanitize::onlyInt($_POST['newstatus']);
+    $instId = Sanitize::onlyInt($_POST['userid']);
 	$stm = $DBH->prepare("SELECT status,reqdata FROM imas_instr_acct_reqs WHERE userid=?");
     $stm->execute(array($instId));
     list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
@@ -121,11 +121,12 @@ if (!empty($newStatus)) {
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         
         // enroll in courses, if not already
-        if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+        if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
             $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
             $stm->execute([$instId]);
             $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-            $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+            $toEnroll = array_diff($allInstrEnroll, $existingEnroll);
             if (count($toEnroll) > 0) {
                 $valbits = array();
                 $valvals = array();
@@ -263,7 +264,7 @@ if (empty($reqFields)) {
     }
 }
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
 //$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}

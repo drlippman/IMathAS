@@ -14,7 +14,7 @@ ini_set("max_execution_time", "600");
 		exit;
 	}
 	
-	$get_uid = Sanitize::simpleString($_GET['uid']);
+	$get_uid = Sanitize::simpleString($_GET['uid'] ?? 'selected');
 	
 	if (isset($_POST['dolockstu']) || isset($_POST['lockinstead'])) { //do lockout - postback
 		if ($get_uid=="selected") {
@@ -38,7 +38,7 @@ ini_set("max_execution_time", "600");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
@@ -47,7 +47,7 @@ ini_set("max_execution_time", "600");
 		}
 
 		if ($get_uid=="selected") {
-			if (count($_POST['checked'])>0) {
+			if (!empty($_POST['checked'])) {
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
 				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
@@ -71,7 +71,7 @@ ini_set("max_execution_time", "600");
 
 
 		if ($get_uid=="selected") {
-				if (count($_POST['checked'])==0) {
+				if (empty($_POST['checked'])) {
 					if ($calledfrom=='lu') {
 						echo "No users selected.  <a href=\"listusers.php?cid=$cid\">Try again</a></form>";
 					}
@@ -102,7 +102,7 @@ ini_set("max_execution_time", "600");
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "'\">";
 			}
 ?>
 		</p>

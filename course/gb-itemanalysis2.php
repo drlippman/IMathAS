@@ -42,6 +42,7 @@
 			$secfilter = -1;
 		}
 	}
+    $showpartdets = isset($_GET['partdetails']);
 
 	//Gbmode : Links NC Dates
 	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
@@ -88,7 +89,16 @@
 	}
 	echo "Item Analysis</div>";
 
-	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a></div>';
+	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a> | ';
+    if ($showpartdets) {
+        echo '<a href="gb-itemanalysis2.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.Sanitize::encodeStringForDisplay($from).'">';
+        echo _('Hide Part Details') . '</a>';
+    } else {
+        echo '<a href="gb-itemanalysis2.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.Sanitize::encodeStringForDisplay($from).'&amp;partdetails=true">';
+        echo _('Show Part Details') . '</a>';
+    }
+
+    echo '</div>';
 
 	echo '<div id="headergb-itemanalysis" class="pagetitle"><h1>Item Analysis: ';
 
@@ -102,6 +112,9 @@
 	$attempts = array();
 	$regens = array();
     $timeontaskperversion = array();
+    $partscores = array();
+    $parttries = array();
+    $partcounts = array();
     $studentsStartedAssessment = 0;
 	echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 
@@ -178,9 +191,31 @@
             if (!isset($attempts[$questionId])) { $attempts[$questionId] = 0; }
             if (!isset($timeontask[$questionId])) { $timeontask[$questionId] = 0; }
             if (!isset($timeontaskperversion[$questionId])) { $timeontaskperversion[$questionId] = 0; }
+            if (!isset($partscores[$questionId])) { $partscores[$questionId] = []; }
+            if (!isset($parttries[$questionId])) { $parttries[$questionId] = []; }
 
             // How many times this question was displayed to all students.
             $qcnt[$questionId] += 1;
+
+            if ($showpartdets && isset($scoredQuestion['answeights']) && count($scoredQuestion['answeights']) > 1) {  // multipart
+                $partcounts[$questionId] = count($scoredQuestion['answeights']);
+                for ($pn=0;$pn<$partcounts[$questionId];$pn++) {
+                    if (!isset($partscores[$questionId][$pn])) { $partscores[$questionId][$pn] = []; }
+                    if (!isset($parttries[$questionId][$pn])) { $parttries[$questionId][$pn] = []; }
+
+                    if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride']) &&
+                        isset($scoredQuestion['scoreoverride'][$pn])
+                    ) {
+                        $partscores[$questionId][$pn][] = $scoredQuestion['scoreoverride'][$pn];
+                    } else if (!empty($scoredQuestion['scoreoverride']) && !is_array($scoredQuestion['scoreoverride'])) {
+                        $partscores[$questionId][$pn][] = $scoredQuestion['scoreoverride'];
+                    } else if (!empty($scoredQuestion['scored_try']) && $scoredQuestion['scored_try'][$pn] > -1) {
+                        $partscores[$questionId][$pn][] = $scoredQuestion['tries'][$pn][$scoredQuestion['scored_try'][$pn]]['raw'];
+                        $parttries[$questionId][$pn][] = count($scoredQuestion['tries'][$pn]);
+                    }
+                    
+                }
+            }
 
             // The number of tries on this question. Use max tries on any part.
             if (!empty($scoredQuestion['scored_try'])) {
@@ -219,6 +254,7 @@
 
             // Time spent per version.
             $timeontaskperversion[$questionId] += $questionData['time'] / ($regens[$questionId] + 1);
+
         }
 	}
 
@@ -277,7 +313,7 @@
 	}
 
 	$notstarted = $totstucnt - $studentsStartedAssessment;
-	$nonstartedper = round(100*$notstarted/$totstucnt,1);
+	$nonstartedper = ($totstucnt>0) ? round(100*$notstarted/$totstucnt,1) : 0;
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
@@ -329,10 +365,14 @@
 			$points[$row['qid']] = $row['points'];
 			$qsetids[$row['qid']] = $row['qsid'];
 			$withdrawn[$row['qid']] = $row['withdrawn'];
-			if ($row['qtype']=='essay' || $row['qtype']=='file') {
+			if ($row['qtype']=='essay' || $row['qtype']=='file' || 
+                ($row['qtype']=='draw' && preg_match('/answerformat.*?freehand/', $row['control']))
+            ) {
 				$needmanualgrade[$row['qid']] = true;
 			} else if ($row['qtype']=='multipart') {
-				if (preg_match('/anstypes.*?(essay|file)/', $row['control'])) {
+				if (preg_match('/anstypes.*?(essay|file)/', $row['control']) ||
+                    (preg_match('/anstypes.*?(draw)/', $row['control']) && preg_match('/answerformat.*?freehand/', $row['control']))
+                ) {
 					$needmanualgrade[$row['qid']] = true;
 				}
 			}
@@ -354,7 +394,7 @@
 			if ($pts==9999) {
 				$pts = $defpoints;
 			}
-			if ($qcnt[$qid]>0) {
+			if (isset($qcnt[$qid]) && $qcnt[$qid]>0) {
 				$avg = $qtotal[$qid]/$qcnt[$qid];
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avg2 = $qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]); //avg adjusted for not attempted
@@ -401,11 +441,13 @@
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
 
-			echo "<td>" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
+			echo '<td title="'._('Question ID').' '. Sanitize::onlyInt($qsetids[$qid]) . '">'; 
+            echo Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
-			echo Sanitize::encodeStringForDisplay($descrips[$qid]) . "</td>";
+			echo Sanitize::encodeStringForDisplay($descrips[$qid]);
+            echo "</td>";
 			echo "<td><a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&asid=average&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "\" ";
 			if (isset($needmanualgrade[$qid])) {
 				echo 'class="manualgrade" ';
@@ -440,7 +482,7 @@
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
 			if ($showhints) {
-				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
+				if ($showextref[$qid] && isset($qcnt[$qid]) && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
@@ -450,6 +492,33 @@
 			echo sprintf("<td><input type=button value=\"Preview\" onClick=\"previewq(%d)\"/></td>\n", Sanitize::onlyInt($qsetids[$qid]));
 
 			echo "</tr>\n";
+
+            if ($showpartdets && isset($partcounts[$qid])) {
+                for ($pn=0;$pn<$partcounts[$qid];$pn++) {
+                    if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
+                    echo '<td></td>';
+                    echo '<td>' . _('Part').' '.($pn+1).'</td>';
+                    echo '<td></td>';
+                    echo '<td class=c>';
+                    if (!empty($partscores[$qid][$pn])) {
+                        echo round(100*array_sum($partscores[$qid][$pn])/count($partscores[$qid][$pn])) . '%';
+                    } else {
+                        echo '0%';
+                    }
+                    echo '</td>';
+                    echo '<td>';
+                    if (!empty($parttries[$qid][$pn])) {
+                        echo round(array_sum($parttries[$qid][$pn])/count($parttries[$qid][$pn]), 1);                    
+                    }
+                    echo '</td>';
+                    echo '<td class=c>';
+                    $cntpartscores = isset($partscores[$qid][$pn]) ? count($partscores[$qid][$pn]) : 0;
+                    echo round(100*($qcnt[$qid] - $cntpartscores)/($qcnt[$qid])).'%';
+                    echo '</td>';
+                    echo '<td colspan=3></td>';
+                    echo '</tr>';
+                }
+            }
 			$i++;
 		}
 
@@ -489,7 +558,7 @@
 	}
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
-	if ($stm->fetchColumn(0)>0) {
+	if ($stm->fetchColumn(0)>0 && !empty($qs) && !empty($avgscore)) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}

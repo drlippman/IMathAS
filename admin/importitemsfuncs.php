@@ -466,7 +466,7 @@ private function importQuestionSet() {
 		foreach ($db_fields['questionset'] as $field) {
 			$exarr[] = $this->data['questionset'][$exportqid][$field];
 		}
-		if ($this->data['questionset'][$exportqid]['hasimg']==1 && count($this->data['questionset'][$exportqid]['qimgs'])>0) {
+		if ($this->data['questionset'][$exportqid]['hasimg']==1 && !empty($this->data['questionset'][$exportqid]['qimgs'])) {
 			$qimgs[$exportqid] = $this->data['questionset'][$exportqid]['qimgs'];
 		}
 		if (count($exarr)>2000) { //do a batch add

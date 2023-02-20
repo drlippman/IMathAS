@@ -28,6 +28,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $anstype = $this->answerBoxParams->getAnswerType();
         $qn = $this->answerBoxParams->getQuestionNumber();
         $multi = $this->answerBoxParams->getIsMultiPartQuestion();
+        $isConditional = $this->answerBoxParams->getIsConditional();
         $partnum = $this->answerBoxParams->getQuestionPartNumber();
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
@@ -41,12 +42,17 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $style = '';
         $params = [];
 
-        $optionkeys = ['answers', 'noshuffle', 'displayformat', 'readerlabel'];
+        $optionkeys = ['answers', 'noshuffle', 'displayformat', 'readerlabel','answerformat'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
         $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
-
+        if (is_array($answers)) {
+            echo 'Eek! $answers in multans should be a list, not an array';
+            $answers = implode(',', $answers);
+        }
+        $answers = trim($answers, ' ,');
+        
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
             $questions = array();
@@ -55,22 +61,24 @@ class MultipleAnswerAnswerBox implements AnswerBox
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
         if ($noshuffle == "last") {
-            $randkeys = $RND->array_rand(array_slice($questions, 0, count($questions) - 1), count($questions) - 1);
+            $randkeys = (array) $RND->array_rand(array_slice($questions, 0, count($questions) - 1), count($questions) - 1);
             $RND->shuffle($randkeys);
             array_push($randkeys, count($questions) - 1);
         } else if ($noshuffle == "all" || count($questions) == 1) {
             $randkeys = array_keys($questions);
         } else {
-            $randkeys = $RND->array_rand($questions, count($questions));
+            $randkeys = (array) $RND->array_rand($questions, count($questions));
             $RND->shuffle($randkeys);
         }
         $hasNoneOfThese = '';
-        if (count($questions) > 1 && trim($answers) == "") {
+        if ((count($questions) > 1 && trim($answers) == "") || $answerformat == 'addnone') {
             $qstr = strtolower($questions[count($questions) - 1]);
             if (strpos($qstr, 'none of') === false) {
                 $questions[] = _('None of these');
                 array_push($randkeys, count($questions) - 1);
-                $answers = count($questions) - 1;
+                if (count($questions) > 1 && trim($answers) == "") {
+                    $answers = count($questions) - 1;
+                }
             }
             $hasNoneOfThese = 'data-multans="hasnone"';
         } else if (count($questions) > 1 && ($noshuffle == 'all' || $noshuffle == 'last')) {
@@ -169,7 +177,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
             $out .= "</div>";
         }
         $tip = _('Select all correct answers');
-        if ($answers !== '') {
+        if ($answers !== '' && !$isConditional) {
             $ansor = explode(' or ', $answers);
             foreach ($ansor as $k => $answers) {
                 $akeys = array_map('trim', explode(',', $answers));
@@ -177,7 +185,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
                     $sa .= '<br/><em>' . _('or') . '</em>';
                 }
                 foreach ($akeys as $akey) {
-                    $sa .= '<br/>' . $questions[$akey];
+                    if (isset($questions[$akey])) {
+                        $sa .= '<br/>' . $questions[$akey];
+                    } else {
+                        echo "Invalid answer key $akey";
+                    }
                 }
             }
         }

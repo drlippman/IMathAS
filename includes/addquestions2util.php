@@ -56,7 +56,7 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
     $query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
     $query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
     $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
-    $query .= "iqs.meantimen,iq.extracredit FROM imas_questions AS iq ";
+    $query .= "iqs.meantimen,iq.extracredit,iqs.broken,iqs.isrand FROM imas_questions AS iq ";
     $query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
     $query .= "WHERE iq.assessmentid=:aid";
     $stm = $DBH->prepare($query);
@@ -76,6 +76,11 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
                 ($line['showhints'] > -1 && ($line['showhints'] & 2) == 2)
             ) {
                 $extrefval += 1;
+            }
+            if (($line['showhints'] == -1 && ($data['showhints'] & 4) == 4) ||
+                ($line['showhints'] > -1 && ($line['showhints'] & 4) == 4)
+            ) {
+                $extrefval += 128;
             }
         } else {
             if (($line['showhints'] == 0 && $data['showhints'] == 1) || $line['showhints'] == 2) {
@@ -117,6 +122,9 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
         if ($line['rubric'] > 0) {
             $extrefval += 64;
         }
+        if ($line['isrand'] == 0) {
+            $extrefval += 256;
+        }
 
         $timeout = array();
         $timeout[0] = round($line['meantime'] / 60, 1);
@@ -133,7 +141,8 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
             (int) Sanitize::onlyInt($line['withdrawn']),
             (int) $extrefval,
             $timeout,
-            (int)Sanitize::onlyInt($line['extracredit'])
+            (int)Sanitize::onlyInt($line['extracredit']),
+            (int)Sanitize::onlyInt($line['broken'])
         );
 
     }

@@ -35,7 +35,7 @@ class CalculatedMatrixScorePart implements ScorePart
         $defaultreltol = .0015;
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
-            'answersize', 'scoremethod'];
+            'answersize', 'scoremethod', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -71,7 +71,7 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
               foreach ($givenanslist as $i=>$v) {
-                $givenanslistvals[$i] = evalMathParser($v);
+                    $givenanslistvals[$i] = evalMathParser($v);
               }
             } else {
               for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
@@ -85,7 +85,11 @@ class CalculatedMatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         } else {
             $givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
-            $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
+            if (strlen($givenans)>1 && $givenans[1]!='(') {
+                $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,1,-1)));
+            } else {
+                $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
+            }
             if ($hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
             } else {
@@ -98,6 +102,7 @@ class CalculatedMatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
+        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
@@ -116,7 +121,11 @@ class CalculatedMatrixScorePart implements ScorePart
         $correct = true;
         $incorrect = array();
 
-        $ansr = substr($answer,2,-2);
+        if (strlen($answer)>1 && $answer[1] != '(') {
+            $ansr = substr($answer,1,-1);
+        } else {
+            $ansr = substr($answer,2,-2);
+        }
         $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
         $answerlist = explode(',',$ansr);
 
@@ -125,7 +134,7 @@ class CalculatedMatrixScorePart implements ScorePart
         }
         if (!empty($answersize)) {
             for ($i=0; $i<count($answerlist); $i++) {
-                if (!checkanswerformat($givenanslist[$i],$ansformats)) {
+                if (isset($givenanslist[$i]) && !checkanswerformat($givenanslist[$i],$ansformats)) {
                     //perhaps should just elim bad answer rather than all?
                     if ($scoremethod == 'byelement') {
                       $incorrect[$i] = 1;
@@ -162,7 +171,7 @@ class CalculatedMatrixScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        $fullmatrix = !in_array("",  $givenanslist, true);
+        $fullmatrix = !in_array("",  $givenanslist, true) && !in_array("NaN",  $givenanslistvals, true);
 
         if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist
@@ -207,6 +216,9 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($correct) {
               $givenanslistvals = matrix_scorer_rref($givenanslistvals, $N);
             }
+        } else if ($fullmatrix && in_array('anyroworder',$ansformats)) {
+            $answerlist = matrix_scorer_roworder($answerlist, $N);
+            $givenanslistvals = matrix_scorer_roworder($givenanslistvals, $N);
         }
         for ($i=0; $i<count($answerlist); $i++) {
             if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {

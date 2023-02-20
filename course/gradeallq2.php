@@ -37,7 +37,7 @@
 	if (isset($_GET['ver'])) {
 		$ver = $_GET['ver'];
 	} else {
-		$ver = 'graded';
+		$ver = 'scored';
 	}
 	if (isset($_GET['page'])) {
 		$page = intval($_GET['page']);
@@ -54,10 +54,12 @@
 	} else {
 		$secfilter = -1;
 	}
+    $userprefUseMQ = (!isset($_SESSION['userprefs']['useeqed']) ||
+        $_SESSION['userprefs']['useeqed'] == 1);
 
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -76,6 +78,26 @@
 	} else {
 		$canedit = 0;
 	}
+    $itemorder = explode(',',preg_replace('/\d+\|\d+~/','',$itemorder));
+    $prevqid = -1; $nextqid = -2;
+    foreach ($itemorder as $i=>$item) {
+        $sub = explode('~',$item);
+        foreach ($sub as $k=>$subitem) {
+            if ($subitem == $qid) {
+                if (count($sub)==1) {
+                    $curqloc = $i+1;
+                } else {
+                    $curqloc = ($i+1).'-'.($k+1);
+                }
+                $nextqid = -1;
+            } else if ($nextqid == -1) {
+                $nextqid = $subitem;
+                break 2;
+            } else {
+                $prevqid = $subitem;
+            }
+        }
+    }
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
@@ -93,24 +115,25 @@
 			if (strpos($k,'-')!==false) {
 				$kp = explode('-',$k);
 				if ($kp[0]=='ud') {
-					//ud-userid-qn-pn
-					$orig = $_POST['os-'.$kp[1].'-'.$kp[2].'-'.$kp[3]];
+					//ud-userid-ver-qn-pn
+					$orig = $_POST['os-'.$kp[1].'-'.$kp[2].'-'.$kp[3].'-'.$kp[4]];
 					if ($v != $orig) {
 						if ($v=='N/A') {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
+							$allscores[$kp[1]][$kp[2].'-'.$kp[3]][$kp[4]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = floatval($v);
+							$allscores[$kp[1]][$kp[2].'-'.$kp[3]][$kp[4]] = floatval($v);
 						}
 					}
 				} else if ($kp[0]=='fb') {
-					//fb-qn-userid
+					//fb-ver-qn-userid
 					if ($v=='' || $v=='<p></p>') {
 						$v = '';
 					}
-					$allfeedbacks[$kp[2]][$kp[1]] = $v;
+					$allfeedbacks[$kp[3]][$kp[1].'-'.$kp[2]] = $v;
 				}
 			}
 		}
+
 		if (isset($_POST['onepergroup']) && $_POST['onepergroup']==1) {
 			foreach ($_POST['groupuid'] as $grp=>$uid) {
 				$grpscores[$grp] = $allscores[$uid];
@@ -206,10 +229,11 @@
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
 					$gbscore = $assess_record->getGbScore();
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true);
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true, -1, false);
 				}
 			}
 		}
+        
 		if (count($changesToLog)>0) {
 			TeacherAuditLog::addTracking(
 				$cid,
@@ -226,9 +250,19 @@
 		if (isset($_GET['quick'])) {
 			echo "saved";
 		} else if ($page == -1 || isset($_POST['islaststu'])) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis2.php?"
-				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
-                    'r' => Sanitize::randomQueryStringParam(),)));
+            if ($page == -1 && !empty($_POST['prevqid'])) {
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq2.php?"
+                    . Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                    'qid' => intval($_POST['prevqid']), 'r' => Sanitize::randomQueryStringParam(),)));
+            } else if ($page == -1 && !empty($_POST['nextqid'])) {
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq2.php?"
+                    . Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                    'qid' => intval($_POST['nextqid']), 'r' => Sanitize::randomQueryStringParam(),)));
+            } else {
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis2.php?"
+                    . Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                        'r' => Sanitize::randomQueryStringParam(),)));
+            }
 		} else {
 			$page++;
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq2.php?"
@@ -286,7 +320,7 @@
 		$points = $defpoints;
 	}
 */
-	$lastupdate = '051620';
+	$lastupdate = '030222';
 	function formatTry($try,$cnt,$pn,$tn) {
 		if (is_array($try) && $try[0] === 'draw') {
 			$id = $cnt.'-'.$pn.'-'.$tn;
@@ -313,8 +347,8 @@
 
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=081921"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=020223"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -330,9 +364,10 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
-        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=021021" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=021123" type="text/javascript"></script>';
     }
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
+    
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
 	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
 
 	$placeinhead .= "<script type=\"text/javascript\">";
@@ -367,7 +402,10 @@
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
 	}
-	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}</style>';
+	$placeinhead .= '<style type="text/css"> 
+        .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
+        .hoverbox { background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);}
+		</style>';
 	require("../includes/rubric.php");
 	$_SESSION['coursetheme'] = $coursetheme;
 	require("../header.php");
@@ -376,17 +414,43 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
-	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h1></div>";
-	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions";
-    if ($submitby == 'by_assessment') {
-        echo '<br>Note: Only students who have submitted their assessment will show here.';
-    }
-	echo '</p><div class="cpmid">';
+	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>";
+    echo sprintf(_('Grading Question %s in %s'), $curqloc, Sanitize::encodeStringForDisplay($aname));
+    echo "</h1></div>";
+
+	echo '<div class="cpmid">';
+    $qsmap = ['stu'=>$stu, 'gbmode'=>$gbmode, 'cid'=>$cid, 'aid'=>$aid, 'qid'=>$qid, 'page'=>$page, 'ver'=>$ver];
 	if ($page==-1) {
-		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
+        $qsmap['page'] = 0;
+		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
-		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=-1\">Grade all students at once</a>";
+        $qsmap['page'] = -1;
+		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Grade all students at once</a>";
 	}
+    $qsmap['page'] = $page;
+    echo '<br/>';
+    if ($ver=='scored') {
+		echo "<b>Showing Scored Attempts.</b>  ";
+        $qsmap['ver'] = 'last';
+		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Last Attempts.</a> ";
+        $qsmap['ver'] = 'all';
+        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show All Attempts.</a> ";
+	} else if ($ver=='last') {
+        $qsmap['ver'] = 'scored';
+        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Scored Attempts.</a> ";
+        echo "<b>Showing Last Attempts.</b>  ";
+        $qsmap['ver'] = 'all';
+        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show All Attempts.</a> ";
+	} else {
+        $qsmap['ver'] = 'scored';
+        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Scored Attempts.</a>  ";
+        $qsmap['ver'] = 'last';
+		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Last Attempts.</a> ";
+        echo "<b>Showing All Attempts.</b>  ";
+    }
+    if ($submitby == 'by_assessment') {
+        echo 'Note: Only submitted attempts will show here.';
+    }
 	if (count($sections)>1) {
 		echo '<br/>';
 		echo _('Limit to section').': ';
@@ -412,6 +476,8 @@
         echo '<li><label><input type=checkbox id="filter-100" onchange="updatefilters()">'._('Score = 100% (after penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-work" onchange="updatefilters()">'._('Questions with Work').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-names" onchange="updatefilters()">'._('Names').'</label></li>';
         echo '</ul>';
         echo '<p>';
 		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
@@ -420,6 +486,7 @@
     echo ' <button type="button" onclick="showallwork()">'._('Show All Work').'</button>';
     echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
     echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
+    echo ' <button type="button" onclick="toggleScrollingScoreboxes()">'._('Floating Scoreboxes').'</button>';
 	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
 		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
@@ -429,6 +496,12 @@
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
 		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
     }
+    if ($page==-1) {
+        echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button>';
+        echo ' <button type=button onclick="sortByName()">'._('Name').'</button>';
+        echo ' <button type=button onclick="sortByRand()">'._('Random').'</button>';
+        echo '</p>';
+    }
     echo '</div>'; // filtersdiv
 	if ($page==-1 && $canedit) {
 		echo '<div class="fixedbottomright">';
@@ -436,23 +509,12 @@
 		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
 		echo '</div>';
 	}
-	echo "<form id=\"mainform\" method=post action=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
+	echo "<form id=\"mainform\" method=post action=\"gradeallq2.php?stu=" . Sanitize::generateQueryStringFromMap($qsmap) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
 	if ($isgroup>0) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
 	}
 
-	// TODO? Add support for 'last' version
-	/*echo "<p>";
-	if ($ver=='graded') {
-		echo "<b>Showing Graded Attempts.</b>  ";
-		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&ver=last\">Show Last Attempts</a>";
-	} else if ($ver=='last') {
-		echo "<a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&ver=graded\">Show Graded Attempts</a>.  ";
-		echo "<b>Showing Last Attempts.</b>  ";
-		echo "<br/><b>Note:</b> Grades and number of attempts used are for the Graded Attempt.  Part points might be inaccurate.";
-	}
-	echo "</p>";
-	*/
+	
 
 	if ($page!=-1) {
 		$stulist = array();
@@ -509,6 +571,7 @@
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
+    echo '<div id="qlistwrap">';
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -537,248 +600,269 @@
 			//$s3asid = $asid; // TODO: revisit this
 		}
 
-		// get an array of qn=>qid
-		list($questions, $toloadquestions) = $assess_record->getQuestionIds('all', 'scored');
+        $locdata = $assess_record->getQuestionLocs($qid,$ver);
 
-		// find this question id in list
-		$lockeys = array_keys($questions,$qid);
-		foreach ($lockeys as $loc) {
-			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
-			$answeightTot = array_sum($qdata['answeights']);
-			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
-			if ($groupdup) {
-				echo '<div class="groupdup">';
-            }
-            
-            $classes = '';
-            if ($qdata['gbrawscore']==1) {
-				$classes = 'qfilter-perfect';
-			} else if ($qdata['gbscore']>0) {
-				$classes = 'qfilter-nonzero';
-			} else if ($qdata['status'] != 'unattempted') {
-                $classes = 'qfilter-zero';
-            } else {
-                // it's possible only one part is unattempted
-                $unattempted = true;
-                foreach ($qdata['parts'] as $partdata) {
-                    if ($partdata['try'] > 0) {
-                        $unattempted = false;
-                        break;
-                    }
-                }
-                if ($unattempted) {
-                    $classes = 'qfilter-unans';
-                } else {
+        foreach ($locdata as $vernum=>$lockeys) {
+            foreach ($lockeys as $loc) {
+                $qdata = $assess_record->getGbQuestionVersionData($loc, true, $vernum, $cnt);
+                $answeightTot = array_sum($qdata['answeights']);
+                $qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
+                
+                $classes = '';
+                if ($qdata['gbrawscore']==1) {
+                    $classes = 'qfilter-perfect';
+                } else if ($qdata['gbscore']>0) {
+                    $classes = 'qfilter-nonzero';
+                } else if ($qdata['status'] != 'unattempted') {
                     $classes = 'qfilter-zero';
-                }
-            }
-            if (abs($qdata['score'] - $qdata['points_possible']) < .002) {
-                $classes .= ' qfilter-100';
-            }
-            if (trim($qdata['feedback']) !== '') {
-                $classes .= ' qfilter-fb';
-            }
-            if (empty($qdata['work'])) {
-                $classes .= ' qfilter-nowork';
-            }
-			echo "<div class=\"$classes bigquestionwrap\">";
-			
-			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
-
-			if ($isgroup > 0 && !$groupdup) {
-				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
-				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
-					echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
-				} else {
-					echo '</b> (empty)</p>';
-				}
-			}
-
-			$teacherreview = $line['userid'];
-			/*
-			To re-enable, need to define before $qdata, but figure another way to
-			get answeights/points.
-			if ($qtype=='multipart') {
-				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$answeights);
-			} else {
-				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
-			}
-			*/
-			echo '<div class=scrollpane>';
-			echo '<div class="questionwrap questionpane">';
-			echo '<div class="question" id="questionwrap'.$cnt.'">';
-			echo $qdata['html'];
-			echo '<script type="text/javascript">
-				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("questionwrap'.$cnt.'"));
-				});
-				</script>';
-			echo '</div></div>';
-
-			if (!empty($qdata['work'])) {
-				echo '<div class="questionpane viewworkwrap">';
-                echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
-                echo '<div class="introtext" style="display:none;">';
-                if ($qdata['worktime'] !== '0') {
-                    echo '<div class="small">' . _('Last Changed').': '.$qdata['worktime'].'</div>';
-                }
-                echo  $qdata['work'].'</div></div>';
-			}
-			echo '</div>';
-			echo "<div class=scoredetails>";
-			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
-			if ($isgroup > 0 && !$groupdup) {
-				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
-			}
-			if ($isgroup) {
-
-			}
-
-			if (!empty($qdata['singlescore'])) {
-				$qdata['answeights'] = [1];
-			}
-			$multiEntry = (count($qdata['answeights'])>1);
-			// loop over parts
-			for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
-				// get points on this part
-
-				if (!empty($qdata['singlescore'])) {
-					$pts = round($qdata['score'],3);
-				} else if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
-					$pts = round($qdata['scoreoverride'] * $qdata['points_possible'] * $qdata['answeights'][$pn], 3);
-				} else if (isset($qdata['scoreoverride']) && isset($qdata['scoreoverride'][$pn])) {
-					if (isset($qdata['parts'][$pn]['points_possible'])) {
-						$pts = round($qdata['scoreoverride'][$pn] * $qdata['parts'][$pn]['points_possible'], 3);
-					} else {
-						$pts = round($qdata['scoreoverride'][$pn] * $qdata['points_possible'] * $qdata['answeights'][$pn], 3);
-					}
-				} else if (count($qdata['parts'])==1 && $qdata['parts'][0]['try']==0) {
-					$pts = 'N/A';
-				} else {
-					$pts = $qdata['parts'][$pn]['score'];
-				}
-
-				// get possible on this part
-				$ptposs = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
-
-				if ($canedit) {
-					$boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
-					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
-					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
-					if ($rubric != 0) {
-						$fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);
-						echo printrubriclink($rubric, $ptposs,"scorebox$boxid","fb-". $loc.'-'. Sanitize::onlyInt($line['userid']), $fbref);
-					}
-				} else {
-					echo Sanitize::encodeStringForDisplay($pts);
-				}
-				echo '/'.Sanitize::encodeStringForDisplay($ptposs).' ';
-			}
-
-			if ($multiEntry && $canedit) {
-				$togr = array();
-				if (isset($qdata['parts'])) {
-					foreach ($qdata['parts'] as $k=>$partinfo) {
-						if (!empty($partinfo['req_manual'])) {
-							$togr[] = Sanitize::onlyInt($k);
-						}
-					}
-				}
-				$fullscores = array();
-				for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
-					$fullscores[$pn] = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
-				}
-				$fullscores = implode(',', $fullscores);
-
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
-				if (count($togr)>0) {
-					$togr = implode(',',$togr);
-					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
-				}
-			} else if ($canedit) {
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
-			}
-
-			if (!empty($qdata['other_tries'])) {
-                $maxtries = 0;
-                foreach ($qdata['other_tries'] as $pn=>$tries) {
-                    if (count($tries)>1) {
-                        $maxtries = count($tries);
-                        break;
+                } else {
+                    // it's possible only one part is unattempted
+                    $unattempted = true;
+                    foreach ($qdata['parts'] as $partdata) {
+                        if ($partdata['try'] > 0) {
+                            $unattempted = false;
+                            break;
+                        }
+                    }
+                    if ($unattempted) {
+                        $classes = 'qfilter-unans';
+                    } else {
+                        $classes = 'qfilter-zero';
                     }
                 }
-                if ($maxtries > 0) {
-                    echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
-                    echo '<div id="alltries'.$cnt.'" style="display:none;">';
+                if (abs($qdata['score'] - $qdata['points_possible']) < .002) {
+                    $classes .= ' qfilter-100';
+                }
+                if (trim($qdata['feedback']) !== '') {
+                    $classes .= ' qfilter-fb';
+                }
+                if (empty($qdata['work'])) {
+                    $classes .= ' qfilter-nowork';
+                } else {
+                    $classes .= ' qfilter-work';
+                }
+                if ($groupdup) {
+                    $classes .= ' groupdup';
+                }
+                $lastchange = Sanitize::encodeStringForDisplay($qdata['lastchange'] ?? '');
+                echo "<div class=\"$classes bigquestionwrap\" data-lastchange=\"$lastchange\">";
+                
+                echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
+
+                if ($isgroup > 0 && !$groupdup) {
+                    echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
+                    if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
+                        echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
+                    } else {
+                        echo '</b> (empty)</p>';
+                    }
+                }
+
+                $teacherreview = $line['userid'];
+                /*
+                To re-enable, need to define before $qdata, but figure another way to
+                get answeights/points.
+                if ($qtype=='multipart') {
+                    $GLOBALS['questionscoreref'] = array("scorebox$cnt",$answeights);
+                } else {
+                    $GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
+                }
+                */
+                echo '<div class=scrollpane>';
+                echo '<div class="questionwrap questionpane">';
+                echo '<div class="question" id="questionwrap'.$cnt.'">';
+                echo $qdata['html'];
+                echo '<script type="text/javascript">
+                    $(function() {
+                        var useMQ = ' . ((empty($qdata['jsparams']['noMQ']) && $userprefUseMQ) ? 'true' : 'false') . ';
+                        imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', useMQ, document.getElementById("questionwrap'.$cnt.'"));
+                    });
+                    </script>';
+                echo '</div></div>';
+
+                if (!empty($qdata['work'])) {
+                    echo '<div class="questionpane viewworkwrap">';
+                    echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
+                    echo '<div class="introtext" style="display:none;">';
+                    if ($qdata['worktime'] !== '0') {
+                        echo '<div class="small">' . _('Last Changed').': '.$qdata['worktime'].'</div>';
+                    }
+                    echo  $qdata['work'].'</div></div>';
+                }
+                echo '</div>';
+                echo "<div class=scoredetails>";
+                echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
+                if ($isgroup > 0 && !$groupdup) {
+                    echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
+                }
+                if ($isgroup) {
+
+                }
+
+                if (!empty($qdata['singlescore'])) {
+                    $qdata['answeights'] = [1];
+                }
+                $multiEntry = (count($qdata['answeights'])>1);
+                // loop over parts
+                for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
+                    // get points on this part
+
+                    if (!empty($qdata['singlescore'])) {
+                        $pts = round($qdata['score'],3);
+                    } else if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
+                        $pts = round($qdata['scoreoverride'] * $qdata['points_possible'] * $qdata['answeights'][$pn], 3);
+                    } else if (isset($qdata['scoreoverride']) && isset($qdata['scoreoverride'][$pn])) {
+                        if (isset($qdata['parts'][$pn]['points_possible'])) {
+                            $pts = round($qdata['scoreoverride'][$pn] * $qdata['parts'][$pn]['points_possible'], 3);
+                        } else {
+                            $pts = round($qdata['scoreoverride'][$pn] * $qdata['points_possible'] * $qdata['answeights'][$pn], 3);
+                        }
+                    } else if (count($qdata['parts'])==1 && $qdata['parts'][0]['try']==0) {
+                        $pts = 'N/A';
+                    } else if (isset($qdata['parts'][$pn]['score'])) {
+                        $pts = $qdata['parts'][$pn]['score'];
+                    } else {
+                        $pts = 0;
+                    }
+
+                    // get possible on this part
+                    $ptposs = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
+
+                    if ($canedit) {
+                        $boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
+                        echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . '-'.$vernum . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\" pattern=\"N\/A|\d*\.?\d*\">";
+                        echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . '-'.$vernum . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
+                        if ($rubric != 0) {
+                            $fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);
+                            echo printrubriclink($rubric, $ptposs,"scorebox$boxid","fb-". $vernum .'-'. $loc.'-'. Sanitize::onlyInt($line['userid']), $fbref);
+                        }
+                    } else {
+                        echo Sanitize::encodeStringForDisplay($pts);
+                    }
+                    echo '/'.Sanitize::encodeStringForDisplay($ptposs).' ';
+                }
+
+                if ($multiEntry && $canedit) {
+                    $togr = array();
+                    if (isset($qdata['parts'])) {
+                        foreach ($qdata['parts'] as $k=>$partinfo) {
+                            if (!empty($partinfo['req_manual'])) {
+                                $togr[] = Sanitize::onlyInt($k);
+                            }
+                        }
+                    }
+                    $fullscores = array();
+                    for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
+                        $fullscores[$pn] = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
+                    }
+                    $fullscores = implode(',', $fullscores);
+
+                    echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
+                    if (count($togr)>0) {
+                        $togr = implode(',',$togr);
+                        echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
+                    }
+                } else if ($canedit) {
+                    echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
+                }
+
+                if (!empty($qdata['other_tries'])) {
+                    $maxtries = 0;
                     foreach ($qdata['other_tries'] as $pn=>$tries) {
-                        if (count($qdata['other_tries']) > 1) {
+                        if (count($tries)>1) {
+                            $maxtries = count($tries);
+                            break;
+                        }
+                    }
+                    if ($maxtries > 0) {
+                        echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
+                        echo '<div id="alltries'.$cnt.'" style="display:none;">';
+                        foreach ($qdata['other_tries'] as $pn=>$tries) {
+                            if (count($qdata['other_tries']) > 1) {
+                                echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+                            }
+                            foreach ($tries as $tn=>$try) {
+                                echo '<div>'._('Try').' '.($tn+1).': ';
+                                formatTry($try,$cnt,$pn,$tn);
+                                echo '</div>';
+                            }
+                        }
+                        echo '</div>';
+                    }
+                }
+
+                if (!empty($qdata['autosaves'])) {
+                    echo ' &nbsp; <button type=button onclick="toggletryblock(\'autosaves\','.$cnt.')">'._('Show autosaves').'</button>';
+                    echo '<div id="autosaves'.$cnt.'" style="display:none;">';
+                    echo '<p class="subdued">'._('Autosaves have been entered by the student but not submitted for grading, so are not included in the scoring.').'</p>';
+                    foreach ($qdata['autosaves'] as $pn=>$tries) {
+                        if (count($qdata['autosaves']) > 1) {
                             echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
                         }
                         foreach ($tries as $tn=>$try) {
-                            echo '<div>'._('Try').' '.($tn+1).': ';
                             formatTry($try,$cnt,$pn,$tn);
-                            echo '</div>';
                         }
                     }
                     echo '</div>';
                 }
-			}
 
-			if (!empty($qdata['autosaves'])) {
-				echo ' &nbsp; <button type=button onclick="toggletryblock(\'autosaves\','.$cnt.')">'._('Show autosaves').'</button>';
-				echo '<div id="autosaves'.$cnt.'" style="display:none;">';
-				echo '<p class="subdued">'._('Autosaves have been entered by the student but not submitted for grading, so are not included in the scoring.').'</p>';
-				foreach ($qdata['autosaves'] as $pn=>$tries) {
-					if (count($qdata['autosaves']) > 1) {
-						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
-					}
-					foreach ($tries as $tn=>$try) {
-						formatTry($try,$cnt,$pn,$tn);
-					}
-				}
-				echo '</div>';
-			}
+                echo "<br/>"._("Question Feedback").": ";
+                if (!$canedit) {
+                    echo '<div>';
+                    echo Sanitize::outgoingHtml($qdata['feedback']);
+                    echo '</div>';
+                } else if ($_SESSION['useed']==0) {
+                    echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'. $vernum.'-'. $loc.'-'.Sanitize::onlyInt($line['userid']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
+                    echo Sanitize::encodeStringForDisplay($qdata['feedback'], true);
+                    echo '</textarea>';
+                } else {
+                    echo '<div class="fbbox skipmathrender" id="fb-'. $vernum.'-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
+                    echo Sanitize::outgoingHtml($qdata['feedback']);
+                    echo '</div>';
+                }
+                echo '<br/>' . _('Question').' #'.($loc+1);
+                echo ', '._('version').' '.($qdata['ver']+1);
+                echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
+                        'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
+                        'to' => $line['userid'])) . "\">Use in Message</a>";
+                echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
+                if (!empty($qdata['timeactive']['total']) || !empty($qdata['lastchange'])) {
+                    echo '<br/>';
+                    if (!empty($qdata['timeactive']['total'])) {
+                        echo _('Time spent on this version').': ';
+                        echo round($qdata['timeactive']['total']/60, 1)._(' minutes').'. ';
+                    }
+                    if (!empty($qdata['lastchange'])) {
+                        echo _('Last Changed').' '.$qdata['lastchange'];
+                    }
+                }
+                echo "</div>\n"; //end review div
+                echo '</div>'; //end wrapper div
 
-			echo "<br/>"._("Question Feedback").": ";
-			if (!$canedit) {
-				echo '<div>';
-				echo Sanitize::outgoingHtml($qdata['feedback']);
-				echo '</div>';
-			} else if ($_SESSION['useed']==0) {
-				echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
-				echo Sanitize::encodeStringForDisplay($qdata['feedback'], true);
-				echo '</textarea>';
-			} else {
-				echo '<div class="fbbox skipmathrender" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
-				echo Sanitize::outgoingHtml($qdata['feedback']);
-				echo '</div>';
-			}
-			echo '<br/>Question #'.($loc+1);
-			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
-					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
-                    'to' => $line['userid'])) . "\">Use in Message</a>";
-            echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
-            if (!empty($qdata['timeactive']['total']) || !empty($qdata['lastchange'])) {
-                echo '<br/>';
-                if (!empty($qdata['timeactive']['total'])) {
-                    echo _('Time spent on this version').': ';
-                    echo round($qdata['timeactive']['total']/60, 1)._(' minutes').'. ';
-                }
-                if (!empty($qdata['lastchange'])) {
-                    echo _('Last Changed').' '.$qdata['lastchange'];
-                }
+                $cnt++;
             }
-			echo "</div>\n"; //end review div
-			echo '</div>'; //end wrapper div
-			if ($groupdup) {
-				echo '</div>';
-			}
-			$cnt++;
-		}
+        }
 		$assess_record->saveRecordIfNeeded();
 	}
+    echo '</div>'; //qlistwrap
 	if ($canedit) {
-		echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+        echo '<p>'.sprintf(_('Grading Question %s in %s'), $curqloc, Sanitize::encodeStringForDisplay($aname)).'</p>';
+
+		echo '<button type="submit">';
+        if ($page == -1 || $page == count($stulist)-1) {
+            echo _('Save Changes');
+        } else {
+            echo _('Save Changes and Next Student');
+        }
+        echo '</button> ';
+        if ($page == -1 || $page == count($stulist)-1) {
+            if ($prevqid > -1) {
+                echo '<button type=submit name=prevqid value="'.Sanitize::onlyInt($prevqid).'">'._('Save and Prev Question').'</button>';
+            }
+            if ($nextqid > -1) {
+                echo '<button type=submit name=nextqid value="'.Sanitize::onlyInt($nextqid).'">'._('Save and Next Question').'</button>';
+            }
+        }
 	}
 	} else {
 		echo '<p><b>'._('No submission to show').'</b></p>';

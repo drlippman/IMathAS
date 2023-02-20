@@ -65,6 +65,10 @@ if ($myrights<20) {
 					}
 					$remlist = implode(',', $oklib);
 				}
+                if ($remlist == '') {
+                    echo _("No selected libraries can be deleted");
+                    exit;
+                }
 				$DBH->beginTransaction();
 				// $remlist now only contains libraries that are OK to delete
 				//now actually delete the libraries

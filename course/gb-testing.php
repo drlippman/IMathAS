@@ -6,12 +6,10 @@ require("../init.php");
 
 
 $cid = Sanitize::courseId($_GET['cid']);
-if (isset($teacherid)) {
-	$isteacher = true;
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
+$stu = 0;
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
+
 if ($isteacher || $istutor) {
 	$canviewall = true;
 } else {
@@ -167,7 +165,7 @@ require("../footer.php");
 
 
 function gbinstrdisp() {
-	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$staticroot,
 		$tutorsection,$includeendmsg,$assessGbUrl;
 	$hidenc = 1;
 	$includeendmsg = true;
@@ -336,7 +334,7 @@ function gbinstrdisp() {
 				}
 				if (isset($gbt[$i][1][$j][0])) {
 					echo $gbt[$i][1][$j][0];
-					if ($gbt[$i][1][$j][3]==1) {
+					if (!empty($gbt[$i][1][$j][3])) {
 						echo ' (NC)';
 					}
 				} else {
@@ -345,7 +343,7 @@ function gbinstrdisp() {
 				if ($isteacher) {
 					echo '</a>';
 				}
-				if ($gbt[$i][1][$j][1]==1) {
+				if (!empty($gbt[$i][1][$j][1])) {
 					echo '<sup>*</sup>';
 				}
 			} else if ($gbt[0][1][$j][6]==2) { //discuss

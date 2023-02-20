@@ -1,7 +1,7 @@
 <?php
 //A collection of chemistry routines
 //
-//Version 0.3 October 19, 2021
+//Version 0.31 May 7, 2022
 
 global $allowedmacros;
 array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily","chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
@@ -10,6 +10,7 @@ array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_g
 //formats a compound for display in as HTML
 function chem_disp($c) {
 	$c = preg_replace('/_(\d+)/','<sub>$1</sub>',$c);
+	$c = preg_replace('/\^(\d+\+|\d+\-|\+|\-)/','<sup>$1</sup>',$c);
 	return str_replace(' ','',$c);
 }
 
@@ -52,6 +53,10 @@ function chem_isotopedisp($el,$sup,$sub,$noitalic=false) {
 //returns the chemical symbol given the atomic number
 function chem_getsymbol($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getsymbol: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][0];
 }
 
@@ -59,13 +64,20 @@ function chem_getsymbol($n) {
 //returns the atomic number given the chemical symbol
 function chem_getnumber($s) {
 	global $chem_numberbyatom;
-	return $chem_numberbyatom[$s];
+    if (!isset($chem_numberbyatom[$s])) {
+        echo "chem_getnumber: unknown symbol $s";
+    }
+	return ($chem_numberbyatom[$s] ?? 0);
 }
 
 //chem_getname(atomic number)
 //returns the chemical name given the atomic number
 function chem_getname($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getname: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][1];
 }
 
@@ -73,6 +85,10 @@ function chem_getname($n) {
 //returns the chemical standard atomic weight given the atomic number
 function chem_getweight($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getweight: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][3];
 }
 
@@ -81,6 +97,10 @@ function chem_getweight($n) {
 //beware: some elements return weird non-numeric values
 function chem_getmeltingpoint($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getmeltingpoint: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][4];
 }
 
@@ -89,6 +109,10 @@ function chem_getmeltingpoint($n) {
 //beware: some elements return weird non-numeric values
 function chem_getboilingpoint($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getboilingpoint: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][5];
 }
 
@@ -98,6 +122,10 @@ function chem_getboilingpoint($n) {
 //    "Transition Metal", "Lanthanide",  or "Actinide"
 function chem_getfamily($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getfamily: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][6];
 }
 
@@ -328,7 +356,9 @@ function chem_makeioniccompound($cation,$anion) {
 			echo "Anion not found.";
 		}
 	}
-
+    if (!isset($cation) || !isset($anion)) {
+        return false;
+    }
 	$lcm = lcm($cation[1],$anion[1]);
 	$catsub = $lcm/$cation[1];
 	if ($catsub==1) {
@@ -789,7 +819,7 @@ $GLOBALS['chem_compounds'] = array(
 		array('Ammonium chloride','N H_4 Cl'),
 		array('Ammonium chlorate','N H_4 Cl O_3'),
 		array('Ammonium perchlorate','N H_4 Cl O_4'),
-		array('Ammonium bicarbonate','N H_4 H CO_3'),
+		array('Ammonium bicarbonate','N H_4 H C O_3'),
 		array('Ammonium nitrate','N H_4 N O_3'),
 		array('Ammonium hydroxide','N H_4 O H'),
 		array('Sodium borohydride','Na B H_4'),
@@ -808,7 +838,7 @@ $GLOBALS['chem_compounds'] = array(
 		array('Sodium nitrate','Na N O_3'),
 		array('Sodium hypochlorite','Na O Cl'),
 		array('Sodium hydroxide','Na O H'),
-		array('Sodium thiocyanate','Na S CN'),
+		array('Sodium thiocyanate','Na S C N'),
 		array('Sodium hydrosulfide','Na S H'),
 		array('Sodium carbonate','Na_2 C O_3'),
 		array('Sodium sulfite','Na_2 S O_3'),

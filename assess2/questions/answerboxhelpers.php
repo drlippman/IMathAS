@@ -18,13 +18,14 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}
-	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_!]+/','',$tocheck);
+	//why?  $cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_!]+/','',$tocheck);
+    $cleanans = $tocheck;
 
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
 	$cleanans = str_replace("exp","e",$cleanans);
-	$cleanans = preg_replace('/\^\((-?[\d\.]+)\)([^\d]|$)/','^$1$2', $cleanans);
-
+	$cleanans = preg_replace('/\^\((-?[\d\.]+)\)([^\d]|$)/','^$1 $2', $cleanans);
+    
 	if (is_numeric($cleanans) && $cleanans>0 && $cleanans<1) {
 		$cleanans = ltrim($cleanans,'0');
 	}
@@ -52,7 +53,12 @@ function checkreqtimes($tocheck,$rtimes) {
 			} else if ($list[$i]=='ignore_symbol') {
 				$cleanans = str_replace($list[$i+1],'',$cleanans);
 				continue;
-			}
+			} else if ($list[$i]=='ignore_spaces') {
+				if ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1') {
+					$cleanans = str_replace(' ','',$cleanans);
+				}
+				continue;
+            }
 			$comp = substr($list[$i+1],0,1);
 			if (substr($list[$i+1],1,1)==='=') { //<=, >=, ==, !=
 				if ($comp=='<' || $comp=='>') {
@@ -73,8 +79,12 @@ function checkreqtimes($tocheck,$rtimes) {
 						$all_numbers = $matches[0];
 						array_walk($all_numbers, 'ltrimzero');
 					}
-					$lookfor = ltrim(str_replace(array('-', ' '),'',substr($lookfor,1)), ' 0');
-					$nummatch = count(array_keys($all_numbers,$lookfor));
+					$lookfor = trim(substr($lookfor,1));
+                    if ($lookfor[0] == '-') {
+                        $lookfor = substr($lookfor,1);
+                    }
+                    $lookfor = ltrim($lookfor, ' 0');
+                    $nummatch = count(array_keys($all_numbers,$lookfor));
 				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
 					$regex = str_replace('/','\\/',substr($lookfor,6));
 					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
@@ -317,6 +327,7 @@ function ntupleToString($ntuples) {
 }
 
 function parseInterval($str, $islist = false) {
+    if (strlen($str)<5) { return false; }
 	if ($islist) {
 		$ints = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/',$str);
 	} else {
@@ -325,7 +336,8 @@ function parseInterval($str, $islist = false) {
 
 	$out = array();
 	foreach ($ints as $int) {
-    $int = trim($int);
+        $int = trim($int);
+        if (strlen($int) < 5) { return false;}
 		$i = array();
 		$i['lb'] = $int[0];
 		$i['rb'] = $int[strlen($int)-1];
@@ -361,6 +373,57 @@ function parsedIntervalToString($parsed, $islist) {
 	} else {
 		return implode('U', $out);
 	}
+}
+
+function parseChemical($string) {
+    $string = str_replace(['<->','<=>'], 'rightleftharpoons', $string);
+    $string = str_replace(['to','rarr','implies'], '->', $string);
+    $string = preg_replace('/\^{(.*?)}/', '^($1)', $string);
+    $string = preg_replace('/\(\(([^\(\)]*)\)\)/', '($1)', $string);
+    $string = str_replace('^+','^(+)', $string);
+    $parts = preg_split('/(->|rightleftharpoons)/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $reactiontype = (count($parts) > 1) ? $parts[1] : null;
+    $sides = [];
+    for ($i=0; $i < count($parts); $i += 2) {
+        $sideparts = [];
+        $lastcut = 0;
+        $str = $parts[$i];
+        $strlen = strlen($str);
+        $depth = 0;
+        // cut by + signs, parse out coefficient and chemical
+        for ($p=1; $p < $strlen - 1; $p++) {
+            $c = $str[$p];
+            if ($c == '+' && $depth == 0 && $str[$p-1] != '^' && $str[$p-1] != '_') {
+                preg_match('/^\s*(\d+)?\s*\*?\s*(.*?)\s*$/', substr($str, $lastcut, $p-$lastcut), $matches);
+                $sideparts[] = [
+                    $matches[1] === '' ? 1 : intval($matches[1]),
+                    str_replace(' ','',$matches[2])
+                ];
+                $lastcut = $p+1;
+            } else if ($c == '(' || $c == '[') {
+                $depth++;
+            } else if ($c == ')' || $c == ']') {
+                $depth--;
+            }
+        }
+        preg_match('/^\s*(\d+)?\s*\*?\s*(.*?)\s*$/', substr($str, $lastcut), $matches);
+        $sideparts[] = [
+            $matches[1] === '' ? 1 : intval($matches[1]),
+            str_replace(' ','',$matches[2])
+        ];
+        // sort by chemical to put in standard order
+        usort($sideparts, function($a,$b) {
+            return strcmp($a[1],$b[1]);
+        });
+        $sides[] = $sideparts;
+    }
+    // if dual direction reaction, sort sides to standarize
+    if (count($sides)>1 && $reactiontype == 'rightleftharpoons') {
+        usort($sides, function($a,$b) {
+            return strcmp($a[0][1], $b[0][1]);
+        });
+    }
+    return [$sides, $reactiontype];
 }
 
 //checks the format of a value
@@ -424,7 +487,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
+		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\(?\-?\d+\)?\)?)$/',$totest)) {
 			return false;
 		}
 	}
@@ -485,8 +548,8 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 		$shorttip = $islist?sprintf(_('Enter a %s of fractions or integers'), $listtype):_('Enter a fraction or integer');
 	} else if (in_array('reducedfraction',$ansformats)) {
 		if (in_array('fracordec',$ansformats)) {
-			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 or -2), or as an exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?sprintf(_('Enter a %s of reduced fractions, integers, or exact decimals'), $listtype):_('Enter a reduced fraction, integer, or exact decimal');
+			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 or -2), or as a decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?sprintf(_('Enter a %s of reduced fractions, integers, or decimals'), $listtype):_('Enter a reduced fraction, integer, or decimal');
 		} else {
 			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6) or as an integer (like 4 or -2)'), $eword);
 			$shorttip = $islist?sprintf(_('Enter a %s of reduced fractions or integers'), $listtype):_('Enter a reduced fraction or integer');
@@ -508,11 +571,11 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 		}
 	} else if (in_array('fracordec',$ansformats)) {
 		if (in_array("allowmixed",$ansformats)) {
-			$tip .= sprintf(_('Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?sprintf(_('Enter a %s of mixed numbers, fractions, or exact decimals'), $listtype):_('Enter a mixed number, fraction, or exact decimal');
+			$tip .= sprintf(_('Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer (like 4 or -2), or decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?sprintf(_('Enter a %s of mixed numbers, fractions, or decimals'), $listtype):_('Enter a mixed number, fraction, or decimal');
 		} else {
-			$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?sprintf(_('Enter a %s of fractions or exact decimals'), $listtype):_('Enter a fraction or exact decimal');
+			$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?sprintf(_('Enter a %s of fractions or decimals'), $listtype):_('Enter a fraction or decimal');
 		}
 	} else if (in_array('decimal',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as an integer or decimal value (like 5 or 3.72)'), $eword);
@@ -588,6 +651,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$infsoln = _('Infinite number of solutions');
     $partnum = $qn%1000;
     $out = '';
+    $includeinf = in_array('nosolninf',$ansformats);
 
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
@@ -613,13 +677,15 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'" role="group" ';
   if (preg_match('/aria-label=".*?"/', $answerbox, $arialabel)) {
     $answerbox = preg_replace('/aria-label=".*?"/',
-      'aria-label="'.Sanitize::encodeStringForDisplay($specsoln).'"', $answerbox);
+      'aria-label="'.Sanitize::encodeStringForDisplay(str_replace('`','',$specsoln)).'"', $answerbox);
     $out .= $arialabel[0];
   }
   $out .= '>';
 	$out .= '<ul class="likelines">';
-	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
-	if ($la=='DNE' || $la=='oo') {
+	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" ' .
+        (($la!='DNE' && (!$includeinf || $la!='oo'))?'checked':'') . 
+        '><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
+	if ($la=='DNE' || ($includeinf && $la=='oo')) {
 		$laqs = $la;
 		$answerbox = str_replace('value="'.$la.'"','value=""', $answerbox);
 	} else {
@@ -632,7 +698,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '</li>';
 
 	$out .= '<li><input type="radio" id="qs'.$qn.'-d" name="qs'.$qn.'" value="DNE" '.($laqs=='DNE'?'checked':'').'><label for="qs'.$qn.'-d">'.$nosoln.'</label></li>';
-	if (in_array('nosolninf',$ansformats)) {
+	if ($includeinf) {
 		$out .= '<li><input type="radio" id="qs'.$qn.'-i" name="qs'.$qn.'" value="inf" '.($laqs=='oo'?'checked':'').'><label for="qs'.$qn.'-i">'.$infsoln.'</label></li>';
 	}
 	$out .= '</ul>';
@@ -669,7 +735,7 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 	if (preg_match('/^no\s*solution/',$answer) || $answer===$nosoln) {
 		$answer = 'DNE';
 	}
-	$qs = $_POST["qs$qn"];
+	$qs = $_POST["qs$qn"] ?? '';
 	if ($qs=='DNE') {
 		$givenans = "DNE";
 	} else if ($qs=='inf') {
@@ -704,6 +770,7 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
     $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
 	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
+    $str = str_replace('&ZeroWidthSpace;', '', $str);
   if (strtoupper(trim($str))==='DNE') {
     $str = 'DNE';
   }
@@ -763,4 +830,8 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
     }
     // no value - return empty string
     return '';
+}
+
+function rewritePlusMinus($str) {
+    return preg_replace('/(.*?)\+\-(.*?)(,|$)/','$1+$2,$1-$2$3',$str);
 }

@@ -120,9 +120,10 @@ var myMQeditor = (function($) {
               {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
               {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
               {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
+              {l:'\\ne', pr:'<span class="mq-binary-operator">&ne;</span>'},
               {p:'or', c:'w', w:'\\text{ or }'},
               {p:'DNE', 'sm':2},
-              {p:'all reals', c:'w', w:'\\text{all reals}', s:2}
+              {p:'all reals', c:'w', w:'\\text{all reals}', 'sm':2}
             ]
           }
         ]
@@ -314,13 +315,14 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 4,
             contents: [
-              {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
-              {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
-              {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
-              {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
-              {p:'or', c:'w', w:'\\text{ or }'},
-              {p:'DNE', 'sm':2},
-              {p:'all reals', c:'w', w:'\\text{all reals}', s:2}
+                {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
+                {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
+                {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
+                {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
+                {l:'\\ne', pr:'<span class="mq-binary-operator">&ne;</span>'},
+                {p:'or', c:'w', w:'\\text{ or }'},
+                {p:'DNE', 'sm':2},
+                {p:'all reals', c:'w', w:'\\text{all reals}', 'sm':2}  
             ]
           }
         ]
@@ -445,7 +447,7 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             {'b':'.'},
-            (calcformat.match(/(list|set)/) ||
+            (calcformat.match(/(list|set\b)/) ||
             qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
@@ -477,7 +479,7 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
-            (calcformat.match(/(list|set)/) ||
+            (calcformat.match(/(list|set\b)/) ||
              qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} :
@@ -485,7 +487,7 @@ var myMQeditor = (function($) {
           ]
         };
       } else {
-        if (calcformat.match(/(list|set)/) || qtype.match(/(interval|string|ntuple)/)) {
+        if (calcformat.match(/(list|set\b)/) || qtype.match(/(interval|string|ntuple)/)) {
           baselayout.tabs[0].tabcontent[2].contents[14] = {'b':','};
         } else if (calcformat.match(/equation/)) { // replace , with =
           baselayout.tabs[0].tabcontent[2].contents[14] = {'b':'='};
@@ -493,6 +495,14 @@ var myMQeditor = (function($) {
         if (calcformat.match(/nodecimal/)) {
           baselayout.tabs[0].tabcontent[2].contents[13] = {s:1};
         }
+      }
+      if (calcformat.match(/allowplusminus/)) {
+        baselayout.tabs[6].tabcontent[0].contents[17] = {l:'\\pm', pr:'<span class="mq-binary-operator">&plusmn;</span>'};
+      }
+      if (calcformat.match(/inequality/)) {
+        //baselayout.tabs[6].tabcontent[0].contents[8].s = 0.5;
+        //baselayout.tabs[6].tabcontent[0].contents.splice(9,0,  {l:'\\ne', s:0.5, pr:'<span class="mq-binary-operator">&ne;</span>'});
+        baselayout.tabs[3].p = 'Ineq';
       }
     } else {
       baselayout = $.extend(true, [], underLayout3);
@@ -520,12 +530,14 @@ var myMQeditor = (function($) {
           );
         }
       }
-      if (qtype=='numfunc' && calcformat.match(/inequality/)) {
-        baselayout.tabs[3].enabled = true;
-        baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
-      }
+      
     }
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic)/)) {
+    if (qtype=='numfunc' && calcformat.match(/inequality/)) {
+      baselayout.tabs[3].enabled = true;
+      baselayout.tabs[3].tabcontent[0].contents.splice(5,3);
+      baselayout.tabs[3].tabcontent[0].s = 5;
+    }
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|setexp|chemeqn)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
@@ -542,7 +554,7 @@ var myMQeditor = (function($) {
       }
     } else if ((qtype.match(/matrix/) || calcformat.match(/matrix/)) && !calcformat.match(/matrixsized/)) {
       baselayout.tabs[5].enabled = true;
-    } else if (calcformat.match(/set/)) {
+    } else if (calcformat.match(/set\b/)) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
@@ -552,7 +564,7 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
-        contents: [{b:'i', v:1}]
+        contents: [{b: calcformat.match(/allowjcomplex/)?'j':'i', v:1}]
       }, {s:.1});
     } else if (calcformat.match(/vector/)) {
       baselayout.tabs[0].tabcontent.unshift({
@@ -566,11 +578,42 @@ var myMQeditor = (function($) {
         baselayout.tabs[0].tabcontent[0].contents = [
             {l:'\\vee',pr:'<span class="mq-binary-operator">∨</span>'},
             {l:'\\wedge',pr:'<span class="mq-binary-operator">∧</span>'},
-            {b:'~'},
+            {l:'\\oplus',pr:'<span class="mq-binary-operator">⊕</span>'},
             {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+            {l:'\\neg',pr:'¬'},
+            {b:'~'},
             {l:'\\implies',pr:'<span class="mq-binary-operator">⇒</span>'},
             {l:'\\iff',pr:'<span class="mq-binary-operator">⇔</span>'}
         ];
+        if (layoutstyle !== 'OSK') {
+            baselayout.tabs[0].tabcontent[0].s = 4;
+        }
+    }
+    if (calcformat.match(/setexp/)) {
+      baselayout.tabs[0].p = "Set Exp";
+      baselayout.tabs[0].tabcontent[0].contents = [
+          {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
+          {l:'\\cap',pr:'<span class="mq-binary-operator">∩</span>'},
+          {l:'\\^c',c:"w",pr:'<span class="mq-non-leaf mq-empty"></span><sup class="mq-binary-operator">c</sup>'},
+          {l:'\\ominus',pr:'<span class="mq-binary-operator">⊖</span>'},
+          {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'}
+      ];
+      if (layoutstyle !== 'OSK') {
+          baselayout.tabs[0].tabcontent[0].s = 3;
+      }
+    }
+    if (qtype=='chemeqn') {
+        baselayout.tabs[0].tabcontent[0].contents = [
+            {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
+            {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
+            {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+        ];
+        if (calcformat.match(/reaction/)) {
+            baselayout.tabs[0].tabcontent[0].contents.push(
+                {l:'\\to',pr:'<span class="mq-binary-operator">→</span>'},
+                {l:'\\rightleftharpoons',pr:'<span class="mq-binary-operator">⇌</span>'}
+            );
+        }
         if (layoutstyle !== 'OSK') {
             baselayout.tabs[0].tabcontent[0].s = 3;
         }
@@ -587,7 +630,7 @@ var myMQeditor = (function($) {
           }, {s:.1});
         } else {
           baselayout.tabs.splice(1, 0, {
-            p: 'Vars',
+            p: (qtype=='chemeqn') ? 'Atoms' : 'Vars',
             enabled: true,
             tabcontent: [{
               flow: 'row',
@@ -734,5 +777,9 @@ MQ.config({
   restrictMismatchedBrackets: true,
   autoCommands: 'pi theta root sqrt ^oo degree',
   autoParenOperators: true,
-  addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
+  addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;'], 
+                'xor': ['VanillaSymbol', '\\oplus ', '&oplus;'], 
+                'uu': ['VanillaSymbol', '\\cup ', '&cup;'], 
+                'nn': ['VanillaSymbol', '\\cap ', '&cap;'],
+                'rightleftharpoons': ['BinaryOperator', '\\rightleftharpoons ', '&rlhar;']}
 });

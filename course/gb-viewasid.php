@@ -22,7 +22,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$asid = Sanitize::onlyInt($_GET['asid']);
 	}
 
-	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
+	if (!isset($_GET['uid']) || (!$isteacher && !$istutor)) {
 		$get_uid = $userid;
 	} else {
 		$get_uid = Sanitize::onlyInt($_GET['uid']);
@@ -542,13 +542,14 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$_SESSION['coursetheme'] = $coursetheme;
 		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=031417"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
 			require("../includes/rubric.php");
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120"></script>';
 			if ($_SESSION['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
 		}
+        $useeqnhelper = 0;
 		require("../assessment/header.php");
 		echo "<style type=\"text/css\">p.tips {	display: none;} .pseudohidden {visibility:hidden;position:absolute;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {

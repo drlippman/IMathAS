@@ -21,7 +21,7 @@ class ExceptionFuncs {
 		$this->latepasses = $latepasses;
 		$this->latepasshrs = $latepasshrs;
 		$this->isstu = $isstu;  // !isset($_SESSION['stuview']) && !$actas
-		$this->courseenddate = $GLOBALS['courseenddate'];
+		$this->courseenddate = $GLOBALS['courseenddate'] ?? 2000000000;
 	}
 	public function setLatepasses($lp) {
 		$this->latepasses = $lp;
@@ -88,6 +88,7 @@ class ExceptionFuncs {
 	// returns: noissue, started, expired
 	public function getTimelimitStatus($aid, $ver) {
 		global $DBH;
+        $now = time();
 		if ($ver > 1) {
 			$query = 'SELECT iar.timelimitexp,iar.status,ia.timelimit FROM imas_assessment_records AS iar ';
 			$query .= 'JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ';
@@ -114,7 +115,6 @@ class ExceptionFuncs {
 			$query .= 'WHERE ias.userid=? AND ia.id=?';
 			$stm = $DBH->prepare($query);
 			$stm->execute(array($this->uid, $aid));
-			$now = time();
 			if ($stm->rowCount()==0) {
 				return 'noissue';
 			} else {

@@ -44,6 +44,9 @@ if ($isstudent) {
 // load user's assessment record - always looking at scored
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';

@@ -27,12 +27,19 @@ function formpoly($coef,$deg) {
 		if (!is_array($deg)) {
 			$deg = explode(',',$deg);
 		}
-		for ($i=0;$i<min(count($deg),count($coef));$i++) {
+        if (count($coef) != count($deg)) {
+            echo "formpoly: coef and deg should have equal lengths";
+        }
+        $max = max(array_keys($coef));
+		for ($i=0;$i<=$max;$i++) {
+            if (!isset($coef[$i]) || !isset($deg[$i])) { continue; }
 			$poly[$i][0] = $coef[$i]*1;
 			$poly[$i][1] = $deg[$i];
 		}
 	} else {
-		for ($i=0;$i<count($coef);$i++) {
+        $max = max(array_keys($coef));
+		for ($i=0;$i<=$max;$i++) {
+            if (!isset($coef[$i])) { $deg--; continue; }
 			$poly[$i][0] = $coef[$i]*1;
 			$poly[$i][1] = $deg;
 			$deg--;
@@ -50,6 +57,7 @@ function formpoly($coef,$deg) {
 //multiplicites (optional): an array of multiplicites of the roots.  Assumed to
 //  be all 1 if not provided
 function formpolyfromroots($a,$roots,$mult=1) {
+    if (count($roots)==0) { return [[$a,0]]; }
 	for($i=0; $i<count($roots); $i++) {
         if (is_array($roots[$i])) { // complex a+bi as [a,b]
             $newpoly = formpoly(array(1,-2*$roots[$i][0],($roots[$i][0])**2 + ($roots[$i][1])**2),2);

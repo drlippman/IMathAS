@@ -466,7 +466,7 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=1;
-		$page_gbcatSelect = array();
+		$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 		$page_gbcatSelect['val'][0] = 0;
 		$page_gbcatSelect['label'][0] ='Default';
 		if ($stm->rowCount()>0) {

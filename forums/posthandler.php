@@ -44,7 +44,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		if ($isteacher) {
-			$type = $_POST['type'];
+			$type = $_POST['type'] ?? 0;
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
 				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
@@ -73,7 +73,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$thisposttime = $now-1;
 		if ($isteacher) {
-			if ($_POST['releaseon']=='Date') {
+			if (isset($_POST['releaseon']) && $_POST['releaseon']=='Date') {
 				require_once("../includes/parsedatetime.php");
 				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
@@ -168,14 +168,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 					$autoscore = explode(',',$autoscore);
 					if ($autoscore[2]>0) { //assigning points
-						$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
-						$stm->execute(array($forumid, $userid));
-						if ($stm->fetchColumn(0) <= $autoscore[3]) {
-							$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
-							$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
-							$stm = $DBH->prepare($query);
-							$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
-						}
+                        $stm = $DBH->prepare("SELECT userid FROM imas_forum_posts WHERE id=?");
+                        $stm->execute([$threadid]);
+                        if ($stm->fetchColumn(0) != $userid) { // only give points for replies if not own thread
+                            $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
+                            $stm->execute(array($forumid, $userid));
+                            if ($stm->fetchColumn(0) <= $autoscore[3]) {
+                                $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+                                $query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
+                                $stm = $DBH->prepare($query);
+                                $stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
+                            }
+                        }
 					}
 				}
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
@@ -293,7 +297,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
 				$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['newfile-'.$i]['name'])));
-				if (trim($_POST['newfiledesc-'.$i])=='') {
+				if (trim($_POST['newfiledesc-'.$i] ?? '')=='') {
 					$_POST['newfiledesc-'.$i] = $userfilename;
 				}
 				$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
@@ -323,7 +327,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$useeditor = "message";
 		$loadgraphfilter = true;
 		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-
+        if (!empty($_GET['embed'])) {
+            $placeinhead .= '<script>function submitpost() { document.getElementsByTagName("form")[0].submit();}</script>';
+        }
 		require("../header.php");
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
@@ -356,6 +362,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			echo '<div id="headerposthandler" class="pagetitle"><h1>Modify Post</h1></div>';
 		} else {
+            $line['subject'] = "";
+            $line['message'] = "";
+            $line['posttype'] = 0;
+            $line['files'] = '';
+            $line['tag'] = '';
+            $line['isanon'] = 0;
+            $replyby = null;
 			if ($_GET['modify']=='reply') {
 
 					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
@@ -367,9 +380,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 				$sub = str_replace('"','&quot;',$sub);
 				$line['subject'] = "Re: $sub";
-				$line['message'] = "";
-                $line['files'] = '';
-				$replyby = null;
+				
 				if ($isteacher) {
 					$stm = $DBH->prepare("SELECT points FROM imas_forums WHERE id=:id");
 					$stm->execute(array(':id'=>$forumid));
@@ -383,11 +394,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						exit;
 					}
 				}
-				$line['subject'] = "";
-				$line['message'] = "";
-				$line['posttype'] = 0;
-				$line['files'] = '';
-                $line['tag'] = '';
+
                 if (isset($_SESSION['ffilter'.$forumid])) {
                     $curstugroupid = $_SESSION['ffilter'.$forumid];
                     if ($curstugroupid == -1) {
@@ -396,7 +403,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
                 } else {
                     $curstugroupid = 0;
                 }
-				$replyby = null;
+
 				echo "<h1>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
 					$showa = false;
@@ -565,7 +572,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
             if ($isteacher && 
                 ($_GET['modify']=='new' || (isset($line['userid']) && $line['userid']==$userid)) && 
-                ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))
+                ($_GET['modify']=='new' || $_GET['modify']==$threadid || ($_GET['modify']!='reply' && $line['parent']==0))
             ) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";
 				echo "<input type=radio name=type id=type0 value=0 ";
@@ -845,7 +852,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$tochange = array();
 
 		function addchildren($b,&$tochange,$children) {
-			if (count($children[$b])>0) {
+			if (!empty($children[$b])) {
 				foreach ($children[$b] as $child) {
 					$tochange[] = $child;
 					if (isset($children[$child]) && count($children[$child])>0) {

@@ -20,6 +20,8 @@
       >
         {{ textToggleLabel }}
       </button>
+      <a :href="settingsLink">{{ $t("links.settings") }}</a>&nbsp;
+      <a :href="questionsLink">{{ $t("links.questions") }}</a>
     </p>
     <div
       class="scrollpane fulldisp"
@@ -129,6 +131,12 @@ export default {
       } else {
         return store.assessInfo.interquestion_text;
       }
+    },
+    settingsLink () {
+      return '../course/addassessment2.php?id=' + store.aid + '&cid=' + store.cid;
+    },
+    questionsLink () {
+      return '../course/addquestions2.php?aid=' + store.aid + '&cid=' + store.cid;
     }
   },
   methods: {

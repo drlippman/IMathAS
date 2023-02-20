@@ -50,6 +50,9 @@ class AssessHelpers
   		$assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            if (!isset($timelimitmults[$row['userid']])) {
+                continue; // skip instructor records or other lingering ones
+            }
             $assess_info->setException(
                 $row['userid'],
                 isset($exceptions[$row['userid']]) ? $exceptions[$row['userid']] : false,
@@ -73,7 +76,7 @@ class AssessHelpers
                     $gbscore = $assess_record->getGbScore();
                     if ($orig_gb_score['gbscore'] != $gbscore['gbscore']) {
                         $aidposs = $assess_info->getSetting('points_possible');
-                        calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+                        calcandupdateLTIgrade($lti_sourcedid, $aid, $row['userid'], $gbscore['gbscore'], true, $aidposs, false);
                     }
                 }
             }
@@ -121,7 +124,7 @@ class AssessHelpers
                     ($assess_record->getStatus()&64)==64)
                 ) {
                     $aidposs = $assess_info->getSetting('points_possible');
-                    calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+                    calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs, false);
                 }
             }
   		}
@@ -191,7 +194,7 @@ class AssessHelpers
         if (strlen($lti_sourcedid) > 1) {
           $gbscore = $assess_record->getGbScore();
           $aidposs = $assess_info->getSetting('points_possible');
-          calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+          calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs, false);
         }
         $cnt++;
       }

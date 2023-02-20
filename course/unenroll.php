@@ -12,7 +12,7 @@ ini_set("max_execution_time", "600");
 		require("../footer.php");
 		exit;
 	}
-	$get_uid = Sanitize::simpleString($_GET['uid']);
+	$get_uid = Sanitize::simpleString($_GET['uid'] ?? '');
 
 	if (isset($_POST['dounenroll'])) { //do unenroll - postback
 		if ($get_uid=="selected") {
@@ -27,7 +27,7 @@ ini_set("max_execution_time", "600");
 			$tounenroll[] = $get_uid;
 		}
 
-		if (!isset($_POST['delwikirev'])) {
+		if (isset($_POST['delwikirev'])) {
 			$delwikirev = intval($_POST['delwikirev']);
 		} else {
 			$delwikirev = 0;
@@ -53,10 +53,13 @@ ini_set("max_execution_time", "600");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=".Sanitize::courseId($cid) . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&r=".Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&r=".Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
+        if (empty($_POST['checked'])) {
+            $_POST['checked'] = [];
+        }
 		if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_POST['posted']) && $_POST['posted']=="Unenroll")) {
 			/*if (isset($_POST['ca']) && $secfilter==-1) {
 				//if "check all" and not section limited, mark as all to deliver "all students" message
@@ -75,8 +78,9 @@ ini_set("max_execution_time", "600");
 			}*/
 			$stm = $DBH->prepare("SELECT COUNT(imas_students.id) FROM imas_students,imas_users WHERE imas_students.userid=imas_users.id AND imas_students.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
+            $stuInClass = $stm->fetchColumn(0);
 
-			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
+			if ($stuInClass == 0 || count($_POST['checked']) == $stuInClass)  {
 				$get_uid = 'all';
 			} else {
 				$get_uid = 'selected';
@@ -87,7 +91,7 @@ ini_set("max_execution_time", "600");
 			$resultUserList = $DBH->prepare("SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid");
 			$resultUserList->execute(array(':courseid'=>$cid));
 		} else if ($get_uid=="selected") {
-			if (count($_POST['checked'])>0) {
+			if (!empty($_POST['checked'])) {
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
 				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
@@ -163,7 +167,7 @@ ini_set("max_execution_time", "600");
 			//	<input type=checkbox name="removewithdrawn" value="1" />
 			//</p>
 			} else if ($get_uid=="selected") {
-				if (count($_POST['checked'])==0) {
+				if (empty($_POST['checked'])) {
 					if ($calledfrom=='lu') {
 						echo "No users selected.  <a href=\"listusers.php?cid=".Sanitize::courseId($cid)."\">Try again</a></form>";
 					}
@@ -199,7 +203,7 @@ ini_set("max_execution_time", "600");
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=".Sanitize::courseId($cid)."'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."'\">";
 			}
 ?>
 		</p>

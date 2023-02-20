@@ -22,6 +22,9 @@
 		$stm->execute(array(':gbcategory'=>$_POST['remove']));
 		$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
 		$stm->execute(array(':gbcategory'=>$_POST['remove']));
+        $oldgbref = '~~'.intval($_POST['remove']).'~~'; // a bit hacky, but OK
+        $stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text, '$oldgbref', '~~0~~') WHERE courseid=:courseid AND text LIKE 'exttool:%'");
+        $stm->execute(array(':courseid'=>$cid));
 		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id");
 		$stm->execute(array(':id'=>$_POST['remove']));
 		if ($stm->rowCount()>0) {
@@ -43,8 +46,11 @@
 		$usersort = $_POST['usersort'];
 		//name,scale,scaletype,chop,drop,weight
 		$ids = array_keys($_POST['weight']);
+
 		foreach ($ids as $id) {
-			$name = $_POST['name'][$id];
+            if ($id != '0') {
+			    $name = $_POST['name'][$id];
+            }
 			$scale = $_POST['scale'][$id];
 			if (trim($scale)=='') {
 				$scale = 0;
@@ -90,7 +96,7 @@
 					$stm->execute(array(':courseid'=>$cid, ':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop,
 						':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype));
 				}
-			} else if ($id==0) {
+			} else if ($id=='0') {
 				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide,$calctype";
 			} else {
 				$stm = $DBH->prepare("UPDATE imas_gbcats SET name=:name,scale=:scale,scaletype=:scaletype,chop=:chop,dropn=:dropn,weight=:weight,hidden=:hidden,calctype=:calctype WHERE id=:id");
@@ -103,10 +109,11 @@
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
 		if (!isset($_POST['gbmode100000'])) {$defgbmode += 100000;}
 		if (!isset($_POST['gbmode200000'])) {$defgbmode += 200000;}
-		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
+		$stugbmode = ($_POST['stugbmode1'] ?? 0) + ($_POST['stugbmode2'] ?? 0) + ($_POST['stugbmode4'] ?? 0) + ($_POST['stugbmode8'] ?? 0);
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
-		if (isset($_POST['submit'])) {
+
+        if (isset($_POST['submit'])) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($_GET['cid'])."&refreshdef=true"."&r=".Sanitize::randomQueryStringParam());
 			exit;
 		}
@@ -131,6 +138,7 @@
 		var td = document.createElement("td");
 		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" value="" type="text">\';
 		tr.appendChild(td);
+        var useweights = !!document.getElementById("usew1").checked;
 
 		var td = document.createElement("td");
 		td.innerHTML = \'<select name="hide[new\'+addrowcnt+\']"> \' +
@@ -160,7 +168,19 @@
 			\'<input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text"> scores\';
 		tr.appendChild(td);
 
+        var td = document.createElement("td");
+        td.className = "fixedtotcell"
+        if (useweights) {
+            td.style.display = "none";
+        }
+		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text">\';
+		tr.appendChild(td);
+
 		var td = document.createElement("td");
+        td.className = "weightcell"
+        if (!useweights) {
+            td.style.display = "none";
+        }
 		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text">\';
 		tr.appendChild(td);
 

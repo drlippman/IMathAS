@@ -99,6 +99,7 @@ array( 'input'=>'divide', 'output'=>'-:', 'definition'=>TRUE),
 array( 'input'=>'&deg;', 'output'=>'^@', 'definition'=>TRUE),
 array( 'input'=>'@', 'tex'=>'circ'),
 array( 'input'=>'o+', 'tex'=>'oplus'),
+array( 'input'=>'o-', 'tex'=>'ominus'),
 array( 'input'=>'ox', 'tex'=>'otimes'),
 array( 'input'=>'o.', 'tex'=>'odot'),
 array( 'input'=>'sum', 'underover'=>TRUE),
@@ -141,12 +142,14 @@ array( 'input'=>'~', 'tex' => 'sim'),
 // Logical symbols
 array( 'input'=>'and', 'space'=>TRUE),
 array( 'input'=>'or', 'space'=>TRUE),
+array( 'input'=>'xor', 'tex'=>'oplus'),
 array( 'input'=>'not', 'tex'=>'neg'),
 array( 'input'=>'=>', 'tex'=>'Rightarrow'),
 array( 'input'=>'implies', 'output'=>'=>', 'definition'=>TRUE),
 array( 'input'=>'if', 'space'=>TRUE),
 array( 'input'=>'<=>', 'tex'=>'Leftrightarrow'), 
 array( 'input'=>'iff', 'output'=>'<=>', 'definition'=>TRUE),
+array( 'input'=>'rightleftharpoons', 'tex'=>'rightleftharpoons'),
 array( 'input'=>'AA', 'tex'=>'forall'),
 array( 'input'=>'EE', 'tex'=>'exists'),
 array( 'input'=>'_|_', 'tex'=>'bot'),
@@ -162,6 +165,7 @@ array( 'input'=>'dt', 'output'=>'{:d t:}', 'definition'=>TRUE),
 array( 'input'=>'oint'),
 array( 'input'=>'del', 'tex'=>'partial'),
 array( 'input'=>'grad', 'tex'=>'nabla'),
+array( 'input'=>'hbar'),
 array( 'input'=>'+-', 'tex'=>'pm'),
 array( 'input'=>'O/', 'tex'=>'emptyset'),
 array( 'input'=>'oo', 'tex'=>'infty'),
@@ -568,11 +572,11 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
-		if ($st[0]== " ") {
+		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$newFrag .= '\\text{'.$st.'}';
-		if ($st[strlen($st)-1]== " ") {
+		if (strlen($st)>0 && $st[strlen($st)-1]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$str = $this->AMremoveCharsAndBlanks($str,$i+1);
@@ -648,7 +652,7 @@ function AMTparseSexpr($str) {
 	} else {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$texsymbol = $this->AMTgetTeXsymbol($symbol);
-		if ($texsymbol[0]=='\\' || (isset($symbol['isop']) && $symbol['isop']==true)) {
+		if ((strlen($texsymbol)>0 && $texsymbol[0]=='\\') || (isset($symbol['isop']) && $symbol['isop']==true)) {
 			return array($texsymbol,$str);
 		} else {
 			return array('{'.$texsymbol.'}',$str);

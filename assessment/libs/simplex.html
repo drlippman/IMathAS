@@ -4,13 +4,15 @@
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2 or later
 <BR>&nbsp;
-<BR>&nbsp;File Version : 26
+<BR>&nbsp;File Version : 43
 <BR>
 <BR><ul>
 <li><a href="#simplex">simplex</a></li>
+
 <li><a href="#simplexchecksolution">simplexchecksolution</a></li>
 <li><a href="#simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></li>
 <li><a href="#simplexcreateinequalities">simplexcreateinequalities</a></li>
+<li><a href="#simplexcreatelatexinequalities">simplexcreatelatexinequalities</a></li>
 <li><a href="#simplexconverttodecimals">simplexconverttodecimals</a></li>
 <li><a href="#simplexconverttofraction">simplexconverttofraction</a></li>
 <li><a href="#simplexdebug">simplexdebug</a></li>
@@ -26,9 +28,14 @@
 <li><a href="#simplexpivot">simplexpivot</a></li>
 <li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexreadsolution">simplexreadsolution</a></li>
+<li><a href="#simplexreadsolutionarray">simplexreadsolutionarray</a></li>
 <li><a href="#simplexsetentry">simplexsetentry</a></li>
 <li><a href="#simplexsolutiontolatex">simplexsolutiontolatex</a></li>
 <li><a href="#simplexsolve2">simplexsolve2</a></li>
+<li><a href="#simplexver">simplexver</a></li>
+</ul>
+***** Internal Functions  ***** 
+<BR><ul>
 <li><a href="#createsimplexelement">createsimplexelement</a></li>
 <li><a href="#simplextoarray">simplextoarray</a></li>
 <li><a href="#verifytype">verifytype</a></li>
@@ -36,6 +43,9 @@
 <li><a href="#hasmixedconstraints">hasmixedconstraints</a></li>
 <li><a href="#simplexfindsolutioninlist">simplexfindsolutioninlist</a></li>
 <li><a href="#simplexhasmixedconstrants">simplexhasmixedconstrants</a></li>
+</ul>
+***** DEPRECIATED Functions ***** 
+<BR><ul>
 <li><a href="#simplexdisplaytable">simplexdisplaytable</a></li>
 <li><a href="#simplexnumberofsolutions">simplexnumberofsolutions</a></li>
 <li><a href="#simplexsolve">simplexsolve</a></li>
@@ -143,6 +153,37 @@ function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, 
 <BR>					0 do not use math ticks
 <BR>			default 1		use math ticks
 <BR>					Use 0 if you are building an answerbox matrix.
+<BR>
+<BR>&nbsp;showfractions: either 0 or 1
+<BR>				0 shows decimals
+<BR>		default 1 shows fractions
+<BR>
+<BR>&nbsp;includeinequalities: either 0 or 1
+<BR>					  0 does append the inequality and right hand sinde number ("<=",35)
+<BR>			  default 1 include the full inequality
+<BR>
+<BR>&nbsp;RETURNS: an array of strings
+    <BR><h3><a name="simplexcreatelatexinequalities">simplexcreatelatexinequalities</a></h3>
+        &nbsp;simplexcreatelatexinequalities()
+        &nbsp;function simplexcreateinequalities(type, objectivevariable, objective, constraints, [headers, displayASCIIticks, showfractions, includeinequalities] )
+<BR>&nbsp;Creates an array of string that correspond to each line of the simple inequalities in latex form
+<BR>
+<BR>&nbsp;INPUTS:
+<BR>
+<BR>&nbsp;type:		a string that contains either "max" or "min"
+<BR>&nbsp;objectivevariable: the name of the objective function, like f of g.
+<BR>&nbsp;objective:   list or array of the coefficients 
+<BR>&nbsp;constraints: an array that contains the inequality information. Constraints are in the
+<BR>			  form of array(array(3,1,0),"<=",35)
+<BR>			  constraint first  part is a list or array of the coefficients in the inequality
+<BR>			  constraint second part is the inequality *<= or >=)
+<BR>			  constraint third  part is the number on the other side of the inequality
+<BR>
+<BR>&nbsp;OPTIONAL
+<BR>
+<BR>&nbsp;headers:	 list or array of the variables names to use  
+<BR>	  default "x1,x2,x3, ..." for max
+<BR>	  default "y1,y2,y3, ..." for min
 <BR>
 <BR>&nbsp;showfractions: either 0 or 1
 <BR>				0 shows decimals
@@ -376,10 +417,10 @@ simplexreadsolution(simplexmatrix,type,showfractions)
 <BR>
 <BR>&nbsp;INPUTS
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
-<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
-<BR>&nbsp;&nbsp;showfractions: either 0 or 1
-<BR>				0 shows decimals
-<BR>		default 1 shows fractions 
+<BR>&nbsp;type: a string that contains either "max" or "min" 
+<BR>&nbsp;showfractions: either 0 or 1
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions
 <BR>
 <BR>&nbsp;RETURNS: an array(solution values for sm, IsOptimized)
 <BR>
@@ -396,6 +437,34 @@ simplexreadsolution(simplexmatrix,type,showfractions)
 <BR>&nbsp;where g contains the minimium value
 <BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
 <BR>
+    <BR><h3><a name="simplexreadsolutionarray">simplexreadsolutionarray</a></h3>
+        simplexreadsolutionarray(simplexmatrix,type,showfractions)
+        <BR>
+        <BR>&nbsp;This reads the simplex matrix to find the current solution to the optimization problem.  It returns
+        <BR>&nbsp;an array that contains the solution.
+        <BR>
+        <BR>&nbsp;INPUTS
+        <BR>&nbsp;simplexmatrix: a valid simplex matrix.
+        <BR>&nbsp;type: a string that contains either "max" or "min" 
+        <BR>&nbsp;showfractions: either 0 or 1
+        <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
+        <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions
+        <BR>
+        <BR>&nbsp;RETURNS: an array(solution values for sm, IsOptimized)
+        <BR>
+        <BR>&nbsp;For Max solutions the solution is an array in the form of:
+        <BR>
+        <BR>&nbsp;x1,  x2, etc,  s1,  s2,  etc.,  f,  IsOptimized
+        <BR>&nbsp;where f contains the maximum value
+        <BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
+        <BR>
+        <BR>
+        <BR>&nbsp;For Min solutions the solution is an array in the form of:
+        <BR>
+        <BR>&nbsp;x1,  x2, etc,  y1,  y2,  etc.,  g,  IsOptimized
+        <BR>&nbsp;where g contains the minimium value
+        <BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
+        <BR>
 <BR><h3><a name="simplexsetentry">simplexsetentry</a></h3>
 simplexsetentry(simplexmatrix,row,col,numerator,denominator)
 <BR>
@@ -455,6 +524,14 @@ simplexsolve2(simplexmatrix,type,[showfractions=1])
 <BR>&nbsp;&nbsp;4 | simplex (1st pivot option from (3,0)) | simplex (2nd pivot option from (3,0))| simplex (1 pivot)				     |
 <BR>&nbsp;&nbsp;5 | simplex (0 pivot)					  | simplex (0 pivot)					 | simplex (0 pivot)				     |
 <BR>
+    <BR><h3><a name="simplexver">simplexver</a></h3>
+        &nbsp;simplexver()
+        <BR>&nbsp;
+        <BR>&nbsp;This function returns the internal version number of the simplex file
+        <BR>
+        <BR>&nbsp;INPUTS: None
+        <BR>
+        <BR>&nbsp;RETURNS: the file verion number
 <BR><h3><a name="createsimplexelement">createsimplexelement</a></h3>
 &nbsp;*********************************************************************************************************************************
 <BR>&nbsp;*********************************************************************************************************************************

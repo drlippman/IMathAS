@@ -330,7 +330,7 @@
 		}
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
-		if ($isnewitem && isset($_POST['doupload'])) {
+		if (!empty($isnewitem) && isset($_POST['doupload'])) {
 			header(sprintf('Location: %s/course/uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
                 Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem)));
 		} else if ($from == 'gbtesting') {
@@ -367,8 +367,31 @@
 		}
 	}
 
+    $stm = $DBH->prepare("SELECT COUNT(DISTINCT section), COUNT(DISTINCT code) FROM imas_students WHERE courseid=:courseid");
+    $stm->execute(array(':courseid'=>$cid));
+    $seccodecnt = $stm->fetch(PDO::FETCH_NUM);
+    $hassection = ($seccodecnt[0]>0);
+    $hascodes = ($seccodecnt[1]>0);
+
+    if ($hassection) {
+        $stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
+        $stm->execute(array(':courseid'=>$cid));
+        if ($stm->fetchColumn(0)==0) {
+            $sortorder = "sec";
+        } else {
+            $sortorder = "name";
+        }
+        if (empty($tutorsection)) {
+            $stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid AND section IS NOT NULL AND section<>'' ORDER BY section");
+            $stm->execute(array(':courseid'=>$cid));
+            $sectionnames = $stm->fetchAll(PDO::FETCH_COLUMN,0);
+        }
+    } else {
+        $sortorder = "name";
+    }
+
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=091721\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=012722\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
@@ -417,7 +440,7 @@
 		 	padding-top: .5em;
 		 }
 		 </style>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051720"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
 	$useeditor = "noinit";
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
@@ -626,49 +649,33 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 ?>
 
 <?php
-		/*$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
-		$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$cid));
-		if ($stm->fetchColumn(0)>0) {
-			$hassection = true;
-		} else {
-			$hassection = false;
-		}
-		*/
-		$stm = $DBH->prepare("SELECT COUNT(DISTINCT section), COUNT(DISTINCT code) FROM imas_students WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$seccodecnt = $stm->fetch(PDO::FETCH_NUM);
-		$hassection = ($seccodecnt[0]>0);
-		$hascodes = ($seccodecnt[1]>0);
-
-		if ($hassection) {
-			$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$cid));
-			if ($stm->fetchColumn(0)==0) {
-				$sortorder = "sec";
-			} else {
-				$sortorder = "name";
-			}
-		} else {
-			$sortorder = "name";
-		}
+        if ($_GET['grades']=='all' && $gbItem!='new' && !empty($_GET['isolate']) && $hassection && empty($tutorsection)) {
+            echo '<p>'._('Section').': ';
+            echo '<select id="secfiltersel" onchange="chgsecfilter(this)">';
+            echo '<option value="-1"' . ($secfilter == -1 ? ' selected' : '') . '>';
+            echo _('All') . '</option>';
+            foreach ($sectionnames as $secname) {
+                echo  '<option value="' . Sanitize::encodeStringForDisplay($secname) . '"';
+                if ($secname==$secfilter) {
+                    echo  ' selected';
+                }
+                echo  '>' . Sanitize::encodeStringForDisplay($secname) . '</option>';
+            }
+            echo '</select>';
+            echo '<script type="text/javascript">
+            function chgsecfilter(el) {
+                var sec = el.value;
+                var toopen = "addgrades.php?cid='.$cid.'&grades=all&isolate=true&gbitem='.$gbItem.'&secfilter=" + encodeURIComponent(sec);
+                window.location = toopen;
+            }
+            </script></p>';
+        }
 
 		if ($_GET['grades']=='all' && $gbItem!='new' && $isteacher) {
 			printf("<p><a href=\"uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s\">Upload Grades</a></p>",
                 Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid, Sanitize::encodeUrlParam($gbItem));
 		}
-		/*
-		if ($hassection && ($_GET['gbitem']=='new' || $_GET['grades']=='all')) {
-			if ($sortorder=="name") {
-				echo "<p>Sorted by name.  <a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}&sortorder=sec\">";
-				echo "Sort by section</a>.</p>";
-			} else if ($sortorder=="sec") {
-				echo "<p>Sorted by section.  <a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}&sortorder=name\">";
-				echo "Sort by name</a>.</p>";
-			}
-		}
-		*/
+		
 		echo '<div id="gradeboxes">';
 		if ($_SESSION['useed']==0) {
 			echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
@@ -790,7 +797,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
                 	echo 'X';
 			}
 			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
+			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" pattern=\"x|X|\d*\.?\d*\"/>";
 			if ($rubric != 0) {
 				echo printrubriclink($rubric,$points,"score". Sanitize::onlyint($row[0]),"feedback". Sanitize::onlyint($row[0]));
 			}

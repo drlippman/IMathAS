@@ -37,8 +37,12 @@ function ineqplot($funcs) {
 				$of[0] = '<='.$f[0];
 			}
 		}
-		$of[1] = $f[2];
-		$of[6] = $f[5];
+        if (isset($f[2])) { 
+		    $of[1] = $f[2];
+        }
+        if (isset($f[5])) {
+		    $of[6] = $f[5];
+        }
 		$outstr[] = implode(',', $of);
 	}
 	return showplot($outstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
@@ -75,7 +79,10 @@ function ineqbetweenplot($funcs) {
 	$shadedir = array();
 	foreach ($funcs as $k=>$function) {
 		$function = explode(",",$function);
-		$filltype = $function[1];
+        if (!isset($function[1])) { 
+            echo "Missing filltype in ineqbetweenplot";
+        }
+		$filltype = $function[1] ?? '';
 		$shadedir[$k] = $filltype;
 		if (!isset($function[2])) {$function[2] = '';}
 		if (!isset($function[4])) {$function[4] = 1;}
@@ -88,7 +95,7 @@ function ineqbetweenplot($funcs) {
 		}
 		//correct for parametric
 		if (substr($function[0],0,2)=='x=') {
-			$val = substr($function[0],2);
+			$val = evalnumstr(substr($function[0],2));
 			$ix = ($val-$xmin)/$dx;
 			if ($ix>0 && $ix<102) {
 				if ($filltype=='right') {

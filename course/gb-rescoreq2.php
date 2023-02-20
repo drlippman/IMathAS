@@ -41,18 +41,18 @@ if (isset($_POST['go'])) {
 		$assess_record->setTeacherInGb(true);
 		// do the rescore
         $assess_record->regradeQuestion($qid, $trytouse);
-        $assess_record->updateLTIscore();
+        $assess_record->updateLTIscore(true, false);
 		$assess_record->saveRecord();
 	}
 	$DBH->commit();
 
-	header('Location: ' . $GLOBALS['basesiteurl'] ."/course/addquestions.php?cid=$cid&aid=$aid");
+	header('Location: ' . $GLOBALS['basesiteurl'] ."/course/addquestions2.php?cid=$cid&aid=$aid");
 
 	exit;
 } else {
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($cid)."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._('Add/Remove Questions')."</a> ";
+	echo "&gt; <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._('Add/Remove Questions')."</a> ";
 	echo "&gt; "._('Regrade Question').'</div>';
 
 	echo '<div id="headergb-rescoreq" class="pagetitle"><h1>'._('Regrade Question').'</h1></div>';

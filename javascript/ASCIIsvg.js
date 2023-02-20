@@ -44,11 +44,13 @@ var border = defaultborder;
 var strokewidth, strokedasharray, stroke, fill;
 var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill, fontbackground;
 var fillopacity = .5;
-var markerstrokewidth = "1";
+var markerstrokewidth = 1;
 var markerstroke = "black";
 var markerfill = "yellow";
 var marker = "none";
 var arrowfill = stroke;
+var arrowrelsize = 1;
+var arrowoffset = 0;
 var dotradius = 4;
 var ticklength = 4;
 var axesstroke = "black";
@@ -845,9 +847,9 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
     u = [u[0]/d, u[1]/d];
     up = [-u[1],u[0]];
     var node = myCreateElementSVG("path");
-    node.setAttribute("d","M "+(w[0]-15*u[0]-4*up[0])+" "+
-      (w[1]-15*u[1]-4*up[1])+" L "+(w[0]-3*u[0])+" "+(w[1]-3*u[1])+" L "+
-      (w[0]-15*u[0]+4*up[0])+" "+(w[1]-15*u[1]+4*up[1])+" z");
+    node.setAttribute("d","M "+(w[0]-arrowrelsize*15*u[0]-arrowrelsize*4*up[0]-1*arrowoffset*u[0])+" "+
+      (w[1]-arrowrelsize*15*u[1]-arrowrelsize*4*up[1]-1*arrowoffset*u[1])+" L "+(w[0]-(1*markerstrokewidth+1*arrowoffset)*u[0])+" "+(w[1]-(1*markerstrokewidth+1*arrowoffset)*u[1])+" L "+
+      (w[0]-arrowrelsize*15*u[0]+arrowrelsize*4*up[0]-1*arrowoffset*u[0])+" "+(w[1]-arrowrelsize*15*u[1]+arrowrelsize*4*up[1]-1*arrowoffset*u[1])+" z");
     node.setAttribute("stroke-width", markerstrokewidth);
     node.setAttribute("stroke", stroke); /*was markerstroke*/
     node.setAttribute("fill", stroke); /*was arrowfill*/

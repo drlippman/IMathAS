@@ -136,8 +136,16 @@ class QuestionHtmlGenerator
         $thisq = $this->questionParams->getQuestionNumber() + 1;
         $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
         $printFormat = $this->questionParams->getPrintFormat();
+        $teacherInGb = $this->questionParams->getTeacherInGb();
 
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
+
+        $thiscourseid = (isset($GLOBALS['cid']) && is_numeric($GLOBALS['cid'])) ?
+            intval($GLOBALS['cid']) : 0;
+
+        if ($printFormat) {
+            $GLOBALS['capturechoiceslivepoll'] = true;
+        }
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
@@ -162,13 +170,16 @@ class QuestionHtmlGenerator
             if (isset($scorenonzero[$thisq]) && !is_array($scorenonzero[$thisq])) {
                 $scorenonzero[$thisq] = array($scorenonzero[$thisq]);
             }
+        } else if ($quesData['qtype'] == "conditional" && is_array($scoreiscorrect[$thisq])) {
+            $scoreiscorrect[$thisq] = $scoreiscorrect[$thisq][0];
+            $scorenonzero[$thisq] = $scorenonzero[$thisq][0];
         }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {
-          if (count($partattemptn) == 1 && isset($partattemptn[0])) {
+          if ($quesData['qtype'] != "multipart" && isset($partattemptn[0])) {
             $GLOBALS['assess2-curq-iscorrect'] = ($scoreiscorrect[$thisq] < 0 ? -1 : ($scoreiscorrect[$thisq]==1 ? 1 : 0));
-          } else {
+          } else if ($quesData['qtype'] == "multipart") {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
               if ($iidx==0 || !isset($scoreiscorrect[$thisq][$kidx])) {
@@ -199,21 +210,46 @@ class QuestionHtmlGenerator
           eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol']));
           eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
         } catch (\Throwable $t) {
+          $errsource = basename($t->getFile());
+          if (strpos($errsource, 'QuestionHtmlGenerator.php') !== false) {
+            $errsource = _('Common Control');
+          }
           $this->addError(
               _('Caught error while evaluating the code in this question: ')
-              . $t->getMessage());
+              . $t->getMessage()
+              . ' on line '
+              . $t->getLine()
+              . ' of '
+              . $errsource
+          );
+
         }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
+        $qtextvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
+
+        if (!$teacherInGb) {
+            $toevalqtxt = preg_replace('~(<p[^>]*>\[teachernote\].*?\[/teachernote\]</p>|\[teachernote\].*?\[/teachernote\])~ms','',$toevalqtxt);
+        } else {
+            $toevalqtxt = preg_replace_callback('~(<p[^>]*>\[teachernote\](.*?)\[/teachernote\]</p>|\[teachernote\](.*?)\[/teachernote\])~ms',
+                function($matches) {
+                    return '<div><input class=\\"dsbtn\\" type=\\"button\\" value=\\"'._('Show Instructor Note').'\\"/>' . 
+                        '<div class=\\"hidden dsbox\\" id=\\"dsboxTN'.uniqid().'\\">' . 
+                        (empty($matches[2]) ? $matches[3] : $matches[2]) . '</div></div>';
+                },$toevalqtxt);
+        }
         $toevalqtxt = str_replace('\\', '\\\\', $toevalqtxt);
         $toevalqtxt = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
 
         $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
+        $solnvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
+
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
         $toevalsoln = preg_replace('/\$answerbox(\[.*?\])?/', '', $toevalsoln);
+        
         // Reset the RNG to a known state after the question code has been eval'd.
         $this->randWrapper->srand($this->questionParams->getQuestionSeed() + 2);
 
@@ -288,16 +324,24 @@ class QuestionHtmlGenerator
             $varsForAnswerBoxGenerator[$vargenKey] = ${$vargenKey};
         }
 
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
+            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+            if (isset($onBeforeAnswerBoxGenerator) && is_callable($onBeforeAnswerBoxGenerator)) {
+                $onBeforeAnswerBoxGenerator();
+            }
+        }
+
         /*
          * Calculate answer weights and generate answer boxes.
          */
 
         // $answerbox must not be renamed, it is expected in eval'd code.
-        $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewloc = null;
+        $answerbox = $previewloc = null;
+        $entryTips = $displayedAnswersForParts = $jsParams = [];
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
-            if (!isset($anstypes)) {
+            if (empty($anstypes) || $anstypes[0]==='') {
               if ($GLOBALS['myrights'] > 10) {
                 $this->addError('Error in question: missing $anstypes for multipart or conditional question');
               }
@@ -307,21 +351,31 @@ class QuestionHtmlGenerator
             // Calculate answer weights.
             // $answeights - question writer defined
             if ($quesData['qtype'] == "multipart") {
-              if (isset($answeights)) {
-        				if (!is_array($answeights)) {
+                if (max(array_keys($anstypes)) != count($anstypes)-1) {
+                    echo 'Error: $anstypes does not have consecutive indexes. This may cause scoring issues.';
+                }
+                if (isset($answeights)) {
+        			if (!is_array($answeights)) {
         					$answeights = explode(",",$answeights);
-        				}
-        				$answeights = array_map('trim', $answeights);
-        				if (count($answeights) != count($anstypes)) {
-        					$answeights = array_fill(0, count($anstypes), 1);
-        				}
-        			} else {
-        				if (count($anstypes)>1) {
-        					$answeights = array_fill(0, count($anstypes), 1);
-        				} else {
-        					$answeights = array(1);
-        				}
-        			}
+                    }
+                    $answeights = array_map('trim', $answeights);
+                    if (count($answeights) != count($anstypes)) {
+                        $answeights = array_fill_keys(array_keys($anstypes), 1); 
+                    }
+                    $answeights = array_map(function($v) {
+                        if (is_numeric($v)) { 
+                            return $v;
+                        } else {
+                            return evalbasic($v);
+                        }
+                    }, $answeights);
+                } else {
+                    if (count($anstypes)>1) {
+                        $answeights = array_fill_keys(array_keys($anstypes), 1);
+                    } else {
+                        $answeights = array(1);
+                    }
+                }    
             }
 
             // Get the answers to all parts of this question.
@@ -369,7 +423,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($answeights[$_pnidx]!=0 || $quesData['qtype'] == "conditional")) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($quesData['qtype'] == "conditional" || !empty($answeights[$_pnidx]))) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -405,6 +459,8 @@ class QuestionHtmlGenerator
             // Generate answer boxes. (multipart question)
             foreach ($anstypes as $atIdx => $anstype) {
                 if (!empty($skipAnswerboxGeneration[$atIdx])) {
+                  $answerbox[$atIdx] = "";
+                  $previewloc[$atIdx] = "";
                   continue;
                 }
                 $questionColor = ($quesData['qtype'] == "multipart")
@@ -423,6 +479,7 @@ class QuestionHtmlGenerator
                     ->setAnswerType($anstype)
                     ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                     ->setIsMultiPartQuestion($this->isMultipart())
+                    ->setIsConditional($quesData['qtype'] == "conditional")
                     ->setQuestionPartNumber($atIdx)
                     ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
@@ -432,14 +489,13 @@ class QuestionHtmlGenerator
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                  $answerBoxGenerator->generate();
                 } catch (\Throwable $t) {
                   $this->addError(
                        _('Caught error while generating this question: ')
                        . $t->getMessage());
                   continue;
                 }
-
-                $answerBoxGenerator->generate();
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
@@ -452,6 +508,11 @@ class QuestionHtmlGenerator
                 if ($printFormat) {
                     $answerbox[$atIdx] = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox[$atIdx]);
                     $answerbox[$atIdx] = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox[$atIdx]);
+                    
+                    if ($anstype === 'choices') {
+                        $qanskey = array_search($jsParams[$qnRef]['livepoll_ans'], $jsParams[$qnRef]['livepoll_randkeys']);
+                        $displayedAnswersForParts[$atIdx] = chr(65+$qanskey) . ': ' . $displayedAnswersForParts[$atIdx];    
+                    }
                 }
                 // enact hidetips if set
                 if (!empty($hidetips) && (!is_array($hidetips) || !empty($hidetips[$atIdx]))) {
@@ -471,14 +532,13 @@ class QuestionHtmlGenerator
                 $scoremethodwhole == 'singlescore' ||
                 $scoremethodwhole == 'allornothing'
               ) ||
-              $quesData['qtype'] == 'conditional'
+              $quesData['qtype'] == 'conditional' && count($anstypes)>1
             ) {
               $jsParams['submitall'] = 1;
             }
         } else {
 
-
-            if ($GLOBALS['myrights'] > 10) {
+            if (!empty($GLOBALS['isquestionauthor'])) {
                 if (isset($anstypes)) {
                     $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
                 } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
@@ -512,6 +572,7 @@ class QuestionHtmlGenerator
                 ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                 ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
+                ->setIsConditional(false)
                 ->setStudentLastAnswers($lastAnswer)
                 ->setColorboxKeyword($questionColor)
                 ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0] ?? false);
@@ -530,6 +591,11 @@ class QuestionHtmlGenerator
             if ($printFormat) {
                 $answerbox = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox);
                 $answerbox = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox);
+
+                if ($quesData['qtype'] == 'choices') {
+                    $qanskey = array_search($jsParams[$qnRef]['livepoll_ans'], $jsParams[$qnRef]['livepoll_randkeys']);
+                    $displayedAnswersForParts[0] = chr(65+$qanskey) . ': ' . $displayedAnswersForParts[0];
+                }
             }
 
             // enact hidetips if set
@@ -564,7 +630,7 @@ class QuestionHtmlGenerator
          * Possibly adjust the showanswer if it doesn't look right
          */
         $doShowDetailedSoln = false;
-        if (isset($showanswer) && is_array($showanswer) && count($showanswer) < count($answerbox)) {
+        if (isset($showanswer) && is_array($showanswer) && is_array($answerbox) && count($showanswer) < count($answerbox)) {
             $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
             if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
                 // not enough showanswerloc boxes for all the parts.  
@@ -582,9 +648,12 @@ class QuestionHtmlGenerator
                 foreach ($showanswer as $kidx=>$atIdx) {
                     $_thisIsReady = true;
                     for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
-                        if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
+                        if (empty($doShowAnswerParts[$iidx]) && !$doShowAnswer) {
                             $_thisIsReady = false;
                             $doShowDetailedSoln = false;
+                            for ($siidx=$iidx; $siidx < $kidx; $siidx++) {
+                                $doShowAnswerParts[$siidx] = false;
+                            }
                             break;
                         } else if ($iidx < $kidx) {
                             $doShowAnswerParts[$iidx] = false;
@@ -596,6 +665,7 @@ class QuestionHtmlGenerator
                 $doShowAnswer = false; // disable automatic display of answers
             }
         }
+
         /*
          * Get the "Show Answer" button location.
          */
@@ -627,21 +697,25 @@ class QuestionHtmlGenerator
          *
          * Question content (raw HTML) is stored in: $evaledqtext
          */
-
+        $GLOBALS['qgenbreak1'] = __LINE__;
         try {
-          eval("\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
+          $prep = \genVarInit($qtextvars);
+          eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
 
         /*
          * Eval the solution code.
          *
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
-
-         eval("\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
+         $GLOBALS['qgenbreak2'] = __LINE__;
+         $prep = \genVarInit($solnvars);
+         eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
        } catch (\Throwable $t) {
           $this->addError(
               _('Caught error while evaluating the text in this question: ')
               . $t->getMessage());
+          $evaledqtext = '';
+          $evaledsoln = '';
         }
         $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
 
@@ -695,7 +769,7 @@ class QuestionHtmlGenerator
             $newqtext = '';
             $lastGroupDone = true;
             foreach ($seqParts as $k=>$seqPart) {
-              $thisGroupDone = $seqGroupDone[$k];
+              $thisGroupDone = !empty($seqGroupDone[$k]);
               preg_match_all('/<(input|select|textarea)[^>]*name="?qn(\d+)/', $seqPart, $matches);
               foreach ($matches[2] as $qnrefnum) {
                 $pn = $qnrefnum % 1000;
@@ -706,14 +780,14 @@ class QuestionHtmlGenerator
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
-                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && $answeights[$pn]!=0) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && !empty($answeights[$pn])) {
                   $thisGroupDone = false;
                 }
               }
               if ($lastGroupDone) { // add html to output
                 $newqtext .= '<p class="seqsep" role="heading" tabindex="-1">';
                 $newqtext .= sprintf(_('Part %d of %d'), $k+1, count($seqParts));
-                $newqtext .= '</p>' . $seqPart;
+                $newqtext .= '</p><div>' . $seqPart . '</div>';
               }
               $lastGroupDone = $thisGroupDone;
             }
@@ -834,6 +908,12 @@ class QuestionHtmlGenerator
             $externalReferences
         );
 
+        $question->setQuestionLastMod($quesData['lastmoddate']);
+
+        if (isset($onGetQuestion) && is_callable($onGetQuestion)) {
+            $onGetQuestion();
+        }
+
         return $question;
     }
 
@@ -911,25 +991,28 @@ class QuestionHtmlGenerator
         $hintloc = '';
 
         $lastkey = max(array_keys($hints));
+
         if ($qdata['qtype'] == "multipart" && is_array($hints[$lastkey])) { //individual part hints
             $hintloc = array();
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
+                if (!is_array($hintpart)) { continue; } // mixed formats
                 $lastkey = max(array_keys($hintpart));
-
+                $hintloc[$iidx] = '';
                 if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
                     $usenum = 10000;
                     $allcorrect = true;
+                    $maxatt = 0;
                     $showfor = array_map('intval', $hintpart[$lastkey][1]);
                     foreach ($showfor as $subpn) {
                         if (!isset($partattemptn[$subpn])) {
                             $partattemptn[$subpn] = 0;
                         }
-                        if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$subpn] == 1) {
-                           continue; // don't consider correct
+                        if (isset($scoreiscorrect[$thisq][$subpn]) && $scoreiscorrect[$thisq][$subpn] == 1) {
+                            continue; // don't consider correct
                         } else {
-                           $allcorrect = false;
+                            $allcorrect = false;
                         }
                         if ($partattemptn[$subpn] > $lastkey && $lastkey < $usenum) {
                             $usenum = $lastkey;
@@ -937,16 +1020,21 @@ class QuestionHtmlGenerator
                             $usenum = $partattemptn[$subpn];
                         }
                     }
-                    if ($allcorrect || $usenum == 10000) { 
+                    if ($allcorrect) {
+                        $maxatt = min($partattemptn)-1;
+                        if ($maxatt > $lastkey) {
+                            $usenum = $lastkey;
+                        } else {
+                            $usenum = max($maxatt,0);
+                        }
+                    }
+                    if ($usenum == 10000) { 
                         continue;
                     }
-                    if (is_array($hintpart[$usenum])) {
+                    if (!empty($hintpart[$usenum]) && is_array($hintpart[$usenum])) {
                         $hintpart[$usenum] = $hintpart[$usenum][0];
                     }
                 } else {
-                    if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
-                        continue;
-                    }
                     if (!isset($partattemptn[$iidx])) {
                         $partattemptn[$iidx] = 0;
                     }
@@ -954,6 +1042,9 @@ class QuestionHtmlGenerator
                         $usenum = $lastkey;
                     } else {
                         $usenum = $partattemptn[$iidx];
+                        if (!empty($scoreiscorrect[$thisq][$iidx]) && $scoreiscorrect[$thisq][$iidx]==1) {
+                            $usenum--;
+                        }
                     }
                 }
                 if (!empty($hintpart[$usenum])) {
@@ -968,14 +1059,23 @@ class QuestionHtmlGenerator
                     }
                 }
             }
-        } else if (!isset($scoreiscorrect) || $scoreiscorrect[$thisq] != 1) { //one hint for question
+        } else { //one hint for question
             if ($attemptn > $lastkey) {
                 $usenum = $lastkey;
             } else {
                 $usenum = $attemptn;
+                if (isset($scoreiscorrect) && ( 
+                    (!is_array($scoreiscorrect[$thisq]) && $scoreiscorrect[$thisq] == 1) ||
+                    (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) == 1)
+                )) {
+                    $usenum--;  // if correct, use prior hint
+                }
             }
-            if ($hints[$usenum] != '') {
-                if (strpos($hints[$usenum], '</div>') !== false) {
+            
+            if (!empty($hints[$usenum])) {
+                if (!is_string($hints[$usenum])) { // shouldn't be, but a hack to get old bad code from throwing errors.
+                    $hintloc = $hints[$usenum]; 
+                } else if (strpos($hints[$usenum], '</div>') !== false) {
                     $hintloc = $hints[$usenum];
                 } else if (strpos($hints[$usenum], 'button"') !== false) {
                     $hintloc = "<p>{$hints[$usenum]}</p>\n";
@@ -986,7 +1086,6 @@ class QuestionHtmlGenerator
                 }
             }
         }
-
         return $hintloc;
     }
 
@@ -1077,7 +1176,7 @@ class QuestionHtmlGenerator
             $showanswer = $this->fixDegrees($showanswer, $procanstypes);
         } else if (isset($showanswer)) {
             foreach ($showanswer as $k=>$v) {
-                if ($v === null) {continue;}
+                if ($v === null || !isset($procanstypes[$k])) {continue;}
                 $showanswer[$k] = $this->fixDegrees($v, $procanstypes[$k]);
             }
         }
@@ -1087,7 +1186,7 @@ class QuestionHtmlGenerator
             foreach ($shanspt as $k=>$v) {
                 if ($v === null) {continue;}
                 $shanspt[$k] = $this->fixDegrees($v, 
-                    is_array($procanstypes) ? $procanstypes[$k] : $procanstypes);
+                    is_array($procanstypes) ? ($procanstypes[$k] ?? '') : $procanstypes);
             }
         }
         
@@ -1160,67 +1259,66 @@ class QuestionHtmlGenerator
         $qnidx = $this->questionParams->getDisplayQuestionNumber();
         $qidx = $this->questionParams->getDbQuestionSetId();
         $qid = $this->questionParams->getQuestionId();
+        $qref = '';
 
         $externalReferences = [];
+        
+        $extrefwidth = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][0] : 700;
+        $extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][1] : 500;
+        $vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][0] : 873;
+        $vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][1] : 500;
 
-        if (($showhints&2)==2 && ($qdata['extref'] != '' || (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != ''))) {
-            $extrefwidth = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][0] : 700;
-            $extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][1] : 500;
-            $vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][0] : 873;
-            $vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][1] : 500;
-            if ($qdata['extref'] != '') {
-                $extref = explode('~~', $qdata['extref']);
 
-                if ($qid > 0 && (!isset($_SESSION['isteacher'])
-                        || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
-                    $qref = $qid . '-' . ($qnidx + 1);
+        if (($showhints&2)==2 && $qdata['extref'] != '') {
+            $extref = explode('~~', $qdata['extref']);
+
+            if ($qid > 0 && (!isset($_SESSION['isteacher'])
+                    || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
+                $qref = $qid . '-' . ($qnidx + 1);
+            } 
+            for ($i = 0; $i < count($extref); $i++) {
+                $extrefpt = explode('!!', $extref[$i]);
+                if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
+                            strpos($extrefpt[1],'youtu.be/')!==false ||
+                            strpos($extrefpt[1],'vimeo.com/')!==false
+                        ) {
+                    $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
+                    $externalReferences[] = [
+                        'label' => $extrefpt[0],
+                        'url' => $extrefpt[1],
+                        'w' => $vidextrefwidth,
+                        'h' => $vidextrefheight,
+                        'ref' => $qref,
+                        'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
+                    ];
+                    //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
                 } else {
-                    $qref = '';
-                }
-                for ($i = 0; $i < count($extref); $i++) {
-                    $extrefpt = explode('!!', $extref[$i]);
-                    if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
-            					strpos($extrefpt[1],'youtu.be/')!==false ||
-            					strpos($extrefpt[1],'vimeo.com/')!==false
-            				) {
-                        $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
-                        $externalReferences[] = [
-                          'label' => $extrefpt[0],
-                          'url' => $extrefpt[1],
-                          'w' => $vidextrefwidth,
-                          'h' => $vidextrefheight,
-                          'ref' => $qref,
-                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
-                        ];
-                        //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
-                    } else {
-                        //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
-                        $externalReferences[] = [
-                          'label' => $extrefpt[0],
-                          'url' => $extrefpt[1],
-                          'w' => $extrefwidth,
-                          'h' => $extrefheight,
-                          'ref' => $qref,
-                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
-                        ];
-                    }
+                    //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
+                    $externalReferences[] = [
+                        'label' => $extrefpt[0],
+                        'url' => $extrefpt[1],
+                        'w' => $extrefwidth,
+                        'h' => $extrefheight,
+                        'ref' => $qref,
+                        'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
+                    ];
                 }
             }
-            if (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != '') {
-                $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $_SESSION['secsalt']);
-                $addr .= '&t=' . ($qdata['solutionopts'] & 1) . '&cid=' . $GLOBALS['cid'];
-                if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
-                    $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);
-                }
-                //$externalReferences .= formpopup(_("Written Example"), $addr, $extrefwidth, $extrefheight, "button", true, "soln", $qref);
-                $externalReferences[] = [
-                  'label' => 'ex',
-                  'url' => $addr,
-                  'w' => $extrefwidth,
-                  'h' => $extrefheight,
-                  'ref' => $qref
-                ];
+        }
+        if (($showhints&4)==4 && ($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != '') {
+            $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $_SESSION['secsalt']);
+            $addr .= '&t=' . ($qdata['solutionopts'] & 1) . '&cid=' . $GLOBALS['cid'];
+            if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
+                $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);
             }
+            //$externalReferences .= formpopup(_("Written Example"), $addr, $extrefwidth, $extrefheight, "button", true, "soln", $qref);
+            $externalReferences[] = [
+                'label' => 'ex',
+                'url' => $addr,
+                'w' => $extrefwidth,
+                'h' => $extrefheight,
+                'ref' => $qref
+            ]; 
         }
 
         return $externalReferences;

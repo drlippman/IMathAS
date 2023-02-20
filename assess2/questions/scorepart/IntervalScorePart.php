@@ -57,6 +57,8 @@ class IntervalScorePart implements ScorePart
         }
 
         $givenans = normalizemathunicode($givenans);
+        $givenans = str_replace('cup', 'U', $givenans);
+        $givenans = trim($givenans," ,");
 
         if (in_array('nosoln',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
@@ -70,6 +72,7 @@ class IntervalScorePart implements ScorePart
         $givenans = preg_replace('/\bu\b/', 'U', $givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
+            $givenansval = trim($givenansval," ,");
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         $formatErr = 0;
@@ -98,7 +101,8 @@ class IntervalScorePart implements ScorePart
                     foreach ($matches[0] as $var) {
                         if (in_array($var,$mathfuncs)) { continue;}
                         if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
-                            strtolower($var) != 'var') {
+                            strtolower($var) != 'var' && $var != 'pi' && $var != 'e' 
+                            && $var != 'E') {
                             $scorePartResult->setRawScore(0);
                             return $scorePartResult;
                         }
@@ -157,6 +161,15 @@ class IntervalScorePart implements ScorePart
         $ansar = explode(' or ',$answer);
         $givenans = str_replace(' ','',$givenans);
 
+        if (in_array('allowsloppyintervals',$ansformats)) {
+            require_once(__DIR__ . '/../../../assessment/libs/interval_ext.php');
+            if ($hasNumVal) {
+                $givenansval = canonicInterval($givenansval);
+            } else {
+                $givenans = canonicInterval($givenans);
+            }
+        }
+
         if ($hasNumVal) {
             $gaarr = parseInterval($givenansval, $ansformatsHasList);
         } else {
@@ -171,6 +184,7 @@ class IntervalScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
+
         $orScores = array(0);
         foreach($ansar as $anans) {
             $answer = str_replace(' ','',$anans);

@@ -104,6 +104,7 @@ $LTIsecrets = array();
 $cntsuccess = 0;
 $cntfailure = 0;
 $cntgiveup = 0;
+$tokensQueued = [];
 $round2 = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "reading record ".$row['hash'].'<br/>';
@@ -123,7 +124,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade'])
+						'grade' => max(0, $row['grade']),
+                        'isstu' => $row['isstu'],
+                        'addedon' => $row['addedon']
 					),
 					null, //no special callback
 					array( 	  //user-data; will get passed to response
@@ -136,52 +139,58 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$updater1p3->update_sendon($row['hash'], $platformid);
 			}
 		} else {
-			debuglog('queing token request for '.$row['hash']. ' on platform '.$platformid);
-			// we need to get a token, so add a token request
-			$platforminfo = $updater1p3->get_platform_info($platformid);
-			$RCX->addRequest(
-				$platforminfo['auth_token_url'],  //url to request
-				array( 		//post data; will get transformed before send
-					'ver' => 'LTI1.3',
-					'action' => 'gettoken',
-					'platformid' => $platformid,
-					'platforminfo' => $platforminfo
-				),
-				null, //no special callback
-				array( 	  //user-data; will get passed to response
-					'action' => 'gettoken',
-					'platformid' => $platformid
-				)
-			);
+			if (!in_array($platformid, $tokensQueued)) { // only request token once per platform
+				debuglog('queing token request for '.$row['hash']. ' on platform '.$platformid);
+				// we need to get a token, so add a token request
+				$platforminfo = $updater1p3->get_platform_info($platformid);
+				$RCX->addRequest(
+					$platforminfo['auth_token_url'],  //url to request
+					array( 		//post data; will get transformed before send
+						'ver' => 'LTI1.3',
+						'action' => 'gettoken',
+						'platformid' => $platformid,
+						'platforminfo' => $platforminfo
+					),
+					null, //no special callback
+					array( 	  //user-data; will get passed to response
+						'action' => 'gettoken',
+						'platformid' => $platformid
+					)
+				);
+				$tokensQueued[] = $platformid;
+			}
 			// add original ltiqueue to round 2, to process after first round is done
 			$round2[] = $row;
 		}
 	} else {
 		// LTI 1.1 update
-		list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:', $row['sourcedid']);
-		$secret = '';
-		if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
-			debuglog('queing 1.1 request for '.$row['hash']);
-			$grade = min(1, max(0, $row['grade']));
-			$RCX->addRequest(
-				$ltiurl,  //url to request
-				array( 		//post data; will get transformed before send
-					'ver' => 'LTI1.1',
-					'action' => 'update',
-					'key' => $ltikey,
-					'keytype' => $keytype,
-					'url' => $ltiurl,
-					'sourcedid' => $lti_sourcedid,
-					'grade' => $grade
-				),
-				null, //no special callback
-				array( 	  //user-data; will get passed to response
-					'hash' => $row['hash'],
-					'sendon' => $row['sendon'],
-					'lasttry' => ($row['failures']>=6)
-				)
-			);
-		}
+        $sourcedid_parts = explode(':|:', $row['sourcedid']);
+        if (count($sourcedid_parts)==4) {
+		    list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = $sourcedid_parts;
+            $secret = '';
+            if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
+                debuglog('queing 1.1 request for '.$row['hash']);
+                $grade = min(1, max(0, $row['grade']));
+                $RCX->addRequest(
+                    $ltiurl,  //url to request
+                    array( 		//post data; will get transformed before send
+                        'ver' => 'LTI1.1',
+                        'action' => 'update',
+                        'key' => $ltikey,
+                        'keytype' => $keytype,
+                        'url' => $ltiurl,
+                        'sourcedid' => $lti_sourcedid,
+                        'grade' => $grade
+                    ),
+                    null, //no special callback
+                    array( 	  //user-data; will get passed to response
+                        'hash' => $row['hash'],
+                        'sendon' => $row['sendon'],
+                        'lasttry' => ($row['failures']>=6)
+                    )
+                );
+            }
+        }
 	}
 }
 
@@ -211,7 +220,9 @@ if (count($round2)>0 &&  $timeused < 40) {
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade'])
+						'grade' => max(0, $row['grade']),
+                        'isstu' => $row['isstu'],
+                        'addedon' => $row['addedon']
 					),
 					null, //no special callback
 					array( 	  //user-data; will get passed to response
@@ -266,7 +277,7 @@ function LTIqueuePostdataCallback($data) {
                 $updater1p3->token_valid($data['platformid'])
             ) { // double check we have a valid token
 				$token = $updater1p3->get_access_token($data['platformid']);
-				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid']);
+				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['isstu'], $data['addedon']);
 			} else {
 				return false;
 			}
@@ -317,6 +328,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 				// record failure. in round 2 token will be read as not valid
 				$updater1p3->token_request_failure($user_data['platformid']);
 				debuglog('token request failure t1 '.$user_data['platformid']);
+                return;
 			}
 			$token_data = json_decode($response, true);
 			if (isset($token_data['access_token'])) {
@@ -354,7 +366,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			unset($post_data['key']);
 			unset($post_data['keytype']);
 
-			error_log("LTI update giving up:\n"
+			$logdata = "LTI update giving up:\n"
 			. "POST data\n"
 			. "---------\n"
 			. print_r($post_data, true) . "\n"
@@ -373,7 +385,10 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			. "--------\n"
 			. "Response \n"
 			. "--------\n"
-			. $response);
+			. $response
+            . $request_info['response_text'];
+            $logstm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+            $logstm->execute([time(), $logdata]);
 		} else {
 			$cntfailure++;
 		}

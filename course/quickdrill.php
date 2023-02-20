@@ -209,6 +209,7 @@ if (isset($_POST['seed'])) {
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead = '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;}</style>';
 $useeditor = 1;
+$useeqnhelper = 0;
 require("../assessment/header.php");
 if ($cid!=0) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

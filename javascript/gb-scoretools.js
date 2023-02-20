@@ -74,12 +74,13 @@ function allvisnocred() {
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
-    var filters = ['unans','zero','nonzero','perfect','fb','nowork', '100'];
-    for (var i=0; i<7; i++) {
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork', 'work', '100'];
+    for (var i=0; i<filters.length; i++) {
         if (document.getElementById('filter-' + filters[i]).checked) {
             $(".bigquestionwrap.qfilter-" + filters[i]).hide();
         }
     }
+    $(".bigquestionwrap .headerpane,.scoredetails .person").toggle(!document.getElementById('filter-names').checked);
 }
 function toggleWork(el) {
 	var next = $(el).next();
@@ -119,7 +120,7 @@ function quicksave() {
 function hidegroupdup(el) {  //el.checked = one per group
 	 var divs = document.getElementsByTagName("div");
 	 for (var i=0;i<divs.length;i++) {
-		 if (divs[i].className=="groupdup") {
+		 if (divs[i].className.match(/groupdup/)) {
 				 if (el.checked) {
 							 divs[i].style.display = "none";
 				 } else { divs[i].style.display = "block"; }
@@ -141,6 +142,30 @@ function hidegroupdup(el) {  //el.checked = one per group
 				spans[i].style.display = el.checked?"":"none";
 			 }
 		}
+}
+function sortByLastChange() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return Date.parse(b.getAttribute('data-lastchange')) - Date.parse(a.getAttribute('data-lastchange'));
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
+}
+function sortByName() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return $(a).children(".headerpane").text().localeCompare($(b).children(".headerpane").text());
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
+}
+function sortByRand() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return 0.5 - Math.random();
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
 }
 function clearfeedback() {
 	var els=document.getElementsByTagName("textarea");
@@ -267,4 +292,50 @@ function sidebysidegrading() {
 		$(el).css('margin','0');
 		$(el).closest(".sidebyside").find('.sidepreview').append(el);
 	});
+}
+
+var scrollingscoreboxes = false;
+function toggleScrollingScoreboxes() {
+    if (scrollingscoreboxes) {
+        $(window).off('scroll.scoreboxes');
+        $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);
+        $(".biquestionwrap .scrollpane").css("margin-bottom","0");
+    } else {
+        $(window).on('scroll.scoreboxes', updatescoreboxscroll);
+        updatescoreboxscroll();
+    }
+    scrollingscoreboxes = !scrollingscoreboxes;
+}
+
+function updatescoreboxscroll() {
+    var scroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var viewbot = scroll + document.documentElement.clientHeight;
+    var wraps = document.getElementsByClassName("bigquestionwrap");
+    var objtop, scoredet, objbot;
+    for (var i=0; i<wraps.length; i++) {
+        if (wraps[i].style.display == "none") { continue; }
+        var rect = wraps[i].childNodes[1].getBoundingClientRect();
+        objtop = rect.top + scroll; 
+        scoredet = wraps[i].childNodes[2];
+        objbot = objtop + wraps[i].childNodes[1].offsetHeight + scoredet.offsetHeight ;
+        if (viewbot > objtop + scoredet.offsetHeight + 20 && 
+            viewbot < objbot && 
+            scoredet.offsetHeight < .5*document.documentElement.clientHeight 
+        ) {
+            if (scoredet.style.position == "static") { 
+                scoredet.style.width = $(scoredet).width() + "px";
+                wraps[i].childNodes[1].style.marginBottom = scoredet.offsetHeight + "px";
+                scoredet.style.position = "fixed";
+                scoredet.style.bottom = 0;
+                scoredet.style.marginLeft = '5px';
+                scoredet.classList.add("hoverbox");
+            }
+        } else {
+            scoredet.style.position = "static";
+            scoredet.style.width = 'auto';
+            scoredet.style.marginLeft = '0';
+            wraps[i].childNodes[1].style.marginBottom = 0;
+            scoredet.classList.remove("hoverbox");
+        }
+    };
 }

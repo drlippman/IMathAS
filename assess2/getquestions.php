@@ -49,6 +49,9 @@ if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';
   exit;
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 $assessInfoOut = array();
 

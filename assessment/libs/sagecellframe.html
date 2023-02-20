@@ -49,7 +49,7 @@ function initcell() {
 				window.parent.postMessage( JSON.stringify({
 					subject: "imathas.update",
 					id: update_id,
-					value: code
+					value: code.replace(/</g,'&lt;').replace(/>/g,'&gt;')
 				}), "*");
 			});
 	}

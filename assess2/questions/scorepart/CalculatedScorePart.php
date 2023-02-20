@@ -53,10 +53,10 @@ class CalculatedScorePart implements ScorePart
               $_POST["qn$qn-val"] = $givenans;
             }
         }
-
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
-          $givenansval = $_POST["qn$qn-val"];
+          $givenansval = trim($_POST["qn$qn-val"]," ,");
           $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($answer==='') {
@@ -80,9 +80,18 @@ class CalculatedScorePart implements ScorePart
             $formatok = "nowhole";
         }
 
+        // rewrite +-
+        if (in_array('allowplusminus', $ansformats)) {
+            if (!in_array('list', $ansformats)) {
+                $ansformats[] = 'list';
+            }
+            $answer = rewritePlusMinus($answer);
+            $givenans = rewritePlusMinus($givenans);    
+        }
+
         if ($reqsigfigs !== '') {
             if (!in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
-                unset($reqsigfigs);
+                $reqsigfigs = '';
             } else {
                 list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
             }
@@ -96,6 +105,11 @@ class CalculatedScorePart implements ScorePart
 
         if (in_array("scinot",$ansformats) || in_array("scinotordec",$ansformats)) {
             $answer = str_replace('xx','*',$answer);
+            $givenans = str_replace('xx','*',$givenans);
+        }
+        if (in_array("allowxtimes",$ansformats)) {
+            $answer = str_replace('x','*',$answer);
+            $givenans = str_replace('x','*',$givenans);
         }
         if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
             $answer = str_replace(array('{','}'),'', $answer);
@@ -145,7 +159,7 @@ class CalculatedScorePart implements ScorePart
                     $scorePartResult->setRawScore(0);
                     return $scorePartResult;
                 }
-                if (preg_match('/(\(|\[)(.+?)\,(.+?)(\)|\])/',$anans,$matches)) {
+                if (preg_match('/(\(|\[)\s*(.+?)\s*\,\s*(.+?)\s*(\)|\])/',$anans,$matches)) {
                     if ($matches[2]=='-oo') {$matches[2] = -1e99;}
                     if ($matches[3]=='oo') {$matches[3] = 1e99;}
                     if (!is_numeric($matches[2])) {
@@ -183,8 +197,8 @@ class CalculatedScorePart implements ScorePart
             $numvalarr = array();
             foreach ($gaarr as $j=>$v) {
                 if ($v!='DNE' && $v!='oo' && $v!='+oo' && $v!='-oo') {
-                    if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
-                        $numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
+                    if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?)\s*(\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
+                        $numvalarr[$j] = ($mnmatches[1]=='-'?-1:1)*($mnmatches[2] + ($mnmatches[4]/$mnmatches[5]));
                     } else {
                         if ($v[strlen($v)-1]=='%') {//single percent
                             $val = substr($v,0,-1);
@@ -194,7 +208,7 @@ class CalculatedScorePart implements ScorePart
                             }
                         }
                         $numvalarr[$j] = evalMathParser($v);
-                        if (!is_finite($numvalarr[$j])) {
+                        if (!is_numeric($numvalarr[$j]) || !is_finite($numvalarr[$j])) {
                           $numvalarr[$j] = '';
                         }
                     }
@@ -333,7 +347,7 @@ class CalculatedScorePart implements ScorePart
                             } else if ($exactsigfig && checksigfigs($tocheck, $anans, $reqsigfigs, false, $reqsigfigoffset, $sigfigscoretype)) {
                                 //see if it'd be right aside from exact sigfigs
                                 $formatok = "nopart";  $partformatok = false; $correctanyformat++; $foundloc = $j; break 2;
-                            }
+                            } 
                         } else if ($abstolerance !== '') {
                             if (abs($anans-$numericans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
                                 if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {

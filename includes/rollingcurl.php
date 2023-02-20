@@ -121,7 +121,7 @@ Class RollingCurlX {
             $this->init_request($i, $multi_handle, $requests_map);
             $num_outstanding++;
         }
-
+        $active = 1;
         do{
             do{
                 $mh_status = curl_multi_exec($multi_handle, $active);
@@ -139,7 +139,7 @@ Class RollingCurlX {
                 while(
                     $num_outstanding < $this->_maxConcurrent && //under the limit
                     $i < count($this->requests) && isset($this->requests[$i]) && //have requests
-                    ($this->_stopAddingTimetime==0 || time() - $startexectime < $this->_stopAddingTime) // within time constrains
+                    ($this->_stopAddingTime==0 || time() - $startexectime < $this->_stopAddingTime) // within time constrains
                 ) {
                     $this->init_request($i, $multi_handle, $requests_map);
                     $num_outstanding++;
@@ -235,14 +235,23 @@ Class RollingCurlX {
         curl_multi_add_handle($multi_handle, $ch);
 
         //add curl handle of a new request to the request map
-        $ch_hash = (string) $ch;
+        if (is_resource($ch)) { //php7
+            $ch_hash = (string) $ch;
+        } else { // php 8
+            $ch_hash = spl_object_id($ch);
+        }
+        
         $requests_map[$ch_hash] = $request_num;
     }
 
 
     private function process_request($completed, $multi_handle, array &$requests_map) {
         $ch = $completed['handle'];
-        $ch_hash = (string) $ch;
+        if (is_resource($ch)) { //php7
+            $ch_hash = (string) $ch;
+        } else { // php 8
+            $ch_hash = spl_object_id($ch);
+        }
         $request =& $this->requests[$requests_map[$ch_hash]]; //map handler to request index to get request info
 
         $request_info = curl_getinfo($ch);
@@ -258,6 +267,7 @@ Class RollingCurlX {
           //if server responded with http error or a non 2xx code
             debuglog('request error: '. curl_error($ch));
             debuglog('http_code: '. $request_info['http_code'].' rounded '.round(intval($request_info['http_code'])/100));
+            $request_info['response_text'] = curl_multi_getcontent($ch);
             $response = false;
         } else { //sucessful response
             $response = curl_multi_getcontent($ch);

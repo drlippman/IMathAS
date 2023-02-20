@@ -1,12 +1,14 @@
 <?php
 
 function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
-    global $imasroot;
+    global $imasroot, $staticroot, $installname;
     require(__DIR__.'/../header.php');
     if ($error !== '') {
         echo '<p class=noticetext>'._('Invalid code - try again').'</p>';
     }
-    echo '<p>'._('Enter the 2-factor authentication code from your device').'</p>';
+    echo '<p>'._('Enter the 2-factor authentication code from your device').'. ';
+    echo _('This code can be found in the Google Authenticator compatible app, like Authy, that you set up when you enabled 2-factor authentication.');
+    echo '</p>';
     echo '<form method="POST" action="'.$redir.'">';
     echo '<input type=hidden name=action value="entermfa" />';
     echo '<p>'._('Code: ').'<input size=8 name=mfatoken /></p>';
@@ -23,7 +25,7 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
 }
 
 function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
-    global $DBH;
+    global $DBH, $imasroot;
     $error = '';
     require(__DIR__.'/GoogleAuthenticator.php');
     $MFA = new GoogleAuthenticator();

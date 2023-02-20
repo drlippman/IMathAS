@@ -58,6 +58,7 @@ class NumberScorePart implements ScorePart
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt ?? '');
         }
 
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if ($answer==='' && $givenans==='') {
@@ -170,7 +171,9 @@ class NumberScorePart implements ScorePart
             sort($tmp);
             $anarr = array($tmp[0]);
             for ($i=1;$i<count($tmp);$i++) {
-                if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+                if (!is_numeric($tmp[$i]) || !is_numeric($tmp[$i-1]) || 
+                    $tmp[$i]-$tmp[$i-1]>1E-12
+                ) {
                     $anarr[] = $tmp[$i];
                 }
             }
@@ -209,8 +212,12 @@ class NumberScorePart implements ScorePart
                     $v = 'DNE';
                 } else {
                     $givenansUnits = parseunits($v);
-                    $v = evalMathParser($givenansUnits[0]);
-                    $gaunitsarr[$k] = $givenansUnits;
+                    if (is_array($givenansUnits)) {
+                        $v = $givenansUnits[0];
+                        $gaunitsarr[$k] = $givenansUnits;
+                    } else { // handle invalid
+                        $gaunitsarr[$k] = [0,'invalid',0,0];
+                    }
                 }
             }
 
@@ -253,8 +260,13 @@ class NumberScorePart implements ScorePart
                         $anans = 'DNE';
                     } else {
                         $anssUnits = parseunits($anans);
-                        $anss[$k] = evalMathParser($anssUnits[0]);
-                        $anssunits[$k] = $anssUnits;
+                        if (is_array($anssUnits)) {
+                            $anss[$k] = $anssUnits[0];
+                            $anssunits[$k] = $anssUnits;
+                        } else {
+                            echo "Invalid answer $anans";
+                            $anssunits[$j] = [0,'invalidans',0,0];
+                        }
                     }
                 }
             }
@@ -264,7 +276,26 @@ class NumberScorePart implements ScorePart
                 }
                 foreach ($anss as $k=>$anans) {
                     if (!is_numeric($anans)) {
-                        if (preg_match('/(\(|\[)(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|-oo)\,(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|oo)(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
+                        if (preg_match('/(\(|\[)\s*(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|-oo)\s*\,\s*(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|oo)\s*(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
+                            //check reqdecimals/sigfigs
+                            if ($reqdecimals !== '') {
+                                $decimalsingivenans = ($p = strpos($givenans,'.'))===false ? 0 : (strlen($givenans)-$p-1);
+                                if ($exactreqdec) {
+                                    if ($reqdecimals != $decimalsingivenans ) {
+                                        continue;
+                                    }
+                                } else {
+                                    if ($reqdecimals > $decimalsingivenans ) {
+                                        continue;
+                                    }
+                                }
+                            }
+                            if ($reqsigfigs !== '') {
+                                // only check sigfigs, not value
+                                if (!checksigfigs($givenans, 1, $reqsigfigs, $exactsigfig, $reqsigfigoffset, false)) {
+                                    continue;
+                                } 
+                            }
                             if ($matches[2]=='-oo') {$matches[2] = -1e99;}
                             if ($matches[3]=='oo') {$matches[3] = 1e99;}
                             if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
@@ -293,7 +324,7 @@ class NumberScorePart implements ScorePart
                                 }
                                 if ($exactreqdec) {
                                     //check number of decimal places in base givenans
-                                    if ($reqdecimals != (($p = strpos($gaunitsarr[$j][3],'.'))===false?0:(strlen($gaunitsarr[$j][3])-$p-1))) {
+                                    if ($reqdecimals != (($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1))) {
                                         continue;
                                     }
                                 } 
@@ -361,6 +392,9 @@ class NumberScorePart implements ScorePart
         if ($score<0) { $score = 0; }
         if ($score==0 && !empty($partialcredit) && !$islist && is_numeric($givenans)) {
             foreach ($altanswers as $i=>$anans) {
+                if (!is_numeric($anans)) {
+                    continue; // skip invalid
+                }
                 /*  disabled until we can support array $reqsigfigs
 				if (isset($reqsigfigs)) {
 					if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {

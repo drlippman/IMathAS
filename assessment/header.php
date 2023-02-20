@@ -5,6 +5,9 @@
 } else {
 	echo '<html lang="en">';
 }
+if (!isset($myrights)) { 
+    $myrights = 0; // avoid errors in headercontent if not defined
+}
 ?>
 <head>
 
@@ -50,8 +53,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 } else {
-	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
-	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
+	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
 
@@ -82,7 +84,7 @@ if (isset($_SESSION['coursetheme'])) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/themes/$coursetheme?v=042217\"/>\n";
 }
 echo '<link rel="stylesheet" href="'.$staticroot.'/handheld.css?v=101817" media="handheld,only screen and (max-width:480px)"/>';
-if ($isdiag) {
+if (!empty($isdiag)) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/diag/print.css\" media=\"print\"/>\n";
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/assessment/print.css\" media=\"print\"/>\n";
@@ -183,11 +185,11 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
-if ($_SESSION['graphdisp']==1) {
+if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==0) {
+    echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
+} else {
 	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=052520\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
-} else {
-	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 ?>
 <!--[if lte IE 6]>
@@ -211,7 +213,7 @@ div { zoom: 1; }
 
 <?php
 
-if (isset($useeditor) && $_SESSION['useed']==1) {
+if (isset($useeditor) && !empty($_SESSION['useed'])) {
 	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
@@ -233,6 +235,8 @@ if ((isset($useeditor) && $_SESSION['useed']==1) || isset($loadiconfont)) {
 	echo '<link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
 	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
+if (!isset($useeqnhelper)) { $useeqnhelper = 0; }
+
 if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';
 	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/eqnhelper.js?v=062216\"></script>";
@@ -274,7 +278,7 @@ if (isset($_SESSION['ltiitemtype'])) {
 	</script>';
 	}
 echo '</head>';
-if ($isfw!==false) {
+if (!empty($isfw)) {
 	echo "<body class=\"fw$isfw\">\n";
 } else {
 	echo "<body>\n";

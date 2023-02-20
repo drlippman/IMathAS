@@ -185,7 +185,8 @@
     "livepoll_wrongquestion": "Submitted question is not the current question.",
     "livepoll_notopen": "This question is not open for submissions.",
     "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again.",
-    "ytnotready": "YouTube is not ready yet"
+    "ytnotready": "YouTube is not ready yet",
+    "file_upload_error": "Error uploading file"
   },
   "confirm": {
     "ok": "OK",
@@ -401,6 +402,7 @@
     "msg_owner": "Message owner to report problems",
     "had_help": "Had help available",
     "save": "Save Changes",
+    "savenext": "Save and Next Student",
     "return": "Return to Gradebook",
     "gb_score": "Score in Gradebook",
     "override": "Override score",
@@ -466,7 +468,9 @@
     "used_timeext": "Used a {n} minute time limit extension",
     "attemptext": "Exception given for {n} additional versions",
     "preview_files": "Preview All Files",
-    "introtexts": "Intro and between-question text"
+    "introtexts": "Intro and between-question text",
+    "floating_scoreboxes": "Floating Scoreboxes",
+    "no_edit": "You are in the gradebook. You cannot edit answers or submit questions from here."
   },
   "work": {
     "add": "Add Work",
@@ -484,5 +488,9 @@
     "qnav": "Question navigation",
     "qvidnav": "Video and question navigation",
     "aheader": "Assessment info"
+  },
+  "links": {
+      "settings": "Settings",
+      "questions": "Questions"
   }
 }

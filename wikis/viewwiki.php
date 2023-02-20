@@ -18,7 +18,7 @@ $body = "";
 
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
-$groupid = intval($_GET['grp']);
+$groupid = intval($_GET['grp'] ?? 0);
 $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 
 if (isset($_GET['framed'])) {
@@ -171,6 +171,7 @@ if ($cid==0) {
 				}
 			}
 		} else {
+            $isgroup = false;
 			$groupid = 0;
 		}
 

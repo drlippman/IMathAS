@@ -48,6 +48,7 @@ class ComplexScorePart implements ScorePart
 
         if (empty($answerformat)) {$answerformat = '';}
         $ansformats = array_map('trim', explode(',', $answerformat));
+        $checkSameform = (in_array('sameform',$ansformats));
 
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -56,15 +57,17 @@ class ComplexScorePart implements ScorePart
             }
         }
         $givenans = normalizemathunicode($givenans);
+        $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($anstype == 'calccomplex' && $hasNumVal) {
+            $givenansval = trim($givenansval," ,");
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($givenans == null) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
-        $answer = str_replace(' ', '', makepretty($answer));
+        $answer = str_replace(' ', '', $answer);
         $givenans = trim($givenans);
 
         if ($answer == 'DNE') {
@@ -93,8 +96,22 @@ class ComplexScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
-            foreach ($gaarr as $i => $tchk) {
 
+            // rewrite +-
+            if (in_array('allowplusminus', $ansformats)) {
+                if (!in_array('list', $ansformats)) {
+                    $ansformats[] = 'list';
+                }
+                $answer = rewritePlusMinus($answer);
+                $givenans = rewritePlusMinus($givenans);
+                $gaarr = array_map('trim', explode(',', $givenans));    
+            }
+
+            $normalizedGivenAnswers = [];
+            foreach ($gaarr as $i => $tchk) {
+                if (in_array('allowjcomplex', $ansformats)) {
+                    $tchk = str_replace('j','i', $tchk);
+                }
                 if (in_array('sloppycomplex', $ansformats)) {
                     $tchk = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $tchk);
                     if (substr_count($tchk, 'i') > 1) {
@@ -123,9 +140,16 @@ class ComplexScorePart implements ScorePart
                         unset($gaarr[$i]);
                     }
                 }
+                if ($checkSameform) {
+                    $gafunc = parseMathQuiet($tchk, 'i');
+                    $normalizedGivenAnswers[$i] = $gafunc->normalizeTreeString();
+                }
             }
         } else { // if "complex"
             foreach ($gaarr as $i => $tchk) {
+                if (in_array('allowjcomplex', $ansformats)) {
+                    $tchk = str_replace('j','i', $tchk);
+                }
                 $cpts = $this->parsecomplex($tchk);
                 if (!is_array($cpts)) {
                     unset($gaarr[$i]);
@@ -139,6 +163,9 @@ class ComplexScorePart implements ScorePart
 
         $ganumarr = array();
         foreach ($gaarr as $j => $givenans) {
+            if (in_array('allowjcomplex', $ansformats)) {
+                $givenans = str_replace('j','i',$givenans);
+            }
             $gaparts = $this->parsesloppycomplex($givenans);
 
             if ($gaparts === false) { //invalid - skip it
@@ -163,10 +190,14 @@ class ComplexScorePart implements ScorePart
             $givenansval = implode(',', $givenansval);
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
-
+        $answer = makepretty($answer);
         $anarr = array_map('trim', explode(',', $answer));
         $annumarr = array();
+        $normalizedAnswers = [];
         foreach ($anarr as $i => $answer) {
+            if (in_array('allowjcomplex', $ansformats)) {
+                $answer = str_replace('j','i',$answer);
+            }
             $ansparts = $this->parsesloppycomplex($answer);
             if ($ansparts === false) { //invalid - skip it
                 continue;
@@ -179,6 +210,10 @@ class ComplexScorePart implements ScorePart
                 }
             }
             $annumarr[] = $ansparts;
+            if ($checkSameform) {
+                $anfunc = parseMathQuiet($answer, 'i');
+                $normalizedAnswers[] = $anfunc->normalizeTreeString();
+            }
         }
 
         if (count($ganumarr) == 0) {
@@ -188,7 +223,7 @@ class ComplexScorePart implements ScorePart
         $extrapennum = count($ganumarr) + count($annumarr);
         $gaarrcnt = count($ganumarr);
         $correct = 0;
-        foreach ($annumarr as $i => $ansparts) {
+        foreach ($annumarr as $ai => $ansparts) {
             $foundloc = -1;
 
             foreach ($ganumarr as $j => $gaparts) {
@@ -203,6 +238,9 @@ class ComplexScorePart implements ScorePart
                             if (abs($ansparts[$i] - $gaparts[$i]) / (abs($ansparts[$i]) + .0001) >= $reltolerance + 1E-12) {break;}
                         }
                     }
+                }
+                if ($checkSameform && $normalizedAnswers[$ai] != $normalizedGivenAnswers[$j]) {
+                    break;
                 }
                 if ($i == count($ansparts)) {
                     $correct += 1;
@@ -335,11 +373,11 @@ class ComplexScorePart implements ScorePart
                     }
                 } else { //i or +i or -i or 3i  (one digit)
                     if ($v[$L] == '+') {
-                        $imag = 1;
+                        $imag = '1';
                     } else if ($v[$L] == '-') {
-                        $imag = -1;
+                        $imag = '-1';
                     } else if ($p == 0) {
-                        $imag = 1;
+                        $imag = '1';
                     } else {
                         $imag = $v[$L];
                     }

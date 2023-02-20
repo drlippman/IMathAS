@@ -65,7 +65,7 @@ if ($cid==0) {
 		} else {
 			$groupid = 0;
 		}
-		if ($_POST['wikicontent']!= null) { //FORM SUBMITTED, DATA PROCESSING
+		if (!empty($_POST['wikicontent'])) { //FORM SUBMITTED, DATA PROCESSING
 			$inconflict = false;
 			$stugroupid = 0;
 

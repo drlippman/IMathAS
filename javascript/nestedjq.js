@@ -474,4 +474,5 @@ function addnewblock() {
         )
     );
     newblockcnt++;
+    document.getElementById('recchg').disabled = false;
 }

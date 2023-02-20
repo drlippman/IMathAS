@@ -32,7 +32,7 @@ if ($overwriteBody==1) {
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
-    echo "<a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
+    echo "<a href=\"addquestions2.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 	if (!isset($_POST['heights'])) {
 		echo '<div class="cpmid"><a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a>';

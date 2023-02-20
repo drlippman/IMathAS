@@ -66,7 +66,7 @@ if (!empty($_POST['newowner'])) {
 
 //process AJAX post-backs
 if (isset($_POST['loadgroup'])) {
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName,rights FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
 	$stm->execute(array($courseownerid, $coursegroupid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {

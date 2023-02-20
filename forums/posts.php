@@ -16,11 +16,12 @@ if (isset($teacherid)) {
 } else {
 	$isteacher = false;
 }
+$istutor = isset($tutorid);
 
 $cid = Sanitize::courseId($_GET['cid']);
 $forumid = Sanitize::onlyInt($_GET['forum']);
 $threadid = Sanitize::onlyInt($_GET['thread']);
-$page = Sanitize::onlyInt($_GET['page']);
+$page = Sanitize::onlyInt($_GET['page'] ?? 1);
 if (!empty($_GET['embed'])) {
 	$flexwidth = true;
 	$nologo = true;
@@ -51,7 +52,7 @@ if ($stm->rowCount()==0) {
 	echo "Invalid forum ID or thread ID";
 	exit;
 }
-list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
 	exit;
@@ -79,7 +80,7 @@ if (isset($_GET['marktagged'])) {
 }
 $stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate,autoscore FROM imas_forums WHERE id=:id");
 $stm->execute(array(':id'=>$forumid));
-list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 	$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
@@ -104,7 +105,11 @@ if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 	exit;
 }
 
-$allowreply = ($isteacher || (time()<$replyby));
+$canviewall = (isset($teacherid) || isset($tutorid));
+$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
+$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
+
+$allowreply = ($canviewall || (time()<$replyby));
 $allowanon = (($forumsettings&1)==1);
 $allowmod = ($isteacher || (($forumsettings&2)==2));
 $allowdel = ($isteacher || (($forumsettings&4)==4));
@@ -113,17 +118,15 @@ $postbeforeview = (($forumsettings&16)==16);
 $haspoints =  ($pointsposs > 0);
 $groupid = 0;
 
-$canviewall = (isset($teacherid) || isset($tutorid));
-$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
-$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
 
-if ($groupset>0) {
+
+if ($groupsetid>0) {
 	if (!isset($_GET['grp'])) {
 		if (!$canviewall) {
 			$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$groupset));
+			$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$groupsetid));
 			if ($stm->rowCount()>0) {
 				$groupid = $stm->fetchColumn(0);
 			} else {
@@ -148,7 +151,7 @@ if ($groupset>0) {
 }
 $placeinhead = '';
 if ($haspoints && $caneditscore && $rubric != 0) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051720"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
 	require("../includes/rubric.php");
 }
 
@@ -368,7 +371,7 @@ if ($oktoshow) {
 	} else {
 		$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
 		$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
-		if ($groupset>0 && $groupid!=-1) {
+		if ($groupsetid>0 && $groupid!=-1) {
 			$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
 			$array[':stugroupid']=$groupid;
 		}
@@ -384,7 +387,7 @@ if ($oktoshow) {
 		}
 		$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
 		$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
-		if ($groupset>0 && $groupid!=-1) {
+		if ($groupsetid>0 && $groupid!=-1) {
 			$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
 			$array[':stugroupid']=$groupid;
 		}
@@ -556,7 +559,7 @@ function printchildren($base,$restricttoowner=false) {
 		//if ($isteacher && $ownerid[$child]!=0) {
 		//	echo "<a href=\"mailto:{$email[$child]}\">";
 		//} else if ($allowmsg && $ownerid[$child]!=0) {
-		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
+		if (($canviewall || $allowmsg) && $ownerid[$child]!=0) {
 			echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\" ";
 			if ($section[$child]!='') {
 				echo 'title="Section: '.$section[$child].'"';
@@ -564,7 +567,7 @@ function printchildren($base,$restricttoowner=false) {
 			echo ">";
 		}
 		echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($poster[$child]).'</span>'; // This is the user's first and last name.
-		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
+		if (($canviewall || $allowmsg) && $ownerid[$child]!=0) {
 			echo "</a>";
 		}
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {

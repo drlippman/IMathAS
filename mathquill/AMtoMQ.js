@@ -80,24 +80,28 @@ var AMQsymbols = [
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
 {input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
+{input:"xor",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"oplus",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"ominus",  tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
+{input:"neg",  tag:"mo", output:"\u00AC", tex:"neg", ttype:CONST},
 //{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", ttype:UNDEROVER},
 {input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
 //{input:"vvv", tag:"mo", output:"\u22C1", tex:"bigvee", ttype:UNDEROVER},
 {input:"nn",  tag:"mo", output:"\u2229", tex:"cap", ttype:CONST},
 //{input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
-{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
+//{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 //{input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
 {input:"xx", tex:"times", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
 //{input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
-{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
-{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+//{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
+//{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
-{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
-{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
+//{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
+//{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
 {input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 //{input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
@@ -137,6 +141,7 @@ var AMQsymbols = [
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
 {input:"=>",  tag:"mo", output:"\u21D2", tex:"implies", ttype:CONST},
 {input:"<=>", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
+{input:"rightleftharpoons", tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
 //{input:"CC",  tag:"mo", output:"\u2102", tex:"mathbb{C}", ttype:CONST, notexcopy:true},
 //{input:"NN",  tag:"mo", output:"\u2115", tex:"mathbb{N}", ttype:CONST, notexcopy:true},
 //{input:"QQ",  tag:"mo", output:"\u211A", tex:"mathbb{Q}", ttype:CONST, notexcopy:true},
@@ -292,9 +297,9 @@ function AMQgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
+    k++;
     if ("0"<=st && st<="9") {
       integ = false;
-      k++;
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;
@@ -590,6 +595,7 @@ function AMQTparseIexpr(str) {
   return [node,str];
 }
 
+var AMQTallowmatrices = true;
 function AMQTparseExpr(str,rightbracket) {
   var symbol, node, result, i, nodeList = [],
   newFrag = '';
@@ -620,7 +626,7 @@ function AMQTparseExpr(str,rightbracket) {
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
 //    if (AMQnestingDepth > 0) AMQnestingDepth--;
 	var len = newFrag.length;
-	if (len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
+	if (AMQTallowmatrices && len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
 		var right = newFrag.charAt(len - 2);
 		if (right==')' || right==']') {
 			var left = newFrag.charAt(6);
@@ -713,20 +719,34 @@ function AMQTparseExpr(str,rightbracket) {
 
 AMQinitSymbols();
 
-return function(str) {
+return function(str,elid,nomatrices) {
  AMQnestingDepth = 0;
+ if (nomatrices === true) { 
+    AMQTallowmatrices = false;
+ }
   str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
-  str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/(ntuple|string)/)
+  ) {
+    str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
+  }
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
   str = str.replace(/all\s+real\s+numbers/g,'"all real numbers"');
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
   str = str.replace(/\bDNE\b/gi,'"DNE"');
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/interval/)
+  ) {
+      str = str.replace(/\bU\b/g,'cup');
+  }  
+ 
   if (str.match(/\S/)==null) {
 	  return "";
   }
-  return AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  var out = AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  return out;
 }
 }();
 
@@ -770,11 +790,14 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\le(?=(\b|\d))/g,'<=');
 	tex = tex.replace(/\\ge(?=(\b|\d))/g,'>=');
   tex = tex.replace(/\\ne(?=(\b|\d))/g,'!=');
+  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
-    tex = tex.replace(/\\cup/g,'U').replace(/\\sim/g,'~');
-    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');
+    tex = tex.replace(/\\rightleftharpoons/g,'rightleftharpoons');
+    // move to intervalscorepart tex = tex.replace(/\\cup/g,'U');
+    tex = tex.replace(/\\sim/g,'~');
+    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,' ^^ ');
     tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');
 	tex = tex.replace(/\\left\\{/g,'lbrace').replace(/\\right\\}/g,'rbrace');
@@ -819,14 +842,13 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2 ');  //change (2)/(3) to 2/3
 	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
 	tex = tex.replace(/\(([\d\.]+)\)\//g,'$1/');  //change (3)/ to 3/
-	tex = tex.replace(/\/\(([\a-zA-Z])\)/g,'/$1');  //change /(x) to /x
-	tex = tex.replace(/\(([\a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
+	tex = tex.replace(/\/\(([a-zA-Z])\)/g,'/$1');  //change /(x) to /x
+	tex = tex.replace(/\(([a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
   tex = tex.replace(/\^\((-?[\d\.]+)\)(\d)/g,'^$1 $2');
   tex = tex.replace(/\^\(-1\)/g,'^-1');
   tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
-  tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
-	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
-  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
+  tex = tex.replace(/\/\(([a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
+	tex = tex.replace(/\(([a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
   tex = tex.replace(/text\(([^)]*)\)/g, '$1');
   tex = tex.replace(/\(\s*(\w)/g,'($1').replace(/(\w)\s*\)/g,'$1)');
   return tex.replace(/^\s+|\s+$/g,'');

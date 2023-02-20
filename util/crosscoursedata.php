@@ -129,7 +129,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	//entry should be cid:aid if copied from another course, but handle other just in case
 	$ancestors = explode(',', $row['ancestors']);
 	$sourceaid = explode(':', $ancestors[$coursedepth[$row['courseid']]]);
-	if (count($courseaid)>1) {
+	if (count($sourceaid)>1) {
 		$sourceaid = $sourceaid[1];
 	} else {
 		$sourceaid = $sourceaid[0];
@@ -179,6 +179,23 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$assessresults[$baseassess][$assesscourse] = array();
 	}
 	$assessresults[$baseassess][$assesscourse][] = $total;
+}
+// pull new assessment data
+$query = 'SELECT assessmentid,score FROM imas_assessment_records WHERE ';
+$query .= "assessmentid IN ($phcopyaids)";
+$stm = $DBH->prepare($query);
+$stm->execute(array_keys($assesscopies));
+//echo "Assess data lookup done: ".(microtime(true)-$ts).'<br>';
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	$baseassess = $assesscopies[$row['assessmentid']]['source'];
+	$assesscourse = $assesscopies[$row['assessmentid']]['course'];
+	if (!isset($assessresults[$baseassess])) {
+		$assessresults[$baseassess] = array();
+	}
+	if (!isset($assessresults[$baseassess][$assesscourse])) {
+		$assessresults[$baseassess][$assesscourse] = array();
+	}
+	$assessresults[$baseassess][$assesscourse][] = $row['score'];
 }
 
 //echo "Assess data processing done: ".(microtime(true)-$ts).'<br>';

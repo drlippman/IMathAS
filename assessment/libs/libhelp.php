@@ -22,7 +22,7 @@
 	$filearray = array();
 	while (($file = readdir($dir)) !== false) {
 		$parts = explode('.', $file);
-		if ($parts[1] == "html") {
+		if (count($parts)>1 && $parts[1] == "html") {
 			if (file_exists($parts[0].'.php')) {
 				$filearray[] = $parts[0];
 			}

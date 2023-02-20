@@ -23,8 +23,6 @@ $(function() {
             advform.scrollIntoView(false);
         }
     }).on('hide.bs.dropdown', function () {
-        console.log("here");
-        console.log(datePickerDivID);
         if (datePickerDivID) {
             $("#"+datePickerDivID).css('visibility','hidden').css('display','none');
         }
@@ -33,44 +31,46 @@ $(function() {
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/g)) {
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore|isrand)(:|=)("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
-            pts = matches[i].split(/:/);
-            pts[1] = pts[1].replace(/"/g,'');
+            pts = matches[i].split(/(:|=)/);
+            pts[2] = pts[2].replace(/"/g,'');
             if (pts[0] == 'author') {
-                $("#search-author").val(pts[1]);
+                $("#search-author").val(pts[2]);
             } else if (pts[0] == 'type') {
-                $("#search-type").val(pts[1]);
+                $("#search-type").val(pts[2]);
             } else if (pts[0] == 'id') {
-                $("#search-id").val(pts[1]);
+                $("#search-id").val(pts[2]);
             } else if (pts[0] == 'avgtime') {
-                var avgt = pts[1].split(/,/);
+                var avgt = pts[2].split(/,/);
                 $("#search-avgtime-min").val(avgt[0]);
                 $("#search-avgtime-max").val(avgt[1]);
             } else if (pts[0] == 'avgscore') {
-                var avgs = pts[1].split(/,/);
+                var avgs = pts[2].split(/,/);
                 $("#search-avgscore-min").val(avgs[0]);
                 $("#search-avgscore-max").val(avgs[1]);
             } else if (pts[0] == 'lastmod') {
-                var avgt = pts[1].split(/,/);
+                var avgt = pts[2].split(/,/);
                 $("#search-lastmod-min").val(avgt[0]);
                 $("#search-lastmod-max").val(avgt[1]);
             } else if (pts[0] == 'mine') {
-                $("#search-mine").prop('checked', pts[1] == 1)
+                $("#search-mine").prop('checked', pts[2] == 1)
             } else if (pts[0] == 'unused') {
-                $("#search-unused").prop('checked', pts[1] == 1)
+                $("#search-unused").prop('checked', pts[2] == 1)
+            } else if (pts[0] == 'isrand') {
+                $("#search-nounrand").prop('checked', pts[2] == 1)
             } else if (pts[0] == 'res') {
-                var helps = pts[1].split(/,/);
+                var helps = pts[2].split(/,/);
                 for (var j=0; j<helps.length;j++) {
                     $("#search-res-"+helps[j]).prop('checked', true);
                 }
             } else if (pts[0] == 'order') {
-                $("#search-newest").prop('checked', pts[1] == 'newest');
+                $("#search-newest").prop('checked', pts[2] == 'newest');
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore|isrand)(:|=)("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -133,6 +133,9 @@ function doAdvSearch() {
     if ($("#search-newest").is(':checked')) {
         outstr += 'order:newest ';
     }
+    if ($("#search-nounrand").is(':checked')) {
+        outstr += 'isrand:1 ';
+    }
     var helps = [];
     $("input[id^=search-res-]:checked").each(function(i,el) {
         helps.push(el.value);
@@ -147,18 +150,25 @@ function doAdvSearch() {
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
 }
+function startQuestionSearch(offset) {
+    if ($("#advsearchbtn").attr("aria-expanded") === 'true') {
+        doAdvSearch();
+    } else {
+        doQuestionSearch(offset);
+    }
+}
 var qsearchintransit = false;
 function doQuestionSearch(offset) {
     if (qsearchintransit) { return; }
     offset = offset || 0;
     $("#searcherror").hide();
-    $("#searchspinner").show();
     var search = document.getElementById("search").value;
     if (cursearchtype == 'all' && search.trim()=='') {
         $("#searcherror").html(_('You must provide a search term when searching All Libraries')).show();
         $("#search").focus();
         return;
     }
+    $("#searchspinner").show();
     qsearchintransit = true;
     $.ajax({
         url: qsearchaddr,
@@ -279,6 +289,11 @@ function displayQuestionList(results) {
         if (q['userights'] == 0) {
             features += '<span title="' + _('Private') + '" aria-label="' + _('Private') + '">' + 
                 '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' +
+                '</span>';
+        }
+        if (q['isrand'] == 0) {
+            features += '<span title="' + _('Not Randomized') + '" aria-label="' + _('Not Randomized') + '">' + 
+                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><line stroke="#f00" x1="5" y1="1" x2="19" y2="23"></line></svg>' +
                 '</span>';
         }
         descrclass = '';
@@ -549,6 +564,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      }
      GB_show('Library Select','libtree2.php?libtree=popup&libs='+listlibs,500,500);
  }
+
  function setlib(libs) {
      //document.getElementById("libs").value = libs;
      curlibs = libs;
@@ -557,8 +573,69 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      doQuestionSearch();
  }
  function setlibnames(libn) {
-     document.getElementById("libnames").innerHTML = libn.replace(/<span.*?<\/span.*?>/g,'');
+     document.getElementById("libnames").innerHTML = libn.replace(/\s*<span.*?<\/span.*?>/g,'').replace(/\s+/g,' ').trim();
      $("#libnames").parent().show();
+
+    // this gets called after setlib, so we'll check for and update history here
+    setlibhistory();
+ }
+
+ var recentlibs = {'ids':[], 'names':[]};
+ if (isLocalStorageAvailable()) {
+    var storagerecentlibs = window.localStorage.getItem('recentlibs');
+    if (storagerecentlibs !== null) {
+        recentlibs = JSON.parse(storagerecentlibs);
+    }
+ } else {
+    var cookierecentlibs = readCookie("recentlibs");
+    if (cookierecentlibs !== null) {
+        recentlibs = JSON.parse(decodeURIComponent(cookierecentlibs));
+    }
+}
+
+ function setlibhistory() {
+    var curloc = recentlibs.ids.indexOf(curlibs);
+    if (curloc != -1) { // remove if already in list
+        recentlibs.ids.splice(curloc,1);
+        recentlibs.names.splice(curloc,1);
+    }
+    recentlibs.ids.unshift(curlibs);
+    let curnames = document.getElementById("libnames").innerHTML.replace(/&\w+;/g,'');
+    curnames = curnames.length > 50 ? curnames.substring(0,49) + "..." : curnames;
+    recentlibs.names.unshift(curnames);
+    
+    if (recentlibs.ids.length > 6) {
+        recentlibs.ids.pop();
+        recentlibs.names.pop();
+    }
+    if (isLocalStorageAvailable()) {
+        window.localStorage.setItem('recentlibs', JSON.stringify(recentlibs));
+    } else {
+        document.cookie = "recentlibs=" + encodeURIComponent(JSON.stringify(recentlibs));
+    }
+    if (recentlibs.ids.length > 1) {
+        $('#searchtypemenu').children(":nth-child(n+4)").remove();
+        $('#searchtypemenu').append($("<li>", {
+            text: _("Recent Libraries"),
+            class: "dropdown-header"
+        }));
+        for (var i=1; i<recentlibs.ids.length; i++) {
+            const curi = i;
+            let libname = recentlibs.names[curi];
+        
+            $('#searchtypemenu').append($("<li>").append($("<a>", {
+                click: function (e) {
+                    setlib(recentlibs.ids[curi]);
+                    setlibnames(recentlibs.names[curi]);
+                    $(document).trigger("click"); // for some reason not happening automatically
+                    return false;
+                },
+                href: "#",
+                role: "button",
+                text: libname
+            })));
+        }
+    }
  }
  function assessselect() {
      var lista = '';
@@ -584,4 +661,15 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      } else {
          return true;
      }
+ }
+
+ function isLocalStorageAvailable(){
+    var test = 'test';
+    try {
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+    } catch(e) {
+        return false;
+    }
  }

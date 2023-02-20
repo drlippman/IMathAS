@@ -6,6 +6,7 @@
 		echo "Need course id";
 		exit;
 	}
+    if (!isset($_GET['id'])) { exit; }
 	$cid = intval($_GET['cid']);
 
 	if (isset($_GET['from'])) {
@@ -28,6 +29,7 @@
 	}
 
 	function findinpublic($items,$id) {
+        if (!is_array($items)) { return false; }
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
 				if ($item['public']==1) {
@@ -40,6 +42,7 @@
 		return false;
 	}
 	function finditeminblock($items,$id) {
+        if (!is_array($items)) { return false; }
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
 				if (finditeminblock($item['items'],$id)) {
@@ -58,7 +61,9 @@
 	$itemid = $stm->fetchColumn(0);
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	list($itemorder,$itemcoursename,$itemcoursetheme) = $stm->fetch(PDO::FETCH_NUM);
+	$row = $stm->fetch(PDO::FETCH_NUM);
+    if ($row === false) { exit; }
+    list($itemorder,$itemcoursename,$itemcoursetheme) = $row;
 	$items = unserialize($itemorder);
 	if ($fcid==0) {
 		$coursename = $itemcoursename;

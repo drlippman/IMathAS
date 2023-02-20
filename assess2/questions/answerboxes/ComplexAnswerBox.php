@@ -32,6 +32,7 @@ class ComplexAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -50,10 +51,18 @@ class ComplexAnswerBox implements AnswerBox
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
         if (in_array('list', $ansformats)) {
-            $tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5172i,-3-4i') . "<br/>";
+            if (in_array('allowjcomplex', $ansformats)) {
+                $tip = _('Enter your answer as a list of complex numbers in a+bj form separated with commas.  Example: 2+5.5172j,-3-4j') . "<br/>";
+            } else {
+                $tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5172i,-3-4i') . "<br/>";
+            }
             $shorttip = _('Enter a list of complex numbers');
         } else {
-            $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
+            if (in_array('allowjcomplex', $ansformats)) {
+                $tip = _('Enter your answer as a complex number in a+bj form.  Example: 2+5.5172j') . "<br/>";
+            } else {
+                $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
+            }
             $shorttip = _('Enter a complex number');
         }
         if (!in_array('nosoln', $ansformats) && !in_array('nosolninf', $ansformats)) {
@@ -86,7 +95,7 @@ class ComplexAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
             $answer = str_replace('"', '', $answer);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = makepretty($answer);
         }
 

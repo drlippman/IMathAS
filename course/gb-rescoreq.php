@@ -143,7 +143,7 @@ if (isset($_POST['record'])) {
 		if (strlen($row['lti_sourcedid'])>1) {
 			$bsarr = explode(';', $bestscorelist);
 			$bs = explode(',', $bsarr[0]);
-			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$row['userid'],$bs,true);
+			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$row['userid'],$bs,true, -1, false);
 		}
 	}
 	
@@ -158,6 +158,7 @@ if (isset($_POST['record'])) {
 		$("#rescoreform").submit();
 	});
 	</script>';
+    $useeqnhelper = 0;
 	require("../assessment/header.php");
 	echo '<h1>'._('Regrade Question').'</h1>';
 	echo '<p>'._('Please be patient - this page will auto-submit when it is done loading').'</p>';

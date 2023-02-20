@@ -48,7 +48,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        $givenans = normalizemathunicode(trim($givenans));
+        $givenans = normalizemathunicode(trim($givenans, " \n\r\t\v\x00,"));
 
         $givenans = preg_replace_callback(
             '/(arcsinh|arccosh|arctanh|arcsin|arccos|arctan|arcsec|arccsc|arccot|root|sqrt|sign|sinh|cosh|tanh|sech|csch|coth|abs|sin|cos|tan|sec|csc|cot|exp|log|ln)[\(\[]/i',
@@ -65,118 +65,13 @@ class FunctionExpressionScorePart implements ScorePart
 
         $correct = true;
 
-        $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$givenans);
-
         if (empty($variables)) { $variables = "x";}
-        $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
-        $ofunc = array();
-        for ($i = 0; $i < count($variables); $i++) {
-            if ($variables[$i]=='lambda') { //correct lamda/lambda
-                $givenans = str_replace('lamda', 'lambda', $givenans);
-            }
-            //find f() function variables
-            if (strpos($variables[$i],'()')!==false) {
-                $ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
-                $variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
-            }
-            // front end will submit p_(left) rather than p_left; strip parens
-            if (preg_match('/^(\w+)_(\w+)$/', $variables[$i], $m)) {
-              $givenans = preg_replace('/'.$m[1].'_\('.$m[2].'\)/', $m[0], $givenans);
-            }
-        }
+        list($variables, $tps, $flist) = numfuncGenerateTestpoints($variables, $domain);
+        $givenans = numfuncPrepForEval($givenans, $variables);
+        $answer = numfuncPrepForEval($answer, $variables);
 
-        if (!empty($domain)) {
-            $fromto = array_map('trim',explode(",",$domain));
-            for ($i=0; $i < count($fromto); $i++) {
-                if ($fromto[$i] === 'integers') { continue; }
-                else if (!is_numeric($fromto[$i])) {
-                    $fromto[$i] = evalbasic($fromto[$i]);
-                }
-            }
-        } else {
-            $fromto = array(-10, 10);
-        }
-        if (count($fromto)==1) {
-            $fromto = array(-10, 10);
-        }
-        $domaingroups = array();
-        $i=0;
-        while ($i<count($fromto)) {
-            if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
-                $domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
-                $i += 3;
-            } else if (isset($fromto[$i+1])) {
-                $domaingroups[] = array($fromto[$i], $fromto[$i+1], false);
-                $i += 2;
-            } else {
-                break;
-            }
-        }
-
-        uasort($variables,'lensort');
-        $newdomain = array();
-        $restrictvartoint = array();
-        foreach($variables as $i=>$v) {
-            if (isset($domaingroups[$i])) {
-                $touse = $i;
-            } else {
-                $touse = 0;
-            }
-            $newdomain[] = $domaingroups[$touse][0];
-            $newdomain[] = $domaingroups[$touse][1];
-            $restrictvartoint[] = $domaingroups[$touse][2];
-        }
-        $fromto = $newdomain;
-        $variables = array_values($variables);
-
-        if (count($ofunc)>0) {
-            usort($ofunc,'lensort');
-            $flist = implode("|",$ofunc);
-            $answer = preg_replace('/('.$flist.')\(/',"funcvar[$1](",$answer);
-            $givenans = preg_replace('/('.$flist.')\(/',"funcvar[$1](",$givenans);
-        }
         $vlist = implode(",",$variables);
 
-
-        for($j=0; $j < count($variables); $j++) {
-            if ($fromto[2*$j+1]==$fromto[2*$j]) {
-                for ($i = 0; $i < 20; $i++) {
-                    $tps[$i][$j] = $fromto[2*$j];
-                } 
-            } else if ($restrictvartoint[$j]) {
-                if ($fromto[2*$j+1]-$fromto[2*$j] > 200) {
-                    for ($i = 0; $i < 20; $i++) {
-                        $tps[$i][$j] = rand($fromto[2*$j],$fromto[2*$j+1]);
-                    }
-                } else {
-                    $allbetween = range($fromto[2*$j],$fromto[2*$j+1]);
-                    shuffle($allbetween);
-                    $n = count($allbetween);
-                    for ($i = 0; $i < 20; $i++) {
-                        $tps[$i][$j] = $allbetween[$i%$n];
-                    }
-                }
-            } else {
-                $dx = ($fromto[2*$j+1]-$fromto[2*$j])/20;
-                for ($i = 0; $i < 20; $i++) {
-                    $tps[$i][$j] = $fromto[2*$j] + $dx*$i + $dx*rand(1,499)/500.0;
-                }
-            }
-        }
-/*
-    old code.  New code above distributes the points more evenly across the domain
-        for ($i = 0; $i < 20; $i++) {
-            for($j=0; $j < count($variables); $j++) {
-                if ($fromto[2*$j+1]==$fromto[2*$j]) {
-                    $tps[$i][$j] = $fromto[2*$j];
-                } else if ($restrictvartoint[$j]) {
-                    $tps[$i][$j] = rand($fromto[2*$j],$fromto[2*$j+1]);
-                } else {
-                    $tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
-                }
-            }
-        }
-*/
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if (strcmp($answer,$givenans) === 0) {
@@ -192,7 +87,7 @@ class FunctionExpressionScorePart implements ScorePart
         }
 
         if (!in_array('inequality',$ansformats) &&
-            (strpos($answer,'<')!==false || strpos($answer,'>')!==false)
+            (strpos($answer,'<')!==false || strpos($answer,'>')!==false || strpos($answer,'!=')!==false)
          ) {
             echo 'Your $answer contains an inequality sign, but you do not have $answerformat="inequality" set. This question probably will not work right.';
         } else if (!in_array('equation',$ansformats) &&
@@ -202,37 +97,53 @@ class FunctionExpressionScorePart implements ScorePart
             echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
         }
 
-        if (in_array('list',$ansformats)) {
+        $isListAnswer = in_array('list',$ansformats);
+        if (in_array('allowplusminus', $ansformats)) {
+            if (!$isListAnswer) {
+                $ansformats[] = 'list';
+                $isListAnswer = true;
+            }
+            $answer = rewritePlusMinus($answer);
+            $givenans = rewritePlusMinus($givenans);
+        }
+
+        if ($isListAnswer) {
             $givenanslist = explode(',', $givenans);
         } else {
             $givenanslist = [$givenans];
         }
 
         $givenanslistvals = array();
+        $givenanslistineq = array();
         $givenanslistnormalized = array();
         $givenansused = array();
         foreach ($givenanslist as $givenans) {
             //build values for student answer
             $givenansvals = array();
-            if (in_array('equation',$ansformats)) {
-                if (substr_count($givenans, '=')!=1) {
-                    continue;
+            if (in_array('inequality',$ansformats)) {
+                if (in_array('equation',$ansformats)) {
+                    preg_match('/(.*)(<=|>=|<|>|!=|=)(.*)/', $givenans, $matches);
+                } else {
+                    preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $givenans, $matches);
                 }
-                $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
-            } else if (in_array('inequality',$ansformats)) {
-                if (preg_match('/(.*)(<=|>=|<|>)(.*)/', $givenans, $matches)) {
+                if (!empty($matches)) {
                     $toevalGivenans = $matches[3] . '-(' . $matches[1] . ')';
                     $givenInequality = $matches[2];
                 } else {
                     continue;
                 }
+            } else if (in_array('equation',$ansformats)) {
+                if (substr_count($givenans, '=')!=1) {
+                    continue;
+                }
+                $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
             } else if (preg_match('/(=|<|>)/', $givenans)) {
                 continue;
             } else {
                 $toevalGivenans = $givenans;
             }
 
-            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist);
+            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist, [], $flist, true);
             if ($givenansfunc === false) { //parse error
                 continue;
             }
@@ -244,12 +155,15 @@ class FunctionExpressionScorePart implements ScorePart
                 $givenansvals[] = $givenansfunc->evaluateQuiet($varvals);
             }
             $givenanslistvals[] = $givenansvals;
+            if (isset($givenInequality)) {
+                $givenanslistineq[] = $givenInequality;
+            }
             if (in_array('sameform',$ansformats)) {
                 $givenanslistnormalized[] = $givenansfunc->normalizeTreeString();
             }
         }
 
-        if (in_array('list',$ansformats)) {
+        if ($isListAnswer) {
             $answerlist = explode(',', $answer);
         } else {
             $answerlist = [$answer];
@@ -261,9 +175,10 @@ class FunctionExpressionScorePart implements ScorePart
             $ansarr = array_map('trim',explode(' or ',$answer));
             $partialpts = array_fill(0, count($ansarr), 1);
             $origanscnt = count($ansarr);
-            if (!empty($partialcredit) && !in_array('list',$ansformats)) { // partial credit only works for non-list answers
+            if (!empty($partialcredit) && !$isListAnswer) { // partial credit only works for non-list answers
                 if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
                 for ($i=0;$i<count($partialcredit);$i+=2) {
+                    $partialcredit[$i] = numfuncPrepForEval($partialcredit[$i], $variables);
                     if (!in_array($partialcredit[$i], $ansarr) || $partialcredit[$i+1]<1) {
                         $ansarr[] = $partialcredit[$i];
                         $partialpts[] = $partialcredit[$i+1];
@@ -275,34 +190,38 @@ class FunctionExpressionScorePart implements ScorePart
 
             foreach ($ansarr as $ansidx=>$answer) {
                 if (is_array($requiretimes)) {
-                    if (in_array('list',$ansformats)) {
+                    if ($isListAnswer) {
                         if (isset($requiretimes[$alidx])) {
                             $thisreqtimes = $requiretimes[$alidx];
                         } else {
                             $thisreqtimes = '';
                         }
                     } else if ($ansidx<$origanscnt) {
-                        $thisreqtimes = $requiretimes[0];
+                        $thisreqtimes = $requiretimes[0] ?? '';
                     } else {
-                        $thisreqtimes = $requiretimes[$ansidx-$origanscnt+1];
+                        $thisreqtimes = $requiretimes[$ansidx-$origanscnt+1] ?? '';
                     }
                 } else {
                     $thisreqtimes = $requiretimes;
                 }
                 $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\'<>]+/','',$answer);
 
-                if (in_array('equation',$ansformats)) {
-                    $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
-                } else if (in_array('inequality',$ansformats)) {
-                    preg_match('/(.*)(<=|>=|<|>)(.*)/', $answer, $matches);
+                if (in_array('inequality',$ansformats)) {
+                    if (in_array('equation',$ansformats)) {
+                        preg_match('/(.*)(<=|>=|<|>|!=|=)(.*)/', $answer, $matches);
+                    } else {
+                        preg_match('/(.*)(<=|>=|<|>|!=)(.*)/', $answer, $matches);
+                    }
                     $answer = $matches[3] . '-(' . $matches[1] . ')';
                     $answerInequality = $matches[2];
-                }
+                } else if (in_array('equation',$ansformats)) {
+                    $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
+                } 
                 if ($answer == '') {
                     continue;
                 }
                 $origanswer = $answer;
-                $answerfunc = parseMathQuiet(makepretty($answer), $vlist);
+                $answerfunc = parseMathQuiet(makepretty($answer), $vlist, [], $flist);
                 if ($answerfunc === false) {  // parse error on $answer - can't do much
                     continue;
                 }
@@ -321,7 +240,7 @@ class FunctionExpressionScorePart implements ScorePart
                         continue; // already used this givenans
                     }
 
-                    $givenansnormalized = $givenanslistnormalized[$gaidx];
+                    $givenansnormalized = $givenanslistnormalized[$gaidx] ?? '';
                     $correct = true;
                     $cntnan = 0;
                     $cntzero = 0;
@@ -380,11 +299,11 @@ class FunctionExpressionScorePart implements ScorePart
                                 $meanratio = array_sum($ratios)/count($ratios);
                                 if (in_array('inequality',$ansformats)) {
                                     if ($meanratio > 0) {
-                                        if ($answerInequality != $givenInequality) {
+                                        if ($answerInequality != $givenanslistineq[$gaidx]) {
                                             $correct = false; continue;
                                         }
                                     } else {
-                                        $flippedIneq = strtr($givenInequality, ['<'=>'>', '>'=>'<']);
+                                        $flippedIneq = strtr($givenanslistineq[$gaidx], ['<'=>'>', '>'=>'<']);
                                         if ($answerInequality != $flippedIneq) {
                                             $correct = false; continue;
                                         }
@@ -442,7 +361,7 @@ class FunctionExpressionScorePart implements ScorePart
             }
         }
     
-        if (in_array('list',$ansformats)) {
+        if ($isListAnswer) {
             $score = array_sum($correctscores)/count($answerlist);
             if (count($givenanslist) > count($answerlist)) {
                 $score -= (count($givenanslist) - count($answerlist))/(count($givenanslist) + count($answerlist));

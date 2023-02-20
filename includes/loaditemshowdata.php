@@ -19,6 +19,10 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 	 $now = time();
 	 foreach ($items as $item) {
 		 if (is_array($item)) { //only add content from open blocks
+            if (empty($item['items'])) { continue; } // skip empty blocks
+            if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+			}
 			 $turnonpublic = false;
 			 if ($ispublic && !$inpublic) {
 			 	 if (isset($item['public']) && $item['public']==1) {
@@ -27,7 +31,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 	 	 continue;
 			 	 }
 			 }
-			 if (!$viewall && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
+			 if (!$viewall && !empty($studentinfo) && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
 				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
 					 continue;
 				 }
@@ -38,7 +42,12 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 						if (!empty($item['id']) && in_array($item['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 						if ($firstload && (strlen($item['SH'])==1 || $item['SH'][1]=='O')) {$isopen=true;}
 					}
-					if ($onlyopen==0 || ($onlyopen==-1 && $item['SH'][1]!='T') || ($onlyopen==1 && $isopen && $item['SH'][1]!='T' && $item['SH'][1]!='F')) {
+					if ($onlyopen==0 || 
+                        ($onlyopen==-1 && (strlen($item['SH'])==1 || $item['SH'][1]!='T')) || 
+                        ($onlyopen==1 && $isopen && 
+                            (strlen($item['SH'])==1 || ($item['SH'][1]!='T' && $item['SH'][1]!='F'))
+                        )
+                    ) {
 						getitemstolookup($item['items'],$inpublic||$turnonpublic,$viewall,$tolookup,$onlyopen,$ispublic);
 					}
 			 }
@@ -289,6 +298,7 @@ function upsendexceptions(&$items) {
 	   $maxedate = 0;
 	   foreach ($items as $k=>$item) {
 		   if (is_array($item)) {
+              if (empty($item['items'])) { continue; }
 			  $hasexc = upsendexceptions($items[$k]['items']);
 			  if ($hasexc!=FALSE) {
 				  if ($hasexc[0]<$items[$k]['startdate']) {

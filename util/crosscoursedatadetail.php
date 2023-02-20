@@ -125,6 +125,47 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$courses[$row['id']] = $row['courseid'];
 	$qmap = $qmap + array_flip($row['itemorder']);	
 }
+// pull descendents looking at new assessment data
+$query = 'SELECT ia.id,ia.courseid,ia.itemorder,ia.ptsposs,ia.ancestors FROM imas_assessments AS ia ';
+$query .= 'JOIN imas_courses AS ic ON ic.id=ia.courseid ';
+$query .= 'JOIN imas_users AS iu ON ic.ownerid=iu.id ';
+$query .= 'JOIN imas_assessment_records AS iar ON ia.id=iar.assessmentid ';
+$query .= 'WHERE iu.groupid=? AND (ia.ancestors REGEXP ? OR ia.ancestors REGEXP ?)';
+$query .= 'GROUP BY ia.id HAVING MAX(iar.lastchange)>?';
+$stm = $DBH->prepare($query);
+$stm->execute(array($lookupgroup, $anregex1, $anregex2, $old));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['courseid'] == $basecourse) { continue; } // don't want to include any assess from the basecourse.
+    $ancestors = explode(',', $row['ancestors']);
+    foreach ($ancestors as $ancestor) {
+        $pts = explode(':', $ancestor);
+        if (count($pts)==2 && $pts[0] == $basecourse) {
+            // found first copy from basecourse
+            if ($pts[1] != $baseassess) {
+                // most direct ancestor from basecourse is not baseassess,
+                // so basecourse must have had copies of the assess
+                continue 2;
+            } 
+            break; // found a copy, don't need to continue loop
+        } 
+    }
+	$row['itemorder'] = explode(',', str_replace('~',',',preg_replace('/\d+\|\d+~/','',$row['itemorder'])));
+	if ($qcnt != count($row['itemorder'])) {
+		//invalid question count
+		continue;
+	}
+	if ($row['ptsposs']==-1) {
+		require_once("../includes/updateptsposs.php");
+		$row['ptsposs'] = updatePointsPossible($row['id']);
+	}
+	if ($row['ptsposs'] != $ptsposs) {
+		//wrong points possible
+		continue;	
+	}
+	$assessdata[$row['id']] = $row;
+	$courses[$row['id']] = $row['courseid'];
+	$qmap = $qmap + array_flip($row['itemorder']);	
+}
 
 //pull qsetids to verify assessments match
 $allaids = array_keys($assessdata);
@@ -230,6 +271,29 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 		$assessresults[$qn][$thisaid][] = getpts($scores[$k]);
 	}
+}
+
+//pull new assessment data
+$query = 'SELECT assessmentid,scoreddata FROM imas_assessment_records WHERE ';
+$query .= "assessmentid IN ($phcopyaids)";
+$stm = $DBH->prepare($query);
+$stm->execute(array_keys($assessdata));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $data = json_decode(gzdecode($row['scoreddata']), true);
+    if (empty($data)) { continue; }
+    $thisaid = $row['assessmentid'];
+
+    $avertouse = isset($data['scored_version']) ? $data['scored_version'] : 0;
+    $aver = $data['assess_versions'][$avertouse];
+    foreach ($aver['questions'] as $qdata) {
+        $qvertouse = isset($qdata['scored_version']) ? $qdata['scored_version'] : 0;
+        $qid = $qdata['question_versions'][$qvertouse]['qid'];
+        $qn = $qmap[$qid];
+		if (!isset($assessresults[$qn][$thisaid])) {
+			$assessresults[$qn][$thisaid] = array();
+		}
+		$assessresults[$qn][$thisaid][] = $qdata['score'];
+    }
 }
 
 //echo "Assess data processing done: ".(microtime(true)-$ts).'<br>';

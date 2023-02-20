@@ -26,7 +26,8 @@ if (isset($CFG['hooks']['init'])) {
 if (!function_exists('disallowsSameSiteNone')) {
 function disallowsSameSiteNone () {
 	// based on https://devblogs.microsoft.com/aspnet/upcoming-samesite-cookie-changes-in-asp-net-and-asp-net-core/
-	$userAgent = $_SERVER['HTTP_USER_AGENT'];
+	if (!isset($_SERVER['HTTP_USER_AGENT'])) { return false; }
+    $userAgent = $_SERVER['HTTP_USER_AGENT'];
 	if (strpos($userAgent, "CPU iPhone OS 12") !== false ||
 		strpos($userAgent, "iPad; CPU OS 12") !== false
 	) {
@@ -49,7 +50,7 @@ function disallowsSameSiteNone () {
 }
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',432000);
-ini_set('auto_detect_line_endings',true);
+
 $hostdomain = explode(':', Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
 $hostparts = explode('.', $hostdomain[0]);
 if ((!function_exists('isDevEnvironment') || !isDevEnvironment())

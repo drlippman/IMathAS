@@ -135,10 +135,11 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessUrl = "../assess2/";
 }
 
-$curBreadcrumb = $breadcrumbbase;
+$curBreadcrumb = $breadcrumbbase ?? '';
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
+$pagetitle = _('Gradebook');
 
 //HANDLE ANY POSTS
 if ($isteacher) {
@@ -241,11 +242,11 @@ if ($isteacher) {
 		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
-			$toins[] = "(?,?,?,?,?)";
-			array_push($qarr, $id, 'offline', $stu, $val, $_POST['feedback'][$id]);
+			$toins[] = "(?,?,?,?)";
+			array_push($qarr, $id, 'offline', $stu, $val);
 		}
 		if (count($toins)>0) {
-			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
+			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score) VALUES ".implode(',',$toins);
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 		}
@@ -292,7 +293,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -387,6 +388,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
 	echo '<li>'._('<sup>e</sup> Has exception').'</li>';
 	echo '<li>'._('<sup>LP</sup> Used latepass').'</li>';
+    echo '<li>'._('<sup>AP</sup> Total is calculated using averaged percents').'</li>';
 	echo '</ul></div>';
 
 	require("../footer.php");
@@ -499,6 +501,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="-1:-1" ';
 		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
 		echo '>', _('Active'), '</option>';
+        echo '<option value="-2:-2" ';
+		if ($colorize == "-2:-2") { echo 'selected="selected" ';}
+		echo '>', _('NC'), '</option>';
 		echo '</select> &nbsp; ';
 		//echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
@@ -1180,6 +1185,7 @@ function gbstudisp($stu) {
 		}
 		echo '</tr>';
 		echo '</thead><tbody>';
+        
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			//$donedbltop = false;
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
@@ -1194,7 +1200,11 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]).'</span>';
+				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]);
+                if ($gbt[0][2][$i][13]==1) { //averaged percents
+                    echo '<sup>AP</sup>';
+                }
+                echo '</span>';
 				if (isset($gbt[0][2][$i][11])) {  //category weight
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
@@ -1513,7 +1523,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 						} else {
 							echo $gbt[$i][2][$j][$availshow];
 						}
-					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops or attempted
+					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops/excused or attempted
 						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
 					} else {
 						echo $gbt[$i][2][$j][$availshow];
@@ -1903,7 +1913,7 @@ function gbinstrdisp() {
 
 							echo '</span>';
 						}
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 					} else {
@@ -1917,7 +1927,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==3) { //exttool
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							if ($gbt[0][1][$j][2]>0) {
+							if (isset($gbt[$i][1][$j][0]) && $gbt[0][1][$j][2]>0) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
 								$avgtip = '';
@@ -1948,7 +1958,7 @@ function gbinstrdisp() {
 					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				}

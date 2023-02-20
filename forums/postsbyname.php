@@ -57,7 +57,7 @@
 
 	$placeinhead = '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=082911" type="text/css" />';
 	if ($haspoints && $caneditscore && $rubric != 0) {
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=113016"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
 		require("../includes/rubric.php");
 	}
 	if ($caneditscore && $_SESSION['useed']!=0) {
@@ -192,7 +192,7 @@
 	}
 	function GBdoReply(threadid,postid) {
 		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
-		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto");
+		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto",true,'','',{'func':'submitpost','label':'<?php echo _('Post Reply');?>'});
 		return false;
 	}
 	</script>
@@ -361,18 +361,18 @@
 				*/
 				if ($_SESSION['useed']==0) {
 					$content .= "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback".Sanitize::onlyInt($line['id'])."\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
-					if ($feedback[$line['id']]!==null) {
+					if (!empty($feedback[$line['id']])) {
 						$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
 					}
 					$content .= "</textarea>";
 				} else {
 					$content .= '<div class="fbbox" id="feedback'.Sanitize::onlyInt($line['id']).'">';
-					if ($feedback[$line['id']]!==null) {
+					if (!empty($feedback[$line['id']])) {
 						$content .= Sanitize::outgoingHtml($feedback[$line['id']]);
 					}
 					$content .= '</div>';
 				}
-			} else if (($line['userid']==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
+			} else if (($line['userid']==$userid || $canviewscore) && !empty($feedback[$line['id']])) {
 				$content .= '<div class="signup">Private Feedback: ';
 				$content .= '<div>'.Sanitize::outgoingHtml($feedback[$line['id']]).'</div>';
 				$content .= '</div>';
@@ -390,7 +390,7 @@
 
 	echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
 
-	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($_GET['page'])."\">Back to Thread List</a></p>";
+	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Thread List</a></p>";
 
 	require("../footer.php");
 

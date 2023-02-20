@@ -33,6 +33,7 @@ class CalculatedAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -57,6 +58,17 @@ class CalculatedAnswerBox implements AnswerBox
         }
 
         $ansformats = array_map('trim', explode(',', $answerformat));
+        $isListAnswer =  (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats));
+
+        if (in_array('allowplusminus', $ansformats)) {
+            if (!$isListAnswer) {
+                $ansformats[] = 'list';
+                $answerformat = ($answerformat == '') ? 'list' : $answerformat . ',list';
+                $isListAnswer = true;
+            }
+        } else if (isset($GLOBALS['myrights']) && $GLOBALS['myrights'] > 10 && is_string($answer) && strpos($answer,'+-')!==false) {
+            echo _('Warning: For +- in an $answer to score correctly, use $answerformat="allowplusminus"');
+        }
 
         if (!empty($ansprompt) && !in_array('nosoln', $ansformats) && !in_array('nosolninf', $ansformats)) {
             $out .= $ansprompt;
@@ -72,7 +84,7 @@ class CalculatedAnswerBox implements AnswerBox
             $rightb = '';
         }
 
-        if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
+        if ($isListAnswer) {
             $tip = _('Enter your answer as a list of values separated by commas: Example: -4, 3, 2') . "<br/>";
             $eword = _('each value');
         } else if (in_array('set', $ansformats) || in_array('exactset', $ansformats)) {
@@ -82,7 +94,7 @@ class CalculatedAnswerBox implements AnswerBox
             $tip = '';
             $eword = _('your answer');
         }
-        list($longtip, $shorttip) = formathint($eword, $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calculated', (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats) || in_array('set', $ansformats) || in_array('exactset', $ansformats)), 1);
+        list($longtip, $shorttip) = formathint($eword, $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calculated', ($isListAnswer || in_array('set', $ansformats) || in_array('exactset', $ansformats)), 1);
         $tip .= $longtip;
         if ($reqsigfigs !== '' && !in_array("scinot", $ansformats) && !in_array("scinotordec", $ansformats) && !in_array("decimal", $ansformats)) {
             $reqsigfigs = '';
@@ -91,7 +103,7 @@ class CalculatedAnswerBox implements AnswerBox
             list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
 
             if ($exactsigfig) {
-                if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
+                if ($isListAnswer) {
                     $answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs, '', false, in_array("scinot", $ansformats) || in_array("scinotordec", $ansformats)));
                 } else {
                     $answer = prettysigfig($answer, $reqsigfigs, '', false, in_array("scinot", $ansformats) || in_array("scinotordec", $ansformats));
@@ -102,11 +114,11 @@ class CalculatedAnswerBox implements AnswerBox
                 $tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs + $reqsigfigoffset);
                 $shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs + $reqsigfigoffset);
             } else {
-                if ($answer != 0) {
+                if (is_numeric($answer) && $answer != 0) {
                     $v = -1 * floor(-log10(abs($answer)) - 1e-12) - $reqsigfigs;
                 }
-                if ($answer != 0 && $v < 0 && strlen($answer) - strpos($answer, '.') - 1 + $v < 0) {
-                    if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
+                if (is_numeric($answer) && $answer != 0 && $v < 0 && strlen($answer) - strpos($answer, '.') - 1 + $v < 0) {
+                    if ($isListAnswer) {
                         $answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs, '', false, in_array("scinot", $ansformats) || in_array("scinotordec", $ansformats)));
                     } else {
                         $answer = prettysigfig($answer, $reqsigfigs, '', false, in_array("scinot", $ansformats) || in_array("scinotordec", $ansformats));
@@ -138,7 +150,7 @@ class CalculatedAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
         $params['calcformat'] = $answerformat;
 
@@ -161,9 +173,13 @@ class CalculatedAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if (!is_numeric($answer)) {
-                $sa = '`' . $answer . '`';
+                //$sa = '`' . $answer . '`';
+                if (in_array('allowplusminus', $ansformats)) {
+                    $answer = str_replace('+-','pm',$answer);
+                }
+                $sa = makeprettydisp($answer);
             } else if (in_array('mixednumber', $ansformats) || in_array("sloppymixednumber", $ansformats) || in_array("mixednumberorimproper", $ansformats)) {
                 $sa = '`' . decimaltofraction($answer, "mixednumber") . '`';
             } else if (in_array("fraction", $ansformats) || in_array("reducedfraction", $ansformats)) {

@@ -129,7 +129,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
 			require_once("../includes/updateptsposs.php");
-			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			updatePointsPossible($aid, $itemorder, $row[2]);
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
@@ -295,7 +295,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true, -1, false);
 					}
 				}
 				$DBH->commit();
@@ -339,7 +339,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true, -1, false);
 					}
 				}
 			}
@@ -384,8 +384,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090821\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=121321\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=011923\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=011923\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -450,6 +450,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         } else {
             $searchin = [$userdeflib];
         }
+        $_SESSION['searchin'.$aid] = $searchin;
+        $_SESSION['lastsearchlibs'.$aid] = implode(',', $searchin);
     } else {
         $searchin = [];
     }
@@ -522,6 +524,9 @@ if ($overwriteBody==1) {
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
 	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions2.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<a href="isolateassessgrade.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>" target="_blank">
+		<?php echo _('View Scores');?>
+	</a>
 	</p>
 <?php
 	}
@@ -598,7 +603,7 @@ if ($overwriteBody==1) {
 <?php
     
 	if ($displaymethod=='VideoCue' || $displaymethod == 'video_cued') {
-		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
+		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&from=addq2&aid='.$aid.'\'"/></p>';
 	} else if ($displaymethod == 'full') {
 		echo '<p>'._('You can break your assessment into pages by using the +Text button and selecting the New Page option.').'</p>';
 	}
@@ -613,7 +618,7 @@ if ($overwriteBody==1) {
 			}
         ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"><?php echo _("Preview"); ?></button>
         <?php if (!$beentaken) { ?>
-        <a href="moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'"><?php echo _("Add New Question") ?></a>
+        <a href="moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>&from=addq2"><?php echo _("Add New Question") ?></a>
         <?php } ?>
 
 	</p>
@@ -640,7 +645,7 @@ if ($overwriteBody==1) {
             }
             ?>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" id="searchtypemenu">
             <li><a href="#" role="button" onclick="alllibs(); return false;">
                 <?php echo _('All Libraries'); ?>
             </a></li>
@@ -660,7 +665,7 @@ if ($overwriteBody==1) {
                 id="searchclear" aria-label="Clear Search">&times;</button>
         </div>
         <div class="dropdown splitbtn" id="searchbtngrp" >
-            <button type="button" class="primary" onclick="doQuestionSearch()">
+            <button type="button" class="primary" onclick="startQuestionSearch()">
                 <?php echo _('Search');?>
             </button><button type="button" id="advsearchbtn" class="primary dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only"><?php echo _('Advanced Search'); ?></span>
@@ -696,6 +701,7 @@ if ($overwriteBody==1) {
                             <option value="calcinterval">Calculated Interval</option>
                             <option value="complex">Complex</option>
                             <option value="calccomplex">Calculated Complex</option>
+							<option value="chemeqn">Chemical Equation</option>
                             <option value="file">File Upload</option>
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>
@@ -718,6 +724,7 @@ if ($overwriteBody==1) {
                     <p><label><input type=checkbox id="search-mine"><?php echo _('Mine Only');?></label> 
                         <label><input type=checkbox id="search-unused"><?php echo _('Exclude Added');?></label> 
                         <label><input type=checkbox id="search-newest"><?php echo _('Newest First');?></label> 
+                        <label><input type=checkbox id="search-nounrand"><?php echo _('Exclude non-randomized');?></label> 
                     </p>
                     <p><?php echo _('Helps');?>: 
                         <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 
@@ -793,7 +800,7 @@ if ($overwriteBody==1) {
 </div>
         
 <form id="selq">
-	<table cellpadding="5" id="myTable" class="gb zebra" style="clear:both; position:relative;" tabindex="-1">
+	<table cellpadding="5" id="myTable" class="gb zebra potential-question-list" style="clear:both; position:relative;" tabindex="-1">
     </table>
     <p><span id="searchnums"><?php echo _('Showing');?> <span id="searchnumvals"></span></span>
       <a href="#" id="searchprev" style="display:none"><?php echo _('Previous Results');?></a>
@@ -804,6 +811,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
     $(function() {
         displayQuestionList(<?php echo json_encode($search_results, JSON_INVALID_UTF8_IGNORE); ?>);
+        setlibhistory();
     });
 </script>
 </div>

@@ -32,7 +32,7 @@ if (!(isset($teacherid))) {
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 	$curBreadcrumb .= _("Modify Question Settings");
 
-	if ($_GET['process']== true) {
+	if (!empty($_GET['process'])) {
 		if (isset($_GET['usedef'])) {
 			$points = 9999;
 			$attempts=9999;

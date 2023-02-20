@@ -1,6 +1,6 @@
 <?php
 	require("../init.php");
-	$isteacher = (isset($teacherid) || $_SESSION['isteacher']==true);
+	$isteacher = (isset($teacherid) || !empty($_SESSION['isteacher']));
 	if (!isset($_SESSION['sessiontestid']) && !$isteacher) {
 		echo "<html><body>Error. </body></html>\n";
 		exit;
@@ -25,6 +25,7 @@
 			</script>';
 	}
 	$_SESSION['coursetheme'] = $coursetheme;
+    $useeqnhelper = 0;
 	require("header.php");
 	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn, button.btn {display: none;}\n textarea {display: none;}\n .question, .review {background-color:#fff;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;} input.sabtn,input.dsbtn {display: none;}</style>\n";

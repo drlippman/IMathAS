@@ -32,6 +32,7 @@ class NTupleAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -109,7 +110,7 @@ class NTupleAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = $answer;
             if ($displayformat == 'vectorlist' || $displayformat == 'vector') {
                 $sa = str_replace(array('<', '>'), array('(:', ':)'), $sa);

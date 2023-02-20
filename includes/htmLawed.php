@@ -3,10 +3,13 @@
 require_once(dirname(__FILE__)."/filehandler.php");
 
 function convertdatauris($in) {
+    if (empty($in)) { return $in; }
+    $orig = $in;
 	global $CFG,$userid;
 	$okext = array('jpeg'=>'.jpg','gif'=>'.gif','png'=>'.png');
 	if (strpos($in,'data:image')===false) {return $in;}
 	$in = preg_replace('/<img[^>]*src="data:image[^>]*$/','',$in);
+    if ($in === null) { error_log('preg error in convertdatauris:' . preg_last_error()); return $orig; }
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		preg_match_all('/<img[^>]*src="(data:image\/(\w+);base64,([^"]*))"/',$in,$matches);
 		$milliseconds = round(microtime(true) * 1000);
@@ -32,7 +35,7 @@ function myhtmLawed($t, $NC=1, $NS='') {
 		'direct_list_nest'=>1,
 		'deny_attribute'=>'on*',
 		'cdata'=>0,
-		'comment'=>0
+		'comment'=>1
 		);
 	$S = "embed=sscr,script";
 	if (is_array($NC)) { //overwrite or append new config

@@ -28,6 +28,8 @@
 		unset($_SESSION['forumsearchtype'.$cid]);
 		unset($_SESSION['forumsearchtag'.$cid]);
 		$searchtype = "none";
+        $searchstr = '';
+        $searchtag = '';
 	} else if(isset($_POST['searchsubmit'])) {
 		$searchstr = trim($_POST['search']);
 		$searchtype = $_POST['searchtype'];
@@ -42,6 +44,7 @@
 	} else {
         $searchtype = "none";
         $searchstr = "";
+        $searchtag = '';
 	}
 
 
@@ -79,13 +82,14 @@
 
 	//pull exceptions, as they may extend the enddate
 	$exceptions = array();
-	if (isset($studentid) && count($forumdata)>0) {
+	if (isset($studentid) && !$inInstrStuView && count($forumdata)>0) {
 		require_once("../includes/exceptionfuncs.php");
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 		$ph = Sanitize::generateQueryPlaceholders($forumdata);
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype,assessmentid FROM imas_exceptions WHERE assessmentid in ($ph) AND userid=? AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 		$stm->execute(array_merge(array_keys($forumdata), array($userid)));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            if (!isset($forumdata[$row[5]])) { continue; } // lingering exception for nonexistant forum
 			$exceptionresult = $exceptionfuncs->getCanUseLatePassForums($row, $forumdata[$row[5]]);
 			$forumdata[$row[5]]['enddate'] = $exceptionresult[7];
 		}
@@ -98,7 +102,9 @@
 		global $itemsimporder;
 		foreach ($items as $item) {
 			if (is_array($item)) {
-				flattenitems($item['items'],$addto);
+                if (!empty($item['items'])) {
+				    flattenitems($item['items'],$addto);
+                }
 			} else {
 				$addto[] = $item;
 			}
@@ -133,7 +139,7 @@
 	//construct tag list selector
 	$taginfo = array();
 	foreach ($itemsimporder as $item) {
-		if (!isset($itemsassoc[$item])) { continue; }
+		if (!isset($itemsassoc[$item]) || !isset($forumdata[$itemsassoc[$item]])) { continue; }
 		$taglist = $forumdata[$itemsassoc[$item]]['taglist'];
 		if ($taglist=='') { continue;}
 		$p = strpos($taglist,':');
@@ -286,10 +292,10 @@ if ($searchtype == 'thread') {
 			if ($isteacher) {
 				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&move=" . Sanitize::onlyInt($line['id']) . "\">Move</a> ";
 			}
-			if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
+			if ($isteacher) {
 				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&modify=" . Sanitize::onlyInt($line['id']) . "\">Modify</a> ";
 			}
-			if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
+			if ($isteacher) {
 				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&remove=" . Sanitize::onlyInt($line['id']) . "\">Remove</a>";
 			}
 			echo "</span>\n";
@@ -535,7 +541,7 @@ if ($searchtype == 'thread') {
 	}
 	*/
 	foreach ($itemsimporder as $item) {
-		if (!isset($itemsassoc[$item])) { continue; }
+		if (!isset($itemsassoc[$item]) || !isset($forumdata[$itemsassoc[$item]])) { continue; }
 		$line = $forumdata[$itemsassoc[$item]];
 
 		if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {

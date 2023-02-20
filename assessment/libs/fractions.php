@@ -6,7 +6,7 @@ array_push($allowedmacros, "fractionrand", "fractiondiffdrands", "fractiondiffdr
 
 //fractionrand(denom)
 //returns a proper reduced fraction with the given denominator
-function fractionrand($d) {
+function fractionrand($d, $returnval = false) {
 	global $RND;
 	$goodnum = array('4'=>array(1,3), '6'=>array(1,5), '8'=>array(1,3,5,7), '10'=>array(1,3,7,9), '12'=>array(1,5,7,11));
 	$d = round($d);
@@ -21,36 +21,68 @@ function fractionrand($d) {
 			$n = $RND->rand(1,$d-1);
 		} while (gcd($d,$n)!=1);
 	}
-	return "$n/$d";
+	if ($returnval) {
+		return ["$n/$d", $n/$d];
+	} else {
+		return "$n/$d";
+	}
 }
 
 //fractiondiffdrands(min,max,n) {
 //returns n fractions with different denominators from min to max
-function fractiondiffdrands($min,$max,$n) {
+function fractiondiffdrands($min,$max,$n, $order = 'any') {
 	$ds = diffrands($min,$max,$n);
 	$out = array();
+	$valout = array();
 	foreach ($ds as $d) {
-		$out[] = fractionrand($d);
+		list($out[], $valout[]) = fractionrand($d, true);
 	}
-	return $out;
+	if ($order == 'inc') {
+		asort($valout);
+	} else if ($order == 'dec') {
+		arsort($valout);
+	}
+	if ($order == 'inc' || $order == 'dec') {
+		$outsorted = [];
+		foreach ($valout as $k=>$v) {
+			$outsorted[] = $out[$k];
+		}
+		return $outsorted;
+	} else {
+		return $out;
+	}
 }
 
 //fractiondiffdrandsfrom(list,n) {
 //returns n fractions with different denominators from the list
-function fractiondiffdrandsfrom($list,$n) {
+function fractiondiffdrandsfrom($list,$n, $order = 'any') {
 	$ds = diffrandsfrom($list,$n);
 	$out = array();
+	$valout = array();
 	foreach ($ds as $d) {
-		$out[] = fractionrand($d);
+		list($out[], $valout[]) = fractionrand($d, true);
 	}
-	return $out;
+	if ($order == 'inc') {
+		asort($valout);
+	} else if ($order == 'dec') {
+		arsort($valout);
+	}
+	if ($order == 'inc' || $order == 'dec') {
+		$outsorted = [];
+		foreach ($valout as $k=>$v) {
+			$outsorted[] = $out[$k];
+		}
+		return $outsorted;
+	} else {
+		return $out;
+	}
 }
 
 //fractionparse(fraction)
 //converts a fraction into an array(num, denom)
 function fractionparse($f) {
 	if (is_array($f)) {return $f;}
-	$p = explode('/',trim($f));
+	$p = array_map('trim', explode('/',$f));
 	if (trim($p[0])=='') {
 		if ($GLOBALS['myrights']>10) {
 			echo "Error in fraction: undefined numerator";
@@ -66,7 +98,7 @@ function fractionparse($f) {
 			}
 			$p[1]=1;
 		}
-		$wp = explode(' ',$p[0]);
+		$wp = array_map('trim', explode(' ',$p[0]));
 		if (count($wp)==1) {
 			return array($p[0],$p[1]);
 		} else {
@@ -103,6 +135,8 @@ function fractiontomixed($fp) {
 
 //fractiontodecimal(f)
 function fractiontodecimal($f) {
+    if ($f === '') { return ''; } // bypass on empty values
+    else if (is_numeric($f)) { return $f; } // don't parse if already a number
 	if (!is_array($f)) {
 		$f = fractionparse($f);
 	}
@@ -111,7 +145,9 @@ function fractiontodecimal($f) {
 			echo "Error: fraction with denominator 0";
 		}
 		return 0;
-	}
+	} else if (!is_numeric($f[0])) {
+        return $f;
+    }
 	return $f[0]/$f[1];
 }
 
@@ -271,11 +307,10 @@ function fractiondivide() {
 //fractionneg(frac)
 //change the sign of a fraction
 function fractionneg($f) {
+    $fracarr = false;
 	if (!is_array($f)) {
 		$f = fractionparse($f);
-	}
-	$fracarr = false;
-	if (is_array($args[0])) {
+	} else {
 		$fracarr = true;
 	}
 	return fractionreduce(-1*$f[0],$f[1],$fracarr);
@@ -284,13 +319,13 @@ function fractionneg($f) {
 //fractionpower(frac, power)
 //raises a fraction to a power
 function fractionpower($f,$p) {
+    $fracarr = false;
 	if (!is_array($f)) {
 		$f = fractionparse($f);
-	}
-	$fracarr = false;
-	if (is_array($args[0])) {
+	} else {
 		$fracarr = true;
 	}
+	
 	$num = pow($f[0], $p);
 	$denom = pow($f[1], $p);
 	return fractionreduce($num,$denom,$fracarr);

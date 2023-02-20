@@ -76,7 +76,9 @@ $itemmap = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
 function flattenitems($items, &$itemmap, &$assessorder) {
     foreach ($items as $item) {
         if (is_array($item)) { // block
-            flattenitems($item['items'], $itemmap, $assessorder);
+            if (!empty($item['items'])) {
+                flattenitems($item['items'], $itemmap, $assessorder);
+            }
         } else if (isset($itemmap[$item])) { // is an assessment
             $assessorder[] = $itemmap[$item];
         }

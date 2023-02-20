@@ -29,7 +29,7 @@
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$page = Sanitize::onlyInt($_GET['page'] ?? 0);
-	$type = $_GET['type'];
+	$type = $_GET['type'] ?? '';
 
 	$teacherof = array();
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE userid=:userid");
@@ -92,6 +92,7 @@
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto=:msgto OR imas_msgs.msgfrom=:msgfrom)";
 	}
+
 	$stm = $DBH->prepare($query);
 	if ($type!='allstu' || !$isteacher) {
 		$stm->execute(array(':courseid'=>$cid, ':id'=>$msgid, ':msgto'=>$userid, ':msgfrom'=>$userid));
@@ -188,7 +189,7 @@
 	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title']);
 	if ($myrights>=20 && preg_match('/Question\s+ID\s+(\d+),\s+seed\s+(\d+)/',$line['message'],$matches)) {
         $qcid = isset($teacherof[$line['courseid']]) ? intval($line['courseid']) : 0;
-        $testqpage = ($courseUIver>1 || $qcid == 0) ? 'testquestion2.php' : 'testquestion.php';
+        $testqpage = ($qcid == 0 || $cid == 0 || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=$qcid&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
 		echo " | <a href=\"$imasroot/course/moddataset.php?cid=$qcid&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
 	}
@@ -252,7 +253,7 @@
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?"
 				. Sanitize::generateQueryStringFromMap(array('cid' => $line['courseid'], 'stu' => $line['msgfrom']))
-			."\">Gradebook</a>";
+			."\" target=\"_blank\">Gradebook</a>";
 		}
 
 	} else if ($type=='sent' && $type!='allstu') {

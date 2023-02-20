@@ -97,6 +97,7 @@ function getCourseBrowserJSON() {
   	  	  	  	  $orderref[$k] = $i;
   	  	  	  	  $i++;
   	  	  	  }
+              $orderref['undef'] = $i;
   	  	  	  $sortby[$loc]['ref'] = $orderref;
   	  	  }
   	  }
@@ -112,10 +113,10 @@ function getCourseBrowserJSON() {
   			continue;
   		}
   		$aval = $a[$sortinf['prop']];
-  		if (is_array($aval)) { $aval = $aval[0];}
+  		if (is_array($aval)) { $aval = $aval[0] ?? 'undef';}
   		$bval = $b[$sortinf['prop']];
-  		if (is_array($bval)) { $bval = $bval[0];}
-  		if (isset($sortinf['ref'])) {
+  		if (is_array($bval)) { $bval = $bval[0] ?? 'undef';}
+  		if (isset($sortinf['ref']) && isset($sortinf['ref'][$aval]) && isset($sortinf['ref'][$bval])) {
   			if ($sortinf['ref'][$aval] != $sortinf['ref'][$bval]) {
   				return (($sortinf['ref'][$aval] < $sortinf['ref'][$bval])? -1 : 1)*($sortinf['asc']?1:-1);
   			}
@@ -136,7 +137,7 @@ $placeinhead = '<script type="text/javascript">';
 $placeinhead .= 'var courses = '.getCourseBrowserJSON().';';
 $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'";';
 $placeinhead .= '</script>';
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>
+$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
 <script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 

@@ -60,7 +60,7 @@ if ($istutor) {
   }
 }
 // get question point values for retotal later
-$assess_info->loadQuestionSettings('all', false, false);
+$assess_info->loadQuestionSettings('all', true, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -70,6 +70,7 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
+$replacedDeleted = false;
 if ($type == 'all' && $keepver == 0) {
   $stm = $DBH->prepare('SELECT score FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
@@ -130,7 +131,7 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 $assess_record->saveRecord();
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, false);
 
 //output JSON object
 echo json_encode($assessInfoOut);

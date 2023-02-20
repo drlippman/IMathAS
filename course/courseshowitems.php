@@ -3,15 +3,15 @@
 // (c) 2007 David Lippman
 require_once ('../includes/loaditemshowdata.php');
 require_once ("../includes/exceptionfuncs.php");
-if ($courseUIver>1) {
+if (!isset($courseUIver) || $courseUIver>1) {
 	$addassess = 'addassessment2.php';
 } else {
 	$addassess = 'addassessment.php';
 }
 
-if (isset ( $studentid ) && ! isset ( $_SESSION ['stuview'] )) {
+if (isset ( $studentid ) && !isset ( $_SESSION ['stuview'] )) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
-} else {
+} else if (isset($userid)) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, false );
 }
 function beginitem($canedit,$aname='',$greyed=false) {
@@ -128,7 +128,7 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
 	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
-	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
+	$out .= " <li><a href=\"addquestions2.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
 	$out .= " <li><a href=\"$thisaddassess?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
@@ -221,6 +221,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   	   $itemshowdata = loadItemShowData($items, true, $viewall, $inpublic, $ispublic);
 	   }
 
+       // sanitize to prevent XSS
+       $parent = implode('-', array_map('intval', explode('-', $parent)));
+
 	   $now = time();
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
@@ -231,6 +234,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   if ($canedit) {echo generateadditem($parent,'t');}
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
+            if (!isset($items[$i]['items'])) {
+                continue; // invalid block - no items
+            }
+            if (!isset($items[$i]['id'])) { // hack fix
+                $items[$i]['id'] = 'tmpid'.$i;
+            }
 			   $turnonpublic = false;
 			   if ($ispublic && !$inpublic) {
 				   if (isset($items[$i]['public']) && $items[$i]['public']==1) {
@@ -240,7 +249,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 
 			   }
-			if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
+			if (!empty($studentinfo) && isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
 				if (!in_array(strtolower('s-'.$studentinfo['section']),array_map('strtolower',$items[$i]['grouplimit']))) {
 					continue;
 				}
@@ -295,6 +304,16 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				} else {
 					$show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startdate, $enddate);
 				}
+                if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && $viewall) {
+                    $seclist = implode(', ', array_map(function($v) { return substr($v,2); }, $items[$i]['grouplimit']));
+                    $show .= '. ';
+                    if (count($items[$i]['grouplimit'])>1) {
+                        $show .= _('Limited to sections');
+                    } else {
+                        $show .= _('Limited to section');
+                    }
+                    $show .= ' ' . Sanitize::encodeStringForDisplay($seclist) . '.';
+                }
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					echo '<div class="block folder" ';
 					if ($titlebg!='') {
@@ -804,7 +823,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
                }
 				 if ($line['ver'] > 1) {
 					 $thisaddassess = "addassessment2.php";
-					 	if ($assessUseVueDev) {
+					 	if ($assessUseVueDev && isset($CFG['assess2-use-vue-dev-address'])) {
 							$assessUrl = sprintf("%s/?cid=%s&aid=%s",
 								$CFG['assess2-use-vue-dev-address'], $cid, $typeid);
 						} else {
@@ -1106,13 +1125,14 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   foreach ($matches as $k=>$m) {
 			   	   	if ($m[1]=='youtube.com') {
 			   	   		$p = explode('v=',$m[2]);
+                        if (count($p)<2) { continue; } // missing id
 			   	   		$p2 = preg_split('/[#&]/',$p[1]);
 			   	   	} else if ($m[1]=='youtu.be') {
 			   	   		$p2 = preg_split('/[#&?]/',substr($m[2],1));
 			   	   	}
 			   	   	$vidid = $p2[0];
 			   	   	if (preg_match('/.*[^r]t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
-			   	   		$start = ($tm[2]?$tm[2]*60:0) + ($tm[4]?$tm[4]*1:0);
+			   	   		$start = (!empty($tm[2])?$tm[2]*60:0) + (!empty($tm[4])?$tm[4]*1:0);
 			   	   	} else if (preg_match('/start=(\d+)/',$m[2],$tm)) {
 			   	   		$start = $tm[1];
 			   	   	} else {
@@ -1328,7 +1348,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('drill', 'Drill', false);
 
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
+				   echo "<b><a href=\"$alink\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1384,7 +1404,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('drill', 'Drill', true);
 
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';
@@ -2129,7 +2149,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			if ($showlinks) {
 				echo '<span class="links">';
                 echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
-                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."remove=ask\">", _('Delete'), "</a>";
+                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."&remove=ask\">", _('Delete'), "</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
 				echo '</span>';
@@ -2208,10 +2228,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 					 if ($line['ver']>1) {
+                         echo " <a href=\"addquestions2.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 						 echo "<a href=\"addassessment2.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 					 } else {
+                         echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
 						 echo "<a href=\"addassessment.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 					 }
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";

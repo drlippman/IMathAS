@@ -542,7 +542,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 
 	$colors = makecolor2($row[3],$row[2],$now);
-	if ($row[7]==2) {
+	if ($row[5]==2) {
 		$colors = "#0f0";
 	}
 	if ($editingon) {$colors='';}
@@ -572,7 +572,11 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+if ($editingon) {
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND avail>0 AND courseid=:courseid ORDER BY name";
+} else {
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+}
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -642,7 +646,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name'],$status);
 	}
-	$tag = substr($row[1],0,8);
+	$tag = substr($row['caltag'],0,8);
 	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
 		$json = array(
 			"type"=>"FS",
@@ -690,6 +694,8 @@ foreach ($itemsimporder as $item) {
 		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
 		continue;
 	}
+    if (!isset($itemsassoc[$item])) { continue; } // itemorder error?
+    
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
@@ -739,14 +745,14 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='InlineText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['I'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['I'.$datetype.$itemsassoc[$item][5]]>0 && !isset($teacherid)) { //if not available, skip
+				if ($byid['I'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['I'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'I'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][2];
-				if (isset($itemfolder[$item])) {
+				if (isset($itemfolder[$item]) && isset($byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'])) {
 					$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'] = str_replace('@@@',$itemfolder[$item],$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder']);
 				}
 				$assess[$moday][$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][3];
@@ -762,7 +768,7 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['L'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['L'.$datetype.$itemsassoc[$item][5]]>0 && !isset($teacherid)) { //if not available, skip
+				if ($byid['L'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['L'.$datetype.$itemsassoc[$item][1]][0];
@@ -930,12 +936,15 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
                 (!empty($item['grouplimit']) && isset($studentinfo['section']) &&
                     substr($item['grouplimit'][0],2) != $studentinfo['section'])
             );
-			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
+            if (!empty($item['items'])) {
+			    flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
+            }
 		} else {
 			$addto[] = $item;
 			$folderholder[$item] = $folder;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
+                $greyitems[$item] = 0;
 			} else {
 				$greyitems[$item] = $curblockgrey;
 			}

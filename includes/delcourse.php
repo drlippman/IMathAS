@@ -60,8 +60,8 @@ function deleteCourse($cid) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$stm2 = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE forumid=:forumid AND files<>''");
 		$stm2->execute(array(':forumid'=>$row[0]));
-		while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-			deleteallpostfiles($row[0]);
+		while ($row2 = $stm2->fetch(PDO::FETCH_NUM)) {
+			deleteallpostfiles($row2[0]);
 		}
 		$query = "DELETE imas_forum_views FROM imas_forum_views JOIN ";
 		$query .= "imas_forum_threads ON imas_forum_views.threadid=imas_forum_threads.id ";
@@ -86,9 +86,9 @@ function deleteCourse($cid) {
 	$stm2->execute(array(':courseid'=>$cid));
 	while ($wid = $stm2->fetch(PDO::FETCH_NUM)) {
 		$stm3 = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
-		$stm3->execute(array(':wikiid'=>$wid));
+		$stm3->execute(array(':wikiid'=>$wid[0]));
 		$stm3 = $DBH->prepare("DELETE FROM imas_wiki_views WHERE wikiid=:wikiid");
-		$stm3->execute(array(':wikiid'=>$wid));
+		$stm3->execute(array(':wikiid'=>$wid[0]));
 	}
 	$stm = $DBH->prepare("DELETE FROM imas_wikis WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));

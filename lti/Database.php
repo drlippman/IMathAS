@@ -173,7 +173,7 @@ class Imathas_LTI_Database implements LTI\Database
         return LTI\LTI_Registration::new ()
             ->set_auth_login_url($row['auth_login_url'])
             ->set_auth_token_url($row['auth_token_url'])
-            ->set_auth_server($row['auth_server'])
+            ->set_auth_server($row['auth_server'] ?? '')
             ->set_client_id($row['client_id'])
             ->set_key_set_url($row['key_set_url'])
             ->set_issuer($iss)
@@ -310,14 +310,23 @@ class Imathas_LTI_Database implements LTI\Database
     /**
      * Get local user id
      * @param  LTI_Message_Launch $launch
+     * @param  string $role
      * @return false|int local userid
      */
-    public function get_local_userid(LTI\LTI_Message_Launch $launch)
+    public function get_local_userid(LTI\LTI_Message_Launch $launch, string $role)
     {
         $ltiuserid = $launch->get_platform_user_id();
         $platform_id = $launch->get_platform_id();
 
-        $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org=?');
+        $query = 'SELECT lti.userid FROM imas_ltiusers AS lti 
+            JOIN imas_users AS iu ON lti.userid=iu.id 
+            WHERE lti.ltiuserid=? AND lti.org=?';
+        if ($role == 'Instructor') {
+            $query .= ' AND iu.rights > 19';
+        }
+        $query .= ' ORDER BY iu.rights, lti.id';
+
+        $stm = $this->dbh->prepare($query);
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
         $userid = $stm->fetchColumn(0);
         if ($userid === false) {
@@ -335,7 +344,14 @@ class Imathas_LTI_Database implements LTI\Database
                 $oldltiuserid = $ltiuserid;
             }
             $oldkey = $migration_claim['oauth_consumer_key'];
-            $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
+            $query = 'SELECT lti.userid FROM imas_ltiusers AS lti 
+                JOIN imas_users AS iu ON lti.userid=iu.id
+                WHERE lti.ltiuserid=? AND lti.org LIKE ?';
+            if ($role == 'Instructor') {
+                $query .= ' AND iu.rights > 19';
+            }
+            $query .= ' ORDER BY iu.rights, lti.id';
+            $stm = $this->dbh->prepare($query);
             $stm->execute(array($oldltiuserid, $oldkey.':%'));
             $userid = $stm->fetchColumn(0);
             if ($userid !== false) {
@@ -357,6 +373,7 @@ class Imathas_LTI_Database implements LTI\Database
                 JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ilc.contextid=?';
             $stm = $this->dbh->prepare($query);
             $stm->execute(array($contextid));
+
             $qarr = array($ltiuserid);
 
             $old_userid = $launch->get_lti1p1_userid();
@@ -374,11 +391,19 @@ class Imathas_LTI_Database implements LTI\Database
             }
 
             if ($orgcnt == 1) { // only use if one matching association
+                $query = 'SELECT lti.userid FROM imas_ltiusers AS lti 
+                    JOIN imas_users AS iu ON lti.userid=iu.id ';
                 if ($old_userid !== false && $old_userid != $ltiuserid) {
-                    $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE (ltiuserid=? OR ltiuserid=?) AND org LIKE ?');
+                    $query .= 'WHERE (lti.ltiuserid=? OR lti.ltiuserid=?) AND lti.org LIKE ?';
                 } else {
-                    $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
+                    $query .= 'WHERE lti.ltiuserid=? AND lti.org LIKE ?';
+                    //$stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
                 }
+                if ($role == 'Instructor') {
+                    $query .= ' AND iu.rights > 19';
+                }
+                $query .= ' ORDER BY iu.rights, lti.id';
+                $stm = $this->dbh->prepare($query);
                 $stm->execute($qarr);
                 $userid = $stm->fetchColumn(0);
                 if ($userid !== false) {
@@ -427,19 +452,24 @@ class Imathas_LTI_Database implements LTI\Database
                 $stm->execute(array($userid, $localcourse->get_courseid()));
             }
         } else {
-            $stm = $this->dbh->prepare('SELECT id,lticourseid FROM imas_students WHERE userid=? AND courseid=?');
-            $stm->execute(array($userid, $localcourse->get_courseid()));
-            $row = $stm->fetch(PDO::FETCH_ASSOC);
-            if ($row === false || $row === null) {
-                $stm = $this->dbh->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
-                $stm->execute(array(':id'=>$localcourse->get_courseid()));
-                $deflatepass = $stm->fetchColumn(0);
+            // check to see if they're already a teacher or tutor
+            $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=? UNION SELECT id FROM imas_tutors WHERE userid=? AND courseid=?');
+            $stm->execute(array($userid, $localcourse->get_courseid(), $userid, $localcourse->get_courseid()));
+            if ($stm->fetchColumn(0) === false) {
+                $stm = $this->dbh->prepare('SELECT id,lticourseid FROM imas_students WHERE userid=? AND courseid=?');
+                $stm->execute(array($userid, $localcourse->get_courseid()));
+                $row = $stm->fetch(PDO::FETCH_ASSOC);
+                if ($row === false || $row === null) {
+                    $stm = $this->dbh->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
+                    $stm->execute(array(':id'=>$localcourse->get_courseid()));
+                    $deflatepass = $stm->fetchColumn(0);
 
-                $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,latepass,lticourseid) VALUES (?,?,?,?,?)');
-                $stm->execute(array($userid, $localcourse->get_courseid(), $section, $deflatepass, $localcourse->get_id()));
-            } else if ($row['lticourseid'] !== $localcourse->get_id()) {
-                $stm = $this->dbh->prepare('UPDATE imas_students SET lticourseid=? WHERE id=?');
-                $stm->execute(array($localcourse->get_id(), $row['id']));
+                    $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,latepass,lticourseid) VALUES (?,?,?,?,?)');
+                    $stm->execute(array($userid, $localcourse->get_courseid(), $section, $deflatepass, $localcourse->get_id()));
+                } else if ($row['lticourseid'] !== $localcourse->get_id()) {
+                    $stm = $this->dbh->prepare('UPDATE imas_students SET lticourseid=? WHERE id=?');
+                    $stm->execute(array($localcourse->get_id(), $row['id']));
+                }
             }
         }
     }

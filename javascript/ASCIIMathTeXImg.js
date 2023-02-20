@@ -112,6 +112,7 @@ var AMsymbols = [
 {input:"divide",   tag:"mo", output:"-:", tex:null, ttype:DEFINITION},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
 {input:"o+", tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"o-", tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
 {input:"ox", tag:"mo", output:"\u2297", tex:"otimes", ttype:CONST},
 {input:"o.", tag:"mo", output:"\u2299", tex:"odot", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
@@ -156,6 +157,7 @@ var AMsymbols = [
 
 //logical symbols
 {input:"and", tag:"mtext", output:"and", tex:null, ttype:SPACE},
+{input:"xor",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
 {input:"or",  tag:"mtext", output:"or",  tex:null, ttype:SPACE},
 {input:"not", tag:"mo", output:"\u00AC", tex:"neg", ttype:CONST},
 {input:"=>",  tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
@@ -163,6 +165,7 @@ var AMsymbols = [
 {input:"if",  tag:"mo", output:"if",     tex:null, ttype:SPACE},
 {input:"<=>", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
 {input:"iff",   tag:"mo", output:"<=>", tex:null, ttype:DEFINITION},
+{input:"rightleftharpoons", tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
 {input:"AA",  tag:"mo", output:"\u2200", tex:"forall", ttype:CONST},
 {input:"EE",  tag:"mo", output:"\u2203", tex:"exists", ttype:CONST},
 {input:"_|_", tag:"mo", output:"\u22A5", tex:"bot", ttype:CONST},
@@ -202,6 +205,7 @@ var AMsymbols = [
 {input:"oint", tag:"mo", output:"\u222E", tex:null, ttype:CONST},
 {input:"del",  tag:"mo", output:"\u2202", tex:"partial", ttype:CONST},
 {input:"grad", tag:"mo", output:"\u2207", tex:"nabla", ttype:CONST},
+{input:"hbar", tag:"mi", output:"\u210F", tex:null, ttype:CONST},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm", ttype:CONST},
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
@@ -882,6 +886,7 @@ function AMTparseAMtoTeX(str) {
   str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
+  str = str.replace(/⁰/g,"^0").replace(/¹/g,"^1").replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9");
   if (str.match(/\S/)==null) {
 	  return "";
   }

@@ -45,6 +45,7 @@
         }
         $DBH->beginTransaction();
         $newqs = array_map('intval', $_POST['addnewdef']);
+        $qids = [];
         foreach ($newqs as $qsetid) {
             if ($qsetid == 0) { continue; }
             $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid,showhints) ";
@@ -79,7 +80,7 @@
                     }
                 }
             }
-            $numnew= count($checked);
+            $numnew= count($qids);
             $viddata = unserialize($viddata);
             if (!isset($viddata[count($viddata)-1][1])) {
                 $finalseg = array_pop($viddata);

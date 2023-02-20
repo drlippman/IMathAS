@@ -35,7 +35,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid, $gbcats = false, $sethidden = false)
 {
     global $DBH;
-    global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+    global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
     global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti, $convertAssessVer, $autoexcusetrack;
     if (!isset($copystickyposts)) {$copystickyposts = false;}
     if ($gbcats === false) {
@@ -44,14 +44,18 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
     if (!isset($outcomes)) {
         $outcomes = array();
     }
-    if (strlen($_POST['append']) > 0 && $_POST['append'][0] != ' ') {
+    
+    if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
     }
+    if (!isset($_POST['append'])) {
+        $_POST['append'] = '';
+    }
     $now = time();
-    $stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+    $stm = $DBH->prepare("SELECT itemtype,typeid,courseid FROM imas_items WHERE id=:id");
     $stm->execute(array(':id' => $itemid));
     if ($stm->rowCount() == 0) {return false;}
-    list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
+    list($itemtype, $typeid, $sourcecid) = $stm->fetch(PDO::FETCH_NUM);
     if ($itemtype == "InlineText") {
         //$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
         //$query .= "SELECT '$cid',title,text,startdate,enddate FROM imas_inlinetext WHERE id='$typeid'";
@@ -103,7 +107,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $tool = explode('~~', substr($row['text'], 8));
             if (isset($tool[3]) && isset($gbcats[$tool[3]])) {
                 $tool[3] = $gbcats[$tool[3]];
-            } else if ($_POST['ctc'] != $cid) {
+            } else if ($sourcecid != $cid) {
                 $tool[3] = 0;
             }
             $row['text'] = 'exttool:' . implode('~~', $tool);
@@ -137,10 +141,10 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($sethidden) {$row['avail'] = 0;}
         if (isset($gbcats[$row['gbcategory']])) {
             $row['gbcategory'] = $gbcats[$row['gbcategory']];
-        } else if ($_POST['ctc'] != $cid) {
+        } else if ($sourcecid != $cid) {
             $row['gbcategory'] = 0;
         }
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $row['groupsetid'] = 0;
         }
         $rubric = $row['rubric']; //array_pop($row);
@@ -166,7 +170,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             ':groupsetid' => $row['groupsetid'], ':tutoredit' => $row['tutoredit'],
             ':sortby' => $row['sortby'], ':autoscore' => $row['autoscore']));
         $newtypeid = $DBH->lastInsertId();
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $forumtrack[$typeid] = $newtypeid;
         }
         if ($rubric != 0) {
@@ -248,7 +252,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($sethidden) {$row['avail'] = 0;}
         if (isset($gbcats[$row['gbcategory']])) {
             $row['gbcategory'] = $gbcats[$row['gbcategory']];
-        } else if ($_POST['ctc'] != $cid) {
+        } else if ($sourcecid != $cid) {
             $row['gbcategory'] = 0;
         }
         if (isset($outcomes[$row['defoutcome']])) {
@@ -266,7 +270,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         } else {
             $row['ancestors'] = $newancestor . ',' . $row['ancestors'];
         }
-        if ($_POST['ctc'] != $cid) {
+        if ($sourcecid != $cid) {
             $forumtopostto = $row['posttoforum'];
             unset($row['posttoforum']);
             if ($row['isgroup'] > 0) {
@@ -330,7 +334,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($reqscoreaid > 0) {
             $reqscoretrack[$newtypeid] = $reqscoreaid;
         }
-        if ($_POST['ctc'] != $cid && $forumtopostto > 0) {
+        if ($sourcecid != $cid && $forumtopostto > 0) {
             $posttoforumtrack[$newtypeid] = $forumtopostto;
         }
         if ($autoexcuse !== null && $autoexcuse !== '' && $cid != $sourcecid) {
@@ -354,7 +358,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $flat = implode(',', $goodqs);
             //$flat is santized above
             $query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,
-				showans,showhints,rubric,withdrawn,fixedseeds,showwork FROM imas_questions
+				showans,showhints,rubric,withdrawn,fixedseeds,showwork,extracredit FROM imas_questions
 				WHERE id IN ($flat)";
             $stm = $DBH->query($query);
             $inssph = array();
@@ -382,8 +386,8 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
                         $row['category'] = 0;
                     }
                 }
-                $inssph[] = "(?,?,?,?,?,?,?,?,?,?,?)";
-                array_push($inss, $newtypeid, $row['questionsetid'], $row['points'], $row['attempts'], $row['penalty'], $row['category'], $row['regen'], $row['showans'], $row['showhints'], $row['fixedseeds'], $row['showwork']);
+                $inssph[] = "(?,?,?,?,?,?,?,?,?,?,?,?)";
+                array_push($inss, $newtypeid, $row['questionsetid'], $row['points'], $row['attempts'], $row['penalty'], $row['category'], $row['regen'], $row['showans'], $row['showhints'], $row['fixedseeds'], $row['showwork'], $row['extracredit']);
                 $rubric[$row['id']] = $row['rubric'];
                 //check for a category that's set to an assessment e.g. AID-1234
                 if (0 == strncmp($row['category'], "AID-", 4)) {
@@ -395,7 +399,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $idtoorder = array_flip($insorder);
 
             if (count($inss) > 0) {
-                $query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints,fixedseeds,showwork) ";
+                $query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints,fixedseeds,showwork,extracredit) ";
                 $query .= "VALUES " . implode(',', $inssph);
                 $stm = $DBH->prepare($query);
                 $stm->execute($inss);
@@ -472,6 +476,9 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
 function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = false)
 {
     global $checked, $blockcnt;
+    if (!isset($_POST['append'])) {
+        $_POST['append'] = '';
+    }
     foreach ($items as $k => $item) {
         if (is_array($item)) {
             if (array_search($parent . '-' . ($k + 1), $checked) !== false) { //copy block
@@ -484,9 +491,9 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['avail'] = $sethidden ? 0 : $item['avail'];
                 $newblock['SH'] = $item['SH'];
                 $newblock['colors'] = $item['colors'];
-                $newblock['public'] = $item['public'];
-                $newblock['fixedheight'] = $item['fixedheight'];
-                $newblock['grouplimit'] = $item['grouplimit'];
+                $newblock['public'] = $item['public'] ?? 0;
+                $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
+                $newblock['grouplimit'] = $item['grouplimit'] ?? [];
                 $newblock['items'] = array();
                 if (count($item['items']) > 0) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
@@ -613,8 +620,12 @@ function removeGrouplimits(&$items)
 function copyallsub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = false)
 {
     global $blockcnt, $reqscoretrack, $assessnewid;
-    if (strlen($_POST['append']) > 0 && $_POST['append'][0] != ' ') {
+    
+    if (!empty($_POST['append']) && $_POST['append'][0] != ' ') {
         $_POST['append'] = ' ' . $_POST['append'];
+    }
+    if (!isset($_POST['append'])) {
+        $_POST['append'] = '';
     }
     foreach ($items as $k => $item) {
         if (is_array($item)) {
@@ -627,11 +638,11 @@ function copyallsub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = f
             $newblock['avail'] = $sethidden ? 0 : $item['avail'];
             $newblock['SH'] = $item['SH'];
             $newblock['colors'] = $item['colors'];
-            $newblock['public'] = $item['public'];
-            $newblock['fixedheight'] = $item['fixedheight'];
-            $newblock['grouplimit'] = $item['grouplimit'];
+            $newblock['public'] = $item['public'] ?? 0;
+            $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
+            $newblock['grouplimit'] = $item['grouplimit'] ?? [];
             $newblock['items'] = array();
-            if (count($item['items']) > 0) {
+            if (isset($item['items']) && count($item['items']) > 0) {
                 copyallsub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
             }
             $addtoarr[] = $newblock;
@@ -827,7 +838,7 @@ function copyrubrics($offlinerubrics = array())
 
         $qfound = array_keys($qrubrictrack, $srcrub['id']);
         if (count($qfound) > 0) {
-            if ($iqupd === null) {
+            if (!isset($iqupd)) {
                 $iqupd = $DBH->prepare("UPDATE imas_questions SET rubric=:rubric WHERE id=:id");
             }
             foreach ($qfound as $qid) {
@@ -838,7 +849,7 @@ function copyrubrics($offlinerubrics = array())
         }
         $ffound = array_keys($frubrictrack, $srcrub['id']);
         if (count($ffound) > 0) {
-            if ($ifupd === null) {
+            if (!isset($ifupd)) {
                 $ifupd = $DBH->prepare("UPDATE imas_forums SET rubric=:rubric WHERE id=:id");
             }
             foreach ($ffound as $fid) {

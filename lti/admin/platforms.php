@@ -274,10 +274,35 @@ echo '</div>';
 
 // D2l
 echo '<div id=d2l class=lmsinstr style="display:none;">';
-echo '<p>'._('To enable LTI 1.3 in a D2L Brightspace instance, the site administrator should:').'</p>';
+if (!empty($CFG['LTI']['autoreg'])) {
+    ?>
+<p>You can configure LTI 1.3 in Brightspace automatically or manually. Automatically is recommended.</p>
+<p>To automatically enable LTI 1.3 in a D2L Brightspace instance, the site administrator should:</p>
+<ul>
+    <li>In Brightspace, go to Admin Tools, then Manage Extensibility</li>
+    <li>Click on the LTI Advantage tab, then click Register Tool</li>
+    <li>For "How would you like to register your tool", choose Dynamic</li>
+    <li>For the Dynamic Registration URL, enter: <?php echo $basesiteurl;?>/lti/dynreg.php</li>
+    <li>Click the "Configure Deployment" checkbox, then click Register</li>
+    <li><?php echo $installname; ?> will give a message that Registration is Complete. Click the Done button.</li>
+    <li>Select the checkbox for <?php echo $installname; ?> and click Enable</li>
+    <li>Click on <?php echo $installname; ?> to bring up registration details. Towards the bottom click View Deployments.  Then click on <?php echo $installname; ?> again to edit the deployment details
+        <ul>
+            <li>Under Security Settings, click the box for "Org Unit Information"</li>
+            <li>Under Configuration Settings, click the box for "Grades created by LTI will be included in Final Grade".  You may also wish to click the "Open as External Resource"</li>
+            <li>Under "Make tool available to: [Add Org Units]", select additional org units to make the tool available to, if needed.</li>
+            <li>Click Save and Close</li>
+        </ul>
+    </li>
+</ul>
+    <?php
+}
+
+echo '<p>'._('To manually enable LTI 1.3 in a D2L Brightspace instance, the site administrator should:').'</p>';
 echo '<ul>';
 echo '<li>'._('Go to the Admin Tool: Manage Extensibility tool').'</li>';
 echo '<li>'._('Go to the LTI Advantage tab, and click Register Tool.').'</li>';
+echo '<li>'._('For "how would you like to register your tool, choose Standard.').'</li>';
 echo '<li>'._('Enter these values:').'<ul>';
 echo ' <li>'._('Domain:').' <span class=tocopy>'.$domainsite.'</span></li>';
 echo ' <li>'._('Redirect URLs:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
@@ -318,7 +343,25 @@ echo '</div>';
 
 // Moodle
 echo '<div id=moodle class=lmsinstr style="display:none;">';
-echo '<p>'._('To enable LTI 1.3 in a Moodle instance, the site administrator should:').'</p>';
+
+if (!empty($CFG['LTI']['autoreg'])) {
+    ?>
+<p>You can configure LTI 1.3 in Moodle automatically or manually. Automatically is recommended.</p>
+<p>To automatically enable LTI 1.3 in a Moodle instance, the site administrator should:</p>
+<ul>
+    <li>In Moodle, go to Site Admin, click the Plugins tab, then under External Tool click Manage Tools</li>
+    <li>In the box for Tool Url, enter: <?php echo $basesiteurl;?>/lti/dynreg.php</li>
+    <li>Click Add LTI Advantage</li>
+    <li><?php echo $installname; ?> will give a message that Registration is Complete. Click the Done button.</li>
+    <li>Find the <?php echo $installname; ?> tool and click Activate</li>
+    <li>Edit the <?php echo $installname; ?> tool, and under Privacy set the "Accept grades from the tool" 
+        setting to Always, click the Force SSL box, and Save Changes.</li>
+</ul>
+    <?php
+}
+
+
+echo '<p>'._('To manually enable LTI 1.3 in a Moodle instance, the site administrator should:').'</p>';
 
 echo '<ul>';
 echo '<li>'._('Go to Site Administration, Plugins, then External Tools: Manage Tools.').'</li>';

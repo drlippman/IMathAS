@@ -233,10 +233,17 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  saveChanges (exit) {
+  saveChanges (exit, nextstu) {
     if (store.inTransit) {
       window.setTimeout(() => this.saveChanges(exit), 20);
       return;
+    }
+    let nextstuurl = '';
+    if (nextstu) {
+      nextstuurl = 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.assessInfo.nextstu;
+      if (window.location.search.match(/from=/)) {
+        nextstuurl += '&from=' + window.location.search.replace(/^.*from=(\w+).*$/, '$1');
+      }
     }
     if (Object.keys(store.scoreOverrides).length === 0 &&
       Object.keys(store.feedbacks).length === 0
@@ -244,6 +251,8 @@ export const actions = {
       store.saving = 'saved';
       if (exit) {
         window.location = window.exiturl;
+      } else if (nextstu) {
+        window.location = nextstuurl;
       }
       return;
     }
@@ -273,12 +282,19 @@ export const actions = {
           return;
         }
         store.saving = 'saved';
-        if (exit) {
+
+        if (exit || nextstu) {
           store.scoreOverrides = {};
           store.feedbacks = {};
+        }
+        if (exit) {
           window.location = window.exiturl;
           return;
+        } else if (nextstu) {
+          window.location = nextstuurl;
+          return;
         }
+
         // update store.assessInfo with the new scores so it
         // can tell if we change anything
         for (const key in store.scoreOverrides) {
@@ -294,15 +310,15 @@ export const actions = {
           // Update part score
           const pts = key.split(/-/);
           const qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
-          if (qdata.scoreoverride && store.scoreOverrides[key] === '') {
+          if (qdata.hasOwnProperty('scoreoverride') && store.scoreOverrides[key] === '') {
             if (typeof qdata.scoreoverride === 'number') {
               Vue.delete(qdata, 'scoreoverride');
             } else {
               Vue.delete(qdata.scoreoverride, pts[3]);
             }
           }
-          if (store.scoreOverrides[key]) { // set or re-set scoreoverride on question part
-            if (!qdata.scoreoverride) {
+          if (store.scoreOverrides.hasOwnProperty(key) && store.scoreOverrides[key] !== '') { // set or re-set scoreoverride on question part
+            if (!qdata.hasOwnProperty('scoreoverride')) {
               store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride = {};
             }
             Vue.set(store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride,

@@ -97,9 +97,7 @@ export default {
     },
     submitNow () {
       actions.endAssess(() => {
-        if (this.settings.submitby === 'by_question') {
-          this.exit();
-        }
+        this.exit();
       });
     },
     useLatepass () {
@@ -108,6 +106,7 @@ export default {
       });
     },
     exit () {
+      this.closeDialog();
       if (window.exiturl && window.exiturl !== '') {
         store.noUnload = true;
         window.location = window.exiturl;

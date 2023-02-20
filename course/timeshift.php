@@ -163,6 +163,7 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid AND enddate<2000000000 ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
+        $page_assessmentList = ['val' => [], 'label' => []];
 		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			$page_assessmentList['val'][$i] = $line['id'];
 			$page_assessmentList['label'][$i] = $line['name'];

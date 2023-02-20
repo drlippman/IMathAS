@@ -66,7 +66,7 @@ if ($myrights < 75) {
     $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist ";
     $query .= "FROM imas_courses JOIN imas_users ON imas_courses.ownerid=imas_users.id ";
     $query .= "JOIN imas_teachers ON imas_teachers.courseid=imas_courses.id WHERE imas_teachers.userid=:uid ";
-    $query .= " ORDER BY imas_courses.name";
+    $query .= " ORDER BY imas_courses.available>3,imas_courses.name";
     $stm = $DBH->prepare($query);
   	$stm->execute(array(':uid'=>$uid));
     $courses_teaching = array();
@@ -109,10 +109,10 @@ if ($myrights < 75) {
       $newrow['status'] = array(($row['available']==0)?_('Available to students'):_('Hidden from students'));
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       $newrow['canedit'] = ($myrights==100 || $row['groupid']==$groupid);
-      if ($newrow['lockaid']>0) {
+      if (!empty($newrow['lockaid'])) {
         $newrow['status'][] = _('Locked for Assessment');
       }
-      if ($newrow['hidefromcourselist']==1) {
+      if (!empty($newrow['hidefromcourselist'])) {
         $newrow['status'][] = '<span class="hocp">'._("Hidden on User's Home Page").'</span>';
       }
       $courses_tutoring[] = $newrow;
@@ -175,7 +175,9 @@ if ($overwriteBody==1) {
   //sub nav links
   echo '<div class="cpmid"><a href="forms.php?from=ud'.$uid.'&action=chgrights&id='.$uid.'">'._('Edit User').'</a>';
   echo ' | <a href="addcourse.php?for='.$uid.'">'. _('Add Course').'</a>';
-  echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
+  if ($userinfo['rights'] <= $myrights) {
+    echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
+  }
   if (!empty($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
     echo " | <a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$uid&sendtype=msg&cid=";
     echo $CFG['GEN']['sendquestionproblemsthroughcourse'] . "',800,'auto')\" title=\"Send Message\">", _('Message'), "</a>";

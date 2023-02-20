@@ -28,13 +28,14 @@
 	}
 
 	require("../includes/calendardisp.php");
-	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=070620\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=011823\"></script>";
 	if ($editingon) {
-		$placeinhead .= '<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-				<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>';
+		$placeinhead .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.css" integrity="sha256-Els0hoF6/l1WxcZEDh4lQsp7EqyeeYXMHCWyv6SdmX0=" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>';
 		$loadiconfont = true;
 	}
 
+    $pagetitle = _('Calendar');
 	require("../header.php");
 	if ($editingon) {
 	?>
@@ -112,7 +113,6 @@
 								$(".calupdatenotice").html(_("Error saving change"));
 								$(dropped).detach().css({top: 0,left: 0}).appendTo($("#"+$(dropped).data("originalParent")).find("div.center"));
 							} else {
-								console.log(msg.success);
 								$(".calupdatenotice").html("");
 								var daycaldata = caleventsarr[$(dropped).data("originalParent")].data;
 								for (var i=0; i<daycaldata.length;i++) {
@@ -134,7 +134,6 @@
 						}).fail(function() {
 								$(dropped).detach().css({top: 0,left: 0}).appendTo($("#"+$(dropped).data("originalParent")).find("div.center"));
 						});
-						console.log(ui.draggable[0].id + " dropped on " + this.id);
 					}
 
 				}

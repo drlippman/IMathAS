@@ -213,7 +213,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 
 $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
-$page_gbcatSelect = array();
+$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 $i=0;
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$page_gbcatSelect['val'][$i] = $row[0];
@@ -483,11 +483,11 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 	<td><input type="checkbox" name="chgtaglist" class="chgbox"/></td>
 	<td class="r">Categorize posts?: </td>
 	<td>
-		<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
+		<input type=checkbox name="usetags" value="1"
 		  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
-		 <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
+		 <span id="tagholder" style="display:none">
 		   Enter in format CategoryDescription:category,category,category<br/>
-		   <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
+		   <textarea rows="2" cols="60" name="taglist"></textarea>
 		 </span>
 	</td>
 </tr>

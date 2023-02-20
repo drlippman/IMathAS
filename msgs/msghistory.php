@@ -45,7 +45,7 @@
 	require("../header.php");
 
 	$allowmsg = false;
-	$query = "SELECT baseid FROM imas_msgs WHERE id=:id";
+	$query = "SELECT baseid,courseid,msgto,msgfrom FROM imas_msgs WHERE id=:id";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= " AND (msgto=:msgto OR msgfrom=:msgfrom)";
 	}
@@ -60,10 +60,41 @@
 		require("../footer.php");
 		exit;
 	}
-	$baseid = $stm->fetchColumn(0);
+    $line =  $stm->fetch(PDO::FETCH_ASSOC);
+	$baseid = $line['baseid'];
 	if ($baseid==0) {
 		$baseid=$msgid;
 	}
+
+    if ($line['courseid']>0) {
+        $otherpartyuserid = ($line['msgto'] == $userid) ? $line['msgfrom'] : $line['msgto'];
+		$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$line['courseid']));
+		$msgset = $stm->fetchColumn(0);
+		$msgmonitor = floor($msgset/5);
+		$msgset = $msgset%5;
+		if ($msgset<3 || $isteacher) {
+			$cansendmsgs = true;
+			if ($msgset==1 && !$isteacher) { //check if sending to teacher
+				$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid and courseid=:courseid");
+				$stm->execute(array(':userid'=>$otherpartyuserid, ':courseid'=>$line['courseid']));
+				if ($stm->rowCount()==0) {
+					$cansendmsgs = false;
+				}
+			} else if ($msgset==2 && !$isteacher) { //check if sending to stu
+				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid and courseid=:courseid");
+				$stm->execute(array(':userid'=>$otherpartyuserid, ':courseid'=>$line['courseid']));
+				if ($stm->rowCount()==0) {
+					$cansendmsgs = false;
+				}
+			}
+		} else {
+			$cansendmsgs = false;
+		}
+	} else {
+		$cansendmsgs = true;
+	}
+
 	$query = "SELECT imas_msgs.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_msgs,imas_users ";
 	$query .= "WHERE imas_msgs.msgfrom=imas_users.id AND (imas_msgs.id=:id OR imas_msgs.baseid=:baseid) ORDER BY imas_msgs.id";
 	$stm = $DBH->prepare($query);
@@ -96,36 +127,7 @@
 		$email[$line['id']] = $line['email'];
 
 	}
-	if ($line['courseid']>0) {
-		$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$line['courseid']));
-		$msgset = $stm->fetchColumn(0);
-		$msgmonitor = floor($msgset/5);
-		$msgset = $msgset%5;
-		if ($msgset<3 || $isteacher) {
-			$cansendmsgs = true;
-			if ($msgset==1 && !$isteacher) { //check if sending to teacher
-				$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid and courseid=:courseid");
-				$stm->execute(array(':userid'=>$line['msgfrom'], ':courseid'=>$line['courseid']));
-				if ($stm->rowCount()==0) {
-					$cansendmsgs = false;
-				}
-			} else if ($msgset==2 && !$isteacher) { //check if sending to stu
-				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid and courseid=:courseid");
-				$stm->execute(array(':userid'=>$line['msgfrom'], ':courseid'=>$line['courseid']));
-				if ($stm->rowCount()==0) {
-					$cansendmsgs = false;
-				}
-			}
-		} else {
-			$cansendmsgs = false;
-		}
-	} else {
-		$cansendmsgs = true;
-	}
-
-
-
+	
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
@@ -221,7 +223,7 @@
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base) {
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$cansendmsgs;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$cansendmsgs;
 		global $filtercid,$page,$type,$imasroot,$staticroot;
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		foreach($children[$base] as $child) {
@@ -273,7 +275,7 @@
 			$icnt++;
 			echo filter($message[$child]);
 			echo "</div>\n";
-			if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children
+			if (isset($children[$child])) { //if has children
 				echo "<div class=";
 				if ($view==0) {
 					echo '"forumgrp"';

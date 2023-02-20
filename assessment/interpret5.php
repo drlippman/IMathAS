@@ -5,7 +5,11 @@
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 
-$GLOBALS['mathfuncs'] = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+$GLOBALS['mathfuncs'] = array("sin","cos","tan","sec","csc","cot",
+ "sinh","cosh","tanh","sech","csch","coth",
+ "arcsin","arccos","arctan","arcsec","arccsc","arccot",
+ "arcsinh","arccosh","arctanh","arcsech","arccsch","arccoth",
+ "sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 if (!isset($GLOBALS['allowedmacros'])) {
     $GLOBALS['allowedmacros'] = $GLOBALS['mathfuncs'];
 }
@@ -15,17 +19,21 @@ $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$to
   '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
   '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros',
   '$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights',
-  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts');
+  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts','$teacherInGb');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
 {
+    if ($countcnt==1) {
+        $GLOBALS['interpretcurvars'] = [];
+        $GLOBALS['interpretcurarrvars'] = [];
+    }
 	if ($blockname=="qtext") {
 		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = removeDisallowedVarsString($str,$anstype,$countcnt);
+		$str = removeDisallowedVarsString($str,$anstype,$countcnt,'"');
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -33,8 +41,12 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("\t", ' ', $str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
-    $str = preg_replace('/&\s*\n/', ' ', $str);
+        $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt).';';
+        $r = '$wherecount[0]=0;' . $r;
+        if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
+            $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
+        }
 		return $r;
 	}
 }
@@ -132,17 +144,19 @@ function interpretline($str,$anstype,$countcnt) {
 				$k++;
 				continue;
 			}
+    
 			//check for for, if, where and rearrange bits if needed
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
 				$j = $forloc;
-				while ($bits[$j][0]!='{' && $j<count($bits)) {
+				while ($j<count($bits) && $bits[$j][0]!='{') {
 					$j++;
 				}
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
 				$todo = implode('',array_slice($bits,$j));
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
-				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
+				//if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
+                if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]}),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=round(floatval({$forcond[2]}),0) && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) ".$todo."}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
@@ -152,7 +166,7 @@ function interpretline($str,$anstype,$countcnt) {
 			} else if ($ifloc == 0) {
 				//this is if at beginning of line, form:  if ($a==3) {todo}
 				$j = 0;
-				while ($bits[$j][0]!='{' && $j<count($bits)) {
+				while ($j<count($bits) && $bits[$j][0]!='{') {
 					$j++;
 				}
 				if ($j==count($bits)) {
@@ -168,7 +182,7 @@ function interpretline($str,$anstype,$countcnt) {
 				$out = "if ($cond) $todo";
 				for ($i=0; $i<count($elseloc); $i++) {
 					$j = $elseloc[$i][0];
-					while ($bits[$j][0]!='{' && $j<count($bits)) {
+					while ($j<count($bits) && $bits[$j][0]!='{') {
 						$j++;
 					}
 					if ($j==count($bits)) {
@@ -193,7 +207,7 @@ function interpretline($str,$anstype,$countcnt) {
 				}
 				$bits = array($out);
 
-			} else if (count($elseloc)>0) {
+			} else if (count($elseloc)>1 || (count($elseloc)==1 && $whereloc==-1)) {
 				echo _('else used without leading if statement');
 				return 'error';
 			}
@@ -214,7 +228,15 @@ function interpretline($str,$anstype,$countcnt) {
 					} else {
 						$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;} }');
 					}
-				} else {
+				} else if (count($elseloc)==1 && $elseloc[0][1]=='else' && $elseloc[0][0]>$whereloc) {
+                    $wherecond = implode('',array_slice($bits,$whereloc+1,$elseloc[0][0]-$whereloc-1));
+                    $elsetodo = implode('',array_slice($bits, $elseloc[0][0]+1));
+                    if ($countcnt==1) {
+						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200 || $wherecount[0]>=1000) {'.$elsetodo.';};');
+					} else {
+						$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {'.$elsetodo.';}; ');
+					}
+                } else {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
 					if ($countcnt==1) {
 						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
@@ -281,12 +303,12 @@ function interpretline($str,$anstype,$countcnt) {
 			$closeparens++;
 		}
 
-
 		$lastsym = $sym;
 		$lasttype = $type;
 		$cnt++;
 		$k++;
 	}
+    
 	//if no explicit end-of-line at end of bits
 	if (count($bits)>0) {
 		$lines[] = implode('',$bits);
@@ -313,6 +335,19 @@ function tokenize($str,$anstype,$countcnt) {
 		$out = '';
 		$c = $str[$i];
 		$len = strlen($str);
+        if ($c=='/' && $str[$i+1]=='*') { //comment block
+            while ($i < $len) {
+                if ($c == '/' && $i > 0 && $str[$i-1] == '*') {
+                    $i++;
+                    $c = $str[$i];
+                    break;
+                }
+                $i++;
+                if ($i<$len) {
+                    $c = $str[$i];
+                }
+            }
+        }
 		if ($c=='/' && $str[$i+1]=='/') { //comment
 			while ($c!="\n" && $i<$len) {
                 $i++;
@@ -347,6 +382,9 @@ function tokenize($str,$anstype,$countcnt) {
 				echo sprintf(_('Eeek.. unallowed var %s!'), Sanitize::encodeStringForDisplay($out));
 				return array(array('',9));
 			}
+            if ($out !== '$') {
+                $GLOBALS['interpretcurvars'][] = $out;
+            }
 
 		} else if ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c=='_') { //is str
 			$intype = 2; //string like function name
@@ -357,7 +395,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word, and set type appropriately if it is
-			if ($out=='if' || $out=='where' || $out=='for') {
+			if ($out=='if' || $out=='where' || $out=='for' || $out=='break' || $out=='continue') {
 				$intype = 8;
 			} else if ($out=='else' || $out=='elseif') {
 				$intype = 8;
@@ -409,9 +447,12 @@ function tokenize($str,$anstype,$countcnt) {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
-					} else if ($out=='rand') {
+					} else if ($out=='is_numeric') {
+                        $out = 'is_nicenumber';  
+                    } else if ($out=='rand') {
 						$out = '$GLOBALS[\'RND\']->rand';
 					} else {
+                        $out = preg_replace('/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/', 'arc$2', $out);
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
 							echo sprintf(_('Eeek.. unallowed macro %s'), Sanitize::encodeStringForDisplay($out));
@@ -419,13 +460,14 @@ function tokenize($str,$anstype,$countcnt) {
 						}
 					}
 					//rewrite arctrig into atrig for PHP
-					$out = str_replace(array("arcsinh","arccosh","arctanh","arcsin","arccos","arctan"),array("asinh","acosh","atanh","safeasin","safeacos","atan"),$out);
+					$out = str_replace(array("arcsinh","arccosh","arctanh","arcsech","arccsch","arccoth","arcsin","arccos","arctan","arcsec","arccsc","arccot"),array("asinh","acosh","atanh","asech","acsch","acoth","safeasin","safeacos","atan","asec","acsc","acot"),$out);
 
 					//connect upcoming parens to function
 					$connecttolast = 2;
 				} else {
 					//not a function, so what is it?
-					if ($out=='true' || $out=='false' || $out=='null') {
+                    $outlower = strtolower($out);
+					if ($outlower=='true' || $outlower=='false' || $outlower=='null') {
 						//we like this - it's an acceptable unquoted string
 					} else {//
 						//an unquoted string!  give a warning to instructor,
@@ -537,7 +579,9 @@ function tokenize($str,$anstype,$countcnt) {
 						//comment inside brackers
 						while ($d!="\n" && $j<$len) {
 							$j++;
-							$d = $str[$j];
+                            if ($j < $len) {
+							    $d = $str[$j];
+                            }
 						}
 					} else if ($d=="\n") {
                         //echo "unmatched parens/brackets - likely will cause an error";
@@ -570,10 +614,12 @@ function tokenize($str,$anstype,$countcnt) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt);
+				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype);
 			}
 			$i++;
-			$c = $str[$i];
+            if ($i<$len) {
+				$c = $str[$i];
+			}
 		} else if ($c=="\n") {
 			//end of line
 			$intype = 7;
@@ -646,7 +692,7 @@ function tokenize($str,$anstype,$countcnt) {
 					$syms[] = array('',7); //end of line;
 					$lastsym = array('',7);
 				}
-			} else if ($out[0]=='{' && $lastsym[0]=='$') { //var var
+			} else if (strlen($out)>0 && $out[0]=='{' && $lastsym[0]=='$') { //var var
 				//conditional value based on if allowed
 				$syms[count($syms)-1][0] = '((checkvarvarisallowed('.substr($out,1,-1).'))?$'.$out.':0)';
 				$connecttolast = 0;
@@ -661,7 +707,7 @@ function tokenize($str,$anstype,$countcnt) {
                     substr($syms[count($syms)-1][0],0,15) == '$stuanswersval[')
                 ) {
                     $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? null)';
-                }
+                } else 
                 if ($connecttolast == 0 && 
                     (substr($syms[count($syms)-1][0],0,16) == '$scoreiscorrect[' ||
                     substr($syms[count($syms)-1][0],0,14) == '$scorenonzero[')
@@ -684,13 +730,36 @@ function tokenize($str,$anstype,$countcnt) {
 	return $syms;
 }
 
+function testIsEscaped($str,$c) {
+    $cnt = 0;
+    $i = $c-1;
+    while ($i >= 0 && $str[$i] == '\\') {
+        $cnt++;
+        $i--;
+    }
+    return (($cnt%2)==1);
+}
+
 //handle braces and variable variables in strings and qtext
-function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
+function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
 	global $disallowedvar;
 
 	//remove any blatent disallowed var
 	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str);
 	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+
+    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*)/', $str, $m);
+    foreach ($m[0] as $v) {
+        $GLOBALS['interpretcurvars'][] = $v;
+    }
+    preg_match_all('/(?<!\\\\)(\$[a-zA-Z_]\w*)((\[\d+\])+)/', $str, $m, PREG_SET_ORDER);
+    foreach ($m as $v) {
+        $GLOBALS['interpretcurarrvars'][] = $v; // will be an array of set matches
+    }
+
+    if ($quotetype!='"') {
+        return $str;
+    }
 
 	$startmarker = 0; $lastend = 0;
 	$invarvar = false;
@@ -698,7 +767,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 	$outstr = '';
 	$depth = 0;
 	for ($c=0;$c<strlen($str);$c++) {
-		if ($str[$c]=='{') {
+		if ($str[$c]=='{' && !testIsEscaped($str,$c)) {
 			if ($invarvar || $inbraces) {
 				$depth++;
 			} else { //may be starting new brace or varvar item
@@ -731,7 +800,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 					//interpret stuff in braces as code
 					$insidebrace = interpretline(substr($str,$startmarker+1,$c-$startmarker-1),$anstype,$countcnt+1);
 					if ($insidebrace!='error') {
-						$outstr .= '{'.$insidebrace.'}';
+						$outstr .= '".('.$insidebrace.')."';
 					}
 				} else if ($invarvar) {
 					$insidebrace = substr($str,$startmarker+1,$c-$startmarker-2);
@@ -794,5 +863,23 @@ function setseed($ns,$ref=0) {
 	}
 }
 
+function genVarInit($vars) {
+    $prep = '';
+    $done = [];
+    foreach ($vars as $var) {
+        if (is_array($var)) { 
+            if (in_array($var[0], $done)) { continue; }
+            // is array ref from qtext
+            // [whole match, var, whole array ref, last array ref]
+            $prep .= 'if (!isset('.$var[1].') || (is_array('.$var[1].') && !isset('.$var[0].'))){'.$var[0].'=null;}';
+            $done[] = $var[0];
+        } else {
+            if (in_array($var, $done)) { continue; }
+            $prep .= 'if (!isset('.$var.')){'.$var.'=null;}';
+            $done[] = $var;
+        }
+    }
+    return $prep;
+}
 
 ?>

@@ -41,7 +41,8 @@ if ($sns['Type'] == 'Notification') {
 $emails = array();
 if ($message) {
 	if ($message['notificationType'] == 'Bounce' &&
-		$message['bounce']['bounceType'] == 'Permanent'
+		($message['bounce']['bounceType'] == 'Permanent' ||
+		 $message['bounce']['bounceType'] == 'Undetermined')
 	) {
 		foreach ($message['bounce']['bouncedRecipients'] as $bouncers) {
 			if ($bouncers['action'] == 'failed') {

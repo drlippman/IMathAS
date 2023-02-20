@@ -3,13 +3,13 @@
 //(c) 2006 David Lippman
 
    require("../init_without_validate.php");
-   require("courseshowitems.php");
    $ispublic = true;
-
+   $_SESSION = ['mathdisp'=>1, 'graphdisp'=>1, 'useed'=>1];
+   
    $cid = Sanitize::courseId($_GET['cid']);
    require("../filter/filter.php");
 
-   $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
+   $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,UIver FROM imas_courses WHERE id=:id");
    $stm->execute(array(':id'=>$cid));
    $line = $stm->fetch(PDO::FETCH_ASSOC);
    if ($line == null) {
@@ -18,7 +18,9 @@
    }
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
+   $courseUIver = $line['UIver'];
 
+   require("courseshowitems.php");
 
    //if ($_GET['folder']!='0') {
    $blockispublic = false;
@@ -28,6 +30,13 @@
 	   $blocktree = explode('-',$_GET['folder']);
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
+        if (!isset($items[$blocktree[$i]-1])) {
+            $_GET['folder'] = 0;
+			$items = unserialize($line['itemorder']);
+			unset($backtrack);
+			unset($blocktree);
+			break;
+        }
 		$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
 		if ($items[$blocktree[$i]-1]['public']==1) {
 			$blockispublic = true;

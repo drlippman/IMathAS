@@ -48,7 +48,8 @@ header("Content-type: application/json;");
    "public_jwk_url": "<?php echo $basesiteurl;?>/lti/jwks.php",
    "custom_fields":{
       "canvas_assignment_due_at":"$Canvas.assignment.dueAt.iso8601",
-      "context_history":"$Context.id.history"
+      "context_history":"$Context.id.history",
+      "canvas_sections":"$com.instructure.User.sectionNames"
    }
 }
 <?php

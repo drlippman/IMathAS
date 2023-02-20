@@ -33,6 +33,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -61,10 +62,22 @@ class FunctionExpressionAnswerBox implements AnswerBox
         if (!empty($ansprompt) && !in_array('nosoln', $ansformats) && !in_array('nosolninf', $ansformats)) {
             $out .= $ansprompt;
         }
+
+        if (in_array('allowplusminus', $ansformats) && !in_array('list', $ansformats)) {
+            $ansformats[] = 'list';
+            $answerformat = ($answerformat == '') ? 'list' : $answerformat . ',list';
+            $isListAnswer = true;
+        }
+
         if (in_array('list', $ansformats)) {
             if (in_array('equation', $ansformats)) {
-                $shorttip = _('Enter a list of algebraic equations');
-                $tip = _('Enter a list of equations, separated by commas.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+                if (in_array('inequality', $ansformats)) {
+                    $shorttip = _('Enter a list of algebraic equations or inequalities');
+                    $tip = _('Enter a list of equations or inequalities, separated by commas.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+                } else {
+                    $shorttip = _('Enter a list of algebraic equations');
+                    $tip = _('Enter a list of equations, separated by commas.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+                }
             } else if (in_array('inequality', $ansformats)) {
                 $shorttip = _('Enter a list of algebraic inequalities');
                 $tip = _('Enter a list of inequalities, separated by commas.  Example: y<3x^2+1, 2+x+y>=3') . "\n<br/>" . _('Be sure your variables match those in the question');
@@ -74,8 +87,13 @@ class FunctionExpressionAnswerBox implements AnswerBox
             }
         } else {
             if (in_array('equation', $ansformats)) {
-                $shorttip = _('Enter an algebraic equation');
-                $tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+                if (in_array('inequality', $ansformats)) {
+                    $shorttip = _('Enter an algebraic equation or inequality');
+                    $tip = _('Enter your answer as an equation or inequality.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+                } else {
+                    $shorttip = _('Enter an algebraic equation');
+                    $tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+                }
             } else if (in_array('inequality', $ansformats)) {
                 $shorttip = _('Enter an algebraic inequality');
                 $tip = _('Enter your answer as an inequality.  Example: y<3x^2+1, 2+x+y>=3') . "\n<br/>" . _('Be sure your variables match those in the question');
@@ -160,7 +178,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
         $params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
         $params['vars'] = $variables;
@@ -182,11 +200,15 @@ class FunctionExpressionAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if ($GLOBALS['myrights'] > 10 && strpos($answer, '|') !== false) {
                 echo 'Warning: use abs(x) not |x| in $answer';
             }
-            $sa = makeprettydisp($answer);
+            $sa = $answer;
+            if (in_array('allowplusminus', $ansformats)) {
+                $sa = str_replace('+-','pm',$sa);
+            }
+            $sa = makeprettydisp($sa);
             $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
 
             for ($i = 0; $i < count($variables); $i++) {

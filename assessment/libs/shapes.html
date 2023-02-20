@@ -5,9 +5,9 @@
     <h1>Basic "Shapes" Library complex</h1>
 
 <p>Library name: shapes</p>
-<p>Functions to create and label basic shapes by using preexisting ASCIIsvg macro.&nbsp; Version 2.&nbsp; August 2021</p>
+<p>Functions to create and label basic shapes by using preexisting ASCIIsvg macro.&nbsp; Version January 2022</p>
 <br />
-<p>By default, an image description is generated for each shape.
+<p>By default, an image description is generated for each shape.</p>
 <span>To import the library, include <em>loadlibrary("shapes")</em> in the question's common control.</span>
 
 <p>The functions in this library can be used to draw and label basic shapes:</p>
@@ -27,7 +27,7 @@
     <li><a href="#polygon">draw_polygon</a></li>
     <li><a href='#prismcubes'>draw_prismcubes</a></li>
     <li><a href='#pyramid'>draw_pyramid</a></li>
-    
+    <li><a href='#polyomino'>draw_polyomino</a></li>
 </div>
 <p>&nbsp;</p>
 <p>&nbsp;<strong>Function output:</strong></p>
@@ -48,6 +48,7 @@
   <li><strong>"rotate,[deg]"</strong> -- Rotates the image by deg degrees. If "deg" is omitted, rotates by a random angle.</li>
   <li><strong>"axes"</strong> -- Draws the xy axes.</li>
   <li><strong>"size,length"</strong> -- Changes the size of the image to be lengthxlength. Default is 300x300.</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
   <li>Note: Angles must be strictly between -2000 and 2000 degrees.</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
@@ -75,6 +76,7 @@
   <li>Note: If a label is a point, type it as (x;y).</li>
   <li><strong>"axes"</strong> -- Draws the x and y axes.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -97,6 +99,7 @@
   <li><strong>"point,angle,[label]"</strong> Plots a point on the circle at angle measured counterclockwise. If optional label is a point (x,y), type is as (x;y).</li>
   <li><strong>"axes"</strong> -- Draws the x and y axes.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
   <li>Note: Angle must be given in degrees, and degree symbol will be displayed by default. To not display degree symbol, use "rad" in the label. E.g. "angle,57.3,1 rad".</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
@@ -120,11 +123,12 @@
   <li><strong>"slant,[label]"</strong> Labels the slant height of the cone.</li>
   <li><strong>"fill,[percent]"</strong> Fills the cone up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height.</li>
   <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
 <p><strong>$gr = draw_cone(1,1,"radius,r=12")</strong> -- A cone with equal diameter and height, with radius drawn and labeled 'r=12'.</p>
-<p><strong>$gr = draw_cone(height,x","fill,30","invert")</strong> -- A random cone, inverted, with its height labeled 'x' and filled up to 30 percent of its height.</p>
+<p><strong>$gr = draw_cone("height,x","fill,30","invert")</strong> -- A random cone, inverted, with its height labeled 'x' and filled up to 30 percent of its height.</p>
 
 
 <p><a name="cylinder"></a></p>
@@ -140,6 +144,7 @@
   <li><strong>"height,[label]"</strong> Labels the height of the cylinder.</li>
   <li><strong>"fill,[percent]"</strong> Fills a specified percent of the cylinder. If 'percent' omitted, fills a random percent.</li>
   <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -158,6 +163,7 @@
   <li><strong>"height,h,[label]"</strong> Must be used with "base". Draws scaled rectangle with base "b" and height "h" with optional label on right-hand vertical side.</li>
   <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <p>Notes:</p>
 <ol>
@@ -180,6 +186,7 @@
   <li><strong>"labels,lengthlab,depthlab,heightlab"</strong> labels the length, depth and height of the prism. You can omit one or more labels, such as "labels,,,heightlab".</li>
   <li><strong>"fill,[percent]"</strong> fills the prism up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height.</li>
   <li><strong>"size,length"</strong> sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -197,6 +204,7 @@
   <li><strong>"diameter,[label]"</strong> Draws a diameter with optional label.</li>
   <li><strong>"fill,[percent]"</strong> Fills the sphere up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height.</li>
   <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -214,6 +222,7 @@
   <li><strong>"height,[label]"</strong> Labels the right-hand vertical side.</li>
   <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -236,6 +245,7 @@
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
   <li><strong>"rotate,[ang]"</strong> Rotates the triangle counterclockwise by ang degrees. If "ang" is omitted, rotates by a random angle.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
   <p>Notes</p>
 <ol>
@@ -274,6 +284,7 @@
   <li><strong>"rotate"</strong> Rotates polygon by random angle.</li>
   <li><strong>"axes"</strong> Shows x and y axes.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -290,6 +301,7 @@
   <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth. Maximum of each dimension is 20.</li>
   <li><strong>"labels,lab1,lab2,lab3"</strong> This labels the length, height and depth of the prism.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -313,10 +325,30 @@
   <li><strong>"fill,[percent]"</strong> fills the pyramid up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height.</li>
   <li><strong>"invert"</strong> inverts the pyramid.</li>
   <li><strong>"size,length"</strong> sets the image size to be length x length. [Default is 300x300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
 <br />
 <p>Examples:</p>
 <p><strong>$gr = draw_pyramid(4,5,6,"length,4","width,5","height,6","fill,30","invert")</strong> -- A pyramid with tip at bottom and rectangular base at top, filled with colored material up to 30 percent of its height, with the rear edge of the base labeled 4, the left edge of the base labeled 5 and its height drawn and labeled 6.</p>
 
 
+<p><a name="polyomino"></a></p>
+<h2><strong>draw_polyomino</strong></h2>
+<p>Draws and labels a random, connected polyomino.</p>
+<p>Syntax: draw_polyomino([n],[option 1],[option 2],[option 3])</p>
+<p>draw_polyomino() -- draws a random polyomino with between 3 and 9 squares.</p>
+<p>draw_polyomino(n) -- draws a random polyomino with at least n squares.</p>
+<p>Each option is a list inside quotes. Options include:</p>
+
+<ul>
+  <li><strong>"fill,[color]"</strong> shades in the polyomino with optional color. Omit [color] to get a random color.</li>
+  <li><strong>"grid"</strong> shows the background grid.</li>
+  <li><strong>"data"</strong> will make the function output an array containing [the graph,area,perimeter] for the polyomino.</li>
+  <li><strong>"size,length"</strong> sets the image size to be length pixels wide. [Default width is 300]</li>
+  <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
+</ul>
+<br />
+<p>Examples:</p>
+<p><strong>$gr = draw_polyomino(5,"fill,transblue","grid")</strong> -- A random polyomino with 5 squares (i.e. a "pentomino"), shaded transparent blue, and shown on a grid.</p>
+<p><strong>$gr,$a,$p = draw_polyomino("fill","data")</strong> -- $gr is a random polyomino with between 3 and 9 squares, shaded with a random color; $a is the number of squares in the shape; $p is the perimeter of the shape</p>
 <a href="#top">Back to top of page</a>

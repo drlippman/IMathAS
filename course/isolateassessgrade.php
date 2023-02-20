@@ -49,9 +49,13 @@
     if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
             $calledfrom='isolateassess';
-            $_POST['checked'] = $_POST['stus'];
+            $_POST['checked'] = $_POST['stus'] ?? [];
             $_POST['assesschk'] = array($aid);
 			include("massexception.php");
+        }
+        if (isset($_GET['masssend'])) {
+            $calledfrom='isolateassess';
+            include('masssend.php');
         }
 	}
 
@@ -136,6 +140,11 @@
 		} else {
 			$sortorder = "name";
 		}
+        if (empty($tutorsection)) {
+            $stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid AND section IS NOT NULL AND section<>'' ORDER BY section");
+			$stm->execute(array(':courseid'=>$cid));
+            $sectionnames = $stm->fetchAll(PDO::FETCH_COLUMN,0);
+        }
 	} else {
 		$sortorder = "name";
 	}
@@ -163,7 +172,32 @@
 	
 	echo '<div id="headerisolateassessgrade" class="pagetitle"><h1>';
 	echo "Grades for " . Sanitize::encodeStringForDisplay($name) . "</h1></div>";
-	echo "<p>$totalpossible points possible</p>";
+
+    echo "<p>$totalpossible "._('points possible').'. ';
+    if ($hassection && empty($tutorsection)) {
+        echo _('Section').': ';
+        echo '<select id="secfiltersel" onchange="chgsecfilter(this)">';
+        echo '<option value="-1"' . ($secfilter == -1 ? ' selected' : '') . '>';
+        echo _('All') . '</option>';
+        foreach ($sectionnames as $secname) {
+            echo  '<option value="' . Sanitize::encodeStringForDisplay($secname) . '"';
+            if ($secname==$secfilter) {
+                echo  ' selected';
+            }
+            echo  '>' . Sanitize::encodeStringForDisplay($secname) . '</option>';
+        }
+        echo '</select>';
+        echo '<script type="text/javascript">
+        function chgsecfilter(el) {
+            var sec = el.value;
+            var toopen = "isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'&secfilter=" + encodeURIComponent(sec);
+            window.location = toopen;
+        }
+        </script>';
+    }
+    echo '</p>';
+
+	
 
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 //	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
@@ -232,7 +266,9 @@
 		if ($aver > 1 && ($line['status']&1)>0) {
 			// identify as unsubmitted if past due, or time limit is expired
 			$data = json_decode(gzdecode($line['scoreddata']), true);
-			$time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            if (abs($timelimit) > 0) {
+			    $time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            }
 			if ($now > $line['thisenddate'] ||
 				(abs($timelimit) > 0 && $now > $time_exp + $overtime_grace * $line['timelimitmult'])
 			) {
@@ -323,7 +359,8 @@
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = round($line['timeontask']/60,1);
-            $isOvertime = ($line['status']&4) == 4;
+            // don't display OT marker anymore for new assess
+            //$isOvertime = ($line['status']&4) == 4;
             $IP = 0;
             $UA = 0;
             if (($line['status']&1)>0 && ($line['thisenddate']<$now ||  //unsubmitted by-assess, and due date passed
@@ -351,7 +388,7 @@
 			$UA = 0;
 		}
 
-		if ($line['starttime']==null) {
+		if ($line['starttime']===null) {
 			if ($aver > 1) {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -424,7 +461,7 @@
 				echo "&nbsp;(IP)";
 			} else 	if ($UA==1) {
 				echo "&nbsp;(UA)";
-			} else	if ($isOvertime) {
+			} else	if (!empty($isOvertime)) {
 				echo "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo "&nbsp;(PT)";
@@ -542,12 +579,18 @@
     }
     echo "<td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
+	
+	if ($includeduedate) {
+        $duedatesort = ",'D'";
+    } else {
+        $duedatesort = '';
+    }
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
-		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	} else if ($hassection && !$hidesection) {
-		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	} else {
-		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";

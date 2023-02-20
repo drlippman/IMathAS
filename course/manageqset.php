@@ -11,7 +11,9 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Question Sets";
 $helpicon = "";
-
+if (!isset($courseUIver)) {
+    $courseUIver = 2;
+}
 //data manipulation here
 $isadmin = false;
 $isgrpadmin = false;
@@ -305,7 +307,7 @@ if ($myrights<20) {
 							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
-						if ($_SESSION['lastsearchlibs'.$cid]!='') {
+						if (!empty($_SESSION['lastsearchlibs'.$cid])) {
 							$listedlibs = explode(',', $_SESSION['lastsearchlibs'.$cid]);
 						} else {
 							$listedlibs = array();
@@ -513,12 +515,12 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; "._("Change Question License/Attribution");
 
-			$clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
-
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
-			}
+			} else {
+                $clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+            }
 		}
 
 	} else if (isset($_POST['chgrights'])) {
@@ -740,6 +742,7 @@ if ($myrights<20) {
 		$llist = implode(',', array_map('intval', explode(',',$searchlibs)));
 
 		$libsortorder = array();
+        $lnamesarr = array();
 		if (substr($searchlibs,0,1)=="0") {
 			$lnamesarr[0] = "Unassigned";
 			$libsortorder[0] = 0;
@@ -994,7 +997,7 @@ function doaction(todo,id) {
 	window.location = addr;
 }
 
-var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>';
+var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs ?? ''); ?>';
 
 function libselect() {
 	window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
@@ -1095,7 +1098,7 @@ function getnextprev(formn,loc) {
 			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
 			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
 			<?php
-			if ($_SESSION['searchall'.$cid]==0 && $_SESSION['lastsearchlibs'.$cid]!='0') {
+			if (isset($_SESSION['searchall'.$cid]) && isset($_SESSION['lastsearchlibs'.$cid]) && $_SESSION['searchall'.$cid]==0 && $_SESSION['lastsearchlibs'.$cid]!='0') {
 				echo '<input type=radio name="action" value="3" onclick="chglibtoggle(this)"/> Add to libraries, removing library assignment in currently listed libraries<br/>';
 			}
 			?>
@@ -1279,7 +1282,7 @@ function getnextprev(formn,loc) {
 		} else if ($isgrpadmin) {
 			echo "<br/>(Delete and Transfer only apply to group's questions)\n";
 		}
-		echo "<table id=myTable class=gb><thead>\n";
+		echo "<table id=myTable class='gb questionset-management-list'><thead>\n";
 		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
 		if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
 		if ($searchall==1) {

@@ -36,7 +36,7 @@
 			);
 		}
 		//update sections
-		if (count($_POST['section'])>0) {
+		if (isset($_POST['section']) && count($_POST['section'])>0) {
 			foreach ($_POST['section'] as $id=>$val) {
 				$stm = $DBH->prepare("UPDATE imas_tutors SET section=:section WHERE id=:id AND courseid=:courseid");
 				$stm->execute(array(':section'=>$val, ':id'=>$id, ':courseid'=>$cid));

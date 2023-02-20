@@ -16,7 +16,7 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 	}
 	</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>';
 }
-if (isset($useeditor) && $_SESSION['useed']==1) {
+if (isset($useeditor) && !empty($_SESSION['useed'])) {
 	//echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
 if (!isset($courseUIver)) { $courseUIver = 1;}

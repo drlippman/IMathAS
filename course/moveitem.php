@@ -155,6 +155,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[1]=='Calendar') {
 		$iteminfo[$row[0]] = array($row[1], _('Calendar'));
 	} else {
+        if (!isset($itemdata[$row[1]][$row[2]])) { continue; } // invalid entry
 		$iteminfo[$row[0]] = array($row[1], $itemdata[$row[1]][$row[2]]);
 	}
 }
@@ -193,7 +194,7 @@ require("../header.php");
 
 <p>
 <button type="button" onclick="cancelmove()" class="secondarybtn">Cancel</button>
-<button type="button" onclick="moveitem()">Move</button></p>
+<button type="button" onclick="moveitem()" class="primary">Move</button></p>
 
 <p class="noticetext" id="error"></p>
 <?php

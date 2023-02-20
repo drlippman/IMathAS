@@ -9,7 +9,11 @@ if (!isset($teacherid)) {
 	exit;
 }
 $aid = Sanitize::onlyInt($_GET['aid']);
-
+if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+    $addqpage = 'addquestions2.php';
+} else {
+    $addqpage = 'addquestions.php';
+}
 //form handling
 
 if (isset($_POST['clearall'])) {
@@ -45,7 +49,7 @@ if (isset($_POST['clearall'])) {
 	ksort($data);
 	$data = array_values($data);
 	array_unshift($data, array($vidid, $vidar));
-	if (trim($_POST['finalseg'])!='') {
+	if (trim($_POST['finalseg'] ?? '')!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
 
@@ -53,7 +57,7 @@ if (isset($_POST['clearall'])) {
 	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
 	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
 
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addqpage?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 	exit;
 }
 
@@ -62,7 +66,7 @@ if (isset($_POST['clearall'])) {
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
+echo "&gt; <a href=\"$addqpage?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
 $stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -422,7 +426,7 @@ for ($i=0;$i<$n;$i++) {
 		echo '<input type="hidden" name="qn'.$i.'" value="' . Sanitize::encodeStringForDisplay($qn[$i]) . '"/>';
 		echo '<br/>';
 		echo _('Has followup?').' <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
-		if ($hasfollowup[$i]) {
+		if (!empty($hasfollowup[$i])) {
 			echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
 		} else {
 			echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
@@ -431,7 +435,7 @@ for ($i=0;$i<$n;$i++) {
 		echo _('Ends at:').' <input type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="' . Sanitize::encodeStringForDisplay($followupendtime[$i]) . '"/> ';
 		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',1);"/> ';
 		echo _('Show link in navigation?').' <input type="checkbox" name="showlink'.$i.'" value="1" ';
-		if ($showlink[$i]) {
+		if (!empty($showlink[$i])) {
 			echo 'checked="checked"';
 		}
 		echo '/></span>';

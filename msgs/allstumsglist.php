@@ -35,7 +35,7 @@
 	if (isset($_POST['remove'])) {
 		$goodmsgs = array();
 		foreach ($_POST['checked'] as $msgid) {
-			if (in_numeric($msgid) && $msgid!=0) {
+			if (is_numeric($msgid) && $msgid!=0) {
 				$goodmsgs[] = intval($msgid);
 			}
 		}
@@ -123,7 +123,7 @@ function chgfilter() {
 	<p>Filter by student: <select id="filterstu" class='pii-full-name' onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
-	if ($filtercid==0) {
+	if ($filterstu==0) {
 		echo "selected=1 ";
 	}
 	echo ">All students</option>";
@@ -202,7 +202,7 @@ function chgfilter() {
         echo "</td><td>";
         if (isset($stulist[$line['msgto']])) {
             echo '<span class="pii-full-name">';
-            Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
+            echo Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
             echo '</span>';
         }
         echo "</td>";

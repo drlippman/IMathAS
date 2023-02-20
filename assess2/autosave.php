@@ -38,6 +38,7 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 } else {
   $uid = $userid;
 }
+$qns = null;
 
 if (isset($_POST['autosave-tosaveqn'])) {
     check_for_required('POST', array('autosave-tosaveqn', 'autosave-lastloaded'));
@@ -49,7 +50,7 @@ if (isset($_POST['autosave-tosaveqn'])) {
     } else {
         $timeactive = json_decode($_POST['autosave-timeactive'], true);
     }
-} else { // deprecated
+} else if (isset($_POST['tosaveqn'])) { // deprecated
     check_for_required('POST', array('tosaveqn', 'lastloaded'));
     $qns = json_decode($_POST['tosaveqn'], true);
     $lastloaded = json_decode($_POST['lastloaded'], true);
@@ -153,7 +154,7 @@ foreach ($qns as $qn=>$parts) {
   }
   $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
   foreach ($parts as $part) {
-    if ($ok_to_save === true || $ok_to_save[$part]) {
+    if ($ok_to_save === true || !empty($ok_to_save[$part])) {
       $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
     }
   }

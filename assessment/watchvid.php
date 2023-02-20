@@ -1,6 +1,9 @@
 <?php
 require_once(__DIR__ . '/../includes/sanitize.php');
 
+if (!isset($_GET['url'])) {
+    exit;
+}
 $url = $_GET['url'];
 $doembed = false;
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -63,8 +66,7 @@ if ($isyoutube) {
 		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
 	}
 
-	if (strpos($url,'end=')!==false) {
-		preg_match('/end=(\d+)/',$url,$m);
+	if (preg_match('/end=(\d+)/',$url,$m)) {
 		$timestart .= '&'.$m[0];
 	}
 	$doembed = true;
@@ -76,7 +78,7 @@ if (strpos($url,'vimeo.com/')!==false) {
 	$vidid = substr($url,strpos($url,'.com/')+5);
   $vidid = preg_replace('/[^0-9]/','',$vidid);
 	$doembed = true;
-	$videoUrl = 'http://player.vimeo.com/video/'.$vidid;
+	$videoUrl = 'https://player.vimeo.com/video/'.$vidid;
 	$out = '<iframe width="853" height="480" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if ($doembed) {
@@ -84,7 +86,7 @@ if ($doembed) {
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
 	echo '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}</style>';
 	echo '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);imasroot="";</script>';
-	echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>';
+    echo '<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>';
     echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fitvids/1.2.0/jquery.fitvids.min.js"></script>';
     echo '<script>$(function() {$("body").fitVids();});</script>';
 	echo '</head>';

@@ -38,6 +38,7 @@ class FileUploadAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $assessmentId = $this->answerBoxParams->getAssessmentId();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -55,7 +56,7 @@ class FileUploadAnswerBox implements AnswerBox
         if (!empty($ansprompt)) {
             $out .= "$ansprompt ";
         }
-        if ($GLOBALS['useeditor'] !== 'review') {
+        if (!isset($GLOBALS['useeditor']) || $GLOBALS['useeditor'] !== 'review') {
             $out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" class=\"filealt\" ";
             if (!empty($answerformat)) {
                 $answerformat = str_replace('images', '.jpg,.jpeg,.gif,.png', $answerformat);
@@ -103,11 +104,11 @@ class FileUploadAnswerBox implements AnswerBox
             } else {
                 $out .= "<br/>$la";
             }
-        } else if ($GLOBALS['useeditor'] === 'review') {
+        } else if (isset($GLOBALS['useeditor']) && $GLOBALS['useeditor'] === 'review') {
             $out .= _('No file submitted');
         }
         $tip .= _('Select a file to upload');
-        if ($scoremethod != 'filesize') {
+        if ($scoremethod != 'filesize' && !$isConditional) {
             $sa .= $answer;
         }
 

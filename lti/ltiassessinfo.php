@@ -81,7 +81,8 @@ if (!empty($_POST['makelineitem'])) {
             $scoredata['userid'],
             $scoredata['score'],
             true,
-            $iteminfo['ptsposs']
+            $iteminfo['ptsposs'],
+            false
         );
         $cnt++;
     }
@@ -89,7 +90,7 @@ if (!empty($_POST['makelineitem'])) {
     if (!empty($GLOBALS['CFG']['LTI']['usequeue'])) {
         $scoreresendmsg .= ' '._('It may take a couple minutes for the updates to show in the LMS.');
     }
-}
+} 
 
 
 //HTML Output

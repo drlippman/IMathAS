@@ -24,7 +24,7 @@ $stm->execute(array(':id'=>$cid));
 $items = unserialize($stm->fetchColumn(0));
 
 $exceptions = array();
-if (!$viewall) {
+if (!$viewall && isset($studentinfo['latepasses'])) {
 	$exceptions = loadExceptions($cid, $userid);
 	require_once("../includes/exceptionfuncs.php");
 	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
@@ -59,6 +59,9 @@ function showitemtree($items,$parent,$greyitems=0) {
 				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
 					 continue;
 				 }
+			}
+            if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
 			}
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 						($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {

@@ -32,14 +32,17 @@ class StringScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'strflags', 'scoremethod', 'answerformat', 'variables'];
+        $optionkeys = ['answer', 'strflags', 'scoremethod', 'answerformat', 'variables', 'requiretimes'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
-
+        
+        if ($answerformat=='list') {
+            $givenans = trim($givenans, " ,");
+        }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if (!empty($scoremethod) &&
@@ -49,7 +52,11 @@ class StringScorePart implements ScorePart
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         }
-
+        if ($requiretimes !== '' && checkreqtimes($givenans,$requiretimes)==0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+        
         if ($answerformat=='list') {
             $gaarr = array_map('trim',explode(',',$givenans));
             $anarr = array_map('trim',explode(',',$answer));
@@ -66,9 +73,20 @@ class StringScorePart implements ScorePart
             $strflags = explode(",",$strflags);
             foreach($strflags as $flag) {
                 $pc = array_map('trim',explode('=',$flag,2));
+                if (!isset($pc[1])) {
+                    if ($pc[0]=='ignore_symbol' || $pc[0] == 'allow_diff' || $pc[0] == 'regex') {
+                        echo "Missing = in strflag";
+                        continue;
+                    } else {
+                        $pc[1] = 1;
+                    }
+                }
                 if ($pc[0]=='ignore_symbol') {
                     $torem[] = $pc[1];
                     continue;
+                }
+                if (!isset($pc[1])) {  // if val not specified, turn on
+                    $pc[1] = true;
                 }
                 if ($pc[0] == 'allow_diff') {
                     $pc[1] = intval($pc[1]);
@@ -97,7 +115,7 @@ class StringScorePart implements ScorePart
             }
             foreach($gaarr as $j=>$givenans) {
                 $givenans = trim($givenans);
-
+                
                 if ($answerformat == "logic") {
                     if (comparelogic($givenans, $answer, $variables)) {
                         $correct += 1;
@@ -105,7 +123,13 @@ class StringScorePart implements ScorePart
                     } 
                     continue; // skip normal processing
                 }
-
+                if ($answerformat == "setexp") {
+                    if (comparesetexp($givenans, $answer, $variables)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } 
+                    continue; // skip normal processing
+                }
                 if (count($torem)>0) {
                     $givenans = str_replace($torem,' ',$givenans);
                 }

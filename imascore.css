@@ -1,5 +1,7 @@
 html {
-
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
 }
 body {
     background-color:#FFFFFF;
@@ -74,6 +76,9 @@ span.iteminfo {
 }
 .warn {
     color: #C40;
+}
+input:invalid {
+	background-color: #faa;
 }
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
@@ -995,6 +1000,9 @@ ol li ol {
 
 svg {
 	overflow: hidden;
+}
+embed[type="image/svg+xml"] {
+    display: inline-block;
 }
 
 table.gridded {

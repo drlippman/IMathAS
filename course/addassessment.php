@@ -7,7 +7,7 @@ require("../init.php");
 require("../includes/htmlutil.php");
 require_once("../includes/TeacherAuditLog.php");
 
-if ($courseUIver > 1) {
+if (isset($courseUIver) && $courseUIver > 1) {
 	if (!isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));
@@ -51,7 +51,7 @@ if (isset($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 	$stm->execute(array(intval($_GET['id'])));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($row === null || $row['courseid'] != $_GET['cid']) {
+	if ($row === false || $row['courseid'] != $_GET['cid']) {
 		echo "Invalid ID";
 		exit;
 	} else if ($row['ver']>1) {
@@ -72,7 +72,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
         $cid = Sanitize::courseId($_GET['cid']);
-        $block = $_GET['block'];
+        $block = $_GET['block'] ?? '';
 
         if (isset($_GET['id'])) {
             $assessmentId = Sanitize::onlyInt($_GET['id']);
@@ -145,7 +145,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        	$assessName = _('Unnamed Assessment');
 	        }
 	        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-	        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
+	        $defpoints = Sanitize::onlyInt($_POST['defpoints'] ?? 0);
 	        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
 	        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
 	        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
@@ -157,7 +157,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
 	        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
 	        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
-	        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
+	        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret'] ?? '');
 	        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
 	        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
@@ -757,7 +757,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
             $stm->execute(array(':courseid'=>$cid));
-            $page_gbcatSelect = array();
+            $page_gbcatSelect = array('val'=>[], 'label'=>[]);
             $i=0;
             if ($stm->rowCount()>0) {
                 while ($row = $stm->fetch(PDO::FETCH_NUM)) {

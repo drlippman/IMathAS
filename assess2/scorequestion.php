@@ -31,7 +31,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('toscoreqn', 'lastloaded'));
+check_for_required('POST', array('lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isActualTeacher && isset($_GET['uid'])) {
@@ -43,7 +43,7 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 $isTeacherPreview = ($canViewAll && $uid == $userid);
 
 // if toscoreqn is not an array, make it into one
-if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
+if (!isset($_POST['toscoreqn']) || $_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $qns = array();
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
   $timeactive = array();
@@ -143,6 +143,9 @@ if ($preview_all) {
 if ($isTeacherPreview) {
     $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // get settings for LTI if needed
 $assess_info->loadLTIMsgPosts($userid, $canViewAll);
@@ -194,7 +197,7 @@ if (count($qns) > 0) {
     if ($v === 'file-autosave') {
       $qref = substr($k,2);
       if ($qref >= 1000) {
-        $qn = Math.floor($qref/1000) - 1;
+        $qn = floor($qref/1000) - 1;
         $pn = $qref % 1000;
       } else {
         $qn = $qref;
@@ -244,7 +247,7 @@ if (count($qns) > 0) {
   $assess_record->reTotalAssess($qns);
 
 } else {
-  $assess_info->loadQuestionSettings('all', false, false);
+  $assess_info->loadQuestionSettings('all', $end_attempt, false);
 }
 
 // save autosaves, if set 
@@ -271,12 +274,12 @@ if (!empty($_POST['autosave-tosaveqn'])) {
                 }
                 $ok_to_save = $assess_record->isSubmissionAllowed($qn, $autosave_qids[$qn], $parts);
                 foreach ($parts as $part) {
-                    if ($ok_to_save === true || $ok_to_save[$part]) {
-                     $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, $part);
+                    if ($ok_to_save === true || !empty($ok_to_save[$part])) {
+                     $assess_record->setAutoSave($now, $autosave_timeactive[$qn] ?? 0, $qn, $part);
                     }
                 }
                 if (isset($_POST['sw' . $qn])) {  //autosaving work
-                    $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, 'work');
+                    $assess_record->setAutoSave($now, $autosave_timeactive[$qn] ?? 0, $qn, 'work');
                 }
             }
             $assessInfoOut['saved_autosaves'] = true;
@@ -372,7 +375,7 @@ if ($end_attempt) {
   foreach ($qns as $qn) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
   }
-  if (count($scoreErrors)>0) {
+  if (!empty($scoreErrors)) {
     $assessInfoOut['scoreerrors'] = $scoreErrors;
   }
 }
@@ -381,7 +384,7 @@ if ($end_attempt) {
 $assess_record->saveRecord();
 
 if (($assessInfoOut['submitby'] == 'by_question' && !$in_practice) || $end_attempt) {
-    $assess_record->updateLTIscore();
+    $assess_record->updateLTIscore($end_attempt, true);
 }
 
 //prep date display

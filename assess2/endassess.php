@@ -52,9 +52,12 @@ $assess_record->loadRecord($uid);
 if ($isTeacherPreview) {
     $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // grab all questions settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', true);
 
 // if have active scored record end it
 if ($assess_record->hasActiveAttempt()) {
@@ -71,7 +74,7 @@ if ($assess_record->hasActiveAttempt()) {
 }
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, true);
 
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(

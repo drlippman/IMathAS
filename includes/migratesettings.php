@@ -49,7 +49,7 @@ function migrateAssessSettings1to2($settings) {
       $settings['keepscore'] = 'last';
       $settings['defregens'] = $settings['defattempts'];
       $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
-      $settings['defpenalty'] = 0;
+      $settings['defpenalty'] = '0';
       $settings['defattempts'] = 1;
     } else {
       $settings['submitby'] = 'by_question';
@@ -62,7 +62,7 @@ function migrateAssessSettings1to2($settings) {
     $settings['keepscore'] = 'best';
     $settings['defregens'] = $settings['defattempts'];
     $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
-    $settings['defpenalty'] = 0;
+    $settings['defpenalty'] = '0';
     $settings['defattempts'] = 1;
     $settings['showscores'] = 'total';
     $settings['showans'] = 'never';
@@ -74,7 +74,7 @@ function migrateAssessSettings1to2($settings) {
     $settings['keepscore'] = 'best';
     $settings['defregens'] = $settings['defattempts'];
     $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
-    $settings['defpenalty'] = 0;
+    $settings['defpenalty'] = '0';
     $settings['defattempts'] = 1;
     $settings['showscores'] = 'at_end';
     if ($showans == 'V' || $showans == 'N' || $showans == 'A') {
@@ -89,7 +89,7 @@ function migrateAssessSettings1to2($settings) {
       $settings['keepscore'] = 'best';
       $settings['defregens'] = $settings['defattempts'];
       $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
-      $settings['defpenalty'] = 0;
+      $settings['defpenalty'] = '0';
       $settings['defattempts'] = 1;
     } else {
       $settings['submitby'] = 'by_question';
@@ -173,6 +173,9 @@ function migrateAssessSettings1to2($settings) {
   }
 
   // convert 'after n missed attempts' or 'on last attempt' penalties
+  if ($settings['defpenalty'] === '') {
+    $settings['defpenalty'] = '0';
+  }
   if ($settings['defpenalty'][0] == 'S') {
     $after = $settings['defpenalty'][1] + 1;
     if ($after < $settings['defattempts']) {
@@ -206,7 +209,7 @@ function migrateAssessSettings1to2($settings) {
 
   // convert showhints
   if ($settings['showhints'] > 0) {
-    $settings['showhints'] = 3;
+    $settings['showhints'] = 7;
   }
 
   // convert showtips
@@ -239,6 +242,8 @@ function migrateAssessSettings1to2($settings) {
 }
 
 function getBasePenalty($pen) {
+  $pen = (string) $pen;
+  if ($pen === '') { $pen = '0'; }
   if ($pen[0]=='S') {
     return substr($pen,2);
   } else if ($pen[0]=='L') {
@@ -260,6 +265,7 @@ function migrateQuestionSettings1to2($settings, $defaults) {
   } else {
     $refattempts = $settings['attempts'];
   }
+  if ($settings['penalty'] === '') { $settings['penalty'] = '0'; }
   if ($settings['penalty'][0] == 'S') {
     $after = $settings['penalty'][1] + 1;
     if ($after < $refattempts) {

@@ -10,6 +10,8 @@ if (isset($CFG['hooks']['admin/actions'])) {
 	require($CFG['hooks']['admin/actions']);
 }
 
+if (!isset($_POST['action'])) { exit; }
+
 $from = 'admin';
 if (isset($_GET['from'])) {
 	if ($_GET['from']=='home') {
@@ -26,7 +28,10 @@ if (isset($_GET['from'])) {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
 		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
-	}
+	} else if ($_GET['from']=='unhide') {
+		$from = 'unhide';
+		$backloc = 'unhidefromcourselist.php?type=teach';
+	} 
 }
 if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
@@ -38,14 +43,11 @@ if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='gd') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
+} else if ($from == 'unhide') {
+    $breadcrumbbase .= '<a href="'.$backloc.'">'._('Unhide Courses').'</a> &gt; ';
 }
 
 switch($_POST['action']) {
-	case "emulateuser":
-		if ($myrights < 100 ) { break;}
-		$be = $_REQUEST['uid'];
-		$_SESSION['userid'] = $be;
-		break;
 	case "chgrights":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
 			echo _("You don't have the authority for this action");
@@ -160,6 +162,9 @@ switch($_POST['action']) {
 			if (isset($_POST['doresetpw'])) {
 				$query .= ',password=:password,forcepwreset=1';
 			}
+            if ($myrights == 100 && $_GET['id'] != $userid && !isset($_SESSION['emulateuseroriginaluser']) && !empty($_POST['clearMFA'])) {
+                $query .= ",MFA=''";
+            }
 			$query .= " WHERE id=:id";
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
@@ -186,11 +191,12 @@ switch($_POST['action']) {
 
 		//if student being promoted, enroll in teacher enroll courses
 		if ($oldrights<=10 && $_POST['newrights']>=20) {
-            if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+            if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+                $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
                 $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
                 $stm->execute([$_GET['id']]);
                 $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-                $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+                $toEnroll = array_diff($allInstrEnroll, $existingEnroll);
                 if (count($toEnroll) > 0) {
                     $valbits = array();
                     $valvals = array();
@@ -227,9 +233,13 @@ switch($_POST['action']) {
 				$stm->execute(array(json_encode($reqdata), $_GET['id']));
 			}
 
-		} else if ($oldrights>10 && $_POST['newrights']<=10 && isset($CFG['GEN']['enrollonnewinstructor'])) {
+		} else if ($oldrights>10 && $_POST['newrights']<=10 && 
+            (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval']))
+        ) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
+
 			require_once("../includes/unenroll.php");
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+			foreach ($allInstrEnroll as $ncid) {
 				unenrollstu($ncid, array($_GET['id']));
 			}
 		}
@@ -421,10 +431,13 @@ switch($_POST['action']) {
 			':specialrights'=>$specialrights,
             ':jsondata'=>json_encode($jsondata)));
 		$newuserid = $DBH->lastInsertId();
-		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
+        if ($_POST['newrights']>=20 && 
+            (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval']))
+        ) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 			$valbits = array();
 			$valvals = array();
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+			foreach ($allInstrEnroll as $ncid) {
 				$valbits[] = "(?,?)";
 				array_push($valvals, $newuserid,$ncid);
 			}
@@ -499,14 +512,6 @@ switch($_POST['action']) {
 			$theme = $_POST['theme'];
 		}
 
-        $unenroll = 0;
-		if (isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==0) {
-			$unenroll = $CFG['CPS']['unenroll'][0];
-		} else if (isset($CFG['CPS']['unenroll'])) {
-			$unenroll = $_POST['allowunenroll'];
-        }
-        $unenroll += empty($_POST['allowenroll']) ? 2 : 0;
-
 		if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
 			$copyrights = $CFG['CPS']['copyrights'][0];
 		} else {
@@ -563,7 +568,7 @@ switch($_POST['action']) {
 			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-reord']);
 		}
 
-		$avail = 1 - $_POST['stuavail'];
+		$avail = isset($_POST['stuavail']) ? 0 : 1;//1 - $_POST['stuavail'];
 
 		$istemplate = 0;
 		if (($myspecialrights&1)==1 || $myrights==100) {
@@ -595,6 +600,17 @@ switch($_POST['action']) {
 				$istemplate |= 8;
 			}
 		}
+
+        $unenroll = 0;
+        if ((isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==1) ||
+            ($myrights == 100 && ($istemplate&4)==4)
+        ) {
+            $unenroll = $_POST['allowunenroll'];
+        } else if (isset($CFG['CPS']['unenroll'])) {
+            $unenroll = $CFG['CPS']['unenroll'][0];
+        }
+        $unenroll += empty($_POST['allowenroll']) ? 2 : 0;
+
 		if (!isset($CFG['coursebrowserRightsToPromote'])) {
 			$CFG['coursebrowserRightsToPromote'] = 40;
 		}
@@ -616,6 +632,7 @@ switch($_POST['action']) {
 
 			$browserdata = array();
 			foreach ($browserprops as $propname=>$propvals) {
+                if (!empty($propvals['fixed'])) { continue; }
 				if (!empty($propvals['required']) && trim($_POST['browser'.$propname]) == '' &&
 					!($propvals['required']==2 && ($istemplate&3)>0)) {
 					$isok = false;
@@ -630,7 +647,7 @@ switch($_POST['action']) {
 				} else { //single val
 					$browserdata[$propname] = Sanitize::stripHtmlTags($_POST['browser'.$propname]);
 				}
-				if ($_POST['browser'.$propname]=='other') {
+				if (isset($_POST['browser'.$propname]) && $_POST['browser'.$propname]=='other') {
 					$browserdata[$propname.'other'] = Sanitize::stripHtmlTags($_POST['browser'.$propname.'other']);
 				}
 			}
@@ -892,6 +909,7 @@ switch($_POST['action']) {
 					}
 					function updateoutcomes(&$arr) {
 						global $outcomes;
+                        if (!is_array($arr)) { return; }
 						foreach ($arr as $k=>$v) {
 							if (is_array($v)) {
 								updateoutcomes($arr[$k]['outcomes']);
@@ -901,6 +919,9 @@ switch($_POST['action']) {
 						}
 					}
 					$outcomesarr = unserialize($outcomesarr);
+                    if ($outcomesarr === false) {
+                        $outcomesarr = [];
+                    }
 					updateoutcomes($outcomesarr);
 					$newoutcomearr = serialize($outcomesarr);
 				} else {
@@ -911,6 +932,7 @@ switch($_POST['action']) {
 				$newitems = array();
 				require("../includes/copyiteminc.php");
 				$convertAssessVer = $destUIver;
+                $_POST['ctc'] = $_POST['usetemplate'];
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate'], $newitems);
 				$itemorder = serialize($newitems);
@@ -1294,7 +1316,7 @@ if ($myrights<75 || $from=='home') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if ($from=='userreports') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php");
-} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
+} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd' || $from=='unhide') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");

@@ -254,9 +254,16 @@
                 {{ $t('gradebook.show_all_work') }}
               </button>
               <button
+                type="button"
                 @click = "previewFiles"
               >
                 {{ $t('gradebook.preview_files') }}
+              </button>
+              <button
+                type="button"
+                @click="toggleFloatingScoreboxes"
+              >
+                {{ $t('gradebook.floating_scoreboxes') }}
               </button>
             </p>
           </div>
@@ -265,6 +272,9 @@
           <button @click="hidetexts = !hidetexts; loadTexts()">
             {{ $t(hidetexts ? 'print.show_text' : 'print.hide_text') }}
           </button>
+          <p class="noticetext">
+            {{ $t('gradebook.no_edit') }}
+          </p>
         </div>
 
         <div v-if="viewFull">
@@ -319,6 +329,7 @@
                   :class = "{'inactive':!showQuestion[qn]}"
                   :qdata = "qdata[curQver[qn]]"
                   :qn = "qn"
+                  :disabled = "!canEdit"
                 />
                 <gb-showwork
                   :work = "qdata[curQver[qn]].work"
@@ -362,6 +373,15 @@
             @click = "submitChanges(true)"
           >
             {{ $t('gradebook.save') }}
+          </button>
+          <button
+            v-if = "canEdit && aData.nextstu"
+            type = "button"
+            :disabled = "!canSubmit"
+            class = "primary"
+            @click = "submitChanges(false,true)"
+          >
+            {{ $t('gradebook.savenext') }}
           </button>
           <span v-if="savedMsg !== ''" class="noticetext">
             {{ savedMsg }}
@@ -717,7 +737,7 @@ export default {
       }
       store.saving = '';
     },
-    submitChanges (exit) {
+    submitChanges (exit, nextstu) {
       if (!this.aData.hasOwnProperty('scoreoverride') && this.showOverride) {
         if (this.assessOverride !== '') {
           store.scoreOverrides.gen = this.assessOverride;
@@ -725,7 +745,8 @@ export default {
         this.showOverride = false;
       }
       var doexit = (exit === true);
-      actions.saveChanges(doexit);
+      var donextstu = (nextstu === true);
+      actions.saveChanges(doexit, donextstu);
     },
     submitForm () {
       this.submitChanges(true);
@@ -778,6 +799,9 @@ export default {
     previewFiles () {
       window.previewallfiles();
     },
+    toggleFloatingScoreboxes () {
+      window.toggleScrollingScoreboxes();
+    },
     loadTexts () {
       if (!store.assessInfo.hasOwnProperty('intro')) {
         actions.loadGbTexts();
@@ -825,6 +849,7 @@ export default {
   right: 10px;
   bottom: 10px;
   text-align: center;
+  z-index: 10;
 }
 .bigquestionwrap {
   border: 1px solid #ccc;
@@ -834,5 +859,8 @@ export default {
 .bigquestionwrap .headerpane {
   padding: 8px;
   background-color: #eee;
+}
+.hoverbox {
+  background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);
 }
 </style>

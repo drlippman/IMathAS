@@ -41,7 +41,10 @@ if (!empty($_GET['from'])) {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
 		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
-	}
+	} else if ($_GET['from']=='unhide') {
+		$from = 'unhide';
+		$backloc = 'unhidefromcourselist.php?type=teach';
+	} 
 }
 if (!isset($_GET['cid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -55,6 +58,8 @@ if (!isset($_GET['cid'])) {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='gd') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
+	} else if ($from == 'unhide') {
+		echo '<a href="'.$backloc.'">'._('Unhide Courses').'</a> &gt; ';
 	}
 	echo "Form</div>\n";
 }
@@ -102,8 +107,12 @@ switch($_GET['action']) {
 		break;
 	case "deladmin":
 		if ($myrights < 75) { echo _("You don't have the authority for this action"); break;}
+        $stm = $DBH->prepare("SELECT FirstName,LastName,SID,rights FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($myrights==100) {
-			$stm = $DBH->query("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
+			$stm = $DBH->prepare("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE (iu.rights=100 OR iu.groupid=?) AND iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
+            $stm->execute(array($groupid));
 		} else {
 			$stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE groupid=? AND rights>12 AND rights<>76 AND rights<>77 ORDER BY LastName,FirstName");
 			$stm->execute(array($groupid));
@@ -116,18 +125,17 @@ switch($_GET['action']) {
 			$otherusers[$row['id']] = $row['LastName'].', '.$row['FirstName'].(isset($row['name'])?' ('.$row['name'].')':'');
 		}
 
+        $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 		$stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=? and lastaccess>?");
 		$stm->execute(array($_GET['id'], time()-2*365*24*60*60));
 		$hasstu = false;
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (!isset($CFG['GEN']['enrollonnewinstructor']) || !in_array($row['courseid'], $CFG['GEN']['enrollonnewinstructor'])) {
+			if (!in_array($row['courseid'], $allInstrEnroll)) {
 				$hasstu = true;
 				break;
 			}
 		}
-		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		
 		echo "<p>Are you sure you want to delete this user, <b>";
 		printf("<span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)",
             Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
@@ -137,9 +145,11 @@ switch($_GET['action']) {
 			echo 'be deleting any important data before deleting this user.</p>';
 		}
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
-		echo '<p>Any questions or libraries owned by this user need to be transfered to another user. <br/>Select user to transfer them to: ';
-		writeHtmlSelect('transferto',array_keys($otherusers),array_values($otherusers), $userid);
-		echo '</p>';
+        if ($line['rights']>10) {
+            echo '<p>Any questions or libraries owned by this user need to be transfered to another user. <br/>Select user to transfer them to: ';
+            writeHtmlSelect('transferto',array_keys($otherusers),array_values($otherusers), $userid);
+            echo '</p>';
+        }
 		echo '<p><button type=submit name="action" value="deladmin">'._('Delete').'</button>';
 		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
@@ -157,7 +167,7 @@ switch($_GET['action']) {
             $oldrights = 10;
             $oldspecialrights = 0;
 		} else {
-			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata,mfa FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
@@ -272,6 +282,10 @@ switch($_GET['action']) {
 		} else {
 			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ';
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
+            if ($myrights == 100 && $_GET['id'] != $userid && $line['mfa'] != '') {
+                echo '<span class=form>Disable 2-Factor Authentication?</span><span class=formright><input type=checkbox name="clearMFA" value="1"/></span>';
+                echo '<br class=form />';
+            }
 		}
 
 		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
@@ -287,10 +301,10 @@ switch($_GET['action']) {
 		//echo "> TA/Tutor/Proctor <BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"20\" ";
 		if ($oldrights == 20) {echo "CHECKED";}
-		echo "> Teacher <BR>\n";
+		echo "> Teacher <span class=small>(cannot create courses or edit course settings)</span><BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"40\" ";
 		if ($oldrights == 40) {echo "CHECKED";}
-		echo "> Limited Course Creator <BR>\n";
+		echo "> Course Creator <span class=small>(teacher who can create courses)</span><BR>\n";
 		if ($myrights>=75) {
 			echo "<input type=radio name=\"newrights\" value=\"75\" ";
 			if ($oldrights == 75) {echo "CHECKED";}
@@ -925,13 +939,16 @@ switch($_GET['action']) {
 
 		if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
 			echo "<span class=form>",_("Allow other instructors to copy course items"),":</span><span class=formright>";
-			echo '<input type=radio name="copyrights" value="0" ';
+			echo '<input type=radio name="copyrights" value="-1" ';
+			if ($copyrights==-1) { echo "checked=1";}
+            echo '/> ',_('No'),'<br/>';
+            echo '<input type=radio name="copyrights" value="0" ';
 			if ($copyrights==0) { echo "checked=1";}
-			echo '/> ',_('Require enrollment key from everyone'),'<br/> <input type=radio name="copyrights" value="1" ';
+			echo '/> ',_('Yes, if I have given them the enrollment key'),'<br/> <input type=radio name="copyrights" value="1" ';
 			if ($copyrights==1) { echo "checked=1";}
-			echo '/> ',_('No key required for group members, require key from others'),' <br/><input type=radio name="copyrights" value="2" ';
+			echo '/> ',_('Yes: No key required for group members, require key from others'),' <br/><input type=radio name="copyrights" value="2" ';
 			if ($copyrights==2) { echo "checked=1";}
-			echo '/> ',_('No key required from anyone'),'</span><br class=form />';
+			echo '/> ',_('Yes: No key required from anyone'),'</span><br class=form />';
 		}
 
 		echo '</div>' ; //end Availability and Access grouping
@@ -1670,7 +1687,7 @@ switch($_GET['action']) {
 		if (isset($_GET['error'])) {
 			echo '<p class=noticetext>Invalid code - try again</p>';
 		}
-		echo '<p>Enter the 2-factor authentication code from your device</p>';
+		echo '<p>Enter the 2-factor authentication code from your device. This code can be found in the Google Authenticator compatible app, like Authy, that you set up when you enabled 2-factor authentication.</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'">';
 		echo '<input type=hidden name=action value="entermfa" />';
 		echo '<p>Code: <input size=8 name=mfatoken /></p>';

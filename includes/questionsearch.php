@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore|isrand)(:|=)("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
-            $out[$match[1]] = str_replace('"', '', $match[2]);
+            $out[$match[1]] = str_replace('"', '', $match[3]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore|isrand)(:|=)("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -50,6 +50,7 @@ function parseSearchString($str)
  *    mine:     1 to limit to mine only
  *    unused:   1 to exclude existing
  *    private:  0 to exclude private questions
+ *    isrand:   1 to exclude non-rand
  *    terms:    array of keywords
  * @param int  $userid   userid of searcher
  * @param string $searchtype  'all' to search all libs, 'libs' to search libs, 'assess' to search assessments
@@ -71,6 +72,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 
     $searchand = [];
     $searchvals = [];
+    $stopwords = ['about','from','that','this','what','when','where','will','with'];
 
     if ($searchtype != 'all' && !is_array($libs)) {
         $libs = explode(',', $libs);
@@ -93,14 +95,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $names = preg_split('/([,\s]+)/', trim($search['author']), -1, PREG_SPLIT_DELIM_CAPTURE);
             if (count($names) == 1) {
                 $searchand[] = 'iq.author LIKE ?';
-                $searchvals[] = $names[0] . '%';
+                $searchvals[] = $names[0] . ',' . '%';
             } else if (trim($names[1]) == ',') {
                 $searchand[] = 'iq.author LIKE ?';
-                $searchvals[] = $names[0] . ',' . $names[1] . '%';
+                $searchvals[] = $names[0] . ',' . $names[2] . '%';
             } else {
                 $searchand[] = '(iq.author LIKE ? OR iq.author LIKE ?)';
-                $searchvals[] = $names[0] . ',' . $names[1] . '%';
-                $searchvals[] = $names[1] . ',' . $names[0] . '%';
+                $searchvals[] = $names[0] . ',' . $names[2] . '%';
+                $searchvals[] = $names[2] . ',' . $names[0] . '%';
             }
         }
     }
@@ -110,20 +112,29 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
     if (!empty($search['terms'])) {
         $wholewords = array();
+        $haspos = false;
         foreach ($search['terms'] as $k => $v) {
-            $sgn = '+';
-            if ($v[0] == '!') {
-                $sgn = '-';
-                $v = substr($v, 1);
-            }
-            if (ctype_alnum($v) && strlen($v) > 3) {
-                $wholewords[] = $sgn . $v . '*';
-                unset($search['terms'][$k]);
+            if ($v[0] != '!' && ctype_alnum($v) && strlen($v) > 3) {
+                $haspos = true;
+                break;
             }
         }
-        if (count($wholewords) > 0) {
-            $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
-            $searchvals[] = implode(' ', $wholewords);
+        if ($haspos) {
+            foreach ($search['terms'] as $k => $v) {
+                $sgn = '+';
+                if ($v[0] == '!') {
+                    $sgn = '-';
+                    $v = substr($v, 1);
+                }
+                if (ctype_alnum($v) && strlen($v) > 3 && !in_array($v, $stopwords)) {
+                    $wholewords[] = $sgn . $v . '*';
+                    unset($search['terms'][$k]);
+                }
+            }
+            if (count($wholewords) > 0) {
+                $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
+                $searchvals[] = implode(' ', $wholewords);
+            }
         }
         if (count($search['terms']) > 0) {
             foreach ($search['terms'] as $k => $v) {
@@ -159,7 +170,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.meanscore < ?';
             $searchvals[] = $avgscoreparts[1];
         }
-        $searchand[] = 'iq.meantimen > 3';
+        $searchand[] = 'iq.meanscoren > 3';
     }
     if (!empty($search['lastmod'])) {
         $lastmodparts = explode(',', $search['lastmod']);
@@ -171,6 +182,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.lastmoddate < ?';
             $searchvals[] = strtotime($lastmodparts[1]);
         }
+    }
+    if (!empty($search['mine'])) {
+        $searchand[] = 'iq.ownerid=?';
+        $searchvals[] = $userid;
     }
     if (!empty($search['res'])) {
         $helps = explode(',', $search['res']);
@@ -186,6 +201,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if (in_array('WE', $helps)) {
             $searchand[] = '(LENGTH(iq.solution) > 0 AND (iq.solutionopts&2)=2)';
         }
+    }
+    if (isset($search['isrand'])) {
+        $searchand[] = 'isrand=' . ($search['isrand'] == '0' ? 0 : 1);
     }
     $searchquery = '';
     if (count($searchand) > 0) {
@@ -209,6 +227,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $libquery = '';
+    $libnames = [];
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $libquery = "ili.libid IN ($llist)";
@@ -249,7 +268,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $groupid = $options['isgroupadmin'];
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $groupid;
             }
@@ -257,14 +276,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
                 $searchvals[] = $groupid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
                 $searchvals[] = $groupid;
             }
         } else {
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals[] = $userid;
             }
@@ -272,7 +291,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
                 $searchvals[] = $userid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
                 $searchvals[] = $userid;
             }
@@ -289,7 +308,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,
-    MIN(ili.libid) AS libid, iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,
+    MIN(ili.libid) AS libid, iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
     imas_users.LastName, imas_users.FirstName, imas_users.groupid,
     LENGTH(iq.solution) AS hassolution,iq.solutionopts,
     ili.junkflag, iq.broken, ili.id AS libitemid ';
@@ -440,7 +459,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         });
         $out = ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
     } else {
-        $out = ['qs' => $res, 'type'=>'all'];
+        $out = ['qs' => $res, 'type'=>'all', 'names' => []];
     }
     $out['offset'] = $offset;
     if (count($res) == $max) {

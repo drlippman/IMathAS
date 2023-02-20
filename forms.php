@@ -2,7 +2,7 @@
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
 require_once("includes/newusercommon.php");
-
+if (!isset($_GET['action'])) { exit; }
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("init.php");
 } else {
@@ -134,8 +134,9 @@ switch($_GET['action']) {
 			}
 		}
 		$_SESSION['challenge'] = uniqid();
+        $_SESSION['newuserstart'] = time();
 		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
-		echo '<span style="display:none"><input name=hval></span>';
+		echo '<span class="sr-only"><label aria-hidden=true">Do not fill this out <input name=hval tabindex="-1"></label></span>';
 		echo "<div class=submit><input type=submit value='",_('Sign Up'),"'></div>\n";
 		echo "</form>\n";
 		if (isset($studentTOS)) {
@@ -246,7 +247,7 @@ switch($_GET['action']) {
             echo '<script type="text/javascript" src="javascript/jquery.qrcode.min.js"></script>';
             echo '<script type="text/javascript">$(function(){$("#mfaqrcode").qrcode({width:128,height:128,text:"'.Sanitize::encodeStringForJavascript($mfaurl).'"})});</script>';
             echo '<input type=hidden name=mfasecret value="'.Sanitize::encodeStringForDisplay($mfasecret).'" />';
-            echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/">Authy</a> is recommended. ';
+            echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/download/">Authy</a> is recommended. ';
             echo 'Using the app, scan the QR code below, or manually enter the key code. Once it is set up, enter the token code provided in the box.</span><BR class=form>';
             echo '<span class=form>QR Code:</span><span class=formright><span id="mfaqrcode"></span></span><br class=form>';
             echo '<span class=form>Key Code:</span><span class=formright>'.Sanitize::encodeStringForDisplay($mfasecret).'</span><br class=form>';
@@ -412,7 +413,7 @@ switch($_GET['action']) {
 		showNewUserValidation("pageform", array('oldpw'), $requiredrules);
 
 		echo "<div class=submit><input type=submit value='",_('Update Info'),"'></div>\n";
-        echo '<script>function doSubmit() { document.getElementById("pageform").submit(); parent.GB_hide();}</script>';
+        echo '<script>function doSubmit() { document.getElementById("pageform").submit(); }</script>';
         
 		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
@@ -517,6 +518,10 @@ switch($_GET['action']) {
 				invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 			);
 			</script>';
+            echo '<p class="sr-only"><label aria-hidden=true>Do not fill this out <input name=terms tabindex="-1" autocomplete="off" /></label></p>';
+            $_SESSION['challenge'] = uniqid();
+            echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
+            $_SESSION['resetpwstart'] = time();    
 			echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
 			echo "</form>";
 		}
@@ -538,6 +543,11 @@ switch($_GET['action']) {
 			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 		);
 		</script>';
+        echo '<p class="sr-only"><label aria-hidden=true>Do not fill this out <input name=terms tabindex="-1" autocomplete="off" /></label></p>';
+        $_SESSION['challenge'] = uniqid();
+        echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
+        $_SESSION['lookupusernamestart'] = time();    
+
 		echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
 		echo "</form>";
 		break;

@@ -443,7 +443,7 @@ function addsuggest() {
 		var found = false;
 		for (var i=1;i<trs.length;i++) {
 			var tds = trs[i].getElementsByTagName("td");
-			if (tds[0].innerHTML==namev) {
+			if (tds[0].innerText==namev) {
 				found = true;
 				tds[tds.length-3].getElementsByTagName("input")[0].value = scorev;
 				if (window.tinymce) {
@@ -456,7 +456,7 @@ function addsuggest() {
 		if (!found) {
 			for (var i=1;i<trs.length;i++) {
 				var tds = trs[i].getElementsByTagName("td");
-				if (tds[0].innerHTML.match(namev)) {
+				if (tds[0].innerText.match(namev)) {
 					tds[tds.length-3].getElementsByTagName("input")[0].value = scorev;
 					if (window.tinymce) {
 						tinymce.get(tds[tds.length-2].getElementsByTagName("input")[0].name).setContent(feedbv);

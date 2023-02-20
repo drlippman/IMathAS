@@ -34,7 +34,10 @@ $showSID = (($rmode&2)==2);
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
+$placeinhead = "";
 $hasInclude = 0;
+$istutor = isset($tutorid);
+$isteacher = isset($teacherid);
 if (!isset($CFG['GEN']['allowinstraddstus'])) {
 	$CFG['GEN']['allowinstraddstus'] = true;
 }
@@ -67,7 +70,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$pagetitle = "Assign Section/Code Numbers";
 
 		if (isset($_POST['submit'])) {
-			$keys = array_keys($_POST['sec']);
+			$keys = array_keys($_POST['sec'] ?? []);
 			foreach ($keys as $stuid) {
 				if ($_POST['sec'][$stuid]=='') {
 					$_POST['sec'][$stuid] = null;
@@ -192,7 +195,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
 			$ulist = implode(',', array_map('intval', $_POST['checked']));
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
 			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid AND imas_users.id IN ($ulist) ";
@@ -580,7 +583,7 @@ if ($overwriteBody==1) {
 		require_once("../includes/newusercommon.php");
 		showNewUserValidation("pageform");
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
 		} else {
 			echo '<textarea id="emails" rows="30" cols="60">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
@@ -641,7 +644,10 @@ if ($overwriteBody==1) {
 		</form>
 
 <?php
-		$requiredrules = array('pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}');
+		$requiredrules = array(
+            'pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}',
+            'email' => 'function(el) { return $("#SID").val().substring(0,4) != "lti-" }'
+        );
 		require_once("../includes/newusercommon.php");
 		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
 	} else {

@@ -9,6 +9,7 @@ require_once('../assess2/AssessStandalone.php');
 $assessver = 2;
 $courseUIver = 2;
 $assessUIver = 2;
+$inQuestionTesting = true;
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -74,6 +75,11 @@ if ($myrights<20) {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line === false) {
+        echo _('Invalid question ID');
+        exit;
+    }
+    $isquestionauthor = ($line['ownerid'] == $userid);
 
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
@@ -126,7 +132,7 @@ if ($myrights<20) {
 		$page_scoreMsg = "";
 		$_SESSION['choicemap'] = array();
 	}
-  $cid = Sanitize::courseId($_GET['cid']);
+  $cid = Sanitize::courseId($_GET['cid'] ?? 0);
 	$page_formAction = "testquestion2.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($qsetid);
 
 	if (isset($_POST['usecheck'])) {
@@ -167,27 +173,27 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
 
 $useeqnhelper = $eqnhelper;
-$lastupdate = '20210401';
+$lastupdate = '20221027';
 $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=112822" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=031721" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=071122" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=032721" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=040322" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=071122" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=021121" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=071122" type="text/javascript"></script>';
 } else {
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100120" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=112021" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112822" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=021123" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=112020" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=031821">
-  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=070221">';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
+  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=081122">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
 $placeinhead .= '<script>
   function loadNewVersion() {
@@ -361,11 +367,12 @@ if ($overwriteBody==1) {
 
   // DO DISPLAY
   echo '<hr/>';
-
+  $starttime = microtime(true);
   $disp = $a2->displayQuestion($qn, [
     'showans' => true,
     'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
   ]);
+  $gentime = microtime(true) - $starttime;
   if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
       $disp['jsparams']['noMQ'] = true;
   }
@@ -422,6 +429,7 @@ if ($overwriteBody==1) {
 
 	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
 	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
+    echo '<span class="small subdued">'._('Generated in ').round(1000*$gentime).'ms</span> ';
   if ($line['ownerid'] == $userid) {
     echo '<a href="moddataset.php?cid='. Sanitize::courseId($cid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
     echo _('Edit Question') . '</a>';
@@ -470,6 +478,7 @@ if ($overwriteBody==1) {
 	echo '</ul>';
 
 	if ($line['ancestors']!='') {
+        $line['ancestors'] = str_replace(',',', ',$line['ancestors']);
 		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);
 		if ($line['ancestorauthors']!='') {
 			echo '<br/>'._('Created by: ').Sanitize::encodeStringForDisplay($line['ancestorauthors']);

@@ -67,7 +67,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = Sanitize::encodeStringForDisplay($_GET['block']);
+	$block = Sanitize::encodeStringForDisplay($_GET['block'] ?? '0');
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => ($_GET['folder'] ?? 0)));
 	$page_formActionTag .= "&tb=$totb";
@@ -411,7 +411,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . $gid ?>";
+	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . ($gid ?? 0) ?>";
 
 	if (to != from) {
 		$("#ms-"+from).after('<input type=hidden name=movefile value="'+from+'" />')
