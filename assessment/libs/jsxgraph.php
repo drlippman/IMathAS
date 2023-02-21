@@ -49,6 +49,7 @@ $allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
 	return "//cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraphcore.js";
+	return "//cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraphcore.js";
 }
 
 function jsx_idlen() {
@@ -1780,6 +1781,9 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$minorTickHeightX = isset($ops['minortickheight'][0]) ? $ops['minortickheight'][0] : 10;
 	$minorTickHeightY = isset($ops['minortickheight'][1]) ? $ops['minortickheight'][1] : 10;
 
+	$labelOffsetX = isset($ops['xoffset']) ? $ops['xoffset'] : [-15, 15];
+	$labelOffsetY = isset($ops['yoffset']) ? $ops['yoffset'] : [10, -15];
+
 	$useMathJax = (isset($ops['axislabel']) && (strpos($ops['axislabel'][0], "`") > -1 || strpos($ops['axislabel'][1], "`") > -1)) ? "true" : "false";
 
 	// Start output
@@ -1811,14 +1815,15 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$out .= "var xTicks{$label}, yTicks{$label};";
    
 	// x-axis
+	$xaxis_label = isset($ops['axislabel'][0]) ? $ops['axislabel'][0] : "";
 	$out .= "var xaxis{$label} = board_{$label}.create('axis', [[0,0], [1,0]], {
 				strokeColor:'black',
 				strokeWidth: 2,
 				highlight:false,
-				name:'" . (isset($ops['axislabel'][0]) ? $ops['axislabel'][0] : "") . "',
+				name: '{$xaxis_label}',
 				label: { 
 					position: 'rt', 
-					offset: [-15,15], 
+					offset: [{$labelOffsetX[0]}, {$labelOffsetX[1]}], 
 					highlight: false, 
 					useMathJax: {$useMathJax}
 				},
@@ -1837,16 +1842,23 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 						visible: $showXLabels
 					}
 				} 
-            });";
+            });
+			xaxis{$label}.setLabel('{$xaxis_label}');";
+
 
 	// y-axis
+	$yaxis_label = isset($ops['axislabel'][1]) ? $ops['axislabel'][1] : "";
 	$out .= "var yaxis{$label} = board_{$label}.create('axis', [[0,0],[0,1]], {
                strokeColor:'black',
                strokeWidth: 2,
                highlight:false,
-               name:'" . (isset($ops['axislabel'][1]) ? $ops['axislabel'][1] : "") . "',
+               name:'{$yaxis_label}',
                withLabel:true,
-               label: {position:'rt', offset:[10,-15], highlight:false, useMathJax:{$useMathJax}},
+               label: {
+					position:'rt', 
+					offset:[{$labelOffsetY[0]}, {$labelOffsetY[1]}], 
+					highlight:false, 
+					useMathJax:{$useMathJax}},
 			   ticks: {
 					insertTicks: false,
 					ticksDistance: $ticksDistanceY,
@@ -1861,7 +1873,8 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 						visible: $showYLabels
 					}
 				} 
-             });";
+             });
+			 yaxis{$label}.setLabel('{$yaxis_label}');";
 	  
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
