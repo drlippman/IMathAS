@@ -273,7 +273,7 @@ class LTI_Grade_Update {
       return $token_data['access_token'];
     } else {
         // record failure
-      $this->token_request_failure($platform_id);
+      $this->token_request_failure($platform_id, $resp);
       $this->debuglog('token request error '.$error);
       return false;
     }
@@ -341,15 +341,20 @@ class LTI_Grade_Update {
   /**
    * Handle token request failure.  Store failure.
    * @param  int    $platform_id
-   * @param  string $scopes
    */
-  public function token_request_failure(int $platform_id) {
+  public function token_request_failure(int $platform_id, $response = '') {
         if (isset($this->failures[$platform_id])) {
             $this->failures[$platform_id]++;
         } else {
             $this->failures[$platform_id] = 1;
         }
         $failures = $this->failures[$platform_id];
+        if ($failures == 2 && !empty($response)) {
+            // log failure response
+            $logdata = 'Grade token failure for platform '. $platform_id . ', response: ' . $response;
+            $logstm = $this->dbh->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+            $logstm->execute([time(), $logdata]);
+        }
         $token_data = [
             'access_token' => 'failed'.$failures,
             'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score',

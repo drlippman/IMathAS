@@ -326,7 +326,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 			// was a token request
 			if ($response === false) {
 				// record failure. in round 2 token will be read as not valid
-				$updater1p3->token_request_failure($user_data['platformid']);
+				$updater1p3->token_request_failure($user_data['platformid'], $request_info['response_text']);
 				debuglog('token request failure t1 '.$user_data['platformid']);
                 return;
 			}
@@ -336,7 +336,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 				debuglog('got token for '.$user_data['platformid']);
 			} else {
                 // record failure. in round 2 token will be read as not valid
-				$updater1p3->token_request_failure($user_data['platformid']);
+				$updater1p3->token_request_failure($user_data['platformid'], $response . $request_info['response_text']);
 				debuglog('token request failure t2 '.$response);
 			}
 			return; // doesn't effect ltiqueue, so return now
