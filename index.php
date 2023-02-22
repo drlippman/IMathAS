@@ -425,7 +425,7 @@ if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
 if (!empty($CFG['logquestionerrors']) && $myrights>=20 && $qerrcnt>0) {
-    echo '<div><span class="noticetext">'.Sanitize::onlyInt($qerrcnt).'</span> of your questions have logged errors. <a target="_blank" href="util/questionerrors.php">View errors</a></div>';
+    echo '<div><span class="noticetext">'.Sanitize::onlyInt($qerrcnt).'</span> ' . _('of your questions have logged errors') . '. <a target="_blank" href="util/questionerrors.php">' . _('View errors') . '</a></div>';
 }
 if ($myrights<75 && ($myspecialrights&(16+32))!=0) {
 	echo '<div>';
