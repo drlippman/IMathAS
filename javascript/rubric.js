@@ -212,7 +212,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 	} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4 ) {  //score total and feedback
 		loc = getRadioValue('rubricgrp');
 		totpts = Math.round(pointsposs*imasrubrics[rubricid].data[loc][2])/pttot;
-		feedback += imasrubrics[rubricid].data[loc][0];//+': '+totpts+'/'+pointsposs+'. ';
+		feedback += qninf + imasrubrics[rubricid].data[loc][0];//+': '+totpts+'/'+pointsposs+'. ';
 		document.getElementById(scoreboxid).value = totpts;
 		if (imasrubrics[rubricid].type==3) {
 			if (clearexisting) {
