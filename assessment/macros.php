@@ -1372,7 +1372,8 @@ function rands($min,$max,$n=0,$ord='def') {
 	if (func_num_args()<3) { echo "rands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'rands');
 	$n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "rands: need n &gt; 0";}
+    $r = [];
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = $GLOBALS['RND']->rand($min,$max);
 	}
@@ -1392,7 +1393,8 @@ function rrands($min,$max,$p=0,$n=0,$ord='def') {
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "rrands: need n &gt; 0";}
+    $r = [];
 	$maxi = floor(($max-$min)/$p + 1e-12);
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
@@ -1426,7 +1428,8 @@ function randsfrom($lst,$n,$ord='def') {
 		$lst = listtoarray($lst);
 	}
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "randsfrom: need n &gt; 0";}
+    $r = [];
 	for ($i=0; $i<$n;$i++) {
 		$r[$i] = $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 	}
@@ -1464,7 +1467,7 @@ function diffrandsfrom($lst,$n,$ord='def') {
 		$lst = listtoarray($lst);
 	}
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "diffrandsfrom: need n &gt; 0";}
 	$GLOBALS['RND']->shuffle($lst);
 	$r = array_slice($lst,0,$n);
   if ($ord == 'inc') {
@@ -1517,7 +1520,8 @@ function nonzerorands($min,$max,$n=0,$ord='def') {
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerorands');
 	if ($min == 0 && $max == 0) { return 0; }
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "nonzerorands: need n &gt; 0";}
+    $r = [];
 	for ($i = 0; $i < $n; $i++) {
 		do {
 			$r[$i] = $GLOBALS['RND']->rand($min,$max);
@@ -1545,7 +1549,8 @@ function nonzerorrands($min,$max,$p=0,$n=0,$ord='def') {
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+    $r = [];
+	if ($n<=0) { echo "nonzerorrands: need n &gt; 0";}
 	for ($i = 0; $i < $n; $i++) {
     $cnt = 0;
 		do {
@@ -1578,7 +1583,7 @@ function diffrands($min,$max,$n=0,$ord='def') {
 	}*/
 
 	$n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "diffrands: need n &gt; 0";}
 	if ($n<.1*($max-$min)) {
 		$out = array();
     $cnt = 0;
@@ -1617,7 +1622,7 @@ function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
 
 	if ($p<=0) {echo "Error with diffrrands: need to set positive step size"; return array_fill(0,$n,$min);}
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "diffrrands: need n &gt; 0";}
 
 	$maxi = floor(($max-$min)/$p + 1e-12);
 
@@ -1675,7 +1680,7 @@ function nonzerodiffrands($min,$max,$n=0,$ord='def',$nowarn=false) {
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerodiffrands');
 	if ($max == $min) {echo "nonzerodiffrands: Need min&lt;max"; return array_fill(0,$n,$min);}
     $n = floor($n);
-	if ($n<=0) { echo "Need n &gt; 0";}
+	if ($n<=0) { echo "nonzerodiffrands: need n &gt; 0";}
 	if ($n > $max-$min+1 || ($min*$max<=0 && $n>$max-$min)) {
 		if ($GLOBALS['myrights']>10 && !$nowarn) {
 			echo "nonzerodiffrands: min-max not far enough for n requested";
