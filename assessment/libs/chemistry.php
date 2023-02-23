@@ -4,7 +4,13 @@
 //Version 0.31 May 7, 2022
 
 global $allowedmacros;
-array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily","chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
+array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp",
+"chem_getsymbol","chem_getnumber","chem_getname","chem_getweight",
+"chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily",
+"chem_randelementbyfamily","chem_diffrandelementsbyfamily", 
+"chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound",
+"chem_getcompoundmolmass","chem_randanion","chem_randcation",
+"chem_makeioniccompound","chem_getsolubility");
 
 //chem_disp(compound)
 //formats a compound for display in as HTML
