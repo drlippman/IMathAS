@@ -468,8 +468,8 @@ if ($overwriteBody==1) {
 		if ($myrights==100) {
             printf(' (<span class="pii-full-name">%s, %s</span>)',
                 Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
-            echo ' <a class="small" href="#" onclick="dellibitems('.Sanitize::onlyInt($row[3]).',';
-            echo Sanitize::onlyInt($row[4]).',this);return false;">';
+            echo ' <a class="small" href="#" onclick="if(confirm(\'Are you sure?\')){dellibitems('.Sanitize::onlyInt($row[3]).',';
+            echo Sanitize::onlyInt($row[4]).',this);} return false;">';
             echo _('Remove all questions in this library added by this person');
             echo '</a>';
 		}
