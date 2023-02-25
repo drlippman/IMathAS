@@ -276,7 +276,7 @@ class ComplexScorePart implements ScorePart
 
     private function parsesloppycomplex($v)
     {
-        $func = makeMathFunction($v, 'i');
+        $func = makeMathFunction($v, 'i', [], '', true);
         if ($func === false) {
             return false;
         }
