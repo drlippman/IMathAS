@@ -1962,7 +1962,9 @@ class AssessRecord
         }
       }
       if ($showscores && $partattemptn[$pn] > 0 && !isset($autosave['stuans'][$pn])) {
-        if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
+        if ($tryToShow === 'scored' && isset($qver['scoreoverride'][$pn]) && !$this->teacherInGb) {
+          $qcolors[$pn] = $qver['scoreoverride'][$pn];
+        } else if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
           $qcolors[$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['raw'];
         } else {
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
