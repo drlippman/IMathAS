@@ -278,7 +278,7 @@ class CalculatedScorePart implements ScorePart
                 if ($toevalGivenans=='DNE' || $toevalGivenans=='oo' || $toevalGivenans=='+oo' || $toevalGivenans=='-oo') {
                     $ganorm[] =  $toevalGivenans;
                 } else {
-                    $givenansfunc = parseMathQuiet($toevalGivenans);
+                    $givenansfunc = parseMathQuiet($toevalGivenans, '', [], '', true);
                     if ($givenansfunc !== false) {
                         $ganorm[] = $givenansfunc->normalizeTreeString();
                     } else {
