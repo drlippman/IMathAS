@@ -267,11 +267,15 @@ class FunctionExpressionScorePart implements ScorePart
                                 $cntbothzero++;
                             }
                         } else if (in_array('toconst',$ansformats)) {
-                            $diffs[] = $givenansvals[$i] - $realans;
-                            $realanss[] = $realans;
-                            $ysqr = $realans*$realans;
-                            $ysqrtot += 1/($ysqr+.0001);
-                            $reldifftot += ($givenansvals[$i] - $realans)/($ysqr+.0001);
+                            if (isNaN($givenansvals[$i])) {
+                                $stunan++;
+                            } else {
+                                $diffs[] = $givenansvals[$i] - $realans;
+                                $realanss[] = $realans;
+                                $ysqr = $realans*$realans;
+                                $ysqrtot += 1/($ysqr+.0001);
+                                $reldifftot += ($givenansvals[$i] - $realans)/($ysqr+.0001);
+                            }
                         } else { //otherwise, compare points
                             if (isNaN($givenansvals[$i])) {
                                 $stunan++;
