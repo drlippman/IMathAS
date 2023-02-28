@@ -964,14 +964,16 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 		$rowcnt = max($rowcnt, max(array_keys($cols[$i]))+1);
 	}
 	for ($j=0;$j<count($coltypes);$j++) {
-		if ($coltypes[$j]==false || $coltypes[$j]==-1) {continue;} //fixed column
+		if ($coltypes[$j]==false) {continue;} //fixed column
 		$maxsize[$j] = 0;
 		foreach ($cols[$j] as $v) {
 			$sl = strlen($v);
 			if ($sl>$maxsize[$j]) { $maxsize[$j] = $sl;}
-			if (!$hasdecimals && strpos($v, '.')!==false) { $hasdecimals = true;}
+			if ($coltypes[$j]>0 && !$hasdecimals && strpos($v, '.')!==false) { $hasdecimals = true;}
 		}
-		$maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
+        if ($coltypes[$j]>0) {
+		    $maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
+        }
 	}
 	if (count($headers)!=0) {
 		if (!is_array($headers[0])) {
