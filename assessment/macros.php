@@ -2391,6 +2391,7 @@ function subarray($a) {
 	}
 	if (count($args)<1) {return array();}
 	$out = array();
+    ksort($args);
     foreach ($args as $k=>$v) {
 		if (strpos($v,':')!==false) {
 			$p = explode(':',$v);
