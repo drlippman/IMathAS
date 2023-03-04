@@ -78,16 +78,23 @@
 	} else {
 		$canedit = 0;
 	}
-    $itemorder = explode(',',preg_replace('/\d+\|\d+~/','',$itemorder));
+    $itemorder = explode(',',$itemorder);
     $prevqid = -1; $nextqid = -2;
+    $curcnt = 1;
     foreach ($itemorder as $i=>$item) {
         $sub = explode('~',$item);
+        if (count($sub)>1) {
+            $subdets = explode('|', $sub[0]);
+            if (count($subdets)>1) {
+                array_shift($sub);
+            }
+        }
         foreach ($sub as $k=>$subitem) {
             if ($subitem == $qid) {
                 if (count($sub)==1) {
-                    $curqloc = $i+1;
+                    $curqloc = $curcnt;
                 } else {
-                    $curqloc = ($i+1).'-'.($k+1);
+                    $curqloc = $curcnt.'-'.($k+1);
                 }
                 $nextqid = -1;
             } else if ($nextqid == -1) {
@@ -96,6 +103,11 @@
             } else {
                 $prevqid = $subitem;
             }
+        }
+        if (count($sub)==1 || count($subdets)==1) {
+            $curcnt++;
+        } else {
+            $curcnt+=$subdets[0];
         }
     }
 
