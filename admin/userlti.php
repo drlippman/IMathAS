@@ -7,13 +7,20 @@ require("../init.php");
 $overwriteBody = 0;
 $body = "";
 
-if ($myrights < 100) {
+$isadmin = ($myrights == 100);
+
+if ($myrights < 20) {
  	$overwriteBody = 1;
 	$body = "You don't have authority to view this page.";
 } else if (isset($_POST['removeuserlti'])) {
   $id = intval($_POST['removeuserlti']);
-  $stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
-  $stm->execute(array(':id'=>$id));
+  if ($isadmin) {
+    $stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
+    $stm->execute(array(':id'=>$id));
+  } else {
+    $stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id AND userid=:userid");
+    $stm->execute(array(':id'=>$id, 'userid'=>$userid));
+  }
   if ($stm->rowCount()>0) {
     echo "OK";
   } else {
@@ -22,8 +29,15 @@ if ($myrights < 100) {
   exit;
 } else if (isset($_POST['removecourselti'])) {
   $id = Sanitize::onlyInt($_POST['removecourselti']);
-  $stm = $DBH->prepare("SELECT org,contextid,courseid FROM imas_lti_courses WHERE id=:id");
-  $stm->execute(array(':id'=>$id));
+  if ($isadmin) {
+    $stm = $DBH->prepare("SELECT org,contextid,courseid FROM imas_lti_courses WHERE id=:id");
+    $stm->execute(array(':id'=>$id));
+  } else {
+    $stm = $DBH->prepare("SELECT ilc.org,ilc.contextid,ilc.courseid FROM imas_lti_courses AS ilc
+        JOIN imas_teachers AS it ON ilc.courseid=it.courseid AND it.userid=:userid
+        WHERE ilc.id=:id");
+    $stm->execute(array(':userid'=>$userid, ':id'=>$id));
+  }
   $row = $stm->fetch(PDO::FETCH_ASSOC);
   if ($row===false) {
   	  echo "ERROR";
@@ -42,7 +56,8 @@ if ($myrights < 100) {
     $row['courseid'],
     [
       'action'=>'LTI connection broken',
-      'contextid'=>$row['contextid']
+      'contextid'=>$row['contextid'],
+      'by'=>$userid
     ]
   );
 
@@ -50,6 +65,27 @@ if ($myrights < 100) {
   exit;
 } else if (isset($_POST['removeplacementlti'])) {
   $id = intval($_POST['removeplacementlti']);
+  if (!$isadmin) {
+    $stm = $DBH->prepare("SELECT typeid,placementtype FROM imas_lti_placements WHERE id=:id");
+    $stm->execute(array(':id'=>$id));
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($row['placementtype']=='assess') {
+        $query = "SELECT it.id FROM imas_assessments AS ia
+            JOIN imas_teachers AS it ON ia.courseid=it.courseid AND it.userid=:userid
+            WHERE ia.id=:id";
+    } else if ($row['placementtype']=='course') {
+        $query = "SELECT it.id FROM imas_courses AS ic 
+            JOIN imas_teachers AS it ON ic.id=it.courseid AND it.userid=:userid
+            WHERE ic.id=:id";
+    } else {
+        echo "ERROR"; exit;
+    }
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':userid'=>$userid, ':id'=>$row['typeid']));
+    if ($stm->rowCount()==0) {
+        echo "ERROR"; exit;
+    }
+  }
   $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE id=:id");
   $stm->execute(array(':id'=>$id));
   if ($stm->rowCount()>0) {
@@ -79,11 +115,15 @@ if ($myrights < 100) {
   echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC), JSON_HEX_TAG);
   exit;
 
-} else if (empty($_GET['id'])) {
+} else if ($isadmin && empty($_GET['id'])) {
   $overwriteBody = 1;
   $body = 'No id provided';
 } else {
-  $uid = Sanitize::onlyInt($_GET['id']);
+  if ($isadmin) {
+    $uid = Sanitize::onlyInt($_GET['id']);
+  } else {
+    $uid = $userid;
+  }
   $query = "SELECT iu.FirstName,iu.LastName,ig.name AS gname,ig.parent ";
   $query .= "FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.id=:id";
   $stm = $DBH->prepare($query);
@@ -109,8 +149,11 @@ if ($myrights < 100) {
   }
 }
 
-$curBreadcrumb = $breadcrumbbase .' <a href="admin2.php">'._('Admin').'</a> &gt; ';
-$curBreadcrumb .= '<a href="userdetails.php?id='.$uid.'">'._('User Details').'</a> &gt; ';
+$curBreadcrumb = $breadcrumbbase;
+if ($isadmin) {
+    $curBreadcrumb .=' <a href="admin2.php">'._('Admin').'</a> &gt; ';
+    $curBreadcrumb .= '<a href="userdetails.php?id='.$uid.'">'._('User Details').'</a> &gt; ';
+}
 $curBreadcrumb .= _('LTI Connections');
 
 /******* begin html output ********/
@@ -213,6 +256,10 @@ if ($overwriteBody==1) {
     </script>';
 
   echo '<h3>'._('LTI course connections').'</h3>';
+  echo '<p class=noticetext>'._('WARNING!!! Breaking a course connection will prevent students from accessing assignments until you reestablish a new connection. ');
+  echo _('If you establish a new connection to a different course, then students will lose access to any work done in the current course. ');
+  echo '</p>';
+
   echo '<table class="gb" id="lticourses"><thead><tr>';
   echo '<th>'._('Course').'</th>';
   echo '<th>'._('Course ID').'</th>';
