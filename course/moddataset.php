@@ -19,6 +19,10 @@
 		exit;
 	}
 
+    if (isset($CFG['hooks']['moddataset'])) {
+        require($CFG['hooks']['moddataset']);
+    }
+
 	// Determine if this is an AJAX quicksave call
 	$quicksave = isset($_GET['quick']) ? true : false;
 
@@ -266,6 +270,10 @@
 					$outputmsg .= _("Library Assignments Updated.")." ";
 				}
 
+                if (function_exists('onUpdateQuestionSet')) {
+                    onUpdateQuestionSet($DBH, $_GET['id']);
+                }
+
 				$stm = $DBH->prepare("SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm->execute(array(':qsetid'=>$_GET['id']));
 				$imgcnt = $stm->rowCount();
@@ -349,6 +357,10 @@
 				':solution'=>$_POST['solution'], ':solutionopts'=>$solutionopts, ':isrand'=>$isrand));
 			$qsetid = $DBH->lastInsertId();
 			$_GET['id'] = $qsetid;
+
+            if (function_exists('onCreateQuestionSet')) {
+                onCreateQuestionSet($DBH, $_GET['id']);
+            }
 
 			if (isset($_GET['templateid'])) {
 				$stm = $DBH->prepare("SELECT var,filename,alttext,id FROM imas_qimages WHERE qsetid=:qsetid");
