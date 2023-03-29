@@ -616,6 +616,7 @@
 
         foreach ($locdata as $vernum=>$lockeys) {
             foreach ($lockeys as $loc) {
+                $teacherreview = $line['userid'];
                 $qdata = $assess_record->getGbQuestionVersionData($loc, true, $vernum, $cnt);
                 $answeightTot = array_sum($qdata['answeights']);
                 $qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
@@ -670,7 +671,6 @@
                     }
                 }
 
-                $teacherreview = $line['userid'];
                 /*
                 To re-enable, need to define before $qdata, but figure another way to
                 get answeights/points.

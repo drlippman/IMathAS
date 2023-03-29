@@ -30,6 +30,7 @@ if ($isRealStudent || empty($_GET['uid'])) {
   $uid = $userid;
 } else {
   $uid = Sanitize::onlyInt($_GET['uid']);
+  $teacherreview = $uid; // used by setseed('userid')
 }
 $viewfull = true;
 if ($isteacher || $istutor) {
