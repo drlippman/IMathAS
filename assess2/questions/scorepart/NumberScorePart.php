@@ -285,9 +285,13 @@ class NumberScorePart implements ScorePart
                                         continue;
                                     }
                                 } else {
+                                    /*  Don't bother to check in this case, since 
+                                        0.1 could be considered as 0.100, so if not exact,
+                                        no reason to bother checking
                                     if ($reqdecimals > $decimalsingivenans ) {
                                         continue;
                                     }
+                                    */
                                 }
                             }
                             if ($reqsigfigs !== '') {
