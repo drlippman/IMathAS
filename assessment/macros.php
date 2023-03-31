@@ -444,7 +444,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$stopat = ($xmax-$xmin)+1;
 			} else {
 				$dx = ($xmax-$xmin)/10;
-				$stopat = ($domainlimited?10:11);
+				$stopat = 11;//($domainlimited?10:11);
 			}
 			if ($xmax != $xmin) {
 				$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
