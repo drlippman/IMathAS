@@ -114,6 +114,7 @@
 				//$str = preg_replace('/<embed[^>]*sscr[^>]*>/',"[Graph with no description]", $str);
 				$str = preg_replace_callback('/<\s*embed[^>]*?sscr=(.)(.+?)\1.*?>/s','svgsscrtotextcallback',$str);
 			}
+            $str = preg_replace('/<canvas[^>]*aria-label="([^"]*)"[^>]*>.*?<\/canvas>/',"[$1]", $str);
 		}
 		if ($_SESSION['mathdisp']==2) {
 			$str = str_replace('\\`','&grave;',$str);
