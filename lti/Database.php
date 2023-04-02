@@ -999,8 +999,16 @@ class Imathas_LTI_Database implements LTI\Database
                     }
                     $ancparts = explode(':', $aidanc[$i]);
                     if ($ancparts[0] != $ancestors[$i]) {
+                        // course sequence doesn't match
                         $isok = false;
                         break; // not the same ancestry path
+                    }
+                    if ($i == $ciddepth) {
+                        // on last one - match sure assessment matches
+                        if ($sourceaid != $ancparts[1]) {
+                            $isok = false;
+                            break;
+                        }
                     }
                 }
                 if ($isok) { // found it!
