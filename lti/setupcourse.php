@@ -45,11 +45,12 @@ if ($_POST['linktype'] == 'assoc') {
   require_once(__DIR__.'/../includes/copycourse.php');
   // TODO: do we want to use the context.title instead of label here? Or both?
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
-  $destcid = copycourse($_POST['copyselect'], $contexttitle, $newUIver);
-  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contexttitle);
+  $tocopycourse = intval($_POST['copyselect']);
+  $destcid = copycourse($tocopycourse, $contexttitle, $newUIver);
+  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contexttitle, $tocopycourse);
   $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
-    ->set_copiedfrom(intval($_POST['copyselect']))
+    ->set_copiedfrom($tocopycourse)
     ->set_UIver($newUIver ? 2 : 1)
     ->set_id($newlticourseid);
 }
