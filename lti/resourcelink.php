@@ -119,7 +119,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       $localcourse->set_UIver($db->get_UIver($localcourse->get_courseid()));
     }
     if ($localcourse->get_UIver() == 1) {
-      header(sprintf('Location: %s/assessment/showtext.php?cid=%d&aid=%d&ltilaunch=true',
+      header(sprintf('Location: %s/assessment/showtest.php?cid=%d&aid=%d&ltilaunch=true',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
         $link->get_typeid()
