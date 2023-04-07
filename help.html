@@ -2675,6 +2675,8 @@ These macros are used to test various conditions.  They typically return true or
   $answer,$showanswer = scorestring($answer,$showanswer,$words,$stuanswers,$thisq,2)</li>
 <li><strong>checkanswerformat(string, answerformat)</strong>: Checks a single numerical expression 
     string, like "3/2" for whether it meets the answerformat listed.</li>
+<li><strong>getsigfigs(value, [expected sigfigs])</strong>: returns the number of sigfigs in 
+    value.  Include the expected sigfigs to resolve ambiguity on numbers like 1200.</li>
   </ul>
 </div> <!-- h2 -->
 <div class=h2>
