@@ -3291,17 +3291,18 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 		$rec = '';
 	}
 	if (strpos($label,'<img')!==false) {
-        return '<button type="button" class="nopad plain" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</button>';
+        return '<button type="button" class="nopad plain" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.Sanitize::encodeStringForJavascript($content).'\','.$width.','.$height.$scroll.')">'.$label.'</button>';
 	} else {
 		if ($type=='link') {
-			return '<a href="#" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.');return false;">'.$labelSanitized.'</a>';
+			return '<a href="#" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.Sanitize::encodeStringForJavascript($content).'\','.$width.','.$height.$scroll.');return false;">'.$labelSanitized.'</a>';
 		} else if ($type=='button') {
 			if (substr($content,0,31)=='http://www.youtube.com/watch?v=') {
 				$content = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=".Sanitize::encodeUrlParam($content);
 				$width = 660;
 				$height = 525;
 			}
-			return '<button type="button" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$labelSanitized.'</button>';
+            return '<button type="button" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.Sanitize::encodeStringForJavascript($content).'\','.$width.','.$height.$scroll.')">'.$labelSanitized.'</button>';
+
 		}
 	}
 }
