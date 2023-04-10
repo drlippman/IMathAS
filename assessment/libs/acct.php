@@ -1830,8 +1830,8 @@ function scoretrialbalancefromjournal($stua, $answer, $j, $groups, $numrows, $sn
 //$data['assets'] = array(account, value, account, value)
 //['liabilities'], [equity],[revenue],[expenses]
 function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions, &$showanswer, &$displayformat, &$answerboxsize) {
-	$out .= '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
-	$sa .= '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
+	$out = '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
+	$sa = '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
 	$allaccts = array();
 	$maxsizedescr = 4; $hasdecimals = false;
 	foreach ($data as $t=>$dt) {
