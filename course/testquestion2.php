@@ -101,8 +101,8 @@ if ($myrights<20) {
       'qsid' => array($qn => $qsetid),
       'stuanswers' => array(),
       'stuanswersval' => array(),
-      'scorenonzero' => array(($qn+1) => false),
-      'scoreiscorrect' => array(($qn+1) => false),
+      'scorenonzero' => array(($qn+1) => -1),
+      'scoreiscorrect' => array(($qn+1) => -1),
       'partattemptn' => array($qn => array()),
       'rawscores' => array($qn => array())
     );

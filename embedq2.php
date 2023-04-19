@@ -134,8 +134,8 @@ if (isset($_POST['state'])) {
         'qsid' => array($qn => $qsid),
         'stuanswers' => array(),
         'stuanswersval' => array(),
-        'scorenonzero' => array(($qn + 1) => false),
-        'scoreiscorrect' => array(($qn + 1) => false),
+        'scorenonzero' => array(($qn + 1) => -1),
+        'scoreiscorrect' => array(($qn + 1) => -1),
         'partattemptn' => array($qn => array()),
         'rawscores' => array($qn => array()),
         'auth' => $QS['auth']
@@ -212,8 +212,8 @@ if (isset($_POST['regen']) && !$issigned) {
     $state['seeds'][$qn] = $seed;
     unset($state['stuanswers'][$qn+1]);
     unset($state['stuanswersval'][$qn+1]);
-    $state['scorenonzero'][$qn+1] = false;
-    $state['scoreiscorrect'][$qn+1] = false;
+    $state['scorenonzero'][$qn+1] = -1;
+    $state['scoreiscorrect'][$qn+1] = -1;
     $state['partattemptn'][$qn] = array();
     $state['rawscores'][$qn] = array();
 }

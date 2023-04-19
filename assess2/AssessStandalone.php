@@ -70,7 +70,7 @@ class AssessStandalone {
       foreach ($arr['seeds'] as $qn=>$seed) {
         foreach (['scorenonzero','scoreiscorrect'] as $f) {
             if (!isset($arr[$f][$qn+1])) {
-                $arr[$f][$qn+1] = false;
+                $arr[$f][$qn+1] = -1;
             }
         }
         foreach (['partattemptn','rawscore'] as $f) {
@@ -369,13 +369,13 @@ class AssessStandalone {
           $this->state['scorenonzero'][$qn+1][$k] = -1;
           $this->state['scoreiscorrect'][$qn+1][$k] = -1;
         } else {
-          $this->state['scorenonzero'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>0);
-          $this->state['scoreiscorrect'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>.98);
+          $this->state['scorenonzero'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>0) ? 1 : 0;
+          $this->state['scoreiscorrect'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>.98) ? 1 : 0;
         }
       }
     } else {
-      $this->state['scorenonzero'][$qn+1] = ($score > 0);
-      $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
+      $this->state['scorenonzero'][$qn+1] = ($score > 0) ? 1 : 0;
+      $this->state['scoreiscorrect'][$qn+1] = ($score > .98) ? 1 : 0;
     }
 
     $returnData = [
