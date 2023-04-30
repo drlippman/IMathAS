@@ -1427,6 +1427,9 @@ function matrixParseStuans($stu) {
 	if ($stu === null) {
 		return array(); 
 	} else {
+        list($arr,$numrows) = parseMatrixToArray($stu);
+        return $arr;
+        /*
         $start = substr($stu,0,2);
         if ($start=='[(' || $start=='((' || $start=='|(') {
             $ansr = substr($stu,2,-2);
@@ -1435,6 +1438,7 @@ function matrixParseStuans($stu) {
         } else {
             return explode('|', $stu);
         }
+        */
     }
 }
 

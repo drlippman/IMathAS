@@ -2,6 +2,8 @@
 
 require("../init.php");
 require('mathparser.php');
+$allowedmacros = [];
+require('macros.php');
 
 if ($myrights < 100) {
   exit;
@@ -148,4 +150,24 @@ foreach ($sameformtests as $test) {
     }
 }
 echo microtime(true) - $st;
-echo "Done";
+echo "Sameform tests done <br><br>";
+
+$st = microtime(true);
+$matrixtests = [
+    ['1|3|4|5',[1,3,4,5],null],
+    ['[3]', [3], 1],
+    ['[(1,2,3)]', [1,2,3], 1],
+    ['[(2pi)/3]', ['(2pi)/3'], 1],
+    ['[(1,2,3),(4,5,6)]',[1,2,3,4,5,6], 2],
+    ['[(sqrt(4),(2pi)/3),(5,6)]',['sqrt(4)','(2pi)/3',5,6], 2],
+    ['((1),(2),(3)]', [1,2,3], 3],
+    ['| (1, 3), (5, 6) |', [1,3,5,6], 2]
+];
+foreach ($matrixtests as $test) {
+    list($a,$d) = parseMatrixToArray($test[0]);
+    if ($a != $test[1] || $d != $test[2]) {
+        echo "Fail on $test[0]<br>";
+    }
+}
+echo microtime(true) - $st;
+echo "matrix tests done <br><br>";

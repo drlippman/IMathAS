@@ -84,12 +84,15 @@ class CalculatedMatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven(implode('|',$givenanslist));
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         } else {
-            $givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
+            list($givenanslist, $N) = parseMatrixToArray($givenans);
+            /*$givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
             if (strlen($givenans)>1 && $givenans[1]!='(') {
                 $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,1,-1)));
             } else {
                 $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
             }
+            $N = substr_count($answer,'),(')+1;
+            */
             if ($hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
             } else {
@@ -97,12 +100,22 @@ class CalculatedMatrixScorePart implements ScorePart
                     $givenanslistvals[$j] = evalMathParser($v);
                 }
             }
-            $N = substr_count($answer,'),(')+1;
+            
             //this may not be backwards compatible
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
+        /*
         $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
+        if (strlen($answer)>1 && $answer[1] != '(') {
+            $ansr = substr($answer,1,-1);
+        } else {
+            $ansr = substr($answer,2,-2);
+        }
+        $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
+        $answerlist = explode(',',$ansr);
+        */
+        list($answerlist, $ansN) = parseMatrixToArray($answer);
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
@@ -121,14 +134,6 @@ class CalculatedMatrixScorePart implements ScorePart
         $correct = true;
         $incorrect = array();
 
-        if (strlen($answer)>1 && $answer[1] != '(') {
-            $ansr = substr($answer,1,-1);
-        } else {
-            $ansr = substr($answer,2,-2);
-        }
-        $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
-        $answerlist = explode(',',$ansr);
-
         foreach ($answerlist as $k=>$v) {
             $answerlist[$k] = evalMathParser($v);
         }
@@ -146,14 +151,16 @@ class CalculatedMatrixScorePart implements ScorePart
             }
 
         } else {
-            if (substr_count($answer,'),(')!=substr_count($givenans,'),(')) {
+            if ($N != $ansN) {
                 $correct = false;
             }
-            $tocheck = str_replace(' ','', $givenans);
+            /*$tocheck = str_replace(' ','', $givenans);
             $tocheck = str_replace(array('],[','),(','>,<'),',',$tocheck);
             $tocheck = substr($tocheck,2,-2);
             $tocheck = explode(',',$tocheck);
             foreach($tocheck as $i=>$chkme) {
+            */
+            foreach ($givenanslist as $i=>$chkme) {
                 if (!checkanswerformat($chkme,$ansformats)) {
                     //perhaps should just elim bad answer rather than all?
                     if ($scoremethod == 'byelement') {
