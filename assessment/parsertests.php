@@ -119,7 +119,16 @@ $sameformtests = [
     ['3-4x^2','-4x^2+3',['x']],
     ['3-4^2','-4^2+3',['x']],
     ['3-x*4','-x*4+3',['x']],
-    ['3-4(x)','-4(x)+3',['x']]
+    ['3-4(x)','-4(x)+3',['x']],
+    ['-(2*3)/4','(-2*3)/4',[]],
+    ['-(2*3)/4','-2*3/4',[]],
+    ['-(2+3)','-2-3',[]], // this and next are debatable; caused by $invert code in mathparser
+    ['-3(2+4)','3(-2-4)',[]],
+    ['-2+3','3+(-2)',[]],
+    ['-2+3-1','3-2-1',[]],
+    ['(-2-3)(-4-5)','(-4-5)(-2-3)',[]],
+    ['(-2-3)(-4-5)','(-5-4)(-3-2)',[]],
+    ['2+3(x-4)','2-3(4-x)',['x']]
 ];
 $st = microtime(true);
 foreach ($sameformtests as $test) {
@@ -130,7 +139,7 @@ foreach ($sameformtests as $test) {
       $str1 = $p->normalizeTreeString();
       $p->parse($test[1]);
       $str2 = $p->normalizeTreeString();
-      if ($str1 != $str2) {
+      if ((!isset($test[3]) && $str1 != $str2) || (isset($test[3]) && $str1 == $str2)) {
         echo "Sameform Test failed on {$test[0]} vs {$test[1]}: $str1 vs $str2<br>";
       }
     } catch (Throwable $t) {

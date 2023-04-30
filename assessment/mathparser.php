@@ -961,6 +961,7 @@ class MathParser
     $this->removeOneTimes();
     // $this->normalizeNodeToString($this->AST);
     //echo $this->toOutputString($this->normalizeNode($this->AST));
+    //print_r($this->AST);
     //print_r($this->normalizeNode($this->AST));
     return $this->toOutputString($this->normalizeNode($this->AST));
   }
@@ -1032,6 +1033,8 @@ class MathParser
       $node['right'] = $this->normalizeNode($node['right']);
       return $node;
     } else {
+      $node['left'] = $this->normalizeNode($node['left']);
+      $node['right'] = $this->normalizeNode($node['right']);
       // for +- and */ we're going to gather all the equal-precendence
       // elements then sort them into a standardized order and rebuild tree
       if ($node['symbol'] == '+' || $node['symbol'] == '-') {
@@ -1042,9 +1045,10 @@ class MathParser
       $allSums = [];
       // walk into node to gather elements
       $this->treeWalk($node, $allSums);
+
       $invert = false;
       usort($allSums, 'self::nodeSort');
-      $invert = false;
+
       if ($basesym == '+' && ($allSums[0]['symbol'] == '~' ||
         ($allSums[0]['type'] == 'number' && $allSums[0]['symbol'] < 0))
       ) {
