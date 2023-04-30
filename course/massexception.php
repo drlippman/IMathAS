@@ -516,7 +516,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	echo '</fieldset>';
     //start new form for new exceptions
     echo '</form>';
-    echo $formtag;
+    echo str_replace('qform','qform2',$formtag);
 	$stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE courseid=:courseid AND userid IN ($tolist)");
 	$stm->execute(array(':courseid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
@@ -618,7 +618,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 
 		echo "Set Exception for assessments: ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'addexc[]\',false)">None</a>. ';
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',false)">None</a>. ';
 
 		echo '<ul class="nomark">';
 
@@ -662,7 +662,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 
 
 		echo "Set Exception for forums: ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'addfexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'addfexc[]\',false)">None</a>. ';
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',false)">None</a>. ';
 
 		echo '<ul class="nomark">';
 
