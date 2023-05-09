@@ -66,6 +66,16 @@ class MultipleAnswerAnswerBox implements AnswerBox
             array_push($randkeys, count($questions) - 1);
         } else if ($noshuffle == "all" || count($questions) == 1) {
             $randkeys = array_keys($questions);
+        } else if (strlen($noshuffle) > 4 && substr($noshuffle, 0, 4) == "last") {
+            $n = intval(substr($noshuffle, 4));
+            if ($n > count($questions)) {
+                $n = count($questions);
+            }
+            $randkeys = (array) $RND->array_rand(array_slice($questions, 0, count($questions) - $n), count($questions) - $n);
+            $RND->shuffle($randkeys);
+            for ($i = count($questions) - $n; $i < count($questions); $i++) {
+                array_push($randkeys, $i);
+            }
         } else {
             $randkeys = (array) $RND->array_rand($questions, count($questions));
             $RND->shuffle($randkeys);
