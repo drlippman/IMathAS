@@ -725,7 +725,9 @@ if (isset($_GET['launch'])) {
 			}
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$email = $_REQUEST['lis_person_contact_email_primary'];
-			} else {
+			} else if (!empty($userrow['email'])) {
+                $email = $userrow['email']; // keep existing if we have it and no new one
+            } else {
 				$email = 'none@none.com';
 			}
 			if ($userrow['FirstName'] === null) { //accidentally deleted the imas_users record!  Restore it
