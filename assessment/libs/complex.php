@@ -721,11 +721,7 @@ function cx_prettyquadRoot(float $a, float $b, float $c){
         
             $a2=$a*2;
             $D=makereducedfraction(-$b,$a2);
-
-            $re= -$D;
             $N=reduceradicalfrac(1,-$d,$a2);
-            $im= sqrt(abs($d))/(2*$a);
-            $im2=-$im;
             $st=array("$D + $N i","$D - $N i");
     }
         else {
