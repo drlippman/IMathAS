@@ -245,6 +245,7 @@ class FunctionExpressionScorePart implements ScorePart
                     $cntnan = 0;
                     $cntzero = 0;
                     $cntbothzero = 0;
+                    $cntvals = 0;
                     $stunan = 0;
                     $ysqrtot = 0;
                     $reldifftot = 0;
@@ -274,6 +275,14 @@ class FunctionExpressionScorePart implements ScorePart
                             $rollingreali = ($rollingreali+1)%3;
 
                             if (count($rollingstu)==3) {
+                                $cntvals++;
+                                if (abs($rollingstu[0])<1e-6 && abs($rollingstu[1]<1e-6 && abs($rollingstu[2])<1e-6)) {
+                                    if (abs($rollingreal[0])<1e-6 && abs($rollingreal[1]<1e-6 && abs($rollingreal[2])<1e-6)) {
+                                        $cntbothzero++;
+                                    } else {
+                                        $cntzero++;
+                                    }
+                                }
                                 // don't want division, so do multiplications
                                 $v1 = ($rollingstu[1] - $rollingstu[0]) * ($rollingreal[2] - $rollingreal[1]);
                                 $v2 = ($rollingreal[1] - $rollingreal[0]) * ($rollingstu[2] - $rollingstu[1]);
@@ -324,6 +333,11 @@ class FunctionExpressionScorePart implements ScorePart
                     }
                     if (in_array('scalarmult',$ansformats) && in_array('toconst',$ansformats)) {
                         // nothing to do; just need to catch combo
+                        if ($cntbothzero == $cntvals) {
+                            $correct = true;
+                        } else if ($cntzero == $cntvals) {
+                            $correct = false; continue;
+                        }
                     } else if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {
                         if ($cntbothzero>18) {
                             $correct = true;
