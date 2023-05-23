@@ -97,6 +97,7 @@ class FunctionExpressionScorePart implements ScorePart
             echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
         }
 
+        $isComplex = in_array('generalcomplex', $ansformats);
         $isListAnswer = in_array('list',$ansformats);
         if (in_array('allowplusminus', $ansformats)) {
             if (!$isListAnswer) {
@@ -143,7 +144,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $toevalGivenans = $givenans;
             }
 
-            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist, [], $flist, true);
+            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist, [], $flist, true, $isComplex);
             if ($givenansfunc === false) { //parse error
                 continue;
             }
@@ -221,7 +222,7 @@ class FunctionExpressionScorePart implements ScorePart
                     continue;
                 }
                 $origanswer = $answer;
-                $answerfunc = parseMathQuiet(makepretty($answer), $vlist, [], $flist);
+                $answerfunc = parseMathQuiet(makepretty($answer), $vlist, [], $flist, false, $isComplex);
                 if ($answerfunc === false) {  // parse error on $answer - can't do much
                     continue;
                 }
@@ -258,12 +259,19 @@ class FunctionExpressionScorePart implements ScorePart
 
                     foreach ($realanstmp as $i=>$realans) {
                         //echo "$answer, real: $realans, my: {$givenansvals[$i]},rel: ". (abs(10^16*$givenansvals[$i]-10^16*$realans))  ."<br/>";
-                        if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
+                        if ((!$isComplex && isNaN($realans)) || ($isComplex && !is_array($realans))) {
+                            $cntnan++; continue;
+                        } //avoid NaN problems
                         if (in_array('toconst',$ansformats) && in_array('scalarmult',$ansformats)) {
                             // use triplets of values
                             // want (g2 - g1) / (g3 -g2) = (r2 - r1) / (r3 - r2)
-                      
-                            if (isNaN($givenansvals[$i])) {
+        // TODO: Catch 0
+        // Considere this appproach to replace toconst, scalarmult
+        //   need to see if tolerances make sense this way
+        //   for toconst can just do g2-g1==r2-r1
+        //   for scalarmult can just to g2/g1 == r2/r1
+        //  need to use complex mult
+                            if ((!$isComplex && isNaN($givenansvals[$i])) || ($isComplex && !is_array($givenansvals[$i]))) {
                                 $stunan++;
                                 continue;
                             }
@@ -274,20 +282,48 @@ class FunctionExpressionScorePart implements ScorePart
                             $rollingreali = ($rollingreali+1)%3;
 
                             if (count($rollingstu)==3) {
-                                // don't want division, so do multiplications
-                                $v1 = ($rollingstu[1] - $rollingstu[0]) * ($rollingreal[2] - $rollingreal[1]);
-                                $v2 = ($rollingreal[1] - $rollingreal[0]) * ($rollingstu[2] - $rollingstu[1]);
-                                // TODO: these tolerances may not make sense in this context
-                                if ($abstolerance !== '') {
-                                    if (abs($v2 - $v1) > $abstolerance+1E-12) { $correct = false; break;}
+                                if ($isComplex) {
+                                    for ($ci=0;$ci<2;$ci++) {
+                                        // don't want division, so do multiplications
+                                        $v1 = ($rollingstu[1][$ci] - $rollingstu[0][$ci]) * ($rollingreal[2][$ci] - $rollingreal[1][$ci]);
+                                        $v2 = ($rollingreal[1][$ci] - $rollingreal[0][$ci]) * ($rollingstu[2][$ci] - $rollingstu[1][$ci]);
+                                        // TODO: these tolerances may not make sense in this context
+                                        if ($abstolerance !== '') {
+                                            if (abs($v2 - $v1) > $abstolerance+1E-12) { $correct = false; break 2;}
+                                        } else {
+                                            if ((abs($v2 - $v1)/(max(abs($v1),abs($v2))+.0001) > $reltolerance+1E-12)) {$correct = false; break 2;}
+                                        }
+                                    }
                                 } else {
-                                    if ((abs($v2 - $v1)/(max(abs($v1),abs($v2))+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                                    // don't want division, so do multiplications
+                                    $v1 = ($rollingstu[1] - $rollingstu[0]) * ($rollingreal[2] - $rollingreal[1]);
+                                    $v2 = ($rollingreal[1] - $rollingreal[0]) * ($rollingstu[2] - $rollingstu[1]);
+                                    // TODO: these tolerances may not make sense in this context
+                                    if ($abstolerance !== '') {
+                                        if (abs($v2 - $v1) > $abstolerance+1E-12) { $correct = false; break;}
+                                    } else {
+                                        if ((abs($v2 - $v1)/(max(abs($v1),abs($v2))+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                                    }
                                 }
                             }
                         } else if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {  //if equation, store ratios
-                            if (isNaN($givenansvals[$i])) {
+                            if ((!$isComplex && isNaN($givenansvals[$i])) || ($isComplex && !is_array($givenansvals[$i]))) {
                                 $stunan++;
-                            } elseif (abs($realans)>.00000001 && is_numeric($givenansvals[$i])) {
+                            } else if ($isComplex) {
+                                if (abs($realans[0])<.0000001 && abs($realans[1])<.00000001) {
+                                    if (abs($givenansvals[$i][0])<.0000001 && abs($givenansvals[$i][1])<.00000001) {
+                                        $cntbothzero++;
+                                    }
+                                } else {
+                                    $r = cplx_div($givenansvals[$i], $realans);
+                                    // this is hacky, but to simplify thing, we'll use the magnitude of the
+                                    // complex scaling factor, rather than the value itself.
+                                    $ratios[] = $r[0]*$r[0] + $r[1]*$r[1];
+                                    if (abs($givenansvals[$i][0])<.0000001 && abs($givenansvals[$i][1])<.00000001) {
+                                        $cntzero++;
+                                    }
+                                }
+                            } else if (abs($realans)>.00000001 && is_numeric($givenansvals[$i])) {
                                 $ratios[] = $givenansvals[$i]/$realans;
                                 if (abs($givenansvals[$i])<=.00000001 && $realans!=0) {
                                     $cntzero++;
@@ -296,7 +332,7 @@ class FunctionExpressionScorePart implements ScorePart
                                 $cntbothzero++;
                             }
                         } else if (in_array('toconst',$ansformats)) {
-                            if (isNaN($givenansvals[$i])) {
+                            if ((!isComplex && isNaN($givenansvals[$i])) || ($isComplex && !is_array($givenansvals[$i]))) {
                                 $stunan++;
                             } else {
                                 $diffs[] = $givenansvals[$i] - $realans;
@@ -304,6 +340,16 @@ class FunctionExpressionScorePart implements ScorePart
                                 $ysqr = $realans*$realans;
                                 $ysqrtot += 1/($ysqr+.0001);
                                 $reldifftot += ($givenansvals[$i] - $realans)/($ysqr+.0001);
+                            }
+                        } else if ($isComplex) { // compare complex points
+                            if (!is_array($givenansvals[$i])) {
+                                $stunan++;
+                            } else if ($abstolerance !== '') {
+                                if (abs($givenansvals[$i][0]-$realans[0]) > $abstolerance+1E-12) { $correct = false; break;}
+                                if (abs($givenansvals[$i][1]-$realans[1]) > $abstolerance+1E-12) { $correct = false; break;}
+                            } else {
+                                if ((abs($givenansvals[$i][0]-$realans[0])/(abs($realans[0])+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                                if ((abs($givenansvals[$i][1]-$realans[1])/(abs($realans[1])+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
                             }
                         } else { //otherwise, compare points
                             if (isNaN($givenansvals[$i])) {
