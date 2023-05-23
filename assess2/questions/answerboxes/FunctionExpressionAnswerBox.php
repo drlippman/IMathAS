@@ -105,6 +105,9 @@ class FunctionExpressionAnswerBox implements AnswerBox
 
         if (empty($variables)) {$variables = "x";}
         $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
+        if (in_array('generalcomplex', $ansformats) && !in_array('i', $variables)) {
+            array_unshift($variables, 'i');
+        }
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
             $variables[$i] = trim($variables[$i]);

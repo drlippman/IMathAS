@@ -18,12 +18,12 @@ function parseMath($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   return $parser;
 }
 
-function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false) {
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false, $docomplex=false) {
   if (trim($str)=='') {
     return false;
   }
   try {
-    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist, $docomplex);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
@@ -56,12 +56,12 @@ function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '',
  * @param string $fvlist comma separated list of variables to treat as functions
  * @return function
  */
-function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false) {
+function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false, $docomplex=false) {
   if (trim($str)=='') {
     return false;
   }
   try {
-    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist, $docomplex);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10 && (!empty($GLOBALS['inQuestionTesting']) || !$hideerrors)) {
@@ -93,10 +93,10 @@ function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '
  * @param  string $str  numerical math string
  * @return float
  */
-function evalMathParser($str) {
+function evalMathParser($str, $docomplex=false) {
   if (trim($str) === '') { return sqrt(-1); } // avoid errors on blank
   try {
-    $parser = new MathParser('');
+    $parser = new MathParser('',[],'',$docomplex);
     $parser->parse($str);
     return $parser->evaluate();
   } catch (Throwable $t) {
@@ -138,7 +138,7 @@ class MathParser
    *                            set of standard math functions.
    * @param string $fvlist   A comma-separated list of variables to treat as functions
    */
-  function __construct($variables, $allowedfuncs = array(), $fvlist = '') {
+  function __construct($variables, $allowedfuncs = array(), $fvlist = '', $docomplex = false) {
     if ($variables != '') {
       $this->variables = array_values(array_filter(array_map('trim', explode(',', $variables)), 'strlen'));
     }
@@ -147,7 +147,8 @@ class MathParser
     }
     //treat pi and e as variables for parsing
     array_push($this->variables, 'pi', 'e');
-    if ($this->docomplex) {
+    if ($docomplex) {
+      $this->docomplex = true;
       array_push($this->variables, 'i');
     }
     usort($this->variables, function ($a,$b) { return strlen($b) - strlen($a);});
@@ -238,7 +239,11 @@ class MathParser
               $t = atan2($a[1],$a[0]);
               return [$m*cos($t*$b[0]), $m*sin($t*$b[0])];
             } else {
-              throw new MathParserException("complex exponents not supported yet");
+              // (a+bi)^(c+di)=(a^2+b^2)^(c/2)e^(-darg(a+ib))×{cos[carg(a+ib)+1/2dln(a^2+b^2)]+isin[carg(a+ib)+1/2dln(a^2+b^2)]}.   
+              $arg = atan2($a[1],$a[0]);
+              $m = safepow($a[0]*$a[0]+$a[1]*$a[1], $b[0]/2) * exp(-$b[1] * $arg);
+              $in = $b[0]*$arg + 1/2*$b[1]*log($a[0]*$a[0]+$a[1]*$a[1]);
+              return [$m*cos($in), $m*sin($in)];
             }
           } else {
             return safepow($a,$b);
@@ -365,15 +370,6 @@ class MathParser
     } catch (Exception $t) { //fallback for PHP5
       return sqrt(-1);
     }
-  }
-
-  /**
-   * Set docomplex
-   * @param  bool $v   Whether to process as complex
-   * @return void
-   */
-  public function setDoComplex($v) {
-    $this->docomplex = $v;
   }
 
   /**
@@ -856,12 +852,15 @@ class MathParser
         return;
     }
     if ($node['type'] === 'number') {
-      if ($this->docomplex && is_array($node['symbol'])) {
-        return [floatval($node['symbol'][0]), floatval($node['symbol'][1])];
+      if ($this->docomplex) {
+        if (is_array($node['symbol'])) {
+          return [floatval($node['symbol'][0]), floatval($node['symbol'][1])];
+        } else {
+          return [floatval($node['symbol']), 0];
+        }
       } else {
         return floatval($node['symbol']);
       }
-      
     } else if ($node['type'] === 'variable') {
       if (isset($this->variableValues[$node['symbol']])) {
         return $this->variableValues[$node['symbol']];

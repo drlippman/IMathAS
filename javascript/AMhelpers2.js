@@ -1494,6 +1494,10 @@ function processCalcComplex(fullstr, format) {
     if (format.indexOf("allowjcomplex")!=-1) {
       str = str.replace(/j/g,'i');
     }
+    if (format.indexOf("generalcomplex")!=-1) {
+      outarr.push(str);
+      continue; // bypass normal evaluation
+    }
     if (format.indexOf("sloppycomplex")==-1) {
       var cparts = parsecomplex(str);
       if (typeof cparts == 'string') {
@@ -1520,11 +1524,18 @@ function processCalcComplex(fullstr, format) {
       outarr.push(outstr);
     }
   }
-  return {
-    err: err,
-    dispvalstr: outarr.join(', '),
-    submitstr: outarr.join(',')
-  };
+  if (format.indexOf("generalcomplex")!=-1) {
+    return {
+      err: err,
+      dispvalstr: outarr.join(', ')
+    };
+  } else {
+    return {
+      err: err,
+      dispvalstr: outarr.join(', '),
+      submitstr: outarr.join(',')
+    };
+  }
 }
 
 function processSizedMatrix(qn) {
@@ -1695,33 +1706,35 @@ function processNumfunc(qn, fullstr, format) {
     } else if (isineq) {
         err += _("syntax error: this is not an inequality")+ '. ';
     }
-    if (fvars.length > 0) {
-        reg = new RegExp("("+fvars.join('|')+")\\(","g");
-        totesteqn = totesteqn.replace(/\w+/g, functoindex); // avoid sqrt(3) matching t() funcvar
-        totesteqn = totesteqn.replace(reg,"$1*sin($1+");
-        totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
-    }
+    if (!format.match(/generalcomplex/)) {
+      if (fvars.length > 0) {
+          reg = new RegExp("("+fvars.join('|')+")\\(","g");
+          totesteqn = totesteqn.replace(/\w+/g, functoindex); // avoid sqrt(3) matching t() funcvar
+          totesteqn = totesteqn.replace(reg,"$1*sin($1+");
+          totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
+      }
 
-    totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-    successfulEvals = 0;
-    for (j=0; j < 20; j++) {
-        totest = 'var DNE=1;';
-        for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-        if (domain[i][2]) { //integers
-            testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-        } else { //any real between min and max
-            testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-        }
-        totest += 'var ' + remapVars[i] + '=' + testval + ';';
-        }
-        res = scopedeval(totest + totesteqn);
-        if (res !== 'synerr') {
-        successfulEvals++;
-        break;
-        }
-    }
-    if (successfulEvals === 0) {
-        err += _("syntax error") + '. ';
+      totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+      successfulEvals = 0;
+      for (j=0; j < 20; j++) {
+          totest = 'var DNE=1;';
+          for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+          if (domain[i][2]) { //integers
+              testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+          } else { //any real between min and max
+              testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
+          }
+          totest += 'var ' + remapVars[i] + '=' + testval + ';';
+          }
+          res = scopedeval(totest + totesteqn);
+          if (res !== 'synerr') {
+          successfulEvals++;
+          break;
+          }
+      }
+      if (successfulEvals === 0) {
+          err += _("syntax error") + '. ';
+      }
     }
     err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   }
