@@ -78,7 +78,7 @@ function ineqbetweenplot($funcs) {
 	$fillcolor = 'blue';
 	$shadedir = array();
 	foreach ($funcs as $k=>$function) {
-		$function = explode(",",$function);
+		$function = array_map('trim',explode(",",$function));
         if (!isset($function[1])) { 
             echo "Missing filltype in ineqbetweenplot";
         }
