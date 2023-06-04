@@ -17,6 +17,7 @@ function getUrlParameter(name) {
 };
 var frame_id = getUrlParameter("frame_id");
 var update_id = getUrlParameter("update_id");
+var update_out = getUrlParameter("update_out");
 var lang = getUrlParameter("lang");
 
 var observeDOM = (function(){
@@ -50,6 +51,16 @@ function initcell() {
 					subject: "imathas.update",
 					id: update_id,
 					value: code.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+				}), "*");
+			});
+	}
+	if (update_out != "") {
+			observeDOM($(".sagecell_output")[0], function() {
+				var code = $(".sagecell_sessionOutput").text();
+				window.parent.postMessage( JSON.stringify({
+					subject: "imathas.update",
+					id: update_out,
+					value: code
 				}), "*");
 			});
 	}

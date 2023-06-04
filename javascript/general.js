@@ -1530,7 +1530,7 @@ jQuery(document).ready(function($) {
 var sagecellcounter = 0;
 function initSageCell(base) {
 	jQuery(base).find(".converttosagecell:visible:not(.inited)").each(function() {
-		var ta, code;
+		var ta, inp, code;
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
@@ -1555,6 +1555,7 @@ function initSageCell(base) {
                     .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
 				ta = ta[0];
 			}
+			inp = $this.find("input[id^=qn]");
 		}
 		if (m = code.match(/^\s+/)) {
 			var chop = m[0].length;
@@ -1570,7 +1571,11 @@ function initSageCell(base) {
         }
 		var returnid = null;
 		if (typeof jQuery(ta).attr("id") != "undefined") {
-				url += '&update_id='+jQuery(ta).attr("id");
+			url += '&update_id='+jQuery(ta).attr("id");
+		}
+		if (inp !== null) {
+			url += '&update_out='+jQuery(inp).attr("id");
+			jQuery(inp).addClass("allowupdate").hide();
 		}
 		url += '&evallabel=' + encodeURIComponent(_('Evaluate'));
         $this.addClass("inited");
