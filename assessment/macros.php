@@ -2933,9 +2933,9 @@ function getstuans($v,$q,$i=0,$blankasnull=true) {
 	}
 }
 
-function evalnumstr($str) {
+function evalnumstr($str, $docomplex=false) {
     if (trim($str) === '') { return ''; }
-    return evalMathParser($str);
+    return evalMathParser($str, $docomplex);
 }
 
 function evalfunc($farr) {
