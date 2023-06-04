@@ -3,6 +3,14 @@
 function isNaN( $var ) {
   // is_numeric catches most things, but not php-generated NAN or INF
   // is_finite catches those
+  if (is_array($var)) { // for complex
+    foreach ($var as $v) {
+        if (!is_numeric($v) || !is_finite($v)) {
+            return true;
+        }
+    }
+    return false;
+  }
   return (!is_numeric($var) || !is_finite($var));
      //return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
      //possible alternative:
@@ -586,7 +594,7 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 	} else if (in_array('scinot',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of numbers using scientific notation'), $listtype):_('Enter a number using scientific notation');
-	} else {
+	} else if (!in_array('generalcomplex',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of mathematical expressions'), $listtype):_('Enter a mathematical expression');
 	}

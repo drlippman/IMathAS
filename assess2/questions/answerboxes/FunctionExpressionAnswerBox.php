@@ -102,9 +102,15 @@ class FunctionExpressionAnswerBox implements AnswerBox
                 $tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');
             }
         }
+        if (in_array('generalcomplex', $ansformats)) {
+            $tip .= '<br>'._('Your answer can contain complex numbers.');
+        }
 
         if (empty($variables)) {$variables = "x";}
         $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
+        if (in_array('generalcomplex', $ansformats) && !in_array('i', $variables)) {
+            array_unshift($variables, 'i');
+        }
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
             $variables[$i] = trim($variables[$i]);
