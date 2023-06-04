@@ -473,7 +473,7 @@ if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line
 </div>
 
 <hr/>
-<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2023 David Lippman</div>
+<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-<?php echo date("Y");?> David Lippman</div>
 
 <?php
 require("../footer.php");
