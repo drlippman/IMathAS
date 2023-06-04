@@ -57,6 +57,7 @@ class MatrixScorePart implements ScorePart
         } else if (!empty($answersize)) {
             $sizeparts = explode(',',$answersize);
             $N = $sizeparts[0];
+            $stuN = $sizeparts[0];
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
             } else {
