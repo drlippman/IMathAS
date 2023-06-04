@@ -251,11 +251,40 @@ class FunctionExpressionScorePart implements ScorePart
                     $ratios = array();
                     $diffs = array();
                     $realanss = array();
+                    $rollingstu = [];
+                    $rollingstui = 0;
+                    $rollingreal = [];
+                    $rollingreali = 0;
 
                     foreach ($realanstmp as $i=>$realans) {
                         //echo "$answer, real: $realans, my: {$givenansvals[$i]},rel: ". (abs(10^16*$givenansvals[$i]-10^16*$realans))  ."<br/>";
                         if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
-                        if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {  //if equation, store ratios
+                        if (in_array('toconst',$ansformats) && in_array('scalarmult',$ansformats)) {
+                            // use triplets of values
+                            // want (g2 - g1) / (g3 -g2) = (r2 - r1) / (r3 - r2)
+                      
+                            if (isNaN($givenansvals[$i])) {
+                                $stunan++;
+                                continue;
+                            }
+                            // last 3 valid values
+                            $rollingstu[$rollingstui] = $givenansvals[$i];
+                            $rollingreal[$rollingreali] = $realans;
+                            $rollingstui = ($rollingstui+1)%3;
+                            $rollingreali = ($rollingreali+1)%3;
+
+                            if (count($rollingstu)==3) {
+                                // don't want division, so do multiplications
+                                $v1 = ($rollingstu[1] - $rollingstu[0]) * ($rollingreal[2] - $rollingreal[1]);
+                                $v2 = ($rollingreal[1] - $rollingreal[0]) * ($rollingstu[2] - $rollingstu[1]);
+                                // TODO: these tolerances may not make sense in this context
+                                if ($abstolerance !== '') {
+                                    if (abs($v2 - $v1) > $abstolerance+1E-12) { $correct = false; break;}
+                                } else {
+                                    if ((abs($v2 - $v1)/(max(abs($v1),abs($v2))+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                                }
+                            }
+                        } else if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {  //if equation, store ratios
                             if (isNaN($givenansvals[$i])) {
                                 $stunan++;
                             } elseif (abs($realans)>.00000001 && is_numeric($givenansvals[$i])) {
@@ -293,7 +322,9 @@ class FunctionExpressionScorePart implements ScorePart
                     if ($stunan>1) { //if more than 1 student NaN response
                         $correct = false; continue;
                     }
-                    if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {
+                    if (in_array('scalarmult',$ansformats) && in_array('toconst',$ansformats)) {
+                        // nothing to do; just need to catch combo
+                    } else if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {
                         if ($cntbothzero>18) {
                             $correct = true;
                         } else if (count($ratios)>1) {

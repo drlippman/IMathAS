@@ -5924,7 +5924,7 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
 function parseMatrixToArray($str) {
     /*
     Handles:
-      Matrices like [(1,2),(3,4)], ((1,2),(3,4)), |(1,2),(3,4)|
+      Matrices like [(1,2),(3,4)], ((1,2),(3,4)), |(1,2),(3,4)|, and [[1,2],[3,4]]
       Where parens confuse: [(sqrt(4),(2pi)/3),(5,6)]
       1x1 matrix like [3] or [(2pi)/3]
       Stored stuans format: 3|4|5|6  - won't be able to return numrows in this case
@@ -5940,14 +5940,20 @@ function parseMatrixToArray($str) {
         $rowcnt = 0;
         $depth = 0;
         $lastcut = 1;
+		$bracketpairs = ['('=>')','['=>']'];
+		$rowbracket = '';
         for ($i=1;$i<strlen($str)-1;$i++) {
             $c = $str[$i];
-            if ($c == '(') {
+			if ($rowbracket === '' && ($c == '(' || $c == '[')) {
+				$rowbracket = $c;
+				$rowendbracket = $bracketpairs[$c];
+			}
+            if ($c == $rowbracket) {
                 if ($depth == 0) {
                     $lastcut = $i+1;
                 }
                 $depth++;
-            } else if ($c == ')') {
+            } else if ($c == $rowendbracket) {
                 $depth--;
                 if ($depth == 0) { // new row 
                     $out[] = trim(substr($str, $lastcut, $i-$lastcut));
