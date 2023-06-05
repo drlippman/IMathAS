@@ -471,7 +471,12 @@ if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line
 </form>
 <div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
 </div>
-
+<script type="text/javascript">
+    $(function() {
+        document.getElementById("submit").style.display = "block";
+        document.getElementById("bsetup").style.display = "none";
+    });
+</script>
 <hr/>
 <div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-<?php echo date("Y");?> David Lippman</div>
 
