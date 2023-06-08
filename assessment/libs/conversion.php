@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26.4;
+	return 26.5;
 }
 
 global $allowedmacros;
@@ -227,6 +227,16 @@ function get_unit_capacities() {
     $unit["Fluid ounce"] = _("Fluid ounce");
     $unit["fluid ounce"] = _("fluid ounce");
 
+    $unit["Teaspoons"] = _("Teaspoons");
+    $unit["teaspoons"] = _("teaspoons");
+    $unit["Teaspoon"] = _("Teaspoon");
+    $unit["teaspoon"] = _("teaspoon");
+
+    $unit["Tablespoons"] = _("Tablespoon");
+    $unit["tablespoons"] = _("tablespoon");
+    $unit["Tablespoon"] = _("Tablespoon");
+    $unit["tablespoon"] = _("tablespoon");
+
     $unit["Cups"] = _("Cups");
     $unit["cups"] = _("cups");
     $unit["Cup"] = _("Cup");
@@ -265,6 +275,16 @@ function get_unit_capacity_abbreviations() {
     $unitabbr["fluid ounces"] = _("fl. oz");
     $unitabbr["Fluid ounce"] = _("fl. oz");
     $unitabbr["fluid ounce"] = _("fl. oz");
+
+    $unitabbr["Teaspoons"] = _("Tsps.");
+    $unitabbr["teaspoons"] = _("tsps.");
+    $unitabbr["Teaspoon"] = _("Tsp.");
+    $unitabbr["teaspoon"] = _("tsp.");
+
+    $unitabbr["Tablespoons"] = _("Tbsps.");
+    $unitabbr["tablespoons"] = _("tbsps.");
+    $unitabbr["Tablespoon"] = _("Tbsp.");
+    $unitabbr["tablespoon"] = _("tbsp.");
 
     $unitabbr["Cups"] = _("c");
     $unitabbr["cups"] = _("c");
@@ -848,10 +868,12 @@ function conversionAbbreviations() {
             $unitabbr = get_unit_capacity_abbreviations();
 
             $retval[0] = $unit["Fluid ounces"]." = ".$unitabbr["Fluid ounces"];
-            $retval[1] = $unit["Cups"]." = ".$unitabbr["Cups"];
-            $retval[2] = $unit["Pints"]." = ".$unitabbr["Pints"];
-            $retval[3] = $unit["Quarts"]." = ".$unitabbr["Quarts"];
-            $retval[4] = $unit["Gallons"]." = ".$unitabbr["Gallons"];
+            $retval[1] = $unit["Teaspoon"]." = ".$unitabbr["Teaspoon"];
+            $retval[2] = $unit["Tablespoon"]." = ".$unitabbr["Tablespoon"];
+            $retval[3] = $unit["Cups"]." = ".$unitabbr["Cups"];
+            $retval[4] = $unit["Pints"]." = ".$unitabbr["Pints"];
+            $retval[5] = $unit["Quarts"]." = ".$unitabbr["Quarts"];
+            $retval[6] = $unit["Gallons"]." = ".$unitabbr["Gallons"];
         } elseif(($type=="Weight")||($type=="Mass")){
             $unit = get_unit_weights();
             $unitabbr = get_unit_weight_abbreviations();
@@ -1351,16 +1373,20 @@ function conversionCapacity2() {
 
 		if($fullname==0) {
             $retval[0] = array("",1,$unitabbr["cup"],8,$unitabbr["fluid ounces"]);
-            $retval[1] = array("",1,$unitabbr["pint"],2,$unitabbr["cups"]);
-            $retval[2] = array("",1,$unitabbr["quart"],2,$unitabbr["pints"]);
-            $retval[3] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
+            $retval[1] = array("",1,$unitabbr["teaspoon"],2.498023,$unitabbr["tablespoon"]);
+            $retval[2] = array("",1,$unitabbr["tablespoon"],16,$unitabbr["cups"]);
+            $retval[3] = array("",1,$unitabbr["pint"],2,$unitabbr["cups"]);
+            $retval[4] = array("",1,$unitabbr["quart"],2,$unitabbr["pints"]);
+            $retval[5] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
         } else {
             $retval[0] = array("",1,$unit["Cup"],8,$unit["Fluid ounces"]);
-            $retval[1] = array("",1,$unit["Pint"],2,$unit["Cups"]);
-            $retval[2] = array("",1,$unit["Quart"],2,$unit["Pints"]);
-            $retval[3] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
+            $retval[1] = array("",1,$unit["teaspoon"],2.498023,$unit["tablespoon"]);
+            $retval[2] = array("",1,$unit["tablespoon"],16,$unit["cups"]);
+            $retval[3] = array("",1,$unit["Pint"],2,$unit["Cups"]);
+            $retval[4] = array("",1,$unit["Quart"],2,$unit["Pints"]);
+            $retval[5] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
         }
-        for($i=0;$i<4;$i+=1){
+        for($i=0;$i<6;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign {$retval[$i][3]} {$retval[$i][4]}";
         }
 
@@ -3044,6 +3070,8 @@ function conversionWeight() {
 //  WAMAP Question ID: 201697
 
 // 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+//
+// 2023-06-06 ver26.5- tablespoon, teaspoon
 //
 // 2022-10-10 ver26.4- Added 1 year = 12 months to time conversion
 //
