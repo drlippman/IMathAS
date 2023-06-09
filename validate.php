@@ -176,10 +176,15 @@ if ($haslogin && !$hasusername) {
         }
         $_POST['usedetected'] = true;
     } else {
-        $stm = $DBH->prepare("SELECT id,password,rights,groupid,jsondata,mfa FROM imas_users WHERE SID=:SID");
+        $query = "SELECT id,password,rights,groupid";
+        if (strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
+            $query .= ',jsondata,mfa';
+        }
+        $query .= " FROM imas_users WHERE SID=:SID";
+        $stm = $DBH->prepare($query);
         $stm->execute(array(':SID' => $_POST['username']));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
-        if ($line != false) {
+        if ($line != false && isset($line['jsondata'])) {
             $json_data = json_decode($line['jsondata'], true);
             if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
                 echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');

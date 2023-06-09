@@ -38,7 +38,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 			}  else {
 				echo '<p>Unable to establish a session.  Check that your browser is set to allow session cookies</p>';
 			}
-		} else if (substr($line['password'],0,8)=='cleared_') {
+		} else if (isset($line['password']) && substr($line['password'],0,8)=='cleared_') {
 			echo '<p>Your password has expired since your account has been unused. Use the Reset Password link below to reset your password.</p>';
 		} else {
 			echo "<p>Login Error.  Try Again</p>\n";
