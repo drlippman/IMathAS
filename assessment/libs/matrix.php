@@ -96,8 +96,8 @@ function matrixformatfrac($m, $bracket='[') {
 //                    table, either 0 or 1.  Use 0 if you are
 //                    building an answerbox matrix.
 //
-//                   0 do not use math ticks
-//           default 1        use math ticks
+//                    0 do not use math ticks
+//           default  1        use math ticks
 //
 // linemode: Show none, augments, or simplex style
 //           0 show no lines
@@ -106,13 +106,14 @@ function matrixformatfrac($m, $bracket='[') {
 //
 // headernames: list or array of the variables "x1,x2,x3" that are
 //              used for the column titles.
-// default     none
+// default      none
 //
 // tablestyle: for any additional styles for the table that you
 //             may want.  like "color:#40B3DF;"
-//     default none
-// rownames:  list or array of the variables "x1,x2,x3" that are
-//              used for the column titles.
+// default     one
+//
+// rownames:   list or array of the variables "x1,x2,x3" that are
+//             used for the column titles.
 // default     none
 //
 // rowheader:  string that is entered into the row name column in the header row
@@ -131,6 +132,9 @@ function matrixdisplaytable() {
     //  3 = linemode - no line, aumented, or simplex
     //  4 = header column names, default is not to show
     //  5 = CSS tablestyle for the table.
+    //  6 = rownames for the table.
+    //  7 = rowheader for the table.
+    //  8 = caption for the table.
 
     // process arguments ------------------------------------
     $args = func_get_args();
@@ -141,8 +145,12 @@ function matrixdisplaytable() {
     }
     $m = $args[0];
 
+    // counts
+    $rows = count($m);
+    $cols = count($m[0]);
+
     if (!isMatrix($m)) {
-        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'error: matrixdisplaytable input not a matrix'; }
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'error: matrixdisplaytable input not a valid matrix'; }
         return '';
     }
 
@@ -170,14 +178,19 @@ function matrixdisplaytable() {
         };
     } else { $mode=0; }
 
-    //headernames
+    //column headernames
     if(isset($args[4])) {
         $headers = $args[4];
         if (!is_array($headers)) {
             $headers = explode(',',$headers);
         }
-    } else { $headers = null; }
-
+    } else {
+        $headers = array();
+        for ($cloop=0;$cloop<$cols; $cloop++) {
+            $headers[$cloop] = "";
+        }
+    }
+    
     //tablestyle
     if(isset($args[5])) {
         $tablestyle = $args[5];
@@ -189,7 +202,12 @@ function matrixdisplaytable() {
         if (!is_array($rownames)) {
             $rownames = explode(',',$rownames);
         }
-    } else { $rownames = null; }
+    } else { 
+        $rownames = array();
+        for ($rloop=0; $rloop<$rows; $rloop++) {
+            $rownames[$rloop] = "";
+        }
+    }
 
     // rowheader
     if(isset($args[7])) {
@@ -219,26 +237,6 @@ function matrixdisplaytable() {
     $toprightborder    = "style='border-top:1px solid black;border-right:1px solid black;'";
     $rightborder       = "style='border-right:1px solid black;'";
     $bottomrightborder = "style='border-bottom:1px solid black;border-right:1px solid black;'";
-
-    // counts
-    $rows = count($m);
-    $cols = count($m[0]);
-
-    if($rowheader!="") {
-        // add default blank spaces if the rowheader cell is not blank
-        if($rownames == null) {
-            $rownames = array();
-            for ($rloop=0; $rloop<$rows; $rloop++) {
-                $rownames[$rloop] = "";
-            }
-        }
-        if($headers==null){
-            $headers = array();
-            for ($cloop=0;$cloop<$cols; $cloop++) {
-                $headers[$cloop] = "";
-            }
-        }
-    }
 
     $lastrow = $rows-1;
     $lastcol = $cols-1;
