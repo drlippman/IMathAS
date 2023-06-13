@@ -484,7 +484,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
         var capheight = $("#GB_caption").outerHeight();
-        var footheight = $("#GB_footer:visible").outerHeight();
+        var footheight = $("#GB_footer:visible").outerHeight() || 0;
         document.getElementById("GB_frameholder").style.height = 
             (h - capheight - footheight)+"px";
 	} else {
