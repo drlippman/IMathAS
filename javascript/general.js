@@ -1566,8 +1566,10 @@ function initSageCell(base) {
 		sagecellcounter++;
 		var url = imasroot+'/assessment/libs/sagecellframe.html?frame_id='+frame_id;
 		url += '&code='+encodeURIComponent(code);
-        if ($this[0].hasAttribute('data-lang')) {
-            url += '&lang='+encodeURIComponent($this.attr('data-lang'));
+		for (dattribute of ['lang', 'hide', 'autoeval']){
+          if ($this[0].hasAttribute(`data-${dattribute}`)) {
+            url += '&' + dattribute + '=' + encodeURIComponent($this.attr(`data-${dattribute}`));
+		  }
         }
 		var returnid = null;
 		if (typeof jQuery(ta).attr("id") != "undefined") {

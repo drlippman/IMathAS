@@ -19,6 +19,13 @@ var frame_id = getUrlParameter("frame_id");
 var update_id = getUrlParameter("update_id");
 var update_out = getUrlParameter("update_out");
 var lang = getUrlParameter("lang");
+var hide = getUrlParameter("hide");
+var autoeval = getUrlParameter("autoeval");
+hide = (hide.trim() == "all" ? "editor, evalButton, language, output, done, sessionFiles, messages, sessionTitle" : hide)
+hide = (hide == '' ? ['permalink', 'fullScreen'] : 
+			[...new Set(hide.split(',').map(s => s.trim()).concat(['permalink', 'fullScreen']))]);
+lang = (lang == '' ? sagecell.allLanguages : lang.split(',').map(s => s.trim()));
+autoeval = (autoeval == '' ? false : autoeval);
 
 var observeDOM = (function(){
     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
@@ -89,8 +96,9 @@ $(function() {
 		code: code,
 		callback: initcell,
 		evalButtonText: evallabel,
-        languages: (lang == '' ? sagecell.allLanguages : [lang]),
-		hide: ["permalink", "fullScreen"]
+        languages: lang,
+		hide: hide,
+		autoeval: autoeval,
 	});
 });
 </script>
