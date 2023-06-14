@@ -6,7 +6,7 @@
 */
 
 global $allowedmacros;
-array_push($allowedmacros,"diffeq_slopefield");
+array_push($allowedmacros,"diffeq_slopefield", "diffeq_comparegensoln");
 
 // func is either just y'(x,y), or x'(x,y),y'(x,y)
 function diffeq_slopefield($func,$options=[]) {
@@ -108,4 +108,131 @@ function diffeq_slopefield($func,$options=[]) {
 		return "<embed type='image/svg+xml' align='middle' width='$width' height='$height' alt='Graph of slopefield; enable text alternatives in user preferences for more' script='$out' />\n";
 	}
 
+}
+
+function diffeq_comparegensoln($a,$b,$vars,$const,$tol='.001',$domain='-10,10') {
+    if ($a=='' || $b=='') { return false;}
+    if (!is_array($vars)) {
+        $vars = array_map('trim', explode(',', $vars));
+    }
+    if (!is_array($const)) {
+        $const = array_map('trim', explode(',', $const));
+    }
+    if (strval($tol)[0]=='|') {
+        $abstolerance = floatval(substr($tol,1));
+    }
+    
+    $allvars = implode(',',$vars).','.implode(',',$const);
+    list($variables, $tps, $flist) = numfuncGenerateTestpoints($allvars, $domain);
+    $vlist = implode(",",$variables);
+    $a = numfuncPrepForEval($a, $variables);
+    $b = numfuncPrepForEval($b, $variables);
+
+    $afunc = makeMathFunction($a, $vlist, [], $flist, true);
+    $bfunc= makeMathFunction($b, $vlist, [], $flist, true);
+    if ($afunc === false || $bfunc === false) {
+        if (!empty($GLOBALS['inQuestionTesting'])) {
+            echo "<p>Debug info: one function failed to compile.</p>";
+        }
+        return false;
+    }
+
+    $avals = [];
+    $bvals = [];
+    $varcnt = count($vars);
+    for ($idx=-1; $idx < count($const); $idx++) {
+        for ($i = 0; $i < 20; $i++) {
+            $varvals = array();
+            for($j=0; $j < count($vars); $j++) {
+                $varvals[$vars[$j]] = $tps[$i][$j];
+            }
+            for($j=0; $j < count($const); $j++) {
+                $varvals[$const[$j]] = ($j==$idx)?$tps[$i][$varcnt]:0;
+            }
+            $avals[$idx][$i] = $afunc($varvals);
+            $bvals[$idx][$i] = $bfunc($varvals);
+
+            if ($avals[$idx][$i]===false || $bvals[$idx][$i]===false) {
+                return false;
+            }
+            if ($idx > -1) {
+                if (isset($avals[-1][$i]) && !isNaN($avals[-1][$i])) {
+                    $avals[$idx][$i] -= $avals[-1][$i];
+                }
+                if (isset($bvals[-1][$i]) && !isNaN($bvals[-1][$i])) {
+                    $bvals[$idx][$i] -= $bvals[-1][$i];
+                }
+            }
+        }
+    }
+    $usedbs = [];
+    for ($ai=-1;$ai<count($const);$ai++) {
+        for ($bi=($ai==-1)?-1:0;$bi<($ai==-1?0:count($const));$bi++) {
+            if (!empty($usedbs[$bi])) { continue; } // only use each once
+            $cntnana = 0;
+            $cntnanb = 0;
+            $diffnan = 0;
+            $cntzero = 0;
+            $cntbothzero = 0;
+            $ratios = [];
+            for ($i = 0; $i < 20; $i++) {
+                $aval = $avals[$ai][$i];
+                $bval = $bvals[$bi][$i];
+                if (isNaN($aval)) {
+                    $cntnana++; 
+                    if (isNaN($bval)) {
+                        $cntnanb++;
+                    } else {
+                        $diffnan++;
+                    }
+                    continue;
+                } else if (isNaN($bval)) {
+                    $cntnanb++;
+                    $diffnan++;
+                    continue;
+                } else if ($ai > -1 && abs($aval)>.00000001 && is_numeric($bval)) {
+                    $ratios[] = $bval/$aval;
+                    if (abs($bval)<=.00000001 && $aval!=0) {
+                        $cntzero++;
+                    }
+                } else if ($ai > -1 && abs($aval)<=.00000001 && is_numeric($bval) && abs($bval)<=.00000001) {
+                    $cntbothzero++;
+                }
+                if ($ai==-1) {
+                    // for yp, test now using normal method
+                    if (isset($abstolerance)) {
+                        if (abs($aval-$bval) > $abstolerance-1E-12) {return false;}
+                    } else {
+                        if ((abs($aval-$bval)/(abs($aval)+.0001) > $tol-1E-12)) {return false;}
+                    }
+                }
+            }
+            if ($cntnana==20 || $cntnanb==20 || ($ai==-1 && $diffnan>1)) {
+                // either function evaluated to nan at all points, or for yp, nans are diff
+                return false;
+            }   
+            if ($ai>-1) {
+                $match = false;
+                if ($cntbothzero > 18-min($cntnana,$cntnanb)) {
+                    $match = true;
+                } else if (count($ratios)>2 && count($ratios)!=$cntzero) {
+                    $meanratio = array_sum($ratios)/count($ratios);
+                    $match = true;
+                    for ($i=0; $i<count($ratios); $i++) {
+                        if (isset($abstolerance)) {
+                            if (abs($ratios[$i]-$meanratio) > $abstolerance+1E-12) {$match = false; break;}
+                        } else {
+                            if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $tol+1E-12)) {$match = false; break;}
+                        }
+                    }
+                }
+                if ($match) {
+                    $usedbs[$bi] = 1;
+                    continue 2; // continue to next ai
+                }
+            }
+        }
+    }
+    // see if we matched all
+    return (count($usedbs)==count($const)); 
 }

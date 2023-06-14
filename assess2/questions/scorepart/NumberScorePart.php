@@ -276,7 +276,7 @@ class NumberScorePart implements ScorePart
                 }
                 foreach ($anss as $k=>$anans) {
                     if (!is_numeric($anans)) {
-                        if (preg_match('/(\(|\[)(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|-oo)\,(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|oo)(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
+                        if (preg_match('/(\(|\[)\s*(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|-oo)\s*\,\s*(-?[\d\.]+|-?[\d\.]+[Ee]?[+\-]?\d+|oo)\s*(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
                             //check reqdecimals/sigfigs
                             if ($reqdecimals !== '') {
                                 $decimalsingivenans = ($p = strpos($givenans,'.'))===false ? 0 : (strlen($givenans)-$p-1);
@@ -285,9 +285,13 @@ class NumberScorePart implements ScorePart
                                         continue;
                                     }
                                 } else {
+                                    /*  Don't bother to check in this case, since 
+                                        0.1 could be considered as 0.100, so if not exact,
+                                        no reason to bother checking
                                     if ($reqdecimals > $decimalsingivenans ) {
                                         continue;
                                     }
+                                    */
                                 }
                             }
                             if ($reqsigfigs !== '') {

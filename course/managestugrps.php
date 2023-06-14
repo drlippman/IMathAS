@@ -319,48 +319,64 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array($grpsetid));
 			if ($stm->rowCount()==0) { //check there's no existing groups;
 				if (isset($_POST['inclocked'])) {
-					$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
+					$stm = $DBH->prepare("SELECT userid,section FROM imas_students WHERE courseid=?");
 				} else {
-					$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=? AND locked=0");
+					$stm = $DBH->prepare("SELECT userid,section FROM imas_students WHERE courseid=? AND locked=0");
 				}
 				$stm->execute(array($cid));
-				$stus = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-				shuffle($stus);
-				$n = count($stus);
-				$grpn = Sanitize::onlyInt($_POST['grpsize']);
-				$rem = $n%$grpn;
-				if ($_POST['grpadj']==0 || ($_POST['grpadj']==2 && $rem>=$grpn/2)) {
-					$numgrps = ceil($n/$grpn);
-					$rem = $grpn - $rem;
-					$grpsize = array_fill(0, $numgrps, $grpn);
-					for ($i=0;$i<$rem;$i++) {
-						$grpsize[$i%$numgrps]--;  //reduce number in group
-					}
-				} else {
-					$numgrps = floor($n/$grpn);
-					$grpsize = array_fill(0, $numgrps, $grpn);
-					for ($i=0;$i<$rem;$i++) {
-						$grpsize[$i%$numgrps]++;  //increase number in group
-					}
-				}
-				$grpsize = array_reverse($grpsize);
-				$ins_grp_stm = $DBH->prepare("INSERT INTO imas_stugroups (groupsetid,name) VALUES (?,?)");
-				$ins_grpmem_stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (?,?)");
-				$stucnt = 0;
-				for ($i=0;$i<$numgrps;$i++) {
-					$ins_grp_stm->execute(array($grpsetid, sprintf(_('Random Group %d'), $i+1)));
-					$newgrpid = $DBH->lastInsertId();
-					for ($j=0;$j<$grpsize[$i];$j++) {
-						$ins_grpmem_stm->execute(array($stus[$stucnt], $newgrpid));
-						$stucnt++;
-					}
-				}
+                $stuallsecs = [];
+                while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                    $sec = (!empty($_POST['sepsections'])) ? $row['section'] : 'all';
+                    $stuallsecs[$sec][] = $row['userid'];
+                }
+                $groupnumcnt = 1;
+                foreach ($stuallsecs as $sec=>$stus) {
+                    shuffle($stus);
+                    $n = count($stus);
+                    $grpn = intval(Sanitize::onlyInt($_POST['grpsize']));
+                    $rem = $n%$grpn;
+                    if ($_POST['grpadj']==0 || ($_POST['grpadj']==2 && $rem>=$grpn/2)) {
+                        $numgrps = ceil($n/$grpn);
+                        if ($rem>0) {
+                            $rem = $grpn - $rem;
+                        }
+                        $grpsize = array_fill(0, $numgrps, $grpn);
+                        for ($i=0;$i<$rem;$i++) {
+                            $grpsize[$i%$numgrps]--;  //reduce number in group
+                        }
+                    } else {
+                        $numgrps = floor($n/$grpn);
+                        $grpsize = array_fill(0, $numgrps, $grpn);
+                        for ($i=0;$i<$rem;$i++) {
+                            $grpsize[$i%$numgrps]++;  //increase number in group
+                        }
+                    }
+                    $grpsize = array_reverse($grpsize);
+
+                    $ins_grp_stm = $DBH->prepare("INSERT INTO imas_stugroups (groupsetid,name) VALUES (?,?)");
+                    $ins_grpmem_stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (?,?)");
+                    $stucnt = 0;
+                    for ($i=0;$i<$numgrps;$i++) {
+                        $ins_grp_stm->execute(array($grpsetid, sprintf(_('Random Group %d'), $groupnumcnt)));
+                        $newgrpid = $DBH->lastInsertId();
+                        $groupnumcnt++;
+                        for ($j=0;$j<$grpsize[$i];$j++) {
+                            $ins_grpmem_stm->execute(array($stus[$stucnt], $newgrpid));
+                            $stucnt++;
+                        }
+                    }
+                }
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
+
+            $stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL ORDER BY section");
+            $stm->execute(array(':courseid'=>$cid));
+            $hassection = ($stm->rowCount()>1);
+
 			$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Create Random Groups";
 		}
 
@@ -448,11 +464,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		natsort($page_grps);
 		$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL ORDER BY section");
 		$stm->execute(array(':courseid'=>$cid));
-		if ($stm->rowCount()>1) {
-			$hassection = true;
-		} else {
-			$hassection = false;
-		}
+        $hassection = ($stm->rowCount()>1);
+
 		if ($hassection) {
 			$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
@@ -635,6 +648,10 @@ if ($overwriteBody==1) {
 		echo '</select></span><br class=form />';
 		echo '<span class=form>'._('Locked students:').'</span>';
 		echo '<span class=formright><label><input type=checkbox name=inclocked />'._('Include locked students').'</label></span><br class=form />';
+        if ($hassection) {
+            echo '<span class=form>'._('Sections:').'</span>';
+            echo '<span class=formright><label><input type=checkbox name=sepsections checked />'._('Group members should have same section').'</label></span><br class=form />';
+        }
 		echo '<div class=submit><input type="submit" value="Create" />';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></div>";
 		echo '</form>';

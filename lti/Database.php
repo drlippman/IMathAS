@@ -748,10 +748,10 @@ class Imathas_LTI_Database implements LTI\Database
         }
 
         // get origin course
-        // TODO: if the $lastcopied isn't owned by us, should we still offer it as
-        // an option to be copied?
-        $stm = $this->dbh->prepare('SELECT DISTINCT id,name,ownerid FROM imas_courses WHERE id=?');
-        $stm->execute(array($target['refcid']));
+        $query = 'SELECT DISTINCT ic.id,ic.name,it.userid FROM imas_courses AS ic ';
+        $query .= 'LEFT JOIN imas_teachers AS it ON it.courseid=ic.id AND it.userid=? WHERE ic.id=?';
+        $stm = $this->dbh->prepare($query);
+        $stm->execute(array($userid, $target['refcid']));
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $copycourses[$row[0]] = $row[1];
             // if it's user's course, also include in assoc list
@@ -999,8 +999,16 @@ class Imathas_LTI_Database implements LTI\Database
                     }
                     $ancparts = explode(':', $aidanc[$i]);
                     if ($ancparts[0] != $ancestors[$i]) {
+                        // course sequence doesn't match
                         $isok = false;
                         break; // not the same ancestry path
+                    }
+                    if ($i == $ciddepth) {
+                        // on last one - match sure assessment matches
+                        if ($sourceaid != $ancparts[1]) {
+                            $isok = false;
+                            break;
+                        }
                     }
                 }
                 if ($isok) { // found it!

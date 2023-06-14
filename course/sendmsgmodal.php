@@ -113,6 +113,10 @@ if (isset($_POST['message'])) {
 	exit;
 } else {
 	$useeditor = "message";
+    $placeinhead = '<script>function sendmsg() { 
+        $("form").submit(); 
+        parent.$("#GB_footer button.primary").hide();
+    }</script>';
 	require("../header.php");
 
 	$iserrreport = false;

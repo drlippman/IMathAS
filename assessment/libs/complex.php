@@ -66,6 +66,8 @@ function cx_arg(array $num, string $argin="rad", int $roundto=12) {
     
     $re=$num[0];
     $im=$num[1];
+
+    /*
     $r= cx_modul($num);
     
     if ($r==0){
@@ -74,7 +76,7 @@ function cx_arg(array $num, string $argin="rad", int $roundto=12) {
         $th1 = asin(abs($im/$r));
         if ($re>=0 && $im>=0){
             $theta=$th1;
-    }    
+        }    
         else if($re<=0 && $im<=0){
             $theta = pi() + $th1;
         }
@@ -84,6 +86,12 @@ function cx_arg(array $num, string $argin="rad", int $roundto=12) {
         else {
             $theta = 2*pi() - $th1;
         }
+    }
+    */
+    $theta = atan2($im,$re);
+    // change to make angles consistent with old code
+    if ($theta < 0) {
+        $theta += 2*pi();
     }
     
     if ($argin=="deg"){
@@ -721,11 +729,7 @@ function cx_prettyquadRoot(float $a, float $b, float $c){
         
             $a2=$a*2;
             $D=makereducedfraction(-$b,$a2);
-
-            $re= -$D;
             $N=reduceradicalfrac(1,-$d,$a2);
-            $im= sqrt(abs($d))/(2*$a);
-            $im2=-$im;
             $st=array("$D + $N i","$D - $N i");
     }
         else {

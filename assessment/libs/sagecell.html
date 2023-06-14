@@ -44,6 +44,37 @@ $answer[1]= "-$a cos(x)"
 &lt;/div&gt;
 &lt;p&gt;Answer: $answerbox[1]&lt;/p&gt;
 </pre>
+
+
+<p>If you want to store the student's code so they can modify it and you can
+  view it, and you want to store the output of the Sagecell after it's evaluated,
+  then you'll need to add an <code>essay</code> part to your question and a 
+  <code>string</code> part. 
+  See the example below for an example of how you could set it up, 
+  including providing default Sage code</p>
+  
+  <p>Question Type: Multipart.  Question Code:</p>
+  <pre>
+  $anstypes = "essay,string"
+  $answeights = "0,1"
+  $scoremethod = "singlescore"
+  $a = rand(2,8)
+  
+  $answer[1]= "-$a cos(x)"
+  </pre>
+  
+  <p>Question text:</p>
+  <pre>
+  &lt;p&gt;Modify the Sagecell below to find the integral of `$a sin(x)`&lt;/p&gt;
+  &lt;div class="converttosagecell"&gt;
+    $answerbox[0]
+    $answerbox[1]
+    &lt;pre class="hidden"&gt;
+      x = var('x')
+      integral(sin(x), x)
+    &lt;/pre&gt;
+  &lt;/div&gt;
+  </pre>
 </body>
 </html>
    

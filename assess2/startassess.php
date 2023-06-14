@@ -89,7 +89,10 @@ if ($canViewAll) {
 
 // check password, if needed
 if (!$in_practice && !$canViewAll &&
-  (!isset($_SESSION['assess2-'.$aid]) || $_SESSION['assess2-'.$aid] != $in_practice) &&
+  (!isset($_SESSION['assess2-'.$aid]) || 
+    (!is_array($_SESSION['assess2-'.$aid]) && $_SESSION['assess2-'.$aid] != $in_practice) || // backward compat needed for a while
+    (is_array($_SESSION['assess2-'.$aid]) && ($_SESSION['assess2-'.$aid][0] != $in_practice || !$assess_info->checkPassword($_SESSION['assess2-'.$aid][1])))
+  ) &&
   !$assess_info->checkPassword($_POST['password'])
 ) {
   echo '{"error": "invalid_password"}';
@@ -379,7 +382,7 @@ $assess_record->saveRecordIfNeeded();
 
 // store assessment start in session data, so we know if they've gotten past
 // password at some point
-$_SESSION['assess2-'.$aid] = $in_practice;
+$_SESSION['assess2-'.$aid] = [$in_practice, $assess_info->getSetting('password')];
 
 //prep date display
 prepDateDisp($assessInfoOut);

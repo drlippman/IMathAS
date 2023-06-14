@@ -350,8 +350,8 @@ function CalcPlot3Dquerystring($funcs, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax,
 //				defaults: window's xmin,xmax,ymin,ymax, 30
 //  Implicit: 		x^2+y^2=z^2,[xmin,ymin,xmax,ymax,zmin,zmax,cubes]
 //				defaults: window's xmin,xmax,ymin,ymax,zmin,zmax 16
-//  Spacecurve: 	curve,x(t),y(t),z(t),[tmin,tmax,tsteps]
-//				defaults: -10,10,100
+//  Spacecurve: 	curve,x(t),y(t),z(t),[tmin,tmax,tsteps,width,color]
+//				defaults: -10,10,100,2,rainbow
 //  Parametric surf: 	psurf,x(u,v),y(u,v),z(u,v),[umin,umax,vmin,vmax,usteps,vsteps]
 //				defaults: 0,2pi,0,pi,30,15
 //  Region: 		region,y=f(x) bottom func,y=g(x) top func,z top function,[xmin,xmax]
@@ -397,7 +397,10 @@ function CalcPlot3DprepFunc($str,$gxmin=-2,$gxmax=2,$gymin=-2,$gymax=2,$gzmin=-2
 		$out[] = 'x='.$bits[1];
 		$out[] = 'y='.$bits[2];
 		$out[] = 'z='.$bits[3];
-		$def = array(array('tmin','tmax','tsteps'), array(-10,10,100));
+		$def = array(array('tmin','tmax','tsteps','width','color','dashed'), array(-10,10,100,2,'rainbow','false'));
+        if (isset($bits[8]) && $bits[8]!='rainbow' && $bits[8]!='gradient') {
+            $out[] = 'constcol=true';
+        }
 		$start = 4;
 	} else if ($bits[0]=='psurf') {
 		if (count($bits)<4) {
@@ -446,6 +449,16 @@ function CalcPlot3DprepFunc($str,$gxmin=-2,$gxmax=2,$gymin=-2,$gymax=2,$gzmin=-2
 		$out[] = 'point=('.$bits[1].','.$bits[2].','.$bits[3].')';
         $def = array(array('color','size'), array('000000', 4));
 		$start = 4;
+	} else if ($bits[0]=='text') {
+		if (count($bits)<5) {
+			echo 'Insufficient information provided for CalcPlot3D text';
+			return '';
+		}
+		$out[] = 'type=text';
+        $out[] = 'text='.str_replace(';',',',$bits[1]);
+		$out[] = 'point=('.$bits[2].','.$bits[3].','.$bits[4].')';
+        $def = array(array('color','fontsize','bold','italic','fontmath','align'), array('000000',14,'true','false','true','Upper-right'));
+		$start = 5;
 	} else {
 		$funcparts = explode('=',$bits[0]);
 		if (count($funcparts)==1) {

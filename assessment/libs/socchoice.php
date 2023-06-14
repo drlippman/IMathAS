@@ -34,7 +34,7 @@ function apportion($pop, $seats, $method, $md = 0) {
 		}
 		return $chopped;
 	} else if ($method=='jefferson' || $method=='adams' || $method=='webster') {
-		if ($other==='fail') {
+		if ($outdiv==='fail') {
 			return 'fail';
 		}
 		$outdiv = explode(',',substr($outdiv,1,-1));
@@ -50,7 +50,7 @@ function apportion($pop, $seats, $method, $md = 0) {
 		}
 		return $chopped;
 	} else if ($method=='huntington') {
-		if ($other==='fail') {
+		if ($outdiv==='fail') {
 			return 'fail';
 		}
 		$outdiv = explode(',',substr($outdiv,1,-1));

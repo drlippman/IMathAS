@@ -65,14 +65,24 @@ class CalculatedComplexAnswerBox implements AnswerBox
         $la = explode('$#$',$la);
         $la = $la[0];
 
-        if ($isListAnswer) {
-            $tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
-            $shorttip = _('Enter a list of complex numbers');
+        if (in_array('generalcomplex', $ansformats)) {
+            if ($isListAnswer) {
+                $tip = _('Enter your answer as a list of complex expressions.  Example: 2+5i,e^(2i)') . "<br/>";
+                $shorttip = _('Enter a list of complex expressions');
+            } else {
+                $tip = _('Enter your answer as a complex expression.  Example: 5e^(2i)') . "<br/>";
+                $shorttip = _('Enter a complex expression');
+            }
         } else {
-            $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
-            $shorttip = _('Enter a complex number');
+            if ($isListAnswer) {
+                $tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
+                $shorttip = _('Enter a list of complex numbers');
+            } else {
+                $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
+                $shorttip = _('Enter a complex number');
+            }
+            $tip .= formathint('each value',$ansformats,($reqdecimals!=='')?$reqdecimals:null,'calccomplex');
         }
-        $tip .= formathint('each value',$ansformats,($reqdecimals!=='')?$reqdecimals:null,'calccomplex');
 
         $classes = ['text'];
         if ($colorbox != '') {

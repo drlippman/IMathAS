@@ -97,17 +97,17 @@
 
 	$outputmsg = '';
 	$errmsg = '';
-	if (isset($_POST['qtext']) && isset($_POST['control'])) {
+	if (isset($_POST['qtext'])) {
 		require_once("../includes/filehandler.php");
 		$now = time();
 		foreach (array('qcontrol','answer','solution') as $v) {
 			if (!isset($_POST[$v])) {$_POST[$v] = '';}
 		}
 		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
-		$_POST['control'] = stripsmartquotes($_POST['control']);
-		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol']);
-		$_POST['answer'] = stripsmartquotes($_POST['answer']);
-		$_POST['solution'] = stripsmartquotes($_POST['solution']);
+		$_POST['control'] = stripsmartquotes($_POST['control'] ?? '');
+		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol'] ?? '');
+		$_POST['answer'] = stripsmartquotes($_POST['answer'] ?? '');
+		$_POST['solution'] = stripsmartquotes($_POST['solution'] ?? '');
 		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
 		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
 
@@ -145,7 +145,7 @@
 			$newextref = array();
 		}
 		//DO we need to add a checkbox or something for updating this if captions are added later?
-		if ($_POST['helpurl']!='') {
+		if (isset($_POST['helpurl']) && $_POST['helpurl']!='') {
 			$vidid = getvideoid($_POST['helpurl']);
 			if ($vidid=='') {
 				$captioned = 0;
@@ -784,6 +784,17 @@
 	}
 	$lnames = implode(", ",$lnames);
 
+    $olnames = '';
+    if ($locklibs != '') {
+        $locklibssafe = implode(',', array_map('intval', explode(',',$locklibs)));
+        $olnames = [];
+        $stm = $DBH->query("SELECT name FROM imas_libraries WHERE id IN ($locklibssafe)");
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $olnames[] = $row[0];
+        }
+        $olnames = implode(", ",$olnames);
+    }
+
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
@@ -839,7 +850,7 @@
 	*/
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=071522"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=022723"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css?v=091522">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
@@ -1156,7 +1167,11 @@ function decboxsize(box) {
 <?php
 if (isset($_GET['id']) && $myq) {
 	echo '<span id=libonlysubmit style="display:none"><input type=submit name=justupdatelibs value="Save Library Change Only"/></span>';
-} ?>
+} 
+if ($olnames !== '') {
+    echo '<br><span class="small">' . _("Other's library assignments: ") . $olnames. '</span>';
+}
+?>
 </p>
 <p>
 <?php echo _('Question type:'); ?> <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>

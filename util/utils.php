@@ -3,7 +3,14 @@
 require("../init.php");
 if (isset($_SESSION['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])) {
 	$_SESSION['userid'] = $_SESSION['emulateuseroriginaluser'];
+    $userid = $_SESSION['userid'];
 	unset($_SESSION['emulateuseroriginaluser']);
+    //reload prefs for original user
+    require_once("../includes/userprefs.php");
+    generateuserprefs();
+    if (isset($_POST['tzname'])) {
+        $_SESSION['tzname'] = $_POST['tzname'];
+    }
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" .Sanitize::randomQueryStringParam());
 	exit;
 }

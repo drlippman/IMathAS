@@ -77,7 +77,7 @@ div.breadcrumb { display:none;}
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=091522"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=061323"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -95,13 +95,6 @@ if (isset($ispublic) && $ispublic && !isset($_SESSION['mathdisp'])) {
 
 if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
-	//don't load MathJax async when using mathgraphcheck; it needs to check immediately
-	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
-	} else {
-		echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
-	}
-	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $_SESSION['useed']==1) {

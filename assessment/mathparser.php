@@ -18,12 +18,12 @@ function parseMath($str, $vars = '', $allowedfuncs = array(), $fvlist = '') {
   return $parser;
 }
 
-function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false) {
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false, $docomplex=false) {
   if (trim($str)=='') {
     return false;
   }
   try {
-    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist, $docomplex);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10 && !$hideerrors) {
@@ -56,12 +56,12 @@ function parseMathQuiet($str, $vars = '', $allowedfuncs = array(), $fvlist = '',
  * @param string $fvlist comma separated list of variables to treat as functions
  * @return function
  */
-function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false) {
+function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '', $hideerrors=false, $docomplex=false) {
   if (trim($str)=='') {
     return false;
   }
   try {
-    $parser = new MathParser($vars, $allowedfuncs, $fvlist);
+    $parser = new MathParser($vars, $allowedfuncs, $fvlist, $docomplex);
     $parser->parse($str);
   } catch (Throwable $t) {
     if ($GLOBALS['myrights'] > 10 && (!empty($GLOBALS['inQuestionTesting']) || !$hideerrors)) {
@@ -93,10 +93,10 @@ function makeMathFunction($str, $vars = '', $allowedfuncs = array(), $fvlist = '
  * @param  string $str  numerical math string
  * @return float
  */
-function evalMathParser($str) {
+function evalMathParser($str, $docomplex=false) {
   if (trim($str) === '') { return sqrt(-1); } // avoid errors on blank
   try {
-    $parser = new MathParser('');
+    $parser = new MathParser('',[],'',$docomplex);
     $parser->parse($str);
     return $parser->evaluate();
   } catch (Throwable $t) {
@@ -128,6 +128,7 @@ class MathParser
   private $numvarregex = '';
   private $variableValues = [];
   private $origstr = '';
+  private $docomplex = false;
 
   /**
    * Construct the parser
@@ -137,7 +138,7 @@ class MathParser
    *                            set of standard math functions.
    * @param string $fvlist   A comma-separated list of variables to treat as functions
    */
-  function __construct($variables, $allowedfuncs = array(), $fvlist = '') {
+  function __construct($variables, $allowedfuncs = array(), $fvlist = '', $docomplex = false) {
     if ($variables != '') {
       $this->variables = array_values(array_filter(array_map('trim', explode(',', $variables)), 'strlen'));
     }
@@ -146,6 +147,10 @@ class MathParser
     }
     //treat pi and e as variables for parsing
     array_push($this->variables, 'pi', 'e');
+    if ($docomplex) {
+      $this->docomplex = true;
+      array_push($this->variables, 'i');
+    }
     usort($this->variables, function ($a,$b) { return strlen($b) - strlen($a);});
 
     //define functions
@@ -167,28 +172,83 @@ class MathParser
       '+' => [
         'precedence'=>11,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a + $b;}],
+        'evalfunc'=>function($a,$b) {
+          if ($this->docomplex) {
+            if (!is_array($a)) { $a = [$a,0]; }
+            if (!is_array($b)) { $b = [$b,0]; }
+            return [$a[0]+$b[0],$a[1]+$b[1]];
+          } else {
+            return $a + $b;
+          }
+        }],
       '-' => [
         'precedence'=>11,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a - $b;}],
+        'evalfunc'=>function($a,$b) {
+          if ($this->docomplex) {
+            if (!is_array($a)) { $a = [$a,0]; }
+            if (!is_array($b)) { $b = [$b,0]; }
+            return [$a[0]-$b[0],$a[1]-$b[1]];
+          } else {
+            return $a - $b;
+          }
+        }],
       '*' => [
         'precedence'=>12,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a * $b;}],
+        'evalfunc'=>function($a,$b) {
+          if ($this->docomplex) {
+            if (!is_array($a)) { $a = [$a,0]; }
+            if (!is_array($b)) { $b = [$b,0]; }
+            return [$a[0]*$b[0] - $a[1]*$b[1],$a[0]*$b[1]+$a[1]*$b[0]];
+          } else {
+            return $a * $b;
+          }
+        }],
       '/' => [
         'precedence'=>12,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {
-          if (abs($b) < 1e-50) {
-            throw new MathParserException("Division by zero");
-          }
-          return $a / $b;
+          if ($this->docomplex) {
+            if (!is_array($a)) { $a = [$a,0]; }
+            if (!is_array($b)) { $b = [$b,0]; }
+            if (abs($b[0]) < 1e-50 && abs($b[1]) < 1e-50) {
+              throw new MathParserException("Division by zero");
+            }
+            $den = $b[0]*$b[0] + $b[1]*$b[1];
+            return [
+              ($a[0]*$b[0] + $a[1]*$b[1])/$den,
+              ($a[1]*$b[0]-$a[0]*$b[1])/$den
+            ];
+          } else {
+            if (abs($b) < 1e-50) {
+              throw new MathParserException("Division by zero");
+            }
+            return $a / $b;
+          } 
         }],
       '^' => [
         'precedence'=>18,
         'assoc'=>'right',
-        'evalfunc'=>function($a,$b) {return safepow($a,$b);}],
+        'evalfunc'=>function($a,$b) {
+          if ($this->docomplex) {
+            if (!is_array($a)) { $a = [$a,0]; }
+            if (!is_array($b)) { $b = [$b,0]; }
+            if ($b[1] == 0) {
+              $m = safepow($a[0]*$a[0]+$a[1]*$a[1], $b[0]/2);
+              $t = atan2($a[1],$a[0]);
+              return [$m*cos($t*$b[0]), $m*sin($t*$b[0])];
+            } else {
+              // (a+bi)^(c+di)=(a^2+b^2)^(c/2)e^(-darg(a+ib))×{cos[carg(a+ib)+1/2dln(a^2+b^2)]+isin[carg(a+ib)+1/2dln(a^2+b^2)]}.   
+              $arg = atan2($a[1],$a[0]);
+              $m = safepow($a[0]*$a[0]+$a[1]*$a[1], $b[0]/2) * exp(-$b[1] * $arg);
+              $in = $b[0]*$arg + 1/2*$b[1]*log($a[0]*$a[0]+$a[1]*$a[1]);
+              return [$m*cos($in), $m*sin($in)];
+            }
+          } else {
+            return safepow($a,$b);
+          }
+        }],
       '!' => [
         'precedence'=>20,
         'assoc'=>'right'],
@@ -282,7 +342,7 @@ class MathParser
    */
   function evaluate($variableValues = array()) {
     foreach ($this->variables as $v) {
-      if ($v == 'pi' || $v == 'e') { continue; }
+      if ($v == 'pi' || $v == 'e' || ($this->docomplex && $v == 'i')) { continue; }
       if (!isset($variableValues[$v])) {
         throw new MathParserException("Missing value for variable $v");
       } else if (!is_numeric($variableValues[$v])) {
@@ -293,7 +353,11 @@ class MathParser
     if (empty($this->AST)) {
         return '';
     }
-    return $this->evalNode($this->AST);
+    $out = $this->evalNode($this->AST);
+    if ($this->docomplex && !is_array($out)) {
+        $out = [$out,0];
+    }
+    return $out;
   }
 
   /**
@@ -792,7 +856,15 @@ class MathParser
         return;
     }
     if ($node['type'] === 'number') {
-      return floatval($node['symbol']);
+      if ($this->docomplex) {
+        if (is_array($node['symbol'])) {
+          return [floatval($node['symbol'][0]), floatval($node['symbol'][1])];
+        } else {
+          return [floatval($node['symbol']), 0];
+        }
+      } else {
+        return floatval($node['symbol']);
+      }
     } else if ($node['type'] === 'variable') {
       if (isset($this->variableValues[$node['symbol']])) {
         return $this->variableValues[$node['symbol']];
@@ -800,6 +872,8 @@ class MathParser
         return M_PI;
       } else if ($node['symbol'] === 'e') {
         return M_E;
+      } else if ($this->docomplex && $node['symbol'] === 'i') {
+        return [0,1];
       } else {
         throw new MathParserException("Variable found without a provided value");
         return;
@@ -812,67 +886,84 @@ class MathParser
       }
       $funcname = $node['symbol'];
       // check for syntax errors or domain issues
-      switch ($funcname) {
-        case 'sqrt':
-          if ($insideval < 0) {
-            throw new MathParserException("Invalid input to $funcname");
-          }
-          break;
-        case 'log':
-          if ($insideval <= 0) {
-            throw new MathParserException("Invalid input to $funcname");
-          }
-          if ($indexval <= 0) {
-            throw new MathParserException("Invalid base to $funcname");
-          }
-          break;
-        case 'arcsin':
-        case 'arccos':
-          $insideval = round($insideval, 12);
-          if ($insideval < -1 || $insideval > 1) {
-            throw new MathParserException("Invalid input to $funcname");
-          }
-          break;
-        case 'arcsec':
-        case 'arccsc':
-          if ($insideval > -1 && $insideval < 1) {
-            throw new MathParserException("Invalid input to $funcname");
-          }
-          break;
-        case 'tan':
-        case 'sec':
-          if ($this->isMultiple($insideval + M_PI/2, M_PI)) {
-            throw new MathParserException("Invalid input to $funcname");
-          }
-          break;
-        case 'cot':
-        case 'csc':
-          if ($this->isMultiple($insideval, M_PI)) {
-            throw new MathParserException("Invalid input to $funcname");
-          }
-          break;
-        case 'nthroot':
-          if ($indexval%2==0 && $insideval<0) {
-            throw new MathParserException("no even root of negative");
-          }
-          break;
-        case 'factorial':
-          if ((int)$insideval != $insideval || $insideval<0) {
-            throw new MathParserException("invalid factorial input ($insideval)");
-          } else if ($insideval > 150) {
-            throw new MathParserException("too big of factorial input ($insideval)");
-          }
-          break;
+      if (!$this->docomplex) {
+        switch ($funcname) {
+          case 'sqrt':
+            if ($insideval < 0) {
+              throw new MathParserException("Invalid input to $funcname");
+            }
+            break;
+          case 'log':
+            if ($insideval <= 0) {
+              throw new MathParserException("Invalid input to $funcname");
+            }
+            if ($indexval <= 0) {
+              throw new MathParserException("Invalid base to $funcname");
+            }
+            break;
+          case 'arcsin':
+          case 'arccos':
+            $insideval = round($insideval, 12);
+            if ($insideval < -1 || $insideval > 1) {
+              throw new MathParserException("Invalid input to $funcname");
+            }
+            break;
+          case 'arcsec':
+          case 'arccsc':
+            if ($insideval > -1 && $insideval < 1) {
+              throw new MathParserException("Invalid input to $funcname");
+            }
+            break;
+          case 'tan':
+          case 'sec':
+            if ($this->isMultiple($insideval + M_PI/2, M_PI)) {
+              throw new MathParserException("Invalid input to $funcname");
+            }
+            break;
+          case 'cot':
+          case 'csc':
+            if ($this->isMultiple($insideval, M_PI)) {
+              throw new MathParserException("Invalid input to $funcname");
+            }
+            break;
+          case 'nthroot':
+            if ($indexval%2==0 && $insideval<0) {
+              throw new MathParserException("no even root of negative");
+            }
+            break;
+          case 'factorial':
+            if ((int)$insideval != $insideval || $insideval<0) {
+              throw new MathParserException("invalid factorial input ($insideval)");
+            } else if ($insideval > 150) {
+              throw new MathParserException("too big of factorial input ($insideval)");
+            }
+            break;
+        }
       }
       //rewrite arctan to atan to match php function name
       $funcname = str_replace('arc', 'a', $funcname);
+      if ($this->docomplex) {
+        $funcname = 'cplx_'.$funcname;
+        if (!is_array($insideval)) {
+          $insideval = [$insideval, 0];
+        }
+      }
       if (!empty($node['index'])) {
         return call_user_func($funcname, $insideval, $indexval);
       }
       return call_user_func($funcname, $insideval);
     } else if ($node['symbol'] === '~') {
       // unary negation
-      return -1*$this->evalNode($node['left']);
+      if ($this->docomplex) {
+        $ev = $this->evalNode($node['left']);
+        if (is_array($ev)) {
+          return [-1*$ev[0],-1*$ev[1]];
+        } else {
+          return -1*$ev;
+        }
+      } else {
+        return -1*$this->evalNode($node['left']);
+      }
     } else if ($node['symbol'] === 'not') {
       // unary not
       return !$this->evalNode($node['left']);
@@ -961,6 +1052,7 @@ class MathParser
     $this->removeOneTimes();
     // $this->normalizeNodeToString($this->AST);
     //echo $this->toOutputString($this->normalizeNode($this->AST));
+    //print_r($this->AST);
     //print_r($this->normalizeNode($this->AST));
     return $this->toOutputString($this->normalizeNode($this->AST));
   }
@@ -1032,6 +1124,8 @@ class MathParser
       $node['right'] = $this->normalizeNode($node['right']);
       return $node;
     } else {
+      $node['left'] = $this->normalizeNode($node['left']);
+      $node['right'] = $this->normalizeNode($node['right']);
       // for +- and */ we're going to gather all the equal-precendence
       // elements then sort them into a standardized order and rebuild tree
       if ($node['symbol'] == '+' || $node['symbol'] == '-') {
@@ -1042,9 +1136,10 @@ class MathParser
       $allSums = [];
       // walk into node to gather elements
       $this->treeWalk($node, $allSums);
+
       $invert = false;
       usort($allSums, 'self::nodeSort');
-      $invert = false;
+
       if ($basesym == '+' && ($allSums[0]['symbol'] == '~' ||
         ($allSums[0]['type'] == 'number' && $allSums[0]['symbol'] < 0))
       ) {
@@ -1486,3 +1581,98 @@ function sign($a,$str=false) {
 function sgn($a) {
 	return ($a==0)?0:(($a<0)?-1:1);
 }
+
+
+function cplx_subt($a,$b) {
+    return [$a[0]-$b[0], $a[1]-$b[1]];
+}
+function cplx_mult($a,$b) {
+  return [$a[0]*$b[0] - $a[1]*$b[1],$a[0]*$b[1]+$a[1]*$b[0]];
+}
+function cplx_div($n,$d) {
+  $ds = $d[0]*$d[0] + $d[1]*$d[1];
+  if ($ds == 0) {
+    throw new MathParserException("Cannot divide by zero in complex division");
+  }
+  return [($n[0]*$d[0] + $n[1]*$d[1])/$ds, ($n[1]*$d[0]-$n[0]*$d[1])/$ds];
+}
+function cplx_sqrt($z) {
+  return cplx_nthroot($z,2);
+}
+function cplx_nthroot($z,$b) {
+  $r = $z[0]*$z[0] + $z[1]*$z[1];
+  $m = safepow($r, $b/(2*$b));
+  $t = atan2($z[1],$z[0]);
+  return [$m*cos($t/$b), $m*sin($t/$b)];
+}
+function cplx_log($z, $b = M_E) {
+  $r = sqrt($z[0]*$z[0] + $z[1]*$z[1]);
+  $t = atan2($z[1],$z[0]);
+  return [log($r,$b), $t/log($b)];
+}
+function cplx_sin($z) {
+  return [sin($z[0])*cosh($z[1]), cos($z[0])*sinh($z[1])];
+}
+function cplx_cos($z) {
+  return [cos($z[0])*cosh($z[1]), -1*sin($z[0])*sinh($z[1])];
+}
+function cplx_tan($z) {
+  return cplx_div(cplx_sin($z), cplx_cos($z));
+}
+function cplx_sec($z) {
+  return cplx_div([1,0], cplx_cos($z));
+}
+function cplx_csc($z) {
+  return cplx_div([1,0], cplx_sin($z));
+}
+function cplx_cot($z) {
+  return cplx_div(cplx_cos($z), cplx_sin($z));
+}
+function cplx_asin($z) {
+  // -i*  ln(iz + sqrt(1-z^2))  
+  $zz = [$z[0]*$z[0] - $z[1]*$z[1], 2*$z[0]*$z[1]];
+  $s = cplx_nthroot([1 - $zz[0], -1*$zz[1]], 2);
+  $in = [$s[0] - $z[1], $s[1] + $z[0]];
+  $ln = cplx_log($in);
+  return [$ln[1], -1*$ln[0]];
+}
+function cplx_acos($z) {
+  // -i*  ln(z + sqrt(z^2-1))  
+  $zz = [$z[0]*$z[0] - $z[1]*$z[1], 2*$z[0]*$z[1]];
+  $s = cplx_nthroot([$zz[0] - 1, $zz[1]], 2);
+  $in = [$s[0] + $z[0], $s[1] + $z[1]];
+  $ln = cplx_log($in);
+  return [$ln[1], -1*$ln[0]];
+}
+function cplx_atan($z) {
+  // -2i * ln((i-z)/(i+z)) 
+  $ln = cplx_log(cplx_div([-1*$z[0], 1 - $z[1]], [$z[0], 1+$z[1]]));
+  return [2*$ln[1], -2*$ln[0]];
+}
+function cplx_asec($z) {
+  // -i*ln((1+sqrt(1-z^2))/z)
+  $zz = [$z[0]*$z[0] - $z[1]*$z[1], 2*$z[0]*$z[1]];
+  $s = cplx_nthroot([1 - $zz[0], -1*$zz[1]], 2);
+  $in = cplx_div([1+$s[0],$s[1]], $z);
+  $ln = cplx_log($in);
+  return [$ln[1], -1*$ln[0]];
+}
+function cplx_acsc($z) {
+  // -i*ln((i+sqrt(z^2-1))/z)
+  $zz = [$z[0]*$z[0] - $z[1]*$z[1], 2*$z[0]*$z[1]];
+  $s = cplx_nthroot([$zz[0] - 1, $zz[1]], 2);
+  $in = cplx_div([$s[0],1+$s[1]], $z);
+  $ln = cplx_log($in);
+  return [$ln[1], -1*$ln[0]];
+}
+function cplx_acot($z) {
+  // -2i * ln((z+i)/(z-i)) 
+  $ln = cplx_log(cplx_div([$z[0], $z[1]+1], [$z[0], $z[1]-1]));
+  return [2*$ln[1], -2*$ln[0]];
+}
+function cplx_funcvar($input, $v) {
+  if (!is_array($input)) { $input = [$input,0];}
+  if (!is_array($v)) { $v = [$v,0];}
+  return cplx_mult($v,cplx_sin([$v[0] + $input[0], $v[1] + $input[1]]));
+}
+

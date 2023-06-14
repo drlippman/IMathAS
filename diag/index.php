@@ -273,10 +273,9 @@ if (isset($_POST['SID'])) {
 		}
 		//if ($allowreentry) {
 
-			$_SESSION['mathdisp'] = $_POST['mathdisp'];//1;
-			$_SESSION['graphdisp'] = $_POST['graphdisp'];//1;
-			//$_SESSION['mathdisp'] = 1;
-			//$_SESSION['graphdisp'] = 1;
+			$_SESSION['mathdisp'] = $CFG['UP']['mathdisp'] ?? 7;
+			$_SESSION['graphdisp'] = $CFG['UP']['graphdisp'] ?? 1;
+
 			$_SESSION['useed'] = 1;
 			$_SESSION['isdiag'] = $diagid;
       if ($aVer > 1) {
@@ -339,8 +338,8 @@ if (isset($_POST['SID'])) {
 	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
 	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 
-	$_SESSION['mathdisp'] = $_POST['mathdisp'];//1;
-	$_SESSION['graphdisp'] = $_POST['graphdisp'];//1;
+	$_SESSION['mathdisp'] = $CFG['UP']['mathdisp'] ?? 7;
+	$_SESSION['graphdisp'] = $CFG['UP']['graphdisp'] ?? 1;
 	$_SESSION['useed'] = 1;
     $_SESSION['isdiag'] = $diagid;
     if ($aVer > 1) {
@@ -460,8 +459,7 @@ for ($i=0;$i<count($sel1);$i++) {
   document.getElementById("tzname").value = tz.name();
 </script>
 <div id="submit" class="submit" style="display:none"><input type=submit value='<?php echo _('Access Diagnostic'); ?>'></div>
-<input type=hidden name="mathdisp" id="mathdisp" value="2" />
-<input type=hidden name="graphdisp" id="graphdisp" value="2" />
+
 <?php
 $allowreentry = ($line['public']&4);
 $pws = explode(';',$line['pws']);
@@ -474,29 +472,13 @@ if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line
 <div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
 </div>
 <script type="text/javascript">
-function determinesetup() {
-	document.getElementById("submit").style.display = "block";
-	if (MathJaxCompatible && !ASnoSVG) {
-		document.getElementById("bsetup").innerHTML = "Browser setup OK";
-	} else {
-		document.getElementById("bsetup").innerHTML = "Using image-based display";
-	}
-	if (MathJaxCompatible) {
-		document.getElementById("mathdisp").value = "1";
-	}
-	if (!ASnoSVG) {
-		document.getElementById("graphdisp").value = "1";
-	}
-}
-var existingonload = window.onload;
-if (existingonload) {
-	window.onload = function() {existingonload(); determinesetup();}
-} else {
-	window.onload = determinesetup;
-}
+    $(function() {
+        document.getElementById("submit").style.display = "block";
+        document.getElementById("bsetup").style.display = "none";
+    });
 </script>
 <hr/>
-<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2018 David Lippman</div>
+<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-<?php echo date("Y");?> David Lippman</div>
 
 <?php
 require("../footer.php");

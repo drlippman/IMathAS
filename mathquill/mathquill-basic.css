@@ -96,6 +96,7 @@
   line-height: 1;
   display: -moz-inline-box;
   display: inline-block;
+  text-indent: 0;
 }
 .mq-math-mode .mq-non-leaf,
 .mq-math-mode .mq-scaled {

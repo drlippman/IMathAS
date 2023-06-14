@@ -49,6 +49,7 @@ header("Content-type: application/json;");
    "custom_fields":{
       "canvas_assignment_due_at":"$Canvas.assignment.dueAt.iso8601",
       "context_history":"$Context.id.history",
+      "link_history":"$ResourceLink.id.history",
       "canvas_sections":"$com.instructure.User.sectionNames"
    }
 }

@@ -622,7 +622,7 @@ class ScoreEngine
             }
             $answeights = array_map('trim', $answeights);
             if (count($answeights) != count($anstypes)) {
-                $answeights = array_fill(0, count($anstypes), 1);
+                $answeights = array_fill_keys(array_keys($anstypes), 1); 
             }
             $answeights = array_map(function($v) {
                 if (is_numeric($v)) { 
@@ -632,11 +632,11 @@ class ScoreEngine
                 }
             }, $answeights);
             if (array_sum($answeights)==0) {
-                $answeights = array_fill(0, count($anstypes), 1);
+                $answeights = array_fill_keys(array_keys($anstypes), 1); 
             }
         } else {
             if (count($anstypes)>1) {
-                $answeights = array_fill(0, count($anstypes), 1);
+                $answeights = array_fill_keys(array_keys($anstypes), 1); 
             } else {
                 $answeights = array(1);
             }

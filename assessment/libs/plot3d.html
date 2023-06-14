@@ -43,9 +43,9 @@ so if you want that, use the CalcPlot3Dlink function instead.</p>
         <br/>xmin,xmax,ymin,ymax default to the graphing window. gridlines defaults to 30.</li>
     <li>Implicit function: <code>x^2+y^2=z^2,[xmin,xmax,ymin,ymax,zmin,zmax,cubes]</code>
         <br/>xmin,xmax,ymin,ymax,zmin,zmax default to the graphing window. cubes defaults to 16.</li>
-    <li>Spacecurve: <code>curve,x(t),y(t),z(t),[tmin,tmax,tsteps]</code>
+    <li>Spacecurve: <code>curve,x(t),y(t),z(t),[tmin,tmax,tsteps,width,color,dashed]</code>
     	<br/>Example:  "curve,sin(t),cos(t),t,-2pi,2pi"
-        <br/>Defaults: tmin=-10, tmax=10, tsteps=100</li>
+        <br/>Defaults: tmin=-10, tmax=10, tsteps=100, width=2, color=rainbow, dashed=false</li>
     <li>Parametric Surface: <code>psurf,x(u,v),y(u,v),z(u,v),[umin,umax,vmin,vmax,usteps,vsteps]</code>
     	<br/>Example: "psurf,cos(u),sin(u),v"
     	<br/>Defaults: umin=0, umax=2pi, vmin=0, vmax=pi, usteps=30, vsteps=15</li>
@@ -72,6 +72,12 @@ so if you want that, use the CalcPlot3Dlink function instead.</p>
         <br/>Defaults: color: hex color string like "FF0000", default "000000" (black)
         <br/>size: default 4
         </li>
+    <li>Text Label: <code>text, label text, x, y, z, [color,fontsize,bold,italic,math-xyz,align]</code>
+        <br/>Example: "text,P,1,2,3"</li>
+        <br/>If the label text contains commas, use semicolons instead, and they will be converted to commas.
+        <br/>Defaults: color=black, fontsize=14, bold=true, italic=false, math-xyz=true, align=Upper-right
+        <br/>math-xyz italicizes only the letters x,y,z.
+        <br/>align can be: Center, Center-left, Center-right, Lower-left, Lower-right, Upper-left, Upper-right.
   </ul></li>
   <li>width, height: the size for the embed. Defaults to 500 by 500</li>
   <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>

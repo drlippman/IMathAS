@@ -136,8 +136,25 @@ function parseqs($file,$touse,$rights) {
 				$qimgs = explode("\n",$qd['qimgs']);
 				foreach($qimgs as $qimg) {
 					$p = explode(',',$qimg);
-					$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-					$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1]));
+                    if (count($p)<2) {continue;}
+                    if (count($p)<3) {
+                        $alttext = '';
+                    } else if (count($p)>3) {
+                        $alttext = implode(',', array_slice($p, 2));
+                    } else {
+                        $alttext = $p[2];
+                    }
+
+                    if (strpos($qd['qtext'],'$'.$p[0])===false && strpos($qd['qcontrol'],'$'.$p[0])===false) {
+                        //skip if not actually used in question
+                        continue;
+                    }
+                    //rehost image
+                    $newfn = rehostfile($p[1], 'qimages', $qsetid.'-');
+                    if ($newfn!==false) {
+					    $stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
+					    $stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+                    }
 				}
 			}
 			return $qsetid;

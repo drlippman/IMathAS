@@ -95,8 +95,8 @@ if (isset($_POST['state'])) {
         'qsid' => $QS['id'],
         'stuanswers' => array(),
         'stuanswersval' => array(),
-        'scorenonzero' => array_fill(1, $numq, false),
-        'scoreiscorrect' => array_fill(1, $numq, false),
+        'scorenonzero' => array_fill(1, $numq, -1),
+        'scoreiscorrect' => array_fill(1, $numq, -1),
         'partattemptn' => array_fill(0, $numq, array()),
         'rawscores' => array_fill(0, $numq, array()),
     );
@@ -159,8 +159,8 @@ if (!empty($_POST['regen'])) {
     $state['seeds'][$qntoregen] = $seed;
     unset($state['stuanswers'][$qntoregen+1]);
     unset($state['stuanswersval'][$qntoregenn+1]);
-    $state['scorenonzero'][$qntoregen+1] = false;
-    $state['scoreiscorrect'][$qntoregen+1] = false;
+    $state['scorenonzero'][$qntoregen+1] = -1;
+    $state['scoreiscorrect'][$qntoregen+1] = -1;
     $state['partattemptn'][$qntoregen] = array();
     $state['rawscores'][$qntoregen] = array();
 }
@@ -217,8 +217,8 @@ if (isset($_POST['toscoreqn'])) {
     $state['seeds'][$qn] = $seed;
     unset($state['stuanswers'][$qn+1]);
     unset($state['stuanswersval'][$qn+1]);
-    $state['scorenonzero'][$qn+1] = false;
-    $state['scoreiscorrect'][$qn+1] = false;
+    $state['scorenonzero'][$qn+1] = -1;
+    $state['scoreiscorrect'][$qn+1] = -1;
     $state['partattemptn'][$qn] = array();
     $state['rawscores'][$qn] = array();
     $a2->setState($state);
@@ -282,11 +282,11 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
-    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=012923" type="text/javascript"></script>';
+    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=021123" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=021823">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css">';
 
 // setup resize message sender

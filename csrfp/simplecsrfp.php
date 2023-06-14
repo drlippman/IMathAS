@@ -148,7 +148,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 				} else {
 					$err = 'Your submission has been blocked because we were unable to verify it came from a valid source. ';
 					$err .= 'This can happen if you have two browser windows open and logged in within one while the other was open, ';
-					$err .= 'or for some other reason your browing session reset.';
+					$err .= 'or for some other reason your browsing session reset.';
 					exit($err);
 				}
 			}

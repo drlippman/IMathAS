@@ -57,6 +57,7 @@ class MatrixScorePart implements ScorePart
         } else if (!empty($answersize)) {
             $sizeparts = explode(',',$answersize);
             $N = $sizeparts[0];
+            $stuN = $sizeparts[0];
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
             } else {
@@ -66,17 +67,12 @@ class MatrixScorePart implements ScorePart
             }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
-            $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
+            //$givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
             $scorePartResult->setLastAnswerAsGiven($givenans);
-            $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
-            $N = substr_count($answer,'),(')+1;
-            if ($N != substr_count($givenans, '),(') + 1) {
-              $scorePartResult->setRawScore(0);
-              return $scorePartResult;
-            }
+            //$givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
+            list($givenanslist, $stuN) = parseMatrixToArray($givenans);
         }
-        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
-
+        
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if ($answer==$givenans) {
@@ -96,6 +92,8 @@ class MatrixScorePart implements ScorePart
                 $fullmatrix = false;
             }
         }
+        /*
+        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
         if (strlen($answer)>1 && $answer[1] != '(') {
             $ansr = substr($answer,1,-1);
         } else {
@@ -103,6 +101,14 @@ class MatrixScorePart implements ScorePart
         }
         $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
         $answerlist = explode(',',$ansr);
+        */
+        list($answerlist, $N) = parseMatrixToArray($answer);
+
+        if ($stuN != $N) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+
 
         if (count($answerlist) != count($givenanslist) || $answerlist[0]==='' || $givenanslist[0]==='') {
             $scorePartResult->setRawScore(0);

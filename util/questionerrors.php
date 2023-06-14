@@ -115,6 +115,9 @@ echo '<p>'._('The questions listed below have logged an error. Some error may oc
 echo _('Click the Seed to test that particular version of the question. Click the question number to edit the question. ');
 echo _('Once you have fixed the issue or determined it does not need fixing, clear the log entry. ');
 echo '</p>';
+if (isset($CFG['hooks']['util/questionerrors'])) {
+	require($CFG['hooks']['util/questionerrors']);
+}
 
 if ($isadmin) {
     if (!empty($_GET['public'])) {
@@ -126,7 +129,7 @@ if ($isadmin) {
 echo '<form id=mainform method=post>';
 //echo '<p>'._('With selected:').'<button type=submit>'._('Clear error').'</button></p>';
 echo '<div class="fixedonscroll">';
-echo 'With selected: <button type="button" id="quicksavebtn" onclick="quicksave()">'._('Clear log').'</button> ';
+echo _('With selected:') . ' <button type="button" id="quicksavebtn" onclick="quicksave()">'._('Clear log').'</button> ';
 echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
 echo '</div>';
 echo '<ul class="nomark">';

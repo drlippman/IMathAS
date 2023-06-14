@@ -249,6 +249,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			} else if ($type=='Block') {
 				$blocktree = explode('-',$id);
+                $bid = array_pop($blocktree);
 				$sub =& $items;
 				if (count($blocktree)>1) {
 					for ($j=1;$j<count($blocktree)-1;$j++) {
@@ -256,6 +257,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				$sub =& $sub[$blocktree[$j]-1];
+                if (empty($sub['id']) || $sub['id'] != $bid) {
+                    continue; // if block id is wrong
+                }
 				$old = [
 					'id' => $id,
 					'startdate' => $sub['startdate'],
@@ -650,7 +654,7 @@ if ($overwriteBody==1) {
 			global $ids,$types,$names,$startdates,$enddates,$LPcutoffs,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
-					$ids[] = $parent.'-'.($k+1);
+					$ids[] = $parent.'-'.($k+1).'-'.$item['id'];
 					$types[] = "Block";
 					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
 					$names[] = $item['name'];

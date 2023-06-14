@@ -47,6 +47,7 @@ class MatrixAnswerBox implements AnswerBox
         }
 
         $ansformats = array_map('trim', explode(',', $answerformat));
+        $dispformats = array_map('trim', explode(',', $displayformat));
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
@@ -61,15 +62,20 @@ class MatrixAnswerBox implements AnswerBox
                 $shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
             }
             if (empty($answerboxsize)) {$answerboxsize = 3;}
-            if ($colorbox == '') {
-                $out .= '<div id="qnwrap' . $qn . '">';
+            if (in_array('inline', $dispformats)) {
+                $style = ' style="display:inline-block;vertical-align:middle"';
             } else {
-                $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '">';
+                $style = '';
+            }
+            if ($colorbox == '') {
+                $out .= '<div id="qnwrap' . $qn . '"' . $style . '>';
+            } else {
+                $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '"' . $style . '>';
             }
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
                 (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
             $out .= '<table role="group" aria-label="' . $arialabel . '">';
-            if ($displayformat == 'det') {
+            if (in_array('det', $dispformats)) {
                 $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
             } else {
                 $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
@@ -106,7 +112,7 @@ class MatrixAnswerBox implements AnswerBox
                 $out .= "</tr>";
             }
             $out .= '</table>';
-            if ($displayformat == 'det') {
+            if (in_array('det', $dispformats)) {
                 $out .= '</td><td class="matrixdetright">&nbsp;</td></tr></table>';
             } else {
                 $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';

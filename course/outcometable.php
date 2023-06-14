@@ -949,11 +949,11 @@ function outcometable() {
                         $gb[$row][1][$col][1][$oc] = $possible[$i];
 					}
 					if ($gb[0][1][$col][2]<1) { //past
-						$cattotpast[$row][$category[$i]][$oc][$col] = $gb[$row][1][$col][0];
+						$cattotpast[$row][$category[$i]][$oc][$col] = $gb[$row][1][$col][0][$oc];
 						$catposspast[$row][$category[$i]][$oc][$col] = $possible[$i];
 					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
-						$cattotcur[$row][$category[$i]][$oc][$col] = $gb[$row][1][$col][0];
+						$cattotcur[$row][$category[$i]][$oc][$col] = $gb[$row][1][$col][0][$oc];
 						$catposscur[$row][$category[$i]][$oc][$col] = $possible[$i];
 					}
 				}
@@ -1006,12 +1006,13 @@ function outcometable() {
 		$totcur = array();
 		$totposscur = array();
 		$pos = 0; //reset position for category totals
-
+        
 		foreach($catorder as $cat) {//foreach category
             if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
 				continue;
 			}
 			//add up scores for each outcome
+
 			if (isset($cattotpast[$ln][$cat])) {
 				foreach ($cattotpast[$ln][$cat] as $oc=>$scs) {
 					$cattotpast[$ln][$cat][$oc] = array_sum($scs);
@@ -1034,8 +1035,10 @@ function outcometable() {
 						$totposspast[$oc] += $catposspast[$ln][$cat][$oc];
 						$totpast[$oc] += $cattotpast[$ln][$cat][$oc];
 					}
+                    
 				}
 			}
+
 			if (isset($cattotcur[$ln][$cat])) {
 				foreach ($cattotcur[$ln][$cat] as $oc=>$scs) {
 					$cattotcur[$ln][$cat][$oc] = array_sum($scs);

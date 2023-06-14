@@ -159,7 +159,7 @@ class CalculatedScorePart implements ScorePart
                     $scorePartResult->setRawScore(0);
                     return $scorePartResult;
                 }
-                if (preg_match('/(\(|\[)(.+?)\,(.+?)(\)|\])/',$anans,$matches)) {
+                if (preg_match('/(\(|\[)\s*(.+?)\s*\,\s*(.+?)\s*(\)|\])/',$anans,$matches)) {
                     if ($matches[2]=='-oo') {$matches[2] = -1e99;}
                     if ($matches[3]=='oo') {$matches[3] = 1e99;}
                     if (!is_numeric($matches[2])) {
@@ -278,7 +278,7 @@ class CalculatedScorePart implements ScorePart
                 if ($toevalGivenans=='DNE' || $toevalGivenans=='oo' || $toevalGivenans=='+oo' || $toevalGivenans=='-oo') {
                     $ganorm[] =  $toevalGivenans;
                 } else {
-                    $givenansfunc = parseMathQuiet($toevalGivenans);
+                    $givenansfunc = parseMathQuiet($toevalGivenans, '', [], '', true);
                     if ($givenansfunc !== false) {
                         $ganorm[] = $givenansfunc->normalizeTreeString();
                     } else {

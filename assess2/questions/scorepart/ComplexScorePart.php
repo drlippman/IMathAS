@@ -112,7 +112,9 @@ class ComplexScorePart implements ScorePart
                 if (in_array('allowjcomplex', $ansformats)) {
                     $tchk = str_replace('j','i', $tchk);
                 }
-                if (in_array('sloppycomplex', $ansformats)) {
+                if (in_array('generalcomplex', $ansformats)) {
+                    // skip format checks
+                } else if (in_array('sloppycomplex', $ansformats)) {
                     $tchk = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $tchk);
                     if (substr_count($tchk, 'i') > 1) {
                         $scorePartResult->setRawScore(0);
@@ -166,7 +168,11 @@ class ComplexScorePart implements ScorePart
             if (in_array('allowjcomplex', $ansformats)) {
                 $givenans = str_replace('j','i',$givenans);
             }
-            $gaparts = $this->parsesloppycomplex($givenans);
+            if (in_array('generalcomplex', $ansformats)) {
+                $gaparts = $this->parseGeneralComplex($givenans);
+            } else {
+                $gaparts = $this->parsesloppycomplex($givenans);
+            }
 
             if ($gaparts === false) { //invalid - skip it
                 continue;
@@ -198,7 +204,11 @@ class ComplexScorePart implements ScorePart
             if (in_array('allowjcomplex', $ansformats)) {
                 $answer = str_replace('j','i',$answer);
             }
-            $ansparts = $this->parsesloppycomplex($answer);
+            if (in_array('generalcomplex', $ansformats)) {
+                $ansparts = $this->parseGeneralComplex($answer);
+            } else {
+                $ansparts = $this->parsesloppycomplex($answer);
+            }
             if ($ansparts === false) { //invalid - skip it
                 continue;
             }
@@ -215,7 +225,6 @@ class ComplexScorePart implements ScorePart
                 $normalizedAnswers[] = $anfunc->normalizeTreeString();
             }
         }
-
         if (count($ganumarr) == 0) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
@@ -276,7 +285,7 @@ class ComplexScorePart implements ScorePart
 
     private function parsesloppycomplex($v)
     {
-        $func = makeMathFunction($v, 'i');
+        $func = makeMathFunction($v, 'i', [], '', true);
         if ($func === false) {
             return false;
         }
@@ -286,6 +295,13 @@ class ComplexScorePart implements ScorePart
             return false;
         }
         return array($a, ($apb - $a) / 4);
+    }
+    private function parseGeneralComplex($v) {
+        $ev = evalMathParser($v, true);
+        if ($ev === false || !is_array($ev)) {
+            return false;
+        }
+        return $ev;
     }
 
     /**
