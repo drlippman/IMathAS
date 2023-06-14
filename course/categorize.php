@@ -94,6 +94,7 @@ function getnextprev(formn,loc) {
 	}
 	return ([[prevl,prevq],[nextl,nextq]]);
 }
+function sethighlightrow() {}
 </script>
 END;
     echo "<div class=breadcrumb>$breadcrumbbase ";
