@@ -510,7 +510,7 @@ function truthtableanswers($exp,$showsteps=TRUE){
     // Find variables
     $vars = array();
     foreach($exp as $token){
-        if(preg_match('/[A-Za-z]/u',$token)){
+        if(preg_match('/[A-Za-z]/u',$token) && !in_array($token,$vars)){
             $vars[] = $token;
         }
     }
