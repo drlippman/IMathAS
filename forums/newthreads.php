@@ -93,6 +93,9 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && !empty($_POST['check
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js?v=011517"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
+$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
+$placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});</script>';
 $pagetitle = _('New Forum Posts');
 require("../header.php");
 
@@ -120,8 +123,24 @@ if (count($lastpost)>0) {
     }
     if ($alt==0) {$stripe = "even"; $alt=1;} else {$stripe = "odd"; $alt=0;}
     echo '<tr>';
-    echo '<td><input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'"/></td>';
-    echo "<td><a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
+    $classes = array();
+    if (!empty($tags[$line['threadid']])) {
+        $classes[] = "tagged";
+    }
+    echo "<tr id=\"tr".Sanitize::onlyInt($line['threadid'])."\"";
+    if (count($classes)>0) {
+            echo ' class="'.implode(' ',$classes).'"';
+    }
+    echo "><td>";
+    echo '<input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'"/></td>';
+    echo "<td><span class=\"right\">\n";
+    if (!empty($tags[$line['threadid']])) {
+        echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['threadid']) . ");return false;\" alt=\"Flagged\" />";
+    } else {
+        echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['threadid'])  . ");return false;\" alt=\"Not flagged\"/>";
+    }
+    echo '</span>';
+    echo "<a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
     printf("<td><span class='pii-full-name'>%s</span></td>", Sanitize::encodeStringForDisplay($name));
     echo "<td><a href=\"thread.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
     echo "<td>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</td></tr>";
