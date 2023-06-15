@@ -81,6 +81,7 @@ function matrixformatfrac($m, $bracket='[') {
     return matrixformat($m, $bracket, true);
 }
 
+/*
 //matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
 // Create a string that is a valid HTML table syntax for display.
 //
@@ -95,23 +96,24 @@ function matrixformatfrac($m, $bracket='[') {
 //                    table, either 0 or 1.  Use 0 if you are
 //                    building an answerbox matrix.
 //
-//              def  0 do not use math ticks
-//                   1        use math ticks
+//                    0 do not use math ticks
+//           default  1        use math ticks
 //
 // linemode: Show none, augments, or simplex style
-//      def  0 show no lines
-//           1 show aumented line
+//           0 show no lines
+//   default 1 show aumented line
 //           2 show simplex  lines
 //
 // headernames: list or array of the variables "x1,x2,x3" that are
 //              used for the column titles.
-// default     none
+// default      none
 //
 // tablestyle: for any additional styles for the table that you
 //             may want.  like "color:#40B3DF;"
-//     default none
-// rownames:  list or array of the variables "x1,x2,x3" that are
-//              used for the row titles.
+// default     one
+//
+// rownames:   list or array of the variables "x1,x2,x3" that are
+//             used for the column titles.
 // default     none
 //
 // rowheader:  string that is entered into the row name column in the header row
@@ -120,275 +122,274 @@ function matrixformatfrac($m, $bracket='[') {
 // caption:    string - caption for the table
 // default     none
 //
+ */
 function matrixdisplaytable() {
+    //  arguments list -------------------------------------
+    //  0 = matrix
+    //  1 = matrix name
+    //  2 = display ASCII tick marks (yes/no)
+    //  3 = linemode - no line, aumented, or simplex
+    //  4 = header column names, default is not to show
+    //  5 = CSS tablestyle for the table.
+    //  6 = rownames for the table.
+    //  7 = rowheader for the table.
+    //  8 = caption for the table.
 
-  //  arguments list -------------------------------------
-  //  0 = matrix
-  //  1 = matrix name
-  //  2 = display ASCII tick marks (yes/no)
-  //  3 = linemode - no line, aumented, or simplex
-  //  4 = header column names, default is not to show
-  //  5 = CSS tablestyle for the table.
+    // process arguments ------------------------------------
+    $args = func_get_args();
 
-  // process arguments ------------------------------------
-  $args = func_get_args();
-
-  if (count($args)==0) {
-    if ($GLOBALS['myrights']>10) { echo "Nothing to display - no matrix supplied.<br/>"; }
-    return "";
-  }
-  $m = $args[0];
-	
-  if (!isMatrix($m)) {
-    if ($GLOBALS['myrights']>10) { echo 'error: matrixdisplaytable input not a valid matrix'; } 
-    return '';
-  }
-	
-  // matrixname
-  if(isset($args[1])) {
-    $matrixname = $args[1];
-  } else {
-    $matrixname = "";
-  }
-
-  //displayASCII
-  if(isset($args[2])) {
-    if($args[2]==0) { $ticks = ""; } else { $ticks = "`";}
-  }
-  else { $ticks = ""; }
-
-  //mode
-  if(isset($args[3])) {
-    $mode = $args[3];
-    if(($mode!=0)&&($mode!=1)&&($mode!=2)) {
-      echo "The supplied mode ($mode) is invalid.  Valid modes are 0,1,2.<br/>";
-      $mode=0;
-    };
-  } else { $mode=0; }
-
-  //headernames
-  if(isset($args[4])) {
-    $headers = $args[4];
-    if (!is_array($headers)) {
-      $headers = explode(',',$headers);
+    if (count($args)==0) {
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo "Nothing to display - no matrix supplied.<br/>"; }
+        return "";
     }
-  } else { $headers = null; }
+    $m = $args[0];
 
-  //tablestyle
-  if(isset($args[5])) {
-    $tablestyle = $args[5];
-  } else {$tablestyle = ""; }
+    // counts
+    $rows = count($m);
+    $cols = count($m[0]);
 
-  //rownames
-  if(isset($args[6])) {
-      $rownames = $args[6];
-      if (!is_array($rownames)) {
-          $rownames = explode(',',$rownames);
-      }
-  } else { $rownames = null; }
+    if (!isMatrix($m)) {
+        if (!empty($GLOBALS['inQuestionTesting'])) { echo 'error: matrixdisplaytable input not a valid matrix'; }
+        return '';
+    }
 
-  // rowheader
-  if(isset($args[7])) {
-      $rowheader = $args[7];
-  }
-  else { $rowheader = ""; }
+    // matrixname
+    if(isset($args[1])) {
+        $matrixname = $args[1];
+    } else {
+        $matrixname = "";
+    }
+
+    //displayASCII
+    if(isset($args[2])) {
+        if($args[2]==0) { $ticks = ""; } else { $ticks = "`";}
+    }
+    else { $ticks = ""; }
+
+    //mode
+    if(isset($args[3])) {
+        $mode = $args[3];
+        if(($mode!=0)&&($mode!=1)&&($mode!=2)) {
+            if (!empty($GLOBALS['inQuestionTesting'])) {
+                echo "The supplied mode ($mode) is invalid.  Valid modes are 0,1,2.<br/>";
+            }
+            $mode=0;
+        };
+    } else { $mode=0; }
+
+    //column headernames
+    if(isset($args[4])) {
+        $headers = $args[4];
+        if (!is_array($headers)) {
+            $headers = explode(',',$headers);
+        }
+    } else {
+        $headers = array();
+        for ($cloop=0;$cloop<$cols; $cloop++) {
+            $headers[$cloop] = "";
+        }
+    }
+    
+    //tablestyle
+    if(isset($args[5])) {
+        $tablestyle = $args[5];
+    } else {$tablestyle = ""; }
+
+    //rownames
+    if(isset($args[6])) {
+        $rownames = $args[6];
+        if (!is_array($rownames)) {
+            $rownames = explode(',',$rownames);
+        }
+    } else { 
+        $rownames = array();
+        for ($rloop=0; $rloop<$rows; $rloop++) {
+            $rownames[$rloop] = "";
+        }
+    }
+
+    // rowheader
+    if(isset($args[7])) {
+        $rowheader = $args[7];
+    }
+    else { $rowheader = ""; }
 
     // caption
-  if(isset($args[8])) {
-      $caption = $args[8];
-  }
-  else { $caption = ""; }
+    if(isset($args[8])) {
+        $caption = $args[8];
+    }
+    else { $caption = ""; }
 
-  // Done processing arguments ----------------------------
-  //
-  // style sheets
-  $nopad = 'class="nopad"';
-  $onerowleftborder  = "style='border-top:1px solid black;border-left:1px solid black;border-bottom:1px solid black;'";
-  $topleftborder     = "style='border-top:1px solid black;border-left:1px solid black;'";
-  $leftborder        = "style='border-left:1px solid black;'";
-  $leftborderSimplex = "style='border-left:1px solid black;border-top:1px solid black;'";
-  $bottomleftborder  = "style='border-bottom:1px solid black;border-left:1px solid black;'";
+    // Done processing arguments ----------------------------
+    //
+    // style sheets
+    $nopad = 'class="nopad"';
+    $onerowleftborder  = "style='border-top:1px solid black;border-left:1px solid black;border-bottom:1px solid black;'";
+    $topleftborder     = "style='border-top:1px solid black;border-left:1px solid black;'";
+    $leftborder        = "style='border-left:1px solid black;'";
+    $leftborderSimplex = "style='border-left:1px solid black;border-top:1px solid black;'";
+    $bottomleftborder  = "style='border-bottom:1px solid black;border-left:1px solid black;'";
 
-  $Simplex = "style='border-top:1px solid black;'";
+    $Simplex = "style='border-top:1px solid black;'";
 
-  $onerowrightborder = "style='border-top:1px solid black;border-right:1px solid black;border-bottom:1px solid black;'";
-  $toprightborder    = "style='border-top:1px solid black;border-right:1px solid black;'";
-  $rightborder       = "style='border-right:1px solid black;'";
-  $bottomrightborder = "style='border-bottom:1px solid black;border-right:1px solid black;'";
+    $onerowrightborder = "style='border-top:1px solid black;border-right:1px solid black;border-bottom:1px solid black;'";
+    $toprightborder    = "style='border-top:1px solid black;border-right:1px solid black;'";
+    $rightborder       = "style='border-right:1px solid black;'";
+    $bottomrightborder = "style='border-bottom:1px solid black;border-right:1px solid black;'";
 
-  // counts
-  $rows = count($m);
-  $cols = count($m[0]);
+    $lastrow = $rows-1;
+    $lastcol = $cols-1;
 
-  if($rowheader!="") {
-      // add default blank spaces if the rowheader cell is not blank
-      if($rownames == null) {
-          $rownames = array();
-          for ($rloop=0; $rloop<$rows; $rloop++) {
-              $rownames[$rloop] = "";
-          }
-      }
-      if($headers==null){
-          $headers = array();
-          for ($cloop=0;$cloop<$cols; $cloop++) {
-              $headers[$cloop] = "";
-          }
-      }
-  }
+    $Tableau = "<table cellspacing='0' style='border:none;border-spacing: 0;border-collapse: collapse;text-align:right;border-spacing: 0px 0px;$tablestyle'>\r\n";
 
-  $lastrow = $rows-1;
-  $lastcol = $cols-1;
+    if($caption!="") {
+        $Tableau .= "<caption>$caption</caption>\r\n";
+    }
+    $Tableau .= "<tbody>\r\n";
 
-  $Tableau = "<table cellspacing='0' style='border:none;border-spacing: 0;border-collapse: collapse;text-align:right;border-spacing: 0px 0px;$tablestyle'>\r\n";
-
-  if($caption!="") {
-      $Tableau .= "<caption>$caption</caption>\r\n";
-  }
-$Tableau .= "<tbody>\r\n";
-
-  for ($rloop=0; $rloop<$rows; $rloop++) {
-    $Tableau .= "<tr>\r\n";
-    if($rloop==0) {
-        if($matrixname!="") {
-            if(!empty($headers)) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
-            // Accessible option added
-            $Tableau.= "<td rowspan='$matricnamerows'> $matrixname </td>\r\n";
-        }
-
-        if(!empty($headers))  {
-            if($rowheader!="") {
+    for ($rloop=0; $rloop<$rows; $rloop++) {
+        $Tableau .= "<tr>\r\n";
+        if($rloop==0) {
+            if($matrixname!="") {
+                if(!empty($headers)) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
                 // Accessible option added
-                $Tableau.= "<th scope=\"col\">$rowheader</th>\r\n";
-            } else {
-                if($rownames!=null) {
-                    $Tableau.= "<td>&nbsp;</td>\r\n";
-                }
+                $Tableau.= "<td rowspan='$matricnamerows'> $matrixname </td>\r\n";
             }
 
-            $Tableau.= "<td $nopad>&nbsp;</td>\r\n"; // for the left table border
-            for ($cloop=0;$cloop<$cols; $cloop++)
-            {
-                if  ($cloop==$lastcol) { // R1C(Last)
-                    if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column filler
-                }
-                if(isset($headers[$cloop])&&($headers[$cloop]!=""))
-                {
+            if(!empty($headers))  {
+                if($rowheader!="") {
                     // Accessible option added
-                    $Tableau.= "<th scope=\"col\">".$headers[$cloop]."</th>\r\n";
+                    $Tableau.= "<th scope=\"col\">$rowheader</th>\r\n";
+                } else {
+                    if($rownames!=null) {
+                        $Tableau.= "<td>&nbsp;</td>\r\n";
+                    }
                 }
-                else
+
+                $Tableau.= "<td $nopad>&nbsp;</td>\r\n"; // for the left table border
+                for ($cloop=0;$cloop<$cols; $cloop++)
                 {
-                    $Tableau.= "<td>&nbsp;</td>\r\n";
-                }
-            }
-            $Tableau.= "<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n";  // for the right table border
-        }
-    }
-
-    if(!empty($rownames))  {
-        // Accessible option added
-        if(($rownames[$rloop]!=null)&&($rownames[$rloop]!="")) {
-            $Tableau.= "<th scope=\"row\">".$rownames[$rloop]."</th>\r\n";
-        } else {
-            $Tableau.= "<td>&nbsp;</td>\r\n";
-        }
-    }
-
-    for ($cloop=0;$cloop<$cols; $cloop++) {
-        //$index =$rloop*$ctemp + $cloop;
-
-        //$TableElement = "&nbsp;".$ticks.$m[$rloop][$cloop].$ticks."&nbsp;";
-        $TableElement = $ticks.$m[$rloop][$cloop].$ticks;
-
-        if ($rloop==0) {
-            if($rows==1)  {
-                // only 1 row
-                if ($cloop==0) { // R1C1
-                    $Tableau.= "<td $onerowleftborder>&nbsp;</td>\r\n<td>$TableElement</td>\r\n";
-                    if($cloop==$lastcol) {
-                        $Tableau.= "<td $onerowrightborder>&nbsp;</td>\r\n";
+                    if  ($cloop==$lastcol) { // R1C(Last)
+                        if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $nopad>&nbsp;</td>\r\n";} // add augemented column filler
+                    }
+                    if(($headers[$cloop]!=null)&&($headers[$cloop]!=""))
+                    {
+                        // Accessible option added
+                        $Tableau.= "<th scope=\"col\">".$headers[$cloop]."</th>\r\n";
+                    }
+                    else
+                    {
+                        $Tableau.= "<td>&nbsp;</td>\r\n";
                     }
                 }
-                elseif ($cloop==$lastcol) { // R1C(Last)
-                    if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n";} // add augemented column
-                    $Tableau.= "<td>$TableElement</td><td $onerowrightborder>&nbsp;</td>\r\n";
-                }
-                else {
-                    $Tableau.= "<td>$TableElement</td>\r\n";
-                }
-            }
-            else {
-                // top row
-                if ($cloop==0) { // R1C1
-                    $Tableau.= "<td $topleftborder>&nbsp;</td>\r\n<td>$TableElement</td>\r\n";
-                    if($cloop==$lastcol) {
-                        $Tableau.= "<td $toprightborder>&nbsp;</td>\r\n";
-                    }
-                }
-                elseif  ($cloop==$lastcol) { // R1C(Last)
-                    if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n";} // add augemented column
-                    $Tableau.= "<td>$TableElement</td>\r\n<td $toprightborder>&nbsp;</td>\r\n";
-                }
-                else {
-                    $Tableau.= "<td>$TableElement</td>\r\n";
-                }
+                $Tableau.= "<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n";  // for the right table border
             }
         }
-        elseif ($rloop==$lastrow) { // top row
-            if ($cloop==0) {  // R(last)C1
-                $Tableau.= "<td $bottomleftborder>&nbsp;</td>\r\n";
-                if($mode==2){
-                    $Tableau.= "<td $Simplex>$TableElement</td>\r\n";
+
+        if(!empty($rownames))  {
+            // Accessible option added
+            if(($rownames[$rloop]!=null)&&($rownames[$rloop]!="")) {
+                $Tableau.= "<th scope=\"row\">".$rownames[$rloop]."</th>\r\n";
+            } else {
+                $Tableau.= "<td>&nbsp;</td>\r\n";
+            }
+        }
+
+        for ($cloop=0;$cloop<$cols; $cloop++) {
+            //$index =$rloop*$ctemp + $cloop;
+
+            //$TableElement = "&nbsp;".$ticks.$m[$rloop][$cloop].$ticks."&nbsp;";
+            $TableElement = $ticks.$m[$rloop][$cloop].$ticks;
+
+            if ($rloop==0) {
+                if($rows==1)  {
+                    // only 1 row
+                    if ($cloop==0) { // R1C1
+                        $Tableau.= "<td $onerowleftborder>&nbsp;</td>\r\n<td>$TableElement</td>\r\n";
+                        if($cloop==$lastcol) {
+                            $Tableau.= "<td $onerowrightborder>&nbsp;</td>\r\n";
+                        }
+                    }
+                    elseif ($cloop==$lastcol) { // R1C(Last)
+                        if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n";} // add augemented column
+                        $Tableau.= "<td>$TableElement</td><td $onerowrightborder>&nbsp;</td>\r\n";
+                    }
+                    else {
+                        $Tableau.= "<td>$TableElement</td>\r\n";
+                    }
                 }
                 else {
-                    $Tableau.= "<td>$TableElement</td>\r\n";
+                    // top row
+                    if ($cloop==0) { // R1C1
+                        $Tableau.= "<td $topleftborder>&nbsp;</td>\r\n<td>$TableElement</td>\r\n";
+                        if($cloop==$lastcol) {
+                            $Tableau.= "<td $toprightborder>&nbsp;</td>\r\n";
+                        }
+                    }
+                    elseif  ($cloop==$lastcol) { // R1C(Last)
+                        if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n";} // add augemented column
+                        $Tableau.= "<td>$TableElement</td>\r\n<td $toprightborder>&nbsp;</td>\r\n";
+                    }
+                    else {
+                        $Tableau.= "<td>$TableElement</td>\r\n";
+                    }
                 }
-                if  ($cloop==$lastcol){  // R(last)C(Last)
+            }
+            elseif ($rloop==$lastrow) { // top row
+                if ($cloop==0) {  // R(last)C1
+                    $Tableau.= "<td $bottomleftborder>&nbsp;</td>\r\n";
+                    if($mode==2){
+                        $Tableau.= "<td $Simplex>$TableElement</td>\r\n";
+                    }
+                    else {
+                        $Tableau.= "<td>$TableElement</td>\r\n";
+                    }
+                    if  ($cloop==$lastcol){  // R(last)C(Last)
+                        $Tableau.= "<td $bottomrightborder>&nbsp;</td>\r\n";
+                    }
+                }
+                elseif  ($cloop==$lastcol){  // R(last)C(Last)
+                    if($mode==2) { $Tableau.= "<td $Simplex>&nbsp;</td><td $leftborderSimplex >&nbsp;</td>\r\n"; }
+                    if($mode==1) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n"; }
+                    if($mode==2) {
+                        $Tableau.= "<td $Simplex>$TableElement</td>\r\n";
+                    }
+                    else {
+                        $Tableau.= "<td>$TableElement</td>\r\n";
+                    }
                     $Tableau.= "<td $bottomrightborder>&nbsp;</td>\r\n";
                 }
-            }
-            elseif  ($cloop==$lastcol){  // R(last)C(Last)
-                if($mode==2) { $Tableau.= "<td $Simplex>&nbsp;</td><td $leftborderSimplex >&nbsp;</td>\r\n"; }
-                if($mode==1) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n"; }
-                if($mode==2) {
-                    $Tableau.= "<td $Simplex>$TableElement</td>\r\n";
-                }
                 else {
-                    $Tableau.= "<td>$TableElement</td>\r\n";
+                    if($mode==2){
+                        $Tableau.= "<td $Simplex>$TableElement</td>\r\n";
+                    }
+                    else {
+                        $Tableau.= "<td>$TableElement</td>\r\n";
+                    }
                 }
-                $Tableau.= "<td $bottomrightborder>&nbsp;</td>\r\n";
             }
             else {
-                if($mode==2){
-                    $Tableau.= "<td $Simplex>$TableElement</td>\r\n";
+                if ($cloop==0) {
+                    $Tableau.= "<td $leftborder>&nbsp;</td><td>$TableElement</td>\r\n";
+                    if ($cloop==$lastcol) {
+                        $Tableau.= "<td $rightborder>&nbsp;</td>\r\n";
+                    }
+                }
+                elseif ($cloop==$lastcol) {
+                    if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n"; }
+                    $Tableau.= "<td>$TableElement</td><td $rightborder>&nbsp;</td>\r\n";
                 }
                 else {
                     $Tableau.= "<td>$TableElement</td>\r\n";
                 }
             }
         }
-        else {
-            if ($cloop==0) {
-                $Tableau.= "<td $leftborder>&nbsp;</td><td>$TableElement</td>\r\n";
-                if ($cloop==$lastcol) {
-                    $Tableau.= "<td $rightborder>&nbsp;</td>\r\n";
-                }
-            }
-            elseif ($cloop==$lastcol) {
-                if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n"; }
-                $Tableau.= "<td>$TableElement</td><td $rightborder>&nbsp;</td>\r\n";
-            }
-            else {
-                $Tableau.= "<td>$TableElement</td>\r\n";
-            }
-        }
+        $Tableau.= "</tr>\r\n";
     }
-    $Tableau.= "</tr>\r\n";
-    }
-  $Tableau.= "</tbody>\r\n";
-  $Tableau.= "</table>\r\n";
+    $Tableau.= "</tbody>\r\n";
+    $Tableau.= "</table>\r\n";
 
-  return $Tableau;
+    return $Tableau;
 }
 
 //matrixsystemdisp(matrix,[variables,leftbracket])
@@ -814,7 +815,7 @@ function matrixsolve($A, $b, $silenterror=false) {
     // number of rows
     $N  = count($b);
     $M = count($b[0]); //number of cols in $b
-    
+
     if ($N>10) {
 	global $myrights;
 	if ($myrights>10) {
@@ -891,7 +892,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
     if ($N>10) {
 	global $myrights;
 	if ($myrights>10) {
-		echo "You really shouldn't use matrixsolvefrac for matrices bigger than 10 rows."; 
+		echo "You really shouldn't use matrixsolvefrac for matrices bigger than 10 rows.";
 	}
     }
     for ($r=0;$r<$N;$r++) {
@@ -917,7 +918,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
 
       // check if matrix is singular
       if (abs($A[$p][$p][0]/$A[$p][$p][1]) <= 1e-10) {
-        if ($GLOBALS['myrights']>10) { echo("Solve failed: Matrix is singular or nearly singular"); } 
+        if ($GLOBALS['myrights']>10) { echo("Solve failed: Matrix is singular or nearly singular"); }
         return $b;
       }
 
@@ -976,7 +977,7 @@ function matrixreduce($A, $rref = false, $frac = false) {
     if ($N>10) {
 	global $myrights;
 	if ($myrights>10) {
-		echo "You really shouldn't use matrixreduce for matrices bigger than 10 rows."; 
+		echo "You really shouldn't use matrixreduce for matrices bigger than 10 rows.";
 	}
     }
 		$usefraccalc = true;
@@ -1337,10 +1338,10 @@ function matrixAbasisForB($A,$B){
 function matrixGetMinor($A,$rowNo,$colNo){
 	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixGetMinor input not a valid matrix'; } return '';}
 	if(count($A[0])<$colNo){
-		echo("The number of columns of A must at least as large as the column selected"); 
+		echo("The number of columns of A must at least as large as the column selected");
 	}
 	if(count($A)<$rowNo){
-		echo("The number of rows of A must at least as large as the row selected"); 
+		echo("The number of rows of A must at least as large as the row selected");
 	}
 
 	$retVal = array();
@@ -1425,7 +1426,7 @@ function matrixNumberOfColumns($m){
 
 function matrixParseStuans($stu) {
 	if ($stu === null) {
-		return array(); 
+		return array();
 	} else {
         list($arr,$numrows) = parseMatrixToArray($stu);
         return $arr;
@@ -1481,7 +1482,7 @@ function matrixFromEigenvals($values) {
         $ops[] = array($sr, $er, $mults[$i-1]);
 		$m = matrixrowcombine($m,$sr,$mults[$i-1],$er,1,$er);
     }
-    
+
     $n = 0;
     // real evals will get one row as evec
     // complex evals will get one row for imag, and next for real part
@@ -1527,7 +1528,7 @@ function matrixFromEigenvals($values) {
     for ($i=count($ops)-1; $i>-1; $i--) {
         $mi = matrixrowcombine($mi,$ops[$i][0],-1*$ops[$i][2],$ops[$i][1],1,$ops[$i][1]);
     }
-    
+
     $evecs = [];
     $r = 0;
     foreach ($values as $v) {
