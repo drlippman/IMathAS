@@ -221,18 +221,20 @@ function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens")
 //breaks a compound into an array of elements and an array of atom counts
 function chem_decomposecompound($c) {
 	$cout = array();
-	if (preg_match('/\(([^\)]*)\)_(\d+)/',$c,$matches)) {
-		$p = explode(' ',$matches[1]);
-		foreach ($p as $cb) {
-			$cbp = explode('_',$cb);
-			if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
-			if (count($cbp)==1) {
-				$cout[$cbp[0]] += $matches[2];
-			} else {
-				$cout[$cbp[0]] += $matches[2]*$cbp[1];
-			}
-		}
-		$c = str_replace($matches[0],'',$c);
+	if (preg_match_all('/\(([^\)]*)\)_(\d+)/',$c,$matcharr, PREG_SET_ORDER)) {
+        foreach ($matcharr as $matches) {
+            $p = explode(' ',$matches[1]);
+            foreach ($p as $cb) {
+                $cbp = explode('_',$cb);
+                if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
+                if (count($cbp)==1) {
+                    $cout[$cbp[0]] += $matches[2];
+                } else {
+                    $cout[$cbp[0]] += $matches[2]*$cbp[1];
+                }
+            }
+            $c = str_replace($matches[0],'',$c);
+        }
 	}
 	$p = explode(' ',trim($c));
 	foreach ($p as $cb) {
