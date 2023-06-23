@@ -218,7 +218,7 @@ class DrawingAnswerBox implements AnswerBox
 
         $dotline = 0;
         $a11yinfo = '';
-        if ($colorbox != '') {$out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '">';}
+        $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '">';
         //$bg = getgraphfilename($plot);
         $bg = preg_replace('/.*script=\'(.*?[^\\\\])\'.*/', '$1', $plot);
         if (isset($GLOBALS['hidedrawcontrols'])) {
@@ -541,7 +541,7 @@ class DrawingAnswerBox implements AnswerBox
                 $params['livepoll_drawinit'] = $GLOBALS['drawinitdata'][$qn];
             }
         }
-        if ($colorbox != '') {$out .= '</div>';}
+        $out .= '</div>';
 
         if ($revertgraphdisp) {
             $_SESSION['graphdisp'] = 0;
