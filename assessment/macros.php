@@ -2191,6 +2191,7 @@ function prettyreal($aarr,$d=0,$comma=',') {
 		$arrayout = true;
 	}
 	$out = array();
+    $d = intval($d);
 	foreach ($aarr as $a) {
         $a = str_replace(',','',$a);
         if (is_numeric($a)) {
