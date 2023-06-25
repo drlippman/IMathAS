@@ -271,6 +271,7 @@ Class RollingCurlX {
             $response = false;
         } else { //sucessful response
             $response = curl_multi_getcontent($ch);
+            $request_info['response_text'] = '';
         }
 
         //get request info
