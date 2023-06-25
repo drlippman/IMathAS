@@ -241,7 +241,9 @@ function getReqData() {
 		$out[$row['status']][] = $userdata;
 	}
 	array_walk_recursive($out, function(&$item) {
-		$item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+        if (!is_null($item)) {
+		    $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+        }
 	});
 	return $out;
 }
