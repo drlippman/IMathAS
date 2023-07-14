@@ -16,7 +16,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
-	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
+	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans","parseStuansAsMatrix");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.
@@ -1440,6 +1440,17 @@ function matrixParseStuans($stu) {
             return explode('|', $stu);
         }
         */
+    }
+}
+
+function parseStuansAsMatrix ($stu) {
+	if ($stu === null) {
+		return matrix(array(), 0, 0);
+	} else {
+		echo $stu;
+        list($arr,$nrows) = parseMatrixToArray($stu);
+		$ncols = count($arr) / $nrows;
+        return matrix($arr, $nrows, $ncols);
     }
 }
 
