@@ -1447,7 +1447,6 @@ function parseStuansAsMatrix ($stu, $eval = true) {
 	if ($stu === null) {
 		return matrix(array(), 0, 0);
 	} else {
-		echo $stu;
         list($arr,$nrows) = parseMatrixToArray($stu);
 		$ncols = count($arr) / $nrows;
 		if ($eval) {
