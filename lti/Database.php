@@ -135,29 +135,33 @@ class Imathas_LTI_Database implements LTI\Database
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
             if (!empty($GLOBALS['CFG']['LTI']['autoreg']) && trim($client_id) != '') {
+                $canvas_oidc_hostname = $GLOBALS['CFG']['LTI']['canvas/oidc/prod'] ?? 'canvas.instructure.com';
+                $canvas_beta_oidc_hostname = $GLOBALS['CFG']['LTI']['canvas/oidc/prod'] ?? 'canvas.beta.instructure.com';
+                $canvas_test_oidc_hostname = $GLOBALS['CFG']['LTI']['canvas/oidc/prod'] ?? 'canvas.test.instructure.com';
+
                 if ($iss === 'https://canvas.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => sprintf('https://%s/api/lti/authorize_redirect', $canvas_oidc_hostname),
+                       'auth_token_url' => sprintf('https://%s/login/oauth2/token', $canvas_oidc_hostname),
+                       'key_set_url' => sprintf('https://%s/api/lti/security/jwks', $canvas_oidc_hostname)
                     ];
                 } else if ($iss === 'https://canvas.beta.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.beta.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.beta.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.beta.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => sprintf('https://%s/api/lti/authorize_redirect', $canvas_beta_oidc_hostname),
+                       'auth_token_url' => sprintf('https://%s/login/oauth2/token', $canvas_beta_oidc_hostname),
+                       'key_set_url' => sprintf('https://%s/api/lti/security/jwks', $canvas_beta_oidc_hostname)
                     ];
                 } else if ($iss === 'https://canvas.test.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.test.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.test.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.test.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => sprintf('https://%s/api/lti/authorize_redirect', $canvas_test_oidc_hostname),
+                       'auth_token_url' => sprintf('https://%s/login/oauth2/token', $canvas_test_oidc_hostname),
+                       'key_set_url' => sprintf('https://%s/api/lti/security/jwks', $canvas_test_oidc_hostname)
                     ];
                 }
                 if (is_array($row)) { // set something above - create platform reg
