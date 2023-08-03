@@ -500,6 +500,15 @@ class Imathas_LTI_Database implements LTI\Database
     }
 
     /**
+     * Update imas_users.lastaccess for a user
+     * @param int  $localuserid
+     */
+    public function set_user_lastaccess(int $localuserid): void {
+        $stm = $this->dbh->prepare('UPDATE imas_users SET lastaccess=? WHERE id=?');
+        $stm->execute(array(time(), $localuserid));
+    }
+
+    /**
      * Get local user course id
      * @param  string $contextid
      * @param  LTI_Message_Launch $launch

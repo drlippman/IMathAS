@@ -171,6 +171,8 @@ if (!empty($_POST['tzname'])) {
 }
 require_once(__DIR__."/../includes/userprefs.php");
 generateuserprefs();
+// log lastaccess
+$db->set_user_lastaccess($localuserid);
 
 if ($role == 'Instructor' && $localcourse === null) {
     // try looking it up again, now that user connection is established
