@@ -1093,6 +1093,8 @@ function AMnumfuncPrepVar(qn,str) {
      }
      return p1;
     });
+  // fix variable pairs being interpreted as asciimath symbol, like in
+  dispstr = dispstr.replace(/(@v\d+@)(@v\d+@)/g,"$1 $2");
   // fix display of /n!
   dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!(?!=)/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
