@@ -273,13 +273,15 @@
 		$arr[1] = str_replace(array('<','>'),array('&lt;','&gt;'),$arr[1]);
 		return '`'.$arr[1].'`';
 	}
-	function printfilter($str) {
+	function printfilter($str, $stripbuttons = true) {
 		global $imasroot;
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1" alt="Graph"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
         $str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
-        $str = preg_replace('/<input[^>]*button[^>]*>/','',$str); //strip buttons
-        $str = preg_replace('/<button[^>]*>.*?<\/button>/','',$str); //strip buttons
+		if ($stripbuttons) {
+			$str = preg_replace('/<input[^>]*button[^>]*>/','',$str); //strip buttons
+			$str = preg_replace('/<button[^>]*>.*?<\/button>/','',$str); //strip buttons
+		}
 
 		if (isset($_POST['hidetxtboxes'])) {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);

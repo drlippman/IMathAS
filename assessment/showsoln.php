@@ -71,9 +71,9 @@ $disp = $a2->displayQuestion($qn, [
     'showhints' => 0
 ]);
 if ($showq) {
-    echo printfilter(filter($disp['html']));
+    echo printfilter(filter($disp['html']), false);
 }
-echo printfilter(filter($disp['soln']));
+echo printfilter(filter($disp['soln']), false);
 
 require("../footer.php");
 
