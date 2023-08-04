@@ -10,7 +10,7 @@ array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp",
 "chem_randelementbyfamily","chem_diffrandelementsbyfamily", 
 "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound",
 "chem_getcompoundmolmass","chem_randanion","chem_randcation",
-"chem_makeioniccompound","chem_getsolubility");
+"chem_makeioniccompound","chem_getsolubility","chem_balancereaction", "chem_eqndisp");
 
 //chem_disp(compound)
 //formats a compound for display in as HTML
@@ -219,7 +219,7 @@ function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens")
 
 //chem_decomposecompound(compound)
 //breaks a compound into an array of elements and an array of atom counts
-function chem_decomposecompound($c) {
+function chem_decomposecompound($c, $assoc = false) {
 	$cout = array();
 	if (preg_match_all('/\(([^\)]*)\)_(\d+)/',$c,$matcharr, PREG_SET_ORDER)) {
         foreach ($matcharr as $matches) {
@@ -247,9 +247,148 @@ function chem_decomposecompound($c) {
 			$cout[$cbp[0]] += $cbp[1];
 		}
 	}
-	return array(array_keys($cout),array_values($cout));
+	if ($assoc) { 
+		return $cout;
+	} else {
+		return array(array_keys($cout),array_values($cout));
+	}
 }
 
+//chem_balanceraction($reactants,$products)
+function chem_balancereaction($reactants,$products) {
+	$allcompounds = [];
+	foreach ($reactants as $i=>$v) {
+		$reactants[$i] = chem_decomposecompound($v, true);
+		array_push($allcompounds, ...array_keys($reactants[$i]));
+	}
+	foreach ($products as $i=>$v) {
+		$products[$i] = chem_decomposecompound($v, true);
+		array_push($allcompounds, ...array_keys($products[$i]));
+	}
+	$allcompounds = array_unique($allcompounds);
+	$compoundrow = array_flip($allcompounds);
+	require_once("matrix.php");
+	$countreact = count($reactants);
+	$countprods = count($products);
+	$colcnt = $countreact + $countprods;
+	$compoundcnt = count($allcompounds);
+	$m = matrix(
+		array_fill(0, $compoundcnt*$colcnt, 0),
+		$compoundcnt,
+		$colcnt
+	);
+	// in m, row is compound, column is element in equation
+	foreach ($allcompounds as $i=>$c) {
+		$r = $compoundrow[$c];
+		foreach ($reactants as $i=>$v) {
+			if (isset($v[$c])) {
+				$m[$r][$i] = $v[$c];
+			}
+		}
+		foreach ($products as $i=>$v) {
+			if (isset($v[$c])) {
+				$m[$r][$countreact + $i] = -$v[$c];
+			}
+		}
+	}
+	// now, reduce matrix
+	$m = matrixreduce($m, true, true);
+	/*  each row corresponds to an atom, each column to a compound
+		determine the number of free variable columns
+		    if many more compounds than atoms, might have multiple free vars
+			if unbalancable, might have zero free variables (only solution all zeros)
+			start at last row, ignore any all-zero rows.  
+			in first non-zero row, find pivot and count remaining cols to find free vars
+			assumption: free variables in these equations will always be in end columns
+		parse each value to fraction
+		find LCM of denominators in each column; set free variable to that
+		calculate values of basic variables
+	*/
+	$freevars = 0;
+	for ($r=$compoundcnt-1;$r>=0;$r--) {
+		if (!arrayIsZeroVector($m[$r])) {
+			for ($c=0;$c<$colcnt;$c++) {
+				if ($m[$r][$c] != 0) {
+					$freevars = $colcnt - $c - 1;
+					break 2;
+				}
+			}
+		}
+	}
+	if ($freevars == 0) { // un-balanceable; return array of zeros
+		return array_fill(0, $colcnt, 0);
+	}
+	$coeffs = [];
+	$freevarvals = [];
+	for ($c = 0; $c < $freevars; $c++) {
+		$coeffs[$c] = [];
+		$d = 1;
+		for ($r = 0; $r < $compoundcnt; $r++) {
+			$coeffs[$c][$r] = fractionparse($m[$r][$colcnt - $freevars + $c]);
+			// find lcm of denominators - that'll be our free variable value
+			$d = lcm($d, $coeffs[$c][$r][1]);
+		}
+		$freevarvals[$c] = $d;
+	}
+	$out = [];
+	for ($r=0; $r < $colcnt - $freevars; $r++) {
+		$out[$r] = 0;
+		for ($c = 0; $c < $freevars; $c++) {
+			$out[$r] -= $coeffs[$c][$r][0]*$freevarvals[$c]/$coeffs[$c][$r][1];
+		}
+	}
+	foreach ($freevarvals as $v) {
+		$out[] = $v;
+	}
+	if ($freevars > 1) {
+		$g = gcd(array_filter($out));
+		if ($g > 1) {
+			for ($i=0; $i<count($out); $i++) {
+				$out[$i] /= $g;
+			}
+		}
+	}
+	return $out;
+}
+
+function chem_eqndisp($reactants, $products, $coefficients, $arrow = "->", $phases = null) {
+	$out = '';
+	$n = -1;
+	foreach ($reactants as $i=>$r) {
+		$n++;
+		if ($coefficients[$n] == 0) {
+			continue;
+		} 
+		if ($i>0) {
+			$out .= ' + ';
+		}
+		if ($coefficients[$n] > 1) { 
+			$out .= $coefficients[$n] . ' ';
+		}
+		$out .= $r;
+		if (is_array($phases) && !empty($phases[$n])) {
+			$out .= ' ('.$phases[$n].')';
+		}
+	}
+	$out .= " $arrow ";
+	foreach ($products as $i=>$r) {
+		$n++;
+		if ($coefficients[$n] == 0) {
+			continue;
+		} 
+		if ($i>0) {
+			$out .= ' + ';
+		}
+		if ($coefficients[$n] > 1) { 
+			$out .= $coefficients[$n] . ' ';
+		}
+		$out .= $r;
+		if (is_array($phases) && !empty($phases[$n])) {
+			$out .= ' ('.$phases[$n].')';
+		}
+	}
+	return $out;
+}
 
 //chem_getcompoundmolmass(compound, [round])
 //gets the molecular mass of the given compound

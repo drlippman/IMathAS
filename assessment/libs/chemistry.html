@@ -6,6 +6,7 @@ A collection of chemistry routines
 <BR><ul>
 <li><a href="#chem_disp">chem_disp</a></li>
 <li><a href="#chem_mathdisp">chem_mathdisp</a></li>
+<li><a href="#chem_eqndisp">chem_eqndisp</a></li>
 <li><a href="#chem_isotopedisp">chem_isotopedisp</a></li>
 <li><a href="#chem_getsymbol">chem_getsymbol</a></li>
 <li><a href="#chem_getnumber">chem_getnumber</a></li>
@@ -24,6 +25,7 @@ A collection of chemistry routines
 <li><a href="#chem_randanion">chem_randanion</a></li>
 <li><a href="#chem_makeioniccompound">chem_makeioniccompound</a></li>
 <li><a href="#chem_getsolubility">chem_getsolubility</a></li>
+<li><a href="#chem_balancereaction">chem_balancereaction</a></li>
 </ul>
 <h3><a name="chem_disp">chem_disp</a></h3>
 chem_disp(compound) 
@@ -31,6 +33,18 @@ chem_disp(compound)
 <BR><h3><a name="chem_mathdisp">chem_mathdisp</a></h3>
 chem_mathdisp(compound) 
 <BR>formats a compound for better display in math mode
+<br><h3><a name="chem_eqndisp">chem_eqndisp</a></h3>
+<p>chem_eqndisp(reactants, products, coefficients, [arrow, phases])</p>
+<p>Generates a display string for a chemical reaction.</p>
+<ul class="nomark">
+    <li>reactants: array of compounds</li>
+    <li>products: array of compounds</li>
+    <li>coefficients: array of coefficients for both reactants and products. The output of 
+        chem_balancereaction can be used for this.</li>
+    <li>arrow: optional, a string for the arrow in the reaction. Defaults to <code>-&gt;</code></li>
+    <li>phases: optional, an array of phases for both reactants and products. Do not include parentheses.</li>
+</ul>
+
 <BR><h3><a name="chem_isotopedisp">chem_isotopedisp</a></h3>
 chem_isotopedisp(element,super,sub,[noitalic])
 <BR>formats a math display string for an isotope with the given element,
@@ -114,3 +128,11 @@ chem_getsolubility(cation, anion)
 <BR>&nbsp;&nbsp;Cations: Cd, Fr, Ra, Cr 2+, Mn 3+, Co 3+, Ni 3+, Cu 1+, Au 1+, Sn 4+, Pb 4+, Hg_2
 <BR>&nbsp;&nbsp;Anions: N, P, C, Se, ClO, ClO_2, ClO_3, HCO_3, H_2PO_4, HSO_3, HSO_4, IO_3, MnO_4, NO_2, CrO_4, Cr_2O_7, HPO_4, SO_3, SiO_3, AsO_4, PO_3, O_2 
 <BR>returns array(stateName, abbreviation)
+
+<BR><h3><a name="chem_balancereaction">chem_balancereaction</a></h3>
+<p>chem_balancereaction(reactants, products)</p>
+<p>Balances a chemical reaction, returning an array of coefficients for the compounds</p>
+<ul class="nomark">
+    <li>reactants: array of compounds</li>
+    <li>products: array of compounds</li>
+</ul>
