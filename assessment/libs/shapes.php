@@ -2236,7 +2236,7 @@ function draw_triangle() {
             if ($bisectors[$i] == 1) {
               $altBisLab[$i] = (!empty($bisectors[$i+3])) ? " labeled ".$bisectors[$i+3]." " : "";
               $altBisPtLab[$i] = (!empty($bisectors[$i+6])) ? " at point ".$bisectors[$i+6] : "";
-              $alt .= ($altitudes[$i] == 1 || $medians[$i] == 1) ? " an" : " An";
+              $alt .= ((isset($altitudes[$i]) && $altitudes[$i] == 1) || $medians[$i] == 1) ? " an" : " An";
               $alt .= " angle bisector ".$altBisLab[$i]." is drawn from that side".$altBisPtLab[$i]." to its opposite vertex";
               $alt .= ".";
             }
