@@ -265,7 +265,7 @@ function chem_balancereaction($reactants,$products) {
 		$products[$i] = chem_decomposecompound($v, true);
 		array_push($allcompounds, ...array_keys($products[$i]));
 	}
-	$allcompounds = array_unique($allcompounds);
+	$allcompounds = array_values(array_unique($allcompounds));
 	$compoundrow = array_flip($allcompounds);
 	require_once("matrix.php");
 	$countreact = count($reactants);
@@ -367,7 +367,7 @@ function chem_eqndisp($reactants, $products, $coefficients, $arrow = "->", $phas
 		}
 		$out .= $r;
 		if (is_array($phases) && !empty($phases[$n])) {
-			$out .= ' ('.$phases[$n].')';
+			$out .= ' ('. trim($phases[$n], ' ()') .')';
 		}
 	}
 	$out .= " $arrow ";
