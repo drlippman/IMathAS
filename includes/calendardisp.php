@@ -958,7 +958,7 @@ function addBlockItems($items, $parent, &$tags,&$colors,&$assess,&$names,&$itemi
 				$moday = tzdate('Y-n-j',$item['startdate']);
 				$json = array(
 					"type"=>"BS",
-					"typeref"=>'BS'.$item['id'].';'.$parent.'-'.$i,
+					"typeref"=>'BS'.$item['id'].':'.$parent.'-'.$i,
 					"tag"=>"B",
 					"name"=> $item['name']
 				);
@@ -967,13 +967,13 @@ function addBlockItems($items, $parent, &$tags,&$colors,&$assess,&$names,&$itemi
 				$colors[$k] = '';
 				$assess[$moday][$k] = $json;
 				$names[$k] = $item['name'];
-				$itemidref[$k] = 'BS'.$item['id'].';'.$parent.'-'.$i;
+				$itemidref[$k] = 'BS'.$item['id'].':'.$parent.'-'.$i;
 			}
 			if ($item['enddate'] < 2000000000) {
 				$moday = tzdate('Y-n-j',$item['enddate']);
 				$json = array(
 					"type"=>"BE",
-					"typeref"=>'BE'.$item['id'].';'.$parent.'-'.$i,
+					"typeref"=>'BE'.$item['id'].':'.$parent.'-'.$i,
 					"tag"=>"B",
 					"name"=> $item['name']
 				);
@@ -982,7 +982,7 @@ function addBlockItems($items, $parent, &$tags,&$colors,&$assess,&$names,&$itemi
 				$colors[$k] = '';
 				$assess[$moday][$k] = $json;
 				$names[$k] = $item['name'];
-				$itemidref[$k] = 'BE'.$item['id'].';'.$parent.'-'.$i;
+				$itemidref[$k] = 'BE'.$item['id'].':'.$parent.'-'.$i;
 			}
 			addBlockItems($item['items'],$parent.'-'.$i, $tags,$colors,$assess,$names,$itemidref);
 		}

@@ -88,10 +88,10 @@
 					}
 				}).on('mouseenter', function(ev) {
 					var id = this.id.substr(2);
-					$("span.calitem[id$="+id+"]").addClass("calitemhighlight");
+					$("span.calitem[id$='"+id+"']").addClass("calitemhighlight");
 				}).on('mouseleave', function(ev) {
 					var id = this.id.substr(2);
-					$("span.calitem[id$="+id+"]").removeClass("calitemhighlight");
+					$("span.calitem[id$='"+id+"']").removeClass("calitemhighlight");
 				});
 			$("table.cal td").droppable({
 				drop: function(event,ui) {
