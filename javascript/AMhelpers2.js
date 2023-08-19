@@ -851,7 +851,11 @@ function showSyntaxCheckMQ(qn) {
   var res = processByType(qn);
   var outstr = '';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
-    outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+    if (params.qtype == 'calcmatrix') {
+        outstr += ' = `' + htmlEntities(res.dispvalstr) + '` ';
+    } else {
+        outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+    }
   }
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
@@ -865,6 +869,7 @@ function showSyntaxCheckMQ(qn) {
     var previewel = document.getElementById('p'+qn);
     if (previewel) {
         previewel.innerHTML = outstr;
+        rendermathnode(previewel);
     }
   }
   if (document.getElementById("qn"+qn)) {
