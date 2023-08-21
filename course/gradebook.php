@@ -384,6 +384,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('PT-practice test').'</li>';
 	echo '<li>'._('EC-extra credit').'</li>';
 	echo '<li>'._('NC-no credit').'</li>';
+    echo '<li>'._('N/A-Not Available').'</li>';
 	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
 	echo '<li>'._('<sup>e</sup> Has exception').'</li>';
