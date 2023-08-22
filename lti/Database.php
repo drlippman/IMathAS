@@ -139,25 +139,25 @@ class Imathas_LTI_Database implements LTI\Database
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => 'https://sso.canvaslms.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://sso.canvaslms.com/login/oauth2/token',
+                       'key_set_url' => 'https://sso.canvaslms.com/api/lti/security/jwks'
                     ];
                 } else if ($iss === 'https://canvas.beta.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.beta.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.beta.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.beta.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => 'https://sso.beta.canvaslms.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://sso.beta.canvaslms.com/login/oauth2/token',
+                       'key_set_url' => 'https://sso.beta.canvaslms.com/api/lti/security/jwks'
                     ];
                 } else if ($iss === 'https://canvas.test.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.test.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.test.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.test.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => 'https://sso.test.canvaslms.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://sso.test.canvaslms.com/login/oauth2/token',
+                       'key_set_url' => 'https://sso.test.canvaslms.com/api/lti/security/jwks'
                     ];
                 }
                 if (is_array($row)) { // set something above - create platform reg

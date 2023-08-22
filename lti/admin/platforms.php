@@ -216,9 +216,9 @@ if (empty($CFG['LTI']['autoreg'])) {
     echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
     echo '</ul>';
     echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
-    echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
-    echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
-    echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
+    echo '<input type="hidden" name=canvas_keyseturl value="https://sso.canvaslms.com/api/lti/security/jwks"/>';
+    echo '<input type="hidden" name=canvas_tokenurl value="https://sso.canvaslms.com/login/oauth2/token"/>';
+    echo '<input type="hidden" name=canvas_authurl value="https://sso.canvaslms.com/api/lti/authorize_redirect"/>';
 
     echo '<input type="hidden" name=canvas_uniqid value="" />';
 
