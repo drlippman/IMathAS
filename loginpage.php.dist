@@ -94,7 +94,7 @@ numerical or algebraic expression answers.
 </ul>
 
 <br class=clear>
-<p class="textright"><?php echo $installname;?> is powered by <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2013 David Lippman</p>
+<p class="textright"><?php echo $installname;?> is powered by <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-<?php echo date("Y");?> David Lippman</p>
 </div>
 <?php 
 	require("footer.php");

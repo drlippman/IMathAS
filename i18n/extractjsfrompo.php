@@ -18,23 +18,34 @@ if (strlen($locale)!=2) {
 $fp = fopen(__dir__.'/'.$locale.'.po', 'r');
 
 $injs = false;
+$inmsgstr = false;
+$inmsgid = false;
+$msgstrout = '';
+$msgidout = '';
 $msgs = array();
 $cnt = 0;
 while (($line = fgets($fp, 4096)) !== false) {
 	$line = trim($line);
 	$cnt++;
 	if ($line=='') {
-		$injs = false; $msgid='""';
+        if ($msgidout != '' && $inmsgstr && $msgstrout != '') {
+            $msgs[] = '"' . $msgidout.'":"'.$msgstrout.'"';
+        }
+		$injs = false; $inmsgstr = false; $inmsgid = false; $msgidout=''; $msgstrout = '';
 	} else if ($line[0]=='#' && strpos($line,'.js')!==false) {
 		$injs = true;
-	} else if (substr($line,0,5)=='msgid') {
-		$msgid = substr($line,6);
+	} else if (substr($line,0,5)=='msgid' && $injs) {
+        $msgidout .= trim(trim(substr($line,6)), '"');
+        $inmsgid = true;
 	} else if (substr($line,0,6)=='msgstr' && $injs) {
-		$msgstr = substr($line,7);
-		if ($msgid!='""') {
-			$msgs[] = $msgid.':'.$msgstr;
-		}
-	}
+		$msgstrout .= trim(trim(substr($line,7)), '"');
+        $inmsgstr = true;
+        $inmsgid = false;
+	} else if ($inmsgstr) {
+        $msgstrout .= trim($line, '"');
+    } else if ($inmsgid) {
+        $msgidout .= trim($line, '"');
+    }
 }
 fclose($fp);
 if (!is_dir(__dir__.'/locale')) {

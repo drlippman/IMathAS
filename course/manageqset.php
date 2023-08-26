@@ -144,7 +144,13 @@ if ($myrights<20) {
 					$tlist = $_GET['transfer'];
 				}
 			}
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+            if ($isadmin) {
+			    $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND lastaccess>? ORDER BY LastName,FirstName");
+                $stm->execute([time()-30*24*60*60]);
+            } else {
+                $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid=? ORDER BY LastName,FirstName");
+                $stm->execute([$groupid]);
+            }
 			$i=0;
 			$page_transferUserList = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
