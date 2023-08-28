@@ -170,7 +170,7 @@ if (!empty($_POST['tzname'])) {
     }
 }
 require_once(__DIR__."/../includes/userprefs.php");
-generateuserprefs();
+generateuserprefs($localuserid);
 // log lastaccess
 $db->set_user_lastaccess($localuserid);
 

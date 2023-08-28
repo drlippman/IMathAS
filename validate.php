@@ -245,7 +245,7 @@ if ($haslogin && !$hasusername) {
                 $_SESSION['static_ok'] = 1;
             }
             require_once "$curdir/includes/userprefs.php";
-            generateuserprefs();
+            generateuserprefs($userid);
 
             $_SESSION['tzoffset'] = $_POST['tzoffset'];
             if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
@@ -424,7 +424,7 @@ if ($hasusername) {
         //userprefs are missing!  They should be defined from initial session setup
         //we should never be here. But in case we are, reload prefs
         require_once "$curdir/includes/userprefs.php";
-        generateuserprefs(true);
+        generateuserprefs($userid);
     }
     if (isset($_SESSION['userprefs']['usertheme']) && strcmp($_SESSION['userprefs']['usertheme'], '0') != 0) {
         $coursetheme = $_SESSION['userprefs']['usertheme'];

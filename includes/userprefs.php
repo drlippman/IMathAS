@@ -112,7 +112,7 @@ function showUserPrefsForm() {
 }
 
 function storeUserPrefs() {
-	global $CFG, $DBH, $userid, $tzname, $sessionid;
+	global $CFG, $DBH, $userid, $tzname;
 
 	//save user prefs.  Get existing
 	$currentuserprefs = array();
@@ -184,8 +184,8 @@ function storeUserPrefs() {
 	}
 }
 
-function generateuserprefs($writetosession=false) {
-	global $DBH, $CFG, $sessionid, $userid;
+function generateuserprefs($uid) {
+	global $DBH, $CFG;
 
 	$_SESSION['userprefs'] = array();
 	$prefdefaults = array(
@@ -198,7 +198,7 @@ function generateuserprefs($writetosession=false) {
 
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$stm = $DBH->prepare("SELECT item,value FROM imas_user_prefs WHERE userid=:id");
-		$stm->execute(array(':id'=>$userid));
+		$stm->execute(array(':id'=>$uid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$_SESSION['userprefs'][$row[0]] = $row[1];
 		}
