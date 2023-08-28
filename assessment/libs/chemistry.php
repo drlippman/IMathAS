@@ -384,7 +384,7 @@ function chem_eqndisp($reactants, $products, $coefficients, $arrow = "->", $phas
 		}
 		$out .= $r;
 		if (is_array($phases) && !empty($phases[$n])) {
-			$out .= ' ('.$phases[$n].')';
+			$out .= ' ('. trim($phases[$n], ' ()') .')';
 		}
 	}
 	return $out;
