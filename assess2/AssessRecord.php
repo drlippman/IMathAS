@@ -2458,6 +2458,11 @@ class AssessRecord
       $verTime = 0;
       // loop through the question numbers
       $aVerScore = 0;
+      if (!isset($curAver['questions'])) {
+        // should never happen; some glitched caused assess version with no questions
+        // should probably remove glitched entry, but for now just skip
+        continue;
+      }
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
         // if not rescoring this question, or if withdrawn,
         // or retotalling indiv questions and not latest assess version,
