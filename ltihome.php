@@ -499,7 +499,11 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		if ($_SESSION['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">'._('Change placement').'</a></p>';
 		}
-		echo '<p>&nbsp;</p><p class=small>'.sprintf(_('This assessment is housed in course ID %s'),Sanitize::courseId($cid)).'</p>';
+		echo '<p>&nbsp;</p><p class=small>'.sprintf(_('This assessment is housed in course ID %s'),Sanitize::courseId($cid)).'. ';
+        if (empty($CFG['LTI']['hideSelfServiceLink'])) {
+            echo '<a href="admin/userlti.php">'._('Edit course link').'</a>';
+        }
+        echo '</p>';
 	}
 }
 require("footer.php");

@@ -148,7 +148,11 @@ echo '<p class=small>'.sprintf(_('This assessment is housed in %s course ID %s (
         $installname, 
         Sanitize::courseId($cid), 
         Sanitize::encodeStringForDisplay($line['coursename'])
-    ).'</p>';
+    ).'. ';
+if (empty($CFG['LTI']['hideSelfServiceLink'])) {
+    echo '<a href="../admin/userlti.php">'._('Edit course link').'</a>';
+}
+echo '</p>';
 
 
 echo '<h2>'._('LMS Syncing Tools').'</h2>';
