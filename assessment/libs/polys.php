@@ -8,7 +8,7 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree");
 
 
 //formpoly(coefficients,powers or degree)
@@ -254,6 +254,16 @@ function getcoef($p,$deg) {
 		}
 	}
 	return $coef;
+}
+
+function polys_getdegree($p) {
+    $deg = 0;
+    for ($i=0;$i<count($p);$i++) {
+        if ($p[$i][1]>$deg) {
+            $deg = $p[$i][1];
+        }
+    }
+    return $deg;
 }
 
 //checkpolypowerorder(polystring,[order])
