@@ -1902,6 +1902,9 @@ class AssessRecord
           }
         } else {
           if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
+            if (isset($autosaves[$qn+1]) && !is_array($autosaves[$qn+1])) { // isn't array yet for some reason; make it one
+                $autosaves[$qn+1] = array($autosaves[$qn+1]);
+            }
             $autosaves[$qn+1][$pn] = $autosave['stuans'][$pn];
           } else {
             $autosaves[$qn+1] = $autosave['stuans'][$pn];

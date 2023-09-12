@@ -137,6 +137,7 @@ if ($in_practice) {
 // Verify confirmation values (to ensure it hasn't been submitted since)
 if (!$assess_record->checkVerification($verification)) {
   // grab question settings data with HTML to update front-end
+  $assess_info->loadQuestionSettings($toloadqids, true, false);
   $showscores = $assess_info->showScoresDuring();
   $assessInfoOut['questions'] = array();
   foreach ($qns as $qn=>$parts) {

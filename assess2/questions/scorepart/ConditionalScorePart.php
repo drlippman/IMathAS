@@ -62,7 +62,7 @@ class ConditionalScorePart implements ScorePart
                 } else if ($answer > 1) {
                   $answer = 1;
                 }
-                $scorePartResult->setRawScore($answer);
+                $scorePartResult->setRawScore(floatval($answer));
                 return $scorePartResult;
             }
         }

@@ -144,7 +144,11 @@ class ComplexScorePart implements ScorePart
                 }
                 if ($checkSameform) {
                     $gafunc = parseMathQuiet($tchk, 'i');
-                    $normalizedGivenAnswers[$i] = $gafunc->normalizeTreeString();
+                    if ($gafunc === false) {
+                        $normalizedGivenAnswers[$i] = '';
+                    } else {
+                        $normalizedGivenAnswers[$i] = $gafunc->normalizeTreeString();
+                    }
                 }
             }
         } else { // if "complex"

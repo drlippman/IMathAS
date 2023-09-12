@@ -444,7 +444,7 @@ class AssessInfo
   public function getAllQuestionPointsAndCats() {
     $out = array();
     foreach ($this->questionData as $qid=>$v) {
-      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>$v['origcategory']];
+      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>($v['origcategory'] ?? 0)];
     }
     return $out;
   }
