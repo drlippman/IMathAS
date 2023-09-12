@@ -3174,7 +3174,7 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 		$d2 = 1/($d2-$L2);
     }
 	if ($i<1000 && abs($numerators[$i]/$denominators[$i] - $d)>1e-12) {
-		return $d;
+		return $sign.$d;
     }
 	if ($format=="mixednumber") {
 		$w = floor($numerators[$i]/$denominators[$i]);
