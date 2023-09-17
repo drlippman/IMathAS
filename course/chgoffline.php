@@ -65,7 +65,7 @@ if (isset($_POST['checked'])) { //form submitted
 			echo "&gt; <a href=\"chgoffline.php?cid=$cid\">Manage Offline Grades</a> &gt; Confirm Delete</div>";
 			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 			echo '<input type="hidden" name="submit" value="Delete" />';
-			echo '<input type="hidden" name="checked" value="'.$checkedlist.'"/>';
+			echo '<input type="hidden" name="checked" value="'.Sanitize::encodeStringForDisplay($checkedlist).'"/>';
 			echo '<p>Are you <b>SURE</b> you want to delete these offline grade items ';
 			echo 'and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first.</p><p>';
 			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id IN ($ph)");

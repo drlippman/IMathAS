@@ -2196,7 +2196,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			endtest($testsettings);
 			if ($shown) {leavetestmsg();}
 		} else if ($_GET['action']=='scoreembed') {
-			$qn = $_POST['toscore'];
+			$qn = intval($_POST['toscore']);
 			$colors = array();
 			$page = intval($_GET['page']);
 			$divopen = false;
@@ -2370,7 +2370,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 		} else if ($_GET['action']=='livepollscoreq') {
 			//TODO:  Check curattempt
-			$qn = $_POST['toscore'];
+			$qn = intval($_POST['toscore']);
 
 			if ($LPinf['curquestion'] != $qn || $LPinf['curstate'] != 2) {
 				echo '{error: "Wrong question or not open for submissions"}';

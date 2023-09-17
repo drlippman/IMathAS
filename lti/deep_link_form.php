@@ -37,7 +37,7 @@ function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
 	require("../header.php");
 	echo '<h1>'._('Select assessment to link to').'</h1>';
   echo '<form method=post action="setupdeeplink.php">';
-  echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
+  echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
   echo '<p><select name=deeplinktarget>';
   foreach ($assessments as $ass) {
     echo '<option value="assess-'.Sanitize::onlyInt($ass['id']).'">';
