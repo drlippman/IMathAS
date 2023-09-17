@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -497,7 +497,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { if (v) {$("#gbdetail").slideDown();} else {$("#gbdetail").slideUp();} }</script>';
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -745,5 +745,5 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

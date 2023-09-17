@@ -230,7 +230,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			 }
 			 if ($row['reqscoretype']&2) { //using percent-based
 				 if ($reqscoreptsposs==-1) {
-					 require("../includes/updateptsposs.php");
+					 require_once "../includes/updateptsposs.php";
 					 $reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
 				 }
 				 if (round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {

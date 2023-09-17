@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid)) {
   echo "Not for you";
@@ -53,7 +53,7 @@ $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDi
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -94,4 +94,4 @@ if ($stm->rowCount()==0) {
         echo '</tr>';
     }
 }
-require('../footer.php');
+require_once '../footer.php';

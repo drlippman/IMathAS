@@ -3,7 +3,7 @@
 //(c) 2016 David Cooper, David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -22,7 +22,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -53,6 +53,6 @@ if ($overwriteBody==1) {
 	echo '<p>'._('Individual student login logs and detailed activity logs can be accessed from the Gradebook report for an individual student').'.</p>';
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

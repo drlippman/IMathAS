@@ -2,9 +2,9 @@
 //IMathAS:  Embed a Question via iFrame
 //(c) 2010 David Lippman
 
-require("./init_without_validate.php");
+require_once "./init_without_validate.php";
 
-require("includes/DEutil.php");
+require_once "includes/DEutil.php";
 header('P3P: CP="ALL CUR ADM OUR"');
 
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -13,7 +13,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  	 $urlmode = 'http://';
  }
 
-require("./assessment/displayq2.php");
+require_once "./assessment/displayq2.php";
 $GLOBALS['assessver'] = 1;
 
 $_SESSION = array();
@@ -44,7 +44,7 @@ $showans = false;
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
 $useeditor = 1;
-require("./assessment/header.php");
+require_once "./assessment/header.php";
 
 if (isset($_GET['showscored'])) {
 	//DE is requesting that the question be redisplayed with right/wrong markers
@@ -181,7 +181,7 @@ if (isset($_GET['showscored'])) {
 }
 
 
-require("./footer.php");
+require_once "./footer.php";
 
 
 function getansweights($code,$seed) {

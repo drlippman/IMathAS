@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
  //set some page specific variables and counters
@@ -284,7 +284,7 @@ if ($myrights<20) {
 		$lastanswers[$qn] = '';
 		$rawscores[$qn] = -1;
 		$scores[$qn] = -1;
-		require("../assessment/displayq2.php");
+		require_once "../assessment/displayq2.php";
 		if (isset($_POST['seed'])) {
 			list($score,$rawscores[$qn]) = scoreq($qn,$qsetid,$_POST['seed'],$_POST['qn'.$qn]);
 			$scores[$qn] = $score;
@@ -313,7 +313,7 @@ if ($showtips==2) {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/eqntips.js?v=012810\"></script>";
 }
 $useeqnhelper = 0;
-require("../assessment/header.php");
+require_once "../assessment/header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -495,7 +495,7 @@ if ($overwriteBody==1) {
 	}
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 
 

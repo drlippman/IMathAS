@@ -6,7 +6,7 @@ require_once(__DIR__."/filehandler.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['delete'])) {
-	require($CFG['hooks']['delete']);
+	require_once $CFG['hooks']['delete'];
 }
 
 function deleteCourse($cid) {

@@ -1,5 +1,5 @@
 <?php
-	require("../init.php");
+	require_once "../init.php";
 	if ($myrights<100) {exit;}
 	/*
 	echo "<p>Raw Non-WebWork Questions anywhere on system </p>\n";

@@ -3,8 +3,8 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once("../includes/TeacherAuditLog.php");
 
 if ($courseUIver == 1) {
@@ -906,7 +906,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>';
 }
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -931,7 +931,7 @@ if ($overwriteBody==1) {
 	<form method=post action="<?php echo $page_formActionTag ?>">
 
 	<?php
-		require("addassessment2form.php");
+		require_once "addassessment2form.php";
 	?>
 
 	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
@@ -939,5 +939,5 @@ if ($overwriteBody==1) {
 	<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

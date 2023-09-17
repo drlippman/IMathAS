@@ -2,7 +2,7 @@
 //IMathAS:  Copy Course Items course list
 
 if (isset($_GET['loadothergroup']) || isset($_GET['loadothers']) || isset($_POST['cidlookup'])) {
-	require("../init.php");
+	require_once "../init.php";
 }
 
 if (!isset($myrights) || $myrights<20) {

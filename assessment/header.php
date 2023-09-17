@@ -19,7 +19,7 @@ if (!isset($myrights)) {
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
 $loadgraphfilter = true;
-require("$curdir/../filter/filter.php");
+require_once "$curdir/../filter/filter.php";
 ?>
 <script type="text/javascript">
 var isImathasAssessment = true;
@@ -263,7 +263,7 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($CFG['GEN']['headerscriptinclude'])) {
-	require("$curdir/../{$CFG['GEN']['headerscriptinclude']}");
+	require_once "$curdir/../{$CFG['GEN']['headerscriptinclude']}";
 }
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
@@ -294,7 +294,7 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 }
 
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
-	require("$curdir/../{$CFG['GEN']['headerinclude']}");
+	require_once "$curdir/../{$CFG['GEN']['headerinclude']}";
 }
 
 if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !$isdiag && (!isset($_SESSION['intreereader']) || $_SESSION['intreereader']==false)) {

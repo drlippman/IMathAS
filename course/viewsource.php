@@ -1,14 +1,14 @@
 <?php
 //IMathAS:  Modify a question's code
 //(c) 2006 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 
 	$pagetitle = "Question Source";
-	require("../header.php");
+	require_once "../header.php";
 	if (!(isset($teacherid)) && $myrights<100) {
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -59,5 +59,5 @@
 	} else {
 		echo "<a href=\"addquestions2.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

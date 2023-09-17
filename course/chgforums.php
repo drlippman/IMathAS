@@ -3,8 +3,8 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
@@ -281,7 +281,7 @@ $(function() {
 })
 </script>';
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Mass Change Forums</div>";
@@ -292,7 +292,7 @@ echo "<form id=\"mainform\" method=post action=\"chgforums.php?cid=$cid\" onsubm
 
 if (count($forumitems)==0) {
 	echo '<p>No forums to change.</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -498,5 +498,5 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 <div class="submit"><input type="submit" name="submit" value="<?php echo _('Apply Changes')?>" /></div>
 </form>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

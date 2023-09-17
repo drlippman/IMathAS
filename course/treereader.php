@@ -2,7 +2,7 @@
 //IMathAS:  Tree-style framed content reading based on block structure
 //(c) 2011 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/exceptionfuncs.php");
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
@@ -231,7 +231,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
 	}
   });
 });</script>';
-require("../header.php");
+require_once "../header.php";
 $stm = $DBH->prepare("SELECT value FROM imas_bookmarks WHERE userid=:userid AND courseid=:courseid AND name=:name");
 $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':name'=>'TR'.$_GET['folder']));
 if ($stm->rowCount()==0) {
@@ -549,5 +549,5 @@ echo $ul[0];
 <iframe id="readerframe" name="readerframe" data-noresize="true" title="Selected Content" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
 </div>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -1,8 +1,8 @@
 <?php
 //IMathAS:  User preference editing for LTI users
 
-require('../init.php');
-require('../includes/userprefs.php');
+require_once '../init.php';
+require_once '../includes/userprefs.php';
 $action = "ltiuserprefs.php?cid=".Sanitize::courseId($cid);
 if (isset($_GET['greybox'])) {
 	$flexwidth = true; 
@@ -13,7 +13,7 @@ if (isset($_GET['greybox'])) {
 	$greybox = false;
 }
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
-require('../header.php');
+require_once '../header.php';
 
 if (isset($_POST['mathdisp'])) {
 	storeUserPrefs();
@@ -30,5 +30,5 @@ if (isset($_POST['mathdisp'])) {
     echo '<script>function doSubmit() { document.getElementById("pageform").submit(); parent.$("#GB_footer button.primary").hide();}</script>';
 }
 
-require('../footer.php');
+require_once '../footer.php';
 ?>

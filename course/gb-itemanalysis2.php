@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Item Analysis (averages)
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -60,9 +60,9 @@
 		exit;
 	}
 	if ($istutor && $tutoredit==2) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You not have access to view scores for this assessment";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -74,7 +74,7 @@
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -568,7 +568,7 @@
 
 		echo "<a href=\"gb-aidexport2.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {

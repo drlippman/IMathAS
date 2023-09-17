@@ -2,8 +2,8 @@
 //IMathAS - User Details page
 //(c) 2017 David Lippman
 
-require("../init.php");
-require("../includes/newusercommon.php");
+require_once "../init.php";
+require_once "../includes/newusercommon.php";
 
 function getRoleNameByRights($rights) {
   switch ($rights) {
@@ -248,7 +248,7 @@ td.hocptd li.hide {
   display: none;
 }
 </style>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -530,4 +530,4 @@ if ($overwriteBody==1) {
 }
 
 echo '<p>&nbsp;</p><p>&nbsp;</p>';
-require("../footer.php");
+require_once "../footer.php";

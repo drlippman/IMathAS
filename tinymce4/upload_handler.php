@@ -1,7 +1,7 @@
 <?php
 
   //check credentials
-  require("../init.php");
+  require_once "../init.php";
   require_once("../includes/filehandler.php");
 
   if ($_SERVER['HTTP_HOST'] == 'localhost') {

@@ -7,16 +7,16 @@
 
 // TODO: rework one-stu-at-a-time to use userid as selector
 
-	require("../init.php");
-	require("../assess2/AssessInfo.php");
-	require("../assess2/AssessRecord.php");
+	require_once "../init.php";
+	require_once "../assess2/AssessInfo.php";
+	require_once "../assess2/AssessRecord.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	if (!$isteacher && !$istutor) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher or tutor to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -69,9 +69,9 @@
 		exit;
 	}
 	if ($istutor && $tutoredit==2) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You not have access to view scores for this assessment";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
@@ -284,7 +284,7 @@
 		exit;
 	}
 
-	require("../includes/htmlutil.php");
+	require_once "../includes/htmlutil.php";
 
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -418,9 +418,9 @@
         .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
         .hoverbox { background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);}
 		</style>';
-	require("../includes/rubric.php");
+	require_once "../includes/rubric.php";
 	$_SESSION['coursetheme'] = $coursetheme;
-	require("../header.php");
+	require_once "../header.php";
 	echo "<style type=\"text/css\">p.tips {	display: none;} .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -890,5 +890,5 @@
   	</div>
 		<div id="eh" class="eh"></div>';
 	$useeqnhelper = 0;
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

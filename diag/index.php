@@ -1,6 +1,6 @@
 <?php
   $init_session_start = true;
-	require("../init_without_validate.php");
+	require_once "../init_without_validate.php";
 
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
@@ -22,9 +22,9 @@
 		$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
-		require("../header.php");
+		require_once "../header.php";
 		$pagetitle = "Diagnostics";
-		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
+		require_once (isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 		echo "<img class=\"floatleft\" src=\"$staticroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
@@ -37,7 +37,7 @@
 			echo "<li><a href=\"$imasroot/diag/index.php?id=" . Sanitize::onlyInt($row[0]) . "\">".Sanitize::encodeStringForDisplay($row[1])."</a></li>";
 		}
 		echo "</ul></div>";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$diagid = Sanitize::onlyInt($_GET['id']);
@@ -373,16 +373,16 @@ if (isset($_POST['SID'])) {
 
 //allow custom login page for specific diagnostics
 if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
-	require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
+	require_once (isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
 } else {
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 $flexwidth = true;
-require("../header.php");
+require_once "../header.php";
 $pagetitle =$line['name'];
-require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
+require_once (isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 ?>
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo Sanitize::onlyInt($diagid); ?>">
@@ -481,6 +481,6 @@ if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line
 <div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-<?php echo date("Y");?> David Lippman</div>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";
 }
 ?>

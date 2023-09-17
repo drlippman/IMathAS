@@ -34,7 +34,7 @@ function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
   $flexwidth = true;
 	$nologo = true;
 
-	require("../header.php");
+	require_once "../header.php";
 	echo '<h1>'._('Select assessment to link to').'</h1>';
   echo '<form method=post action="setupdeeplink.php">';
   echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
@@ -49,5 +49,5 @@ function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
   echo '</select></p>';
   echo '<button type=submit>'._('Create Link').'</button>';
   echo '</form>';
-  require('../footer.php');
+  require_once '../footer.php';
 }

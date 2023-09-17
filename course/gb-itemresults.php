@@ -7,12 +7,12 @@
 
 // does NOT work for randomized questions or matching.
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid) && !isset($tutorid)) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You need to log in as a teacher or tutor to access this page";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -113,7 +113,7 @@ $placeinhead = ' <style type="text/css">
 }
 </style>';
 $useeqnhelper = 0;
-require("../assessment/header.php");
+require_once "../assessment/header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
@@ -124,7 +124,7 @@ list ($defpoints, $aname, $itemorder,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
 echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 if (isset($tutorid) && $tutoredit==2) {
 	echo 'You do not have access to view scores for this assessment.';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 $itemarr = array();
@@ -146,7 +146,7 @@ foreach (explode(',',$itemorder) as $k=>$itel) {
 }
 echo '<p style="color:#f00;">Warning: Results are not accurate or meaningful for randomized questions</p>';
 
-require("../assessment/displayq2.php");
+require_once "../assessment/displayq2.php";
 $questions = array_keys($qdata);
 foreach ($itemarr as $k=>$q) {
 	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
@@ -161,7 +161,7 @@ foreach ($itemarr as $k=>$q) {
 	echo '<br class="clear"/>';
 	echo '</div>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 function sandboxeval($control, $qtype) {
 	try {

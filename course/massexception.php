@@ -254,7 +254,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		if (isset($_POST['sendmsg'])) {
 			$_POST['submit'] = "Message";
 			$_POST['checked'] = explode(',',$_POST['tolist']);
-			require("masssend.php");
+			require_once "masssend.php";
 			exit;
 		}
 	}
@@ -298,7 +298,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			return true;
 		});
 	})</script>';
-	require("../header.php");
+	require_once "../header.php";
 
 	$cid = Sanitize::courseId($_GET['cid']);
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -351,7 +351,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                 $aid = Sanitize::onlyInt($_GET['aid']);
                 echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
 			}
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		$formtag .= "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
@@ -697,7 +697,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo '</fieldset>';
 	}
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 
 

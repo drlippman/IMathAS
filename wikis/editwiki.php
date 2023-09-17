@@ -4,8 +4,8 @@
 
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -98,7 +98,7 @@ if ($cid==0) {
 					$lasteditedby = $row['LastName'].', '.$row['FirstName'];
 
 				} else { //we're all good for a diff calculation
-					require("../includes/diff.php");
+					require_once "../includes/diff.php";
 
 					$diff = diffsparsejson($wikicontent,$revisiontext);
 
@@ -193,7 +193,7 @@ if ($cid==0) {
 
  /******* begin html output ********/
  $pagetitle = _("Edit Wiki").': '.Sanitize::encodeStringForDisplay($wikiname);
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -235,5 +235,5 @@ if (isset($lasteditedby)) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -3,10 +3,10 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/copyiteminc.php");
-require("../includes/loaditemshowdata.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
 require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
@@ -643,7 +643,7 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -805,7 +805,7 @@ function tabToSettings() {
 	<h2>Change Settings</h2>
 
 <?php
-	require('chgassessments2form.php');
+	require_once 'chgassessments2form.php';
 ?>
 
 
@@ -814,5 +814,5 @@ function tabToSettings() {
 	</form>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

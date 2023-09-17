@@ -2,7 +2,7 @@
 // IMathAS: Assessment settings migration
 // (c) 2019 David Lippman
 
-require(__DIR__ . '/convertintro.php');
+require_once __DIR__ . '/convertintro.php';
 
 function migrateAssessSettings($settings, $oldUIver, $newUIver) {
   if ($oldUIver == 1 && $newUIver == 2) {

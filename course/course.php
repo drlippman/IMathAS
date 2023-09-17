@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("courseshowitems.php");
-require("../includes/htmlutil.php");
-require("../includes/calendardisp.php");
+require_once "../init.php";
+require_once "courseshowitems.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/calendardisp.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -381,7 +381,7 @@ if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -434,12 +434,12 @@ if ($overwriteBody==1) {
 <?php
 	//check for course layout
 	if (isset($CFG['GEN']['courseinclude'])) {
-		require($CFG['GEN']['courseinclude']);
+		require_once $CFG['GEN']['courseinclude'];
 		if ($firstload) {
 			echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 			echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 ?>
@@ -676,7 +676,7 @@ if ($overwriteBody==1) {
    }
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 function makeTopMenu() {
 	global $teacherid;

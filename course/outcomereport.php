@@ -2,14 +2,14 @@
 //IMathAS:  Outcomes report generator
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 
 
 if (!isset($teacherid) && !isset($studentid)) {
 	echo "You're not validated to view this page."; exit;
 }
 
-require("outcometable.php");
+require_once "outcometable.php";
 $canviewall = true;
 $catfilter = -1;
 $secfilter = -1;
@@ -129,7 +129,7 @@ $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 	</script>';
 
 if ($report != 'export') {
-	require("../header.php");
+	require_once "../header.php";
 
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if (isset($teacherid)) {
@@ -474,5 +474,5 @@ if ($report=='overview') {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

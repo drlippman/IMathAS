@@ -4,9 +4,9 @@
 
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/diff.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/diff.php";
 
 
 /*** pre-html data manipulation, including function code *******/

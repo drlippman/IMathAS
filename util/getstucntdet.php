@@ -9,7 +9,7 @@ ul {
 </head>
 <body>
 <?php
-	require("../init.php");
+	require_once "../init.php";
 	if ($myrights<100 && ($myspecialrights&(32+64))==0) {
 		exit;
 	}

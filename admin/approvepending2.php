@@ -1,13 +1,13 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 require_once('../includes/filehandler.php');
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/approvepending'])) {
-	require($CFG['hooks']['admin/approvepending']);
+	require_once $CFG['hooks']['admin/approvepending'];
 }
 
 $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
@@ -58,7 +58,7 @@ if (!empty($_POST['newstatus'])) {
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
-			require("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
 				unenrollstu($rcid, array(intval($instId)));
 			}
@@ -303,7 +303,7 @@ if (!isset($_GET['from'])) {
 	$curBreadcrumb .= "&gt; <a href=\"../util/utils.php\">Utilities</a> &gt; ";
 }
 
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . $pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -505,4 +505,4 @@ var app = new Vue({
 </script>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";

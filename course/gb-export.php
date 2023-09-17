@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Export or email Gradebook
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -24,7 +24,7 @@
 	}
 
 	if (!isset($_POST['commentloc'])) {
-		require("../header.php");
+		require_once "../header.php";
         echo "<div class=breadcrumb>$breadcrumbbase ";
         if (empty($_COOKIE['fromltimenu'])) {
             echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -65,7 +65,7 @@
 			echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -91,7 +91,7 @@
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 
-	require("gbtable2.php");
+	require_once "gbtable2.php";
 	$includecomments = true;
 	if ($_POST['submit']=="Download Gradebook for Excel") {
 		header('Content-type: application/vnd.ms-excel');
@@ -100,8 +100,8 @@
 		header('Pragma: public');
 		echo '<html><head>';
 		echo '<style type="text/css">';
-		require("../imascore.css");
-		require("../themes/modern.css");
+		require_once "../imascore.css";
+		require_once "../themes/modern.css";
 		echo '</style></head><body>';
 		gbinstrdisp();
 		echo '</body></html>';
@@ -183,9 +183,9 @@
 			}
 			if ($_GET['emailgb']!='') {
 				mail(Sanitize::emailAddress($_GET['emailgb']), "Gradebook for $coursename", $message, $headers);
-				require("../header.php");
+				require_once "../header.php";
 				echo "Gradebook Emailed.  <a href=\"gradebook.php?cid=$cid\">Return to Gradebook</a>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 

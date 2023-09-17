@@ -3,8 +3,8 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once("../includes/TeacherAuditLog.php");
 
 if (!isset($teacherid)) {
@@ -56,7 +56,7 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$checkedlist = implode(',', array_map('intval', $checked));
 
-			require("../header.php");
+			require_once "../header.php";
             echo "<div class=breadcrumb>$breadcrumbbase ";
             if (empty($_COOKIE['fromltimenu'])) {
                 echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -77,7 +77,7 @@ if (isset($_POST['checked'])) { //form submitted
 			echo '</p><p><button type=submit name=confirm value=true>'._('Yes, Delete').'</button> ';
 			echo '<input type=button value="Nevermind" class="secondarybtn" onClick="window.location=\'gradebook.php?cid='.$cid.'\'"></p>';
 			echo '</form>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	} else {
@@ -143,7 +143,7 @@ $placeinhead .= '<script type="text/javascript">
    });
  });
  </script>';
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if (empty($_COOKIE['fromltimenu'])) {
@@ -164,7 +164,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 if (count($gbitems)==0) {
 	echo "<p>No offline grades.  <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add one</a> or ";
 	echo '<a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 } else {
 	echo '<div class="cpmid"><a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></div>';
@@ -238,5 +238,5 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 <div class="submit"><input type="submit" name="submit" value="<?php echo _('Apply Changes')?>" /></div>
 </form>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

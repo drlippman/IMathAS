@@ -4,10 +4,10 @@
 require_once("includes/newusercommon.php");
 if (!isset($_GET['action'])) { exit; }
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
-	require("init.php");
+	require_once "init.php";
 } else {
 	$init_session_start = true;
-	require("init_without_validate.php");
+	require_once "init_without_validate.php";
 	if (isset($CFG['CPS']['theme'])) {
 		$defaultcoursetheme = $CFG['CPS']['theme'][0];
 	} else if (!isset($defaultcoursetheme)) {
@@ -18,10 +18,10 @@ if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['forms'])) {
-	require($CFG['hooks']['forms']);
+	require_once $CFG['hooks']['forms'];
 }
 
-require("includes/htmlutil.php");
+require_once "includes/htmlutil.php";
 
 if (isset($_GET['greybox'])) {
 	$gb = '&greybox=true';
@@ -37,7 +37,7 @@ if (isset($CFG['locale'])) {
 if ($_GET['action']=='chguserinfo') {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 }
-require("header.php");
+require_once "header.php";
 switch($_GET['action']) {
 	case "newuser":
 		if ($gb == '') {
@@ -239,7 +239,7 @@ switch($_GET['action']) {
         echo '</select></span><br class="form" />';
 				
         if ($line['mfa']=='') {
-            require('includes/GoogleAuthenticator.php');
+            require_once 'includes/GoogleAuthenticator.php';
             $MFA = new GoogleAuthenticator();
             $mfasecret = $MFA->createSecret();
             $mfaurl = $MFA->getOtpauthUrl($installname.':'.$line['SID'], $mfasecret, $installname);
@@ -363,7 +363,7 @@ switch($_GET['action']) {
 		echo '</fieldset>';
 
 		//show accessibilty and display prefs form
-		require("includes/userprefs.php");
+		require_once "includes/userprefs.php";
 		showUserPrefsForm();
 
 
@@ -639,5 +639,5 @@ switch($_GET['action']) {
 		echo "<p>You can also bookmark <a href=\"getpostlist.php?key=".Sanitize::encodeStringForDisplay($code)."\">this page</a> to be able to access your post list without needing to log in.</p>";
 		break;
 }
-	require("footer.php");
+	require_once "footer.php";
 ?>

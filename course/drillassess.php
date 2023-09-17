@@ -2,13 +2,13 @@
 //IMathAS:  Drill Assess player (updated quickdrill)
 //(c) 2011 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 $courseUIver = 1; // Doesn't quite work right yet
 if ($courseUIver > 1) {
     include('../assess2/AssessStandalone.php');
     $a2 = new AssessStandalone($DBH);
 } else {
-    require("../assessment/displayq2.php");
+    require_once "../assessment/displayq2.php";
 }
 
 if (!isset($teacherid) && !isset($studentid) && !isset($tutorid)) {
@@ -245,9 +245,9 @@ if ($courseUIver > 1) {
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
         <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
     $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
-    require("../header.php");
+    require_once "../header.php";
 } else {
-    require("../assessment/header.php");
+    require_once "../assessment/header.php";
 }
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">" . Sanitize::encodeStringForDisplay($coursename) . "</a> ";
 echo "&gt; " . _("Drill Assessment") . "</div>";
@@ -463,7 +463,7 @@ if ($courseUIver > 1) {
     </div>
     <div id="eh" class="eh"></div>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 
 

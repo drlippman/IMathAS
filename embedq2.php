@@ -10,10 +10,10 @@
 // (c) 2020 David Lippman
 
 $init_skip_csrfp = true;
-require "./init_without_validate.php";
+require_once "./init_without_validate.php";
 
 require_once './assess2/AssessStandalone.php';
-require("includes/JWT.php");
+require_once "includes/JWT.php";
 
 $assessver = 2;
 $courseUIver = 2;
@@ -375,7 +375,7 @@ $placeinhead .= '<script type="text/javascript">
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
-require "./header.php";
+require_once "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 echo '<div class="questionwrap">';
@@ -416,4 +416,4 @@ $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
-require "./footer.php";
+require_once "./footer.php";

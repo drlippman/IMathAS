@@ -1,6 +1,6 @@
 <?php
 
-require('../init.php');
+require_once '../init.php';
 
 if (!isset($teacherid)) {
     echo 'You are not authorized to view this page';
@@ -81,7 +81,7 @@ $placeinhead = '<script>
 </style>';
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 echo '<p><button type="button" onclick="uncheckall()">',_('Uncheck All'),'</button> ';
 echo '<button type="button" onclick="checkall()">',_('Select All'),'</button></p>';
@@ -107,4 +107,4 @@ echo '</tbody></table>';
 
 echo '<p><button type="button" onclick="setassess()">',_('Use Assessments'),'</button></p>';
 
-require('../footer.php');
+require_once '../footer.php';

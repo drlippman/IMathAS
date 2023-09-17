@@ -14,7 +14,7 @@
 //use "sortby" with consecutive values to specify order in characteristics
 //should be used to sort values. Use negative for a descending sort
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($CFG['coursebrowser'])) {
 	echo "Course Browser is not enabled on this site";
 	exit;
@@ -142,7 +142,7 @@ $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
 $pagetitle = _('Course Browser');
-require("../header.php");
+require_once "../header.php";
 
 if (!isset($_GET['embedded'])) {
   $curBreadcrumb = $breadcrumbbase . _('Course Browser');
@@ -402,4 +402,4 @@ new Vue({
 });
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

@@ -12,7 +12,7 @@
 
 
 
-require("../../init.php");
+require_once "../../init.php";
 
 if (($myrights < 100 && empty($CFG['LTI']['useradd13'])) || $myrights < 40) {
   exit;
@@ -84,7 +84,7 @@ foreach ($platforms as $row) {
 $uniqid = uniqid();
 
 $pagetitle = _('LTI 1.3 Platforms');
-require("../../header.php");
+require_once "../../header.php";
 
 echo '<div class=breadcrumb>'.$breadcrumbbase;
 echo '<a href="../../admin/admin2.php">'._('Admin').'</a> ';
@@ -427,4 +427,4 @@ $(function() {
 });
 </script>
 <?php
-require('../../footer.php');
+require_once '../../footer.php';

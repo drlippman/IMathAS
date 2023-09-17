@@ -61,7 +61,7 @@ if (!empty($_SESSION['userid'])) { // logged in
         if ($wasLTI) {
             require __DIR__."/header.php";
             echo _('Your session has expired. Please go back to your LMS and open this assignment again.');
-            require 'footer.php';
+            require_once 'footer.php';
             exit;
         }
     }
@@ -196,7 +196,7 @@ if ($haslogin && !$hasusername) {
         require_once "includes/password.php";
     }
     if (!empty($line['mfa'])) {
-        require(__DIR__.'/includes/mfa.php');
+        require_once __DIR__.'/includes/mfa.php';
         $mfadata = json_decode($line['mfa'], true);
         if (isset($_SERVER['QUERY_STRING'])) {
             $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']);

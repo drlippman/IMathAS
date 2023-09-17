@@ -7,9 +7,9 @@
 ini_set("max_execution_time", "600");
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$get_uid = Sanitize::simpleString($_GET['uid'] ?? '');
@@ -117,7 +117,7 @@ ini_set("max_execution_time", "600");
 		}
 
 		/**** confirmation page body *****/
-		require("../header.php");
+		require_once "../header.php";
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=".Sanitize::courseId($cid)."&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($get_uid)."\">";

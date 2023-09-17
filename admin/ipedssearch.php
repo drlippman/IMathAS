@@ -1,6 +1,6 @@
 <?php
 
-require('../init_without_validate.php');
+require_once '../init_without_validate.php';
 header('Content-Type: application/json; charset=utf-8');
 $skip = ['high','middle','junior','elementary','school'];
 $out = array();

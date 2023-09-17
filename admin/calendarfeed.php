@@ -1,9 +1,9 @@
 <?php
 
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 
 //replace later with some sort of access code
-require("../includes/JWT.php");
+require_once "../includes/JWT.php";
 if (!isset($_REQUEST['t'])) {
 	echo 'Token required';
 	exit;
@@ -44,7 +44,7 @@ if (isset($JWTsess->T) && $a = toalarmformat($JWTsess->C)) {
 	$alarms['C'] = $a;
 }
 
-require("../includes/calendardata.php");
+require_once "../includes/calendardata.php";
 
 list($coursename,$calevents) = getCalendarEventData($cid, $userid);
 

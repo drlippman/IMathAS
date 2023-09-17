@@ -20,7 +20,7 @@
     ALTER TABLE imas_assessment_records ADD INDEX status;
 */
 
-require("../../init_without_validate.php");
+require_once "../../init_without_validate.php";
 ini_set("max_execution_time", "180");
 
 if (php_sapi_name() == "cli") {

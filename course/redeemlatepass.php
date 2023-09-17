@@ -2,12 +2,12 @@
 //IMathAS:  Redeem latepasses
 //(c) 2007 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 
-	require("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
@@ -25,7 +25,7 @@
 	$latepasses = $studentinfo['latepasses'];
 
 	if (isset($_GET['undo'])) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>";
 		if ($from != 'ltitimelimit') {
 			echo "$breadcrumbbase ";
@@ -90,7 +90,7 @@
 		} else {
 			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$_SESSION['ltiitemid']}\">Continue</a></p>";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 
 	} else if (isset($_POST['confirm'])) {
 		//$addtime = $latepasshrs*60*60;
@@ -161,7 +161,7 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$_SESSION['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 		}
 	} else {
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>";
 		if ($from != 'ltitimelimit') {
 			echo "$breadcrumbbase ";
@@ -279,7 +279,7 @@
 		} else {
 			echo "<p>You are not allowed to use additional latepasses on this assessment.</p>";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 	}
 
 ?>

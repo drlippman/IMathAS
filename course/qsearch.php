@@ -1,6 +1,6 @@
 <?php 
 
-require('../init.php');
+require_once '../init.php';
 
 if (!isset($teacherid)) {
     echo 'You do not have access to this page';
@@ -60,7 +60,7 @@ if (isset($_GET['getassess'])) {
     exit;
 }
 
-require('../includes/questionsearch.php');
+require_once '../includes/questionsearch.php';
 
 $search = parseSearchString($_POST['search']);
 $offset = intval($_POST['offset']);

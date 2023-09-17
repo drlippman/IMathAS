@@ -4,8 +4,8 @@
 	//add/modify gbitem w/ grade edit
 	//grade edit
 	//single grade edit
-	require("../init.php");
-	require("../includes/htmlutil.php");
+	require_once "../init.php";
+	require_once "../includes/htmlutil.php";
 	require_once("../includes/TeacherAuditLog.php");
 
 	$istutor = false;
@@ -30,15 +30,15 @@
 			}
 		}
 		if (!$isok) {
-			require("../header.php");
+			require_once "../header.php";
 			echo "You don't have authority for this action";
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	} else if (!$isteacher) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -78,7 +78,7 @@
 			}
 			exit;
 		} else {
-			require("../header.php");
+			require_once "../header.php";
 			$stm = $DBH->prepare("SELECT name,courseid FROM imas_gbitems WHERE id=:id");
 			$stm->execute(array(':id'=>$delItem));
 			list($itemname,$itemcourseid) = $stm->fetch(PDO::FETCH_NUM);
@@ -97,7 +97,7 @@
 				Sanitize::encodeUrlParam($_GET['stu']), $cid, Sanitize::encodeUrlParam($_GET['del']));
 
 			echo '</p></form>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 
@@ -445,8 +445,8 @@
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
-	require("../includes/rubric.php");
-	require("../header.php");
+	require_once "../includes/rubric.php";
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -828,7 +828,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 
 <?php
 	$placeinfooter = '<div id="autosuggest"><ul></ul></div>';
-	require("../footer.php");
+	require_once "../footer.php";
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {

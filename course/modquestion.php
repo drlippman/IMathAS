@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once("../includes/TeacherAuditLog.php");
 
  //set some page specific variables and counters
@@ -242,7 +242,7 @@ function previewq(qn) {
   previewpop.focus();
 }
 </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -379,5 +379,5 @@ if (!isset($_GET['id'])) {
 	echo '</form>';
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -1,6 +1,6 @@
 <?php
 $init_skip_csrfp = true;
-require('../init.php');
+require_once '../init.php';
 
 if ($myrights < 20) {
   exit;

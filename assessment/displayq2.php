@@ -8,8 +8,8 @@ $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arc
 $allowedmacros = $mathfuncs;
 require_once("mathphp2.php");
 require_once("mathparser.php");
-require("interpret5.php");
-require("macros.php");
+require_once "interpret5.php";
+require_once "macros.php";
 require_once(__DIR__ . "/../includes/sanitize.php");
 // This script is no longer officially supported, so don't bother recording errors
 error_reporting(0);

@@ -2,11 +2,11 @@
 //Displays forum threads
 //(c) 2006 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 if (isset($teacherid)) {
@@ -183,9 +183,9 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 }
 
 if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
-	require("../header.php");
+	require_once "../header.php";
 		echo '<p>This forum is closed.  <a href="../course/course.php?cid='.$cid.'">Return to the course page</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -275,11 +275,11 @@ if ($tagfilter != '') {
 
 $caller = 'thread';
 if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
-	require("posthandler.php");
+	require_once "posthandler.php";
 }
 
 if (isset($_GET['search']) && trim($_GET['search'])!='') {
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 		echo "$breadcrumbbase  <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -294,7 +294,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		$oktoshow = ($stm->rowCount()>0);
 		if (!$oktoshow) {
 			echo '<p>'._('This search is blocked. In this forum, you must post your own thread before you can read those posted by others.').'</p>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -352,7 +352,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		echo "<p><a href=\"posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeUrlParam($row[0])."&thread=".Sanitize::encodeUrlParam($row[1])."\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -386,7 +386,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/t
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
 $placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid';</script>";
-require("../header.php");
+require_once "../header.php";
 
 
 if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -814,5 +814,5 @@ echo "</p>";
 		echo "<p>$prevnext</p>";
 	}
 
-	require("../footer.php");
+	require_once "../footer.php";
 	?>

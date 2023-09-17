@@ -1,9 +1,9 @@
 <?php
 
-require("../init.php");
-require('mathparser.php');
+require_once "../init.php";
+require_once 'mathparser.php';
 $allowedmacros = [];
-require('macros.php');
+require_once 'macros.php';
 
 if ($myrights < 100) {
   exit;

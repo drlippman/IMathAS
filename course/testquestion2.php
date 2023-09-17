@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 require_once('../assess2/AssessStandalone.php');
 
 $assessver = 2;
@@ -214,7 +214,7 @@ $placeinhead .= '<script>
       });
   }
   </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -499,6 +499,6 @@ $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

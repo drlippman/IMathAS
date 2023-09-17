@@ -3,7 +3,7 @@
 //(c) 2021 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/TeacherAuditLog.php");
 
  //set some page specific variables and counters
@@ -76,7 +76,7 @@ if (!(isset($teacherid))) {
     }
 }
 
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -122,4 +122,4 @@ if ($overwriteBody==1) {
     }
     echo '</form>';
 }
-require('../footer.php');
+require_once '../footer.php';

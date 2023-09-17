@@ -4,7 +4,7 @@
 
 use \IMSGlobal\LTI;
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 	echo _("Not authorized to view this page");
 	exit;
@@ -25,7 +25,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
   require_once($CFG['hooks']['lti']);
 }
 if (isset($CFG['hooks']['ltihome'])) {
-	require($CFG['hooks']['ltihome']);
+	require_once $CFG['hooks']['ltihome'];
 }
 
 $db = new Imathas_LTI_Database($DBH);
@@ -51,7 +51,7 @@ if (!empty($_POST['pullroster'])) {
         list($newcnt,$notfound) = $db->update_roster($data, $localcourse, $platform_id);
     }
 
-	require('../header.php');
+	require_once '../header.php';
 	echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Roster Pull Results').'</div>';
     echo '<h1>'._('Roster Pull Results').'</h2>';
     

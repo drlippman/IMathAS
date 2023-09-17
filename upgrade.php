@@ -2,7 +2,7 @@
 //Database and data storage upgrade script
 //Call this script via the web as an admin each time you update the code
 
-require('migrator.php');
+require_once 'migrator.php';
 
 //don't use this anymore:  create files in the /migrations/ directory
 //old approach: change counter; increase by 1 each time a change is made
@@ -53,10 +53,10 @@ unset($dbpassword);
 	//$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
 		$init_skip_csrfp = true;
-		require("init_without_validate.php");
+		require_once "init_without_validate.php";
 	} else {
 		$init_skip_csrfp = true;
-		require("init.php");
+		require_once "init.php";
 		if ($myrights<100) {
 			echo "No rights, aborting";
 			exit;

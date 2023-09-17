@@ -1,15 +1,15 @@
 <?php
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 	require_once("../includes/TeacherAuditLog.php");
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	if (!$isteacher && !$istutor) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher or tutor to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -56,9 +56,9 @@
 		exit;
 	}
 	if ($istutor && $tutoredit==2) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You not have access to view scores for this assessment";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
@@ -246,8 +246,8 @@
 	}
 
 
-	require("../assessment/displayq2.php");
-	require("../includes/htmlutil.php");
+	require_once "../assessment/displayq2.php";
+	require_once "../includes/htmlutil.php";
 
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -313,10 +313,10 @@
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
 	}
 	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}</style>';
-	require("../includes/rubric.php");
+	require_once "../includes/rubric.php";
 	$_SESSION['coursetheme'] = $coursetheme;
     $useeqnhelper = 0;
-	require("../assessment/header.php");
+	require_once "../assessment/header.php";
 	echo "<style type=\"text/css\">p.tips {	display: none;} .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -724,7 +724,7 @@
 
 
 
-	require("../footer.php");
+	require_once "../footer.php";
 	function getpts($sc) {
 		if (strpos($sc,'~')===false) {
 			if ($sc>0) {

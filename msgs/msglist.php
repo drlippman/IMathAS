@@ -10,13 +10,13 @@ tagged: 0 no, 1 yes
 If deleted on both ends, delete from DB
 
 	*/
-	require("../init.php");
-	require('../includes/getcourseopts.php');
+	require_once "../init.php";
+	require_once '../includes/getcourseopts.php';
 
 	if (isset($cid) && $cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 
@@ -172,9 +172,9 @@ If deleted on both ends, delete from DB
 				}
 			}
 			if (!$isvalid) {
-				require("../header.php");
+				require_once "../header.php";
 				echo 'You are not permitted to send a message to that user in this course.';
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 
@@ -265,7 +265,7 @@ If deleted on both ends, delete from DB
 					}
 				}
 				</script>';
-			require("../header.php");
+			require_once "../header.php";
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 				echo "<a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -336,7 +336,7 @@ If deleted on both ends, delete from DB
                     $message = $res['html'];
                     $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
                 } else {
-                    require("../assessment/displayq2.php");
+                    require_once "../assessment/displayq2.php";
                     $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
                 }
 				$message = printfilter(forcefiltergraph($message));
@@ -511,7 +511,7 @@ If deleted on both ends, delete from DB
 				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
 			}
 			echo '</form>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -558,7 +558,7 @@ If deleted on both ends, delete from DB
 	if (isset($_SESSION['ltiitemtype'])) {
 		$nologo = true;
 	}
-	require("../header.php");
+	require_once "../header.php";
 	$curdir = rtrim(dirname(__FILE__), '/\\');
    
 	echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -878,5 +878,5 @@ function chgfilter() {
 	}
 
 	echo '<p>&nbsp;</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

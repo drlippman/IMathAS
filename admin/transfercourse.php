@@ -2,7 +2,7 @@
 // Add/remove Teachers
 // IMathAS (c) 2018 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -76,7 +76,7 @@ if (isset($_POST['loadgroup'])) {
 	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['search'])) {
-	require("../includes/userutils.php");
+	require_once "../includes/userutils.php";
 	$search = (string) trim($_POST['search']);
 	$possible_teachers = searchForUser($search, true, true);
 	$out = array();
@@ -112,7 +112,7 @@ $placeinhead .= '<style type="text/css">
 
 $pagetitle = _('Transfer Course Ownership');
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if ($from == 'admin') {
@@ -201,4 +201,4 @@ var app = new Vue({
 });
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

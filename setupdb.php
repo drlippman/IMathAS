@@ -1054,7 +1054,7 @@ $stm->execute(array(':SID'=>$username, ':password'=>$md5pw, ':rights'=>100, ':Fi
 echo "user " . Sanitize::encodeStringForDisplay($username) . " created<br/>";
 
 //write upgradecounter
-require("upgrade.php");
+require_once "upgrade.php";
 
 echo "<p><b>Database setup complete</b>.  <a href=\"index.php\">Go to IMathAS login page</a>, or <a href=\"installexamples.php\">install a library of example questions</a> (will ask you to log in)</p>";
 ?>

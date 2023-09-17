@@ -4,7 +4,7 @@
 
 $lastupdate = '20230602';
 
-require('../init.php');
+require_once '../init.php';
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
   echo 'Error - need to specify course ID and assessment ID in URL';
   exit;
@@ -48,7 +48,7 @@ if ($isltilimited || $inTreeReader) {
 }
 $nologo = true;
 $useeditor = 1;
-require('../header.php');
+require_once '../header.php';
 
 if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
@@ -81,4 +81,4 @@ $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
-require('../footer.php');
+require_once '../footer.php';

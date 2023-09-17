@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid)) {
 	exit;
@@ -20,9 +20,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 $stuemails = implode('; ',$stuemails);
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 echo '<textarea id="emails" style="width:470px;height:400px;">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
 echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
-require("../footer.php");
+require_once "../footer.php";
 ?>

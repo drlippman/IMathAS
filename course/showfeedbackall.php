@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 $cid = Sanitize::courseId($_GET['cid']);
 
 $isteacher = isset($teacherid);
@@ -65,7 +65,7 @@ if ($canviewall && !empty($_GET['stu'])) {
 	$stu = $userid;
 }
 
-require("gbtable2.php");
+require_once "gbtable2.php";
 
 $includecomments = true;
 
@@ -73,7 +73,7 @@ $gbt = gbtable($stu);
 
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 echo '<h1>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h1>';
 
@@ -105,4 +105,4 @@ for ($i=0;$i<count($gbt[0][1]);$i++) {
 	echo '</div>';
 }
 
-require("../footer.php");
+require_once "../footer.php";

@@ -1,7 +1,7 @@
 <?php
 //save calendar drag-and-drop
 
-require("../init.php");
+require_once "../init.php";
 
 header('Content-Type: application/json');
 

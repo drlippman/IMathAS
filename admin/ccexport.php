@@ -2,9 +2,9 @@
 //IMathAS: Common Catridge v1.1 Export
 //(c) 2011 David Lippman
 
-require "../init.php";
-require "../includes/copyiteminc.php";
-require "../includes/loaditemshowdata.php";
+require_once "../init.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
 
 if (!is_numeric($_GET['cid'])) {
     echo 'Invalid course ID.';
@@ -21,9 +21,9 @@ $path = realpath("../course/files");
 
 if (isset($_GET['create']) && isset($_POST['whichitems'])) {
     if ($_POST['lms'] == 'bb' && $_POST['carttype'] == 'bb') {
-        require "bbexport-generate.php";
+        require_once "bbexport-generate.php";
     } else {
-        require "ccexport-generate.php";
+        require_once "ccexport-generate.php";
     }
     exit;
 } else {
@@ -100,7 +100,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
     $placeinhead .= '<style type="text/css">
 	 .nomark.canvasoptlist li { text-indent: -25px; margin-left: 25px;}
 	 </style>';
-    require "../header.php";
+    require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"../course/course.php?cid=$cid\">" . Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; ";
@@ -260,6 +260,6 @@ $alt = 0;
     echo '</form>';
 
 }
-require "../footer.php";
+require_once "../footer.php";
 
 ?>

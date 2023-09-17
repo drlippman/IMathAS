@@ -134,7 +134,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($stm->rowCount()==0) {
 
 				$sendemail = false;
-				require("../header.php");
+				require_once "../header.php";
 				echo '<h1>Error:</h1><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
 				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::url($returnurl).'">Continue</a></p>';
 				echo '<hr>';
@@ -142,7 +142,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<p>Message:</p><div class="editor">'.Sanitize::outgoingHtml(filter($_POST['message'])).'</div>';
 				echo '<p>HTML format:</p>';
 				echo '<div class="editor">'.Sanitize::encodeStringForDisplay($_POST['message']).'</div>';
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			} else {
 				$uid = $stm->fetchColumn(0);
@@ -330,7 +330,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
         if (!empty($_GET['embed'])) {
             $placeinhead .= '<script>function submitpost() { document.getElementsByTagName("form")[0].submit();}</script>';
         }
-		require("../header.php");
+		require_once "../header.php";
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
             if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -422,7 +422,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
                         $message = $res['html'];
                         $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
                     } else {
-                        require("../assessment/displayq2.php");
+                        require_once "../assessment/displayq2.php";
                         $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
                     }
 					$message = printfilter(forcefiltergraph($message));
@@ -740,7 +740,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } else if (isset($_GET['remove']) && $allowdel) {// $isteacher) { //removing post
@@ -809,13 +809,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm->execute(array(':id'=>$_GET['remove']));
 		$parent = $stm->fetchColumn(0);
 
-		require("../header.php");
+		require_once "../header.php";
 		if (!$isteacher) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
 			$stm->execute(array(':parent'=>$_GET['remove']));
 			if ($stm->rowCount()>0) {
 			echo "Someone has replied to this post, so you cannot remove it.  <a href=\"$returnurl\">Back</a>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -838,7 +838,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '<p><button type=submit name=confirm value=true>'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum   NEW ONE
@@ -923,7 +923,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}</script>';
 		$pagetitle = "Move Thread";
 
-		require("../header.php");
+		require_once "../header.php";
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
             if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -982,7 +982,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo "<p><input type=submit value=\"Move\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo "</form>";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 	}

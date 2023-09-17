@@ -12,7 +12,7 @@ $loadmathfilter = 1;
 $loadgraphfilter = 1;
 require_once("../includes/filehandler.php");
 require_once("../filter/filter.php");
-require("bbexport-templates.php");
+require_once "bbexport-templates.php";
 if (substr($mathimgurl,0,4) !== 'http') {
     // need to make an absolute url
     if (strlen($imasroot) > 0) { 

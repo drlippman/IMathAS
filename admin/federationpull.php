@@ -5,7 +5,7 @@
 //TODO: Fix handling of library items when questions are deleted, undeleted
 //      when questions are added
 
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/filehandler.php");
 
 if ($myrights<100) {
@@ -94,7 +94,7 @@ if (!$continuing) {  //start a fresh pull
 } else if ($pullstatus['step']==0 && !isset($_POST['record'])) {
 	//have pulled library info
 	//do interactive confirm.
-	require("../header.php");
+	require_once "../header.php";
 	print_header();
 
 	echo '<h1>Updating Libraries</h1>';
@@ -495,7 +495,7 @@ if (!$continuing) {  //start a fresh pull
 		$(".U"+n).prop("checked",false);
 	}
 	</script>';
-	require("../header.php");
+	require_once "../header.php";
 	print_header();
 
 	echo '<h1>Updating Questions Batch</h1>';
@@ -516,7 +516,7 @@ if (!$continuing) {  //start a fresh pull
 	if (count($quids)==0) {
 		echo '<p>No questions to update</p>';
 	} else {
-		require("../includes/diff.php");
+		require_once "../includes/diff.php";
 		$licenses = array(
 			0=>'Copyrighted',
 			1=>'IMathAS / WAMAP / MyOpenMath Community License',
@@ -1008,7 +1008,7 @@ if (!$continuing) {  //start a fresh pull
 	//do interactive confirmation
 
 	$data = json_decode(file_get_contents(getfopenloc($pullstatus['fileurl'])), true);
-	require("../header.php");
+	require_once "../header.php";
 	print_header();
 
 	//pull library names and local ids
@@ -1239,13 +1239,13 @@ if ($autocontinue) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/federationpull.php?peer=".Sanitize::encodeUrlParam($peer));
 	exit;
 } else if ($done) {
-	require("../header.php");
+	require_once "../header.php";
 	print_header();
 	echo '<p>Done!</p>';
 	echo '<p><a href="admin2.php">Back to Admin Page</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 } else {
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 }
 ?>

@@ -1,7 +1,7 @@
 <?php
  //IMathAS:  Save page reordering from Quick View
  //(c) 2008 David Lippman
- require("../init.php");
+ require_once "../init.php";
 
  if (!isset($teacherid)) {
 	 echo "Must be a teacher to access this page";
@@ -183,7 +183,7 @@ function additems2($arr) {
  }
  echo '1,'.md5($itemlist).':';
 
- require("courseshowitems.php");
+ require_once "courseshowitems.php";
  $openblocks = Array(0);
  $prevloadedblocks = array(0);
  if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}

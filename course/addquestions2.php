@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 include("../includes/htmlutil.php");
 require_once("../includes/TeacherAuditLog.php");
 
@@ -463,7 +463,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
     // do initial search
-    require('../includes/questionsearch.php');
+    require_once '../includes/questionsearch.php';
     $search_parsed = parseSearchString($searchterms);
     $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
         'existing' => $existingq
@@ -474,7 +474,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 /******* begin html output ********/
 //hack to prevent the page breaking on accessible mode
 $_SESSION['useed'] = 1;
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -819,4 +819,4 @@ if ($overwriteBody==1) {
     }
 }
 
-require("../footer.php");
+require_once "../footer.php";

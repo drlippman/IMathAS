@@ -16,7 +16,7 @@ img {
 <body>
 <?php
 	$pagetitle = "Entering Answers";
-	require("../infoheader.php");
+	require_once "../infoheader.php";
 ?>
 
 <img class="floatleft" src="<?php echo "$imasroot/img/typing.jpg"?>" alt="Picture of typing"/>

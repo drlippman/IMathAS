@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 if ($myrights<20) {exit;}
 
 $isadmin = (isset($_GET['cid']) && $_GET['cid']=='admin' && $myrights==100);
@@ -106,7 +106,7 @@ function quicksave() {
 	});
 }
 </script>';
-require('../header.php');
+require_once '../header.php';
 
 echo '<div class=breadcrumb><a href="../index.php">'._('Home').'</a> &gt; '._('Question Errors').'</div>';
 echo '<h2>'._('Question Errors').'</h2>';
@@ -116,7 +116,7 @@ echo _('Click the Seed to test that particular version of the question. Click th
 echo _('Once you have fixed the issue or determined it does not need fixing, clear the log entry. ');
 echo '</p>';
 if (isset($CFG['hooks']['util/questionerrors'])) {
-	require($CFG['hooks']['util/questionerrors']);
+	require_once $CFG['hooks']['util/questionerrors'];
 }
 
 if ($isadmin) {
@@ -152,7 +152,7 @@ foreach ($qorder as $qsetid) {
 echo '</ul>';
 echo '</form>';
 
-require('../footer.php');
+require_once '../footer.php';
 
 
 

@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -206,7 +206,7 @@ $placeinhead .= '$(".sl").attr("title","'._("Modify course settings").'");$(".tr
 $placeinhead .= '</script>';
 
  /******* begin html output ********/
- require("../header.php");
+ require_once "../header.php";
 
  if ($overwriteBody==1) {
 	echo $body;
@@ -422,5 +422,5 @@ $placeinhead .= '</script>';
 <?php
 	}
 }
- require("../footer.php");
+ require_once "../footer.php";
 ?>

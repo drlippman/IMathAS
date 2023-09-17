@@ -3,7 +3,7 @@
 //for mobile access w/o logging in
 //(c) 2009 David Lippman
 	$init_skip_csrfp = true;
-   	require("init_without_validate.php");
+   	require_once "init_without_validate.php";
    	$keyString = Sanitize::simpleString($_GET['key']);
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
         $keyString = Sanitize::simpleString($_COOKIE['remoteaccess']);

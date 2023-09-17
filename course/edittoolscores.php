@@ -2,8 +2,8 @@
 //IMathAS:  Add/modify external tool scores
 //(c) 2014 David Lippman
 
-	require("../init.php");
-	require("../includes/htmlutil.php");
+	require_once "../init.php";
+	require_once "../includes/htmlutil.php";
 
 
 	$istutor = false;
@@ -32,15 +32,15 @@
 	if ($istutor) {
 		$isok = (($tutoredit&1)==1);
 		if (!$isok) {
-			require("../header.php");
+			require_once "../header.php";
 			echo "You don't have authority for this action";
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	} else if (!$isteacher) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -53,7 +53,7 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
 			exit;
 		} else {
-			require("../header.php");
+			require_once "../header.php";
 			echo "<p>Are you SURE you want to clear all associated grades on this item from the gradebook?</p>";
 			
 			$querystring = http_build_query(array('stu'=>$_GET['stu'], 'cid'=>$cid, 'lid'=> $lid));
@@ -64,7 +64,7 @@
 			echo " <a href=\"gradebook.php?$querystring2\">Nevermind</a></p>";
 			echo '</form>';
 			
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -131,7 +131,7 @@
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=121213\"></script>";
 
 
-	require("../header.php");
+	require_once "../header.php";
     printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
         Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -260,5 +260,5 @@
 </form>
 
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

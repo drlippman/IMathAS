@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -965,7 +965,7 @@ if (!empty($_POST['chglib'])) {
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
 }
-require("../header.php");
+require_once "../header.php";
 
 $address = $GLOBALS['basesiteurl'] . '/course';
 
@@ -1347,7 +1347,7 @@ function getnextprev(formn,loc) {
 	}
 
 }
-require("../footer.php");
+require_once "../footer.php";
 
 
 function delqimgs($qsid) {

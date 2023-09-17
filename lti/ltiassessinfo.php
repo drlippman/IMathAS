@@ -4,7 +4,7 @@
 
 use \IMSGlobal\LTI;
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 	echo _("Not authorized to view this page");
 	exit;
@@ -67,7 +67,7 @@ if (!empty($_POST['makelineitem'])) {
         $lineitems[$row['lticourseid']] = $row['lineitem'];
     }
 
-    require(__DIR__ . '/../includes/ltioutcomes.php');
+    require_once __DIR__ . '/../includes/ltioutcomes.php';
     $cnt = 0;
     foreach ($scores as $scoredata) {
         if (!isset($lineitems[$scoredata['lticourseid']])) {
@@ -99,7 +99,7 @@ $placeinhead = '<style>.flexform { display: flex; justify-content: space-between
  .flexform button {margin-left: 10px;}
  .borderwrap { border: 1px solid #ccc; padding: 10px; max-width:600px;}
  .borderwrap h3 { margin-top: 5px;}</style>';
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class="breadcrumb">'.$breadcrumbbase . ' '.$pagetitle.'</div>';
 
@@ -203,7 +203,7 @@ if ($launch->has_nrps() && empty($localcourse->get_allow_direct_login())) {
     echo '</form>';
     echo '</div>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 function formatdate($date) {
 	if ($date==0 || $date==2000000000) {

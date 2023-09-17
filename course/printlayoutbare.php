@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 
@@ -58,7 +58,7 @@ $isdiag = false;
 if ($overwriteBody==1) {
 	echo $body;
 } if (!isset($_POST['versions'])) {
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -98,7 +98,7 @@ if ($overwriteBody==1) {
 
 } else {
     $useeqnhelper = 0;
-	require("../assessment/header.php");
+	require_once "../assessment/header.php";
 	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -352,7 +352,7 @@ if ($overwriteBody==1) {
 
 }
 $_SESSION['graphdisp'] = $origgraphdisp;
-require("../footer.php");
+require_once "../footer.php";
 
 function printq2($qn,$qsetid,$seed,$pts,$showpts) {
     global $a2,$isfinal,$imasroot,$urlmode;

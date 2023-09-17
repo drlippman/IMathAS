@@ -1,12 +1,12 @@
 <?php
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 if ($myrights<20) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You need to log in as a teacher to access this page";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -1003,7 +1003,7 @@ $placeinhead .= '<style type="text/css">
  </style>';
 
 $flexwidth = true;
-require("../header.php");
+require_once "../header.php";
 
 if (isset($_GET['aid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -1503,5 +1503,5 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 
 </form>
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

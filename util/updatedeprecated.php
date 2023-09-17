@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) { exit;}
 if (isset($_POST['data'])) {
 	$info = array();

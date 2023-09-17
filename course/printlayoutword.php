@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
  //set some page specific variables and counters
@@ -39,11 +39,11 @@ $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 
 if ($overwriteBody==1) {
-	require("../header.php");
+	require_once "../header.php";
 	echo $body;
 } if (!isset($_REQUEST['versions'])) {
 
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -348,7 +348,7 @@ if ($overwriteBody==1) {
 		$pandocurl = 'http://'.$CFG['GEN']['pandocserver'];
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
@@ -404,7 +404,7 @@ if ($overwriteBody==1) {
 	*/
   $_SESSION['mathdisp'] = $origmathdisp;
   $_SESSION['graphdisp'] = $origgraphdisp;
-  require("../footer.php");
+  require_once "../footer.php";
 	exit;
 }
 

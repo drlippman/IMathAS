@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid) || !isset($cid)) {
 	echo "You are not authorized to view this page";
@@ -55,7 +55,7 @@ if (isset($_POST['aidorder'])) {
 	exit;
 
 } else {
-	require("../includes/copyiteminc.php");
+	require_once "../includes/copyiteminc.php";
 	$stm = $DBH->query("SELECT itemorder FROM imas_courses WHERE id=$cid");
 	$items = unserialize($stm->fetchColumn(0));
 	$gitypeids = array();
@@ -67,7 +67,7 @@ if (isset($_POST['aidorder'])) {
 	$agbcats = array();
 	getsubinfo($items,'0','','Assessment');
 
-	require("../header.php");
+	require_once "../header.php";
 
 	echo '<h1>Quick-setup conditional release</h1>';
 
@@ -92,7 +92,7 @@ if (isset($_POST['aidorder'])) {
 	echo '<input type="submit"/>';
 	echo '</form>';
 
-	require("../footer.php");
+	require_once "../footer.php";
 }
 
 

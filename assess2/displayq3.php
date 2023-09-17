@@ -68,8 +68,8 @@ $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arc
 $allowedmacros = $mathfuncs;
 require_once("../assessment/mathphp2.php");
 require_once("../assessment/mathparser.php");
-require("../assessment/interpret5.php");
-require("../assessment/macros.php");
+require_once "../assessment/interpret5.php";
+require_once "../assessment/macros.php";
 require_once(__DIR__ . "/../includes/sanitize.php");
 
 

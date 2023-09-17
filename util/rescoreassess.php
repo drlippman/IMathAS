@@ -1,7 +1,7 @@
 <?php
 
-require("../init.php");
-require("../assessment/testutil.php");
+require_once "../init.php";
+require_once "../assessment/testutil.php";
 
 if ($myrights<100) {
 	exit;

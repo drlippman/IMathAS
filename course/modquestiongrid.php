@@ -179,7 +179,7 @@
 				}
 			}
 			</script>';
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 
@@ -346,7 +346,7 @@ if (isset($_POST['checked'])) { //modifying existing
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 ?>

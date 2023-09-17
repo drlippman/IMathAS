@@ -264,7 +264,7 @@ if (isset($placeinhead)) {
 }
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
-	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
+	require_once "$curdir/{$CFG['GEN']['headerscriptinclude']}";
 }
 if (function_exists('insertIntoHead')) {
     insertIntoHead();
@@ -303,7 +303,7 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 }
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
     $prepend = '/' == substr($CFG['GEN']['headerinclude'], 0, 1) ? '' : $curdir;
-	require("$prepend/{$CFG['GEN']['headerinclude']}");
+	require_once "$prepend/{$CFG['GEN']['headerinclude']}";
 }
 $didnavlist = false;  $essentialsnavcnt = 0;
 function getactivetab() {

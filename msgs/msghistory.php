@@ -2,11 +2,11 @@
 	//Displays message history as conversation
 	//(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
@@ -42,7 +42,7 @@
 			}
 		}
 		</script>';
-	require("../header.php");
+	require_once "../header.php";
 
 	$allowmsg = false;
 	$query = "SELECT baseid,courseid,msgto,msgfrom FROM imas_msgs WHERE id=:id";
@@ -57,7 +57,7 @@
 	}
 	if ($stm->rowCount()==0) {
 		echo "Message not found";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
     $line =  $stm->fetch(PDO::FETCH_ASSOC);
@@ -296,5 +296,5 @@
 	echo "<script type=\"text/javascript\">";
 	echo "var bcnt =".$bcnt."; var icnt = $icnt;\n";
 	echo "</script>";
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

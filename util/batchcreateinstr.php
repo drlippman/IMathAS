@@ -9,11 +9,11 @@ ini_set("max_execution_time", "1600");
 
 
 
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/copyiteminc.php");
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['util/batchcreateinstr'])) {
-    require($CFG['hooks']['util/batchcreateinstr']);
+    require_once $CFG['hooks']['util/batchcreateinstr'];
 }
 
 if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
@@ -261,7 +261,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 
   echo '</p>';
 } else {
-  require("../header.php");
+  require_once "../header.php";
   if ($_GET['from']=='userreports') {
   	  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/userreports.php\">User Reports</a>\n";
   } else if ($_GET['from'] == 'admin') {
@@ -290,7 +290,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($_GET['from']).'">';
   echo '<input type="submit" value="Go"/>';
   echo '</form>';
-  require("../footer.php");
+  require_once "../footer.php";
 }
 
 

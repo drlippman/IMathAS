@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/filehandler.php");
 
 

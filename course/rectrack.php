@@ -18,7 +18,7 @@ forummod	modify form post/reply		imas_forum_posts.id,  info has imas_forums.id ;
 */
 
 $init_skip_csrfp = true;
-require("../init.php");
+require_once "../init.php";
 if (isset($studentid)) {
 	$now = time();
 	if (isset($_POST['unloadinglinked'])) {

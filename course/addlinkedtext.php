@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/parsedatetime.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/parsedatetime.php";
 
 
 
@@ -501,7 +501,7 @@ $placeinhead .= '<script type="text/javascript">
  </script>';
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -680,5 +680,5 @@ if ($overwriteBody==1) {
 	<p>&nbsp;</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

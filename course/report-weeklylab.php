@@ -3,8 +3,8 @@
 //(c) 2016 David Cooper, David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -291,7 +291,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -510,7 +510,7 @@ $(function() {
 });
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 }
 
 ?>

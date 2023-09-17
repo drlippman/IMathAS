@@ -2,11 +2,11 @@
 //IMathAS:  Frontend of testing engine - manages administration of assessments
 //(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 	//Look to see if a hook file is defined, and include if it is
 	if (isset($CFG['hooks']['assessment/showtest'])) {
-		require(__DIR__.'/../'.$CFG['hooks']['assessment/showtest']);
+		require_once __DIR__.'/../'.$CFG['hooks']['assessment/showtest'];
 	}
 
 	if (!isset($CFG['TE']['navicons'])) {
@@ -130,7 +130,7 @@
 		}
 		if ($isreview && $canuselatepass && !isset($_GET['goreview'])) {
 			//ask them if they're sure they want review mode vs latepass
-			require("header.php");
+			require_once "header.php";
 			showEnterAssessmentBreadcrumbs($adata['name']);
 			echo '<p>'._('This assessment is past the due date, and is now in un-graded review mode where no scores will be saved.').'</p>';
 			echo '<p>'.sprintf(_('You have %d LatePass(es) available which you could use to re-open the assignment for scored work.'), $latepasses).'</p>';
@@ -138,11 +138,11 @@
 			echo _('This will re-open the assessment for graded work').'</p>';
 			echo '<p><a href="showtest.php?cid='.$cid.'&id='.$aid.'&goreview=true">'.('Continue in Review Mode').'</a> ';
 			echo '<span class="noticetext">'._('If you open the assessment in un-graded review mode now, you will not be able to use a LatePass later').'</span></p>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		if ($assessmentclosed) {
-			require("header.php");
+			require_once "header.php";
 			showEnterAssessmentBreadcrumbs($adata['name']);
 			if ($now<$activestartdate) {
 				echo '<p>', _('This assessment is not available yet'), '</p>';
@@ -171,7 +171,7 @@
 					}
 				}
 			}
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		//check reqscore
@@ -198,7 +198,7 @@
 
 				if ($adata['reqscoretype']&2) { //using percent-based
 					if ($reqscoreptsposs==-1) {
-						require("../includes/updateptsposs.php");
+						require_once "../includes/updateptsposs.php";
 						$reqscoreptsposs = updatePointsPossible($adata['reqscoreaid']);
 					}
 					if (round(100*$prereqscoretot/$reqscoreptsposs,1)+.02<abs($adata['reqscore'])) {
@@ -209,7 +209,7 @@
 				}
 			}
 			if ($isBlocked) {
-				require("header.php");
+				require_once "header.php";
 				echo '<h2>'._('You cannot start this assessment yet.').'</h2>';
 				echo '<p>';
 				printf(_('Access to this assessment requires a score of %d%s on %s'),
@@ -217,7 +217,7 @@
 					($adata['reqscoretype']&2)?'%':_(' points'),
 					Sanitize::encodeStringForDisplay($reqscorename));
 				echo '</p>';
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 
@@ -259,7 +259,7 @@
 				$adata['password'] = '';
 			} else {
 				echo "<p>Not authorized from this computer</p>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -279,7 +279,7 @@
 				}
 			}
 			if ($pwfail) {
-				require("../header.php");
+				require_once "../header.php";
 				showEnterAssessmentBreadcrumbs($adata['name']);
 				echo $out;
 				echo '<h1>'.$adata['name'].'</h1>';
@@ -292,7 +292,7 @@
 					echo '<input type=submit value="', _('Submit'), '" />';
 					echo "</form>";
 				}
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -805,7 +805,7 @@
 		//check for past time limit, with some leniency for javascript timing.
 		//want to reject if javascript was bypassed
 		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],10)) {
-			require("header.php");
+			require_once "header.php";
 			showEnterAssessmentBreadcrumbs($testsettings['name']);
 			echo '<p>';
 			if (isset($_POST['asidverify'])) {
@@ -1187,7 +1187,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	if (!empty($_SESSION['intreereader'])) {
 		$flexwidth = true;
 	}
-	require("header.php");
+	require_once "header.php";
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
@@ -1417,7 +1417,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 			echo '<p><input type=submit name="grpsubmit" value="', _('Record Group and Continue'), '"/></p>';
 			echo '</form>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -3134,7 +3134,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 	//IP:  eqntips
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 	function showembedupdatescript() {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;

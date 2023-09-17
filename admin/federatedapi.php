@@ -9,7 +9,7 @@ if (empty($_GET['peer']) || !isset($_GET['since']) || !isset($_GET['sig'])) {
 }
 
 $since = intval($_GET['since']);
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 require_once("../includes/filehandler.php");
 
 $peerName = Sanitize::stripHtmlTags($_GET['peer']);

@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Record system notice read in custominfo
 
-require("../init.php");
+require_once "../init.php";
 
 $stm = $DBH->prepare("SELECT custominfo FROM imas_students WHERE courseid=1 AND userid=:userid");
 $stm->execute(array(':userid'=>$userid));

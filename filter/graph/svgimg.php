@@ -1,6 +1,6 @@
 <?php
 	$dbsetup = true; //to prevent database connection
-	require("../../init_without_validate.php");
+	require_once "../../init_without_validate.php";
 
 	$imgdir = __DIR__ . '/imgs/'; //relative to current dir
 

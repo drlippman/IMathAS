@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -295,7 +295,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/diag.js\"></script>\n";
 
  /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) { //NO AUTHORITY
 	echo $body;
@@ -603,5 +603,5 @@ if ($overwriteBody==1) { //NO AUTHORITY
 <?php
 	}
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

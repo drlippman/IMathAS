@@ -4,7 +4,7 @@
 // Assessment "badness" report, based on
 // Lumen Learning's ImprovOER model
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid) && !isset($adminid)) {
 	exit;
@@ -16,7 +16,7 @@ $includeduedate = true;
 $canviewall = true;
 $catfilter = -1;
 $secfilter = -1;
-require("gbtable2.php");
+require_once "gbtable2.php";
 
 $gbt = gbtable();
 
@@ -160,7 +160,7 @@ foreach ($gbt[0][1] as $col=>$data) {
 arsort($assessbadness);
 
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-require("../header.php");
+require_once "../header.php";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._('Assessment Metric');
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<div id="headeraddlinkedtext" class="pagetitle"><h1>'._('Assessment Metric').'</h1></div>';
@@ -199,5 +199,5 @@ echo "<script>initSortTable('myTable',Array('S','N','N','N','N','N','N','N','N',
 <p>This metric is intended to help you see, at a quick glance, which assessments might be the most problematic in your
 course.</p>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

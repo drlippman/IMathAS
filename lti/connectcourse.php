@@ -54,7 +54,7 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
     list($copycourses,$assoccourses,$sourceUIver) =
         $db->get_potential_courses($target,$last_copied_cid,$userid);
   }
-  require('../header.php');
+  require_once '../header.php';
 
   echo '<form method=post action="setupcourse.php">';
   echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
@@ -138,5 +138,5 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
         $(".forassoc").toggle($("#linktypeassoc").is(":checked"));
       });
   });</script>';
-  require('../footer.php');
+  require_once '../footer.php';
 }

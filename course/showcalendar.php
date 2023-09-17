@@ -1,11 +1,11 @@
 <?php
 //IMathAS:  Display the calendar by itself
 //(c) 2008 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 
@@ -27,7 +27,7 @@
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
 	}
 
-	require("../includes/calendardisp.php");
+	require_once "../includes/calendardisp.php";
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=011823\"></script>";
 	if ($editingon) {
 		$placeinhead .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.css" integrity="sha256-Els0hoF6/l1WxcZEDh4lQsp7EqyeeYXMHCWyv6SdmX0=" crossorigin="anonymous">
@@ -36,7 +36,7 @@
 	}
 
     $pagetitle = _('Calendar');
-	require("../header.php");
+	require_once "../header.php";
 	if ($editingon) {
 	?>
 	<style type="text/css">
@@ -182,7 +182,7 @@
 
 	 showcalendar("showcalendar");
 
-	 require("../footer.php");
+	 require_once "../footer.php";
 
 
 

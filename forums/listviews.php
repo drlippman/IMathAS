@@ -2,7 +2,7 @@
 //IMathAS 2014
 //list forum thread viewers
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid)) {
 	echo "Not authorized to view this page";
@@ -23,7 +23,7 @@ if ($stm->rowCount()==0) {
 }
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 echo '<h3>'._('Thread Views').'</h3>';
 $query = "SELECT iu.LastName,iu.FirstName,ifv.lastview FROM imas_users AS iu JOIN ";
@@ -42,5 +42,5 @@ if ($stm->rowCount()==0) {
 	echo '</tbody></table>';
 }
 echo '<p class="small">'._('Note: Only the most recent thread view per person is shown').'</p>';
-require("../footer.php");
+require_once "../footer.php";
 ?>

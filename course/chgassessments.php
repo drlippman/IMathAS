@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/copyiteminc.php");
-require("../includes/loaditemshowdata.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
 require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
@@ -502,7 +502,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -1120,5 +1120,5 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 	</form>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

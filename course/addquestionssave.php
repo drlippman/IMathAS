@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Save changes to addquestions submitted through AHAH
 //(c) 2007 IMathAS/WAMAP Project
-	require("../init.php");
+	require_once "../init.php";
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (!isset($teacherid)) {
@@ -102,7 +102,7 @@
         updatePointsPossible($aid, $itemorder, $defpoints);
         $DBH->commit();
 
-        require('../includes/addquestions2util.php');
+        require_once '../includes/addquestions2util.php';
         list($jsarr, $existingqs, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, [
             'intro' => $current_intro_json,
             'itemorder' => $itemorder,

@@ -2,7 +2,7 @@
 //IMathAS - User Details page
 //(c) 2017 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 $overwriteBody = 0;
 $body = "";
@@ -219,7 +219,7 @@ $(function() {
   });
 })
 </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
   echo $body;
@@ -336,4 +336,4 @@ If you remove a user connection, it will require you to login again to your <?ph
   echo '<th>',_('Remove'),'</th>';
   echo '</tr></thead><tbody></tbody></table></div>';
 }
-require("../footer.php");
+require_once "../footer.php";

@@ -34,8 +34,8 @@ if (php_sapi_name() == "cli") {
     $_SERVER['HTTP_HOST'] = explode('//',$argv[1])[1];
 }
 
-require("../init_without_validate.php");
-require("../includes/rollingcurl.php");
+require_once "../init_without_validate.php";
+require_once "../includes/rollingcurl.php";
 require_once('../includes/ltioutcomes.php');
 
 function debuglog($str) {
@@ -66,7 +66,7 @@ $scriptStartTime = time();
 
 //if called via AWS SNS, we need to return an OK quickly so it won't retry
 if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
-	require("../includes/AWSSNSutil.php");
+	require_once "../includes/AWSSNSutil.php";
 	respondOK();
 }
 

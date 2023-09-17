@@ -2,13 +2,13 @@
 //IMathAS:  Redeem latepasses
 //(c) 2007 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$fid = Sanitize::onlyInt($_GET['fid']);
 	$from = $_GET['from'] ?? '';
 
-	require("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
@@ -28,7 +28,7 @@
 	$now = time();
 
 	if (isset($_GET['undo'])) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -116,7 +116,7 @@
 			echo "<p><a href=\"course.php?cid=".Sanitize::courseId($cid)."\">Continue</a></p>";
 		}
 
-		require("../footer.php");
+		require_once "../footer.php";
 
 	} else if (isset($_POST['confirm'])) {
 
@@ -244,7 +244,7 @@
 
 	} else {
 		//TO HERE - TODO keep going
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -364,7 +364,7 @@
 		} else {
 			echo "<p>You are not allowed to use additional latepasses on this forum assignment.</p>";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 	}
 
 ?>

@@ -1,7 +1,7 @@
 <?php
 //Utility function for copying questions used in an assessment into a seperate library
 //not integrated into user interface
-require("../init.php");
+require_once "../init.php";
 if (!isset($teacherid)) {exit;}
 
 if (!isset($_GET['cid'])) {
@@ -10,7 +10,7 @@ if (!isset($_GET['cid'])) {
 }
 $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_POST['libs']) || $_POST['libs']=='') {
-	require("../header.php");
+	require_once "../header.php";
 	if (isset($_POST['libs'])) {
 		echo "<p><b>No library selected.  Try again</b></p>";
 	}
@@ -39,7 +39,7 @@ END;
 			echo "<p><input type=submit value=\"Copy Questions to Library\">\n";
 			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"></p>\n";
 			echo "</form>\n";
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 
 }

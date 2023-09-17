@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -50,7 +50,7 @@ if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missin
             }
 			if (count($blockitems)>0) {
 				if (isset($_POST['delcontents']) && $_POST['delcontents']==1) { //clear out contents of block
-					require("delitembyid.php");
+					require_once "delitembyid.php";
 					delrecurse($blockitems);
 					array_splice($sub,$blockid,1); //remove block and contained items from itemorder
 				} else {
@@ -90,7 +90,7 @@ if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missin
 	}
 }
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -115,7 +115,7 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 /**** end html code ******/
 //nothing after the end of html for this page
 /***** cleanup code ******/

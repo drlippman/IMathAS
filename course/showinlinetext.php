@@ -1,15 +1,15 @@
 <?php
 //IMathAS:  Displays a inline text item.  Only used in treereader, so no nav
 //(c) 2018 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 	require_once("../includes/filehandler.php");
 	
 	$inlinetextid = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	if (empty($inlinetextid)) {
@@ -32,7 +32,7 @@
 
 	$placeinhead = '';
 	
-	require("../header.php");
+	require_once "../header.php";
 	
 	
 	echo '<div class="inlinetextholder" style="padding-left:10px; padding-right: 10px;">';
@@ -57,6 +57,6 @@
 	}
 	echo '</div>';
 	
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

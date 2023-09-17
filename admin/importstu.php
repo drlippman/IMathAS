@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/newusercommon.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/newusercommon.php";
 require_once("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
@@ -110,7 +110,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 		if (isset($CFG['GEN']['newpasswords'])) {
 			require_once("../includes/password.php");
         }
-        require('../includes/setSectionGroups.php');
+        require_once '../includes/setSectionGroups.php';
 		if ($isadmin) {
 			$ncid = Sanitize::onlyInt($_POST['enrollcid']);
 		} else {
@@ -261,7 +261,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -397,5 +397,5 @@ if ($overwriteBody==1) {
 	echo "	</form>\n";
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

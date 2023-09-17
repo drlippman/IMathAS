@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Flagged threads list for a course
 //(c) 2017 David Lippman
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = Sanitize::courseId($_GET['cid']);
@@ -58,7 +58,7 @@ $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/thread.js?v=011517"></script>';
 $pagetitle = _('Flagged Forum Posts');
-require("../header.php");
+require_once "../header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
 echo '<div id="headerflaggedthreads" class="pagetitle"><h1>'._('Flagged Forum Posts').'</h1></div>';
 echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=" . Sanitize::encodeUrlParam($from) . "&cid=$cid&unflagall=true'\">" . _('Unflag All') . "</button></p>";
@@ -88,5 +88,5 @@ if (count($lastpost)>0) {
 } else {
   echo "No flagged posts";
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

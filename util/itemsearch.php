@@ -1,15 +1,15 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) {exit;}
 if ((isset($_POST['submit']) && $_POST['submit']=="Message") || isset($_GET['masssend'])) {
 	$cid = $CFG['GEN']['sendquestionproblemsthroughcourse'];
 	$teacherid = true;
 	$calledfrom = "itemsearch";
-	require("../course/masssend.php");
+	require_once "../course/masssend.php";
 	exit;
 }
 
-require("../header.php");
+require_once "../header.php";
 echo '<h2>Search through inline and link text items</h2>';
 echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.Sanitize::encodeStringForDisplay($_POST['search']).'"> <input type="submit" value="Search"/></p>';
 if (isset($_POST['search'])) {
@@ -36,5 +36,5 @@ if (isset($_POST['search'])) {
 
 }
 echo '</form>';
-require("../footer.php");
+require_once "../footer.php";
 ?>

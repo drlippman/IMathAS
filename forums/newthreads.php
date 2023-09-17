@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  New threads list for a course
 //(c) 2006 David Lippman
-require("../init.php");
+require_once "../init.php";
 $cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'] ?? '';
 
@@ -97,7 +97,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/t
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});</script>';
 $pagetitle = _('New Forum Posts');
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; New Forum Posts</div>\n";
 echo '<div id="headernewthreads" class="pagetitle"><h1>New Forum Posts</h1></div>';
@@ -154,5 +154,5 @@ if (count($lastpost)>0) {
 } else {
   echo "No new posts";
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

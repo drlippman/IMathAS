@@ -1,5 +1,5 @@
 <?php
-require("../../init.php");
+require_once "../../init.php";
 
 if (empty($_GET['linkid'])) {
 	echo "no link id provided";

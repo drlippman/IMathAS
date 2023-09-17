@@ -3,7 +3,7 @@
 //(c) 2008 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid)) {
 	echo _("You must be a teacher to access this page");
@@ -126,7 +126,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
     </script>
     <style> td { white-space: nowrap;}</style>';
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=="cal") {
@@ -194,5 +194,5 @@ echo '<tr/>';
 </form>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

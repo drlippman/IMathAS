@@ -1,5 +1,5 @@
 <?php
-    require('../init.php');
+    require_once '../init.php';
     if ($myrights < 100) { exit; }
     require_once(__DIR__ . "/../includes/sanitize.php");
 ?>
@@ -14,8 +14,8 @@
 	//just a development testing program, to test question interpreter
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
-	require('interpret5.php');
-	require("macros.php");
+	require_once 'interpret5.php';
+	require_once "macros.php";
 	if (isset($_POST['txt'])) {
 		//echo "Post: $cleaned<BR>\n";
 		$res = interpret('answer','numfunc',$cleaned);

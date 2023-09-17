@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
@@ -206,7 +206,7 @@ if (!(isset($teacherid))) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 echo '<div id="headeruploadmultgrades" class="pagetitle"><h1>Upload Multiple Grades</h1></div>';
 if ($overwriteBody==1) {
@@ -294,6 +294,6 @@ if ($overwriteBody==1) {
 	echo '</form>';
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

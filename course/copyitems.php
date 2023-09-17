@@ -7,9 +7,9 @@
 ini_set("max_execution_time", "600");
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/copyiteminc.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -361,7 +361,7 @@ if (!(isset($teacherid))) {
 				copyrubrics($offlinerubrics);
 			}
 			if (isset($_POST['copystudata']) && ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64)) {
-				require("../util/copystudata.php");
+				require_once "../util/copystudata.php";
 				copyStuData($cid, $_POST['ctc']);
 			}
 			$DBH->commit();
@@ -435,7 +435,7 @@ if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
 $placeinhead .= '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
-require("../header.php");
+require_once "../header.php";
 }
 if ($overwriteBody==1) {
 	echo $body;
@@ -657,7 +657,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		echo '<p>'._('Course List').'</p>';
 	}
 	//this displays the actual course list
-	require("../includes/coursecopylist.php");
+	require_once "../includes/coursecopylist.php";
 
 	writeEkeyField()
 ?>

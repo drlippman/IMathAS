@@ -7,7 +7,7 @@
 // need session to hold launch cache
 $init_session_start = true;
 $init_skip_csrfp = true;
-require('../init_without_validate.php');
+require_once '../init_without_validate.php';
 require_once(__DIR__ . '/lib/lti.php');
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
@@ -33,5 +33,5 @@ if (isset($_SESSION['userid']) &&
 
 // TODO: Look for lti1p1 claim for remapping userid a/o contextid
 
-require(__DIR__ .'/show_postback_form.php');
+require_once __DIR__ .'/show_postback_form.php';
 show_postback_form($launch, new Imathas_LTI_Database($DBH));

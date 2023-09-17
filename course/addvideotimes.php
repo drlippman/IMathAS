@@ -2,7 +2,7 @@
 // IMathAS: Add video cueing to assessments
 // (c) 2012 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 if (!isset($teacherid)) {
@@ -63,7 +63,7 @@ if (isset($_POST['clearall'])) {
 
 
 //start display
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"$addqpage?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
@@ -457,6 +457,6 @@ echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 echo '<p><button type="submit" name="clearall" value=1 onclick="return confirm(\'Are you SURE? This will delete ALL defined cues.\')">Reset All Cues</button></p>';
 echo '</form>';
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

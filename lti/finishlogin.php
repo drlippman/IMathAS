@@ -8,7 +8,7 @@
 
 $init_session_start = true;
 $init_skip_csrfp = true;
-require('../init_without_validate.php');
+require_once '../init_without_validate.php';
 require_once(__DIR__ . '/lib/lti.php');
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
@@ -151,7 +151,7 @@ if ($localuserid === false) {
 }
 if ($localuserid === false) {
   // wasn't able to create a new user; redisplay form and try again.
-  require(__DIR__ .'/show_postback_form.php');
+  require_once __DIR__ .'/show_postback_form.php';
   show_postback_form($launch, new Imathas_LTI_Database($DBH), $err);
   exit;
 }
@@ -181,7 +181,7 @@ if ($role == 'Instructor' && $localcourse === null) {
 
 if ($role == 'Instructor' && $localcourse === null) {
   // no course connection yet
-  require(__DIR__.'/connectcourse.php');
+  require_once __DIR__.'/connectcourse.php';
   connect_course($launch, $db, $localuserid);
 } else {
 
@@ -201,13 +201,13 @@ if ($role == 'Instructor' && $localcourse === null) {
 
   // we have a course connection
   if ($launch->is_deep_link_launch() && $role == 'Instructor') {
-    require(__DIR__.'/deep_link_form.php');
+    require_once __DIR__.'/deep_link_form.php';
     deep_link_form($launch, $localuserid, $localcourse, $db);
   } else if ($launch->is_submission_review_launch()) {
-    require(__DIR__.'/submissionlink.php');
+    require_once __DIR__.'/submissionlink.php';
     link_to_submission($launch, $localuserid, $localcourse, $db);
   } else if ($launch->is_resource_launch()) {
-    require(__DIR__.'/resourcelink.php');
+    require_once __DIR__.'/resourcelink.php';
     link_to_resource($launch, $localuserid, $localcourse, $db);
   } else {
     echo 'Error - invalid launch type';

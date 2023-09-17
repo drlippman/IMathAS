@@ -2,7 +2,7 @@
 
 function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
     global $imasroot, $staticroot, $installname;
-    require(__DIR__.'/../header.php');
+    require_once __DIR__.'/../header.php';
     if ($error !== '') {
         echo '<p class=noticetext>'._('Invalid code - try again').'</p>';
     }
@@ -21,13 +21,13 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
     }
     echo '<p><button type=submit>'._('Verify Code').'</button></p>';
     echo '</form>';
-    require(__DIR__.'/../footer.php');
+    require_once __DIR__.'/../footer.php';
 }
 
 function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
     global $DBH, $imasroot;
     $error = '';
-    require(__DIR__.'/GoogleAuthenticator.php');
+    require_once __DIR__.'/GoogleAuthenticator.php';
     $MFA = new GoogleAuthenticator();
     if (isset($mfadata['lastfail']) && time() - $mfadata['lastfail'] > 30) {
         unset($mfadata['failcnt']);

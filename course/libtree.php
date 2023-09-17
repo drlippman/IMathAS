@@ -6,9 +6,9 @@
 		$isgrpadmin = false;
 		if (isset($_GET['cid']) && $_GET['cid']=="admin") {
 			if ($myrights <75) {
-				require("../header.php");
+				require_once "../header.php";
 				echo "You need to log in as an admin to access this page";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			} else if ($myrights < 100) {
 				$isgrpadmin = true;

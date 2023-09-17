@@ -10,7 +10,7 @@ ini_set("max_execution_time", "3600");
 
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/filehandler.php");
 
 
@@ -588,7 +588,7 @@ if ($myrights < 100) {
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/course/libtree.css\" type=\"text/css\" />";
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -709,5 +709,5 @@ if ($overwriteBody==1) {
 		echo "</form>\n";
 	}
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -1,13 +1,13 @@
 <?php
 //IMathAS:  Admin actions
 //(c) 2006 David Lippman
-require("../init.php");
+require_once "../init.php";
 require_once("../includes/password.php");
 require_once("../includes/TeacherAuditLog.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/actions'])) {
-	require($CFG['hooks']['admin/actions']);
+	require_once $CFG['hooks']['admin/actions'];
 }
 
 if (!isset($_POST['action'])) { exit; }
@@ -479,9 +479,9 @@ switch($_POST['action']) {
 			$terms = $stm->fetch(PDO::FETCH_NUM);
 			if ($terms[0]!='') {
 				if (!isset($_POST['termsagree'])) {
-					require("../header.php");
+					require_once "../header.php";
 					echo '<p>',_('You must agree to the terms of use to copy this course.'),'</p>';
-					require("../footer.php");
+					require_once "../footer.php";
 					exit;
 				} else {
 					$now = time();
@@ -930,7 +930,7 @@ switch($_POST['action']) {
 				$removewithdrawn = true;
 				$usereplaceby = "all";
 				$newitems = array();
-				require("../includes/copyiteminc.php");
+				require_once "../includes/copyiteminc.php";
 				$convertAssessVer = $destUIver;
                 $_POST['ctc'] = $_POST['usetemplate'];
 				copyallsub($items,'0',$newitems,$gbcats);
@@ -992,7 +992,7 @@ switch($_POST['action']) {
 			$stm->execute(array($groupid));
 			$hasGroupLTI = ($stm->fetchColumn() !== false);
 
-			require("../header.php");
+			require_once "../header.php";
 			echo '<div class="breadcrumb">'.$breadcrumbbase._(' Course Creation Confirmation').'</div>';
 			echo '<h1>',_('Your course has been created'),'!</h1>';
 			echo '<p>',_('For students to enroll in this course via direct login, you will need to provide them two things'),':<ol>';
@@ -1018,7 +1018,7 @@ switch($_POST['action']) {
 				}
 			}
 			echo '<a href="../course/course.php?cid='.$cid.'">',_('Enter the Course'),'</a>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		break;
@@ -1047,7 +1047,7 @@ switch($_POST['action']) {
 			}
 			break;
 		} else {
-			require("../includes/delcourse.php");
+			require_once "../includes/delcourse.php";
 			$stm = $DBH->prepare("SELECT ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$userdata = $stm->fetch(PDO::FETCH_ASSOC);
@@ -1269,7 +1269,7 @@ switch($_POST['action']) {
 		$error = '';
 		if ($mfadata != '') {
 			$mfadata = json_decode($mfadata, true);
-			require('../includes/GoogleAuthenticator.php');
+			require_once '../includes/GoogleAuthenticator.php';
 			$MFA = new GoogleAuthenticator();
 			//check that code is valid and not a replay
 			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
@@ -1288,11 +1288,11 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
 				if (isset($_POST['mfatrust'])) {
-					require("../header.php");
+					require_once "../header.php";
 					echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
 					echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';
 					echo '<p><a href="../index.php">Continue</a></p>';
-					require("../footer.php");
+					require_once "../footer.php";
 					exit;
 				}
 

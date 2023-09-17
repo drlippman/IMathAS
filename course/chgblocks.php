@@ -3,8 +3,8 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -177,7 +177,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/c
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -316,5 +316,5 @@ foreach ($existblocks as $pos=>$name) {
 </form>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

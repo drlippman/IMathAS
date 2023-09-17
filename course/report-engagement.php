@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid)) {
   echo "Not for you";
@@ -106,7 +106,7 @@ $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDi
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -149,4 +149,4 @@ echo '<p>'._('Remember not all messages or posts warrant replies.').'</p>';
 
 //echo ($t1-$t0).', '.($t2-$t1).', '.($t3-$t2).', '.($t4-$t3).', '.($t5-$t4).', '.($t6-$t5);
 
-require('../footer.php');
+require_once '../footer.php';

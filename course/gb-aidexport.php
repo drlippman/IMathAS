@@ -2,7 +2,7 @@
 //IMathAS: Pull Student responses on an assessment
 //(c) 2009 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 $isteacher = isset($teacherid);
 $cid = Sanitize::courseId($_GET['cid']);
@@ -126,8 +126,8 @@ if (isset($_POST['options'])) {
 		$mathfuncs = array("sin","cos","tan","sinh","cosh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 		$allowedmacros = $mathfuncs;
 		require_once("../assessment/mathphp2.php");
-		require("../assessment/interpret5.php");
-		require("../assessment/macros.php");
+		require_once "../assessment/interpret5.php";
+		require_once "../assessment/macros.php";
 
 		$query_placeholders = Sanitize::generateQueryPlaceholders(array_values($qsetids));
 		$stm = $DBH->prepare("SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($query_placeholders)"); //INT vals from DB
@@ -377,7 +377,7 @@ if (isset($_POST['options'])) {
 } else {
 	//ask for options
 	$pagetitle = "Assessment Export";
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; <a href=\"gb-itemanalysis.php?aid=$aid&cid=$cid\">Item Analysis</a> ";
 	echo '&gt; Assessment Export</div>';
@@ -394,7 +394,7 @@ if (isset($_POST['options'])) {
 	echo '<p>Export will be a commas separated values (.CSV) file, which can be opened in Excel</p>';
 	//echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 
 }
 ?>
