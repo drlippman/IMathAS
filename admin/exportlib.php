@@ -311,7 +311,7 @@ if ($overwriteBody==1) {
 
 <?php
 	$select = "all";
-	include("../course/libtree.php");
+	require_once("../course/libtree.php");
 ?>
 		<span class="form">Limit to non-private questions and libs?</span>
 		<span class="formright">

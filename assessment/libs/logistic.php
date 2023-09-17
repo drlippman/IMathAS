@@ -64,12 +64,12 @@ function logisticregression($x,$y) {
   }
 
   // iterate for k
-  $err_old =  lr_beta2k($x, $y, $k, $e1, $e2, $emult, $ydiff, $ymult);
+  $err_old =  lr_beta2k($x, $y, $k, $e1, $e2, $emult, $ydiff, $ymult, $y1, $y2);
   $lambda = 0.01;
   $k = $k + $sign * $lambda;
   $err = $err_old + 1;
   while (abs($err - $err_old) > 1e-6) {
-    $err = lr_beta2k($x, $y, $k, $e1, $e2, $emult, $ydiff, $ymult);
+    $err = lr_beta2k($x, $y, $k, $e1, $e2, $emult, $ydiff, $ymult, $y1, $y2);
     if ($err < $err_old) {
       $lambda *= 5;
       $err_old = $err;
@@ -231,17 +231,17 @@ function lr_beta2($x, $y, $a1, $b1, $c1) {
   return $sum;
 }
 
-function lr_betak($x, $y, $k1, $e1, $e2, $emult, $ydiff, $ymult) {
+function lr_betak($x, $y, $k1, $e1, $e2, $emult, $ydiff, $ymult, $y1, $y2) {
   $e1k = pow($e1, $k1);
   $e2k = pow($e2, $k1);
   $efrac = pow($emult / exp($x), $k1);
   $fval = $ymult * ($e1k - $e2k) / ($y2 * $e1k - $y1 * $e2k + $ydiff * $efrac);
   return $y - $fval;
 }
-function lr_beta2k($x, $y, $k1, $e1, $e2, $emult, $ydiff, $ymult) {
+function lr_beta2k($x, $y, $k1, $e1, $e2, $emult, $ydiff, $ymult, $y1, $y2) {
   $sum = 0;
   for ($i = 0; $i < count($y); $i++) {
-    $beta = lr_betak($x[$i], $y[$i], $k1, $e1, $e2, $emult, $ydiff, $ymult);
+    $beta = lr_betak($x[$i], $y[$i], $k1, $e1, $e2, $emult, $ydiff, $ymult, $y1, $y2);
     $sum += $beta * $beta;
   }
   return $sum;

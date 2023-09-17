@@ -722,6 +722,7 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 			if (!$hasdecimals && strpos($ansarray[$j][$i],'.')!==false) { $hasdecimals = true;}
 		}
 	}
+    $out = '';
 
 	$hashead = false;
 	for ($j=0;$j<count($rowhead);$j++) {
@@ -896,7 +897,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 				}
 				if ($cols[$j][$i]==='nobox') {$out .= "<td$dec></td>"; $sa.= "<td$dec></td>"; continue;}
 
-				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec $class>$beforetxt $f $aftertxt</td>"; $sa.= "<td$dec $class>$beforetxt $f $aftertxt</td>"; continue;}
+				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec>$beforetxt $f $aftertxt</td>"; $sa.= "<td$dec>$beforetxt $f $aftertxt</td>"; continue;}
 
 				$out .= '<td'.$dec.' class="r">'.$beforetxt.((substr($cols[$j][$i],0,1)=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']'.$aftertxt.'</td>';
 				$sa .= '<td'.$dec.' class="r">'.$beforetxt.((substr($cols[$j][$i],0,1)=='$'||$coltypes[$j]===2)?'$':'');
@@ -1910,6 +1911,7 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 function scoretrialbalance($stua, $answer, $data, $numrows, $sn) {
 	if ($stua == null) {return $answer;}
 	$accttype=array(); $snmap = array();  $c = $sn;
+    $nq = 0;
 	foreach ($data as $t=>$dt) {
 		$nq += count($dt)/2;
 		$ansdat[$t] = array();

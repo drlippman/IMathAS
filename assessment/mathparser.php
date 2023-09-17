@@ -1399,7 +1399,7 @@ class MathParserException extends Exception
   }
 
   public function getData() {
-    return $data;
+    return $this->data;
   }
 }
 

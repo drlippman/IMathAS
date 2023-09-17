@@ -2883,7 +2883,7 @@ function prettytime($time,$in,$out) {
 			}
 		} else if (strpos($out,'s')!==false) {  //sec
 			$time = round($time,4);
-			$outst = "$time second". ($sec!=1 ? 's':'');
+			$outst = "$time second". ($time!=1 ? 's':'');
 		}
 	}
 	return $outst;
