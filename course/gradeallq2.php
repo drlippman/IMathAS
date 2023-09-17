@@ -421,7 +421,7 @@
 	require("../includes/rubric.php");
 	$_SESSION['coursetheme'] = $coursetheme;
 	require("../header.php");
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
+	echo "<style type=\"text/css\">p.tips {	display: none;} .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";

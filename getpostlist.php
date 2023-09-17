@@ -154,7 +154,7 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 			$forumcontent[$line['forumid']] .= "<span style='color: gray;'>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</span></td></tr>";
 		}
 
-		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>New Posts</div>";
+		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-bottom:5px;'>New Posts</div>";
 		foreach($coursenames as $id=>$name) {
 			echo "<div style='font-size:100%; color: #606; font-weight: 700; '>" .Sanitize::encodeStringForDisplay($name)."</div>";
 			echo "<div style='margin-left: 5px;'>";
@@ -168,7 +168,7 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 			echo '</div>';
 		}
 	} else {
-		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>No New Posts</div>";
+		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-bottom:5px;'>No New Posts</div>";
 	}
 	$query = "SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_users.FirstName,imas_users.LastName ";
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto=:msgto AND imas_msgs.msgfrom=imas_users.id ";
