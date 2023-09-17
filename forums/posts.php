@@ -163,7 +163,7 @@ if (isset($_GET['view'])) {
 }
 
 $caller = "posts";
-include("posthandler.php");
+require_once "posthandler.php";
 
 $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=010619" type="text/css" />';

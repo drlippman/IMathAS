@@ -14,8 +14,8 @@
 		$scoredview = false;
 	}
 
-	include("displayq2.php");
-	include("testutil.php");
+	require_once "displayq2.php";
+	require_once "testutil.php";
 	$flexwidth = true; //tells header to use non _fw stylesheet
 	if ($scoredview) {
 		$placeinhead = '<script type="text/javascript">

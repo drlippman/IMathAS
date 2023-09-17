@@ -830,7 +830,7 @@ function cx_plot(array $num, string $argin = "deg" ,int $roundto = 3, bool $show
 
 function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
 	
-    include_once("matrix.php");
+    require_once "matrix.php";
     if (!isMatrix($A)) { echo 'error: input not a matrix'; return '';}
     
 	// number of rows

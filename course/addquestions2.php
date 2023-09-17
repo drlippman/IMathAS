@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require_once "../init.php";
-include("../includes/htmlutil.php");
+require_once "../includes/htmlutil.php";
 require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
@@ -68,9 +68,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else if (isset($_POST['add'])) {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -141,9 +141,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());

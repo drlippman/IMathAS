@@ -5,7 +5,7 @@
 require_once "../init.php";
 $courseUIver = 1; // Doesn't quite work right yet
 if ($courseUIver > 1) {
-    include('../assess2/AssessStandalone.php');
+    require_once '../assess2/AssessStandalone.php';
     $a2 = new AssessStandalone($DBH);
 } else {
     require_once "../assessment/displayq2.php";

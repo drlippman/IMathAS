@@ -162,34 +162,34 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
-		include("masssend.php");
+		require_once "masssend.php";
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
 		$calledfrom='gb';
-		include("massexception.php");
+		require_once "massexception.php";
 	}
 	if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
 		$calledfrom='gb';
-		include("gb-excuse.php");
+		require_once "gb-excuse.php";
 	}
 	if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
 		$calledfrom='gb';
-		include("gb-excuse.php");
+		require_once "gb-excuse.php";
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
-		include("unenroll.php");
-		include("../footer.php");
+		require_once "unenroll.php";
+		require_once "../footer.php";
 		exit;
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
-		include("lockstu.php");
-		include("../footer.php");
+		require_once "lockstu.php";
+		require_once "../footer.php";
 		exit;
 	}
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {

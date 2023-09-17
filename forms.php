@@ -140,7 +140,7 @@ switch($_GET['action']) {
 		echo "<div class=submit><input type=submit value='",_('Sign Up'),"'></div>\n";
 		echo "</form>\n";
 		if (isset($studentTOS)) {
-			include($studentTOS);
+			require_once $studentTOS;
 		}
 		break;
 	case "forcechgpwd":

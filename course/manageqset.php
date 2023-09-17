@@ -1113,7 +1113,7 @@ function getnextprev(formn,loc) {
 			Select libraries to add these questions to.
 			</p>
 
-			<?php $libtreeshowchecks = false; include("libtree2.php"); ?>
+			<?php $libtreeshowchecks = false; require_once "libtree2.php"; ?>
 
 
 			<p>
@@ -1136,7 +1136,7 @@ function getnextprev(formn,loc) {
 
 			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
-			<?php include("libtree.php"); ?>
+			<?php require_once "libtree.php"; ?>
 
 			<p>
 				<input type=submit value="Template Questions">

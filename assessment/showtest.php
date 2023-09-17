@@ -52,9 +52,9 @@
 	$inexception = false;
 	$exceptionduedate = 0;
 
-	include("displayq2.php");
-	include("testutil.php");
-	include("asidutil.php");
+	require_once "displayq2.php";
+	require_once "testutil.php";
+	require_once "asidutil.php";
 
 	//error_reporting(0);  //prevents output of error messages
 
@@ -3691,7 +3691,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 			}
 			if ($hascatset) {
-				include("../assessment/catscores.php");
+				require_once "../assessment/catscores.php";
 				catscores($questions,$bestscores,$testsettings['defpoints'],$testsettings['defoutcome'],$testsettings['courseid']);
 			}
 		}

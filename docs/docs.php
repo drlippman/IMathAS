@@ -1,7 +1,7 @@
 <?php
 $nologo = true;
 $dbsetup = true; //prevents connection to database
-include("../init_without_validate.php");
+require_once "../init_without_validate.php";
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/infopages.css\" type=\"text/css\">\n";
 require_once "../header.php";
 $pagetitle = "Documentation";

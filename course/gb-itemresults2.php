@@ -144,7 +144,7 @@ foreach (explode(',',$itemorder) as $k=>$itel) {
 }
 echo '<p style="color:#f00;">Warning: Results are not accurate or meaningful for randomized questions</p>';
 
-include('../assess2/AssessStandalone.php');
+require_once '../assess2/AssessStandalone.php';
 $a2 = new AssessStandalone($DBH);
 foreach ($qsdata as $k=>$v) {
     $a2->setQuestionData($k, $v);

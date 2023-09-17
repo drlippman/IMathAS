@@ -215,7 +215,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	}
 	if (isset($_REQUEST['breakfromgroup']) && $isteacher) {
 		if (isset($_POST['breakfromgroup']) && $_POST['breakfromgroup']=="confirmed") {
-			include("../includes/stugroups.php");
+			require_once "../includes/stugroups.php";
 			$stm = $DBH->prepare("SELECT userid,agroupid FROM imas_assessment_sessions WHERE id=:id");
 			$stm->execute(array(':id'=>$asid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -1181,7 +1181,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
 		if ($stm->fetchColumn(0)>0) {
-			include("../assessment/catscores.php");
+			require_once "../assessment/catscores.php";
 			catscores($questions,$scores,$line['defpoints'], $line['defoutcome'],$cid);
 		}
 		require_once "../footer.php";
@@ -1314,7 +1314,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
 		if ($stm->fetchColumn(0)>0) {
-			include("../assessment/catscores.php");
+			require_once "../assessment/catscores.php";
 			catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
 		}
 

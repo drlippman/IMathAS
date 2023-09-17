@@ -288,7 +288,7 @@ function finderiv_bsm($type, $strike, $mat, $today, $spot, $rf, $vol, $ans , $fm
 	$mat = $matdays/365;
 	$d1 = (log($spot/$strike)+($rf+pow($vol,2)/2)*$mat)/($vol*sqrt($mat));
 	$d2 = $d1-$vol*sqrt($mat);
-	include_once("stats.php");
+	require_once "stats.php";
 	switch (strtoupper($ans)) {
 		case "VALUE":
 			if (strcasecmp($type,"call")==0) {

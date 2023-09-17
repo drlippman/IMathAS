@@ -4,7 +4,7 @@
 // licensed under GPL version 2 or later
 //
 
-include_once("fractions.php");  // fraction routine
+require_once "fractions.php";  // fraction routine
 
 function simplexver() {
 	return 47;

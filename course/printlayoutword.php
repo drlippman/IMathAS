@@ -162,7 +162,7 @@ if ($overwriteBody==1) {
 	$numq = count($questions);
 
 	if ($courseUIver > 1) {
-		include('../assess2/AssessStandalone.php');
+		require_once '../assess2/AssessStandalone.php';
 		$a2 = new AssessStandalone($DBH);
 		$stm = $DBH->prepare("SELECT iqs.* FROM imas_questionset AS iqs JOIN imas_questions ON imas_questions.questionsetid=iqs.id WHERE imas_questions.assessmentid=:id");
 		$stm->execute(array(':id'=>$aid));
@@ -170,7 +170,7 @@ if ($overwriteBody==1) {
 			$a2->setQuestionData($qdata['id'], $qdata);
 		}
 	} else {
-	include("../assessment/displayq2.php");
+	require_once "../assessment/displayq2.php";
 	}
 
 	if (is_numeric($_REQUEST['versions'])) {

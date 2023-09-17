@@ -885,7 +885,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
 	if (count($b)!=count($A)) {
 		echo "A and b must have same number of rows";  return $b;
 	}
-	include_once("fractions.php");
+	require_once "fractions.php";
     // number of rows
     $N  = count($b);
     $M = count($b[0]); //number of cols in $b
@@ -969,7 +969,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
 //NOTE:  In most cases, using matrixrandunreduce is a better option than using this!
 function matrixreduce($A, $rref = false, $frac = false) {
 	if (!isMatrix($A)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixreduce input not a valid matrix'; } return '';}
-	include_once("fractions.php");
+	require_once "fractions.php";
     // number of rows
     $N  = count($A);
     $M = count($A[0]);

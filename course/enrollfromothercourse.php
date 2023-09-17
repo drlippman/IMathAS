@@ -77,7 +77,7 @@ $curBreadcrumb .= '&gt; Enroll From Another Course';
 /***** page body *****/
 if (!empty($overwriteBody)) {
 	if (strlen($body)<2) {
-		include("./$fileToInclude");
+		require_once "./$fileToInclude";
 	} else {
 		echo $body;
 	}

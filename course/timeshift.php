@@ -9,7 +9,7 @@ ini_set("max_execution_time", "120");
 
 /*** master php includes *******/
 require_once "../init.php";
-include("../includes/htmlutil.php");
+require_once "../includes/htmlutil.php";
 
 function shiftsub(&$itema) {
 	global $shiftstring;

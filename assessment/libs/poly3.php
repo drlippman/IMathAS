@@ -14,7 +14,7 @@ if(!is_array($allowedmacros)) {
 
 array_push($allowedmacros, "formpoly3fromstring", "formpoly3fromresults", "dividepoly3", "longdivisionpoly3", "writepoly3");
 
-include_once("fractions.php");  // fraction routine
+require_once "fractions.php";  // fraction routine
 
 // function formpoly3fromstring(variable, polynomialstring, [IsFraction=TRUE])
 // Creates an array of coefficients whose position in the array

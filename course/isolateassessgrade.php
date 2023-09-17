@@ -32,11 +32,11 @@
 	if ($isteacher || ($istutor && ($tutoredit&1) == 1 )) {
 		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
-			include("gb-excuse.php");
+			require_once "gb-excuse.php";
 		}
 		if (isset($_POST['posted']) && $_POST['posted']=="Un-excuse Grade") {
 			$calledfrom='isolateassess';
-			include("gb-excuse.php");
+			require_once "gb-excuse.php";
         }
         if (isset($_POST['submitua'])) {
 			require_once '../assess2/AssessHelpers.php';
@@ -51,11 +51,11 @@
             $calledfrom='isolateassess';
             $_POST['checked'] = $_POST['stus'] ?? [];
             $_POST['assesschk'] = array($aid);
-			include("massexception.php");
+			require_once "massexception.php";
         }
         if (isset($_GET['masssend'])) {
             $calledfrom='isolateassess';
-            include('masssend.php');
+            require_once 'masssend.php';
         }
 	}
 

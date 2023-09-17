@@ -324,7 +324,7 @@ If deleted on both ends, delete from DB
                 $parts = explode('-',$_GET['quoteq']);
 				$GLOBALS['assessver'] = $parts[4];
                 if ($courseUIver > 1) {
-                    include('../assess2/AssessStandalone.php');
+                    require_once '../assess2/AssessStandalone.php';
                     $a2 = new AssessStandalone($DBH);
                     $state = array(
                         'seeds' => array($parts[0] => $parts[2]),

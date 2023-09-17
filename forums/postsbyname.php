@@ -53,7 +53,7 @@
 	$allowreply = ($canviewall || (time()<$replyby));
 
 	$caller = "byname";
-	include("posthandler.php");
+	require_once "posthandler.php";
 
 	$placeinhead = '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=082911" type="text/css" />';
 	if ($haspoints && $caneditscore && $rubric != 0) {

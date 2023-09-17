@@ -243,7 +243,7 @@ if ($overwriteBody==1) {
 			echo ">&nbsp;</div>\n";
 		}
 	}
-	include("../assessment/displayq2.php");
+	require_once "../assessment/displayq2.php";
 
 
 	//echo "<div class=maintest>\n";

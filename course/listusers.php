@@ -513,7 +513,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 /***** php display blocks are interspersed throughout the html as needed ****/
 if ($overwriteBody==1) {
 	if (strlen($body)<2) {
-		include("./$fileToInclude");
+		require_once "./$fileToInclude";
 	} else {
 		echo $body;
 	}
