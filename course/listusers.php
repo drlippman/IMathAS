@@ -153,14 +153,14 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
-			require_once("../includes/newusercommon.php");
+			require_once "../includes/newusercommon.php";
 			$errors = checkNewUserValidation(array('SID','firstname','lastname','email','pw1'));
 			if ($errors != '') {
 				$overwriteBody = 1;
 				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
 				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once("../includes/password.php");
+					require_once "../includes/password.php";
 					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
 					$md5pw = md5($_POST['pw1']);
@@ -214,7 +214,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 
 		if (isset($_POST['timelimitmult'])) {
 			$msgout = '';
@@ -254,7 +254,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 						$msgout .= '<p>Invalid password - left unchanged</p>';
 					} else {
 						if (isset($CFG['GEN']['newpasswords'])) {
-							require_once("../includes/password.php");
+							require_once "../includes/password.php";
 							$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 						} else {
 							$newpw = md5($_POST['pw1']);
@@ -580,7 +580,7 @@ if ($overwriteBody==1) {
 	</form>
 
 <?php
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform");
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		if (empty($_POST['checked'])) {
@@ -648,7 +648,7 @@ if ($overwriteBody==1) {
             'pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}',
             'email' => 'function(el) { return $("#SID").val().substring(0,4) != "lti-" }'
         );
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
 	} else {
 ?>

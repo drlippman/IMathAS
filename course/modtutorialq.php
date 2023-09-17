@@ -865,7 +865,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
-	require_once("../assessment/interpret5.php");
+	require_once "../assessment/interpret5.php";
 	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $answerformat, $scoremethod, $qshuffle, $variables, $keepcode, $randvars) = getqvalues($code,$type);
 	$partial = array();
 	for ($n=0;$n<$nparts;$n++) {

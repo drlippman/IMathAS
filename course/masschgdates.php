@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -86,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		];
 
 		for ($i=0; $i<$cnt; $i++) {
-			require_once("../includes/parsedatetime.php");
+			require_once "../includes/parsedatetime.php";
 
 			$data = explode(',',$_POST['data'.$i]);
 

@@ -1,8 +1,8 @@
 <?php
 
 require_once "../init.php";
-require_once("../includes/htmLawed.php");
-require_once("../includes/convertintro.php");
+require_once "../includes/htmLawed.php";
+require_once "../includes/convertintro.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);

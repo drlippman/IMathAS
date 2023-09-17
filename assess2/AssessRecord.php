@@ -4,14 +4,14 @@
  * (c) 2019 David Lippman
  */
 
-require_once(__DIR__ . '/AssessUtils.php');
-require_once(__DIR__ . '/../filter/filter.php');
-require_once(__DIR__ . '/questions/QuestionGenerator.php');
-require_once(__DIR__ . '/questions/models/QuestionParams.php');
-require_once(__DIR__ . '/questions/models/ShowAnswer.php');
-require_once(__DIR__ . '/questions/ScoreEngine.php');
-require_once(__DIR__ . '/questions/models/ScoreQuestionParams.php');
-require_once(__DIR__ . '/../includes/TeacherAuditLog.php');
+require_once __DIR__ . '/AssessUtils.php';
+require_once __DIR__ . '/../filter/filter.php';
+require_once __DIR__ . '/questions/QuestionGenerator.php';
+require_once __DIR__ . '/questions/models/QuestionParams.php';
+require_once __DIR__ . '/questions/models/ShowAnswer.php';
+require_once __DIR__ . '/questions/ScoreEngine.php';
+require_once __DIR__ . '/questions/models/ScoreQuestionParams.php';
+require_once __DIR__ . '/../includes/TeacherAuditLog.php';
 
 use IMathAS\assess2\questions\QuestionGenerator;
 use IMathAS\assess2\questions\models\QuestionParams;
@@ -237,7 +237,7 @@ class AssessRecord
   public function updateLTIscore($sendnow = true, $isstu = true) {
     $lti_sourcedid = $this->getLTIsourcedId();
     if (strlen($lti_sourcedid) > 1) {
-        require_once(__DIR__ . '/../includes/ltioutcomes.php');
+        require_once __DIR__ . '/../includes/ltioutcomes.php';
         $gbscore = $this->getGbScore();
         $aidposs = $this->assess_info->getSetting('points_possible');
         calcandupdateLTIgrade($lti_sourcedid, $this->curAid, $this->curUid, $gbscore['gbscore'], $sendnow, $aidposs, $isstu);
@@ -868,7 +868,7 @@ class AssessRecord
       $filename = basename(str_replace('\\','/',$_FILES["qn$qref"]['name']));
       $filename = preg_replace('/[^\w\.]/','',$filename);
       $s3object = "adata/$s3asid/$filename";
-      require_once(__DIR__."/../includes/filehandler.php");
+      require_once __DIR__."/../includes/filehandler.php";
       if (storeuploadedfile("qn$qref",$s3object)) {
         return "@FILE:$s3asid/$filename@";
       }

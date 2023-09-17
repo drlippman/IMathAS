@@ -12,7 +12,7 @@ ini_set("max_execution_time", "900");
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 require_once "../includes/copyiteminc.php";
 require_once "../includes/loaditemshowdata.php";
 require_once "itemexportfields.php";

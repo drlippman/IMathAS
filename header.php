@@ -10,7 +10,7 @@ if (!isset($myrights)) {
 }
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['header'])) {
-    require_once($CFG['hooks']['header']);
+    require_once $CFG['hooks']['header'];
 }
 ?>
 <head>
@@ -364,7 +364,7 @@ echo '<div class="midwrapper" role="main">';
 
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$curdir/filter/filter.php");
+require_once "$curdir/filter/filter.php";
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 

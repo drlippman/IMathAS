@@ -26,7 +26,7 @@ $items = unserialize($stm->fetchColumn(0));
 $exceptions = array();
 if (!$viewall && isset($studentinfo['latepasses'])) {
 	$exceptions = loadExceptions($cid, $userid);
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 }
 //update block start/end dates to show blocks containing items with exceptions

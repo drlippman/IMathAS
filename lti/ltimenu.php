@@ -4,13 +4,13 @@ require_once '../init.php';
 
 use \IMSGlobal\LTI;
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-    require_once($CFG['hooks']['lti']);
+    require_once $CFG['hooks']['lti'];
 }
 if (!isset($_GET['launchid'])) {
     echo _('Unable to identify launch information.  Please launch again from the LMS');

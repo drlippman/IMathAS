@@ -153,7 +153,7 @@
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$adata['id']));
 				if ($stm->rowCount()>0) {
 					$exception = $stm->fetch(PDO::FETCH_NUM);
-					require_once("../includes/exceptionfuncs.php");
+					require_once "../includes/exceptionfuncs.php";
 					$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 					$useexception = $exceptionfuncs->getCanUseAssessException($exception, $adata, true);
 					if ($useexception) {

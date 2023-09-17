@@ -4,8 +4,8 @@
  * (c) 2019 David Lippman
  */
 
-require_once(__DIR__ . '/../includes/exceptionfuncs.php');
-require_once(__DIR__ . '/../includes/Rand.php');
+require_once __DIR__ . '/../includes/exceptionfuncs.php';
+require_once __DIR__ . '/../includes/Rand.php';
 /**
  * Primary class for working with assessment settings
  */

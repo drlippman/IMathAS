@@ -422,7 +422,7 @@ switch($_GET['action']) {
 
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {
-			require_once("../includes/newusercommon.php");
+			require_once "../includes/newusercommon.php";
 			showNewUserValidation("userform", ['group'], ['group' => 'true, min: -1']);
 		} else if ($myrights==100) {
 			echo '<p>&nbsp;</p><p>&nbsp;</p>';

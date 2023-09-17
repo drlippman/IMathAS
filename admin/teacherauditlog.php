@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 

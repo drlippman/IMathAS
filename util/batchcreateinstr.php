@@ -10,7 +10,7 @@ ini_set("max_execution_time", "1600");
 
 
 require_once "../init.php";
-require_once("../includes/copyiteminc.php");
+require_once "../includes/copyiteminc.php";
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['util/batchcreateinstr'])) {
     require_once $CFG['hooks']['util/batchcreateinstr'];
@@ -34,7 +34,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   	  $newusergroupid = $groupid;
   }
   if (isset($CFG['GEN']['newpasswords'])) {
-    require_once("../includes/password.php");
+    require_once "../includes/password.php";
   }
   if (isset($CFG['GEN']['homelayout'])) {
     $homelayout = $CFG['GEN']['homelayout'];

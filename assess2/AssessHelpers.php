@@ -4,9 +4,9 @@
  * (c) 2020 David Lippman
  */
 
-require_once(__DIR__."/../includes/ltioutcomes.php");
-require_once(__DIR__.'/AssessInfo.php');
-require_once(__DIR__.'/AssessRecord.php');
+require_once __DIR__."/../includes/ltioutcomes.php";
+require_once __DIR__.'/AssessInfo.php';
+require_once __DIR__.'/AssessRecord.php';
 
 class AssessHelpers
 {

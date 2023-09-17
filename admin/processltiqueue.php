@@ -36,7 +36,7 @@ if (php_sapi_name() == "cli") {
 
 require_once "../init_without_validate.php";
 require_once "../includes/rollingcurl.php";
-require_once('../includes/ltioutcomes.php');
+require_once '../includes/ltioutcomes.php';
 
 function debuglog($str) {
 	if (!empty($GLOBALS['CFG']['LTI']['noisydebuglog'])) {

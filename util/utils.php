@@ -6,7 +6,7 @@ if (isset($_SESSION['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])
     $userid = $_SESSION['userid'];
 	unset($_SESSION['emulateuseroriginaluser']);
     //reload prefs for original user
-    require_once("../includes/userprefs.php");
+    require_once "../includes/userprefs.php";
     generateuserprefs($userid);
     if (isset($_POST['tzname'])) {
         $_SESSION['tzname'] = $_POST['tzname'];

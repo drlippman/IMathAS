@@ -65,7 +65,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } elseif (!empty($_POST['title'])) { //form posted to itself with new/modified data, update the block
 	$DBH->beginTransaction();
-	require_once("../includes/parsedatetime.php");
+	require_once "../includes/parsedatetime.php";
 	if ($_POST['avail']==1) {
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;

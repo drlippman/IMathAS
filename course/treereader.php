@@ -3,7 +3,7 @@
 //(c) 2011 David Lippman
 
 require_once "../init.php";
-require_once("../includes/exceptionfuncs.php");
+require_once "../includes/exceptionfuncs.php";
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	echo "You are not enrolled in this course. Please return to the <a href=\"../index.php\">Home Page</a> and enroll";

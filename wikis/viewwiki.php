@@ -105,7 +105,7 @@ if ($cid==0) {
 	} else { //just viewing
 		$curBreadcrumb .= " &gt; View Wiki";
 
-		require_once("../filter/filter.php");
+		require_once "../filter/filter.php";
 
 		if (isset($teacherid) || $now<$row['editbydate']) {
 			$canedit = true;

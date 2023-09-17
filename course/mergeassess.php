@@ -167,7 +167,7 @@ if (isset($_POST['mergefrom'])) {
 	$stm->execute(array(':itemorder'=>$newitemorder, ':intro'=>$intro, ':id'=>$newaid));
 
 	//update points poss
-	require_once("../includes/updateptsposs.php");
+	require_once "../includes/updateptsposs.php";
 	updatePointsPossible($newaid, $newitemorder, $defpoints);
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES (:courseid, 'Assessment', :typeid)";

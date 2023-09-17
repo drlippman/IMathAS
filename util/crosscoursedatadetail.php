@@ -53,7 +53,7 @@ $stm = $DBH->prepare('SELECT name,courseid,itemorder,ptsposs,defpoints FROM imas
 $stm->execute(array($baseassess));
 list($assessname,$basecourse,$itemorder,$ptsposs,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 if ($ptsposs==-1) {
-	require_once("../includes/updateptsposs.php");
+	require_once "../includes/updateptsposs.php";
 	$ptsposs = updatePointsPossible($baseassess);
 }
 $qarr = array();
@@ -114,7 +114,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		continue;
 	}
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	if ($row['ptsposs'] != $ptsposs) {
@@ -155,7 +155,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		continue;
 	}
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	if ($row['ptsposs'] != $ptsposs) {

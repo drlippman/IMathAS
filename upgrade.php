@@ -505,7 +505,7 @@ unset($dbpassword);
 				$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
 				$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
 				$stm = $DBH->query($query);
-				require_once("./includes/filehandler.php");
+				require_once "./includes/filehandler.php";
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$doneagroups = array();
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,bestlastanswers=:bestlastanswers,reviewlastanswers=:reviewlastanswers WHERE id=:id");
@@ -1126,7 +1126,7 @@ unset($dbpassword);
 			 }
 			 $hasimg = array();
 			 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				require_once("includes/filehandler.php");
+				require_once "includes/filehandler.php";
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$arr = $s3->getBucket($GLOBALS['AWSbucket'],"cfiles/");
 				if ($arr!=false) {

@@ -9,8 +9,8 @@
 	}
 
 	if ($_GET['process']== true) {
-		require_once("../includes/updateptsposs.php");
-		require_once("../includes/TeacherAuditLog.php");
+		require_once "../includes/updateptsposs.php";
+		require_once "../includes/TeacherAuditLog.php";
 		if (isset($_POST['add'])) { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));

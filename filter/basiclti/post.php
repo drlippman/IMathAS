@@ -32,7 +32,7 @@ if ($stm->rowCount()==0) {
 }
 $line = $stm->fetch(PDO::FETCH_ASSOC);
 
-require_once("blti_util.php");
+require_once "blti_util.php";
 $parms = array();
 
 if (trim($line['custom'])!='') {

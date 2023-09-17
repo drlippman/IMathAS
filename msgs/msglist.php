@@ -216,11 +216,11 @@ If deleted on both ends, delete from DB
 			$stm->execute(array(':id'=>$_POST['to']));
 			list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
 			if ($msgnotify==1) {
-      	  		require_once("../includes/email.php");
+      	  		require_once "../includes/email.php";
       	  		send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subjectPost, $cidP, $cname, $msgid);
 			}
 			if ($FCMtokenTo != '') {
-				require_once("../includes/FCM.php");
+				require_once "../includes/FCM.php";
 				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cidP)."&msgid=$msgid";
 				sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
 					Sanitize::encodeStringForDisplay($subjectPost), $url);
@@ -341,7 +341,7 @@ If deleted on both ends, delete from DB
                 }
 				$message = printfilter(forcefiltergraph($message));
 				if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-					require_once("../includes/filehandler.php");
+					require_once "../includes/filehandler.php";
 					$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
 						$curdir = rtrim(dirname(__FILE__), '/\\');
 						return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);

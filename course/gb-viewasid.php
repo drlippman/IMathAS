@@ -2,8 +2,8 @@
 //IMathAS:  View/Edit and Question breakdown views
 //(c) 2007 David Lippman
 	require_once "../init.php";
-	require_once("../includes/filehandler.php");
-  require_once("../includes/TeacherAuditLog.php");
+	require_once "../includes/filehandler.php";
+  require_once "../includes/TeacherAuditLog.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['course/gb-viewasid'])) {
@@ -147,7 +147,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			if ($stm->rowCount()>0) {
 				list($aid, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				if (strlen($ltisourcedid)>1) {
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					updateLTIgrade('delete',$ltisourcedid,$aid,$uid);
 				}
 
@@ -250,7 +250,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				list($seeds, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				$seeds = explode(',', $seeds);
 				if (strlen($ltisourcedid)>1) {
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					updateLTIgrade('update',$ltisourcedid,$aid,$uid,0);
 				}
 
@@ -389,7 +389,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
           $stm2->execute(array(':id'=>$line['id'], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
             ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
           if (strlen($line['lti_sourcedid'])>1) {
-            require_once("../includes/ltioutcomes.php");
+            require_once "../includes/ltioutcomes.php";
             calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$bestscores,true);
           }
         } else {
@@ -512,7 +512,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$aid = $row[0];
 				if (strlen($row[1])>1) {
 					//update LTI score
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					calcandupdateLTIgrade($row[1],$row[0],$row[2],$scores,true);
 				}
 			} else {
@@ -720,7 +720,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$saenddate = $line['enddate'];
 		unset($exped);
 
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP, $latepasshrs);
 		$excepadata = array(
 			'id'=>$line['assessmentid'],

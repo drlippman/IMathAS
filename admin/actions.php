@@ -2,8 +2,8 @@
 //IMathAS:  Admin actions
 //(c) 2006 David Lippman
 require_once "../init.php";
-require_once("../includes/password.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/password.php";
+require_once "../includes/TeacherAuditLog.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/actions'])) {
@@ -238,7 +238,7 @@ switch($_POST['action']) {
         ) {
             $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 
-			require_once("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			foreach ($allInstrEnroll as $ncid) {
 				unenrollstu($ncid, array($_GET['id']));
 			}
@@ -324,7 +324,7 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE msgfrom=:msgfrom");
 		$stm->execute(array(':msgfrom'=>$deluid));
 
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		//delete profile pics
 		deletecoursefile('userimg_'.$deluid.'.jpg');
 		deletecoursefile('userimg_sm'.$deluid.'.jpg');
@@ -470,7 +470,7 @@ switch($_POST['action']) {
 	case "modify":
 	case "addcourse":
 		if ($myrights < 40) { echo _("You don't have the authority for this action"); break;}
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 
 		if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
 			$coursetocheck = intval($_POST['usetemplate']);
@@ -1114,7 +1114,7 @@ switch($_POST['action']) {
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$old = time() - 60*60*24*30*$_POST['months'];
 		$who = $_POST['who'];
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		if ($who=="students") {
 			$sstm = $DBH->prepare("SELECT id FROM imas_users WHERE  lastaccess<:old AND (rights=0 OR rights=10)");
 			$sstm->execute(array(':old'=>$old));

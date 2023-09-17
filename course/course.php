@@ -40,7 +40,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
     }
 	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		//deleteasidfilesbyquery(array('id'=>$_SESSION['sessiontestid']),1);
 		deleteasidfilesbyquery2('id',$_SESSION['sessiontestid'],null,1);
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");

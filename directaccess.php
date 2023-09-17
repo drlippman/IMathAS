@@ -8,8 +8,8 @@
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
 	 }
 	$init_session_start = true;
- 	require_once(__DIR__ . "/init_without_validate.php");
-	require_once(__DIR__ ."/includes/newusercommon.php");
+ 	require_once __DIR__ . "/init_without_validate.php";
+	require_once __DIR__ ."/includes/newusercommon.php";
 	$cid = Sanitize::courseId($_GET['cid']);
 
  	if (!isset($_GET['cid'])) {
@@ -61,7 +61,7 @@
 
 		if ($page_newaccounterror=='') {//no error
 			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("includes/password.php");
+				require_once "includes/password.php";
 				$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			} else {
 				$md5pw = md5($_POST['pw1']);
@@ -115,7 +115,7 @@
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
 
-				require_once("./includes/email.php");
+				require_once "./includes/email.php";
 				send_email($_POST['email'], $sendfrom, $installname._(' Confirmation'), $message, array(), array(), 10);
 
 				echo "<html><body>\n";
@@ -135,7 +135,7 @@
 		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
 	$init_session_start = true;
-	require_once(__DIR__ ."/validate.php");
+	require_once __DIR__ ."/validate.php";
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student

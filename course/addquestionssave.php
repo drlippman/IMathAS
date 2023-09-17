@@ -98,7 +98,7 @@
         $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
         $stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
-        require_once("../includes/updateptsposs.php");
+        require_once "../includes/updateptsposs.php";
         updatePointsPossible($aid, $itemorder, $defpoints);
         $DBH->commit();
 
@@ -150,7 +150,7 @@
 		exit;
 	}
 	if (count($new_text_segments_json)>0) {
-		require_once("../includes/htmLawed.php");
+		require_once "../includes/htmLawed.php";
 		foreach ($new_text_segments_json as $k=>$seg) {
 			$new_text_segments_json[$k]['text'] = myhtmlawed($seg['text']);
 			if (isset($new_text_segments_json[$k]['pagetitle'])) {
@@ -298,7 +298,7 @@
 			$stm = $DBH->query("DELETE FROM imas_questions WHERE id IN ($toremove)");
 		}
 		//update points possible
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		updatePointsPossible($aid, $_REQUEST['order'], $defpoints);
 
 		// Delete any teacher or tutor attempts on this assessment

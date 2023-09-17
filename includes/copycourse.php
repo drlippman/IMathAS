@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__."/copyiteminc.php");
+require_once __DIR__."/copyiteminc.php";
 
 // TODO: Revamp this total hack job.
 // Rewrite the item and course copying as a class

@@ -6,7 +6,7 @@
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/parsedatetime.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 
 

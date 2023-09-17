@@ -2828,7 +2828,7 @@ function anova2way_f($arr, $replication=False){
 function anova_table(array $array, int $factor = 1, $rep=False, int $roundto=12, string $f1="Factor A", string $f2="Factor B"){
 	if ($factor!=1 && $factor!=2) { echo 'error: the factor variable only expects 1 for one-way and 2 for two-way ANOVA'; return '';}
 	/*if (!function_exists('calconarray')) {
-       // require_once(__DIR__.'/assessment/macros.php');
+       // require_once __DIR__.'/assessment/macros.php';
 	}*/
 	array_walk_recursive($array, function(&$x) use ($roundto) { $x = round($x,$roundto);});
 	

@@ -211,7 +211,7 @@
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
 	}
 	if (count($exceptions)>0) {
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher && !$istutor);
 	}
 	//get excusals

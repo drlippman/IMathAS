@@ -598,7 +598,7 @@ if ($myrights<20) {
 		}
 		//load filter.  Need earlier than usual header.php load
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		require_once("$curdir/../filter/filter.php");
+		require_once "$curdir/../filter/filter.php";
 
 			//remember search
 		if (isset($_POST['search'])) {

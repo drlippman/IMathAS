@@ -2,7 +2,7 @@
 
 namespace IMathAS\assess2\questions\answerboxes;
 
-require_once(__DIR__ . '/AnswerBox.php');
+require_once __DIR__ . '/AnswerBox.php';
 
 use Sanitize;
 

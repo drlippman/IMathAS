@@ -70,7 +70,7 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
 
     if ($beentaken) {
         // retotal student assessment records with changes, which will set new excusals
-        require_once('../assess2/AssessHelpers.php');
+        require_once '../assess2/AssessHelpers.php';
         AssessHelpers::retotalAll($cid, $aid, false);
     }
 

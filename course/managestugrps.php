@@ -6,7 +6,7 @@
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/stugroups.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 /*** pre-html data manipulation, including function code *******/
 $cid = Sanitize::courseId($_GET['cid']);

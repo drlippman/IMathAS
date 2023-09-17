@@ -8,7 +8,7 @@
 $init_session_start = true;
 $init_skip_csrfp = true;
 require_once '../init_without_validate.php';
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 

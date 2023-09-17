@@ -26,7 +26,7 @@ if (isset($_POST['edatetype'])) {
         $old = time() - 7*24*60*60;
         $ttype = '1w';
     } else {
-        require_once("../includes/parsedatetime.php");
+        require_once "../includes/parsedatetime.php";
         $old = parsedatetime($_POST['edate'],$_POST['etime'],time() - 24*60*60);
         $ttype = 'edate';
     }

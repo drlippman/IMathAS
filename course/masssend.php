@@ -56,7 +56,7 @@
 				}
 			}
 		}
-		require_once("../includes/htmLawed.php");
+		require_once "../includes/htmLawed.php";
 		$messagePost = myhtmLawed($_POST['message']);
 		$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
 		if (trim($subjectPost)=='') {
@@ -94,8 +94,8 @@
 			$stm->execute(array(':id'=>$userid));
 			$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));
 
-			require_once("../includes/email.php");
-			require_once("../includes/FCM.php");
+			require_once "../includes/email.php";
+			require_once "../includes/FCM.php";
 
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
@@ -183,7 +183,7 @@
 				$teacheraddys[] = $self;
 			}
 
-			require_once("../includes/email.php");
+			require_once "../includes/email.php";
 
 			foreach ($emailaddys as $k=>$addy) {
 				send_email($addy, $sendfrom, $subjectPost,

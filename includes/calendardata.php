@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/exceptionfuncs.php');
+require_once __DIR__.'/exceptionfuncs.php';
 
 //light calendar data collection function
 
@@ -90,7 +90,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		$typeids = implode(',', array_keys($itemlist['Assessment']));
 		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,LPcutoff,reqscore,reqscoreaid,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			require_once("../includes/exceptionfuncs.php");
+			require_once "../includes/exceptionfuncs.php";
 			if (isset($exceptions[$row['id']])) {
 				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row, true);
 				if ($useexception) {
@@ -239,7 +239,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			if ($row['startdate']>$now && (!isset($teacherid) || $stuview)) {
 				continue;
 			}
-			require_once("../includes/exceptionfuncs.php");
+			require_once "../includes/exceptionfuncs.php";
 			list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = $exceptionfuncs->getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
 
 			if ($row['postby']!=2000000000) {

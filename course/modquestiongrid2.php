@@ -10,7 +10,7 @@
 	}
 
 	if (!empty($_GET['process'])) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if (isset($_POST['add'])) { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));

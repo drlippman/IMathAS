@@ -239,7 +239,7 @@
 				// is added, this is removed:  count($adjustedScores) > 0 &&
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					$gbscore = $assess_record->getGbScore();
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true, -1, false);
 				}
@@ -582,7 +582,7 @@
 	$stm->execute($qarr);
 	$cnt = 0;
 	$onepergroup = array();
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
     echo '<div id="qlistwrap">';
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {

@@ -2,7 +2,7 @@
 //IMathAS:  Displays a inline text item.  Only used in treereader, so no nav
 //(c) 2018 David Lippman
 	require_once "../init.php";
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
 	
 	$inlinetextid = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);

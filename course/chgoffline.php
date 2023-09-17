@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
@@ -81,7 +81,7 @@ if (isset($_POST['checked'])) { //form submitted
 			exit;
 		}
 	} else {
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 
 		$sets = array();
 		$qarr = array();

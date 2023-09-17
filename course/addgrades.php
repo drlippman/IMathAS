@@ -6,7 +6,7 @@
 	//single grade edit
 	require_once "../init.php";
 	require_once "../includes/htmlutil.php";
-	require_once("../includes/TeacherAuditLog.php");
+	require_once "../includes/TeacherAuditLog.php";
 
 	$istutor = false;
 	$isteacher = false;
@@ -124,7 +124,7 @@
 	}
 
 	if (isset($_POST['name']) && $isteacher) {
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {

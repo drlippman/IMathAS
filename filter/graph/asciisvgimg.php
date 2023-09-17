@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__."/../../assessment/mathparser.php");
+require_once __DIR__."/../../assessment/mathparser.php";
 // ASCIIsvgIMG.php
 // (c) 2006-2009 David Lippman   http://www.pierce.ctc.edu/dlippman
 // Generates an image based on an ASCIIsvg script

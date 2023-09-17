@@ -54,7 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$pagetitle = "Confirm Page Contents Delete";
 		}
 	} else if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -89,7 +89,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         }
         if ($_POST['groupsetid'] === 'bysec') {
             // want to use by-section groups.  Create
-            require_once('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             $_POST['groupsetid'] = createSectionGroupset($cid);
         }
 		if (isset($_GET['id'])) {  //already have id - update

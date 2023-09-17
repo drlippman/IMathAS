@@ -12,7 +12,7 @@
     $aid = intval($_GET['aid']);
 
 	if (isset($_POST['action'])) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if ($_POST['action'] == 'add') { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints,ver FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));

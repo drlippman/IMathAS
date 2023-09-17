@@ -114,7 +114,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	unset($row['itemorder']);
 
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	$assessdata[$row['id']] = $row;
@@ -144,7 +144,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		continue;
 	}
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	if ($row['ptsposs'] != $assessdata[$sourceaid]['ptsposs']) {

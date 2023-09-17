@@ -7,7 +7,7 @@ require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/copyiteminc.php";
 require_once "../includes/loaditemshowdata.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -394,7 +394,7 @@ if (!(isset($teacherid))) {
 		}
 		if (isset($_POST['docopyopt']) || isset($_POST['chgdefpoints']) || isset($_POST['removeperq'])) {
 			//update points possible
-			require_once("../includes/updateptsposs.php");
+			require_once "../includes/updateptsposs.php";
 			foreach ($checked as $aid) {
 				updatePointsPossible($aid);
 			}

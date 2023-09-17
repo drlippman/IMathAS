@@ -32,7 +32,7 @@ ini_set("max_execution_time", "600");
 		} else {
 			$delwikirev = 0;
 		}
-		require_once("../includes/unenroll.php");
+		require_once "../includes/unenroll.php";
 		if (isset($_POST['removewithdrawn'])) {
 			$withwithdraw = 'remove';
 		} else if ($get_uid=="all") {

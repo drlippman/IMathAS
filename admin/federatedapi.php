@@ -10,7 +10,7 @@ if (empty($_GET['peer']) || !isset($_GET['since']) || !isset($_GET['sig'])) {
 
 $since = intval($_GET['since']);
 require_once "../init_without_validate.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 $peerName = Sanitize::stripHtmlTags($_GET['peer']);
 $stm = $DBH->prepare("SELECT id,secret FROM imas_federation_peers WHERE peername=:peername");

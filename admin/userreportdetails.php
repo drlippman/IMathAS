@@ -60,7 +60,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 		  $errors = checkNewUserValidation(array('pw1'));
 		  if ($errors == '') {
 			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("../includes/password.php");
+				require_once "../includes/password.php";
 				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			} else {
 				$newpw = md5($_POST['pw1']);

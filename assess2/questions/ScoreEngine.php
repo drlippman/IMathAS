@@ -2,10 +2,10 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . '/ErrorHandler.php');
-require_once(__DIR__ . '/QuestionHtmlGenerator.php');
-require_once(__DIR__ . '/models/ScoreQuestionParams.php');
-require_once(__DIR__ . '/scorepart/ScorePartFactory.php');
+require_once __DIR__ . '/ErrorHandler.php';
+require_once __DIR__ . '/QuestionHtmlGenerator.php';
+require_once __DIR__ . '/models/ScoreQuestionParams.php';
+require_once __DIR__ . '/scorepart/ScorePartFactory.php';
 
 use PDO;
 use RuntimeException;
@@ -267,7 +267,7 @@ class ScoreEngine
         }
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
             if (function_exists('onBeforeScoreQuestion')) {
                 onBeforeScoreQuestion($scoreQuestionParams,
                     $varsForScorepart, $additionalVarsForScoring);
@@ -729,7 +729,7 @@ class ScoreEngine
         ];
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
             if (function_exists('onScorePartMultiPart')) {
                 $returnData = onScorePartMultiPart($returnData, $scorePartResult);
             }
@@ -802,7 +802,7 @@ class ScoreEngine
         );
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
             if (function_exists('onScorePartNonMultiPart')) {
                 $returnData = onScorePartNonMultiPart($returnData, $scorePartResult);
             }

@@ -672,7 +672,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 			if ($updateLTI && isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $_SESSION['ltiitemtype']==0) {
 				//update lti record.  We only do this for single assessment placements
 
-				require_once("../includes/ltioutcomes.php");
+				require_once "../includes/ltioutcomes.php";
 
 				$total = 0;
 				$allans = true;
@@ -709,7 +709,7 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 			$outstr .= $match;
 		}
 	}
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
 	if ($testsettings['isgroup']>0 && $_SESSION['groupid']>0 && !$isreview) {
 		deleteasidfilesfromstring2($outstr,'agroupid',$_SESSION['groupid'],$testsettings['id']);
 	} else {

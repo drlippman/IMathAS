@@ -11,7 +11,7 @@ ini_set("max_execution_time", "900");
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -311,7 +311,7 @@ if ($overwriteBody==1) {
 
 <?php
 	$select = "all";
-	require_once("../course/libtree.php");
+	require_once "../course/libtree.php";
 ?>
 		<span class="form">Limit to non-private questions and libs?</span>
 		<span class="formright">

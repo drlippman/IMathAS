@@ -16,13 +16,13 @@ if (!isset($_GET['launchid'])) {
     exit;
 }
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-  require_once($CFG['hooks']['lti']);
+  require_once $CFG['hooks']['lti'];
 }
 if (isset($CFG['hooks']['ltihome'])) {
 	require_once $CFG['hooks']['ltihome'];

@@ -6,7 +6,7 @@ if ($myrights < 20) {
   exit;
 }
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
@@ -42,7 +42,7 @@ if ($_POST['linktype'] == 'assoc') {
     ->set_copiedfrom($prev_copiedfrom)
     ->set_id($newlticourseid);
 } else if ($_POST['linktype'] == 'copy') {
-  require_once(__DIR__.'/../includes/copycourse.php');
+  require_once __DIR__.'/../includes/copycourse.php';
   // TODO: do we want to use the context.title instead of label here? Or both?
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
   $tocopycourse = intval($_POST['copyselect']);

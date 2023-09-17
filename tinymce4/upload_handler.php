@@ -2,7 +2,7 @@
 
   //check credentials
   require_once "../init.php";
-  require_once("../includes/filehandler.php");
+  require_once "../includes/filehandler.php";
 
   if ($_SERVER['HTTP_HOST'] == 'localhost') {
     //to help with development, while vue runs on 8080

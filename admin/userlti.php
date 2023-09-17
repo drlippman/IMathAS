@@ -49,7 +49,7 @@ if ($myrights < 20) {
   $stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
 
-  require_once('../includes/TeacherAuditLog.php');
+  require_once '../includes/TeacherAuditLog.php';
   TeacherAuditLog::addTracking(
     $row['courseid'],
     "Course Settings Change",

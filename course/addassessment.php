@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 if (isset($courseUIver) && $courseUIver > 1) {
 	if (!isset($_GET['id'])) {
@@ -92,7 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
             	$DBH->beginTransaction();
-                require_once('../includes/filehandler.php');
+                require_once '../includes/filehandler.php';
                 deleteallaidfiles($assessmentId);
 								$grades = array();
 								$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -162,7 +162,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
         	$DBH->beginTransaction();
-            require_once("../includes/parsedatetime.php");
+            require_once "../includes/parsedatetime.php";
             if ($_POST['avail']==1) {
                 if ($_POST['sdatetype']=='0') {
                     $startdate = 0;
@@ -450,7 +450,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 				//update ptsposs field
 				if (isset($_POST['defpoints'])) {
-					require_once("../includes/updateptsposs.php");
+					require_once "../includes/updateptsposs.php";
 					updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
 				}
 			}

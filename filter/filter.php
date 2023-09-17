@@ -13,7 +13,7 @@
 	if ((isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
 		include("$filterdir/graph/asciisvgimg.php");
 		$AS = new AStoIMG;
-		require_once("$filterdir/../includes/filehandler.php");
+		require_once "$filterdir/../includes/filehandler.php";
 	}
 	if ((!isset($_SESSION['graphdisp']) || $_SESSION['graphdisp']==0)) {
 		include_once("$filterdir/graph/sscrtotext.php");

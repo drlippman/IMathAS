@@ -14,7 +14,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
-	require_once("../includes/parsedatetime.php");
+	require_once "../includes/parsedatetime.php";
 	$checkedlist = implode(',', array_map('intval', $checked));
 	$sets = array();
 	$qarr = array();

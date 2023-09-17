@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -49,7 +49,7 @@ class NumberScorePart implements ScorePart
         
         $hasUnits = in_array('units',$ansformats);
         if ($hasUnits) {
-            require_once(__DIR__.'/../../../assessment/libs/units.php');
+            require_once __DIR__.'/../../../assessment/libs/units.php';
         }
         
         $givenans = normalizemathunicode($givenans);

@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 	require_once "../init.php";
 	require_once "../includes/htmlutil.php";
-    require_once('../includes/TeacherAuditLog.php');
+    require_once '../includes/TeacherAuditLog.php';
 
 	if (!(isset($teacherid))) {
 		require_once "../header.php";
@@ -44,7 +44,7 @@
 		}
 		//add new tutors
 		if (isset($_POST['promotetotutor'])) {
-			require_once("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			$ph = Sanitize::generateQueryPlaceholders($_POST['promotetotutor']);
 			$stm = $DBH->prepare("SELECT u.id,u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=? AND u.id IN ($ph)");
 			$stm->execute(array_merge(array($cid), $_POST['promotetotutor']));

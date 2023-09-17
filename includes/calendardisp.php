@@ -11,7 +11,7 @@ if (isset($_GET['callength'])) {
 	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }
 
-require_once("filehandler.php");
+require_once "filehandler.php";
 
 function showcalendar($refpage) {
 global $DBH;

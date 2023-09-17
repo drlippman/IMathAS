@@ -6,7 +6,7 @@
 //      when questions are added
 
 require_once "../init.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 if ($myrights<100) {
 	echo "Not authorized";

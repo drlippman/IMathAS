@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 if ($courseUIver == 1) {
 	if (isset($_GET['id'])) {
@@ -163,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$toset['intro'] = Sanitize::incomingHtml($_POST['intro']);
 		}
-    require_once("../includes/parsedatetime.php");
+    require_once "../includes/parsedatetime.php";
 		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
 
     if ($_POST['sdatetype']=='0') {
@@ -527,7 +527,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			// Re-total any student attempts on this assessment
             //need to re-score assessment attempts based on withdrawal
-            require_once('../assess2/AssessHelpers.php');
+            require_once '../assess2/AssessHelpers.php';
             AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
                 ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 

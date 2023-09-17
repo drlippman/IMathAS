@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -103,7 +103,7 @@ if (!(isset($teacherid))) {
 				$_GET['qsetid'] = $stm->fetchColumn(0);
 			}
 		}
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if (isset($_GET['qsetid'])) { //new - adding
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));

@@ -104,7 +104,7 @@ function show_postback_form($launch, $db, $err='') {
       }
 
       echo '<div class=submit><button type=submit>'._('Create Account').'</button></div>';
-      require_once(__DIR__.'/../includes/newusercommon.php');
+      require_once __DIR__.'/../includes/newusercommon.php';
       $requiredrules = array(
         'curSID'=>'{depends: function(element) {return $("#SID").val()==""}}',
         'curPW'=>'{depends: function(element) {return $("#SID").val()==""}}',

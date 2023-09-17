@@ -6,7 +6,7 @@
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/newusercommon.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 /*** pre-html data manipulation, including function code *******/
 // Reads past the UTF-8 bom if it is there.
@@ -108,7 +108,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		if (isset($CFG['GEN']['newpasswords'])) {
-			require_once("../includes/password.php");
+			require_once "../includes/password.php";
         }
         require_once '../includes/setSectionGroups.php';
 		if ($isadmin) {

@@ -7,7 +7,7 @@
 function showUserPrefsForm() {
 	global $CFG, $tzname;
 
-	require_once(dirname(__FILE__)."/htmlutil.php");
+	require_once dirname(__FILE__."/htmlutil.php");
 
 	$prefs = array();
 	$prefs['mathdisp'] = array(

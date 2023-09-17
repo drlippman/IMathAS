@@ -1042,7 +1042,7 @@ $DBH->query($sql);
 echo 'php_sessions created<br/>';
 
 if (isset($CFG['GEN']['newpasswords'])) {
-	require_once("includes/password.php");
+	require_once "includes/password.php";
 	$md5pw = password_hash($password, PASSWORD_DEFAULT);
 } else {
 	$md5pw = md5($password);

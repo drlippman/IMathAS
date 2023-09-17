@@ -2,7 +2,7 @@
 //IMathAS: gradebook table generating function
 //(c) 2007 David Lippman
 
-require_once("../includes/exceptionfuncs.php");
+require_once "../includes/exceptionfuncs.php";
 
 if ($GLOBALS['canviewall'] || !isset($studentinfo)) {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, false);
@@ -10,7 +10,7 @@ if ($GLOBALS['canviewall'] || !isset($studentinfo)) {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 }
 
-require_once("../includes/sanitize.php");
+require_once "../includes/sanitize.php";
 
 //used by gbtable
 function getpts($sc) {
@@ -413,7 +413,7 @@ function gbtable() {
 		$k = 0;
 
 		if ($line['ptsposs']==-1) {
-			require_once("../includes/updateptsposs.php");
+			require_once "../includes/updateptsposs.php";
 			$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
 		}
 		$possible[$kcnt] = $line['ptsposs'];

@@ -194,7 +194,7 @@ if ($isteacher) {
 	}
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
 		//based on a contribution by Cam Joyce
-		require_once("gbtable2.php");
+		require_once "gbtable2.php";
 
 		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
 		$placeinhead .= '<script type="text/javascript">addLoadEvent(print);</script>';
@@ -260,7 +260,7 @@ if ($isteacher) {
 
 
 //DISPLAY
-require_once("gbtable2.php");
+require_once "gbtable2.php";
 require_once "../includes/htmlutil.php";
 
 $placeinhead = '<script type="text/javascript">

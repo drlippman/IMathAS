@@ -14,11 +14,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -43,7 +43,7 @@ $now = time();
 
 // option to reset assessment entirely
 if ($isActualTeacher && $uid == $userid && isset($_GET['reset'])) {
-  require_once(__DIR__ . '/../includes/filehandler.php');
+  require_once __DIR__ . '/../includes/filehandler.php';
   deleteAssess2FilesOnUnenroll(array($uid), array($aid), array());
   $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=? AND assessmentid=?");
   $stm->execute(array($uid, $aid));

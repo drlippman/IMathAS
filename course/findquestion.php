@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;

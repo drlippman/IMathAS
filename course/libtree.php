@@ -1,5 +1,5 @@
 <?php
-	require_once("../init.php");
+	require_once "../init.php";
 
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		$isadmin = false;

@@ -98,7 +98,7 @@
 	$outputmsg = '';
 	$errmsg = '';
 	if (isset($_POST['qtext'])) {
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		$now = time();
 		foreach (array('qcontrol','answer','solution') as $v) {
 			if (!isset($_POST[$v])) {$_POST[$v] = '';}
@@ -116,7 +116,7 @@
 		}
 
 		if (strpos($_POST['qtext'],'data:image')!==false) {
-			require_once("../includes/htmLawed.php");
+			require_once "../includes/htmLawed.php";
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
 

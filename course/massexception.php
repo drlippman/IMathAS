@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Make deadline exceptions for a multiple students; included by listusers and gradebook
 //(c) 2007 David Lippman
-require_once(__DIR__."/../includes/TeacherAuditLog.php");
+require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 	if (!isset($imasroot)) {
 		echo "This file cannot be called directly";
@@ -14,7 +14,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
         $DBH->beginTransaction();
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;

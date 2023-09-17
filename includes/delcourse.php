@@ -2,7 +2,7 @@
 //IMathAS: Course hard deletion code
 //(c) 2018 David Lippman
 
-require_once(__DIR__."/filehandler.php");
+require_once __DIR__."/filehandler.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['delete'])) {

@@ -9,7 +9,7 @@
 $init_session_start = true;
 $init_skip_csrfp = true;
 require_once '../init_without_validate.php';
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/../includes/password.php';
@@ -55,7 +55,7 @@ if ($localuserid === false) {
             if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
                 $flexwidth = true;
                 $nologo = true;
-                require_once('../includes/mfa.php');
+                require_once '../includes/mfa.php';
                 $formaction = $imasroot."/lti/finishlogin.php";
                 if (!isset($_POST['mfatoken'])) {
                     mfa_showLoginEntryForm($formaction, '', false);
@@ -80,7 +80,7 @@ if ($localuserid === false) {
     ($role=='Instructor' && !empty($GLOBALS['CFG']['LTI']['allow_instr_create']))
   )) {
     // create new account
-    require_once(__DIR__.'/../includes/newusercommon.php');
+    require_once __DIR__.'/../includes/newusercommon.php';
     $err = checkNewUserValidation();
 
     $groupid = 0;
@@ -169,7 +169,7 @@ if (!empty($_POST['tzname'])) {
         $tzname = $_SESSION['tzname'];
     }
 }
-require_once(__DIR__."/../includes/userprefs.php");
+require_once __DIR__."/../includes/userprefs.php";
 generateuserprefs($localuserid);
 // log lastaccess
 $db->set_user_lastaccess($localuserid);

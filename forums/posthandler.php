@@ -2,7 +2,7 @@
 //IMathAS:  include with posts.php and postsbyname.php for handling deletes, replies, etc.
 //(c) 2006 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 
 ini_set("max_execution_time", "60");
@@ -52,7 +52,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else if ($_POST['replyby']=="Never") {
 				$replyby = 0;
 			} else {
-				require_once("../includes/parsedatetime.php");
+				require_once "../includes/parsedatetime.php";
 				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime'],null);
 			}
 		} else {
@@ -74,7 +74,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$thisposttime = $now-1;
 		if ($isteacher) {
 			if (isset($_POST['releaseon']) && $_POST['releaseon']=='Date') {
-				require_once("../includes/parsedatetime.php");
+				require_once "../includes/parsedatetime.php";
 				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
 		}
@@ -257,7 +257,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($sendemail) {
-			require_once("../includes/email.php");
+			require_once "../includes/email.php";
 
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid=:forumid AND iu.id<>:userid";
@@ -292,7 +292,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if (isset($_FILES['newfile-0'])) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$i = 0;
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
@@ -427,7 +427,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
                     }
 					$message = printfilter(forcefiltergraph($message));
 					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-						require_once("../includes/filehandler.php");
+						require_once "../includes/filehandler.php";
 						$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
 							$curdir = rtrim(dirname(__FILE__), '/\\');
 							return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
@@ -530,7 +530,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<span class=form>Files:</span>";
 				echo "<span class=formright>";
 				if ($line['files']!='') {
-					require_once('../includes/filehandler.php');
+					require_once '../includes/filehandler.php';
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
 						echo '<input type="text" name="filedesc['.$i.']" value="'.Sanitize::encodeStringForDisplay($files[2*$i]).'" aria-label="'._('Description').'"/>';
@@ -754,7 +754,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($go) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$stm = $DBH->prepare("SELECT parent,files FROM imas_forum_posts WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['remove']));
 			list($parent,$files) = $stm->fetch(PDO::FETCH_NUM);

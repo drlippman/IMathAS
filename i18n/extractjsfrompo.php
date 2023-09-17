@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 if (php_sapi_name() !== 'cli') {
 	echo "this script can only be run on the command line";

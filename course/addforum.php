@@ -50,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
 		$DBH->beginTransaction();
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -186,7 +186,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         // handle groupsetid
         if ($_POST['groupsetid'] === 'bysec') {
             // want to use by-section groups.  Create
-            require_once('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             $groupsetid = createSectionGroupset($cid);
         }
 

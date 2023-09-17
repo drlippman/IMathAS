@@ -2,7 +2,7 @@
 //IMathAS:  Displays a wiki, public view
 //(c) 2010 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";

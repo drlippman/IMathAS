@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once('../assess2/AssessStandalone.php');
+require_once '../assess2/AssessStandalone.php';
 
 $assessver = 2;
 $courseUIver = 2;

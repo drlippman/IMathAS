@@ -139,7 +139,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		':courseid' => $row['id']
 	));
 
-	require_once("../includes/email.php");
+	require_once "../includes/email.php";
 
 	if ($row['msgnotify'] == 1 && $row['email'] != 'none@none.com' && $row['email'] != '') { //send email notification
 		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";

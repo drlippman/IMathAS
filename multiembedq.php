@@ -171,7 +171,7 @@ $showhints = true;
 if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	//load filter
 	$loadgraphfilter = true;
-	require_once("./filter/filter.php");
+	require_once "./filter/filter.php";
 
 	//need question ids, attempts, seeds.  Put in query string, or??
 	$qn = Sanitize::onlyInt($_POST['toscore']);

@@ -15,7 +15,7 @@ $flexwidth = true;
 $nologo = true;
 
 if (isset($_POST['message'])) {
-	require_once("../includes/email.php");
+	require_once "../includes/email.php";
 
 	$origmessage = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
@@ -56,7 +56,7 @@ if (isset($_POST['message'])) {
 				send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subject, $cid, $coursename, $msgid);
 			}
 			if ($FCMtokenTo != '') {
-				require_once("../includes/FCM.php");
+				require_once "../includes/FCM.php";
 				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
 				sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
 						Sanitize::encodeStringForDisplay($subject), $url);
@@ -143,7 +143,7 @@ if (isset($_POST['message'])) {
         }
 		$message = printfilter(forcefiltergraph($message));
 		if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);

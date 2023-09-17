@@ -95,7 +95,7 @@ if ($overwriteBody==1) {
 
 	//load filter
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/../filter/filter.php");
+	require_once "$curdir/../filter/filter.php";
 
 	$out = '<!DOCTYPE html><html><body>';
 

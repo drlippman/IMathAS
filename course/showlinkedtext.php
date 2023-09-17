@@ -51,7 +51,7 @@
 		$text = '<p><a href="'.Sanitize::url($text).'" target="_blank">'.Sanitize::encodeStringForDisplay($title).'</a> (will open in a new tab or window)</p>';
 	} else if (substr(strip_tags($text),0,5)=="file:") {
 		$filename = substr(strip_tags($text),5);
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		$alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
 		$text = '<p>Download file: <a href="'.Sanitize::url($alink).'">'.Sanitize::encodeStringForDisplay($title).'</a></p>';
 	}

@@ -70,7 +70,7 @@ if ($cid==0) {
 			$stugroupid = 0;
 
 			//clean up wiki content
-			require_once("../includes/htmLawed.php");
+			require_once "../includes/htmLawed.php";
 			$wikicontent = myhtmLawed($_POST['wikicontent']);
 			$wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
 			$wikicontent = preg_replace('/\s+/',' ',$wikicontent);

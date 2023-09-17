@@ -7,7 +7,7 @@ require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/copyiteminc.php";
 require_once "../includes/loaditemshowdata.php";
-require_once("../includes/TeacherAuditLog.php");
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -492,8 +492,8 @@ if (!(isset($teacherid))) {
             isset($_POST['removeperq']) || $_POST['exceptionpenalty'] !== '' ||
             $_POST['subtype'] !== 'DNC'
         ) {
-            require_once("../includes/updateptsposs.php");
-            require_once("../assess2/AssessHelpers.php");
+            require_once "../includes/updateptsposs.php";
+            require_once "../assess2/AssessHelpers.php";
 			foreach ($checked as $aid) {
                 //update points possible
                 updatePointsPossible($aid);
@@ -507,7 +507,7 @@ if (!(isset($teacherid))) {
 			}
         }
         if ($_POST['showwork'] != 'DNC') {
-            require_once("../assess2/AssessHelpers.php");
+            require_once "../assess2/AssessHelpers.php";
             // update "show work after" status flags
             foreach ($checked as $aid) {
                 $thissubby = $coreOK ? $submitby : $cursubmitby[$aid];

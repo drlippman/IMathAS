@@ -11,7 +11,7 @@ if ($myrights<=10) {
 $snippets = array();
 
 if (isset($_POST['snippets'])) {
-	require_once("../includes/htmLawed.php");
+	require_once "../includes/htmLawed.php";
 
 	$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$userid));

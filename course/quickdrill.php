@@ -2,7 +2,7 @@
 //IMathAS:  "Quick Drill" player
 //(c) 2009 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 //options:  	id=questionsetid
 //		cid=courseid (not required)
@@ -87,7 +87,7 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 
 		send_email($_GET['email'], $sendfrom, 'QuickDrill Results', $message, array(), array(), 8);
 

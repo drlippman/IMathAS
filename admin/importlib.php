@@ -11,7 +11,7 @@ ini_set("max_execution_time", "3600");
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 
 /*** pre-html data manipulation, including function code *******/

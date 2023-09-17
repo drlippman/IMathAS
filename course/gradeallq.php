@@ -2,7 +2,7 @@
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
 	require_once "../init.php";
-	require_once("../includes/TeacherAuditLog.php");
+	require_once "../includes/TeacherAuditLog.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -206,7 +206,7 @@
 
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$scores,true);
 				}
 			}
@@ -420,7 +420,7 @@
 	$stm->execute($qarr);
 	$cnt = 0;
 	$onepergroup = array();
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$GLOBALS['assessver'] = $line['ver'];

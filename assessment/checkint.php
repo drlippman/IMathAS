@@ -1,7 +1,7 @@
 <?php
     require_once '../init.php';
     if ($myrights < 100) { exit; }
-    require_once(__DIR__ . "/../includes/sanitize.php");
+    require_once __DIR__ . "/../includes/sanitize.php";
 ?>
 <html>
 <body>

@@ -2,9 +2,9 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . '/answerboxes/AnswerBoxParams.php');
-require_once(__DIR__ . '/answerboxes/AnswerBoxFactory.php');
-require_once(__DIR__ . '/models/Question.php');
+require_once __DIR__ . '/answerboxes/AnswerBoxParams.php';
+require_once __DIR__ . '/answerboxes/AnswerBoxFactory.php';
+require_once __DIR__ . '/models/Question.php';
 
 use PDO;
 
@@ -325,7 +325,7 @@ class QuestionHtmlGenerator
         }
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'];
             if (isset($onBeforeAnswerBoxGenerator) && is_callable($onBeforeAnswerBoxGenerator)) {
                 $onBeforeAnswerBoxGenerator();
             }

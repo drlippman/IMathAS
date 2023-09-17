@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__.'/OAuth.php');
-require_once(__DIR__.'/updateptsposs.php');
-require_once(__DIR__.'/../lti/LTI_Grade_Update.php');
+require_once __DIR__.'/OAuth.php';
+require_once __DIR__.'/updateptsposs.php';
+require_once __DIR__.'/../lti/LTI_Grade_Update.php';
 
 /**
  * Add a grade update to the LTI queue. This only can send updates, not deletes

@@ -40,7 +40,7 @@
 	$isRealStudent = (isset($studentid) && !$actas && !isset($_SESSION['stuview']));
 	$latepasses = 0;
 	if (!isset($_SESSION['stuview'])) { //want to load for actas too
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		if ($isRealStudent) {
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 			$latepasses = $studentinfo['latepasses'];
@@ -460,7 +460,7 @@
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" ||
 			if ($myrights<6 || isset($teacherid) || isset($tutorid)) {  // is teacher or guest - delete out out assessment session
-				require_once("../includes/filehandler.php");
+				require_once "../includes/filehandler.php";
 				//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
 				deleteasidfilesbyquery2('userid',$userid,$aid,1);
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
@@ -1096,7 +1096,7 @@
 				}
 			}
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
 			deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
@@ -1283,7 +1283,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
 			$loginfo = "$userfullname creating group. ";
 			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("../includes/password.php");
+				require_once "../includes/password.php";
 			}
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
@@ -1580,7 +1580,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		//}
 	}
 } else {
-	require_once("../filter/filter.php");
+	require_once "../filter/filter.php";
 }
 	//identify question-specific  intro/instruction
 	//comes in format [Q 1-3] in intro

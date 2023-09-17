@@ -2,7 +2,7 @@
 //IMathAS:  Core randomizers and display macros
 //(c) 2006 David Lippman
 
-require_once(__DIR__ . '/../includes/Rand.php');
+require_once __DIR__ . '/../includes/Rand.php';
 $GLOBALS['RND'] = new Rand();
 
 array_push($GLOBALS['allowedmacros'],"exp","nthlog",
@@ -5815,7 +5815,7 @@ function comparentuples() {
 }
 
 function comparenumberswithunits($unitExp1, $unitExp2, $tol='0.001') {
-  require_once(__DIR__.'/../assessment/libs/units.php');
+  require_once __DIR__.'/../assessment/libs/units.php';
   if (strval($tol)[0]=='|') {
     $abstolerance = floatval(substr($tol,1));
   }

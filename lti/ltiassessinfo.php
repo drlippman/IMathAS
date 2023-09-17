@@ -16,7 +16,7 @@ if (!isset($_GET['launchid'])) {
     exit;
 }
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 

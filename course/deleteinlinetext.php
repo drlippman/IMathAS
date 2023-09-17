@@ -27,7 +27,7 @@ if (!(isset($teacherid))) {
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 	$textid = Sanitize::onlyInt($_GET['id']);
 	if (isset($_POST['remove']) && $_POST['remove']=="really") {
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		$DBH->beginTransaction();
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='InlineText' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$textid, ':courseid'=>$cid));

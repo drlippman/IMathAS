@@ -3,9 +3,9 @@
 //JSON edition
 //(c) 2017 David Lippman
 
-require_once("../includes/htmLawed.php");
-require_once("../includes/updateptsposs.php");
-require_once("../includes/migratesettings.php");
+require_once "../includes/htmLawed.php";
+require_once "../includes/updateptsposs.php";
+require_once "../includes/migratesettings.php";
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {

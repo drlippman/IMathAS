@@ -11,9 +11,9 @@ ini_set("max_execution_time", "900");
 
 /*** master php includes *******/
 require_once "../init.php";
-require_once(__DIR__ . "/../includes/htmLawed.php");
+require_once __DIR__ . "/../includes/htmLawed.php";
 require_once "../includes/safeunserialize.php";
-require_once("../includes/filehandler.php");
+require_once "../includes/filehandler.php";
 
 if ($myrights < 100) {
     echo "This page is only accessible by admins";

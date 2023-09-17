@@ -89,7 +89,7 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	} else {
 		$exception = null;
 	}
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
@@ -301,7 +301,7 @@ if ($oktoshow) {
 	}
 
 	if (count($files)>0) {
-		require_once('../includes/filehandler.php');
+		require_once '../includes/filehandler.php';
 	}
 
 	//get next/prev before marked as read

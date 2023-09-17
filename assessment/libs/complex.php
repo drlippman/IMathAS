@@ -187,7 +187,7 @@ function cx_polEu(array $num, string $argin="rad", int $roundto=12) {
     }
 
     if (!function_exists('reduceradical')) {
-        require_once(__DIR__.'/radicals.php');
+        require_once __DIR__.'/radicals.php';
       }
     
     $A=array();  
@@ -665,7 +665,7 @@ function cx_format2std(array $num,int $roundto=3) {
 
 function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
     if (!function_exists('reduceradical')) {
-        require_once(__DIR__.'/radicals.php');
+        require_once __DIR__.'/radicals.php';
       }
 
     if (!is_array($num[0]) && count($num)==2) {
@@ -720,7 +720,7 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 function cx_prettyquadRoot(float $a, float $b, float $c){
     
     if (!function_exists('reduceradicalfrac')) {
-        require_once(__DIR__.'/radicals.php');
+        require_once __DIR__.'/radicals.php';
       }
     
     $d=$b**2 - 4*$a*$c;

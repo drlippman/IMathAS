@@ -1,5 +1,5 @@
 <?php
-require_once("../includes/sanitize.php");
+require_once "../includes/sanitize.php";
 
 if (!isset($_GET['cid']) || $_GET['cid']==="embedq") {
 	$_SESSION = array();

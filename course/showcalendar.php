@@ -19,7 +19,7 @@
 		$editingon = false;
 	}
 
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);

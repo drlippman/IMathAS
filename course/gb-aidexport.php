@@ -125,7 +125,7 @@ if (isset($_POST['options'])) {
 		$qanswers = array();
 		$mathfuncs = array("sin","cos","tan","sinh","cosh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 		$allowedmacros = $mathfuncs;
-		require_once("../assessment/mathphp2.php");
+		require_once "../assessment/mathphp2.php";
 		require_once "../assessment/interpret5.php";
 		require_once "../assessment/macros.php";
 

@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . "/init_without_validate.php");
+require_once __DIR__ . "/init_without_validate.php";
 header('P3P: CP="ALL CUR ADM OUR"');
 ini_set('session.gc_maxlifetime',432000);
 if ($_SERVER['HTTP_HOST'] != 'localhost') {

@@ -83,7 +83,7 @@
 	//pull exceptions, as they may extend the enddate
 	$exceptions = array();
 	if (isset($studentid) && !$inInstrStuView && count($forumdata)>0) {
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 		$ph = Sanitize::generateQueryPlaceholders($forumdata);
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype,assessmentid FROM imas_exceptions WHERE assessmentid in ($ph) AND userid=? AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
@@ -328,7 +328,7 @@ if ($searchtype == 'thread') {
 	 } else {
 	   $itemicons = $CFG['CPS']['itemicons'];
 	 }
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
 	$now = time();
 	if ($searchstr != '') {
 		$searchstr = trim(str_replace(' and ', ' ',$searchstr));

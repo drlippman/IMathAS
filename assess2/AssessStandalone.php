@@ -17,13 +17,13 @@ Ideally handle both
 
 */
 
-require_once(__DIR__ . '/AssessUtils.php');
-require_once(__DIR__ . '/../filter/filter.php');
-require_once(__DIR__ . '/questions/QuestionGenerator.php');
-require_once(__DIR__ . '/questions/models/QuestionParams.php');
-require_once(__DIR__ . '/questions/models/ShowAnswer.php');
-require_once(__DIR__ . '/questions/ScoreEngine.php');
-require_once(__DIR__ . '/questions/models/ScoreQuestionParams.php');
+require_once __DIR__ . '/AssessUtils.php';
+require_once __DIR__ . '/../filter/filter.php';
+require_once __DIR__ . '/questions/QuestionGenerator.php';
+require_once __DIR__ . '/questions/models/QuestionParams.php';
+require_once __DIR__ . '/questions/models/ShowAnswer.php';
+require_once __DIR__ . '/questions/ScoreEngine.php';
+require_once __DIR__ . '/questions/models/ScoreQuestionParams.php';
 
 use IMathAS\assess2\questions\models\Question;
 use IMathAS\assess2\questions\QuestionGenerator;
@@ -386,7 +386,7 @@ class AssessStandalone {
     ];
 
     if (isset($GLOBALS['CFG']['hooks']['assess2/assess_standalone'])) {
-        require_once($GLOBALS['CFG']['hooks']['assess2/assess_standalone']);
+        require_once $GLOBALS['CFG']['hooks']['assess2/assess_standalone'];
         $returnData = onScoreQuestionReturn($returnData, $scoreResult);
     }
 

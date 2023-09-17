@@ -1,7 +1,7 @@
 <?php
 
 require_once "../init.php";
-require_once('../includes/filehandler.php');
+require_once '../includes/filehandler.php';
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
@@ -48,7 +48,7 @@ if (!empty($_POST['newstatus'])) {
 			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
 		}
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
 			$installname._(' Account Status'), $message,
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -84,7 +84,7 @@ if (!empty($_POST['newstatus'])) {
                 $CFG['email']['new_acct_bcclist'] = getDenyBcc();
             }
 
-            require_once("../includes/email.php");
+            require_once "../includes/email.php";
             send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
                 $installname._(' Account Status'), $message,
                 !empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -152,7 +152,7 @@ if (!empty($_POST['newstatus'])) {
 			$CFG['email']['new_acct_bcclist'] = getApproveBcc();
 		}
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 		send_email($row['email'], !empty($accountapproval)?$accountapproval:$sendfrom,
 			$installname._(' Account Approval'), $message,
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),

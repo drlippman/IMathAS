@@ -140,7 +140,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 $duedates = '';
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$exception = null; $latepasses = 0;
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 		$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));

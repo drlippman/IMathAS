@@ -101,7 +101,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['linktype']=='text') {
 			$_POST['text'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['text']));
 		} else if ($_POST['linktype']=='file') {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			if ($_FILES['userfile']['name']!='') {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
@@ -550,7 +550,7 @@ if ($overwriteBody==1) {
 			<input type="hidden" name="MAX_FILE_SIZE" value="15000000" />
 			<span class="formright">
 			<?php if ($filename != '') {
-				require_once("../includes/filehandler.php");
+				require_once "../includes/filehandler.php";
 				echo '<input type="hidden" name="curfile" value="'.Sanitize::encodeStringForDisplay($filename).'"/>';
 				$alink = getcoursefileurl($filename);
 				echo _('Current file:').' <a target="_blank" href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>'._('Replace').' ';

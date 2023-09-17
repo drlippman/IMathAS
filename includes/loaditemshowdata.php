@@ -180,7 +180,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 				foreach ($assessPreReqsToLookup[$line['id']] as $refaid) {
 					$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscorename'] = $line['name'];
 					if ($line['ptsposs']==-1) {
-						require_once(__DIR__."/updateptsposs.php");
+						require_once __DIR__."/updateptsposs.php";
 						$line['ptsposs'] = updatePointsPossible($line['id']);
 					}
 					$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscoreptsposs'] = $line['ptsposs'];
