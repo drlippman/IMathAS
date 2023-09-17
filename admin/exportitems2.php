@@ -629,7 +629,7 @@ if ($overwriteBody==1) {
 		</table>
 
 	<fieldset><legend>Options</legend>
-	<table>
+	<table role="presentation">
 	<tbody>
 	<tr class="r"><td class="r">Export course settings?</td><td><input type=checkbox name="exportcourseopt"  value="1" checked/></td></tr>
 	<tr class="r"><td class="r">Export gradebook scheme and categories?</td><td>

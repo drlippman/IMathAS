@@ -383,7 +383,7 @@ if (!$continuing) {  //start a fresh pull
 					':name'=>$lib['n'], ':ownerid'=>$userid, ':federationlevel'=>$_POST['fedlevel'.$lib['uid']],
 					':parent'=>$thisparent, ':groupid'=>$groupid));
 				//record new ID
-				"Adding lib<Br/>";
+				echo "Adding lib<br/>";
 				$localid[$lib['uid']] = $DBH->lastInsertId();
 			}
 		}

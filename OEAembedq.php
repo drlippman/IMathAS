@@ -220,7 +220,6 @@ if (isset($QS['showscored'])) {
 		}
 		$rawafter = implode('~',$rawafter);
 	}
-	$lastanswers[0] = $lastanswers[0];
 
 	$pts = getpts($after);
 

@@ -124,7 +124,7 @@ class AssessHelpers
                     ($assess_record->getStatus()&64)==64)
                 ) {
                     $aidposs = $assess_info->getSetting('points_possible');
-                    calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs, false);
+                    calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], true, $aidposs, false);
                 }
             }
   		}

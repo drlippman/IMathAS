@@ -34,7 +34,7 @@ function printlist($parent) {
 
 function parseqs($file,$touse,$rights) {
 	function writeq($qd,$rights,$qn) {
-		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin, $importuserid, $importgroupid;
+		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin, $importuserid, $importgroupid, $sourceinstall;
 		$now = time();
 		$toundel = array();
 		$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");

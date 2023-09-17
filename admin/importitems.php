@@ -46,7 +46,7 @@ $newqcnt = 0;
 $updateqcnt = 0;
 function additem($itemtoadd,$item,$questions,$qset) {
 
-	global $DBH,$newlibs;
+	global $DBH,$newlibs,$myrights;
 	global $userid, $userights, $cid, $missingfiles, $newqcnt, $updateqcnt, $sourceinstall;
 	$mt = microtime();
 	if ($item[$itemtoadd]['type'] == "Assessment") {

@@ -32,7 +32,7 @@ class AssessInfo
   *                           or an array of question IDs.
   * @param bool $forcecodeload true to force load of question code
   */
-  function __construct($DBH, $aid, $cid, $questions = false, $forcecodeload = false) {
+  public function __construct($DBH, $aid, $cid, $questions = false, $forcecodeload = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
     $this->cid = $cid;
@@ -1025,7 +1025,7 @@ class AssessInfo
   * @param  array $defaults  Assessment settings assoc array.
   * @return array            Normalized $settings array.
   */
-  static function normalizeQuestionSettings($settings, $defaults) {
+  public static function normalizeQuestionSettings($settings, $defaults) {
 
     if ($settings['points'] == 9999) {
       $settings['points_possible'] = $defaults['defpoints'];
@@ -1125,7 +1125,7 @@ class AssessInfo
   * @param  array $settings   Assessment settings assoc array from the database.
   * @return array             Normalized $settings.
   */
-  static function normalizeSettings($settings) {
+  public static function normalizeSettings($settings) {
     // set global assessUIver
     $GLOBALS['assessUIver'] = $settings['ver'];
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);

@@ -50,7 +50,7 @@ class AssessRecord
    * @param object $DBH PDO Database Handler
    * @param object $assess_info  AssessInfo instance
    */
-  function __construct($DBH, $assess_info = null, $is_practice = false) {
+  public function __construct($DBH, $assess_info = null, $is_practice = false) {
     $this->DBH = $DBH;
     $this->assess_info = $assess_info;
     $this->curAid = $assess_info->getSetting('id');
@@ -3271,7 +3271,7 @@ class AssessRecord
       if ($qptsposs > -1) {
         $ptsposs = $qptsposs;
       } else {
-        $ptsposs = $assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
+        $ptsposs = $this->assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
       }
       if ($ptsposs == 0) {
         $adjscore = 0;
