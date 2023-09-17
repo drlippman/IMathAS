@@ -842,7 +842,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			}
 			$out .= '</tr>';
 		}
-		'</thead>';
+		$out .= '</thead>';
 	} else {
 		$out = '<table class="'.$tblclass.'">';
 	}
@@ -1003,7 +1003,7 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			}
 			$out .= '</tr>';
 		}
-		'</thead>';
+		$out .= '</thead>';
 	} else {
 		$out = '<table class="'.$tblclass.'">';
 	}
