@@ -10,7 +10,7 @@ require_once("../includes/TeacherAuditLog.php");
 if ($courseUIver == 1) {
 	if (isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
-			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
+			$GLOBALS['basesiteurl'], $cid, Sanitize::onlyInt($_GET['id'])));
 	} else {
 		header(sprintf('Location: %s/course/addassessment.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));

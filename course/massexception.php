@@ -314,6 +314,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
         echo "\">Gradebook</a> &gt; ";
         if ($calledfrom == 'isolateassess') {
+            $aid = Sanitize::onlyInt($_GET['aid']);
             echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';
 	}
         echo " Manage Exceptions</div>\n";
@@ -329,6 +330,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
 		$formtag .= "\" id=\"qform\">\n";
 	} else if ($calledfrom == 'isolateassess') {
+        $aid = Sanitize::onlyInt($_GET['aid']);
         $formtag = "<form method=post action=\"isolateassessgrade.php?cid=$cid&aid=$aid&massexception=1\" id=\"qform\">\n";
 	}
 
@@ -346,6 +348,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			} else if ($calledfrom=='gb') {
 				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
 			} else if ($calledfrom == 'isolateassess') {
+                $aid = Sanitize::onlyInt($_GET['aid']);
                 echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
 			}
 			require("../footer.php");

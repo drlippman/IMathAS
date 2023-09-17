@@ -56,7 +56,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		header('Content-type: text/imas');
 		header("Content-Disposition: attachment; filename=\"imasexport.imas\"");
 		echo "PACKAGE DESCRIPTION\n";
-		echo $_POST['packdescription'];
+		echo Sanitize::simpleASCII($_POST['packdescription']);
 		echo "\n";
 		echo "INSTALLNAME\n";
 		echo $installname;

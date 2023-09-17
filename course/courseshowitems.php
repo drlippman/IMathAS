@@ -223,7 +223,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
        // sanitize to prevent XSS
        $parent = implode('-', array_map('intval', explode('-', $parent)));
-
+       $parent = Sanitize::simpleString($parent);
+       
 	   $now = time();
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {

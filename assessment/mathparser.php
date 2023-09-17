@@ -851,7 +851,6 @@ class MathParser
    */
   private function evalNode($node) {
     if (empty($node)) {
-        error_log("evaluate empty node error on str " . $this->origstr);
         throw new MathParserException("Cannot evaluate an empty expression");
         return;
     }

@@ -54,7 +54,7 @@ if (isset($_POST['checked'])) { //form submitted
             $stm->execute($checked);
 
 		} else {
-			$checkedlist = implode(',', $checked);
+			$checkedlist = implode(',', array_map('intval', $checked));
 
 			require("../header.php");
             echo "<div class=breadcrumb>$breadcrumbbase ";

@@ -42,7 +42,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			$stu = 0;
 		}
 		if (isset($_GET['from'])) {
-			$from = $_GET['from'];
+			$from = Sanitize::simpleString($_GET['from']);
 		} else {
 			$from = 'gb';
 		}
@@ -344,6 +344,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 
         $clearid = $_POST['clearq'];
         if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
+          $clearid = intval($clearid);
           deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
           $scores[$clearid] = -1;
           $attempts[$clearid] = 0;
@@ -392,8 +393,6 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
             calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$bestscores,true);
           }
         } else {
-          echo "$clearid";
-          print_r($scores);
           $err = "<p>Error.  Try again.</p>";
         }
       }

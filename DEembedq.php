@@ -140,6 +140,7 @@ if (isset($_GET['showscored'])) {
 		//DE is requesting that the question be redisplayed
 		list($params, $auth, $sig) = parse_params($_SERVER['QUERY_STRING']);
 		list($seed, $rawscores, $lastanswers[0]) = explode(';', $params['redisplay'],3);
+        $seed = intval($seed);
 		$rawscores = array();
 	} else {
 		$seed = rand(1,9999);

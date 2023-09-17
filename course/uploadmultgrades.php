@@ -36,7 +36,7 @@ if (!(isset($teacherid))) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$useridarr[$row[1]] = $row[0];
 		}
-		$coltoadd = $_POST['addcol'];
+		$coltoadd = intval($_POST['addcol']);
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;

@@ -33,7 +33,7 @@
 	$actas = false;
 	$isreview = false;
 	if (isset($teacherid) && isset($_GET['actas'])) {
-		$userid = $_GET['actas'];
+		$userid = Sanitize::onlyInt($_GET['actas']);
 		unset($teacherid);
 		$actas = true;
 	}
@@ -287,7 +287,7 @@
 					echo '<p>' . _("This assessment requires the use of Remote Proctor Now (RPNow).") . '</p>';
 				} else {
 					echo '<p>', _('Password required for access.'), '</p>';
-					echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&amp;id={$_GET['id']}\">";
+					echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&amp;id=$aid\">";
 					echo "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
 					echo '<input type=submit value="', _('Submit'), '" />';
 					echo "</form>";
@@ -422,7 +422,7 @@
 				$_SESSION['isteacher']=false;
 			}
 			if ($actas) {
-				$_SESSION['actas']=$_GET['actas'];
+				$_SESSION['actas']=Sanitize::onlyInt($_GET['actas']);
 				$_SESSION['isreview'] = false;
 			} else {
 				unset($_SESSION['actas']);
@@ -477,7 +477,7 @@
 				$_SESSION['isteacher']=false;
 			}
 			if ($actas) {
-				$_SESSION['actas']=$_GET['actas'];
+				$_SESSION['actas']=Sanitize::onlyInt($_GET['actas']);
 				$_SESSION['isreview'] = false;
 			} else {
 				unset($_SESSION['actas']);
@@ -922,7 +922,7 @@
 				}
 			}
 		} else {
-			$toclear = $_GET['reattempt'];
+			$toclear = Sanitize::onlyInt($_GET['reattempt']);
 			if ($attempts[$toclear]<$qi[$questions[$toclear]]['attempts'] || $qi[$questions[$toclear]]['attempts']==0) {
 				//$scores[$toclear] = -1;
 				if (!in_array($toclear,$reattempting)) {
@@ -981,7 +981,7 @@
 		$_SESSION['lastregen'] = $now;
 		if ($doexit) { exit;}
 		srand();
-		$toregen = $_GET['regen'];
+		$toregen = Sanitize::onlyInt($_GET['regen']);
 
 		if ($qi[$questions[$toregen]]['fixedseeds'] !== null && $qi[$questions[$toregen]]['fixedseeds'] != '') {
 			$fs = explode(',',$qi[$questions[$toregen]]['fixedseeds']);
@@ -1109,7 +1109,7 @@
 
 	}
 	if (isset($_GET['jumptoans']) && $testsettings['showans']==='J') {
-		$tojump = $_GET['jumptoans'];
+		$tojump = Sanitize::onlyInt($_GET['jumptoans']);
 		$attempts[$tojump]=$qi[$questions[$tojump]]['attempts'];
 		if ($scores[$tojump]<0){
 			$scores[$tojump] = 0;
@@ -1678,7 +1678,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 		} else if ($_GET['action']=="shownext") {
 			if (isset($_GET['score'])) {
-				$last = $_GET['score'];
+				$last = intval($_GET['score']);
 
 				if ($_POST['verattempts']!=$attempts[$last]) {
 					echo "<p>", _('The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.'), "</p>";
@@ -1732,7 +1732,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					$done = true;
 				}
 			} else if (isset($_GET['to'])) {
-				$toshow = $_GET['to'];
+				$toshow = intval($_GET['to']);
 				$done = false;
 			}
 
@@ -1776,7 +1776,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		} else if ($_GET['action']=="skip") {
 
 			if (isset($_GET['score'])) { //score a problem
-				$qn = $_GET['score'];
+				$qn = Sanitize::onlyInt($_GET['score']);
 
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>", _('This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.'), "</p>";
@@ -1941,7 +1941,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo "</div>\n";
 			    }
 			} else if (isset($_GET['to'])) { //jump to a problem
-				$next = $_GET['to'];
+				$next = Sanitize::onlyInt($_GET['to']);
 				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\"  class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
 
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat'],$testsettings['extrefs']);
@@ -2053,7 +2053,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 		} else if ($_GET['action']=="seq") {
 			if (isset($_GET['score'])) { //score a problem
-				$qn = $_GET['score'];
+				$qn = intval($_GET['score']);
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>", _('The last question has been submitted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.'), "</p>";
 				} else {
@@ -2138,7 +2138,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			}
 			if (isset($_GET['to'])) { //jump to a problem
-				$toshow = $_GET['to'];
+				$toshow = intval($_GET['to']);
 			}
 			if ($done || isset($_GET['done'])) { //are all done
 
@@ -2198,7 +2198,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		} else if ($_GET['action']=='scoreembed') {
 			$qn = $_POST['toscore'];
 			$colors = array();
-			$page = $_GET['page'];
+			$page = intval($_GET['page']);
 			$divopen = false;
 			if ($_POST['verattempts']!=$attempts[$qn]) {
 				echo '<div class="prequestion">';
@@ -2418,7 +2418,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$qn = Sanitize::onlyInt($_GET['qn']);
 			$aid = $testsettings['id'];
 			$seed = Sanitize::onlyInt($_GET['seed']);
-			$startt = $_GET['startt'];
+			$startt = Sanitize::onlyInt($_GET['startt']);
 			$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=2,seed=:seed,startt=:startt WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':curquestion'=>$qn, ':seed'=>$seed, ':startt'=>$startt, ':assessmentid'=>$aid));
 
@@ -2526,7 +2526,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 			exit;
 		} else if ($_GET['action']=='livepollshowqscore') {
-			$qn = $_GET['qn'];
+			$qn = Sanitize::onlyInt($_GET['qn']);
 			if ($LPinf['curquestion'] != $qn || $LPinf['curstate'] != 4) {
 				echo _('wrong question or not open for displaying scored result');
 				exit;

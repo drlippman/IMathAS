@@ -91,6 +91,7 @@ if (isset($_POST['updatecaption'])) {
 		echo 'Invalid video ID';
 		exit;
 	}
+    $vidid = Sanitize::simpleASCII($vidid);
 	$ctx = stream_context_create(array('http'=>
 	    array(
 		'timeout' => 1

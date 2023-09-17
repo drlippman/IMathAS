@@ -89,7 +89,7 @@ if ($myrights<20) {
   $qn = 27;  //question number to use during testing
   if (isset($_POST['state'])) {
     $state = json_decode($_POST['state'], true);
-    $seed = $state['seeds'][$qn];
+    $seed = intval($state['seeds'][$qn]);
   } else {
     if (isset($_GET['seed'])) {
   		$seed = Sanitize::onlyInt($_GET['seed']);

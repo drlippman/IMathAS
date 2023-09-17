@@ -823,7 +823,8 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$imasroot,$CFG;
-	if (!$_SESSION['istutorial']) {
+	$qn = intval($qn);
+    if (!$_SESSION['istutorial']) {
 		if ($inreview) {
 			echo '<div class="review clearfix">';
 		}

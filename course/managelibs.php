@@ -601,7 +601,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="delq" value="yes" >
 			Also delete questions in library
 		</p>
-		<input type=hidden name=remove value="<?php echo $rlist ?>">
+		<input type=hidden name=remove value="<?php echo Sanitize::encodeStringForDisplay($rlist); ?>">
 		<p>
 			<input type=submit value="Really Delete">
 			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
