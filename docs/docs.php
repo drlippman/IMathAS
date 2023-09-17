@@ -5,7 +5,7 @@ include("../init_without_validate.php");
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/infopages.css\" type=\"text/css\">\n";
 require_once "../header.php";
 $pagetitle = "Documentation";
-require_once (isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
+require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
 ?>
 
 <h1>Guides</h1>
