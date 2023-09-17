@@ -1987,7 +1987,7 @@ class DrawingScorePart implements ScorePart
                 $percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
             }
             //divide up over all the lines
-            $percentunmatcheddrawn = $percentunmatcheddrawn;
+            
             //if ($GLOBALS['myrights']==100) {
             //  print_r($anslines);
             //  print_r($linedata);

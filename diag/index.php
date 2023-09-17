@@ -24,7 +24,7 @@
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 		require_once "../header.php";
 		$pagetitle = "Diagnostics";
-		require_once isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
+		require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
 		echo "<img class=\"floatleft\" src=\"$staticroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
@@ -373,7 +373,7 @@ if (isset($_POST['SID'])) {
 
 //allow custom login page for specific diagnostics
 if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
-	require_once isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php";
+	require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php";
 } else {
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
@@ -382,7 +382,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/j
 $flexwidth = true;
 require_once "../header.php";
 $pagetitle =$line['name'];
-require_once isset($CFG['GEN']['diagincludepath']?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
+require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
 ?>
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo Sanitize::onlyInt($diagid); ?>">

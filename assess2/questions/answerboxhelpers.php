@@ -331,7 +331,7 @@ function ntupleToString($ntuples) {
 			$out[] = implode(' or ', $sub);
 		}
 	}
-	implode(',', $out);
+	return implode(',', $out);
 }
 
 function parseInterval($str, $islist = false) {
