@@ -62,8 +62,12 @@ if ($forumcourseid != $cid) {
 }
 
 if (isset($_GET['markunread'])) {
-	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
+	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid AND tagged=0");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
+    if ($stm->rowCount()==0) { // must be tagged
+        $stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=0 WHERE userid=:userid AND threadid=:threadid");
+        $stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
+    }
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
