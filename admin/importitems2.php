@@ -225,6 +225,7 @@ echo $curBreadcrumb;
 if (count($ids) > 0) {
             ?>
 		<table cellpadding=5 class=gb>
+        <caption class="sr-only">Course Items</caption>
 		<thead>
 			<tr><th></th><th><?php echo _('Type'); ?></th><th><?php echo _('Title'); ?></th></tr>
 		</thead>

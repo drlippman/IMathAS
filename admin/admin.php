@@ -221,6 +221,7 @@ $placeinhead .= '</script>';
 	<h2>Courses</h2>
 	<div class=item>
 	<table class=gb border=0 width="90%">
+        <caption class="sr-only">Table of Courses</caption>
 		<thead>
 			<tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Settings</th><th>Teachers</th><th>Transfer</th><th>Delete</th>
 			</tr>
@@ -347,6 +348,7 @@ $placeinhead .= '</script>';
 	<h3>Diagnostics</h3>
 	<div class=item>
 	<table class=gb width="90%" id="diagTable">
+        <caption class="sr-only">Table of Diagnostics</caption>
 		<thead>
 		<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
 		</thead>
@@ -383,6 +385,7 @@ $placeinhead .= '</script>';
 	<h3><?php echo $page_userBlockTitle ?></h3>
 	<div class=item>
 		<table class=gb width="90%" id="myTable">
+        <caption class="sr-only">Table of Users</caption>
 		<thead>
 			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Delete</th></tr>
 		</thead>

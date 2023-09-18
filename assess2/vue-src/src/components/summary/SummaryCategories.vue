@@ -1,5 +1,6 @@
 <template>
   <table class="scorelist">
+    <caption class="sr-only">Category Scores</caption>
     <tr>
       <th>{{ $t('catlist.category') }}</th>
       <th>{{ $t('catlist.score') }}</th>

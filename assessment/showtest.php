@@ -1307,7 +1307,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					if ($stm->rowCount()>0) {
 						$row = $stm->fetch(PDO::FETCH_NUM);
 						if ($row[1]>0) {
-							echo "<p>", _(sprintf('%s already has a group.  No change made'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
+							echo "<p>", _(sprintf('%s already has a group.  No change made', Sanitize::encodeStringForDisplay($thisusername))), "</p>";
 							$loginfo .= "$thisusername already in group. ";
 						} else {
 							$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid,:stugroupid)");
@@ -1327,7 +1327,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
 							//$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
 							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
-							echo "<p>", _(sprintf('%s added to group, overwriting existing attempt.'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
+							echo "<p>", _(sprintf('%s added to group, overwriting existing attempt.', Sanitize::encodeStringForDisplay($thisusername))), "</p>";
 							$loginfo .= "$thisusername switched to group. ";
 						}
 					} else {
@@ -1338,7 +1338,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES (:userid,$fieldphs)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':userid'=>$_POST['user'.$i]) + $rowgrptest);
-						echo "<p>", _(sprintf('%s added to group.'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
+						echo "<p>", _(sprintf('%s added to group.', Sanitize::encodeStringForDisplay($thisusername))), "</p>";
 						$loginfo .= "$thisusername added to group. ";
 					}
 				}
@@ -2968,11 +2968,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							if ($showcorrectnow) {
 								$msg .= _(" and correct answer");
 							}
-							if ($showcorrectnow) {
-								echo $msg . _(', is displayed below') . '</p>';
-							} else {
-								echo $msg . _(', is displayed below') . '</p>';
-							}
+							echo $msg . _(', is displayed below') . '</p>';
 						}
 						echo '</div>';
 					}
@@ -3141,6 +3137,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 		$jsonbits = array();
 		$pgposs = 0;
+        $pgpts = 0;
+        $cntunans = 0;
+        $cntcanimp = 0;
+
 		for($j=0;$j<count($scores);$j++) {
 			$bit = "\"q$j\":[0,";
 			if (unans($scores[$j])) {
@@ -3229,7 +3229,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 
 	function showembednavbar($pginfo,$curpg) {
-		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
+		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings,$isdiag;
 
 		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
 		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";

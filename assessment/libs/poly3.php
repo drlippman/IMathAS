@@ -361,7 +361,7 @@ function poly3_fractionsubtract($minuend,$subtrahend){
 	$powerminuend = count($minuend)-1;
 	$powersubtrahend = count($subtrahend)-1;
 	if($powerminuend!=$powersubtrahend) {
-    	echo "poly3_fractionsubtract - polynomials are different - ERROR.<br/>\r\n minuend=".var_dump($minuend)."<br/>\r\n subtrahend=".var_dump($subtrahend)."<br/>\r\n";
+    	echo "poly3_fractionsubtract - polynomials are different - ERROR.";
 	}
 
 	$power = max($powerminuend,$powersubtrahend);
@@ -442,7 +442,7 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 	$powerminuend = count($minuend)-1;
 	$powersubtrahend = count($subtrahend)-1;
 	if($powerminuend!=$powersubtrahend) {
-    	echo "poly3_fractionsubtract - polynomials are different - ERROR.<br/>\r\n minuend=".var_dump($minuend)."<br/>\r\n subtrahend=".var_dump($subtrahend)."<br/>\r\n";
+    	echo "poly3_fractionsubtract - polynomials are different - ERROR,";
 	}
 
 	$power = max($powerminuend,$powersubtrahend);

@@ -279,6 +279,7 @@ if ($overwriteBody==1) {
 		<div id="headerimportstu" class="pagetitle"><h1>Import Students</h1></div>
 		<p>The first 5 students in the file are listed below.  Check the columns were identified correctly</p>
 			<table class=gb>
+            <caption class="sr-only">Student Info</caption>
 			<thead>
 				<tr>
 					<th>Username</th><th>Firstname</th><th>Lastname</th><th>e-mail</th>

@@ -3,7 +3,15 @@
     if ($myrights < 100) { exit; }
     require_once __DIR__ . "/../includes/sanitize.php";
 ?>
-<html>
+<!DOCTYPE html>
+<?php 
+if (isset($CFG['locale'])) {
+    echo '<html lang="'.$CFG['locale'].'">';
+} else {
+    echo '<html lang="en">';
+}
+?>
+<head><title>Interpreter test</title></head>
 <body>
 <form action="checkint.php" method=post>
 <textarea name=txt cols=80 rows=10><?php $cleaned = $_POST['txt']??''; echo Sanitize::encodeStringForDisplay($cleaned);?></textarea>

@@ -1,5 +1,6 @@
 <template>
   <table class="qdetails">
+    <caption class="sr-only">Penalties Applied</caption>
     <thead>
       <tr>
         <th>{{ $t('qdetails.part') }}</th>

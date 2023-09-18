@@ -892,11 +892,11 @@ function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
 					if(cx_modul($mult)!=0 && cx_modul($A[$r][$j])!=0){
 
 						$A[$i][$j] = cx_sub([$A[$i][$j],cx_mul([$mult,$A[$r][$j]])]);  
-					} else {$A[$i][$j]=$A[$i][$j];}
+					} 
 						
-						if (cx_modul($A[$i][$j]) <= 1e-10) {
-							$A[$i][$j] = [0,0]; //treat values close to 0 as 0
-								}		
+                    if (cx_modul($A[$i][$j]) <= 1e-10) {
+                        $A[$i][$j] = [0,0]; //treat values close to 0 as 0
+                    }		
 	    	    }
 	    }
 

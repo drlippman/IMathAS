@@ -952,6 +952,7 @@ function seqshowqinfobar($qn,$toshow) {
 			}
 		} else {
 			if (isset($CFG['TE']['navicons'])) {
+                $thisscore = getpts($bestscores[$qn]);
 				if ($thisscore==0 || $noindivscores) {
 					echo "<img src=\"$staticroot/img/{$CFG['TE']['navicons']['canretrywrong']}\" alt=\""._('Incorrect but can retry')."\"/> ";
 				} else {

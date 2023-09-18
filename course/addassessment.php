@@ -1188,7 +1188,7 @@ if ($overwriteBody==1) {
 		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Additional Display Options
 		 </div>
 		 <div class="blockitems hidden">
@@ -1239,7 +1239,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand"/>
 		   Time Limit and Access Control
 		 </div>
 		 <div class="blockitems hidden">
@@ -1295,7 +1295,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand"/>
 		   Help and Hints
 		 </div>
 		 <div class="blockitems hidden">
@@ -1356,7 +1356,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Grading and Feedback
 		 </div>
 		 <div class="blockitems hidden">
@@ -1429,7 +1429,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Group Assessment
 		 </div>
 		 <div class="blockitems hidden">

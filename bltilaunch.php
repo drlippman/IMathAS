@@ -1114,7 +1114,7 @@ if ($stm->rowCount()==0) {
 				} else {
 					$ancestors = intval($sourcecid).','.$ancestors;
 				}
-				$ancestors = $ancestors;
+
 				$outcomes = array();
 				$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
 				$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';

@@ -197,7 +197,9 @@ if (!isset($_GET['embedded'])) {
   		<b>{{ course.name }}</b>
   	</div>
 	<div class="card-main">
-		<table class="proplist"><tbody>
+		<table class="proplist">
+        <caption class="sr-only">Course Details</caption>
+        <tbody>
 		<tr v-for="(propval,propname) in courseOut(course)">
 			<th>{{ courseBrowserProps[propname].name }}</th>
 			<td v-if="!Array.isArray(propval)"> {{ propval }} </td>
