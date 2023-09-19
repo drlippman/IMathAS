@@ -527,6 +527,7 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&assigncode=1">
 		<table class=gb>
+        <caption class="sr-only">Students</caption>
 			<thead>
 			<tr>
 				<th>Name</th><th>Section</th><th>Code</th>
@@ -750,6 +751,7 @@ if ($overwriteBody==1) {
 		</p>
 
 	<table class=gb id=myTable>
+    <caption class="sr-only">Roster</caption>
 		<thead>
 		<tr>
 			<th></th>

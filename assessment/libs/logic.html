@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<style>
-    table {border: 0px;
-        border-style: solid;}
-    table th {padding: 50px;
-        margin: 50px;}
-    table td {padding: 5px 5px 50px 5px;
-        margin: 50px;}
-    table table {border-collapse: collapse;}
-    table table td {border: 3px;
-        border-style: solid;
-        text-align: left;
-        vertical-align: top;
-        margin:4px;
-        padding:10px;}
-    table table th {border: 0px solid;
-        text-align: left;
-        vertical-align: top;
-        margin:4px;
-        padding:10px;}
-    table caption {
-        position: absolute;
-        right: 0px;
-        top: 0px;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        color: transparent;
-        }
-</style>
-
+    <head>
+        <title>logic help</title>
+        <style>
+            table {border: 0px;
+                border-style: solid;}
+            table th {padding: 50px;
+                margin: 50px;}
+            table td {padding: 5px 5px 50px 5px;
+                margin: 50px;}
+            table table {border-collapse: collapse;}
+            table table td {border: 3px;
+                border-style: solid;
+                text-align: left;
+                vertical-align: top;
+                margin:4px;
+                padding:10px;}
+            table table th {border: 0px solid;
+                text-align: left;
+                vertical-align: top;
+                margin:4px;
+                padding:10px;}
+            table caption {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                color: transparent;
+                }
+        </style>
+    </head>
 <body>
 <h1>Macro Library logic</h1>
 Version 1.0: April 18, 2022<br />
@@ -256,19 +258,19 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             <tr>
                 <th>Note:</th>
                 <td>This is useful for autogenerating answers to the answerboxes found in truthtable. It does <b>not</b> affect $anstypes or $answer. It is recommended you place something like the following in the Common Control box:<br >
-                    <p style="font-family:courier;">
-                        $exp = 'p and q or not r'
-                        $table = truthtable($exp, FALSE,TRUE)<br />
-                        $tableanswers = truthtableanswers($exp,TRUE)<br />
-                        $numboxes = count($tableanswers)-1<br />
-                        for($i=0..$numboxes){<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$anstypes[$i] = "choices"<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$displayformat[$i] = "select"<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$questions[$i] = array('F','T')  // Order is important: F=0 and T=1<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$noshuffle[$i] = "all"<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$answer[$i] = $tableanswers[$i]<br />
-                        }
-                    </p>
+                    <pre>
+$exp = 'p and q or not r'
+$table = truthtable($exp, FALSE,TRUE)
+$tableanswers = truthtableanswers($exp,TRUE)
+$numboxes = count($tableanswers)-1<br />
+for($i=0..$numboxes){
+&nbsp;&nbsp;&nbsp;&nbsp;$anstypes[$i] = "choices"
+&nbsp;&nbsp;&nbsp;&nbsp;$displayformat[$i] = "select"
+&nbsp;&nbsp;&nbsp;&nbsp;$questions[$i] = array('F','T')  // Order is important: F=0 and T=1
+&nbsp;&nbsp;&nbsp;&nbsp;$noshuffle[$i] = "all"
+&nbsp;&nbsp;&nbsp;&nbsp;$answer[$i] = $tableanswers[$i]
+}
+                    </pre>
                     
                 </td>
             </tr>

@@ -334,7 +334,7 @@ if ($overwriteBody==1) {
 
 
 	echo '<h2>'.$timedescr.'</h2>';
-	echo '<table class="gb">';
+	echo '<table class="gb" role="presentation">';
 	echo '<tr> <td>'.$attemptedstudents.' (out of '.$totalstudents.') </td><td> Students attempted at least one assessment. </td></tr>';
 	echo '<tr> <td class="r">'.$assessmentcount.'</td><td> Assessments were attempted. </td></tr>';
 	echo '<tr> <td class="r">'. $totalAttemptCount.'</td><td> Total attempts were made. </td></tr>';
@@ -348,6 +348,7 @@ if ($overwriteBody==1) {
    </p>
 
 <table class="gb" id="stuTable">
+<caption class="sr-only">Student Activity</caption>
 <thead><tr>
    <th> Student </th>
    <th> Number of Assessments Attempted </th>
@@ -438,6 +439,7 @@ foreach ($st as $uid=>$stu) {
    </p>
 
 <table class="gb" id="assessTable">
+<caption class="sr-only">Assessment summary</caption>
   <thead>
    <th> Assessment </th>
    <th> Number of Attempts </th>

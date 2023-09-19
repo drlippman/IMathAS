@@ -385,7 +385,7 @@ function gbinstrdisp() {
         $hidepast = false;
     }
 	$gbt = gbtable();
-	echo '<table class="gb" id="myTable"><thead><tr>';
+	echo '<table class="gb" id="myTable"><caption class="sr-only">Gradebook</caption><thead><tr>';
 	$n=0;
 	$pointsrow = '<th>Points Possible</th>';
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers

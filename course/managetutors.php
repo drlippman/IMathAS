@@ -201,6 +201,7 @@
 	<form id="curform" method=post action="managetutors.php?cid=<?php echo $cid ?>">
 	
 	<table class="gb">
+    <caption class="sr-only">Tutors</caption>
 	<thead>
 		<tr>
 			<th>Tutor name</th>

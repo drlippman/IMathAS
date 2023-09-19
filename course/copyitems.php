@@ -456,6 +456,7 @@ if ($overwriteBody==1) {
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 	<table cellpadding=5 class=gb>
+    <caption class="sr-only">Calendar Items</caption>
 		<thead>
 		<tr><th></th><th>Date</th><th>Tag</th><th>Text</th></tr>
 		</thead>
@@ -534,6 +535,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<p><?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a></p>
 
 	<table cellpadding=5 class=gb>
+    <caption class="sr-only">Course Items</caption>
 		<thead>
 		<?php
 			echo '<tr><th></th><th>'._('Title').'</th><th>'._('Summary').'</th></tr>';
@@ -590,7 +592,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<p> </p>
 <div id="copyoptions" style="display:none;">
 	<fieldset><legend><?php echo _('Options'); ?></legend>
-	<table>
+	<table role="presentation">
 	<tbody>
 	<tr class="allon"><td class="r"><?php echo _('Copy course settings?'); ?></td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
 	<tr class="allon"><td class="r"><?php echo sprintf(_('Copy gradebook scheme and categories %s (%s will overwrite current scheme %s)?'),'<br/>','<i>','</i>'); ?> </td><td>

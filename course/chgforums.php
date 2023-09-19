@@ -312,6 +312,7 @@ foreach($forumitems as $id=>$name) {
 <fieldset>
 <legend>Forum Options</legend>
 <table class=gb>
+<caption class="sr-only">Settings</caption>
 <thead>
 <tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 </thead>

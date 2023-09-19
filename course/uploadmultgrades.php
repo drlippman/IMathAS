@@ -232,6 +232,7 @@ if ($overwriteBody==1) {
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','addcol[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','addcol[]',false)">None</a></p>
 
 		<table class="gb">
+        <caption class="sr-only">Grades to import</caption>
 		<thead>
 		  <tr><th>In column</th><th>Load this?</th><th>Overwrite?</th><th>Name</th><th>Points</th><th>Count?</th><th>Gradebook Category</th><th>Feedback in column<br/>(blank for none)</th></tr>
 		</thead>

@@ -686,6 +686,7 @@ $(function() {
 		<fieldset>
 		<legend>Assessment Options</legend>
 		<table class="gb" id="opttable">
+            <caption class="sr-only">Settings</caption>
 			<thead>
 			<tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 			</thead>

@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <title>Embedded Content</title>
 <style type="text/css">
 body,html {
 	margin: 0; 

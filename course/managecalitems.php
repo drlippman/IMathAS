@@ -142,6 +142,7 @@ $stm->execute(array(':courseid'=>$cid));
 <form method=post action="managecalitems.php?cid=<?php echo $cid.'&amp;from='.$from;?>">
 <h3>Manage Events</h3>
 <table class="gb">
+<caption class="sr-only">Calendar Events</caption>
 <thead>
 <tr><th>Delete?</th><th>Date</th><th>Tag</th><th>Event Details</th></tr>
 </thead>

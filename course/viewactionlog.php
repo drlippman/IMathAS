@@ -193,9 +193,6 @@ foreach ($actions as $r) {
 	case 'gbviewasid':
 		$actionmsg =  'Viewed in gradebook assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
 		break;
-	case 'assessreview':
-		echo 'Opened in review mode assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
-		break;
 	case 'assesslti':
 		$actionmsg =  'Opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)').' via LTI';
 		break;

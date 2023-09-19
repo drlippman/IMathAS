@@ -1,7 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <title>More Question Writing Examples</title>
-
+
+
 <script src="../javascript/ASCIIMathML.js" type="text/javascript"></script>
 <script src="../javascript/ASCIIsvg.js" type="text/javascript"></script>
 <script src="../course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js" type="text/javascript"></script>
@@ -11,13 +13,16 @@
 <div class=title>
 <h1>More Question Writing Examples</h1>
 </div>
-
+
+
 <h2>Purpose of this document</h2>
 <p>This document contains example IMathAS questions with explanation of the
 code used.  For detailed question language reference, please refer to the 
 <a href="../help.html">help file</a>.</p>
-
-
+
+
+
+
 <h2>Example of Function type</h2>
 <h4>Common Control</h4>
 <pre>
@@ -33,34 +38,42 @@ third argument specifies that 2 random integers should be chosen</p>
 $variables is used to define the variables in the expression.  If more than one variable
 is used, enter a list of variables, like $variables = "x,y,x".  This defaults to "x", so
 this line is not really necessary in this problem.</p>
-
+
+
 <p>$domain specifies the domain on which the student's answer should be compared to
 the given answer.  Enter as a list "min,max".  The same domain will apply to all
 variables in the expression.  This defaults to -10 to 10</p>
-
+
+
 <h4>Question Control</h4>
 <pre>
 $ansprompt = "Ans="
 </pre>
 <p>Rather than place the $answerbox in the question text, I'm going to have the
-system place the default answer box at the end of the question.  The $ansprompt
+system place the default answer box at the end of the question.  The $ansprompt
+
 variable specifies that the box should have "Ans=" displayed in front of the answer box</p>
-
+
+
 <h4>Question Text</h4>
 <pre>
 Simplify `x^$a/x^$b`
-
+
+
 Write your answer with positive exponents only.
 </pre>
-
+
+
 <h4>Answer</h4>
 <pre>
 $p = abs($a - $b)
 $answer = "x^($p)" if ($a>$b)
 $answer = "1/x^($p)" if ($a<$b)
-
+
+
 $showanswer = "x^($a-$b) = $answer"
-
+
+
 $requiretimes = "^,<2,-,=0"
 </pre>
 <p>The first three lines define the answer.  Note that it would have worked just
@@ -71,38 +84,48 @@ on values of other variables</p>
 <p>The $showanswer line defines the answer to show to students.  There is no default value
 for Function type questions, so you must specify something if you want an answer to be available
 to students.  In this case, I showed the first step as well as the answer</p>
-
+
+
 <p>$requiretimes places format requirements on the student's answer.  The list in quotes is in pairs; 
 the first value is the symbol to look for, and the second value indicates the number of times that symbol
 should appear.  In this example, the ^ symbol should show up less than two times, and the - symbol should
 show up zero times.  The first rule requires that students cannot simply reenter the original expression
 and get credit.  The second rule requires that students cannot enter negative exponents</p>
-
-
-
+
+
+
+
+
+
 <h2>Example of Matching type</h2>
 <h4>Common Control</h4>
 <pre>
 $qarr = array("`sin x`","`cos x`","`x^2`","`x^3`","`e^x`","`log x`","`2^x`")
 $aarr = array("`cos x`","`-sin x`","`2x`","`3x^2`","`e^x`","`1/x`","`2^x ln2`")
-
+
+
 $questions,$answers = jointshuffle($qarr,$aarr,4,5)
-
+
+
 $questiontitle = "`f(x)`";
 $answertitle = "`f'(x)`";
 </pre>
 <p>The first two lines define arrays of functions ($qarr) and their derivatives ($aarr)</p>
-
+
+
 <p>The third line creates two new arrays, $questions and $answers, by jointly shuffling the arrays 
 (retaining respective pairing), and picking 4 elements of the $qarr, and 5 elements of the $aarr.</p>
-
+
+
 <p>The last two lines define the titles (column headers) for the $questions and $answers lists.</p>
-
+
+
 <h4>Question Text</h4>
 <pre>
 Match each function with it's derivative.
 </pre>
-
+
+
 <h4>Answer</h4>
 <p>There is no need to specify anything here</p>
 <p>The Matching type requires a $questions array and $answers array.  The $questions will display on the left with
@@ -110,36 +133,46 @@ entry boxes next to each.  The $answers will display on the right, lettered.  If
 then you do not have to do anything else - the first entry of the $answers array will be assumed to be the answer to the first
 entry of the $questions array.  If there are more entries in $answers than $questions, the left over answers are presumed
 to never be used.  If you want an answer to be used more than once, you will need to define a $matchlist</p>
-
-
+
+
+
+
 <h2>Load Library Example (Number type)</h2>
 Example of using loadlibrary to access functions in a macro file (mean from stats library in this case)
-
-
+
+
+
+
 <h4>Common Control</h4>
 <pre>
 $a = nonzerodiffrands(1,10,5)
 </pre>
-
+
+
 <p>This line defines an array variable $a to be 5 different nonzero integers between 1 and 10.  Note that since
 a single variable was defined, it was created as an array variable</p>
-
+
+
 <h4>Question Control</h4>
 <pre>
 $table = showarrays("x",$a)
 </pre>
 <p>This defines $table using a standard display macro that creates a tabular display of the array $a 
 with title (header) "x".  If you want to display two lists side-by-side, you can do so, for example: showarrays("x",$a,"y",$b)</p>
-
+
+
 <h4>Question Text</h4>
 <pre>
 Find `bar x`
-
+
+
 $table
 </pre>
-
+
+
 <p>Recall that items in backticks are rendered as math.  The math command "bar" will place a bar over the item that follows it</p>
-
+
+
 <h4>Answer</h4>
 <pre>
 loadlibrary("stats")
@@ -149,7 +182,8 @@ $answer = mean($a)
 of IMathAS.  The Macro Library Help link will show what libraries are currently installed and the functions they
 provide.</p>
 <p>Here we are using the mean function from the stats library to determine the answer.</p>
-
+
+
 <h2>Another Example of Matching Type</h2>
 <h4>Common Control</h4>
 <pre>$a,$b,$c = rands(-3,3,3)
@@ -164,34 +198,42 @@ provide.</p>
 single function or an array of functions.  In this case, we're giving an array of
 functions, though we're only specifying the function and the color.  There
 are other options available.</p>
-
-<pre>$plot = showplot($graphs,-3,3,-5,5,off,off)
+
+
+<pre>$plot = showplot($graphs,-3,3,-5,5,off,off)
+
 </pre>
 <p>this actually calls the showplot macro.  After the
 function, the window is specified, then we're setting the
 labels to off, and grid is set to off</p>
-
-
+
+
+
+
 <pre>$questions = array("`f(x)`","`f'(x)`","`int f(x)dx`")
 $answers = $cols</pre>
 <p>this defines the questions and answers.  Note that they
 are matched - the first entry in $answers is the answer
 the first entry in $questions.  Notice that the primary randomization
 in this question is the shuffling of the color array.</p>
-
+
+
 <h4>Question Control</h4>
 <pre>$questiontitle = "Function"
 $answertitle = "Graph Color"</pre>
 <p>these set titles for the list of questions and answers</p>
-
+
+
 <h4>Question Text</h4>
 <pre>Match each function with its graph
-
+
+
 $plot</pre>
 <h4>Answer</h4>
 <p>Nothing is needed here.  The answers are automatically associated with the questions based
 on array order</p>
-
+
+
 <h2>Example of Multipart Type</h2>
 <h4>Common Control</h4></pre>
 <pre>$anstypes = array("calculated","calculated")
@@ -200,12 +242,14 @@ $c = nonzerorand(-30,30)</pre>
 <p>The first line defines that there will be two parts, both of
 type calculated.  Refer the help for valid anstypes.</p>
 <p>The next two lines define our random variables</p>
-
+
+
 <h4>Question Control</h4>
 <pre>$question = makeprettydisp("{$a}x+{$b}y=$c")
 </pre>
 <p>Set up the equation</p>
-
+
+
 <pre>$hidepreview[1] = true</pre>
 <p>in some multipart questions, it might be useful to hide
 the preview button usually provided with calculated and
@@ -217,10 +261,12 @@ like this in a multipart problem unless the option applies
 to all parts of the problem.</p>
 <p>Note that this is a silly example; there is no good reason
 to hide the preview on one part of this question but not the other</p>
-
+
+
 <h4>Question Text</h4>
 <pre>Find the x and y intercepts of $question
-
+
+
 x-int: `x=`$answerbox[0]&lt;br/&gt
 y-int: `y=`$answerbox[1]</pre>
 <h4>Answer</h4>
@@ -228,62 +274,74 @@ y-int: `y=`$answerbox[1]</pre>
 answerboxes in the problem text.  Make sure you put the
 boxes in numerical order; entry tips are given assuming
 this.</p>
-
+
+
 <pre>$answer[0] = $c/$a
 $answer[1] = $c/$b
 </pre>
 <p>like with other options, the $answer also needs to be
 suffixed with the question part.</p>
-
+
+
 <h2>Example of Number Type</h2>
 <h4>Common Control</h4>
 <pre>$a = nonzerorand(-5,5)
 </pre>
 <p>Set $a to be a nonzero random number between -5 and 5</p>
-
+
+
 <pre>$b = rrand(.1,5,.1) if ($a &lt; 0)
 $b = rrand(-5,-.1,.1) if ($a &gt; 0)
 </pre>
 <p>a decimal number between -5 and 5, with one decimal place.  
 We're going to ensure that $a and $b are different signs
 using the "if" conditional</p>
-
+
+
 <pre>$c,$d = nonzerodiffrands(-5,5,2)</pre>
 <p>two different, nonzero integers</p>
-
+
+
 <h4>Question Control</h4>
 <pre>$prob = "`$a + $b + $c + $d`"
 </pre>
 <p>this could show up as:  -4 + -2.3 + 3 + -1
 the backquotes tell it to display as math</p>
-
+
+
 <pre>$prob2 = makeprettydisp("$a + $b + $c + $d")</pre>
 <p>if we want to simplify it like: -4 - 2.3 + 3 - 1</p>
-
+
+
 <h4>Question Text</h4>
 <pre>Find: $prob
-
+
+
 or equivalently: $prob2</pre>
 <h4>Answer</h4>
 <pre>$answer = $a + $b + $c + $d</pre>
 <p>for number, we just need to specify the answer.  No
 quotes here because we're calculating, not creating
 a display string</p>
-
+
+
 <p>by default, numbers are allowed a .001 relative error.<br/>
 $reltolerance = .0001 would require a higher accuracy<br/>
 $abstolerance = .01 would require an absolute error under .01<br/>
 $answer = "[-10,8)" would accept any answer where
  `-10 &lt;= givenanswer &lt; 8`</p>
-
+
+
 <h2>Example of Calculated Type</h2>
 <h4>Common Control</h4>
 <pre>$a,$b = randsfrom("2,3,5,7,11",2)
 </pre>
 <p>choose two numbers from a list.  Can also choose from
 an array</p>
-
-
+
+
+
+
 <pre>$c = rand(1,10) where ($c % $a != 0)
 $d = rand(1,10) where ($d % $b != 0)
 </pre>
@@ -291,52 +349,66 @@ $d = rand(1,10) where ($d % $b != 0)
 you to avoid a specific case.  In this case, we're requiring
 that $a not divide evenly into $c.  The modulus operator, %, gives
 the remainder upon division</p>
-
+
+
 <pre>$answerformat = "reducedfraction"</pre>
 <p>note that the student could enter 2/5*6/7 and get the
 correct answer.  We can prevent this by adding this line.  $answerformat = "fraction" is also
 an option, if you don't care if the answer is reduced.</p>
-
+
+
 <h4>Question Control</h4>
-
+
+
 <h4>Question Text</h4>
 <pre>Multiply: `$c/$a * $d/$b`
-
+
+
 Enter your answer as a single, reduced fraction</pre>
-
+
+
 <h4>Answer</h4>
-
+
+
 <pre>$answer = $c/$a * $d/$b</pre>
 <p>like with the Number type, we supply a number as the
 answer.  The only difference is that the student can
 enter a calculation instead of a number</p>
-
+
+
 <h2>Example of Multiple-Choice Type</h2>
 <h4>Common Control</h4></pre>
 <pre>$a,$b = nonzerodiffrands(-5,5,2)
 </pre>
 <p>pick two different nonzero numbers. The numbers are important here to ensure that all the
 choices will be different.</p>
-
-
+
+
+
+
 <pre>$questions[0] = $a+$b
 $questions[1] = $a-$b
 $questions[2] = $a*$b</pre>
-
+
+
 <p>we can either define the entire $questions array
 at once, or define each piece separately.  The former
 would look like:  $questions = array($a+$b,$a-$b,...</p>
-
+
+
 <h4>Question Control</h4>
 <pre>$displayformat = "horiz"
 $text = makeprettydisp("$a+$b")</pre>
-
+
+
 <p>The first line above will lay out the choices horizontally.  To do
 a standard vertical layout, just omit this line</p>
-
+
+
 <h4>Question Text</h4>
 <pre>Find $text</pre>
-
+
+
 <h4>Answer</h4></pre>
 <pre>$answer = 0</pre>
 <p>Here the answer is the INDEX into the questions array
@@ -345,7 +417,8 @@ so the first entry is at index 0.</p>
 <p>In multiple-choice questions, the question order is automatically randomized
 unless you specify otherwise, so it's fine for $answer to always be 0; the location
 of the correct answer will be shuffled</p>
-
+
+
 <h2>Example of Multiple Answer Type</h2>
 <h4>Common Control</h4>
 <pre>$questions = listtoarray("`sin(x)`,`sin^-1(x)`,`tan(x)`,`csc(x)`,`x^2`")</pre>
@@ -353,60 +426,78 @@ of the correct answer will be shuffled</p>
 The listtoarray macro converts a list of numbers or
 strings to an array.  Use calclisttoarray to convert
 a list of calculations to an array of numbers</p>
-
+
+
 <h4>Question Control</h4>
-
+
+
 <h4>Question Text</h4>
 <pre>Select all the functions that are periodic</pre>
-
+
+
 <h4>Answer</h4>
-
+
+
 <pre>$answers = "0,2,3"
 </pre>
 <p>the answer here is a list of indexes into the $questions
 array that contain correct answers.  Remember that
 arrays are 0-indexed.  Like with multiple-choice, the question order is randomized automatically.</p>
-
+
+
 <p>Normally, each part is given equal weight (each checkbox is worth 1/5 point).  If you wish
 to divide the point score only by the number of correct
 answers, use this line: $scoremethod = "answers"</p>
-
+
+
 <h2>A Graphing Example (Multipart)</h2>
 <h4>Common Control</h4>
 <pre>$anstypes = listtoarray("number,number,number,number")
-</pre>
+</pre>
+
 <p>Specify the answer types.  In this case, four number answers</p>
-
-
+
+
+
+
 <pre>$graphs[0] = "-x-5,black,-5,-1,,closed"
 $graphs[1] = "-2x+3,black,-1,2,open"
 $graphs[2] = "-2x+3,black,2,5,open"</pre>
 <p>Define the graphs.  For each graph, it's:
 function,color,xmin,xmax,startmark,endmark</p>
-
+
+
 <pre>$graphs[3] = "2,black,2,2,closed"
 </pre>
 <p>last one is really just a dot, but we define it as
 a function</p>
-
+
+
 <pre>$plot = showplot($graphs,-5,5,-5,5,1,1)</pre>
 <p>The inputs here are: graphs,xmin,xmax,ymin,ymax,label spacing,grid spacing</p>
-
+
+
 <h4>Question Control</h4>
 <p>this question is not randomized; it's just meant for
 illustration of graphing options.</p>
-
+
+
 <h4>Question Text</h4>
 <pre>The graph below is the function `f(x)`
-
+
+
 $plot
-
+
+
 Find `lim_(x-&gt;-1^+) \ f(x)`  $answerbox[0]
-
+
+
 Find `lim_(x-&gt;-1^-) \ f(x)`  $answerbox[1]
-
+
+
 Find `lim_(x-&gt;-1) \ f(x)`  $answerbox[2]
-
+
+
 Find `lim_(x-&gt;2) \ f(x)` $answerbox[3]
 </pre>
 <p>the backslashes above add extra spacing between the
@@ -420,8 +511,10 @@ $answer[3] = -1
 </pre>
 <p>Define the part answers.  "DNE" and "oo" (for infinity) are allowed string
 answers to number questions</p>
-
+
+
 <hr/><p>&copy; 2006 David Lippman<br/>This guide was written with development grant support from the WA State Distance Learning Council</p>
 </body>
 </html>
-
+
+

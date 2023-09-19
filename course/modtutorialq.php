@@ -1317,7 +1317,7 @@ if (trim($randvars)=='') {
 calculations you'll need to display simplified values below. <a href="#" onclick="$('#randvarsexamples').show();return false;">Example</a></p>
 <div id="randvarsexamples" style="display:none;">
 <p>Example: Suppose we wanted to ask a Numeric expression randomized question like: Add 2/3 + 3/5</p>
-<table>
+<table role="presentation">
 <tr><td><code>$d1,$d2 = diffrands(3,7,2)</code></td><td> Pick two different random values for the denominators</br>
 <tr><td><code>$n1 = rand(1,$d1-1) where (gcd($n1,$d1)==1)</code></td><td>Pick a numerator that is relatively prime with the denominator</br>
 <tr><td><code>$n2 = rand(1,$d2-1) where (gcd($n2,$d2)==1)</code></td><td>ditto</br>
@@ -1425,7 +1425,7 @@ for ($n=0;$n<10;$n++) {
 	} else {
 		echo '<div class="hasparts'.$n.'" style="display:none;">';
 	}
-	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
+	echo '<table class="choicetbl"><caption class="sr-only">Answers</caption><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
 	for ($i=0;$i<6;$i++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};

@@ -197,6 +197,7 @@ if (isset($_POST['checked'])) { //modifying existing
 ?>
 <p>Leave items blank to use the assessment's default values</p>
 <table class=gb>
+<caption class="sr-only">Question Settings</caption>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions

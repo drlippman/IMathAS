@@ -302,7 +302,7 @@
 <form>
 <input type=hidden name="lastitemhash" value="<?php echo Sanitize::encodeStringForDisplay($_GET['lih']);?>" />
 <p>Leave items blank to use the assessment's default values</p>
-<table class=gb>
+<table class=gb role="presentation">
 <thead><tr>
 <?php
 		if (isset($_GET['modqs'])) { //modifying existing questions

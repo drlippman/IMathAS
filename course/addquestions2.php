@@ -754,7 +754,7 @@ if ($overwriteBody==1) {
 </div>
 </div>
 
-<div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img src="../img/updating.gif"/></div>
+<div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img alt="" src="../img/updating.gif"/></div>
 
 <div id="addbar" class="footerbar sr-only">
     <div class="dropup inlinediv splitbtn">

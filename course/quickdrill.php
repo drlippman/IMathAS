@@ -412,7 +412,7 @@ function getansweights($code,$seed) {
 		$n = substr_count($match[1],',')+1;
 		if ($n>1) {
 			$weights = array_fill(0,$n-1,round(1/$n,3));
-			$weights[] = 1-array_sum($line['answeights']);
+			$weights[] = 1-array_sum($weights);
 			return $weights;
 		} else {
 			return array(1);
