@@ -3534,7 +3534,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 			}
 			if (!empty($s3asid)) {
-				require_once dirname(__FILE__."/../includes/filehandler.php");
+				require_once dirname(__FILE__)."/../includes/filehandler.php";
 
 				if (substr($la,0,5)=="Error") {
 					$out .= "<br/>$la";
@@ -5357,7 +5357,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return ($score);
 		//return $correct;
 	} else if ($anstype == "essay") {
-		require_once dirname(__FILE__."/../includes/htmLawed.php");
+		require_once dirname(__FILE__)."/../includes/htmLawed.php";
 		$givenans = myhtmLawed($givenans);
 		$givenans = str_replace('~', '&tilde;', $givenans);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
@@ -7364,7 +7364,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		$hasfile = false;
-		require_once dirname(__FILE__."/../includes/filehandler.php");
+		require_once dirname(__FILE__)."/../includes/filehandler.php";
 		if (trim($filename)=='') {
 			$found = false;
 			if ($_POST["lf$qn"]!='') {

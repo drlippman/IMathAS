@@ -32,7 +32,7 @@ class EssayScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        require_once dirname(__FILE__."/../../../includes/htmLawed.php");
+        require_once dirname(__FILE__)."/../../../includes/htmLawed.php";
 
         $givenans = myhtmLawed($givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);

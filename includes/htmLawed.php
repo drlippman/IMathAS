@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__."/filehandler.php");
+require_once dirname(__FILE__)."/filehandler.php";
 
 function convertdatauris($in) {
     if (empty($in)) { return $in; }
