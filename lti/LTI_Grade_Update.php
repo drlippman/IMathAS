@@ -27,7 +27,7 @@ class LTI_Grade_Update {
 
   public function __construct(PDO $DBH) {
     $this->dbh = $DBH;
-    $this->debug = !empty($CFG['LTI']['noisydebuglog']);
+    $this->debug = !empty($GLOBALS['CFG']['LTI']['noisydebuglog']);
   }
 
   /**

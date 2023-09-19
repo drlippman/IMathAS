@@ -668,6 +668,6 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	}
 }
-require ("../footer.php");
+require_once "../footer.php";
 
 ?>

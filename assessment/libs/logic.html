@@ -19,6 +19,15 @@
         vertical-align: top;
         margin:4px;
         padding:10px;}
+    table caption {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        color: transparent;
+        }
 </style>
 
 <body>
@@ -48,7 +57,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logicallyequivalent">logicallyequivalent(exp1,exp2,vars)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A logical expression.<br />
@@ -66,7 +76,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logcallyimplies">logcallyimplies(exp1,exp2,vars)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A logical expression.<br />
@@ -84,7 +95,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logicevaluate">logicevaluate(exp,vars,truths)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -106,7 +118,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logicevaluateall">logicevaluateall(exp,vars)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -127,7 +140,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logicrand">logicrand(vars,ops,bnum,unum)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array (or list) of variables.<br />
@@ -150,7 +164,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logicmakepretty">logicmakepretty(exp)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.
@@ -166,7 +181,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logicsteps">logicsteps(exp)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.
@@ -186,7 +202,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="truthtable">truthtable(exp, [showResult=FALSE], [showSteps=TRUE], [offset=0])</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -205,6 +222,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
                 <td> <code>truthtable('(p and q) or not p',TRUE,TRUE)</code> would return a string for the table shown below (but in math display mode):
                 
                     <table style="border: 0px solid; margin: 3px; border-collapse:collapse; border-style: hidden; ">
+                    <caption>Truth table</caption>
                     <tr><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">q</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q)</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">neg p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q) or neg p</th></tr>
                     <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
                     <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td></tr>
@@ -224,7 +242,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="truthtableanswers">truthtableanswers(exp, [showSteps=TRUE])</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -260,7 +279,8 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <tr>
     <td>
         <h3><a name="logiclegend">logiclegend()</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Output:</th>
                 <td>An simple string of HTML syntax that generates a table showing keyboard shortcuts for entering logic expressions.</td>

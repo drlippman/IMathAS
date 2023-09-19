@@ -19,6 +19,15 @@
         vertical-align: top;
         margin:4px;
         padding:10px;}
+    table caption {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        color: transparent;
+        }
 </style>
 
 <body>
@@ -60,7 +69,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexpequals">setexpequals(exp1,exp2,vars,[contents = array()],[universe = array()])</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A set expression.<br />
@@ -89,7 +99,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexpsubset">setexpsubset(exp1,exp2,vars,[contents = array()],[universe = array()])</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A set expression.<br />
@@ -118,7 +129,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexpevaluate">setexpevaluate(exp,vars,contents,universe)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A set expression.<br />
@@ -141,7 +153,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexpmakepretty">setexpmakepretty(exp)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A set expression.</td>
@@ -157,7 +170,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexpsteps">setexpsteps(exp)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A set expression.
@@ -177,7 +191,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexprand">setexprand(vars,ops,bnum,unum)</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array (or list) of variables.<br />
@@ -200,7 +215,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="setexplegend">setexplegend()</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Output:</th>
                 <td>An simple string of HTML syntax that generates a table showing keyboard shortcuts for entering set expressions.</td>
@@ -212,7 +228,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="venn2diagram">venn2diagram(vars,[shade = ""],[labels = ""],[size = 200])</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array/list of 2 variables (single alphabetical characters).<br />
@@ -235,7 +252,8 @@ Note: All variables used in these functions must be single alphabetical characte
 <tr>
     <td>
         <h3><a name="venn3diagram">venn3diagram(vars,[shade = ""],[labels = ""],[size = 250])</a></h3>
-        <table role="presentation" valign="top">
+        <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array/list of 3 variables (single alphabetical characters).<br />

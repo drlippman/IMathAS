@@ -145,7 +145,7 @@ echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="displ
 echo "</form>";
 echo "</div>";
 
-$gbt = gbinstrdisp();
+gbinstrdisp();
 
 echo "<p>Meanings:   NC-no credit</p>";
 //echo "</div>";

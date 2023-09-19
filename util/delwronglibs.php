@@ -81,7 +81,7 @@ if (isset($_POST['record'])) {
 		echo '<a href="#" onclick="previewq('.$row['id'].');return false;">';
 		echo 'Question '.$row['id'].'</a>: '.Sanitize::encodeStringForDisplay($row['description']);
 		echo '. <input type="checkbox" name="unwrong[]" value="'.Sanitize::onlyInt($row['liid']).'"/> Un-mark as wrong lib';
-		'</li>';
+		echo '</li>';
 	}
 	echo '</ul>';
 	echo '<input type="submit" name="record" value="Remove Library Assignments" />';

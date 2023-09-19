@@ -138,7 +138,8 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
-	<table cellpadding=5 class=gb role="presentation">
+	<table cellpadding=5 class=gb>
+    <caption class="sr-only">Items</caption>
 	<thead>
 		<tr><th></th><th>Title</th></tr>
 	</thead>

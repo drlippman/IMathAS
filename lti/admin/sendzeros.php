@@ -34,6 +34,7 @@ if (php_sapi_name() == "cli") {
 }
 
 function addSendsToLTIQueue($values) {
+    global $DBH;
     $ph = Sanitize::generateQueryPlaceholdersGrouped($values, 5);
 	$query = 'INSERT IGNORE INTO imas_ltiqueue ';
 	$query .= "(hash, sourcedid, grade, failures, sendon) VALUES $ph";

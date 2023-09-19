@@ -57,7 +57,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//deleting groupset
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			deletegroupset($deleteGroupSet, $cid);
+			deletegroupset($deleteGroupSet);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		} else {

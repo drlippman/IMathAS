@@ -175,7 +175,7 @@ END;
 	$colorcode .= "<span class=r0>Private</span></p>\n";
 
 	function printlist($parent) {
-		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin;
+		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$allownongrouplibs;
 		$arr = array();
 		if ($parent==0 && isset($published)) {
 			$arr = explode(',',$published);

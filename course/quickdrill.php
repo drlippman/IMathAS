@@ -408,7 +408,7 @@ function getansweights($code,$seed) {
 
 	}
 	if (!$foundweights) {
-		preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
+		preg_match('/anstypes\s*=(.*)/',$code,$match);
 		$n = substr_count($match[1],',')+1;
 		if ($n>1) {
 			$weights = array_fill(0,$n-1,round(1/$n,3));

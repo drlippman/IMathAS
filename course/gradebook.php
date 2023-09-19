@@ -601,7 +601,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		*/
 	}
 	$includelastchange = false;  //don't need it for instructor view
-	$gbt = gbinstrdisp();
+	gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
 	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";

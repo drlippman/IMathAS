@@ -172,7 +172,7 @@ class MathParser
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {
           if ($this->docomplex) {
-            if (!is_array($aException)) { $a = [$a,0]; }
+            if (!is_array($a)) { $a = [$a,0]; }
             if (!is_array($b)) { $b = [$b,0]; }
             return [$a[0]-$b[0],$a[1]-$b[1]];
           } else {

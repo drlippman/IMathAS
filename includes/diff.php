@@ -179,6 +179,7 @@ function htmlDiff($old, $new){
 */
 function htmlDiff($old, $new){
 	$diff = diff(explode(' ', $old), explode(' ', $new));
+    $ret = '';
 	foreach($diff as $k){
 		if(is_array($k))
 			$ret .= (!empty($k['d'])?"<del>".implode(' ',$k['d'])."</del> ":'').

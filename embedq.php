@@ -108,7 +108,6 @@ if (isset($_POST['seed']) && isset($_POST['check'])) {
 	if (empty($_GET['noresults'])) {
 		$qcol = explode('~',$rawscores[0]);
 	}
-	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
 	$pts = getpts($after);
 	$page_scoreMsg .= '<script type="text/javascript">

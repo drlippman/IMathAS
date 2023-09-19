@@ -460,7 +460,6 @@ class AwsClient
     {
         $endpoint = 'https://' . strtolower($this->service) . '.' . $this->region . '.amazonaws.com/';
 
-        $params = $params;
         $headers = [
             'Content-Type' => 'application/x-amz-json-1.0',
             'X-Amz-Target' => $this->service . '_' . $this->version . '.' . $action,

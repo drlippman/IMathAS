@@ -30,7 +30,7 @@ if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the studen
 		$stm = $DBH->prepare("INSERT INTO imas_bookmarks (userid,courseid,name,value) VALUES (:userid, :courseid, :name, :value)");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':name'=>'TR'.$_GET['folder'], ':value'=>$_GET['recordbookmark']));
 	}
-	return "OK";
+	echo "OK";
 	exit;
 }
 

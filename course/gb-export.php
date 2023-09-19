@@ -559,11 +559,7 @@ function gbinstrdisp() {
                         }
 
 					} else { //no score
-						if ($gbt[$i][0][0]=='Averages') {
-							echo '-';
-						} else {
-							echo '-';
-						}
+						echo '-';
 					}
 					if (isset($gbt[$i][1][$j][6]) ) {
 						if ($gbt[$i][1][$j][6]>1) {
