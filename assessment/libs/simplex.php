@@ -4,10 +4,10 @@
 // licensed under GPL version 2 or later
 //
 
-require_once "fractions.php";  // fraction routine
+include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 47;
+	return 48;
 }
 
 global $allowedmacros;
@@ -1169,7 +1169,7 @@ function simplexdisplaycolortable() {
                 $pivottextcolor = $currentpoint[3];
 			}
 
-			if(($prow >= 0)&&($prow >= 0)) {
+			if(($prow >= 0)&&($pcol >= 0)) {
                 $pivotstylematrix[$prow][$pcol] = "style='border:1px solid $pivotbordercolor;color:$pivottextcolor'";
 			}
 		}
@@ -1974,7 +1974,8 @@ function simplexfindpivotpoint($sm) {
 	$ratiotest = array();
 
 	if($ColumnMinValue[0]<0) {
-		// Find all columns that are equal to the min value
+		#region Find all columns that are equal to the min value
+
 		$ColumnMinIndexList = array();
 
 		// Find all columns that are equal with the maximum negative values
@@ -2042,9 +2043,11 @@ function simplexfindpivotpoint($sm) {
                 }
             }
 		}
+		#endregion
     }
     else {
-        // check for multiple solutions
+		#region check for multiple solutions
+
         // look at all zero indicator (non-basic) variables and see if the objective row is zero
         // and there are nonnegative ratios in the column
         // there are $lastrow number of slack variables
@@ -2129,6 +2132,7 @@ function simplexfindpivotpoint($sm) {
                 }
             }
         }
+		#endregion
     }
 
     // return the status and the list of points, if any.
@@ -2526,7 +2530,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
                     // last row is zero - might be a non zero value
                     for($r=0;$r<$lastrow;$r++) {
                         // find the non zero entry row
-                        if(($sma[$r][$c][0]!=0)&&($sma[$r][$c][0]!=0)) {
+                        if($sma[$r][$c][0]!=0) {
                             if($columnsolutionfound) {
                                 // already has a non zero entry - solution is a zero
                                 $columnsolutionfound = false;
@@ -2797,6 +2801,8 @@ function simplexsolve2() {
 	//TODO - verify this for max mixed constraints
 	//TODO - verify this for min mixed constraints
 
+	//TODO - verify that it always checks once for multiple solutions
+
 	do {
 		// check for mixed constraints
         $hasmixedconstraints = simplexhasmixedconstrants($sm);
@@ -2838,7 +2844,7 @@ function simplexsolve2() {
 			//								   , all pivot points
 			//								   , simplex matrix
 			//								   , soluiton
-            if(!isset($simplexsets[$rows])) {
+            if(is_null($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 			//2021-03-29 fixed typo row-->rows
@@ -2853,7 +2859,7 @@ function simplexsolve2() {
 
 		if(count($pivotpoints) > 1) {
 			// add the multiple pivot point matrix to the output
-			if(!isset($simplexsets[$rows])) {
+			if(is_null($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 
@@ -3404,7 +3410,7 @@ function simplexdisplaytable() {
                 $pivottextcolor = $currentpoint[3];
 			}
 
-			if(($prow >= 0)&&($prow >= 0)) {
+			if(($prow >= 0)&&($pcol >= 0)) {
                 $pivotstylematrix[$prow][$pcol] = "style='border:1px solid $pivotbordercolor;color:$pivottextcolor'";
 			}
 		}
@@ -3651,6 +3657,10 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 //Change log
+// 2023-0x-xx ver 49
+//
+// 2023-09-19 ver 48 - Identical sub-expressions bug fixes.
+//
 // 2022-12-12 ver 47 - Fixed logic bug in simplexreadsolutionarray - mixed constraints do not work
 //                     in the library. Working on a TODO list to add mixed constraints.
 //
@@ -3763,3 +3773,5 @@ function simplexsolve($sm,$type,$showfractions=1) {
 //     simplexdisplaycolortable
 //     simplexsolutionconverttofraction
 
+
+?>
