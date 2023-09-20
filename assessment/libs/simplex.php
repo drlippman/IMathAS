@@ -2460,7 +2460,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$ismixed=FALSE,$de
                     // last row is zero - might be a non zero value
                     for($r=0;$r<$lastrow;$r++) {
                         // find the non zero entry row
-                        if(($sma[$r][$c][0]!=0)&&($sma[$r][$c][0]!=0)) {
+                        if($sma[$r][$c][0]!=0) {
                             if($columnsolutionfound) {
                                 // already has a non zero entry - solution is a zero
                                 $columnsolutionfound = false;

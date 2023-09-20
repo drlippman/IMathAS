@@ -38,7 +38,7 @@ if (!empty($_POST['tolock'])) {
 	$db->lock_stus($_POST['tolock'], $localcourse->get_courseid());
 	header(sprintf('Location: %s/lti/ltihome.php?launchid=%s',
 		$GLOBALS['basesiteurl'],
-		$launch->get_launch_id()
+		Sanitize::simpleString($launch->get_launch_id())
 	));
 	exit;
 }
