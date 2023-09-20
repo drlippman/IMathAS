@@ -1073,7 +1073,8 @@ function drawTarget(x,y,skipencode) {
 
 					do {
 						curx += flip*3;
-						ctx.lineTo(curx, stretch*Math.sqrt(flip*(curx - tplines[curTarget][i][0][0])) + tplines[curTarget][i][0][1]);
+                        cury = stretch*Math.sqrt(flip*(curx - tplines[curTarget][i][0][0])) + tplines[curTarget][i][0][1];
+						ctx.lineTo(curx, cury);
 					} while (curx > 0 && curx < targets[curTarget].imgwidth && cury > 0 && cury < targets[curTarget].imgheight);
 				}
 			}
