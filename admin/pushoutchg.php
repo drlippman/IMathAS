@@ -1,6 +1,6 @@
 <?php
-require("../init.php");
-require("../header.php");
+require_once "../init.php";
+require_once "../header.php";
 
 ini_set("max_execution_time", "900");
 
@@ -73,4 +73,4 @@ if ($myrights==100) {
 } else {
 	echo 'Not allowed';
 }
-require("../footer.php");
+require_once "../footer.php";

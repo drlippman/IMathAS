@@ -2,7 +2,7 @@
 //IMathAS:  Grid view of login log
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = Sanitize::courseId($_GET['cid']);
@@ -42,7 +42,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$now = time();
 	if (isset($_REQUEST['daterange'])) {
-		require("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		$start = parsedatetime($_REQUEST['sdate'],'12:00am');
 		$end = parsedatetime($_REQUEST['edate'],'11:59pm');
 		if (($end-$start)/86400>365) {
@@ -123,7 +123,7 @@ if (isset($_GET['download'])) {
 }
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css"> table.logingrid td {text-align: center; border-right:1px solid #ccc;} table.logingrid td.left {text-align: left;}</style>';
-require("../header.php");
+require_once "../header.php";
 if ($overwriteBody==1) {
 	echo $body;
 } else {
@@ -208,5 +208,5 @@ if ($haslocked) {
 	closes their browser, they can continue using the same session on the same computer until 7pm Thursday.</p>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

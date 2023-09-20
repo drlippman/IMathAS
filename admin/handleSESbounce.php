@@ -9,8 +9,8 @@
 	Need to set $CFG['email']['authcode'] in config
 */
 
-require("../init_without_validate.php");
-require("../includes/AWSSNSutil.php");
+require_once "../init_without_validate.php";
+require_once "../includes/AWSSNSutil.php";
 
 if (php_sapi_name() == "cli") {
 	//running command line - no need for auth code

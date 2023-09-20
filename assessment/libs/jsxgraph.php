@@ -1711,6 +1711,8 @@ function jsx_creategeometryboard($label, $ops) {
 	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'true';
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
+    $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
+    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
   
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
@@ -1735,7 +1737,9 @@ function jsx_creategeometryboard($label, $ops) {
         pan: {
             enabled: {$pan},
             needshift: false
-        }
+        },
+        title: '$title',
+        description: '$description'
     });";
 
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
@@ -1753,7 +1757,9 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'true';
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
-   
+    $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
+    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
+
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
 	$xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
@@ -1773,6 +1779,9 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	
 	$minorTickHeightX = isset($ops['minortickheight'][0]) ? $ops['minortickheight'][0] : 10;
 	$minorTickHeightY = isset($ops['minortickheight'][1]) ? $ops['minortickheight'][1] : 10;
+
+	$labelOffsetX = isset($ops['xoffset']) ? $ops['xoffset'] : [-15, 15];
+	$labelOffsetY = isset($ops['yoffset']) ? $ops['yoffset'] : [10, -15];
 
 	$useMathJax = (isset($ops['axislabel']) && (strpos($ops['axislabel'][0], "`") > -1 || strpos($ops['axislabel'][1], "`") > -1)) ? "true" : "false";
 
@@ -1797,20 +1806,23 @@ function jsx_createrectangularboard ($label, $ops = array()) {
              pan: {
 				enabled: {$pan},
 				needshift: false
-			 }
+			 },
+             title: '$title',
+             description: '$description'
            });";
 
 	$out .= "var xTicks{$label}, yTicks{$label};";
    
 	// x-axis
+	$xaxis_label = isset($ops['axislabel'][0]) ? $ops['axislabel'][0] : "";
 	$out .= "var xaxis{$label} = board_{$label}.create('axis', [[0,0], [1,0]], {
 				strokeColor:'black',
 				strokeWidth: 2,
 				highlight:false,
-				name:'" . (isset($ops['axislabel'][0]) ? $ops['axislabel'][0] : "") . "',
+				name: '{$xaxis_label}',
 				label: { 
 					position: 'rt', 
-					offset: [-15,15], 
+					offset: [{$labelOffsetX[0]}, {$labelOffsetX[1]}], 
 					highlight: false, 
 					useMathJax: {$useMathJax}
 				},
@@ -1829,16 +1841,23 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 						visible: $showXLabels
 					}
 				} 
-            });";
+            });
+			xaxis{$label}.setLabel('{$xaxis_label}');";
+
 
 	// y-axis
+	$yaxis_label = isset($ops['axislabel'][1]) ? $ops['axislabel'][1] : "";
 	$out .= "var yaxis{$label} = board_{$label}.create('axis', [[0,0],[0,1]], {
                strokeColor:'black',
                strokeWidth: 2,
                highlight:false,
-               name:'" . (isset($ops['axislabel'][1]) ? $ops['axislabel'][1] : "") . "',
+               name:'{$yaxis_label}',
                withLabel:true,
-               label: {position:'rt', offset:[10,-15], highlight:false, useMathJax:{$useMathJax}},
+               label: {
+					position:'rt', 
+					offset:[{$labelOffsetY[0]}, {$labelOffsetY[1]}], 
+					highlight:false, 
+					useMathJax:{$useMathJax}},
 			   ticks: {
 					insertTicks: false,
 					ticksDistance: $ticksDistanceY,
@@ -1853,7 +1872,8 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 						visible: $showYLabels
 					}
 				} 
-             });";
+             });
+			 yaxis{$label}.setLabel('{$yaxis_label}');";
 	  
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
@@ -1869,7 +1889,9 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	$zoom = isset($ops['zoom']) ? jsx_getbool($ops['zoom']) : 'false';
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'false';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
-   
+    $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
+    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
+
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$rmax = isset($ops['r'][0]) ? (float) $ops['r'][0] : 5;
 	$rInc = isset($ops['r'][1]) ? (float) $ops['r'][1] : 1;
@@ -1911,7 +1933,9 @@ function jsx_createpolarboard ($label, $ops=array()) {
 			pan: {
 				enabled: {$pan},
 				needshift: false
-			}
+			},
+            title: '$title',
+            description: '$description'
 		});
 	";
 

@@ -858,7 +858,8 @@ function updatePts() {
             $(this).val($(this).attr("data-lastval"));
         });
     } else {
-        var newdefpts = Math.round($("#defpts").val());
+        var newdefpts = Math.ceil($("#defpts").val());
+        $("#defpts").val(newdefpts);
         var olddefpts = $("#defpts").attr("data-lastval");
         if (newdefpts == "" || newdefpts <= 0) {
             newdefpts = olddefpts;
@@ -1118,7 +1119,7 @@ function generateTable() {
         html +=
             "<br/><span class=small>" +
             _("Default") +
-            ': <input id="defpts" size=2 value="' +
+            ': <input id="defpts" type=number min=0 step=1 size=2 value="' +
             defpoints +
             '" data-lastval="' +
             defpoints +
@@ -1295,7 +1296,7 @@ function generateTable() {
                         html += ">" + _("With") + "</option></select>" + _(" replacement");
                         html += "</td>";
                         html +=
-                            '<td class="nowrap c"><input size=2 id="grppts-' +
+                            '<td class="nowrap c"><input size=2 type=number min=0 step=1 id="grppts-' +
                             i +
                             '" value="' +
                             curgrppoints +
@@ -1629,7 +1630,7 @@ function generateTable() {
                             "</td>";
                     } else {
                         html +=
-                            '<td><input size=2 id="pts-' +
+                            '<td><input size=2 type=number min=0 step=1 id="pts-' +
                             i +
                             '" value="' +
                             curpt +

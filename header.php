@@ -10,7 +10,7 @@ if (!isset($myrights)) {
 }
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['header'])) {
-    require_once($CFG['hooks']['header']);
+    require_once $CFG['hooks']['header'];
 }
 ?>
 <head>
@@ -77,7 +77,7 @@ div.breadcrumb { display:none;}
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=091522"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=061323"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -95,13 +95,6 @@ if (isset($ispublic) && $ispublic && !isset($_SESSION['mathdisp'])) {
 
 if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
-	//don't load MathJax async when using mathgraphcheck; it needs to check immediately
-	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
-	} else {
-		echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
-	}
-	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $_SESSION['useed']==1) {
@@ -234,7 +227,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==0) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"none\";function rendermathnode(el,callback) {if(typeof callback=='function'){callback();}}</script>";
 }
-echo "<script src=\"$staticroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
+echo "<script src=\"$staticroot/javascript/mathjs.js?v=20230729\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=011923\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
@@ -271,7 +264,7 @@ if (isset($placeinhead)) {
 }
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
-	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
+	require_once "$curdir/{$CFG['GEN']['headerscriptinclude']}";
 }
 if (function_exists('insertIntoHead')) {
     insertIntoHead();
@@ -310,7 +303,7 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 }
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
     $prepend = '/' == substr($CFG['GEN']['headerinclude'], 0, 1) ? '' : $curdir;
-	require("$prepend/{$CFG['GEN']['headerinclude']}");
+	require_once "$prepend/{$CFG['GEN']['headerinclude']}";
 }
 $didnavlist = false;  $essentialsnavcnt = 0;
 function getactivetab() {
@@ -371,7 +364,7 @@ echo '<div class="midwrapper" role="main">';
 
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$curdir/filter/filter.php");
+require_once "$curdir/filter/filter.php";
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 

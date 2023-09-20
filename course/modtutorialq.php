@@ -1,12 +1,12 @@
 <?php
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 if ($myrights<20) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You need to log in as a teacher to access this page";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -370,8 +370,8 @@ if (isset($_POST['text'])) {
 		$editmsg .=  "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 	} else {
 		if ($frompot==1) {
-			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
+			$editmsg .=  "<a href=\"modquestion2.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+			$editmsg .=  "<a href=\"modquestion2.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
 		}
 		$editmsg .=  "<a href=\"addquestions2.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 	}
@@ -865,7 +865,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
-	require_once("../assessment/interpret5.php");
+	require_once "../assessment/interpret5.php";
 	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $answerformat, $scoremethod, $qshuffle, $variables, $keepcode, $randvars) = getqvalues($code,$type);
 	$partial = array();
 	for ($n=0;$n<$nparts;$n++) {
@@ -1003,7 +1003,7 @@ $placeinhead .= '<style type="text/css">
  </style>';
 
 $flexwidth = true;
-require("../header.php");
+require_once "../header.php";
 
 if (isset($_GET['aid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -1317,7 +1317,7 @@ if (trim($randvars)=='') {
 calculations you'll need to display simplified values below. <a href="#" onclick="$('#randvarsexamples').show();return false;">Example</a></p>
 <div id="randvarsexamples" style="display:none;">
 <p>Example: Suppose we wanted to ask a Numeric expression randomized question like: Add 2/3 + 3/5</p>
-<table>
+<table role="presentation">
 <tr><td><code>$d1,$d2 = diffrands(3,7,2)</code></td><td> Pick two different random values for the denominators</br>
 <tr><td><code>$n1 = rand(1,$d1-1) where (gcd($n1,$d1)==1)</code></td><td>Pick a numerator that is relatively prime with the denominator</br>
 <tr><td><code>$n2 = rand(1,$d2-1) where (gcd($n2,$d2)==1)</code></td><td>ditto</br>
@@ -1425,7 +1425,7 @@ for ($n=0;$n<10;$n++) {
 	} else {
 		echo '<div class="hasparts'.$n.'" style="display:none;">';
 	}
-	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
+	echo '<table class="choicetbl"><caption class="sr-only">Answers</caption><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
 	for ($i=0;$i<6;$i++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};
@@ -1503,5 +1503,5 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 
 </form>
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

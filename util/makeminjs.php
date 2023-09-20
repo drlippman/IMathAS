@@ -3,7 +3,7 @@
 
 ini_set("max_execution_time", "600");
 
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) { exit; }
 error_reporting(E_ALL);
 function minify($c) {

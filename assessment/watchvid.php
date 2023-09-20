@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../includes/sanitize.php');
+require_once __DIR__ . '/../includes/sanitize.php';
 
 if (!isset($_GET['url'])) {
     exit;

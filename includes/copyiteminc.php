@@ -6,7 +6,7 @@ require_once __DIR__ . "/migratesettings.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['includes/copyiteminc'])) {
-    require $CFG['hooks']['includes/copyiteminc'];
+    require_once $CFG['hooks']['includes/copyiteminc'];
 }
 
 ini_set("max_execution_time", "900");
@@ -570,14 +570,12 @@ function doaftercopy($sourcecid, &$newitems)
                         $autoexcuse[$k]['cat'] = $outcomes[$v['cat']];
                     } else {
                         $autoexcuse[$k]['cat'] = _('Category') . ' ' . $catcnt;
-                        $cntcnt++;
                     }
                 } else if (substr($v['cat'], 0, 4) == 'AID-') {
                     if (isset($assessnewid[substr($v['cat'], 4)])) {
                         $autoexcuse[$k]['cat'] = 'AID-' . $assessnewid[substr($v['cat'], 4)];
                     } else {
                         $autoexcuse[$k]['cat'] = _('Category') . ' ' . $catcnt;
-                        $cntcnt++;
                     }
                 }
             }

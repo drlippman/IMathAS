@@ -27,7 +27,7 @@ class LTI_Grade_Update {
 
   public function __construct(PDO $DBH) {
     $this->dbh = $DBH;
-    $this->debug = !empty($CFG['LTI']['noisydebuglog']);
+    $this->debug = !empty($GLOBALS['CFG']['LTI']['noisydebuglog']);
   }
 
   /**
@@ -273,7 +273,7 @@ class LTI_Grade_Update {
       return $token_data['access_token'];
     } else {
         // record failure
-      $this->token_request_failure($platform_id);
+      $this->token_request_failure($platform_id, $resp, $error);
       $this->debuglog('token request error '.$error);
       return false;
     }
@@ -341,15 +341,20 @@ class LTI_Grade_Update {
   /**
    * Handle token request failure.  Store failure.
    * @param  int    $platform_id
-   * @param  string $scopes
    */
-  public function token_request_failure(int $platform_id) {
+  public function token_request_failure(int $platform_id, $response = '', $error = '') {
         if (isset($this->failures[$platform_id])) {
             $this->failures[$platform_id]++;
         } else {
             $this->failures[$platform_id] = 1;
         }
         $failures = $this->failures[$platform_id];
+        if ($failures == 2) {
+            // log failure response
+            $logdata = 'Grade token failure for platform '. $platform_id . ', response: ' . $response . ', error: ' . $error;
+            $logstm = $this->dbh->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+            $logstm->execute([time(), $logdata]);
+        }
         $token_data = [
             'access_token' => 'failed'.$failures,
             'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score',

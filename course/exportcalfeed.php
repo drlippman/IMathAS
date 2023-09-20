@@ -1,7 +1,7 @@
 <?php
 
-require("../init.php");
-require("../includes/JWT.php");
+require_once "../init.php";
+require_once "../includes/JWT.php";
 
 //grab user's hashed password to sign request with
 $stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
@@ -52,8 +52,8 @@ function updatecallink() {
 	});
 }
 </script>';
-require("../header.php");
-require("../includes/htmlutil.php");
+require_once "../header.php";
+require_once "../includes/htmlutil.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 echo '&gt; <a href="showcalendar.php?cid='.$cid.'">'._('Calendar').'</a> ';
@@ -110,5 +110,5 @@ echo _('Go to Settings, then "Mail, Contacts, and Calendars". Tap "Add Account",
 echo '</p>';
 
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

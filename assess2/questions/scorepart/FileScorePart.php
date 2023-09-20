@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use DOMDocument;
 use ZipArchive;
@@ -47,7 +47,7 @@ class FileScorePart implements ScorePart
         $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name'] ?? ''));
         $filename = preg_replace('/[^\w\.]/','',$filename);
         $hasfile = false;
-        require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
+        require_once dirname(__FILE__)."/../../../includes/filehandler.php";
         if (trim($filename)=='') {
             if (is_string($givenans) && substr($givenans,0,5) === '@FILE') { // has an autosaved file
                 $scorePartResult->setLastAnswerAsGiven($givenans);

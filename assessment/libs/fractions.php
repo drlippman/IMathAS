@@ -338,7 +338,7 @@ function fractionroot($f,$root=2) {
 	if (!is_array($f)) {
 		$f = fractionparse($f);
 	}
-	include_once("radicals.php");
+	require_once "radicals.php";
 	return reduceradicalfrac(1, $f[0]*$f[1], $f[1]);
 }
 

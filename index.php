@@ -4,7 +4,7 @@
 //(c) 2010 David Lippman
 
 /*** master includes ***/
-require("./init.php");
+require_once "./init.php";
 $now = time();
 
 //0: classes you're teaching
@@ -372,7 +372,7 @@ if (!empty($CFG['logquestionerrors']) && $myrights >= 20) {
     $qerrcnt = $stm->fetchColumn(0);
 }
 /*** done pulling stuff.  Time to display something ***/
-require("header.php");
+require_once "header.php";
 $msgtotal = array_sum($newmsgcnt);
 if (!isset($CFG['GEN']['homelinkbox'])) {
 	echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
@@ -425,7 +425,7 @@ if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
 if (!empty($CFG['logquestionerrors']) && $myrights>=20 && $qerrcnt>0) {
-    echo '<div><span class="noticetext">'.Sanitize::onlyInt($qerrcnt).'</span> of your questions have logged errors. <a target="_blank" href="util/questionerrors.php">View errors</a></div>';
+    echo '<div><span class="noticetext">'.Sanitize::onlyInt($qerrcnt).'</span> ' . _('of your questions have logged errors') . '. <a target="_blank" href="util/questionerrors.php">' . _('View errors') . '</a></div>';
 }
 if ($myrights<75 && ($myspecialrights&(16+32))!=0) {
 	echo '<div>';
@@ -496,7 +496,7 @@ for ($i=0; $i<3; $i++) {
 	}
 }
 
-require('footer.php');
+require_once 'footer.php';
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $username, $courseListOrder, $myspecialrights;

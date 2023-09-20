@@ -74,12 +74,13 @@ function allvisnocred() {
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
-    var filters = ['unans','zero','nonzero','perfect','fb','nowork', '100'];
-    for (var i=0; i<7; i++) {
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork', 'work', '100'];
+    for (var i=0; i<filters.length; i++) {
         if (document.getElementById('filter-' + filters[i]).checked) {
             $(".bigquestionwrap.qfilter-" + filters[i]).hide();
         }
     }
+    $(".bigquestionwrap .headerpane,.scoredetails .person").toggle(!document.getElementById('filter-names').checked);
 }
 function toggleWork(el) {
 	var next = $(el).next();
@@ -146,6 +147,22 @@ function sortByLastChange() {
     var wrap = document.getElementById("qlistwrap");
     [].map.call( wrap.children, Object ).sort( function ( a, b ) {
         return Date.parse(b.getAttribute('data-lastchange')) - Date.parse(a.getAttribute('data-lastchange'));
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
+}
+function sortByName() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return $(a).children(".headerpane").text().localeCompare($(b).children(".headerpane").text());
+    }).forEach( function ( elem ) {
+        wrap.appendChild( elem );
+    });
+}
+function sortByRand() {
+    var wrap = document.getElementById("qlistwrap");
+    [].map.call( wrap.children, Object ).sort( function ( a, b ) {
+        return 0.5 - Math.random();
     }).forEach( function ( elem ) {
         wrap.appendChild( elem );
     });

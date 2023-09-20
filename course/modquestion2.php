@@ -3,8 +3,8 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require "../init.php";
-require "../includes/htmlutil.php";
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once "../includes/TeacherAuditLog.php";
 
 //set some page specific variables and counters
@@ -317,7 +317,7 @@ $(function() {
     });
 });
 </script>';
-require "../header.php";
+require_once "../header.php";
 
 if ($overwriteBody == 1) {
     echo $body;
@@ -466,5 +466,5 @@ if (isset($_GET['qsetid'])) { //adding new question
     echo '</form>';
 }
 
-require "../footer.php";
+require_once "../footer.php";
 ?>

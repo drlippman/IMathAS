@@ -1,6 +1,6 @@
 <?php
   $init_session_start = true;
-	require("../init_without_validate.php");
+	require_once "../init_without_validate.php";
 
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
@@ -22,9 +22,9 @@
 		$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
-		require("../header.php");
+		require_once "../header.php";
 		$pagetitle = "Diagnostics";
-		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
+		require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
 		echo "<img class=\"floatleft\" src=\"$staticroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
@@ -37,7 +37,7 @@
 			echo "<li><a href=\"$imasroot/diag/index.php?id=" . Sanitize::onlyInt($row[0]) . "\">".Sanitize::encodeStringForDisplay($row[1])."</a></li>";
 		}
 		echo "</ul></div>";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$diagid = Sanitize::onlyInt($_GET['id']);
@@ -273,10 +273,9 @@ if (isset($_POST['SID'])) {
 		}
 		//if ($allowreentry) {
 
-			$_SESSION['mathdisp'] = $_POST['mathdisp'];//1;
-			$_SESSION['graphdisp'] = $_POST['graphdisp'];//1;
-			//$_SESSION['mathdisp'] = 1;
-			//$_SESSION['graphdisp'] = 1;
+			$_SESSION['mathdisp'] = $CFG['UP']['mathdisp'] ?? 7;
+			$_SESSION['graphdisp'] = $CFG['UP']['graphdisp'] ?? 1;
+
 			$_SESSION['useed'] = 1;
 			$_SESSION['isdiag'] = $diagid;
       if ($aVer > 1) {
@@ -339,8 +338,8 @@ if (isset($_POST['SID'])) {
 	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
 	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 
-	$_SESSION['mathdisp'] = $_POST['mathdisp'];//1;
-	$_SESSION['graphdisp'] = $_POST['graphdisp'];//1;
+	$_SESSION['mathdisp'] = $CFG['UP']['mathdisp'] ?? 7;
+	$_SESSION['graphdisp'] = $CFG['UP']['graphdisp'] ?? 1;
 	$_SESSION['useed'] = 1;
     $_SESSION['isdiag'] = $diagid;
     if ($aVer > 1) {
@@ -374,16 +373,16 @@ if (isset($_POST['SID'])) {
 
 //allow custom login page for specific diagnostics
 if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
-	require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
+	require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php";
 } else {
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 $flexwidth = true;
-require("../header.php");
+require_once "../header.php";
 $pagetitle =$line['name'];
-require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
+require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
 ?>
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo Sanitize::onlyInt($diagid); ?>">
@@ -460,8 +459,7 @@ for ($i=0;$i<count($sel1);$i++) {
   document.getElementById("tzname").value = tz.name();
 </script>
 <div id="submit" class="submit" style="display:none"><input type=submit value='<?php echo _('Access Diagnostic'); ?>'></div>
-<input type=hidden name="mathdisp" id="mathdisp" value="2" />
-<input type=hidden name="graphdisp" id="graphdisp" value="2" />
+
 <?php
 $allowreentry = ($line['public']&4);
 $pws = explode(';',$line['pws']);
@@ -474,31 +472,15 @@ if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line
 <div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
 </div>
 <script type="text/javascript">
-function determinesetup() {
-	document.getElementById("submit").style.display = "block";
-	if (MathJaxCompatible && !ASnoSVG) {
-		document.getElementById("bsetup").innerHTML = "Browser setup OK";
-	} else {
-		document.getElementById("bsetup").innerHTML = "Using image-based display";
-	}
-	if (MathJaxCompatible) {
-		document.getElementById("mathdisp").value = "1";
-	}
-	if (!ASnoSVG) {
-		document.getElementById("graphdisp").value = "1";
-	}
-}
-var existingonload = window.onload;
-if (existingonload) {
-	window.onload = function() {existingonload(); determinesetup();}
-} else {
-	window.onload = determinesetup;
-}
+    $(function() {
+        document.getElementById("submit").style.display = "block";
+        document.getElementById("bsetup").style.display = "none";
+    });
 </script>
 <hr/>
-<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2018 David Lippman</div>
+<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-<?php echo date("Y");?> David Lippman</div>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";
 }
 ?>

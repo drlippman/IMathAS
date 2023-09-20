@@ -2,18 +2,18 @@
 //IMathAS:  Course Map view
 //(c) 2017 David Lippman
 
-require("../init.php");
-require('../includes/loaditemshowdata.php');
+require_once "../init.php";
+require_once '../includes/loaditemshowdata.php';
 
 $placeinhead = '<style type="text/css">
 ul.qview ul { border-left: 1px dashed #ccc; padding-left: 10px;}
 </style>';
 
-require("../header.php");
+require_once "../header.php";
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by an unauthorized person
 	echo _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -26,7 +26,7 @@ $items = unserialize($stm->fetchColumn(0));
 $exceptions = array();
 if (!$viewall && isset($studentinfo['latepasses'])) {
 	$exceptions = loadExceptions($cid, $userid);
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 }
 //update block start/end dates to show blocks containing items with exceptions
@@ -207,6 +207,6 @@ echo '<ul class="qview coursemap">';
 showitemtree($items,'0');
 echo '</ul>';
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -2,8 +2,8 @@
 //IMathAS: Student sorting report
 //(c) 2018 David Lippman
 
-require("../init.php");
-require("../includes/report-commonstu-funcs.php");
+require_once "../init.php";
+require_once "../includes/report-commonstu-funcs.php";
 
 if (!isset($teacherid)) {
 	echo "Not authorized";
@@ -63,7 +63,7 @@ $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDi
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -484,4 +484,4 @@ var app = new Vue({
 </script>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";

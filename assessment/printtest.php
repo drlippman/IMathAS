@@ -1,5 +1,5 @@
 <?php
-	require("../init.php");
+	require_once "../init.php";
 	$isteacher = (isset($teacherid) || !empty($_SESSION['isteacher']));
 	if (!isset($_SESSION['sessiontestid']) && !$isteacher) {
 		echo "<html><body>Error. </body></html>\n";
@@ -14,8 +14,8 @@
 		$scoredview = false;
 	}
 
-	include("displayq2.php");
-	include("testutil.php");
+	require_once "displayq2.php";
+	require_once "testutil.php";
 	$flexwidth = true; //tells header to use non _fw stylesheet
 	if ($scoredview) {
 		$placeinhead = '<script type="text/javascript">
@@ -26,8 +26,8 @@
 	}
 	$_SESSION['coursetheme'] = $coursetheme;
     $useeqnhelper = 0;
-	require("header.php");
-	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn, button.btn {display: none;}\n textarea {display: none;}\n .question, .review {background-color:#fff;}</style>\n";
+	require_once "header.php";
+	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;} input.btn, button.btn {display: none;} textarea {display: none;} .question, .review {background-color:#fff;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;} input.sabtn,input.dsbtn {display: none;}</style>\n";
 	echo '<script type="text/javascript">
 		function rendersa() { 
@@ -121,7 +121,7 @@
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
-			require("../includes/exceptionfuncs.php");
+			require_once "../includes/exceptionfuncs.php";
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher);
 			$useexception = $exceptionfuncs->getCanUseAssessException($row, $testsettings, true);
 		}
@@ -380,5 +380,5 @@
 		echo '<div class="intro">'.filter($endtext).'</div>';
 	}
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

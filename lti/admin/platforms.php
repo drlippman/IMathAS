@@ -12,7 +12,7 @@
 
 
 
-require("../../init.php");
+require_once "../../init.php";
 
 if (($myrights < 100 && empty($CFG['LTI']['useradd13'])) || $myrights < 40) {
   exit;
@@ -84,7 +84,7 @@ foreach ($platforms as $row) {
 $uniqid = uniqid();
 
 $pagetitle = _('LTI 1.3 Platforms');
-require("../../header.php");
+require_once "../../header.php";
 
 echo '<div class=breadcrumb>'.$breadcrumbbase;
 echo '<a href="../../admin/admin2.php">'._('Admin').'</a> ';
@@ -216,9 +216,9 @@ if (empty($CFG['LTI']['autoreg'])) {
     echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
     echo '</ul>';
     echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
-    echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
-    echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
-    echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
+    echo '<input type="hidden" name=canvas_keyseturl value="https://sso.canvaslms.com/api/lti/security/jwks"/>';
+    echo '<input type="hidden" name=canvas_tokenurl value="https://sso.canvaslms.com/login/oauth2/token"/>';
+    echo '<input type="hidden" name=canvas_authurl value="https://sso.canvaslms.com/api/lti/authorize_redirect"/>';
 
     echo '<input type="hidden" name=canvas_uniqid value="" />';
 
@@ -427,4 +427,4 @@ $(function() {
 });
 </script>
 <?php
-require('../../footer.php');
+require_once '../../footer.php';

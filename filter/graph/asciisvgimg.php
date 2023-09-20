@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__."/../../assessment/mathparser.php");
+require_once __DIR__."/../../assessment/mathparser.php";
 // ASCIIsvgIMG.php
 // (c) 2006-2009 David Lippman   http://www.pierce.ctc.edu/dlippman
 // Generates an image based on an ASCIIsvg script
@@ -1210,10 +1210,10 @@ function ASplot($function) {
 					$iy = $yymax;
 					//if jumping from top of graph to bottom, change value
 					//for interpolation purposes
-					if ($y<$yymin) { $y = $yymax+.5*($ymax-$ymin);}
+					if ($y<$yymin) { $y = $yymax+.5*($yymax-$yymin);}
 				} else { //going down
 					$iy = $yymin;
-					if ($y>$yymax) { $y = $yymin-.5*($ymax-$ymin);}
+					if ($y>$yymax) { $y = $yymin-.5*($yymax-$yymin);}
 				}
 				$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
 				$this->ASline(array("[$px,$py]","[$ix,$iy]"));

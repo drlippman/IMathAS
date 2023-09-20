@@ -2,9 +2,9 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . '/answerboxes/AnswerBoxParams.php');
-require_once(__DIR__ . '/answerboxes/AnswerBoxFactory.php');
-require_once(__DIR__ . '/models/Question.php');
+require_once __DIR__ . '/answerboxes/AnswerBoxParams.php';
+require_once __DIR__ . '/answerboxes/AnswerBoxFactory.php';
+require_once __DIR__ . '/models/Question.php';
 
 use PDO;
 
@@ -325,7 +325,7 @@ class QuestionHtmlGenerator
         }
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/question_html_generator'];
             if (isset($onBeforeAnswerBoxGenerator) && is_callable($onBeforeAnswerBoxGenerator)) {
                 $onBeforeAnswerBoxGenerator();
             }
@@ -351,13 +351,16 @@ class QuestionHtmlGenerator
             // Calculate answer weights.
             // $answeights - question writer defined
             if ($quesData['qtype'] == "multipart") {
+                if (max(array_keys($anstypes)) != count($anstypes)-1) {
+                    echo 'Error: $anstypes does not have consecutive indexes. This may cause scoring issues.';
+                }
                 if (isset($answeights)) {
         			if (!is_array($answeights)) {
         					$answeights = explode(",",$answeights);
                     }
                     $answeights = array_map('trim', $answeights);
                     if (count($answeights) != count($anstypes)) {
-                        $answeights = array_fill(0, count($anstypes), 1);
+                        $answeights = array_fill_keys(array_keys($anstypes), 1); 
                     }
                     $answeights = array_map(function($v) {
                         if (is_numeric($v)) { 
@@ -368,7 +371,7 @@ class QuestionHtmlGenerator
                     }, $answeights);
                 } else {
                     if (count($anstypes)>1) {
-                        $answeights = array_fill(0, count($anstypes), 1);
+                        $answeights = array_fill_keys(array_keys($anstypes), 1);
                     } else {
                         $answeights = array(1);
                     }

@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100 || empty($_GET['from']) || empty($_GET['to'])) {
 	exit;

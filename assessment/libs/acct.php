@@ -722,6 +722,7 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 			if (!$hasdecimals && strpos($ansarray[$j][$i],'.')!==false) { $hasdecimals = true;}
 		}
 	}
+    $out = '';
 
 	$hashead = false;
 	for ($j=0;$j<count($rowhead);$j++) {
@@ -841,7 +842,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			}
 			$out .= '</tr>';
 		}
-		'</thead>';
+		$out .= '</thead>';
 	} else {
 		$out = '<table class="'.$tblclass.'">';
 	}
@@ -896,7 +897,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 				}
 				if ($cols[$j][$i]==='nobox') {$out .= "<td$dec></td>"; $sa.= "<td$dec></td>"; continue;}
 
-				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec $class>$beforetxt $f $aftertxt</td>"; $sa.= "<td$dec $class>$beforetxt $f $aftertxt</td>"; continue;}
+				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec>$beforetxt $f $aftertxt</td>"; $sa.= "<td$dec>$beforetxt $f $aftertxt</td>"; continue;}
 
 				$out .= '<td'.$dec.' class="r">'.$beforetxt.((substr($cols[$j][$i],0,1)=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']'.$aftertxt.'</td>';
 				$sa .= '<td'.$dec.' class="r">'.$beforetxt.((substr($cols[$j][$i],0,1)=='$'||$coltypes[$j]===2)?'$':'');
@@ -964,14 +965,16 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 		$rowcnt = max($rowcnt, max(array_keys($cols[$i]))+1);
 	}
 	for ($j=0;$j<count($coltypes);$j++) {
-		if ($coltypes[$j]==false || $coltypes[$j]==-1) {continue;} //fixed column
+		if ($coltypes[$j]==false) {continue;} //fixed column
 		$maxsize[$j] = 0;
 		foreach ($cols[$j] as $v) {
 			$sl = strlen($v);
 			if ($sl>$maxsize[$j]) { $maxsize[$j] = $sl;}
-			if (!$hasdecimals && strpos($v, '.')!==false) { $hasdecimals = true;}
+			if ($coltypes[$j]>0 && !$hasdecimals && strpos($v, '.')!==false) { $hasdecimals = true;}
 		}
-		$maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
+        if ($coltypes[$j]>0) {
+		    $maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
+        }
 	}
 	if (count($headers)!=0) {
 		if (!is_array($headers[0])) {
@@ -1000,7 +1003,7 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			}
 			$out .= '</tr>';
 		}
-		'</thead>';
+		$out .= '</thead>';
 	} else {
 		$out = '<table class="'.$tblclass.'">';
 	}
@@ -1173,7 +1176,7 @@ function makeTchartsfromjournal($j, $order, $sn, &$anstypes, &$answer, &$showans
 		if (!isset($debits[$o])) {$debits[$o] = array();}
 		if (!isset($credits[$o])) {$credits[$o] = array();}
 		$out .= makeTchart($o, $max, $debits[$o], $credits[$o], $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize,true, $showtotal);
-		$sn += $max*2 + 2;
+		$sn += $max*2 + ($showtotal?2:0);
 	}
 	$out .= '<br class="clear"/>';
 	$showanswer .= '<br class="clear"/><p>&nbsp;</p>';
@@ -1181,7 +1184,7 @@ function makeTchartsfromjournal($j, $order, $sn, &$anstypes, &$answer, &$showans
 }
 
 // scoreTchartsfromjournal($stua,$answer,$j,$order,$sn)
-function scoreTchartsfromjournal($stua,$answer,$j,$order,$sn) {
+function scoreTchartsfromjournal($stua,$answer,$j,$order,$sn, $showtotal=true) {
 	$out = '';
 	$debits = array(); $credits = array();
 	foreach ($j as $jd) {
@@ -1212,7 +1215,7 @@ function scoreTchartsfromjournal($stua,$answer,$j,$order,$sn) {
 		if (!isset($debits[$o])) {$debits[$o] = array();}
 		if (!isset($credits[$o])) {$credits[$o] = array();}
 		$answer = scoreTchart($stua, $answer, $max, $debits[$o], $credits[$o], $sn);
-		$sn += $max*2 + 2;
+		$sn += $max*2 + ($showtotal?2:0);
 	}
 	return $answer;
 }
@@ -1828,8 +1831,8 @@ function scoretrialbalancefromjournal($stua, $answer, $j, $groups, $numrows, $sn
 //$data['assets'] = array(account, value, account, value)
 //['liabilities'], [equity],[revenue],[expenses]
 function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions, &$showanswer, &$displayformat, &$answerboxsize) {
-	$out .= '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
-	$sa .= '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
+	$out = '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
+	$sa = '<table class="acctstatement noborder"><caption>'.$bigtitle.'</caption><thead><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
 	$allaccts = array();
 	$maxsizedescr = 4; $hasdecimals = false;
 	foreach ($data as $t=>$dt) {
@@ -1908,6 +1911,7 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 function scoretrialbalance($stua, $answer, $data, $numrows, $sn) {
 	if ($stua == null) {return $answer;}
 	$accttype=array(); $snmap = array();  $c = $sn;
+    $nq = 0;
 	foreach ($data as $t=>$dt) {
 		$nq += count($dt)/2;
 		$ansdat[$t] = array();

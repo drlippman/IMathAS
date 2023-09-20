@@ -8,7 +8,7 @@
 
 */
 
-require("../init.php");
+require_once "../init.php";
 
 $type = Sanitize::simpleString($_GET['type']);
 
@@ -163,7 +163,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	var itemorderhash="h";
 	</script>';
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class=breadcrumb>'.$breadcrumbbase._("Course Order").'</div>';
 
@@ -261,6 +261,6 @@ if (count($hiddencourses)>0) {
 	echo  '</ul></li>';
 }
 echo '</ul>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

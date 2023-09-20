@@ -1,2 +1,2 @@
 <?php
-require("ptx.php");
+require_once "ptx.php";

@@ -1,14 +1,14 @@
 <?php
 //IMathAS:  Add/remove class tutors
 //(c) 2009 David Lippman
-	require("../init.php");
-	require("../includes/htmlutil.php");
-    require_once('../includes/TeacherAuditLog.php');
+	require_once "../init.php";
+	require_once "../includes/htmlutil.php";
+    require_once '../includes/TeacherAuditLog.php';
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	if (isset($CFG['GEN']['allowinstraddtutors']) &&  $CFG['GEN']['allowinstraddtutors']==false) {
@@ -44,7 +44,7 @@
 		}
 		//add new tutors
 		if (isset($_POST['promotetotutor'])) {
-			require_once("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			$ph = Sanitize::generateQueryPlaceholders($_POST['promotetotutor']);
 			$stm = $DBH->prepare("SELECT u.id,u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=? AND u.id IN ($ph)");
 			$stm->execute(array_merge(array($cid), $_POST['promotetotutor']));
@@ -183,7 +183,7 @@
 
 	//*** DISPLAY ***
 	$pagetitle = "Manage Tutors";
-	require("../header.php");
+	require_once "../header.php";
 	$cid = Sanitize::courseId($_GET['cid']);
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
@@ -201,6 +201,7 @@
 	<form id="curform" method=post action="managetutors.php?cid=<?php echo $cid ?>">
 	
 	<table class="gb">
+    <caption class="sr-only">Tutors</caption>
 	<thead>
 		<tr>
 			<th>Tutor name</th>
@@ -252,5 +253,5 @@ foreach ($tutorlist as $tutor) {
 	</form>
 
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

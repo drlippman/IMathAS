@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 $tohide = Sanitize::courseId($_GET['tohide']);
 if (!isset($_GET['type'])) {
 	$type = 'take';

@@ -1,8 +1,8 @@
 <?php
 // IMathAS: show items function for main course page
 // (c) 2007 David Lippman
-require_once ('../includes/loaditemshowdata.php');
-require_once ("../includes/exceptionfuncs.php");
+require_once '../includes/loaditemshowdata.php';
+require_once "../includes/exceptionfuncs.php";
 if (!isset($courseUIver) || $courseUIver>1) {
 	$addassess = 'addassessment2.php';
 } else {
@@ -202,7 +202,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
 	   global $itemshowdata, $exceptionfuncs,$coursejsondata, $excused,$staticroot;
 
-	   require_once("../includes/filehandler.php");
+	   require_once "../includes/filehandler.php";
 
 		 $assessUseVueDev = !empty($CFG['assess2-use-vue-dev']);
 
@@ -223,7 +223,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
        // sanitize to prevent XSS
        $parent = implode('-', array_map('intval', explode('-', $parent)));
-
+       $parent = Sanitize::simpleString($parent);
+       
 	   $now = time();
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
@@ -2088,7 +2089,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   $now = time();
 	   for ($i=0;$i<count($items); $i++) {
 		   if (is_array($items[$i])) { //is a block
-			$items[$i]['name'] = $items[$i]['name'];
 
 			if ($items[$i]['startdate']==0) {
 				$startdate = _('Always');

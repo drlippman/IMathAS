@@ -1,7 +1,7 @@
 <?php
 
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-    require_once($CFG['hooks']['lti']);
+    require_once $CFG['hooks']['lti'];
     /**
      * see ltihooks.php.dist for details
      */

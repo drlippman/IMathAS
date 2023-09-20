@@ -8,8 +8,8 @@
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
 	 }
 	$init_session_start = true;
- 	require_once(__DIR__ . "/init_without_validate.php");
-	require_once(__DIR__ ."/includes/newusercommon.php");
+ 	require_once __DIR__ . "/init_without_validate.php";
+	require_once __DIR__ ."/includes/newusercommon.php";
 	$cid = Sanitize::courseId($_GET['cid']);
 
  	if (!isset($_GET['cid'])) {
@@ -61,7 +61,7 @@
 
 		if ($page_newaccounterror=='') {//no error
 			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("includes/password.php");
+				require_once "includes/password.php";
 				$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			} else {
 				$md5pw = md5($_POST['pw1']);
@@ -95,7 +95,7 @@
 				':email'=>Sanitize::emailAddress($_POST['email']),
 				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout, ':jsondata'=>json_encode($jsondata)));
             $newuserid = $DBH->lastInsertId();
-            require('./includes/setSectionGroups.php');
+            require_once './includes/setSectionGroups.php';
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
                 $stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
@@ -115,7 +115,7 @@
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
 
-				require_once("./includes/email.php");
+				require_once "./includes/email.php";
 				send_email($_POST['email'], $sendfrom, $installname._(' Confirmation'), $message, array(), array(), 10);
 
 				echo "<html><body>\n";
@@ -135,7 +135,7 @@
 		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
 	$init_session_start = true;
-	require_once(__DIR__ ."/validate.php");
+	require_once __DIR__ ."/validate.php";
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
@@ -144,13 +144,13 @@
 			list($coursename,$enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM);
             $keylist = array_map('trim',explode(';',$enrollkey));
             if (($allowunenroll&2)==2) {
-                require("header.php");
+                require_once "header.php";
                 echo "<h1>" . Sanitize::encodeStringForDisplay($coursename) . "</h1>";
                 echo '<p>'._('Course is closed for self enrollment.  Contact your instructor for access.').'</p>';
-                require("footer.php");
+                require_once "footer.php";
                 exit;
             } else if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
-                require('./includes/setSectionGroups.php');
+                require_once './includes/setSectionGroups.php';
 				if (count($keylist)>1) {
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
                     $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
@@ -165,14 +165,14 @@
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid. '&r=' . Sanitize::randomQueryStringParam());
 				exit;
 			} else {
-				require("header.php");
+				require_once "header.php";
 				echo "<h1>" . Sanitize::encodeStringForDisplay($coursename) . "</h1>";
 				echo '<form method="post" action="directaccess.php?cid='.$cid.'">';
 				echo '<p>',_('Incorrect enrollment key.  Try again.'),'</p>';
 				echo "<p>",_("Course Enrollment Key:"),"  <input type=text name=\"ekey\"></p>";
 				echo "<p><input type=\"submit\" value=\"",_("Submit"),"\"></p>";
 				echo "</form>";
-				require("footer.php");
+				require_once "footer.php";
 				exit;
 			}
 		} else {
@@ -190,7 +190,6 @@
 		} else {
 			$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/infopages.css\" type=\"text/css\">\n";
 		}
-		//$placeinhead = "<style type=\"text/css\">div#header {clear: both;height: 75px;background-color: #9C6;margin: 0px;padding: 0px;border-left: 10px solid #036;border-bottom: 5px solid #036;} \n.vcenter {font-family: sans-serif;font-size: 28px;margin: 0px;margin-left: 30px;padding-top: 25px;color: #fff;}</style>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 		$pagetitle = $coursename;
 		$challenge = uniqid();
@@ -200,7 +199,7 @@
 		if (isset($CFG['locale'])) {
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
 		}
-		require("header.php");
+		require_once "header.php";
 		//echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";
 		echo "<div id=\"header\"><div class=\"vcenter\">" . Sanitize::encodeStringForDisplay($coursename) . "</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
@@ -208,7 +207,7 @@
 		$cid = intval($_GET['cid']);
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		if (file_exists("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html")) {
-			require("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html");
+			require_once "$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html";
 		}
 		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll FROM imas_courses WHERE id=:id");
         $stm->execute(array(':id'=>$cid));
@@ -217,7 +216,7 @@
             echo '<p>', _('Course is closed for self enrollment.  Contact your instructor for access.'),'</p>';
             echo '<p><a href="'.$GLOBALS['basesiteurl'].'/index.php">',_('Go to home page'),'</a>. ';
             echo _('If you are already enrolled, you can log in there.'),'</p>';
-            require('footer.php');
+            require_once 'footer.php';
             exit;
         }
 
@@ -348,5 +347,5 @@ if (isset($_GET['getsid'])) {
 	);
 	showNewUserValidation('pageform', (strlen($enrollkey)>0)?array('ekey','ekey2'):array(), $requiredrules);
 
-	require("footer.php");
+	require_once "footer.php";
 	}

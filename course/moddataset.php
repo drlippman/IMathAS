@@ -9,13 +9,13 @@
 //3 - CC-BY-SA-NC
 //4 - CC-BY-SA
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if ($myrights<20) {
-		require("../header.php");
+		require_once "../header.php";
 		echo _("You need to log in as a teacher to access this page");
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -97,17 +97,17 @@
 
 	$outputmsg = '';
 	$errmsg = '';
-	if (isset($_POST['qtext']) && isset($_POST['control'])) {
-		require_once("../includes/filehandler.php");
+	if (isset($_POST['qtext'])) {
+		require_once "../includes/filehandler.php";
 		$now = time();
 		foreach (array('qcontrol','answer','solution') as $v) {
 			if (!isset($_POST[$v])) {$_POST[$v] = '';}
 		}
 		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
-		$_POST['control'] = stripsmartquotes($_POST['control']);
-		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol']);
-		$_POST['answer'] = stripsmartquotes($_POST['answer']);
-		$_POST['solution'] = stripsmartquotes($_POST['solution']);
+		$_POST['control'] = stripsmartquotes($_POST['control'] ?? '');
+		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol'] ?? '');
+		$_POST['answer'] = stripsmartquotes($_POST['answer'] ?? '');
+		$_POST['solution'] = stripsmartquotes($_POST['solution'] ?? '');
 		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
 		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
 
@@ -116,7 +116,7 @@
 		}
 
 		if (strpos($_POST['qtext'],'data:image')!==false) {
-			require_once("../includes/htmLawed.php");
+			require_once "../includes/htmLawed.php";
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
 
@@ -145,7 +145,7 @@
 			$newextref = array();
 		}
 		//DO we need to add a checkbox or something for updating this if captions are added later?
-		if ($_POST['helpurl']!='') {
+		if (isset($_POST['helpurl']) && $_POST['helpurl']!='') {
 			$vidid = getvideoid($_POST['helpurl']);
 			if ($vidid=='') {
 				$captioned = 0;
@@ -559,10 +559,10 @@
 			} else if ($errmsg == '' && $frompot==0) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/'.$addq.'.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
 			} else {
-				require("../header.php");
+				require_once "../header.php";
 				echo $errmsg;
 				echo $outputmsg;
-				require("../footer.php");
+				require_once "../footer.php";
 			}
 			exit;
 		}
@@ -784,6 +784,17 @@
 	}
 	$lnames = implode(", ",$lnames);
 
+    $olnames = '';
+    if ($locklibs != '') {
+        $locklibssafe = implode(',', array_map('intval', explode(',',$locklibs)));
+        $olnames = [];
+        $stm = $DBH->query("SELECT name FROM imas_libraries WHERE id IN ($locklibssafe)");
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $olnames[] = $row[0];
+        }
+        $olnames = implode(", ",$olnames);
+    }
+
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
@@ -839,7 +850,7 @@
 	*/
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=071522"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=022723"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css?v=091522">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
@@ -998,7 +1009,7 @@
 	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
-	require("../header.php");
+	require_once "../header.php";
 
 
 	if (isset($_GET['aid'])) {
@@ -1156,7 +1167,11 @@ function decboxsize(box) {
 <?php
 if (isset($_GET['id']) && $myq) {
 	echo '<span id=libonlysubmit style="display:none"><input type=submit name=justupdatelibs value="Save Library Change Only"/></span>';
-} ?>
+} 
+if ($olnames !== '') {
+    echo '<br><span class="small">' . _("Other's library assignments: ") . $olnames. '</span>';
+}
+?>
 </p>
 <p>
 <?php echo _('Question type:'); ?> <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
@@ -1512,5 +1527,5 @@ $placeinfooter='
 ?>
 
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

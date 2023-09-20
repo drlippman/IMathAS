@@ -3,9 +3,9 @@
 //(c) 2010 David Lippman
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $init_skip_csrfp = true;
-require("./init_without_validate.php");
+require_once "./init_without_validate.php";
 
-require("includes/JWT.php");
+require_once "includes/JWT.php";
 header('P3P: CP="ALL CUR ADM OUR"');
 
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -14,7 +14,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  	 $urlmode = 'http://';
  }
 
-require("./assessment/displayq2.php");
+require_once "./assessment/displayq2.php";
 $GLOBALS['assessver'] = 2;
 
 $_SESSION = array();
@@ -139,7 +139,7 @@ if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 	</script>';
 }
 $useeditor = 1;
-require("./assessment/header.php");
+require_once "./assessment/header.php";
 
 if ($_SESSION['graphdisp'] == 1) {
 	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';
@@ -220,7 +220,6 @@ if (isset($QS['showscored'])) {
 		}
 		$rawafter = implode('~',$rawafter);
 	}
-	$lastanswers[0] = $lastanswers[0];
 
 	$pts = getpts($after);
 
@@ -318,7 +317,7 @@ if (isset($QS['showscored'])) {
 
 }
 
-require("./footer.php");
+require_once "./footer.php";
 
 
 function getansweights($code,$seed) {

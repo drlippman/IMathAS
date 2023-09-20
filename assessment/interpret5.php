@@ -838,7 +838,7 @@ function loadlibrary($str) {
 	$libdir = rtrim(dirname(__FILE__), '/\\') .'/libs/';
 	foreach ($libs as $lib) {
 		if (is_file($libdir . $lib.".php")) {
-			include_once($libdir.$lib.".php");
+			require_once $libdir.$lib.".php";
 		} else {
 			echo sprintf(_("Error loading library %s\n"), Sanitize::encodeStringForDisplay($lib));
 		}

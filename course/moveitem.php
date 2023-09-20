@@ -2,7 +2,7 @@
 //IMathAS: Move item dialog
 //(c) 2017 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($teacherid)) {
@@ -155,14 +155,13 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[1]=='Calendar') {
 		$iteminfo[$row[0]] = array($row[1], _('Calendar'));
 	} else {
+        if (!isset($itemdata[$row[1]][$row[2]])) { continue; } // invalid entry
 		$iteminfo[$row[0]] = array($row[1], $itemdata[$row[1]][$row[2]]);
 	}
 }
 
 if ($itemtomove[0] != 'B') {
 	$itemtomovename = $iteminfo[$itemtomove][1];
-} else {
-	$itemtomovename = $itemtomovename;
 }
 
 $flexwidth = true;
@@ -175,7 +174,7 @@ $placeinhead .= '<script type="text/javascript">
   var block = "'.$curblock.'";
   </script>';
 $placeinhead .= '<style type="text/css"> select { max-width: 100%;} </style>';
-require("../header.php");
+require_once "../header.php";
 
 ?>
 <div id="headerforms" class="pagetitle">
@@ -193,9 +192,9 @@ require("../header.php");
 
 <p>
 <button type="button" onclick="cancelmove()" class="secondarybtn">Cancel</button>
-<button type="button" onclick="moveitem()">Move</button></p>
+<button type="button" onclick="moveitem()" class="primary">Move</button></p>
 
 <p class="noticetext" id="error"></p>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

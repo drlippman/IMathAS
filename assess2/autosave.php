@@ -19,11 +19,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 //error_reporting(E_ALL);
 
@@ -137,6 +137,7 @@ if ($in_practice) {
 // Verify confirmation values (to ensure it hasn't been submitted since)
 if (!$assess_record->checkVerification($verification)) {
   // grab question settings data with HTML to update front-end
+  $assess_info->loadQuestionSettings($toloadqids, true, false);
   $showscores = $assess_info->showScoresDuring();
   $assessInfoOut['questions'] = array();
   foreach ($qns as $qn=>$parts) {

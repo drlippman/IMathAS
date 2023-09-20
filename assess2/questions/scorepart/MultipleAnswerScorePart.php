@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -33,7 +33,7 @@ class MultipleAnswerScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answers', 'noshuffle', 'scoremethod'];
+        $optionkeys = ['answers', 'noshuffle', 'scoremethod', 'answerformat'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -53,17 +53,29 @@ class MultipleAnswerScorePart implements ScorePart
             array_push($randqkeys,count($questions)-1);
         } else if ($noshuffle == "all" || count($questions)==1) {
             $randqkeys = array_keys($questions);
+        } else if (strlen($noshuffle)>4 && substr($noshuffle,0,4)=="last") {
+            $n = intval(substr($noshuffle,4));
+            if ($n>count($questions)) {
+                $n = count($questions);
+            }
+            $randqkeys = (array) $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
+            $RND->shuffle($randqkeys);
+            for ($i=count($questions)-$n;$i<count($questions);$i++) {
+                array_push($randqkeys,$i);
+            }
         } else {
             $randqkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randqkeys);
         }
         $qcnt = count($questions);
-        if ($qcnt > 1 && trim($answers) == "") {
+        if (($qcnt > 1 && trim($answers) == "") || $answerformat == 'addnone') {
           $qstr = strtolower(implode(' ', $questions));
           if (strpos($qstr, 'none of') === false) {
             $questions[] = _('None of these');
             array_push($randqkeys, $qcnt);
-            $answers = $qcnt;
+            if ($qcnt > 1 && trim($answers) == "") {
+                $answers = $qcnt;
+            }
           }
         }
         $ansor = explode(' or ', $answers);
@@ -130,7 +142,7 @@ class MultipleAnswerScorePart implements ScorePart
         $scorePartResult->setRawScore($bestscore);
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part'];
             if (isset($onGetResult) && is_callable($onGetResult)) {
                 $onGetResult();
             }

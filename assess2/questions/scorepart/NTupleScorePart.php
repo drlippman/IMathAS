@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -429,6 +429,6 @@ class NTupleScorePart implements ScorePart
                 $out[] = implode(' or ', $sub);
             }
         }
-        implode(',', $out);
+        return implode(',', $out);
     }
 }

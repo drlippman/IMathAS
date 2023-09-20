@@ -672,7 +672,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 			if ($updateLTI && isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $_SESSION['ltiitemtype']==0) {
 				//update lti record.  We only do this for single assessment placements
 
-				require_once("../includes/ltioutcomes.php");
+				require_once "../includes/ltioutcomes.php";
 
 				$total = 0;
 				$allans = true;
@@ -709,7 +709,7 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 			$outstr .= $match;
 		}
 	}
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
 	if ($testsettings['isgroup']>0 && $_SESSION['groupid']>0 && !$isreview) {
 		deleteasidfilesfromstring2($outstr,'agroupid',$_SESSION['groupid'],$testsettings['id']);
 	} else {
@@ -823,7 +823,8 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$imasroot,$CFG;
-	if (!$_SESSION['istutorial']) {
+	$qn = intval($qn);
+    if (!$_SESSION['istutorial']) {
 		if ($inreview) {
 			echo '<div class="review clearfix">';
 		}
@@ -951,6 +952,7 @@ function seqshowqinfobar($qn,$toshow) {
 			}
 		} else {
 			if (isset($CFG['TE']['navicons'])) {
+                $thisscore = getpts($bestscores[$qn]);
 				if ($thisscore==0 || $noindivscores) {
 					echo "<img src=\"$staticroot/img/{$CFG['TE']['navicons']['canretrywrong']}\" alt=\""._('Incorrect but can retry')."\"/> ";
 				} else {

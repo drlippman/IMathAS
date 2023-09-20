@@ -2,7 +2,7 @@
 //IMathAS:  Displays a wiki, public view
 //(c) 2010 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";
@@ -13,12 +13,12 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		$pubcid = $cid;  //swap out cid's before calling validate
 	  $cid = Sanitize::courseId($_GET['from']);
 		$_GET['cid'] = Sanitize::courseId($_GET['from']);
-		require("../init.php");
+		require_once "../init.php";
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else {
 		$fcid = 0;
-		require("../init_without_validate.php");
+		require_once "../init_without_validate.php";
 	}
 	if (!isset($_GET['id'])) {
 		echo "<html><body>No item specified.</body></html>\n";
@@ -66,9 +66,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 	}
 
 	if (!findinpublic($items,$itemid)) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$ispublic = true;
@@ -78,13 +78,13 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 	$wikiname = $row[0];
 	$now = time();
 	if ($row[5]>0 || $row[4]==0 || ($row[4]==1 && ($now<$row[1] || $now>$row[2]))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "This wiki is not currently available for viewing";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb> $breadcrumbbase View Wiki</div>";
 	echo '<div id="headerviewwiki" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($wikiname).'</h1></div>';
 	$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
@@ -106,6 +106,6 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 	echo '</div>';
 
 	echo "<div class=right><a href=\"../course/public.php?cid=$cid\">Return to Public Course Page</a></div>\n";
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

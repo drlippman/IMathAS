@@ -2,13 +2,13 @@
 	//Lists forum posts by Student name
 	//(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	/*if (!isset($teacherid) && !isset($tutorid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You must be a teacher to access this page\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}*/
 	if (isset($teacherid)) {
@@ -53,18 +53,18 @@
 	$allowreply = ($canviewall || (time()<$replyby));
 
 	$caller = "byname";
-	include("posthandler.php");
+	require_once "posthandler.php";
 
 	$placeinhead = '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=082911" type="text/css" />';
 	if ($haspoints && $caneditscore && $rubric != 0) {
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
-		require("../includes/rubric.php");
+		require_once "../includes/rubric.php";
 	}
 	if ($caneditscore && $_SESSION['useed']!=0) {
 		$useeditor = "noinit";
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
         echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -79,7 +79,7 @@
 		$stm->execute(array(':forumid'=>$forumid, ':userid'=>$userid));
 		if ($stm->rowCount()==0) {
 			echo '<p>This page is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -192,7 +192,7 @@
 	}
 	function GBdoReply(threadid,postid) {
 		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
-		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto");
+		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto",true,'','',{'func':'submitpost','label':'<?php echo _('Post Reply');?>'});
 		return false;
 	}
 	</script>
@@ -392,6 +392,6 @@
 
 	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Thread List</a></p>";
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

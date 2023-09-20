@@ -2,7 +2,7 @@
 // Add/remove Teachers
 // IMathAS (c) 2018 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -90,7 +90,7 @@ if (isset($_POST['remove'])) {
 	$stm->execute(array($cid));
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
-	require("../includes/userutils.php");
+	require_once "../includes/userutils.php";
 	$possible_teachers = searchForUser(Sanitize::stripHtmlTags($_POST['search']), true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
@@ -144,7 +144,7 @@ $placeinhead .= '<style type="text/css">
 
 $pagetitle = _('Add/Remove Teachers');
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if ($from == 'admin') {
@@ -164,7 +164,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <div id="currentteachers">
 	<h2>Current Teachers</h2>
 	<p>With selected: <button @click="removeTeachers()">Remove as teacher</button>
-	   <span v-if="processingRemove" class="noticetext">Saving Changes... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
+	   <span v-if="processingRemove" class="noticetext">Saving Changes... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark">
 		<li v-for="teacher in existingTeachers" :key="teacher.id">
@@ -177,8 +177,8 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	<p><button @click="loadGroup()">List my group members</button>
 		or lookup a teacher: <input v-model="toLookup" size=30>
 		<button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-		<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
-		<span v-if="processingAdd" class="noticetext">Adding teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
+		<span v-if="processingSearch" class="noticetext">Looking up teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
+		<span v-if="processingAdd" class="noticetext">Adding teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
 	</p>
 	<p v-if="searchResults !== null && searchResults.length==0">No teachers found</p>
 	<p v-if="searchResults !== null && searchResults.length>0">
@@ -293,4 +293,4 @@ var app = new Vue({
 });
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

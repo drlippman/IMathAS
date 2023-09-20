@@ -267,9 +267,12 @@ Class RollingCurlX {
           //if server responded with http error or a non 2xx code
             debuglog('request error: '. curl_error($ch));
             debuglog('http_code: '. $request_info['http_code'].' rounded '.round(intval($request_info['http_code'])/100));
+            $request_info['response_text'] = curl_multi_getcontent($ch);
+            $request_info['error'] = curl_error($ch); 
             $response = false;
         } else { //sucessful response
             $response = curl_multi_getcontent($ch);
+            $request_info['response_text'] = '';
         }
 
         //get request info

@@ -1,7 +1,7 @@
 <?php
 
-require(__DIR__.'/migratesettings.php');
-require_once(__DIR__."/TeacherAuditLog.php");
+require_once __DIR__.'/migratesettings.php';
+require_once __DIR__."/TeacherAuditLog.php";
 
 //util function for unenrolling students
 //$cid = courseid
@@ -72,9 +72,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$stugroups[] = $row[0];
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/filehandler.php");
+	require_once "$curdir/filehandler.php";
 	if ($withwithdrawn=='remove' || $usereplaceby) {
-		require_once("$curdir/updateassess.php");
+		require_once "$curdir/updateassess.php";
 	}
 	if (!empty($tounenroll) && count($tounenroll)>0) {
         $stulist = implode(',', array_map('intval', $tounenroll));

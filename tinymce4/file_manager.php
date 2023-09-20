@@ -1,6 +1,6 @@
 <?php
-require("../init.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/filehandler.php";
 
 
 
@@ -9,7 +9,7 @@ ini_set("max_execution_time", "120");
 
 
 //which language file to use
-include("file_manager/lang/lang_eng.php");
+require_once "file_manager/lang/lang_eng.php";
 
 //which images to use
 $delete_image 			= "file_manager/x.png";

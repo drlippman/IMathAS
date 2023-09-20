@@ -2,7 +2,7 @@
 //Edit message snippets
 //(c) 2017 David Lippman, IMathAS
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<=10) {
 	exit;
@@ -11,7 +11,7 @@ if ($myrights<=10) {
 $snippets = array();
 
 if (isset($_POST['snippets'])) {
-	require_once("../includes/htmLawed.php");
+	require_once "../includes/htmLawed.php";
 
 	$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$userid));
@@ -230,7 +230,7 @@ if (isset($_POST['snippets'])) {
 			padding-left: 0px;
 		}
 	</style>';
-	require("../header.php");
+	require_once "../header.php";
 
 
 	echo '<div class=breadcrumb>'.$breadcrumbbase.' '._("Prewritten Snippets").'</div>';
@@ -270,5 +270,5 @@ if (isset($_POST['snippets'])) {
 	echo '<p><button type="button" onclick="addgrp()">'._('Add Group').'</button> ';
 	echo '<button type="button" class="savebtn" onclick="savesnippets()">'._('Save Changes').'</button> <span class="submitnotice noticetext"></span></p>';
 
-	require("../footer.php");
+	require_once "../footer.php";
 }

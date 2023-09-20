@@ -442,7 +442,7 @@ function fin_pPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY,
 
 function fin_IRR(array $CF, array $FR){
     if (count($CF)!=count($FR)) {echo 'array sizes do not match: cannot compute'; return '';}
-    include("solvers.php");
+    require_once "solvers.php";
     
     $f="0";
     $co=count($FR);
@@ -480,7 +480,7 @@ function fin_IRR(array $CF, array $FR){
 function fin_NPV(array $CF, array $FR, float $IY){
     if (count($CF)!=count($FR)) {echo 'array sizes do not match: cannot compute'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
-    //include("macros.php");
+    //require_once "macros.php";
     
     $f="0";
     $co=count($FR);

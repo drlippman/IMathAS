@@ -10,8 +10,8 @@ ini_set("max_execution_time", "900");
 
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/filehandler.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -56,7 +56,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		header('Content-type: text/imas');
 		header("Content-Disposition: attachment; filename=\"imasexport.imas\"");
 		echo "PACKAGE DESCRIPTION\n";
-		echo $_POST['packdescription'];
+		echo Sanitize::simpleASCII($_POST['packdescription']);
 		echo "\n";
 		echo "INSTALLNAME\n";
 		echo $installname;
@@ -294,7 +294,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -311,7 +311,7 @@ if ($overwriteBody==1) {
 
 <?php
 	$select = "all";
-	include("../course/libtree.php");
+	require_once "../course/libtree.php";
 ?>
 		<span class="form">Limit to non-private questions and libs?</span>
 		<span class="formright">
@@ -333,5 +333,5 @@ if ($overwriteBody==1) {
 
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -59,9 +59,13 @@ class LTI_Message_Launch {
      */
     public static function from_cache($launch_id, Database $database, Cache $cache = null) {
         $new = new LTI_Message_Launch($database, $cache, null);
-        $new->launch_id = $launch_id;
-        $new->jwt = [ 'body' => $new->cache->get_launch_data($launch_id) ];
-        return $new->validate_registration();
+        if ($new->cache->get_launch_data($launch_id) !== false) {
+            $new->launch_id = $launch_id;
+            $new->jwt = [ 'body' => $new->cache->get_launch_data($launch_id) ];
+            return $new->validate_registration();
+        } else {
+            throw new LTI_Exception("Unable to load launch from cache.", 1);
+        }
     }
 
     /**

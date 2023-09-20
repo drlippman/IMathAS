@@ -1,27 +1,37 @@
-<html>
-    
-
-<style>
-    table {border: 0px;
-        border-style: solid;}
-    table th {padding: 50px;
-        margin: 50px;}
-    table td {padding: 5px 5px 50px 5px;
-        margin: 50px;}
-    table table {border-collapse: collapse;}
-    table table td {border: 3px;
-        border-style: solid;
-        text-align: left;
-        vertical-align: top;
-        margin:4px;
-        padding:10px;}
-    table table th {border: 0px solid;
-        text-align: left;
-        vertical-align: top;
-        margin:4px;
-        padding:10px;}
-</style>
-
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>logic help</title>
+        <style>
+            table {border: 0px;
+                border-style: solid;}
+            table th {padding: 50px;
+                margin: 50px;}
+            table td {padding: 5px 5px 50px 5px;
+                margin: 50px;}
+            table table {border-collapse: collapse;}
+            table table td {border: 3px;
+                border-style: solid;
+                text-align: left;
+                vertical-align: top;
+                margin:4px;
+                padding:10px;}
+            table table th {border: 0px solid;
+                text-align: left;
+                vertical-align: top;
+                margin:4px;
+                padding:10px;}
+            table caption {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                color: transparent;
+                }
+        </style>
+    </head>
 <body>
 <h1>Macro Library logic</h1>
 Version 1.0: April 18, 2022<br />
@@ -45,11 +55,12 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <li><a href="#logiclegend">logiclegend</a></li>
 </ul>
 
-<table>
+<table role="presentation">
 <tr>
     <td>
         <h3><a name="logicallyequivalent">logicallyequivalent(exp1,exp2,vars)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A logical expression.<br />
@@ -68,6 +79,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logcallyimplies">logcallyimplies(exp1,exp2,vars)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A logical expression.<br />
@@ -86,6 +98,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logicevaluate">logicevaluate(exp,vars,truths)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -98,7 +111,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">logicevaluate('a implies b','a,b','1,0')</p> would output 0 (FALSE), since a->b is false when a=1 and b=0.</td>
+                <td><code>logicevaluate('a implies b','a,b','1,0')</code> would output 0 (FALSE), since a->b is false when a=1 and b=0.</td>
             </tr>
         </table>
     </td>
@@ -108,6 +121,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logicevaluateall">logicevaluateall(exp,vars)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -119,7 +133,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">logicevaluateall('a and b','a,b')</p> would output <p style="font-family:courier;">array(0,0,0,1)</p>The entry at index 2 (binary 10) corresponds to evaluating 'a and b' with a=1 and b=0. Remember that arrays are 0-indexed.</td>
+                <td><code>logicevaluateall('a and b','a,b')</code> would output <code>array(0,0,0,1)</code>The entry at index 2 (binary 10) corresponds to evaluating 'a and b' with a=1 and b=0. Remember that arrays are 0-indexed.</td>
             </tr>
         </table>
     </td>
@@ -129,6 +143,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logicrand">logicrand(vars,ops,bnum,unum)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array (or list) of variables.<br />
@@ -152,6 +167,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logicmakepretty">logicmakepretty(exp)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.
@@ -168,6 +184,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logicsteps">logicsteps(exp)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.
@@ -178,7 +195,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">logicsteps('(p and q) or not p')</p> would return array('p and q', 'not p', '(p and q) or not p') since these are the steps necessary to evaluate '(p and q) or not p'.</td>
+                <td><code>logicsteps('(p and q) or not p')</code> would return array('p and q', 'not p', '(p and q) or not p') since these are the steps necessary to evaluate '(p and q) or not p'.</td>
             </tr>
         </table>
     </td>
@@ -188,6 +205,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="truthtable">truthtable(exp, [showResult=FALSE], [showSteps=TRUE], [offset=0])</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -203,14 +221,15 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             </tr>
             <tr>
                 <th>Example:</th>
-                <td> <p style="font-family:courier;">truthtable('(p and q) or not p',TRUE,TRUE)</p> would return a string for the table shown below (but in math display mode):
+                <td> <code>truthtable('(p and q) or not p',TRUE,TRUE)</code> would return a string for the table shown below (but in math display mode):
                 
                     <table style="border: 0px solid; margin: 3px; border-collapse:collapse; border-style: hidden; ">
-                    <tr><th style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">p</th><th style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">q</th><th style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">(p and q)</th><th style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">neg p</th><th style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">(p and q) or neg p</th></tr>
-                    <tr><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
-                    <tr><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td></tr>
-                    <tr><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
-                    <tr><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; text-align: left; padding: 10px; text-align: center; vertical-align: center;">T</td></tr></table>
+                    <caption>Truth table</caption>
+                    <tr><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">q</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q)</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">neg p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q) or neg p</th></tr>
+                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
+                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td></tr>
+                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
+                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr></table>
     
                 </td>
             </tr>
@@ -226,6 +245,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="truthtableanswers">truthtableanswers(exp, [showSteps=TRUE])</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A logical expression.<br />
@@ -238,19 +258,19 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
             <tr>
                 <th>Note:</th>
                 <td>This is useful for autogenerating answers to the answerboxes found in truthtable. It does <b>not</b> affect $anstypes or $answer. It is recommended you place something like the following in the Common Control box:<br >
-                    <p style="font-family:courier;">
-                        $exp = 'p and q or not r'
-                        $table = truthtable($exp, FALSE,TRUE)<br />
-                        $tableanswers = truthtableanswers($exp,TRUE)<br />
-                        $numboxes = count($tableanswers)-1<br />
-                        for($i=0..$numboxes){<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$anstypes[$i] = "choices"<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$displayformat[$i] = "select"<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$questions[$i] = array('F','T')  // Order is important: F=0 and T=1<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$noshuffle[$i] = "all"<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;$answer[$i] = $tableanswers[$i]<br />
-                        }
-                    </p>
+                    <pre>
+$exp = 'p and q or not r'
+$table = truthtable($exp, FALSE,TRUE)
+$tableanswers = truthtableanswers($exp,TRUE)
+$numboxes = count($tableanswers)-1<br />
+for($i=0..$numboxes){
+&nbsp;&nbsp;&nbsp;&nbsp;$anstypes[$i] = "choices"
+&nbsp;&nbsp;&nbsp;&nbsp;$displayformat[$i] = "select"
+&nbsp;&nbsp;&nbsp;&nbsp;$questions[$i] = array('F','T')  // Order is important: F=0 and T=1
+&nbsp;&nbsp;&nbsp;&nbsp;$noshuffle[$i] = "all"
+&nbsp;&nbsp;&nbsp;&nbsp;$answer[$i] = $tableanswers[$i]
+}
+                    </pre>
                     
                 </td>
             </tr>
@@ -262,6 +282,7 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
     <td>
         <h3><a name="logiclegend">logiclegend()</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Output:</th>
                 <td>An simple string of HTML syntax that generates a table showing keyboard shortcuts for entering logic expressions.</td>

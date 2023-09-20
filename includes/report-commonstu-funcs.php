@@ -2,7 +2,7 @@
 //IMathAS: Student sorting report functions
 //(c) 2018 David Lippman
 
-require_once("../includes/parsedatetime.php");
+require_once "../includes/parsedatetime.php";
 
 function getGBcats($cid) {
 	global $DBH;
@@ -53,7 +53,7 @@ function runRuleSet($ruleset) {
 	$GLOBALS['alwaysshowIP'] = true;
 	$GLOBALS['secfilter'] = -1;
 
-	require_once("gbtable2.php");
+	require_once "gbtable2.php";
 
 	$gb = gbtable();
 

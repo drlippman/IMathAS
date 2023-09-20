@@ -178,11 +178,7 @@ class ExceptionFuncs {
 				$adata['enddate'] = $exception[1];
 			} else {
 				//if not using exception, use latepasscnt as actual number of latepasses used, or 0
-				if ($exception!==null) {
-					$latepasscnt = 0;//max(0,$exception[2]);
-				} else {
-					$latepasscnt = 0;
-				}
+				$latepasscnt = 0;
             }
 			if ($getcanusereason) {
 				$canuselatepass = $this->getCanUseAssessLatePass($adata, $latepasscnt, true);

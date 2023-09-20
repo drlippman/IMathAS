@@ -3,8 +3,8 @@
 // Mass set assessment prereqs
 // David Lippman
 
-require('../init.php');
-require("../includes/htmlutil.php");
+require_once '../init.php';
+require_once "../includes/htmlutil.php";
 
 if (!isset($teacherid)) {
     echo 'You are not authorized to view this page';
@@ -93,7 +93,7 @@ $from = Sanitize::simpleString($_GET['from'] ?? '');
 
 $pagetitle = _('Mass Change Prereqs');
 $placeinhead = '<script type="text/javascript" src="'. $staticroot . '/javascript/tablesorter.js"></script>';
-require('../header.php');
+require_once '../header.php';
 
 echo '<div class=breadcrumb>';
 echo $breadcrumbbase . '<a href="course.php?cid='.$cid.'">'
@@ -189,7 +189,7 @@ initSortTable('myTable',Array('S',false),true);
 </script>
 <?php
 
-require('../footer.php');
+require_once '../footer.php';
 
 
 

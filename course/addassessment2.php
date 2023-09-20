@@ -3,14 +3,14 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 if ($courseUIver == 1) {
 	if (isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
-			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
+			$GLOBALS['basesiteurl'], $cid, Sanitize::onlyInt($_GET['id'])));
 	} else {
 		header(sprintf('Location: %s/course/addassessment.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));
@@ -163,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$toset['intro'] = Sanitize::incomingHtml($_POST['intro']);
 		}
-    require_once("../includes/parsedatetime.php");
+    require_once "../includes/parsedatetime.php";
 		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
 
     if ($_POST['sdatetype']=='0') {
@@ -527,7 +527,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			// Re-total any student attempts on this assessment
             //need to re-score assessment attempts based on withdrawal
-            require_once('../assess2/AssessHelpers.php');
+            require_once '../assess2/AssessHelpers.php';
             AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
                 ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
@@ -906,7 +906,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>';
 }
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -931,7 +931,7 @@ if ($overwriteBody==1) {
 	<form method=post action="<?php echo $page_formActionTag ?>">
 
 	<?php
-		require("addassessment2form.php");
+		require_once "addassessment2form.php";
 	?>
 
 	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
@@ -939,5 +939,5 @@ if ($overwriteBody==1) {
 	<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

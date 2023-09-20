@@ -539,7 +539,6 @@ function get_unit_area_abbreviations() {
 
     //$unitabbr["acre"] = _("ac");  //https://en.wikipedia.org/wiki/Acre
     //$unitabbr["acres"] = _("ac");
-    $unitabbr["acre"] = _("acre");
     $unitabbr["acres"] = _("acres");
 
     //metric

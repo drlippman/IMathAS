@@ -7,7 +7,7 @@
 function showUserPrefsForm() {
 	global $CFG, $tzname;
 
-	require_once(dirname(__FILE__)."/htmlutil.php");
+	require_once dirname(__FILE__)."/htmlutil.php";
 
 	$prefs = array();
 	$prefs['mathdisp'] = array(
@@ -75,7 +75,7 @@ function showUserPrefsForm() {
 	}
 	$_SESSION['userprefs']['tztype'] = isset($_SESSION['userprefs']['tzname'])?2:0;
 
-	$timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
+	$timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC);
 
 	echo '<fieldset id="userinfoprefs"><legend>'._('Accessibility and Display Preferences').'</legend>';
 	echo '<p>'._('Default settings are indicated with a *').'</p>';
@@ -112,7 +112,7 @@ function showUserPrefsForm() {
 }
 
 function storeUserPrefs() {
-	global $CFG, $DBH, $userid, $tzname, $sessionid;
+	global $CFG, $DBH, $userid, $tzname;
 
 	//save user prefs.  Get existing
 	$currentuserprefs = array();
@@ -184,8 +184,8 @@ function storeUserPrefs() {
 	}
 }
 
-function generateuserprefs($writetosession=false) {
-	global $DBH, $CFG, $sessionid, $userid;
+function generateuserprefs($uid) {
+	global $DBH, $CFG;
 
 	$_SESSION['userprefs'] = array();
 	$prefdefaults = array(
@@ -198,7 +198,7 @@ function generateuserprefs($writetosession=false) {
 
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$stm = $DBH->prepare("SELECT item,value FROM imas_user_prefs WHERE userid=:id");
-		$stm->execute(array(':id'=>$userid));
+		$stm->execute(array(':id'=>$uid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$_SESSION['userprefs'][$row[0]] = $row[1];
 		}

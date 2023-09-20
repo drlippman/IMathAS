@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -65,7 +65,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } elseif (!empty($_POST['title'])) { //form posted to itself with new/modified data, update the block
 	$DBH->beginTransaction();
-	require_once("../includes/parsedatetime.php");
+	require_once "../includes/parsedatetime.php";
 	if ($_POST['avail']==1) {
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
@@ -358,7 +358,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/c
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -471,7 +471,7 @@ if ($overwriteBody==1) {
 
 	<br />&nbsp;<br/>
 	<input type=radio name="colors" id="colorcustom" value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom
-	<table class="coloropts" style="display: inline; border-collapse: collapse; margin-left: 15px;">
+	<table class="coloropts" role="presentation" style="display: inline; border-collapse: collapse; margin-left: 15px;">
 		<tr>
 			<td id="ex1" style="border: 1px solid #000;background-color:
 			<?php echo $titlebg;?>;color:<?php echo $titletxt;?>;">
@@ -483,7 +483,7 @@ if ($overwriteBody==1) {
 		</tr>
 	</table>
 	<br class="coloropts"/>
-	<table class="coloropts" style=" margin-left: 30px;">
+	<table class="coloropts" role="presentation" style=" margin-left: 30px;">
 		<tr>
 			<td>Title Background: </td>
 			<td><input type=text id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" />
@@ -519,7 +519,7 @@ if (isset($blockitems)) {
 echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 }
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 /**** end html code ******/
 //nothing after the end of html for this page

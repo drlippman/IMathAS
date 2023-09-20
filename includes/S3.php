@@ -487,7 +487,7 @@ class S3 {
 		if ($rest->error === false && $rest->code !== 200)
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		if ($rest->error !== false) {
-			trigger_error(sprintf("S3::setBucketLogging({$bucket}, {$uri}): [%s] %s",
+			trigger_error(sprintf("S3::setBucketLogging({$bucket}): [%s] %s",
 			$rest->error['code'], $rest->error['message']), E_USER_WARNING);
 			return false;
 		}

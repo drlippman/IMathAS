@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($_GET['type'])) {
 	$type = 'take';
@@ -58,7 +58,7 @@ if (!empty($_GET['toundel'])) {
 
 $pagetitle = "View Hidden Courses You're $typename from Course List";
 $curBreadcrumb = "$breadcrumbbase Unhide Courses\n";
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<h1>View Hidden Courses You\'re '.$typename.'</h1>';
@@ -142,6 +142,6 @@ if (count($deleted) > 0) {
     echo '</ul>';
 }
 echo '<p><a href="../index.php">Back to Home Page</a></p>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -1,12 +1,12 @@
 <?php
 $init_skip_csrfp = true;
-require('../init.php');
+require_once '../init.php';
 
 if ($myrights < 20) {
   exit;
 }
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 

@@ -771,7 +771,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	$leftborder = min(60, 9*max(strlen($maxfreq),strlen($maxfreq-$step))+10) + ($usevertlabel?30:0);
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	$bottomborder = 25+($label===''?0:20);
-	$outst = "setBorder($leftborder,$bottomborder,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	$outst = "setBorder($leftborder,$bottomborder,0,$topborder);  initPicture(".$start.",$x,0,$maxfreq);";
 
 	if (isset($options['showgrid']) && $options['showgrid']==false) {
 		$gdy = 0;
@@ -806,7 +806,7 @@ function piechart($pcts,$labels,$w=250,$h=130) {
         return '';
     }
 	if ($_SESSION['graphdisp']==0) {
-		$out .= '<table><caption>'._('Pie Chart').'</caption>';
+		$out = '<table><caption>'._('Pie Chart').'</caption>';
 		$out .= '<tr><th>'._('Label').'</th>';
 		$out .= '<th>'._('Percent').'</th></tr>';
 		foreach ($labels as $k=>$label) {
@@ -2828,7 +2828,7 @@ function anova2way_f($arr, $replication=False){
 function anova_table(array $array, int $factor = 1, $rep=False, int $roundto=12, string $f1="Factor A", string $f2="Factor B"){
 	if ($factor!=1 && $factor!=2) { echo 'error: the factor variable only expects 1 for one-way and 2 for two-way ANOVA'; return '';}
 	/*if (!function_exists('calconarray')) {
-       // require_once(__DIR__.'/assessment/macros.php');
+       // require_once __DIR__.'/assessment/macros.php';
 	}*/
 	array_walk_recursive($array, function(&$x) use ($roundto) { $x = round($x,$roundto);});
 	

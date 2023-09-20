@@ -21,6 +21,7 @@
     </div>
   </div>
   <table v-else class="LPres" ref="main">
+    <caption class="sr-only">Results</caption>
     <thead>
       <tr>
         <th>{{ $t('livepoll.answer') }}</th>

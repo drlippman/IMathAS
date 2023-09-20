@@ -8,7 +8,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['validate'])) {
-    require $CFG['hooks']['validate'];
+    require_once $CFG['hooks']['validate'];
 }
 
 session_start();
@@ -59,9 +59,9 @@ if (!empty($_SESSION['userid'])) { // logged in
         unset($userid);
         $_SESSION = array();
         if ($wasLTI) {
-            require __DIR__."/header.php";
+            require_once __DIR__."/header.php";
             echo _('Your session has expired. Please go back to your LMS and open this assignment again.');
-            require 'footer.php';
+            require_once 'footer.php';
             exit;
         }
     }
@@ -93,7 +93,7 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
         }
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
         
-        require __DIR__."/header.php";
+        require_once __DIR__."/header.php";
         echo '<form method=post action="' . $formAction . '">';
         echo '<p>' . _('You have requested guest access to a course.') . '</p>';
         echo '<p><button type=button onclick="location.href=\'' . $imasroot . '/index.php\'">', _('Nevermind'), '</button> ';
@@ -106,7 +106,7 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
      });
      </script>';
         echo '</form>';
-        require __DIR__ . '/footer.php';
+        require_once __DIR__ . '/footer.php';
         exit;
     }
     $haslogin = true;
@@ -176,10 +176,15 @@ if ($haslogin && !$hasusername) {
         }
         $_POST['usedetected'] = true;
     } else {
-        $stm = $DBH->prepare("SELECT id,password,rights,groupid,jsondata,mfa FROM imas_users WHERE SID=:SID");
+        $query = "SELECT id,password,rights,groupid";
+        if (strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
+            $query .= ',jsondata,mfa';
+        }
+        $query .= " FROM imas_users WHERE SID=:SID";
+        $stm = $DBH->prepare($query);
         $stm->execute(array(':SID' => $_POST['username']));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
-        if ($line != false) {
+        if ($line != false && isset($line['jsondata'])) {
             $json_data = json_decode($line['jsondata'], true);
             if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
                 echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');
@@ -191,7 +196,7 @@ if ($haslogin && !$hasusername) {
         require_once "includes/password.php";
     }
     if (!empty($line['mfa'])) {
-        require(__DIR__.'/includes/mfa.php');
+        require_once __DIR__.'/includes/mfa.php';
         $mfadata = json_decode($line['mfa'], true);
         if (isset($_SERVER['QUERY_STRING'])) {
             $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']);
@@ -218,9 +223,9 @@ if ($haslogin && !$hasusername) {
         // }
         //
         if ($line['rights'] == 0) {
-            require __DIR__."/header.php";
+            require_once __DIR__."/header.php";
             echo _("You have not yet confirmed your registration.  You must respond to the email that was sent to you by IMathAS.");
-            require __DIR__ . '/footer.php';
+            require_once __DIR__ . '/footer.php';
             exit;
         }
 
@@ -240,7 +245,7 @@ if ($haslogin && !$hasusername) {
                 $_SESSION['static_ok'] = 1;
             }
             require_once "$curdir/includes/userprefs.php";
-            generateuserprefs();
+            generateuserprefs($userid);
 
             $_SESSION['tzoffset'] = $_POST['tzoffset'];
             if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
@@ -419,7 +424,7 @@ if ($hasusername) {
         //userprefs are missing!  They should be defined from initial session setup
         //we should never be here. But in case we are, reload prefs
         require_once "$curdir/includes/userprefs.php";
-        generateuserprefs(true);
+        generateuserprefs($userid);
     }
     if (isset($_SESSION['userprefs']['usertheme']) && strcmp($_SESSION['userprefs']['usertheme'], '0') != 0) {
         $coursetheme = $_SESSION['userprefs']['usertheme'];
@@ -504,7 +509,7 @@ if ($hasusername) {
             }
             setcookie('fromltimenu', '', time() - 3600);
         } else if ($_SESSION['ltiitemtype'] == 0 && $_SESSION['ltirole'] == 'learner') {
-            require __DIR__ . '/includes/userutils.php';
+            require_once __DIR__ . '/includes/userutils.php';
             logout();
             header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php?r=' . Sanitize::randomQueryStringParam());
             exit;
@@ -536,7 +541,7 @@ if ($hasusername) {
                 'index.php', 'gbviewassess.php', 'autosave.php', 'endassess.php', 'getscores.php', 'livepollstatus.php', 'loadassess.php',
                 'loadquestion.php', 'scorequestion.php', 'startassess.php', 'uselatepass.php', 'gbloadassess.php', 'gbloadassessver.php',
                 'gbloadquestionver.php', 'getquestions.php', 'savework.php', 'posts.php', 'thread.php', 'postsbyname.php',
-                'savetagged.php', 'recordlikes.php', 'listlikes.php', 'gbloadtexts.php');
+                'savetagged.php', 'recordlikes.php', 'listlikes.php', 'gbloadtexts.php', 'rectrack.php');
             //call hook, if defined
             if (function_exists('allowedInAssessment')) {
                 $allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
@@ -594,10 +599,10 @@ if ($hasusername) {
                 $studentinfo['lticourseid'] = $line['lticourseid'];
             }
             if ($line['locked'] > 0) {
-                require __DIR__."/header.php";
+                require_once __DIR__."/header.php";
                 echo "<p>", _("You have been locked out of this course by your instructor.  Please see your instructor for more information."), "</p>";
                 echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
-                require __DIR__ . '/footer.php';
+                require_once __DIR__ . '/footer.php';
                 exit;
             } else {
                 $now = time();
@@ -703,7 +708,7 @@ if ($hasusername) {
                     ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'], 'assess2/') === false ||
                         strpos($_SERVER['QUERY_STRING'], '&aid=' . $lockaid) === false))
                 ) {
-                    require __DIR__."/header.php";
+                    require_once __DIR__."/header.php";
                     echo '<p>', _('This course is currently locked for another assessment'), '</p>';
 
                     if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0) {
@@ -713,7 +718,7 @@ if ($hasusername) {
                     } else {
                         echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=" . Sanitize::encodeUrlParam($lockaid) . "\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">", _("Go Back"), "</a></p>";
                     }
-                    require __DIR__ . '/footer.php';
+                    require_once __DIR__ . '/footer.php';
                     //header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
                     exit;
                 }
@@ -755,7 +760,7 @@ if (!$verified) {
         if (!isset($loginpage)) {
             $loginpage = "loginpage.php";
         }
-        require $loginpage;
+        require_once $loginpage;
         exit;
     }
 }

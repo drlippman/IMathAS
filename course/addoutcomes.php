@@ -2,7 +2,7 @@
 //(c) 2013 David Lippman.  Part of IMathAS
 //Define course outcomes
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 if (isset($_POST['order'])) {
@@ -228,7 +228,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	var itemorderhash="h";
 	</script>';
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Course Outcomes").'</div>';
 
@@ -243,6 +243,6 @@ printoutcome($outcomes);
 echo '</ul>';
 echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
 echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

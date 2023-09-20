@@ -139,25 +139,25 @@ class Imathas_LTI_Database implements LTI\Database
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => 'https://sso.canvaslms.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://sso.canvaslms.com/login/oauth2/token',
+                       'key_set_url' => 'https://sso.canvaslms.com/api/lti/security/jwks'
                     ];
                 } else if ($iss === 'https://canvas.beta.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.beta.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.beta.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.beta.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => 'https://sso.beta.canvaslms.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://sso.beta.canvaslms.com/login/oauth2/token',
+                       'key_set_url' => 'https://sso.beta.canvaslms.com/api/lti/security/jwks'
                     ];
                 } else if ($iss === 'https://canvas.test.instructure.com') {
                     $row = [
                        'issuer' => $iss,
                        'client_id' => trim($client_id),
-                       'auth_login_url' => 'https://canvas.test.instructure.com/api/lti/authorize_redirect',
-                       'auth_token_url' => 'https://canvas.test.instructure.com/login/oauth2/token',
-                       'key_set_url' => 'https://canvas.test.instructure.com/api/lti/security/jwks'
+                       'auth_login_url' => 'https://sso.test.canvaslms.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://sso.test.canvaslms.com/login/oauth2/token',
+                       'key_set_url' => 'https://sso.test.canvaslms.com/api/lti/security/jwks'
                     ];
                 }
                 if (is_array($row)) { // set something above - create platform reg
@@ -500,6 +500,15 @@ class Imathas_LTI_Database implements LTI\Database
     }
 
     /**
+     * Update imas_users.lastaccess for a user
+     * @param int  $localuserid
+     */
+    public function set_user_lastaccess(int $localuserid): void {
+        $stm = $this->dbh->prepare('UPDATE imas_users SET lastaccess=? WHERE id=?');
+        $stm->execute(array(time(), $localuserid));
+    }
+
+    /**
      * Get local user course id
      * @param  string $contextid
      * @param  LTI_Message_Launch $launch
@@ -748,10 +757,10 @@ class Imathas_LTI_Database implements LTI\Database
         }
 
         // get origin course
-        // TODO: if the $lastcopied isn't owned by us, should we still offer it as
-        // an option to be copied?
-        $stm = $this->dbh->prepare('SELECT DISTINCT id,name,ownerid FROM imas_courses WHERE id=?');
-        $stm->execute(array($target['refcid']));
+        $query = 'SELECT DISTINCT ic.id,ic.name,it.userid FROM imas_courses AS ic ';
+        $query .= 'LEFT JOIN imas_teachers AS it ON it.courseid=ic.id AND it.userid=? WHERE ic.id=?';
+        $stm = $this->dbh->prepare($query);
+        $stm->execute(array($userid, $target['refcid']));
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $copycourses[$row[0]] = $row[1];
             // if it's user's course, also include in assoc list
@@ -999,8 +1008,16 @@ class Imathas_LTI_Database implements LTI\Database
                     }
                     $ancparts = explode(':', $aidanc[$i]);
                     if ($ancparts[0] != $ancestors[$i]) {
+                        // course sequence doesn't match
                         $isok = false;
                         break; // not the same ancestry path
+                    }
+                    if ($i == $ciddepth) {
+                        // on last one - match sure assessment matches
+                        if ($sourceaid != $ancparts[1]) {
+                            $isok = false;
+                            break;
+                        }
                     }
                 }
                 if ($isok) { // found it!

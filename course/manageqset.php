@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -144,7 +144,13 @@ if ($myrights<20) {
 					$tlist = $_GET['transfer'];
 				}
 			}
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+            if ($isadmin) {
+			    $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND lastaccess>? ORDER BY LastName,FirstName");
+                $stm->execute([time()-30*24*60*60]);
+            } else {
+                $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid=? ORDER BY LastName,FirstName");
+                $stm->execute([$groupid]);
+            }
 			$i=0;
 			$page_transferUserList = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -556,12 +562,12 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; Change Question Rights";
 
-			$clist = Sanitize::encodeStringForDisplay(implode(",", $_POST['nchecked']));
-
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
-			}
+			} else {
+                $clist = Sanitize::encodeStringForDisplay(implode(",", $_POST['nchecked']));
+            }
 		}
 	} else if (isset($_GET['transfer'])) {
 
@@ -592,7 +598,7 @@ if ($myrights<20) {
 		}
 		//load filter.  Need earlier than usual header.php load
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		require_once("$curdir/../filter/filter.php");
+		require_once "$curdir/../filter/filter.php";
 
 			//remember search
 		if (isset($_POST['search'])) {
@@ -959,7 +965,7 @@ if (!empty($_POST['chglib'])) {
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
 }
-require("../header.php");
+require_once "../header.php";
 
 $address = $GLOBALS['basesiteurl'] . '/course';
 
@@ -1107,7 +1113,7 @@ function getnextprev(formn,loc) {
 			Select libraries to add these questions to.
 			</p>
 
-			<?php $libtreeshowchecks = false; include("libtree2.php"); ?>
+			<?php $libtreeshowchecks = false; require_once "libtree2.php"; ?>
 
 
 			<p>
@@ -1130,7 +1136,7 @@ function getnextprev(formn,loc) {
 
 			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
-			<?php include("libtree.php"); ?>
+			<?php require_once "libtree.php"; ?>
 
 			<p>
 				<input type=submit value="Template Questions">
@@ -1341,7 +1347,7 @@ function getnextprev(formn,loc) {
 	}
 
 }
-require("../footer.php");
+require_once "../footer.php";
 
 
 function delqimgs($qsid) {

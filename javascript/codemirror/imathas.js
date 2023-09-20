@@ -95,7 +95,7 @@
     // calculus
     imathasBuiltin += " calculusdiffquotient calculusnumint";
     // chemistry
-    imathasBuiltin += " chem_disp chem_mathdisp chem_isotopedisp chem_getsymbol chem_getnumber chem_getname chem_getweight chem_getmeltingpoint chem_getboilingpoint chem_getfamily chem_randelementbyfamily chem_diffrandelementsbyfamily chem_getrandcompound chem_getdiffrandcompounds chem_decomposecompound chem_getcompoundmolmass chem_randanion chem_randcation chem_makeioniccompound";
+    imathasBuiltin += " chem_disp chem_mathdisp chem_isotopedisp chem_getsymbol chem_getnumber chem_getname chem_getweight chem_getmeltingpoint chem_getboilingpoint chem_getfamily chem_randelementbyfamily chem_diffrandelementsbyfamily chem_getrandcompound chem_getdiffrandcompounds chem_decomposecompound chem_getcompoundmolmass chem_randanion chem_randcation chem_makeioniccompound chem_getsolubility chem_eqndisp chem_balancereaction";
     // chgbase
     imathasBuiltin += " baseconvert asciitodec dectoascii";
     // complex
@@ -145,7 +145,7 @@
     // polys2
     imathasBuiltin += " formpoly2 writepoly2 addpolys2 subtpolys2 multpolys2 scalepoly2 getcoef2 polypower2";
     // polys
-    imathasBuiltin += " formpoly formpolyfromroots writepoly addpolys subtpolys multpolys scalepoly roundpoly quadroot getcoef polypower checkpolypowerorder derivepoly";
+    imathasBuiltin += " formpoly formpolyfromroots writepoly addpolys subtpolys multpolys scalepoly roundpoly quadroot getcoef polypower checkpolypowerorder derivepoly polys_getdegree";
     // primes
     imathasBuiltin += " getprime getprimes isprime";
     // radicals

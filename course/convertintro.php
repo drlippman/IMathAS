@@ -1,8 +1,8 @@
 <?php
 
-require("../init.php");
-require_once("../includes/htmLawed.php");
-require_once("../includes/convertintro.php");
+require_once "../init.php";
+require_once "../includes/htmLawed.php";
+require_once "../includes/convertintro.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
@@ -24,11 +24,11 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 			$converted[] = Sanitize::encodeStringForDisplay($row[2]);
 		}
 	}
-	require("../header.php");
+	require_once "../header.php";
 	echo '<h2>Converted:</h2>';
 	echo '<p>'.implode('<br/>', $converted).'</p>';
 	echo "<p><a href=\"course.php?cid=$cid\">Done</a></p>";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 } else {
 	$stm = $DBH->prepare("SELECT intro,itemorder,ver FROM imas_assessments WHERE id=:id AND courseid=:courseid");
@@ -55,7 +55,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 		$qcnt = substr_count($qitemorder, ',')+1;
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		$curBreadcrumb .= "<a href=\"$addassess?cid=$cid&id=$aid\">"._("Modify Assessment")."</a>";
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt '._('Convert Intro').'</div>';
 		echo '<div id="headeraddlinkedtext" class="pagetitle"><h1>'._('Convert Intro').'</h1></div>';
 		if ($isembed) {
@@ -118,7 +118,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 		echo '<form method="POST" action="'.sprintf('convertintro.php?cid=%d&aid=%d',$cid,$aid).'" onsubmit="return confirm(\'Are you SURE??? This is risky and can NOT be undone. Make sure you have a backup just in case something goes wrong.\');">';
 		echo '<p><button type="submit" name="convert" value="all">'._('Convert All Assessments in Course').'</button></p>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 	}
 }
 ?>

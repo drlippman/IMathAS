@@ -10,10 +10,10 @@
 // (c) 2020 David Lippman
 
 $init_skip_csrfp = true;
-require "./init_without_validate.php";
+require_once "./init_without_validate.php";
 
 require_once './assess2/AssessStandalone.php';
-require("includes/JWT.php");
+require_once "includes/JWT.php";
 
 $assessver = 2;
 $courseUIver = 2;
@@ -134,8 +134,8 @@ if (isset($_POST['state'])) {
         'qsid' => array($qn => $qsid),
         'stuanswers' => array(),
         'stuanswersval' => array(),
-        'scorenonzero' => array(($qn + 1) => false),
-        'scoreiscorrect' => array(($qn + 1) => false),
+        'scorenonzero' => array(($qn + 1) => -1),
+        'scoreiscorrect' => array(($qn + 1) => -1),
         'partattemptn' => array($qn => array()),
         'rawscores' => array($qn => array()),
         'auth' => $QS['auth']
@@ -212,8 +212,8 @@ if (isset($_POST['regen']) && !$issigned) {
     $state['seeds'][$qn] = $seed;
     unset($state['stuanswers'][$qn+1]);
     unset($state['stuanswersval'][$qn+1]);
-    $state['scorenonzero'][$qn+1] = false;
-    $state['scoreiscorrect'][$qn+1] = false;
+    $state['scorenonzero'][$qn+1] = -1;
+    $state['scoreiscorrect'][$qn+1] = -1;
     $state['partattemptn'][$qn] = array();
     $state['rawscores'][$qn] = array();
 }
@@ -290,16 +290,16 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/javascript/drawing.js?v=041920" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-    $placeinhead .= '<script src="' . $staticroot . '/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+    $placeinhead .= '<script src="' . $staticroot . '/javascript/mathjs.js?v=20230729" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
-    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=012923" type="text/javascript"></script>';
+    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=20230818" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=021823">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css">';
 
 // setup resize message sender
@@ -375,7 +375,7 @@ $placeinhead .= '<script type="text/javascript">
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
-require "./header.php";
+require_once "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 echo '<div class="questionwrap">';
@@ -416,4 +416,4 @@ $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
-require "./footer.php";
+require_once "./footer.php";

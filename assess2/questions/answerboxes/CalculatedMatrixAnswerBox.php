@@ -47,6 +47,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
         }
 
         $ansformats = array_map('trim', explode(',', $answerformat));
+        $dispformats = array_map('trim', explode(',', $displayformat));
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
@@ -62,13 +63,18 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             if (isset($GLOBALS['capturechoices'])) {
                 $GLOBALS['answersize'][$qn] = $answersize;
             }
-            if ($colorbox == '') {
-                $out .= '<div id="qnwrap' . $qn . '">';
+            if (in_array('inline', $dispformats)) {
+                $style = ' style="display:inline-block;vertical-align:middle"';
             } else {
-                $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '">';
+                $style = '';
+            }
+            if ($colorbox == '') {
+                $out .= '<div id="qnwrap' . $qn . '"' . $style . '>';
+            } else {
+                $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '"' . $style . '>';
             }
             $out .= '<table>';
-            if ($displayformat == 'det') {
+            if (in_array('det', $dispformats)) {
                 $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
             } else {
                 $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
@@ -106,7 +112,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
                 $out .= "</tr>";
             }
             $out .= "</table>\n";
-            if ($displayformat == 'det') {
+            if (in_array('det', $dispformats)) {
                 $out .= '</td><td class="matrixdetright">&nbsp;</td></tr></table>';
             } else {
                 $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';

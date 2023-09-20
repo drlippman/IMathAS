@@ -3,7 +3,7 @@
 // grid for multiple.  For embed
 //(c) 2020 David Lippman
 
-    require('../init.php');
+    require_once '../init.php';
 
 	if (!(isset($teacherid))) {
 		echo "You are not authorized to view this page";
@@ -12,7 +12,7 @@
     $aid = intval($_GET['aid']);
 
 	if (isset($_POST['action'])) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if ($_POST['action'] == 'add') { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints,ver FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -195,7 +195,7 @@
         $stm = $DBH->prepare($query);
         $stm->execute(array($cid, $aid));
         
-        require('../includes/addquestions2util.php');
+        require_once '../includes/addquestions2util.php';
         list($jsarr,$existingqs) = getQuestionsAsJSON($cid, $aid);
         
         header('Content-Type: application/json; charset=utf-8');
@@ -288,11 +288,11 @@
             </script>';
     $flexwidth = true;
     $nologo = true;        
-    require("../header.php");
+    require_once "../header.php";
     
     if ($beentaken) {
         echo '<p>'._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page').'</p>';
-        require('../footer.php');
+        require_once '../footer.php';
         exit;
     }
 
@@ -302,7 +302,7 @@
 <form>
 <input type=hidden name="lastitemhash" value="<?php echo Sanitize::encodeStringForDisplay($_GET['lih']);?>" />
 <p>Leave items blank to use the assessment's default values</p>
-<table class=gb>
+<table class=gb role="presentation">
 <thead><tr>
 <?php
 		if (isset($_GET['modqs'])) { //modifying existing questions
@@ -365,7 +365,7 @@
 
                 $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\">";
                 foreach ($showworkoptions as $v=>$l) {
-                    $qrows[$row['id']] .= '<option value="'.$v.'" '.($row['showwork']==$v ? 'selected':'').'>';
+                    $qrows[$row['id']] .= '<option value="'.Sanitize::encodeStringForDisplay($v).'" '.($row['showwork']==$v ? 'selected':'').'>';
                     $qrows[$row['id']] .= Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 $qrows[$row['id']] .= '</select></td>';
@@ -476,7 +476,7 @@
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 ?>

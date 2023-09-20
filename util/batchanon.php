@@ -2,11 +2,11 @@
 //Batch anonymize users
 //IMathAS (c) 2018 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights < 100) { echo "You don't have the authority for this action"; exit;}
 
-require("../header.php");
+require_once "../header.php";
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";
 $curBreadcrumb .= ' &gt; <a href="utils.php">Utils</a>';
@@ -35,7 +35,7 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
 		$n = $stm->rowCount();
 		echo '<p>'.Sanitize::onlyInt($n).' accounts anonymized (or re-anonymized)</p>';
 		echo '<p><a href="utils.php">Done</a></p>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } 
@@ -70,5 +70,5 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
 </form>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";
 	

@@ -3,9 +3,9 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
@@ -54,9 +54,9 @@ if (isset($_POST['checked'])) { //form submitted
             $stm->execute($checked);
 
 		} else {
-			$checkedlist = implode(',', $checked);
+			$checkedlist = implode(',', array_map('intval', $checked));
 
-			require("../header.php");
+			require_once "../header.php";
             echo "<div class=breadcrumb>$breadcrumbbase ";
             if (empty($_COOKIE['fromltimenu'])) {
                 echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -65,7 +65,7 @@ if (isset($_POST['checked'])) { //form submitted
 			echo "&gt; <a href=\"chgoffline.php?cid=$cid\">Manage Offline Grades</a> &gt; Confirm Delete</div>";
 			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 			echo '<input type="hidden" name="submit" value="Delete" />';
-			echo '<input type="hidden" name="checked" value="'.$checkedlist.'"/>';
+			echo '<input type="hidden" name="checked" value="'.Sanitize::encodeStringForDisplay($checkedlist).'"/>';
 			echo '<p>Are you <b>SURE</b> you want to delete these offline grade items ';
 			echo 'and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first.</p><p>';
 			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id IN ($ph)");
@@ -77,11 +77,11 @@ if (isset($_POST['checked'])) { //form submitted
 			echo '</p><p><button type=submit name=confirm value=true>'._('Yes, Delete').'</button> ';
 			echo '<input type=button value="Nevermind" class="secondarybtn" onClick="window.location=\'gradebook.php?cid='.$cid.'\'"></p>';
 			echo '</form>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	} else {
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 
 		$sets = array();
 		$qarr = array();
@@ -143,7 +143,7 @@ $placeinhead .= '<script type="text/javascript">
    });
  });
  </script>';
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if (empty($_COOKIE['fromltimenu'])) {
@@ -164,7 +164,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 if (count($gbitems)==0) {
 	echo "<p>No offline grades.  <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add one</a> or ";
 	echo '<a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 } else {
 	echo '<div class="cpmid"><a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></div>';
@@ -185,6 +185,7 @@ foreach($gbitems as $id=>$name) {
 <fieldset>
 <legend>Offline Grade Options</legend>
 <table class=gb id=options>
+<caption class="sr-only">Settings</caption>
 <thead>
 <tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 </thead>
@@ -238,5 +239,5 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 <div class="submit"><input type="submit" name="submit" value="<?php echo _('Apply Changes')?>" /></div>
 </form>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

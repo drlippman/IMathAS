@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 
@@ -22,7 +22,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -110,5 +110,5 @@ if ($overwriteBody==1) {
 	}
 }
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

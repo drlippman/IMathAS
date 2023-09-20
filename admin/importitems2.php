@@ -8,10 +8,10 @@
 ini_set("max_execution_time", "900");
 
 /*** master php includes *******/
-require "../init.php";
+require_once "../init.php";
 require_once "../includes/filehandler.php";
-require "itemexportfields.php";
-require "importitemsfuncs.php";
+require_once "itemexportfields.php";
+require_once "importitemsfuncs.php";
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -116,7 +116,7 @@ if (!(isset($teacherid))) {
     }
 }
 /******* begin html output ********/
-require "../header.php";
+require_once "../header.php";
 
 if ($overwriteBody == 1) {
     echo $body;
@@ -181,7 +181,7 @@ echo $curBreadcrumb;
 
         if ($data['course']['UIver'] > $courseUIver) {
             echo '<p class=noticetext>' . _('The import file is for a more recent assessment version than this course - cannot import.') . '</p>';
-            require "../footer.php";
+            require_once "../footer.php";
             exit;
         } else if ($data['course']['UIver'] < $courseUIver) {
             echo '<p class=noticetext>' . _('The import file is for an older assessment version than this course - assessments will be upgraded.') . '</p>';
@@ -225,6 +225,7 @@ echo $curBreadcrumb;
 if (count($ids) > 0) {
             ?>
 		<table cellpadding=5 class=gb>
+        <caption class="sr-only">Course Items</caption>
 		<thead>
 			<tr><th></th><th><?php echo _('Type'); ?></th><th><?php echo _('Title'); ?></th></tr>
 		</thead>
@@ -288,4 +289,4 @@ if ($hascourseopts || $hasgbsetup || $hasoffline || $hascalitems || $hasstickypo
     }
 
 }
-require "../footer.php";
+require_once "../footer.php";

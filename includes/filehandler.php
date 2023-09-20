@@ -9,7 +9,7 @@ function getfilehandlertype($filetype) {
 			$GLOBALS['filehandlertypecfiles'] = 'local';
 			if (isset($GLOBALS['AWSkey'])) {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
-				require_once("$curdir/S3.php");
+				require_once "$curdir/S3.php";
 				$GLOBALS['filehandlertype'] = 's3';
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 					$GLOBALS['filehandlertypecfiles'] = 's3';

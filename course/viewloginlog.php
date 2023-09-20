@@ -2,7 +2,7 @@
 //IMathAS:  View login record
 //(c) 2011 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = intval($_GET['cid']);
@@ -28,7 +28,7 @@ if (isset($teacherid)) {
 }
 $curBreadcrumb .= "View Login Log\n";
 $pagetitle = "View Login Log";
-require("../header.php");
+require_once "../header.php";
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 
 
@@ -52,6 +52,6 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 
 echo '</ul>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>
