@@ -124,7 +124,6 @@ function matrixformatfrac($m, $bracket='[') {
 //
  */
 function matrixdisplaytable() {
-
     //  arguments list -------------------------------------
     //  0 = matrix
     //  1 = matrix name
