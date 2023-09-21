@@ -1,1 +1,1 @@
-{"version":3,"sources":[],"names":[],"mappings":"","file":"js/lang-de-json.js","sourceRoot":""}
+{"version":3,"sources":["webpack:///js/lang-de-json.js"],"names":["window","push","6ce2","module","exports","JSON","parse"],"mappings":"CAACA,OAAO,gBAAkBA,OAAO,iBAAmB,IAAIC,KAAK,CAAC,CAAC,gBAAgB,CAEzEC,OACA,SAAUC,GAEhBA,EAAOC,QAAUC,KAAKC,MAAM","file":"js/lang-de-json.js?v=ad36af72d71151aaffad","sourceRoot":""}
