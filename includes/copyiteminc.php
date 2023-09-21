@@ -475,7 +475,12 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
 
 function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = false)
 {
-    global $checked, $blockcnt;
+    global $checked, $blockcnt, $cid, $sourcecid;
+    if (intval($cid) == intval($sourcecid)) {
+        $samecourse = true;
+    } else {
+        $samecourse = false;
+    }
     if (!isset($_POST['append'])) {
         $_POST['append'] = '';
     }
@@ -493,7 +498,7 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['colors'] = $item['colors'];
                 $newblock['public'] = $item['public'] ?? 0;
                 $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
-                $newblock['grouplimit'] = $item['grouplimit'] ?? [];
+                $newblock['grouplimit'] = $samecourse ? ($item['grouplimit'] ?? []) : [];
                 $newblock['items'] = array();
                 if (count($item['items']) > 0) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
