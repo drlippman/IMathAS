@@ -40,6 +40,7 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 			if (in_array($item['id'], $tochg)) {
 				foreach ($sets as $k=>$v) {
 					if (is_array($v)) {
+                        $items[$n][$k] = []; // reset first before adding
 						foreach ($v as $kk=>$vv) {
 							$items[$n][$k][$kk] = $vv;
 						}
