@@ -4346,10 +4346,11 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
+            $eps = (($partial[$i]==0||abs($partial[$i])>1)?1E-12:(abs($partial[$i])*1E-12));
 			if ($abstol) {
-				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+				if (abs($stu-$partial[$i]) < $tol + $eps) { $match = $i; break;}
 			} else {
-				if (abs($stu - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+				if (abs($stu - $partial[$i])/(abs($partial[$i])+$eps) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
 		if ($match>-1 && isset($fbtxt[$match/2])) {
@@ -4411,10 +4412,11 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
+            $eps = (($partial[$i]==0||abs($partial[$i])>1)?1E-12:(abs($partial[$i])*1E-12));
 			if ($abstol) {
-				if (abs($stunum-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+				if (abs($stunum-$partial[$i]) < $tol + $eps) { $match = $i; break;}
 			} else {
-				if (abs($stunum - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+				if (abs($stunum - $partial[$i])/(abs($partial[$i])+$eps) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
 		if ($match>-1) {
