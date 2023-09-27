@@ -389,6 +389,7 @@ class NTupleScorePart implements ScorePart
                         'rb' => $str[$i],
                         'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
                     );
+                    $thisTuple['vals'] = array_map("trim", $thisTuple['vals']);
                     $lastend = $i;
                     if ($do_eval) {
                         for ($j=0; $j < count($thisTuple['vals']); $j++) {
