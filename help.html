@@ -3019,7 +3019,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	the correct answer.  To override the tolerance use +- in the setting, like this:
 	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
 	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $reltolerance = .01)</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "units", "nosoln", or "nosolninf"</dt>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "set", "integer, "units", "nosoln", or "nosolninf"</dt>
 	<dd>
         <ul>
             <li>Answerformats can be combined, like $answerformat = "nosoln,list"</li>
@@ -3027,6 +3027,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
             <li>If $answerformat="list", then duplicate values are ignored.</li>
             <li>If $answerformat="exactlist", then duplicate values are not ignored.</li>
             <li>If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</li>
+            <li>$answerformat = "set" behaves like "list", but expects the answer list to be wrapped in curly braces as a set.</li>
             <li>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)</li>
             <li>$answerformat = "units" adds unit checking.  Supply the answer like <code>$answer = "3 kg/m^2"</code>.  
                 The student's answer can be in other equivalent units, so "300 cm" is considered equivalent to "3 m".
