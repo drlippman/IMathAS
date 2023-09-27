@@ -44,6 +44,7 @@ if (!(isset($teacherid))) {
 			$showdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 		}
 		$gradestodel = array();
+        $gbitemid = array();
 		foreach ($coltoadd as $col) {
 			if (trim($_POST["colname$col"])=='') {continue;}
 			$name = trim($_POST["colname$col"]);
