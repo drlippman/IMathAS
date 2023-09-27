@@ -46,7 +46,7 @@ function matrix($vals,$rows,$cols) {
 //matrixformat(matrix)
 //Formats a matrix item into an ASCIIMath string for display or $answer
 function matrixformat($m, $bracket='[', $asfraction=false) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixformat input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixformat input not a valid matrix'; } return '';}
 	if ($bracket == '(') {
 		$rb = ')';
 	} else if ($bracket == '|') {
@@ -398,7 +398,7 @@ function matrixdisplaytable() {
 //variables is optional array of variables to use
 //leftbracket determines if left bracket is shown (def true)
 function matrixsystemdisp($m,$v=null,$leftbracket=true) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsystemdisp input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixsystemdisp input not a valid matrix'; } return '';}
 
 	if ($leftbracket) {
 		$out = '{';
@@ -460,7 +460,7 @@ function matrixsystemdisp($m,$v=null,$leftbracket=true) {
 //get entry from a matrix at given row and col
 //rows and cols are 0 indexed (first row is row 0)
 function matrixgetentry($m,$r,$c) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetentry input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetentry input not a valid matrix'; } return '';}
 	if ($r<0 || $c<0 || $r>=count($m) || $c>=count($m[0])) {
 		echo 'invalid row or column';
 		return 0;
@@ -474,7 +474,7 @@ function matrixgetentry($m,$r,$c) {
 //  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
 function matrixgetrow($m,$r, $asArray=false) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetrow input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetrow input not a valid matrix'; } return '';}
 	if ($r<0 || $r>=count($m)) {
 		echo 'invalid row';
 	} else {
@@ -491,7 +491,7 @@ function matrixgetrow($m,$r, $asArray=false) {
 //  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
 function matrixgetcol($m,$c, $asArray=false) {
-	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetcol input not a matrix'; } return '';}
+	if (!isMatrix($m)) { if ($GLOBALS['myrights']>10) { echo 'error: matrixgetcol input not a valid matrix'; } return '';}
 	if ($c<0 || $c>=count($m[0])) {
 		echo 'invalid col';
 	} else {
