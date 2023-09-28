@@ -1695,6 +1695,8 @@ function processNumfunc(qn, fullstr, format) {
             }
         } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length>1) {
             err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
+        } else if (totesteqn.match(/(^(<|>|!))|(=|>|<)$/)) {
+            err += _("syntax error: your inequality should have expressions on both sides")+ '. ';
         }
         totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>|!=)(.*)/,"$1-($3)");
     } else if (totesteqn.match(/=/)) {
@@ -1704,6 +1706,8 @@ function processNumfunc(qn, fullstr, format) {
             err += _("syntax error: you gave an equation, not an expression")+ '. ';
         } else if (totesteqn.match(/=/g).length>1) {
             err += _("syntax error: your equation should only contain one equal sign")+ '. ';
+        } else if (totesteqn.match(/(^=)|(=$)/)) {
+            err += _("syntax error: your equation should have expressions on both sides")+ '. ';
         }
         totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
     } else if (iseqn && isineq) {
