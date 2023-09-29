@@ -585,7 +585,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
 		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
 		//images_upload_credentials: true,
-		paste_data_images: true,
+		paste_data_images: false,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
 		branding: false,
