@@ -556,6 +556,19 @@ class AssessRecord
   }
 
   /**
+   * Determine if they've started the current version yet
+   * * @return boolean true if they've started
+   */
+  public function hasStartedAssess() {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return false;
+    }
+    $aver = $this->getAssessVer('last');
+    return ($aver['starttime'] > 0);
+  }
+
+  /**
    * Update the LTI sourcedid if needed
    * @param  string $sourcedid  The full IMathAS-format sourcedid
    * @return void
@@ -676,7 +689,7 @@ class AssessRecord
         $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
       } else if (!$active && $submitby == 'by_assessment') {
         // for by-assess, set "accept work after" status on end
-        if ($accept_work_after) {
+        if ($accept_work_after && $this->data['assess_versions'][$lastver]['starttime'] > 0) {
           $this->assessRecord['status'] |= 128;
         } else {
           $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
