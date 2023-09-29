@@ -1822,7 +1822,7 @@ function sortarray($a) {
 		$dir = func_get_arg(1);
 	}
 	if (isset($dir) && $dir=="rev") {
-		if (is_numeric($a[0])) {
+		if (isset($a[0]) && is_numeric($a[0])) {
 			rsort($a, SORT_NUMERIC);
 		} else {
 			rsort($a);
