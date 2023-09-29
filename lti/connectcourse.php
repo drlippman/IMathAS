@@ -57,7 +57,7 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
   require_once '../header.php';
 
   echo '<form method=post action="setupcourse.php">';
-  echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDsiplay($launch->get_launch_id()).'"/>';
+  echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
   echo '<h1>'._('Establish Course Connection').'</h1>';
   echo '<p>'.sprintf(_('Your LMS course is not yet linked with a course on %s.'),$installname).'</p>';
 
