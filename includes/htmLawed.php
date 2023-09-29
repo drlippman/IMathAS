@@ -8,8 +8,19 @@ function convertdatauris($in) {
 	global $CFG,$userid;
 	$okext = array('jpeg'=>'.jpg','gif'=>'.gif','png'=>'.png');
 	if (strpos($in,'data:image')===false) {return $in;}
-	$in = preg_replace('/<img[^>]*src="data:image[^>]*$/','',$in);
-    if ($in === null) { error_log('preg error in convertdatauris:' . preg_last_error()); return $orig; }
+	//this seems to be failing, so replace with search approach
+    // $in = preg_replace('/<img[^>]*src="data:image[^>]*$/','',$in);
+    // if ($in === null) { error_log('preg error in convertdatauris:' . preg_last_error()); return $orig; }
+    $p = strrpos($in, 'src="data:image');
+    if ($p !== false) {
+        $ps = strrpos($in,'<img',$p-strlen($in));
+        if ($ps !== false) {
+            $p2 = strpos($in, '>', $p);
+            if ($p2 === false) {
+                $in = substr($in,0,$ps);
+            }
+        }
+    }
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		preg_match_all('/<img[^>]*src="(data:image\/(\w+);base64,([^"]*))"/',$in,$matches);
 		$milliseconds = round(microtime(true) * 1000);
@@ -21,11 +32,23 @@ function convertdatauris($in) {
 			storecontenttofile($img,$key,"public");
 			$in = str_replace($matches[1][$k],getuserfileurl($key),$in);
 		}	
-		return $in;
-	} else {
-		$in = preg_replace('/<img[^>]*src="data:image[^>]*>/','',$in);
-	}
-	return $in;
+	} 
+    return stripdataimage($in);
+}
+
+function stripdataimage($in) {
+    $poff = 0;
+    while ($poff<strlen($in) && ($p = strpos($in,'src="data:image',$poff)) !== false) {
+        $poff = $p+1;
+        $ps = strrpos($in,'<img',$p-strlen($in));
+        if ($ps !== false) {
+            $p2 = strpos($in, '>', $p);
+            if ($p2 !== false) {
+                $in = substr($in,0,$ps).substr($in,$p2+1);
+            }
+        }
+    }
+    return $in;
 }
 
 function myhtmLawed($t, $NC=1, $NS='') {
