@@ -307,6 +307,7 @@ class DrawingScorePart implements ScorePart
                     $leftrightdir = $function[1][0];
                     array_pop($function);
                 }
+
                 //curves: function
                 //    function, xmin, xmax
                 //dot:  x,y
@@ -372,14 +373,18 @@ class DrawingScorePart implements ScorePart
                         $xp = $xtopix(substr($function[0],2));
                         if (count($function)==3) { //line segment or ray
                             if ($function[1]=='-oo') { //ray down
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix(floatval($function[2])-1);
                                 $y2p = $ytopix(floatval($function[2]));
                                 $ansvecs[$key] = array('r', $xp, $y2p, $xp, $y1p);
                             } else if ($function[2]=='oo') { //ray up
+                                $function[1] = evalbasic($function[1],true);
                                 $y1p = $ytopix(floatval($function[1]));
                                 $y2p = $ytopix(floatval($function[1])+1);
                                 $ansvecs[$key] = array('r', $xp, $y1p, $xp, $y2p);
                             } else { //line seg
+                                $function[1] = evalbasic($function[1],true);
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix(floatval($function[1]));
                                 $y2p = $ytopix(floatval($function[2]));
                                 $ansvecs[$key] = array('ls', $xp, $y1p, $xp, $y2p);
@@ -638,14 +643,18 @@ class DrawingScorePart implements ScorePart
                         //colinear
                         if (count($function)==3) { //line segment or ray
                             if ($function[1]=='-oo') { //ray to left
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
                                 $y2p = $ytopix($func(['x'=>floatval($function[2])]));
                                 $ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
                             } else if ($function[2]=='oo') { //ray to right
+                                $function[1] = evalbasic($function[1],true);
                                 $y1p = $ytopix($func(['x'=>floatval($function[1])]));
                                 $y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
                                 $ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
                             } else { //line seg
+                                $function[1] = evalbasic($function[1],true);
+                                $function[2] = evalbasic($function[2],true);
                                 if ($function[1]>$function[2]) {  //if xmin>xmax, swap
                                     $tmp = $function[2];
                                     $function[2] = $function[1];
