@@ -36,7 +36,7 @@ if (!(isset($teacherid))) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$useridarr[$row[1]] = $row[0];
 		}
-		$coltoadd = intval($_POST['addcol']);
+		$coltoadd = $_POST['addcol'];
 		require_once "../includes/parsedatetime.php";
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
@@ -46,6 +46,7 @@ if (!(isset($teacherid))) {
 		$gradestodel = array();
         $gbitemid = array();
 		foreach ($coltoadd as $col) {
+            $col = intval($col);
 			if (trim($_POST["colname$col"])=='') {continue;}
 			$name = trim($_POST["colname$col"]);
 			$pts = intval($_POST["colpts$col"]);
@@ -194,6 +195,7 @@ if (!(isset($teacherid))) {
 		if (!isset($usernamecol)) {
 			$usernamecol = 1;
 		}
+        $showdate = 0;
 	}
 
     $curBreadcrumb = $breadcrumbbase;
