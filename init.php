@@ -49,7 +49,10 @@ function disallowsSameSiteNone () {
 }
 }
 if (isset($sessionpath)) { session_save_path($sessionpath);}
-ini_set('session.gc_maxlifetime',432000);
+ini_set('session.gc_maxlifetime', $CFG['GEN']['sessionmaxlife'] ?? 432000);
+if (isset($CFG['GEN']['gc_divisor'])) {
+    ini_set('session.gc_divisor', $CFG['GEN']['gc_divisor']);
+}
 
 $hostdomain = explode(':', Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
 $hostparts = explode('.', $hostdomain[0]);

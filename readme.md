@@ -12,7 +12,7 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ### Requirements
 IMathAS is designed for simple installation with minimal requirements.  The system
-requires PHP 7.2+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+requires PHP 7.4+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
 - mbstring (required)
 - pdo_mysql (required)
 - gettext (required)
@@ -107,6 +107,8 @@ where days is the number of days since last login to consider old, and userid is
 to the new assessment interface.
 - `$CFG['reqadminmfa']`: Require admins to enable two-factor authentication.
 - `$CFG['logquestionerrors']`: Enable logging of question errors.
+- `$CFG['GEN']['sessionmaxlife']`: Overrides session.gc_maxlifetime.
+- `$CFG['GEN']['gc_divisor']`: Overrides session.gc_divisor.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
