@@ -1583,7 +1583,7 @@ function matrixCompare($m,$n,$tol='.001') {
 		return false;
 	}
 	$toltype = 'rel';
-	if ($tol[0]=='|') {
+	if (strval($tol)[0]=='|') {
 		$toltype = 'abs';
 		$tol = substr($tol,1);
 	}
