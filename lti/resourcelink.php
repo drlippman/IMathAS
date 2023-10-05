@@ -53,6 +53,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         }
         if ($destaid === false) {
           // can't find assessment - copy it
+          $GLOBALS['datesbylti'] = $localcourse->get_dates_by_lti();
           require_once __DIR__.'/../includes/copycourse.php';
           $destaid = copyassess($sourceaid, $destcid);
         }
