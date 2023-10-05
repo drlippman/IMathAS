@@ -674,7 +674,7 @@ if ($myrights<20) {
 				$searchlikes = "imas_questionset.broken=1 AND ";
 			} else if (substr($safesearch,0,7)=='childof') {
         $searchlikes = "imas_questionset.ancestors REGEXP ? AND ";
-        $searchlikevals[] = '[[:<:]]'.substr($safesearch,8).'[[:>:]]';
+        $searchlikevals[] = MYSQL_LEFT_WRDBND.substr($safesearch,8).MYSQL_RIGHT_WRDBND;
 
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";

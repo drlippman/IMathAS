@@ -102,7 +102,7 @@ if (isset($_POST['updatecaption'])) {
 	if ($captioned==1) {
 		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
-		$stm->execute(array('[[:<:]]'.$vidid.'[[:>:]]'));
+		$stm->execute(array(MYSQL_LEFT_WRDBND.$vidid.MYSQL_RIGHT_WRDBND));
 		$chg = 0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$parts = explode('~~', $row[1]);
