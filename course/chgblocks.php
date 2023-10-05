@@ -95,6 +95,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_POST['chggreyout'])) {
 		$sets['SH'][2] = $_POST['contentbehavior'];
 	}
+    if (isset($_POST['chgshowhide']) || isset($_POST['chgavailbeh']) || isset($_POST['chggreyout'])) {
+		$sets['SH'] = implode('', $sets['SH']);
+	}
     if (isset($_POST['chginnav'])) {
 		$sets['innav'] = !empty($_POST['innav']) ? 1 : 0;
 	}
