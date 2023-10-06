@@ -15,7 +15,7 @@ if (isset($_POST['mergefrom'])) {
 			$seta[$n - 1] = $aid;
 		}
 	}
-	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,LPcutoff,';
+	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,date_by_lti,LPcutoff,';
 	$fieldstocopy .= 'timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,';
 	$fieldstocopy .= 'defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,';
 	$fieldstocopy .= 'allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,';
