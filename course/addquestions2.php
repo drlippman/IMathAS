@@ -554,7 +554,7 @@ if ($overwriteBody==1) {
     echo '<li>',_('If you choose <b>All Libraries</b>, you must provide a search term then click Search. '),'</li></ul>';
 
     echo "<p>",_("To select questions and add them:"),"</p><ul>";
-    echo " <li>",_("Click the eye-shaped <b>Preview</b> icon to view an example of the question"),"</li>";
+    echo " <li>",_("Click the <b>Preview</b> button to view an example of the question"),"</li>";
     echo " <li>",_("Use the checkboxes to mark the questions you want to use"),"</li>";
     echo " <li>",_("Click the <b>Add</b> button to add the questions to your assessment"),"</li> ";
     echo "  </ul>";
