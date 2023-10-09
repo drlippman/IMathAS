@@ -5644,8 +5644,8 @@ function comparelogic($a,$b,$vars) {
     }
     $varlist = implode(',', $vars);
 
-	$keywords = ['and', '^^', 'xor', 'oplus', 'or', 'vv', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
-	$replace = 	['#a',  '#a', '#x',  '#x',    '#o', '#o', '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
+	$keywords = ['\\', 'and', '^^', 'wedge', 'xor', 'oplus', 'or', 'vv', 'vee', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
+	$replace = 	['',   '#a',  '#a', '#a',    '#x',  '#x',    '#o', '#o', '#o',  '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
     $a = str_replace($keywords,$replace,$a);
     $b = str_replace($keywords,$replace,$b);
 
