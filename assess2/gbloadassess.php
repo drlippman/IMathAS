@@ -109,7 +109,7 @@ if (!$assess_record->hasRecord()) {
     if ($isGroup > 0) {
       $groupsetid = $assess_info->getSetting('groupsetid');
       list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
-      if ($stugroup == 0) {
+      if ($stugroupid == 0) {
         if ($isGroup == 3) {
             if ($stugroupid == 0 || count($current_members) == 0) {
                 // no group yet - can't do anything
