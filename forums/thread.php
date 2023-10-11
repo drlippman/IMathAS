@@ -698,7 +698,7 @@ echo "</p>";
 				$query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
 			}
 			if ($sortby==0) {
-				$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
+				$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.postdate DESC ";
 			} else if ($sortby==1) {
 				$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_threads.lastposttime DESC ";
 			}
