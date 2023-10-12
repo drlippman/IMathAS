@@ -578,6 +578,9 @@ function calculateIntersection($x1, $x2, $isOpenX1, $isOpenX2, $y1, $y2, $isOpen
 
 function traverseUnion($border_left, $border_right, $isOpenLeft, $isOpenRight) {
   $y1 = array();
+  $y2=array();
+  $isOpenY1=array();
+  $isOpenY2=array();
 
   for($i=0; $i<count($border_left); $i++) {
     $inskip = false;
