@@ -93,6 +93,14 @@ class CalculatedMatrixScorePart implements ScorePart
             }
             $N = substr_count($answer,'),(')+1;
             */
+
+            //this may not be backwards compatible
+            $scorePartResult->setLastAnswerAsGiven($givenans);
+            if ($givenanslist === false) { // invalid answer
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
+
             if ($hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
             } else {
@@ -102,7 +110,6 @@ class CalculatedMatrixScorePart implements ScorePart
             }
             
             //this may not be backwards compatible
-            $scorePartResult->setLastAnswerAsGiven($givenans);
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
         /*
