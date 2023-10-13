@@ -1513,7 +1513,7 @@ function processCalcComplex(fullstr, format) {
         err += singlevalsyntaxcheck(cparts[0], format);
         err += singlevalsyntaxcheck(cparts[1], format);
       }
-    }
+    } 
     err += syntaxcheckexpr(str, format);
     prep = prepWithMath(mathjs(str,'i'));
     real = scopedeval('var i=0;'+prep);
@@ -1747,7 +1747,7 @@ function processNumfunc(qn, fullstr, format) {
           err += _("syntax error") + '. ';
       }
     }
-    err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
+    err += syntaxcheckexpr(strprocess[0], format + ',isnumfunc', vars.map(escapeRegExp).join('|'));
   }
   return {
     err: err
@@ -1986,9 +1986,7 @@ function singlevalsyntaxcheck(str,format) {
 		}
 	} else if (!onlyAscii.test(str)) {
 		return _("Your answer contains an unrecognized symbol")+". ";
-  	} else if (str.match(/=/)) {
-        return _("You gave an equation, not an expression")+ '. ';
-    }
+  	} 
 	return '';
 }
 
@@ -2053,6 +2051,9 @@ function syntaxcheckexpr(str,format,vl) {
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
 	  }
+      if (str.match(/=/) && !format.match(/isnumfunc/)) {
+        err += _("You gave an equation, not an expression")+ '. ';
+      }
 
 	  return err;
 }
