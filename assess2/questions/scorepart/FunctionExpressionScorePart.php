@@ -67,6 +67,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         if (empty($variables)) { $variables = "x";}
         list($variables, $tps, $flist) = numfuncGenerateTestpoints($variables, $domain);
+
         $givenans = numfuncPrepForEval($givenans, $variables);
         $answer = numfuncPrepForEval($answer, $variables);
 
@@ -402,7 +403,7 @@ class FunctionExpressionScorePart implements ScorePart
                     }
 
                     if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
-                        echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
+                        echo _('Debug info: function evaled to Not-a-number at all test points.  Check $domain');
                     }
                     if ($stunan>1) { //if more than 1 student NaN response
                         $correct = false; continue;
@@ -446,7 +447,7 @@ class FunctionExpressionScorePart implements ScorePart
                         } else {
                             $correct = false;
                         }
-                    } else if (!$isComplex && in_array('toconst',$ansformats)) {
+                    } else if (!$isComplex && in_array('toconst',$ansformats) && count($diffs)>0) {
                         if ($abstolerance !== '') {
                             //if abs, use mean diff - will minimize error in abs diffs
                             $meandiff = array_sum($diffs)/count($diffs);
