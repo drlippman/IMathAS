@@ -625,12 +625,23 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 // fill (optional) = the fill color of the bins; default is blue
 // stroke (optional) = the color of the bin line; default is black
 
-function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200,$showgrid=true,$fill='blue',$stroke='black') {
+function fdhistogram($freq,$label,$start,$cw,$labelstart=false,$upper=false,$width=300,$height=200,$showgrid=true,$fill='blue',$stroke='black') {
 	if (!is_array($freq)) {echo "freqarray must be an array"; return 0;}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
-	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
+    $vertlabel = 'Frequency';
+    if (is_array($labelstart)) {
+        $opts = $labelstart;
+        $labelstart = false;
+        foreach (['labelstart','upper','width','height','showgrid','fill','stroke','vertlabel'] as $v) {
+            if (isset($opts[$v])) {
+                ${$v} = $opts[$v];
+            }
+        }
+    }
+	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
+    
 	if ($upper===false) {
 		$dx = $cw;
 		$dxdiff = 0;
@@ -665,12 +676,12 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	}
 	
 	
-	if ($startlabel===false) {
+	if ($labelstart===false) {
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
-		$startlabel = $start;
+		$labelstart = $start;
 	} //else {
-		$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
-		$x = $startlabel;
+		$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\";";
+		$x = $labelstart;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
 		for ($curr=0; $curr<count($freq)+1; $curr++) {
@@ -680,7 +691,8 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	//}
 	//$outst .= "text([".($start-.1*($x-$start)).",".(.5*$maxfreq)."],\"Freq\",,90)";
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
-	$outst .= "textabs([0,". ($height/2+15)  ."],\"Frequency\",\"right\",90);";
+
+	$outst .= "textabs([". ($width/2+15)  .",0],\"$label\",\"above\");textabs([0,". ($height/2+15)  ."],\"$vertlabel\",\"right\",90);";
 	$outst .= $st;
 	return showasciisvg($outst,$width,$height);
 }

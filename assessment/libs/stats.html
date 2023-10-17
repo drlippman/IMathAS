@@ -189,6 +189,9 @@ fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height,showgrid,fil
 <BR>&nbsp;showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
 <BR>&nbsp;fill (optional) = the fill color of the bins; default is blue
 <BR>&nbsp;stroke (optional) = the line color of the bins; default is black
+<p>To fill in only some optional parameters, the 5th argument can instead be an associate array 
+ of values to fill in, like ['width'=>500, 'fill'=>'blue'].  When used this way, 'vertlabel' can 
+ be used to change the vertical axis label.</p>
 <BR><h3><a name="fdbargraph">fdbargraph</a></h3>
 fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>barlabels: array of labels for the bars
