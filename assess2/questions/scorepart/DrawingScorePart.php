@@ -1753,7 +1753,11 @@ class DrawingScorePart implements ScorePart
                     $dots[$k] = explode(',',$pt);
                 }
                 //remove duplicate dots
-                for ($k=count($dots)-1;$k>0;$k--) {
+                for ($k=count($dots)-1;$k>=0;$k--) {
+                    if (!is_nicenumber($dots[$k][0]) || !is_nicenumber($dots[$k][1])) {
+                        unset($dots[$k]);
+                        continue;
+                    }
                     for ($j=0;$j<$k;$j++) {
                         if (abs($dots[$k][0]-$dots[$j][0])<$defpttol && abs($dots[$k][1]==$dots[$j][1])<$defpttol) {
                             unset($dots[$k]);
@@ -1772,22 +1776,25 @@ class DrawingScorePart implements ScorePart
                 }
                 //remove duplicate odots, and dots below odots
                 for ($k=count($odots)-1;$k>=0;$k--) {
+                    if (!is_nicenumber($odots[$k][0]) || !is_nicenumber($odots[$k][1])) {
+                        unset($odots[$k]);
+                        continue;
+                    }
                     foreach ($dots as $j=>$thisdot) {
-                        if (abs($odots[$k][0]-$thisdot[0])<$defpttol && abs($odots[$k][1]==$thisdot[1])<$defpttol) {
+                        if (abs($odots[$k][0]-$thisdot[0])<$defpttol && abs($odots[$k][1]-$thisdot[1])<$defpttol) {
                             unset($dots[$j]);
                             break;
                         }
                     }
                     for ($j=0;$j<$k;$j++) {
                         if (!isset($odots[$j])) { continue; }
-                        if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]==$odots[$j][1])<$defpttol) {
+                        if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]-$odots[$j][1])<$defpttol) {
                             unset($odots[$k]);
                             continue 2;
                         }
                     }
                 }
             }
-
             $scores = array();
             if ((count($dots)+count($odots))==0) {
                 $extradots = 0;
