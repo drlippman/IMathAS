@@ -662,13 +662,14 @@ function setupLivePreview(qn, skipinitial) {
 
 			  RenderNow: function(text) {
 				  //called by preview button
-			      this.buffer.innerHTML = this.oldtext = text;
+                  this.oldtext = text;
+			      this.buffer.innerHTML = this.preformat(text);
 			      this.mjRunning = true;
 			      this.RenderBuffer();
 			  },
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
-                      if (MathJax.typesetPromise) {
+                      if (MathJax.typesetPromise && this.mjPromise) {
                         this.mjPromise = this.mjPromise.then(function () {
                             //MathJax.typesetClear([this.buffer]);
                             MathJax.typesetPromise([this.buffer]).then(this.PreviewDone.bind(this));
@@ -713,7 +714,7 @@ function setupLivePreview(qn, skipinitial) {
                   }
 			    } else {
 			      this.oldtext = text;
-			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
+			      this.buffer.innerHTML = "`"+htmlEntities(this.preformat(text))+"`";
 			      this.mjRunning = true;
 			      this.RenderBuffer();
 			    }
@@ -746,7 +747,7 @@ function setupLivePreview(qn, skipinitial) {
 
 				  RenderNow: function(text) {
 				      var outnode = document.getElementById("p"+qn);
-				      outnode.innerHTML = text;
+				      outnode.innerHTML = htmlEntities(text);
 				      rendermathnode(outnode);
 				  },
 

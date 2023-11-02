@@ -1566,11 +1566,11 @@ function initSageCell(base) {
 		sagecellcounter++;
 		var url = imasroot+'/assessment/libs/sagecellframe.html?frame_id='+frame_id;
 		url += '&code='+encodeURIComponent(code);
-		for (dattribute of ['lang', 'hide', 'autoeval']){
-          if ($this[0].hasAttribute(`data-${dattribute}`)) {
-            url += '&' + dattribute + '=' + encodeURIComponent($this.attr(`data-${dattribute}`));
-		  }
-        }
+        ['lang', 'hide', 'autoeval'].forEach(function(dattribute) {
+            if ($this[0].hasAttribute('data-'+dattribute)) {
+                url += '&' + dattribute + '=' + encodeURIComponent($this.attr('data-'+dattribute));
+            }
+        });
 		var returnid = null;
 		if (typeof jQuery(ta).attr("id") != "undefined") {
 			url += '&update_id='+jQuery(ta).attr("id");
