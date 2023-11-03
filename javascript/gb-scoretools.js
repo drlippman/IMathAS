@@ -174,6 +174,7 @@ function clearfeedback() {
 			els[i].value = '';
 		}
 	}
+    $("div.fbbox").empty();
 }
 function cleardeffeedback() {
 	var els=document.getElementsByTagName("textarea");
@@ -182,6 +183,11 @@ function cleardeffeedback() {
 			els[i].value = '';
 		}
 	}
+    $("div.fbbox").each(function(i,el) {
+        if (el.innerHTML==GBdeffbtext) {
+            $(el).empty();
+        }
+    });
 }
 
 function showgraphtip(el, la, init) {
