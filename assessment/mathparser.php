@@ -524,7 +524,7 @@ class MathParser
               }
             } else if ($nextSymbol == 'root') {
               // found a root.  Parse the index
-              if (preg_match('/^[\(\[]?(-?\d+)[\)\]]?/', substr($str,$n+1), $sub)) {
+              if (preg_match('/^[\(\[]*(-?\d+)[\)\]]*/', substr($str,$n+1), $sub)) {
                 // replace the last node with an nthroot node
                 $tokens[count($tokens)-1] = [
                   'type' => 'function',

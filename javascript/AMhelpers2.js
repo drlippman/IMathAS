@@ -788,6 +788,8 @@ function normalizemathunicode(str) {
 	str = str.replace(/Ω/g,"Omega").replace(/Γ/g,"Gamma").replace(/Φ/g,"Phi").replace(/Δ/g,"Delta").replace(/Σ/g,"Sigma");
     str = str.replace(/&(ZeroWidthSpace|nbsp);/g, ' ').replace(/\u200B/g, ' ');
     str = str.replace(/degree\s+s\b/g,'degree');
+    // remove extra parens on numbers, like roots and logs
+    str = str.replace(/\(\((-?\d+)\)\)/g, '($1)');
 	return str;
 }
 
@@ -958,6 +960,7 @@ function processByType(qn) {
       return false;
     }
     var str = el.value;
+
     str = normalizemathunicode(str);
     str = str.replace(/^\s+/,'').replace(/\s+$/,'');
     if (str.match(/^\s*$/)) {
