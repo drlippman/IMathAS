@@ -287,12 +287,13 @@ require_once "includes/sanitize.php";
             $_SESSION['challenge'] = '';
             unset($_SESSION['resetpwstart']);
 
-			$query = "SELECT id,email,rights,lastemail FROM imas_users WHERE SID=:sid";
+			$query = "SELECT id,email,rights,jsondata FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':sid'=>$_POST['username']));
 			if ($stm->rowCount()>0) {
-				list($id,$email,$rights,$lastemail) = $stm->fetch(PDO::FETCH_NUM);
-				if (time() - $lastemail < 60) {
+				list($id,$email,$rights,$jsondata) = $stm->fetch(PDO::FETCH_NUM);
+                $jsondata = json_decode($jsondata,true);
+				if (isset($jsondata['lastemail']) && time() - $jsondata['lastemail'] < 60) {
 					echo 'Please wait and try again';
 					exit;
 				}
@@ -312,21 +313,23 @@ require_once "includes/sanitize.php";
 					exit;
 				}
 
-				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-				$code = '';
-				for ($i=0;$i<10;$i++) {
-					$code .= substr($chars,rand(0,61),1);
-				}
-
-				$query = "UPDATE imas_users SET remoteaccess=:code,lastemail=:now WHERE id=:id";
+                if (is_array($jsondata)) {
+                    $jsondata['lastemail'] = time();
+                } else {
+                    $jsondata = ['lastemail' => time()];
+                }
+				$query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':code'=>$code, ':now'=>time(), ':id'=>$id));
+				$stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$id));
+
+                require_once './includes/passwordreset.php';
+                $code = make_pwreset_link($id);
 
 				$message  = "<h3>".sprintf(_('This is an automated message from %s. Do not respond to this email'),$installname)."</h3>\r\n";
 				$message .= "<p>"._('Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ');
 				$message .= _("If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You will then be prompted to choose a new password.")."</p>";
-				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code\">";
-				$message .= $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code</a>\r\n";
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&code=$code\">";
+				$message .= $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&code=$code</a>\r\n";
 
 				require_once "./includes/email.php";
 				send_email($email, $sendfrom, $installname._(' Password Reset Request'), $message, array(), array(), 10);
@@ -353,32 +356,27 @@ require_once "includes/sanitize.php";
 				exit;
 			}
 
-			$query = "SELECT remoteaccess FROM imas_users WHERE id=:id";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':id'=>$_POST['id']));
-			if ($stm->rowCount() > 0) {
-				$row = $stm->fetch(PDO::FETCH_ASSOC);
-				if ($row['remoteaccess']!='' && $row['remoteaccess']===$_POST['code']) {
-					if (isset($CFG['GEN']['newpasswords'])) {
-						$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-					} else {
-						$newpw = md5($_POST['pw1']);
-					}
+            require_once './includes/passwordreset.php';
+            $linkdata = verify_pwreset_link($_POST['code']);
 
-					$query = "UPDATE imas_users SET password=:newpw,remoteaccess='' WHERE id=:id LIMIT 1";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':id'=>$_POST['id'], ':newpw'=>$newpw));
-					echo _("Password Reset"),".  ";
-					echo "<a href=\"index.php\">",_("Login with your new password"),"</a>";
-				} else {
-					echo _('Invalid code');
-				}
-			} else {
-				echo _('Invalid user');
-			}
+			if (isset($linkdata['uid'])) {
+                if (isset($CFG['GEN']['newpasswords'])) {
+                    $newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+                } else {
+                    $newpw = md5($_POST['pw1']);
+                }
+
+                $query = "UPDATE imas_users SET password=:newpw WHERE id=:id LIMIT 1";
+                $stm = $DBH->prepare($query);
+                $stm->execute(array(':id'=>$linkdata['uid'], ':newpw'=>$newpw));
+                echo _("Password Reset"),".  ";
+                echo "<a href=\"index.php\">",_("Login with your new password"),"</a>";
+            } else {
+                echo _('Invalid code');
+            }
 		} else if (isset($_GET['code'])) {
 			//moved to forms.php - keep redirect for to keep old links working for now.
-			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($_GET['code']) . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=resetpw&code='.Sanitize::encodeUrlParam($_GET['code']) . "&r=" . Sanitize::randomQueryStringParam());
 		}
         exit;
 	} else if (isset($_GET['action']) && $_GET['action']=="lookupusername") {
@@ -397,7 +395,7 @@ require_once "includes/sanitize.php";
         $_SESSION['challenge'] = '';
         unset($_SESSION['lookupusernamestart']);
 
-		$query = "SELECT id,SID,lastaccess,lastemail FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
+		$query = "SELECT id,SID,lastaccess,jsondata FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':email'=>$_POST['email']));
 		if ($stm->rowCount() > 0) {
@@ -407,7 +405,8 @@ require_once "includes/sanitize.php";
 			$message .= _("All usernames using this email address are listed below")."</p><p>";
 			$ids = array();
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				if (time() - $row['lastemail'] < 60) {
+                $jsondata = json_decode($row['jsondata'],true);
+				if (isset($jsondata['lastemail']) && time() - $jsondata['lastemail'] < 60) {
 					echo 'Please wait and try again';
 					exit;
 				}
@@ -418,16 +417,22 @@ require_once "includes/sanitize.php";
 					$lastlogin = date("n/j/y g:ia",$row['lastaccess']);
 				}
 				$message .= _("Username").": <b>{$row['SID']}</b>.  "._("Last logged in").": $lastlogin<br/>";
+
+                if (is_array($jsondata)) {
+                    $jsondata['lastemail'] = time();
+                } else {
+                    $jsondata = ['lastemail' => time()];
+                }
+                $query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
+                $stm = $DBH->prepare($query);
+                $stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$row['id']));
 			}
 			$message .= "</p><p>"._("If you forgot your password, use the Lost Password link at the login page.")."</p>";
 
 			require_once "./includes/email.php";
 			send_email($_POST['email'], $sendfrom, $installname._(' Username Request'), $message, array(), array(), 10);
 			echo $cnt . _(" usernames match this email address and were emailed"),".  <a href=\"index.php\">",_("Return to login page"),"</a>";
-
-			$ids = implode(',', $ids); // database values, so safe
-			$stm = $DBH->prepare("UPDATE imas_users SET lastemail=? WHERE id IN ($ids)");
-			$stm->execute(array(time()));
+            
 		} else {
 
 			$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID LIKE 'lti-%'";
@@ -464,9 +469,22 @@ require_once "includes/sanitize.php";
 		}
 		session_destroy();
 	} else if (isset($_GET['action']) && ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd")) {
-		$stm = $DBH->prepare("SELECT password,email,lastemail FROM imas_users WHERE id=:uid");
+		$stm = $DBH->prepare("SELECT password,email,jsondata,mfa FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
+        if ($line['mfa'] !== '') {
+            $mfadata = json_decode($line['mfa'], true);
+            require_once 'includes/GoogleAuthenticator.php';
+            $MFA = new GoogleAuthenticator();
+
+            if (!$MFA->verifyCode($mfadata['secret'], $_POST['mfa'])) {
+                // MFA ok
+                require_once "header.php";
+                echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chgpwd$gb\">Try Again</a>\n";
+                require_once "footer.php";
+                exit;
+            }
+        }
 		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
 			if (isset($CFG['GEN']['newpasswords'])) {
 				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
@@ -476,7 +494,8 @@ require_once "includes/sanitize.php";
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 
-			if ($_GET['action']=="chgpwd" && time() - $line['lastemail'] > 60) {
+            $jsondata = json_decode($jsondata,true);
+			if ($_GET['action']=="chgpwd") {
 				require_once "./includes/email.php";
 				$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
 				$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
@@ -484,18 +503,11 @@ require_once "includes/sanitize.php";
 				$message .= '</p><p>'._('If this was you, you can disregard this email.').' ';
 				$message .= _('If you did not make these changes, please log into your account and correct the changes and change your password.').' ';
 
-				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-				$code = '';
-				for ($i=0;$i<10;$i++) {
-					$code .= substr($chars,rand(0,61),1);
-				}
-
-				$query = "UPDATE imas_users SET remoteaccess=:code,lastemail=:now WHERE id=:id";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':code'=>$code, ':now'=>time(), ':id'=>$userid));
+                require_once './includes/passwordreset.php';
+                $code = make_pwreset_link($userid, true);   
 
 				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
-				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$userid&code=$code\">";
+				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&code=$code\">";
 				$message .= _('Reset Password').'</a></p>';
 
 				send_email($line['email'], $sendfrom,
@@ -503,7 +515,20 @@ require_once "includes/sanitize.php";
 					$message, array(), array(), 10
 				);
 
+                if (is_array($jsondata)) {
+                    $jsondata['lastemail'] = time();
+                } else {
+                    $jsondata = ['lastemail' => time()];
+                }
+                $query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
+                $stm = $DBH->prepare($query);
+                $stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
 			}
+            // record last password update time
+            $query = "UPDATE imas_users SET lastemail=:now WHERE id=:id";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array(':now'=>time(), ':id'=>$userid));
+            $_SESSION['started'] = time()+1;
 		} else {
 			echo "<html><body>",_("Password change failed"),".  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">",_("Try Again"),"</a>\n";
 			echo "</body></html>\n";
@@ -750,9 +775,9 @@ require_once "includes/sanitize.php";
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
-		$stm = $DBH->prepare("SELECT email,lastemail,mfa,password FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT email,jsondata,mfa,password FROM imas_users WHERE id=?");
 		$stm->execute(array($userid));
-        list($old_email,$lastemail,$lastmfa,$oldpw) = $stm->fetch(PDO::FETCH_NUM);
+        list($old_email,$jsondata,$lastmfa,$oldpw) = $stm->fetch(PDO::FETCH_NUM);
 
         if ($lastmfa !== '') {
             $mfadata = json_decode($lastmfa, true);
@@ -857,7 +882,9 @@ require_once "includes/sanitize.php";
 		require_once "includes/userprefs.php";
 		storeUserPrefs();
 
-		if (($pwchanged || trim($old_email) != trim($_POST['email'])) && (time() - $lastemail > 60)) {
+        $jsondata = json_decode($jsondata,true);
+
+		if ($pwchanged || trim($old_email) != trim($_POST['email'])) {
 			require_once "./includes/email.php";
 			$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
 			$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
@@ -870,27 +897,35 @@ require_once "includes/sanitize.php";
 			$message .= '</p><p>'._('If this was you, you can disregard this email.').' ';
 			$message .= _('If you did not make these changes, please log into your account and correct the changes and change your password.').' ';
 
-			if ($pwchanged) {
-				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-				$code = '';
-				for ($i=0;$i<10;$i++) {
-					$code .= substr($chars,rand(0,61),1);
-				}
+            require_once './includes/passwordreset.php';
+            $code = make_pwreset_link($userid, true);  
 
-				$query = "UPDATE imas_users SET remoteaccess=:code,lastemail=:now WHERE id=:id";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':code'=>$code, ':now'=>time(), ':id'=>$userid));
-
-				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
-				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$userid&code=$code\">";
-				$message .= _('Reset Password').'</a></p>';
-			}
+            $message .= _('If you are unable to log into your account, use the following link.'). ' ';
+            $message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&code=$code\">";
+            $message .= _('Reset Password').'</a></p>';
+			
 
 			send_email($old_email, $sendfrom,
 				_('Alert:'). ' '.$installname.' '._('Account Activity'),
 				$message, array(), array(), 10
 			);
 
+            if (is_array($jsondata)) {
+                $jsondata['lastemail'] = time();
+            } else {
+                $jsondata = ['lastemail' => time()];
+            }
+            $query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
+
+            if ($pwchanged) {
+                // record last password update time
+                $query = "UPDATE imas_users SET lastemail=:now WHERE id=:id";
+                $stm = $DBH->prepare($query);
+                $stm->execute(array(':now'=>time(), ':id'=>$userid));
+                $_SESSION['started'] = time()+1;
+            }
 		}
 
 	} else if (isset($_POST['action']) && $_POST['action'] == 'cleartrustedmfa') {
@@ -921,12 +956,7 @@ require_once "includes/sanitize.php";
 		$hidelist = implode(',', $tohide);
 		$stm = $DBH->prepare("UPDATE imas_users SET hideonpostswidget=:hidelist WHERE id= :uid");
 		$stm->execute(array(':uid'=>$userid, ':hidelist'=>$hidelist));
-	} else if (isset($_GET['action']) && $_GET['action']=="googlegadget") {
-		if (isset($_GET['clear'])) {
-			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess='' WHERE id = :uid");
-			$stm->execute(array(':uid'=>$userid));
-		}
-	}
+	} 
 	if ($isgb) {
 		echo '<html><body>',_('Changes Recorded.'),'  <input type="button" onclick="parent.GB_hide()" value="',_('Done'),'" /></body></html>';
 	} else if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {

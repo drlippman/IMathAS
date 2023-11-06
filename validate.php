@@ -292,6 +292,7 @@ if ($haslogin && !$hasusername) {
         // do actual login
         $_SESSION['userid'] = $userid;
         $_SESSION['time'] = $now;
+        $_SESSION['started'] = $now;
         unset($loginmfaverified);
         unset($_SESSION['challenge']); //challenge is used up - forget it.
 
@@ -378,12 +379,19 @@ if ($hasusername) {
 
     $query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
     if (strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
-        $query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset,mfa';
+        $query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset,mfa,lastemail';
     }
     $query .= " FROM imas_users WHERE id=:id";
     $stm = $DBH->prepare($query);
     $stm->execute(array(':id' => $userid));
     $line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line['lastemail'] > ($_SESSION['started'] ?? 0)) {
+        // lastemail actually records last password reset
+        // if password has been reset since session began, force relogin in
+        user_logout();
+        header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php?r=' . Sanitize::randomQueryStringParam());
+        exit;
+    }
     $username = $line['SID'];
     $myrights = $line['rights'];
     if ($myrights == 12) {
@@ -510,7 +518,7 @@ if ($hasusername) {
             setcookie('fromltimenu', '', time() - 3600);
         } else if ($_SESSION['ltiitemtype'] == 0 && $_SESSION['ltirole'] == 'learner') {
             require_once __DIR__ . '/includes/userutils.php';
-            logout();
+            user_logout();
             header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php?r=' . Sanitize::randomQueryStringParam());
             exit;
         }
@@ -817,4 +825,12 @@ function generaterandstring()
         $pass .= substr($chars, rand(0, 61), 1);
     }
     return $pass;
+}
+
+function user_logout() {
+	$_SESSION = array();
+	if (isset($_COOKIE[session_name()])) {
+		setcookie(session_name(), '', time()-42000, '/', '', false, true);
+	}
+	session_destroy();
 }

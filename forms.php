@@ -145,6 +145,10 @@ switch($_GET['action']) {
 		break;
 	case "forcechgpwd":
 	case "chgpwd":
+        $stm = $DBH->prepare("SELECT mfa FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$userid));
+        $mfa = $stm->fetchColumn(0);
+
 		if ($gb == '' && $_GET['action']!='forcechgpwd') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Change Password'),"</div>\n";
 		}
@@ -156,6 +160,9 @@ switch($_GET['action']) {
 			echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=chgpwd$gb\">\n";
 		}
 		echo "<span class=form><label for=\"oldpw\">",_('Enter old password'),":</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
+        if ($mfa !== '') {
+            echo "<span class=form><label for=\"mfa\">",_('Enter 2-factor Authentication code'),":</label></span> <input class=form type=text id=mfa name=mfa size=10 /> <BR class=form>\n";
+        }
 		echo "<span class=form><label for=\"pw1\">",_('Enter new password'),":</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">",_('Verify new password'),":</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
 
@@ -492,13 +499,11 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Reset Password'),'</h1></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
 		if (isset($_GET['code'])) {
-			$userId = Sanitize::onlyInt($_GET['id']);
-			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$userId));
-			$row = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
+            require_once './includes/passwordreset.php';
+            // verify reset code
+            $linkdata = verify_pwreset_link($_GET['code']);
+			if (!empty($linkdata['uid'])) {
 				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';
-				echo '<input type="hidden" name="id" value="'.Sanitize::encodeStringForDisplay($_GET['id']).'"/>';
 				echo '<p>',_('Please select a new password'),':</p>';
 				echo '<p>',_('Enter new password'),':  <input type="password" size="25" id=pw1 name="pw1"/><br/>';
 				echo '<p>',_('Verify new password'),':  <input type="password" size="25" id=pw2 name="pw2"/></p>';
@@ -608,36 +613,7 @@ switch($_GET['action']) {
             'forms.php?action=chguserinfo');
         echo '</p>';
         break;
-	case "googlegadget":
-		$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$userid));
-		$code = $stm->fetchColumn(0);
-		if ($code=='' || isset($_GET['regen'])) {
-			$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-			do {
-				$pass = '';
-				for ($i=0;$i<10;$i++) {
-					$pass .= substr($chars,rand(0,61),1);
-				}
-				$stm = $DBH->prepare("SELECT id FROM imas_users WHERE remoteaccess=:remoteaccess");
-				$stm->execute(array(':remoteaccess'=>$pass));
-			} while ($stm->rowCount()>0);
-			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess=:remoteaccess WHERE id=:id");
-			$stm->execute(array(':remoteaccess'=>$pass, ':id'=>$userid));
-			$code = $pass;
-		}
-		echo '<div id="headerforms" class="pagetitle"><h1>Google Gadget Access Code</h1></div>';
-		echo "<p>The $installname Google Gadget allow you to view a list of new forum posts ";
-		echo "and messages from your iGoogle page.  To install, click the link below to add ";
-		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";
-		echo "to gain access to your data</p>";
-
-		echo "<p>Access Code: ".Sanitize::encodeStringForDisplay($code)."</p>";
-		echo "<p><a href=\"forms.php?action=googlegadget&regen=true$gb\">Generate a new Access code<a/><br/>";
-		echo "<p><a href=\"actions.php?action=googlegadget&clear=true$gb\">Clear Access code</a></p>";
-		echo "<p>Note: This access code only allows Google to access a list of new posts and messages, and does not provide access to grades or any other data stored at $installname.  Be aware that this form of access is insecure and could be intercepted by a third party.</p>";
-		echo "<p>You can also bookmark <a href=\"getpostlist.php?key=".Sanitize::encodeStringForDisplay($code)."\">this page</a> to be able to access your post list without needing to log in.</p>";
-		break;
+	
 }
 	require_once "footer.php";
 ?>
