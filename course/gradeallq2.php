@@ -360,7 +360,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022223"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=110323"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=110823"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -506,7 +506,8 @@
     echo '</p>';
 	if ($canedit) {
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
-		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
+		echo '<button type=button onclick="allmanualfullcred();">'._('Full Credit manually-graded parts').'</button> ';
+        echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
     }
     if ($page==-1) {
         echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button>';
@@ -772,10 +773,14 @@
                     echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
                     if (count($togr)>0) {
                         $togr = implode(',',$togr);
-                        echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
+                        echo ' | <a href="#" class="fullcredmanuallink" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
                     }
                 } else if ($canedit) {
-                    echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
+                    $class = 'fullcredlink';
+                    if (!empty($qdata['parts'][0]['req_manual'])) {
+                        $class .= ' fullcredmanuallink';
+                    }
+                    echo '<br/>Quick grade: <a href="#" class="'.$class.'" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
                 }
 
                 if (!empty($qdata['other_tries'])) {

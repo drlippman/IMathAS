@@ -67,6 +67,11 @@ function allvisfullcred() {
 	    $(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
     }
 }
+function allmanualfullcred() {
+    if (confirm(_('Are you SURE you want to give all students full credit on manually-graded parts?'))) {
+	    $(".fullcredmanuallink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    }
+}
 function allvisnocred() {
     if (confirm(_('Are you SURE you want to give all students zero credit?'))) {
     	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
