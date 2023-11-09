@@ -737,6 +737,18 @@ class Imathas_LTI_Database implements LTI\Database
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
                 $othercourses[$row[0]] = $row[1];
             }
+        } else if ($target['type'] == 'course') {
+            // look for other courses we could associate with
+            $query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
+            $query .= "AND imt.userid=:userid ";
+            $query .= "WHERE ic.available<4 AND ic.ancestors REGEXP :cregex ORDER BY ic.name";
+            $stm = $this->dbh->prepare($query);
+            $stm->execute(array(
+                ':userid' => $userid,
+                ':cregex' => MYSQL_LEFT_WRDBND . $target['refcid'] . MYSQL_RIGHT_WRDBND));
+            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                $othercourses[$row[0]] = $row[1];
+            }
         } else if (function_exists('lti_get_othercourses')) {
             $othercourses = lti_get_othercourses($target, $userid);
         }
