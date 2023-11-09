@@ -72,6 +72,10 @@ if ($type == 'assess') {
     if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
     $resource->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
     }
+} else if ($type == 'course') {
+    $resource = LTI\LTI_Deep_Link_Resource::new()
+        ->set_url($basesiteurl . '/lti/launch.php?refcid='.$localcourse->get_courseid())
+        ->set_title($GLOBALS['installname']);
 } else if (function_exists('lti_can_handle_deeplink') && lti_can_handle_deeplink($type)) {
     $resource = lti_get_deeplink_resource($type,$typeid);
 } else {

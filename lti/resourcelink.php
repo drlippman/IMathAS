@@ -66,6 +66,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
           exit;
         }
       }
+    } else if ($target['type'] === 'course') {
+      $link = $db->make_link_assoc($target['refcid'],'course',$resource_link['id'],$contextid,$platform_id);  
     } else if (function_exists('lti_can_ext_handle_launch') && lti_can_ext_handle_launch($launch->get_target_link())) {
       $link = lti_handle_launch($launch, $localcourse, $localuserid, $db);
     } else {
