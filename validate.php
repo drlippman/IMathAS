@@ -385,7 +385,10 @@ if ($hasusername) {
     $stm = $DBH->prepare($query);
     $stm->execute(array(':id' => $userid));
     $line = $stm->fetch(PDO::FETCH_ASSOC);
-    if ($line['lastemail'] > ($_SESSION['started'] ?? 0)) {
+    if (!isset($_SESSION['started'])) {
+        $_SESSION['started'] = time();
+    }
+    if ($line['lastemail'] > $_SESSION['started']) {
         // lastemail actually records last password reset
         // if password has been reset since session began, force relogin in
         user_logout();
