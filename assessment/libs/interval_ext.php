@@ -325,12 +325,11 @@ function calculateIntersection($x1, $x2, $isOpenX1, $isOpenX2, $y1, $y2, $isOpen
   $z2 = 0;
   $isOpenZ1 = false;
   $isOpenZ2 = false;
-
-  switch ( testPointVsInterval($y1,$x1,$x2)) {
+  switch ( testPointVsInterval($y1,$x1,$x2)) { 
     case EQUAL_LEFT:
       // echo "here: " . EQUAL_LEFT;
 
-      switch ( testPointVsInterval($y2,$x1,$x2)) {
+      switch ( testPointVsInterval($y2,$x1,$x2)) { 
 	case EQUAL_LEFT:
 	  if ($isOpenX1 || $isOpenY1 || $isOpenY2) {
 	    // echo " + " . EQUAL_LEFT . " -> doNotIntersectStop";
@@ -567,6 +566,8 @@ function calculateIntersection($x1, $x2, $isOpenX1, $isOpenX2, $y1, $y2, $isOpen
 
   if ($result == ERROR || $result == DONOTINTERSECT_STOP || $result == DONOTINTERSECT_CONTINIUE) {
     return array("result" => $result);
+  } else if ($z1==$z2 && ($isOpenZ1 || $isOpenZ2)) { // check for (1,1] or similar
+    return array("result" => DONOTINTERSECT_STOP);
   } else {
     return array("result" => $result,
       "left-border" => $z1, "right-border" => $z2,
@@ -796,6 +797,7 @@ function calculateIntersectionSet($values) {
      // $z2 = $value["right-border"];
      // $isOpenZ1 = $value["is-open-left"];
      // $isOpenZ2 = $value["is-open-right"];
+     $hasIntersection = false;
 
     for ($i = 1; $i < count($values); $i++) {
         $value = $values[$i];
@@ -823,7 +825,7 @@ function calculateIntersectionSet($values) {
                   	$z2[] = $result["right-border"];
             	    $isOpenZ1[] = $result["is-open-left"];
                   	$isOpenZ2[] = $result["is-open-right"];
-
+                    $hasIntersection = true;
                   	break;
             	case DONOTINTERSECT_CONTINIUE:
             	case DONOTINTERSECT_STOP:
@@ -832,13 +834,21 @@ function calculateIntersectionSet($values) {
                 }
             }
         } // foreach value
+
         if (!empty($z1)) {
             $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
         }
 
     } // for values
 
-    return $item;
+    if ($hasIntersection) {
+        return $item;
+    } else {
+        return array( "left-border" => [],
+        "right-border" => [],
+        "is-open-left" => [],
+        "is-open-right" => [] );
+    }
 }
 
 
