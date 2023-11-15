@@ -1773,7 +1773,6 @@ function encodeDraw() {
 		}
 	}
 	out += tpineqout.join(",");
-    console.log(out);
 	if (targetOuts[curTarget].value != out) {
 		var dochange = (targetOuts[curTarget].value != '' || out != ';;;;;;;;');
 		targetOuts[curTarget].value = out;
