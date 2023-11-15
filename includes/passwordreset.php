@@ -17,7 +17,7 @@ function make_pwreset_link($userid, $recoverylink = false) {
         }
         $query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
         $stm = $DBH->prepare($query);
-        $stm->execute(array(':code'=>$code, ':id'=>$id));
+        $stm->execute(array(':code'=>$code, ':id'=>$userid));
     }
 
     if ($recoverylink) {
