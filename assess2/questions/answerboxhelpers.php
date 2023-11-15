@@ -770,20 +770,24 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
-	$str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
-	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
-	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
-	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
-	//these are the slim vector unicodes: u2329 and u232a
+    $str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
+    $str = str_replace(array('‒','–','—','―','−'),'-',$str);
+    $str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
+    $str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
+    //these are the slim vector unicodes: u2329 and u232a
     $str = str_replace(array('⟨','⟩'), array('<','>'), $str);
     $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
-	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
+    $str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
     $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
-	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
+    $str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
     $str = str_replace('&ZeroWidthSpace;', '', $str);
-  if (strtoupper(trim($str))==='DNE') {
-    $str = 'DNE';
-  }
+    if (strtoupper(trim($str))==='DNE') {
+        $str = 'DNE';
+    }
+    // truncate excessively long answer
+    if (strlen($str)>8000) {
+        $str = substr($str,0,8000);
+    }
 	return $str;
 }
 

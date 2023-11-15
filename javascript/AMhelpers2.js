@@ -224,6 +224,7 @@ function init(paramarr, enableMQ, baseel) {
       $("#qnwrap"+qn+".introtext img").on('click', rotateimg);
     }
     initEnterHandler(qn);
+    $("input[id^=qn"+qn+"]").attr("maxlength",8000);
   }
   initDupRubrics();
   initShowAnswer2();
@@ -232,6 +233,7 @@ function init(paramarr, enableMQ, baseel) {
   }
   initqsclickchange();
   initClearScoreMarkers();
+  
   if (paramarr.scripts) {
     function handleScript(arr, cnt) {
       if (arr[cnt][0] == 'code') {
@@ -931,6 +933,9 @@ function preSubmitString(name, str) {
   str = str.replace(/^\s+/,'').replace(/\s+$/,'');
   if (params.qtype == 'numfunc') {
     str = AMnumfuncPrepVar(qn, str)[3];
+  }
+  if (str.length > 30000) {
+    str = str.substr(0,30000);
   }
   return str;
 }
