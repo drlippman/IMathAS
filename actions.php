@@ -494,7 +494,7 @@ require_once "includes/sanitize.php";
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 
-            $jsondata = json_decode($jsondata,true);
+            $jsondata = json_decode($line['jsondata'],true);
 			if ($_GET['action']=="chgpwd") {
 				require_once "./includes/email.php";
 				$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
