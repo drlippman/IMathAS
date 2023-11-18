@@ -15167,6 +15167,12 @@
         }
         return path2;
       };
+      var removeOnFailure = function () {
+        var editor = tinymce.activeEditor;
+        var img = $(editor.dom.doc).find('img[src^="blob:"]').get(0);
+        if (img)
+            editor.execCommand('mceRemoveNode', false, img);
+      };
       var defaultHandler = function (blobInfo, success, failure, progress) {
         var xhr, formData;
         xhr = XMLHttpRequest();
@@ -15176,16 +15182,19 @@
           progress(e.loaded / e.total * 100);
         };
         xhr.onerror = function () {
+          removeOnFailure();
           failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
         };
         xhr.onload = function () {
           var json;
           if (xhr.status < 200 || xhr.status >= 300) {
+            removeOnFailure();
             failure('HTTP Error: ' + xhr.status);
             return;
           }
           json = JSON.parse(xhr.responseText);
           if (!json || typeof json.location !== 'string') {
+            removeOnFailure();
             failure('Invalid JSON: ' + xhr.responseText);
             return;
           }

@@ -129,6 +129,9 @@ export default {
       this.filelist = out;
     },
     updateValue: function (value) {
+      if (value.length > 30000) {
+        value = value.substr(0, 30000);
+      }
       this.$emit('input', value);
     },
     focus: function () {
