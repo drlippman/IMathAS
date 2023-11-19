@@ -2363,6 +2363,37 @@
       }
       return url;
     };
+    var resizeImage = function (o, callback) {
+        console.log("trying to resize");
+        var imgURL = o.blobUri() || URL.createObjectURL(o.blob());
+        var image = new Image();
+        image.onload = function (imageEvent) {
+            // Resize the image
+            var canvas = document.createElement('canvas'),
+                max_size = 1000,
+                width = image.width,
+                height = image.height;
+            if (width > height) {
+                if (width > max_size) {
+                    height *= max_size / width;
+                    width = max_size;
+                }
+            } else {
+                if (height > max_size) {
+                    width *= max_size / height;
+                    height = max_size;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+            var resizedImage = canvas.toBlob(function(b) {
+                console.log("calling back");
+                callback(b);
+            }, 'image/jpeg');
+        }
+        image.src = imgURL;
+    }
     var Tools = {
       trim: trim,
       isArray: ArrUtils.isArray,
@@ -2380,7 +2411,8 @@
       createNS: createNS,
       resolve: resolve$1,
       explode: explode,
-      _addCacheSuffix: _addCacheSuffix
+      _addCacheSuffix: _addCacheSuffix,
+      resizeImage: resizeImage
     };
 
     var doc = domGlobals.document, push$2 = Array.prototype.push, slice$2 = Array.prototype.slice;
@@ -15201,8 +15233,10 @@
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        xhr.send(formData);
+        Tools.resizeImage(blobInfo, function(resizedblob) {
+            formData.append('file', resizedblob, blobInfo.filename());
+            xhr.send(formData);
+        });
       };
       var noUpload = function () {
         return new promiseObj(function (resolve) {
