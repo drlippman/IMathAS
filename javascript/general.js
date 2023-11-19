@@ -1406,18 +1406,22 @@ function initFileAlt(el) {
 		.on("blur.filealt", function(e) { jQuery(e.target).removeClass("has-focus");} )
 		.on("click.filealt", function(e) { label.html(origLabel); } )
 		.on("change.filealt", function(e) {
-			var fileName = '';
-			fileName = e.target.value.split(/(\\|\/)/g).pop();
-			if (fileName) {
-				var maxFileSize = 10000*1024; // 10MB
-        if (this.files[0].size > maxFileSize) {
-          alert(_('This file is too large - maximum size is 10MB'));
-          $(this).val('');
-        } else {
-					label.html(fileName);
-				}
-			}
-		});
+            label.html(_('Preparing file...'));
+            doImageUploadResize(this,function(el) {
+                var fileName = '';
+                fileName = el.value.split(/(\\|\/)/g).pop();
+                if (fileName) {
+                    var maxFileSize = 10000*1024; // 10MB
+                    if (el.files[0].size > maxFileSize) {
+                        alert(_('This file is too large - maximum size is 10MB'));
+                        $(el).val('');
+                        label.html('');
+                    } else {
+                        label.html(fileName);
+                    }
+                }
+            });
+        });
 }
 jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
 
@@ -1773,3 +1777,62 @@ function setActiveTab(el) {
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
 
 }(jQuery);
+
+// from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js
+
+function doImageUploadResize(el, callback) {
+    const that = el; // input node
+    const originalFile = el.files[0];
+
+    if (!originalFile || !originalFile.type.startsWith('image')) {
+        callback(el);
+        return;
+    }
+
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var img = document.createElement('img');
+        var canvas = document.createElement('canvas');
+
+        img.src = e.target.result
+        img.onload = function () {
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            var width = img.width;
+            var height = img.height;
+            var prefix = '';
+            if (img.width > 1000 || img.height > 1000) {
+                const ratio = Math.min(1000 / img.width, 1000 / img.height);
+                width = Math.round(img.width * ratio);
+                height = Math.round(img.height * ratio);
+                prefix = 'resized_';
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(function (blob) {
+                var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
+
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(resizedFile);
+
+                // temporary remove event listener, change and restore
+                var currentOnChange = that.onchange;
+
+                that.onchange = null;
+                that.files = dataTransfer.files;
+                that.onchange = currentOnChange;
+                if (typeof callback === 'function') {
+                    callback(that);
+                }
+            }, 'image/jpeg', .95);
+        }
+    }
+    reader.readAsDataURL(originalFile);
+}

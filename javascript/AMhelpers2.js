@@ -224,7 +224,7 @@ function init(paramarr, enableMQ, baseel) {
       $("#qnwrap"+qn+".introtext img").on('click', rotateimg);
     }
     initEnterHandler(qn);
-    $("input[id^=qn"+qn+"]").attr("maxlength",8000);
+    $("input[id^=qn"+qn+"]:not([type=file])").attr("maxlength",8000);
   }
   initDupRubrics();
   initShowAnswer2();
