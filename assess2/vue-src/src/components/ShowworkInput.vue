@@ -138,6 +138,11 @@ export default {
       this.objTinymce.focus();
     },
     uploadFile: function () {
+      if (this.$refs.fileinput.files[0].size > 15000 * 1024) {
+        actions.handleError('file_toolarge');
+        this.$refs.fileinput.value = '';
+        return;
+      }
       const data = new FormData();
       data.append('type', 'attach');
       data.append('file', this.$refs.fileinput.files[0]);
