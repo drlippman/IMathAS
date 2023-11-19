@@ -2364,7 +2364,6 @@
       return url;
     };
     var resizeImage = function (o, callback) {
-        console.log("trying to resize");
         var imgURL = o.blobUri() || URL.createObjectURL(o.blob());
         var image = new Image();
         image.onload = function (imageEvent) {
@@ -2388,7 +2387,6 @@
             canvas.height = height;
             canvas.getContext('2d').drawImage(image, 0, 0, width, height);
             var resizedImage = canvas.toBlob(function(b) {
-                console.log("calling back");
                 callback(b);
             }, 'image/jpeg');
         }
@@ -15234,7 +15232,7 @@
         };
         formData = new domGlobals.FormData();
         Tools.resizeImage(blobInfo, function(resizedblob) {
-            formData.append('file', resizedblob, blobInfo.filename());
+            formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
             xhr.send(formData);
         });
       };

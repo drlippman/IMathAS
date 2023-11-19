@@ -954,7 +954,7 @@ var image = (function (domGlobals) {
         };
         formData = new domGlobals.FormData();
         global$2.resizeImage(blobInfo, function(resizedblob) {
-            formData.append('file', resizedblob, blobInfo.filename());
+            formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
             xhr.send(formData);
         });
       };
