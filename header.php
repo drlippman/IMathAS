@@ -99,7 +99,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $_SESSION['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
     }
     if (isset($_SESSION['ltiitemtype'])) {
         echo '<script type="text/x-mathjax-config">
@@ -120,6 +120,9 @@ if (!isset($_SESSION['mathdisp'])) {
             AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
+            ["arccot","arccsc","arccot"].forEach(function(v) {
+                AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
+            });
         });
         </script>';
     if (!empty($CFG['GEN']['uselocaljs'])) {
@@ -143,7 +146,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) { // mathjax 3
     if (isset($useeditor) && $_SESSION['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
     }
     // for autoload of a11y extension, add "a11y/semantic-enrich" to load, and put in options enrichSpeech: "shallow",
     echo '<script>
@@ -173,6 +176,9 @@ if (!isset($_SESSION['mathdisp'])) {
             AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
+            ["arccot","arccsc","arccot"].forEach(function(v) {
+                AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
+            });
             MathJax.startup.defaultReady();
           }
        }
@@ -200,7 +206,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
 
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script src="'.$staticroot.'/katex/katex.min.js"></script>';
@@ -220,7 +226,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\"; function rendermathnode(el,callback) {AMprocessNode(el); if(typeof callback=='function'){callback();}}</script>";
 } else if ($_SESSION['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el,callback) {AMprocessNode(el);} if(typeof callback=='function'){callback();}</script>";
