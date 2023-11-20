@@ -1110,6 +1110,7 @@ function AMnumfuncPrepVar(qn,str) {
     });
   // fix variable pairs being interpreted as asciimath symbol, like in
   dispstr = dispstr.replace(/(@v\d+@)(@v\d+@)/g,"$1 $2");
+  dispstr = dispstr.replace(/(@v\d+@)(@v\d+@)/g,"$1 $2");
   // fix display of /n!
   dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!(?!=)/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
@@ -1179,7 +1180,6 @@ function AMnumfuncPrepVar(qn,str) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
   }
-
   return [str,dispstr,vars.join("|"),submitstr];
 }
 
