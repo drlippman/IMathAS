@@ -477,10 +477,14 @@ function initPicture(x_min,x_max,y_min,y_max) {
  node.setAttribute("y","0");
  node.setAttribute("width",width);
  node.setAttribute("height",height);
- node.setAttribute("style","stroke-width:1;fill:white");
+ node.setAttribute("fill","white");
  svgpicture.appendChild(node);
 }
 
+function setBackgroundColor(color) {
+    var bgrect = svgpicture.getElementsByTagName("rect")[0];
+    bgrect.setAttribute("fill", color);
+}
 function setStrokeFill(node) {
   node.setAttribute("stroke-width", strokewidth);
   if (strokedasharray!=null)
