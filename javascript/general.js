@@ -308,7 +308,8 @@ function GB_resize(e) {
 
 	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
 	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
-	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
+    
+	jQuery("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
 }
 function GB_endresize(e) {
 	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
@@ -379,7 +380,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
               .data("original_h", $(gbwin).height())
-              .data("footer_h", $("#GB_footer:visible").outerHeight() + $("#GB_caption").outerHeight())
+              .data("footer_h", ($("#GB_footer:visible").outerHeight() || 0) + $("#GB_caption").outerHeight())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
 
@@ -456,7 +457,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
             var belowel;
             for (var i in showbelow) {
                 if (belowel = document.getElementById(showbelow[i])) {
-                    inittop = belowel.getBoundingClientRect().bottom + 10;
+                    inittop = Math.max(0, belowel.getBoundingClientRect().bottom + 10);
                     if (height=='auto') {
 						h = (window.self !== window.top) ? Math.min(600,self.innerHeight) : self.innerHeight;
 						h = Math.max(200, h - inittop - 20);
