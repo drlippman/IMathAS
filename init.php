@@ -54,8 +54,8 @@ if (isset($CFG['GEN']['gc_divisor'])) {
     ini_set('session.gc_divisor', $CFG['GEN']['gc_divisor']);
 }
 if (isset($CFG['MySQL_ver']) && $CFG['MySQL_ver'] >= 8) {
-    define('MYSQL_LEFT_WRDBND', '\\\\b');
-    define('MYSQL_RIGHT_WRDBND', '\\\\b');
+    define('MYSQL_LEFT_WRDBND', '\\b');
+    define('MYSQL_RIGHT_WRDBND', '\\b');
 } else {
     define('MYSQL_LEFT_WRDBND', '[[:<:]]');
     define('MYSQL_RIGHT_WRDBND', '[[:>:]]');
