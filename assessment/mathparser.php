@@ -415,6 +415,9 @@ class MathParser
       } else if (ctype_digit($c) || $c=='.') {
         // if it's a number/decimal value
         preg_match('/^(\d*\.?\d*(E\+?-?\d+)?)/', substr($str,$n), $matches);
+        if ($matches[1] === '.') { // special case for lone period
+            continue;
+        }
         $tokens[] = [
           'type'=>'number',
           'symbol'=> $matches[1]
@@ -518,7 +521,7 @@ class MathParser
               }
             } else if ($peek == '^') {
               // found something like sin^2; append power to symbol for now
-              if (preg_match('/^(\-?\d+|\((\-\d+)\))/', substr($str,$n+2), $sub)) {
+              if (preg_match('/^(\-?\d+|\((\-?\d+)\))/', substr($str,$n+2), $sub)) {
                 $tokens[count($tokens)-1]['symbol'] .= '^' . (isset($sub[2]) ? $sub[2] : $sub[1]);
                 $n += strlen($sub[1]) + 1;
               }
