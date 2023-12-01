@@ -1838,8 +1838,8 @@ function parsecomplex(v) {
 	var real,imag,c,nd,p,R,L;
 	v = v.replace(/\s/,'');
 	v = v.replace(/\((\d+\*?i|i)\)\/(\d+)/g,'$1/$2');
-	v = v.replace(/sin/,'s$n');
-	v = v.replace(/pi/,'p$');
+	v = v.replace(/sin/g,'s$n');
+	v = v.replace(/pi/g,'p$');
 	var len = v.length;
 	//preg_match_all('/(\bi|i\b)/',v,matches,PREG_OFFSET_CAPTURE);
 	//if (count(matches[0])>1) {
@@ -1941,10 +1941,10 @@ function parsecomplex(v) {
 				real = real.substr(1);
 			}
 		}
-		real = real.replace("s$n","sin");
-		real = real.replace("p$","pi");
-		imag = imag.replace("s$n","sin");
-		imag = imag.replace("p$","pi");
+		real = real.replace(/s\$n/g,"sin");
+		real = real.replace(/p\$/g,"pi");
+		imag = imag.replace(/s\$n/g,"sin");
+		imag = imag.replace(/p\$/g,"pi");
 		imag = imag.replace(/\*\//g,"/");
 		return [real,imag];
 	}
