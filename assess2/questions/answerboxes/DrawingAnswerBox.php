@@ -695,7 +695,7 @@ class DrawingAnswerBox implements AnswerBox
                 if (!is_array($background) && substr($background, 0, 5) == "draw:") {
                     $sa = showplot($saarr, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
                     $insat = strpos($sa, ');', strpos($sa, 'axes')) + 2;
-                    $sa = substr($sa, 0, $insat) . str_replace("'", '"', substr($background, 5)) . substr($sa, $insat);
+                    $sa = substr($sa, 0, $insat) . str_replace("'", '"', substr($background, 5)) . ';' . substr($sa, $insat);
                 } else if (!is_array($background) && ($background == 'none' || $background == 'transparent')) {
                     $sa = showasciisvg("initPicture(0,10,0,10);", $settings[6], $settings[7]);
                 } else {
