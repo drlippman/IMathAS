@@ -2971,6 +2971,18 @@ somewhere in the Question Text portion of the question.
     Do this by wrapping the teacher note in the [teachernote] shortcode like this: <code>[teachernote]This is the note[/teachernote]</code>
 </p>
 
+<h3>Hiding/Toggling content</h3>
+<p>If you need to hide content from view, you can wrap it in <code>&lt;div class="hidden"&gt;&lt;/div&gt;</code>.
+  Be aware the content is still in the page, so a student can still view the hidden content
+  using the browser inspector, so don't use this to hide secret info, but it can be helpful 
+  if you need to hide an answerbox that is being populated by some other means.</p>
+<p>If you want to toggle a block of content, one option for shorter content is to use 
+    forminlinebutton.  For longer content, you can wrap the content in a block using 
+    <code>&lt;div data-toggler="Title for button"&gt;&lt;/div&gt;</code>.  That will
+    hide the wrapped content, and add a button with the specified title for toggling the 
+    content.  You can optionally add a <code>data-toggler-hide</code> attribute as well 
+    if you want a different button label once the content is showing.
+</p>
 
 </div> <!-- h2 -->
 <div class=h2>
