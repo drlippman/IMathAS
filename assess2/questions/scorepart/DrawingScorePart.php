@@ -303,6 +303,9 @@ class DrawingScorePart implements ScorePart
                 } else {
                     $scoretype[$key] = 0;
                 }
+                if ($function[0][0] === 'x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
                 if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
                     $leftrightdir = $function[1][0];
                     array_pop($function);
@@ -1470,6 +1473,9 @@ class DrawingScorePart implements ScorePart
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
+                if ($function[0][0]=='x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
                 if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
                     $isxequals = true;
                     $function[0] = substr($function[0],1);
