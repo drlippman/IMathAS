@@ -661,6 +661,10 @@ function gbstudisp($stu) {
 
 	$gbt = gbtable($stu);
 
+    if ($GLOBALS['myrights'] === 100 && !empty($_GET['showgbt'])) {
+        print_r($gbt);
+    }
+
 	if ($stu>0) {
 		echo '<div style="font-size:1.1em;font-weight:bold">';
 		if ($isteacher || $istutor) {
