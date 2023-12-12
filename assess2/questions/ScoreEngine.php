@@ -183,9 +183,6 @@ class ScoreEngine
             }
             if (is_array($reqdecimals)) {
                 foreach ($reqdecimals as $kidx => $vval) {
-                    if (substr((string)$vval, 0, 1) == '=') {
-                        continue;
-                    } //skip '=2' style $reqdecimals
                     list($vval, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($vval);
                     if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
                         if (count($reqdecscoretype)==2) {
@@ -199,7 +196,7 @@ class ScoreEngine
                         }
                     }
                 }
-            } else if (substr((string)$reqdecimals, 0, 1) != '=') { //skip '=2' style $reqdecimals
+            } else { 
                 list($parsedreqdec, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs((string)$reqdecimals);
                 if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
                     if (count($reqdecscoretype)==2) {
