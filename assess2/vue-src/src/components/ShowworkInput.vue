@@ -19,7 +19,7 @@
           </button>
         </li>
         <li>
-          <input type="file" ref="fileinput" capture="environment" @change="uploadFile" />
+          <input type="file" ref="fileinput" @change="uploadFile" />
           <span class="noticetext" v-if="uploading">
             {{ $t('question.uploading') }}
           </span>

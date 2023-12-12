@@ -63,9 +63,7 @@ class FileUploadAnswerBox implements AnswerBox
                 $answerformat = str_replace('canpreview', '.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
                 $out .= ' accept="' . preg_replace('/[^\w\.,\/\*\-]/', '', $answerformat) . '"';
             }
-            if (empty($answerformat) || strpos($answerformat,'.jpg')!==false) {
-                $out .= ' capture="environment"';
-            }
+            
             $out .= "/>\n";
             $out .= '<label for="qn' . $qn . '"><span role="button" class="filealt-btn ' . $colorbox . '">';
             $out .= '<span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() .
