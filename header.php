@@ -352,7 +352,9 @@ if (!empty($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($n
 		echo "<li><a {$a['cal']} href=\"$imasroot/course/showcalendar.php?cid=$cid\">",_('Calendar'),"</a></li>\n";
 	}
 
-	echo "<li><a {$a['gb']} href=\"$imasroot/course/gradebook.php?cid=$cid\">",_('Gradebook'),"</a></li>"; //Gradebook
+    if (isset($coursetoolset) && ($coursetoolset&4)==0) {
+	    echo "<li><a {$a['gb']} href=\"$imasroot/course/gradebook.php?cid=$cid\">",_('Gradebook'),"</a></li>"; //Gradebook
+    }
 
 	if (!isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">",_('Log Out'),"</a></li>";

@@ -565,7 +565,7 @@ switch($_POST['action']) {
 		if (isset($CFG['CPS']['toolset']) && $CFG['CPS']['toolset'][1]==0) {
 			$toolset = $CFG['CPS']['toolset'][0];
 		} else {
-			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-reord']);
+			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-gb']);
 		}
 
 		$avail = isset($_POST['stuavail']) ? 0 : 1;//1 - $_POST['stuavail'];

@@ -1111,7 +1111,11 @@ switch($_GET['action']) {
 
 			echo '<input type="checkbox" name="toolset-forum" value="2" ';
 			if (($toolset&2)==0) { echo 'checked="checked"';}
-			echo '> ',_('Forum List');
+			echo '> ',_('Forum List'),'<br/>';
+
+            echo '<input type="checkbox" name="toolset-gb" value="4" ';
+			if (($toolset&4)==0) { echo 'checked="checked"';}
+			echo '> ',_('Gradebook');
 
 			echo '</span><br class=form />';
 		}
