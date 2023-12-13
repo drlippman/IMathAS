@@ -3531,8 +3531,9 @@ None - the essay type is not computer graded.
 <dl>
 <dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" </dt>
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
-<dt>$displayformat = "editor" </dt>
-	<dd>Use the rich text editor for the essay answer box.</dd>
+<dt>$displayformat = "editor" or "pre" </dt>
+	<dd>"editor" to use the rich text editor for the essay answer box.<br>
+    "pre" to use standard text entry, and to display in gradebook as preformatted text.</dd>
 <dt>$scoremethod = "takeanything" or "takeanythingorblank" or "nomanual"</dt>
 	<dd>The first two sets the problem to give full credit for any answer.  The second also counts
 	blank answers as correct.  The "nomanual" option will give no credit for any answer, but doesn't 
