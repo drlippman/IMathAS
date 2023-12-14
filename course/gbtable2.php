@@ -114,7 +114,7 @@ row[1][1][0] first score - assessment
 row[1][1][0][0] = score
 row[1][1][0][1] = 0 no comment, 1 has comment - is comment in includecomments
 row[1][1][0][2] = show gbviewasid link: 0 no, 1 yes,
-row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT, 5 UA  + 10 if still active
+row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT, 5 UA, 6 No submission  + 10 if still active
 row[1][1][0][4] = asid, or 'new' (or userid for assess2)
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
 row[1][1][0][6] = 1 if had exception, = 2 if was latepass
@@ -1436,7 +1436,11 @@ function gbtable() {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
 			$countthisone =true;
-		} else { //regular score available to students
+		} elseif ($l['lastchange'] == 0) { // no submissions
+            $gb[$row][1][$col][0] = $pts; //the score
+			$gb[$row][1][$col][3] = 6;  //no other info
+			$countthisone =true;
+        } else { //regular score available to students
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 0;  //no other info
 			$countthisone =true;

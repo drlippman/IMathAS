@@ -384,6 +384,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('PT-practice test').'</li>';
 	echo '<li>'._('EC-extra credit').'</li>';
 	echo '<li>'._('NC-no credit').'</li>';
+    echo '<li>'._('NS-no submission').'</li>';
     echo '<li>'._('N/A-Not Available').'</li>';
 	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
@@ -604,7 +605,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NS-no submission<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require_once "../footer.php";
 
 	/*if ($isteacher) {
@@ -1073,6 +1074,8 @@ function gbstudisp($stu) {
                         echo ' (OT)';
                     } else if ($gbt[1][1][$i][3]==4) {
                         echo ' (PT)';
+                    } else if ($gbt[1][1][$i][3]==6) {
+                        echo ' (NS)';
                     }
                 }
 			} else {
@@ -1813,7 +1816,7 @@ function gbinstrdisp() {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 							}
 						}
-
+                        
 						echo $gbt[$i][1][$j][0];
 
 						echo '</a>';
@@ -1833,6 +1836,8 @@ function gbinstrdisp() {
                                 // echo ' (OT)';
                             } else if ($gbt[$i][1][$j][3]==4) {
                                 echo ' (PT)';
+                            } else if ($gbt[$i][1][$j][3]==6) {
+                                echo ' (NS)';
                             }
                         }
 
