@@ -1358,6 +1358,12 @@ class Imathas_LTI_Database implements LTI\Database
         }
     }
 
+    public function record_log($logdata): void
+    {
+        $logstm = $this->dbh->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+        $logstm->execute([time(), $logdata]);
+    }
+
     private function verify_migration_claim($claim) {
         $key = $claim['oauth_consumer_key'];
         $query = "SELECT password FROM imas_users WHERE SID=? 
