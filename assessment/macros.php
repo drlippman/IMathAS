@@ -5961,6 +5961,7 @@ function parseMatrixToArray($str) {
         $lastcut = 1;
 		$bracketpairs = ['('=>')','['=>']'];
 		$rowbracket = '';
+        $rowendbracket = '';
         for ($i=1;$i<strlen($str)-1;$i++) {
             $c = $str[$i];
 			if ($rowbracket === '' && ($c == '(' || $c == '[')) {
