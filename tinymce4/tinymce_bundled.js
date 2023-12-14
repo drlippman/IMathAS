@@ -2364,7 +2364,14 @@
       return url;
     };
     var resizeImage = function (o, callback) {
-        var imgURL = o.blobUri() || URL.createObjectURL(o.blob());
+        var imgURL;
+        if (typeof o.blobUri == 'function') {
+            imgURL = o.blobUri();
+        } else if (typeof o.blob == 'function') {
+            imgURL = URL.createObjectURL(o.blob());
+        } else {
+            imgURL = URL.createObjectURL(o.blob);
+        }
         var image = new Image();
         image.onload = function (imageEvent) {
             // Resize the image
@@ -29371,9 +29378,16 @@ var image = (function (domGlobals) {
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        formData.append('file', blobInfo.blob, blobInfo.name);
         formData.append('type', 'attach');
-        xhr.send(formData);
+        if (blobInfo.blob.type.startsWith('image')) {
+            global$2.resizeImage(blobInfo, function(resizedblob) {
+                formData.append('file', resizedblob, blobInfo.name.replace(/\.\w+$/,'.jpg'));
+                xhr.send(formData);
+            });
+        } else {
+            formData.append('file', blobInfo.blob, blobInfo.name);
+            xhr.send(formData);
+        }
       };
       var uploadBlob = function (blobInfo, handler) {
         return new global$1(function (resolve, reject) {

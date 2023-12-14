@@ -2364,7 +2364,14 @@
       return url;
     };
     var resizeImage = function (o, callback) {
-        var imgURL = o.blobUri() || URL.createObjectURL(o.blob());
+        var imgURL;
+        if (typeof o.blobUri == 'function') {
+            imgURL = o.blobUri();
+        } else if (typeof o.blob == 'function') {
+            imgURL = URL.createObjectURL(o.blob());
+        } else {
+            imgURL = URL.createObjectURL(o.blob);
+        }
         var image = new Image();
         image.onload = function (imageEvent) {
             // Resize the image
