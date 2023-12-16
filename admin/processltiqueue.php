@@ -85,7 +85,7 @@ $updater1p3 = new LTI_Grade_Update($DBH);
 $updateStart = time();
 $batchsize = isset($CFG['LTI']['queuebatch'])?$CFG['LTI']['queuebatch']:10;
 $RCX = new RollingCurlX($batchsize);
-$RCX->setTimeout(5000); //5 second timeout on each request
+$RCX->setTimeout(8000); //8 second timeout on each request
 $RCX->setStopAddingTime(45); //stop adding new request after 45 seconds
 $RCX->setCallback('LTIqueueCallback'); //callback after response
 $RCX->setPostdataCallback('LTIqueuePostdataCallback'); //pre-send callback
