@@ -673,7 +673,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 		$specsoln = _('One solution: ');
 	}
 
-	if (isset($ansprompt)) {
+	if (isset($ansprompt) && $ansprompt != '') {
 		$anspromptp = explode(';', $ansprompt);
 		unset($ansprompt);
 		$specsoln = $anspromptp[0];
@@ -691,6 +691,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
     $out .= $arialabel[0];
   }
   $out .= '>';
+  
 	$out .= '<ul class="likelines">';
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" ' .
         (($la!='DNE' && (!$includeinf || $la!='oo'))?'checked':'') . 
