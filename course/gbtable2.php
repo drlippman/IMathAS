@@ -1755,7 +1755,7 @@ function gbtable() {
 				unset($cattotattempted[$ln][$category[$i]][$col]);
 				unset($cattotcur[$ln][$category[$i]][$col]);
 				unset($cattotfuture[$ln][$category[$i]][$col]);
-			} else if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) {
+			} else if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) { // no score or no credit
 				if (!empty($sectionlimit[$col]) && 
 					(empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
 				) {
@@ -1768,6 +1768,9 @@ function gbtable() {
 					}
 					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
+                        if (isset($gb[$ln][1][$col][0]) && $gb[$ln][1][$col][3]%10==1) { // score but no credit; still count as attempted
+                            $cattotattempted[$ln][$category[$i]][$col] = 0;
+                        }
 					}
 					$cattotfuture[$ln][$category[$i]][$col] = 0;
 				} else if ($cntingb[$i]==2) {
@@ -1777,6 +1780,9 @@ function gbtable() {
 					}
 					if (($availstu[$ln][$aid] ?? $gb[0][1][$col][3]) < 2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
+                        if (isset($gb[$ln][1][$col][0]) && $gb[$ln][1][$col][3]%10==1) { // score but no credit; still count as attempted
+                            $cattotattemptedec[$ln][$category[$i]][$col] = 0;
+                        }
 					}
 					$cattotfutureec[$ln][$category[$i]][$col] = 0;
 				}
@@ -2258,6 +2264,7 @@ function gbtable() {
 							$cattotstuec[$stype][$cat] = array_sum($cattotstuec[$stype][$cat]);
 						}
 					}
+
 					$catpossstu[$stype][$cat] = array_sum($catpossstu[$stype][$cat]);
 
 					if ($cats[$cat][1]!=0) { //scale is set
