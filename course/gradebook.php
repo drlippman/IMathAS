@@ -1064,7 +1064,7 @@ function gbstudisp($stu) {
                     if ($gbt[1][1][$i][3]>9) {
                         $gbt[1][1][$i][3] -= 10;
                     }
-                    if ($gbt[1][1][$i][3]==1) {
+                    if ($gbt[1][1][$i][3]==1 && $gbt[1][1][$i][0] !== 'NC') {
                         echo ' (NC)';
                     } else if ($gbt[1][1][$i][3]==2) {
                         echo ' (IP)';
