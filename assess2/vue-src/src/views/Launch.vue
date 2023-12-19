@@ -194,7 +194,7 @@ export default {
       }
     },
     okToLaunch () {
-      if (!this.canViewAll &&
+      if (!this.showPreviewAll &&
         this.aInfo.isgroup === 3 &&
         this.aInfo.group_members.length === 0
       ) {

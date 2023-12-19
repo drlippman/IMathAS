@@ -73,9 +73,9 @@ if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$i
 <script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
 <script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.js?v=<?php echo $lastupdate;?>"></script>
 <script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=<?php echo $lastupdate;?>"></script>
-<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
-<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.js?v=<?php echo $lastupdate;?>"></script>
-<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.legacy.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.legacy.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index.legacy.js?v=<?php echo $lastupdate;?>"></script>
 
 <?php
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">

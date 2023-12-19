@@ -378,7 +378,7 @@ export default {
       actions.setRendered(this.qn, true);
     },
     setInitValues () {
-      var regex = /^(qn|tc|qs)\\d/;
+      var regex = /^(qn|tc|qs)\d/;
       var thisqn = this.qn;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function (index, el) {
