@@ -424,7 +424,7 @@ export default {
     },
     allFull () {
       for (let i = 0; i < this.answeights.length; i++) {
-        this.$set(this.curScores, i, this.partPoss[i]);
+        this.curScores[i] = this.partPoss[i];
         actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
       }
     },
@@ -433,7 +433,7 @@ export default {
         if (this.qdata.parts[i] && this.qdata.parts[i].hasOwnProperty('req_manual') &&
           this.qdata.parts[i].req_manual === true
         ) {
-          this.$set(this.curScores, i, this.partPoss[i]);
+          this.curScores[i] = this.partPoss[i];
           actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
         }
       }
@@ -444,7 +444,7 @@ export default {
       store.clearAttempts.show = true;
     },
     initCurScores () {
-      this.$set(this, 'curScores', this.initScores);
+      this.curScores = this.initScores;
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
     },
     showRubric (pn) {

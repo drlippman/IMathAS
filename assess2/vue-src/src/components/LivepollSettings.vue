@@ -42,7 +42,7 @@ export default {
   computed: {
     showQuestionDefault: {
       set (val) {
-        this.$set(store.livepollSettings, 'showQuestionDefault', val);
+        store.livepollSettings['showQuestionDefault'] = val;
       },
       get () {
         return store.livepollSettings.showQuestionDefault;
@@ -50,7 +50,7 @@ export default {
     },
     showResultsLiveDefault: {
       set (val) {
-        this.$set(store.livepollSettings, 'showResultsLiveDefault', val);
+        store.livepollSettings['showResultsLiveDefault'] = val;
       },
       get () {
         return store.livepollSettings.showResultsLiveDefault;
@@ -58,7 +58,7 @@ export default {
     },
     showResultsAfter: {
       set (val) {
-        this.$set(store.livepollSettings, 'showResultsAfter', val);
+        store.livepollSettings['showResultsAfter'] = val;
       },
       get () {
         return store.livepollSettings.showResultsAfter;
@@ -66,7 +66,7 @@ export default {
     },
     showAnswersAfter: {
       set (val) {
-        this.$set(store.livepollSettings, 'showAnswersAfter', val);
+        store.livepollSettings['showAnswersAfter'] = val;
       },
       get () {
         return store.livepollSettings.showAnswersAfter;
@@ -74,7 +74,7 @@ export default {
     },
     useTimer: {
       set (val) {
-        this.$set(store.livepollSettings, 'useTimer', val);
+        store.livepollSettings['useTimer'] = val;
       },
       get () {
         return store.livepollSettings.useTimer;
@@ -82,7 +82,7 @@ export default {
     },
     questionTimelimit: {
       set (val) {
-        this.$set(store.livepollSettings, 'questionTimelimit', val);
+        store.livepollSettings['questionTimelimit'] = val;
       },
       get () {
         return store.livepollSettings.questionTimelimit;

@@ -18,7 +18,8 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'vue/no-reserved-component-names': 'off',
     'no-var': 'off',
-    'object-shorthand': 'off'
+    'object-shorthand': 'off',
+    'dot-notation': 'off'
   },
   parserOptions: {
     parser: '@babel/eslint-parser'
