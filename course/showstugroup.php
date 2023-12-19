@@ -3,7 +3,7 @@
 //(c) 2016 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 /*** pre-html data manipulation, including function code *******/
 $cid = intval($_GET['cid']);

@@ -5,7 +5,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -36,6 +36,8 @@ $body = "";
 $pagetitle = "";
 $placeinhead = "";
 $hasInclude = 0;
+$istutor = isset($tutorid);
+$isteacher = isset($teacherid);
 if (!isset($CFG['GEN']['allowinstraddstus'])) {
 	$CFG['GEN']['allowinstraddstus'] = true;
 }
@@ -68,7 +70,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$pagetitle = "Assign Section/Code Numbers";
 
 		if (isset($_POST['submit'])) {
-			$keys = array_keys($_POST['sec']);
+			$keys = array_keys($_POST['sec'] ?? []);
 			foreach ($keys as $stuid) {
 				if ($_POST['sec'][$stuid]=='') {
 					$_POST['sec'][$stuid] = null;
@@ -77,7 +79,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$_POST['code'][$stuid] = null;
 				}
             }
-            require('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
 			foreach ($keys as $stuid) {
 				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
                 $stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
@@ -138,7 +140,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-                require('../includes/setSectionGroups.php');
+                require_once '../includes/setSectionGroups.php';
                 setSectionGroups($id, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
@@ -151,14 +153,14 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
-			require_once("../includes/newusercommon.php");
+			require_once "../includes/newusercommon.php";
 			$errors = checkNewUserValidation(array('SID','firstname','lastname','email','pw1'));
 			if ($errors != '') {
 				$overwriteBody = 1;
 				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
 				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once("../includes/password.php");
+					require_once "../includes/password.php";
 					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
 					$md5pw = md5($_POST['pw1']);
@@ -184,7 +186,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-                require('../includes/setSectionGroups.php');
+                require_once '../includes/setSectionGroups.php';
                 setSectionGroups($newuserid, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
@@ -193,7 +195,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
 			$ulist = implode(',', array_map('intval', $_POST['checked']));
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
 			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid AND imas_users.id IN ($ulist) ";
@@ -212,7 +214,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 
 		if (isset($_POST['timelimitmult'])) {
 			$msgout = '';
@@ -252,7 +254,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 						$msgout .= '<p>Invalid password - left unchanged</p>';
 					} else {
 						if (isset($CFG['GEN']['newpasswords'])) {
-							require_once("../includes/password.php");
+							require_once "../includes/password.php";
 							$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 						} else {
 							$newpw = md5($_POST['pw1']);
@@ -305,10 +307,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
 				$stm->execute(array(':locked'=>$locked, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
             }
-            require('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             setSectionGroups($_GET['uid'], $cid, $section);
 
-			require('../includes/userpics.php');
+			require_once '../includes/userpics.php';
 
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
@@ -328,13 +330,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 
 
-			require("../header.php");
+			require_once "../header.php";
 			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 			echo '<div id="headerlistusers" class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			echo "<p>User info updated. ";
 			echo $msgout;
 			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
-			require("../footer.php");
+			require_once "../footer.php";
 
 			//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
@@ -501,7 +503,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   }
   </script>';
 
-require("../header.php");
+require_once "../header.php";
 $curdir = rtrim(dirname(__FILE__), '/\\');
 }
 /**** post-html data manipulation ******/
@@ -511,7 +513,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 /***** php display blocks are interspersed throughout the html as needed ****/
 if ($overwriteBody==1) {
 	if (strlen($body)<2) {
-		include("./$fileToInclude");
+		require_once "./$fileToInclude";
 	} else {
 		echo $body;
 	}
@@ -525,6 +527,7 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&assigncode=1">
 		<table class=gb>
+        <caption class="sr-only">Students</caption>
 			<thead>
 			<tr>
 				<th>Name</th><th>Section</th><th>Code</th>
@@ -578,10 +581,10 @@ if ($overwriteBody==1) {
 	</form>
 
 <?php
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform");
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
 		} else {
 			echo '<textarea id="emails" rows="30" cols="60">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
@@ -646,7 +649,7 @@ if ($overwriteBody==1) {
             'pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}',
             'email' => 'function(el) { return $("#SID").val().substring(0,4) != "lti-" }'
         );
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
 	} else {
 ?>
@@ -748,6 +751,7 @@ if ($overwriteBody==1) {
 		</p>
 
 	<table class=gb id=myTable>
+    <caption class="sr-only">Roster</caption>
 		<thead>
 		<tr>
 			<th></th>
@@ -895,5 +899,5 @@ if ($overwriteBody==1) {
 	}
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

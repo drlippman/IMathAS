@@ -2,7 +2,7 @@
 // Add/remove Teachers
 // IMathAS (c) 2018 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -66,7 +66,7 @@ if (!empty($_POST['newowner'])) {
 
 //process AJAX post-backs
 if (isset($_POST['loadgroup'])) {
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName,rights FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
 	$stm->execute(array($courseownerid, $coursegroupid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -76,7 +76,7 @@ if (isset($_POST['loadgroup'])) {
 	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['search'])) {
-	require("../includes/userutils.php");
+	require_once "../includes/userutils.php";
 	$search = (string) trim($_POST['search']);
 	$possible_teachers = searchForUser($search, true, true);
 	$out = array();
@@ -112,7 +112,7 @@ $placeinhead .= '<style type="text/css">
 
 $pagetitle = _('Transfer Course Ownership');
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if ($from == 'admin') {
@@ -134,7 +134,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p><button type=button @click="loadGroup()">List my group members</button>
 	or lookup a teacher: <input v-model="toLookup" size=30>
 	<button type=button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
+	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
 </p>
 <p>
 	<button type=submit :disabled="selectedTeacher == 0">Transfer</button>
@@ -201,4 +201,4 @@ var app = new Vue({
 });
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

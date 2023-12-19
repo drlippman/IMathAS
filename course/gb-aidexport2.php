@@ -2,9 +2,9 @@
 //IMathAS: Pull Student responses on an assessment (assess2)
 //(c) 2019 David Lippman
 
-require("../init.php");
-require("../assess2/AssessInfo.php");
-require("../assess2/AssessRecord.php");
+require_once "../init.php";
+require_once "../assess2/AssessInfo.php";
+require_once "../assess2/AssessRecord.php";
 
 $isteacher = isset($teacherid);
 $cid = Sanitize::courseId($_GET['cid']);
@@ -13,7 +13,7 @@ if (!$isteacher) {
 	echo "This page not available to students";
 	exit;
 }
-
+$doemail = $dopts = $doptpts = $doraw = $doptraw = $doba = $dobca = $dola = false;
 if (isset($_POST['options'])) {
 	//ready to output
 	$outcol = 0;
@@ -133,7 +133,7 @@ if (isset($_POST['options'])) {
 			$gb[$r][1] = $row[3];
 		}
         if ($doemail) {
-            $gb[$r][2] = $row[4];
+            $gb[$r][$hassection? 2 : 1] = $row[4];
         }
 		$sturow[$row[0]] = $r;
 		$r++;
@@ -180,22 +180,21 @@ if (isset($_POST['options'])) {
             $qscore = array();
             $qatt = array();
 
-            if ($question_object['status'] == 'unattempted') {
-                $qscore = array(0);
-                $raw = array(0);
-                $qatt = array('');
-            } else {
-	            for ($pn = 0; $pn < count($question_object['parts']); $pn++) {
-	                $partinfo = $question_object['parts'][$pn];
-                    if ($partinfo['try'] == 0) {
-                        $qscore[$pn] = 0;
-                        $raw[$pn] = 0;
-                    } else {
-                        $qscore[$pn] = $partinfo['score'];
-                        $raw[$pn] = $partinfo['rawscore'];
-	                }
-	            }
+
+            for ($pn = 0; $pn < count($question_object['parts']); $pn++) {
+                $partinfo = $question_object['parts'][$pn];
+                if (isset($partinfo['score']) && $partinfo['score']>=0) {
+                    $qscore[$pn] = $partinfo['score'];
+                } else {
+                    $qscore[$pn] = 0;
+                }
+                if (isset($partinfo['rawscore']) && $partinfo['rawscore']>=0) {
+                    $raw[$pn] = $partinfo['rawscore'];
+                } else {
+                    $raw[$pn] = 0;
+                }
             }
+            
 
             $c = $qcol[$questionIds[$qn]];
             $offset = 0;
@@ -229,7 +228,13 @@ if (isset($_POST['options'])) {
 	header("Content-Disposition: attachment; filename=\"aexport-$aid.csv\"");
 	foreach ($gb as $gbline) {
 		$line = '';
+        if (empty($gbline)) { 
+            continue;
+        }
 		foreach ($gbline as $val) {
+            if (is_null($val)) {
+                $val = '';
+            }
 			 # remove any windows new lines, as they interfere with the parsing at the other end
 			  $val = str_replace("\r\n", "\n", $val);
 			  $val = str_replace("\n", " ", $val);
@@ -252,7 +257,7 @@ if (isset($_POST['options'])) {
 } else {
 	//ask for options
 	$pagetitle = "Assessment Export";
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; <a href=\"gb-itemanalysis2.php?aid=$aid&cid=$cid\">Item Analysis</a> ";
 	echo '&gt; Assessment Export</div>';
@@ -272,7 +277,7 @@ if (isset($_POST['options'])) {
 	//echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
 	echo '</form>';
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 }
 ?>

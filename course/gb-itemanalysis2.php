@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Item Analysis (averages)
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -60,9 +60,9 @@
 		exit;
 	}
 	if ($istutor && $tutoredit==2) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You not have access to view scores for this assessment";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -74,7 +74,7 @@
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -313,7 +313,7 @@
 	}
 
 	$notstarted = $totstucnt - $studentsStartedAssessment;
-	$nonstartedper = round(100*$notstarted/$totstucnt,1);
+	$nonstartedper = ($totstucnt>0) ? round(100*$notstarted/$totstucnt,1) : 0;
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
@@ -365,10 +365,14 @@
 			$points[$row['qid']] = $row['points'];
 			$qsetids[$row['qid']] = $row['qsid'];
 			$withdrawn[$row['qid']] = $row['withdrawn'];
-			if ($row['qtype']=='essay' || $row['qtype']=='file') {
+			if ($row['qtype']=='essay' || $row['qtype']=='file' || 
+                ($row['qtype']=='draw' && preg_match('/answerformat.*?freehand/', $row['control']))
+            ) {
 				$needmanualgrade[$row['qid']] = true;
 			} else if ($row['qtype']=='multipart') {
-				if (preg_match('/anstypes.*?(essay|file)/', $row['control'])) {
+				if (preg_match('/anstypes.*?(essay|file)/', $row['control']) ||
+                    (preg_match('/anstypes.*?(draw)/', $row['control']) && preg_match('/answerformat.*?freehand/', $row['control']))
+                ) {
 					$needmanualgrade[$row['qid']] = true;
 				}
 			}
@@ -390,7 +394,7 @@
 			if ($pts==9999) {
 				$pts = $defpoints;
 			}
-			if ($qcnt[$qid]>0) {
+			if (isset($qcnt[$qid]) && $qcnt[$qid]>0) {
 				$avg = $qtotal[$qid]/$qcnt[$qid];
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avg2 = $qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]); //avg adjusted for not attempted
@@ -437,7 +441,8 @@
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
 
-			echo "<td>" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
+			echo '<td title="'._('Question ID').' '. Sanitize::onlyInt($qsetids[$qid]) . '">'; 
+            echo Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
@@ -477,7 +482,7 @@
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
 			if ($showhints) {
-				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
+				if ($showextref[$qid] && isset($qcnt[$qid]) && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
@@ -553,8 +558,8 @@
 	}
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
-	if ($stm->fetchColumn(0)>0) {
-		include("../assessment/catscores.php");
+	if ($stm->fetchColumn(0)>0 && !empty($qs) && !empty($avgscore)) {
+		require_once "../assessment/catscores.php";
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
 	if ($isteacher) {
@@ -563,7 +568,7 @@
 
 		echo "<a href=\"gb-aidexport2.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {

@@ -1,21 +1,21 @@
 <?php
 
-require("../init.php");
-require_once('../includes/filehandler.php');
+require_once "../init.php";
+require_once '../includes/filehandler.php';
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/approvepending'])) {
-	require($CFG['hooks']['admin/approvepending']);
+	require_once $CFG['hooks']['admin/approvepending'];
 }
 
-$newStatus = Sanitize::onlyInt($_POST['newstatus']);
-$instId = Sanitize::onlyInt($_POST['userid']);
 $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
 
 //handle ajax postback
-if (!empty($newStatus)) {
+if (!empty($_POST['newstatus'])) {
+    $newStatus = Sanitize::onlyInt($_POST['newstatus']);
+    $instId = Sanitize::onlyInt($_POST['userid']);
 	$stm = $DBH->prepare("SELECT status,reqdata FROM imas_instr_acct_reqs WHERE userid=?");
     $stm->execute(array($instId));
     list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
@@ -48,7 +48,7 @@ if (!empty($newStatus)) {
 			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
 		}
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
 			$installname._(' Account Status'), $message,
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -58,7 +58,7 @@ if (!empty($newStatus)) {
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
-			require("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
 				unenrollstu($rcid, array(intval($instId)));
 			}
@@ -84,7 +84,7 @@ if (!empty($newStatus)) {
                 $CFG['email']['new_acct_bcclist'] = getDenyBcc();
             }
 
-            require_once("../includes/email.php");
+            require_once "../includes/email.php";
             send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
                 $installname._(' Account Status'), $message,
                 !empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -152,7 +152,7 @@ if (!empty($newStatus)) {
 			$CFG['email']['new_acct_bcclist'] = getApproveBcc();
 		}
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 		send_email($row['email'], !empty($accountapproval)?$accountapproval:$sendfrom,
 			$installname._(' Account Approval'), $message,
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -241,7 +241,9 @@ function getReqData() {
 		$out[$row['status']][] = $userdata;
 	}
 	array_walk_recursive($out, function(&$item) {
-		$item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+        if (!is_null($item)) {
+		    $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+        }
 	});
 	return $out;
 }
@@ -264,7 +266,7 @@ if (empty($reqFields)) {
     }
 }
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
 //$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
@@ -301,7 +303,7 @@ if (!isset($_GET['from'])) {
 	$curBreadcrumb .= "&gt; <a href=\"../util/utils.php\">Utilities</a> &gt; ";
 }
 
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . $pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -503,4 +505,4 @@ var app = new Vue({
 </script>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";

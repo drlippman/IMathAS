@@ -813,6 +813,7 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        store.inProgress = false;
         if (typeof callback === 'function') {
           callback();
         }

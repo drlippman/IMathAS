@@ -3,6 +3,14 @@
 function isNaN( $var ) {
   // is_numeric catches most things, but not php-generated NAN or INF
   // is_finite catches those
+  if (is_array($var)) { // for complex
+    foreach ($var as $v) {
+        if (!is_numeric($v) || !is_finite($v)) {
+            return true;
+        }
+    }
+    return false;
+  }
   return (!is_numeric($var) || !is_finite($var));
      //return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
      //possible alternative:
@@ -53,7 +61,12 @@ function checkreqtimes($tocheck,$rtimes) {
 			} else if ($list[$i]=='ignore_symbol') {
 				$cleanans = str_replace($list[$i+1],'',$cleanans);
 				continue;
-			}
+			} else if ($list[$i]=='ignore_spaces') {
+				if ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1') {
+					$cleanans = str_replace(' ','',$cleanans);
+				}
+				continue;
+            }
 			$comp = substr($list[$i+1],0,1);
 			if (substr($list[$i+1],1,1)==='=') { //<=, >=, ==, !=
 				if ($comp=='<' || $comp=='>') {
@@ -74,8 +87,12 @@ function checkreqtimes($tocheck,$rtimes) {
 						$all_numbers = $matches[0];
 						array_walk($all_numbers, 'ltrimzero');
 					}
-					$lookfor = ltrim(str_replace(array('-', ' '),'',substr($lookfor,1)), ' 0');
-					$nummatch = count(array_keys($all_numbers,$lookfor));
+					$lookfor = trim(substr($lookfor,1));
+                    if ($lookfor[0] == '-') {
+                        $lookfor = substr($lookfor,1);
+                    }
+                    $lookfor = ltrim($lookfor, ' 0');
+                    $nummatch = count(array_keys($all_numbers,$lookfor));
 				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
 					$regex = str_replace('/','\\/',substr($lookfor,6));
 					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
@@ -314,10 +331,11 @@ function ntupleToString($ntuples) {
 			$out[] = implode(' or ', $sub);
 		}
 	}
-	implode(',', $out);
+	return implode(',', $out);
 }
 
 function parseInterval($str, $islist = false) {
+    if (strlen($str)<5) { return false; }
 	if ($islist) {
 		$ints = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/',$str);
 	} else {
@@ -326,7 +344,8 @@ function parseInterval($str, $islist = false) {
 
 	$out = array();
 	foreach ($ints as $int) {
-    $int = trim($int);
+        $int = trim($int);
+        if (strlen($int) < 5) { return false;}
 		$i = array();
 		$i['lb'] = $int[0];
 		$i['rb'] = $int[strlen($int)-1];
@@ -367,6 +386,9 @@ function parsedIntervalToString($parsed, $islist) {
 function parseChemical($string) {
     $string = str_replace(['<->','<=>'], 'rightleftharpoons', $string);
     $string = str_replace(['to','rarr','implies'], '->', $string);
+    $string = preg_replace('/\^{(.*?)}/', '^($1)', $string);
+    $string = preg_replace('/\(\(([^\(\)]*)\)\)/', '($1)', $string);
+    $string = str_replace('^+','^(+)', $string);
     $parts = preg_split('/(->|rightleftharpoons)/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
     $reactiontype = (count($parts) > 1) ? $parts[1] : null;
     $sides = [];
@@ -432,7 +454,7 @@ function checkanswerformat($tocheck,$ansformats) {
 
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		$tocheck = preg_replace('/\s/','',$tocheck);
-		if (!preg_match('/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\s*\d*?\.\d*?\s*$/',$tocheck))) {
+		if (!preg_match('/^\(?\-?\s*\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\s*\d*?\.\d*?\s*$/',$tocheck))) {
 			return false;
 		} else {
 			if (in_array("reducedfraction",$ansformats) && strpos($tocheck,'/')!==false) {
@@ -440,7 +462,9 @@ function checkanswerformat($tocheck,$ansformats) {
 				$tmpa = explode("/",$tocheck);
 				if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1 || $tmpa[1]==1) {
 					return false;
-				}
+				} else if (substr_count($tocheck,'-')>1) {
+                    return false;
+                }
 			}
 		}
 	}
@@ -572,7 +596,7 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 	} else if (in_array('scinot',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of numbers using scientific notation'), $listtype):_('Enter a number using scientific notation');
-	} else {
+	} else if (!in_array('generalcomplex',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of mathematical expressions'), $listtype):_('Enter a mathematical expression');
 	}
@@ -649,7 +673,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 		$specsoln = _('One solution: ');
 	}
 
-	if (isset($ansprompt)) {
+	if (isset($ansprompt) && $ansprompt != '') {
 		$anspromptp = explode(';', $ansprompt);
 		unset($ansprompt);
 		$specsoln = $anspromptp[0];
@@ -663,10 +687,11 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'" role="group" ';
   if (preg_match('/aria-label=".*?"/', $answerbox, $arialabel)) {
     $answerbox = preg_replace('/aria-label=".*?"/',
-      'aria-label="'.Sanitize::encodeStringForDisplay($specsoln).'"', $answerbox);
+      'aria-label="'.Sanitize::encodeStringForDisplay(str_replace('`','',$specsoln)).'"', $answerbox);
     $out .= $arialabel[0];
   }
   $out .= '>';
+  
 	$out .= '<ul class="likelines">';
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" ' .
         (($la!='DNE' && (!$includeinf || $la!='oo'))?'checked':'') . 
@@ -721,7 +746,7 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 	if (preg_match('/^no\s*solution/',$answer) || $answer===$nosoln) {
 		$answer = 'DNE';
 	}
-	$qs = $_POST["qs$qn"];
+	$qs = $_POST["qs$qn"] ?? '';
 	if ($qs=='DNE') {
 		$givenans = "DNE";
 	} else if ($qs=='inf') {
@@ -746,19 +771,24 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
-	$str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
-	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
-	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
-	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
-	//these are the slim vector unicodes: u2329 and u232a
+    $str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
+    $str = str_replace(array('‒','–','—','―','−'),'-',$str);
+    $str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
+    $str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
+    //these are the slim vector unicodes: u2329 and u232a
     $str = str_replace(array('⟨','⟩'), array('<','>'), $str);
     $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
-	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
+    $str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
     $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
-	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
-  if (strtoupper(trim($str))==='DNE') {
-    $str = 'DNE';
-  }
+    $str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
+    $str = str_replace('&ZeroWidthSpace;', '', $str);
+    if (strtoupper(trim($str))==='DNE') {
+        $str = 'DNE';
+    }
+    // truncate excessively long answer
+    if (strlen($str)>8000) {
+        $str = substr($str,0,8000);
+    }
 	return $str;
 }
 

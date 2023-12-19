@@ -17,14 +17,15 @@ Ideally handle both
 
 */
 
-require_once(__DIR__ . '/AssessUtils.php');
-require_once(__DIR__ . '/../filter/filter.php');
-require_once(__DIR__ . '/questions/QuestionGenerator.php');
-require_once(__DIR__ . '/questions/models/QuestionParams.php');
-require_once(__DIR__ . '/questions/models/ShowAnswer.php');
-require_once(__DIR__ . '/questions/ScoreEngine.php');
-require_once(__DIR__ . '/questions/models/ScoreQuestionParams.php');
+require_once __DIR__ . '/AssessUtils.php';
+require_once __DIR__ . '/../filter/filter.php';
+require_once __DIR__ . '/questions/QuestionGenerator.php';
+require_once __DIR__ . '/questions/models/QuestionParams.php';
+require_once __DIR__ . '/questions/models/ShowAnswer.php';
+require_once __DIR__ . '/questions/ScoreEngine.php';
+require_once __DIR__ . '/questions/models/ScoreQuestionParams.php';
 
+use IMathAS\assess2\questions\models\Question;
 use IMathAS\assess2\questions\QuestionGenerator;
 use IMathAS\assess2\questions\models\QuestionParams;
 use IMathAS\assess2\questions\models\ShowAnswer;
@@ -37,12 +38,13 @@ class AssessStandalone {
   private $state = array();
   private $qdata = array();
   private $now = 0;
+  private $question = null;
 
   /**
    * Construct object
    * @param object $DBH PDO Database Handler
    */
-  function __construct($DBH) {
+  public function __construct($DBH) {
     $this->DBH = $DBH;
     $this->now = time();
   }
@@ -59,7 +61,7 @@ class AssessStandalone {
    *  $arr['rawscores'] = array of qn=>pn=>rawscores
    *  $arr['wrongfmt'] = array of qn=>pn=>wrongfmt
    */
-  function setState($arr) {
+  public function setState($arr) {
       foreach (['stuanswers','stuanswersval','scorenonzero','scoreiscorrect','partattemptn','rawscore'] as $f) {
           if (!isset($arr[$f])) {
               $arr[$f] = [];
@@ -68,7 +70,7 @@ class AssessStandalone {
       foreach ($arr['seeds'] as $qn=>$seed) {
         foreach (['scorenonzero','scoreiscorrect'] as $f) {
             if (!isset($arr[$f][$qn+1])) {
-                $arr[$f][$qn+1] = false;
+                $arr[$f][$qn+1] = -1;
             }
         }
         foreach (['partattemptn','rawscore'] as $f) {
@@ -84,22 +86,33 @@ class AssessStandalone {
    * getState()
    * gets the state an associative array (see setState)
    */
-  function getState() {
+  public function getState() {
     return $this->state;
   }
 
   /* setQuestionData($qsid, $data)
   * Sets question data
   */
-  function setQuestionData($qsid, $data) {
+  public function setQuestionData($qsid, $data) {
     $this->qdata[$qsid] = $data;
+  }
+
+  /**
+   * Get the Question object.
+   *
+   * Note: This only returns a Question after calling displayQuestion().
+   *
+   * @return Question|null The Question object
+   */
+  public function getQuestion(): ?Question {
+      return $this->question;
   }
 
   /*
    * loadQuestionData()
    * loads the questions from state
    */
-  function loadQuestionData() {
+  public function loadQuestionData() {
     $ph = Sanitize::generateQueryPlaceholders($this->state['qsid']);
     $stm = $this->DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
     $stm->execute(array_values($this->state['qsid']));
@@ -108,7 +121,7 @@ class AssessStandalone {
     }
   }
 
-  function getOpVal($options, $key, $default=null) {
+  public function getOpVal($options, $key, $default=null) {
       if (isset($options[$key])) {
           return $options[$key];
       } else if (isset($this->state[$key])) {
@@ -123,7 +136,7 @@ class AssessStandalone {
    * displays the question $qn, using details from state
    * Values in $options can override the state values
    */
-  function displayQuestion($qn, $options=[]) {
+  public function displayQuestion($qn, $options=[]) {
     $qsid = $this->state['qsid'][$qn];
     $attemptn = empty($this->state['partattemptn'][$qn]) ? 0 : max($this->state['partattemptn'][$qn]);
     $maxtries = $this->getOpVal($options, 'maxtries', 0);
@@ -217,6 +230,7 @@ class AssessStandalone {
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
+    $this->question = $question;
 
     list($qout,$scripts) = $this->parseScripts($question->getQuestionContent());
     $jsparams = $question->getJsParams();
@@ -265,7 +279,7 @@ class AssessStandalone {
    * scores the question $qn, using details from state
    * $parts_to_score: array of pn=>bool for whether to score the part
    */
-  function scoreQuestion($qn, $parts_to_score = true) {
+  public function scoreQuestion($qn, $parts_to_score = true) {
     $qsid = $this->state['qsid'][$qn];
 
     $attemptn = empty($this->state['partattemptn'][$qn]) ? 0 : max($this->state['partattemptn'][$qn]);
@@ -345,9 +359,9 @@ class AssessStandalone {
       }
     }
 
-    $allPartsAns = (count($this->state['partattemptn'][$qn]) == count($scoreResult['answeights']));
+    $allPartsAns = (count($this->state['partattemptn'][$qn]) >= count($scoreResult['answeights']));
     $score = array_sum($scores);
-    if (count($partla) > 1) {
+    if (count($scoreResult['answeights']) > 1) {
       $this->state['scorenonzero'][$qn+1] = array();
       $this->state['scoreiscorrect'][$qn+1] = array();
       foreach ($partla as $k=>$v) {
@@ -355,13 +369,13 @@ class AssessStandalone {
           $this->state['scorenonzero'][$qn+1][$k] = -1;
           $this->state['scoreiscorrect'][$qn+1][$k] = -1;
         } else {
-          $this->state['scorenonzero'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>0);
-          $this->state['scoreiscorrect'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>.98);
+          $this->state['scorenonzero'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>0) ? 1 : 0;
+          $this->state['scoreiscorrect'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>.98) ? 1 : 0;
         }
       }
     } else {
-      $this->state['scorenonzero'][$qn+1] = ($score > 0);
-      $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
+      $this->state['scorenonzero'][$qn+1] = ($score > 0) ? 1 : 0;
+      $this->state['scoreiscorrect'][$qn+1] = ($score > .98) ? 1 : 0;
     }
 
     $returnData = [
@@ -372,7 +386,7 @@ class AssessStandalone {
     ];
 
     if (isset($GLOBALS['CFG']['hooks']['assess2/assess_standalone'])) {
-        require_once($GLOBALS['CFG']['hooks']['assess2/assess_standalone']);
+        require_once $GLOBALS['CFG']['hooks']['assess2/assess_standalone'];
         $returnData = onScoreQuestionReturn($returnData, $scoreResult);
     }
 

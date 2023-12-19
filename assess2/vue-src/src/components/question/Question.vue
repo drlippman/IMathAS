@@ -510,7 +510,6 @@ input.red {
   border-radius: 4px 0 0 4px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  height: 20px;
 }
 .scoremark.red {
   border-color: #900;

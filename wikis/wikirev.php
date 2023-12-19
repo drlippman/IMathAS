@@ -4,9 +4,9 @@
 
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/diff.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/diff.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -17,7 +17,7 @@ $body = "";
 
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
-$groupid = intval($_GET['grp']);
+$groupid = intval($_GET['grp'] ?? 0);
 
 if ($cid==0) {
 	$overwriteBody=1;
@@ -35,7 +35,7 @@ if ($cid==0) {
 		$overwriteBody=1;
 		$body = "Error - not available for viewing";
 	} else {
-		require_once("../filter/filter.php");
+		require_once "../filter/filter.php";
 
 		if (isset($teacherid) || $now<$row['editbydate']) {
 			$canedit = true;
@@ -74,7 +74,7 @@ if ($cid==0) {
 				if (function_exists('json_encode')) {
 					$row['revision']=  json_decode($row['revision']);
 				} else {
-					require_once("../includes/JSON.php");
+					require_once "../includes/JSON.php";
 					$jsonser = new Services_JSON();
 					$row['revision'] = $jsonser->decode($row['revision']);
 				}
@@ -112,7 +112,7 @@ if ($overwriteBody==1) {
 	if (function_exists('json_encode')) {
 		echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
 	} else {
-		require_once("../includes/JSON.php");
+		require_once "../includes/JSON.php";
 		$jsonser = new Services_JSON();
 		echo $jsonser->encode($out);
 	}

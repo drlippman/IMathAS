@@ -2,8 +2,8 @@
 //Create question libraries based on a course
 //IMathAS (c) 2018 David Lippman for Lumen Learning
 
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 if ($myrights<100) { exit; }
 if (!isset($_GET['cid'])) {
@@ -179,7 +179,7 @@ function buildexistblocks($items,$parent,$pre='') {
 $existblocks = array();
 buildexistblocks($itemorder,'0');
 
-require("../header.php");
+require_once "../header.php";
 ?>
 <script>
 var curlibs = '';
@@ -230,5 +230,5 @@ echo '<p>Rights for new libraries: <select name="librights">
 echo '<input type="submit" value="Go">';
 echo '</form>';
 
-require("../footer.php");
+require_once "../footer.php";
 

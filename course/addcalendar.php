@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -23,7 +23,7 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	require("delitembyid.php");
+	require_once "delitembyid.php";
 	$DBH->beginTransaction();
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];

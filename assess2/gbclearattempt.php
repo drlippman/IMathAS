@@ -21,12 +21,12 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
+require_once "../includes/TeacherAuditLog.php";
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -60,7 +60,7 @@ if ($istutor) {
   }
 }
 // get question point values for retotal later
-$assess_info->loadQuestionSettings('all', false, false);
+$assess_info->loadQuestionSettings('all', true, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -70,6 +70,7 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
+$replacedDeleted = false;
 if ($type == 'all' && $keepver == 0) {
   $stm = $DBH->prepare('SELECT score FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
@@ -91,7 +92,7 @@ if ($type == 'all' && $keepver == 0) {
   // update LTI grade
   $lti_sourcedid = $assess_record->getLTIsourcedId();
   if (strlen($lti_sourcedid) > 1) {
-    require_once("../includes/ltioutcomes.php");
+    require_once "../includes/ltioutcomes.php";
     updateLTIgrade('delete',$lti_sourcedid,$aid,$uid);
   }
   $assess_record->saveRecordIfNeeded(); //to commit

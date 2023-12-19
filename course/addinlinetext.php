@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/parsedatetime.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/parsedatetime.php";
+require_once "../includes/filehandler.php";
 
 
 
@@ -67,7 +67,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = Sanitize::encodeStringForDisplay($_GET['block']);
+	$block = Sanitize::encodeStringForDisplay($_GET['block'] ?? '0');
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => ($_GET['folder'] ?? 0)));
 	$page_formActionTag .= "&tb=$totb";
@@ -402,7 +402,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -411,7 +411,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . $gid ?>";
+	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . ($gid ?? 0) ?>";
 
 	if (to != from) {
 		$("#ms-"+from).after('<input type=hidden name=movefile value="'+from+'" />')
@@ -554,5 +554,5 @@ $(function() { chghidetitle(); });
 	<p><sup>*</sup>Avoid quotes in the filename</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

@@ -285,6 +285,11 @@ export default {
       var script = document.createElement('script');
       script.src = 'https://' + this.aInfo.livepoll_server + ':3000/socket.io/socket.io.js';
       document.getElementsByTagName('head')[0].appendChild(script);
+    } else if (this.aInfo.displaymethod === 'video_cued' && !window.YT) {
+      const tag = document.createElement('script');
+      tag.id = 'yt_player_api';
+      tag.src = 'https://www.youtube.com/player_api';
+      document.head.appendChild(tag);
     }
     setTimeout(window.drawPics, 50);
     window.rendermathnode(this.$refs.summary);

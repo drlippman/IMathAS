@@ -1,9 +1,9 @@
 <?php
 
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 
 //replace later with some sort of access code
-require("../includes/JWT.php");
+require_once "../includes/JWT.php";
 if (!isset($_REQUEST['t'])) {
 	echo 'Token required';
 	exit;
@@ -44,7 +44,7 @@ if (isset($JWTsess->T) && $a = toalarmformat($JWTsess->C)) {
 	$alarms['C'] = $a;
 }
 
-require("../includes/calendardata.php");
+require_once "../includes/calendardata.php";
 
 list($coursename,$calevents) = getCalendarEventData($cid, $userid);
 
@@ -88,6 +88,8 @@ echo 'NAME:'.calencode($coursename).$EOL;
 echo 'DESCRIPTION:'.calencode($installname.': '.$coursename).$EOL;
 echo 'X-WR-CALNAME:'.calencode($coursename).$EOL;
 echo 'X-WR-CALDESC:'.calencode($installname.': '.$coursename).$EOL;
+
+$now = time();
 
 foreach ($calevents as $event) {
 	echo 'BEGIN:VEVENT'.$EOL;

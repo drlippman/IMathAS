@@ -165,6 +165,7 @@ array( 'input'=>'dt', 'output'=>'{:d t:}', 'definition'=>TRUE),
 array( 'input'=>'oint'),
 array( 'input'=>'del', 'tex'=>'partial'),
 array( 'input'=>'grad', 'tex'=>'nabla'),
+array( 'input'=>'hbar'),
 array( 'input'=>'+-', 'tex'=>'pm'),
 array( 'input'=>'O/', 'tex'=>'emptyset'),
 array( 'input'=>'oo', 'tex'=>'infty'),
@@ -205,6 +206,9 @@ array( 'input'=>'tan', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'arcsin', 'unary'=>TRUE, 'func'=>TRUE), 
 array( 'input'=>'arccos', 'unary'=>TRUE, 'func'=>TRUE), 
 array( 'input'=>'arctan', 'unary'=>TRUE, 'func'=>TRUE), 
+array( 'input'=>'arcsec', 'tex'=>'text{arcsec}', 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'arccsc', 'tex'=>'text{arccsc}', 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'arccot', 'tex'=>'text{arccot}',  'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'sinh', 'tex'=>'text{sinh}', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'cosh', 'tex'=>'text{cosh}', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'tanh', 'tex'=>'text{tanh}',  'unary'=>TRUE, 'func'=>TRUE),
@@ -571,11 +575,11 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
-		if ($st[0]== " ") {
+		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$newFrag .= '\\text{'.$st.'}';
-		if ($st[strlen($st)-1]== " ") {
+		if (strlen($st)>0 && $st[strlen($st)-1]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$str = $this->AMremoveCharsAndBlanks($str,$i+1);
@@ -651,7 +655,7 @@ function AMTparseSexpr($str) {
 	} else {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$texsymbol = $this->AMTgetTeXsymbol($symbol);
-		if ($texsymbol[0]=='\\' || (isset($symbol['isop']) && $symbol['isop']==true)) {
+		if ((strlen($texsymbol)>0 && $texsymbol[0]=='\\') || (isset($symbol['isop']) && $symbol['isop']==true)) {
 			return array($texsymbol,$str);
 		} else {
 			return array('{'.$texsymbol.'}',$str);

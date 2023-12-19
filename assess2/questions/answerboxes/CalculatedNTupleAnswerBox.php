@@ -32,6 +32,7 @@ class CalculatedNTupleAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -75,6 +76,9 @@ class CalculatedNTupleAnswerBox implements AnswerBox
             $tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
             $shorttip = _('Enter an n-tuple');
         }
+        if ($reqdecimals !== '') {
+            list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
+        }
         $tip .= formathint('each value', $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calcntuple');
 
         $classes = ['text'];
@@ -98,7 +102,7 @@ class CalculatedNTupleAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
 
         $out .= '<input ' .
@@ -116,7 +120,7 @@ class CalculatedNTupleAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = makeprettydisp($answer);
             if ($displayformat == 'vector') {
                 $sa = str_replace(array('<', '>'), array('(:', ':)'), $sa);

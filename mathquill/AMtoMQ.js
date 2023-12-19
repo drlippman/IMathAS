@@ -297,9 +297,9 @@ function AMQgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
+    k++;
     if ("0"<=st && st<="9") {
       integ = false;
-      k++;
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;
@@ -725,7 +725,11 @@ return function(str,elid,nomatrices) {
     AMQTallowmatrices = false;
  }
   str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
-  str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/(ntuple|string)/)
+  ) {
+    str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
+  }
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
@@ -808,6 +812,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');
+    tex = tex.replace(/degree/g,'degree '); // prevent degreesin from becoming degree in
     
 	while ((i=tex.indexOf('frac{'))!=-1) { //found a fraction start
 		nested = 1;

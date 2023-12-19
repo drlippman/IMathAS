@@ -1,7 +1,7 @@
 <?php
 
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-    require_once($CFG['hooks']['lti']);
+    require_once $CFG['hooks']['lti'];
     /**
      * see ltihooks.php.dist for details
      */
@@ -66,12 +66,18 @@ function parse_name_from_launch(array $data) {
  * @return array  ('type'=>, 'refcid'=> ) and possibly others
  */
 function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): array {
-  parse_str(parse_url($targetlink, PHP_URL_QUERY), $param);
+  $linkquery = parse_url($targetlink, PHP_URL_QUERY);
+  if ($linkquery === null) {
+    return [];
+  }
+  parse_str($linkquery, $param);
 
   if (!empty($param['refaid'])) {
     $out = ['type'=>'aid', 'refaid'=>$param['refaid'], 'refcid'=>$param['refcid']];
   } else if (!empty($param['refblock'])) {
     $out = ['type'=>'block', 'refblock'=>$param['refblock'], 'refcid'=>$param['refcid']];
+  } else if (!empty($param['refcid'])) {
+    $out = ['type'=>'course', 'refcid'=>$param['refcid']];
   } else if (!empty($param['custom_place_aid'])) {
     $refcid = $db->get_course_from_aid($param['custom_place_aid']);
     $out = ['type'=>'aid', 'refaid'=>$param['custom_place_aid'], 'refcid'=>$refcid];

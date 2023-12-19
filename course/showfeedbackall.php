@@ -1,13 +1,11 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 $cid = Sanitize::courseId($_GET['cid']);
-if (isset($teacherid)) {
-	$isteacher = true;
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
+
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
+
 if (!$isteacher && !$istutor && !isset($studentid)) {
 	echo _('Error - you are not a student, teacher, or tutor for this course');
 	exit;
@@ -67,7 +65,7 @@ if ($canviewall && !empty($_GET['stu'])) {
 	$stu = $userid;
 }
 
-require("gbtable2.php");
+require_once "gbtable2.php";
 
 $includecomments = true;
 
@@ -75,12 +73,12 @@ $gbt = gbtable($stu);
 
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 echo '<h1>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h1>';
 
 for ($i=0;$i<count($gbt[0][1]);$i++) {
-	if ($gbt[1][1][$i][1] === '' || $gbt[1][1][$i][1]==='<p></p>') {
+	if (empty($gbt[1][1][$i][1]) || $gbt[1][1][$i][1]==='<p></p>') {
 		continue;
 	}
 	if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A') {
@@ -97,9 +95,7 @@ for ($i=0;$i<count($gbt[0][1]);$i++) {
 	if ($gbt[0][1][$i][3]>$availshow) {
 		continue;
 	}
-	if ($hidepast && $gbt[0][1][$i][3]==0) {
-		continue;
-	}
+
 	echo '<h3>';
 	echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
 	echo ' '.sprintf(_('(Score: %g/%g)'), $gbt[1][1][$i][0], $gbt[0][1][$i][2]);
@@ -109,4 +105,4 @@ for ($i=0;$i<count($gbt[0][1]);$i++) {
 	echo '</div>';
 }
 
-require("../footer.php");
+require_once "../footer.php";

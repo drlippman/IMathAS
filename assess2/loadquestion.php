@@ -19,11 +19,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -101,6 +101,9 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
 if ($in_practice) {
     $assess_info->overridePracticeSettings();
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // if livepoll, look up status and verify
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
@@ -149,9 +152,12 @@ $assess_info->loadQuestionSettings($qidstoload, true, false);
 // For livepoll, verify seed and generate new question version if needed
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $curQuestionObject = $assess_record->getQuestionObject($qn, false, false, false);
-  if ($curQuestionObject['seed'] != $livepollStatus['seed']) {
+  if ($curQuestionObject['seed'] != $livepollStatus['seed'] ||
+    $qid != $livepollStatus['curqid']
+  ) {
     // teacher has changed seed. Need to generate a new question version.
-    $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $livepollStatus['seed']);
+    $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $livepollStatus['seed'], $livepollStatus['curqid']);
+    $assess_info->loadQuestionSettings([$qid], true, false);
   }
 }
 
@@ -234,7 +240,7 @@ if (!empty($_POST['autosave-tosaveqn'])) {
                 }
                 $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
                 foreach ($parts as $part) {
-                    if ($ok_to_save === true || $ok_to_save[$part]) {
+                    if ($ok_to_save === true || !empty($ok_to_save[$part])) {
                      $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
                     }
                 }

@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../assessment/displayq2.php");
-require("../assessment/testutil.php");
+require_once "../init.php";
+require_once "../assessment/displayq2.php";
+require_once "../assessment/testutil.php";
 $assessver = 2;
 
  //set some page specific variables and counters
@@ -116,7 +116,7 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $useeqnhelper = $eqnhelper;
 $useOldassessUI = true;
 
-require("../assessment/header.php");
+require_once "../assessment/header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -368,6 +368,6 @@ if ($overwriteBody==1) {
   echo ' <a href="testquestion2.php?cid='.$cid.'&qsetid='.$qsetid.'">';
   echo _('Test in new interface').'</a></p>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

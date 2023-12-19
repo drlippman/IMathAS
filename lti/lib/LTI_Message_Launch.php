@@ -59,9 +59,13 @@ class LTI_Message_Launch {
      */
     public static function from_cache($launch_id, Database $database, Cache $cache = null) {
         $new = new LTI_Message_Launch($database, $cache, null);
-        $new->launch_id = $launch_id;
-        $new->jwt = [ 'body' => $new->cache->get_launch_data($launch_id) ];
-        return $new->validate_registration();
+        if ($new->cache->get_launch_data($launch_id) !== false) {
+            $new->launch_id = $launch_id;
+            $new->jwt = [ 'body' => $new->cache->get_launch_data($launch_id) ];
+            return $new->validate_registration();
+        } else {
+            throw new LTI_Exception("Unable to load launch from cache.", 1);
+        }
     }
 
     /**
@@ -390,7 +394,7 @@ class LTI_Message_Launch {
         } catch(\Exception $e) {
           continue;
         }
-        $newkeys[$key['kid']] = array('alg'=>$key['alg'], 'pub'=>$pubkey['key']);
+        $newkeys[$key['kid']] = array('alg'=> $key['alg'] ?? 'RS256', 'pub'=>$pubkey['key']);
       }
       // record keys
       $this->db->record_keys($key_set_url, $newkeys);
@@ -438,7 +442,7 @@ class LTI_Message_Launch {
 
     private function validate_state() {
         // Check State for OIDC.
-        if ($this->cookie->get_cookie('lti1p3_' . $this->request['state']) !== $this->request['state']) {
+        if (!isset($this->request['state']) || $this->cookie->get_cookie('lti1p3_' . $this->request['state']) !== $this->request['state']) {
             // Error if state doesn't match
             throw new LTI_Exception("State not found", 1);
         }
@@ -446,11 +450,10 @@ class LTI_Message_Launch {
     }
 
     private function validate_jwt_format() {
-        $jwt = $this->request['id_token'];
-
-        if (empty($jwt)) {
+        if (empty($this->request['id_token'])) {
             throw new LTI_Exception("Missing id_token", 1);
         }
+        $jwt = $this->request['id_token'];
 
         // Get parts of JWT.
         $jwt_parts = explode('.', $jwt);
@@ -477,6 +480,10 @@ class LTI_Message_Launch {
 
     private function validate_registration() {
         // Find registration.
+        if (empty($this->jwt['body']['aud'])) {
+            echo "Unable to find registration. Missing client_id; no aud in JWT";
+            throw new LTI_Exception("Missing aud in JWT.", 1);
+        }
         $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
 
         $this->registration = $this->db->find_registration_by_issuer($this->jwt['body']['iss'], $client_id);

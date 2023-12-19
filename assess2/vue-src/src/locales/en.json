@@ -78,10 +78,12 @@
     "time_expired": "Your current assessment time limit expired at {date}.",
     "time_grace_expires": "Your current assessment time limit expired at {date}. The grace period ends {grace}.",
     "timelimit": "Time limit: {time}.",
-    "timelimit_wgrace": "Time limit: {time}, with a grace period of {grace} subject to a {penalty}% penalty.",
+    "timelimit_wgrace": "Time limit: {time}, with a grace period of {grace}.",
+    "timelimit_wgrace_penalty": "Time limit: {time}, with a grace period of {grace} subject to a {penalty}% penalty.",
     "timelimit_extend": "Extended from the original {time}.",
     "timelimit_restricted": "Because of the upcoming due date, your time limit will expire at the due date, {due}.",
-    "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}.",
+    "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period which expires at the due date, {due}.",
+    "timelimit_wgrace_restricted_penalty": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}.",
     "timelimit_ext": "You have been given a {n} minute extension on the time limit",
     "timelimit_ext_used": "You have used a {n} minute timelimit extension",
     "excused": "You have been excused from this assignment. It will not be counted in your grade.",
@@ -185,8 +187,9 @@
     "livepoll_wrongquestion": "Submitted question is not the current question.",
     "livepoll_notopen": "This question is not open for submissions.",
     "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again.",
-    "ytnotready": "YouTube is not ready yet",
-    "file_upload_error": "Error uploading file"
+    "ytnotready": "YouTube is not ready yet. Please be patient for a few seconds.",
+    "file_upload_error": "Error uploading file",
+    "file_toolarge": "Error uploading file - too large. Must be under 15MB"
   },
   "confirm": {
     "ok": "OK",
@@ -469,7 +472,8 @@
     "attemptext": "Exception given for {n} additional versions",
     "preview_files": "Preview All Files",
     "introtexts": "Intro and between-question text",
-    "floating_scoreboxes": "Floating Scoreboxes"
+    "floating_scoreboxes": "Floating Scoreboxes",
+    "no_edit": "You are in the gradebook. You cannot edit answers or submit questions from here."
   },
   "work": {
     "add": "Add Work",

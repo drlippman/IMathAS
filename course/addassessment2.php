@@ -3,14 +3,14 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 if ($courseUIver == 1) {
 	if (isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
-			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
+			$GLOBALS['basesiteurl'], $cid, Sanitize::onlyInt($_GET['id'])));
 	} else {
 		header(sprintf('Location: %s/course/addassessment.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));
@@ -163,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$toset['intro'] = Sanitize::incomingHtml($_POST['intro']);
 		}
-    require_once("../includes/parsedatetime.php");
+    require_once "../includes/parsedatetime.php";
 		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
 
     if ($_POST['sdatetype']=='0') {
@@ -184,7 +184,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
 		// Core options
-		if ($_POST['copyfrom'] > 0) { // copy options from another assessment
+		if (!empty($_POST['copyfrom'])) { // copy options from another assessment
 			$fields = array('displaymethod','submitby','defregens','defregenpenalty',
 									'keepscore','defattempts','defpenalty','showscores','showans',
 									'viewingb','scoresingb','ansingb','gbcategory','caltag','shuffle',
@@ -233,13 +233,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
 			$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
-			$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
+			$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern'] ?? 0);
+            $defregenpenalty = Sanitize::onlyInt($_POST['defregenpenalty'] ?? 0);
 			if ($toset['defregens'] == 1) {
 				$toset['defregenpenalty'] = 0;
-			} else if ($defregenpenalty_aftern > 1 && $_POST['defregenpenalty'] > 0) {
-				$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
+			} else if ($defregenpenalty_aftern > 1 && $defregenpenalty > 0) {
+				$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . $defregenpenalty;
 			} else {
-				$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
+				$toset['defregenpenalty'] = $defregenpenalty;
 			}
 			if (isset($_POST['keepscore'])) {
 				$toset['keepscore'] = Sanitize::simpleString($_POST['keepscore']);
@@ -247,17 +248,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 			$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
-			$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern']);
+			$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern'] ?? 0);
+            $defattemptpenalty = Sanitize::onlyInt($_POST['defattemptpenalty'] ?? 0);
 			if ($toset['defattempts'] == 1) {
 				$toset['defpenalty'] = 0;
-			} else if ($defattemptpenalty_aftern > 1 && $_POST['defattemptpenalty'] > 0) {
-				$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . Sanitize::onlyInt($_POST['defattemptpenalty']);
+			} else if ($defattemptpenalty_aftern > 1 && $defattemptpenalty > 0) {
+				$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . $defattemptpenalty;
 			} else {
-				$toset['defpenalty'] = Sanitize::onlyInt($_POST['defattemptpenalty']);
+				$toset['defpenalty'] = $defattemptpenalty;
 			}
 
 			$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
-			if ($toset['showscores'] == 'none') {
+			if ($toset['showscores'] == 'none' || $toset['showscores'] == 'total' || !isset($_POST['showans'])) {
 				$toset['showans'] = 'never';
 			} else {
 				$toset['showans'] = Sanitize::simpleString($_POST['showans']);
@@ -293,7 +295,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	    if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
 	    	$toset['LPcutoff'] = parsedatetime($_POST['lpdate'],$_POST['lptime'],0);
 	    	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $toset['LPcutoff']) ||
-					$toset['LPcutoff']<$enddate
+					$toset['LPcutoff'] < $toset['enddate']
 				) {
 	    		$toset['LPcutoff'] = 0; //don't really set if it matches course end date or is before
 	    	}
@@ -337,9 +339,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$toset['eqnhelper'] = 2;
 
-			if (!isset($_POST['doposttoforum'])) {
-	      $toset['posttoforum'] = 0;
-	    } else {
+			if (!isset($_POST['doposttoforum']) || empty($_POST['posttoforum'])) {
+				$toset['posttoforum'] = 0;
+			} else {
 				$toset['posttoforum'] = Sanitize::onlyInt($_POST['posttoforum']);
 			}
 
@@ -381,7 +383,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			// group assessmentid
 	    $toset['isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
 			if ($toset['isgroup'] > 0) {
-				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid']);
+				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid'] ?? 0);
 				$toset['groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
 			} else {
 				$toset['groupsetid'] = 0;
@@ -525,7 +527,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			// Re-total any student attempts on this assessment
             //need to re-score assessment attempts based on withdrawal
-            require_once('../assess2/AssessHelpers.php');
+            require_once '../assess2/AssessHelpers.php';
             AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
                 ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
@@ -539,7 +541,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($from=='mcd') {
 				header(sprintf('Location: %s/course/masschgdates.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
 			} else if ($from=='lti') {
-				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+                if (!empty($_SESSION['ltiver']) && $_SESSION['ltiver'] == '1.3') {
+				    header(sprintf('Location: %s/assess2/?cid=%s&aid=%s', $GLOBALS['basesiteurl'], $cid, $assessmentId));
+                } else {
+				    header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+                }
 			} else {
 				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, $rqp));
@@ -743,6 +749,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $skippenalty=10;
       } else
 			*/
+            if ($line['defpenalty'] === '') {
+                $line['defpenalty'] = '0';
+            }
 			if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
 				$defattemptpenalty = substr($line['defpenalty'],2);
 				$defattemptpenalty_aftern = $line['defpenalty'][1];
@@ -750,7 +759,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if (is_string($line['defpenalty']) &&$line['defregenpenalty'][0]==='S') {
+      if ($line['defpenalty'] === '') { $line['defpenalty'] = '0'; }
+			if (is_string($line['defpenalty']) && $line['defregenpenalty'][0]==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
 				$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {
@@ -827,18 +837,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
               global $page_outcomes, $outcomeOptions;
               foreach ($ar as $v) {
                   if (is_array($v)) { //outcome group
-										$outcomeOptions[] = array(
-											'value' => '',
-											'text' => $v['name'],
-											'isgroup' => true
-										);
+                    $outcomeOptions[] = array(
+                        'value' => '',
+                        'text' => $v['name'],
+                        'isgroup' => true
+                    );
                     flattenarr($v['outcomes']);
-                  } else {
-										$outcomeOptions[] = array(
-											'value' => $v,
-											'text' => $page_outcomes[$v],
-											'isgroup' => false
-										);
+                  } else if (isset($page_outcomes[$v])) {
+                    $outcomeOptions[] = array(
+                        'value' => $v,
+                        'text' => $page_outcomes[$v],
+                        'isgroup' => false
+                    );
                   }
               }
           }
@@ -896,7 +906,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>';
 }
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -921,7 +931,7 @@ if ($overwriteBody==1) {
 	<form method=post action="<?php echo $page_formActionTag ?>">
 
 	<?php
-		require("addassessment2form.php");
+		require_once "addassessment2form.php";
 	?>
 
 	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
@@ -929,5 +939,5 @@ if ($overwriteBody==1) {
 	<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

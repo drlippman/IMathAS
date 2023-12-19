@@ -2,10 +2,10 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . '/ErrorHandler.php');
-require_once(__DIR__ . '/QuestionHtmlGenerator.php');
-require_once(__DIR__ . '/models/ScoreQuestionParams.php');
-require_once(__DIR__ . '/scorepart/ScorePartFactory.php');
+require_once __DIR__ . '/ErrorHandler.php';
+require_once __DIR__ . '/QuestionHtmlGenerator.php';
+require_once __DIR__ . '/models/ScoreQuestionParams.php';
+require_once __DIR__ . '/scorepart/ScorePartFactory.php';
 
 use PDO;
 use RuntimeException;
@@ -56,6 +56,7 @@ class ScoreEngine
     );
 
     const ADDITIONAL_VARS_FOR_SCORING = array(
+        'feedback',
         'qnpointval',
     );
 
@@ -142,9 +143,12 @@ class ScoreEngine
           $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
           eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
         } catch (\Throwable $t) {
-          $this->addError(
-              _('Caught error while evaluating the code in this question: ')
-              . $t->getMessage());
+            $this->addError(
+                _('Caught error while evaluating the code in this question: ')
+                . $t->getMessage()
+                . ' on line '
+                . $t->getLine()
+              );
         }
 
         /*
@@ -169,9 +173,9 @@ class ScoreEngine
             $anstypes = array_map('trim', $anstypes);
         }
 
-        if (isset($reqdecimals)) {
+        if (isset($reqdecimals) && $reqdecimals !== '') {
             $hasGlobalAbstol = false;
-            if (is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
+            if (isset($anstypes) && is_array($anstypes) && !isset($abstolerance) && !isset($reltolerance)) {
                 $abstolerance = array();
             } else if (isset($anstypes) && isset($abstolerance) && !is_array($abstolerance)) {
                 $abstolerance = array_fill(0, count($anstypes), $abstolerance);
@@ -179,20 +183,43 @@ class ScoreEngine
             }
             if (is_array($reqdecimals)) {
                 foreach ($reqdecimals as $kidx => $vval) {
-                    if (substr((string)$vval, 0, 1) == '=') {
-                        continue;
-                    } //skip '=2' style $reqdecimals
-                    if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
-                        $abstolerance[$kidx] = 0.5 / (pow(10, $vval));
+                    list($vval, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($vval);
+                    if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
+                        if (count($reqdecscoretype)==2) {
+                            if ($reqdecscoretype[0]=='abs') {
+                                $abstolerance[$kidx] = $reqdecscoretype[1];
+                            } else {
+                                $reltolerance[$kidx] = $reqdecscoretype[1];
+                            }
+                        } else {
+                            $abstolerance[$kidx] = 0.5 / (pow(10, $vval));
+                        }
                     }
                 }
-            } else if (substr((string)$reqdecimals, 0, 1) != '=') { //skip '=2' style $reqdecimals
+            } else { 
+                list($parsedreqdec, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs((string)$reqdecimals);
                 if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
-                    $abstolerance = 0.5 / (pow(10, $reqdecimals));
+                    if (count($reqdecscoretype)==2) {
+                        if ($reqdecscoretype[0]=='abs') {
+                            $abstolerance = $reqdecscoretype[1];
+                        } else {
+                            $reltolerance = $reqdecscoretype[1];
+                        }
+                    } else {
+                        $abstolerance = 0.5 / (pow(10, $parsedreqdec));
+                    }
                 } else if (isset($anstypes) && !isset($reltolerance)) {
                     foreach ($anstypes as $kidx => $vval) {
-                        if (!isset($abstolerance[$kidx]) && $vval != 'draw' && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
-                            $abstolerance[$kidx] = 0.5 / (pow(10, $reqdecimals));
+                        if (!isset($abstolerance[$kidx]) && $vval != 'draw' && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
+                            if (count($reqdecscoretype)==2) {
+                                if ($reqdecscoretype[0]=='abs') {
+                                    $abstolerance[$kidx] = $reqdecscoretype[1];
+                                } else {
+                                    $reltolerance[$kidx] = $reqdecscoretype[1];
+                                }
+                            } else {
+                                $abstolerance[$kidx] = 0.5 / (pow(10, $parsedreqdec));
+                            }
                         }
                     }
                 }
@@ -216,7 +243,7 @@ class ScoreEngine
                 continue;
             }
 
-            if ('answerformat' == $optionKey) {
+            if ('answerformat' == $optionKey && is_scalar($answerformat)) {
                 $answerformat = str_replace(' ', '', $answerformat);
             }
 
@@ -234,6 +261,14 @@ class ScoreEngine
             }
 
             $additionalVarsForScoring[$optionKey] = ${$optionKey};
+        }
+
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
+            if (function_exists('onBeforeScoreQuestion')) {
+                onBeforeScoreQuestion($scoreQuestionParams,
+                    $varsForScorepart, $additionalVarsForScoring);
+            }
         }
 
         /*
@@ -264,8 +299,7 @@ class ScoreEngine
             }
         }
 
-        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+        if (function_exists('onScoreQuestionResult')) {
             $scoreResult = onScoreQuestionResult($scoreResult, $varsForScorepart, $additionalVarsForScoring);
         }
 
@@ -277,6 +311,23 @@ class ScoreEngine
           $this->addError($errors);
         }
         $scoreResult['errors'] = $this->errors;
+
+        if (!empty($GLOBALS['CFG']['logquestionerrors']) && 
+            count($this->errors) > 0 &&
+            (time() - $quesData['lastmoddate']) > 10000
+        ) {
+            // only log if hasn't been edited in a few hours
+            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
+                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
+            $stm = $this->dbh->prepare($query);
+            $stm->execute([
+                $scoreQuestionParams->getDbQuestionSetId(),
+                $scoreQuestionParams->getQuestionSeed(),
+                1,
+                time(),
+                implode('; ', $this->errors)
+            ]);
+        }
 
         return $scoreResult;
     }
@@ -384,7 +435,7 @@ class ScoreEngine
                   list($randqkeys, $randakeys) = $_SESSION['choicemap'][$assessmentId][$partnum];
                   $mapped = array();
                   foreach ($tmp as $k=>$v) {
-                    $mapped[$randqkeys[$k]] = $randakeys[$v];
+                    $mapped[$randqkeys[$k]] = $randakeys[$v] ?? '';
                   }
                   ksort($mapped);
                   $stuanswers[$thisq][$kidx] = implode('|', $mapped);
@@ -413,9 +464,11 @@ class ScoreEngine
                         sort($stuanswers[$thisq][$kidx]);
                         $stuanswers[$thisq][$kidx] = implode('|', $stuanswers[$thisq][$kidx]);
                     } else { // choices
-                        $stuanswers[$thisq][$kidx] = $_SESSION['choicemap'][$assessmentId][$partnum][$stuanswers[$thisq][$kidx]];
                         if ($stuanswers[$thisq][$kidx] === null) {
                             $stuanswers[$thisq][$kidx] = 'NA';
+                        }
+                        if (is_numeric($stuanswers[$thisq][$kidx])) {
+                            $stuanswers[$thisq][$kidx] = $_SESSION['choicemap'][$assessmentId][$partnum][$stuanswers[$thisq][$kidx]];
                         }
                     }
                 }
@@ -500,7 +553,7 @@ class ScoreEngine
                     sort($stuanswers[$thisq]);
                     $stuanswers[$thisq] = implode('|', $stuanswers[$thisq]);
                 } else { // choices
-                    $stuanswers[$thisq] = $_SESSION['choicemap'][$assessmentId][$qnidx][$stuanswers[$thisq]];
+                    $stuanswers[$thisq] = $_SESSION['choicemap'][$assessmentId][$qnidx][$stuanswers[$thisq]] ?? 'NA';
                     if ($stuanswers[$thisq] === null) {
                         $stuanswers[$thisq] = 'NA';
                     }
@@ -547,6 +600,11 @@ class ScoreEngine
             ${$k} = $v;
         }
 
+        // handle undefined $anstypes to prevent exception
+        if (!isset($anstypes)) {
+            echo '$anstypes not defined - will cause scoring issues';
+            $anstypes = [];
+        }
         /*
          * Begin scoring.
          */
@@ -554,21 +612,42 @@ class ScoreEngine
         $partLastAnswerAsGiven = array();
         $partLastAnswerAsNumber = array();
         $partCorrectAnswerWrongFormat = array();
+
         if (isset($answeights)) {
-  				if (!is_array($answeights)) {
-  					$answeights = explode(",",$answeights);
-  				}
-  				$answeights = array_map('trim', $answeights);
-  				if (count($answeights) != count($anstypes)) {
-  					$answeights = array_fill(0, count($anstypes), 1);
-  				}
-  			} else {
-  				if (count($anstypes)>1) {
-  					$answeights = array_fill(0, count($anstypes), 1);
-  				} else {
-  					$answeights = array(1);
-  				}
-  			}
+            if (!is_array($answeights)) {
+                $answeights = explode(",",$answeights);
+            }
+            $answeights = array_map('trim', $answeights);
+            if (count($answeights) != count($anstypes)) {
+                $answeights = array_fill_keys(array_keys($anstypes), 1); 
+            }
+            $answeights = array_map(function($v) {
+                if (is_numeric($v)) { 
+                    return $v;
+                } else {
+                    return evalbasic($v);
+                }
+            }, $answeights);
+            if (array_sum($answeights)==0) {
+                $answeights = array_fill_keys(array_keys($anstypes), 1); 
+            }
+        } else {
+            if (count($anstypes)>1) {
+                $answeights = array_fill_keys(array_keys($anstypes), 1); 
+            } else {
+                $answeights = array(1);
+            }
+        }
+
+        $scoremethodwhole = '';
+        if (isset($scoremethod)) {
+            if (!is_array($scoremethod)) {
+                $scoremethodwhole = $scoremethod;
+            } else if (!empty($scoremethod['whole'])) {
+                $scoremethodwhole = $scoremethod['whole'];
+            }
+        }
+
         $scores = array();
         $raw = array();
         $accpts = 0;
@@ -587,27 +666,27 @@ class ScoreEngine
                 $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum] ?? '');  
             } else {
                 $scoreQuestionParams->setIsRescore($baseIsRescore);
-                $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
+                $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"] ?? '');
             }
 
+            $raw[$partnum] = 0;
             try {
               $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+              $scorePartResult = $scorePart->getResult();
             } catch (\Throwable $t) {
-              $this->addError(
-                  _('Caught error while evaluating the code in this question: ')
-                  . $t->getMessage());
+                $this->addError(
+                    _('Caught error while scoring parts in this question: ')
+                    . $t->getMessage()
+                    . ' on line '
+                    . $t->getLine()
+                    . ' of '
+                    . basename($t->getFile())
+                  );
             }
-            $scorePartResult = $scorePart->getResult();
-            $raw[$partnum] = $scorePartResult->getRawScore();
-
-            $scoremethodwhole = '';
-            if (isset($scoremethod)) {
-                if (!is_array($scoremethod)) {
-                    $scoremethodwhole = $scoremethod;
-                } else if (!empty($scoremethod['whole'])) {
-                    $scoremethodwhole = $scoremethod['whole'];
-                }
+            if (isset($scorePartResult)) {
+                $raw[$partnum] = $scorePartResult->getRawScore();
             }
+            
 
             if ($scoremethodwhole == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
@@ -627,63 +706,59 @@ class ScoreEngine
             }
 
             $raw[$partnum] = round($raw[$partnum], 2);
-            $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
-            $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
-            $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
+            if (isset($scorePartResult)) {
+                $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
+                $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
+                $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
+            } else {
+                $partLastAnswerAsGiven[$partnum] = '';
+                $partLastAnswerAsNumber[$partnum] = '';
+                $partCorrectAnswerWrongFormat[$partnum] = false;
+            }
+        }
+
+        $returnData = [
+            'rawScores' => $raw,
+            'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+            'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+            'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
+            'answeights' => $answeights,
+        ];
+
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
+            if (function_exists('onScorePartMultiPart')) {
+                $returnData = onScorePartMultiPart($returnData, $scorePartResult);
+            }
         }
 
         if ($scoremethodwhole == "singlescore") {
-            return array(
+            return array_merge($returnData, [
                 'scores' => array(round(array_sum($scores), 3)),
-                'rawScores' => $raw,
-                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'scoreMethod' => 'singlescore',
-                'answeights' => $answeights
-            );
+            ]);
         } else if ($scoremethodwhole == "allornothing") {
             if (array_sum($scores) < .98) {
-                return array(
+                return array_merge($returnData, [
                     'scores' => array(0),
-                    'rawScores' => $raw,
-                    'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                    'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                     'scoreMethod' => 'allornothing',
-                    'answeights' => $answeights
-                );
+                ]);
             } else {
-                return array(
+                return array_merge($returnData, [
                     'scores' => array(1),
-                    'rawScores' => $raw,
-                    'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                    'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                     'scoreMethod' => 'allornothing',
-                    'answeights' => $answeights
-                );
+                ]);
             }
         } else if ($scoremethodwhole == "acct") {
             $sc = round(array_sum($scores) / $accpts, 3);
-            return (array(
+            return array_merge($returnData, [
                 'scores' => array($sc),
-                'rawScores' => $raw,
-                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'scoreMethod' => 'singlescore',
-                'answeights' => $answeights
-            ));
+            ]);
         } else {
-            return array(
+            return array_merge($returnData, [
                 'scores' => $scores,
-                'rawScores' => $raw,
-                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
-                'answeights' => $answeights
-            );
+            ]);
         }
     }
 
@@ -714,7 +789,7 @@ class ScoreEngine
             }
         }
 
-        return array(
+        $returnData = array(
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 3)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
@@ -722,6 +797,15 @@ class ScoreEngine
             'correctAnswerWrongFormat' => array($scorePartResult->getCorrectAnswerWrongFormat()),
             'answeights' => array(1)
         );
+
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
+            if (function_exists('onScorePartNonMultiPart')) {
+                $returnData = onScorePartNonMultiPart($returnData, $scorePartResult);
+            }
+        }
+
+        return $returnData;
     }
 
     /**
@@ -783,9 +867,18 @@ class ScoreEngine
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
                                      int $errline, array $errcontext = []): bool
     {
-        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
-
-        if (E_WARNING == $errno || E_ERROR == $errno) {
+        $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
+        if (E_ERROR == $errno || (E_WARNING == $errno &&
+            (
+                ($showallerrors || $errstr != 'Trying to access array offset on value of type null') &&
+                ($showallerrors || empty($GLOBALS['CFG']['suppress_question_warning_display']))
+            )
+        )) {
+            if ($errstr == 'Trying to access array offset on value of type null') {
+              $errstr = 'Trying to access array offset of undefined variable';
+            }
+            ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+            
             $this->addError(sprintf('Caught %s in the question code: %s on line %s in file %s',
                 ErrorHandler::ERROR_CODES[$errno],
                 $errstr, $errline, $errfile));

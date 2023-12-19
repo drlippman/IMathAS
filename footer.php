@@ -3,7 +3,7 @@
 <div class="footerwrapper"><?php
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if (file_exists("$curdir/footercontent.php")) {
-		require("$curdir/footercontent.php");
+		require_once "$curdir/footercontent.php";
 	}
 ?>
 </div>
@@ -16,19 +16,19 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 	}
 	</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>';
 }
-if (isset($useeditor) && $_SESSION['useed']==1) {
+if (isset($useeditor) && !empty($_SESSION['useed'])) {
 	//echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
 if (!isset($courseUIver)) { $courseUIver = 1;}
 if (($courseUIver == 1 || isset($useOldassessUI)) && isset($useeqnhelper)
 	&& ($useeqnhelper==1 || $useeqnhelper==2)) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require("$curdir/assessment/eqnhelper.html");
+	require_once "$curdir/assessment/eqnhelper.html";
 } else if (($courseUIver == 1 || isset($useOldassessUI)) && isset($useeqnhelper)
 	&& ($useeqnhelper==3 || $useeqnhelper==4)) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require("$curdir/assessment/mathquilled.html");
-	require("$curdir/assessment/eqnhelperbasic.html");
+	require_once "$curdir/assessment/mathquilled.html";
+	require_once "$curdir/assessment/eqnhelperbasic.html";
 }
 
 if ((isset($testsettings) && $testsettings['showtips']==2) ||
@@ -43,7 +43,7 @@ if (isset($placeinfooter)) {
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['footerscriptinclude'])) {
-	require("$curdir/{$CFG['GEN']['footerscriptinclude']}");
+	require_once "$curdir/{$CFG['GEN']['footerscriptinclude']}";
 }
 ?>
 </body>

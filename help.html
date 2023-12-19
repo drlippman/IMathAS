@@ -2100,6 +2100,14 @@ different numbers that are not opposites:
 </p>
 <pre>$a,$b = diffrands(-5,5,2) where ($a+$b!=0)</pre>
 <p>
+<p>Beware that the system will give up if it's unable to meet the specified conditions after 200 tries, 
+    so be sure your <code>where</code> condition has fairly high probability of success, ideally at least 10%.  If it doesn't,
+    you should consider where there are other ways to generate your values.  Alternatively, you can 
+    specify a fallback value to use if the condition fails using <code>else</code>:
+</p>
+</p>
+<pre>$a = rand(1,100) where (gcd($a,$b)==1) else ($a = 7)</pre>
+<p>
 &quot;if&quot; is used to make an assignment conditional.  For example:
 </p>
 <pre>
@@ -2121,6 +2129,7 @@ Comparison operators available for &quot;if&quot; and &quot;where&quot; statemen
 <li>&lt; Less than</li>
 <li>&gt;= Greater than or equal to</li>
 <li>&lt;= Less than or equal to</li>
+<li>isset($v) Whether $v is defined</li>
 </ul>
 <p>
 To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
@@ -2169,6 +2178,16 @@ if ($a==0) {
   $b = rand(1,5)
 } where ($a+$b !==0)
 </pre>
+<p>or with a fallback</p>
+<pre>
+{
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0) else {
+  $a = -3
+  $b = 5
+}
+</pre>
 
 <h3 id="loops">Loops</h3>
 <p>There are several looping macros (such as calconarray) that can meet most needs.  For more general use
@@ -2176,7 +2195,7 @@ there is a "for" loop:</p>
 
 <pre>for ($i=a..b) { action }</pre>
 <p>
-Here <em>a</em> and <em>b</em> represent whole numbers or variables.  Expressions are not allowed.
+Here <em>a</em> and <em>b</em> represent whole numbers, variables, or simple expressions.
 </p>
 <p>Examples:</p>
 <pre>
@@ -2195,6 +2214,11 @@ for ($i=0..4) {
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 {for ($i=1..5) {$a = $a+$i} } if ($a>2)    WORKS
 </pre>
+
+<p>Inside a for loop, <code>break</code> can be used to break out of the loop, and 
+   <code>continue</code> can be used to move on to the next iteration without executing 
+   any further code in the block.
+</p>
 
 
 </div> <!-- h2 -->
@@ -2251,12 +2275,15 @@ The following macros create graphs or tables:
 <ul>
 <li><strong>showarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  Alternatively you can call this function with arguments
-    showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "r", or "l" to center, left-align, or right align data,
+    showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
 	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
       and $opts["caption"] to add a caption to the table.  To align each column differently, provide a
 	  a string with a character for each column, like "rcc"</li>
-<li><strong>showdataarray(array,[columns])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
-    in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
+<li><strong>showdataarray(array,[columns,options])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
+    in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.
+    Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
+    or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
+    and $opts["caption"] to add a caption to the table.</li>
 <li><strong>horizshowarrays(string,array,[string,array]...)</strong>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
     as row labels.  Does not text wrap, so only use for small data sets.</li>
 <li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[format])</strong>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.
@@ -2450,7 +2477,7 @@ These macros help with working with strings:
 <ul>
 <li><strong>stringappend(value,string)</strong>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
 <li><strong>stringprepend(value,string)</strong>:  Same as stringappend, but prepends string to value</li>
-<li><strong>today([string])</strong>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
+<li><strong>today([string])</strong>: Returns today's date, like "July 3, 2008".  Can change format using string (see https://www.php.net/manual/en/datetime.format.php for formats)</li>
 <li><strong>stringpos(needle,haystack)</strong>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
 <li><strong>stringlen(string)</strong>: returns the character count in the provided string</li>
 <li><strong>stringclean(string,mode)</strong>: mode 0: trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric characters.</li>
@@ -2500,12 +2527,13 @@ These macros are for working with arrays:
 	    would return $a[2], $a[4], and $a[6]</li>
 	 </ul>
 	 </li>
+<li><strong>splicearray(array,offset,length,[replacement])</strong>: Removes the elements designated by offset and length from the given array, and replaces them with the elements of the replacement array, if supplied.</li>
 <li><strong>joinarray(array,symbol)</strong>:  Convert an array to a string, joining elements with the given symbol</li>
 <li><strong>mergearrays(array,array,[array,...])</strong>:  Combines two or more arrays into one long array</li>
 <li><strong>unionarrays(array,array)</strong>:  Unions two arrays, preventing duplicates, into a new array</li>
 <li><strong>intersectarrays(array,array)</strong>:  Finds the intersection of two arrays</li>
 <li><strong>diffarrays(array1,array2)</strong>: Returns all elements in array1 that are not also in array2</li>
-<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values</li>
+<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values. Beware this doesn't re-index the array, so you may want to then use array_values if you need consecutive array keys.</li>
 <li><strong>array_values(array)</strong>: Returns the values of an array, reindexing with consecutive numeric indices.</li>
 <li><strong>count(array)</strong>:  Counts the number of entries in the array</li>
 <li><strong>is_array(variable)</strong>:  Determines if the variable is an array</li>
@@ -2535,6 +2563,12 @@ These macros are fairly general purpose:
   start is the first value used, and num indicates the number of entries to create.
   ABarray(5,2) will output array("[AB5]","[AB6]").
   This macro is often used in conjunction with the showarrays macro.</li>
+<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: 
+  If fed a string from $stuanswers or $stuanswersval of an N-tuple or Calculted N-tuple question,
+  this will extract the components of the n-tuple, returning them as an array.  It is recommended to
+  provide a second argument of the number of components expected, and if the values are expected to
+  be numeric, put true as the third argument.  This function will return false if the input is 
+  not a valid ntuple.  This function only works for a single n-tuple, not a list of them.</li>
 <li><strong>scoremultiorder(stua, answer, swap, type, [weights])</strong>: In a multipart question, allows questions or groups 
   of questions to be scored in any order.  Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 
   'ntuple', and 'calcntuple'.  <em>Note:</em> Use of the "list" option for individual question types is <b>strongly</b> recommended over 
@@ -2568,17 +2602,17 @@ These macros are used for mathematical calculations:
 <li><strong>sin(t), cos(t), tan(t), sec(t), csc(t), cot(t)</strong>: The usual trig functions</li>
 <li><strong>arcsin(v), arccos(v), arctan(v), atan2(y,x)</strong>: The inverse trig functions</li>
 <li><strong>abs(v)</strong>: Absolute value</li>
-<li><strong>gcd(a,b)</strong>: Greatest common divisor of a and b</li>
-<li><strong>lcm(a,b)</strong>: Least common multiple of a and b</li>
+<li><strong>gcd(a,b,[c,d,...])</strong>: Greatest common divisor of the inputs</li>
+<li><strong>lcm(a,b,[c,d,...])</strong>: Least common multiple of the inputs</li>
 <li><strong>sign(a,[option])</strong>:  Returns the sign of a, as 1 or -1.  If option is set to true, returns a string "+" or "-" instead. If option
   is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
 <li><strong>sgn(a)</strong>: Returns the sign of a, as -1, 0, or 1.</li>
 <li><strong>v!</strong>: Factorial, like $a = $b!</li>
 <li><strong>evalfunc(func,vars,val1,val2,..)</strong>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
-<li><strong>evalnumstr(expr)</strong>: Evaluates a string representation of a numerical expression, like "(2pi)/3", to a decimal.  
+<li><strong>evalnumstr(expr, [complex])</strong>: Evaluates a string representation of a numerical expression, like "(2pi)/3", to a decimal.  
   Avoid using this in place of direct calculation in most cases, but it can be handy if you already have generated the string 
-  for display but then need to do a calculation with it.</li>
+  for display but then need to do a calculation with it.  Set complex to true if the calculation involves complex number expressions.</li>
 <li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
 </ul>
 </div> <!-- h2 -->
@@ -2596,12 +2630,16 @@ These macros are used to test various conditions.  They typically return true or
     Pass this function the $stuanswers or $sutanswersval arrays, $thisq for the question number,
     and an array of part numbers, and it will check to make sure a non-blank answer has been 
     provided for all of the part numbers.  A part number can also be given as "1 or 2" if answering
-    either part is sufficient.  To allow a blank answer, prefix a part number with a tilde. 
+    either part is sufficient.  If it is a single part question, use null for the part number.
+    To allow a blank answer, prefix a part number with a tilde. 
     It is good to wrap any multipart or conditional code using student answers in an "if" block 
     using stuansready as the condition.  It is advisable to pass $anstypes as a 4th input, which 
     allows the function to handle special cases like matrices better. $answerformat can be added 
     as an optional 5th input, which will check the student answer meets the answerformat (currently 
-    only checks Calculated questions, and no lists).</li>
+    only checks Calculated questions, and no lists). Or you can put 'checknumeric' for the answerformat 
+    and it will check that "number" and "calculated" answers are numeric (must use $stuanswersval for calculated in this case).
+    Note this won't work for list answers, only single numbers, and that it won't recognize answers 
+    with commas like "2,345" as numeric.</li>
 <li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparenumberswithunits(a,b,[tol])</strong>:  Compares numbers-with-units a and b to see if they are equivalent to the specified tolerance. Set tol to 
@@ -2615,9 +2653,14 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
   Set domain to "xmin,xmax" to specify a domain for comparison, or "xmin,xmax,integers" to restrict domain to integer values.</li>
+<li><strong>comparesameform(a,b,[vars])</strong>: Compares expresions a and b to see if they are 
+    in the "same form". This means exactly the same, except for commutation of addition and 
+    multiplication, multiplication by 1, implicit multiplication, and extra parentheses. This is picky,
+    so use with caution. Set vars to a list of variables (defaults to 'x').</li>
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
+<li><strong>isset($var)</strong>: Checks to see if $var is defined</li>
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
 <li><strong>is_nan(val)</strong>:  Checks if the value is NAN (not a number), which results from things like sqrt(-1). Only works on calculated values, not string expressions.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
@@ -2632,6 +2675,8 @@ These macros are used to test various conditions.  They typically return true or
   $answer,$showanswer = scorestring($answer,$showanswer,$words,$stuanswers,$thisq,2)</li>
 <li><strong>checkanswerformat(string, answerformat)</strong>: Checks a single numerical expression 
     string, like "3/2" for whether it meets the answerformat listed.</li>
+<li><strong>getsigfigs(value, [expected sigfigs])</strong>: returns the number of sigfigs in 
+    value.  Include the expected sigfigs to resolve ambiguity on numbers like 1200.</li>
   </ul>
 </div> <!-- h2 -->
 <div class=h2>
@@ -2704,8 +2749,9 @@ available in each library</p>
 <tr><td>* / + -</td><td>Multiply, divide, add, subtract</td></tr>
 <tr><td>^</td><td>Powers.  2^3 = 8.</td></tr>
 <tr><td>e, pi</td><td>The standard constants</td></tr>
-<tr><td>%</td><td>Modulus (remainder after division.  5%2 = 1)</td></tr>
-<tr><td>mod(p,n)</td><td>Modulus. This version gives positive results for modulus of negative numbers.</td></tr>
+<tr><td>%</td><td>Modulus of integers (remainder after division.  5%2 = 1)</td></tr>
+<tr><td>mod(p,n)</td><td>Modulus of integers. This version gives positive results for modulus of negative numbers.</td></tr>
+<tr><td>fmod(p,n)</td><td>Modulus of decimal values. May give negative results from negative inputs.</td></tr>
 <tr><td>!</td><td>Factorial</td></tr>
 <tr><td>sqrt</td><td>Square root</td></tr>
 <tr><td>sin,cos,tan,cot,sinh,cosh</td><td>Standard trig function.  Be sure to enter as sin(2), not sin 2</td></tr>
@@ -2926,6 +2972,18 @@ somewhere in the Question Text portion of the question.
     Do this by wrapping the teacher note in the [teachernote] shortcode like this: <code>[teachernote]This is the note[/teachernote]</code>
 </p>
 
+<h3>Hiding/Toggling content</h3>
+<p>If you need to hide content from view, you can wrap it in <code>&lt;div class="hidden"&gt;&lt;/div&gt;</code>.
+  Be aware the content is still in the page, so a student can still view the hidden content
+  using the browser inspector, so don't use this to hide secret info, but it can be helpful 
+  if you need to hide an answerbox that is being populated by some other means.</p>
+<p>If you want to toggle a block of content, one option for shorter content is to use 
+    forminlinebutton.  For longer content, you can wrap the content in a block using 
+    <code>&lt;div data-toggler="Title for button"&gt;&lt;/div&gt;</code>.  That will
+    hide the wrapped content, and add a button with the specified title for toggling the 
+    content.  You can optionally add a <code>data-toggler-hide</code> attribute as well 
+    if you want a different button label once the content is showing.
+</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -2974,7 +3032,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	the correct answer.  To override the tolerance use +- in the setting, like this:
 	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
 	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $reltolerance = .01)</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "units", "nosoln", or "nosolninf"</dt>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "set", "integer, "units", "nosoln", or "nosolninf"</dt>
 	<dd>
         <ul>
             <li>Answerformats can be combined, like $answerformat = "nosoln,list"</li>
@@ -2982,6 +3040,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
             <li>If $answerformat="list", then duplicate values are ignored.</li>
             <li>If $answerformat="exactlist", then duplicate values are not ignored.</li>
             <li>If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</li>
+            <li>$answerformat = "set" behaves like "list", but expects the answer list to be wrapped in curly braces as a set.</li>
             <li>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)</li>
             <li>$answerformat = "units" adds unit checking.  Supply the answer like <code>$answer = "3 kg/m^2"</code>.  
                 The student's answer can be in other equivalent units, so "300 cm" is considered equivalent to "3 m".
@@ -3117,7 +3176,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	You can match either of two symbols by putting || between them, like ".5||1/2,>0"<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
 	You can put "ignore_commas,true" at the beginning of the $requiretimes to ignore commas in the answer<br/>
-	You can put "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer
+	You can put "ignore_spaces,true" at the beginning of the $requiretimes to ignore spaces in the answer<br/>
+    You can put "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer
 	</dd>
 <dt>$requiretimeslistpart = a list, in the same format as $requiretimes </dt>
 	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used,
@@ -3217,8 +3277,14 @@ of choices is automatically randomized.
     if $scoremethod="takeanything", full credit will be given for any response.</dd>
 <dt>$displayformat = "horiz", "2column, "3column", or "inline" </dt>
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
-<dt>$noshuffle = "all" </dt>
-	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
+<dt>$noshuffle = "all" or "last" </dt>
+	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled). 
+        If $noshuffle="last", then the last element of $questions will not be randomized (shuffled) but the others will.
+    </dd>
+<dt>$answerformat = "addnone" </dt>
+	<dd>Adds "None of these" to the options. This is added automatically if <code>$answers=""</code>, and you can 
+        add "None of these" yourselv to <code>$questions</code>, but this provides another way to always include the 
+        "None of these" option.</dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
@@ -3311,10 +3377,11 @@ A student is asked to enter a function
 	use "#" in the symbol location to match any number (including decimal values); 3.2x+42y would match twice.<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
 	You can match either of two symbols by putting || between them, like "x^-3||/x^3,>0"<br/>
-	Include "ignore_case,false" to make the search case sensitive.
+	Include "ignore_case,false" to make the search case sensitive.<br/>
+    You can put "ignore_spaces,true" at the beginning of the $requiretimes to ignore spaces in the answer<br/>
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" or "list" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "generalcomplex" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" or "list" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -3323,6 +3390,7 @@ A student is asked to enter a function
 	"inequality": Specifies that the answer is expected to be an inequality rather than an expression.
 	The given answers should also be an inequality.  Be sure to specify all variables in the equation in $variables.  This may fail
     on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
+    "generalcomplex": Specifies the answer is a complex function, involving i.<br/>
     "list": Allow a list of expressions or equations to be entered. Does not ignore duplicates. You cannot
        use this in combination with $partialcredit.  $requiretimes will apply to each element of the list.<br/>
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
@@ -3463,8 +3531,9 @@ None - the essay type is not computer graded.
 <dl>
 <dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" </dt>
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
-<dt>$displayformat = "editor" </dt>
-	<dd>Use the rich text editor for the essay answer box.</dd>
+<dt>$displayformat = "editor" or "pre" </dt>
+	<dd>"editor" to use the rich text editor for the essay answer box.<br>
+    "pre" to use standard text entry, and to display in gradebook as preformatted text.</dd>
 <dt>$scoremethod = "takeanything" or "takeanythingorblank" or "nomanual"</dt>
 	<dd>The first two sets the problem to give full credit for any answer.  The second also counts
 	blank answers as correct.  The "nomanual" option will give no credit for any answer, but doesn't 
@@ -3524,7 +3593,8 @@ drawn line from the correct line.
 	        	<li>cubic (a(x-h)^3+k style cubics)</li>
 	        	<li>abs (absolute value)</li>
 	        	<li>circle (circles)</li>
-	        	<li>dot (open and closed dots)</li>
+	        	<li>dot (closed dots)</li>
+                <li>opendot (open dots)</li>
 	        	<li>sqrt (square root)</li>
 	        	<li>cuberoot (cube root)</li>
 	        	<li>trig (sin and cos)</li>
@@ -3549,7 +3619,9 @@ drawn line from the correct line.
                 arbitrary segments.
             </li>
 	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
-	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
+	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors. 
+                Note you can use $scoremethod to change how vectors are scored.
+            </li>
 	      </ul>
 	    <p>$answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.</p>
 	    <p> $answerformat = "closedpolygon" can be used for drawing a single polygon that is closed; the enclosed area will be shaded and the drawing terminate when the shape is
@@ -3602,7 +3674,7 @@ drawn line from the correct line.
 	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is
 	between 0 and 1).  Otherwise
 	the student will receive full credit.  Not set by default.</dd>
-<dt>$scoremethod = "takeanything", "direction", "relativelength"</dt>
+<dt>$scoremethod = "takeanything", "direction", "relativelength", "ignoreoverlap"</dt>
 		<dd>When "takeanything" is used, this will give full credit for any non-blank answer.  This might be of use with the freehand drawing option.
             <br>
             "direction" and "relativelength" are only used for vectors.  
@@ -3610,6 +3682,8 @@ drawn line from the correct line.
               will only score direction for displacement vectors.
             "relativelength" will score like "direction", but will also check that the drawn vectors have 
               correct lengths relative to each other.
+              <br>
+            "ignoreoverlap" only works with $answerformat="line", and will not deduct for overlapped lines.
         </dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
@@ -3749,8 +3823,10 @@ Complex questions require the student to enter a complex number in a+bi form.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "list" </dt>
-	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt>$answerformat = "list" or "allowjcomplex" </dt>
+	<dd>"list" Specifies that the answer will be a list of complex numbers.
+		"allowjcomplex" allows 2+3j instead of 2+3i
+	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3787,9 +3863,12 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
+<dt><dt>$answerformat = "sloppycomplex", "generalcomplex", "allowjcomplex" "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "sameform" </dt>
 	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
 	must still only contain one i.  <br/>
+    Use "generalcomplex" to allow students to enter complex expressions that may involve calculations.
+    <br/>
+	"allowjcomplex" allows for use of j instead of i as the imaginary unit. <br/>
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
@@ -3837,9 +3916,10 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult" or "ref"</dt>
+<dt>$answerformat = "scalarmult" or "ref" or "anyroworder"</dt>
 	<dd>If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
-	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.</dd>
+	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
+    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3849,9 +3929,12 @@ The entries are compared to a given tolerance.
 	<dd>By default, the whole matrix must be correct to receive any credit.
 	Set $scoremethod = "byelement" to give partial credit if only some elements of
 	the matrix are correct.</dd>
-<dt>$displayformat = "det" </dt>
+<dt>$displayformat = "det" or "inline" </dt>
 	<dd>When $answersize is used, by default square brackets are used around the
-		entry array. Set $displayformat = "det" to use vertical bars instead.</dd>
+		entry array. Set $displayformat = "det" to use vertical bars instead.
+    <br>
+       Normally matrices with $answersize set are displayed on their own line. Set 
+       $displayformat = "inline" to display it inline with text.</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number </dt>
@@ -3889,12 +3972,13 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult","ref","fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt>$answerformat = "scalarmult","ref","anyroworder",fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
 	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
-	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.</dd>
+	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
+    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3904,9 +3988,12 @@ The entries are compared to a given tolerance.
 	<dd>By default, the whole matrix must be correct to receive any credit.
 	Set $scoremethod = "byelement" to give partial credit if only some elements of
 	the matrix are correct.</dd>
-<dt>$displayformat = "det" </dt>
+<dt>$displayformat = "det" or "inline"</dt>
 	<dd>When $answersize is used, by default square brackets are used around the
-		entry array. Set $displayformat = "det" to use vertical bars instead.</dd>
+		entry array. Set $displayformat = "det" to use vertical bars instead.
+        <br>
+        Normally matrices with $answersize set are displayed on their own line. Set 
+        $displayformat = "inline" to display it inline with text.</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number </dt>
@@ -3955,11 +4042,13 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$answerformat = "normalcurve" or "list"</dt>
+<dt>$answerformat = "normalcurve" or "list" or "allowsloppyintervals"</dt>
 	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
     shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.
     <br/>
-    "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"</dd>
+    "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"
+    <br/>
+    "allowsloppyintervals" will accept unsimplified unions, so will count [2,5)U(3,7) as equivalent to [2,7)</dd>
 <dt>$scoremethod = "partialcredit"</dt>
   <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
 		will changing the scoring mode to give partial credit. (new assessment system only).</dd>
@@ -4000,7 +4089,7 @@ interval notation.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", or "inequality" </dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", "allowsloppyintervals", or "inequality" </dt>
 	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
@@ -4008,7 +4097,8 @@ interval notation.
     interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
     <br/>
     "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)".  Does not work with "inequality".
-	</dd>
+	<br/>
+    "allowsloppyintervals" will accept unsimplified unions, so will count [2,5)U(3,7) as equivalent to [2,7)</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>

@@ -205,6 +205,7 @@ var AMsymbols = [
 {input:"oint", tag:"mo", output:"\u222E", tex:null, ttype:CONST},
 {input:"del",  tag:"mo", output:"\u2202", tex:"partial", ttype:CONST},
 {input:"grad", tag:"mo", output:"\u2207", tex:"nabla", ttype:CONST},
+{input:"hbar", tag:"mi", output:"\u210F", tex:null, ttype:CONST},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm", ttype:CONST},
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
@@ -254,6 +255,9 @@ var AMsymbols = [
 {input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
 {input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
 {input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+{input:"arcsec",  tag:"mo", tex:"mathrm{arcsec}", ttype:UNARY, func:true},
+{input:"arccsc",  tag:"mo", tex:"mathrm{arccsc}", ttype:UNARY, func:true},
+{input:"arccot",  tag:"mo", tex:"mathrm{arccot}", ttype:UNARY, func:true},
 {input:"sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
 {input:"cosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
 {input:"tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
@@ -885,6 +889,7 @@ function AMTparseAMtoTeX(str) {
   str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
+  str = str.replace(/⁰/g,"^0").replace(/¹/g,"^1").replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9");
   if (str.match(/\S/)==null) {
 	  return "";
   }

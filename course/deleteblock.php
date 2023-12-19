@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -16,13 +16,16 @@ $cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".$cid."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Block";
 
 
-if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
+if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+} elseif (!isset($_REQUEST['remove'])) {
+    $overwriteBody = 1;
+	$body = "Invalid request";
+} else {// a valid delete request loaded the page
 	if (isset($_POST['remove']) && $_POST['remove']=="really") { // the request has been confirmed, delete the block
 		$blocktree = explode('-',$_GET['id']);
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -47,7 +50,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
             }
 			if (count($blockitems)>0) {
 				if (isset($_POST['delcontents']) && $_POST['delcontents']==1) { //clear out contents of block
-					require("delitembyid.php");
+					require_once "delitembyid.php";
 					delrecurse($blockitems);
 					array_splice($sub,$blockid,1); //remove block and contained items from itemorder
 				} else {
@@ -68,7 +71,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('Sanitize::onlyInt',$obarr)));
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=". $cid.$btf . "&r=" . Sanitize::randomQueryStringParam());
-
+        exit;
 	} else {
 		$blocktree = explode('-',$_GET['id']);
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -78,15 +81,16 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$sub =& $items;
 		if (count($blocktree)>1) {
 			for ($i=1;$i<count($blocktree);$i++) {
+                if (!is_array($sub[$blocktree[$i]-1])) { echo 'Error'; exit; }
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
+        if (!is_array($sub[$blockid])) { echo 'Error'; exit; }
 		$itemname =  $sub[$blockid]['name'];
 	}
-
 }
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -111,7 +115,7 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 /**** end html code ******/
 //nothing after the end of html for this page
 /***** cleanup code ******/

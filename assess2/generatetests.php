@@ -4,8 +4,8 @@
  * (c) 2019 David Lippman
  */
 
-require('../init.php');
-require_once("../includes/filehandler.php");
+require_once '../init.php';
+require_once "../includes/filehandler.php";
 
 
 if ($myrights < 100) {
@@ -14,7 +14,7 @@ if ($myrights < 100) {
 }
 
 if (!isset($_POST['cid'])) {
-  require('../header.php');
+  require_once '../header.php';
 ?>
   <h1>Generate Testing Scenarios</h1>
   <p>This page will generate a set of testing data for the new assessment player.
@@ -30,7 +30,7 @@ if (!isset($_POST['cid'])) {
     <input type=submit />
   </form>
 <?php
-  require('../footer.php');
+  require_once '../footer.php';
   exit;
 }
 
@@ -89,7 +89,7 @@ $stm = $DBH->prepare("DELETE FROM imas_outcomes WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 
 /** Create new stuff **/
-require("testdata.php");
+require_once "testdata.php";
 
 // initialize itemorder
 $courseitemorder = [];

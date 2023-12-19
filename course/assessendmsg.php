@@ -4,7 +4,7 @@
 
 
 if (!isset($imasroot)) {
-	require("../init.php");
+	require_once "../init.php";
 	if (!(isset($teacherid))) { // loaded by a NON-teacher
 		echo "You must be a teacher to access this page";
 		exit;
@@ -55,7 +55,7 @@ if (!isset($imasroot)) {
 	$pagetitle = "End of Assessment Messages";
 	$useeditor = "commonmsg";
 
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -71,9 +71,9 @@ if (!isset($imasroot)) {
 		$endmsg = $stm->fetchColumn(0);
 	} else {
 		$endmsg = '';
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No assessments selected";
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -134,5 +134,5 @@ if (!isset($imasroot)) {
 The "otherwise, show" message will display if no other score messages are defined.  Use this instead
 of trying to create a 0 score entry</p>
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

@@ -26,7 +26,10 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	$ggbid = uniqid();
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
-  } else	if (!isset($GLOBALS['geogebracount'])) {
+        if (!isset($GLOBALS['geogebracount'])) {
+            $GLOBALS['geogebracount'] = 0;
+        }
+    } else if (!isset($GLOBALS['geogebracount'])) {
 		$GLOBALS['geogebracount'] = 0;
 		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
 	}

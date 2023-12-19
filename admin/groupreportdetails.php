@@ -2,7 +2,7 @@
 //IMathAS - Group super Details page
 //(c) 2019 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 function getRoleNameByRights($rights) {
   switch ($rights) {
@@ -174,7 +174,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -267,4 +267,4 @@ if ($overwriteBody==1) {
 }
 
 echo '<p>&nbsp;</p><p>&nbsp;</p>';
-require("../footer.php");
+require_once "../footer.php";

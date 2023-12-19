@@ -1,7 +1,7 @@
 <?php
 
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-  require_once($CFG['hooks']['lti']);
+  require_once $CFG['hooks']['lti'];
   /**
    * see ltihooks.php.dist for details
    */
@@ -53,7 +53,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         }
         if ($destaid === false) {
           // can't find assessment - copy it
-          require_once(__DIR__.'/../includes/copycourse.php');
+          $GLOBALS['datesbylti'] = $localcourse->get_dates_by_lti();
+          require_once __DIR__.'/../includes/copycourse.php';
           $destaid = copyassess($sourceaid, $destcid);
         }
         if ($destaid !== false) {
@@ -65,6 +66,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
           exit;
         }
       }
+    } else if ($target['type'] === 'course') {
+      $link = $db->make_link_assoc($target['refcid'],'course',$resource_link['id'],$contextid,$platform_id);  
     } else if (function_exists('lti_can_ext_handle_launch') && lti_can_ext_handle_launch($launch->get_target_link())) {
       $link = lti_handle_launch($launch, $localcourse, $localuserid, $db);
     } else {
@@ -119,7 +122,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       $localcourse->set_UIver($db->get_UIver($localcourse->get_courseid()));
     }
     if ($localcourse->get_UIver() == 1) {
-      header(sprintf('Location: %s/assessment/showtext.php?cid=%d&aid=%d&ltilaunch=true',
+      header(sprintf('Location: %s/assessment/showtest.php?cid=%d&aid=%d&ltilaunch=true',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
         $link->get_typeid()

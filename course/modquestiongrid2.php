@@ -9,8 +9,8 @@
 		exit;
 	}
 
-	if ($_GET['process']== true) {
-		require_once("../includes/updateptsposs.php");
+	if (!empty($_GET['process'])) {
+		require_once "../includes/updateptsposs.php";
 		if (isset($_POST['add'])) { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -149,6 +149,17 @@
 
 			updatePointsPossible($aid, $itemorder, $defpoints);
 		}
+        // Delete any teacher or tutor attempts on this assessment
+        $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+            imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array($cid, $aid));
+        $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+            imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array($cid, $aid));
 
 	} else {
 		//get defaults
@@ -199,7 +210,7 @@
 				}
 			}
 			</script>';
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 
@@ -217,6 +228,7 @@ if (isset($_POST['checked'])) { //modifying existing
 ?>
 <p><?php echo _("Leave items blank to use the assessment's default values"); ?></p>
 <table class=gb>
+<caption class="sr-only">Question Settings</caption>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
@@ -256,7 +268,6 @@ if (isset($_POST['checked'])) { //modifying existing
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						$qrows[$row['id']] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
@@ -280,7 +291,7 @@ if (isset($_POST['checked'])) { //modifying existing
                 $qrows[$row['id']] .= '</select></td>';
                 $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\">";
                 foreach ($showworkoptions as $v=>$l) {
-                    $qrows[$row['id']] .= '<option value="'.$v.'" '.($row['showwork']==$v ? 'selected':'').'>';
+                    $qrows[$row['id']] .= '<option value="'.Sanitize::encodeStringForDisplay($v).'" '.($row['showwork']==$v ? 'selected':'').'>';
                     $qrows[$row['id']] .= Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 $qrows[$row['id']] .= '</select></td>';
@@ -350,7 +361,6 @@ if (isset($_POST['checked'])) { //modifying existing
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						echo "<td><img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}
@@ -397,6 +407,6 @@ if (isset($_POST['checked'])) { //modifying existing
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}

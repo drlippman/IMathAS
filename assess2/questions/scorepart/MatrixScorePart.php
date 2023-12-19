@@ -2,9 +2,9 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
-require_once(__DIR__ . '/matrix_common.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
+require_once __DIR__ . '/matrix_common.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -57,6 +57,7 @@ class MatrixScorePart implements ScorePart
         } else if (!empty($answersize)) {
             $sizeparts = explode(',',$answersize);
             $N = $sizeparts[0];
+            $stuN = $sizeparts[0];
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
             } else {
@@ -66,17 +67,12 @@ class MatrixScorePart implements ScorePart
             }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
-            $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
+            //$givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
             $scorePartResult->setLastAnswerAsGiven($givenans);
-            $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
-            $N = substr_count($answer,'),(')+1;
-            if ($N != substr_count($givenans, '),(') + 1) {
-              $scorePartResult->setRawScore(0);
-              return $scorePartResult;
-            }
+            //$givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
+            list($givenanslist, $stuN) = parseMatrixToArray($givenans);
         }
-        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
-
+        
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if ($answer==$givenans) {
@@ -96,12 +92,25 @@ class MatrixScorePart implements ScorePart
                 $fullmatrix = false;
             }
         }
-
-        $ansr = substr($answer,2,-2);
+        /*
+        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
+        if (strlen($answer)>1 && $answer[1] != '(') {
+            $ansr = substr($answer,1,-1);
+        } else {
+            $ansr = substr($answer,2,-2);
+        }
         $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
         $answerlist = explode(',',$ansr);
+        */
+        list($answerlist, $N) = parseMatrixToArray($answer);
 
-        if (count($answerlist) != count($givenanslist)) {
+        if ($stuN != $N) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+
+
+        if (count($answerlist) != count($givenanslist) || $answerlist[0]==='' || $givenanslist[0]==='') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
@@ -135,7 +144,7 @@ class MatrixScorePart implements ScorePart
           $M = count($answerlist) / $N;
           for ($r=0;$r<$N;$r++) {
             $c = 0;
-            while (abs($answerlist[$r*$M+$c]) < 1e-10 && $c < $M) {
+            while ($c < $M && abs($answerlist[$r*$M+$c]) < 1e-10) {
               if (abs($givenanslist[$r*$M+$c]) > 1e-10) {
                 $correct = false; // nonzero where 0 expected
               }
@@ -153,7 +162,11 @@ class MatrixScorePart implements ScorePart
           if ($correct) {
             $givenanslist = matrix_scorer_rref($givenanslist, $N);
           }
+        } else if ($fullmatrix && in_array('anyroworder',$ansformats)) {
+            $answerlist = matrix_scorer_roworder($answerlist, $N);
+            $givenanslist = matrix_scorer_roworder($givenanslist, $N);
         }
+
         $incorrect = 0;
         for ($i=0; $i<count($answerlist); $i++) {
             if (!is_numeric($givenanslist[$i])) {

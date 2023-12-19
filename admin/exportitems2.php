@@ -11,11 +11,11 @@ ini_set("max_execution_time", "900");
 
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/filehandler.php");
-require("../includes/copyiteminc.php");
-require("../includes/loaditemshowdata.php");
-require("itemexportfields.php");
+require_once "../init.php";
+require_once "../includes/filehandler.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
+require_once "itemexportfields.php";
 
 mb_substitute_character("none");
 
@@ -272,6 +272,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 
 	//get imas_questions
+    $qmap = array();
+    $qsmap = array();
+    $qscnt = 0; $qcnt = 0;
 	if (isset($itemtypebackref['Assessment'])) {
 		$toget = array_keys($itemtypebackref['Assessment']);
 		$ph = Sanitize::generateQueryPlaceholders($toget);
@@ -286,9 +289,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$query .= "WHERE imas_assessments.id IN ($ph)";
 		$stm = $DBH->prepare($query);
 		$stm->execute($toget);
-		$qmap = array();
-		$qsmap = array();
-		$qscnt = 0; $qcnt = 0;
 		$output['questions'] = array();
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$qid = $line['id'];
@@ -507,7 +507,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$output_qid = $qsmap[$line['id']];
 			//handle qimages
 			if ($line['hasimg']==1) {
-				$line['qimgs'] = $qimgmap[$line['id']];
+                if (isset($qimgmap[$line['id']])) {
+				    $line['qimgs'] = $qimgmap[$line['id']];
+                } else {
+                    $line['hasimg'] = 0;
+                }
 			}
 			if (isset($dependencies[$line['id']])) {
 				foreach ($dependencies[$line['id']] as $k=>$v) {
@@ -581,7 +585,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	getsubinfo($items,'0','',false,'|- ');
 }
 
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -603,6 +607,7 @@ if ($overwriteBody==1) {
 		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 		<table cellpadding=5 class=gb>
+        <caption class="sr-only">Course Items</caption>
 		<thead>
 			<tr><th></th><th>Type</th><th>Title</th></tr>
 		</thead>
@@ -625,7 +630,7 @@ if ($overwriteBody==1) {
 		</table>
 
 	<fieldset><legend>Options</legend>
-	<table>
+	<table role="presentation">
 	<tbody>
 	<tr class="r"><td class="r">Export course settings?</td><td><input type=checkbox name="exportcourseopt"  value="1" checked/></td></tr>
 	<tr class="r"><td class="r">Export gradebook scheme and categories?</td><td>
@@ -649,5 +654,5 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -3,8 +3,8 @@
 //(c) 2011 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -17,7 +17,7 @@ $from = $_GET['from'] ?? '';
 $fromstr = '';
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-if ($from=='modq') {
+if ($from=='modq' && !empty($_GET['qid'])) {
 	$fromstr = '&amp;' . Sanitize::generateQueryStringFromMap(array('from' => 'modq', 'aid' => $_GET['aid'],
 			'qid' => $_GET['qid']));
 	$returnstr = 'modquestion.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
@@ -146,7 +146,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
 /******* begin html output ********/
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=113016"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
 $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
@@ -164,7 +164,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
 	  $(".dropdown-toggle").dropdown();
 	});
   </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -254,5 +254,5 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 
 }
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

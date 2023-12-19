@@ -30,7 +30,3 @@ function timetominutes($str) {
 function thisyear() {
 	return date("Y",time());
 }
-
-?>
-
-

@@ -1,16 +1,16 @@
 <?php
 //IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
 	//TODO:  make tutor friendly by adding section filter
 	if (!$isteacher && !$istutor) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -32,14 +32,14 @@
 	if ($isteacher || ($istutor && ($tutoredit&1) == 1 )) {
 		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
-			include("gb-excuse.php");
+			require_once "gb-excuse.php";
 		}
 		if (isset($_POST['posted']) && $_POST['posted']=="Un-excuse Grade") {
 			$calledfrom='isolateassess';
-			include("gb-excuse.php");
+			require_once "gb-excuse.php";
         }
         if (isset($_POST['submitua'])) {
-			require('../assess2/AssessHelpers.php');
+			require_once '../assess2/AssessHelpers.php';
 			AssessHelpers::submitAllUnsumitted($cid, $aid);
 			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
 				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
@@ -49,9 +49,13 @@
     if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
             $calledfrom='isolateassess';
-            $_POST['checked'] = $_POST['stus'];
+            $_POST['checked'] = $_POST['stus'] ?? [];
             $_POST['assesschk'] = array($aid);
-			include("massexception.php");
+			require_once "massexception.php";
+        }
+        if (isset($_GET['masssend'])) {
+            $calledfrom='isolateassess';
+            require_once 'masssend.php';
         }
 	}
 
@@ -99,7 +103,7 @@
             });
         });
 		</script>';
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -207,7 +211,7 @@
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
 	}
 	if (count($exceptions)>0) {
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher && !$istutor);
 	}
 	//get excusals
@@ -262,7 +266,9 @@
 		if ($aver > 1 && ($line['status']&1)>0) {
 			// identify as unsubmitted if past due, or time limit is expired
 			$data = json_decode(gzdecode($line['scoreddata']), true);
-			$time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            if (abs($timelimit) > 0) {
+			    $time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+            }
 			if ($now > $line['thisenddate'] ||
 				(abs($timelimit) > 0 && $now > $time_exp + $overtime_grace * $line['timelimitmult'])
 			) {
@@ -353,7 +359,8 @@
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = round($line['timeontask']/60,1);
-            $isOvertime = ($line['status']&4) == 4;
+            // don't display OT marker anymore for new assess
+            //$isOvertime = ($line['status']&4) == 4;
             $IP = 0;
             $UA = 0;
             if (($line['status']&1)>0 && ($line['thisenddate']<$now ||  //unsubmitted by-assess, and due date passed
@@ -381,7 +388,7 @@
 			$UA = 0;
 		}
 
-		if ($line['starttime']==null) {
+		if ($line['starttime']===null) {
 			if ($aver > 1) {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -454,7 +461,7 @@
 				echo "&nbsp;(IP)";
 			} else 	if ($UA==1) {
 				echo "&nbsp;(UA)";
-			} else	if ($isOvertime) {
+			} else	if (!empty($isOvertime)) {
 				echo "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo "&nbsp;(PT)";
@@ -572,17 +579,23 @@
     }
     echo "<td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
+	
+	if ($includeduedate) {
+        $duedatesort = ",'D'";
+    } else {
+        $duedatesort = '';
+    }
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
-		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	} else if ($hassection && !$hidesection) {
-		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	} else {
-		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true,false);</script>";
+		echo "<script> initSortTable('myTable',Array('S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 
 
 	function getpts($sc) {

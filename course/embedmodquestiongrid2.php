@@ -3,7 +3,7 @@
 // grid for multiple.  For embed
 //(c) 2020 David Lippman
 
-    require('../init.php');
+    require_once '../init.php';
 
 	if (!(isset($teacherid))) {
 		echo "You are not authorized to view this page";
@@ -12,7 +12,7 @@
     $aid = intval($_GET['aid']);
 
 	if (isset($_POST['action'])) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if ($_POST['action'] == 'add') { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints,ver FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -24,6 +24,7 @@
             }
 
 			$newitemorder = '';
+            $points = '';
 			if (isset($_POST['addasgroup'])) {
 				$newitemorder = '1|0';
 			}
@@ -105,14 +106,15 @@
 			updatePointsPossible($aid, $itemorder, $defpoints);
 
 		} else if ($_POST['action'] == 'mod') { //modifying existing
-			$stm = $DBH->prepare("SELECT itemorder,defpoints,ver FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,defpoints,ver,intro FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			list($itemorder, $defpoints, $aver) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder, $defpoints, $aver, $intro) = $stm->fetch(PDO::FETCH_NUM);
             if (!isset($_POST['lastitemhash']) || $_POST['lastitemhash'] !== md5($itemorder)) {
                 header('Content-Type: application/json; charset=utf-8');
                 echo '{"error": "Assessment content has changed since last loaded. Reload the page and try again"}';
                 exit;
             }
+			$jsonintro = json_decode($intro,true);
 
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -138,7 +140,6 @@
                     (empty($_POST['showhints4'.$qid]) ? 0 : 4)
                 );
                 $showwork = intval($_POST['showwork'.$qid]);
-				if ($points=='') { $points = 9999;}
 				if ($attempts=='' || intval($attempts)==0) {$attempts = 9999;}
 				$stm = $DBH->prepare("UPDATE imas_questions SET attempts=:attempts,showhints=:showhints,showwork=:showwork WHERE id=:id");
 				$stm->execute(array(':attempts'=>$attempts, ':showhints'=>$showhints, ':showwork'=>$showwork, ':id'=>$qid));
@@ -162,15 +163,39 @@
 						}
 						$itemorder = implode(',',$itemarr);
 					}
+					if ($jsonintro!==null) { //is json intro
+						$toadd = intval($_POST['copies'.$qid]);
+						for ($j = 1; $j < count($jsonintro); $j++) {
+							if ($jsonintro[$j]['displayBefore']>$key) {
+								$jsonintro[$j]['displayBefore'] += $toadd;
+								$jsonintro[$j]['displayUntil'] += $toadd;
+							}
+						}
+					}
+				}
+				if ($jsonintro !== null) {
+					$intro = json_encode($jsonintro);
 				}
 			}
-			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
-			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
+			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':intro'=>$intro, ':id'=>$aid));
 
 			updatePointsPossible($aid, $itemorder, $defpoints);
         }
+
+        // Delete any teacher or tutor attempts on this assessment
+        $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+            imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array($cid, $aid));
+        $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+            imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array($cid, $aid));
         
-        require('../includes/addquestions2util.php');
+        require_once '../includes/addquestions2util.php';
         list($jsarr,$existingqs) = getQuestionsAsJSON($cid, $aid);
         
         header('Content-Type: application/json; charset=utf-8');
@@ -263,11 +288,11 @@
             </script>';
     $flexwidth = true;
     $nologo = true;        
-    require("../header.php");
+    require_once "../header.php";
     
     if ($beentaken) {
         echo '<p>'._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page').'</p>';
-        require('../footer.php');
+        require_once '../footer.php';
         exit;
     }
 
@@ -277,7 +302,7 @@
 <form>
 <input type=hidden name="lastitemhash" value="<?php echo Sanitize::encodeStringForDisplay($_GET['lih']);?>" />
 <p>Leave items blank to use the assessment's default values</p>
-<table class=gb>
+<table class=gb role="presentation">
 <thead><tr>
 <?php
 		if (isset($_GET['modqs'])) { //modifying existing questions
@@ -317,7 +342,6 @@
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						$qrows[$row['id']] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
@@ -341,7 +365,7 @@
 
                 $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\">";
                 foreach ($showworkoptions as $v=>$l) {
-                    $qrows[$row['id']] .= '<option value="'.$v.'" '.($row['showwork']==$v ? 'selected':'').'>';
+                    $qrows[$row['id']] .= '<option value="'.Sanitize::encodeStringForDisplay($v).'" '.($row['showwork']==$v ? 'selected':'').'>';
                     $qrows[$row['id']] .= Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 $qrows[$row['id']] .= '</select></td>';
@@ -410,7 +434,6 @@
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						echo "<td><img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}
@@ -453,7 +476,7 @@
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 ?>

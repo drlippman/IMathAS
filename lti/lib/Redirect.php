@@ -22,7 +22,8 @@ class Redirect {
             $cookie = new Cookie();
         }
         if (!empty($cookie->get_cookie(self::$CAN_302_COOKIE))) {
-            return $this->do_redirect();
+            $this->do_redirect();
+            return;
         }
         $cookie->set_cookie(self::$CAN_302_COOKIE, "true");
         $this->do_js_redirect();

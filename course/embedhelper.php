@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <title>Embedded Content</title>
 <style type="text/css">
 body,html {
 	margin: 0; 
@@ -9,7 +11,7 @@ body,html {
 </head>
 <body>
 <?php
-require("../includes/sanitize.php");
+require_once "../includes/sanitize.php";
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
  	 $urlmode = 'https://';
 } else {

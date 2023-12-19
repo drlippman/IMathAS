@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -118,6 +118,10 @@ class NTupleScorePart implements ScorePart
 
             //parse the ntuple without evaluating
             $tocheck = $this->parseNtuple($givenans, false, false);
+            if (!is_array($tocheck)) {
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
             if ($checkSameform) {
                 $normalizedGivenAnswer = $tocheck;
             }
@@ -147,7 +151,7 @@ class NTupleScorePart implements ScorePart
             }
         }
 
-        if (count($gaarr)==0) {
+        if (!is_array($gaarr) || count($gaarr)==0) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
@@ -169,6 +173,16 @@ class NTupleScorePart implements ScorePart
             }
         }
 
+        // ensure values are numbers
+        foreach ($gaarr as $k=>$givenans) {
+            foreach ($givenans['vals'] as $v) {
+                if (!is_numeric($v)) {
+                    unset($gaarr[$k]);
+                    continue 2;
+                }
+            }
+        }
+        
         if (in_array('anyorder', $ansformats)) {
             foreach ($anarr as $k=>$listans) {
                 foreach ($listans as $ork=>$orv) {
@@ -337,6 +351,7 @@ class NTupleScorePart implements ScorePart
         $ntuples = [];
         $NCdepth = 0;
         $lastcut = 0;
+        $lastend = 0;
         $inor = false;
         $str = makepretty($str);
         $matchbracket = array(
@@ -346,47 +361,57 @@ class NTupleScorePart implements ScorePart
             '{' => '}'
         );
         $closebracket = '';
-    		$openbracket = '';
-    		for ($i=0; $i<strlen($str); $i++) {
-    				$dec = false;
-    				if ($str[$i]=='(' || $str[$i]=='[' || $str[$i]=='<' || $str[$i]=='{') {
-    						if ($NCdepth==0) {
-    								$lastcut = $i;
-    								$closebracket = $matchbracket[$str[$i]];
-    								$openbracket = $str[$i];
-    						}
-    						if ($openbracket == '' || $str[$i] == $openbracket) {
-    							$NCdepth++;
-    						}
-    				} else if ($str[$i]==$closebracket) {
-    						$NCdepth--;
-    						if ($NCdepth==0) {
-    								$thisTuple = array(
-                                        'lb' => $str[$lastcut],
-                                        'rb' => $str[$i],
-                                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
-    								);
-    								if ($do_eval) {
-                                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
-                                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
-                                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
-                                            }
-                                        }
-    								}
-    								if ($do_or && $inor) {
-    										$ntuples[count($ntuples)-1][] = $thisTuple;
-    								} else if ($do_or) {
-    										$ntuples[] = array($thisTuple);
-    								} else {
-    										$ntuples[] = $thisTuple;
-    								}
-    								$inor = ($do_or && substr($str, $i+1, 2)==='or');
-    								$openbracket = '';
-    								$closebracket = '';
-    						}
-    				}
-    		}
-    		return $ntuples;
+        $openbracket = '';
+        for ($i=0; $i<strlen($str); $i++) {
+            $dec = false;
+            if ($str[$i]=='(' || $str[$i]=='[' || $str[$i]=='<' || $str[$i]=='{') {
+                if ($NCdepth==0) {
+                    if ($lastend > 0) {
+                        $between = trim(substr($str, $lastend+1, $i-$lastend-1));
+                        $inor = ($do_or && $between === 'or');
+                        if ($between !== 'or' && $between !== ',' && $between !== '') {
+                            // invalid
+                            return $ntuples;
+                        }
+                    }
+                    $lastcut = $i;
+                    $closebracket = $matchbracket[$str[$i]];
+                    $openbracket = $str[$i];
+                }
+                if ($openbracket == '' || $str[$i] == $openbracket) {
+                    $NCdepth++;
+                }
+            } else if ($str[$i]==$closebracket) {
+                $NCdepth--;
+                if ($NCdepth==0) {
+                    $thisTuple = array(
+                        'lb' => $str[$lastcut],
+                        'rb' => $str[$i],
+                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
+                    );
+                    $thisTuple['vals'] = array_map("trim", $thisTuple['vals']);
+                    $lastend = $i;
+                    if ($do_eval) {
+                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
+                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
+                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
+                            }
+                        }
+                    }
+                    if ($do_or && $inor) {
+                            $ntuples[count($ntuples)-1][] = $thisTuple;
+                    } else if ($do_or) {
+                            $ntuples[] = array($thisTuple);
+                    } else {
+                            $ntuples[] = $thisTuple;
+                    }
+                    //$inor = ($do_or && substr($str, $i+1, 2)==='or');
+                    $openbracket = '';
+                    $closebracket = '';
+                }
+            }
+        }
+        return $ntuples;
     }
 
     private function ntupleToString($ntuples) {
@@ -405,6 +430,6 @@ class NTupleScorePart implements ScorePart
                 $out[] = implode(' or ', $sub);
             }
         }
-        implode(',', $out);
+        return implode(',', $out);
     }
 }

@@ -272,6 +272,9 @@
           <button @click="hidetexts = !hidetexts; loadTexts()">
             {{ $t(hidetexts ? 'print.show_text' : 'print.hide_text') }}
           </button>
+          <p class="noticetext">
+            {{ $t('gradebook.no_edit') }}
+          </p>
         </div>
 
         <div v-if="viewFull">
@@ -326,6 +329,7 @@
                   :class = "{'inactive':!showQuestion[qn]}"
                   :qdata = "qdata[curQver[qn]]"
                   :qn = "qn"
+                  :disabled = "!canEdit"
                 />
                 <gb-showwork
                   :work = "qdata[curQver[qn]].work"
@@ -829,6 +833,9 @@ export default {
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
       actions.loadGbAssessData();
     }
+  },
+  updated () {
+    this.$nextTick(window.sendLTIresizemsg);
   }
 };
 </script>

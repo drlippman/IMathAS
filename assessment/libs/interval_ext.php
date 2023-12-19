@@ -28,7 +28,7 @@ function testPointVsInterval($point, $x1, $x2)
   return $res;
 }
 
-$emptySet = array( "left-border" => 0,
+$GLOBALS['interval_ext_emptySet'] = array( "left-border" => 0,
 		   "right-border" => 0,
 		   "is-open-left" => true,
 		   "is-open-right" => true );
@@ -325,12 +325,11 @@ function calculateIntersection($x1, $x2, $isOpenX1, $isOpenX2, $y1, $y2, $isOpen
   $z2 = 0;
   $isOpenZ1 = false;
   $isOpenZ2 = false;
-
-  switch ( testPointVsInterval($y1,$x1,$x2)) {
+  switch ( testPointVsInterval($y1,$x1,$x2)) { 
     case EQUAL_LEFT:
       // echo "here: " . EQUAL_LEFT;
 
-      switch ( testPointVsInterval($y2,$x1,$x2)) {
+      switch ( testPointVsInterval($y2,$x1,$x2)) { 
 	case EQUAL_LEFT:
 	  if ($isOpenX1 || $isOpenY1 || $isOpenY2) {
 	    // echo " + " . EQUAL_LEFT . " -> doNotIntersectStop";
@@ -567,6 +566,8 @@ function calculateIntersection($x1, $x2, $isOpenX1, $isOpenX2, $y1, $y2, $isOpen
 
   if ($result == ERROR || $result == DONOTINTERSECT_STOP || $result == DONOTINTERSECT_CONTINIUE) {
     return array("result" => $result);
+  } else if ($z1==$z2 && ($isOpenZ1 || $isOpenZ2)) { // check for (1,1] or similar
+    return array("result" => DONOTINTERSECT_STOP);
   } else {
     return array("result" => $result,
       "left-border" => $z1, "right-border" => $z2,
@@ -578,6 +579,9 @@ function calculateIntersection($x1, $x2, $isOpenX1, $isOpenX2, $y1, $y2, $isOpen
 
 function traverseUnion($border_left, $border_right, $isOpenLeft, $isOpenRight) {
   $y1 = array();
+  $y2=array();
+  $isOpenY1=array();
+  $isOpenY2=array();
 
   for($i=0; $i<count($border_left); $i++) {
     $inskip = false;
@@ -735,11 +739,11 @@ function traverseIntersection($border_left, $border_right, $isOpenLeft, $isOpenR
 }
 
 function calculateMostCommonIntersection($border_left, $border_right, $isOpenLeft, $isOpenRight) {
-  global $emptySet;
+  global $interval_ext_emptySet;
 
   // case empy input
   if (count($border_left) == 0) {
-    return $emptySet;
+    return $interval_ext_emptySet;
   }
 
   // start condition
@@ -765,7 +769,7 @@ function calculateMostCommonIntersection($border_left, $border_right, $isOpenLef
       	  break;
 	case DONOTINTERSECT_CONTINIUE:
 	case DONOTINTERSECT_STOP:
-	  return $emptySet;
+	  return $interval_ext_emptySet;
 
 	  break;
 	default:
@@ -780,11 +784,11 @@ function calculateMostCommonIntersection($border_left, $border_right, $isOpenLef
 }
 
 function calculateIntersectionSet($values) {
-    global $emptySet;
+    global $interval_ext_emptySet;
 
      // case empy input
      if (count($values) == 0) {
-        return $emptySet;
+        return $interval_ext_emptySet;
      }
 
      // start condition
@@ -793,6 +797,7 @@ function calculateIntersectionSet($values) {
      // $z2 = $value["right-border"];
      // $isOpenZ1 = $value["is-open-left"];
      // $isOpenZ2 = $value["is-open-right"];
+     $hasIntersection = false;
 
     for ($i = 1; $i < count($values); $i++) {
         $value = $values[$i];
@@ -820,7 +825,7 @@ function calculateIntersectionSet($values) {
                   	$z2[] = $result["right-border"];
             	    $isOpenZ1[] = $result["is-open-left"];
                   	$isOpenZ2[] = $result["is-open-right"];
-
+                    $hasIntersection = true;
                   	break;
             	case DONOTINTERSECT_CONTINIUE:
             	case DONOTINTERSECT_STOP:
@@ -830,11 +835,20 @@ function calculateIntersectionSet($values) {
             }
         } // foreach value
 
-        $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
+        if (!empty($z1)) {
+            $item = traverseUnion($z1, $z2, $isOpenZ1, $isOpenZ2 );
+        }
 
     } // for values
 
-    return $item;
+    if ($hasIntersection) {
+        return $item;
+    } else {
+        return array( "left-border" => [],
+        "right-border" => [],
+        "is-open-left" => [],
+        "is-open-right" => [] );
+    }
 }
 
 
@@ -859,13 +873,13 @@ function parseFloat($input) {
 // ######################################################################
 
 function parseString($input) {
-  $parts = preg_split("/\s*U\s*/i",$input);
+  $parts = preg_split("/\s*(uu|U|cup)\s*/i",$input);
 
   return parseParts($parts);
 }
 
 function parseParts($parts) {
-  global $emptySet;
+  global $interval_ext_emptySet;
 
   $hasError = false;
 
@@ -927,10 +941,10 @@ function parseParts($parts) {
 
   if (count($borderLeft) == 0) {
     return array("has-error" => false,
-  	    "left-border" => array($emptySet["left-border"]),
-  	    "right-border" => array($emptySet["right-border"]),
-  	    "is-open-left" => array($emptySet["is-open-left"]),
-  	    "is-open-right" => array($emptySet["is-open-right"]),
+  	    "left-border" => array($interval_ext_emptySet["left-border"]),
+  	    "right-border" => array($interval_ext_emptySet["right-border"]),
+  	    "is-open-left" => array($interval_ext_emptySet["is-open-left"]),
+  	    "is-open-right" => array($interval_ext_emptySet["is-open-right"]),
   	    "index" => $index);
   } else {
     return array("has-error" => false,
@@ -959,10 +973,10 @@ function toString($borderLeft, $borderRight, $isOpenLeft, $isOpenRight, $index) 
 }
 
 function toStringPart($borderLeft, $borderRight, $isOpenLeft, $isOpenRight, $index) {
-  global $emptySet;
+  global $interval_ext_emptySet;
 
-  if ($borderLeft == $emptySet["left-border"] && $borderRight == $emptySet["right-border"] &&
-      $isOpenLeft == $emptySet["is-open-left"] && $isOpenRight == $emptySet["is-open-right"]) {
+  if ($borderLeft == $interval_ext_emptySet["left-border"] && $borderRight == $interval_ext_emptySet["right-border"] &&
+      $isOpenLeft == $interval_ext_emptySet["is-open-left"] && $isOpenRight == $interval_ext_emptySet["is-open-right"]) {
      return EMPTY_SET;
   }
 

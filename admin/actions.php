@@ -1,14 +1,16 @@
 <?php
 //IMathAS:  Admin actions
 //(c) 2006 David Lippman
-require("../init.php");
-require_once("../includes/password.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/password.php";
+require_once "../includes/TeacherAuditLog.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/actions'])) {
-	require($CFG['hooks']['admin/actions']);
+	require_once $CFG['hooks']['admin/actions'];
 }
+
+if (!isset($_POST['action'])) { exit; }
 
 $from = 'admin';
 if (isset($_GET['from'])) {
@@ -26,7 +28,10 @@ if (isset($_GET['from'])) {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
 		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
-	}
+	} else if ($_GET['from']=='unhide') {
+		$from = 'unhide';
+		$backloc = 'unhidefromcourselist.php?type=teach';
+	} 
 }
 if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
@@ -38,6 +43,8 @@ if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='gd') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
+} else if ($from == 'unhide') {
+    $breadcrumbbase .= '<a href="'.$backloc.'">'._('Unhide Courses').'</a> &gt; ';
 }
 
 switch($_POST['action']) {
@@ -231,7 +238,7 @@ switch($_POST['action']) {
         ) {
             $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
 
-			require_once("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			foreach ($allInstrEnroll as $ncid) {
 				unenrollstu($ncid, array($_GET['id']));
 			}
@@ -317,7 +324,7 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE msgfrom=:msgfrom");
 		$stm->execute(array(':msgfrom'=>$deluid));
 
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		//delete profile pics
 		deletecoursefile('userimg_'.$deluid.'.jpg');
 		deletecoursefile('userimg_sm'.$deluid.'.jpg');
@@ -463,7 +470,7 @@ switch($_POST['action']) {
 	case "modify":
 	case "addcourse":
 		if ($myrights < 40) { echo _("You don't have the authority for this action"); break;}
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 
 		if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
 			$coursetocheck = intval($_POST['usetemplate']);
@@ -472,9 +479,9 @@ switch($_POST['action']) {
 			$terms = $stm->fetch(PDO::FETCH_NUM);
 			if ($terms[0]!='') {
 				if (!isset($_POST['termsagree'])) {
-					require("../header.php");
+					require_once "../header.php";
 					echo '<p>',_('You must agree to the terms of use to copy this course.'),'</p>';
-					require("../footer.php");
+					require_once "../footer.php";
 					exit;
 				} else {
 					$now = time();
@@ -558,10 +565,10 @@ switch($_POST['action']) {
 		if (isset($CFG['CPS']['toolset']) && $CFG['CPS']['toolset'][1]==0) {
 			$toolset = $CFG['CPS']['toolset'][0];
 		} else {
-			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-reord']);
+			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-gb']);
 		}
 
-		$avail = 1 - $_POST['stuavail'];
+		$avail = isset($_POST['stuavail']) ? 0 : 1;//1 - $_POST['stuavail'];
 
 		$istemplate = 0;
 		if (($myspecialrights&1)==1 || $myrights==100) {
@@ -625,6 +632,7 @@ switch($_POST['action']) {
 
 			$browserdata = array();
 			foreach ($browserprops as $propname=>$propvals) {
+                if (!empty($propvals['fixed'])) { continue; }
 				if (!empty($propvals['required']) && trim($_POST['browser'.$propname]) == '' &&
 					!($propvals['required']==2 && ($istemplate&3)>0)) {
 					$isok = false;
@@ -639,7 +647,7 @@ switch($_POST['action']) {
 				} else { //single val
 					$browserdata[$propname] = Sanitize::stripHtmlTags($_POST['browser'.$propname]);
 				}
-				if ($_POST['browser'.$propname]=='other') {
+				if (isset($_POST['browser'.$propname]) && $_POST['browser'.$propname]=='other') {
 					$browserdata[$propname.'other'] = Sanitize::stripHtmlTags($_POST['browser'.$propname.'other']);
 				}
 			}
@@ -901,6 +909,7 @@ switch($_POST['action']) {
 					}
 					function updateoutcomes(&$arr) {
 						global $outcomes;
+                        if (!is_array($arr)) { return; }
 						foreach ($arr as $k=>$v) {
 							if (is_array($v)) {
 								updateoutcomes($arr[$k]['outcomes']);
@@ -910,6 +919,9 @@ switch($_POST['action']) {
 						}
 					}
 					$outcomesarr = unserialize($outcomesarr);
+                    if ($outcomesarr === false) {
+                        $outcomesarr = [];
+                    }
 					updateoutcomes($outcomesarr);
 					$newoutcomearr = serialize($outcomesarr);
 				} else {
@@ -918,8 +930,9 @@ switch($_POST['action']) {
 				$removewithdrawn = true;
 				$usereplaceby = "all";
 				$newitems = array();
-				require("../includes/copyiteminc.php");
+				require_once "../includes/copyiteminc.php";
 				$convertAssessVer = $destUIver;
+                $_POST['ctc'] = $_POST['usetemplate'];
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate'], $newitems);
 				$itemorder = serialize($newitems);
@@ -979,7 +992,7 @@ switch($_POST['action']) {
 			$stm->execute(array($groupid));
 			$hasGroupLTI = ($stm->fetchColumn() !== false);
 
-			require("../header.php");
+			require_once "../header.php";
 			echo '<div class="breadcrumb">'.$breadcrumbbase._(' Course Creation Confirmation').'</div>';
 			echo '<h1>',_('Your course has been created'),'!</h1>';
 			echo '<p>',_('For students to enroll in this course via direct login, you will need to provide them two things'),':<ol>';
@@ -987,7 +1000,7 @@ switch($_POST['action']) {
 			if (trim($_POST['ekey'])=='') {
 				echo '<li>',sprintf(_('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, %s modify your course settings %s'),'<a href="forms.php?action=modify&id='.$cid.'">','</a>'),'</li>';
 			} else {
-				echo '<li>',_('The enrollment key'),': <b>'.$_POST['ekey'].'</b></li>';
+				echo '<li>',_('The enrollment key'),': <b>'.Sanitize::encodeStringForDisplay($_POST['ekey']).'</b></li>';
 			}
 			echo '</ol></p>';
 
@@ -1005,7 +1018,7 @@ switch($_POST['action']) {
 				}
 			}
 			echo '<a href="../course/course.php?cid='.$cid.'">',_('Enter the Course'),'</a>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		break;
@@ -1034,7 +1047,7 @@ switch($_POST['action']) {
 			}
 			break;
 		} else {
-			require("../includes/delcourse.php");
+			require_once "../includes/delcourse.php";
 			$stm = $DBH->prepare("SELECT ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$userdata = $stm->fetch(PDO::FETCH_ASSOC);
@@ -1101,7 +1114,7 @@ switch($_POST['action']) {
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$old = time() - 60*60*24*30*$_POST['months'];
 		$who = $_POST['who'];
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		if ($who=="students") {
 			$sstm = $DBH->prepare("SELECT id FROM imas_users WHERE  lastaccess<:old AND (rights=0 OR rights=10)");
 			$sstm->execute(array(':old'=>$old));
@@ -1256,7 +1269,7 @@ switch($_POST['action']) {
 		$error = '';
 		if ($mfadata != '') {
 			$mfadata = json_decode($mfadata, true);
-			require('../includes/GoogleAuthenticator.php');
+			require_once '../includes/GoogleAuthenticator.php';
 			$MFA = new GoogleAuthenticator();
 			//check that code is valid and not a replay
 			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
@@ -1275,11 +1288,11 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
 				if (isset($_POST['mfatrust'])) {
-					require("../header.php");
+					require_once "../header.php";
 					echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
 					echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';
 					echo '<p><a href="../index.php">Continue</a></p>';
-					require("../footer.php");
+					require_once "../footer.php";
 					exit;
 				}
 
@@ -1303,7 +1316,7 @@ if ($myrights<75 || $from=='home') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if ($from=='userreports') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php");
-} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
+} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd' || $from=='unhide') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");

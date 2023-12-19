@@ -2,13 +2,13 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 
-	require("../init.php");
-	require('../includes/getcourseopts.php');
+	require_once "../init.php";
+	require_once '../includes/getcourseopts.php';
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
@@ -42,14 +42,14 @@
 	deleted: 0 not deleted, 1 deleted by sender, 2 deleted by reader  (ordered this way so we can use < 2)
 	tagged: 0 no, 1 yes
 	*/
-	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
+	if (isset($_POST['remove']) && !empty($_POST['checked'])) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND deleted=2 AND msgfrom=?");
 		$stm->execute(array($userid));
 		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE id IN ($checklist) AND msgfrom=?");
 		$stm->execute(array($userid));
 	}
-	if (isset($_POST['unsend']) && count($_POST['checked'])>0 && $isteacher) {
+	if (isset($_POST['unsend']) && !empty($_POST['checked']) && $isteacher) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND msgfrom=?");
 		$stm->execute(array($userid));
@@ -62,7 +62,7 @@
 	}
 
 	$pagetitle = "Messages";
-	require("../header.php");
+	require_once "../header.php";
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
@@ -265,5 +265,5 @@ function chgfilter() {
 		echo "<p>$prevnext</p>";
 	}
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

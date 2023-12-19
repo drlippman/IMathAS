@@ -224,6 +224,7 @@ function init(paramarr, enableMQ, baseel) {
       $("#qnwrap"+qn+".introtext img").on('click', rotateimg);
     }
     initEnterHandler(qn);
+    $("input[id^=qn"+qn+"]:not([type=file])").attr("maxlength",8000);
   }
   initDupRubrics();
   initShowAnswer2();
@@ -232,6 +233,7 @@ function init(paramarr, enableMQ, baseel) {
   }
   initqsclickchange();
   initClearScoreMarkers();
+  
   if (paramarr.scripts) {
     function handleScript(arr, cnt) {
       if (arr[cnt][0] == 'code') {
@@ -662,13 +664,14 @@ function setupLivePreview(qn, skipinitial) {
 
 			  RenderNow: function(text) {
 				  //called by preview button
-			      this.buffer.innerHTML = this.oldtext = text;
+                  this.oldtext = text;
+			      this.buffer.innerHTML = this.preformat(text);
 			      this.mjRunning = true;
 			      this.RenderBuffer();
 			  },
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
-                      if (MathJax.typesetPromise) {
+                      if (MathJax.typesetPromise && this.mjPromise) {
                         this.mjPromise = this.mjPromise.then(function () {
                             //MathJax.typesetClear([this.buffer]);
                             MathJax.typesetPromise([this.buffer]).then(this.PreviewDone.bind(this));
@@ -713,7 +716,7 @@ function setupLivePreview(qn, skipinitial) {
                   }
 			    } else {
 			      this.oldtext = text;
-			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
+			      this.buffer.innerHTML = "`"+htmlEntities(this.preformat(text))+"`";
 			      this.mjRunning = true;
 			      this.RenderBuffer();
 			    }
@@ -746,7 +749,7 @@ function setupLivePreview(qn, skipinitial) {
 
 				  RenderNow: function(text) {
 				      var outnode = document.getElementById("p"+qn);
-				      outnode.innerHTML = text;
+				      outnode.innerHTML = htmlEntities(text);
 				      rendermathnode(outnode);
 				  },
 
@@ -785,6 +788,10 @@ function normalizemathunicode(str) {
 	str = str.replace(/α/g,"alpha").replace(/β/g,"beta").replace(/γ/g,"gamma").replace(/δ/g,"delta").replace(/ε/g,"epsilon").replace(/κ/g,"kappa");
 	str = str.replace(/λ/g,"lambda").replace(/ρ/g,"rho").replace(/τ/g,"tau").replace(/χ/g,"chi").replace(/ω/g,"omega");
 	str = str.replace(/Ω/g,"Omega").replace(/Γ/g,"Gamma").replace(/Φ/g,"Phi").replace(/Δ/g,"Delta").replace(/Σ/g,"Sigma");
+    str = str.replace(/&(ZeroWidthSpace|nbsp);/g, ' ').replace(/\u200B/g, ' ');
+    str = str.replace(/degree\s+s\b/g,'degree');
+    // remove extra parens on numbers, like roots and logs
+    str = str.replace(/\(\((-?\d+)\)\)/g, '($1)');
 	return str;
 }
 
@@ -850,7 +857,11 @@ function showSyntaxCheckMQ(qn) {
   var res = processByType(qn);
   var outstr = '';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
-    outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+    if (params.qtype == 'calcmatrix') {
+        outstr += ' = `' + htmlEntities(res.dispvalstr) + '` ';
+    } else {
+        outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+    }
   }
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
@@ -864,6 +875,7 @@ function showSyntaxCheckMQ(qn) {
     var previewel = document.getElementById('p'+qn);
     if (previewel) {
         previewel.innerHTML = outstr;
+        rendermathnode(previewel);
     }
   }
   if (document.getElementById("qn"+qn)) {
@@ -922,6 +934,9 @@ function preSubmitString(name, str) {
   if (params.qtype == 'numfunc') {
     str = AMnumfuncPrepVar(qn, str)[3];
   }
+  if (str.length > 30000) {
+    str = str.substr(0,30000);
+  }
   return str;
 }
 
@@ -950,6 +965,7 @@ function processByType(qn) {
       return false;
     }
     var str = el.value;
+
     str = normalizemathunicode(str);
     str = str.replace(/^\s+/,'').replace(/\s+$/,'');
     if (str.match(/^\s*$/)) {
@@ -1053,8 +1069,8 @@ function AMnumfuncPrepVar(qn,str) {
   var foundaltcap = [];
   var dispstr = str;
 
-  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
-  str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|pi)/g, functoindex);
+  str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|pi)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
     // handle double parens
     if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
@@ -1092,6 +1108,9 @@ function AMnumfuncPrepVar(qn,str) {
      }
      return p1;
     });
+  // fix variable pairs being interpreted as asciimath symbol, like in
+  dispstr = dispstr.replace(/(@v\d+@)(@v\d+@)/g,"$1 $2");
+  dispstr = dispstr.replace(/(@v\d+@)(@v\d+@)/g,"$1 $2");
   // fix display of /n!
   dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!(?!=)/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
@@ -1161,7 +1180,6 @@ function AMnumfuncPrepVar(qn,str) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
   }
-
   return [str,dispstr,vars.join("|"),submitstr];
 }
 
@@ -1427,7 +1445,7 @@ function processCalcNtuple(fullstr, format) {
   var res = NaN;
   var dec;
   // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
-  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',').replace(/(^,|,$)/g,'');;
+  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/g, ',').replace(/(^,|,$)/g,'');
   fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
@@ -1490,15 +1508,22 @@ function processCalcComplex(fullstr, format) {
   var real, imag, imag2, prep;
   for (var cnt=0; cnt<arr.length; cnt++) {
     str = arr[cnt].replace(/^\s+/,'').replace(/\s+$/,'');
+    if (format.indexOf("allowjcomplex")!=-1) {
+      str = str.replace(/j/g,'i');
+    }
+    if (format.indexOf("generalcomplex")!=-1) {
+      outarr.push(str);
+      continue; // bypass normal evaluation
+    }
     if (format.indexOf("sloppycomplex")==-1) {
-      var cparts = parsecomplex(arr[cnt]);
+      var cparts = parsecomplex(str);
       if (typeof cparts == 'string') {
         err += cparts;
       } else {
         err += singlevalsyntaxcheck(cparts[0], format);
         err += singlevalsyntaxcheck(cparts[1], format);
       }
-    }
+    } 
     err += syntaxcheckexpr(str, format);
     prep = prepWithMath(mathjs(str,'i'));
     real = scopedeval('var i=0;'+prep);
@@ -1508,6 +1533,7 @@ function processCalcComplex(fullstr, format) {
       err += _("syntax incomplete");
       real = NaN;
     }
+
     if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
       imag -= real;
       outstr = Math.abs(real)<1e-16?'':real;
@@ -1515,11 +1541,18 @@ function processCalcComplex(fullstr, format) {
       outarr.push(outstr);
     }
   }
-  return {
-    err: err,
-    dispvalstr: outarr.join(', '),
-    submitstr: outarr.join(',')
-  };
+  if (format.indexOf("generalcomplex")!=-1) {
+    return {
+      err: err,
+      dispvalstr: outarr.join(', ')
+    };
+  } else {
+    return {
+      err: err,
+      dispvalstr: outarr.join(', '),
+      submitstr: outarr.join(',')
+    };
+  }
 }
 
 function processSizedMatrix(qn) {
@@ -1574,6 +1607,7 @@ function processCalcMatrix(fullstr, format) {
     okformat = false;
   }
   fullstr = fullstr.substring(1,fullstr.length-1);
+ 
   var err = '';
   var blankerr = '';
   var rowlist = [];
@@ -1589,7 +1623,11 @@ function processCalcMatrix(fullstr, format) {
       lastcut = i+1;
     }
   }
-  rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  if (lastcut == 0 && fullstr.charAt(0) != '(') {
+    rowlist.push(fullstr);
+  } else {
+    rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  }
   var lastnumcols = -1;
   if (MCdepth !== 0) {
     okformat = false;
@@ -1667,6 +1705,8 @@ function processNumfunc(qn, fullstr, format) {
             }
         } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length>1) {
             err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
+        } else if (totesteqn.match(/(^(<|>|!))|(=|>|<)$/)) {
+            err += _("syntax error: your inequality should have expressions on both sides")+ '. ';
         }
         totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>|!=)(.*)/,"$1-($3)");
     } else if (totesteqn.match(/=/)) {
@@ -1676,6 +1716,8 @@ function processNumfunc(qn, fullstr, format) {
             err += _("syntax error: you gave an equation, not an expression")+ '. ';
         } else if (totesteqn.match(/=/g).length>1) {
             err += _("syntax error: your equation should only contain one equal sign")+ '. ';
+        } else if (totesteqn.match(/(^=)|(=$)/)) {
+            err += _("syntax error: your equation should have expressions on both sides")+ '. ';
         }
         totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
     } else if (iseqn && isineq) {
@@ -1685,35 +1727,37 @@ function processNumfunc(qn, fullstr, format) {
     } else if (isineq) {
         err += _("syntax error: this is not an inequality")+ '. ';
     }
-    if (fvars.length > 0) {
-        reg = new RegExp("("+fvars.join('|')+")\\(","g");
-        totesteqn = totesteqn.replace(/\w+/g, functoindex); // avoid sqrt(3) matching t() funcvar
-        totesteqn = totesteqn.replace(reg,"$1*sin($1+");
-        totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
-    }
+    if (!format.match(/generalcomplex/)) {
+      if (fvars.length > 0) {
+          reg = new RegExp("("+fvars.join('|')+")\\(","g");
+          totesteqn = totesteqn.replace(/\w+/g, functoindex); // avoid sqrt(3) matching t() funcvar
+          totesteqn = totesteqn.replace(reg,"$1*sin($1+");
+          totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
+      }
 
-    totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-    successfulEvals = 0;
-    for (j=0; j < 20; j++) {
-        totest = 'var DNE=1;';
-        for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-        if (domain[i][2]) { //integers
-            testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-        } else { //any real between min and max
-            testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-        }
-        totest += 'var ' + remapVars[i] + '=' + testval + ';';
-        }
-        res = scopedeval(totest + totesteqn);
-        if (res !== 'synerr') {
-        successfulEvals++;
-        break;
-        }
+      totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+      successfulEvals = 0;
+      for (j=0; j < 20; j++) {
+          totest = 'var DNE=1;';
+          for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+          if (domain[i][2]) { //integers
+              testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+          } else { //any real between min and max
+              testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
+          }
+          totest += 'var ' + remapVars[i] + '=' + testval + ';';
+          }
+          res = scopedeval(totest + totesteqn);
+          if (res !== 'synerr') {
+          successfulEvals++;
+          break;
+          }
+      }
+      if (successfulEvals === 0) {
+          err += _("syntax error") + '. ';
+      }
     }
-    if (successfulEvals === 0) {
-        err += _("syntax error") + '. ';
-    }
-    err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
+    err += syntaxcheckexpr(strprocess[0], format + ',isnumfunc', vars.map(escapeRegExp).join('|'));
   }
   return {
     err: err
@@ -1794,8 +1838,8 @@ function parsecomplex(v) {
 	var real,imag,c,nd,p,R,L;
 	v = v.replace(/\s/,'');
 	v = v.replace(/\((\d+\*?i|i)\)\/(\d+)/g,'$1/$2');
-	v = v.replace(/sin/,'s$n');
-	v = v.replace(/pi/,'p$');
+	v = v.replace(/sin/g,'s$n');
+	v = v.replace(/pi/g,'p$');
 	var len = v.length;
 	//preg_match_all('/(\bi|i\b)/',v,matches,PREG_OFFSET_CAPTURE);
 	//if (count(matches[0])>1) {
@@ -1897,10 +1941,10 @@ function parsecomplex(v) {
 				real = real.substr(1);
 			}
 		}
-		real = real.replace("s$n","sin");
-		real = real.replace("p$","pi");
-		imag = imag.replace("s$n","sin");
-		imag = imag.replace("p$","pi");
+		real = real.replace(/s\$n/g,"sin");
+		real = real.replace(/p\$/g,"pi");
+		imag = imag.replace(/s\$n/g,"sin");
+		imag = imag.replace(/p\$/g,"pi");
 		imag = imag.replace(/\*\//g,"/");
 		return [real,imag];
 	}
@@ -1928,7 +1972,7 @@ function singlevalsyntaxcheck(str,format) {
 	} else if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
 		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
 		 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
-		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
+		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 			return (_("not a valid fraction")+". ");
 		  }
 	} else if (format.indexOf('mixednumber')!=-1) {
@@ -1952,9 +1996,7 @@ function singlevalsyntaxcheck(str,format) {
 		}
 	} else if (!onlyAscii.test(str)) {
 		return _("Your answer contains an unrecognized symbol")+". ";
-  	} else if (str.match(/=/)) {
-        return _("You gave an equation, not an expression")+ '. ';
-    }
+  	} 
 	return '';
 }
 
@@ -2019,6 +2061,9 @@ function syntaxcheckexpr(str,format,vl) {
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
 	  }
+      if (str.match(/=/) && !format.match(/isnumfunc/)) {
+        err += _("You gave an equation, not an expression")+ '. ';
+      }
 
 	  return err;
 }

@@ -3,7 +3,7 @@
 use \IMSGlobal\LTI;
 
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-  require_once($CFG['hooks']['lti']);
+  require_once $CFG['hooks']['lti'];
 }
 
 /**
@@ -32,6 +32,11 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
         echo sprintf(_("No courses found. Create a course on %s first."), $installname);
         exit;
     }
+    $last_copied_cid = 0;
+  } else if ($target['refcid'] === null) {
+    // assessment ID existed, but wasn't able to find the course.
+    echo sprintf(_("This link referenced assessment ID %d, but that assessment no longer exists on %s, making it impossible to know which course to copy or associate with. Try another link in your LMS course. If none work, you may need to do a fresh export/import."), $target['refaid'], $installname);
+    exit;
   } else {
     $sourcecid = $target['refcid'];
     $last_copied_cid = $target['refcid'];
@@ -49,10 +54,10 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
     list($copycourses,$assoccourses,$sourceUIver) =
         $db->get_potential_courses($target,$last_copied_cid,$userid);
   }
-  require('../header.php');
+  require_once '../header.php';
 
   echo '<form method=post action="setupcourse.php">';
-  echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
+  echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
   echo '<h1>'._('Establish Course Connection').'</h1>';
   echo '<p>'.sprintf(_('Your LMS course is not yet linked with a course on %s.'),$installname).'</p>';
 
@@ -133,5 +138,5 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
         $(".forassoc").toggle($("#linktypeassoc").is(":checked"));
       });
   });</script>';
-  require('../footer.php');
+  require_once '../footer.php';
 }

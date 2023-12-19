@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 //Is not currently part of the GUI
 
-require("init.php");
+require_once "init.php";
 if ($myrights<100) {
 	exit;
 }
@@ -14,7 +14,7 @@ error_reporting(E_ALL);
 ini_set("max_execution_time", "3600");
 
 
-require("header.php");
+require_once "header.php";
 
 $start = microtime(true);
 //get last updated time
@@ -185,5 +185,5 @@ echo "Done: updated $nq questions with a total of $totn new datapoints";
 echo '<br/>Max memory: '.memory_get_peak_usage().', '.memory_get_peak_usage(true);
 echo '<br/>Time: '.(microtime(true) - $start);
 
-require("footer.php");
+require_once "footer.php";
 ?>

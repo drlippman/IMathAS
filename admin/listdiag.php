@@ -4,7 +4,7 @@
 
 //TODO:  fix diag delete breadcrumbs
 
-require("../init.php");
+require_once "../init.php";
 
 $overwriteBody = 0;
 $body = "";
@@ -97,7 +97,7 @@ $(function() {
   $(".dropdown-toggle").dropdown();
 });
 </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
   echo $body;
@@ -157,4 +157,4 @@ if ($overwriteBody==1) {
     }
   }
 }
-require("../footer.php");
+require_once "../footer.php";

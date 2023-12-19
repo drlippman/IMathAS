@@ -27,7 +27,7 @@ class LTI_Grade_Update {
 
   public function __construct(PDO $DBH) {
     $this->dbh = $DBH;
-    $this->debug = !empty($CFG['LTI']['noisydebuglog']);
+    $this->debug = !empty($GLOBALS['CFG']['LTI']['noisydebuglog']);
   }
 
   /**
@@ -59,7 +59,7 @@ class LTI_Grade_Update {
         $this->failures[$platform_id] = intval(substr($row['token'],6));
       }
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
-      $stm->execute(array($platform_id, $scope));
+      $stm->execute(array($platform_id, $scopehash));
       return false;
     } else {
       $row['failed'] = (substr($row['token'],0,6)==='failed');
@@ -147,12 +147,12 @@ class LTI_Grade_Update {
         $this->debuglog('Grade update Error:' . curl_error($ch));
         return false;
     }
-    $this->debuglog('Grade update success:' . $resp_body);
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     curl_close ($ch);
 
     $resp_headers = substr($response, 0, $header_size);
     $resp_body = substr($response, $header_size);
+    $this->debuglog('Grade update success:' . $resp_body);
     return [
         'headers' => array_filter(explode("\r\n", $resp_headers)),
         'body' => json_decode($resp_body, true),
@@ -177,7 +177,7 @@ class LTI_Grade_Update {
     string $comment = ''
   ) {
     $canvasext = [
-        'new_submission' => $isstu
+        'new_submission' => ($isstu ? true : false)
     ];
     if ($isstu && !empty($addedon)) {
         $canvasext['submitted_at'] = date('Y-m-d\TH:i:s.uP', $addedon);
@@ -234,7 +234,7 @@ class LTI_Grade_Update {
         $this->failures[$platform_id] = intval(substr($row['token'],6));
       }
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
-      $stm->execute(array($platform_id, $scope));
+      $stm->execute(array($platform_id, $scopehash));
     } else {
       $row['failed'] = (substr($row['token'],0,6)==='failed');
       $this->access_tokens[$platform_id] = $row;
@@ -267,13 +267,13 @@ class LTI_Grade_Update {
     $error = curl_error($ch);
     curl_close ($ch);
 
-    if (isset($token_data['access_token'])) {
+    if (!empty($token_data['access_token']) && !empty($token_data['expires_in'])) {
       $this->store_access_token($platform_id, $token_data);
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
     } else {
         // record failure
-        $this->token_request_failure($platform_id);
+      $this->token_request_failure($platform_id, $resp, $error);
       $this->debuglog('token request error '.$error);
       return false;
     }
@@ -286,9 +286,12 @@ class LTI_Grade_Update {
    * @return void
    */
   public function store_access_token(int $platform_id, array $token_data): void {
+    /*  we know what the scope is here, so skip this
     $scopes = explode(' ', $token_data['scope']);
     sort($scopes);
     $scopehash = md5(implode('|',$scopes));
+    */
+    $scopehash = md5('https://purl.imsglobal.org/spec/lti-ags/scope/score');
     $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
     $stm->execute(array($platform_id, $scopehash, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
     $this->access_tokens[$platform_id] = array(
@@ -339,15 +342,23 @@ class LTI_Grade_Update {
    * Handle token request failure.  Store failure.
    * @param  int    $platform_id
    */
-  public function token_request_failure(int $platform_id) {
+  public function token_request_failure(int $platform_id, $response = '', $error = '') {
         if (isset($this->failures[$platform_id])) {
-            $failures = $this->failures[$platform_id]++;
+            $this->failures[$platform_id]++;
         } else {
-            $failures = 1;
+            $this->failures[$platform_id] = 1;
+        }
+        $failures = $this->failures[$platform_id];
+        if ($failures == 2) {
+            // log failure response
+            $logdata = 'Grade token failure for platform '. $platform_id . ', response: ' . $response . ', error: ' . $error;
+            $logstm = $this->dbh->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+            $logstm->execute([time(), $logdata]);
         }
         $token_data = [
             'access_token' => 'failed'.$failures,
-            'expires' => time() + min(pow(3, $failures-1), 24*60*60)
+            'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score',
+            'expires_in' => min(300*$failures*$failures, 24*60*60)
         ];
         // store failure
         $this->store_access_token($platform_id, $token_data);
@@ -385,7 +396,7 @@ class LTI_Grade_Update {
     if (!empty($this->private_key)) {
       return $this->private_key;
     }
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_keys WHERE key_set_url=? ORDER BY created_at DESC LIMIT 1');
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_keys WHERE key_set_url=? AND privatekey != "" ORDER BY created_at DESC LIMIT 1');
     $stm->execute(array(TOOL_HOST.'/lti/jwks.php'));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     $this->private_key = $row;

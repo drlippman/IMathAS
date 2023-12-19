@@ -2,7 +2,7 @@
 //IMathAS:  View login record
 //(c) 2011 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = intval($_GET['cid']);
@@ -16,23 +16,25 @@ $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
     $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
+$from = '';
 if (isset($teacherid)) {
 	if (isset($_GET['from']) && $_GET['from']=='gb') {
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> &gt; ";
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid&stu=$uid\">Student Detail</a> &gt; ";
+        $from = '&from=gb';
 	} else {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; ";
 	}
 }
 $curBreadcrumb .= "View Login Log\n";
 $pagetitle = "View Login Log";
-require("../header.php");
+require_once "../header.php";
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 
 
 
 echo '<div id="headerloginlog" class="pagetitle"><h1>'.$pagetitle. '</h1></div>';
-echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.'">View Activity Log</a></div>';
+echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.$from.'">View Activity Log</a></div>';
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -50,6 +52,6 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 
 echo '</ul>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

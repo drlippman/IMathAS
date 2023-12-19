@@ -2363,6 +2363,42 @@
       }
       return url;
     };
+    var resizeImage = function (o, callback) {
+        var imgURL;
+        if (typeof o.blobUri == 'function') {
+            imgURL = o.blobUri();
+        } else if (typeof o.blob == 'function') {
+            imgURL = URL.createObjectURL(o.blob());
+        } else {
+            imgURL = URL.createObjectURL(o.blob);
+        }
+        var image = new Image();
+        image.onload = function (imageEvent) {
+            // Resize the image
+            var canvas = document.createElement('canvas'),
+                max_size = 1000,
+                width = image.width,
+                height = image.height;
+            if (width > height) {
+                if (width > max_size) {
+                    height *= max_size / width;
+                    width = max_size;
+                }
+            } else {
+                if (height > max_size) {
+                    width *= max_size / height;
+                    height = max_size;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+            var resizedImage = canvas.toBlob(function(b) {
+                callback(b);
+            }, 'image/jpeg');
+        }
+        image.src = imgURL;
+    }
     var Tools = {
       trim: trim,
       isArray: ArrUtils.isArray,
@@ -2380,7 +2416,8 @@
       createNS: createNS,
       resolve: resolve$1,
       explode: explode,
-      _addCacheSuffix: _addCacheSuffix
+      _addCacheSuffix: _addCacheSuffix,
+      resizeImage: resizeImage
     };
 
     var doc = domGlobals.document, push$2 = Array.prototype.push, slice$2 = Array.prototype.slice;
@@ -15167,6 +15204,12 @@
         }
         return path2;
       };
+      var removeOnFailure = function () {
+        var editor = tinymce.activeEditor;
+        var img = $(editor.dom.doc).find('img[src^="blob:"]').get(0);
+        if (img)
+            editor.execCommand('mceRemoveNode', false, img);
+      };
       var defaultHandler = function (blobInfo, success, failure, progress) {
         var xhr, formData;
         xhr = XMLHttpRequest();
@@ -15176,24 +15219,29 @@
           progress(e.loaded / e.total * 100);
         };
         xhr.onerror = function () {
+          removeOnFailure();
           failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
         };
         xhr.onload = function () {
           var json;
           if (xhr.status < 200 || xhr.status >= 300) {
+            removeOnFailure();
             failure('HTTP Error: ' + xhr.status);
             return;
           }
           json = JSON.parse(xhr.responseText);
           if (!json || typeof json.location !== 'string') {
+            removeOnFailure();
             failure('Invalid JSON: ' + xhr.responseText);
             return;
           }
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        xhr.send(formData);
+        Tools.resizeImage(blobInfo, function(resizedblob) {
+            formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+            xhr.send(formData);
+        });
       };
       var noUpload = function () {
         return new promiseObj(function (resolve) {

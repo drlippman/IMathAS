@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("courseshowitems.php");
-require("../includes/htmlutil.php");
-require("../includes/calendardisp.php");
+require_once "../init.php";
+require_once "courseshowitems.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/calendardisp.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -20,7 +20,9 @@ function buildBlockLeftNav($items, $parent, &$blocklist) {
 					$blocklist[] = array($item['name'], $parent.'-'.($k+1), $item['SH'][1]);
 				}
 			}
-			buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            if (!empty($item['items'])) {
+			    buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            }
 		}
 	}
 }
@@ -38,7 +40,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
     }
 	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		//deleteasidfilesbyquery(array('id'=>$_SESSION['sessiontestid']),1);
 		deleteasidfilesbyquery2('id',$_SESSION['sessiontestid'],null,1);
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");
@@ -201,19 +203,29 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		buildBlockLeftNav($items, '0', $stuLeftNavBlocks);
 	}
 
+    $contentbehavior = 0;
 	if ($_GET['folder']!='0') {
 		$now = time();
 		$blocktree = array_map('intval', explode('-',$_GET['folder']));
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+			if (!isset($items[$blocktree[$i]-1]['name']) || (
+                !isset($teacherid) && !isset($tutorid) && 
+                $items[$blocktree[$i]-1]['avail']<2 && 
+                $items[$blocktree[$i]-1]['SH'][0]!='S' && (
+                    $now<$items[$blocktree[$i]-1]['startdate'] || 
+                    $now>$items[$blocktree[$i]-1]['enddate'] || 
+                    $items[$blocktree[$i]-1]['avail']=='0'
+                )
+            )) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
 				unset($blocktree);
 				break;
 			}
+            $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+
 			if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
 				if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
 					echo 'Not authorized';
@@ -227,9 +239,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-	} else {
-        $contentbehavior = 0;
-    }
+	}
 	//DEFAULT DISPLAY PROCESSING
 	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
 	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";
@@ -242,7 +252,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
 
-	$curBreadcrumb = $breadcrumbbase;
+	$curBreadcrumb = $breadcrumbbase ?? '';
 	if (isset($backtrack) && count($backtrack)>0) {
 		if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 			array_unshift($backtrack, array($coursename, '0'));
@@ -300,7 +310,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	   } else {
 		   $newmsgs = '';
 	   }
-	}
+	} else {
+        $newmsgs = '';
+    }
 	/* very old
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
@@ -363,13 +375,13 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=12120\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=011823\"></script>";
 if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -392,7 +404,7 @@ if ($overwriteBody==1) {
 		//	}
 		//}
 		function moveDialog(block,item) {
-			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto");
+			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto", true, '', null, {'label':_('Move'),'func':'moveitem'});
 			return false;
 		}
 		function additem(blk,tb) {
@@ -422,12 +434,12 @@ if ($overwriteBody==1) {
 <?php
 	//check for course layout
 	if (isset($CFG['GEN']['courseinclude'])) {
-		require($CFG['GEN']['courseinclude']);
+		require_once $CFG['GEN']['courseinclude'];
 		if ($firstload) {
 			echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 			echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 ?>
@@ -580,11 +592,16 @@ if ($overwriteBody==1) {
 		}
 		echo '<a href="coursemap.php?cid='.$cid.'">'._('Course Map').'</a>';
 		echo '</p>';
+        if (($toolset&4)==0) {
+            echo '<p><a href="gradebook.php?cid='. $cid .'" class="essen">' . _('Gradebook') . '</a> ';
+            if (($coursenewflag&1)==1) {
+                echo '<span class="noticetext">', _('New'), '</span>';
+            }
+            echo '</p>';
+        }
 	?>
 
-			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?>
-			</p>
+			
 	<?php
 		if (count($stuLeftNavBlocks)>0) {
 			echo '<p class=leftnavp><b>'._('Quick Links').'</b>';
@@ -664,7 +681,7 @@ if ($overwriteBody==1) {
    }
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 function makeTopMenu() {
 	global $teacherid;

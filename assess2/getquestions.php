@@ -15,11 +15,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -49,6 +49,9 @@ if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';
   exit;
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 $assessInfoOut = array();
 
@@ -57,6 +60,9 @@ if ($assess_info->getSetting('submitby') == 'by_assessment' &&
   $assess_record->hasActiveAttempt()
 ) {
   echo '{"error": "active_attempt"}';
+  exit;
+} else if (!$assess_record->hasStartedAssess()) {
+  echo '{"error": "not_ready"}';
   exit;
 }
 

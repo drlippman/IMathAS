@@ -32,6 +32,7 @@ class NumberAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -117,11 +118,6 @@ class NumberAnswerBox implements AnswerBox
                 $exactdec = true;
                 $tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
                 $shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
-                if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
-                    $answer = implode(',', prettyreal(explode(',', $answer), $reqdecimals));
-                } else {
-                    $answer = prettyreal($answer, $reqdecimals);
-                }
             } else {
                 $tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least %d decimal places.'), $reqdecimals);
                 $shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
@@ -131,31 +127,44 @@ class NumberAnswerBox implements AnswerBox
             list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
 
             if ($exactsigfig) {
-                if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
-                    $answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
-                } else {
-                    $answer = prettysigfig($answer, $reqsigfigs);
-                }
                 $tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
                 $shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
             } else if ($reqsigfigoffset > 0) {
                 $tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs + $reqsigfigoffset);
                 $shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs + $reqsigfigoffset);
             } else {
-                if ($answer != 0) {
-                    $v = -1 * floor(-log10(abs($answer)) - 1e-12) - $reqsigfigs;
-                }
-                if ($answer != 0 && $v < 0 && strlen($answer) - strpos($answer, '.') - 1 + $v < 0) {
-                    if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
-                        $answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
-                    } else {
-                        $answer = prettysigfig($answer, $reqsigfigs);
-                    }
-                }
                 $tip .= "<br/>" . sprintf(_('Your answer should have at least %d significant figures.'), $reqsigfigs);
                 $shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
             }
         }
+        if (!$isConditional && is_array($answer)) {
+            echo 'for number question, $answer should be a number or string, not an array';
+            $answer = (string)$answer;
+        }
+        $ansarr = explode(',', $answer);
+        foreach ($ansarr as $i=>$anans) {
+            $ansors = explode(' or ', $anans);
+            foreach ($ansors as $k=>$ans) {
+                if (!is_numeric($ans)) { continue; } // skip interval $answers and such
+                if ($reqdecimals !== '' && $exactreqdec) {
+                    $ansors[$k] = prettyreal($ans, $reqdecimals);
+                } else if ($reqsigfigs !== '') {
+                    if ($exactsigfig) {
+                        $ansors[$k] = prettysigfig($ans, $reqsigfigs);
+                    } else if ($reqsigfigoffset > 0) {
+                    } else {
+                        if ($ans != 0) {
+                            $v = -1 * floor(-log10(abs($ans)) - 1e-12) - $reqsigfigs;
+                        }
+                        if ($ans != 0 && $v < 0 && strlen($ans) - strpos($ans, '.') - 1 + $v < 0) {
+                            $ansors[$k] = prettysigfig($ans, $reqsigfigs);
+                        }
+                    }
+                }
+            }
+            $ansarr[$i] = implode(' or ', $ansors);
+        }
+        $answer = implode(',', $ansarr);
 
         $classes = ['text'];
         if ($colorbox != '') {
@@ -211,8 +220,8 @@ class NumberAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt ?? '', $colorbox);
             $answer = str_replace('"', '', $answer);
         }
-        if ($answer !== '' && !is_array($answer)) {
-            if (in_array('parenneg', $ansformats) && $answer < 0) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
+            if (in_array('parenneg', $ansformats) && is_numeric($answer) && $answer < 0) {
                 $sa = '(' . (-1 * $answer) . ')';
             } else if (is_numeric($answer) && $answer != 0 && abs($answer) < .001 && abs($answer) > 1e-9) {
                 $sa = prettysmallnumber($answer);

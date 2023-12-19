@@ -32,6 +32,7 @@ class NTupleAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -76,6 +77,7 @@ class NTupleAnswerBox implements AnswerBox
             $shorttip = _('Enter an n-tuple');
         }
         if ($reqdecimals !== '') {
+            list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
             $tip .= sprintf(_('Each value should be accurate to %d decimal places.'), $reqdecimals) . '<br/>';
             $shorttip .= sprintf(_(", each value accurate to %d decimal places"), $reqdecimals);
         }
@@ -109,7 +111,7 @@ class NTupleAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = $answer;
             if ($displayformat == 'vectorlist' || $displayformat == 'vector') {
                 $sa = str_replace(array('<', '>'), array('(:', ':)'), $sa);

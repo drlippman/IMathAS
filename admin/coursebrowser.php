@@ -14,7 +14,7 @@
 //use "sortby" with consecutive values to specify order in characteristics
 //should be used to sort values. Use negative for a descending sort
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($CFG['coursebrowser'])) {
 	echo "Course Browser is not enabled on this site";
 	exit;
@@ -97,6 +97,7 @@ function getCourseBrowserJSON() {
   	  	  	  	  $orderref[$k] = $i;
   	  	  	  	  $i++;
   	  	  	  }
+              $orderref['undef'] = $i;
   	  	  	  $sortby[$loc]['ref'] = $orderref;
   	  	  }
   	  }
@@ -112,10 +113,10 @@ function getCourseBrowserJSON() {
   			continue;
   		}
   		$aval = $a[$sortinf['prop']];
-  		if (is_array($aval)) { $aval = $aval[0];}
+  		if (is_array($aval)) { $aval = $aval[0] ?? 'undef';}
   		$bval = $b[$sortinf['prop']];
-  		if (is_array($bval)) { $bval = $bval[0];}
-  		if (isset($sortinf['ref'])) {
+  		if (is_array($bval)) { $bval = $bval[0] ?? 'undef';}
+  		if (isset($sortinf['ref']) && isset($sortinf['ref'][$aval]) && isset($sortinf['ref'][$bval])) {
   			if ($sortinf['ref'][$aval] != $sortinf['ref'][$bval]) {
   				return (($sortinf['ref'][$aval] < $sortinf['ref'][$bval])? -1 : 1)*($sortinf['asc']?1:-1);
   			}
@@ -141,7 +142,7 @@ $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
 $pagetitle = _('Course Browser');
-require("../header.php");
+require_once "../header.php";
 
 if (!isset($_GET['embedded'])) {
   $curBreadcrumb = $breadcrumbbase . _('Course Browser');
@@ -196,7 +197,9 @@ if (!isset($_GET['embedded'])) {
   		<b>{{ course.name }}</b>
   	</div>
 	<div class="card-main">
-		<table class="proplist"><tbody>
+		<table class="proplist">
+        <caption class="sr-only">Course Details</caption>
+        <tbody>
 		<tr v-for="(propval,propname) in courseOut(course)">
 			<th>{{ courseBrowserProps[propname].name }}</th>
 			<td v-if="!Array.isArray(propval)"> {{ propval }} </td>
@@ -401,4 +404,4 @@ new Vue({
 });
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

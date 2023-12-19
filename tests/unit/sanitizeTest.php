@@ -1,6 +1,6 @@
 <?php
 
-require(__DIR__ . '/../../includes/sanitize.php');
+require_once __DIR__ . '/../../includes/sanitize.php';
 
 use PHPUnit\Framework\TestCase;
 

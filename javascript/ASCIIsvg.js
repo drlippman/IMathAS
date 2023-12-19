@@ -44,11 +44,13 @@ var border = defaultborder;
 var strokewidth, strokedasharray, stroke, fill;
 var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill, fontbackground;
 var fillopacity = .5;
-var markerstrokewidth = "1";
+var markerstrokewidth = 1;
 var markerstroke = "black";
 var markerfill = "yellow";
 var marker = "none";
 var arrowfill = stroke;
+var arrowrelsize = 1;
+var arrowoffset = 0;
 var dotradius = 4;
 var ticklength = 4;
 var axesstroke = "black";
@@ -475,10 +477,14 @@ function initPicture(x_min,x_max,y_min,y_max) {
  node.setAttribute("y","0");
  node.setAttribute("width",width);
  node.setAttribute("height",height);
- node.setAttribute("style","stroke-width:1;fill:white");
+ node.setAttribute("fill","white");
  svgpicture.appendChild(node);
 }
 
+function setBackgroundColor(color) {
+    var bgrect = svgpicture.getElementsByTagName("rect")[0];
+    bgrect.setAttribute("fill", color);
+}
 function setStrokeFill(node) {
   node.setAttribute("stroke-width", strokewidth);
   if (strokedasharray!=null)
@@ -845,9 +851,9 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
     u = [u[0]/d, u[1]/d];
     up = [-u[1],u[0]];
     var node = myCreateElementSVG("path");
-    node.setAttribute("d","M "+(w[0]-15*u[0]-4*up[0])+" "+
-      (w[1]-15*u[1]-4*up[1])+" L "+(w[0]-3*u[0])+" "+(w[1]-3*u[1])+" L "+
-      (w[0]-15*u[0]+4*up[0])+" "+(w[1]-15*u[1]+4*up[1])+" z");
+    node.setAttribute("d","M "+(w[0]-arrowrelsize*15*u[0]-arrowrelsize*4*up[0]-1*arrowoffset*u[0])+" "+
+      (w[1]-arrowrelsize*15*u[1]-arrowrelsize*4*up[1]-1*arrowoffset*u[1])+" L "+(w[0]-(1*markerstrokewidth+1*arrowoffset)*u[0])+" "+(w[1]-(1*markerstrokewidth+1*arrowoffset)*u[1])+" L "+
+      (w[0]-arrowrelsize*15*u[0]+arrowrelsize*4*up[0]-1*arrowoffset*u[0])+" "+(w[1]-arrowrelsize*15*u[1]+arrowrelsize*4*up[1]-1*arrowoffset*u[1])+" z");
     node.setAttribute("stroke-width", markerstrokewidth);
     node.setAttribute("stroke", stroke); /*was markerstroke*/
     node.setAttribute("fill", stroke); /*was arrowfill*/
@@ -1006,15 +1012,16 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   }
   pnode = myCreateElementSVG("path");
   st="";
-  if (dox) {
+  
+  if (dox && ymin < 1e-8 && ymax > -1e-8) {
 	  st="M"+(fqonlyx?origin[0]:winxmin)+","+(height-origin[1])+" "+winxmax+","+
     (height-origin[1]);
   }
-  if (doy) {
+  if (doy && xmin < 1e-8 && xmax > -1e-8) {
 	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+(fqonlyy?height-origin[1]:winymax);
   }
 
-  if (dox && dx>0) {
+  if (dox && dx>0 && ymin < 1e-8 && ymax > -1e-8) {
 	  for (x = origin[0]; x<winxmax; x = x+dx)
 	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
 		   (height-origin[1]-ticklength);
@@ -1024,7 +1031,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	  	  	(height-origin[1]-ticklength);
 	  }
   }
-  if (doy && dy>0) {
+  if (doy && dy>0 && xmin < 1e-8 && xmax > -1e-8) {
 	   if (!fqonlyy) {
 	     for (y = height-origin[1]; y<winymax; y = y+dy)
 	      if (y>=winymin) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;

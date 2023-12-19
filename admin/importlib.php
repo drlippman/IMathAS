@@ -10,8 +10,8 @@ ini_set("max_execution_time", "3600");
 
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/filehandler.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -34,7 +34,7 @@ function printlist($parent) {
 
 function parseqs($file,$touse,$rights) {
 	function writeq($qd,$rights,$qn) {
-		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin, $importuserid, $importgroupid;
+		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin, $importuserid, $importgroupid, $sourceinstall;
 		$now = time();
 		$toundel = array();
 		$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");
@@ -136,8 +136,25 @@ function parseqs($file,$touse,$rights) {
 				$qimgs = explode("\n",$qd['qimgs']);
 				foreach($qimgs as $qimg) {
 					$p = explode(',',$qimg);
-					$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-					$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1]));
+                    if (count($p)<2) {continue;}
+                    if (count($p)<3) {
+                        $alttext = '';
+                    } else if (count($p)>3) {
+                        $alttext = implode(',', array_slice($p, 2));
+                    } else {
+                        $alttext = $p[2];
+                    }
+
+                    if (strpos($qd['qtext'],'$'.$p[0])===false && strpos($qd['qcontrol'],'$'.$p[0])===false) {
+                        //skip if not actually used in question
+                        continue;
+                    }
+                    //rehost image
+                    $newfn = rehostfile($p[1], 'qimages', $qsetid.'-');
+                    if ($newfn!==false) {
+					    $stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
+					    $stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+                    }
 				}
 			}
 			return $qsetid;
@@ -571,7 +588,7 @@ if ($myrights < 100) {
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/course/libtree.css\" type=\"text/css\" />";
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -692,5 +709,5 @@ if ($overwriteBody==1) {
 		echo "</form>\n";
 	}
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

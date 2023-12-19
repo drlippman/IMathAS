@@ -1,7 +1,7 @@
 <?php
 
-require("../init_without_validate.php");
-require("../header.php");
+require_once "../init_without_validate.php";
+require_once "../header.php";
 echo '<h2>Question License</h2>';
 
 if (empty($_GET['id'])) {
@@ -12,8 +12,8 @@ if (empty($_GET['id'])) {
 function getquestionlicense($row) {
 	global $CFG, $sendfrom;
 	$license = 'This question was written by '.Sanitize::encodeStringForDisplay($row['author']);
-	if ($row['authorancestors']!='') {
-		$license .= ', derived from work by '.Sanitize::encodeStringForDisplay($row['authorancestors']);
+	if ($row['ancestorauthors']!='') {
+		$license .= ', derived from work by '.Sanitize::encodeStringForDisplay($row['ancestorauthors']);
 	}
 	if ($row['license']==0) {
 		$license .= '. This work is copyrighted, or contains copyright material. ';
@@ -74,5 +74,5 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	echo getquestionlicense($row);
 	echo '</p>';
 }
-require('../footer.php');
+require_once '../footer.php';
 ?>

@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__.'/OAuth.php');
-require_once(__DIR__.'/updateptsposs.php');
-require_once(__DIR__.'/../lti/LTI_Grade_Update.php');
+require_once __DIR__.'/OAuth.php';
+require_once __DIR__.'/updateptsposs.php';
+require_once __DIR__.'/../lti/LTI_Grade_Update.php';
 
 /**
  * Add a grade update to the LTI queue. This only can send updates, not deletes
@@ -15,7 +15,7 @@ require_once(__DIR__.'/../lti/LTI_Grade_Update.php');
  *                          to send after the $CFG-set queuedelay.
  * @param boolean $isstu    whether it was a student initiated grade change
  */
-function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=1) {
+function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=true) {
 	global $DBH, $CFG;
 
 	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
@@ -30,7 +30,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=1) {
 		':sourcedid' => $sourcedid,
 		':grade' => $grade,
 		':sendon' => (time() + ($sendnow?0:$LTIdelay)),
-        ':isstu' => $isstu,
+        ':isstu' => $isstu ? 1 : 0,
         ':addedon' => time()
 	));
 
@@ -68,7 +68,11 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
     // new assesses
     $total = $scores;
   }
-	$grade = max(0,$total/$aidposs);
+    if ($aidposs > 0) {
+	    $grade = max(0,$total/$aidposs);
+    } else {
+        $grade = 0;
+    }
 	$grade = number_format($grade,8);
 	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow,$isstu);
 }
@@ -77,6 +81,9 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
 function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$isstu=true) {
 	global $CFG;
 
+    if (empty($uid) || empty($sourcedid) || is_array($sourcedid)) {
+        return false;
+    }
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
 		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k

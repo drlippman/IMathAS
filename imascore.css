@@ -1001,6 +1001,9 @@ ol li ol {
 svg {
 	overflow: hidden;
 }
+embed[type="image/svg+xml"] {
+    display: inline-block;
+}
 
 table.gridded {
 	border-collapse: collapse;

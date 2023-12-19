@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-include("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -68,9 +68,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else if (isset($_POST['add'])) {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -128,8 +128,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
-			require_once("../includes/updateptsposs.php");
-			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			require_once "../includes/updateptsposs.php";
+			updatePointsPossible($aid, $itemorder, $row[2]);
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
@@ -141,9 +141,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -153,7 +153,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	if (isset($_REQUEST['clearattempts'])) {
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-			require_once('../includes/filehandler.php');
+			require_once '../includes/filehandler.php';
 			deleteallaidfiles($aid);
 			$grades = array();
 			if ($aver > 1) {
@@ -260,7 +260,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
 				//update points possible
-				require_once("../includes/updateptsposs.php");
+				require_once "../includes/updateptsposs.php";
 				updatePointsPossible($aid, $itemorder, $defpoints);
 			}
 
@@ -274,8 +274,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				//need to re-score assessment attempts based on withdrawal
-				require_once('../assess2/AssessInfo.php');
-				require_once('../assess2/AssessRecord.php');
+				require_once '../assess2/AssessInfo.php';
+				require_once '../assess2/AssessRecord.php';
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 				$assess_info->loadQuestionSettings();
 				$DBH->beginTransaction();
@@ -294,7 +294,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
-						require_once("../includes/ltioutcomes.php");
+						require_once "../includes/ltioutcomes.php";
 						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true, -1, false);
 					}
 				}
@@ -338,7 +338,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
-						require_once("../includes/ltioutcomes.php");
+						require_once "../includes/ltioutcomes.php";
 						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true, -1, false);
 					}
 				}
@@ -384,12 +384,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=062522\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=041422\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=062423\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=011923\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
-    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=120121\" type=\"text/css\" />";
+    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
     $placeinhead .= '<script>
         $(function() {
             if (window.top != window.self) {
@@ -403,7 +403,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/../filter/filter.php");
+	require_once "$curdir/../filter/filter.php";
 	if ($aver > 1) {
 		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
 		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
@@ -419,7 +419,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$beentaken = false;
 	}
     
-    require_once('../includes/addquestions2util.php');
+    require_once '../includes/addquestions2util.php';
     list($jsarr, $existingq, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, $row);
 
     if (isset($_SESSION['searchtype'.$aid])) {
@@ -450,6 +450,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         } else {
             $searchin = [$userdeflib];
         }
+        $_SESSION['searchin'.$aid] = $searchin;
+        $_SESSION['lastsearchlibs'.$aid] = implode(',', $searchin);
     } else {
         $searchin = [];
     }
@@ -461,7 +463,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
     // do initial search
-    require('../includes/questionsearch.php');
+    require_once '../includes/questionsearch.php';
     $search_parsed = parseSearchString($searchterms);
     $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
         'existing' => $existingq
@@ -472,7 +474,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 /******* begin html output ********/
 //hack to prevent the page breaking on accessible mode
 $_SESSION['useed'] = 1;
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -552,7 +554,7 @@ if ($overwriteBody==1) {
     echo '<li>',_('If you choose <b>All Libraries</b>, you must provide a search term then click Search. '),'</li></ul>';
 
     echo "<p>",_("To select questions and add them:"),"</p><ul>";
-    echo " <li>",_("Click the eye-shaped <b>Preview</b> icon to view an example of the question"),"</li>";
+    echo " <li>",_("Click the <b>Preview</b> button to view an example of the question"),"</li>";
     echo " <li>",_("Use the checkboxes to mark the questions you want to use"),"</li>";
     echo " <li>",_("Click the <b>Add</b> button to add the questions to your assessment"),"</li> ";
     echo "  </ul>";
@@ -699,6 +701,7 @@ if ($overwriteBody==1) {
                             <option value="calcinterval">Calculated Interval</option>
                             <option value="complex">Complex</option>
                             <option value="calccomplex">Calculated Complex</option>
+							<option value="chemeqn">Chemical Equation</option>
                             <option value="file">File Upload</option>
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>
@@ -721,6 +724,7 @@ if ($overwriteBody==1) {
                     <p><label><input type=checkbox id="search-mine"><?php echo _('Mine Only');?></label> 
                         <label><input type=checkbox id="search-unused"><?php echo _('Exclude Added');?></label> 
                         <label><input type=checkbox id="search-newest"><?php echo _('Newest First');?></label> 
+                        <label><input type=checkbox id="search-nounrand"><?php echo _('Exclude non-randomized');?></label> 
                     </p>
                     <p><?php echo _('Helps');?>: 
                         <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 
@@ -750,7 +754,7 @@ if ($overwriteBody==1) {
 </div>
 </div>
 
-<div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img src="../img/updating.gif"/></div>
+<div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img alt="" src="../img/updating.gif"/></div>
 
 <div id="addbar" class="footerbar sr-only">
     <div class="dropup inlinediv splitbtn">
@@ -815,4 +819,4 @@ if ($overwriteBody==1) {
     }
 }
 
-require("../footer.php");
+require_once "../footer.php";

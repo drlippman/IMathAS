@@ -8,7 +8,7 @@
 
 */
 
-require("../init.php");
+require_once "../init.php";
 
 $type = Sanitize::simpleString($_GET['type']);
 
@@ -56,9 +56,11 @@ if (isset($_POST['order'])) {
 				 }
 				 if (substr($id,0,3)=='new') {
 				 	 $name = $_POST['newg'.substr($id,6)];
-				 } else {
+				 } else if (substr($id,0,3)=='grp') {
 				 	 $name = $_POST['g'.substr($id,3)];
-				 }
+				 } else {
+                    $name = $id;
+                 }
 				 $block['name'] = Sanitize::stripHtmlTags($name);
 				 $outarr[] = $block;
 			 } else { //is a course
@@ -161,7 +163,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	var itemorderhash="h";
 	</script>';
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class=breadcrumb>'.$breadcrumbbase._("Course Order").'</div>';
 
@@ -259,6 +261,6 @@ if (count($hiddencourses)>0) {
 	echo  '</ul></li>';
 }
 echo '</ul>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

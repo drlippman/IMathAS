@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__."/copyiteminc.php");
+require_once __DIR__."/copyiteminc.php";
 
 // TODO: Revamp this total hack job.
 // Rewrite the item and course copying as a class
@@ -105,7 +105,6 @@ function copycourse($sourcecid, $name, $newUIver) {
   } else {
     $ancestors = intval($sourcecid).','.$ancestors;
   }
-  $ancestors = $ancestors;
   $outcomes = array();
   $query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
   $query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
@@ -137,10 +136,14 @@ function copycourse($sourcecid, $name, $newUIver) {
       foreach ($arr as $k=>$v) {
         if (is_array($v)) {
           updateoutcomes($arr[$k]['outcomes']);
+        } else if (!isset($outcomes[$v])) {
+            // outcome exists in outcomesarr, but doesn't actually exist; must not have updated properly
+          unset($arr[$k]);
         } else {
           $arr[$k] = $outcomes[$v];
         }
       }
+      $arr = array_values($arr);
     }
     $outcomesarr = unserialize($outcomesarr);
     updateoutcomes($outcomesarr);
@@ -152,6 +155,7 @@ function copycourse($sourcecid, $name, $newUIver) {
   $usereplaceby = "all";
   $newitems = array();
   $cid = $destcid; //needed for copyiteminc
+  $_POST['ctc'] = $sourcecid;
   copyallsub($items,'0',$newitems,$gbcats);
   doaftercopy($sourcecid, $newitems);
 

@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 
@@ -53,11 +53,12 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 $origgraphdisp = $_SESSION['graphdisp'];
 $_SESSION['graphdisp'] = 2;
 $assessver = 2;
+$isdiag = false;
 
 if ($overwriteBody==1) {
 	echo $body;
 } if (!isset($_POST['versions'])) {
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -96,7 +97,8 @@ if ($overwriteBody==1) {
 	echo '<div class="submit"><input type=submit value="Continue"></div></form>';
 
 } else {
-	require("../assessment/header.php");
+    $useeqnhelper = 0;
+	require_once "../assessment/header.php";
 	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -181,7 +183,7 @@ if ($overwriteBody==1) {
 <?php
 
     if ($courseUIver > 1) {
-        include('../assess2/AssessStandalone.php');
+        require_once '../assess2/AssessStandalone.php';
         $a2 = new AssessStandalone($DBH);
         $stm = $DBH->prepare("SELECT iqs.* FROM imas_questionset AS iqs JOIN imas_questions ON imas_questions.questionsetid=iqs.id WHERE imas_questions.assessmentid=:id");
         $stm->execute(array(':id'=>$aid));
@@ -189,7 +191,7 @@ if ($overwriteBody==1) {
             $a2->setQuestionData($qdata['id'], $qdata);
         }
     } else {
-	include("../assessment/displayq2.php");
+	require_once "../assessment/displayq2.php";
     }
 
 
@@ -204,13 +206,13 @@ if ($overwriteBody==1) {
 	for ($j=0; $j<$copies; $j++) {
 		$seeds[$j] = array();
 		if ($line['shuffle']&2) {  //all questions same random seed
-			if ($shuffle&4) { //all students same seed
+			if ($line['shuffle']&4) { //all students same seed
 				$seeds[$j] = array_fill(0,count($questions),$aid+$j);
 			} else {
 				$seeds[$j] = array_fill(0,count($questions),rand(1,9999));
 			}
 		} else {
-			if ($shuffle&4) { //all students same seed
+			if ($line['shuffle']&4) { //all students same seed
 				for ($i = 0; $i<count($questions);$i++) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
@@ -350,7 +352,7 @@ if ($overwriteBody==1) {
 
 }
 $_SESSION['graphdisp'] = $origgraphdisp;
-require("../footer.php");
+require_once "../footer.php";
 
 function printq2($qn,$qsetid,$seed,$pts,$showpts) {
     global $a2,$isfinal,$imasroot,$urlmode;

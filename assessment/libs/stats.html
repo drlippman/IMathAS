@@ -1,4 +1,7 @@
-<html><body>
+<!DOCTYPE html>
+<html lang="en"><head>
+    <title>stats help</title>
+</head><body>
 <h1>Macro Library stats</h1>
 A library of Stats functions.  Version 1.30, Nov 20, 2021
 <BR><ul>
@@ -186,6 +189,9 @@ fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height,showgrid,fil
 <BR>&nbsp;showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
 <BR>&nbsp;fill (optional) = the fill color of the bins; default is blue
 <BR>&nbsp;stroke (optional) = the line color of the bins; default is black
+<p>To fill in only some optional parameters, the 5th argument can instead be an associate array 
+ of values to fill in, like ['width'=>500, 'fill'=>'blue'].  When used this way, 'vertlabel' can 
+ be used to change the vertical axis label.</p>
 <BR><h3><a name="fdbargraph">fdbargraph</a></h3>
 fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>barlabels: array of labels for the bars
@@ -343,8 +349,8 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
 <BR>Display macro.  Creates a dotplot from a data set
 <BR> array: array of data values
 <BR> label: title of the dotplot that will be placed below the horizontal axis
-<BR> dot spacing (default 1): horiz spacing of dots; data will be rounded to nearest value
-<br> axis spacing (defaults to dot spacing): spacing of axis labels 
+<BR> dotspacing (default 1): horiz spacing of dots; data will be rounded to nearest value
+<br> labelspacing (defaults to dot spacing): spacing of axis labels 
 <BR> width,height (default 300x150): width and height in pixels of graph
   <p>&nbsp;</p>
   <p><h3><a name="anova1way"></a><strong>anova1way</strong>(arr1, arr2, [arr3, ...])</h3></p>

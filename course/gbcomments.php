@@ -2,13 +2,13 @@
 //IMathAS:  Add/modify gradebook comments
 //(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -28,7 +28,7 @@
 	}
 
 	if (isset($_GET['upload'])) {
-		require("../header.php");
+		require_once "../header.php";
 
         echo "<div class=breadcrumb>$breadcrumbbase ";
         if (empty($_COOKIE['fromltimenu'])) {
@@ -106,7 +106,7 @@
 				}
 				if ($successes>0) {
 					echo "<a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Return to comments list</a></p>";
-					require("../footer.php");
+					require_once "../footer.php";
 					exit;
 				}
 
@@ -137,7 +137,7 @@
 
 		echo "</form>";
 
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 
@@ -162,7 +162,7 @@
 		exit;
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 	echo '<script type="text/javascript">function sendtoall(type) {'."\n";
 	echo '  var form=document.getElementById("mainform");'."\n";
 	echo '  for (var e = 0; e<form.elements.length; e++) {'."\n";
@@ -186,7 +186,7 @@
 		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
 
 	} else if ($comtype=='instr') {
-		echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=stu\">View/Edit Student comments</a></div>";
 		echo '<h1>Modify Instructor Notes</h1>';
 		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";
@@ -210,6 +210,6 @@
 	}
 	echo '<div class="submit"><input type="submit" value="'._('Save Comments').'"/></div>';
 	echo "</form>";
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

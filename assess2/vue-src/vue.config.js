@@ -24,6 +24,12 @@ module.exports = {
     }
     config.plugin("webpack-bundle-analyzer").use(BundleAnalyzerPlugin);
   },
+  configureWebpack: {
+    output: {
+      filename: 'js/[name].js',
+      chunkFilename: 'js/[name].js?v=[chunkhash]'
+    }
+  },
   // in dev server mode, proxy all requests to localhost
   devServer: {
     proxy: process.env.VUE_APP_PROXY

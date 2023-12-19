@@ -2,7 +2,7 @@
 //Unit tests for specific functions
 //(c) 2018 IMathAS
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {
 	echo "Unauthorized";
@@ -47,9 +47,9 @@ $xxtests = [
     ['x+1 leq 3', 'x+1 leq 3']
 ];
 
-require("../assessment/interpret5.php");
-require("../assessment/macros.php");
-require("../assess2/questions/answerboxhelpers.php");
+require_once "../assessment/interpret5.php";
+require_once "../assessment/macros.php";
+require_once "../assess2/questions/answerboxhelpers.php";
 
 
 foreach ($reqtimestests as $test) {

@@ -3,8 +3,8 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require "../init.php";
-require "../includes/htmlutil.php";
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once "../includes/TeacherAuditLog.php";
 
 //set some page specific variables and counters
@@ -39,6 +39,9 @@ if (!(isset($teacherid))) {
     $curBreadcrumb .= _("Modify Question Settings");
 
     if (!empty($_GET['process'])) {
+        $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id");
+        $stm->execute(array(':id' => $aid));
+        list($itemorder, $defpoints, $intro) = $stm->fetch(PDO::FETCH_NUM);
         if (isset($_GET['usedef'])) {
             $points = 9999;
             $attempts = 9999;
@@ -53,6 +56,9 @@ if (!(isset($teacherid))) {
             $_POST['copies'] = 1;
         } else {
             if (trim($_POST['points']) == "") {$points = 9999;} else { $points = intval($_POST['points']);}
+            if ($points == $defpoints) {
+                $points = 9999;
+            }
             if (trim($_POST['attempts']) == "" || intval($_POST['attempts']) <= 0) {
                 $attempts = 9999;
             } else {
@@ -125,12 +131,29 @@ if (!(isset($teacherid))) {
                 $stm->execute(array(':id' => $_GET['id']));
                 $_GET['qsetid'] = $stm->fetchColumn(0);
             }
+
+            // see if question was in group if points changed, and change others in group to same
+            if ($old_settings['points'] != $points) {
+                $aitems = explode(',', $itemorder);
+                foreach ($aitems as $v) {
+                    if ($v == $_GET['id']) { break; }
+                    else if (is_numeric($v)) { continue; }
+                    $sub = explode('~', $v);
+                    if (in_array($_GET['id'], $sub)) {
+                        $grpparts = explode('|',$sub[0]);
+				        if (strpos($sub[0],'|')!==false && $grpparts[0]<count($sub)-1) { // only standardize points if n < count
+                            array_shift($sub);
+                            $tofix = implode(',', array_map('intval', $sub));
+                            $stm = $DBH->prepare("UPDATE imas_questions SET points=? WHERE id IN ($tofix)");
+                            $stm->execute([$points]);
+                        }
+                        break;
+                    }
+                }
+            }
         }
         require_once "../includes/updateptsposs.php";
         if (isset($_GET['qsetid'])) { //new - adding
-            $stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
-            $stm->execute(array(':id' => $aid));
-            list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
             for ($i = 0; $i < $_POST['copies']; $i++) {
                 $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,showwork,questionsetid,rubric,showhints,fixedseeds,extracredit) ";
                 $query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :showwork, :questionsetid, :rubric, :showhints, :fixedseeds, :extracredit)";
@@ -153,8 +176,20 @@ if (!(isset($teacherid))) {
                     }
                 }
             }
-            $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
-            $stm->execute(array(':itemorder' => $itemorder, ':id' => $aid));
+            if (isset($_GET['id']) && $_POST['copies'] > 0) {
+                if (($jsonintro=json_decode($intro,true))!==null) { //is json intro
+                    $toadd = intval($_POST['copies']);
+                    for ($j = 1; $j < count($jsonintro); $j++) {
+                        if ($jsonintro[$j]['displayBefore']>$key) {
+                            $jsonintro[$j]['displayBefore'] += $toadd;
+                            $jsonintro[$j]['displayUntil'] += $toadd;
+                        }
+                    }
+                    $intro = json_encode($jsonintro);
+                }
+            } 
+            $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
+            $stm->execute(array(':itemorder' => $itemorder, ':intro' => $intro, ':id' => $aid));
 
             updatePointsPossible($aid, $itemorder, $defpoints);
         } else {
@@ -163,13 +198,13 @@ if (!(isset($teacherid))) {
 
         // Delete any teacher or tutor attempts on this assessment
         $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
-      imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
-      WHERE iar.assessmentid=?';
+            imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
         $stm = $DBH->prepare($query);
         $stm->execute(array($cid, $aid));
         $query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
-      imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
-      WHERE iar.assessmentid=?';
+            imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
+            WHERE iar.assessmentid=?';
         $stm = $DBH->prepare($query);
         $stm->execute(array($cid, $aid));
 
@@ -216,10 +251,11 @@ if (!(isset($teacherid))) {
         $stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
         $stm->execute(array(':id' => $qsetid));
         $qdescrip = $stm->fetchColumn(0);
+        $qingroup = false;
         if (isset($_GET['loc'])) {
             $qdescrip = $_GET['loc'] . ': ' . $qdescrip;
+            $qingroup = (strpos($_GET['loc'],'-') !== false);
         }
-        $qingroup = (strpos($_GET['loc'],'-') !== false);
 
         $rubric_vals = array(0);
         $rubric_names = array('None');
@@ -247,6 +283,7 @@ if (!(isset($teacherid))) {
         $defaults = $stm->fetch(PDO::FETCH_ASSOC);
         $defaults['showwork'] = ($defaults['showwork'] & 3);
 
+        if ($defaults['defpenalty'] === '') { $defaults['defpenalty'] = '0'; }
         if ($defaults['defpenalty'][0] === 'S') {
             $defaults['penalty'] = sprintf(_('%d%% after %d full-credit tries'),
                 substr($defaults['defpenalty'], 2), $defaults['defpenalty'][1]);
@@ -303,7 +340,7 @@ $(function() {
     });
 });
 </script>';
-require "../header.php";
+require_once "../header.php";
 
 if ($overwriteBody == 1) {
     echo $body;
@@ -406,8 +443,8 @@ if (!isset($_GET['id']) || $beentaken) {
 <span class=form><?php echo _('Use Scoring Rubric'); ?></span><span class=formright>
 <?php
 writeHtmlSelect('rubric', $rubric_vals, $rubric_names, $line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Add new rubric") . "</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Edit rubrics") . "</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id'] ?? '') . "\">" . _("Add new rubric") . "</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id'] ?? '') . "\">" . _("Edit rubrics") . "</a> ";
     ?>
     </span><br class="form"/>
 <?php
@@ -452,5 +489,5 @@ if (isset($_GET['qsetid'])) { //adding new question
     echo '</form>';
 }
 
-require "../footer.php";
+require_once "../footer.php";
 ?>

@@ -8,25 +8,27 @@
 		$urlmode = 'http://';
 	}
 	/*** master php includes *******/
-	require("../init_without_validate.php");
-
-	require("courseshowitems.php");
-
+	require_once "../init_without_validate.php";
 
 	$ispublic = true;
-	$cid = Sanitize::courseId($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid'] ?? 0);
+    $myrights = 5;
 
-	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset,UIver FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($line == null) {
+	if ($line == false) {
 		echo "Course cannot be found";
 		exit;
 	}
 	$coursename = $line['name'];
 	$coursetheme = $line['theme'];
 	$pagetitle = $line['name'];
+    $courseUIver = $line['UIver'];
 	$items = unserialize($line['itemorder']);
+    $breadcrumbbase = '';
+
+    require_once "courseshowitems.php";
 
 	if (!isset($_GET['folder']) || $_GET['folder']=='') {
 		$_GET['folder'] = '0';
@@ -38,11 +40,7 @@
 		$blocktree = explode('-',$_GET['folder']);
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!empty($items[$blocktree[$i]-1]['public'])) {
-				$blockispublic = true;
-			}
-			if (!is_array($items[$blocktree[$i]-1])) { //invalid blocktree
+			if (!isset($blocktree[$i]) || !is_numeric($blocktree[$i]) || !isset($items[$blocktree[$i]-1]) || !is_array($items[$blocktree[$i]-1])) { //invalid blocktree
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
@@ -55,6 +53,10 @@
 				unset($backtrack);
 				unset($blocktree);
 				break;
+			}
+            $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+			if (!empty($items[$blocktree[$i]-1]['public'])) {
+				$blockispublic = true;
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
@@ -101,7 +103,7 @@
 	}
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 ?>
 <script>
 	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo Sanitize::courseId($cid) ?>&folder=';
@@ -120,7 +122,7 @@ require("../header.php");
  }
 
  echo "<hr/>This is the publicly accessible content from a course on $installname.  There may be additional content available by <a href=\"course.php?cid=$cid\">logging in</a>";
-require("../footer.php");
+require_once "../footer.php";
 
  function tzdate($string,$time) {
 	  global $tzoffset;

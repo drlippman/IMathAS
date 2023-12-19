@@ -273,7 +273,7 @@ export default {
     handlePlayerError (event) {
       store.errorMsg = event.data;
     },
-    jumpTo (newCueNum, newToshow) {
+    jumpTo (newCueNum, newToshow, failed = 0) {
       if (newCueNum === -1 || newToshow === 'q') {
         // if showing a question, pause the video
         this.exitFullscreen();
@@ -282,8 +282,15 @@ export default {
         }
       } else {
         if (this.ytplayer === null || typeof this.ytplayer.seekTo !== 'function') {
-          store.errorMsg = 'ytnotready';
+          if (failed === 0) {
+            store.errorMsg = 'ytnotready';
+          }
+          window.setTimeout(() => {
+            this.jumpTo(newCueNum, newToshow, 1);
+          }, 100);
           return;
+        } else if (failed > 0) {
+          store.errorMsg = null;
         }
         const newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
@@ -318,9 +325,12 @@ export default {
         this.createPlayer();
       };
       // async load YouTube API
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/player_api';
-      document.head.appendChild(tag);
+      if (!document.getElementById('yt_player_api')) {
+        const tag = document.createElement('script');
+        tag.id = 'yt_player_api';
+        tag.src = 'https://www.youtube.com/player_api';
+        document.head.appendChild(tag);
+      }
     }
   },
   created () {

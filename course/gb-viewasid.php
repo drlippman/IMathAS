@@ -1,13 +1,13 @@
 <?php
 //IMathAS:  View/Edit and Question breakdown views
 //(c) 2007 David Lippman
-	require("../init.php");
-	require_once("../includes/filehandler.php");
-  require_once("../includes/TeacherAuditLog.php");
+	require_once "../init.php";
+	require_once "../includes/filehandler.php";
+  require_once "../includes/TeacherAuditLog.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['course/gb-viewasid'])) {
-	require($CFG['hooks']['course/gb-viewasid']);
+	require_once $CFG['hooks']['course/gb-viewasid'];
 }
 
 
@@ -22,7 +22,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$asid = Sanitize::onlyInt($_GET['asid']);
 	}
 
-	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
+	if (!isset($_GET['uid']) || (!$isteacher && !$istutor)) {
 		$get_uid = $userid;
 	} else {
 		$get_uid = Sanitize::onlyInt($_GET['uid']);
@@ -42,7 +42,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			$stu = 0;
 		}
 		if (isset($_GET['from'])) {
-			$from = $_GET['from'];
+			$from = Sanitize::simpleString($_GET['from']);
 		} else {
 			$from = 'gb';
 		}
@@ -119,7 +119,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			$stugroupmem[] = $get_uid;
 
 			if ($doadd) {
-				require("../assessment/asidutil.php");
+				require_once "../assessment/asidutil.php";
 				list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 				//$starttime = time();
 				foreach ($stugroupmem as $uid) {
@@ -147,7 +147,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			if ($stm->rowCount()>0) {
 				list($aid, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				if (strlen($ltisourcedid)>1) {
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					updateLTIgrade('delete',$ltisourcedid,$aid,$uid);
 				}
 
@@ -215,7 +215,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	}
 	if (isset($_REQUEST['breakfromgroup']) && $isteacher) {
 		if (isset($_POST['breakfromgroup']) && $_POST['breakfromgroup']=="confirmed") {
-			include("../includes/stugroups.php");
+			require_once "../includes/stugroups.php";
 			$stm = $DBH->prepare("SELECT userid,agroupid FROM imas_assessment_sessions WHERE id=:id");
 			$stm->execute(array(':id'=>$asid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -250,7 +250,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				list($seeds, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				$seeds = explode(',', $seeds);
 				if (strlen($ltisourcedid)>1) {
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					updateLTIgrade('update',$ltisourcedid,$aid,$uid,0);
 				}
 
@@ -344,6 +344,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 
         $clearid = $_POST['clearq'];
         if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
+          $clearid = intval($clearid);
           deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
           $scores[$clearid] = -1;
           $attempts[$clearid] = 0;
@@ -388,12 +389,10 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
           $stm2->execute(array(':id'=>$line['id'], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
             ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
           if (strlen($line['lti_sourcedid'])>1) {
-            require_once("../includes/ltioutcomes.php");
+            require_once "../includes/ltioutcomes.php";
             calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$bestscores,true);
           }
         } else {
-          echo "$clearid";
-          print_r($scores);
           $err = "<p>Error.  Try again.</p>";
         }
       }
@@ -435,7 +434,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 
 	//OUTPUTS
 	if ($links==0) { //View/Edit full assessment
-		require("../assessment/displayq2.php");
+		require_once "../assessment/displayq2.php";
 
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
 			$haderror = false;
@@ -513,7 +512,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$aid = $row[0];
 				if (strlen($row[1])>1) {
 					//update LTI score
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					calcandupdateLTIgrade($row[1],$row[0],$row[2],$scores,true);
 				}
 			} else {
@@ -542,14 +541,15 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$_SESSION['coursetheme'] = $coursetheme;
 		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=022622"></script>';
-			require("../includes/rubric.php");
+			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
+			require_once "../includes/rubric.php";
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120"></script>';
 			if ($_SESSION['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
 		}
-		require("../assessment/header.php");
+        $useeqnhelper = 0;
+		require_once "../assessment/header.php";
 		echo "<style type=\"text/css\">p.tips {	display: none;} .pseudohidden {visibility:hidden;position:absolute;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {
 
@@ -621,7 +621,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			echo '<a href="'.Sanitize::encodeStringForDisplay('gb-viewasid.php?stu='.$stu.'&asid='.$asid.'&from='.$from.'&cid='.$cid.'&uid='.$get_uid.'&from='.$_GET['from']).'">';
 			echo _('Assessment Detail').'</a> &gt; Confirm Action</div>';
 			echo $body;
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		} else {
 			echo "Detail</div>";
@@ -677,7 +677,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
 		if ($showans=='N' && !$isteacher && !$istutor) {
 			echo "You shouldn't be here";
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		echo "<h3>{$line['name']}</h3>\n";
@@ -720,7 +720,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$saenddate = $line['enddate'];
 		unset($exped);
 
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP, $latepasshrs);
 		$excepadata = array(
 			'id'=>$line['assessmentid'],
@@ -1181,10 +1181,10 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
 		if ($stm->fetchColumn(0)>0) {
-			include("../assessment/catscores.php");
+			require_once "../assessment/catscores.php";
 			catscores($questions,$scores,$line['defpoints'], $line['defoutcome'],$cid);
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 
 	} else if ($links==1) { //show grade detail question/category breakdown
 		$placeinhead = "<script type=\"text/javascript\">function previewq(qn) {
@@ -1192,7 +1192,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
 			previewpop.focus();
 		}</script>";
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";}
@@ -1314,7 +1314,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
 		if ($stm->fetchColumn(0)>0) {
-			include("../assessment/catscores.php");
+			require_once "../assessment/catscores.php";
 			catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
 		}
 
@@ -1341,7 +1341,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		echo "<p>Total:  $totpt / $totposs  ($pc %)</p>\n";
 
 		echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
-		require("../footer.php");
+		require_once "../footer.php";
 
 	}
 

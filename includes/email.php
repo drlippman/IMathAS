@@ -68,10 +68,10 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 	}
 	if (isset($CFG['email']['handler']) && $priority>$CFG['email']['handlerpriority']) {
 		list($handlerscript, $sendfunc) = $CFG['email']['handler'];
-		require_once(__DIR__ . '/' . $handlerscript);
+		require_once __DIR__ . '/' . $handlerscript;
 		$sendfunc($email, $from, $subject, $message, $replyto, $bccList);
 	} else if (!empty($CFG['GEN']['useSESmail']) && $priority>$CFG['email']['handlerpriority']) {
-		require_once(__DIR__ . '/mailses.php');
+		require_once __DIR__ . '/mailses.php';
 		send_SESemail($email, $from, $subject, $message, $replyto, $bccList);
 	} else {
 		$tostr = implode(',', $email);

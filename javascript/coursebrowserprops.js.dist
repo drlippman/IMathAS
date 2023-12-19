@@ -70,7 +70,7 @@ var courseBrowserProps = {
 			"dhcalc": "Contemporary Calculus, Hoffman",
 			"dgcalc": "Community Calculus, Guichard/et al",
 			"apcalc": "APEX Calculus, Hartman/et al",
-			"accalc": "Active Calculus, Boalkins",
+			"accalc": "Active Calculus, Boelkins",
 			"oscalc": "Calculus, OpenStax/Strang/Herman",
 			"group5": "Math for Liberal Arts / QR",
 			"lqr": "Math in Society, Lippman",

@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 	if (!isset($DBH)) {
-		require("../init.php");
+		require_once "../init.php";
 		if (isset($_GET['embed'])) {
 			$calledfrom='embed';
 			$_POST['submit'] = "Message";
@@ -13,9 +13,9 @@
 	}
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -56,7 +56,7 @@
 				}
 			}
 		}
-		require_once("../includes/htmLawed.php");
+		require_once "../includes/htmLawed.php";
 		$messagePost = myhtmLawed($_POST['message']);
 		$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
 		if (trim($subjectPost)=='') {
@@ -94,8 +94,8 @@
 			$stm->execute(array(':id'=>$userid));
 			$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));
 
-			require_once("../includes/email.php");
-			require_once("../includes/FCM.php");
+			require_once "../includes/email.php";
+			require_once "../includes/FCM.php";
 
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
@@ -168,7 +168,7 @@
 			$_SESSION['mathdisp']=2;
 			$_SESSION['graphdisp']=2;
 
-			require("../filter/filter.php");
+			require_once "../filter/filter.php";
 			$message = filter($messagePost);
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
 
@@ -183,7 +183,7 @@
 				$teacheraddys[] = $self;
 			}
 
-			require_once("../includes/email.php");
+			require_once "../includes/email.php";
 
 			foreach ($emailaddys as $k=>$addy) {
 				send_email($addy, $sendfrom, $subjectPost,
@@ -232,13 +232,15 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='gb') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+		} else if ($calledfrom=='isolateassess') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/isolateassessgrade.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='itemsearch') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php?r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='embed') {
-			require("../header.php");
+			require_once "../header.php";
 			echo '<p>'._('Messages Sent').'.';
 			echo ' <button type="button" onclick="top.GB_hide()">'._('Close').'</button>';
-			require("../footer.php");
+			require_once "../footer.php";
 		}
 		exit;
 	} else {
@@ -249,7 +251,7 @@
 		$sendtype = (isset($_POST['posted']))?$_POST['posted']:$_POST['submit']; //E-mail or Message
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
-		require("../header.php");
+		require_once "../header.php";
 		if ($calledfrom=='embed') {
 			$_POST['checked'] = explode('-', $_GET['to']);
 		} else {
@@ -258,21 +260,25 @@
                 echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
             }
             if ($calledfrom=='lu') {
-				echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+				echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; ";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
-			} else if ($calledfrom=='itemsearch') {
-				echo "Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
-			}
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."\">Gradebook</a> &gt; ";
+			} else if ($calledfrom=='isolateassess') {
+                echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';  
+            } //else if ($calledfrom=='itemsearch')
+			echo "Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+			
 		}
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No users selected.  ";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try again</a>\n";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Try again</a>\n";
-			}
-			require("../footer.php");
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."\">Try again</a>\n";
+			} else if ($calledfrom=='isolateassess') {
+                echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('Try again').'</a>';  
+            }
+			require_once "../footer.php";
 			exit;
 		}
 		echo '<div id="headermasssend" class="pagetitle">';
@@ -281,10 +287,12 @@
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
+			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='itemsearch') {
 			echo "<form method=post action=\"itemsearch.php?masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
-		} else if ($calledfrom=='embed') {
+		} else if ($calledfrom=='isolateassess') {
+            echo '<form method=post action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'&masssend='.Sanitize::encodeUrlParam($sendtype).'">';  
+        } else if ($calledfrom=='embed') {
 			echo "<form method=post action=\"masssend.php?embed=true&cid=".Sanitize::courseId($cid)."&masssend=".Sanitize::encodeUrlParam($sendtype);
 			if (isset($_GET['nolimit'])) {
 				echo '&nolimit=true';
@@ -292,7 +300,7 @@
 			echo "\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
+		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"\"></span><br class=form>\n";
 		echo "<span class=form><label for=\"message\">Message:</label></span>";
 		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70> </textarea></div></span><br class=form>\n";
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";
@@ -347,7 +355,7 @@
 			);
 		}
 		echo '</ul>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 

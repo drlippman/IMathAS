@@ -1,7 +1,9 @@
 <?php
 
-require("../init.php");
-require('mathparser.php');
+require_once "../init.php";
+require_once 'mathparser.php';
+$allowedmacros = [];
+require_once 'macros.php';
 
 if ($myrights < 100) {
   exit;
@@ -36,6 +38,7 @@ $tests = [
  ['8sin(pi/2)/4', [], 2],
  ['4arcsin(sqrt(2)/2)/pi', [], 1],
  ['root(3)(8) + root3(8)', [], 4],
+ ['root((3))(8) + log_((3))(3)', [], 3],
  ['sqrt4+1', [], 3],
  ['sqrt4x', ['x'=>10], 20],
  ['sin^2(pi/4)', [], 1/2],
@@ -119,7 +122,16 @@ $sameformtests = [
     ['3-4x^2','-4x^2+3',['x']],
     ['3-4^2','-4^2+3',['x']],
     ['3-x*4','-x*4+3',['x']],
-    ['3-4(x)','-4(x)+3',['x']]
+    ['3-4(x)','-4(x)+3',['x']],
+    ['-(2*3)/4','(-2*3)/4',[]],
+    ['-(2*3)/4','-2*3/4',[]],
+    ['-(2+3)','-2-3',[]], // this and next are debatable; caused by $invert code in mathparser
+    ['-3(2+4)','3(-2-4)',[]],
+    ['-2+3','3+(-2)',[]],
+    ['-2+3-1','3-2-1',[]],
+    ['(-2-3)(-4-5)','(-4-5)(-2-3)',[]],
+    ['(-2-3)(-4-5)','(-5-4)(-3-2)',[]],
+    ['2+3(x-4)','2-3(4-x)',['x']]
 ];
 $st = microtime(true);
 foreach ($sameformtests as $test) {
@@ -130,7 +142,7 @@ foreach ($sameformtests as $test) {
       $str1 = $p->normalizeTreeString();
       $p->parse($test[1]);
       $str2 = $p->normalizeTreeString();
-      if ($str1 != $str2) {
+      if ((!isset($test[3]) && $str1 != $str2) || (isset($test[3]) && $str1 == $str2)) {
         echo "Sameform Test failed on {$test[0]} vs {$test[1]}: $str1 vs $str2<br>";
       }
     } catch (Throwable $t) {
@@ -139,4 +151,24 @@ foreach ($sameformtests as $test) {
     }
 }
 echo microtime(true) - $st;
-echo "Done";
+echo "Sameform tests done <br><br>";
+
+$st = microtime(true);
+$matrixtests = [
+    ['1|3|4|5',[1,3,4,5],null],
+    ['[3]', [3], 1],
+    ['[(1,2,3)]', [1,2,3], 1],
+    ['[(2pi)/3]', ['(2pi)/3'], 1],
+    ['[(1,2,3),(4,5,6)]',[1,2,3,4,5,6], 2],
+    ['[(sqrt(4),(2pi)/3),(5,6)]',['sqrt(4)','(2pi)/3',5,6], 2],
+    ['((1),(2),(3)]', [1,2,3], 3],
+    ['| (1, 3), (5, 6) |', [1,3,5,6], 2]
+];
+foreach ($matrixtests as $test) {
+    list($a,$d) = parseMatrixToArray($test[0]);
+    if ($a != $test[1] || $d != $test[2]) {
+        echo "Fail on $test[0]<br>";
+    }
+}
+echo microtime(true) - $st;
+echo "matrix tests done <br><br>";

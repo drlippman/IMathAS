@@ -33,6 +33,7 @@ class ChoicesAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $assessmentId = $this->answerBoxParams->getAssessmentId();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -53,8 +54,8 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
-        if ($noshuffle == "last") {
-            $randkeys = $RND->array_rand(array_slice($questions, 0, count($questions) - 1), count($questions) - 1);
+        if ($noshuffle == "last" && count($questions)>0) {
+            $randkeys = (array) $RND->array_rand(array_slice($questions, 0, count($questions) - 1), count($questions) - 1);
             $RND->shuffle($randkeys);
             array_push($randkeys, count($questions) - 1);
         } else if ($noshuffle == "all") {
@@ -64,13 +65,13 @@ class ChoicesAnswerBox implements AnswerBox
             if ($n > count($questions)) {
                 $n = count($questions);
             }
-            $randkeys = $RND->array_rand(array_slice($questions, 0, count($questions) - $n), count($questions) - $n);
+            $randkeys = (array) $RND->array_rand(array_slice($questions, 0, count($questions) - $n), count($questions) - $n);
             $RND->shuffle($randkeys);
             for ($i = count($questions) - $n; $i < count($questions); $i++) {
                 array_push($randkeys, $i);
             }
         } else {
-            $randkeys = $RND->array_rand($questions, count($questions));
+            $randkeys = (array) $RND->array_rand($questions, count($questions));
             $RND->shuffle($randkeys);
         }
         $_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
@@ -99,11 +100,11 @@ class ChoicesAnswerBox implements AnswerBox
 
         if ($displayformat == 'inline') {
             if ($colorbox != '') {$style .= ' class="' . $colorbox . '" ';} else { $style = '';}
-            $out .= "<span $style id=\"qnwrap$qn\" role=group ";
+            $out .= "<span $style id=\"qnwrap$qn\" role=radiogroup ";
             $out .= 'aria-label="' . $arialabel . '">';
         } else if ($displayformat != 'select') {
             if ($colorbox != '') {$style .= ' class="' . $colorbox . ' clearfix" ';} else { $style = ' class="clearfix" ';}
-            $out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group ";
+            $out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=radiogroup ";
             $out .= 'aria-label="' . $arialabel . '">';
         }
         if ($displayformat == "select") {
@@ -180,11 +181,13 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         $tip = _('Select the best answer');
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $anss = explode(' or ', $answer);
             $sapt = array();
             foreach ($anss as $v) {
-                $sapt[] = $questions[intval($v)];
+                if (isset($questions[intval($v)])) {
+                    $sapt[] = $questions[intval($v)];
+                } 
             }
             $sa = implode(' or ', $sapt); //$questions[$answer];
         }

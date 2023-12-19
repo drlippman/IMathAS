@@ -1,6 +1,6 @@
 <?php
 $init_skip_csrfp = true;
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 
 $host = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.
@@ -48,7 +48,9 @@ header("Content-type: application/json;");
    "public_jwk_url": "<?php echo $basesiteurl;?>/lti/jwks.php",
    "custom_fields":{
       "canvas_assignment_due_at":"$Canvas.assignment.dueAt.iso8601",
-      "context_history":"$Context.id.history"
+      "context_history":"$Context.id.history",
+      "link_history":"$ResourceLink.id.history",
+      "canvas_sections":"$com.instructure.User.sectionNames"
    }
 }
 <?php

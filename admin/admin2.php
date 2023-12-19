@@ -2,7 +2,7 @@
 //IMathAS: Admin front page
 //(c) David Lippman 2017
 
-require("../init.php");
+require_once "../init.php";
 
 
 function getRoleNameByRights($rights) {
@@ -55,7 +55,7 @@ if ($myrights < 75) {
 
 
   } else if (!empty($_GET['finduser']) || !empty($_GET['findteacher'])) {
-    require("../includes/userutils.php");
+    require_once "../includes/userutils.php";
 
     //search for a user (teacher or regular)
     if (trim($_GET['findteacher'])!=='') {
@@ -169,7 +169,7 @@ if ($myrights < 75) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -206,9 +206,9 @@ if ($overwriteBody==1) {
       if (count($possible_users)==0) {
         echo '<p>'._('No users found').'</p>';
       } else {
-      	if ($hasp1) {
-      		echo '<style type="text/css"> tr.p0 {color:#999;} tr.p2 {color:#060;}</style>';
-      	}
+      	//if ($hasp1) {
+      	//	echo '<style type="text/css"> tr.p0 {color:#999;} tr.p2 {color:#060;}</style>';
+      	//}
         echo '<table class="gb" id="myTable">';
         echo '<thead><tr>';
         echo '<th>'._('Name').'</th>';
@@ -435,4 +435,4 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";

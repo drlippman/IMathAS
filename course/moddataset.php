@@ -9,13 +9,13 @@
 //3 - CC-BY-SA-NC
 //4 - CC-BY-SA
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if ($myrights<20) {
-		require("../header.php");
+		require_once "../header.php";
 		echo _("You need to log in as a teacher to access this page");
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -62,10 +62,10 @@
 		return Sanitize::simpleString($vidid);
  	}
 
- 	$cid = Sanitize::courseId($_GET['cid']);
+ 	$cid = Sanitize::courseId($_GET['cid'] ?? '0');
 	$isadmin = false;
 	$isgrpadmin = false;
-	if ($_GET['cid']=='admin') {
+	if ($cid==='admin') {
 		if ($myrights==100) {
 			$isadmin = true;
 		} else if ($myrights==75) {
@@ -93,21 +93,21 @@
         $addq = 'addquestions';
         $from = 'addq';
     }
-	$testqpage = ($courseUIver>1 || $cid == 0) ? 'testquestion2.php' : 'testquestion.php';
+	$testqpage = ($cid == 0 || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
 	$errmsg = '';
 	if (isset($_POST['qtext'])) {
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		$now = time();
 		foreach (array('qcontrol','answer','solution') as $v) {
 			if (!isset($_POST[$v])) {$_POST[$v] = '';}
 		}
 		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
-		$_POST['control'] = stripsmartquotes($_POST['control']);
-		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol']);
-		$_POST['answer'] = stripsmartquotes($_POST['answer']);
-		$_POST['solution'] = stripsmartquotes($_POST['solution']);
+		$_POST['control'] = stripsmartquotes($_POST['control'] ?? '');
+		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol'] ?? '');
+		$_POST['answer'] = stripsmartquotes($_POST['answer'] ?? '');
+		$_POST['solution'] = stripsmartquotes($_POST['solution'] ?? '');
 		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
 		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
 
@@ -116,7 +116,7 @@
 		}
 
 		if (strpos($_POST['qtext'],'data:image')!==false) {
-			require_once("../includes/htmLawed.php");
+			require_once "../includes/htmLawed.php";
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
 
@@ -145,7 +145,7 @@
 			$newextref = array();
 		}
 		//DO we need to add a checkbox or something for updating this if captions are added later?
-		if ($_POST['helpurl']!='') {
+		if (isset($_POST['helpurl']) && $_POST['helpurl']!='') {
 			$vidid = getvideoid($_POST['helpurl']);
 			if ($vidid=='') {
 				$captioned = 0;
@@ -161,7 +161,7 @@
 				$captioned = (preg_match('/"vssId":\s*"\./', $t))?1:0; 
             }
             $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
-			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
+			$newextref[] = $_POST['helptype'].'!!'.trim($_POST['helpurl']).'!!'.$captioned.'!!'.$helpdescr;
 		}
 		$extref = implode('~~',$newextref);
 		if (isset($_POST['doreplaceby'])) {
@@ -189,6 +189,20 @@
 		$_POST['solution'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['solution']);
 		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
 		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
+
+        $isrand = preg_match('/(shuffle|getprimes?|rand[a-zA-Z]*)\(/',$_POST['control']) ? 1 : 0;
+        if (!$isrand) { // check any included code
+            preg_match_all('/includecodefrom\(\s*(\d+)\s*\)/',$_POST['control'],$matches,PREG_PATTERN_ORDER);
+            if (!empty($matches[1])) {
+                $ph = Sanitize::generateQueryPlaceholders($matches[1]);
+                $stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id IN ($ph)");
+                $stm->execute($matches[1]);
+                while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                    $isrand = preg_match('/(shuffle|getprimes?|rand[a-zA-Z]*)\(/',$row['control']) ? 1 : 0;
+                    if ($isrand) { break; }
+                }
+            }
+        }
 
 		if (isset($_GET['id'])) { //modifying existing
 			$qsetid = intval($_GET['id']);
@@ -234,7 +248,7 @@
 			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
 			if ($isok && !isset($_POST['justupdatelibs'])) {
 				$query = "UPDATE imas_questionset SET description=:description,author=:author,userights=:userights,license=:license,";
-				$query .= "otherattribution=:otherattribution,qtype=:qtype,control=:control,qcontrol=:qcontrol,solution=:solution,";
+				$query .= "otherattribution=:otherattribution,qtype=:qtype,control=:control,qcontrol=:qcontrol,solution=:solution,isrand=:isrand,";
 				$query .= "qtext=:qtext,answer=:answer,lastmoddate=:lastmoddate,extref=:extref,replaceby=:replaceby,solutionopts=:solutionopts";
 				if (isset($_POST['undelete'])) {
 					$query .= ',deleted=0';
@@ -242,8 +256,8 @@
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':description'=>$_POST['description'], ':author'=>$_POST['author'], ':userights'=>$_POST['userights'],
-					':license'=>$_POST['license'], ':otherattribution'=>$_POST['addattr'], ':qtype'=>$_POST['qtype'], ':control'=>$_POST['control'],
-					':qcontrol'=>$_POST['qcontrol'], ':solution'=>$_POST['solution'], ':qtext'=>$_POST['qtext'], ':answer'=>$_POST['answer'],
+					':license'=>$_POST['license'], ':otherattribution'=>($_POST['addattr'] ?? ''), ':qtype'=>$_POST['qtype'], ':control'=>$_POST['control'],
+					':qcontrol'=>$_POST['qcontrol'], ':solution'=>$_POST['solution'], ':isrand'=>$isrand, ':qtext'=>$_POST['qtext'], ':answer'=>$_POST['answer'],
 					':lastmoddate'=>$now, ':extref'=>$extref, ':replaceby'=>$replaceby, ':solutionopts'=>$solutionopts, ':id'=>$_GET['id']));
 
 				if ($stm->rowCount()>0) {
@@ -325,14 +339,14 @@
 					$ancestorauthors = $lastauthor;
 				}
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,license,otherattribution,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,extref,replaceby,solution,solutionopts) VALUES ";
-			$query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :license, :otherattribution, :qtype, :control, :qcontrol, :qtext, :answer, :hasimg, :ancestors, :ancestorauthors, :extref, :replaceby, :solution, :solutionopts);";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,license,otherattribution,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,extref,replaceby,solution,solutionopts,isrand) VALUES ";
+			$query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :license, :otherattribution, :qtype, :control, :qcontrol, :qtext, :answer, :hasimg, :ancestors, :ancestorauthors, :extref, :replaceby, :solution, :solutionopts, :isrand);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':description'=>$_POST['description'], ':ownerid'=>$userid,
-				':author'=>$_POST['author'], ':userights'=>$_POST['userights'], ':license'=>$_POST['license'], ':otherattribution'=>$_POST['addattr'],
+				':author'=>$_POST['author'], ':userights'=>$_POST['userights'], ':license'=>$_POST['license'], ':otherattribution'=>($_POST['addattr'] ?? ''),
 				':qtype'=>$_POST['qtype'], ':control'=>$_POST['control'], ':qcontrol'=>$_POST['qcontrol'], ':qtext'=>$_POST['qtext'], ':answer'=>$_POST['answer'],
 				':hasimg'=>$_POST['hasimg'], ':ancestors'=>$ancestors, ':ancestorauthors'=>$ancestorauthors, ':extref'=>$extref, ':replaceby'=>$replaceby,
-				':solution'=>$_POST['solution'], ':solutionopts'=>$solutionopts));
+				':solution'=>$_POST['solution'], ':solutionopts'=>$solutionopts, ':isrand'=>$isrand));
 			$qsetid = $DBH->lastInsertId();
 			$_GET['id'] = $qsetid;
 
@@ -545,10 +559,10 @@
 			} else if ($errmsg == '' && $frompot==0) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/'.$addq.'.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
 			} else {
-				require("../header.php");
+				require_once "../header.php";
 				echo $errmsg;
 				echo $outputmsg;
-				require("../footer.php");
+				require_once "../footer.php";
 			}
 			exit;
 		}
@@ -563,6 +577,10 @@
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
+            if ($line === false) {
+                echo _('Invalid question ID');
+                exit;
+            }
 
 			$myq = ($line['ownerid']==$userid);
 			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || ($line['userights']==3 && $line['groupid']==$groupid) || $line['userights']>3) {
@@ -703,14 +721,15 @@
 			$line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
 	} else {
 			$myq = true;
+            $line = array();
 			$line['description'] = _("Enter description here");
 			$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
             $stm->execute(array(':id'=>$userid));
             $qrightsdef = $stm->fetchColumn(0);
 			$line['userights'] = 0;
-
+            $line['author'] = '';
 			$line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:1;
-
+            $line['otherattribution'] = '';
 			$line['qtype'] = "number";
 			$line['control'] = '';
 			$line['qcontrol'] = '';
@@ -764,6 +783,17 @@
 		$lnames[] = $row[0];
 	}
 	$lnames = implode(", ",$lnames);
+
+    $olnames = '';
+    if ($locklibs != '') {
+        $locklibssafe = implode(',', array_map('intval', explode(',',$locklibs)));
+        $olnames = [];
+        $stm = $DBH->query("SELECT name FROM imas_libraries WHERE id IN ($locklibssafe)");
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $olnames[] = $row[0];
+        }
+        $olnames = implode(", ",$olnames);
+    }
 
 	// Build form action
 	$formAction = "moddataset.php?process=true"
@@ -819,9 +849,9 @@
 	}
 	*/
 	$useeditor = "noinit";
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=071522"></script>';
-	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=022723"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css?v=091522">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -852,7 +882,7 @@
 	        qtextbox.rows += 3;
 	        qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
-	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>\n");
+	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>");
 
 	        var toinit = [];
 	        if ((el=="qtext" && editoron==0) || (el!="qtext" && editoron==1)) {
@@ -898,7 +928,7 @@
 	   function setupQtextEditor(id) {
 	   	var qtextbox = document.getElementById(id);
 	   	if (!qtextbox) { return; }
-		qtextbox.value = qtextbox.value.replace(/\s*<br\s*\/>\s*<br\s*\/>\s*/g, "\n<br /><br />\n");
+		qtextbox.value = qtextbox.value.replace(/\s*((<br\s*\/>\s*){1,}<br\s*\/>)\s*/g, "\n$1\n");
 	   	qEditor[id] = CodeMirror.fromTextArea(qtextbox, {
 			matchTags: true,
 			mode: "imathasqtext",
@@ -906,6 +936,7 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+            viewportMargin: 500,
 			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
 		  });
@@ -922,6 +953,7 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+            viewportMargin: 500,
 			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
 		      });
@@ -967,7 +999,7 @@
 	   </script>';
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
-		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
+		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto; clip-path: inset(0px);}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
 		#qtbox .CodeMirror-scroll {min-height:150px; max-height:600px;}
 		.CodeMirror-selectedtext {color: #ffffff !important;background-color: #3366AA;}
@@ -977,7 +1009,7 @@
 	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
-	require("../header.php");
+	require_once "../header.php";
 
 
 	if (isset($_GET['aid'])) {
@@ -988,8 +1020,8 @@
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">"._("Add Drill Assessment")."</a> &gt; "._("Modify Questions")."</div>";
 	} else {
-		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
+		if ($cid==="admin") {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a> ";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
 		} else {
 			echo "<div class=breadcrumb><a href=\"../index.php\">"._("Home")."</a> ";
@@ -1135,7 +1167,11 @@ function decboxsize(box) {
 <?php
 if (isset($_GET['id']) && $myq) {
 	echo '<span id=libonlysubmit style="display:none"><input type=submit name=justupdatelibs value="Save Library Change Only"/></span>';
-} ?>
+} 
+if ($olnames !== '') {
+    echo '<br><span class="small">' . _("Other's library assignments: ") . $olnames. '</span>';
+}
+?>
 </p>
 <p>
 <?php echo _('Question type:'); ?> <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
@@ -1405,7 +1441,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		});
 	}
 	quickSaveQuestion.url = "<?php echo $formAction; // Sanitized near line 806 ?>&quick=1";
-	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'] ?? 0); ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
 		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");
@@ -1491,5 +1527,5 @@ $placeinfooter='
 ?>
 
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

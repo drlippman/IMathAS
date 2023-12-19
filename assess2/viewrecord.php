@@ -1,14 +1,14 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 if ($myrights < 100) {
   exit;
 }
 
 echo '<pre>';
 if (isset($_GET['retotal'])) {
-  require('AssessInfo.php');
-  require('AssessRecord.php');
+  require_once 'AssessInfo.php';
+  require_once 'AssessRecord.php';
   $aid = intval($_GET['aid']);
   $uid = intval($_GET['uid']);
   $assess_info = new AssessInfo($DBH, $aid, $cid, true);

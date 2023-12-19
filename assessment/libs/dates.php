@@ -136,7 +136,7 @@ function dates_randdate($from,$to,$fmt="F j, Y") {
 function dates_dateformat($date,$newFormat, $origFormat="F j, Y"	) {
 	$dt = date_create_from_format($origFormat,$date);
 	if ($dt==false) {
-		echo "date_dateformat::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
+		echo "date_dateformat::could not create date from string. The date is " . $date . " and the format is " . $origFormat . ".";
 		return false;
 	}
 	return $dt->format($newFormat);

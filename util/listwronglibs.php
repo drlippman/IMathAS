@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {exit;}
 $stm = $DBH->query("SELECT iqs.uniqueid,il.uniqueid FROM imas_questionset AS iqs

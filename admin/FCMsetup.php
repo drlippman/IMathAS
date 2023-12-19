@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 if (isset($_POST['token'])) {
 	$stm = $DBH->prepare("UPDATE imas_users SET FCMtoken=:token WHERE id=:id");
@@ -97,7 +97,7 @@ messaging.onMessage(function(payload) {
 
 </script>';
 
-require("../header.php");
+require_once "../header.php";
 ?>
 <div class="breadcrumb"><a href="../index.php">Home</a> &gt; <a href="../forms.php?action=chguserinfo">User Profile</a> &gt; Notification Settings</div>
 
@@ -119,5 +119,5 @@ require("../header.php");
 <button type="button" onclick="removeNotifications()">Stop Notifications</button></p>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

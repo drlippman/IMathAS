@@ -68,11 +68,7 @@ function drawtriSSS($a,$b,$c) {
 		$com .= "text([$b/2,0],\"{$labels[1]}\",\"below\");";
 	}
 	if ($len[2]>0) {
-		if ($xp>$b) {
-			$com .= "text([($b+$xp+.1*$b/$yp)/2,$yp/2+.1*$b/$yp],\"{$labels[2]}\",\"right\");";
-		} else { 
-			$com .= "text([($b+$xp+.1*$b/$yp)/2,$yp/2+.1*$b/$yp],\"{$labels[2]}\",\"right\");";
-		}
+		$com .= "text([($b+$xp+.1*$b/$yp)/2,$yp/2+.1*$b/$yp],\"{$labels[2]}\",\"right\");";
 	}
 		
 	$dw = 200;

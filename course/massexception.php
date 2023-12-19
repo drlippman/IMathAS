@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Make deadline exceptions for a multiple students; included by listusers and gradebook
 //(c) 2007 David Lippman
-require_once(__DIR__."/../includes/TeacherAuditLog.php");
+require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 	if (!isset($imasroot)) {
 		echo "This file cannot be called directly";
@@ -14,7 +14,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
         $DBH->beginTransaction();
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
@@ -22,9 +22,11 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
         $attemptext = (isset($_POST['attemptext'])) ? intval($_POST['attemptextnum']) : 0;
 
-		$forumitemtype = $_POST['forumitemtype'];
-		$postbydate = ($forumitemtype=='R')?0:parsedatetime($_POST['pbdate'],$_POST['pbtime']);
-		$replybydate = ($forumitemtype=='P')?0:parsedatetime($_POST['rbdate'],$_POST['rbtime']);
+        if (isset($_POST['forumitemtype'])) {
+            $forumitemtype = $_POST['forumitemtype'];
+            $postbydate = ($forumitemtype=='R')?0:parsedatetime($_POST['pbdate'],$_POST['pbtime']);
+            $replybydate = ($forumitemtype=='P')?0:parsedatetime($_POST['rbdate'],$_POST['rbtime']);
+        }
 
 		if (!isset($_POST['addexc'])) { $_POST['addexc'] = array();}
 		if (!isset($_POST['addfexc'])) { $_POST['addfexc'] = array();}
@@ -252,7 +254,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		if (isset($_POST['sendmsg'])) {
 			$_POST['submit'] = "Message";
 			$_POST['checked'] = explode(',',$_POST['tolist']);
-			require("masssend.php");
+			require_once "masssend.php";
 			exit;
 		}
 	}
@@ -296,7 +298,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			return true;
 		});
 	})</script>';
-	require("../header.php");
+	require_once "../header.php";
 
 	$cid = Sanitize::courseId($_GET['cid']);
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -312,6 +314,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
         echo "\">Gradebook</a> &gt; ";
         if ($calledfrom == 'isolateassess') {
+            $aid = Sanitize::onlyInt($_GET['aid']);
             echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';
 	}
         echo " Manage Exceptions</div>\n";
@@ -319,15 +322,16 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 
 	echo '<div id="headermassexception" class="pagetitle"><h1>Manage Exceptions</h1></div>';
 	if ($calledfrom=='lu') {
-		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\" id=\"qform\">\n";
+		$formtag = "<form method=post action=\"listusers.php?cid=$cid&massexception=1\" id=\"qform\">\n";
 	} else if ($calledfrom=='gb') {
-		echo "<form method=post action=\"gradebook.php?cid=$cid&massexception=1";
+		$formtag = "<form method=post action=\"gradebook.php?cid=$cid&massexception=1";
 		if (isset($_GET['uid'])) {
-			echo "&uid=" . Sanitize::onlyInt($_GET['uid']);
+			$formtag .= "&uid=" . Sanitize::onlyInt($_GET['uid']);
 		}
-		echo "\" id=\"qform\">\n";
+		$formtag .= "\" id=\"qform\">\n";
 	} else if ($calledfrom == 'isolateassess') {
-        echo "<form method=post action=\"isolateassessgrade.php?cid=$cid&aid=$aid&massexception=1\" id=\"qform\">\n";
+        $aid = Sanitize::onlyInt($_GET['aid']);
+        $formtag = "<form method=post action=\"isolateassessgrade.php?cid=$cid&aid=$aid&massexception=1\" id=\"qform\">\n";
 	}
 
 	if (isset($_POST['tolist'])) {
@@ -335,31 +339,31 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	}
 	if (isset($_GET['uid'])) {
 		$tolist = intval($_GET['uid']);
-		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
+		$formtag .= "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
 	} else {
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "<p>No students selected.</p>";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
 			} else if ($calledfrom=='gb') {
 				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
 			} else if ($calledfrom == 'isolateassess') {
+                $aid = Sanitize::onlyInt($_GET['aid']);
                 echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
 			}
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
-		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
+		$formtag .= "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));
 	}
-
 
 	$isall = false;
 	if (isset($_POST['ca'])) {
 		$isall = true;
-		echo "<input type=hidden name=\"ca\" value=\"1\"/>";
+		$formtag .= "<input type=hidden name=\"ca\" value=\"1\"/>";
 	}
-
+    echo $formtag;
 
 	if (isset($_GET['uid']) || count($_POST['checked'])==1) {
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
@@ -513,6 +517,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo "<p>No exceptions currently exist for the selected students.</p>";
 	}
 	echo '</fieldset>';
+    //start new form for new exceptions
+    echo '</form>';
+    echo str_replace('qform','qform2',$formtag);
 	$stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE courseid=:courseid AND userid IN ($tolist)");
 	$stm->execute(array(':courseid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
@@ -614,7 +621,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 
 		echo "Set Exception for assessments: ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'addexc[]\',false)">None</a>. ';
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',false)">None</a>. ';
 
 		echo '<ul class="nomark">';
 
@@ -658,7 +665,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 
 
 		echo "Set Exception for forums: ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'addfexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'addfexc[]\',false)">None</a>. ';
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',false)">None</a>. ';
 
 		echo '<ul class="nomark">';
 
@@ -690,7 +697,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo '</fieldset>';
 	}
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 
 

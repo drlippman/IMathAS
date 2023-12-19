@@ -10,7 +10,7 @@
  *
  * Tweaked to bundle as a util
  */
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) {exit;}
 
 function minify($c) {
@@ -160,6 +160,7 @@ class TinyMCE_Compressor {
 		// Set base URL for where tinymce is loaded from
 		//$buffer = "var tinyMCEPreInit={base:'" . dirname($_SERVER["SCRIPT_NAME"]) . "',suffix:'.min'};";
 
+        $buffer = '';
 		// Load all tinymce script files into buffer
 		foreach ($allFiles as $file) {
 			if ($file) {

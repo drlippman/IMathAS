@@ -34,7 +34,7 @@ function apportion($pop, $seats, $method, $md = 0) {
 		}
 		return $chopped;
 	} else if ($method=='jefferson' || $method=='adams' || $method=='webster') {
-		if ($other==='fail') {
+		if ($outdiv==='fail') {
 			return 'fail';
 		}
 		$outdiv = explode(',',substr($outdiv,1,-1));
@@ -50,7 +50,7 @@ function apportion($pop, $seats, $method, $md = 0) {
 		}
 		return $chopped;
 	} else if ($method=='huntington') {
-		if ($other==='fail') {
+		if ($outdiv==='fail') {
 			return 'fail';
 		}
 		$outdiv = explode(',',substr($outdiv,1,-1));
@@ -156,7 +156,7 @@ function apportion_info($pop, $seats, $method) {
 		$moddivs = array_values($tolowerdown);
 		//if the next value is the same, then the divisor that adds $tosub additional
 		//seats would add $tosub+1 additional seats, so the method fails.
-		if ($toadd==0) {
+		if ($tosub==0) {
 			$toraiseup = array();
 			foreach ($quotas as $s=>$q) {
 				$luq[$s] = ceil($q);

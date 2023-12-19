@@ -308,7 +308,8 @@ function GB_resize(e) {
 
 	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
 	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
-	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
+    
+	jQuery("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
 }
 function GB_endresize(e) {
 	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
@@ -379,7 +380,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
               .data("original_h", $(gbwin).height())
-              .data("footer_h", $("#GB_footer:visible").outerHeight() + $("#GB_caption").outerHeight())
+              .data("footer_h", ($("#GB_footer:visible").outerHeight() || 0) + $("#GB_caption").outerHeight())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
 
@@ -456,7 +457,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
             var belowel;
             for (var i in showbelow) {
                 if (belowel = document.getElementById(showbelow[i])) {
-                    inittop = belowel.getBoundingClientRect().bottom + 10;
+                    inittop = Math.max(0, belowel.getBoundingClientRect().bottom + 10);
                     if (height=='auto') {
 						h = (window.self !== window.top) ? Math.min(600,self.innerHeight) : self.innerHeight;
 						h = Math.max(200, h - inittop - 20);
@@ -484,7 +485,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
         var capheight = $("#GB_caption").outerHeight();
-        var footheight = $("#GB_footer:visible").outerHeight();
+        var footheight = $("#GB_footer:visible").outerHeight() || 0;
         document.getElementById("GB_frameholder").style.height = 
             (h - capheight - footheight)+"px";
 	} else {
@@ -1406,18 +1407,22 @@ function initFileAlt(el) {
 		.on("blur.filealt", function(e) { jQuery(e.target).removeClass("has-focus");} )
 		.on("click.filealt", function(e) { label.html(origLabel); } )
 		.on("change.filealt", function(e) {
-			var fileName = '';
-			fileName = e.target.value.split(/(\\|\/)/g).pop();
-			if (fileName) {
-				var maxFileSize = 10000*1024; // 10MB
-        if (this.files[0].size > maxFileSize) {
-          alert(_('This file is too large - maximum size is 10MB'));
-          $(this).val('');
-        } else {
-					label.html(fileName);
-				}
-			}
-		});
+            label.html(_('Preparing file...'));
+            doImageUploadResize(this,function(el) {
+                var fileName = '';
+                fileName = el.value.split(/(\\|\/)/g).pop();
+                if (fileName) {
+                    var maxFileSize = 10000*1024; // 10MB
+                    if (el.files[0].size > maxFileSize) {
+                        alert(_('This file is too large - maximum size is 10MB'));
+                        $(el).val('');
+                        label.html('');
+                    } else {
+                        label.html(fileName);
+                    }
+                }
+            });
+        });
 }
 jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
 
@@ -1530,7 +1535,7 @@ jQuery(document).ready(function($) {
 var sagecellcounter = 0;
 function initSageCell(base) {
 	jQuery(base).find(".converttosagecell:visible:not(.inited)").each(function() {
-		var ta, code;
+		var ta, inp, code;
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
@@ -1541,7 +1546,7 @@ function initSageCell(base) {
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
                     code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {
@@ -1552,9 +1557,10 @@ function initSageCell(base) {
 				}
 			} else {
 				code = jQuery(ta[0]).val().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
 				ta = ta[0];
 			}
+			inp = $this.find("input[id^=qn]");
 		}
 		if (m = code.match(/^\s+/)) {
 			var chop = m[0].length;
@@ -1565,12 +1571,18 @@ function initSageCell(base) {
 		sagecellcounter++;
 		var url = imasroot+'/assessment/libs/sagecellframe.html?frame_id='+frame_id;
 		url += '&code='+encodeURIComponent(code);
-        if ($this[0].hasAttribute('data-lang')) {
-            url += '&lang='+encodeURIComponent($this.attr('data-lang'));
-        }
+        ['lang', 'hide', 'autoeval'].forEach(function(dattribute) {
+            if ($this[0].hasAttribute('data-'+dattribute)) {
+                url += '&' + dattribute + '=' + encodeURIComponent($this.attr('data-'+dattribute));
+            }
+        });
 		var returnid = null;
 		if (typeof jQuery(ta).attr("id") != "undefined") {
-				url += '&update_id='+jQuery(ta).attr("id");
+			url += '&update_id='+jQuery(ta).attr("id");
+		}
+		if (inp !== null) {
+			url += '&update_out='+jQuery(inp).attr("id");
+			jQuery(inp).addClass("allowupdate").hide();
 		}
 		url += '&evallabel=' + encodeURIComponent(_('Evaluate'));
         $this.addClass("inited");
@@ -1766,3 +1778,62 @@ function setActiveTab(el) {
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
 
 }(jQuery);
+
+// from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js
+
+function doImageUploadResize(el, callback) {
+    const that = el; // input node
+    const originalFile = el.files[0];
+
+    if (!originalFile || !originalFile.type.startsWith('image')) {
+        callback(el);
+        return;
+    }
+
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var img = document.createElement('img');
+        var canvas = document.createElement('canvas');
+
+        img.src = e.target.result
+        img.onload = function () {
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            var width = img.width;
+            var height = img.height;
+            var prefix = '';
+            if (img.width > 1000 || img.height > 1000) {
+                const ratio = Math.min(1000 / img.width, 1000 / img.height);
+                width = Math.round(img.width * ratio);
+                height = Math.round(img.height * ratio);
+                prefix = 'resized_';
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(function (blob) {
+                var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
+
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(resizedFile);
+
+                // temporary remove event listener, change and restore
+                var currentOnChange = that.onchange;
+
+                that.onchange = null;
+                that.files = dataTransfer.files;
+                that.onchange = currentOnChange;
+                if (typeof callback === 'function') {
+                    callback(that);
+                }
+            }, 'image/jpeg', .95);
+        }
+    }
+    reader.readAsDataURL(originalFile);
+}

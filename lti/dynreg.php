@@ -1,9 +1,9 @@
 <?php
 
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 if (empty($CFG['LTI']['autoreg'])) {
     echo "Dynamic registration is not currently enabled. Contact the system admin.";
@@ -85,7 +85,7 @@ $post = [
             [
                 "type" => "LtiDeepLinkingRequest",
                 "target_link_uri" => $basesiteurl.'/lti/launch.php',
-                "label" => sprintf(_("Add %s Assessment"), $installname)
+                "label" => sprintf(_("%s Assessment"), $installname)
             ],
             [
                 "type" => "LtiResourceLink",

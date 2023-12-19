@@ -3,7 +3,7 @@
 use \IMSGlobal\LTI;
 
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-    require_once($CFG['hooks']['lti']);
+    require_once $CFG['hooks']['lti'];
     /**
      * see ltihooks.php.dist for details
      */
@@ -28,17 +28,16 @@ function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
   }
   $contextid = $launch->get_platform_context_id();
   $platform_id = $launch->get_platform_id();
-  $resource_link = $launch->get_resource_link();
 
   $assessments = $db->get_assessments($localcourse->get_courseid());
 
   $flexwidth = true;
 	$nologo = true;
 
-	require("../header.php");
+	require_once "../header.php";
 	echo '<h1>'._('Select assessment to link to').'</h1>';
   echo '<form method=post action="setupdeeplink.php">';
-  echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
+  echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
   echo '<p><select name=deeplinktarget>';
   foreach ($assessments as $ass) {
     echo '<option value="assess-'.Sanitize::onlyInt($ass['id']).'">';
@@ -50,5 +49,5 @@ function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
   echo '</select></p>';
   echo '<button type=submit>'._('Create Link').'</button>';
   echo '</form>';
-  require('../footer.php');
+  require_once '../footer.php';
 }

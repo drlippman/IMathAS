@@ -3,15 +3,17 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Question Sets";
 $helpicon = "";
-
+if (!isset($courseUIver)) {
+    $courseUIver = 2;
+}
 //data manipulation here
 $isadmin = false;
 $isgrpadmin = false;
@@ -142,7 +144,13 @@ if ($myrights<20) {
 					$tlist = $_GET['transfer'];
 				}
 			}
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+            if ($isadmin) {
+			    $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND lastaccess>? ORDER BY LastName,FirstName");
+                $stm->execute([time()-30*24*60*60]);
+            } else {
+                $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid=? ORDER BY LastName,FirstName");
+                $stm->execute([$groupid]);
+            }
 			$i=0;
 			$page_transferUserList = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -305,7 +313,7 @@ if ($myrights<20) {
 							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
-						if ($_SESSION['lastsearchlibs'.$cid]!='') {
+						if (!empty($_SESSION['lastsearchlibs'.$cid])) {
 							$listedlibs = explode(',', $_SESSION['lastsearchlibs'.$cid]);
 						} else {
 							$listedlibs = array();
@@ -513,12 +521,12 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; "._("Change Question License/Attribution");
 
-			$clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
-
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
-			}
+			} else {
+                $clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+            }
 		}
 
 	} else if (isset($_POST['chgrights'])) {
@@ -554,12 +562,12 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; Change Question Rights";
 
-			$clist = Sanitize::encodeStringForDisplay(implode(",", $_POST['nchecked']));
-
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
-			}
+			} else {
+                $clist = Sanitize::encodeStringForDisplay(implode(",", $_POST['nchecked']));
+            }
 		}
 	} else if (isset($_GET['transfer'])) {
 
@@ -590,7 +598,7 @@ if ($myrights<20) {
 		}
 		//load filter.  Need earlier than usual header.php load
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		require_once("$curdir/../filter/filter.php");
+		require_once "$curdir/../filter/filter.php";
 
 			//remember search
 		if (isset($_POST['search'])) {
@@ -666,7 +674,7 @@ if ($myrights<20) {
 				$searchlikes = "imas_questionset.broken=1 AND ";
 			} else if (substr($safesearch,0,7)=='childof') {
         $searchlikes = "imas_questionset.ancestors REGEXP ? AND ";
-        $searchlikevals[] = '[[:<:]]'.substr($safesearch,8).'[[:>:]]';
+        $searchlikevals[] = MYSQL_LEFT_WRDBND.substr($safesearch,8).MYSQL_RIGHT_WRDBND;
 
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";
@@ -740,6 +748,7 @@ if ($myrights<20) {
 		$llist = implode(',', array_map('intval', explode(',',$searchlibs)));
 
 		$libsortorder = array();
+        $lnamesarr = array();
 		if (substr($searchlibs,0,1)=="0") {
 			$lnamesarr[0] = "Unassigned";
 			$libsortorder[0] = 0;
@@ -956,7 +965,7 @@ if (!empty($_POST['chglib'])) {
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
 }
-require("../header.php");
+require_once "../header.php";
 
 $address = $GLOBALS['basesiteurl'] . '/course';
 
@@ -994,7 +1003,7 @@ function doaction(todo,id) {
 	window.location = addr;
 }
 
-var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>';
+var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs ?? ''); ?>';
 
 function libselect() {
 	window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
@@ -1095,7 +1104,7 @@ function getnextprev(formn,loc) {
 			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
 			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
 			<?php
-			if ($_SESSION['searchall'.$cid]==0 && $_SESSION['lastsearchlibs'.$cid]!='0') {
+			if (isset($_SESSION['searchall'.$cid]) && isset($_SESSION['lastsearchlibs'.$cid]) && $_SESSION['searchall'.$cid]==0 && $_SESSION['lastsearchlibs'.$cid]!='0') {
 				echo '<input type=radio name="action" value="3" onclick="chglibtoggle(this)"/> Add to libraries, removing library assignment in currently listed libraries<br/>';
 			}
 			?>
@@ -1104,7 +1113,7 @@ function getnextprev(formn,loc) {
 			Select libraries to add these questions to.
 			</p>
 
-			<?php $libtreeshowchecks = false; include("libtree2.php"); ?>
+			<?php $libtreeshowchecks = false; require_once "libtree2.php"; ?>
 
 
 			<p>
@@ -1127,7 +1136,7 @@ function getnextprev(formn,loc) {
 
 			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
-			<?php include("libtree.php"); ?>
+			<?php require_once "libtree.php"; ?>
 
 			<p>
 				<input type=submit value="Template Questions">
@@ -1338,7 +1347,7 @@ function getnextprev(formn,loc) {
 	}
 
 }
-require("../footer.php");
+require_once "../footer.php";
 
 
 function delqimgs($qsid) {

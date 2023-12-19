@@ -32,6 +32,7 @@ class ChemEquationAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -81,7 +82,7 @@ class ChemEquationAnswerBox implements AnswerBox
         if ($useeqnhelper) {
             $params['helper'] = 1;
         }
-        $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+        $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         $params['vars'] = $variables;
 
         $params['calcformat'] = $answerformat . ($answerformat==''?'':',') . 'chem';
@@ -96,8 +97,10 @@ class ChemEquationAnswerBox implements AnswerBox
         $preview .= '</button> &nbsp;';
         $preview .= "<span id=p$qn></span> ";
 
-        $sa .= '`' . $answer . '`';
-        $sa = str_replace(['<->','<=>','leftrightharpoons'], 'rightleftharpoons', $sa);
+        if (!$isConditional && !is_array($answer)) {
+            $sa .= '`' . $answer . '`';
+            $sa = str_replace(['<->','<=>','leftrightharpoons'], 'rightleftharpoons', $sa);
+        }
 
         // Done!
         $this->answerBox = $out;

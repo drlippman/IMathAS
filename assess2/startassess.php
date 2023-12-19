@@ -20,11 +20,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -43,7 +43,7 @@ $now = time();
 $preview_all = ($canViewAll && !empty($_POST['preview_all']));
 
 // load settings including question info
-$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all);
+$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all || !empty($_POST['in_print']));
 $assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
@@ -63,7 +63,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || $_POST['in_print'] == 1);
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || !empty($_POST['in_print']));
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -83,10 +83,16 @@ if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // check password, if needed
 if (!$in_practice && !$canViewAll &&
-  (!isset($_SESSION['assess2-'.$aid]) || $_SESSION['assess2-'.$aid] != $in_practice) &&
+  (!isset($_SESSION['assess2-'.$aid]) || 
+    (!is_array($_SESSION['assess2-'.$aid]) && $_SESSION['assess2-'.$aid] != $in_practice) || // backward compat needed for a while
+    (is_array($_SESSION['assess2-'.$aid]) && ($_SESSION['assess2-'.$aid][0] != $in_practice || !$assess_info->checkPassword($_SESSION['assess2-'.$aid][1])))
+  ) &&
   !$assess_info->checkPassword($_POST['password'])
 ) {
   echo '{"error": "invalid_password"}';
@@ -228,7 +234,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
     // for practice, if we don't have unsubmitted attempt, then
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
-  } else if (!($canViewAll && $_POST['in_print'] == 1)) { // only mark as started if student
+  } else if (!($canViewAll && !empty($_POST['in_print']))) { // only mark as started if student
     if ($assess_record->hasUnstartedAttempt()) {
       // has an assessment attempt they haven't started yet
       $assess_record->setStatus(true, true);
@@ -320,7 +326,7 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = ($assess_record->hasActiveAttempt() ||
-    ($canViewAll && $_POST['in_print'] == 1)  // for GB print view, fake an active attempt
+    ($canViewAll && !empty($_POST['in_print']))  // for GB print view, fake an active attempt
   );
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
@@ -333,9 +339,11 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 // grab video cues if needed
 if ($assess_info->getSetting('displaymethod') === 'video_cued') {
   $viddata = $assess_info->getVideoCues();
-  $assessInfoOut['videoid'] = $viddata['vidid'];
-  $assessInfoOut['videoar'] = $viddata['vidar'];
-  $assessInfoOut['videocues'] = $viddata['cues'];
+  if (isset($viddata['vidid'])) {
+    $assessInfoOut['videoid'] = $viddata['vidid'];
+    $assessInfoOut['videoar'] = $viddata['vidar'];
+    $assessInfoOut['videocues'] = $viddata['cues'];
+  }
 }
 
 // grab livepoll status if needed.  If doesn't exist, create record
@@ -363,7 +371,7 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
 
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
-$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || $_POST['in_print'] == 1);
+$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || !empty($_POST['in_print']));
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
 
 // if practice, add that
@@ -374,7 +382,7 @@ $assess_record->saveRecordIfNeeded();
 
 // store assessment start in session data, so we know if they've gotten past
 // password at some point
-$_SESSION['assess2-'.$aid] = $in_practice;
+$_SESSION['assess2-'.$aid] = [$in_practice, $assess_info->getSetting('password')];
 
 //prep date display
 prepDateDisp($assessInfoOut);

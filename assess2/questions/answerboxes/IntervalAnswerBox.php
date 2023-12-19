@@ -32,6 +32,7 @@ class IntervalAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -66,6 +67,7 @@ class IntervalAnswerBox implements AnswerBox
                 $tip .= _('Use oo to enter Infinity.');
             }
             if ($reqdecimals !== '') {
+                list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
                 $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
             }
             $shorttip = _('Enter an interval using interval notation');
@@ -130,7 +132,7 @@ class IntervalAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, 'interval');
             $answer = str_replace('"', '', $answer);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if (in_array('normalcurve', $ansformats) && $_SESSION['graphdisp'] != 0) {
                 $sa .= '<div style="position: relative; width: 500px; height:200px;padding:0px;background:#fff;">';
                 $answer = preg_replace('/\s/', '', $answer);

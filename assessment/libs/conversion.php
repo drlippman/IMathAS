@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 25;
+	return 26.5;
 }
 
 global $allowedmacros;
@@ -227,6 +227,16 @@ function get_unit_capacities() {
     $unit["Fluid ounce"] = _("Fluid ounce");
     $unit["fluid ounce"] = _("fluid ounce");
 
+    $unit["Teaspoons"] = _("Teaspoons");
+    $unit["teaspoons"] = _("teaspoons");
+    $unit["Teaspoon"] = _("Teaspoon");
+    $unit["teaspoon"] = _("teaspoon");
+
+    $unit["Tablespoons"] = _("Tablespoon");
+    $unit["tablespoons"] = _("tablespoon");
+    $unit["Tablespoon"] = _("Tablespoon");
+    $unit["tablespoon"] = _("tablespoon");
+
     $unit["Cups"] = _("Cups");
     $unit["cups"] = _("cups");
     $unit["Cup"] = _("Cup");
@@ -265,6 +275,16 @@ function get_unit_capacity_abbreviations() {
     $unitabbr["fluid ounces"] = _("fl. oz");
     $unitabbr["Fluid ounce"] = _("fl. oz");
     $unitabbr["fluid ounce"] = _("fl. oz");
+
+    $unitabbr["Teaspoons"] = _("Tsps.");
+    $unitabbr["teaspoons"] = _("tsps.");
+    $unitabbr["Teaspoon"] = _("Tsp.");
+    $unitabbr["teaspoon"] = _("tsp.");
+
+    $unitabbr["Tablespoons"] = _("Tbsps.");
+    $unitabbr["tablespoons"] = _("tbsps.");
+    $unitabbr["Tablespoon"] = _("Tbsp.");
+    $unitabbr["tablespoon"] = _("tbsp.");
 
     $unitabbr["Cups"] = _("c");
     $unitabbr["cups"] = _("c");
@@ -519,7 +539,6 @@ function get_unit_area_abbreviations() {
 
     //$unitabbr["acre"] = _("ac");  //https://en.wikipedia.org/wiki/Acre
     //$unitabbr["acres"] = _("ac");
-    $unitabbr["acre"] = _("acre");
     $unitabbr["acres"] = _("acres");
 
     //metric
@@ -624,6 +643,11 @@ function get_unit_times() {
     $unit["days"] = _("days");
     $unit["day"] = _("day");
 
+    $unit["Months"] = _("Months");
+    $unit["Month"] = _("Month");
+    $unit["months"] = _("months");
+    $unit["month"] = _("month");
+
     $unit["Years"] = _("Years");
     $unit["Year"] = _("Year");
     $unit["years"] = _("years");
@@ -660,6 +684,11 @@ function get_unit_time_abbreviations() {
     $unitabbr["Day"] = _("d");
     $unitabbr["days"] = _("d");
     $unitabbr["day"] = _("d");
+
+    $unitabbr["Months"] = _("mths");
+    $unitabbr["Month"] = _("mth");
+    $unitabbr["months"] = _("mths");
+    $unitabbr["month"] = _("mth");
 
     $unitabbr["Years"] = _("yrs");
     $unitabbr["Year"] = _("yr");
@@ -838,10 +867,12 @@ function conversionAbbreviations() {
             $unitabbr = get_unit_capacity_abbreviations();
 
             $retval[0] = $unit["Fluid ounces"]." = ".$unitabbr["Fluid ounces"];
-            $retval[1] = $unit["Cups"]." = ".$unitabbr["Cups"];
-            $retval[2] = $unit["Pints"]." = ".$unitabbr["Pints"];
-            $retval[3] = $unit["Quarts"]." = ".$unitabbr["Quarts"];
-            $retval[4] = $unit["Gallons"]." = ".$unitabbr["Gallons"];
+            $retval[1] = $unit["Teaspoon"]." = ".$unitabbr["Teaspoon"];
+            $retval[2] = $unit["Tablespoon"]." = ".$unitabbr["Tablespoon"];
+            $retval[3] = $unit["Cups"]." = ".$unitabbr["Cups"];
+            $retval[4] = $unit["Pints"]." = ".$unitabbr["Pints"];
+            $retval[5] = $unit["Quarts"]." = ".$unitabbr["Quarts"];
+            $retval[6] = $unit["Gallons"]." = ".$unitabbr["Gallons"];
         } elseif(($type=="Weight")||($type=="Mass")){
             $unit = get_unit_weights();
             $unitabbr = get_unit_weight_abbreviations();
@@ -914,7 +945,7 @@ function conversionAbbreviations() {
 
             $retval[0] = $unit["Milligram"]." = ".$unitabbr["Milligram"];
             $retval[1] = $unit["Centigram"]." = ".$unitabbr["Centigram"];
-            $retval[2] = $unit["Decigram"]." = ".$unit["Decigram"];
+            $retval[2] = $unit["Decigram"]." = ".$unitabbr["Decigram"];
             $retval[3] = $unit["Gram"]." = ".$unitabbr["Gram"];
             $retval[4] = $unit["Dekagram"]." = ".conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n");
             $retval[5] = $unit["Hectogram"]." = ".$unitabbr["Hectogram"];
@@ -992,9 +1023,10 @@ function conversionAbbreviations() {
         $retval[1] = $unit["Minutes"]." = ".$unitabbr["Minutes"];
         $retval[2] = $unit["Hours"]." = ".$unitabbr["Hours"];
         $retval[3] = $unit["Days"]." = ".$unitabbr["Days"];
-        $retval[4] = $unit["Years"]." = ".$unitabbr["Years"];
-        $retval[5] = $unit["Decade"]." = ".$unitabbr["Decade"];
-        $retval[6] = $unit["Century"]." = ".$unitabbr["Century"];
+        $retval[4] = $unit["Months"]." = ".$unitabbr["Months"];
+        $retval[5] = $unit["Years"]." = ".$unitabbr["Years"];
+        $retval[6] = $unit["Decade"]." = ".$unitabbr["Decade"];
+        $retval[7] = $unit["Century"]." = ".$unitabbr["Century"];
     }
 
     #endregion
@@ -1132,10 +1164,13 @@ function conversionArea2() {
             $retval[2] = array("",1,$quote.$unitabbr["acre"].$quote, 43560, $unitabbr["feet"]);
             $retval[3] = array("",1,$unitabbr["mile"],640,$quote.$unitabbr["acre"].$quote);
             $html = "y";
-            for($i=0;$i<4;$i+=1){
+            for($i=0;$i<2;$i+=1){
                 if($i>0) {$html = "n";}
                 $retval[$i][0] = conversionUnits2ScreenReader2($retval[$i][1],$retval[$i][2],2,number_format($retval[$i][3]),$retval[$i][4],2,"=",$tick,$html);
             }
+            $retval[2][0] = conversionUnits2ScreenReader2($retval[2][1],$retval[2][2],1,number_format($retval[2][3]),$retval[2][4],2,"=",$tick,$html);
+            $retval[3][0] = conversionUnits2ScreenReader2($retval[3][1],$retval[3][2],2,number_format($retval[3][3]),$retval[3][4],1,"=",$tick,$html);
+
         } else {
             $retval[0] = array("",1,$unit["feet squared"], 144, $unit["inches squared"]);
             $retval[1] = array("",1,$unit["yard squared"], 9, $unit["feet squared"]);
@@ -1154,12 +1189,12 @@ function conversionArea2() {
         #region Metric Conversion
 
         if($fullname==0 || $fullname==3) {
-            $retval[0] = array("",1,$unitabbr["Kilometer"],1000,$unitabbr["Hectometer"]);
+            $retval[0] = array("",1,$unitabbr["Kilometer"],100,$unitabbr["Hectometer"]);
             $retval[1] = array("",1,$unitabbr["Hectometer"],100,$unitabbr["Dekameter"]);
             $retval[2] = array("",1,$unitabbr["Dekameter"],100,$unitabbr["Meter"]);
             $retval[3] = array("",1,$unitabbr["Meter"],100,$unitabbr["Decimeter"]);
             $retval[4] = array("",1,$unitabbr["Decimeter"],100,$unitabbr["Centimeter"]);
-            $retval[5] = array("",1,$unitabbr["Centimeter"],1000,$unitabbr["Millimeter"]);
+            $retval[5] = array("",1,$unitabbr["Centimeter"],100,$unitabbr["Millimeter"]);
             $retval[6] = array("",1,$unitabbr["Ares"],100,$unitabbr["Meter"]);
             $retval[7] = array("",1,$unitabbr["Hectares"],100,$unitabbr["Ares"]);
             $html = "y";
@@ -1167,28 +1202,28 @@ function conversionArea2() {
                 if($i>0) {$html = "n";}
                 $retval[$i][0] = conversionUnits2ScreenReader2($retval[$i][1],$retval[$i][2],2,number_format($retval[$i][3]),$retval[$i][4],2,"=",$tick,$html);
             }
-            $retval[6][0] = "{$retval[6][1]} {$retval[6][2]} = {$retval[6][3]} {$retval[6][4]}";
+            $retval[6][0] = conversionUnits2ScreenReader2($retval[6][1],$retval[6][2],1,number_format($retval[6][3]),$retval[6][4],2,"=",$tick,$html);
             $retval[7][0] = "{$retval[7][1]} {$retval[7][2]} = {$retval[7][3]} {$retval[7][4]}";
 
         } elseif($fullname==1) {
-            $retval[0] = array("",1,$unit["Kilometer squared"],1000,$unit["Hectometer squared"]);
+            $retval[0] = array("",1,$unit["Kilometer squared"],100,$unit["Hectometer squared"]);
             $retval[1] = array("",1,$unit["Hectometer squared"],100,$unit["Dekameter squared"]);
             $retval[2] = array("",1,$unit["Dekameter squared"],100,$unit["Meter squared"]);
             $retval[3] = array("",1,$unit["Meter squared"],100,$unit["Decimeter squared"]);
             $retval[4] = array("",1,$unit["Decimeter squared"],100,$unit["Centimeter squared"]);
-            $retval[5] = array("",1,$unit["Centimeter squared"],1000,$unit["Millimeter squared"]);
+            $retval[5] = array("",1,$unit["Centimeter squared"],100,$unit["Millimeter squared"]);
             $retval[6] = array("",1,$unit["Ares"],100,$unit["Meter squared"]);
             $retval[7] = array("",1,$unit["Hectares"],100,$unit["Ares"]);
             for($i=0;$i<8;$i+=1){
                 $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} = ".number_format($retval[$i][3])." {$retval[$i][4]}";
             }
         } else  {
-            $retval[0] = array("",1,$unit["Square kilometer"],1000,$unit["Square hectometer"]);
+            $retval[0] = array("",1,$unit["Square kilometer"],100,$unit["Square hectometer"]);
             $retval[1] = array("",1,$unit["Square hectometer"],100,$unit["Square dekameter"]);
             $retval[2] = array("",1,$unit["Square dekameter"],100,$unit["Square meter"]);
             $retval[3] = array("",1,$unit["Square meter"],100,$unit["Square decimeter"]);
             $retval[4] = array("",1,$unit["Square decimeter"],100,$unit["Square centimeter"]);
-            $retval[5] = array("",1,$unit["Square centimeter"],1000,$unit["Square millimeter"]);
+            $retval[5] = array("",1,$unit["Square centimeter"],100,$unit["Square millimeter"]);
             $retval[6] = array("",1,$unit["Ares"],100,$unit["Meter squared"]);
             $retval[7] = array("",1,$unit["Hectares"],100,$unit["Ares"]);
             for($i=0;$i<8;$i+=1){
@@ -1337,16 +1372,20 @@ function conversionCapacity2() {
 
 		if($fullname==0) {
             $retval[0] = array("",1,$unitabbr["cup"],8,$unitabbr["fluid ounces"]);
-            $retval[1] = array("",1,$unitabbr["pint"],2,$unitabbr["cups"]);
-            $retval[2] = array("",1,$unitabbr["quart"],2,$unitabbr["pints"]);
-            $retval[3] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
+            $retval[1] = array("",1,$unitabbr["teaspoon"],2.498023,$unitabbr["tablespoon"]);
+            $retval[2] = array("",1,$unitabbr["tablespoon"],16,$unitabbr["cups"]);
+            $retval[3] = array("",1,$unitabbr["pint"],2,$unitabbr["cups"]);
+            $retval[4] = array("",1,$unitabbr["quart"],2,$unitabbr["pints"]);
+            $retval[5] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
         } else {
             $retval[0] = array("",1,$unit["Cup"],8,$unit["Fluid ounces"]);
-            $retval[1] = array("",1,$unit["Pint"],2,$unit["Cups"]);
-            $retval[2] = array("",1,$unit["Quart"],2,$unit["Pints"]);
-            $retval[3] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
+            $retval[1] = array("",1,$unit["teaspoon"],2.498023,$unit["tablespoon"]);
+            $retval[2] = array("",1,$unit["tablespoon"],16,$unit["cups"]);
+            $retval[3] = array("",1,$unit["Pint"],2,$unit["Cups"]);
+            $retval[4] = array("",1,$unit["Quart"],2,$unit["Pints"]);
+            $retval[5] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
         }
-        for($i=0;$i<4;$i+=1){
+        for($i=0;$i<6;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign {$retval[$i][3]} {$retval[$i][4]}";
         }
 
@@ -1365,14 +1404,14 @@ function conversionCapacity2() {
             $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekaliter"],1,"n"),10,$unitabbr["Liter"]);
             $retval[3] = array("",1,$unitabbr["Liter"],10,$unitabbr["Deciliter"]);
             $retval[4] = array("",1,$unitabbr["Liter"],100,$unitabbr["Centiliter"]);
-            $retval[5] = array("",1,$unitabbr["Liter"],100,$unitabbr["Milliliter"]);
+            $retval[5] = array("",1,$unitabbr["Liter"],1000,$unitabbr["Milliliter"]);
         } else {
             $retval[0] = array("",1,$unit["Kiloliter"],1000,$unit["Liter"]);
-            $retval[1] = array("",1,$unit["Hectoliter"],100,$unitabbr["Liter"]);
+            $retval[1] = array("",1,$unit["Hectoliter"],100,$unit["Liter"]);
             $retval[2] = array("",1,$unit["Dekaliter"],10,$unit["Liter"]);
             $retval[3] = array("",1,$unit["Liter"],10,$unit["Deciliter"]);
             $retval[4] = array("",1,$unit["Liter"],100,$unit["Centiliter"]);
-            $retval[5] = array("",1,$unit["Liter"],100,$unit["Milliliter"]);
+            $retval[5] = array("",1,$unit["Liter"],1000,$unit["Milliliter"]);
         }
         for($i=0;$i<6;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign {$retval[$i][3]} {$retval[$i][4]}";
@@ -1668,7 +1707,7 @@ function conversionFormulaGeometry() {
         $retval[0] = "{$tick}SA=2LW+2LH+2WH{$tick} "._("(Surface Area of a Rectangular Solid)");
         $retval[1] = "{$tick}SA=6 s^2{$tick} "._("(Surface Area of a Cube)");
         $retval[2] = "{$tick}SA=4{$PI}r^2{$tick} "._("(Surface Area of a Sphere)");
-        $retval[3] = "{$tick}SA=2{$PI}rh+4{$PI}r^2{$tick} "._("(Surface Area of a Right Circular Cylinder)");
+        $retval[3] = "{$tick}SA=2{$PI}rh+2{$PI}r^2{$tick} "._("(Surface Area of a Right Circular Cylinder)");
     } elseif($type=="Volume") {
         $retval[0] = "{$tick}V = LWH{$tick} "._("(Volume of a Rectangular Solid)");
         $retval[1] = "{$tick}V = s^3{$tick} "._("(Volume of a Cube)");
@@ -1860,15 +1899,15 @@ function conversionLength2() {
         #region American to Metric Conversion
 
 		if($fullname==0) {
-			$retval[0] = array("",1,$unitabbr["inch"],round(2.54, $rounding),$unitabbr["centimeter"]);      // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
-            $retval[1] = array("",1,$unitabbr["foot"],round(0.3048, $rounding),$unitabbr["meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
-            $retval[2] = array("",1,$unitabbr["yard"],round(0.9144, $rounding),$unitabbr["meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
-            $retval[3] = array("",1,$unitabbr["mile"],round(1.60934400, $rounding),$unitabbr["kilometer"]); // 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
+			$retval[0] = array("",1,$unitabbr["inch"],round(2.54, $rounding),$unitabbr["Centimeter"]);      // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
+            $retval[1] = array("",1,$unitabbr["foot"],round(0.3048, $rounding),$unitabbr["Meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
+            $retval[2] = array("",1,$unitabbr["yard"],round(0.9144, $rounding),$unitabbr["Meter"]);         // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
+            $retval[3] = array("",1,$unitabbr["mile"],round(1.60934400, $rounding),$unitabbr["Kilometer"]); // 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
         } else {
-			$retval[0] = array("",1,$unit["inch"],round(2.54, $rounding),$unit["centimeter"]);
-            $retval[1] = array("",1,$unit["foot"],round(0.3048, $rounding),$unit["meter"]);
-            $retval[2] = array("",1,$unit["yard"],round(0.9144, $rounding),$unit["meter"]);
-            $retval[3] = array("",1,$unit["mile"],round(1.60934400, $rounding),$unit["kilometer"]);
+			$retval[0] = array("",1,$unit["inch"],round(2.54, $rounding),$unit["Centimeter"]);
+            $retval[1] = array("",1,$unit["foot"],round(0.3048, $rounding),$unit["Meter"]);
+            $retval[2] = array("",1,$unit["yard"],round(0.9144, $rounding),$unit["Meter"]);
+            $retval[3] = array("",1,$unit["mile"],round(1.60934400, $rounding),$unit["Kilometer"]);
         }
         for($i=0;$i<4;$i+=1){
             $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} $sign_tick {$retval[$i][3]} {$retval[$i][4]}";
@@ -2096,18 +2135,20 @@ function conversionTime2() {
 		$retval[1] = array("",1,$unitabbr["hour"], 60, $unitabbr["minutes"]);
 		$retval[2] = array("",1,$unitabbr["day"], 24, $unitabbr["hours"]);
 		$retval[3] = array("",1,$unitabbr["year"], 365, $unitabbr["days"]);
-		$retval[4] = array("",1,$unitabbr["decade"], 10, $unitabbr["years"]);
-		$retval[5] = array("",1,$unitabbr["century"], 100, $unitabbr["years"]);
+        $retval[4] = array("",1,$unitabbr["year"], 12, $unitabbr["months"]);
+		$retval[5] = array("",1,$unitabbr["decade"], 10, $unitabbr["years"]);
+		$retval[6] = array("",1,$unitabbr["century"], 100, $unitabbr["years"]);
     } else {
         $retval[0] = array("",1,$unit["minute"], 60, $unit["seconds"]);
 		$retval[1] = array("",1,$unit["hour"], 60, $unit["minutes"]);
 		$retval[2] = array("",1,$unit["day"], 24, $unit["hours"]);
 		$retval[3] = array("",1,$unit["year"], 365, $unit["days"]);
-		$retval[4] = array("",1,$unit["decade"], 10, $unit["years"]);
-		$retval[5] = array("",1,$unit["century"], 100, $unit["years"]);
+        $retval[4] = array("",1,$unit["year"], 12, $unit["months"]);
+		$retval[5] = array("",1,$unit["decade"], 10, $unit["years"]);
+		$retval[6] = array("",1,$unit["century"], 100, $unit["years"]);
     }
 
-    for($i=0;$i<6;$i+=1){
+    for($i=0;$i<7;$i+=1){
         //$retval[$i][0] = sprintf("%d %s = %d %s",$retval[$i][1], $retval[$i][2], $retval[$i][3], $retval[$i][4]);
         $retval[$i][0] = "{$retval[$i][1]} {$retval[$i][2]} = {$retval[$i][3]} {$retval[$i][4]}";
     }
@@ -2544,7 +2585,7 @@ function conversionWeight2() {
             $retval[2] = array("",1,conversionUnits2ScreenReader1("",$unitabbr["Dekagram"],1,"n"),10,$unitabbr["Gram"]);
             $retval[3] = array("",1,$unitabbr["Gram"],10,$unitabbr["Decigram"]);
             $retval[4] = array("",1,$unitabbr["Gram"],100,$unitabbr["Centigram"]);
-            $retval[5] = array("",1,$unitabbr["Gram"],100,$unitabbr["Milligram"]);
+            $retval[5] = array("",1,$unitabbr["Gram"],1000,$unitabbr["Milligram"]);
             $retval[6] = array("",1,$unitabbr["Metric Ton"],1000,$unitabbr["Kilogram"]);
         } else {
             $retval[0] = array("",1,$unit["Kilogram"],1000,$unit["Gram"]);
@@ -2552,7 +2593,7 @@ function conversionWeight2() {
             $retval[2] = array("",1,$unit["Dekagram"],10,$unit["Gram"]);
             $retval[3] = array("",1,$unit["Gram"],10,$unit["Decigram"]);
             $retval[4] = array("",1,$unit["Gram"],100,$unit["Centigram"]);
-            $retval[5] = array("",1,$unit["Gram"],100,$unit["Milligram"]);
+            $retval[5] = array("",1,$unit["Gram"],1000,$unit["Milligram"]);
             $retval[6] = array("",1,$unit["Metric Ton"],1000,$unit["Kilogram"]);
         }
         for($i=0;$i<7;$i+=1){
@@ -3027,7 +3068,15 @@ function conversionWeight() {
 
 //  WAMAP Question ID: 201697
 
-// 2022-xx-xx ver 26 - planning to add a make fraction converion function
+// 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+//
+// 2023-06-06 ver26.5- tablespoon, teaspoon
+//
+// 2022-10-10 ver26.4- Added 1 year = 12 months to time conversion
+//
+// 2022-10-10 ver26.3- Fixed Typo on  1 acre = 43,560 ft^2 and 1 mi = 640 acre
+//  through            100 mg, mL
+// 2022-10-12          decigram abbriavation
 //
 // 2022-08-17 ver 25 - Fixed Typos
 //

@@ -2,7 +2,7 @@
 //IMathAS:  Categorize questions used in an assessment
 //(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	$aid = Sanitize::onlyInt($_GET['aid']);
@@ -33,7 +33,7 @@
 
 	$pagetitle = _("Categorize Questions");
 	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
-	require("../header.php");
+	require_once "../header.php";
 	$warn_cat=_("Are you SURE you want to reset all categories to Uncategorized/Default?");
 	$custom=_("Custom");
 	echo <<<END
@@ -94,6 +94,7 @@ function getnextprev(formn,loc) {
 	}
 	return ([[prevl,prevq],[nextl,nextq]]);
 }
+function sethighlightrow() {}
 </script>
 END;
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -207,6 +208,7 @@ END;
 	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>'._('Description').'</th><th class="sr-only">'._('Preview').'</th><th>'._('Category').'</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
+        if (!isset($qsetids[$qid])) { continue; }
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
 		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td>';
 		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td>";
@@ -291,6 +293,6 @@ echo _("for all uncategorized questions").": <input type=button value=\""._("Qui
 	echo '<p><input type=submit value="'._('Record Categorizations').'"> '._('and return to the Add/Remove Questions page').'.  <input type="button" class="secondarybtn" value="'._('Reset').'" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

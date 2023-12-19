@@ -3,7 +3,7 @@
 //for Lumen's OEA embed
 //Based on work by @kdv24 and @AbeerKhakwani
 
-require("../init.php");
+require_once "../init.php";
 if ($myrights < 100) {
   echo "You are not authorized to use this page";
   exit;

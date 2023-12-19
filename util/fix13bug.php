@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 // one time fix for badly copied LTI1.3 courses
 if ($myrights<100) {

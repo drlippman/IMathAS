@@ -17,11 +17,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -52,9 +52,12 @@ $assess_record->loadRecord($uid);
 if ($isTeacherPreview) {
     $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 // grab all questions settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', true);
 
 // if have active scored record end it
 if ($assess_record->hasActiveAttempt()) {

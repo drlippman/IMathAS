@@ -32,6 +32,7 @@ class MatrixAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -46,6 +47,7 @@ class MatrixAnswerBox implements AnswerBox
         }
 
         $ansformats = array_map('trim', explode(',', $answerformat));
+        $dispformats = array_map('trim', explode(',', $displayformat));
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
@@ -56,19 +58,26 @@ class MatrixAnswerBox implements AnswerBox
             $tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
             $shorttip = _('Enter an integer or decimal number');
             if ($reqdecimals!=='') {
+                list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
+
                 $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
                 $shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
             }
             if (empty($answerboxsize)) {$answerboxsize = 3;}
-            if ($colorbox == '') {
-                $out .= '<div id="qnwrap' . $qn . '">';
+            if (in_array('inline', $dispformats)) {
+                $style = ' style="display:inline-block;vertical-align:middle"';
             } else {
-                $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '">';
+                $style = '';
+            }
+            if ($colorbox == '') {
+                $out .= '<div id="qnwrap' . $qn . '"' . $style . '>';
+            } else {
+                $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '"' . $style . '>';
             }
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
                 (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
             $out .= '<table role="group" aria-label="' . $arialabel . '">';
-            if ($displayformat == 'det') {
+            if (in_array('det', $dispformats)) {
                 $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
             } else {
                 $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
@@ -105,7 +114,7 @@ class MatrixAnswerBox implements AnswerBox
                 $out .= "</tr>";
             }
             $out .= '</table>';
-            if ($displayformat == 'det') {
+            if (in_array('det', $dispformats)) {
                 $out .= '</td><td class="matrixdetright">&nbsp;</td></tr></table>';
             } else {
                 $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
@@ -126,6 +135,7 @@ class MatrixAnswerBox implements AnswerBox
             $shorttip = _('Enter a matrix of integer or decimal numbers');
             $tip = _('Enter your answer as a matrix filled with integer or decimal numbers, like [(2,3,4),(3,4,5)]');
             if ($reqdecimals !== '') {
+                list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
                 $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
             }
 
@@ -168,7 +178,7 @@ class MatrixAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = '`' . $answer . '`';
         }
 

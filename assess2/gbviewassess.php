@@ -2,9 +2,9 @@
 // IMathAS: Assess2 gradebook details page
 // (c) 2019 David Lippman
 
-$lastupdate = '20220712';
+$lastupdate = '20231127';
 
-require('../init.php');
+require_once '../init.php';
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
   echo 'Error - need to specify course ID and assessment ID in URL';
   exit;
@@ -31,7 +31,7 @@ if ($from=='isolate') {
 }
 
 $isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
-$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader') !== false);
 $isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
   $diagid = Sanitize::onlyInt($_SESSION['isdiag']);
@@ -47,10 +47,10 @@ $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesi
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=071322" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/rubric_min.js?v=022622" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20231201" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/rubric_min.js?v=022223" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=071022">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
   <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';
@@ -59,7 +59,7 @@ if ($isltilimited || $inTreeReader) {
 }
 $nologo = true;
 $useeditor = 1;
-require('../header.php');
+require_once '../header.php';
 
 if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
@@ -108,4 +108,4 @@ $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
-require('../footer.php');
+require_once '../footer.php';

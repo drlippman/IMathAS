@@ -33,6 +33,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
+        $isConditional = $this->answerBoxParams->getIsConditional();
 
         $out = '';
         $tip = '';
@@ -101,9 +102,15 @@ class FunctionExpressionAnswerBox implements AnswerBox
                 $tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');
             }
         }
+        if (in_array('generalcomplex', $ansformats)) {
+            $tip .= '<br>'._('Your answer can contain complex numbers.');
+        }
 
         if (empty($variables)) {$variables = "x";}
         $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
+        if (in_array('generalcomplex', $ansformats) && !in_array('i', $variables)) {
+            array_unshift($variables, 'i');
+        }
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
             $variables[$i] = trim($variables[$i]);
@@ -177,7 +184,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
         if (empty($hidepreview)) {
-            $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+            $params['preview'] = !empty($_SESSION['userprefs']['livepreview']) ? 1 : 2;
         }
         $params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
         $params['vars'] = $variables;
@@ -199,7 +206,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer)) {
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
             if ($GLOBALS['myrights'] > 10 && strpos($answer, '|') !== false) {
                 echo 'Warning: use abs(x) not |x| in $answer';
             }

@@ -120,7 +120,11 @@ function catscores($quests,$scores,$defptsposs,$defoutcome,$cid) {
 			$catname = Sanitize::encodeStringForDisplay($category);
 		}
 		if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-		$pc = round(100*$catscore[$category]/$catposs[$category],1);
+        if ($catposs[$category] > 0) {
+		    $pc = round(100*$catscore[$category]/$catposs[$category],1);
+        } else {
+            $pc = 0;
+        }
 		echo "<td>$catname</td><td>" . Sanitize::encodeStringForDisplay($catscore[$category]) . " / " . Sanitize::encodeStringForDisplay($catposs[$category]) . " (" . Sanitize::encodeStringForDisplay($pc) . " %)</td></tr>\n";
 	}
 	echo "</tbody></table>\n";
