@@ -14,9 +14,11 @@ module.exports = {
     'no-labels': 'off',
     'vue/require-component-is': 'warn',
     'quote-props': ['warn', 'as-needed'],
-    'no-prototype-builtins': 'off'
+    'no-prototype-builtins': 'off',
+    'vue/multi-word-component-names': 'off',
+    'vue/no-reserved-component-names': 'off'
   },
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@babel/eslint-parser'
   }
 };
