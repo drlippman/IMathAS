@@ -182,7 +182,8 @@ export default {
     },
     submitClass () {
       return (store.assessInfo.submitby === 'by_assessment' || !this.questionData.canretry_primary)
-        ? 'secondary' : 'primary';
+        ? 'secondary'
+        : 'primary';
     },
     showScore () {
       return (store.inProgress &&
@@ -377,7 +378,7 @@ export default {
       actions.setRendered(this.qn, true);
     },
     setInitValues () {
-      var regex = new RegExp('^(qn|tc|qs)\\d');
+      var regex = /^(qn|tc|qs)\\d/;
       var thisqn = this.qn;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function (index, el) {

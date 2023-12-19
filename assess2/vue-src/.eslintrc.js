@@ -16,7 +16,8 @@ module.exports = {
     'quote-props': ['warn', 'as-needed'],
     'no-prototype-builtins': 'off',
     'vue/multi-word-component-names': 'off',
-    'vue/no-reserved-component-names': 'off'
+    'vue/no-reserved-component-names': 'off',
+    'no-var': 'off'
   },
   parserOptions: {
     parser: '@babel/eslint-parser'

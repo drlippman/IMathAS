@@ -4,13 +4,14 @@
       <li
         v-for="(tab,index) in tabs"
         :key = "index"
-        :class = "{active: index === activeTab}"
-        :aria-selected = "index === activeTab"
+        :class = "{active: tab.hash === activeTabHash}"
+        :aria-selected = "tab.hash === activeTabHash"
         ref = "tab"
         tabindex = "0"
         @click = "setActive(index)"
         @keydown = "handleKey($event, index)"
-        :aria-controls = "tab.id"
+        :aria-controls = "tab.hash"
+        :id = "tab.hash + '_tab'"
       >
         {{ tab.name }}
       </li>
@@ -24,24 +25,35 @@
 // https://simplyaccessible.com/article/danger-aria-tabs/
 // along with the design patterns recommended at
 // https://www.w3.org/TR/wai-aria-practices/examples/tabs/tabs-2/tabs.html
+// vue 3 changes from https://zerotomastery.io/blog/tab-component-design-with-vue/
+import { computed } from 'vue';
 
 export default {
   name: 'VueTabs',
   props: ['id'],
   data: function () {
     return {
-      activeTab: 0,
+      activeTabHash: '',
       tabs: []
+    };
+  },
+  provide () {
+    return {
+      addTab: (tab) => {
+        const count = this.tabs.push(tab);
+
+        if (count === 1) {
+          this.activeTabHash = tab.hash;
+        }
+      },
+      activeTabHash: computed(() => this.activeTabHash)
     };
   },
   methods: {
     setActive (index) {
-      for (const i in this.tabs) {
-        this.tabs[i].active = (i * 1 === index * 1);
-      }
-      this.activeTab = index;
+      this.activeTabHash = this.tabs[index].hash;
       this.$nextTick(() => {
-        document.getElementById(this.tabs[index].id).focus();
+        document.getElementById(this.tabs[index].hash).focus();
       });
     },
     setFocus (index) {
@@ -62,16 +74,7 @@ export default {
         this.setFocus(cnt - 1);
       }
     }
-  },
-  mounted () {
-    this.tabs = this.$children;
-    for (const i in this.tabs) {
-      this.tabs[i].control = this.id + '_' + i;
-      this.tabs[i].id = this.id + '_' + i + '_pane';
-    }
-    this.tabs[0].active = true;
   }
-
 };
 </script>
 

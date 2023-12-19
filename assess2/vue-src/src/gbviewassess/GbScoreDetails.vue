@@ -303,7 +303,8 @@ export default {
         },
         {
           label: (store.assessInfo.hasOwnProperty('qerrortitle')
-            ? store.assessInfo.qerrortitle : this.$t('gradebook.msg_owner')),
+            ? store.assessInfo.qerrortitle
+            : this.$t('gradebook.msg_owner')),
           link: this.questionErrorUrl
         }
       ];
