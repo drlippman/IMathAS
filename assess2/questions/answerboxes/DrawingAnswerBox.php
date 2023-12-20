@@ -153,10 +153,15 @@ class DrawingAnswerBox implements AnswerBox
 
             }
         } else {
+            $xname = '';
+            $yname = '';
             if (strpos($settings[4], ':') !== false) {
                 $settings[4] = explode(':', $settings[4]);
                 $xlbl = $settings[4][0];
                 $xgrid = $settings[4][1];
+                if (count($settings[4])>2) {
+                    $xname = $settings[4][2];
+                }
             } else {
                 $xlbl = $settings[4];
                 $xgrid = $settings[4];
@@ -165,13 +170,20 @@ class DrawingAnswerBox implements AnswerBox
                 $settings[5] = explode(':', $settings[5]);
                 $ylbl = $settings[5][0];
                 $ygrid = $settings[5][1];
+                if (count($settings[5])>2) {
+                    $yname = $settings[5][2];
+                }
             } else {
                 $ylbl = $settings[5];
                 $ygrid = $settings[5];
             }
             $sclinglbl = "$xlbl:$ylbl";
+            if ($xname != '' || $yname != '') {
+                $sclinglbl .= ":$xname:$yname";
+            }
             $sclinggrid = "$xgrid:$ygrid";
         }
+        
         if ($snaptogrid !== 0) {
             list($newwidth, $newheight) = getsnapwidthheight($settings[0], $settings[1], $settings[2], $settings[3], $settings[6], $settings[7], $snaptogrid);
             if (abs($newwidth - $settings[6]) / $settings[6] < .1) {
@@ -202,12 +214,6 @@ class DrawingAnswerBox implements AnswerBox
             $plot = '';  
         } else {
             $plot = showplot($background, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
-        }
-        if (is_array($xsclgridpts) && count($xsclgridpts) > 2) {
-            $plot = addlabel($plot, $settings[1], 0, $xsclgridpts[2], "black", "aboveleft");
-        }
-        if (is_array($settings[5]) && count($settings[5]) > 2) {
-            $plot = addlabel($plot, 0, $settings[3], $settings[5][2], "black", "belowright");
         }
         if (!empty($grid) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
             $plot = addfractionaxislabels($plot, $xsclgridpts[0]);

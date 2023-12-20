@@ -230,15 +230,29 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	} else {
 		$commands .= ');';
 	}
-
+    $xvar = 'x';
+    $yvar = 'y';
+    $hasaxislabels = false;
 	if (isset($lbl) && count($lbl)>3) {
-		$commands .= "text([{$winxmax},0],\"{$lbl[2]}\",\"aboveleft\");";
-		$commands .= "text([0,{$ymax}],\"{$lbl[3]}\",\"belowright\");";
+        $xvar = $lbl[2];
+        $yvar = $lbl[3];
+        if ($xvar != '') {
+		    $commands .= "text([{$winxmax},0],\"{$xvar}\",\"aboveleft\");";
+        }
+        if ($yvar != '') {
+		    $commands .= "text([0,{$ymax}],\"{$yvar}\",\"belowright\");";
+        }
+        $hasaxislabels = true;
 	}
 	$absymin = 1E10;
 	$absymax = -1E10;
+    $globalalt = '';
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
+        if (substr($function,0,4) == 'alt:') {
+            $globalalt = substr($function, 4);
+            continue;
+        }
         $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
         if (!isset($function[0]) || $function[0]==='') { continue; }
@@ -388,7 +402,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			if (isset($function[3]) && $function[3]!='') {
 				$thisymax = $function[3];
 			} else {$thisymax = $yymax;}
-			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+			$alt .= "<table class=stats><thead><tr><th>$xvar</th><th>$yvar</th></thead></tr><tbody>";
 			$alt .= "<tr><td>$val</td><td>$thisymin</td></tr>";
 			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
@@ -448,7 +462,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$stopat = 11;//($domainlimited?10:11);
 			}
 			if ($xmax != $xmin) {
-				$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+				$alt .= "<table class=stats><thead><tr><th>$xvar</th><th>$yvar</th></thead></tr><tbody>";
 			} else {
 				$alt .= '. ';
 			}
@@ -714,10 +728,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$ymax = min($absymax,$ymax);
 	}
 	$commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});".$commands;
-	$alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. ".$alt;
+    if ($hasaxislabels) {
+	    $alt = "Graphing window shows horizontal axis" .
+            ($xvar == '' ? '' : " labeled $xvar") . ": {$winxmin} to {$winxmax}, vertical axis" .
+            ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}. ".$alt;
+    } else {
+	    $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. ".$alt;
+    }
 
 	if ($_SESSION['graphdisp']==0) {
-		return $alt;
+		return ($globalalt == '') ? $alt : $globalalt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
 	}
