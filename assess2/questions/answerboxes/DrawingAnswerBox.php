@@ -238,7 +238,7 @@ class DrawingAnswerBox implements AnswerBox
                 }
                 $out .= '<p class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() .
                     (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '') . '</p>';
-                $out .= '<p>' . _('Graph to add drawings to:') . '</p>';
+                $out .= '<p>' . _('Graphing window to add drawings to:') . '</p>';
                 if ($_SESSION['graphdisp'] > 0) {
                     $plot = str_replace('<embed', '<embed data-nomag=1', $plot); //hide mag
                     //overlay canvas over SVG.
