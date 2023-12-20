@@ -252,7 +252,6 @@ export default {
       if (!this.questionContentLoaded && !this.loadingAttempted &&
         this.active && store.errorMsg === null
       ) {
-        window.console.log('loading question ' + this.qn);
         this.loadingAttempted = true;
         actions.loadQuestion(this.qn, false, false);
       } else if (this.questionContentLoaded && this.active &&

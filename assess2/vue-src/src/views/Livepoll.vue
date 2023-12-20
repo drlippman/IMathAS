@@ -152,12 +152,16 @@ export default {
     },
     addResult (data) {
       // add question result data
-      if (!store.livepollResults.hasOwnProperty(this.curqn)) {
-        store.livepollResults[this.curqn] = {};
-      }
       data.score = JSON.parse(data.score);
       data.ans = JSON.parse(data.ans);
-      store.livepollResults[this.curqn][data.user] = data;
+      if (!store.livepollResults.hasOwnProperty(this.curqn)) {
+        const newobj = {};
+        newobj[this.curqn] = {};
+        newobj[this.curqn][data.user] = data;
+        store.livepollResults = Object.assign({}, store.livepollResults, newobj);
+      } else {
+        store.livepollResults[this.curqn][data.user] = data;
+      }
     },
     showHandler (data) {
       if (data.action === 'showq') {
@@ -249,7 +253,7 @@ export default {
         newstate: 1,
         forceregen: 1
       });
-      store.livepollResults[this.curqn] = {};
+      store.livepollResults.splice(this.curqn, 1);
     },
     updateShowAnswers () {
       // if already showing results, need to call the server with new state
