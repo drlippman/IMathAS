@@ -39,7 +39,13 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 		if (is_array($item)) {
 			if (in_array($item['id'], $tochg)) {
 				foreach ($sets as $k=>$v) {
-					if (is_array($v)) {
+					if ($k == 'SH') {
+                        for ($i=0;$i<3;$i++) {
+                            if ($v[$i] !== null) {
+                                $items[$n][$k][$i] = $v[$i];
+                            }
+                        }
+                    } else if (is_array($v)) {
                         $items[$n][$k] = []; // reset first before adding
 						foreach ($v as $kk=>$vv) {
 							$items[$n][$k][$kk] = $vv;
@@ -84,7 +90,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sets['avail'] = intval($_POST['avail']);
 	}
 	if (isset($_POST['chgshowhide']) || isset($_POST['chgavailbeh']) || isset($_POST['chggreyout'])) {
-		$sets['SH'] = array();
+		$sets['SH'] = array(null,null,null);
 	}
 	if (isset($_POST['chgshowhide'])) {
 		$sets['SH'][0] = $_POST['showhide'];
@@ -94,9 +100,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	if (isset($_POST['chggreyout'])) {
 		$sets['SH'][2] = $_POST['contentbehavior'];
-	}
-    if (isset($_POST['chgshowhide']) || isset($_POST['chgavailbeh']) || isset($_POST['chggreyout'])) {
-		$sets['SH'] = implode('', $sets['SH']);
 	}
     if (isset($_POST['chginnav'])) {
 		$sets['innav'] = !empty($_POST['innav']) ? 1 : 0;
