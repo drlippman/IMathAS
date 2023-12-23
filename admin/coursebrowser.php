@@ -137,7 +137,7 @@ $placeinhead = '<script type="text/javascript">';
 $placeinhead .= 'var courses = '.getCourseBrowserJSON().';';
 $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'";';
 $placeinhead .= '</script>';
-$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
+$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
@@ -213,8 +213,7 @@ if (!isset($_GET['embedded'])) {
 		</tr>
 
 		</tbody></table>
-		<p v-for="(propval,propname) in course"
-		   v-if="courseBrowserProps[propname] && courseBrowserProps[propname].type && courseBrowserProps[propname].type=='textarea'"
+		<p v-for="(propval,propname) in courseText(course)"
 		   class="pre-line"
 		>{{ propval }}</p>
 	</div>
@@ -229,16 +228,18 @@ if (!isset($_GET['embedded'])) {
 
 </div>
 <script type="text/javascript">
-new Vue({
-	el: '#app',
-	data: {
-		selectedItems: [],
-		courseBrowserProps: courseBrowserProps,
-		showFilters: false,
-		showFilter: '',
-		filterLeft: 0,
-		courseTypes: courseBrowserProps.meta.courseTypes,
-		activeTab: 0,
+const { createApp } = Vue;
+createApp({
+	data: function() {
+        return {
+            selectedItems: [],
+            courseBrowserProps: courseBrowserProps,
+            showFilters: false,
+            showFilter: '',
+            filterLeft: 0,
+            courseTypes: courseBrowserProps.meta.courseTypes,
+            activeTab: 0,
+        }
 	},
 	methods: {
 		clickaway: function(event) {
@@ -269,6 +270,17 @@ new Vue({
 					} else if (courseBrowserProps[propname].type && courseBrowserProps[propname].type=='string' && propname!='name') {
 						courseout[propname] = course[propname];
 					}
+				}
+			}
+			return courseout;
+		},
+        courseText: function (course) {
+			var courseout = {};
+			for (propname in course) {
+				if (this.courseBrowserProps[propname] && 
+                    this.courseBrowserProps[propname].type &&
+                    this.courseBrowserProps[propname].type == 'textarea') {
+							courseout[propname] = course[propname];
 				}
 			}
 			return courseout;
@@ -401,7 +413,7 @@ new Vue({
 		$("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
 	}
 
-});
+}).mount('#app');
 </script>
 <?php
 require_once "../footer.php";
