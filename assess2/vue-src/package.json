@@ -10,7 +10,7 @@
   "dependencies": {
     "@rushstack/eslint-patch": "^1.6.1",
     "@vue/eslint-config-standard": "^8.0.1",
-    "core-js": "^3.9.0",
+    "core-js": "^3.34.0",
     "vue": "^3.2.37",
     "vue-i18n": "^9.8.0",
     "vue-router": "^4.2.5"
