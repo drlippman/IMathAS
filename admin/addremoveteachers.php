@@ -120,7 +120,7 @@ if (!empty($_GET['from'])) {
 	}
 }
 
-$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .fade-enter-active {
@@ -193,17 +193,19 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 </div>
 
 <script type="text/javascript">
-var app = new Vue({
-	el: '#app',
-	data: {
-		processingRemove: false,
-		processingSearch: false,
-		processingAdd: false,
-		existingTeachers: <?php echo json_encode(getTeachers($cid));?>,
-		courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
-		toLookup: "",
-		searchResults: null,
-		lastSearchType: ''
+const { createApp } = Vue;
+createApp({
+	data: function() {
+        return {
+            processingRemove: false,
+            processingSearch: false,
+            processingAdd: false,
+            existingTeachers: <?php echo json_encode(getTeachers($cid));?>,
+            courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
+            toLookup: "",
+            searchResults: null,
+            lastSearchType: ''
+        };
 	},
 	methods: {
 		removeTeachers: function() {
@@ -290,7 +292,7 @@ var app = new Vue({
 			}
 		}
 	}
-});
+}).mount('#app');
 </script>
 <?php
 require_once "../footer.php";
