@@ -410,7 +410,9 @@ createApp({
 		document.addEventListener('click', this.clickaway);
 	},
 	mounted: function() {
-		$("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
+        this.$nextTick(function() {
+		    $("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
+        });
 	}
 
 }).mount('#app');
