@@ -2428,6 +2428,9 @@ function csvdownloadlink() {
       }
     }
   }
+  if (!preg_match('/[^",]/',$rows[0])) {
+    array_shift($rows);
+  }
   foreach ($rows as $i=>$row) {
     $rows[$i] = rtrim($row,',');
   }
