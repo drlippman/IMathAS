@@ -90,12 +90,20 @@
     <div v-else-if="showNext"  class="submitbtnwrap">
       <router-link
         :to="'/skip/'+ (this.qn + 2)"
-        tag="button"
-        class="secondarybtn"
-        :disabled = "!canSubmit"
+        custom
+        v-slot="{ navigate }"
       >
-        <icons name="right" />
-        {{ $t('question.next') }}
+        <button
+          type="button"
+          @click="navigate"
+          @keypress.enter="navigate"
+          role="link"
+          class="secondarybtn"
+          :disabled = "!canSubmit"
+        >
+          <icons name="right" />
+          {{ $t('question.next') }}
+        </button>
       </router-link>
     </div>
   </div>
@@ -122,7 +130,8 @@ export default {
     return {
       work: '',
       lastWorkVal: '',
-      showWorkInput: false
+      showWorkInput: false,
+      loadingAttempted: false
     };
   },
   computed: {
@@ -173,7 +182,8 @@ export default {
     },
     submitClass () {
       return (store.assessInfo.submitby === 'by_assessment' || !this.questionData.canretry_primary)
-        ? 'secondary' : 'primary';
+        ? 'secondary'
+        : 'primary';
     },
     showScore () {
       return (store.inProgress &&
@@ -235,10 +245,18 @@ export default {
   },
   methods: {
     loadQuestionIfNeeded (skiprender) {
-      if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
+      if (this.questionContentLoaded && !this.loadingAttempted) {
+        // if question content is loaded, mark it as loading attempted
+        this.loadingAttempted = this.questionContentLoaded;
+      }
+      if (!this.questionContentLoaded && !this.loadingAttempted &&
+        this.active && store.errorMsg === null
+      ) {
+        this.loadingAttempted = true;
         actions.loadQuestion(this.qn, false, false);
       } else if (this.questionContentLoaded && this.active &&
         !this.questionData.rendered && skiprender !== true) {
+        window.console.log('rendering question ' + this.qn);
         this.renderAndTrack();
       }
     },
@@ -359,7 +377,7 @@ export default {
       actions.setRendered(this.qn, true);
     },
     setInitValues () {
-      var regex = new RegExp('^(qn|tc|qs)\\d');
+      var regex = /^(qn|tc|qs)\d/;
       var thisqn = this.qn;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function (index, el) {
@@ -422,7 +440,7 @@ export default {
       this.renderAndTrack();
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     actions.setRendered(this.qn, false);
   },
   watch: {

@@ -1,8 +1,8 @@
-import Vue from 'vue';
+import { reactive, nextTick } from 'vue';
 import Router from './router';
 import { mapInterquestionTexts, mapInterquestionPages } from '@/mixins/maptexts';
 
-export const store = Vue.observable({
+export const store = reactive({
   assessInfo: null,
   APIbase: null,
   aid: null,
@@ -340,7 +340,7 @@ export const actions = {
         }
         // copy into questions for reload later if needed
         for (const qn in store.work) {
-          Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
+          store.assessInfo.questions[parseInt(qn)].work = store.work[qn];
           delete store.work[qn];
         }
 
@@ -548,7 +548,7 @@ export const actions = {
         } else if (qns.length === 1) {
           store.assessInfo.questions[qns[0]].hadSeqNext = hasSeqNext;
           // scroll to score result
-          Vue.nextTick(() => {
+          nextTick(() => {
             var el;
             if (!hasSeqNext) {
               el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
@@ -599,12 +599,12 @@ export const actions = {
     store.somethingDirty = false;
     // this.clearAutosaveTimer()
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
-      Vue.set(store.autosaveQueue, qn, []);
+      store.autosaveQueue[qn] = [];
     }
     if (store.autosaveQueue[qn].indexOf(partnum) === -1) {
       store.autosaveQueue[qn].push(partnum);
     }
-    Vue.set(store.autosaveTimeactive, qn, timeactive);
+    store.autosaveTimeactive[qn] = timeactive;
     if (store.autosaveTimer === null) {
       store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 60 * 1000);
     }
@@ -612,7 +612,7 @@ export const actions = {
   clearAutosave (qns) {
     for (const i in qns) {
       if (store.autosaveQueue.hasOwnProperty(qns[i])) {
-        Vue.delete(store.autosaveQueue, qns[i]);
+        delete store.autosaveQueue[qns[i]];
       }
     }
     if (Object.keys(store.autosaveQueue).length === 0) {
@@ -974,7 +974,7 @@ export const actions = {
   },
   setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {
-      Vue.set(store.initValues, qn, {});
+      store.initValues[qn] = {};
     }
     // only record initvalue if we don't already have one
     let pn = 0;
@@ -1157,7 +1157,7 @@ export const actions = {
         ) {
           response.questions[i].category = store.assessInfo.questions[iint].category;
         }
-        Vue.set(store.assessInfo.questions, iint, response.questions[i]);
+        store.assessInfo.questions[iint] = response.questions[i];
       }
       delete response.questions;
     }

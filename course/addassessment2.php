@@ -900,11 +900,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
  /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
-if (!empty($CFG['GEN']['uselocaljs'])) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/vue2-6-14.min.js"></script>';
-} else {
-	$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>';
-}
+//if (!empty($CFG['GEN']['uselocaljs'])) {
+//	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/vue2-6-14.min.js"></script>';
+//} else {
+    $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+//}
 
  require_once "../header.php";
 

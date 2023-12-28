@@ -1,5 +1,5 @@
 export const dateTimeFormats = {
-  'en': {
+  en: {
     short: {
       year: 'numeric', month: 'short', day: 'numeric'
     },
