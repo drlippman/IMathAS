@@ -84,6 +84,14 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 		if (count($bccList)>0) {
 			$headers .= "Bcc: ".implode(',', $bccList)."\r\n";
 		}
+        if (count($email) == 1) {
+            $headers .= 'List-Unsubscribe-Post: List-Unsubscribe=One-Click' . "\r\n";
+            preg_match('/[^<>\s]+@[^<>\s]+/',$tostr,$matches);
+            $baseemail = $matches[0];
+            $hash = md5($baseemail . ($GLOBALS['CFG']['email']['secsalt'] ?? '123'));
+            $headers .= 'List-Unsubscribe: <' . $GLOBALS['basesiteurl'] . '/actions.php?action=unsubscribe&email='
+                . Sanitize::encodeUrlParam($baseemail) . '&ver=' . $hash . ">\r\n";
+        }
 		mail($tostr, $subject, $message, $headers);
 	}	
 }

@@ -187,6 +187,7 @@ By default, emails are sent using the built-in PHP `mail()` function.  This can 
       - Optionally, but recommended: set `$CFG['email']['authcode']`, and set up SES to call
          `/admin/handleSESbounce.php?authcode=####` on bounces or complaints.
     - `$CFG['email']['handlerpriority']` can be set to define a breakpoint between using the default `mail()` delivery and the custom handler.   See `/includes/email.php` for values.
+- `$CFG['email']['secsalt']`: A secret value used for salting hashes.
 
 
 

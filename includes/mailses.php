@@ -313,7 +313,7 @@ class SimpleEmailService
 		}
 
 		$rest = new SimpleEmailServiceRequest($this, 'POST');
-		$action = empty($sesMessage->attachments) ? 'SendEmail' : 'SendRawEmail';
+		$action = 'SendRawEmail'; // needed for list unsubscribe header empty($sesMessage->attachments) ? 'SendEmail' : 'SendRawEmail';
 		$rest->setParameter('Action', $action);
 
 		if($action == 'SendRawEmail') {
@@ -617,6 +617,14 @@ final class SimpleEmailServiceMessage {
 				$raw_message .= 'Subject: =?' . $this->subjectCharset . '?B?' . base64_encode($this->subject) . '?=' . "\n";
 			}
 		}
+        if (count($this->to) == 1) {
+            $raw_message .= 'List-Unsubscribe-Post: List-Unsubscribe=One-Click' . "\n";
+            preg_match('/[^<>\s]+@[^<>\s]+/',$this->to[0],$matches);
+            $baseemail = $matches[0];
+            $hash = md5($baseemail . ($GLOBALS['CFG']['email']['secsalt'] ?? '123'));
+            $raw_message .= 'List-Unsubscribe: <' . $GLOBALS['basesiteurl'] . '/actions.php?action=unsubscribe&email='
+                . Sanitize::encodeUrlParam($baseemail) . '&ver=' . $hash . ">\n";
+        }
 		$raw_message .= 'MIME-Version: 1.0' . "\n";
 		$raw_message .= 'Content-type: Multipart/Mixed; boundary="' . $boundary . '"' . "\n";
 		$raw_message .= "\n--{$boundary}\n";
