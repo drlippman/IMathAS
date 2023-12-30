@@ -218,6 +218,13 @@ $alt = 0;
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=lticanvas" target="_blank">Canvas Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
+        <p>&nbsp;</p>
+        <p>If you don't want to embed in Canvas, but want students to know about 
+           <?php echo $installname; ?> assignments in the Canvas calendar, you can 
+           <a href="canvascalexport.php?cid=<?php echo $cid;?>">export Canvas calendar items</a>.
+           Note it's best to do this after <em>all</em> assignments for the course 
+           are ready and have dates set. Otherwise, be careful on import to carefully 
+           select what you import, or else you'll end up with duplicate events.</p>
 	</div>
 	<div id="lmsbb" style="display:none" class="lmsblock">
 		<fieldset>
