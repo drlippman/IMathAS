@@ -1,6 +1,6 @@
 <?php
 
-function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bccList=array()) {
+function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bccList=array(), $includeUnsub = false) {
 	global $CFG;
 	if (!isset($CFG['email']['SES_KEY_ID'])) {
 		$CFG['email']['SES_KEY_ID'] = getenv('SES_KEY_ID');
@@ -34,7 +34,7 @@ function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bcc
 	}
 	$m->setSubject($subject);
 	$m->setMessageFromString(null,$message);
-	$ses->sendEmail($m);
+	$ses->sendEmail($m, $includeUnsub);
 }
 
 /**
@@ -306,7 +306,7 @@ class SimpleEmailService
 	* @return An array containing the unique identifier for this message and a separate request id.
 	*         Returns false if the provided message is missing any required fields.
 	*/
-	public function sendEmail($sesMessage) {
+	public function sendEmail($sesMessage, $includeUnsub = false) {
 		if(!$sesMessage->validate()) {
 			$this->__triggerError('sendEmail', 'Message failed validation.');
 			return false;
@@ -317,7 +317,7 @@ class SimpleEmailService
 		$rest->setParameter('Action', $action);
 
 		if($action == 'SendRawEmail') {
-			$rest->setParameter('RawMessage.Data', $sesMessage->getRawMessage());
+			$rest->setParameter('RawMessage.Data', $sesMessage->getRawMessage($includeUnsub));
 		} else {
 			$i = 1;
 			foreach($sesMessage->to as $to) {
@@ -598,7 +598,7 @@ final class SimpleEmailServiceMessage {
 	 * @return string
 	 * @author Daniel Zahariev
 	 */
-	function getRawMessage()
+	function getRawMessage($includeUnsub = false)
 	{
 		$boundary = uniqid(rand(), true);
 		$raw_message = "To: " . join(', ', $this->to) . "\n";
@@ -617,7 +617,7 @@ final class SimpleEmailServiceMessage {
 				$raw_message .= 'Subject: =?' . $this->subjectCharset . '?B?' . base64_encode($this->subject) . '?=' . "\n";
 			}
 		}
-        if (count($this->to) == 1) {
+        if ($includeUnsub && count($this->to) == 1) {
             $raw_message .= 'List-Unsubscribe-Post: List-Unsubscribe=One-Click' . "\n";
             preg_match('/[^<>\s]+@[^<>\s]+/',$this->to[0],$matches);
             $baseemail = $matches[0];
