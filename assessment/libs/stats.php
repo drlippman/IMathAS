@@ -597,7 +597,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$startlabel = $start;
 	} //else {
-    $maxx = 2*max($a);
+    $maxx = 2*max(abs(max($a)), abs(min($a)));
 		$outst .= "axes($maxx,$step,1,null,$gdy); fill=\"$fill\"; stroke=\"$stroke\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
@@ -886,11 +886,11 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 	return $out;
 }
 
-//normrand(mu,sigma,n, [rnd])
+//normrand(mu,sigma,n, [rnd,posonly,skew])
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false,$skew=0) {
 	if (!is_nicenumber($mu) || !is_nicenumber($sig) || !is_nicenumber($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
@@ -898,6 +898,8 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
     global $RND;
     $icnt = 0;
     $z = [];
+    $d = $skew/sqrt(1+$skew*$skew);
+    $d2 = sqrt(1-$d*$d);
     while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
@@ -907,6 +909,15 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
         $r = sqrt(-2*log($r)/$r);
         $v1 = $sig*$a*$r + $mu;
         $v2 = $sig*$b*$r + $mu;
+        if ($skew != 0) {
+            $v3 = $d*$v1 + $d2*$v2;
+            $v3 = $v1 >=0 ? $v3 : -$v3;
+            if (!$pos || $v3 > 0) {
+                $z[] = round($v3, $rnd);
+            }
+            $icnt += 0.5;
+            continue;
+        }
         if (!$pos || $v1 > 0) {
             $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
         }

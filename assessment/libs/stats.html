@@ -213,11 +213,12 @@ piechart(percents, labels, {width, height})
 <BR>labels: array of labels for each pie piece
 <BR>uses Google Charts API
 <BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n, [rnd, positive])
+normrand(mu,sigma,n, [rnd, positive, skew])
 <BR>returns an array of n random numbers that are normally distributed with given
 <BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 <BR>specify rnd to round to that many digit
 <BR>set positive to true to not include negative values
+<BR>set skew to a nonzero value to skew the data
 <BR><h3><a name="expdistrand">expdistrand</a></h3>
 expdistrand(mu, n, [rnd])
 <BR>returns an array of n random numbers that are exponentially distributed
