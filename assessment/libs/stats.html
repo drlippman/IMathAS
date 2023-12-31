@@ -32,6 +32,11 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#piechart">piechart</a></li>
 <li><a href="#normrand">normrand</a></li>
 <li><a href="#expdistrand">expdistrand</a></li>
+<li><a href="#stats_randg">stats_randg</a></li>
+<li><a href="#stats_randF">stats_randF</a></li>
+<li><a href="#stats_randt">stats_randt</a></li>
+<li><a href="#stats_randchi2">stats_randchi2</a></li>
+<li><a href="#stats_randpoisson">stats_randpoisson</a></li>
 <li><a href="#boxplot">boxplot</a></li>
 <li><a href="#normalcdf">normalcdf</a></li>
 <li><a href="#tcdf">tcdf</a></li>
@@ -224,6 +229,29 @@ expdistrand(mu, n, [rnd])
 <BR>returns an array of n random numbers that are exponentially distributed
 <BR>with given mean mu.
 <BR>specify rnd to round to that many digits (default 3)
+
+<h3><a name="stats_randg">stats_randg</a></h3>
+<p>stats_randg(shape, n)</p>
+<p>returns an array of n random numbers from a gamma distribution</p>
+
+<h3><a name="stats_randF">stats_randF</a></h3>
+<p>stats_randF(df1, df2, n)</p>
+<p>returns an array of n random numbers from an F disstribution with df1 and df2 degrees of freedom</p>
+
+<h3><a name="stats_randt">stats_randt</a></h3>
+<p>stats_randt(mu, sigma, df, n)</p>
+<p>returns an array of n random numbers from a t-distribution with given mean mu,
+    standard distribution sigma, and degrees of freedom df.
+</p>
+
+<h3><a name="stats_randchi2">stats_randchi2</a></h3>
+<p>stats_randchi2(df, n)</p>
+<p>returns an array of n random numbers from a chi squared distribution with df degrees of freedom</p>
+
+<h3><a name="stats_randpoisson">stats_randpoisson</a></h3>
+<p>stats_randpoisson(lambda, n)</p>
+<p>returns an array of n random numbers from a Poisson distribution with parameter lambda.</p>
+
 <BR><h3><a name="boxplot">boxplot</a></h3>
 boxplot(array,axislabel,[options])
 <BR>draws a boxplot based on the data in array, with given axislabel

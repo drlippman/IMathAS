@@ -10,7 +10,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
- "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t");
+ "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t",
+ "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson");
 
 //nCr(n,r)
 //The Choose function
@@ -2974,5 +2975,104 @@ function student_t($arr1, $arr2, bool $equalVar = False, bool $paired = False, i
 	$p = 1- tcdf($t,$df,$roundto);
 
 	return [$t,$p,$df];//[$F_a,$p_a]
+}
+
+function stats_randg($shape,$n) {
+    // from jStat, Returns a Gamma deviate by the method of Marsaglia and Tsang
+    // limited to case where $shape >= 1
+    global $RND;
+    if ($shape < 1) {
+        echo 'Invalid input to randg: ' . $shape;
+        return 0;
+    }
+    $a1 = $shape - 1/3;
+    $a2 = 1/sqrt(9*$a1);
+    // get norm rand data, with extras
+    $d = normrand(0,1,2*$n);
+    $out = [];
+    for ($i=0;$i<$n;$i++) {
+        do {
+            do {
+                $x = array_pop($d);
+                $v = 1 + $a2 * $x;
+            } while ($v <= 0);
+            $v = $v*$v*$v;
+            $u = rrand(0,.999999,.000001); 
+        } while ($u > 1 - 0.331 * pow($x,4) &&
+            log($u) > 0.5*$x*$x + $a1*(1-$v + log($v)));
+        $out[] = $a1 * $v;
+    }
+    return $out;
+}
+
+function stats_randF($df1,$df2,$n) {
+    $x1 = stats_randg($df1 / 2, $n);
+    $x2 = stats_randg($df2 / 2, $n);
+    $out = [];
+    for ($i=0;$i<$n;$i++) {
+        $out[] = ($x1[$i]*2/$df1) / ($x2[$i]*2/$df2);
+    }
+    return $out;
+}
+function stats_randchi2($df,$n) {
+    $x = stats_randg($df / 2, $n);
+    array_walk($x, function($i) { return $i*2; });
+    return $x;
+}
+
+function stats_randt($mu,$sig,$df,$n) {
+    $x = normrand(0,1,$n);
+    $g = stats_randg($df/2, $n);
+    $out = [];
+    for ($i=0;$i<$n;$i++) {
+        $out[] = $sig*($x[$i] * sqrt($df/(2*$g[$i]))) + $mu;
+    }
+    return $out;
+}
+
+function stats_randpoisson($l,$n) {
+    global $RND;
+    $out = [];
+    if ($l < 10) {
+        $L = exp(-1*$l);
+        for ($i=0;$i<$n;$i++) {
+            $k = 0;
+            $p = 1;
+            do {
+                $k++;
+                $r = rrand(0,.999999,.000001); 
+                $p *= $r;
+            } while ($p > $L);
+            
+            $out[] = $k-1;
+        }
+    } else {
+        $lam = $l;
+        $slam = sqrt($lam);
+        $loglam = log($lam);
+        $b = 0.931 + 2.53 * $slam;
+        $a = -0.059 + 0.02483 * $b;
+        $invalpha = 1.1239 + 1.1328/($b - 3.4);
+        $vr = 0.9277 - 3.6224 / ($b-2);
+
+        while (count($out) < $n) {
+            $u = rrand(0,.999999,.000001) - 0.5;
+            $v = rrand(0,.999999,.000001); 
+            $us = 0.5 - abs($u);
+            $k = floor((2*$a/$us + $b)*$u + $lam + 0.43);
+            if ($us >= 0.07 && $v < $vr) {
+                $out[] = $k;
+                continue;
+            }
+            if ($k < 0 || ($us < 0.013 && $v > $us)) {
+                continue;
+            }
+            if (log($v) + log($invalpha) - log($a/($us*$us) + $b) <=
+                (-$lam + $k*$loglam - gamma_log($k+1))) {
+                    $out[] = $k;
+            }
+        }
+    }
+    return $out;
 }
 ?>
