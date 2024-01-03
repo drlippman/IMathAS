@@ -1363,13 +1363,21 @@ function setupToggler2(base) {
 	});
 }
 function setupPopuplinks(base) {
+    var allowedprops = ['popup','width','innerWidth','height','innerHeight','left','screenX','top','screenY'];
 	$(base).find("a[data-popup]").each(function(i,el) {
 		if (!el.id) { el.id = 'link' + Math.random().toString(16).slice(2); }
         $(el).off("click.popup").on("click.popup", function(e) {
             e.preventDefault();
-            var pts = el.getAttribute("data-popup").split(/,/);
-            var nid = 'popup_' + el.id;
-            popupwindow(nid, el.href, pts[0], pts[1] || 500);
+            var attr = el.getAttribute('data-popup').split(/,/);
+            var attrout = [];
+            for (let i=0;i < attr.length; i++) {
+                let pts = attr[i].split(/=/);
+                if (pts.length == 2 && allowedprops.includes(pts[0])) {
+                    attrout.push(pts[0] + '=' + parseInt(pts[1]));
+                }
+            }
+            console.log(attrout.join(','));
+            window.open(el.href, 'popup_'+el.id, attrout.join(','));
             return false;
         });
     });
