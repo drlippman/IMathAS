@@ -1178,10 +1178,10 @@ export const actions = {
           let canretrydet = false;
           for (const pn in thisq.parts) {
             const remaining = thisq.tries_max - thisq.parts[pn].try;
-            if (remaining < trymin) {
+            if (remaining < trymin && thisq.answeights[pn] > 0) {
               trymin = remaining;
             }
-            if (remaining > trymax) {
+            if (remaining > trymax && thisq.answeights[pn] > 0) {
               trymax = remaining;
             }
             if (remaining > 0 &&

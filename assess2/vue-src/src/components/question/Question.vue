@@ -326,7 +326,7 @@ export default {
       const trymax = this.questionData.tries_max;
       for (const pn in this.questionData.parts) {
         var regex;
-        if (this.questionData.parts[pn].try >= trymax) {
+        if (this.questionData.parts[pn].try >= trymax && this.questionData.answeights[pn] > 0) {
           // out of tries - disable inputs
           if (Object.keys(this.questionData.parts).length === 1 && Object.keys(this.questionData.jsparams).length > 1) {
             // Only one "part" listed, but multiple input boxes.

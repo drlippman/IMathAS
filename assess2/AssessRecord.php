@@ -2833,6 +2833,7 @@ class AssessRecord
     if ($by_question) {
       $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
       $tries = $qvers[count($qvers) - 1]['tries'];
+      $answeights = $qvers[count($qvers) - 1]['answeights'] ?? [];
       if (!empty($qvers[count($qvers)-1]['jumptoans'])) {
         // jump to answer has been clicked - submission not allowed
         foreach ($partssubmitted as $pn) {
@@ -2844,6 +2845,7 @@ class AssessRecord
     } else {
       $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
+      $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'] ?? [];
     }
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
 
@@ -2852,7 +2854,7 @@ class AssessRecord
       if (!isset($tries[$pn])) {
         $out[$pn] = true;
       } else {
-        $out[$pn] = (count($tries[$pn]) < $tries_max);
+        $out[$pn] = (count($tries[$pn]) < $tries_max || ($answeights[$pn] ?? 1) == 0);
       }
     }
 
