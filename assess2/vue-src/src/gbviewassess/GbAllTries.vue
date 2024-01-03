@@ -87,7 +87,7 @@ export default {
             }
             la = '[[' + la.join('],[') + ']]';
             const id = this.qn + '-' + pn + '-' + tn;
-            const ref = this.tries[pn][tn][2][0] || '';
+            const ref = this.tries[pn][tn][2] || [];
 
             window.canvases['GBR' + id] = ref.slice();
             window.canvases['GBR' + id].unshift('GBR' + id);
