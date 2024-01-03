@@ -172,14 +172,16 @@ jQuery(function() {
 var popupwins = [];
 function popupwindow(id,content,width,height,scroll) {
 	if (height=='fit') {
-		height = window.height - 80;
+		height = window.innerHeight - 80;
 	}
 	var attr = "width="+width+",height="+height+",status=0,resizable=1,directories=0,menubar=0";
 	if (scroll!=null && scroll==true) {
 		attr += ",scrollbars=1";
 	}
+
 	if (typeof(popupwins[id])!="undefined" && !popupwins[id].closed) {
 		popupwins[id].focus();
+		return;
 	}
 	if (content.match(/^http/)) {
 		popupwins[id] = window.open(content,id,attr);
@@ -1192,6 +1194,7 @@ function initlinkmarkup(base) {
 	setIframeSpinner(base);
     setupToggler(base);
 	setupToggler2(base);
+    setupPopuplinks(base);
 	$(base).fitVids();
     resizeResponsiveIframes(base, true);
 }
@@ -1358,6 +1361,18 @@ function setupToggler2(base) {
 			}
 		});
 	});
+}
+function setupPopuplinks(base) {
+	$(base).find("a[data-popup]").each(function(i,el) {
+		if (!el.id) { el.id = 'link' + Math.random().toString(16).slice(2); }
+        $(el).off("click.popup").on("click.popup", function(e) {
+            e.preventDefault();
+            var pts = el.getAttribute("data-popup").split(/,/);
+            var nid = 'popup_' + el.id;
+            popupwindow(nid, el.href, pts[0], pts[1] || 500);
+            return false;
+        });
+    });
 }
 
 //generic grouping block toggle
