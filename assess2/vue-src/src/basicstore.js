@@ -1178,10 +1178,14 @@ export const actions = {
           let canretrydet = false;
           for (const pn in thisq.parts) {
             const remaining = thisq.tries_max - thisq.parts[pn].try;
-            if (remaining < trymin && thisq.answeights[pn] > 0) {
+            const parthasnoval = (thisq.hasOwnProperty('answeights') &&
+             parseFloat(thisq.answeights[pn]) === 0) ||
+              (thisq.parts[pn].hasOwnProperty('points_possible') &&
+              parseFloat(thisq.parts[pn].points_possible) === 0);
+            if (remaining < trymin && !parthasnoval) {
               trymin = remaining;
             }
-            if (remaining > trymax && thisq.answeights[pn] > 0) {
+            if (remaining > trymax && !parthasnoval) {
               trymax = remaining;
             }
             if (remaining > 0 &&
