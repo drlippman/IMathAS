@@ -140,51 +140,24 @@
 			$(".reply").addClass("pseudohidden");
 		}
 	}
-	function onarrow(e,field) {
-		if (window.event) {
-			var key = window.event.keyCode;
-		} else if (e.which) {
-			var key = e.which;
-		}
+    $(function () {
+        $("input[type=text][id^=score]").on('keyup', function() {
+            var visel = $("input[type=text][id^=score]:visible");
+            var idx = visel.index(this);
+            if (idx != -1) {
+                if (event.which == 38 && idx > 0) { 
+                    idx--; 
+                } else if ((event.which == 40 || event.which == 13) && idx < visel.length-1) {
+                    idx++;
+                }
+                visel[idx].focus();
+            }
+        }).on('keypress', function() {
+            if (event.which == 13) { event.preventDefault(); }
+        });
+    })
+	
 
-		if (key==40 || key==38) {
-			var i;
-			for (i = 0; i < field.form.elements.length; i++)
-			   if (field == field.form.elements[i])
-			       break;
-
-		      if (key==38) {
-			      i = i-2;
-			      if (i<0) { i=0;}
-		      } else {
-			      i = (i + 2) % field.form.elements.length;
-		      }
-		      if (field.form.elements[i].type=='text') {
-			      field.form.elements[i].focus();
-		      }
-		      return false;
-		} else {
-			return true;
-		}
-	}
-	function onenter(e,field) {
-		if (window.event) {
-			var key = window.event.keyCode;
-		} else if (e.which) {
-			var key = e.which;
-		}
-		if (key==13) {
-			var i;
-			for (i = 0; i < field.form.elements.length; i++)
-			   if (field == field.form.elements[i])
-			       break;
-		      i = (i + 2) % field.form.elements.length;
-		      field.form.elements[i].focus();
-		      return false;
-		} else {
-			return true;
-		}
-	}
 	function GBviewThread(threadid) {
 		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
 		GB_show(_("Thread"),"posts.php?"+qsb,800,"auto");
@@ -307,7 +280,7 @@
 		$content .= '<span class="right">';
 		if ($haspoints) {
 			if ($caneditscore && $line['stuid']!==null) {
-				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" value=\"";
 				if (isset($scores[$line['id']])) {
 					$content .= Sanitize::encodeStringForDisplay($scores[$line['id']]);
 				}
