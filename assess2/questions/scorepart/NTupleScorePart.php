@@ -256,6 +256,7 @@ class NTupleScorePart implements ScorePart
                     $matchedparts = [];
                     foreach ($answer['vals'] as $i=>$ansval) {
                         $gansval = $givenans['vals'][$i];
+                        $matchedparts[$i] = 0;
                         if (is_numeric($ansval) && is_numeric($gansval)) {
                             if ($abstolerance !== '') {
                                 if (abs($ansval-$gansval) < $abstolerance + 1E-12) {
@@ -276,9 +277,9 @@ class NTupleScorePart implements ScorePart
                         continue;
                     }
 
-                    if (count($matchedparts)==count($answer['vals'])) { //if totally correct
+                    if (array_sum($matchedparts)==count($answer['vals'])) { //if totally correct
                         $correct += 1; $foundloc = $j; break 2;
-                    } else if ($scoremethod=='byelement' && count($matchedparts)>0) { //if partially correct
+                    } else if ($scoremethod=='byelement' && array_sum($matchedparts)>0) { //if partially correct
                         if (is_array($partweights)) {
                             $fraccorrect = 0;
                             foreach ($partweights as $pwi => $pwv) {
@@ -288,7 +289,7 @@ class NTupleScorePart implements ScorePart
                             }
                             $fraccorrect /= array_sum($partweights);
                         } else {
-                            $fraccorrect = count($matchedparts)/count($answer['vals']);
+                            $fraccorrect = array_sum($matchedparts)/count($answer['vals']);
                         }
                         if (!isset($partialmatches["$ai-$j"]) || $fraccorrect>$partialmatches["$ai-$j"]) {
                             $partialmatches["$ai-$j"] = $fraccorrect;
