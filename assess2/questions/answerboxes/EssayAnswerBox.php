@@ -59,6 +59,11 @@ class EssayAnswerBox implements AnswerBox
             $cols = 50;
             $rows = intval($answerboxsize);
         }
+        $nopaste = false;
+        if ($displayformat == 'editornopaste') {
+            $nopaste = true;
+            $displayformat = 'editor';
+        }
         if ($displayformat == 'editor') {
             $rows += 5;
         }
@@ -112,6 +117,9 @@ class EssayAnswerBox implements AnswerBox
             }
             if ($displayformat == 'editor' && $GLOBALS['useeditor'] == 1) {
                 $params['usetinymce'] = 1;
+                if ($nopaste) {
+                    $params['nopaste'] = 1;
+                }
             }
         }
         $tip .= _('Enter your answer as text.  This question is not automatically graded.');

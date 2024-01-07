@@ -210,6 +210,12 @@ function init(paramarr, enableMQ, baseel) {
         div.html(html);
         $("#qn"+qn).hide().after(div);
       } else {
+        var extendsetup = null;
+        if (params.nopaste) {
+            extendsetup = { 
+                'paste_preprocess': function(plugin, args) { args.content = '';}
+            };
+        }
         initeditor("selector","#qn" + qn + ".mceEditor",null,false,function(ed) {
           ed.on('blur', function (e) {
             tinymce.triggerSave();
@@ -217,7 +223,7 @@ function init(paramarr, enableMQ, baseel) {
           }).on('focus', function (e) {
             jQuery(e.target.targetElm).triggerHandler('focus');
           })
-        });
+        }, extendsetup);
       }
     }
     if (params.qtype == 'essay') {

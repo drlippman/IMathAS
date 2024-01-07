@@ -376,7 +376,7 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
-        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20231201" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20240107" type="text/javascript"></script>';
     }
     
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
