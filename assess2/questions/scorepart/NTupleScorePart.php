@@ -282,7 +282,7 @@ class NTupleScorePart implements ScorePart
                         if (is_array($partweights)) {
                             $fraccorrect = 0;
                             foreach ($partweights as $pwi => $pwv) {
-                                if ($matchedparts[$pwi] == 1) {
+                                if (!empty($matchedparts[$pwi])) {
                                     $fraccorrect += $pwv;
                                 }
                             }
