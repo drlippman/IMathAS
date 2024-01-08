@@ -1713,19 +1713,19 @@ switch($_GET['action']) {
 			if ($from!='home' && $myrights>=75) {
 				$query .= ",iut.LastName AS teacherfirst,iut.FirstName AS teacherlast";
 			}
-			$query .= " FROM imas_users AS iu JOIN ";
-			$query .= "imas_students AS i_s ON iu.id=i_s.userid JOIN imas_courses AS ic ON ic.id=i_s.courseid ";
+			$query .= " FROM imas_users AS iu LEFT JOIN ";
+			$query .= "imas_students AS i_s ON iu.id=i_s.userid LEFT JOIN imas_courses AS ic ON ic.id=i_s.courseid ";
 			$myrights = 75;
 			if ($from=='home' || $myrights<75) {
 				$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
 				$query .= "WHERE i_t.userid=? AND ";
 				$qarr = array($userid);
 			} else {
-				$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
-				$query .= "JOIN imas_users AS iut ON i_t.userid=iut.id ";
+				$query .= "LEFT JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
+				$query .= "LEFT JOIN imas_users AS iut ON i_t.userid=iut.id ";
 				if ($myrights<100) {
-					$query .= "WHERE iut.groupid=? AND ";
-					$qarr = array($groupid);
+					$query .= "WHERE (iut.groupid=? OR iu.groupid=?) AND ";
+					$qarr = array($groupid,$groupid);
 				} else {
 					$query .= "WHERE ";
 					$qarr = array();
@@ -1750,6 +1750,7 @@ switch($_GET['action']) {
 				echo '<table class="gb"><thead><th>Student</th><th>Username</th><th>Course</th>';
 				if ($from!='home' && $myrights>=75) {
 					echo '<th>Instructor</th>';
+                    echo '<th>Edit User</th>';
 				}
 				echo '</thead><tbody>';
 				$i = 0;
@@ -1762,6 +1763,8 @@ switch($_GET['action']) {
 					echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
 					if ($from!='home' && $myrights>=75) {
 						echo '<td>'.Sanitize::encodeStringForDisplay($row['teacherlast'].', '.$row['teacherfirst']).'</td>';
+                        echo '<td><a href="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=chgrights&id='.Sanitize::onlyInt($row['id']).'">';
+                        echo _('Edit').'</a></td>';
 					}
 					echo '</td></tr>';
 				}
