@@ -2,7 +2,7 @@
 // IMathAS: Assess2 gradebook details page
 // (c) 2019 David Lippman
 
-$lastupdate = '20240104';
+$lastupdate = '20240108';
 
 require_once '../init.php';
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
