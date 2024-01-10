@@ -181,7 +181,9 @@ function popupwindow(id,content,width,height,scroll) {
 
 	if (typeof(popupwins[id])!="undefined" && !popupwins[id].closed) {
 		popupwins[id].focus();
-		return;
+        if (popupwins[id].location.href == content) {
+            return;
+        }
 	}
 	if (content.match(/^http/)) {
 		popupwins[id] = window.open(content,id,attr);
