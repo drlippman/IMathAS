@@ -76,7 +76,7 @@ if (isset($_POST['deltype']) && is_numeric($_POST['delold']) &&
     }
 
     echo '<p>' . sprintf(_('%d messages deleted'), $cnt) . '</p>';
-    echo '<p><a href="msglist?cid=' . $cid .'">' . _('Done') . '</a></p>';
+    echo '<p><a href="msglist.php?cid=' . $cid .'">' . _('Done') . '</a></p>';
     require '../footer.php';
     exit;
 }
