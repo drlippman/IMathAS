@@ -1309,11 +1309,6 @@ class MathParser
       $sym2 = '/';
     }
 
-    if ($node['left']['symbol'] === '~') {
-
-    }
-
-
     if ($sym1 !== '') {
       if ($node['left']['symbol'] === '~' && ($node['left']['left']['symbol'] === $sym1 || $node['left']['left']['symbol'] === $sym2)) {
         $node['left'] = $this->normalizeNode($node['left']);
