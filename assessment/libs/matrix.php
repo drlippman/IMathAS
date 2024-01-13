@@ -16,7 +16,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
-	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
+	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans","parseStuansAsMatrix");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.
@@ -1443,8 +1443,23 @@ function matrixParseStuans($stu) {
     }
 }
 
+function parseStuansAsMatrix ($stu, $eval = true) {
+	if ($stu === null) {
+		return matrix(array(), 0, 0);
+	} else {
+        list($arr,$nrows) = parseMatrixToArray($stu);
+		$ncols = count($arr) / $nrows;
+		if ($eval) {
+		  $arr = calconarray($arr, "evalnumstr(x)");
+		}
+        return matrix($arr, $nrows, $ncols);
+    }
+}
+
 function isMatrix($m) {
-	if (isset($m) && is_array($m) && isset($m[0]) && is_array($m[0])) {
+	if (!isset($m) || !is_array($m)) { return false; }
+	if (count($m) == 0) {return true;}
+	if (isset($m[0]) && is_array($m[0])) {
         $rcnt = count($m);
         $ccnt = count($m[0]);
         if ($rcnt == 0 || $ccnt == 0) { return false; }
