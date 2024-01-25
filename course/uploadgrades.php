@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
@@ -125,7 +125,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -166,6 +166,6 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

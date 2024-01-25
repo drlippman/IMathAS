@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__."/copyiteminc.php");
+require_once __DIR__."/copyiteminc.php";
 
 // TODO: Revamp this total hack job.
 // Rewrite the item and course copying as a class
@@ -105,7 +105,6 @@ function copycourse($sourcecid, $name, $newUIver) {
   } else {
     $ancestors = intval($sourcecid).','.$ancestors;
   }
-  $ancestors = $ancestors;
   $outcomes = array();
   $query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
   $query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';

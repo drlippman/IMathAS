@@ -8,7 +8,7 @@
 //  where sig = sha1(gbitemid::cid-linkid::userid)
 
 $init_skip_csrfp = true;
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 unset($init_skip_csrfp);
 
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {

@@ -2,9 +2,9 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
-require_once(__DIR__ . '/matrix_common.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
+require_once __DIR__ . '/matrix_common.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -93,6 +93,14 @@ class CalculatedMatrixScorePart implements ScorePart
             }
             $N = substr_count($answer,'),(')+1;
             */
+
+            //this may not be backwards compatible
+            $scorePartResult->setLastAnswerAsGiven($givenans);
+            if ($givenanslist === false) { // invalid answer
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
+
             if ($hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
             } else {
@@ -102,7 +110,6 @@ class CalculatedMatrixScorePart implements ScorePart
             }
             
             //this may not be backwards compatible
-            $scorePartResult->setLastAnswerAsGiven($givenans);
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
         /*

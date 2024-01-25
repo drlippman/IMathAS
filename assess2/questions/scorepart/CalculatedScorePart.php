@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -131,21 +131,27 @@ class CalculatedScorePart implements ScorePart
                         $scorePartResult->setRawScore(0);
                         return $scorePartResult;
                     }
-                    if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+                    if ((!is_numeric($anans) || $checkSameform) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
                         if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
                             $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
+                            if ($checkSameform) {
+                                $anfunc = parseMathQuiet($anans);
+                                if ($anfunc !== false) {
+                                    $ansnorm[$k][$j] = $anfunc->normalizeTreeString();
+                                }
+                            }
                         } else {
                             $anfunc = parseMathQuiet($anans);
                             if ($anfunc !== false) {
                                 $aarr[$j] = $anfunc->evaluateQuiet();
                                 if ($checkSameform) {
-                                $ansnorm[$k][$j] = $anfunc->normalizeTreeString();
+                                    $ansnorm[$k][$j] = $anfunc->normalizeTreeString();
                                 }
                             } else {
                                 $aarr[$j] = '';
                             }
                         }
-                    }
+                    } 
                 }
                 $anarr[$k] = $aarr;
             }
@@ -172,6 +178,12 @@ class CalculatedScorePart implements ScorePart
                 } else if ((!is_numeric($anans) || $checkSameform) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
                     if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
                         $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
+                        if ($checkSameform) {
+                            $anfunc = parseMathQuiet($anans);
+                            if ($anfunc !== false) {
+                                $ansnorm[0][$j] = $anfunc->normalizeTreeString();
+                            }
+                        }
                     } else {
                         $anfunc = parseMathQuiet($anans);
                         if ($anfunc !== false) {
@@ -248,23 +260,30 @@ class CalculatedScorePart implements ScorePart
                 $lastval = $v;
             }
 
+            $tmp = $anarr;
+            asort($tmp);
+            $anarr = [];
             if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart)) {
-                list($tmp,$tmprtlp) = jointsort($anarr,$requiretimeslistpart);
-            } else {
-                $tmp = $anarr;
-                sort($tmp);
+                $tmprtlp = $requiretimeslistpart;
+                $requiretimeslistpart = [];
             }
-            $anarr = array($tmp[0]);
-            if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart)) {
-                $requiretimeslistpart = array($tmprtlp[0]);
+            if ($checkSameform) {
+                $tmpansnorm = $ansnorm;
+                $ansnorm = [];
             }
-            for ($i=1;$i<count($tmp);$i++) {
-                if (!is_numeric($tmp[$i][0]) || !is_numeric($tmp[$i-1][0]) || count($tmp[$i])>1 || count($tmp[$i-1])>1 || abs($tmp[$i][0]-$tmp[$i-1][0])>1E-12) {
-                    $anarr[] = $tmp[$i];
+
+            $lastkey = -1;
+            foreach ($tmp as $key=>$v) {
+                if ($lastkey == -1 || !is_numeric($tmp[$key][0]) || !is_numeric($tmp[$lastkey][0]) || count($tmp[$key])>1 || count($tmp[$lastkey])>1 || abs($tmp[$key][0]-$tmp[$lastkey][0])>1E-12) {
+                    $anarr[] = $v;
                     if (!empty($requiretimeslistpart) && is_array($requiretimeslistpart)) {
-                        $requiretimeslistpart[] = $tmprtlp[$i];
+                        $requiretimeslistpart[] = $tmprtlp[$key];
+                    }
+                    if ($checkSameform) {
+                        $ansnorm[] = $tmpansnorm[$key];
                     }
                 }
+                $lastkey = $key;
             }
 
         } else {

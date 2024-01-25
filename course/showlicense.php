@@ -1,7 +1,7 @@
 <?php
 
-require("../init_without_validate.php");
-require("../header.php");
+require_once "../init_without_validate.php";
+require_once "../header.php";
 echo '<h2>Question License</h2>';
 
 if (empty($_GET['id'])) {
@@ -74,5 +74,5 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	echo getquestionlicense($row);
 	echo '</p>';
 }
-require('../footer.php');
+require_once '../footer.php';
 ?>

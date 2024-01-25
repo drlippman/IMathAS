@@ -6,7 +6,7 @@ require_once __DIR__ . "/migratesettings.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['includes/copyiteminc'])) {
-    require $CFG['hooks']['includes/copyiteminc'];
+    require_once $CFG['hooks']['includes/copyiteminc'];
 }
 
 ini_set("max_execution_time", "900");
@@ -475,7 +475,12 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
 
 function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = false)
 {
-    global $checked, $blockcnt;
+    global $checked, $blockcnt, $cid, $sourcecid;
+    if (intval($cid) == intval($sourcecid)) {
+        $samecourse = true;
+    } else {
+        $samecourse = false;
+    }
     if (!isset($_POST['append'])) {
         $_POST['append'] = '';
     }
@@ -493,7 +498,7 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['colors'] = $item['colors'];
                 $newblock['public'] = $item['public'] ?? 0;
                 $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
-                $newblock['grouplimit'] = $item['grouplimit'] ?? [];
+                $newblock['grouplimit'] = $samecourse ? ($item['grouplimit'] ?? []) : [];
                 $newblock['items'] = array();
                 if (count($item['items']) > 0) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
@@ -570,14 +575,12 @@ function doaftercopy($sourcecid, &$newitems)
                         $autoexcuse[$k]['cat'] = $outcomes[$v['cat']];
                     } else {
                         $autoexcuse[$k]['cat'] = _('Category') . ' ' . $catcnt;
-                        $cntcnt++;
                     }
                 } else if (substr($v['cat'], 0, 4) == 'AID-') {
                     if (isset($assessnewid[substr($v['cat'], 4)])) {
                         $autoexcuse[$k]['cat'] = 'AID-' . $assessnewid[substr($v['cat'], 4)];
                     } else {
                         $autoexcuse[$k]['cat'] = _('Category') . ' ' . $catcnt;
-                        $cntcnt++;
                     }
                 }
             }

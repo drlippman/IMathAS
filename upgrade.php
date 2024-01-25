@@ -2,7 +2,7 @@
 //Database and data storage upgrade script
 //Call this script via the web as an admin each time you update the code
 
-require('migrator.php');
+require_once 'migrator.php';
 
 //don't use this anymore:  create files in the /migrations/ directory
 //old approach: change counter; increase by 1 each time a change is made
@@ -53,10 +53,10 @@ unset($dbpassword);
 	//$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
 		$init_skip_csrfp = true;
-		require("init_without_validate.php");
+		require_once "init_without_validate.php";
 	} else {
 		$init_skip_csrfp = true;
-		require("init.php");
+		require_once "init.php";
 		if ($myrights<100) {
 			echo "No rights, aborting";
 			exit;
@@ -505,7 +505,7 @@ unset($dbpassword);
 				$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
 				$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
 				$stm = $DBH->query($query);
-				require_once("./includes/filehandler.php");
+				require_once "./includes/filehandler.php";
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$doneagroups = array();
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,bestlastanswers=:bestlastanswers,reviewlastanswers=:reviewlastanswers WHERE id=:id");
@@ -1126,7 +1126,7 @@ unset($dbpassword);
 			 }
 			 $hasimg = array();
 			 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				require_once("includes/filehandler.php");
+				require_once "includes/filehandler.php";
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$arr = $s3->getBucket($GLOBALS['AWSbucket'],"cfiles/");
 				if ($arr!=false) {

@@ -1,7 +1,7 @@
 <?php 
 
 // TODO: 
-require('../init.php');
+require_once '../init.php';
 
 if ($myrights < 40) {
     echo 'You are not authorized for this page';
@@ -109,7 +109,7 @@ $stm->execute(array($grp));
 $ipeds = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/ipedssearch.js"></script>';
-require('../header.php');
+require_once '../header.php';
 echo '<div class=breadcrumb>'.$breadcrumbbase.' IPEDS/NCES Association</div>';
 echo '<form method=post action="ipedslink.php">';
 if ($myrights == 100) {
@@ -305,4 +305,4 @@ if ($myrights == 100 || empty($ipeds)) {
     <?php
 }
 
-require('../footer.php');
+require_once '../footer.php';

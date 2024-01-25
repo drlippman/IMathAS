@@ -3,8 +3,8 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -54,7 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$pagetitle = "Confirm Page Contents Delete";
 		}
 	} else if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -89,7 +89,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         }
         if ($_POST['groupsetid'] === 'bysec') {
             // want to use by-section groups.  Create
-            require_once('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             $_POST['groupsetid'] = createSectionGroupset($cid);
         }
 		if (isset($_GET['id'])) {  //already have id - update
@@ -241,7 +241,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -341,5 +341,5 @@ if ($started) {
 }//default display
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

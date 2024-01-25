@@ -1,14 +1,14 @@
 <?php
 //IMathAS:  Add/modify gradebook categories
 //(c) 2006 David Lippman
-	require("../init.php");
-	require("../includes/htmlutil.php");
+	require_once "../init.php";
+	require_once "../includes/htmlutil.php";
 
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -230,7 +230,7 @@
 	</script>';
 
 	$placeinhead = $sc;
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -527,5 +527,5 @@
 		}
 
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

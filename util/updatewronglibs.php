@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) { exit;}
 
 function doquery($vals) {  //provide presanitized values

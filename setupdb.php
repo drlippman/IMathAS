@@ -18,7 +18,7 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 $dbsetup = true;
 $use_local_sessions = true;
 $init_session_start = true;
-include("init_without_validate.php");
+require_once "init_without_validate.php";
 $stm = $DBH->query("SHOW TABLES LIKE 'imas_dbschema'");
 if ($stm->rowCount()>0) {
 	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
@@ -1042,7 +1042,7 @@ $DBH->query($sql);
 echo 'php_sessions created<br/>';
 
 if (isset($CFG['GEN']['newpasswords'])) {
-	require_once("includes/password.php");
+	require_once "includes/password.php";
 	$md5pw = password_hash($password, PASSWORD_DEFAULT);
 } else {
 	$md5pw = md5($password);
@@ -1054,7 +1054,7 @@ $stm->execute(array(':SID'=>$username, ':password'=>$md5pw, ':rights'=>100, ':Fi
 echo "user " . Sanitize::encodeStringForDisplay($username) . " created<br/>";
 
 //write upgradecounter
-require("upgrade.php");
+require_once "upgrade.php";
 
 echo "<p><b>Database setup complete</b>.  <a href=\"index.php\">Go to IMathAS login page</a>, or <a href=\"installexamples.php\">install a library of example questions</a> (will ask you to log in)</p>";
 ?>

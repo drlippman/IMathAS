@@ -4,8 +4,8 @@
 
 $flexwidth = true;
 $nologo = true;
-require("../init.php");
-require("../header.php");
+require_once "../init.php";
+require_once "../header.php";
 
 if (!isset($studentid) && !isset($tutorid) && !isset($teacherid)) {
 	echo "You are not registered in this course";
@@ -124,4 +124,4 @@ if ($type=='A') {
 	echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback).'</div>';
 }
 
-require("../footer.php");
+require_once "../footer.php";

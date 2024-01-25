@@ -1,5 +1,5 @@
 <?php
-require_once("sanitize.php");
+require_once "sanitize.php";
 //IMathAS: HTML utility functions
 
 //$name is the html name&id for the select list

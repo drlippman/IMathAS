@@ -4,10 +4,10 @@
 
 header("Content-Type: text/plain");
 
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 
-require("mbxfilter.php");
-require("../assessment/displayq2.php");
+require_once "mbxfilter.php";
+require_once "../assessment/displayq2.php";
 
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
  	 $urlmode = 'https://';

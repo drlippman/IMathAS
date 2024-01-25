@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -206,7 +206,7 @@ $placeinhead .= '$(".sl").attr("title","'._("Modify course settings").'");$(".tr
 $placeinhead .= '</script>';
 
  /******* begin html output ********/
- require("../header.php");
+ require_once "../header.php";
 
  if ($overwriteBody==1) {
 	echo $body;
@@ -221,6 +221,7 @@ $placeinhead .= '</script>';
 	<h2>Courses</h2>
 	<div class=item>
 	<table class=gb border=0 width="90%">
+        <caption class="sr-only">Table of Courses</caption>
 		<thead>
 			<tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Settings</th><th>Teachers</th><th>Transfer</th><th>Delete</th>
 			</tr>
@@ -347,6 +348,7 @@ $placeinhead .= '</script>';
 	<h3>Diagnostics</h3>
 	<div class=item>
 	<table class=gb width="90%" id="diagTable">
+        <caption class="sr-only">Table of Diagnostics</caption>
 		<thead>
 		<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
 		</thead>
@@ -383,6 +385,7 @@ $placeinhead .= '</script>';
 	<h3><?php echo $page_userBlockTitle ?></h3>
 	<div class=item>
 		<table class=gb width="90%" id="myTable">
+        <caption class="sr-only">Table of Users</caption>
 		<thead>
 			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Delete</th></tr>
 		</thead>
@@ -422,5 +425,5 @@ $placeinhead .= '</script>';
 <?php
 	}
 }
- require("../footer.php");
+ require_once "../footer.php";
 ?>

@@ -2,9 +2,9 @@
 //IMathAS:  Drill Assess creator (rough version)
 //(c) 2011 David Lippman
 
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/parsedatetime.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/parsedatetime.php";
 
 
 if (!isset($teacherid)) {
@@ -289,7 +289,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/a
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
-require("../header.php");
+require_once "../header.php";
 
 /*  Get data for question searching */
 //remember search
@@ -826,6 +826,6 @@ echo '</form>';
 	echo "<p>Link to view results: <a href=\"$url\">$url</a></p>" ;
 
 }*/
-require('../footer.php');
+require_once '../footer.php';
 
 ?>

@@ -1,13 +1,13 @@
 <?php
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 	$linkedtextid = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	if (empty($linkedtextid)) {
@@ -51,7 +51,7 @@
 		$text = '<p><a href="'.Sanitize::url($text).'" target="_blank">'.Sanitize::encodeStringForDisplay($title).'</a> (will open in a new tab or window)</p>';
 	} else if (substr(strip_tags($text),0,5)=="file:") {
 		$filename = substr(strip_tags($text),5);
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		$alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
 		$text = '<p>Download file: <a href="'.Sanitize::url($alink).'">'.Sanitize::encodeStringForDisplay($title).'</a></p>';
 	}
@@ -82,7 +82,7 @@
 	});
 	$(function() {$("#exttoolframe").css("height",$(window).height() - $(".midwrapper").position().top - ($(".midwrapper").height()-500) - ($("body").outerHeight(true) - $("body").innerHeight()));});
 	</script>';
-	require("../header.php");
+	require_once "../header.php";
 	if ((isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3)) {
 		$fixbc = 'style="position:fixed;top:0;width:100%"';
 		$pad = 'padding-top: 25px;';
@@ -175,6 +175,6 @@
 	if ($shownav) {
 		echo "<div class=right><a href=\"course.php?cid=$cid\">Return to Course Page</a></div>\n";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

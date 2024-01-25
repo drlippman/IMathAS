@@ -1,12 +1,12 @@
 <?php
 $init_skip_csrfp = true;
-require('../init.php');
+require_once '../init.php';
 
 if ($myrights < 20) {
   exit;
 }
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
@@ -42,7 +42,7 @@ if ($_POST['linktype'] == 'assoc') {
     ->set_copiedfrom($prev_copiedfrom)
     ->set_id($newlticourseid);
 } else if ($_POST['linktype'] == 'copy') {
-  require_once(__DIR__.'/../includes/copycourse.php');
+  require_once __DIR__.'/../includes/copycourse.php';
   // TODO: do we want to use the context.title instead of label here? Or both?
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
   $tocopycourse = intval($_POST['copyselect']);
@@ -56,9 +56,9 @@ if ($_POST['linktype'] == 'assoc') {
 }
 
 if ($launch->is_resource_launch()) {
-  require(__DIR__.'/resourcelink.php');
+  require_once __DIR__.'/resourcelink.php';
   link_to_resource($launch, $userid, $localcourse, $db);
 } else if ($launch->is_deep_link_launch() && $role == 'Instructor') {
-  require(__DIR__.'/deep_link_form.php');
+  require_once __DIR__.'/deep_link_form.php';
   deep_link_form($launch, $userid, $localcourse, $db);
 }

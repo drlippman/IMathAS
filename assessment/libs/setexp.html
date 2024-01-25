@@ -1,26 +1,39 @@
-<html>
-    
-
-<style>
-    table {border: 0px;
-        border-style: solid;}
-    table th {padding: 50px;
-        margin: 50px;}
-    table td {padding: 5px 5px 50px 5px;
-        margin: 50px;}
-    table table {border-collapse: collapse;}
-    table table td {border: 3px;
-        border-style: solid;
-        text-align: left;
-        vertical-align: top;
-        margin:4px;
-        padding:10px;}
-    table table th {border: 0px solid;
-        text-align: left;
-        vertical-align: top;
-        margin:4px;
-        padding:10px;}
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>
+        setexp help
+    </title>
+    <style>
+        table {border: 0px;
+            border-style: solid;}
+        table th {padding: 50px;
+            margin: 50px;}
+        table td {padding: 5px 5px 50px 5px;
+            margin: 50px;}
+        table table {border-collapse: collapse;}
+        table table td {border: 3px;
+            border-style: solid;
+            text-align: left;
+            vertical-align: top;
+            margin:4px;
+            padding:10px;}
+        table table th {border: 0px solid;
+            text-align: left;
+            vertical-align: top;
+            margin:4px;
+            padding:10px;}
+        table caption {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            color: transparent;
+            }
+    </style>
+</head>
 
 <body>
 <h1>Macro Library setexp</h1>
@@ -31,9 +44,9 @@ A collection of functions designed to aid in the creation of basic set questions
 
 Note: All variables used in these functions must be single alphabetical characters. Greek words or symbols are not supported.<br />
 <br /><br />
-A table of valid terms used for set operations is given below:
 <table style="border:3px;border-style:solid;">
-    <tr><td style="padding:2px;"><b>Operation</b></td>              <td style="padding:2px;"><b>Acceptable Terms</b></td></tr>
+    <caption>A table of valid terms for set operations.</caption>
+    <tr><th style="padding:2px;"><b>Operation</b></th>              <th style="padding:2px;"><b>Acceptable Terms</b></th></tr>
     <tr><td style="padding:2px;">Intersection (&cap;)</td>              <td style="padding:2px;">nn, cap</td></tr>
     <tr><td style="padding:2px;">Union (&cup;)</td>                     <td style="padding:2px;">uu, cup</td></tr>
     <tr><td style="padding:2px;">Complement (<sup>c</sup>)</td>     <td style="padding:2px;">^c, ' (a single apostrophe)</td></tr>
@@ -57,11 +70,12 @@ A table of valid terms used for set operations is given below:
 <li><a href="#venn3diagram">venn3diagram</a></li>
 </ul>
 
-<table>
+<table role="presentation">
 <tr>
     <td>
         <h3><a name="setexpequals">setexpequals(exp1,exp2,vars,[contents = array()],[universe = array()])</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A set expression.<br />
@@ -80,8 +94,8 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><div style="font-family:courier;">setexpequals("(A nn B)^c", "A^c uu B^c", "A,B")</div> will return TRUE, as the two expressions are equal in all scenarios.<br />
-                    <br /><div style="font-family:courier;">setexpequals("A", "A nn B", "A,B", array("1","1,2"), "1,2,3")</div> will return TRUE, since the sets A and (A nn B) are the same when A = {1}, B = {1,2} and the universe is {1,2,3}.</td>
+                <td><p><code>setexpequals("(A nn B)^c", "A^c uu B^c", "A,B")</code></p> will return TRUE, as the two expressions are equal in all scenarios.<br />
+                    <br /><p><code>setexpequals("A", "A nn B", "A,B", array("1","1,2"), "1,2,3")</code></p> will return TRUE, since the sets A and (A nn B) are the same when A = {1}, B = {1,2} and the universe is {1,2,3}.</td>
             </tr>
         </table>
     </td>
@@ -91,6 +105,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="setexpsubset">setexpsubset(exp1,exp2,vars,[contents = array()],[universe = array()])</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp1</i>: A set expression.<br />
@@ -109,8 +124,8 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><div style="font-family:courier;">setexpsubset("(A nn B)", "A", "A,B")</div> will return TRUE, as (A n B) is a subset of A in all scenarios.<br />
-                    <br /><div style="font-family:courier;">setexpsubset("A", "B^c", "A,B", array("1,3","1,2"), "1,2,3")</div> will return FALSE, since A is not a subset of B^c when A={1,3} and B={1,2} and the universe is {1,2,3}</td>
+                <td><p><code>setexpsubset("(A nn B)", "A", "A,B")</code></p> will return TRUE, as (A n B) is a subset of A in all scenarios.<br />
+                    <br /><p><code>setexpsubset("A", "B^c", "A,B", array("1,3","1,2"), "1,2,3")</code></p> will return FALSE, since A is not a subset of B^c when A={1,3} and B={1,2} and the universe is {1,2,3}</td>
             </tr>
         </table>
     </td>
@@ -120,6 +135,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="setexpevaluate">setexpevaluate(exp,vars,contents,universe)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A set expression.<br />
@@ -133,7 +149,7 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><div style="font-family:courier;">setexpevalaute("(A^c nn B)", "A,B", array("1","2"), "1,2,3")</div> will return array(2), since (A^c n B) = {2} when A = {1} and B = {2} and the universe is {1,2,3}.</td>
+                <td><p><code>setexpevalaute("(A^c nn B)", "A,B", array("1","2"), "1,2,3")</code></p> will return array(2), since (A^c n B) = {2} when A = {1} and B = {2} and the universe is {1,2,3}.</td>
             </tr>
         </table>
     </td>
@@ -143,6 +159,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="setexpmakepretty">setexpmakepretty(exp)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A set expression.</td>
@@ -159,6 +176,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="setexpsteps">setexpsteps(exp)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>exp</i>: A set expression.
@@ -169,7 +187,7 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">setexpsteps('(A nn B) uu A^c')</p> would return array('A nn B', 'A^c', '(A nn B) uu A^c') since these are the steps necessary to evaluate '(A nn B) uu A^c'.</td>
+                <td><p><code>setexpsteps('(A nn B) uu A^c')</code></p> would return array('A nn B', 'A^c', '(A nn B) uu A^c') since these are the steps necessary to evaluate '(A nn B) uu A^c'.</td>
             </tr>
         </table>
     </td>
@@ -179,6 +197,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="setexprand">setexprand(vars,ops,bnum,unum)</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array (or list) of variables.<br />
@@ -192,7 +211,7 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">setexprand("A,B,C","nn,uu,xor",2,1)</p> Returns a random expression using A, B, C as sets with 2 binary operations (with options and/or/xor only) and 1 negation symbol. For instance, it could return the string 'C nn (A xor B)^c'.</td>
+                <td><p><code>setexprand("A,B,C","nn,uu,xor",2,1)</code></p> Returns a random expression using A, B, C as sets with 2 binary operations (with options and/or/xor only) and 1 negation symbol. For instance, it could return the string 'C nn (A xor B)^c'.</td>
             </tr>
         </table>
     </td>
@@ -202,6 +221,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="setexplegend">setexplegend()</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Output:</th>
                 <td>An simple string of HTML syntax that generates a table showing keyboard shortcuts for entering set expressions.</td>
@@ -214,6 +234,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="venn2diagram">venn2diagram(vars,[shade = ""],[labels = ""],[size = 200])</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array/list of 2 variables (single alphabetical characters).<br />
@@ -227,7 +248,7 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">venn3diagram("A,B","A cap B")</p>Creates an image of a 2-circle Venn diagram with the region (A n B) shaded.</td>
+                <td><p><code>venn3diagram("A,B","A cap B")</code></p>Creates an image of a 2-circle Venn diagram with the region (A n B) shaded.</td>
             </tr>
         </table>
     </td>
@@ -237,6 +258,7 @@ A table of valid terms used for set operations is given below:
     <td>
         <h3><a name="venn3diagram">venn3diagram(vars,[shade = ""],[labels = ""],[size = 250])</a></h3>
         <table valign="top">
+            <caption>Details</caption>
             <tr>
                 <th>Input:</th>
                 <td><i>vars</i>: An array/list of 3 variables (single alphabetical characters).<br />
@@ -250,7 +272,7 @@ A table of valid terms used for set operations is given below:
             </tr>
             <tr>
                 <th>Example:</th>
-                <td><p style="font-family:courier;">venn3diagram("A,B,C","A cap B")</p>Creates an image of a 3-circle Venn diagram with the region (A n B) shaded.</td>
+                <td><p><code>venn3diagram("A,B,C","A cap B")</code></p>Creates an image of a 3-circle Venn diagram with the region (A n B) shaded.</td>
             </tr>
         </table>
     </td>

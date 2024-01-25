@@ -3,7 +3,7 @@
 //utility code for removing withdrawn questions from assessments
 //and replacing questions where replaceby exists.
 
-require_once(__DIR__."/updateptsposs.php");
+require_once __DIR__."/updateptsposs.php";
 
 //aidarr is array of assessment IDs, or course ID to do all
 function updateassess($aidarr,$removewithdrawn,$doreplaceby) {

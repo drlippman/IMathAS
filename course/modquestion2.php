@@ -3,8 +3,8 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require "../init.php";
-require "../includes/htmlutil.php";
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once "../includes/TeacherAuditLog.php";
 
 //set some page specific variables and counters
@@ -39,6 +39,9 @@ if (!(isset($teacherid))) {
     $curBreadcrumb .= _("Modify Question Settings");
 
     if (!empty($_GET['process'])) {
+        $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id");
+        $stm->execute(array(':id' => $aid));
+        list($itemorder, $defpoints, $intro) = $stm->fetch(PDO::FETCH_NUM);
         if (isset($_GET['usedef'])) {
             $points = 9999;
             $attempts = 9999;
@@ -53,6 +56,9 @@ if (!(isset($teacherid))) {
             $_POST['copies'] = 1;
         } else {
             if (trim($_POST['points']) == "") {$points = 9999;} else { $points = intval($_POST['points']);}
+            if ($points == $defpoints) {
+                $points = 9999;
+            }
             if (trim($_POST['attempts']) == "" || intval($_POST['attempts']) <= 0) {
                 $attempts = 9999;
             } else {
@@ -125,12 +131,29 @@ if (!(isset($teacherid))) {
                 $stm->execute(array(':id' => $_GET['id']));
                 $_GET['qsetid'] = $stm->fetchColumn(0);
             }
+
+            // see if question was in group if points changed, and change others in group to same
+            if ($old_settings['points'] != $points) {
+                $aitems = explode(',', $itemorder);
+                foreach ($aitems as $v) {
+                    if ($v == $_GET['id']) { break; }
+                    else if (is_numeric($v)) { continue; }
+                    $sub = explode('~', $v);
+                    if (in_array($_GET['id'], $sub)) {
+                        $grpparts = explode('|',$sub[0]);
+				        if (strpos($sub[0],'|')!==false && $grpparts[0]<count($sub)-1) { // only standardize points if n < count
+                            array_shift($sub);
+                            $tofix = implode(',', array_map('intval', $sub));
+                            $stm = $DBH->prepare("UPDATE imas_questions SET points=? WHERE id IN ($tofix)");
+                            $stm->execute([$points]);
+                        }
+                        break;
+                    }
+                }
+            }
         }
         require_once "../includes/updateptsposs.php";
         if (isset($_GET['qsetid'])) { //new - adding
-            $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id");
-            $stm->execute(array(':id' => $aid));
-            list($itemorder, $defpoints, $intro) = $stm->fetch(PDO::FETCH_NUM);
             for ($i = 0; $i < $_POST['copies']; $i++) {
                 $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,showwork,questionsetid,rubric,showhints,fixedseeds,extracredit) ";
                 $query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :showwork, :questionsetid, :rubric, :showhints, :fixedseeds, :extracredit)";
@@ -317,7 +340,7 @@ $(function() {
     });
 });
 </script>';
-require "../header.php";
+require_once "../header.php";
 
 if ($overwriteBody == 1) {
     echo $body;
@@ -466,5 +489,5 @@ if (isset($_GET['qsetid'])) { //adding new question
     echo '</form>';
 }
 
-require "../footer.php";
+require_once "../footer.php";
 ?>

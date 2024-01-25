@@ -1,6 +1,6 @@
 <?php
 /*  For testing
-require("../init.php");
+require_once "../init.php";
 if (isset($_POST['title'])) {
 	echo sendFCM(2,$_POST['title'],$_POST['body'],'');
 }

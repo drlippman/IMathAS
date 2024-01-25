@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
  //set some page specific variables and counters
@@ -39,11 +39,11 @@ $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 
 if ($overwriteBody==1) {
-	require("../header.php");
+	require_once "../header.php";
 	echo $body;
 } if (!isset($_REQUEST['versions'])) {
 
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -95,7 +95,7 @@ if ($overwriteBody==1) {
 
 	//load filter
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/../filter/filter.php");
+	require_once "$curdir/../filter/filter.php";
 
 	$out = '<!DOCTYPE html><html><body>';
 
@@ -162,7 +162,7 @@ if ($overwriteBody==1) {
 	$numq = count($questions);
 
 	if ($courseUIver > 1) {
-		include('../assess2/AssessStandalone.php');
+		require_once '../assess2/AssessStandalone.php';
 		$a2 = new AssessStandalone($DBH);
 		$stm = $DBH->prepare("SELECT iqs.* FROM imas_questionset AS iqs JOIN imas_questions ON imas_questions.questionsetid=iqs.id WHERE imas_questions.assessmentid=:id");
 		$stm->execute(array(':id'=>$aid));
@@ -170,7 +170,7 @@ if ($overwriteBody==1) {
 			$a2->setQuestionData($qdata['id'], $qdata);
 		}
 	} else {
-	include("../assessment/displayq2.php");
+	require_once "../assessment/displayq2.php";
 	}
 
 	if (is_numeric($_REQUEST['versions'])) {
@@ -348,7 +348,7 @@ if ($overwriteBody==1) {
 		$pandocurl = 'http://'.$CFG['GEN']['pandocserver'];
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
@@ -404,7 +404,7 @@ if ($overwriteBody==1) {
 	*/
   $_SESSION['mathdisp'] = $origmathdisp;
   $_SESSION['graphdisp'] = $origgraphdisp;
-  require("../footer.php");
+  require_once "../footer.php";
 	exit;
 }
 

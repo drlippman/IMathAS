@@ -1,7 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <title>Intro to Question Writing in IMathAS</title>
-
+
+
 <script src="../javascript/ASCIIMathML.js" type="text/javascript"></script>
 <script src="../javascript/ASCIIsvg.js" type="text/javascript"></script>
 <script src="../course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js" type="text/javascript"></script>
@@ -11,18 +13,21 @@
 <div class=title>
 <h1>Intro to Question Writing in IMathAS</h1>
 </div>
-
+
+
 <h2>Purpose of this document</h2>
 <p>This document will guide you through the process of writing an example IMathAS
 Question.  This is meant to be an introduction.  This is not a comprehensive
 guide; please refer to the <a href="../help.html">help file</a> for more
 detailed information.</p>
-
+
+
 <h2>Getting Started</h2>
 <p>Start out by clicking the "Manage Question Set" link from the grey control
 box on the course page.  Click "Add New Question".  This will take you to the
 question editor</p>
-
+
+
 <h2>Question Parts</h2>
 <p>A question has several parts:</p>
 <ul>
@@ -43,22 +48,27 @@ Common Control and Question Text is fine.  For complicated questions, you may fi
 boxes helpful.</p>
 <p>Each question type has specific requirements.  You can click the "Writing Questions Help" link above
 the Common Control box to pop up that section of the help file</p>
-
+
+
 <h2>Description</h2>
 <p>For this example, let's write a question asking students to write the equation for a graphed parabola.  
 In the description box, enter something like "Write equation for parabola, form y=a(x-b)^2+c"</p>
-
+
+
 <h2>Use Rights</h2>
 <p>Let's leave this as the default "Allow use, use as template, no modifications".  This allows other to use
 your question or derive new questions based on this one, but they cannot modify this question itself.</p>
-
+
+
 <h2>Assign to Library</h2>
 <p>If you have set up a scratch-work library, click the "Select Library" button and choose that library.  Otherwise, it
 is fine to leave this as "Unassigned" for now</p>
-
+
+
 <h2>Question Type</h2>
 <p>We want students to enter an equation for the curve, so select the type "Function" from the pull-down.</p>
-
+
+
 <h2>Common Control</h2>
 <p>To write our question, we need to pick values for a, b, and c.  In order for the question to change
 for each student, we need to have these values randomly chosen.  Enter:</p>
@@ -75,10 +85,12 @@ we want numbers between -3 and 3, and want 2 of them.</p>
 <p>If we simply entered the question as "$a*(x-$b)^2+$c", it will not display the way we want if $b or $c are negative.  To fix this, we
 use the function "makepretty", which cleans up double sign problems.  We put the equation in quotes because it is a string, not a calculation
 we want to perform.</p>
-
+
+
 <p>We have not defined the variables in our equation or its domain.  These default to "x" for the variable, and -5 to 5 for the domain,
 so we really don't need to in this case.</p>
-
+
+
 <h2>Question Control</h2>
 <p>We want to display a graph to the student.  We'll define the graph here:</p>
 <pre>
@@ -88,26 +100,33 @@ $graph = showplot("$eqn,red",-6,6,-6,6)
 and we want it graphed in red.  Additional options allow defining a limited domain, open and closed dots, width, dashing, etc.  
 The next numbers (-6,6,-6,6) define the viewing window.  Additional options allow changing the axis labeling, grid spacing, and the 
 display size of the graph</p>
-
+
+
 <h2>Question Text</h2>
 <p>Time to actually write the question!  Enter</p>
 <pre>
 Find an equation for the graph shown below.  (&lt;i&gt;Hint&lt;/i&gt;: use the form `y=a(x-h)^2+k`)
-
+
+
 $graph
-
+
+
 `y=` $answerbox
-</pre>
-
+</pre>
+
+
+
 <p>Notice the use of the HTML tag &lt;i&gt; to create italic text.  All HTML tags are
 valid in IMathAS questions.  An empty line, however, is automatically turned into a paragraph break. </p>
 <p>Notice also that the equation in the hint is enclosed in backticks, \`.  Anything enclosed in backticks
 is rendered as pretty math.  Enter the math using standard calculator-style notation.  There are also ways
-to display more advanced math (example: \`int_3^5 x^2 dx\` would display as `int_3^5 x^2 dx`)</p>
+to display more advanced math (example: \`int_3^5 x^2 dx\` would display as `int_3^5 x^2 dx`)</p>
+
 <p>On the last line, the variable $answerbox is used.  This variable allows you to place the answer entry box
 anywhere in the question.  It is not necessary to do so, but in this case, I wanted to preface the answer box
 with "y=" so the student would know they don't need to enter the "y=" part of the equation</p>
-
+
+
 <h2>Answer</h2>
 <p>Time to specify the answer.  Enter:</p>
 <pre>
@@ -116,7 +135,8 @@ $showanswer = "`y=$eqn`"
 </pre>
 <p>The first line defines the answer.  In this case, the answer was just the equation we used for graphing.  The second
 line defines the answer to show to students (if the show answers option is selected).</p>
-<p>We could have given more detail in the $showanswer.  For example, we could have written (without line breaks):</p>
+<p>We could have given more detail in the $showanswer.  For example, we could have written (without line breaks):</p>
+
 <pre>
 $testx = $b+1
 $testy = $a*($testx - $b)^2+$c
@@ -124,7 +144,8 @@ $showanswer = "Notice the vertex is at ($b,$c).  Using the form `y=a(x-h)^2+k`,
    this gives `y=a(x-($b))^2+($c)`.  Plugging in the point ($testx,$testy) 
    for `x` and `y` allows us to solve for a, leading to `y=$eqn`"
 </pre>
-
+
+
 <h2>Try it Out</h2>
 <p>Click the "Save and Test Question" button at the bottom of the page.  This will save the question and pop up a window
 displaying the question.  Try entering the answer and clicking "Submit".  The system will display your score
@@ -132,13 +153,16 @@ on the question, and display a new version of the question.  Testing a question 
 that it is behaving the way you want, and you didn't miss something (like not using nonzero random numbers).</p>
 <p>When you are done, click "Update Question", or just navigate back to the Manage Question Set page.  You should now see
 your question in the list (unless you assigned it to a different library than you're currently viewing).</p>
-
+
+
 <h2>Use as Template</h2>
 <p>To create a new question, it is often quickest to not start from scratch.  If you click on the Template link next to any question,
 it will create a new question, starting with all the code from an existing question.  This way you can create a similar but new
 question without starting from scratch and without losing the original question.</p>
-
+
+
 <hr/><p>&copy; 2006 David Lippman<br/>This guide was written with development grant support from the WA State Distance Learning Council</p>
 </body>
 </html>
-
+
+

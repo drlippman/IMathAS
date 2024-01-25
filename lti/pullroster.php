@@ -4,7 +4,7 @@
 
 use \IMSGlobal\LTI;
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 	echo _("Not authorized to view this page");
 	exit;
@@ -16,16 +16,16 @@ if (!isset($_GET['launchid'])) {
     exit;
 }
 
-require_once(__DIR__ . '/lib/lti.php');
+require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
-  require_once($CFG['hooks']['lti']);
+  require_once $CFG['hooks']['lti'];
 }
 if (isset($CFG['hooks']['ltihome'])) {
-	require($CFG['hooks']['ltihome']);
+	require_once $CFG['hooks']['ltihome'];
 }
 
 $db = new Imathas_LTI_Database($DBH);
@@ -38,7 +38,7 @@ if (!empty($_POST['tolock'])) {
 	$db->lock_stus($_POST['tolock'], $localcourse->get_courseid());
 	header(sprintf('Location: %s/lti/ltihome.php?launchid=%s',
 		$GLOBALS['basesiteurl'],
-		$launch->get_launch_id()
+		Sanitize::simpleString($launch->get_launch_id())
 	));
 	exit;
 }
@@ -51,7 +51,7 @@ if (!empty($_POST['pullroster'])) {
         list($newcnt,$notfound) = $db->update_roster($data, $localcourse, $platform_id);
     }
 
-	require('../header.php');
+	require_once '../header.php';
 	echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Roster Pull Results').'</div>';
     echo '<h1>'._('Roster Pull Results').'</h2>';
     

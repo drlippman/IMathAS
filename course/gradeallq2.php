@@ -7,16 +7,16 @@
 
 // TODO: rework one-stu-at-a-time to use userid as selector
 
-	require("../init.php");
-	require("../assess2/AssessInfo.php");
-	require("../assess2/AssessRecord.php");
+	require_once "../init.php";
+	require_once "../assess2/AssessInfo.php";
+	require_once "../assess2/AssessRecord.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	if (!$isteacher && !$istutor) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher or tutor to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -69,9 +69,9 @@
 		exit;
 	}
 	if ($istutor && $tutoredit==2) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You not have access to view scores for this assessment";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
@@ -239,7 +239,7 @@
 				// is added, this is removed:  count($adjustedScores) > 0 &&
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
-					require_once("../includes/ltioutcomes.php");
+					require_once "../includes/ltioutcomes.php";
 					$gbscore = $assess_record->getGbScore();
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true, -1, false);
 				}
@@ -284,7 +284,7 @@
 		exit;
 	}
 
-	require("../includes/htmlutil.php");
+	require_once "../includes/htmlutil.php";
 
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -360,7 +360,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022223"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=020223"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=110823"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -376,7 +376,7 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
-        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20230818" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20240107" type="text/javascript"></script>';
     }
     
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
@@ -418,10 +418,10 @@
         .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
         .hoverbox { background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);}
 		</style>';
-	require("../includes/rubric.php");
+	require_once "../includes/rubric.php";
 	$_SESSION['coursetheme'] = $coursetheme;
-	require("../header.php");
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
+	require_once "../header.php";
+	echo "<style type=\"text/css\">p.tips {	display: none;} .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
@@ -506,7 +506,8 @@
     echo '</p>';
 	if ($canedit) {
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
-		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
+		echo '<button type=button onclick="allmanualfullcred();">'._('Full Credit manually-graded parts').'</button> ';
+        echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
     }
     if ($page==-1) {
         echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button>';
@@ -582,7 +583,7 @@
 	$stm->execute($qarr);
 	$cnt = 0;
 	$onepergroup = array();
-	require_once("../includes/filehandler.php");
+	require_once "../includes/filehandler.php";
     echo '<div id="qlistwrap">';
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
@@ -772,10 +773,14 @@
                     echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
                     if (count($togr)>0) {
                         $togr = implode(',',$togr);
-                        echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
+                        echo ' | <a href="#" class="fullcredmanuallink" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
                     }
                 } else if ($canedit) {
-                    echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
+                    $class = 'fullcredlink';
+                    if (!empty($qdata['parts'][0]['req_manual'])) {
+                        $class .= ' fullcredmanuallink';
+                    }
+                    echo '<br/>Quick grade: <a href="#" class="'.$class.'" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
                 }
 
                 if (!empty($qdata['other_tries'])) {
@@ -890,5 +895,5 @@
   	</div>
 		<div id="eh" class="eh"></div>';
 	$useeqnhelper = 0;
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

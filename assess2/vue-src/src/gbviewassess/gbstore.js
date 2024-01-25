@@ -1,7 +1,7 @@
-import Vue from 'vue';
+import { reactive, nextTick } from 'vue';
 import { mapInterquestionTexts } from '@/mixins/maptexts';
 
-export const store = Vue.observable({
+export const store = reactive({
   assessInfo: null,
   APIbase: null,
   aid: null,
@@ -64,7 +64,7 @@ export const actions = {
             callback();
           }
           // initialize editor and answerbox highlighting
-          Vue.nextTick(() => {
+          nextTick(() => {
             window.initAnswerboxHighlights();
             if (window.location.hash) {
               const el = document.getElementById(window.location.hash.substring(1).replace(/\//, ''));
@@ -109,9 +109,10 @@ export const actions = {
           ver = store.assessInfo.assess_versions.length - 1;
         }
         // set into store
-        Vue.delete(store.assessInfo, 'interquestion_text');
-        Vue.delete(store.assessInfo, 'intro');
-        Vue.set(store.assessInfo.assess_versions, ver, response);
+        delete store.assessInfo.interquestion_text;
+        delete store.assessInfo.intro;
+
+        store.assessInfo.assess_versions[ver] = response;
 
         // set current versions to scored versions
         store.curAver = ver;
@@ -127,7 +128,7 @@ export const actions = {
         }
 
         // initialize editor and answerbox highlighting
-        Vue.nextTick(() => {
+        nextTick(() => {
           window.initAnswerboxHighlights();
         });
       })
@@ -169,10 +170,12 @@ export const actions = {
           mapInterquestionTexts(response, qs);
         }
 
-        Vue.set(store.assessInfo, 'intro', response.intro);
-        Vue.set(store.assessInfo, 'interquestion_text', response.interquestion_text);
+        store.assessInfo.intro = response.intro;
+        store.assessInfo.interquestion_text = response.interquestion_text;
         if (callback) {
-          Vue.nextTick(() => { callback(); });
+          nextTick(() => {
+            callback();
+          });
         }
       })
       .fail((xhr, textStatus, errorThrown) => {
@@ -193,7 +196,7 @@ export const actions = {
       forceload !== true
     ) {
       // already have html loaded - just switch displayed version
-      Vue.set(store.curQver, qn, ver);
+      store.curQver[qn] = ver;
       return;
     }
     store.inTransit = true;
@@ -214,15 +217,13 @@ export const actions = {
         if (beforeSet) {
           beforeSet();
         }
-        Vue.set(store.assessInfo.assess_versions[store.curAver].questions[qn],
-          ver,
-          Object.assign(store.assessInfo.assess_versions[store.curAver].questions[qn][ver], response)
-        );
+        store.assessInfo.assess_versions[store.curAver].questions[qn][ver] =
+          Object.assign(store.assessInfo.assess_versions[store.curAver].questions[qn][ver], response);
         // set current versions to this version
-        Vue.set(store.curQver, qn, ver);
+        store.curQver[qn] = ver;
 
         // initialize answerbox highlighting
-        Vue.nextTick(() => {
+        nextTick(() => {
           window.initAnswerboxHighlights();
         });
       })
@@ -312,53 +313,39 @@ export const actions = {
           const qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
           if (qdata.hasOwnProperty('scoreoverride') && store.scoreOverrides[key] === '') {
             if (typeof qdata.scoreoverride === 'number') {
-              Vue.delete(qdata, 'scoreoverride');
+              delete qdata.scoreoverride;
             } else {
-              Vue.delete(qdata.scoreoverride, pts[3]);
+              delete qdata.scoreoverride[pts[3]];
             }
           }
           if (store.scoreOverrides.hasOwnProperty(key) && store.scoreOverrides[key] !== '') { // set or re-set scoreoverride on question part
             if (!qdata.hasOwnProperty('scoreoverride')) {
               store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride = {};
             }
-            Vue.set(store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride,
-              pts[3],
-              store.scoreOverrides[key]
-            );
+            store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride[pts[3]] =
+              store.scoreOverrides[key];
           }
         }
         // update question scores
         for (const key in response.newscores) {
           const pts = key.split(/-/);
-          Vue.set(
-            store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]],
-            'score',
-            response.newscores[key][0]
-          );
+          store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].score =
+            response.newscores[key][0];
           // update part info
           for (let i = 0; i < response.newscores[key][1].length; i++) {
-            Vue.set(
-              store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].parts,
-              i,
-              response.newscores[key][1][i]
-            );
+            store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].parts[i] =
+              response.newscores[key][1][i];
           }
         }
         // update feedbacks in store
         for (const key in store.feedbacks) {
           const pts = key.split(/-/);
           if (pts[1] === 'g') { // general feedback
-            Vue.set(
-              store.assessInfo.assess_versions[pts[0]],
-              'feedback',
-              store.feedbacks[key]
-            );
+            store.assessInfo.assess_versions[pts[0]].feedback =
+              store.feedbacks[key];
           } else { // question feedback
-            Vue.set(
-              store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]],
-              'feedback',
-              store.feedbacks[key]
-            );
+            store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].feedback =
+              store.feedbacks[key];
           }
         }
 
@@ -376,7 +363,7 @@ export const actions = {
               if (qv === response.assess_info[an].scoredvers[qn]) {
                 qvers[qv].scored = true;
               } else if (qvers[qv].scored) {
-                Vue.delete(qvers[qv], 'scored');
+                delete qvers[qv].scored;
               }
             }
           }
@@ -442,12 +429,12 @@ export const actions = {
             const regex = new RegExp('^' + data.aver + '-');
             for (const key in store.scoreOverrides) {
               if (key.match(regex)) {
-                Vue.delete(store.scoreOverrides, key);
+                delete store.scoreOverrides[key];
               }
             }
             if (response.hasOwnProperty('newver')) {
               // replace assessment attempt
-              Vue.set(store.assessInfo.assess_versions, data.aver, response.newver);
+              store.assessInfo.assess_versions[data.aver] = response.newver;
             } else {
               // delete version
               store.assessInfo.assess_versions.splice(data.aver, 1);
@@ -461,23 +448,23 @@ export const actions = {
             const regex = new RegExp('^' + data.aver + '-' + data.qn + '-' + data.qver + '-');
             for (const key in store.scoreOverrides) {
               if (key.match(regex)) {
-                Vue.delete(store.scoreOverrides, key);
+                delete store.scoreOverrides[key];
               }
             }
-            Vue.set(store.assessInfo.assess_versions[data.aver], 'score', response.assessinfo.score);
-            Vue.set(store.assessInfo.assess_versions[data.aver], 'status', response.assessinfo.status);
+            store.assessInfo.assess_versions[data.aver].score = response.assessinfo.score;
+            store.assessInfo.assess_versions[data.aver].status = response.assessinfo.status;
             if (response.hasOwnProperty('newver')) {
               // replace assessment attempt
-              Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn], data.qver, response.newver);
+              store.assessInfo.assess_versions[data.aver].questions[data.qn][data.qver] = response.newver;
               // set scored
-              Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version], 'scored', true);
+              store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version].scored = true;
             } else {
               // update curQver to new scored version, and set that version as scored
               // use callback to delete this version on response
               actions.loadGbQuestionVersion(data.qn, response.qinfo.scored_version, true,
                 () => {
                   store.assessInfo.assess_versions[data.aver].questions[data.qn].splice(data.qver, 1);
-                  Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version], 'scored', true);
+                  store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version].scored = true;
                 }
               );
             }
@@ -530,11 +517,11 @@ export const actions = {
     qloop: for (let i = 0; i < qdata.length; i++) {
       for (qv = 0; qv < qdata[i].length; qv++) {
         if (qdata[i][qv].hasOwnProperty('scored')) {
-          Vue.set(store.curQver, i, qv);
+          store.curQver[i] = qv;
           continue qloop;
         }
         // if no scored found, show last
-        Vue.set(store.curQver, i, qdata[i].length - 1);
+        store.curQver[i] = qdata[i].length - 1;
       }
     }
   },

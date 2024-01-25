@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -598,7 +598,7 @@ if ($myrights<20) {
 		}
 		//load filter.  Need earlier than usual header.php load
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		require_once("$curdir/../filter/filter.php");
+		require_once "$curdir/../filter/filter.php";
 
 			//remember search
 		if (isset($_POST['search'])) {
@@ -674,7 +674,7 @@ if ($myrights<20) {
 				$searchlikes = "imas_questionset.broken=1 AND ";
 			} else if (substr($safesearch,0,7)=='childof') {
         $searchlikes = "imas_questionset.ancestors REGEXP ? AND ";
-        $searchlikevals[] = '[[:<:]]'.substr($safesearch,8).'[[:>:]]';
+        $searchlikevals[] = MYSQL_LEFT_WRDBND.substr($safesearch,8).MYSQL_RIGHT_WRDBND;
 
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";
@@ -965,7 +965,7 @@ if (!empty($_POST['chglib'])) {
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
 }
-require("../header.php");
+require_once "../header.php";
 
 $address = $GLOBALS['basesiteurl'] . '/course';
 
@@ -1113,7 +1113,7 @@ function getnextprev(formn,loc) {
 			Select libraries to add these questions to.
 			</p>
 
-			<?php $libtreeshowchecks = false; include("libtree2.php"); ?>
+			<?php $libtreeshowchecks = false; require_once "libtree2.php"; ?>
 
 
 			<p>
@@ -1136,7 +1136,7 @@ function getnextprev(formn,loc) {
 
 			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
-			<?php include("libtree.php"); ?>
+			<?php require_once "libtree.php"; ?>
 
 			<p>
 				<input type=submit value="Template Questions">
@@ -1347,7 +1347,7 @@ function getnextprev(formn,loc) {
 	}
 
 }
-require("../footer.php");
+require_once "../footer.php";
 
 
 function delqimgs($qsid) {

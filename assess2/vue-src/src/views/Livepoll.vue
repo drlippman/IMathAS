@@ -152,12 +152,16 @@ export default {
     },
     addResult (data) {
       // add question result data
-      if (!store.livepollResults.hasOwnProperty(this.curqn)) {
-        this.$set(store.livepollResults, this.curqn, {});
-      }
       data.score = JSON.parse(data.score);
       data.ans = JSON.parse(data.ans);
-      this.$set(store.livepollResults[this.curqn], data.user, data);
+      if (!store.livepollResults.hasOwnProperty(this.curqn)) {
+        const newobj = {};
+        newobj[this.curqn] = {};
+        newobj[this.curqn][data.user] = data;
+        store.livepollResults = Object.assign({}, store.livepollResults, newobj);
+      } else {
+        store.livepollResults[this.curqn][data.user] = data;
+      }
     },
     showHandler (data) {
       if (data.action === 'showq') {
@@ -172,22 +176,22 @@ export default {
         } else {
           data.timelimit = 0;
         }
-        this.$set(store.assessInfo, 'livepoll_status', {
+        store.assessInfo['livepoll_status'] = {
           curstate: 2,
           curquestion: parseInt(data.qn) + 1,
           seed: parseInt(data.seed),
           startt: parseInt(data.startt),
           timelimit: parseInt(data.timelimit)
-        });
+        };
       } else {
         // On question stop, server sends as data:
         //  action: newstate, qn: qn
-        this.$set(store.assessInfo, 'livepoll_status',
+        store.assessInfo['livepoll_status'] =
           Object.assign(store.assessInfo.livepoll_status, {
             curquestion: parseInt(data.qn) + 1,
             curstate: parseInt(data.action),
             timelimit: 0
-          }));
+          });
       }
     },
     selectQuestion (dispqn) {
@@ -249,7 +253,7 @@ export default {
         newstate: 1,
         forceregen: 1
       });
-      this.$set(store.livepollResults, this.curqn, {});
+      store.livepollResults.splice(this.curqn, 1);
     },
     updateShowAnswers () {
       // if already showing results, need to call the server with new state

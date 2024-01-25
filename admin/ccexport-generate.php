@@ -10,8 +10,8 @@ if (!isset($myrights)) {
 error_reporting(0);
 $loadmathfilter = 1;
 $loadgraphfilter = 1;
-require_once("../filter/filter.php");
-require_once("../includes/filehandler.php");
+require_once "../filter/filter.php";
+require_once "../includes/filehandler.php";
 if (substr($mathimgurl,0,4) !== 'http') {
     // need to make an absolute url
     if (strlen($imasroot) > 0) { 
@@ -406,7 +406,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[8]==-1) {
-					require_once("../includes/updateptsposs.php");
+					require_once "../includes/updateptsposs.php";
 					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);
 				}
 				//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';

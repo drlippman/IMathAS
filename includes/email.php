@@ -28,7 +28,7 @@ priority: (optional) priority of the email from 1 (low) to 10 (high)
 		  
 */
 
-function send_email($email, $from, $subject, $message, $replyto=array(), $bccList=array(), $priority=10) {
+function send_email($email, $from, $subject, $message, $replyto=array(), $bccList=array(), $priority=10, $includeUnsub = false) {
 	global $CFG;
 	if (!is_array($email)) {
 		$email = array($email);
@@ -68,11 +68,11 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 	}
 	if (isset($CFG['email']['handler']) && $priority>$CFG['email']['handlerpriority']) {
 		list($handlerscript, $sendfunc) = $CFG['email']['handler'];
-		require_once(__DIR__ . '/' . $handlerscript);
-		$sendfunc($email, $from, $subject, $message, $replyto, $bccList);
+		require_once __DIR__ . '/' . $handlerscript;
+		$sendfunc($email, $from, $subject, $message, $replyto, $bccList, $includeUnsub);
 	} else if (!empty($CFG['GEN']['useSESmail']) && $priority>$CFG['email']['handlerpriority']) {
-		require_once(__DIR__ . '/mailses.php');
-		send_SESemail($email, $from, $subject, $message, $replyto, $bccList);
+		require_once __DIR__ . '/mailses.php';
+		send_SESemail($email, $from, $subject, $message, $replyto, $bccList, $includeUnsub);
 	} else {
 		$tostr = implode(',', $email);
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -84,6 +84,14 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 		if (count($bccList)>0) {
 			$headers .= "Bcc: ".implode(',', $bccList)."\r\n";
 		}
+        if ($includeUnsub && count($email) == 1) {
+            $headers .= 'List-Unsubscribe-Post: List-Unsubscribe=One-Click' . "\r\n";
+            preg_match('/[^<>\s]+@[^<>\s]+/',$tostr,$matches);
+            $baseemail = $matches[0];
+            $hash = md5($baseemail . ($GLOBALS['CFG']['email']['secsalt'] ?? '123'));
+            $headers .= 'List-Unsubscribe: <' . $GLOBALS['basesiteurl'] . '/actions.php?action=unsubscribe&email='
+                . Sanitize::encodeUrlParam($baseemail) . '&ver=' . $hash . ">\r\n";
+        }
 		mail($tostr, $subject, $message, $headers);
 	}	
 }
@@ -102,5 +110,5 @@ function send_msg_notification($emailto, $from, $subject, $courseid, $coursename
 	$message .= '<p>'.sprintf(_('If you do not wish to receive email notification of new messages, please <%s>click here to change your user preferences'), 'a href="' . $GLOBALS['basesiteurl'] . '/forms.php?action=chguserinfo"');
 	$message .= "</a></p>\r\n";
 	
-	send_email($emailto, $sendfrom, _('New message notification'), $message, array(), array(), 1);			
+	send_email($emailto, $sendfrom, _('New message notification'), $message, array(), array(), 1, true);			
 }

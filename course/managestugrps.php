@@ -3,10 +3,10 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/stugroups.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/stugroups.php";
+require_once "../includes/filehandler.php";
 
 /*** pre-html data manipulation, including function code *******/
 $cid = Sanitize::courseId($_GET['cid']);
@@ -57,7 +57,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//deleting groupset
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			deletegroupset($deleteGroupSet, $cid);
+			deletegroupset($deleteGroupSet);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		} else {
@@ -261,7 +261,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (count($alreadygroupedstu)>0) {
-				require("../header.php");
+				require_once "../header.php";
 				echo '<p>Some students joined a group already and were skipped:</p><p>';
 				$stulist = array_map('Sanitize::onlyInt', $alreadygroupedstu);
 				$query_placeholders = Sanitize::generateQueryPlaceholders($stulist);
@@ -273,7 +273,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$loginfo .= $row[1].', '.$row[0].' already in group.';
 				}
 				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']) . "\">Continue</a></p>";
-				require("../footer.php");
+				require_once "../footer.php";
 				$now = time();
 				if (isset($GLOBALS['CFG']['log'])) {
 					$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
@@ -534,7 +534,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -825,6 +825,6 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

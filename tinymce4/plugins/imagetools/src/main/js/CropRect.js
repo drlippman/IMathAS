@@ -253,7 +253,7 @@ define("tinymce/imagetoolsplugin/CropRect", [
 			dragHelpers = [];
 		}
 
-		render(containerElm);
+		render();
 
 		instance = Tools.extend({
 			toggleVisibility: toggleVisibility,

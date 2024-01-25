@@ -17,7 +17,7 @@
 
 
 
-require("../init.php");
+require_once "../init.php";
 $cid = Sanitize::courseId($_GET['cid']);
 $isteacher = isset($teacherid);
 $istutor = isset($tutorid);
@@ -162,44 +162,44 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
-		include("masssend.php");
+		require_once "masssend.php";
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
 		$calledfrom='gb';
-		include("massexception.php");
+		require_once "massexception.php";
 	}
 	if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
 		$calledfrom='gb';
-		include("gb-excuse.php");
+		require_once "gb-excuse.php";
 	}
 	if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
 		$calledfrom='gb';
-		include("gb-excuse.php");
+		require_once "gb-excuse.php";
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
-		include("unenroll.php");
-		include("../footer.php");
+		require_once "unenroll.php";
+		require_once "../footer.php";
 		exit;
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
 		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
-		include("lockstu.php");
-		include("../footer.php");
+		require_once "lockstu.php";
+		require_once "../footer.php";
 		exit;
 	}
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
 		//based on a contribution by Cam Joyce
-		require_once("gbtable2.php");
+		require_once "gbtable2.php";
 
 		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
 		$placeinhead .= '<script type="text/javascript">addLoadEvent(print);</script>';
 		$flexwidth = true;
-		require("../header.php");
+		require_once "../header.php";
 
 		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
 		echo '<a href="gradebook.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">', _('Back to Gradebook'), '</a></div>';
@@ -216,7 +216,7 @@ if ($isteacher) {
 
 			echo "</div></div></div>";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 	}
@@ -260,8 +260,8 @@ if ($isteacher) {
 
 
 //DISPLAY
-require_once("gbtable2.php");
-require("../includes/htmlutil.php");
+require_once "gbtable2.php";
+require_once "../includes/htmlutil.php";
 
 $placeinhead = '<script type="text/javascript">
 var cid = '.Sanitize::onlyInt($cid).';
@@ -319,7 +319,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}
 	</script>';
 
-	require("../header.php");
+	require_once "../header.php";
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
         echo "<div class=breadcrumb>";
         echo $curBreadcrumb;
@@ -384,6 +384,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('PT-practice test').'</li>';
 	echo '<li>'._('EC-extra credit').'</li>';
 	echo '<li>'._('NC-no credit').'</li>';
+    echo '<li>'._('NS-no submission').'</li>';
     echo '<li>'._('N/A-Not Available').'</li>';
 	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
@@ -392,7 +393,7 @@ if (isset($studentid) || $stu!=0) { //show student view
     echo '<li>'._('<sup>AP</sup> Total is calculated using averaged percents').'</li>';
 	echo '</ul></div>';
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
@@ -421,7 +422,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } div.trld {display:table-cell;vertical-align:middle;white-space: nowrap;} </style>";
 	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>";
     echo $curBreadcrumb;
     echo _('Gradebook'), "</div>";
@@ -601,11 +602,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 		*/
 	}
 	$includelastchange = false;  //don't need it for instructor view
-	$gbt = gbinstrdisp();
+	gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
-	require("../footer.php");
+	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NS-no submission<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	require_once "../footer.php";
 
 	/*if ($isteacher) {
 		echo "<div class=cp>";
@@ -652,7 +653,7 @@ function gbstudisp($stu) {
 		$stm->execute(array(':id'=>$stu, ':courseid'=>$_GET['cid']));
 		if ($stm->rowCount()==0) { //shouldn't happen
 			echo 'Invalid student id';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
@@ -660,6 +661,10 @@ function gbstudisp($stu) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 
 	$gbt = gbtable($stu);
+
+    if ($GLOBALS['myrights'] === 100 && !empty($_GET['showgbt'])) {
+        print_r($gbt);
+    }
 
 	if ($stu>0) {
 		echo '<div style="font-size:1.1em;font-weight:bold">';
@@ -1059,7 +1064,7 @@ function gbstudisp($stu) {
                     if ($gbt[1][1][$i][3]>9) {
                         $gbt[1][1][$i][3] -= 10;
                     }
-                    if ($gbt[1][1][$i][3]==1) {
+                    if ($gbt[1][1][$i][3]==1 && $gbt[1][1][$i][0] !== 'NC') {
                         echo ' (NC)';
                     } else if ($gbt[1][1][$i][3]==2) {
                         echo ' (IP)';
@@ -1069,6 +1074,8 @@ function gbstudisp($stu) {
                         echo ' (OT)';
                     } else if ($gbt[1][1][$i][3]==4) {
                         echo ' (PT)';
+                    } else if ($gbt[1][1][$i][3]==6) {
+                        echo ' (NS)';
                     }
                 }
 			} else {
@@ -1809,7 +1816,7 @@ function gbinstrdisp() {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 							}
 						}
-
+                        
 						echo $gbt[$i][1][$j][0];
 
 						echo '</a>';
@@ -1829,6 +1836,8 @@ function gbinstrdisp() {
                                 // echo ' (OT)';
                             } else if ($gbt[$i][1][$j][3]==4) {
                                 echo ' (PT)';
+                            } else if ($gbt[$i][1][$j][3]==6) {
+                                echo ' (NS)';
                             }
                         }
 

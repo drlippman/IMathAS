@@ -2,19 +2,19 @@
 	//Displays Message list of students
 	//(c) 2008 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
 		$isteacher = true;
 	} else {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You must be a teacher, and access this page from the course page Messages link.\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 
@@ -50,7 +50,7 @@
 	}
 
 	$pagetitle = "Student Messages";
-	require("../header.php");
+	require_once "../header.php";
 
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
@@ -219,5 +219,5 @@ function chgfilter() {
 	}
 	echo "<p><a href=\"msglist.php?cid=$cid\">Back to My Messages</a></p>";
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

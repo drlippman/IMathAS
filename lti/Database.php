@@ -732,8 +732,20 @@ class Imathas_LTI_Database implements LTI\Database
             $stm = $this->dbh->prepare($query);
             $stm->execute(array(
                 ':userid' => $userid,
-                ':cregex' => '[[:<:]]' . $target['refcid'] . '[[:>:]]',
-                ':aregex' => '[[:<:]]' . $target['refaid'] . '[[:>:]]'));
+                ':cregex' => MYSQL_LEFT_WRDBND . $target['refcid'] . MYSQL_RIGHT_WRDBND,
+                ':aregex' => MYSQL_LEFT_WRDBND . $target['refaid'] . MYSQL_RIGHT_WRDBND));
+            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                $othercourses[$row[0]] = $row[1];
+            }
+        } else if ($target['type'] == 'course') {
+            // look for other courses we could associate with
+            $query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
+            $query .= "AND imt.userid=:userid ";
+            $query .= "WHERE ic.available<4 AND ic.ancestors REGEXP :cregex ORDER BY ic.name";
+            $stm = $this->dbh->prepare($query);
+            $stm->execute(array(
+                ':userid' => $userid,
+                ':cregex' => MYSQL_LEFT_WRDBND . $target['refcid'] . MYSQL_RIGHT_WRDBND));
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
                 $othercourses[$row[0]] = $row[1];
             }
@@ -939,7 +951,7 @@ class Imathas_LTI_Database implements LTI\Database
      */
     public function find_aid_by_immediate_ancestor(int $aidtolookfor, int $destcid)
     {
-        $anregex = '^([0-9]+:)?' . $aidtolookfor . '[[:>:]]';
+        $anregex = '^([0-9]+:)?' . $aidtolookfor . MYSQL_RIGHT_WRDBND;
         $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
         $stm->execute(array(':ancestors' => $anregex, ':destcid' => $destcid));
         return $stm->fetchColumn(0);
@@ -954,7 +966,7 @@ class Imathas_LTI_Database implements LTI\Database
      */
     public function find_aid_by_loose_ancestor(int $aidtolookfor, int $destcid)
     {
-        $anregex = '[[:<:]]' . $aidtolookfor . '[[:>:]]';
+        $anregex = MYSQL_LEFT_WRDBND . $aidtolookfor . MYSQL_RIGHT_WRDBND;
         $stm = $this->dbh->prepare("SELECT id,name,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
         $stm->execute(array(':ancestors' => $anregex, ':destcid' => $destcid));
         $res = $stm->fetchAll(PDO::FETCH_ASSOC);
@@ -995,7 +1007,7 @@ class Imathas_LTI_Database implements LTI\Database
             // then we'll walk back through the ancestors and make sure the course
             // history path matches.
             // This approach will work as long as there's a newer-format ancestry record
-            $anregex = '[[:<:]]' . $aidsourcecid . ':' . $sourceaid . '[[:>:]]';
+            $anregex = MYSQL_LEFT_WRDBND . $aidsourcecid . ':' . $sourceaid . MYSQL_RIGHT_WRDBND;
             $stm = $this->dbh->prepare("SELECT id,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
             $stm->execute(array(':ancestors' => $anregex, ':destcid' => $destcid));
             while ($res = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -1032,7 +1044,7 @@ class Imathas_LTI_Database implements LTI\Database
             $aidtolookfor = $sourceaid;
             for ($i = $ciddepth; $i >= 0; $i--) { //starts one course back from aidsourcecid because of the unshift
                 $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:cid");
-                $stm->execute(array(':ancestors' => '^([0-9]+:)?' . $aidtolookfor . '[[:>:]]', ':cid' => $ancestors[$i]));
+                $stm->execute(array(':ancestors' => '^([0-9]+:)?' . $aidtolookfor . MYSQL_RIGHT_WRDBND, ':cid' => $ancestors[$i]));
                 if ($stm->rowCount() > 0) {
                     $aidtolookfor = $stm->fetchColumn(0);
                 } else {
@@ -1047,7 +1059,7 @@ class Imathas_LTI_Database implements LTI\Database
             // ok, still didn't work, so assessment wasn't copied through the whole
             // history.  So let's see if we have a copy in our course with the assessment
             // anywhere in the ancestry.
-            $anregex = '[[:<:]]' . $sourceaid . '[[:>:]]';
+            $anregex = MYSQL_LEFT_WRDBND . $sourceaid . MYSQL_RIGHT_WRDBND;
             $stm = $this->dbh->prepare("SELECT id,name,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
             $stm->execute(array(':ancestors' => $anregex, ':destcid' => $destcid));
             $res = $stm->fetchAll(PDO::FETCH_ASSOC);
@@ -1344,6 +1356,12 @@ class Imathas_LTI_Database implements LTI\Database
             $stm = $this->dbh->prepare($query);
             $stm->execute(array_merge(array(time()), $stuids, array($courseid)));
         }
+    }
+
+    public function record_log($logdata): void
+    {
+        $logstm = $this->dbh->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+        $logstm->execute([time(), $logdata]);
     }
 
     private function verify_migration_claim($claim) {

@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/newusercommon.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/newusercommon.php";
+require_once "../includes/filehandler.php";
 
 /*** pre-html data manipulation, including function code *******/
 // Reads past the UTF-8 bom if it is there.
@@ -108,9 +108,9 @@ if (!(isset($teacherid)) && $myrights<100) {
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		if (isset($CFG['GEN']['newpasswords'])) {
-			require_once("../includes/password.php");
+			require_once "../includes/password.php";
         }
-        require('../includes/setSectionGroups.php');
+        require_once '../includes/setSectionGroups.php';
 		if ($isadmin) {
 			$ncid = Sanitize::onlyInt($_POST['enrollcid']);
 		} else {
@@ -261,7 +261,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -279,6 +279,7 @@ if ($overwriteBody==1) {
 		<div id="headerimportstu" class="pagetitle"><h1>Import Students</h1></div>
 		<p>The first 5 students in the file are listed below.  Check the columns were identified correctly</p>
 			<table class=gb>
+            <caption class="sr-only">Student Info</caption>
 			<thead>
 				<tr>
 					<th>Username</th><th>Firstname</th><th>Lastname</th><th>e-mail</th>
@@ -397,5 +398,5 @@ if ($overwriteBody==1) {
 	echo "	</form>\n";
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

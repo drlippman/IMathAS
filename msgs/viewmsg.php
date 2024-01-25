@@ -2,13 +2,13 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
@@ -62,7 +62,7 @@
 			}
 		}
 		</script>';
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -101,7 +101,7 @@
 	}
 	if ($stm->rowCount()==0) {
 		echo "Message not found";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -153,7 +153,7 @@
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$adata['id']));
 				if ($stm->rowCount()>0) {
 					$exception = $stm->fetch(PDO::FETCH_NUM);
-					require_once("../includes/exceptionfuncs.php");
+					require_once "../includes/exceptionfuncs.php";
 					$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 					$useexception = $exceptionfuncs->getCanUseAssessException($exception, $adata, true);
 					if ($useexception) {
@@ -268,5 +268,5 @@
 		$stm->execute(array(':id'=>$msgid));
 	}
 	echo '<p>&nbsp;</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

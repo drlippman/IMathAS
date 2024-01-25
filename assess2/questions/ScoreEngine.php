@@ -2,10 +2,10 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . '/ErrorHandler.php');
-require_once(__DIR__ . '/QuestionHtmlGenerator.php');
-require_once(__DIR__ . '/models/ScoreQuestionParams.php');
-require_once(__DIR__ . '/scorepart/ScorePartFactory.php');
+require_once __DIR__ . '/ErrorHandler.php';
+require_once __DIR__ . '/QuestionHtmlGenerator.php';
+require_once __DIR__ . '/models/ScoreQuestionParams.php';
+require_once __DIR__ . '/scorepart/ScorePartFactory.php';
 
 use PDO;
 use RuntimeException;
@@ -183,9 +183,6 @@ class ScoreEngine
             }
             if (is_array($reqdecimals)) {
                 foreach ($reqdecimals as $kidx => $vval) {
-                    if (substr((string)$vval, 0, 1) == '=') {
-                        continue;
-                    } //skip '=2' style $reqdecimals
                     list($vval, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($vval);
                     if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
                         if (count($reqdecscoretype)==2) {
@@ -199,7 +196,7 @@ class ScoreEngine
                         }
                     }
                 }
-            } else if (substr((string)$reqdecimals, 0, 1) != '=') { //skip '=2' style $reqdecimals
+            } else { 
                 list($parsedreqdec, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs((string)$reqdecimals);
                 if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
                     if (count($reqdecscoretype)==2) {
@@ -267,7 +264,7 @@ class ScoreEngine
         }
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
             if (function_exists('onBeforeScoreQuestion')) {
                 onBeforeScoreQuestion($scoreQuestionParams,
                     $varsForScorepart, $additionalVarsForScoring);
@@ -729,7 +726,7 @@ class ScoreEngine
         ];
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
             if (function_exists('onScorePartMultiPart')) {
                 $returnData = onScorePartMultiPart($returnData, $scorePartResult);
             }
@@ -802,7 +799,7 @@ class ScoreEngine
         );
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/score_engine'])) {
-            require_once($GLOBALS['CFG']['hooks']['assess2/questions/score_engine']);
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/score_engine'];
             if (function_exists('onScorePartNonMultiPart')) {
                 $returnData = onScorePartNonMultiPart($returnData, $scorePartResult);
             }

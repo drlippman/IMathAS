@@ -5,18 +5,18 @@
 
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
-	//include("$filterdir/simplelti/simplelti.php");
+	//require_once "$filterdir/simplelti/simplelti.php";
 	if ((isset($_SESSION['mathdisp']) && $_SESSION['mathdisp']==2 ) || isset($loadmathfilter)) { //use image fallback for math
-		include("$filterdir/math/ASCIIMath2TeX.php");
+		require_once "$filterdir/math/ASCIIMath2TeX.php";
 		$AMT = new AMtoTeX;
 	}
 	if ((isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
-		include("$filterdir/graph/asciisvgimg.php");
+		require_once "$filterdir/graph/asciisvgimg.php";
 		$AS = new AStoIMG;
-		require_once("$filterdir/../includes/filehandler.php");
+		require_once "$filterdir/../includes/filehandler.php";
 	}
 	if ((!isset($_SESSION['graphdisp']) || $_SESSION['graphdisp']==0)) {
-		include_once("$filterdir/graph/sscrtotext.php");
+		require_once "$filterdir/graph/sscrtotext.php";
 	}
 	function mathfiltercallback($arr) {
 		global $AMT,$mathimgurl,$coursetheme;
@@ -49,7 +49,7 @@
 		if (trim($arr[2])=='') {return $arr[0];}
 
 		if (!isset($AS) || $AS===null) {
-			include("$filterdir/graph/asciisvgimg.php");
+			require_once "$filterdir/graph/asciisvgimg.php";
 			$AS = new AStoIMG;
 		}
 
@@ -74,7 +74,7 @@
 		if (trim($arr[2])=='') {return $arr[0];}
 
 		if (!isset($AS) || $AS===null) {
-			include("$filterdir/graph/asciisvgimg.php");
+			require_once "$filterdir/graph/asciisvgimg.php";
 			$AS = new AStoIMG;
 		}
 

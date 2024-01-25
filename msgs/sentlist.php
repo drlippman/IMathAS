@@ -2,13 +2,13 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 
-	require("../init.php");
-	require('../includes/getcourseopts.php');
+	require_once "../init.php";
+	require_once '../includes/getcourseopts.php';
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
@@ -62,7 +62,7 @@
 	}
 
 	$pagetitle = "Messages";
-	require("../header.php");
+	require_once "../header.php";
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
@@ -265,5 +265,5 @@ function chgfilter() {
 		echo "<p>$prevnext</p>";
 	}
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

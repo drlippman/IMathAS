@@ -1,8 +1,8 @@
 <?php
-require_once("../includes/htmLawed.php");
+require_once "../includes/htmLawed.php";
 $loadmathfilter = true; $loadgraphfilter = true;
-require_once("../filter/filter.php");
-require_once("../includes/filehandler.php");
+require_once "../filter/filter.php";
+require_once "../includes/filehandler.php";
 
 
 function mbxfilter($str) {

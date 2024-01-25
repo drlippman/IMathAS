@@ -10,7 +10,7 @@
 	}
 
 	if (!empty($_GET['process'])) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if (isset($_POST['add'])) { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -210,7 +210,7 @@
 				}
 			}
 			</script>';
-		require("../header.php");
+		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 
@@ -228,6 +228,7 @@ if (isset($_POST['checked'])) { //modifying existing
 ?>
 <p><?php echo _("Leave items blank to use the assessment's default values"); ?></p>
 <table class=gb>
+<caption class="sr-only">Question Settings</caption>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
@@ -290,7 +291,7 @@ if (isset($_POST['checked'])) { //modifying existing
                 $qrows[$row['id']] .= '</select></td>';
                 $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\">";
                 foreach ($showworkoptions as $v=>$l) {
-                    $qrows[$row['id']] .= '<option value="'.$v.'" '.($row['showwork']==$v ? 'selected':'').'>';
+                    $qrows[$row['id']] .= '<option value="'.Sanitize::encodeStringForDisplay($v).'" '.($row['showwork']==$v ? 'selected':'').'>';
                     $qrows[$row['id']] .= Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 $qrows[$row['id']] .= '</select></td>';
@@ -406,6 +407,6 @@ if (isset($_POST['checked'])) { //modifying existing
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}

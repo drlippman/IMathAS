@@ -2,7 +2,7 @@
 //IMathAS:  include with posts.php and postsbyname.php for handling deletes, replies, etc.
 //(c) 2006 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 
 ini_set("max_execution_time", "60");
@@ -52,7 +52,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else if ($_POST['replyby']=="Never") {
 				$replyby = 0;
 			} else {
-				require_once("../includes/parsedatetime.php");
+				require_once "../includes/parsedatetime.php";
 				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime'],null);
 			}
 		} else {
@@ -74,7 +74,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$thisposttime = $now-1;
 		if ($isteacher) {
 			if (isset($_POST['releaseon']) && $_POST['releaseon']=='Date') {
-				require_once("../includes/parsedatetime.php");
+				require_once "../includes/parsedatetime.php";
 				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
 		}
@@ -134,7 +134,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($stm->rowCount()==0) {
 
 				$sendemail = false;
-				require("../header.php");
+				require_once "../header.php";
 				echo '<h1>Error:</h1><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
 				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::url($returnurl).'">Continue</a></p>';
 				echo '<hr>';
@@ -142,7 +142,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<p>Message:</p><div class="editor">'.Sanitize::outgoingHtml(filter($_POST['message'])).'</div>';
 				echo '<p>HTML format:</p>';
 				echo '<div class="editor">'.Sanitize::encodeStringForDisplay($_POST['message']).'</div>';
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			} else {
 				$uid = $stm->fetchColumn(0);
@@ -257,7 +257,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($sendemail) {
-			require_once("../includes/email.php");
+			require_once "../includes/email.php";
 
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid=:forumid AND iu.id<>:userid";
@@ -292,7 +292,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if (isset($_FILES['newfile-0'])) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$i = 0;
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
@@ -330,7 +330,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
         if (!empty($_GET['embed'])) {
             $placeinhead .= '<script>function submitpost() { document.getElementsByTagName("form")[0].submit();}</script>';
         }
-		require("../header.php");
+		require_once "../header.php";
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
             if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -410,7 +410,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$parts = explode('-',$_GET['quoteq']);
 					$GLOBALS['assessver'] = $parts[4];
                     if ($courseUIver > 1) {
-                        include('../assess2/AssessStandalone.php');
+                        require_once '../assess2/AssessStandalone.php';
                         $a2 = new AssessStandalone($DBH);
                         $state = array(
                             'seeds' => array($parts[0] => $parts[2]),
@@ -422,12 +422,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
                         $message = $res['html'];
                         $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
                     } else {
-                        require("../assessment/displayq2.php");
+                        require_once "../assessment/displayq2.php";
                         $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
                     }
 					$message = printfilter(forcefiltergraph($message));
 					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-						require_once("../includes/filehandler.php");
+						require_once "../includes/filehandler.php";
 						$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
 							$curdir = rtrim(dirname(__FILE__), '/\\');
 							return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
@@ -530,12 +530,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<span class=form>Files:</span>";
 				echo "<span class=formright>";
 				if ($line['files']!='') {
-					require_once('../includes/filehandler.php');
+					require_once '../includes/filehandler.php';
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
 						echo '<input type="text" name="filedesc['.$i.']" value="'.Sanitize::encodeStringForDisplay($files[2*$i]).'" aria-label="'._('Description').'"/>';
 						// $_GET['modify'] will be sanitized by getuserfileurl().
-						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
+						echo '<a href="'.Sanitize::encodeStringForDisplay(getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1])).'" target="_blank">View</a> ';
 						echo '<label for="filedel['.$i.']">Delete?</label> <input type="checkbox" name="filedel['.$i.']" id="filedel['.$i.']" value="1"/><br/>';
 					}
 				}
@@ -740,7 +740,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } else if (isset($_GET['remove']) && $allowdel) {// $isteacher) { //removing post
@@ -754,7 +754,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($go) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$stm = $DBH->prepare("SELECT parent,files FROM imas_forum_posts WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['remove']));
 			list($parent,$files) = $stm->fetch(PDO::FETCH_NUM);
@@ -809,13 +809,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm->execute(array(':id'=>$_GET['remove']));
 		$parent = $stm->fetchColumn(0);
 
-		require("../header.php");
+		require_once "../header.php";
 		if (!$isteacher) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
 			$stm->execute(array(':parent'=>$_GET['remove']));
 			if ($stm->rowCount()>0) {
 			echo "Someone has replied to this post, so you cannot remove it.  <a href=\"$returnurl\">Back</a>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -838,7 +838,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '<p><button type=submit name=confirm value=true>'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum   NEW ONE
@@ -923,7 +923,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}</script>';
 		$pagetitle = "Move Thread";
 
-		require("../header.php");
+		require_once "../header.php";
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
             if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -982,7 +982,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo "<p><input type=submit value=\"Move\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo "</form>";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 	}

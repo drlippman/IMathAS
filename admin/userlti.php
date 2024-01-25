@@ -2,7 +2,7 @@
 //IMathAS - User Details page
 //(c) 2017 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 $overwriteBody = 0;
 $body = "";
@@ -49,7 +49,7 @@ if ($myrights < 20) {
   $stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
 
-  require_once('../includes/TeacherAuditLog.php');
+  require_once '../includes/TeacherAuditLog.php';
   TeacherAuditLog::addTracking(
     $row['courseid'],
     "Course Settings Change",
@@ -115,12 +115,9 @@ if ($myrights < 20) {
   echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC), JSON_HEX_TAG);
   exit;
 
-} else if ($isadmin && empty($_GET['id'])) {
-  $overwriteBody = 1;
-  $body = 'No id provided';
 } else {
   if ($isadmin) {
-    $uid = Sanitize::onlyInt($_GET['id']);
+    $uid = Sanitize::onlyInt($_GET['id'] ?? $userid);
   } else {
     $uid = $userid;
   }
@@ -222,7 +219,7 @@ $(function() {
   });
 })
 </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
   echo $body;
@@ -234,6 +231,49 @@ if ($overwriteBody==1) {
   echo '</span></h1></div>';
 
   echo '<p>'._('Group').': '.Sanitize::encodeStringForDisplay($userinfo['gname']).'</p>';
+
+  echo '<p><strong><a href="#" class="togglecontrol" aria-controls="instructions">'._('Instructions').'</a></strong></p>';
+  echo '<div id="instructions" style="display:none;">';
+?>
+<p>At the top of the page you will see a section for <strong>LTI user connections</strong>.
+This is how <?php echo $installname;?> links your LMS account to your <?php echo $installname;?> account.
+Each connection is tied to the LTI key being used, so you may see multiple rows.
+Generally there should be no reason to need this section. The only time you'd need to remove a user connection is if you accidentally logged into someone else's <?php echo $installname;?> account, or you logged into your own <?php echo $installname;?> account from someone else's LMS account. 
+If you remove a user connection, it will require you to login again to your <?php echo $installname;?> account when you click a link from the LMS.</p>
+<p>The second section for <strong>LTI course connections</strong> is the one you're more likely to need.&nbsp;</p>
+<ul>
+<li>The first two columns list your <?php echo $installname;?> course name and ID.&nbsp;</li>
+<li>The third column shows the LTI key the connection is using&nbsp;</li>
+<li>The fourth column labeled "contextid/label" shows a unique course identifier sent by the LMS (which will look like a random string), and below it will be the LMS course name, if the LMS sent it.</li>
+</ul>
+<p>If you linked your LMS course to the wrong <?php echo $installname;?> course, here's where you'd handle that.&nbsp;</p>
+<ul>
+<li>First, you'll want to verify what <?php echo $installname;?> course you're currently linked with.&nbsp; To do that:
+<ul>
+<li>Click a <?php echo $installname;?> link from the LMS course.</li>
+<li>If you see "LTI Home" at the top, click that.&nbsp;&nbsp;</li>
+<li>If you see LTI with a triangle at the top, click that and select "Info and LMS Sync".</li>
+<li>Scroll down and look for "This assessment is housed in course ID ____"</li>
+</ul>
+</li>
+<li>In the LTI course connection list, look for that course ID.&nbsp; I can help to sort the table by the Course ID column.&nbsp; The course may be linked to multiple LMS courses, so look at the "contextid/label" column to find the right LMS course, if possible.&nbsp;</li>
+<li>To break the connection, click Remove Connection</li>
+</ul>
+<p><span style="color: #ff0000;">WARNINGS: </span></p>
+<ul>
+<li>Once you break the course connection, students won't be able to use any <?php echo $installname;?> links until you establish a new connection.</li>
+<li>When you click on a <?php echo $installname;?> link from the LMS, <?php echo $installname;?> will prompt again for what course you want to associate with or copy.&nbsp; If you connect to a different course, be aware that <em>students will lose access to any work done under the original course connection</em> (though any score already in Canvas will still be in Canvas), and any future work will be in the newly associated course.</li>
+</ul>
+<p>A common situation that's come up with course-level LTI keys is that someone will setup their course, it will be working fine, then they'll either change the LTI key, or accidentally import a second <?php echo $installname;?> "app" and put a different LTI key on it.&nbsp; Since course connections are linked to the key used, this creates a new course connection and new user connections, meaning students are now either working in a new course, or they have a new user account tied to that new key and you end up with duplicate enrollments in your <?php echo $installname;?> course.&nbsp; If this happens, you have a choice:</p>
+<ul>
+<li>Leave it alone, and all new student work will be in the new course or under the new enrollment</li>
+<li>Switch back to the old LTI key, and students will have access again to the old course or enrollment, but will lose access to anything done during the mixup</li>
+</ul>
+<p>Either way, breaking a course connection doesn't really help here.&nbsp; Also no, there's not a way to merge the work or enrollments; you'll just have to live with it.&nbsp;</p>
+<p>There is an additional feature on this page.&nbsp; Once you find your course connection listing, if you click on the "contextid/label" value for that row, a new table will show up at the bottom of the page, listing all the individual assessment connections.&nbsp; It lists the type of link, the assessment name, and a unique linkid from the LMS, and you can break the individual connection.&nbsp; This would only ever be needed if you were using the content selector tool in your LMS, and selected the wrong assignment, and wanted to change it.&nbsp; The easier way is to just delete the assignment in the LMS and create a new one, but breaking the connection here would be another way.</p>
+<p><em>Use at your own risk.&nbsp; Breaking a connection is not un-doable.</em></p>
+<?php
+  echo '</div>';
 
   echo '<h3>'._('LTI user connections').'</h3>';
   echo '<table class="gb" id="ltiusers"><thead><tr>';
@@ -296,4 +336,4 @@ if ($overwriteBody==1) {
   echo '<th>',_('Remove'),'</th>';
   echo '</tr></thead><tbody></tbody></table></div>';
 }
-require("../footer.php");
+require_once "../footer.php";

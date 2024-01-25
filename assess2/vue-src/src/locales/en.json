@@ -187,8 +187,9 @@
     "livepoll_wrongquestion": "Submitted question is not the current question.",
     "livepoll_notopen": "This question is not open for submissions.",
     "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again.",
-    "ytnotready": "YouTube is not ready yet",
-    "file_upload_error": "Error uploading file"
+    "ytnotready": "YouTube is not ready yet. Please be patient for a few seconds.",
+    "file_upload_error": "Error uploading file",
+    "file_toolarge": "Error uploading file - too large. Must be under 15MB"
   },
   "confirm": {
     "ok": "OK",

@@ -14,11 +14,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -109,7 +109,7 @@ if (!$assess_record->hasRecord()) {
     if ($isGroup > 0) {
       $groupsetid = $assess_info->getSetting('groupsetid');
       list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
-      if ($stugroup == 0) {
+      if ($stugroupid == 0) {
         if ($isGroup == 3) {
             if ($stugroupid == 0 || count($current_members) == 0) {
                 // no group yet - can't do anything
@@ -123,19 +123,25 @@ if (!$assess_record->hasRecord()) {
       } else {
         $current_members = array_keys($current_members); // we just want the user IDs
       }
-      $sourcedidarr = [];
-      if ($lineitemdata != '') {
-          $lineitemparts = explode(':|:', $lineitemdata);
-          $ph = Sanitize::generateQueryPlaceholders($current_members);
-          $query = "SELECT userid,ltiuserid FROM imas_ltiusers WHERE org=? AND userid IN ($ph)";
-          $stm->execute(array_merge([$ltiorg], $current_members));
-          while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-              $lineitemparts[1] = $row['ltiuserid'];
-              $sourcedidarr[$row['userid']] = implode(':|:', $lineitemparts);
-          }
+
+      if ($current_members === false) {
+        // no group; create for self
+        $assess_record->createRecord(false, 0, false, $lineitemdata);
+      } else {
+        $sourcedidarr = [];
+        if ($lineitemdata != '') {
+            $lineitemparts = explode(':|:', $lineitemdata);
+            $ph = Sanitize::generateQueryPlaceholders($current_members);
+            $query = "SELECT userid,ltiuserid FROM imas_ltiusers WHERE org=? AND userid IN ($ph)";
+            $stm->execute(array_merge([$ltiorg], $current_members));
+            while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                $lineitemparts[1] = $row['ltiuserid'];
+                $sourcedidarr[$row['userid']] = implode(':|:', $lineitemparts);
+            }
+        }
+        // creating for group
+        $assess_record->createRecord($current_members, $stugroupid, false, $sourcedidarr);
       }
-      // creating for group
-      $assess_record->createRecord($current_members, $stugroupid, false, $sourcedidarr);
     } else { // not group
       // creating for self
       $assess_record->createRecord(false, 0, false, $lineitemdata);

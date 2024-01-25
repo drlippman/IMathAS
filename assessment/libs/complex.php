@@ -187,7 +187,7 @@ function cx_polEu(array $num, string $argin="rad", int $roundto=12) {
     }
 
     if (!function_exists('reduceradical')) {
-        require_once(__DIR__.'/radicals.php');
+        require_once __DIR__.'/radicals.php';
       }
     
     $A=array();  
@@ -665,7 +665,7 @@ function cx_format2std(array $num,int $roundto=3) {
 
 function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
     if (!function_exists('reduceradical')) {
-        require_once(__DIR__.'/radicals.php');
+        require_once __DIR__.'/radicals.php';
       }
 
     if (!is_array($num[0]) && count($num)==2) {
@@ -678,7 +678,11 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 
         $num1=$num[$i];
         $sq=round($num[$i][0]**2+$num[$i][1]**2,12);
-        $r= reduceradical($sq);
+        if (round($sq)==round($sq,8)) { // close enough to int
+            $r= reduceradical($sq);
+        } else {
+            $r = round(sqrt($sq),$roundto);
+        }
         //$r= round(cx_modul($num1),$roundto);
 
         if ($argin=="rad"){
@@ -687,7 +691,7 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
                 $th1=makexxpretty("$th1 pi"); 
         }
             else {
-                $th1=round(cx_arg($num1,"deg"),$rounto);
+                $th1=round(cx_arg($num1,"deg"),$roundto);
         }
         
         $A[$i]=makexpretty("$r (cos($th1)+isin($th1))");
@@ -720,7 +724,7 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 function cx_prettyquadRoot(float $a, float $b, float $c){
     
     if (!function_exists('reduceradicalfrac')) {
-        require_once(__DIR__.'/radicals.php');
+        require_once __DIR__.'/radicals.php';
       }
     
     $d=$b**2 - 4*$a*$c;
@@ -830,7 +834,7 @@ function cx_plot(array $num, string $argin = "deg" ,int $roundto = 3, bool $show
 
 function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
 	
-    include_once("matrix.php");
+    require_once "matrix.php";
     if (!isMatrix($A)) { echo 'error: input not a matrix'; return '';}
     
 	// number of rows
@@ -892,11 +896,11 @@ function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
 					if(cx_modul($mult)!=0 && cx_modul($A[$r][$j])!=0){
 
 						$A[$i][$j] = cx_sub([$A[$i][$j],cx_mul([$mult,$A[$r][$j]])]);  
-					} else {$A[$i][$j]=$A[$i][$j];}
+					} 
 						
-						if (cx_modul($A[$i][$j]) <= 1e-10) {
-							$A[$i][$j] = [0,0]; //treat values close to 0 as 0
-								}		
+                    if (cx_modul($A[$i][$j]) <= 1e-10) {
+                        $A[$i][$j] = [0,0]; //treat values close to 0 as 0
+                    }		
 	    	    }
 	    }
 

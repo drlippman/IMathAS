@@ -2,7 +2,7 @@
 //IMathAS:  Outcomes report array generator
 //(c) 2013 David Lippman for Lumen Learning
 
-require_once("../includes/exceptionfuncs.php");
+require_once "../includes/exceptionfuncs.php";
 
 /***
 format of output

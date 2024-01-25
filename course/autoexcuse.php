@@ -1,6 +1,6 @@
 <?php
 
-require('../init.php');
+require_once '../init.php';
 
 if (!isset($teacherid)) {
     echo "You need to log in as a teacher to access this page";
@@ -70,7 +70,7 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
 
     if ($beentaken) {
         // retotal student assessment records with changes, which will set new excusals
-        require_once('../assess2/AssessHelpers.php');
+        require_once '../assess2/AssessHelpers.php';
         AssessHelpers::retotalAll($cid, $aid, false);
     }
 
@@ -152,7 +152,7 @@ foreach ($excusals as $k=>$exc) {
 }
 
 $pagetitle = _('Auto Excuse');
-require('../header.php');
+require_once '../header.php';
 ?>
 <script type="text/javascript">
 var newcnt = 0;
@@ -288,6 +288,6 @@ echo '<p class="noticetext" id="err"></p>';
 echo '<p><button type="submit">'._('Save Changes').'</button></p>';
 echo '</form>';
 
-require('../footer.php');
+require_once '../footer.php';
 
 

@@ -76,6 +76,9 @@ class CalculatedNTupleAnswerBox implements AnswerBox
             $tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
             $shorttip = _('Enter an n-tuple');
         }
+        if ($reqdecimals !== '') {
+            list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
+        }
         $tip .= formathint('each value', $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calcntuple');
 
         $classes = ['text'];

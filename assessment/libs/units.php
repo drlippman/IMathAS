@@ -313,7 +313,7 @@ function parseunits($unitsExpression) {
     $unitsDivisionMessage='Eek! Only one division symbol allowed in the expression.';
     $unitsSymbolMessage='Eek! Improper symbol or operation used. Expressions can only use decimal numbers, letters, multiplication, division and exponents. No parentheses allowed.';
     
-    $unitsBadSyntax='/[\(\)]|\^\^|\*\*|\^\*|\*\^|\*\*|\-\-|\-\*|\*\-|\-\^|\d\-\d|\s\.\s|\.\.|\d\.\d\.|\.[\d\.\*]\.|[a-zA-Z]\.|\*\.[a-zA-Z]|\*[\*\.]\*|\d\-\d|\d\+\d/'; //bad combinations of symbols.
+    $unitsBadSyntax='/[\(\)]|\^\^|\*\*|\^\*|\*\^|\-\-|\-\*|\*\-|\-\^|\d\-\d|\s\.\s|\.\.|\d\.\d\.|\.[\d\.\*]\.|[a-zA-Z]\.|\*\.[a-zA-Z]|\*[\*\.]\*|\d\+\d/'; //bad combinations of symbols.
     $unitsBadSymbols='/[^a-zA-Z\d\*\/\^\.\-]/'; //expression can only contain letters, numbers, multiplication, division, exponents, decimals and negative symbol
     $unitsStartLike='/^[a-zA-Z0-9\.\-]/'; //expression must start with one of these symbols
     $unitsEndLike='/[a-zA-Z0-9\.]$/'; //expression must end with one of these symbols

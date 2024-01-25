@@ -3,8 +3,8 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
@@ -14,7 +14,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
-	require_once("../includes/parsedatetime.php");
+	require_once "../includes/parsedatetime.php";
 	$checkedlist = implode(',', array_map('intval', $checked));
 	$sets = array();
 	$qarr = array();
@@ -281,7 +281,7 @@ $(function() {
 })
 </script>';
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Mass Change Forums</div>";
@@ -292,7 +292,7 @@ echo "<form id=\"mainform\" method=post action=\"chgforums.php?cid=$cid\" onsubm
 
 if (count($forumitems)==0) {
 	echo '<p>No forums to change.</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -312,6 +312,7 @@ foreach($forumitems as $id=>$name) {
 <fieldset>
 <legend>Forum Options</legend>
 <table class=gb>
+<caption class="sr-only">Settings</caption>
 <thead>
 <tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 </thead>
@@ -498,5 +499,5 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 <div class="submit"><input type="submit" name="submit" value="<?php echo _('Apply Changes')?>" /></div>
 </form>
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

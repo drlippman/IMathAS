@@ -2,9 +2,9 @@
 //IMathAS: Common Catridge v1.1 Export
 //(c) 2011 David Lippman
 
-require "../init.php";
-require "../includes/copyiteminc.php";
-require "../includes/loaditemshowdata.php";
+require_once "../init.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
 
 if (!is_numeric($_GET['cid'])) {
     echo 'Invalid course ID.';
@@ -21,9 +21,9 @@ $path = realpath("../course/files");
 
 if (isset($_GET['create']) && isset($_POST['whichitems'])) {
     if ($_POST['lms'] == 'bb' && $_POST['carttype'] == 'bb') {
-        require "bbexport-generate.php";
+        require_once "bbexport-generate.php";
     } else {
-        require "ccexport-generate.php";
+        require_once "ccexport-generate.php";
     }
     exit;
 } else {
@@ -100,7 +100,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
     $placeinhead .= '<style type="text/css">
 	 .nomark.canvasoptlist li { text-indent: -25px; margin-left: 25px;}
 	 </style>';
-    require "../header.php";
+    require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"../course/course.php?cid=$cid\">" . Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; ";
@@ -139,6 +139,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 	<table cellpadding=5 class=gb>
+    <caption class="sr-only">Items</caption>
 	<thead>
 		<tr><th></th><th>Title</th></tr>
 	</thead>
@@ -217,6 +218,13 @@ $alt = 0;
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=lticanvas" target="_blank">Canvas Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
+        <p>&nbsp;</p>
+        <p>If you don't want to embed in Canvas, but want students to know about 
+           <?php echo $installname; ?> assignments in the Canvas calendar, you can 
+           <a href="canvascalexport.php?cid=<?php echo $cid;?>">export Canvas calendar items</a>.
+           Note it's best to do this after <em>all</em> assignments for the course 
+           are ready and have dates set. Otherwise, be careful on import to carefully 
+           select what you import, or else you'll end up with duplicate events.</p>
 	</div>
 	<div id="lmsbb" style="display:none" class="lmsblock">
 		<fieldset>
@@ -260,6 +268,6 @@ $alt = 0;
     echo '</form>';
 
 }
-require "../footer.php";
+require_once "../footer.php";
 
 ?>

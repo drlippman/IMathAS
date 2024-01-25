@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -62,7 +62,7 @@ class ConditionalScorePart implements ScorePart
                 } else if ($answer > 1) {
                   $answer = 1;
                 }
-                $scorePartResult->setRawScore($answer);
+                $scorePartResult->setRawScore(floatval($answer));
                 return $scorePartResult;
             }
         }

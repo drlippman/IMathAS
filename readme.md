@@ -12,7 +12,7 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ### Requirements
 IMathAS is designed for simple installation with minimal requirements.  The system
-requires PHP 7.2+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+requires PHP 7.4+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
 - mbstring (required)
 - pdo_mysql (required)
 - gettext (required)
@@ -65,6 +65,10 @@ These are all added to the `config.php` by the install script.
 -   `$enablebasiclti`: Set to true to enable use of IMathAS as an LTI producer (tool).
 -   `$AWSkey, $AWSsecret, $AWSbucket`: To allow students and teachers to upload files through the text editor, and to enable file upload questions, this specifies an Amazon S3 key, secret, and bucket to use for file storage. If not specified, local storage will be used instead.
 - `$CFG['GEN']['newpasswords']`:  all new installations should set this to `'only'` to use good-quality password security.  It can be set to `'transition'` for very old systems to transition to the new storage.  If omitted the system will use md5 for passwords, which is highly discouraged.
+- `$CFG['MySQL_ver']`: Set to your MySQL version, as a simple decimal with major version only, like 5.6, 8.0, or 8.1. Only necessary if you're using 8+. If upgrading from 5.x to 8,
+make sure you also edit your config.php and make sure the PDO connection includes a charset.  If it doesn't already, you'll want to add <code>;charset=latin1</code> to 
+the connection string (after the host= and dbname= portions) to ensure the encoding remains
+the same as the 5.x default after upgrade.  If on a new install, it's better to use <code>;charset=utf8mb4</code>.
 
 ### System Defaults
 
@@ -107,6 +111,8 @@ where days is the number of days since last login to consider old, and userid is
 to the new assessment interface.
 - `$CFG['reqadminmfa']`: Require admins to enable two-factor authentication.
 - `$CFG['logquestionerrors']`: Enable logging of question errors.
+- `$CFG['GEN']['sessionmaxlife']`: Overrides session.gc_maxlifetime.
+- `$CFG['GEN']['gc_divisor']`: Overrides session.gc_divisor.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
@@ -181,6 +187,7 @@ By default, emails are sent using the built-in PHP `mail()` function.  This can 
       - Optionally, but recommended: set `$CFG['email']['authcode']`, and set up SES to call
          `/admin/handleSESbounce.php?authcode=####` on bounces or complaints.
     - `$CFG['email']['handlerpriority']` can be set to define a breakpoint between using the default `mail()` delivery and the custom handler.   See `/includes/email.php` for values.
+- `$CFG['email']['secsalt']`: A secret value used for salting hashes.
 
 
 

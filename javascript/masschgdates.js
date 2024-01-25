@@ -64,7 +64,7 @@ Date.prototype.daysBetween = function(d) {
 
         var rtrn = null;
 
-        if (! d instanceof Date) {
+        if (!(d instanceof Date)) {
             try {
                 d = new Date(d);
             }

@@ -1,7 +1,7 @@
 <?php
 namespace Idealstack\DynamoDbSessionsDependencyFree;
 
-require_once(__DIR__.'/DynamoDbClient.php');
+require_once __DIR__.'/DynamoDbClient.php';
 
 class DynamoDbSessionConnection extends AwsClient {
     /** @var DynamoDbClient The DynamoDB client */

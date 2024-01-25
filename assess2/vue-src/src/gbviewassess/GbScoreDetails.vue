@@ -178,7 +178,7 @@ export default {
   },
   data: function () {
     return {
-      curScores: false,
+      curScores: [],
       showfeedback: false,
       showAllTries: false,
       showPenalties: false,
@@ -199,30 +199,6 @@ export default {
       var out = [];
       for (let i = 0; i < this.answeights.length; i++) {
         out[i] = Math.round(1000 * this.qdata.points_possible * this.answeights[i]) / 1000;
-      }
-      return out;
-    },
-    initScores () {
-      var out = [];
-      for (let i = 0; i < this.answeights.length; i++) {
-        if (this.qdata.singlescore) {
-          out.push(this.qdata.score);
-        } else if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
-          // handle the case of a single override
-          let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
-          partscore = Math.round(1000 * partscore) / 1000;
-          out.push(partscore);
-        } else if (this.qdata.scoreoverride && this.qdata.scoreoverride.hasOwnProperty(i)) {
-          if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
-            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible) / 1000);
-          } else {
-            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
-          }
-        } else if (this.maxTry === 0 || !this.qdata.parts[i].hasOwnProperty('score')) { // not attempted or not showing
-          out.push('N/A');
-        } else {
-          out.push(this.qdata.parts[i].score);
-        }
       }
       return out;
     },
@@ -303,7 +279,8 @@ export default {
         },
         {
           label: (store.assessInfo.hasOwnProperty('qerrortitle')
-            ? store.assessInfo.qerrortitle : this.$t('gradebook.msg_owner')),
+            ? store.assessInfo.qerrortitle
+            : this.$t('gradebook.msg_owner')),
           link: this.questionErrorUrl
         }
       ];
@@ -423,7 +400,7 @@ export default {
     },
     allFull () {
       for (let i = 0; i < this.answeights.length; i++) {
-        this.$set(this.curScores, i, this.partPoss[i]);
+        this.curScores[i] = this.partPoss[i];
         actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
       }
     },
@@ -432,7 +409,7 @@ export default {
         if (this.qdata.parts[i] && this.qdata.parts[i].hasOwnProperty('req_manual') &&
           this.qdata.parts[i].req_manual === true
         ) {
-          this.$set(this.curScores, i, this.partPoss[i]);
+          this.curScores[i] = this.partPoss[i];
           actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
         }
       }
@@ -443,7 +420,28 @@ export default {
       store.clearAttempts.show = true;
     },
     initCurScores () {
-      this.$set(this, 'curScores', this.initScores);
+      var out = [];
+      for (let i = 0; i < this.answeights.length; i++) {
+        if (this.qdata.singlescore) {
+          out.push(this.qdata.score);
+        } else if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
+          // handle the case of a single override
+          let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
+          partscore = Math.round(1000 * partscore) / 1000;
+          out.push(partscore);
+        } else if (this.qdata.scoreoverride && this.qdata.scoreoverride.hasOwnProperty(i)) {
+          if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
+            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible) / 1000);
+          } else {
+            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
+          }
+        } else if (this.maxTry === 0 || !this.qdata.parts[i].hasOwnProperty('score')) { // not attempted or not showing
+          out.push('N/A');
+        } else {
+          out.push(this.qdata.parts[i].score);
+        }
+      }
+      this.curScores = out;
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
     },
     showRubric (pn) {

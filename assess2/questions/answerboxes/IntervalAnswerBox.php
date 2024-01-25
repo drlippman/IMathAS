@@ -67,6 +67,7 @@ class IntervalAnswerBox implements AnswerBox
                 $tip .= _('Use oo to enter Infinity.');
             }
             if ($reqdecimals !== '') {
+                list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
                 $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
             }
             $shorttip = _('Enter an interval using interval notation');

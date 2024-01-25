@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("delitembyid.php");
+require_once "../init.php";
+require_once "delitembyid.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -29,7 +29,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$textid = Sanitize::onlyInt($_GET['id']);
 
 	if (isset($_POST['remove']) && $_POST['remove']=="really") {
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 
 		$DBH->beginTransaction();
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='LinkedText' AND courseid=:courseid");
@@ -57,7 +57,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -76,5 +76,5 @@ if ($overwriteBody==1) {
 
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

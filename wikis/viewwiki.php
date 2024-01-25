@@ -4,9 +4,9 @@
 
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/diff.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/diff.php";
 
 
 
@@ -105,7 +105,7 @@ if ($cid==0) {
 	} else { //just viewing
 		$curBreadcrumb .= " &gt; View Wiki";
 
-		require_once("../filter/filter.php");
+		require_once "../filter/filter.php";
 
 		if (isset($teacherid) || $now<$row['editbydate']) {
 			$canedit = true;
@@ -245,7 +245,7 @@ if ($cid==0) {
 	$placeinhead .= '</script>';
  }
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -363,5 +363,5 @@ if ($isgroup) {
 }
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

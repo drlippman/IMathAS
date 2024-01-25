@@ -1,20 +1,20 @@
 <?php
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
-   require("../init.php");
-   require("courseshowitems.php");
-   require("../includes/calendardisp.php");
+   require_once "../init.php";
+   require_once "courseshowitems.php";
+   require_once "../includes/calendardisp.php";
    if (isset($instrPreviewId)) {
 	   $tutorid = $instrPreviewId;
    }
    if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
    }
    $cid = Sanitize::courseId($_GET['cid']);
-   require("../filter/filter.php");
+   require_once "../filter/filter.php";
 
    $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,latepasshrs FROM imas_courses WHERE id=:id");
    $stm->execute(array(':id'=>$cid));
@@ -70,7 +70,7 @@
 		$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	   }
    }
-
+   
    $openblocks = Array(0);
    if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]);}
    if (isset($_COOKIE['prevloadedblocks-'.$cid]) && $_COOKIE['prevloadedblocks-'.$cid]!='') {$prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$cid]);} else {$prevloadedblocks = array();}

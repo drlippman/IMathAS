@@ -155,7 +155,7 @@ function veccomparesamespan($a,$b) {
         return false;
     }
 	if (count($a)!=count($b)) {return false;}
-	include_once("matrix.php");
+	require_once "matrix.php";
 	if ($b===null) { return 0;}
 	foreach ($b as $k=>$bv) {
 		if (is_array($bv)) {continue;}

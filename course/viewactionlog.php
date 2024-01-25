@@ -2,7 +2,7 @@
 //IMathAS:  View content tracking logs
 //(c) 2013 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = intval($_GET['cid']);
@@ -28,7 +28,7 @@ if (isset($teacherid)) {
 }
 $curBreadcrumb .= "View Activity Log\n";
 $pagetitle = "View Activity Log";
-require("../header.php");
+require_once "../header.php";
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 
 echo '<div id="headerloginlog" class="pagetitle"><h1>'.$pagetitle. '</h1></div>';
@@ -193,9 +193,6 @@ foreach ($actions as $r) {
 	case 'gbviewasid':
 		$actionmsg =  'Viewed in gradebook assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
 		break;
-	case 'assessreview':
-		echo 'Opened in review mode assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
-		break;
 	case 'assesslti':
 		$actionmsg =  'Opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)').' via LTI';
 		break;
@@ -237,6 +234,6 @@ foreach ($actions as $r) {
 }
 echo '</tbody></table>';
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -8,9 +8,9 @@
 ini_set("max_execution_time", "600");
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	
@@ -61,7 +61,7 @@ ini_set("max_execution_time", "600");
 		}
 
 		/**** confirmation page body *****/
-		require("../header.php");
+		require_once "../header.php";
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";

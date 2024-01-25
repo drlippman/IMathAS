@@ -2,7 +2,7 @@
 //IMathAS:  "Quick Drill" player
 //(c) 2009 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 //options:  	id=questionsetid
 //		cid=courseid (not required)
@@ -18,7 +18,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 
 if (isset($_GET['public'])) {
     $init_session_start = true;
-	require("../init_without_validate.php");
+	require_once "../init_without_validate.php";
 
 	$_SESSION['publicquickdrill'] = true;
 
@@ -35,7 +35,7 @@ if (isset($_GET['public'])) {
 	$_SESSION['graphdisp'] = 1;
 	$_SESSION['mathdisp'] = 2;
 } else {
-	require("../init.php");
+	require_once "../init.php";
 	$public = '';
 	$publica = '';
 }
@@ -43,7 +43,7 @@ if (isset($_GET['reset'])) {
 	echo "Session reset";
 	exit;
 }
-require("../assessment/displayq2.php");
+require_once "../assessment/displayq2.php";
 
 $pagetitle = "Quick Drill";
 
@@ -87,7 +87,7 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 
 		send_email($_GET['email'], $sendfrom, 'QuickDrill Results', $message, array(), array(), 8);
 
@@ -210,7 +210,7 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead = '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;}</style>';
 $useeditor = 1;
 $useeqnhelper = 0;
-require("../assessment/header.php");
+require_once "../assessment/header.php";
 if ($cid!=0) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Drill</div>";
@@ -252,7 +252,7 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 		$_SESSION['drillresults'][$qsetid] = array();
 	}
 	$_SESSION['drillresults'][$qsetid][] = array("n",$n,"$hours:$minutes:$seconds","$curscore out of ".count($scores));
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -271,7 +271,7 @@ if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questio
 		$_SESSION['drillresults'][$qsetid] = array();
 	}
 	$_SESSION['drillresults'][$qsetid][] = array("nc",$nc,"$hours:$minutes:$seconds",count($scores).' tries used');
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 if ($timesup == true) { //if time has expired
@@ -298,7 +298,7 @@ if ($timesup == true) { //if time has expired
 		$_SESSION['drillresults'][$qsetid] = array();
 	}
 	$_SESSION['drillresults'][$qsetid][] = array("t","$hours:$minutes:$seconds","$curscore out of ".count($scores));
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -394,7 +394,7 @@ if ($showans) {
 	echo "</form>\n";
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 
 function getansweights($code,$seed) {
@@ -408,11 +408,11 @@ function getansweights($code,$seed) {
 
 	}
 	if (!$foundweights) {
-		preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
+		preg_match('/anstypes\s*=(.*)/',$code,$match);
 		$n = substr_count($match[1],',')+1;
 		if ($n>1) {
 			$weights = array_fill(0,$n-1,round(1/$n,3));
-			$weights[] = 1-array_sum($line['answeights']);
+			$weights[] = 1-array_sum($weights);
 			return $weights;
 		} else {
 			return array(1);

@@ -26,14 +26,14 @@
           :active = "true"
           :disabled = "true"
           :getwork = "2"
-          @workchanged = "workChanged(curqn, ...arguments)"
+          @workchanged = "(val) => workChanged(curqn, val)"
         />
         <div v-else>
           <showwork-input
             :id="'sw' + curqn"
             :value = "question.work"
             rows = "3"
-            @input = "workChanged(curqn, ...arguments)"
+            @input = "(val) => workChanged(curqn, val)"
           />
         </div>
       </div>

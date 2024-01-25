@@ -1,12 +1,12 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 if (isset($_SESSION['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])) {
 	$_SESSION['userid'] = $_SESSION['emulateuseroriginaluser'];
     $userid = $_SESSION['userid'];
 	unset($_SESSION['emulateuseroriginaluser']);
     //reload prefs for original user
-    require_once("../includes/userprefs.php");
+    require_once "../includes/userprefs.php";
     generateuserprefs($userid);
     if (isset($_POST['tzname'])) {
         $_SESSION['tzname'] = $_POST['tzname'];
@@ -17,7 +17,7 @@ if (isset($_SESSION['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['util/utils'])) {
-	require($CFG['hooks']['util/utils']);
+	require_once $CFG['hooks']['util/utils'];
 }
 
 if ($myrights >= 75 && isset($_GET['emulateuser'])) {
@@ -91,6 +91,7 @@ if (isset($_POST['updatecaption'])) {
 		echo 'Invalid video ID';
 		exit;
 	}
+    $vidid = Sanitize::simpleASCII($vidid);
 	$ctx = stream_context_create(array('http'=>
 	    array(
 		'timeout' => 1
@@ -101,7 +102,7 @@ if (isset($_POST['updatecaption'])) {
 	if ($captioned==1) {
 		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
-		$stm->execute(array('[[:<:]]'.$vidid.'[[:>:]]'));
+		$stm->execute(array(MYSQL_LEFT_WRDBND.$vidid.MYSQL_RIGHT_WRDBND));
 		$chg = 0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$parts = explode('~~', $row[1]);
@@ -160,7 +161,7 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 }
 if (isset($_GET['listadmins'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a>\n";
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Admin List</div>';
 	echo '<h1>Admin List</h1>';
 	$query = 'SELECT iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id ';
@@ -182,23 +183,23 @@ if (isset($_GET['listadmins'])) {
 		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 if (isset($_GET['form'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
 
 	if ($_GET['form']=='emu') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Emulate User</div>';
 		echo '<form method="post" action="'.$imasroot.'/admin/actions.php">';
 		echo '<input type=hidden name=action value="emulateuser" />';
 		echo 'Emulate user with userid: <input type="text" size="5" name="uid"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 	} else if ($_GET['form']=='jumptoitem') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Jump to Item</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo '<input type=hidden name=action value="jumptoitem" />';
@@ -209,26 +210,26 @@ if (isset($_GET['form'])) {
 		echo 'Edit Question ID: <input type="text" size="8" name="eqid"/><br/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 
 	} else if ($_GET['form']=='rescue') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Recover Items</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/rescuecourse.php">';
 		echo 'Recover lost items in course ID: <input type="text" size="5" name="cid"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 	} else if ($_GET['form']=='updatecaption') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo 'YouTube video ID: <input type="text" size="11" name="updatecaption"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 	} else if ($_GET['form']=='lookup') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; User Lookup</div>';
 
 		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID']) || !empty($_POST['email'])) {
@@ -344,14 +345,14 @@ if (isset($_GET['form'])) {
 			echo '<input type="submit" value="Go"/>';
 			echo '</form>';
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 
 	}
 
 
 } else {
 	//listing of utilities
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Utilities</div>';
 	echo '<h2>Admin Utilities </h2>';
 	if (isset($_GET['debug'])) {
@@ -382,6 +383,6 @@ if (isset($_GET['form'])) {
 	echo '<a href="updatewronglibs.php">Update WrongLibFlags</a><br/>';
 	echo '<a href="blocksearch.php">Search Block titles</a><br/>';
 	echo '<a href="itemsearch.php">Search inline/linked items</a>';
-	require("../footer.php");
+	require_once "../footer.php";
 }
 ?>

@@ -1559,7 +1559,7 @@ function JSXG_createBlankBoard($label, $ops){
         $out .= "{$x2},";
       }
       // y2 value
-      if (isset($ops['slider-names']) && strpos($y1, "%")>-1){
+      if (isset($ops['slider-names']) && strpos($y2, "%")>-1){
         $out .= "function(){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){

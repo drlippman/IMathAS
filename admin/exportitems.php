@@ -10,10 +10,10 @@ ini_set("max_execution_time", "900");
 
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/filehandler.php");
-require("../includes/copyiteminc.php");
-require("../includes/loaditemshowdata.php");
+require_once "../init.php";
+require_once "../includes/filehandler.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
 
 /*** pre-html data manipulation, including function code *******/
 function exportcopysub($items,$parent,&$addtoarr) {
@@ -403,7 +403,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	getsubinfo($items,'0','',false,'|- ');
 }
 
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -426,6 +426,7 @@ if ($overwriteBody==1) {
 		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 		<table cellpadding=5 class=gb>
+        <caption class="sr-only">Course Items</caption>
 		<thead>
 			<tr><th></th><th>Type</th><th>Title</th></tr>
 		</thead>
@@ -454,5 +455,5 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

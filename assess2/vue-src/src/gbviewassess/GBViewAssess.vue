@@ -833,6 +833,9 @@ export default {
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
       actions.loadGbAssessData();
     }
+  },
+  updated () {
+    this.$nextTick(window.sendLTIresizemsg);
   }
 };
 </script>

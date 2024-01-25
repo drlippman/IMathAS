@@ -3,11 +3,11 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/copyiteminc.php");
-require("../includes/loaditemshowdata.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -394,13 +394,13 @@ if (!(isset($teacherid))) {
 		}
 		if (isset($_POST['docopyopt']) || isset($_POST['chgdefpoints']) || isset($_POST['removeperq'])) {
 			//update points possible
-			require_once("../includes/updateptsposs.php");
+			require_once "../includes/updateptsposs.php";
 			foreach ($checked as $aid) {
 				updatePointsPossible($aid);
 			}
 		}
 		if (isset($_POST['chgendmsg'])) {
-			include("assessendmsg.php");
+			require_once "assessendmsg.php";
 		} else {
 			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']).$btf . "&r=" . Sanitize::randomQueryStringParam());
@@ -502,7 +502,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -686,6 +686,7 @@ $(function() {
 		<fieldset>
 		<legend>Assessment Options</legend>
 		<table class="gb" id="opttable">
+            <caption class="sr-only">Settings</caption>
 			<thead>
 			<tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 			</thead>
@@ -1120,5 +1121,5 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 	</form>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

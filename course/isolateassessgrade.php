@@ -1,16 +1,16 @@
 <?php
 //IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
 	//TODO:  make tutor friendly by adding section filter
 	if (!$isteacher && !$istutor) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -32,14 +32,14 @@
 	if ($isteacher || ($istutor && ($tutoredit&1) == 1 )) {
 		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
-			include("gb-excuse.php");
+			require_once "gb-excuse.php";
 		}
 		if (isset($_POST['posted']) && $_POST['posted']=="Un-excuse Grade") {
 			$calledfrom='isolateassess';
-			include("gb-excuse.php");
+			require_once "gb-excuse.php";
         }
         if (isset($_POST['submitua'])) {
-			require('../assess2/AssessHelpers.php');
+			require_once '../assess2/AssessHelpers.php';
 			AssessHelpers::submitAllUnsumitted($cid, $aid);
 			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
 				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
@@ -51,11 +51,11 @@
             $calledfrom='isolateassess';
             $_POST['checked'] = $_POST['stus'] ?? [];
             $_POST['assesschk'] = array($aid);
-			include("massexception.php");
+			require_once "massexception.php";
         }
         if (isset($_GET['masssend'])) {
             $calledfrom='isolateassess';
-            include('masssend.php');
+            require_once 'masssend.php';
         }
 	}
 
@@ -103,7 +103,7 @@
             });
         });
 		</script>';
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -211,7 +211,7 @@
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
 	}
 	if (count($exceptions)>0) {
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher && !$istutor);
 	}
 	//get excusals
@@ -595,7 +595,7 @@
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 
 
 	function getpts($sc) {

@@ -2,7 +2,7 @@
 //IMathAS: View of forum grade details, to be linked from gradebook
 //(c) 2011 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	$cid = intval($_GET['cid']);
@@ -124,7 +124,7 @@
 		$nologo = true;
 		$showlink = false;
 	}
-	require("../header.php");
+	require_once "../header.php";
 	if (!$embedded) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($stu)."&cid=".Sanitize::encodeUrlParam($cid)."\">Gradebook</a> ";
@@ -136,7 +136,7 @@
 
 	if ($istutor && $tutoredit==2) {
 		echo '<p>No access to scores for this forum</p>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -242,5 +242,5 @@
 		echo '<p><input type="submit" value="Save Scores" /></p>';
 		echo '</form>';
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

@@ -2,14 +2,14 @@
 //IMathAS: Re-score a question
 //(c) 2018 David Lippman
 
-require("../init.php");
-require("../assessment/displayq2.php");
-require("../includes/ltioutcomes.php");
+require_once "../init.php";
+require_once "../assessment/displayq2.php";
+require_once "../includes/ltioutcomes.php";
 
 if (!isset($teacherid) && !isset($tutorid)) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You need to log in as a teacher or tutor to access this page";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -159,7 +159,7 @@ if (isset($_POST['record'])) {
 	});
 	</script>';
     $useeqnhelper = 0;
-	require("../assessment/header.php");
+	require_once "../assessment/header.php";
 	echo '<h1>'._('Regrade Question').'</h1>';
 	echo '<p>'._('Please be patient - this page will auto-submit when it is done loading').'</p>';
 	
@@ -206,9 +206,9 @@ if (isset($_POST['record'])) {
 		$cnt++;
 	}
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 } else {
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($cid)."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._('Add/Remove Questions')."</a> ";
 	echo "&gt; "._('Regrade Question').'</div>';
@@ -236,6 +236,6 @@ if (isset($_POST['record'])) {
 	echo '<p>'._('When you continue, all students\' attempts will be loaded up on your screen and then automatically submitted for regrading. ');
 	echo _('Please be patient - it may take a minute or two').'</p>';
 	
-	require("../footer.php");
+	require_once "../footer.php";
 }
 		

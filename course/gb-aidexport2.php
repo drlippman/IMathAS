@@ -2,9 +2,9 @@
 //IMathAS: Pull Student responses on an assessment (assess2)
 //(c) 2019 David Lippman
 
-require("../init.php");
-require("../assess2/AssessInfo.php");
-require("../assess2/AssessRecord.php");
+require_once "../init.php";
+require_once "../assess2/AssessInfo.php";
+require_once "../assess2/AssessRecord.php";
 
 $isteacher = isset($teacherid);
 $cid = Sanitize::courseId($_GET['cid']);
@@ -257,7 +257,7 @@ if (isset($_POST['options'])) {
 } else {
 	//ask for options
 	$pagetitle = "Assessment Export";
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; <a href=\"gb-itemanalysis2.php?aid=$aid&cid=$cid\">Item Analysis</a> ";
 	echo '&gt; Assessment Export</div>';
@@ -277,7 +277,7 @@ if (isset($_POST['options'])) {
 	//echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
 	echo '</form>';
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 }
 ?>

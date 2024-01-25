@@ -2,7 +2,7 @@
 //IMathAS:  GB view for testing center staff
 //(c) 2008 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = Sanitize::courseId($_GET['cid']);
@@ -58,8 +58,8 @@ if ($isteacher || $istutor) {
 }
 
 //DISPLAY
-require("gbtable2.php");
-require("../includes/htmlutil.php");
+require_once "gbtable2.php";
+require_once "../includes/htmlutil.php";
 
 $placeinhead = '';
 
@@ -120,7 +120,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 }
 
-require("../header.php");
+require_once "../header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
 
@@ -145,11 +145,11 @@ echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="displ
 echo "</form>";
 echo "</div>";
 
-$gbt = gbinstrdisp();
+gbinstrdisp();
 
 echo "<p>Meanings:   NC-no credit</p>";
 //echo "</div>";
-require("../footer.php");
+require_once "../footer.php";
 //echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
 
 /*if ($isteacher) {

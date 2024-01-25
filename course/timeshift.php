@@ -8,8 +8,8 @@
 ini_set("max_execution_time", "120");
 
 /*** master php includes *******/
-require("../init.php");
-include("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 function shiftsub(&$itema) {
 	global $shiftstring;
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -211,7 +211,7 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 
 ?>

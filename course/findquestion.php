@@ -3,8 +3,8 @@
 //(c) 2021 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/TeacherAuditLog.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -76,7 +76,18 @@ if (!(isset($teacherid))) {
     }
 }
 
-require("../header.php");
+$placeinhead = '<script>
+function toggleaids(val) {
+    $("input[type=checkbox]").each(function(i,el) {
+        if (!el.disabled) {
+            el.checked = val;
+        }
+    });
+    return false;
+}
+</script>';
+
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -84,7 +95,7 @@ if ($overwriteBody==1) {
 
 	echo '<div class="breadcrumb">' . $curBreadcrumb . '</div>';
     echo '<div class="pagetitle"><h1>' . $pagetitle . '</h1></div>';
-    echo '<form method="post">';
+    echo '<form method="post" id="aform">';
     if (empty($qsetid)) {
         echo '<p>'._('This will find all usages of a question in this course.').'</p>';
         echo '<p>'._('Search for Question ID').': <input name=qsetid size=10 /></p>';
@@ -92,6 +103,8 @@ if ($overwriteBody==1) {
     } else {
         if ($didreplace) {
             echo '<p>'.sprintf(_('Replace changed %d questions'), $chgcnt).'<p>';
+            echo '<p><a href="findquestion?cid=' . $cid . '&aid=' . $aid . '&from=' . $from .'">';
+            echo _('Search Again') . '</p>';
         } else if ($results === false){ 
             echo 'error';
         } else if (count($results) == 0) {
@@ -110,16 +123,19 @@ if ($overwriteBody==1) {
                 echo $result['name'].'</a></li>';
             }
             echo '</ul>';
+            echo '<p>' . _('Select:') . ' ';
+            echo '<a href="#" onclick="return toggleaids(true);">' . _('All') . '</a>';
+            echo ' <a href="#" onclick="return toggleaids(false);">' . _('None') . '</a></p>';
             echo '<input type=hidden name=qsetid value="'.$qsetid.'" />';
             echo '<p>'. _('In selected assessments, replace with question ID');
             echo ': <input name=replaceid size=10 /></p>';
             echo '<p><button type="submit">'._('Replace').'</button>';
             echo '<p>'._('Note: assessments that students have already started are disabled, as replacing questions in those will cause problems if the questions have different types or number of parts. ');
             echo sprintf(_('If you are absolutely sure you know what you are doing, you can %s enable %s them.'),
-                '<a href="#" onclick="$(\'.q-taken\').prop(\'disabled\', false)">', '</a>');
+                '<a href="#" onclick="$(\'.q-taken\').prop(\'disabled\', false); return false;">', '</a>');
             echo '</p>';
         }
     }
     echo '</form>';
 }
-require('../footer.php');
+require_once '../footer.php';

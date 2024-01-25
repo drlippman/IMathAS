@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -282,7 +282,7 @@ class NTupleScorePart implements ScorePart
                         if (is_array($partweights)) {
                             $fraccorrect = 0;
                             foreach ($partweights as $pwi => $pwv) {
-                                if ($matchedparts[$pwi] == 1) {
+                                if (!empty($matchedparts[$pwi])) {
                                     $fraccorrect += $pwv;
                                 }
                             }
@@ -389,6 +389,7 @@ class NTupleScorePart implements ScorePart
                         'rb' => $str[$i],
                         'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
                     );
+                    $thisTuple['vals'] = array_map("trim", $thisTuple['vals']);
                     $lastend = $i;
                     if ($do_eval) {
                         for ($j=0; $j < count($thisTuple['vals']); $j++) {
@@ -429,6 +430,6 @@ class NTupleScorePart implements ScorePart
                 $out[] = implode(' or ', $sub);
             }
         }
-        implode(',', $out);
+        return implode(',', $out);
     }
 }

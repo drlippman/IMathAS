@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if (empty($cid)) {
     echo "call as util/fixforums.php?cid=### with your course ID to fix";

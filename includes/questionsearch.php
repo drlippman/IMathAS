@@ -359,7 +359,13 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     } else {
         $query .= ' GROUP BY ili.qsetid ';
         if (!empty($search['order']) && $search['order']=='newest') {
-            $query .= ' ORDER BY iq.lastmoddate DESC ';
+            if ($searchtype == 'libs') {
+                $query .= ' ORDER BY libid,iq.lastmoddate DESC ';
+            } else {
+                $query .= ' ORDER BY iq.lastmoddate DESC ';
+            }
+        } else if ($searchtype == 'libs') {
+            $query .= ' ORDER BY libid ';
         }
     }
     if (!empty($max) && intval($max) > 0) {

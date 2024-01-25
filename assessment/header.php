@@ -19,7 +19,7 @@ if (!isset($myrights)) {
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
 $loadgraphfilter = true;
-require("$curdir/../filter/filter.php");
+require_once "$curdir/../filter/filter.php";
 ?>
 <script type="text/javascript">
 var isImathasAssessment = true;
@@ -98,7 +98,7 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=112420" type="text/javascript"></script>';
+echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=110223" type="text/javascript"></script>';
 
 
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
@@ -263,7 +263,7 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($CFG['GEN']['headerscriptinclude'])) {
-	require("$curdir/../{$CFG['GEN']['headerscriptinclude']}");
+	require_once "$curdir/../{$CFG['GEN']['headerscriptinclude']}";
 }
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
@@ -294,7 +294,7 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 }
 
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
-	require("$curdir/../{$CFG['GEN']['headerinclude']}");
+	require_once "$curdir/../{$CFG['GEN']['headerinclude']}";
 }
 
 if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !$isdiag && (!isset($_SESSION['intreereader']) || $_SESSION['intreereader']==false)) {

@@ -2,7 +2,7 @@
 //IMathAS:  Core randomizers and display macros
 //(c) 2006 David Lippman
 
-require_once(__DIR__ . '/../includes/Rand.php');
+require_once __DIR__ . '/../includes/Rand.php';
 $GLOBALS['RND'] = new Rand();
 
 array_push($GLOBALS['allowedmacros'],"exp","nthlog",
@@ -18,7 +18,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "prettyint","prettyreal","prettysigfig","roundsigfig","arraystodots","subarray",
  "showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray",
  "array_reverse","root","getsnapwidthheight","is_numeric","is_nan","sign","sgn","prettynegs",
- "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod",
+ "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod","fmod",
  "numtowords","randname","randnamewpronouns","randmalename","randfemalename",
  "randnames","randmalenames","randfemalenames","randcity","randcities","prettytime",
  "definefunc","evalfunc","evalnumstr","safepow","arrayfindindices","stringtoarray","strtoupper",
@@ -230,15 +230,29 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	} else {
 		$commands .= ');';
 	}
-
+    $xvar = 'x';
+    $yvar = 'y';
+    $hasaxislabels = false;
 	if (isset($lbl) && count($lbl)>3) {
-		$commands .= "text([{$winxmax},0],\"{$lbl[2]}\",\"aboveleft\");";
-		$commands .= "text([0,{$ymax}],\"{$lbl[3]}\",\"belowright\");";
+        $xvar = $lbl[2];
+        $yvar = $lbl[3];
+        if ($xvar != '') {
+		    $commands .= "text([{$winxmax},0],\"{$xvar}\",\"aboveleft\");";
+        }
+        if ($yvar != '') {
+		    $commands .= "text([0,{$ymax}],\"{$yvar}\",\"belowright\");";
+        }
+        $hasaxislabels = true;
 	}
 	$absymin = 1E10;
 	$absymax = -1E10;
+    $globalalt = '';
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
+        if (substr($function,0,4) == 'alt:') {
+            $globalalt = substr($function, 4);
+            continue;
+        }
         $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
         if (!isset($function[0]) || $function[0]==='') { continue; }
@@ -388,7 +402,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			if (isset($function[3]) && $function[3]!='') {
 				$thisymax = $function[3];
 			} else {$thisymax = $yymax;}
-			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+			$alt .= "<table class=stats><thead><tr><th>$xvar</th><th>$yvar</th></thead></tr><tbody>";
 			$alt .= "<tr><td>$val</td><td>$thisymin</td></tr>";
 			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
@@ -448,7 +462,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$stopat = 11;//($domainlimited?10:11);
 			}
 			if ($xmax != $xmin) {
-				$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+				$alt .= "<table class=stats><thead><tr><th>$xvar</th><th>$yvar</th></thead></tr><tbody>";
 			} else {
 				$alt .= '. ';
 			}
@@ -714,10 +728,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$ymax = min($absymax,$ymax);
 	}
 	$commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});".$commands;
-	$alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. ".$alt;
+    if ($hasaxislabels) {
+	    $alt = "Graphing window shows horizontal axis" .
+            ($xvar == '' ? '' : " labeled $xvar") . ": {$winxmin} to {$winxmax}, vertical axis" .
+            ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}. ".$alt;
+    } else {
+	    $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. ".$alt;
+    }
 
 	if ($_SESSION['graphdisp']==0) {
-		return $alt;
+		return ($globalalt == '') ? $alt : $globalalt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
 	}
@@ -1822,7 +1842,7 @@ function sortarray($a) {
 		$dir = func_get_arg(1);
 	}
 	if (isset($dir) && $dir=="rev") {
-		if (is_numeric($a[0])) {
+		if (isset($a[0]) && is_numeric($a[0])) {
 			rsort($a, SORT_NUMERIC);
 		} else {
 			rsort($a);
@@ -2883,7 +2903,7 @@ function prettytime($time,$in,$out) {
 			}
 		} else if (strpos($out,'s')!==false) {  //sec
 			$time = round($time,4);
-			$outst = "$time second". ($sec!=1 ? 's':'');
+			$outst = "$time second". ($time!=1 ? 's':'');
 		}
 	}
 	return $outst;
@@ -3174,13 +3194,17 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 		$d2 = 1/($d2-$L2);
     }
 	if ($i<1000 && abs($numerators[$i]/$denominators[$i] - $d)>1e-12) {
-		return $d;
+		return $sign.$d;
     }
 	if ($format=="mixednumber") {
 		$w = floor($numerators[$i]/$denominators[$i]);
 		if ($w>0) {
+            $out = "{$sign}$w";
 			$n = $numerators[$i] - $w*$denominators[$i];
-			return "{$sign}$w $n/".$denominators[$i];
+            if (abs($n)>1e-12) {
+                $out .= " $n/".$denominators[$i];
+            }
+			return $out;
 		} else {
 			return $sign.$numerators[$i].'/'.$denominators[$i];
 		}
@@ -4346,10 +4370,11 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
+            $eps = (($partial[$i]==0||abs($partial[$i])>1)?1E-12:(abs($partial[$i])*1E-12));
 			if ($abstol) {
-				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+				if (abs($stu-$partial[$i]) < $tol + $eps) { $match = $i; break;}
 			} else {
-				if (abs($stu - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+				if (abs($stu - $partial[$i])/(abs($partial[$i])+$eps) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
 		if ($match>-1 && isset($fbtxt[$match/2])) {
@@ -4411,10 +4436,11 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
+            $eps = (($partial[$i]==0||abs($partial[$i])>1)?1E-12:(abs($partial[$i])*1E-12));
 			if ($abstol) {
-				if (abs($stunum-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+				if (abs($stunum-$partial[$i]) < $tol + $eps) { $match = $i; break;}
 			} else {
-				if (abs($stunum - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+				if (abs($stunum - $partial[$i])/(abs($partial[$i])+$eps) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
 		if ($match>-1) {
@@ -5642,8 +5668,8 @@ function comparelogic($a,$b,$vars) {
     }
     $varlist = implode(',', $vars);
 
-	$keywords = ['and', '^^', 'xor', 'oplus', 'or', 'vv', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
-	$replace = 	['#a',  '#a', '#x',  '#x',    '#o', '#o', '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
+	$keywords = ['\\', 'and', '^^', 'wedge', 'xor', 'oplus', 'or', 'vv', 'vee', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
+	$replace = 	['',   '#a',  '#a', '#a',    '#x',  '#x',    '#o', '#o', '#o',  '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
     $a = str_replace($keywords,$replace,$a);
     $b = str_replace($keywords,$replace,$b);
 
@@ -5815,7 +5841,7 @@ function comparentuples() {
 }
 
 function comparenumberswithunits($unitExp1, $unitExp2, $tol='0.001') {
-  require_once(__DIR__.'/../assessment/libs/units.php');
+  require_once __DIR__.'/../assessment/libs/units.php';
   if (strval($tol)[0]=='|') {
     $abstolerance = floatval(substr($tol,1));
   }
@@ -5955,6 +5981,7 @@ function parseMatrixToArray($str) {
         $lastcut = 1;
 		$bracketpairs = ['('=>')','['=>']'];
 		$rowbracket = '';
+        $rowendbracket = '';
         for ($i=1;$i<strlen($str)-1;$i++) {
             $c = $str[$i];
 			if ($rowbracket === '' && ($c == '(' || $c == '[')) {

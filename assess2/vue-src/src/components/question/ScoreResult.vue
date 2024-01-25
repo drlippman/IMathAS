@@ -24,10 +24,18 @@
         <router-link
           v-if = "showNext"
           :to="'/skip/' + (this.qn + 2)"
-          tag="button"
+          custom
+          v-slot="{ navigate }"
         >
-          <icons name="right" alt=""/>
-          {{ $t('scoreresult.next') }}
+          <button
+            type="button"
+            @click="navigate"
+            @keypress.enter="navigate"
+            role="link"
+          >
+            <icons name="right" alt="" />
+            {{ $t('scoreresult.next') }}
+          </button>
         </router-link>
         <button
           v-if = "showSubmit"

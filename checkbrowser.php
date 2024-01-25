@@ -1,9 +1,9 @@
 <?php
-	require("init_without_validate.php");
+	require_once "init_without_validate.php";
 	$_SESSION['mathdisp']=1;
 	$_SESSION['graphdisp']=1;
 	$nologo = true;
-	require("header.php");
+	require_once "header.php";
 	
 ?>
 
@@ -52,5 +52,5 @@ jsdiv.appendChild(document.createTextNode("JavaScript is enabled in your browser
 <h2>Is it working?</h2>
 When everything is working, <A href="index.php">Return to Login Page</a>
 <?php
-	require("footer.php");
+	require_once "footer.php";
 ?>

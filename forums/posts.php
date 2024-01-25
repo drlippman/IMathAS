@@ -2,13 +2,13 @@
 //Displays forums posts
 //(c) 2006 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 if (isset($teacherid)) {
@@ -62,8 +62,12 @@ if ($forumcourseid != $cid) {
 }
 
 if (isset($_GET['markunread'])) {
-	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
+	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid AND tagged=0");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
+    if ($stm->rowCount()==0) { // must be tagged
+        $stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=0 WHERE userid=:userid AND threadid=:threadid");
+        $stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
+    }
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
@@ -89,7 +93,7 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	} else {
 		$exception = null;
 	}
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
@@ -99,9 +103,9 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = $exceptionfuncs->getCanUseLatePassForums($exception, $infoline);
 }
 if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
-	require("../header.php");
+	require_once "../header.php";
 	echo '<p>This forum is closed.  <a href="course.php?cid='.$cid.'">Return to the course page</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -152,7 +156,7 @@ if ($groupsetid>0) {
 $placeinhead = '';
 if ($haspoints && $caneditscore && $rubric != 0) {
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022622"></script>';
-	require("../includes/rubric.php");
+	require_once "../includes/rubric.php";
 }
 
 
@@ -163,7 +167,7 @@ if (isset($_GET['view'])) {
 }
 
 $caller = "posts";
-include("posthandler.php");
+require_once "posthandler.php";
 
 $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=010619" type="text/css" />';
@@ -173,7 +177,7 @@ if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 }
-require("../header.php");
+require_once "../header.php";
 
 if ($haspoints && $caneditscore && $rubric != 0) {
 	$stm = $DBH->prepare("SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=:id");
@@ -301,7 +305,7 @@ if ($oktoshow) {
 	}
 
 	if (count($files)>0) {
-		require_once('../includes/filehandler.php');
+		require_once '../includes/filehandler.php';
 	}
 
 	//get next/prev before marked as read
@@ -738,5 +742,5 @@ if (empty($_GET['embed'])) {
 } else {
 	echo '<div class=right><button type="button" onclick="parent.GB_hide()">'._('Close').'</button></div>';
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

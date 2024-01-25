@@ -17,7 +17,7 @@ function reduceradical($in,$root=2,$format="string") {
 		echo 'inputs to radicalfrac must be integers';
 		return;
 	}
-	$in = intval($in);
+	$in = (int)round($in);
 
 	if ($in > 10000000) {
 		if ($GLOBALS['myrights'] > 10) {
@@ -40,7 +40,7 @@ function reduceradical($in,$root=2,$format="string") {
 		return;
     }
 
-	$root = intval($root);
+	$root = (int)round($root);
 
     $iscomplex = false;
     $sign = '';

@@ -50,7 +50,8 @@ function setupLivePreview(qn) {
 
 				RenderNow: function (text) {
 					//called by preview button
-					this.buffer.innerHTML = this.oldtext = text;
+                    this.oldtext = text;
+					this.buffer.innerHTML = this.preformat(text);
 					this.mjRunning = true;
 					this.RenderBuffer();
 				},
@@ -117,7 +118,7 @@ function setupLivePreview(qn) {
 						MathJax.Hub.Queue(["CreatePreview", this]);
 					} else {
 						this.oldtext = text;
-						this.buffer.innerHTML = "`" + this.preformat(text) + "`";
+						this.buffer.innerHTML = "`" + htmlEntities(this.preformat(text)) + "`";
 						this.mjRunning = true;
 						this.RenderBuffer();
 					}
@@ -150,7 +151,7 @@ function setupLivePreview(qn) {
 
 				RenderNow: function (text) {
 					var outnode = document.getElementById("p" + qn);
-					outnode.innerHTML = text;
+					outnode.innerHTML = htmlEntities(text);
 					rendermathnode(outnode);
 				},
 
@@ -166,7 +167,9 @@ function updateLivePreview(targ) {
 	setupLivePreview(qn);
 	LivePreviews[qn].Update();
 }
-
+function htmlEntities(str) {
+  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;');
+}
 function normalizemathunicode(str) {
 	str = str.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, "");
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
@@ -244,6 +247,7 @@ function calculate(inputId, outputId, format) {
 				res = NaN;
 			}
 			str = str.replace(/[^\u0000-\u007f]/g, '?');
+            str = htmlEntities(str);
 			if (!isNaN(res) && res != "Infinity" && res !== '') {
 				if (format.indexOf('showval') == -1) {
 					str = "`" + str + "` " + wrapAMnotice(err);
@@ -363,6 +367,7 @@ function intcalculate(inputId, outputId, format) {
 			vals = str.substring(1, str.length - 1);
 			vals = vals.split(/,/);
 			if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
+                origstr = htmlEntities(origstr);
 				if (format.indexOf('inequality') != -1) {
 					origstr = origstr.replace('<=', 'le').replace('>=', 'ge').replace('<', 'lt').replace('>', 'gt');
 					fullstr = "`" + origstr + "`: " + wrapAMnotice(_("invalid inequality notation"));
@@ -451,12 +456,12 @@ function intcalculate(inputId, outputId, format) {
 				}
 			} else {
 				if (format.indexOf('showval') == -1) {
-					fullstr = '`' + strarr.join('uu') + '`' + ". " + wrapAMnotice(fullerr);
+					fullstr = '`' + htmlEntities(strarr.join('uu')) + '`' + ". " + wrapAMnotice(fullerr);
 				} else {
 					if (format.indexOf('list') != -1) {
-						fullstr = '`' + strarr.join(',') + '` = ' + calcstrarr.join(' , ') + ". " + wrapAMnotice(fullerr);
+						fullstr = '`' + htmlEntities(strarr.join(',')) + '` = ' + calcstrarr.join(' , ') + ". " + wrapAMnotice(fullerr);
 					} else {
-						fullstr = '`' + strarr.join('uu') + '` = ' + calcstrarr.join(' U ') + ". " + wrapAMnotice(fullerr);
+						fullstr = '`' + htmlEntities(strarr.join('uu')) + '` = ' + calcstrarr.join(' U ') + ". " + wrapAMnotice(fullerr);
 					}
 				}
 			}
@@ -562,9 +567,9 @@ function ntuplecalc(inputId, outputId, format) {
 		fullstr = fullstr.replace(/</g, '(:').replace(/>/g, ':)');
 		//outstr = '`'+fullstr+'` = '+outcalced;
 		if (format.indexOf('showval') == -1 || notationok == false) {
-			outstr = '`' + fullstr + '`' + ". " + wrapAMnotice(err);
+			outstr = '`' + htmlEntities(fullstr) + '`' + ". " + wrapAMnotice(err);
 		} else {
-			outstr = '`' + fullstr + '` = ' + outcalced + ". " + wrapAMnotice(err);
+			outstr = '`' + htmlEntities(fullstr) + '` = ' + outcalced + ". " + wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
@@ -643,9 +648,9 @@ function complexcalc(inputId, outputId, format) {
 		}
 		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
 		if (format.indexOf('showval') == -1) {
-			outstr = '`' + fullstr + '`' + ". " + wrapAMnotice(err);
+			outstr = '`' + htmlEntities(fullstr) + '`' + ". " + wrapAMnotice(err);
 		} else {
-			outstr = '`' + fullstr + '` = ' + outcalced + ". " + wrapAMnotice(err);
+			outstr = '`' + htmlEntities(fullstr) + '` = ' + outcalced + ". " + wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
@@ -878,9 +883,9 @@ function matrixcalc(inputId, outputId, rows, cols, format) {
 	//calcstr = calcstr.replace(/([^\[\(\)\],]+)/g, calced);
 	str = str.replace(/[^\u0000-\u007f]/g, '?');
 	if (format.indexOf("showval") == -1) {
-		str = "`" + str + "`. " + err;
+		str = "`" + htmlEntities(str) + "`. " + err;
 	} else {
-		str = "`" + str + "` = `" + calcstr + "`. " + err;
+		str = "`" + htmlEntities(str) + "` = `" + calcstr + "`. " + err;
 	}
 
 	if (outputId != null) {
@@ -907,7 +912,7 @@ function stringqpreview(inputId, outputId) {
 
 	var qn = outputId.substr(1);
 	setupLivePreview(qn);
-	LivePreviews[qn].RenderNow("`" + str + "`");
+	LivePreviews[qn].RenderNow("`" + htmlEntities(str) + "`");
 
 	/*var outnode = document.getElementById(outputId);
 	var n = outnode.childNodes.length;
@@ -1120,7 +1125,7 @@ function AMpreview(inputId, outputId) {
 	}
 	var qn = outputId.substr(1);
 	setupLivePreview(qn);
-	LivePreviews[qn].RenderNow('`' + dispstr + '` ' + wrapAMnotice(err));
+	LivePreviews[qn].RenderNow('`' + htmlEntities(dispstr) + '` ' + wrapAMnotice(err));
 
 }
 

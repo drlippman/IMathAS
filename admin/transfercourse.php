@@ -2,7 +2,7 @@
 // Add/remove Teachers
 // IMathAS (c) 2018 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -76,7 +76,7 @@ if (isset($_POST['loadgroup'])) {
 	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['search'])) {
-	require("../includes/userutils.php");
+	require_once "../includes/userutils.php";
 	$search = (string) trim($_POST['search']);
 	$possible_teachers = searchForUser($search, true, true);
 	$out = array();
@@ -88,7 +88,7 @@ if (isset($_POST['loadgroup'])) {
 	exit;
 }
 
-$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .fade-enter-active {
@@ -112,7 +112,7 @@ $placeinhead .= '<style type="text/css">
 
 $pagetitle = _('Transfer Course Ownership');
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if ($from == 'admin') {
@@ -134,7 +134,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p><button type=button @click="loadGroup()">List my group members</button>
 	or lookup a teacher: <input v-model="toLookup" size=30>
 	<button type=button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
+	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
 </p>
 <p>
 	<button type=submit :disabled="selectedTeacher == 0">Transfer</button>
@@ -149,15 +149,17 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 </div>
 </form>
 <script type="text/javascript">
-var app = new Vue({
-	el: '#app',
-	data: {
-		processingSearch: false,
-		courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
-		toLookup: "",
-		searchResults: null,
-		lastSearchType: '',
-		selectedTeacher: 0
+const { createApp } = Vue;
+createApp({
+	data: function() {
+        return {
+            processingSearch: false,
+            courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
+            toLookup: "",
+            searchResults: null,
+            lastSearchType: '',
+            selectedTeacher: 0
+        };
 	},
 	methods: {
 		loadGroup: function() {
@@ -198,7 +200,7 @@ var app = new Vue({
 			window.location.href = '<?php echo $imasroot.$backloc;?>';
 		}
 	}
-});
+}).mount('#app');
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

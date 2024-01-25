@@ -6,11 +6,11 @@
 $GLOBALS['noformatfeedback'] = true;
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
-require_once("mathphp2.php");
-require_once("mathparser.php");
-require("interpret5.php");
-require("macros.php");
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once "mathphp2.php";
+require_once "mathparser.php";
+require_once "interpret5.php";
+require_once "macros.php";
+require_once __DIR__ . "/../includes/sanitize.php";
 // This script is no longer officially supported, so don't bother recording errors
 error_reporting(0);
 
@@ -184,10 +184,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			echo Sanitize::encodeStringForDisplay($t->getMessage());
 			echo '</p>';
 		}
-	} catch (Exception $e) {
-		$res1 = false;
-		$res2 = false;
-	}
+	} 
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -923,10 +920,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			echo Sanitize::encodeStringForDisplay($t->getMessage());
 			echo '</p>';
 		}
-	} catch (Exception $e) {
-		$res1 = false;
-		$res2 = false;
-	}
+	} 
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -3310,7 +3304,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
             } else {
                 $bge = '';
             }
-			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid,''];";
 			if (isset($GLOBALS['capturedrawinit'])) {
 				if (!isset($GLOBALS['drawinitdata'])) {
 					$GLOBALS['drawinitdata'] = array();
@@ -3540,7 +3534,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 			}
 			if (!empty($s3asid)) {
-				require_once(dirname(__FILE__)."/../includes/filehandler.php");
+				require_once dirname(__FILE__)."/../includes/filehandler.php";
 
 				if (substr($la,0,5)=="Error") {
 					$out .= "<br/>$la";
@@ -4029,7 +4023,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
@@ -4135,7 +4129,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -5363,7 +5357,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return ($score);
 		//return $correct;
 	} else if ($anstype == "essay") {
-		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
+		require_once dirname(__FILE__)."/../includes/htmLawed.php";
 		$givenans = myhtmLawed($givenans);
 		$givenans = str_replace('~', '&tilde;', $givenans);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
@@ -5577,7 +5571,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 
 		if (!isset($reltolerance)) {
 			if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
@@ -5913,12 +5907,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else {
 						$xop = $x2p;
 					}
-					$settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+					
 					if (($logloc = strpos($function[0],'log'))!==false ||
 						($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
 						$nestd = 0; $vertasy = 0;
-						$startloc = strpos($function[0],'(',$logloc!==false?$loglog:$lnloc);
+						$startloc = strpos($function[0],'(',$logloc!==false?$logloc:$lnloc);
 						for ($i = $startloc; $i<strlen($function[0]); $i++) {
 							if ($function[0][$i]=='(') {
 								$nestd++;
@@ -7165,7 +7159,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$linepts++;
 					}
 				}
-				$linecnt++;
 			}
 			//break apart student entry
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
@@ -7277,7 +7270,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
 			}
 			//divide up over all the lines
-			$percentunmatcheddrawn = $percentunmatcheddrawn;
+
 			//if ($GLOBALS['myrights']==100) {
 			//	print_r($anslines);
 			//	print_r($linedata);
@@ -7371,7 +7364,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		$hasfile = false;
-		require_once(dirname(__FILE__)."/../includes/filehandler.php");
+		require_once dirname(__FILE__)."/../includes/filehandler.php";
 		if (trim($filename)=='') {
 			$found = false;
 			if ($_POST["lf$qn"]!='') {
@@ -7641,7 +7634,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($pt==false) {
 				return 0;
-				break;
 			}
 		}
 		return 1;

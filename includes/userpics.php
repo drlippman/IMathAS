@@ -3,7 +3,7 @@
 //(c) 20009 David Lippman
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$curdir/filehandler.php");
+require_once "$curdir/filehandler.php";
 
 // $image is $_FILES[ <image name> ]
 // $imageId is the id used in a database or wherever for this image

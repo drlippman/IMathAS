@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . "/htmLawed.php");
+require_once __DIR__ . "/htmLawed.php";
 
 class Sanitize
 {

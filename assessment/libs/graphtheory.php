@@ -21,7 +21,7 @@
 //    position of vertex labels.
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphcircuittostringans","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphcircuittostringans","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath","graphgetvalence");
 
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
@@ -235,7 +235,7 @@ function graphemptygraph($n) {
 //returns array(dist,next) where
 //dist[i] is the shortest dist to end, and
 //next[i] is the vertex next closest to the end
-function graphdijkstra($g,$dest=-1) {
+function graphdijkstra($g,$dest=-1,$op=[]) {
 	$n = count($g[0]);
 	$dist = array();
 	$next = array();
@@ -727,7 +727,7 @@ function graphgetedges($g,$op) {
 //graphgetedgesarray(g)
 //gets array of edges in a graph
 //returns array of edges; each edge is array(startvert,endvert)
-function graphgetedgesarray($g) {
+function graphgetedgesarray($g,$op=[]) {
 	$n = count($g[0]);
 	$good = array();
 	for ($i=0; $i<$n; $i++) {
@@ -1090,6 +1090,7 @@ function graphpathlayout($g,$op=array()) {
 
 	for ($i=0; $i<$n; $i++) {
 		if ($dist[$i]<0) { $dist[$i] = 0;}
+        if (!isset($loccnt[$dist[$i]])) {$loccnt[$dist[$i]] = 0;}
 		$pos[$i][0] = 1-$dh*$dist[$i];
 		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ (!empty($op['wiggle'])?$dv/5*sin(4*$dist[$i]):0);
 		$loccnt[$dist[$i]]++;

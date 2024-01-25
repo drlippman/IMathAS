@@ -1,8 +1,8 @@
 <?php
-	require("../../init.php");
+	require_once "../../init.php";
 	$nologo = true;
 	$flexwidth = true;
-	require("../../header.php");
+	require_once "../../header.php";
 	
 	echo "<h1>Installed Macro Libraries</h1>\n";
 	echo "Load a macro library by entering the line <pre>loadlibrary(\"list of library names\")</pre> at the beginning of the Common Control section.<BR>\n";
@@ -35,5 +35,5 @@
 	}
 	echo "</ul>\n";
 	
-	require("../../footer.php");
+	require_once "../../footer.php";
 ?>

@@ -6,7 +6,7 @@
 ini_set("max_execution_time", "600");
 
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {
 	echo 'You do not have the authority for this action';
@@ -22,16 +22,16 @@ $curBreadcrumb .= ' &gt; Cross-Course Results';
 
 function reporterror($err) {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<h1>Cross-Course Assessment Results</h1>';
 	echo '<p class=noticetext>'.$err.'</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
 if (empty($_REQUEST['basecourse'])) {
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<h1>Cross-Course Assessment Results</h1>';
 	echo '<p>This utility allows you to output assessment averages from all copies of the specified course ID.</p>';
@@ -42,7 +42,7 @@ if (empty($_REQUEST['basecourse'])) {
 	echo '<p>Output format: <select name=output><option value=html selected>Online</option><option value=csv>CSV download</option></select></p>';
 	echo '<p><button type=submit>Generate</button></p>';
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -64,7 +64,7 @@ $ts = microtime(true);
 //pull ancestor courses
 $days = intval($_REQUEST['days']);
 $old = time() - (empty($days)?30:$days)*24*60*60;
-$anregex = '[[:<:]]'.$basecourse.'[[:>:]]';
+$anregex = MYSQL_LEFT_WRDBND.$basecourse.MYSQL_RIGHT_WRDBND;
 $query = 'SELECT ic.id,ic.ancestors,ic.name FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id
 	  JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
 	  iu.groupid=? AND ic.ancestors REGEXP ?
@@ -114,7 +114,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	unset($row['itemorder']);
 
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	$assessdata[$row['id']] = $row;
@@ -144,7 +144,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		continue;
 	}
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	if ($row['ptsposs'] != $assessdata[$sourceaid]['ptsposs']) {
@@ -228,7 +228,7 @@ foreach ($assessdata as $aid=>$ainfo) {
 }
 
 if ($_REQUEST['output']=='html') {
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<h1>Cross-Course Assessment Results</h1>';
 	echo '<p>All scores are averages reported as percents.  The average only includes students who took the assessment.</p>';
@@ -251,7 +251,7 @@ if ($_REQUEST['output']=='html') {
 		'days'=>$days,
 		'basecourse'=>$basecourse));
 	echo '<p><a href="crosscoursedata.php?'.$qs.'">Download as CSV</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 } else {
 	header('Content-type: text/csv');
 	header("Content-Disposition: attachment; filename=\"gradebook-$cid.csv\"");

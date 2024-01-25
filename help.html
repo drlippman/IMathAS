@@ -2331,7 +2331,7 @@ The following macros create graphs or tables:
 	<li><strong>xmin,xmax,ymin,ymax</strong>: Graphing window.  Defaults to -5 to 5 for both. Use "0:-n" (for some value of n) for xmin or ymin to only
 	       have gridlines and labels after 0, while still using -n to adjust spacing. This is an alternative to using addplotborder to create
 	       first quadrant graphs.</li>
-	<li><strong>labels</strong>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis.</li>
+	<li><strong>labels</strong>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis. Use "xlbl:ylbl:xname:yname" to put a named label on the axes.</li>
 	<li><strong>grid</strong>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><strong>width,height</strong>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
 	</ul></li>
@@ -2533,7 +2533,7 @@ These macros are for working with arrays:
 <li><strong>unionarrays(array,array)</strong>:  Unions two arrays, preventing duplicates, into a new array</li>
 <li><strong>intersectarrays(array,array)</strong>:  Finds the intersection of two arrays</li>
 <li><strong>diffarrays(array1,array2)</strong>: Returns all elements in array1 that are not also in array2</li>
-<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values</li>
+<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values. Beware this doesn't re-index the array, so you may want to then use array_values if you need consecutive array keys.</li>
 <li><strong>array_values(array)</strong>: Returns the values of an array, reindexing with consecutive numeric indices.</li>
 <li><strong>count(array)</strong>:  Counts the number of entries in the array</li>
 <li><strong>is_array(variable)</strong>:  Determines if the variable is an array</li>
@@ -2749,8 +2749,9 @@ available in each library</p>
 <tr><td>* / + -</td><td>Multiply, divide, add, subtract</td></tr>
 <tr><td>^</td><td>Powers.  2^3 = 8.</td></tr>
 <tr><td>e, pi</td><td>The standard constants</td></tr>
-<tr><td>%</td><td>Modulus (remainder after division.  5%2 = 1)</td></tr>
-<tr><td>mod(p,n)</td><td>Modulus. This version gives positive results for modulus of negative numbers.</td></tr>
+<tr><td>%</td><td>Modulus of integers (remainder after division.  5%2 = 1)</td></tr>
+<tr><td>mod(p,n)</td><td>Modulus of integers. This version gives positive results for modulus of negative numbers.</td></tr>
+<tr><td>fmod(p,n)</td><td>Modulus of decimal values. May give negative results from negative inputs.</td></tr>
 <tr><td>!</td><td>Factorial</td></tr>
 <tr><td>sqrt</td><td>Square root</td></tr>
 <tr><td>sin,cos,tan,cot,sinh,cosh</td><td>Standard trig function.  Be sure to enter as sin(2), not sin 2</td></tr>
@@ -2971,6 +2972,18 @@ somewhere in the Question Text portion of the question.
     Do this by wrapping the teacher note in the [teachernote] shortcode like this: <code>[teachernote]This is the note[/teachernote]</code>
 </p>
 
+<h3>Hiding/Toggling content</h3>
+<p>If you need to hide content from view, you can wrap it in <code>&lt;div class="hidden"&gt;&lt;/div&gt;</code>.
+  Be aware the content is still in the page, so a student can still view the hidden content
+  using the browser inspector, so don't use this to hide secret info, but it can be helpful 
+  if you need to hide an answerbox that is being populated by some other means.</p>
+<p>If you want to toggle a block of content, one option for shorter content is to use 
+    forminlinebutton.  For longer content, you can wrap the content in a block using 
+    <code>&lt;div data-toggler="Title for button"&gt;&lt;/div&gt;</code>.  That will
+    hide the wrapped content, and add a button with the specified title for toggling the 
+    content.  You can optionally add a <code>data-toggler-hide</code> attribute as well 
+    if you want a different button label once the content is showing.
+</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -3019,7 +3032,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	the correct answer.  To override the tolerance use +- in the setting, like this:
 	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
 	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $reltolerance = .01)</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "units", "nosoln", or "nosolninf"</dt>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "set", "integer, "units", "nosoln", or "nosolninf"</dt>
 	<dd>
         <ul>
             <li>Answerformats can be combined, like $answerformat = "nosoln,list"</li>
@@ -3027,6 +3040,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
             <li>If $answerformat="list", then duplicate values are ignored.</li>
             <li>If $answerformat="exactlist", then duplicate values are not ignored.</li>
             <li>If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</li>
+            <li>$answerformat = "set" behaves like "list", but expects the answer list to be wrapped in curly braces as a set.</li>
             <li>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)</li>
             <li>$answerformat = "units" adds unit checking.  Supply the answer like <code>$answer = "3 kg/m^2"</code>.  
                 The student's answer can be in other equivalent units, so "300 cm" is considered equivalent to "3 m".
@@ -3517,8 +3531,9 @@ None - the essay type is not computer graded.
 <dl>
 <dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" </dt>
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
-<dt>$displayformat = "editor" </dt>
-	<dd>Use the rich text editor for the essay answer box.</dd>
+<dt>$displayformat = "editor" or "editornopaste" or "pre" </dt>
+	<dd>"editor" to use the rich text editor for the essay answer box, or "editornopaste" for the rich text editor with paste disabled.<br>
+    "pre" to use standard text entry, and to display in gradebook as preformatted text.</dd>
 <dt>$scoremethod = "takeanything" or "takeanythingorblank" or "nomanual"</dt>
 	<dd>The first two sets the problem to give full credit for any answer.  The second also counts
 	blank answers as correct.  The "nomanual" option will give no credit for any answer, but doesn't 
@@ -3578,7 +3593,8 @@ drawn line from the correct line.
 	        	<li>cubic (a(x-h)^3+k style cubics)</li>
 	        	<li>abs (absolute value)</li>
 	        	<li>circle (circles)</li>
-	        	<li>dot (open and closed dots)</li>
+	        	<li>dot (closed dots)</li>
+                <li>opendot (open dots)</li>
 	        	<li>sqrt (square root)</li>
 	        	<li>cuberoot (cube root)</li>
 	        	<li>trig (sin and cos)</li>
@@ -4027,7 +4043,7 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
 <dt>$answerformat = "normalcurve" or "list" or "allowsloppyintervals"</dt>
-	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
+	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the open interval that should be
     shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.
     <br/>
     "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"

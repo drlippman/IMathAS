@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 
@@ -31,7 +31,7 @@ $placeinhead .= "<script src=\"$staticroot/javascript/AMhelpers.js\" type=\"text
 $nologo = true;
 $loadgraphfilter = true;
 $assessver = 2;
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -243,7 +243,7 @@ if ($overwriteBody==1) {
 			echo ">&nbsp;</div>\n";
 		}
 	}
-	include("../assessment/displayq2.php");
+	require_once "../assessment/displayq2.php";
 
 
 	//echo "<div class=maintest>\n";
@@ -410,7 +410,7 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 function printq($qn,$qsetid,$seed,$pts) {
 	global $DBH,$RND,$isfinal,$imasroot,$urlmode;

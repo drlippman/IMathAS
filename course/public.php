@@ -8,7 +8,7 @@
 		$urlmode = 'http://';
 	}
 	/*** master php includes *******/
-	require("../init_without_validate.php");
+	require_once "../init_without_validate.php";
 
 	$ispublic = true;
 	$cid = Sanitize::courseId($_GET['cid'] ?? 0);
@@ -28,7 +28,7 @@
 	$items = unserialize($line['itemorder']);
     $breadcrumbbase = '';
 
-    require("courseshowitems.php");
+    require_once "courseshowitems.php";
 
 	if (!isset($_GET['folder']) || $_GET['folder']=='') {
 		$_GET['folder'] = '0';
@@ -103,7 +103,7 @@
 	}
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 ?>
 <script>
 	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo Sanitize::courseId($cid) ?>&folder=';
@@ -122,7 +122,7 @@ require("../header.php");
  }
 
  echo "<hr/>This is the publicly accessible content from a course on $installname.  There may be additional content available by <a href=\"course.php?cid=$cid\">logging in</a>";
-require("../footer.php");
+require_once "../footer.php";
 
  function tzdate($string,$time) {
 	  global $tzoffset;

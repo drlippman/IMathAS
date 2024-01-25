@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 
 if (!isset($teacherid)) {
@@ -8,14 +8,14 @@ if (!isset($teacherid)) {
 }
 
 if (isset($_POST['mergefrom'])) {
-    require("../header.php");
+    require_once "../header.php";
 	$seta = array();
 	foreach ($_POST['mergefrom'] as $aid=>$n) {
 		if (trim($n)!='') {
 			$seta[$n - 1] = $aid;
 		}
 	}
-	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,LPcutoff,';
+	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,date_by_lti,LPcutoff,';
 	$fieldstocopy .= 'timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,';
 	$fieldstocopy .= 'defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,';
 	$fieldstocopy .= 'allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,';
@@ -123,7 +123,7 @@ if (isset($_POST['mergefrom'])) {
 	$stm->execute(array(':itemorder'=>$newitemorder, ':intro'=>$intro, ':id'=>$newaid));
 
 	//update points poss
-	require_once("../includes/updateptsposs.php");
+	require_once "../includes/updateptsposs.php";
 	updatePointsPossible($newaid, $newitemorder, $defpoints);
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES (:courseid, 'Assessment', :typeid)";
@@ -145,7 +145,7 @@ if (isset($_POST['mergefrom'])) {
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<div class="pagetitle"><h1>Merge Assessments</h1></div>';
 	echo '<p>Merge complete</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 
 } else {
@@ -183,7 +183,7 @@ if (isset($_POST['mergefrom'])) {
 	$pagetitle = "Merge Assessments";
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Merge Assessments";
 
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<div class="pagetitle"><h1>Merge Assessments</h1></div>';
 
@@ -200,5 +200,5 @@ if (isset($_POST['mergefrom'])) {
 
 	echo '<input type="submit" value="Go">';
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 }

@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {
 	exit;
@@ -15,7 +15,7 @@ function selgrp(n) {
 	$(".LG"+n).prop("checked",!state)
 }
 </script>';
-require("../header.php");
+require_once "../header.php";
 echo '<h1>Remove Questions Marked with Wrong Library</h1>';
 
 if (isset($_POST['record'])) {
@@ -81,11 +81,11 @@ if (isset($_POST['record'])) {
 		echo '<a href="#" onclick="previewq('.$row['id'].');return false;">';
 		echo 'Question '.$row['id'].'</a>: '.Sanitize::encodeStringForDisplay($row['description']);
 		echo '. <input type="checkbox" name="unwrong[]" value="'.Sanitize::onlyInt($row['liid']).'"/> Un-mark as wrong lib';
-		'</li>';
+		echo '</li>';
 	}
 	echo '</ul>';
 	echo '<input type="submit" name="record" value="Remove Library Assignments" />';
 	echo '</form>';
 }
 
-require("../footer.php");
+require_once "../footer.php";

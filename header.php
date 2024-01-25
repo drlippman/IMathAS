@@ -10,7 +10,7 @@ if (!isset($myrights)) {
 }
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['header'])) {
-    require_once($CFG['hooks']['header']);
+    require_once $CFG['hooks']['header'];
 }
 ?>
 <head>
@@ -77,7 +77,7 @@ div.breadcrumb { display:none;}
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=061323"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=011024"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -99,7 +99,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $_SESSION['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
     }
     if (isset($_SESSION['ltiitemtype'])) {
         echo '<script type="text/x-mathjax-config">
@@ -120,6 +120,9 @@ if (!isset($_SESSION['mathdisp'])) {
             AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
+            ["arccot","arccsc","arccot"].forEach(function(v) {
+                AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
+            });
         });
         </script>';
     if (!empty($CFG['GEN']['uselocaljs'])) {
@@ -143,7 +146,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) { // mathjax 3
     if (isset($useeditor) && $_SESSION['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
     }
     // for autoload of a11y extension, add "a11y/semantic-enrich" to load, and put in options enrichSpeech: "shallow",
     echo '<script>
@@ -173,6 +176,9 @@ if (!isset($_SESSION['mathdisp'])) {
             AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
             AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
+            ["arccot","arccsc","arccot"].forEach(function(v) {
+                AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
+            });
             MathJax.startup.defaultReady();
           }
        }
@@ -200,7 +206,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
 
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script src="'.$staticroot.'/katex/katex.min.js"></script>';
@@ -220,7 +226,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=012923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\"; function rendermathnode(el,callback) {AMprocessNode(el); if(typeof callback=='function'){callback();}}</script>";
 } else if ($_SESSION['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el,callback) {AMprocessNode(el);} if(typeof callback=='function'){callback();}</script>";
@@ -229,7 +235,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$staticroot/javascript/mathjs.js?v=20230729\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=011923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=112623\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {
@@ -238,7 +244,7 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 
 
 if (isset($useeditor) && $_SESSION['useed']==1) {
-    echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=062821"></script>';
+    echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=121323"></script>';
     //echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.js?v=062821"></script>';
 
 	echo "\n";
@@ -264,7 +270,7 @@ if (isset($placeinhead)) {
 }
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
-	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
+	require_once "$curdir/{$CFG['GEN']['headerscriptinclude']}";
 }
 if (function_exists('insertIntoHead')) {
     insertIntoHead();
@@ -303,7 +309,7 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 }
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
     $prepend = '/' == substr($CFG['GEN']['headerinclude'], 0, 1) ? '' : $curdir;
-	require("$prepend/{$CFG['GEN']['headerinclude']}");
+	require_once "$prepend/{$CFG['GEN']['headerinclude']}";
 }
 $didnavlist = false;  $essentialsnavcnt = 0;
 function getactivetab() {
@@ -346,7 +352,9 @@ if (!empty($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($n
 		echo "<li><a {$a['cal']} href=\"$imasroot/course/showcalendar.php?cid=$cid\">",_('Calendar'),"</a></li>\n";
 	}
 
-	echo "<li><a {$a['gb']} href=\"$imasroot/course/gradebook.php?cid=$cid\">",_('Gradebook'),"</a></li>"; //Gradebook
+    if (isset($coursetoolset) && ($coursetoolset&4)==0) {
+	    echo "<li><a {$a['gb']} href=\"$imasroot/course/gradebook.php?cid=$cid\">",_('Gradebook'),"</a></li>"; //Gradebook
+    }
 
 	if (!isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">",_('Log Out'),"</a></li>";
@@ -364,7 +372,7 @@ echo '<div class="midwrapper" role="main">';
 
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$curdir/filter/filter.php");
+require_once "$curdir/filter/filter.php";
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 

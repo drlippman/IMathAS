@@ -2,12 +2,12 @@
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
 
-   require("../init_without_validate.php");
+   require_once "../init_without_validate.php";
    $ispublic = true;
    $_SESSION = ['mathdisp'=>1, 'graphdisp'=>1, 'useed'=>1];
    
    $cid = Sanitize::courseId($_GET['cid']);
-   require("../filter/filter.php");
+   require_once "../filter/filter.php";
 
    $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,UIver FROM imas_courses WHERE id=:id");
    $stm->execute(array(':id'=>$cid));
@@ -20,7 +20,7 @@
    $items = unserialize($line['itemorder']);
    $courseUIver = $line['UIver'];
 
-   require("courseshowitems.php");
+   require_once "courseshowitems.php";
 
    //if ($_GET['folder']!='0') {
    $blockispublic = false;

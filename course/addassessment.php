@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 if (isset($courseUIver) && $courseUIver > 1) {
 	if (!isset($_GET['id'])) {
@@ -60,7 +60,7 @@ if (isset($_GET['id'])) {
 			exit;
 		}
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
-			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
+			$GLOBALS['basesiteurl'], $cid, Sanitize::onlyInt($_GET['id'])));
 	}
 }
 
@@ -92,7 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
             	$DBH->beginTransaction();
-                require_once('../includes/filehandler.php');
+                require_once '../includes/filehandler.php';
                 deleteallaidfiles($assessmentId);
 								$grades = array();
 								$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -162,7 +162,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
         	$DBH->beginTransaction();
-            require_once("../includes/parsedatetime.php");
+            require_once "../includes/parsedatetime.php";
             if ($_POST['avail']==1) {
                 if ($_POST['sdatetype']=='0') {
                     $startdate = 0;
@@ -450,7 +450,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 				//update ptsposs field
 				if (isset($_POST['defpoints'])) {
-					require_once("../includes/updateptsposs.php");
+					require_once "../includes/updateptsposs.php";
 					updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
 				}
 			}
@@ -854,7 +854,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -1188,7 +1188,7 @@ if ($overwriteBody==1) {
 		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Additional Display Options
 		 </div>
 		 <div class="blockitems hidden">
@@ -1239,7 +1239,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand"/>
 		   Time Limit and Access Control
 		 </div>
 		 <div class="blockitems hidden">
@@ -1295,7 +1295,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand"/>
 		   Help and Hints
 		 </div>
 		 <div class="blockitems hidden">
@@ -1356,7 +1356,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Grading and Feedback
 		 </div>
 		 <div class="blockitems hidden">
@@ -1429,7 +1429,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Group Assessment
 		 </div>
 		 <div class="blockitems hidden">
@@ -1465,5 +1465,5 @@ if ($overwriteBody==1) {
 	</form>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

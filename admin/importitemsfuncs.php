@@ -3,9 +3,9 @@
 //JSON edition
 //(c) 2017 David Lippman
 
-require_once("../includes/htmLawed.php");
-require_once("../includes/updateptsposs.php");
-require_once("../includes/migratesettings.php");
+require_once "../includes/htmLawed.php";
+require_once "../includes/updateptsposs.php";
+require_once "../includes/migratesettings.php";
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {
@@ -855,6 +855,7 @@ private function insertAssessment() {
 	}
 	$this->qmap = array();
 	$qpoints = array();
+    $qec = array();
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$tomap = array();
 		$qids = $this->getAssessQids($this->data['items'][$toimport]['data']['itemorder']);
@@ -871,6 +872,9 @@ private function insertAssessment() {
 			if ($this->data['questions'][$qid]['points']<9999) {
 				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
 			}
+            if (!empty($this->data['questions'][$qid]['extracredit'])) {
+                $qec[$qid] = $this->data['questions'][$qid]['extracredit'];
+            }
 			// adjust settings if needed
 			if (!isset($this->data['items'][$toimport]['data']['ver'])) {
 				$this->data['items'][$toimport]['data']['ver'] = 1;
@@ -912,6 +916,7 @@ private function insertAssessment() {
 		}
 		//remap itemorder and collapse
 		$mappedqpoints = array();
+        $mappedqec = array();
         $aitems = $thisitemdata['itemorder'];
         $newitems = [];
 		foreach ($aitems as $i=>$q) {
@@ -926,6 +931,9 @@ private function insertAssessment() {
                     }
 					if (isset($qpoints[$subq])) {
 						$mappedqpoints[$this->qmap[$subq]] = $qpoints[$subq];
+                    }
+                    if (isset($qec[$subq])) {
+                        $mappedqec[$this->qmap[$subq]] = $qec[$subq];
                     }
                     if (isset($this->qmap[$q[$k]])) {
                         $newsub[] = $this->qmap[$q[$k]];
@@ -945,11 +953,14 @@ private function insertAssessment() {
 				if (isset($qpoints[$q])) {
 					$mappedqpoints[$this->qmap[$q]] = $qpoints[$q];
 				}
+                if (isset($qec[$q])) {
+                    $mappedqec[$this->qmap[$q]] = $qec[$q];
+                }
 			}
 		}
 		$aitemorder = implode(',', $newitems);
 		if (!isset($thisitemdata['ptsposs']) || $thisitemdata['ptsposs']==-1) {
-			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $thisitemdata['defpoints']);
+			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $mappedqec, $thisitemdata['defpoints']);
 		}
 		$a_upd_stm->execute(array($rsaid, $aitemorder, $thisitemdata['ptsposs'], $this->typemap['Assessment'][$toimport]));
 	}

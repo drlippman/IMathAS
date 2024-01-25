@@ -267,7 +267,7 @@ function chem_balancereaction($reactants,$products) {
 	}
 	$allcompounds = array_values(array_unique($allcompounds));
 	$compoundrow = array_flip($allcompounds);
-	require_once("matrix.php");
+	require_once "matrix.php";
 	$countreact = count($reactants);
 	$countprods = count($products);
 	$colcnt = $countreact + $countprods;

@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
@@ -37,14 +37,16 @@ if (!(isset($teacherid))) {
 			$useridarr[$row[1]] = $row[0];
 		}
 		$coltoadd = $_POST['addcol'];
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {
 			$showdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 		}
 		$gradestodel = array();
+        $gbitemid = array();
 		foreach ($coltoadd as $col) {
+            $col = intval($col);
 			if (trim($_POST["colname$col"])=='') {continue;}
 			$name = trim($_POST["colname$col"]);
 			$pts = intval($_POST["colpts$col"]);
@@ -193,6 +195,7 @@ if (!(isset($teacherid))) {
 		if (!isset($usernamecol)) {
 			$usernamecol = 1;
 		}
+        $showdate = 0;
 	}
 
     $curBreadcrumb = $breadcrumbbase;
@@ -206,7 +209,7 @@ if (!(isset($teacherid))) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 echo '<div id="headeruploadmultgrades" class="pagetitle"><h1>Upload Multiple Grades</h1></div>';
 if ($overwriteBody==1) {
@@ -232,6 +235,7 @@ if ($overwriteBody==1) {
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','addcol[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','addcol[]',false)">None</a></p>
 
 		<table class="gb">
+        <caption class="sr-only">Grades to import</caption>
 		<thead>
 		  <tr><th>In column</th><th>Load this?</th><th>Overwrite?</th><th>Name</th><th>Points</th><th>Count?</th><th>Gradebook Category</th><th>Feedback in column<br/>(blank for none)</th></tr>
 		</thead>
@@ -294,6 +298,6 @@ if ($overwriteBody==1) {
 	echo '</form>';
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

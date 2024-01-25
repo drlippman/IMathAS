@@ -2,7 +2,7 @@
 //IMathAS: User reports front page view
 //(c) David Lippman 2018 for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 
 
 function getRoleNameByRights($rights) {
@@ -46,7 +46,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     $curBreadcrumb = $curBreadcrumb . ' <a href="userreports.php">' . _('User Reports') . '</a> &gt; ' . _("Group Members");
 
   } else if (!empty($_GET['findteacher'])) {
-    require("../includes/userutils.php");
+    require_once "../includes/userutils.php";
     
     //search for a user (teacher or regular)
     $limitToTeacher = true;
@@ -124,7 +124,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -270,4 +270,4 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";

@@ -38,10 +38,10 @@ $CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));
 ini_set("max_execution_time", "300");
 
 
-require("../init_without_validate.php");
-require("../includes/AWSSNSutil.php");
-require("../includes/unenroll.php");
-require("../includes/delcourse.php");
+require_once "../init_without_validate.php";
+require_once "../includes/AWSSNSutil.php";
+require_once "../includes/unenroll.php";
+require_once "../includes/delcourse.php";
 
 if (php_sapi_name() == "cli") {
 	//running command line - no need for auth code
@@ -139,7 +139,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		':courseid' => $row['id']
 	));
 
-	require_once("../includes/email.php");
+	require_once "../includes/email.php";
 
 	if ($row['msgnotify'] == 1 && $row['email'] != 'none@none.com' && $row['email'] != '') { //send email notification
 		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";

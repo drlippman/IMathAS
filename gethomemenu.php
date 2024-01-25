@@ -3,8 +3,8 @@
 //called via AJAX
 //IMathAS
 $init_skip_csrfp = true;
-require("init.php");
-//require("header.php");
+require_once "init.php";
+//require_once "header.php";
 
 $stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$userid));

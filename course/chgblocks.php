@@ -3,8 +3,8 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -39,7 +39,14 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 		if (is_array($item)) {
 			if (in_array($item['id'], $tochg)) {
 				foreach ($sets as $k=>$v) {
-					if (is_array($v)) {
+					if ($k == 'SH') {
+                        for ($i=0;$i<3;$i++) {
+                            if ($v[$i] !== null) {
+                                $items[$n][$k][$i] = $v[$i];
+                            }
+                        }
+                    } else if (is_array($v)) {
+                        $items[$n][$k] = []; // reset first before adding
 						foreach ($v as $kk=>$vv) {
 							$items[$n][$k][$kk] = $vv;
 						}
@@ -83,7 +90,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sets['avail'] = intval($_POST['avail']);
 	}
 	if (isset($_POST['chgshowhide']) || isset($_POST['chgavailbeh']) || isset($_POST['chggreyout'])) {
-		$sets['SH'] = array();
+		$sets['SH'] = array(null,null,null);
 	}
 	if (isset($_POST['chgshowhide'])) {
 		$sets['SH'][0] = $_POST['showhide'];
@@ -177,7 +184,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/c
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -204,6 +211,7 @@ foreach ($existblocks as $pos=>$name) {
 ?>
 </ul>
 <table class="gb" id="opttable">
+<caption class="sr-only">Settings</caption>
 <thead>
 <tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 </thead>
@@ -281,7 +289,7 @@ foreach ($existblocks as $pos=>$name) {
 
 			<br />&nbsp;<br/>
 			<input type=radio name="colors" id="colorcustom" value="custom"/>Use custom:
-			<table style="display: inline; border-collapse: collapse; margin-left: 15px;">
+			<table style="display: inline; border-collapse: collapse; margin-left: 15px;" role="presentation">
 				<tr>
 					<td id="ex1" style="border: 1px solid #000;background-color:#DDDDFF;color:#000000;">Sample Title Cell</td>
 				</tr>
@@ -290,7 +298,7 @@ foreach ($existblocks as $pos=>$name) {
 				</tr>
 			</table>
 			<br/>
-			<table style=" margin-left: 30px;">
+			<table style=" margin-left: 30px;" role="presentation">
 				<tr>
 					<td>Title Background: </td>
 					<td><input type=text id="titlebg" name="titlebg" value="#DDDDFF" />
@@ -316,5 +324,5 @@ foreach ($existblocks as $pos=>$name) {
 </form>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

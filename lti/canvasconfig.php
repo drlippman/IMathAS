@@ -1,6 +1,6 @@
 <?php
 $init_skip_csrfp = true;
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 
 $host = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.

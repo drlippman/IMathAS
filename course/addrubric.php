@@ -3,8 +3,8 @@
 //(c) 2011 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -164,7 +164,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
 	  $(".dropdown-toggle").dropdown();
 	});
   </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -254,5 +254,5 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 
 }
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

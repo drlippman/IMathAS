@@ -4,7 +4,7 @@
 //(c) 2010 David Lippman
 
 /*** master includes ***/
-require("./init.php");
+require_once "./init.php";
 $now = time();
 
 //0: classes you're teaching
@@ -372,7 +372,7 @@ if (!empty($CFG['logquestionerrors']) && $myrights >= 20) {
     $qerrcnt = $stm->fetchColumn(0);
 }
 /*** done pulling stuff.  Time to display something ***/
-require("header.php");
+require_once "header.php";
 $msgtotal = array_sum($newmsgcnt);
 if (!isset($CFG['GEN']['homelinkbox'])) {
 	echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
@@ -496,7 +496,7 @@ for ($i=0; $i<3; $i++) {
 	}
 }
 
-require('footer.php');
+require_once 'footer.php';
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $username, $courseListOrder, $myspecialrights;

@@ -4,9 +4,9 @@
  * (c) 2020 David Lippman
  */
 
-require_once(__DIR__."/../includes/ltioutcomes.php");
-require_once(__DIR__.'/AssessInfo.php');
-require_once(__DIR__.'/AssessRecord.php');
+require_once __DIR__."/../includes/ltioutcomes.php";
+require_once __DIR__.'/AssessInfo.php';
+require_once __DIR__.'/AssessRecord.php';
 
 class AssessHelpers
 {
@@ -124,7 +124,7 @@ class AssessHelpers
                     ($assess_record->getStatus()&64)==64)
                 ) {
                     $aidposs = $assess_info->getSetting('points_possible');
-                    calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs, false);
+                    calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], true, $aidposs, false);
                 }
             }
   		}

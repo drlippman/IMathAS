@@ -1,6 +1,6 @@
 <?php
 
-require("../../init.php");
+require_once "../../init.php";
 
 if ($myrights < 100) {
   exit;
@@ -34,7 +34,7 @@ if (!empty($_POST)) {
 }
 
 $pagetitle = _('LTI Private Keys');
-require("../../header.php");
+require_once "../../header.php";
 
 echo '<div class=breadcrumb>'.$breadcrumbbase;
 echo '<a href="../../admin/admin2.php">'._('Admin').'</a> ';
@@ -67,4 +67,4 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 echo '</ul>';
 echo '<p><button type=submit name="newkey" value=1>'._('Add New Key').'</button></p>';
 echo '</form>';
-require('../../footer.php');
+require_once '../../footer.php';

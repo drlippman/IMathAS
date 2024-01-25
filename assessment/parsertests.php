@@ -1,9 +1,9 @@
 <?php
 
-require("../init.php");
-require('mathparser.php');
+require_once "../init.php";
+require_once 'mathparser.php';
 $allowedmacros = [];
-require('macros.php');
+require_once 'macros.php';
 
 if ($myrights < 100) {
   exit;
@@ -38,6 +38,7 @@ $tests = [
  ['8sin(pi/2)/4', [], 2],
  ['4arcsin(sqrt(2)/2)/pi', [], 1],
  ['root(3)(8) + root3(8)', [], 4],
+ ['root((3))(8) + log_((3))(3)', [], 3],
  ['sqrt4+1', [], 3],
  ['sqrt4x', ['x'=>10], 20],
  ['sin^2(pi/4)', [], 1/2],
@@ -93,6 +94,7 @@ $tests = [
  ['coth^-1(2)', [], 0.549306144]
 ];
 
+$st = microtime(true);
 foreach ($tests as $test) {
   $p = new MathParser(implode(',', array_keys($test[1])));
   $out = 0;
@@ -108,7 +110,9 @@ foreach ($tests as $test) {
     $p->printTokens();
   }
 }
-
+$t = microtime(true) - $st;
+$tp = $t/count($tests);
+echo "Parser tests done in $t, $tp per<br><br>";
 
 $sameformtests = [
     ['(x+3)(-x+5)','(5-x)(3+x)',['x']],
@@ -124,13 +128,17 @@ $sameformtests = [
     ['3-4(x)','-4(x)+3',['x']],
     ['-(2*3)/4','(-2*3)/4',[]],
     ['-(2*3)/4','-2*3/4',[]],
+    ['5-(2*3)/4','5-2*3/4',[]],
     ['-(2+3)','-2-3',[]], // this and next are debatable; caused by $invert code in mathparser
     ['-3(2+4)','3(-2-4)',[]],
     ['-2+3','3+(-2)',[]],
     ['-2+3-1','3-2-1',[]],
+    ['-5+3-1','3-5-1',[]],
+    ['5 - 3 - 2 - 0', '-3 - 2 + 5 - 0', []],
     ['(-2-3)(-4-5)','(-4-5)(-2-3)',[]],
     ['(-2-3)(-4-5)','(-5-4)(-3-2)',[]],
-    ['2+3(x-4)','2-3(4-x)',['x']]
+    ['2+3(x-4)','2-3(4-x)',['x']],
+    ['2(x+3)','2x+2*3', ['x'], 1]
 ];
 $st = microtime(true);
 foreach ($sameformtests as $test) {
@@ -149,8 +157,9 @@ foreach ($sameformtests as $test) {
       echo $t->getMessage();
     }
 }
-echo microtime(true) - $st;
-echo "Sameform tests done <br><br>";
+$t = microtime(true) - $st;
+$tp = $t/count($sameformtests);
+echo "Sameform tests done in $t, $tp per<br><br>";
 
 $st = microtime(true);
 $matrixtests = [
@@ -169,5 +178,6 @@ foreach ($matrixtests as $test) {
         echo "Fail on $test[0]<br>";
     }
 }
-echo microtime(true) - $st;
-echo "matrix tests done <br><br>";
+$t = microtime(true) - $st;
+$tp = $t/count($matrixtests);
+echo "Matrix tests done in $t, $tp per<br><br>";

@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Make deadline exceptions for a multiple students; included by listusers and gradebook
 //(c) 2007 David Lippman
-require_once(__DIR__."/../includes/TeacherAuditLog.php");
+require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 	if (!isset($imasroot)) {
 		echo "This file cannot be called directly";
@@ -14,7 +14,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
         $DBH->beginTransaction();
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
@@ -254,7 +254,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		if (isset($_POST['sendmsg'])) {
 			$_POST['submit'] = "Message";
 			$_POST['checked'] = explode(',',$_POST['tolist']);
-			require("masssend.php");
+			require_once "masssend.php";
 			exit;
 		}
 	}
@@ -298,7 +298,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			return true;
 		});
 	})</script>';
-	require("../header.php");
+	require_once "../header.php";
 
 	$cid = Sanitize::courseId($_GET['cid']);
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -314,6 +314,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
         echo "\">Gradebook</a> &gt; ";
         if ($calledfrom == 'isolateassess') {
+            $aid = Sanitize::onlyInt($_GET['aid']);
             echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';
 	}
         echo " Manage Exceptions</div>\n";
@@ -329,6 +330,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
 		$formtag .= "\" id=\"qform\">\n";
 	} else if ($calledfrom == 'isolateassess') {
+        $aid = Sanitize::onlyInt($_GET['aid']);
         $formtag = "<form method=post action=\"isolateassessgrade.php?cid=$cid&aid=$aid&massexception=1\" id=\"qform\">\n";
 	}
 
@@ -346,9 +348,10 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			} else if ($calledfrom=='gb') {
 				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
 			} else if ($calledfrom == 'isolateassess') {
+                $aid = Sanitize::onlyInt($_GET['aid']);
                 echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
 			}
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		$formtag .= "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
@@ -694,7 +697,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo '</fieldset>';
 	}
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 
 

@@ -77,6 +77,7 @@ class NTupleAnswerBox implements AnswerBox
             $shorttip = _('Enter an n-tuple');
         }
         if ($reqdecimals !== '') {
+            list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
             $tip .= sprintf(_('Each value should be accurate to %d decimal places.'), $reqdecimals) . '<br/>';
             $shorttip .= sprintf(_(", each value accurate to %d decimal places"), $reqdecimals);
         }

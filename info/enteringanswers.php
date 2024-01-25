@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <?php
 	$dbsetup = true; //prevents connection to database
-	include("../init_without_validate.php");
+	require_once "../init_without_validate.php";
 ?>
 <html>
 <head>
@@ -16,7 +16,7 @@ img {
 <body>
 <?php
 	$pagetitle = "Entering Answers";
-	require("../infoheader.php");
+	require_once "../infoheader.php";
 ?>
 
 <img class="floatleft" src="<?php echo "$imasroot/img/typing.jpg"?>" alt="Picture of typing"/>
