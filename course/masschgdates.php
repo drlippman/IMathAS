@@ -172,6 +172,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = $data[6]; // $_POST['type'.$i];
 			$id = $data[7]; // $_POST['id'.$i];
 			$avail = intval($data[8]);
+			if ($avail == 2) {
+				$enddate =  2000000000;
+				if ($type != 'Link' && $type != 'InlineText') {
+					$startdate = 0;
+				}
+			}
 
 			$new = [
 				'id' => $id,
