@@ -111,6 +111,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if (substr($row['sourcedid'],0,6)=='LTI1.3') {
 		// LTI 1.3 update
 		list($ltiver,$ltiuserid,$score_url,$platformid) = explode(':|:', $row['sourcedid']);
+		if (!is_numeric($platformid)) { continue; }
 		if ($updater1p3->have_token($platformid)) {
 			if ($updater1p3->token_valid($platformid)) {
 				debuglog('queing request with token for '.$row['hash']);
