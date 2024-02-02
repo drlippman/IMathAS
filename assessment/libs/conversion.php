@@ -1372,15 +1372,15 @@ function conversionCapacity2() {
 
 		if($fullname==0) {
             $retval[0] = array("",1,$unitabbr["cup"],8,$unitabbr["fluid ounces"]);
-            $retval[1] = array("",1,$unitabbr["teaspoon"],2.498023,$unitabbr["tablespoon"]);
-            $retval[2] = array("",1,$unitabbr["tablespoon"],16,$unitabbr["cups"]);
+            $retval[1] = array("",1,$unitabbr["tablespoon"],3,$unitabbr["teaspoons"]);
+            $retval[2] = array("",1,$unitabbr["cup"],16,$unitabbr["tablespoons"]);
             $retval[3] = array("",1,$unitabbr["pint"],2,$unitabbr["cups"]);
             $retval[4] = array("",1,$unitabbr["quart"],2,$unitabbr["pints"]);
             $retval[5] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
         } else {
             $retval[0] = array("",1,$unit["Cup"],8,$unit["Fluid ounces"]);
-            $retval[1] = array("",1,$unit["teaspoon"],2.498023,$unit["tablespoon"]);
-            $retval[2] = array("",1,$unit["tablespoon"],16,$unit["cups"]);
+            $retval[1] = array("",1,$unit["cup"],3,$unit["teaspoons"]);
+            $retval[2] = array("",1,$unit["tablespoon"],16,$unit["tablespoons"]);
             $retval[3] = array("",1,$unit["Pint"],2,$unit["Cups"]);
             $retval[4] = array("",1,$unit["Quart"],2,$unit["Pints"]);
             $retval[5] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
