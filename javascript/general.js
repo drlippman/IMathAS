@@ -788,14 +788,14 @@ function togglevideoembed() {
 	if (els.length>0) {
 		if (els.css('display')=='none') {
 			els.show();
-			els.parent('.fluid-width-video-wrapper').show();
+			els.closest('.video-wrapper-wrapper').show();
 			jQuery(this).text(' [-]')
 				.attr('title',_("Hide video"))
 				.attr('aria-label',_("Hide embedded video"));
 		} else {
 			els.hide();
 			els.get(0).contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
-			els.parent('.fluid-width-video-wrapper').hide();
+			els.closest('.video-wrapper-wrapper').hide();
 			jQuery(this).text(' [+]');
 			jQuery(this).attr('title',_("Watch video here"));
 			jQuery(this).attr('aria-label',_("Embed video") + ' ' + jQuery(this).prev().text());
@@ -815,7 +815,7 @@ function togglevideoembed() {
         if ($this.closest('.itemhdr').length == 0) {
             viframe.insertAfter($this);
             $this.parent().fitVids();
-            jQuery('<br/>').insertAfter($this);
+            //jQuery('<br/>').insertAfter($this);
         } else {
             var par = $this.closest('.itemhdr').next();
             par.prepend(viframe);
