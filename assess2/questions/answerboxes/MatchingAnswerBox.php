@@ -206,14 +206,30 @@ class MatchingAnswerBox implements AnswerBox
         if (!$isConditional) {
             for ($i = 0; $i < count($randqkeys); $i++) {
                 if (!empty($matchlist)) {
-                    $akey = array_search($matchlist[$randqkeys[$i]], $randakeys);
+                    $anss = array_map('trim', explode(' or ', $matchlist[$randqkeys[$i]]));
+                    $ansopts = [];
+                    foreach ($anss as $v) {
+                        $akey = array_search($v, $randakeys);
+                        if ($displayformat == "select") {
+                            $ansopts[] = $answers[$randakeys[$akey]];
+                        } else {
+                            $ansopts[] = chr($akey + 97);
+                        }
+                    }
+                    if ($displayformat == "select") {
+                        $sa .= '<br/>' . implode(' or ', $ansopts);
+                    } else if (count($ansopts) > 1) {
+                        $sa .= '(' . implode(' or ', $ansopts) . ') ';
+                    } else {
+                        $sa .= $ansopts[0] . ' ';
+                    }
                 } else {
                     $akey = array_search($randqkeys[$i], $randakeys);
-                }
-                if ($displayformat == "select") {
-                    $sa .= '<br/>' . $answers[$randakeys[$akey]];
-                } else {
-                    $sa .= chr($akey + 97) . " ";
+                    if ($displayformat == "select") {
+                        $sa .= '<br/>' . $answers[$randakeys[$akey]];
+                    } else {
+                        $sa .= chr($akey + 97) . " ";
+                    }
                 }
             }
         }
