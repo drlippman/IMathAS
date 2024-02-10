@@ -479,7 +479,11 @@ if ($overwriteBody==1) {
 
 	if ($line['ancestors']!='') {
         $line['ancestors'] = str_replace(',',', ',$line['ancestors']);
-		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);
+		$line['ancestors'] = explode(',', $line['ancestors']);
+		foreach ($line['ancestors'] as $k=>$ancestorqsid) {
+			$line['ancestors'][$k] = '<a href="testquestion2.php?cid='.$cid.'&qsetid='.intval($ancestorqsid).'">'.intval($ancestorqsid).'</a>';
+		}
+		echo "<p>"._("Derived from:")." ".implode(', ', $line['ancestors']);
 		if ($line['ancestorauthors']!='') {
 			echo '<br/>'._('Created by: ').Sanitize::encodeStringForDisplay($line['ancestorauthors']);
 		}
