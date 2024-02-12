@@ -206,9 +206,10 @@ class QuestionHtmlGenerator
         // In older questions, code is broken up into three parts.
         // In "modern" questions, the last two parts are empty.
         try {
-          eval(interpret('control', $quesData['qtype'], $quesData['control']));
-          eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol']));
-          eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
+          $db_qsetid = $this->questionParams->getDbQuestionSetId();
+          eval(interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]));
+          eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol'], 1, [$db_qsetid]));
+          eval(interpret('answer', $quesData['qtype'], $quesData['answer'], 1, [$db_qsetid]));
         } catch (\Throwable $t) {
           $errsource = basename($t->getFile());
           if (strpos($errsource, 'QuestionHtmlGenerator.php') !== false) {
