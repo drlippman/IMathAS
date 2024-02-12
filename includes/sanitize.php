@@ -231,6 +231,7 @@ class Sanitize
 			? preg_replace('/[^\da-z\.-]/i', '', $parsed_url['host']) : '';
 		$port = isset($parsed_url['port']) ? preg_replace('/[^\d]/', '', $parsed_url['port']) : '';
 		$fragment = isset($parsed_url['fragment']) ? rawurlencode(rawurldecode($parsed_url['fragment'])) : '';
+        $fragment = str_replace('%3D', '=', $fragment);
 
         // Sanitize the path
         if (isset($parsed_url['path'])) {
