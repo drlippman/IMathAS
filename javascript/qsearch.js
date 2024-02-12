@@ -217,6 +217,11 @@ var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong 
     '</span> ';
 var wrongLibState = {};
 function displayQuestionList(results) {
+    if (typeof results === 'string') {  // error message
+        $("#searcherror").html(results).show();
+        $("#search").focus();
+        return;
+    }
     var searchtype = 'libs';
     var colcnt = 9;
     var thead = '<thead><tr>'
