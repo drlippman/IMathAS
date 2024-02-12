@@ -3995,10 +3995,11 @@ class AssessRecord
    * Clears any Latepass blocks (review or gb) for current student
    */
   public function clearLPblocks() {
+    $cid = $this->assess_info->getCourseId();
     $query = "UPDATE imas_content_track SET type=IF(type = 'assessreview', 'assessreviewub', 'gbviewsafe')
-        WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')";
+        WHERE typeid=:typeid AND courseid=:courseid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')";
     $stm = $this->DBH->prepare($query);
-    $stm->execute([':typeid' => $this->curAid, ':userid' => $this->curUid]);
+    $stm->execute([':typeid' => $this->curAid, ':courseid' => $cid, ':userid' => $this->curUid]);
   }
 
   /**
