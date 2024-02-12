@@ -673,8 +673,6 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
                     $inside = 'error';
                     echo 'Error: circular reference in includecodefrom';
                 } else {
-                    $included_qs[] = $out;
-                
                     $stm = $DBH->prepare("SELECT control,qtype FROM imas_questionset WHERE id=:id");
                     $stm->execute(array(':id'=>$out));
                     if ($stm->rowCount()==0) {
@@ -683,7 +681,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
                     } else {
                         list($thiscontrol, $thisqtype) = $stm->fetch(PDO::FETCH_NUM);
                         //$inside = interpretline(mysql_result($result,0,0),$anstype);
-                        $inside = interpret('control',$anstype,$thiscontrol,$countcnt+1,$included_qs);
+                        $inside = interpret('control',$anstype,$thiscontrol,$countcnt+1, [$out, ...$included_qs ]);
                         if ($thisqtype!=$anstype) {
                             //echo 'Imported code question type does not match current question answer type';
                         }
