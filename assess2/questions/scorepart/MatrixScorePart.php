@@ -138,25 +138,27 @@ class MatrixScorePart implements ScorePart
             }
         }
 
-        if ($fullmatrix && in_array('ref',$ansformats)) {
+        if ($fullmatrix && (in_array('ref',$ansformats) || in_array('rowequiv',$ansformats))) {
           // reduce correct answer to rref
           $answerlist = matrix_scorer_rref($answerlist, $N);
           $M = count($answerlist) / $N;
-          for ($r=0;$r<$N;$r++) {
-            $c = 0;
-            while ($c < $M && abs($answerlist[$r*$M+$c]) < 1e-10) {
-              if (abs($givenanslist[$r*$M+$c]) > 1e-10) {
-                $correct = false; // nonzero where 0 expected
-              }
-              $c++;
+          if (in_array('ref',$ansformats)) {
+            for ($r=0;$r<$N;$r++) {
+                $c = 0;
+                while ($c < $M && abs($answerlist[$r*$M+$c]) < 1e-10) {
+                if (abs($givenanslist[$r*$M+$c]) > 1e-10) {
+                    $correct = false; // nonzero where 0 expected
+                }
+                $c++;
+                }
+                /* Removed: Not all ref defs include leading 1's
+                if ($c < $M) { // if there's a first non-zero entry, should be 1
+                if (abs($givenanslist[$r*$M+$c] - 1) > 1e-10) {
+                    $correct = false;
+                }
+                }
+                */
             }
-            /* Removed: Not all ref defs include leading 1's
-            if ($c < $M) { // if there's a first non-zero entry, should be 1
-              if (abs($givenanslist[$r*$M+$c] - 1) > 1e-10) {
-                $correct = false;
-              }
-            }
-            */
           }
           // now reduce given answer to rref
           if ($correct) {
