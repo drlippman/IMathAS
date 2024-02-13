@@ -33,7 +33,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = removeDisallowedVarsString($str,$anstype,$countcnt,'"');
+		$str = removeDisallowedVarsString($str,$anstype,$countcnt,'"',$included_qs);
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -614,7 +614,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype);
+				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt,$qtype,$included_qs);
 			}
 			$i++;
             if ($i<$len) {
@@ -746,7 +746,7 @@ function testIsEscaped($str,$c) {
 }
 
 //handle braces and variable variables in strings and qtext
-function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"') {
+function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"',$included_qs=[]) {
 	global $disallowedvar;
 
 	//remove any blatent disallowed var
