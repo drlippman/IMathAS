@@ -4773,6 +4773,8 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
   $x = (!empty($eqnvars[1])) ? $eqnvars[1] : 'x';
   $y = (!empty($eqnvars[2])) ? $eqnvars[2] : 'y';
   $pts = gettwopointdata($str,$type,$xmin,$xmax,$ymin,$ymax,$w,$h);
+  $outexps = [];
+  $outeqs = [];
   if (!empty($pts)) {
     if ($type=='line' || $type=='lineseg' || $type=='ray') {
   		foreach ($pts as $key => $pt) {
