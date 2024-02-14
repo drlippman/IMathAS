@@ -2379,6 +2379,10 @@
                 max_size = 1000,
                 width = image.width,
                 height = image.height;
+                if (width < max_size && height < max_size) {
+                    // no need to resize
+                    callback(false);
+                }
             if (width > height) {
                 if (width > max_size) {
                     height *= max_size / width;
@@ -2394,7 +2398,7 @@
             canvas.height = height;
             canvas.getContext('2d').drawImage(image, 0, 0, width, height);
             var resizedImage = canvas.toBlob(function(b) {
-                callback(b);
+                callback(true,b);
             }, 'image/jpeg');
         }
         image.src = imgURL;
@@ -15238,8 +15242,12 @@
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        Tools.resizeImage(blobInfo, function(resizedblob) {
-            formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+        Tools.resizeImage(blobInfo, function(resized,resizedblob) {
+            if (resized) {
+                formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+            } else {
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+            }
             xhr.send(formData);
         });
       };

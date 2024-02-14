@@ -953,8 +953,12 @@ var image = (function (domGlobals) {
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        global$2.resizeImage(blobInfo, function(resizedblob) {
-            formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+        global$2.resizeImage(blobInfo, function(resized,resizedblob) {
+            if (resized) {
+                formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+            } else {
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+            }
             xhr.send(formData);
         });
       };
