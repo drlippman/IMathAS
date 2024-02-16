@@ -16,7 +16,7 @@
             {{ confirmBody }}
           </p>
           <div class="flexrow flexright">
-            <button @click="doOk" class="primary">
+            <button @click="doOk" class="primary" key="okbtn">
               {{ okMessage }}
             </button>
             <button

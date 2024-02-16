@@ -4,13 +4,13 @@
       {{ $t('password.label') }}
     </label>
     <input
-      :value="value"
+      :value="modelValue"
       id="password"
       name="password"
       type="password"
       autocomplete="off"
       @input="handleInput"
-      @keyup.enter="$emit('onenter')"
+      @keydown.enter="handleEnter"
     >
   </div>
 </template>
@@ -18,10 +18,15 @@
 <script>
 export default {
   name: 'PasswordEntry',
-  props: ['value'],
+  props: ['modelValue'],
   methods: {
     handleInput (event) {
-      this.$emit('input', event.target.value);
+      this.$emit('update:modelValue', event.target.value);
+    },
+    handleEnter (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.$emit('onenter');
     }
   }
 };
