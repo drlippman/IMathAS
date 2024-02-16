@@ -420,7 +420,7 @@ class MathParser
         }
         $tokens[] = [
           'type'=>'number',
-          'symbol'=> $matches[1]
+          'symbol'=> (float) $matches[1]
         ];
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
