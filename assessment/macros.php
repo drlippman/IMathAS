@@ -5987,7 +5987,22 @@ function parseMatrixToArray($str) {
         return [explode('|',$str), null];
     } else if (strpos($str,',')===false) {
         // 1x1 matrix
-        return [[substr($str,1,-1)], 1];
+        $val = substr($str,1,-1);
+        if (strlen($val)>2 && $val[0]=='(') {
+            $depth = 0;
+            for ($i=0;$i<strlen($val);$i++) {
+                if ($val[$i] == '(') { $depth++; }
+                if ($val[$i] == ')') { $depth--; }
+                if ($depth == 0) {
+                    if ($i == strlen($val)-1) {
+                        $val = substr($val,1,-1);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return [[$val], 1];
     } else {
         $out = [];
         $rowcnt = 0;
