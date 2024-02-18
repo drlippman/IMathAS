@@ -1623,6 +1623,44 @@ function cplx_csc($z) {
 function cplx_cot($z) {
   return cplx_div(cplx_cos($z), cplx_sin($z));
 }
+function cplx_sinh($z) {
+  return [sinh($z[0])*cos($z[1]), cosh($z[0])*sin($z[1])];
+}
+function cplx_cosh($z) {
+  return [cosh($z[0])*cos($z[1]), sinh($z[0])*sin($z[1])];
+}
+function cplx_tanh($z) {
+  return cplx_div(cplx_sinh($z), cplx_cosh($z));
+}
+function cplx_sech($z) {
+  return cplx_div([1,0], cplx_cosh($z));
+}
+function cplx_csch($z) {
+  return cplx_div([1,0], cplx_sinh($z));
+}
+function cplx_coth($z) {
+  return cplx_div(cplx_cosh($z), cplx_sinh($z));
+}
+function cplx_asinh($z) {
+  $r = cplx_sqrt([$a[0]*$a[0] - $a[1]*$a[1] + 1,2*$a[0]*$b[1]]);
+  return cplx_log([$z[0] + $r[0], $z[1] + $r[1]]);
+}
+function cplx_acosh($z) {
+    $r = cplx_sqrt([$a[0]*$a[0] - $a[1]*$a[1] - 1,2*$a[0]*$b[1]]);
+    return cplx_log([$z[0] + $r[0], $z[1] + $r[1]]);
+}
+function cplx_atanh($z) {
+    return cplx_mult([.5,1], cplx_log(cplx_div([1+$z[0],$z[1]], [1-$z[0],-1*$z[1]])));
+}
+function cplx_asech($z) {
+    return cplx_acosh(cplx_div([1,0],$z));
+}
+function cplx_acsch($z) {
+    return cplx_asinh(cplx_div([1,0],$z));
+}
+function cplx_acoth($z) {
+    return cplx_mult([.5,1], cplx_log(cplx_div([$z[0]+1,$z[1]], [$z[0]-1,$z[1]])));
+}
 function cplx_asin($z) {
   // -i*  ln(iz + sqrt(1-z^2))  
   $zz = [$z[0]*$z[0] - $z[1]*$z[1], 2*$z[0]*$z[1]];
