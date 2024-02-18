@@ -3610,7 +3610,7 @@ function cleanbytoken($str,$funcs = array()) {
         // try to strip extraneous parens
         $cout = count($out);
         for ($i=0;$i<$cout;$i++) {
-            if ($out[$i][0]=='(' && $out[$i][strlen($out[$i])-1]==')') {
+            if (is_string($out[$i]) && $out[$i][0]=='(' && $out[$i][strlen($out[$i])-1]==')') {
                 if (($i==0 || $out[$i-1]=='+') &&
                     ($i==$cout-1 || $out[$i+1]=='+' || $out[$i+1]=='-')) {
                         $out[$i] = substr($out[$i],1,-1);
