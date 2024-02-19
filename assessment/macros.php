@@ -3596,7 +3596,7 @@ function cleanbytoken($str,$funcs = array()) {
         } else {
             $out[] = $token[0];
         }
-        if ($i<$grplasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && $tokens[$i+1][1]==4))) {
+        if ($i<$grplasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && ($tokens[$i+1][1]==4 || $tokens[$i+1][1]==2)))) {
             $out[] = ' ';
         }
     }
