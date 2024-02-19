@@ -3489,6 +3489,16 @@ function cleanbytoken($str,$funcs = array()) {
             if (count($out)==0 && $i>0) {
                 $finalout[] = '0';
             } else {
+                // try to strip extraneous parens
+                $cout = count($out);
+                for ($j=0;$j<$cout;$j++) {
+                    if (is_string($out[$j]) && strlen($out[$j])>2 && $out[$j][0]=='(' && $out[$j][strlen($out[$j])-1]==')' && strpos($out[$j],',')===false) {
+                        if (($j==0 || $out[$j-1]=='+') &&
+                            ($j==$cout-1 || $out[$j+1]=='+' || $out[$j+1]=='-')) {
+                                $out[$j] = substr($out[$j],1,-1);
+                        }
+                    }
+                }
                 $finalout[] = implode('',$out);
             }
             $finalout[] = $token[0];
@@ -3610,7 +3620,7 @@ function cleanbytoken($str,$funcs = array()) {
         // try to strip extraneous parens
         $cout = count($out);
         for ($i=0;$i<$cout;$i++) {
-            if (is_string($out[$i]) && $out[$i][0]=='(' && $out[$i][strlen($out[$i])-1]==')') {
+            if (is_string($out[$i]) && strlen($out[$i])>2 && $out[$i][0]=='(' && $out[$i][strlen($out[$i])-1]==')' && strpos($out[$i],',')===false) {
                 if (($i==0 || $out[$i-1]=='+') &&
                     ($i==$cout-1 || $out[$i+1]=='+' || $out[$i+1]=='-')) {
                         $out[$i] = substr($out[$i],1,-1);
