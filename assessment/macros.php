@@ -3489,6 +3489,7 @@ function cleanbytoken($str,$funcs = array()) {
             if (count($out)==0 && $i>0) {
                 $finalout[] = '0';
             } else {
+                /* Disabled for now - causing issues with badly written questions
                 // try to strip extraneous parens
                 $cout = count($out);
                 for ($j=0;$j<$cout;$j++) {
@@ -3499,6 +3500,7 @@ function cleanbytoken($str,$funcs = array()) {
                         }
                     }
                 }
+                */
                 $finalout[] = implode('',$out);
             }
             $finalout[] = $token[0];
@@ -3617,6 +3619,7 @@ function cleanbytoken($str,$funcs = array()) {
     if (count($out)==0 && $lastout == -1) {
         $finalout[] = '0';
     } else {
+        /* Disabled for now - causing issues with badly written questions
         // try to strip extraneous parens
         $cout = count($out);
         for ($i=0;$i<$cout;$i++) {
@@ -3627,6 +3630,7 @@ function cleanbytoken($str,$funcs = array()) {
                 }
             }
         }
+        */
         $finalout[] = implode('',$out);
     }
 	
