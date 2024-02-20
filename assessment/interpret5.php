@@ -72,6 +72,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 	$ifloc = -1;
 	$elseloc = array();
 	$forloc = -1;
+    $foreachloc = -1;
 	$whereloc = -1;
 	$lastsym = '';
 	$lasttype = -1;
@@ -161,6 +162,29 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]}),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=round(floatval({$forcond[2]}),0) && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) ".$todo."}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
+					return 'error';
+				}
+			} else if ($foreachloc>-1) {
+				//convert foreach($arr AS $k=>$v) {todo}
+				$j = $foreachloc;
+				while ($j<count($bits) && $bits[$j][0]!='{') {
+					$j++;
+				}
+				$cond = implode('',array_slice($bits,$foreachloc+1,$j-$foreachloc-1));
+				$todo = implode('',array_slice($bits,$j));
+				//should be $arr as $k=>$v
+				if (preg_match('/^\s*\(\s*(\$\w+)\*?\s*as\s*(\$\w+)\s*=>\s*(\$\w+)\s*\)\s*$/i',$cond,$matches)) {
+					$foreachcond = array_slice($matches,1,3);
+					$bits = array("if (!is_array({$foreachcond[0]})) {echo 'input of foreach must be an array';} else {
+                        \$forloopcnt[{$countcnt}]=0; 
+                        foreach ({$foreachcond[0]} as {$foreachcond[1]}=>{$foreachcond[2]}) { 
+                            \$forloopcnt[{$countcnt}]++;
+                            if (\$forloopcnt[{$countcnt}]==1000) { break; }
+                            $todo
+                        }; 
+                        if (\$forloopcnt[{$countcnt}]>=1000) {echo \"foreach loop exceeded 1000 iterations - giving up\";}}");
+				} else {
+					echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
 					return 'error';
 				}
 			} else if ($ifloc == 0) {
@@ -255,6 +279,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			}
 
 			$forloc = -1;
+            $foreachloc = -1;
 			$ifloc = -1;
 			$whereloc = -1;
 			$elseloc = array();
@@ -290,6 +315,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				$whereloc = count($bits);
 			} else if ($sym=='for') {
 				$forloc = count($bits);
+			} else if ($sym=='foreach') {
+				$foreachloc = count($bits);
 			} else if ($sym=='else' || $sym=='elseif') {
 				$elseloc[] = array(count($bits),$sym);
 			}
@@ -395,7 +422,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word, and set type appropriately if it is
-			if ($out=='if' || $out=='where' || $out=='for' || $out=='break' || $out=='continue') {
+			if ($out=='if' || $out=='where' || $out=='for' || $out=='foreach' || $out=='break' || $out=='continue') {
 				$intype = 8;
 			} else if ($out=='else' || $out=='elseif') {
 				$intype = 8;
@@ -467,7 +494,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 				} else {
 					//not a function, so what is it?
                     $outlower = strtolower($out);
-					if ($outlower=='true' || $outlower=='false' || $outlower=='null') {
+					if ($outlower=='true' || $outlower=='false' || $outlower=='null' || $outlower=='as') {
 						//we like this - it's an acceptable unquoted string
 					} else {//
 						//an unquoted string!  give a warning to instructor,

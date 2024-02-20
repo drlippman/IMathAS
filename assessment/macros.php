@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
+ "array_values","array_keys","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform","splicearray",
  "getsigfigs","checksigfigs");
 

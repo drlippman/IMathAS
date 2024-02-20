@@ -2209,6 +2209,23 @@ for ($i=0..4) {
 }
 </pre>
 
+<p>For associative arrays (arrays with non-numeric or non-consecutive keys) you can use a "foreach" loop:</p>
+
+<pre>foreach ($arr as $k=>$v) { action }</pre>
+<p>
+Here <em>$arr</em> is the associative array, and as it loops the keys will be assigned
+to <em>$k</em> and the values to <em>$v</em>.
+</p>
+<p>Example:</p>
+<pre>
+$arr = ['red' => 3, 'green' => 5, 'blue' => 2]
+
+$str = ''
+for ($arr as $color=>$num) {
+  $str .= "There are $num balls that are $color. "
+}
+</pre>
+
 <p>Conditions can be used <em>inside</em> a for loop, but not outside without explicit blocking</p>
 <pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
@@ -2535,6 +2552,7 @@ These macros are for working with arrays:
 <li><strong>diffarrays(array1,array2)</strong>: Returns all elements in array1 that are not also in array2</li>
 <li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values. Beware this doesn't re-index the array, so you may want to then use array_values if you need consecutive array keys.</li>
 <li><strong>array_values(array)</strong>: Returns the values of an array, reindexing with consecutive numeric indices.</li>
+<li><strong>array_keys(array)</strong>: Returns the keys of an associative array.</li>
 <li><strong>count(array)</strong>:  Counts the number of entries in the array</li>
 <li><strong>is_array(variable)</strong>:  Determines if the variable is an array</li>
 <li><strong>sumarray(array)</strong>: Adds the entries in an array</li>
