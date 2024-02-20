@@ -156,8 +156,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 				$stm = $DBH->prepare($query);
 				$stm->execute($insarr);
-				$stm = $DBH->prepare("SELECT id,ver FROM imas_assessments WHERE groupsetid=:groupsetid");
-				$stm->execute(array(':groupsetid'=>$grpsetid));
+				$stm = $DBH->prepare("SELECT id,ver FROM imas_assessments WHERE groupsetid=:groupsetid AND courseid=:courseid");
+				$stm->execute(array(':groupsetid'=>$grpsetid, ':courseid'=>$cid));
 				while ((list($aid,$aver) = $stm->fetch(PDO::FETCH_NUM)) && $grpsetid>0) {
 					//if asid exists for this grpid, need to update students.
 					//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
@@ -560,18 +560,18 @@ if ($overwriteBody==1) {
 		echo '<h3>Delete student group set</h3>';
 		echo "<p>Are you SURE you want to delete the set of student groups <b>" . Sanitize::encodeStringForDisplay($page_grpsetname) . "</b> and all the groups contained within it? ";
 		$used = '';
-		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$deleteGroupSet));
+		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid=:groupsetid AND courseid=:courseid");
+		$stm->execute(array(':groupsetid'=>$deleteGroupSet, ':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$used .= "Assessment: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
-		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$deleteGroupSet));
+		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE groupsetid=:groupsetid AND courseid=:courseid");
+		$stm->execute(array(':groupsetid'=>$deleteGroupSet, ':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$used .= "Forum: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
-		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$deleteGroupSet));
+		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE groupsetid=:groupsetid AND courseid=:courseid");
+		$stm->execute(array(':groupsetid'=>$deleteGroupSet, ':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$used .= "Wiki: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
