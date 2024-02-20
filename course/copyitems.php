@@ -289,6 +289,10 @@ if (!(isset($teacherid))) {
 			}
 
 			if (isset($_POST['checked']) || $_POST['whattocopy']=='all') {
+                if ($ctc != $cid) {
+                    prepopulate_forumtrack($ctc,$cid);
+                }
+
 				$checked = $_POST['checked'] ?? [];
 				$stm = $DBH->prepare("SELECT blockcnt,dates_by_lti FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));

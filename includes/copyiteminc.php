@@ -951,3 +951,16 @@ function copyallcalitems($sourcecid, $destcid)
         $stm->execute($qarr);
     }
 }
+
+function prepopulate_forumtrack($sourcecid, $destcid)
+{
+    // load forum mapping based on name match, to use for post-to-forum remapping
+    global $DBH, $forumtrack;
+    $query = "SELECT sf.id,df.id FROM imas_forums AS sf JOIN imas_forums AS df ON sf.name=df.name ";
+    $query .= "WHERE sf.courseid=:sourcecid AND df.courseid=:destcid";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':sourcecid'=>$sourcecid, ':destcid'=>$destcid));
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+        $forumtrack[$row[0]] = $row[1];
+    }
+}
