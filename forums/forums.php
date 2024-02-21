@@ -241,7 +241,6 @@ if ($searchtype == 'thread') {
 		$arr[] = $userid;
 	}
 
-	$query .= " ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
 	$stm->execute($arr);
 	$result=$stm->fetchALL(PDO::FETCH_ASSOC);
@@ -442,7 +441,7 @@ if ($searchtype == 'thread') {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$qarr[':userid']=$userid;
 	}
-	$query .= "GROUP BY imas_forum_threads.forumid ORDER BY imas_forums.id";
+	$query .= "GROUP BY imas_forum_threads.forumid";
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
@@ -470,7 +469,7 @@ if ($searchtype == 'thread') {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$qarr[':userid']=$userid;
 	}
-	$query .= "GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+	$query .= "GROUP BY imas_forum_posts.forumid";
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 
