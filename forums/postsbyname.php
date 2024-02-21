@@ -26,10 +26,21 @@
 		$stm->execute(array(':forumid'=>$forumid));
 		$now = time();
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            /*
             $stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) 
                 VALUES (:userid, :threadid, :lastview)
                 ON DUPLICATE KEY UPDATE lastview=:lastview2");
 		    $stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now, ':lastview2'=>$now));
+            */
+            $stm2 = $DBH->prepare("SELECT lastview FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
+			$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0]));
+			if ($stm2->rowCount()>0) {
+				$stm2 = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid=:threadid");
+				$stm2->execute(array(':lastview'=>$now, ':userid'=>$userid, ':threadid'=>$row[0]));
+			} else{
+				$stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
+				$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now));
+		    }
 		}
 	}
 	$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid,autoscore FROM imas_forums WHERE id=:id");
