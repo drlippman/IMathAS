@@ -29,6 +29,9 @@ if (isset($_POST['mergefrom'])) {
 	$defpoints = $row['defpoints'];
 	$row['name'] .= ' - merge result';
 	$row['courseid'] = $cid;
+    if ($row['date_by_lti']>1) {
+        $row['date_by_lti'] = 1;
+    }
 	$fieldlist = implode(',', array_keys($row));
 	$placeholders = Sanitize::generateQueryPlaceholders($row);
 	$stm = $DBH->prepare("INSERT INTO imas_assessments ($fieldlist) VALUES ($placeholders)");
