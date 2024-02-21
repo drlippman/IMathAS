@@ -313,20 +313,60 @@ $searchlikevals = array();
 if (trim($safesearch)=='') {
 	$searchlikes = '';
 } else {
-	$searchterms = explode(" ",$safesearch);
-	$searchlikes = "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-	foreach ($searchterms as $t) {
-		$searchlikevals[] = "%$t%";
-	}
+    $isIDsearch = false;
 	if (substr($safesearch,0,3)=='id=') {
-		$searchlikes = "imas_questionset.id=? AND ";
-		$searchlikevals = array(substr($safesearch,3));
-	} else if (is_numeric($safesearch)) {
-		$searchlikes .= "OR imas_questionset.id=?) AND ";
-		$searchlikevals[] = $safesearch;
-	} else {
-		$searchlikes .= ") AND";
-	}
+        $searchlikes = "imas_questionset.id=? AND ";
+        $searchlikevals = array(substr($safesearch,3));
+        $isIDsearch = substr($safesearch,3);
+    } else if (ctype_digit(trim($safesearch))) {
+        $searchlikes = "imas_questionset.id=? AND ";
+        $searchlikevals = [trim($safesearch)];
+        $isIDsearch = trim($safesearch);
+    } else {
+        $searchterms = explode(" ",$safesearch);
+        $searchlikes = '';
+        foreach ($searchterms as $k=>$v) {
+            if (substr($v,0,5) == 'type=') {
+                $searchlikes .= "imas_questionset.qtype=? AND ";
+                $searchlikevals[] = substr($v,5);
+                unset($searchterms[$k]);
+            }
+        }
+        $wholewords = array();
+        foreach ($searchterms as $k=>$v) {
+            if (ctype_alnum($v) && strlen($v)>2) {
+                $wholewords[] = '+'.$v.'*';
+                unset($searchterms[$k]);
+            }
+        }
+        if (count($wholewords)==0 && !$isIDsearch && $searchall===1 && $searchmine===0) {
+            echo _('Cannot search all libraries without at least one 3+ letter word in the search terms');
+            $_SESSION['searchall'.$cid] = 0;
+            exit;
+        }
+        if (count($wholewords)>0 || count($searchterms)>0) {
+                $searchlikes .= '(';
+                if (count($wholewords)>0) {
+                    $searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+                }
+                if (count($searchterms)>0) {
+                    if (count($wholewords)>0) {
+                        $searchlikes .= 'AND ';
+                    }
+                    $searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+                    foreach ($searchterms as $t) {
+                        $searchlikevals[] = "%$t%";
+                    }
+                }
+                if (ctype_digit($safesearch)) {
+                    $searchlikes .= "OR imas_questionset.id=?) AND ";
+                    $searchlikevals[] = $safesearch;
+                    $isIDsearch = $safesearch;
+                } else {
+                    $searchlikes .= ") AND";
+                }
+        }
+    }
 }
 
 if (isset($_SESSION['lastsearchlibsD'.$daid])) {
@@ -376,12 +416,15 @@ if (!$beentaken) {
 			$qarr[] = $userid;
 		}
 		$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
-
+        if ($searchall==1) {
+			$query .= " LIMIT 300";
+		}
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);
 		if ($stm->rowCount()==0) {
 			$noSearchResults = true;
 		} else {
+            $searchlimited = ($stm->rowCount()==300);
 			$alt=0;
 			$lastlib = -1;
             $i=0;
@@ -796,7 +839,10 @@ if (!$beentaken) {
 				</tr>
 <?php
 					}
-				}
+                }
+                if ($searchlimited) {
+                    echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
+                }
 ?>
 			</tbody>
 		</table>

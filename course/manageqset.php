@@ -673,8 +673,8 @@ if ($myrights<20) {
 			} else if ($safesearch=='isbroken') {
 				$searchlikes = "imas_questionset.broken=1 AND ";
 			} else if (substr($safesearch,0,7)=='childof') {
-        $searchlikes = "imas_questionset.ancestors REGEXP ? AND ";
-        $searchlikevals[] = MYSQL_LEFT_WRDBND.substr($safesearch,8).MYSQL_RIGHT_WRDBND;
+                $searchlikes = "imas_questionset.ancestors REGEXP ? AND ";
+                $searchlikevals[] = MYSQL_LEFT_WRDBND.substr($safesearch,8).MYSQL_RIGHT_WRDBND;
 
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";
@@ -689,12 +689,12 @@ if ($myrights<20) {
 				$searchlikes = '';
 				foreach ($searchterms as $k=>$v) {
 					if (substr($v,0,5) == 'type=') {
-            $searchlikes .= "imas_questionset.qtype=? AND ";
-            $searchlikevals[] = substr($v,5);
+                        $searchlikes .= "imas_questionset.qtype=? AND ";
+                        $searchlikevals[] = substr($v,5);
 						unset($searchterms[$k]);
 					}
 				}
-        $wholewords = array();
+                $wholewords = array();
 				foreach ($searchterms as $k=>$v) {
 					if (ctype_alnum($v) && strlen($v)>2) {
 						$wholewords[] = '+'.$v.'*';
@@ -707,28 +707,28 @@ if ($myrights<20) {
                     $_SESSION['searchall'.$cid] = 0;
                     exit;
                 }
-        if (count($wholewords)>0 || count($searchterms)>0) {
-  				$searchlikes .= '(';
-  				if (count($wholewords)>0) {
-  					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
-  				}
-  				if (count($searchterms)>0) {
-  					if (count($wholewords)>0) {
-  						$searchlikes .= 'AND ';
-  					}
-  					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-  					foreach ($searchterms as $t) {
-  						$searchlikevals[] = "%$t%";
-  					}
-  				}
-  				if (ctype_digit($safesearch)) {
-  					$searchlikes .= "OR imas_questionset.id=?) AND ";
-  					$searchlikevals[] = $safesearch;
-  					$isIDsearch = $safesearch;
-  				} else {
-  					$searchlikes .= ") AND";
-  				}
-        }
+                if (count($wholewords)>0 || count($searchterms)>0) {
+                        $searchlikes .= '(';
+                        if (count($wholewords)>0) {
+                            $searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+                        }
+                        if (count($searchterms)>0) {
+                            if (count($wholewords)>0) {
+                                $searchlikes .= 'AND ';
+                            }
+                            $searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+                            foreach ($searchterms as $t) {
+                                $searchlikevals[] = "%$t%";
+                            }
+                        }
+                        if (ctype_digit($safesearch)) {
+                            $searchlikes .= "OR imas_questionset.id=?) AND ";
+                            $searchlikevals[] = $safesearch;
+                            $isIDsearch = $safesearch;
+                        } else {
+                            $searchlikes .= ") AND";
+                        }
+                }
 			}
 		}
 
