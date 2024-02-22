@@ -64,6 +64,7 @@
     "latepass_used": "You used one LatePass. | You used {n} LatePasses.",
     "extension": "You were granted an extension.",
     "penalty": "A penalty of {p}% will be applied.",
+    "penalty_after": "A penalty of {p}% will be applied after {date}.",
     "take": "You can take this assessment one time. | You can take this assessment {n} times.",
     "take_more": "You can take this assessment one more time. | You can take this assessment {n} more times.",
     "attempt_inprogress": "You have an assessment attempt in progress.",

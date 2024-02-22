@@ -103,7 +103,12 @@ export default {
           dateobj.sub += ' ' + this.$t('setlist.extension');
         }
         if (settings.exceptionpenalty > 0) {
-          dateobj.alert = this.$t('setlist.penalty', { p: settings.exceptionpenalty });
+          const now = new Date().getTime()
+          if (settings.original_enddate * 1000 > now) {
+            dateobj.alert = this.$t('setlist.penalty_after', { p: settings.exceptionpenalty, date: settings.original_enddate_disp });
+          } else {
+            dateobj.alert = this.$t('setlist.penalty', { p: settings.exceptionpenalty });
+          }
         }
       }
       if (settings.can_use_latepass > 0) {
