@@ -1071,7 +1071,7 @@ function gbstudisp($stu) {
                     } else if ($gbt[1][1][$i][3]==5) {
                         echo ' (UA)';
                     } else if ($gbt[1][1][$i][3]==3) {
-                        echo ' (OT)';
+                        // echo ' (OT)';
                     } else if ($gbt[1][1][$i][3]==4) {
                         echo ' (PT)';
                     } else if ($gbt[1][1][$i][3]==6) {
