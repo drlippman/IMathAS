@@ -170,6 +170,10 @@ if (!empty($_POST['tzname'])) {
         $tzname = $_SESSION['tzname'];
     }
 }
+// don't need cache anymore for students
+if ($role !== 'Instructor') {
+    unset($_SESSION['lticache'][$launch->get_launch_id()]);
+}
 require_once __DIR__."/../includes/userprefs.php";
 generateuserprefs($localuserid);
 // log lastaccess
