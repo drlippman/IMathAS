@@ -261,6 +261,14 @@ class Imathas_LTI_Database implements LTI\Database
         foreach ($keys as $kid => $keyinfo) {
             $stm->execute(array($keyseturl, $kid, $keyinfo['alg'], $keyinfo['pub']));
         }
+        // expire any existing keys from that keyset url
+        $kids = array_keys($keys);
+        if (count($kids)>0) {
+            $ph = Sanitize::generateQueryPlaceholders($kids);
+            $stm = $this->dbh->prepare("DELETE FROM imas_lti_keys WHERE key_set_url=? AND kid NOT IN ($ph)");
+            array_unshift($kids, $keyseturl);
+            $stm->execute($kids);
+        }
     }
 
     /**
