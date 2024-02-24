@@ -20,7 +20,7 @@ import { store } from '../basicstore';
 
 export default {
   name: 'VideocuedNav',
-  props: ['cue', 'toshow'],
+  props: ['cue', 'toshow', 'showfollowup'],
   components: {
     MenuButton,
     VideocuedNavListItem
@@ -67,7 +67,8 @@ export default {
             subitem: true
           });
         }
-        if (cuedata.hasOwnProperty('followuptime')) {
+        if (cuedata.hasOwnProperty('followuptime') &&
+          (cuedata.followuplink || this.showfollowup.includes(i))) {
           out.push({
             // internallink: '/videocued/' + cuen + '/f',
             onclick: () => this.$emit('jumpto', i, 'f'),
