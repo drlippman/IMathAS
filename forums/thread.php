@@ -455,12 +455,19 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$postcount[$row[0]] = $row[1] -1;
 	$maxdate[$row[0]] = $row[2];
 }
-$query= "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid=:userid";
 if ($dofilter) {
-	$query .= " AND threadid IN ($limthreads)";
+    $query = "SELECT threadid,lastview,tagged FROM imas_forum_views ";
+	$query .= "WHERE userid=:userid AND threadid IN ($limthreads)";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':userid'=>$userid));
+} else {
+    $query = "SELECT ifv.threadid,ifv.lastview,ifv.tagged FROM imas_forum_views AS ifv ";
+    $query .= "JOIN imas_forum_threads AS ift ON ift.id=ifv.threadid ";
+    $query .= "WHERE ifv.userid=:userid AND ift.forumid=:forumid";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':userid'=>$userid, ':forumid'=>$forumid));
 }
-$stm = $DBH->prepare($query);
-$stm->execute(array(':userid'=>$userid));
+
 // $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 $lastview = array();
 $flags = array();
