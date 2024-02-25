@@ -435,15 +435,16 @@ $maxdate = array();
 $lastview = array();
 $flags = array();
 if (count($threaddata) > 0) {
-    $query = "SELECT imas_forum_posts.id,count(imas_forum_views.userid) FROM imas_forum_views,imas_forum_posts ";
-    $query .= "WHERE imas_forum_views.threadid=imas_forum_posts.id AND imas_forum_posts.parent=0 AND ";
-    $query .= "imas_forum_posts.threadid IN ($shownthreadlist) ";
-    $query .= "GROUP BY imas_forum_posts.id";
+    $DBH->query('SET SESSION query_cache_type=0;');
+    
+    $query = "SELECT threadid,count(userid) FROM imas_forum_views ";
+    $query .= "WHERE threadid IN ($shownthreadlist) GROUP BY threadid";
     $stm = $DBH->query($query);
     // $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
         $uniqviews[$row[0]] = $row[1];
     }
+    
 
     // pull views, last date
     $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
