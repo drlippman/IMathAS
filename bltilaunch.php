@@ -1281,10 +1281,10 @@ if ($stm->rowCount()==0) {
 					//echo "found 3";
 					//exit;
 				}
-				if (!$foundaid && count($res)>0 && $aidsourcename != '') { //multiple results - look for the identical name
+				if (!$foundaid && count($res)>0) { //multiple results - look for the identical name
 					foreach ($res as $k=>$row) {
 						$res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
-						if ($row['name']==$aidsourcename) {
+						if ($aidsourcename != '' && $row['name']==$aidsourcename) {
 							$aid = $row['id'];
 							$foundaid = true;
 							//echo "here 5: $aid";
