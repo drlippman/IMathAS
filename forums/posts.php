@@ -44,7 +44,7 @@ if ($page==-4) {
 } else {
 	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=$cid&forum=$forumid&page=$page";
 }
-$query = "SELECT ifs.settings,ifs.replyby,ifs.defdisplay,ifs.name,ifs.points,ifs.groupsetid,ifs.postby,ifs.rubric,ifs.tutoredit,ifs.enddate,ifs.avail,ifs.allowlate,ifs.courseid,ift.forumid ";
+$query = "SELECT ifs.settings,ifs.replyby,ifs.defdisplay,ifs.name,ifs.points,ifs.groupsetid,ifs.postby,ifs.rubric,ifs.tutoredit,ifs.enddate,ifs.avail,ifs.allowlate,ifs.autoscore,ifs.courseid,ift.forumid ";
 $query .= "FROM imas_forums AS ifs JOIN imas_forum_threads AS ift ON ifs.id=ift.forumid WHERE ifs.id=:id AND ift.id=:threadid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$forumid, ':threadid'=>$threadid));
@@ -52,7 +52,7 @@ if ($stm->rowCount()==0) {
 	echo "Invalid forum ID or thread ID";
 	exit;
 }
-list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
 	exit;
@@ -82,9 +82,7 @@ if (isset($_GET['marktagged'])) {
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
-$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate,autoscore FROM imas_forums WHERE id=:id");
-$stm->execute(array(':id'=>$forumid));
-list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
+
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 	$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
