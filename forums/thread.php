@@ -435,9 +435,7 @@ $maxdate = array();
 $lastview = array();
 $flags = array();
 if (count($threaddata) > 0) {
-    $DBH->query('SET SESSION query_cache_type=0;');
-    
-    $query = "SELECT threadid,count(userid) FROM imas_forum_views ";
+   $query = "SELECT threadid,count(userid) FROM imas_forum_views ";
     $query .= "WHERE threadid IN ($shownthreadlist) GROUP BY threadid";
     $stm = $DBH->query($query);
     // $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -445,7 +443,6 @@ if (count($threaddata) > 0) {
         $uniqviews[$row[0]] = $row[1];
     }
     
-
     // pull views, last date
     $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
     $query .= "WHERE threadid IN ($shownthreadlist) ";
