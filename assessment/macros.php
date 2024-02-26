@@ -5265,15 +5265,29 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
         }
     }
 
+    $swapindices = [];
+    if (!is_array($swap)) {
+        $swap = [$swap];
+    }
+	foreach ($swap as $k=>$sw) {
+		$swap[$k] = explode(';', $sw);
+		foreach ($swap[$k] as $i=>$s) {
+			$swap[$k][$i] = listtoarray($s);
+            $swapindices[] = $swap[$k][$i][0];
+		}
+    }
+
     $newans = $answer;
     if ($type == 'calculated') {
         $newansval = [];
-        foreach ($newans as $k=>$v) {
+        foreach ($swapindices as $k) {
+            $v = $newans[$k];
             $newansval[$k] = evalMathParser($v);
         }
     } else if ($type == 'complex' || $type == 'calccomplex') {
         $newansval = [];
-        foreach ($newans as $k=>$v) {
+        foreach ($swapindices as $k) {
+            $v = $newans[$k];
             $newansval[$k] = parsesloppycomplex($v);
         }
         foreach ($stua as $k=>$v) {
@@ -5281,7 +5295,8 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
         }
     } else if ($type == 'ntuple' || $type == 'calcntuple') {
         $newansval = [];
-        foreach ($newans as $k=>$v) {
+        foreach ($swapindices as $k) {
+            $v = $newans[$k];
             $newansval[$k] = explode(',', substr($v,1,-1));
             if ($type == 'calcntuple') {
                 foreach ($newansval[$k] as $j=>$vv) {
@@ -5293,20 +5308,12 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             $stua[$k] = explode(',', substr($v,1,-1));
         }
     }
+
     if ($weights !== null) {
         if (!is_array($weights)) {
             $weights = explode(',', $weights);
         }
         $newweights = $weights;
-    }
-    if (!is_array($swap)) {
-        $swap = [$swap];
-    }
-	foreach ($swap as $k=>$sw) {
-		$swap[$k] = explode(';', $sw);
-		foreach ($swap[$k] as $i=>$s) {
-			$swap[$k][$i] = listtoarray($s);
-		}
     }
 
 	foreach ($swap as $sw) {
@@ -5367,6 +5374,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 			}
 		}
     }
+
     if ($weights !== null) {
         return array($newans, $newweights);
     } else {
