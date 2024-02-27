@@ -98,6 +98,7 @@ class Sanitize
 	public static function encodeStringForDisplay($string, $doubleencode = false)
 	{
         if ($string === null) { return '';}
+        $string = (string) $string; //force to string type
 		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), $doubleencode);
 	}
 
