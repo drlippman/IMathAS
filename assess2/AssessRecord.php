@@ -181,7 +181,7 @@ class AssessRecord
         echo '{"error": "encoding_error"}';
         exit;
       }
-      $qarr[':scoreddata'] = gzencode($encoded);
+      $qarr[':scoreddata'] = gzcompress($encoded);
     }
     if ($this->is_practice && !empty($this->data)) {
       $fields[] = 'practicedata';
@@ -190,7 +190,7 @@ class AssessRecord
         echo '{"error": "encoding_error"}';
         exit;
       }
-      $qarr[':practicedata'] = gzencode($encoded);
+      $qarr[':practicedata'] = gzcompress($encoded);
     }
 
     if ($this->hasRecord) {
@@ -299,7 +299,7 @@ class AssessRecord
     $waspractice = $this->is_practice;
     if ($this->is_practice) {
       $this->buildAssessData($recordStart);
-      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
+      $practicetosave = (!empty($this->data)) ? gzcompress(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
       $this->assessRecord['practicedata'] = $practicetosave;
       $this->setInPractice(false);
     } else {
@@ -308,7 +308,7 @@ class AssessRecord
 
     //generate scored data
     $this->buildAssessData($recordStart && !$waspractice);
-    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
+    $scoredtosave = (!empty($this->data)) ? gzcompress(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
     $this->assessRecord['scoreddata'] = $scoredtosave;
 
     // switch back to practice if started that way
@@ -4170,11 +4170,11 @@ class AssessRecord
     if (empty($this->data)) {
       if ($this->is_practice) {
         if ($this->assessRecord['practicedata'] != '') {
-          $this->data = json_decode(gzdecode($this->assessRecord['practicedata']), true);
+          $this->data = json_decode(Sanitize::gzexpand($this->assessRecord['practicedata']), true);
         }
       } else {
         if ($this->assessRecord['scoreddata'] != '') {
-          $this->data = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
+          $this->data = json_decode(Sanitize::gzexpand($this->assessRecord['scoreddata']), true);
         }
       }
       if (empty($this->data)) {

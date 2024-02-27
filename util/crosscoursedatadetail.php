@@ -279,7 +279,7 @@ $query .= "assessmentid IN ($phcopyaids)";
 $stm = $DBH->prepare($query);
 $stm->execute(array_keys($assessdata));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    $data = json_decode(gzdecode($row['scoreddata']), true);
+    $data = json_decode(Sanitize::gzexpand($row['scoreddata']), true);
     if (empty($data)) { continue; }
     $thisaid = $row['assessmentid'];
 

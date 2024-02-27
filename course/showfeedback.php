@@ -61,7 +61,7 @@ if ($type=='A') {
 	$stm->execute(array($id, $uid, $cid));
 
 	list($aname, $submitby, $deffb, $scoreddata) = $stm->fetch(PDO::FETCH_NUM);
-	$scoreddata = json_decode(gzdecode($scoreddata), true);
+	$scoreddata = json_decode(Sanitize::gzexpand($scoreddata), true);
 	$by_question = ($submitby == 'by_question');
 
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';

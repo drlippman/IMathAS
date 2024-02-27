@@ -523,8 +523,8 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 	$tomaybedel = [];
 	$tolookupaid = [];
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$scoreddata = gzdecode($row['scoreddata']);
-		$practicedata = $row['practicedata']==''?'':gzdecode($row['practicedata']);
+		$scoreddata = Sanitize::gzexpand($row['scoreddata']);
+		$practicedata = $row['practicedata']==''?'':Sanitize::gzexpand($row['practicedata']);
 		preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $matches);
 		foreach ($matches[1] as $file) {
 			// if it's a group asssess, we'll look to see if anyone else is using
@@ -552,8 +552,8 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		$query .= "WHERE assessmentid IN ($aidlist2) AND userid NOT IN ($userlist)";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$scoreddata = gzdecode($row['scoreddata']);
-			$practicedata = gzdecode($row['practicedata']);
+			$scoreddata = Sanitize::gzexpand($row['scoreddata']);
+			$practicedata = Sanitize::gzexpand($row['practicedata']);
 			preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $exmatch);
 			//remove from tolookup list all files found in other sessions
 			$tomaybedel = array_diff($tomaybedel, $exmatch[1]);

@@ -601,4 +601,11 @@ class Sanitize
         return preg_replace('/(<p>(&nbsp;)?<\/p>\s*)+$/','', $str);
     }
 
+    public static function gzexpand($data) {
+        if (mb_strpos($data , "\x1f" . "\x8b" . "\x08") === 0) {
+            return gzdecode($data);
+        } else {
+            return gzuncompress($data);
+        }
+    }
 }

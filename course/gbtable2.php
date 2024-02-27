@@ -2546,7 +2546,7 @@ function gbpercentile($a,$p) {
 }
 
 function buildFeedback2($scoreddata) {
-	$scoreddata = json_decode(gzdecode($scoreddata), true);
+	$scoreddata = json_decode(Sanitize::gzexpand($scoreddata), true);
 	$out = '';
 
 	foreach ($scoreddata['assess_versions'] as $av => $aver) {
