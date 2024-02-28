@@ -324,15 +324,21 @@ export default {
     },
     disableOutOfTries () {
       const trymax = this.questionData.tries_max;
+      let qpartcount = 0;
+      for (const pkey in this.questionData.jsparams) {
+        if (pkey.match(/^\d+$/)) {
+          qpartcount++;
+        }
+      }
       for (const pn in this.questionData.parts) {
         var regex;
         if (this.questionData.parts[pn].try >= trymax && this.questionData.answeights[pn] > 0) {
           // out of tries - disable inputs
-          if (Object.keys(this.questionData.parts).length === 1 && Object.keys(this.questionData.jsparams).length > 1) {
+          if (Object.keys(this.questionData.parts).length === 1 && qpartcount > 1) {
             // Only one "part" listed, but multiple input boxes.
             // Probably conditional. Disable all boxes
             regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + (this.qn + 1) + '\\d{3}\\b)');
-          } else if (pn === 0) {
+          } else if (parseInt(pn) === 0) {
             regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + ((this.qn + 1) * 1000 + pn * 1) + '\\b)');
           } else {
             regex = new RegExp('^(qn|tc|qs)' + ((this.qn + 1) * 1000 + pn * 1) + '\\b');

@@ -439,7 +439,7 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
 	$retstrout .= printfilter($res['html']) . '</div>';
 	$retstrout .= '</div></div>';
 
-	return array($retstrout, $res['jsparams']['ans'], ($res['solnopts']&5==5)?$res['soln']:'');
+	return array($retstrout, $res['jsparams']['ans'], (($res['solnopts']&5)==5)?$res['soln']:'');
 }
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {

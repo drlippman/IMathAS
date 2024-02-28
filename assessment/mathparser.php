@@ -1642,11 +1642,11 @@ function cplx_coth($z) {
   return cplx_div(cplx_cosh($z), cplx_sinh($z));
 }
 function cplx_asinh($z) {
-  $r = cplx_sqrt([$a[0]*$a[0] - $a[1]*$a[1] + 1,2*$a[0]*$b[1]]);
+  $r = cplx_sqrt([$z[0]*$z[0] - $z[1]*$z[1] + 1,2*$z[0]*$z[1]]);
   return cplx_log([$z[0] + $r[0], $z[1] + $r[1]]);
 }
 function cplx_acosh($z) {
-    $r = cplx_sqrt([$a[0]*$a[0] - $a[1]*$a[1] - 1,2*$a[0]*$b[1]]);
+    $r = cplx_sqrt([$z[0]*$z[0] - $z[1]*$z[1] - 1,2*$z[0]*$z[1]]);
     return cplx_log([$z[0] + $r[0], $z[1] + $r[1]]);
 }
 function cplx_atanh($z) {
