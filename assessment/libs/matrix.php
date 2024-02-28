@@ -16,7 +16,9 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
-	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
+	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans",
+    "matrixFromCols","matrixFromRows"
+);
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.
@@ -1611,6 +1613,63 @@ function matrixCompare($m,$n,$tol='.001') {
 		}
 	}
 	return $isequiv;
+}
+
+function matrixFromCols() {
+    $args = func_get_args();
+    $numcols = count($args);
+    $m = [];
+    $numrows = -1;
+    foreach ($args as $c=>$col) {
+        if (!is_array($col)) {
+            echo "Invalid input to matrixFromCols";
+            return $m;
+        }
+        if ($numrows == -1) {
+            $numrows = count($col);
+        } else if (count($col) != $numrows) {
+            echo "All inputs to matrixFromCols must have same number of elements";
+            return $m;
+        }
+        if (is_array($col[0])) { // is rx1 column matrix
+            for ($r=0;$r<$numrows;$r++) {
+                $m[$r][$c] = $col[$r][0];
+            }
+        } else { // is array of elements
+            for ($r=0;$r<$numrows;$r++) {
+                $m[$r][$c] = $col[$r];
+            }
+        }
+    }
+    return $m;
+}
+function matrixFromRows() {
+    $args = func_get_args();
+    $numrows = count($args);
+    $m = [];
+    $numcols = -1;
+    foreach ($args as $r=>$row) {
+        if (!is_array($row)) {
+            echo "Invalid input to matrixFromRows";
+            return $m;
+        }
+        if ($numcols == -1) {
+            $numcols = count(is_array($row[0]) ? $row[0] : $row);
+        } else if (count(is_array($row[0]) ? $row[0] : $row) != $numcols) {
+            echo "All inputs to matrixFromRows must have same number of elements";
+            return $m;
+        }
+        if (is_array($row[0])) { // is 1xr row matrix
+            for ($c=0;$c<$numcols;$c++) {
+                $m[$r][$c] = $row[0][$c];
+            }
+        } else { // is array of elements
+            for ($c=0;$c<$numcols;$c++) {
+                $m[$r][$c] = $row[$c];
+            }
+        }
+    }
+    return $m;
 }
 
 ?>

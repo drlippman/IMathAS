@@ -45,6 +45,8 @@ Matrix functions.  Version 1.6, Jan 19
 <li><a href="#matrixreduce">matrixreduce</a></li>
 <li><a href="#matrixnumsolutions">matrixnumsolutions</a></li>
 <li><a href="#matrixround">matrixround</a></li>
+<li><a href="#matrixFromCols">matrixFromCols</a></li>
+<li><a href="#matrixFromRows">matrixFromRows</a></li>
 <li><a href="#polyregression">polyregression</a></li>
 <li><a href="#matrixGetRank">matrixGetRank</a></li>
 <li><a href="#arrayIsZeroVector">arrayIsZeroVector</a></li>
@@ -218,6 +220,17 @@ matrixnumsolutions(A,n)
 <BR><h3><a name="matrixround">matrixround</a></h3>
 matrixround(matrix, decimal places)
 <BR>rounds each entry of the matrix the specified decimal places
+
+<BR><h3><a name="matrixFromCols">matrixFromCols</a></h3>
+matrixFromCols(col1, col2, ...)
+<BR>creates a matrix from the given columns. The columns can either be nx1 column matrices,
+    or arrays.
+
+<BR><h3><a name="matrixFromRows">matrixFromRows</a></h3>
+matrixFromRows(row1, row2, ...)
+<BR>creates a matrix from the given rows. The row2 can either be 1xn row matrices,
+    or arrays.
+        
 <BR><h3><a name="polyregression">polyregression</a></h3>
 polyregression(x,y,n)
 <BR>find a nth degree polynomial that best fits the data
