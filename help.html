@@ -2568,6 +2568,13 @@ These macros are for working with arrays:
 These macros are fairly general purpose:
 <ul>
 <li><strong>ifthen(condition,trueval,falseval)</strong>:  Takes a comparison condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
+<li><strong>cases(testvalue,comparearray,outputarray,[defaultoutput, tolerance])</strong>:  Compares the 
+  testvalue to each of the comparearray entries, and if a match is found, returns the corresponding 
+  entry of outputarray. If there is no match, the defaultoutput is returned. Note that if both values 
+  are numeric, the comparison is made with tolerance, otherwise the values are compared using string 
+  matching (meaning 0.5 will not be considered equivalent to "1/2").  Tolerance defaults to 0.0015 
+  relative error. Prefix with |, like "|0.1" for absolute tolerance.  Example: 
+  <code>cases(3,[1,2,3,4],["a","b","c","d"])</code> would return "c".</code></li>
 <li><strong>formhoverover(label,tip)</strong>:  Creates a hover-over definition or other tip</li>
 <li><strong>formpopup(label,content,[width,height,style,scrollbars])</strong>:  Creates a link or button leading to a popup window.  Content can
   be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>

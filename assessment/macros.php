@@ -25,7 +25,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend",
  "stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today",
  "numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction",
- "ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots",
+ "ifthen","cases","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots",
  "jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace",
  "makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes",
  "comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp",
@@ -3141,6 +3141,36 @@ function arrayhasduplicates($arr) {
 
 function ifthen($c,$t,$f) {
 	return $c?$t:$f;
+}
+
+function cases($val, $inputs, $outputs, $default = '', $tol = .0015) {
+    if (is_array($val)) {
+        echo "First input to cases must be a number or string";
+        return '';
+    } else if (!is_array($inputs) || !is_array($outputs)) {
+        echo "Second and third inputs to cases must be arrays";
+        return '';
+    } else if (count($inputs) != count($outputs)) {
+        echo "Second and third inputs to cases must have same number of elements";
+        return '';
+    }
+    $abstol = false;
+    if (strval($tol)[0]=='|') {
+		$tol = floatval(substr($tol,1));
+        $abstol = true;
+	}
+    foreach ($inputs as $k=>$x) {
+        if (is_numeric($x) && is_numeric($val)) {
+            if ($abstol) {
+                if (abs($x-$val) < $tol+1E-12) {return $outputs[$k];}
+            } else {
+                if (abs($x-$val)/(abs($x)+.0001) < $tol+1E-12) {return $outputs[$k];}
+            }
+        } else if ((string) $x === (string) $val) {
+            return $outputs[$k];
+        }
+    }
+    return $default;
 }
 
 
