@@ -5308,14 +5308,13 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
     }
 
     $newans = $answer;
+    $newansval = [];
     if ($type == 'calculated') {
-        $newansval = [];
         foreach ($swapindices as $k) {
             $v = $newans[$k];
             $newansval[$k] = evalMathParser($v);
         }
     } else if ($type == 'complex' || $type == 'calccomplex') {
-        $newansval = [];
         foreach ($swapindices as $k) {
             $v = $newans[$k];
             $newansval[$k] = parsesloppycomplex($v);
@@ -5324,7 +5323,6 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             $stua[$k] = parsesloppycomplex($v);
         }
     } else if ($type == 'ntuple' || $type == 'calcntuple') {
-        $newansval = [];
         foreach ($swapindices as $k) {
             $v = $newans[$k];
             $newansval[$k] = explode(',', substr($v,1,-1));
@@ -5338,7 +5336,6 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             $stua[$k] = explode(',', substr($v,1,-1));
         }
     }
-
     if ($weights !== null) {
         if (!is_array($weights)) {
             $weights = explode(',', $weights);
@@ -5379,7 +5376,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $tmpw[$k] = $newweights[$v];
                     }
-                    if (isset($newansval)) {
+                    if (isset($newansval[$v])) {
                         $tmpv[$k] = $newansval[$v];
                     }
 				}
@@ -5388,7 +5385,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $newweights[$sw[$i][$k]] = $newweights[$v];
                     }
-                    if (isset($newansval)) {
+                    if (isset($newansval[$v])) {
                         $newansval[$sw[$i][$k]] = $newansval[$v];
                     }
 				}
@@ -5397,7 +5394,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $newweights[$sw[$loc][$k]] = $tmpw[$k];
                     }
-                    if (isset($newansval)) {
+                    if (isset($tmpv[$k])) {
                         $newansval[$sw[$loc][$k]] = $tmpv[$k];
                     }
 				}
