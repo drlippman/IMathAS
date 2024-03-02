@@ -249,24 +249,24 @@ if ($overwriteBody==1) {
 			}
 		}
 		foreach ($columndata as $col=>$data) {
-			echo '<tr><td>'.($col+1).'</td>';
-			echo '<td><input type="checkbox" name="addcol[]" value="'.$col.'" /></td>';
-			echo '<td><select name="coloverwrite'.$col.'"><option value="0" ';
+			echo '<tr><td>'.(intval($col)+1).'</td>';
+			echo '<td><input type="checkbox" name="addcol[]" value="'.Sanitize::onlyInt($col).'" /></td>';
+			echo '<td><select name="coloverwrite'.Sanitize::onlyInt($col).'"><option value="0" ';
 			if ($data[3]==0) {echo 'selected="selected"';}
 			echo '>Add as new item</option>';
 			if ($data[3]>0) {
 				echo '<option value="'.Sanitize::encodeStringForDisplay($data[3]).'" selected="selected">Overwrite existing scores</option>';
 			}
 			echo '</select></td>';
-			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.Sanitize::encodeStringForDisplay($data[0]).'" /></td>';
-			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.Sanitize::encodeStringForDisplay($data[1]).'" /></td>';
-			echo '<td><select name="colcnt'.$col.'">';
+			echo '<td><input type="text" size="20" name="colname'.Sanitize::onlyInt($col).'" value="'.Sanitize::encodeStringForDisplay($data[0]).'" /></td>';
+			echo '<td><input type="text" size="3" name="colpts'.Sanitize::onlyInt($col).'"  value="'.Sanitize::encodeStringForDisplay($data[1]).'" /></td>';
+			echo '<td><select name="colcnt'.Sanitize::onlyInt($col).'">';
 			echo '<option value="1" selected="selected">Count in gradebook</option>';
 			echo '<option value="0">Don\'t count and hide from students</option>';
 			echo '<option value="3">Don\'t count in grade total</option>';
 			echo '<option value="2">Count as extra credit</option></select></td>';
-			echo '<td><select name="colgbcat'.$col.'">'.$gbcatoptions.'</select></td>';
-			echo '<td><input type="text" size="3" name="colfeedback'.$col.'"  value="'.Sanitize::encodeStringForDisplay($data[2]>-1?$data[2]+1:'').'" /></td>';
+			echo '<td><select name="colgbcat'.Sanitize::onlyInt($col).'">'.$gbcatoptions.'</select></td>';
+			echo '<td><input type="text" size="3" name="colfeedback'.Sanitize::onlyInt($col).'"  value="'.Sanitize::encodeStringForDisplay($data[2]>-1?$data[2]+1:'').'" /></td>';
 			echo '</tr>';
 		}
 		echo '</tbody></table>';

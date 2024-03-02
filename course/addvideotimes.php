@@ -149,7 +149,7 @@ if ($viddata != '') {
 	$followupenddtime = array();
 	$hasfollowup = array();
 	$showlink = array();
-	$finalsegtitle;
+	$finalsegtitle = '';
 	for ($i=0;$i<$n;$i++) {
 		$title[$i] = $data[$i][0];
 		if (count($data[$i])==1) {

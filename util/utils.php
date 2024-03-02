@@ -85,6 +85,24 @@ if (isset($_GET['fixorphanqs'])) {
 	echo '<p><a href="utils.php">Utils</a></p>';
 	exit;
 }
+if (isset($_POST['setupfcm'])) {
+    $data = json_decode($_POST['setupfcm'], true);
+    if ($data === null || !isset($data['client_email']) || !isset($data['private_key'])) {
+        echo '<p>Error: invalid data</p>';
+    } else {
+        $stm = $DBH->query("SELECT kid,privatekey FROM imas_lti_keys WHERE key_set_url='https://oauth2.googleapis.com/token'");
+        if ($stm->rowCount() > 0) {
+            $stm = $DBH->prepare("UPDATE imas_lti_keys set kid=?,privatekey=? WHERE 'https://oauth2.googleapis.com/token'");
+            $stm->execute([$data['client_email'], $data['private_key']]);
+        } else {
+            $stm = $DBH->prepare("INSERT INTO imas_lti_keys (key_set_url,kid,privatekey) VALUES (?,?,?)");
+            $stm->execute(['https://oauth2.googleapis.com/token', $data['client_email'], $data['private_key']]);
+        }
+        echo '<p>Key information stored.</p>';
+    }
+    echo '<p><a href="utils.php">Utils</a></p>';
+	exit;
+}
 if (isset($_POST['updatecaption'])) {
 	$vidid = trim($_POST['updatecaption']);
 	if (strlen($vidid)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$vidid)) {
@@ -226,6 +244,24 @@ if (isset($_GET['form'])) {
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo 'YouTube video ID: <input type="text" size="11" name="updatecaption"/>';
 		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
+		require_once "../footer.php";
+	} else if ($_GET['form']=='setupfcm') {
+		require_once "../header.php";
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Setup FCM</div>';
+		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
+        echo '<p>To enabled Firebase Cloud Messaging for push notifications, you need to 
+            set up an app with Firebase, enable the FireBase Cloud Messaging API, and
+            generate a private key, which will be downloaded as a .json file.  You will 
+            need to add the FCM project id to your config.php by setting 
+            <code>$CFG[\'FCM\'][\'project_id\']</code>.  Then copy the contents of the
+            .json file into the box below.</p>';
+        $stm = $DBH->query("SELECT kid,privatekey FROM imas_lti_keys WHERE key_set_url='https://oauth2.googleapis.com/token'");
+        if ($stm->rowCount() > 0) {
+            echo '<p><b>NOTE</b>: it appears you already have a configuration loaded. You can load a new one if you need to overwrite the existing.</p>';
+        }
+        echo '<textarea name=setupfcm id=setupfcm rows=30 style="width:100%"></textarea>';
+		echo '<input type="submit" value="Save"/>';
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='lookup') {
@@ -382,7 +418,8 @@ if (isset($_GET['form'])) {
 	echo '<a href="listwronglibs.php">List WrongLibFlags</a><br/>';
 	echo '<a href="updatewronglibs.php">Update WrongLibFlags</a><br/>';
 	echo '<a href="blocksearch.php">Search Block titles</a><br/>';
-	echo '<a href="itemsearch.php">Search inline/linked items</a>';
+	echo '<a href="itemsearch.php">Search inline/linked items</a><br/>';
+    echo '<a href="utils.php?form=setupfcm">Set up FCM for push notifications</a><br/>';
 	require_once "../footer.php";
 }
 ?>
