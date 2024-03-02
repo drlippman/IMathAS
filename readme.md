@@ -158,6 +158,7 @@ course list from the course browser options, so you must also have `$CFG['course
 
 ### LTI
 
+- If you're going to be using LTI 1.3, make sure you go to Admin Page, LTI 1.3 Platforms, Manage Private Keys and add a new key.  This should only need to be done once, unless you choose to rotate your keys.
 - `$CFG['LTI']['noCourseLevel']`: set to true to hide course level LTI key and secret from users. Use this if you want to require use of global LTI key/secrets.
 - `$CFG['LTI']['noGlobalMsg']`: When the `noCourseLevel` option above is set, use this option to define a message that will be displayed on the export page when no global LTI is set for the group.
 - `$CFG['LTI']['showURLinSettings']`: Set to true to show the LTI launch URL on the course settings page.  Normally omitted to avoid confusion (since it's not needed in most LMSs).
