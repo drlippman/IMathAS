@@ -2529,8 +2529,18 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
     $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
     $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
     for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
-        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+        if ($dotspace >= $labelspace) {
+            $outst .= "line([$x,$tm],[$x,$tx]);";
+        }
+        $outst .= "text([$x,0],\"$x\",\"below\");";
     }  
+    if ($dotspace < $labelspace) {
+        $startdot = min(floor($start/$dotspace+1e-12),floor($start/$labelspace+1e-12)*$labelspace/$dotspace)*$dotspace;
+        $enddot = max(ceil($maxx/$dotspace-1e-12)*$dotspace, $endlabel);
+        for ($x=$startdot; $x<=$enddot; $x+=$dotspace) {
+            $outst .= "line([$x,$tm],[$x,$tx]);";
+        }
+    }
 	
 	//initializes SVG frame and canvas.
 	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
