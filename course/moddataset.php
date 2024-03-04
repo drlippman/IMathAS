@@ -195,7 +195,7 @@
 		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
 		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
 
-        $isrand = preg_match('/(shuffle|getprimes?|rand[a-zA-Z]*)\s*\(/',$_POST['control']) ? 1 : 0;
+        $isrand = preg_match('/((shuffle|getprimes?|rand[a-zA-Z]*)\s*\(|randweights)/',$_POST['control']) ? 1 : 0;
         if (!$isrand) { // check any included code
             preg_match_all('/includecodefrom\(\s*(\d+)\s*\)/',$_POST['control'],$matches,PREG_PATTERN_ORDER);
             if (!empty($matches[1])) {
