@@ -661,7 +661,8 @@ if ($myrights<20) {
 			$skipfederated = 0;
 			$safesearch = '';
 		}
-    $searchlikevals = array();
+        $searchlikevals = array();
+        $stopwords = ['about','are','com','for','from','how','that','the','this','was','what','when','where','will','with','und','www'];
 		$isIDsearch = 0;
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
@@ -696,7 +697,7 @@ if ($myrights<20) {
 				}
                 $wholewords = array();
 				foreach ($searchterms as $k=>$v) {
-					if (ctype_alnum($v) && strlen($v)>2) {
+					if (ctype_alnum($v) && strlen($v)>2 && !in_array($v, $stopwords)) {
 						$wholewords[] = '+'.$v.'*';
 						unset($searchterms[$k]);
 					}
