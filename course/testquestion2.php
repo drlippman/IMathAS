@@ -370,7 +370,8 @@ if ($overwriteBody==1) {
   $starttime = microtime(true);
   $disp = $a2->displayQuestion($qn, [
     'showans' => true,
-    'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
+    'showallparts' => ($hasSeqParts && !empty($_GET['showallparts'])),
+    'showteachernotes' => true
   ]);
   $gentime = microtime(true) - $starttime;
   if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
@@ -426,6 +427,10 @@ if ($overwriteBody==1) {
 			$sendtitle = _('Contact support');
 		}
 	}
+
+    if (strpos($disp['html'], 'dsboxTN') !== false) {
+        echo '<p class=small>' . _('Note: Instructor Notes only show in the gradebook for instructors. They will not display to students ever.') . '</p>';
+    }
 
 	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
 	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';

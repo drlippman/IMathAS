@@ -226,6 +226,9 @@ class AssessStandalone {
     if (!empty($options['printformat'])) {
         $questionParams->setPrintFormat(true);
     }
+    if (!empty($options['showteachernotes'])) {
+        $questionParams->setTeacherInGb(true);
+    }
 
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
