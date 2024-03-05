@@ -168,7 +168,7 @@ function updateLivePreview(targ) {
 	LivePreviews[qn].Update();
 }
 function htmlEntities(str) {
-  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function normalizemathunicode(str) {
 	str = str.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, "");
