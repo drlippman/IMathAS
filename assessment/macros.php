@@ -1988,6 +1988,9 @@ function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 		$n = $n*-1;
 		$d = $d*-1;
 	}
+    if ($dblslash === 'parts') {
+        return [$n,$d];
+    }
 	if ($varinnum!==false) {
 		if ($n==1) {
 			$n = '';
