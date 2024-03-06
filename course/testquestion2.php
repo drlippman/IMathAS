@@ -175,7 +175,6 @@ $nologo = true;
 $useeqnhelper = $eqnhelper;
 $lastupdate = '20221027';
 $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=112822" type="text/javascript"></script>';
