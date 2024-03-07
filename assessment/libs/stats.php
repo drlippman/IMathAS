@@ -1547,20 +1547,12 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 //alpha: for confidence bound.  defaults to .05
 //grid:  If you've modified the grid, include it here
 //return array(answer, showanswer) to be used to set $answer and $showanswer
-function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.05, $gridi="-5,5,-5,5,1,1,300,300") {
+function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.05, $gridi="-5,5,-5,5,1,1,300,300",$snaptogrid=null) {
 	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
-	$gridi = explode(',',$gridi);
-	$grid=array(-5,5,-5,5,1,1,300,300);
-	foreach ($gridi as $i=>$v) {
-		$grid[$i] = $v;
-	}
-  if (strpos($grid[0],'0:')!==false) {
-		$grid[0] = substr($grid[0],2);
-	}
-  if (strpos($grid[2],'0:')!==false) {
-		$grid[2] = substr($grid[2],2);
-	}
+
+    list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($gridi,$snaptogrid);
+    $grid = explode(',', $gridi);
 
 	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
@@ -1574,7 +1566,8 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	$answers = array();
 	$showanswer = null;
 	list($r,$m,$b) = linreg($xarr,$yarr);
-    $lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3],$grid[6],$grid[7]);
+    $lines = gettwopointlinedata($line,$xmin,$xmax,$ymin,$ymax,$w,$h);
+
 	if (isset($lines[0])) {
 		if ($lines[0][0]==$lines[0][2]) {
 			$stum = 100000;
@@ -1591,7 +1584,7 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 		}
 		$eqns = arraystodoteqns($xarr,$yarr);
 		$eqns[] = "$m*x+$b,blue";
-		$showanswer = showplot($eqns,$grid[0],$grid[1],$grid[2],$grid[3],$grid[4],$grid[5],$grid[6],$grid[7]);
+		$showanswer = showplot($eqns,$xmin,$xmax,$ymin,$ymax,$grid[4],$grid[5],$w,$h);
 	} else {
 		if ($gradedots) {
 			$answers = arraystodots($xarr,$yarr);

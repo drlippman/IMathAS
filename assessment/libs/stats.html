@@ -308,14 +308,15 @@ checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
 <BR>alpha: for confidence bound.  defaults to .05
 <BR>return array(answer, showanswer) to be used to set $answer and $showanswer
 <BR><h3><a name="checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></h3>
-checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid])
+checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid, snaptogrid])
 <BR>intended for checking a student answer for drawing a line fit to data.  Determines
 <BR>if the student answer is within the confidence bounds for the regression equation.
 <BR>xarray, yarray:  list/array of data values
 <BR>student answer from draw:  the $stuanswers[$thisq]
 <BR>grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
 <BR>alpha: for confidence bound.  defaults to .05
-<BR>grid:  If you've modified the grid, include it here
+<BR>grid:  If you've modified the grid, include it here 
+<BR>snaptogrid: If you're using snaptogrid, include it here
 <BR>return array(answer, showanswer) to be used to set $answer and $showanswer
 <BR><h3><a name="binomialpdf">binomialpdf</a></h3>
 binomialpdf(N,p,x)
