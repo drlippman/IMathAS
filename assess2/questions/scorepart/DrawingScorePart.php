@@ -47,6 +47,8 @@ class DrawingScorePart implements ScorePart
             } else {
                 $reltolerance = 1;
             }
+        } else if ($reltolerance == 0) {
+            $reltolerance = 1e-12; // give some wiggle room for arithmetic errors
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
