@@ -486,7 +486,7 @@ class Sanitize
 	 */
 	public static function courseId($courseId)
 	{
-		if ("admin" == strtolower(trim($courseId))) {
+		if ("admin" == strtolower(trim($courseId ?? ''))) {
 			return "admin";
 		} else {
 			return self::onlyInt($courseId);
