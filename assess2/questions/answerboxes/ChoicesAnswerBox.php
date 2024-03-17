@@ -103,8 +103,16 @@ class ChoicesAnswerBox implements AnswerBox
             $out .= "<span $style id=\"qnwrap$qn\" role=radiogroup ";
             $out .= 'aria-label="' . $arialabel . '">';
         } else if ($displayformat != 'select') {
-            if ($colorbox != '') {$style .= ' class="' . $colorbox . ' clearfix" ';} else { $style = ' class="clearfix" ';}
-            $out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=radiogroup ";
+            $classes = ['clearfix'];
+            if ($colorbox != '') { 
+                $classes[] = $colorbox;
+            }
+            if ($displayformat == 'horiz') {
+                $classes[] = 'choicesflexrow';
+            }
+
+            $style = 'class="' . implode(' ', $classes) . '" ';
+            $out .= "<div $style id=\"qnwrap$qn\" role=radiogroup ";
             $out .= 'aria-label="' . $arialabel . '">';
         }
         if ($displayformat == "select") {

@@ -229,6 +229,12 @@ td.l, table.stats tbody td.l {
   text-align: left;
 }
 
+.choicesflexrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
 @media only screen and (max-width: 700px) {
   table[role=presentation] > tbody > tr > td,
 	table[role=presentation] > tbody > tr > th,
