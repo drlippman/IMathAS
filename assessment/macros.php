@@ -3470,7 +3470,7 @@ function intervaltoineq($str,$var) {
                 return $var . ' != ' . $pts[0];
             }
 		} else {
-			$out[] = $pts[0] . ($sm=='['?'le':'lt') . $var . ($em==']'?'le':'lt') . $pts[1];
+			$out[] = $pts[0] . ($sm=='['?' le ':' lt ') . $var . ($em==']'?' le ':' lt ') . $pts[1];
 		}
 	}
 	return implode(' \\ "or" \\ ',$out);
