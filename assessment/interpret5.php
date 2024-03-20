@@ -581,7 +581,6 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
                             $toprocess = substr($str,$i+1,$j-$i-1);
-
                             $inside = interpretline($toprocess,$anstype,$countcnt+1,$included_qs);
 
 							if ($inside=='error') {
@@ -604,10 +603,16 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 						}
 					} else if ($d=='/' && $str[$j+1]=='/') {
 						//comment inside brackers
+                        if (!$inq && ($intype == 4 || $intype == 11)) {
+                            $str[$j] = ' '; // remove comment contents
+                        }
 						while ($d!="\n" && $j<$len) {
 							$j++;
                             if ($j < $len) {
 							    $d = $str[$j];
+                                if (!$inq && ($intype == 4 || $intype == 11)) {
+                                    $str[$j] = ' ';
+                                }
                             }
 						}
 					} else if ($d=="\n") {
