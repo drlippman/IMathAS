@@ -164,18 +164,20 @@ $_SESSION['tzoffset'] = $_POST['tzoffset'];
 $_SESSION['time'] = time();
 $_SESSION['started'] = time();
 $tzname = '';
-if (!empty($_POST['tzname'])) {
-    $_SESSION['tzname'] = $_POST['tzname'];
- 	if (date_default_timezone_set($_SESSION['tzname'])) {
-        $tzname = $_SESSION['tzname'];
-    }
-}
+
 // don't need cache anymore for students
 if ($role !== 'Instructor') {
     unset($_SESSION['lticache'][$launch->get_launch_id()]);
 }
 require_once __DIR__."/../includes/userprefs.php";
 generateuserprefs($localuserid);
+if (!empty($_POST['tzname'])) {
+    $_SESSION['tzname'] = $_POST['tzname'];
+ 	if (date_default_timezone_set($_SESSION['tzname'])) {
+        $tzname = $_SESSION['tzname'];
+    }
+}
+
 // log lastaccess
 $db->set_user_lastaccess($localuserid);
 
