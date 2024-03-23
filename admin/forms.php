@@ -661,6 +661,7 @@ switch($_GET['action']) {
 					$theme = $ctcinfo['theme'];
 					$msgset = $ctcinfo['msgset'];
 					$courselevel = $ctcinfo['level'];
+                    $deftime = $ctcinfo['deftime'];
 				}
 			} else {
 				$ctc = 0;
