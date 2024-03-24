@@ -11,6 +11,9 @@ body: <input name="body"><br/>
 <input type="submit">
 </form>
 */
+if (isset($CFG['FCM']['project_id'])) {
+    require_once __DIR__ . '/JWT.php';
+}
 
 function sendFCM($token,$title,$body,$url='') {
 	global $CFG;
