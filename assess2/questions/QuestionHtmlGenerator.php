@@ -627,55 +627,9 @@ class QuestionHtmlGenerator
 
         $answerbox = $this->adjustPreviewLocation($answerbox, $toevalqtxt, $previewloc);
 
-        /*
-         * Possibly adjust the showanswer if it doesn't look right
-         */
-        $doShowDetailedSoln = false;
-        if (isset($showanswer) && is_array($showanswer) && is_array($answerbox) && count($showanswer) < count($answerbox)) {
-            $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
-            if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
-                // not enough showanswerloc boxes for all the parts.  
-                /*
-                  This approach combined to a single showanswer
-                $questionWriterVars['showanswer'] = implode('<br>', $showanswer);
-                $toevalqtxt = preg_replace('/(\$showanswerloc\[.*?\]|\[SAB.*?\])(\s*<br\/><br\/>)?/','', $toevalqtxt);
-                */
-                // this approach will only show the manually placed boxes, and only show them after all 
-                // preceedingly-indexed parts have been cleared for answer showing.
-                ksort($showanswer);
-                $_lastPartUsed = -1;
-                $_thisIsReady = true;
-                $doShowDetailedSoln = true;
-                foreach ($showanswer as $kidx=>$atIdx) {
-                    $_thisIsReady = true;
-                    for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
-                        if (empty($doShowAnswerParts[$iidx]) && !$doShowAnswer) {
-                            $_thisIsReady = false;
-                            $doShowDetailedSoln = false;
-                            for ($siidx=$iidx; $siidx < $kidx; $siidx++) {
-                                $doShowAnswerParts[$siidx] = false;
-                            }
-                            break;
-                        } else if ($iidx < $kidx) {
-                            $doShowAnswerParts[$iidx] = false;
-                        }
-                    }
-                    $doShowAnswerParts[$kidx] = $_thisIsReady;
-                    $_lastPartUsed = $kidx;
-                }
-                $doShowAnswer = false; // disable automatic display of answers
-            }
-        }
-
-        /*
-         * Get the "Show Answer" button location.
-         */
-
-        // This variable must be named $showanswerloc, as it may be used by
-        // the question writer.
-        $showanswerloc = $this->getShowAnswerLocation($doShowAnswer, $doShowAnswerParts,
-          $answerbox, $entryTips, $displayedAnswersForParts, $questionWriterVars,
-          $anstypes ?? $quesData['qtype']);
+        // replace $showanswerloc[n] with [SABn] for later processing after eval
+        $toevalqtxt = preg_replace('/\$showanswerloc\[(.*?)\]/','[SAB$1]', $toevalqtxt);
+        
 
         // incorporate $showanswer.  Really this should be done prior to the last line,
         // and remove the redundant logic from that function, but I don't want to refactor 
@@ -719,6 +673,56 @@ class QuestionHtmlGenerator
           $evaledsoln = '';
         }
         $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
+
+        /*
+         * Possibly adjust the showanswer if it doesn't look right
+         */
+        $doShowDetailedSoln = false;
+        if (isset($showanswer) && is_array($showanswer) && is_array($answerbox) && count($showanswer) < count($answerbox)) {
+            $showansboxloccnt = substr_count($evaledqtext,'$showanswerloc') + substr_count($evaledqtext,'[SAB');
+            if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
+                // not enough showanswerloc boxes for all the parts.  
+                /*
+                  This approach combined to a single showanswer
+                $questionWriterVars['showanswer'] = implode('<br>', $showanswer);
+                $toevalqtxt = preg_replace('/(\$showanswerloc\[.*?\]|\[SAB.*?\])(\s*<br\/><br\/>)?/','', $toevalqtxt);
+                */
+                // this approach will only show the manually placed boxes, and only show them after all 
+                // preceedingly-indexed parts have been cleared for answer showing.
+                ksort($showanswer);
+                $_lastPartUsed = -1;
+                $_thisIsReady = true;
+                $doShowDetailedSoln = true;
+                foreach ($showanswer as $kidx=>$atIdx) {
+                    $_thisIsReady = true;
+                    for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
+                        if (empty($doShowAnswerParts[$iidx]) && !$doShowAnswer) {
+                            $_thisIsReady = false;
+                            $doShowDetailedSoln = false;
+                            for ($siidx=$iidx; $siidx < $kidx; $siidx++) {
+                                $doShowAnswerParts[$siidx] = false;
+                            }
+                            break;
+                        } else if ($iidx < $kidx) {
+                            $doShowAnswerParts[$iidx] = false;
+                        }
+                    }
+                    $doShowAnswerParts[$kidx] = $_thisIsReady;
+                    $_lastPartUsed = $kidx;
+                }
+                $doShowAnswer = false; // disable automatic display of answers
+            }
+        }
+
+        /*
+         * Get the "Show Answer" button location.
+         */
+
+        // This variable must be named $showanswerloc, as it may be used by
+        // the question writer.
+        $showanswerloc = $this->getShowAnswerLocation($doShowAnswer, $doShowAnswerParts,
+          $answerbox, $entryTips, $displayedAnswersForParts, $questionWriterVars,
+          $anstypes ?? $quesData['qtype']);
 
         /*
          * Special answer box stuff.
