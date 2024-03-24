@@ -64,6 +64,8 @@ function sendFCM($token,$title,$body,$url='') {
 }
 
 function sendFCM2($token,$title,$body,$url='') {
+    global $CFG;
+    
 	$access_token = get_FCM_token();
 
 	if ($access_token !== false) {
