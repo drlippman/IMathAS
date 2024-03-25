@@ -117,7 +117,7 @@ function get_FCM_token() {
 	$stm = $DBH->query("SELECT token,expires FROM imas_lti_tokens WHERE platformid=0 AND scopes='FCM'");
 	if ($stm !== false) {
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
-		if ($row !== false && $row['expires']<$now - 10) {
+		if ($row !== false && $row['expires'] > $now - 10) {
 			// have valid token - return it
 			return $row['token'];
 		}
