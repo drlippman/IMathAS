@@ -625,8 +625,7 @@ private function insertLinked() {
 			if ($newfn!==false) {
 				$this->data['items'][$toimport]['data']['text'] = 'file:'.$this->cid.'/'.$newfn;
 			}else {
-				echo "fail on rehost";
-				exit;
+				echo "fail on rehost of file " . Sanitize::encodeStringforDisplay($this->data['items'][$toimport]['data']['text']) . ' in linked item ' . Sanitize::encodeStringForDisplay($this->data['items'][$toimport]['data']['title']);
 			}
 		} else if (substr($this->data['items'][$toimport]['data']['text'],0,8)=='exttool:') {
 			//remap gbcategory

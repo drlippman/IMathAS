@@ -124,7 +124,10 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 	$parseurl = parse_url($url);
 	$fn =  Sanitize::sanitizeFilenameAndCheckBlacklist($prependToFilename.basename($parseurl['path']));
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
-		copy($url, $tmpdir.'/'.$fn);
+		$copyres = copy($url, $tmpdir.'/'.$fn);
+        if ($copyres === false) {
+            return false;
+        }
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
 		} else {
@@ -152,7 +155,10 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 		if (!is_dir($dir)) {
 			mkdir_recursive($dir);
 		}
-		copy($url, $dir.'/'.$fn);
+		$copyres = copy($url, $dir.'/'.$fn);
+        if ($copyres === false) {
+            return false;
+        }
 		return $fn;
 	}
 }
