@@ -1432,13 +1432,15 @@ function funcvar ($input, $v) {
 function safepow($base,$power) {
 	if ($base===0) {
     if($power===0) {
-      throw new MathParserException("0^0 is undefined");
+      echo "0^0 is undefined";
+      return NAN;
     } else {
       return 0;
     }
   }
   if (!is_numeric($base) || !is_numeric($power)) {
-    throw new MathParserException("cannot evaluate powers with nonnumeric values");
+    echo "cannot evaluate powers with nonnumeric values";
+    return NAN;
   }
 	if ($base<0 && floor($power)!=$power) {
 		for ($j=3; $j<50; $j+=2) {
@@ -1450,7 +1452,8 @@ function safepow($base,$power) {
 				}
 			}
 		}
-		throw new MathParserException("invalid power for negative base");
+		echo "invalid power for negative base";
+        return NAN;
 	}
 	if (floor($base)==$base && floor($power)==$power && $power>0) { //whole # exponents
 		$result = pow(abs($base),$power);
@@ -1466,103 +1469,129 @@ function safepow($base,$power) {
 function sec($x) {
   $val = cos($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for sec");
+    echo "Invalid input for sec";
+    return NAN;
   }
 	return (1/$val);
 }
 function csc($x) {
   $val = sin($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for csc");
+    echo "Invalid input for csc";
+    return NAN;
   }
 	return (1/$val);
 }
 function cot($x) {
   $val = tan($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for cot");
+    echo "Invalid input for cot";
+    return NAN;
   }
 	return (1/$val);
 }
 function sech($x) {
   $val = cosh($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for sech");
+    echo "Invalid input for sech";
+    return NAN;
   }
 	return (1/$val);
 }
 function csch($x) {
   $val = sinh($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for csch");
+    echo "Invalid input for csch";
+    return NAN;
   }
 	return (1/$val);
 }
 function coth($x) {
   $val = tanh($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for coth");
+    echo "Invalid input for coth";
+    return NAN;
   }
 	return (1/$val);
 }
 function asec($x) {
   if (abs($x)<1e-16) {
-    throw new MathParserException("Invalid input for arcsec");
+    echo "Invalid input for arcsec";
+    return NAN;
   }
   $inv = round(1/$x, 12);
   if ($inv < -1 || $inv > 1) {
-    throw new MathParserException("Invalid input for arcsec");
+    echo "Invalid input for arcsec";
+    return NAN;
   }
   return acos($inv);
 }
 function acsc($x) {
   if (abs($x)<1e-16) {
-    throw new MathParserException("Invalid input for arccsc");
+    echo "Invalid input for arccsc";
+    return NAN;
   }
   $inv = round(1/$x, 12);
   if ($inv < -1 || $inv > 1) {
-    throw new MathParserException("Invalid input for arccsc");
+    echo "Invalid input for arccsc";
+    return NAN;
   }
   return asin($inv);
 }
 function acot($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arccot");
+        echo "Invalid input for arccot";
+        return NAN;
     }
     return atan(1/$x);
 }
 function asech($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arcsech");
+        echo "Invalid input for arcsech";
+        return NAN;
     }
     $inv = round(1/$x, 12);
     if ($inv < 1) {
-        throw new MathParserException("Invalid input for arcsech");
+        echo "Invalid input for arcsech";
+        return NAN;
     }
     return acosh($inv);
 }
 function acsch($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arccsch");
+        echo "Invalid input for arccsch";
+        return NAN;
     }
     $inv = round(1/$x, 12);
     return asinh($inv);
 }
 function acoth($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arccoth");
+        echo "Invalid input for arccoth";
+        return NAN;
     }
     $inv = round(1/$x, 12);
     if ($inv < -1 || $inv > 1) {
-        throw new MathParserException("Invalid input for arccoth");
+        echo "Invalid input for arccoth";
+        return NAN;
     }
     return atanh($inv);
 }
 function safeasin($x) {
-  return asin(round($x,12));  
+  $inp = round($x, 12);
+  if ($inp < -1 || $inp > 1) {
+    echo "Invalid input for arcsin";
+    return NAN;
+  }
+  return asin($inp);  
 }
 function safeacos($x) {
-  return acos(round($x,12));  
+  $inp = round($x, 12);
+  if ($inp < -1 || $inp > 1) {
+    echo "Invalid input for arccos";
+    return NAN;
+  }
+  return acos($inp);  
 }
 function sign($a,$str=false) {
 	if ($str==="onlyneg") {
