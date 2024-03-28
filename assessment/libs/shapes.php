@@ -3495,7 +3495,7 @@ function draw_rectprism() {
   if (array_key_exists(0,$argsArray)) {
     if (isset($argsArray[0][0]) && is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && isset($argsArray[1][0]) && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0 && isset($argsArray[2][0]) && is_numeric($argsArray[2][0]) && $argsArray[2][0]>0) {
     $length = $argsArray[0][0];
-    $depth = $argsArray[1][0];
+    $depth = 0.8 * $argsArray[1][0];
     $height = $argsArray[2][0];
   } else {
       //echo "Warning! Must include length, depth and height.";
@@ -3564,6 +3564,16 @@ function draw_rectprism() {
   $xMax = $length+$depth/2;
   $yMax = $height+$depth*sqrt(3)/2;
   $xyMax = max($xMax,$yMax);
+    
+    $ratio = $yMax/$xMax;
+    if ($ratio > 1) {
+     $sizeh = $size;
+     $sizew = ($size-20)/$ratio + 60;
+    } else {
+     $sizew = $size;
+     $sizeh = ($size-60)*$ratio + 20;
+    }
+    
   $args = "";
   // Fill the prism
   if ($hasFill === true) {
@@ -3593,7 +3603,8 @@ function draw_rectprism() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(10);initPicture(-$xyMax/10,1.1*$xyMax,-$xyMax/10,1.1*$xyMax);$args;",$size,$size,$alt);
+
+  $gr = showasciisvg("setBorder(10,10,40,10);initPicture(-0.2*$xMax,1.2*$xMax,-0.2*$yMax,1.2*$yMax);$args;",$sizew,$sizeh,$alt);
   return $gr;
 }
 
