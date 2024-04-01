@@ -124,7 +124,10 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 	$parseurl = parse_url($url);
 	$fn =  Sanitize::sanitizeFilenameAndCheckBlacklist($prependToFilename.basename($parseurl['path']));
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
-		copy($url, $tmpdir.'/'.$fn);
+		$copyres = copy($url, $tmpdir.'/'.$fn);
+        if ($copyres === false) {
+            return false;
+        }
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
 		} else {
@@ -152,7 +155,10 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 		if (!is_dir($dir)) {
 			mkdir_recursive($dir);
 		}
-		copy($url, $dir.'/'.$fn);
+		$copyres = copy($url, $dir.'/'.$fn);
+        if ($copyres === false) {
+            return false;
+        }
 		return $fn;
 	}
 }
@@ -523,8 +529,8 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 	$tomaybedel = [];
 	$tolookupaid = [];
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$scoreddata = gzdecode($row['scoreddata']);
-		$practicedata = $row['practicedata']==''?'':gzdecode($row['practicedata']);
+		$scoreddata = Sanitize::gzexpand($row['scoreddata']);
+		$practicedata = $row['practicedata']==''?'':Sanitize::gzexpand($row['practicedata']);
 		preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $matches);
 		foreach ($matches[1] as $file) {
 			// if it's a group asssess, we'll look to see if anyone else is using
@@ -552,8 +558,8 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		$query .= "WHERE assessmentid IN ($aidlist2) AND userid NOT IN ($userlist)";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$scoreddata = gzdecode($row['scoreddata']);
-			$practicedata = gzdecode($row['practicedata']);
+			$scoreddata = Sanitize::gzexpand($row['scoreddata']);
+			$practicedata = Sanitize::gzexpand($row['practicedata']);
 			preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $exmatch);
 			//remove from tolookup list all files found in other sessions
 			$tomaybedel = array_diff($tomaybedel, $exmatch[1]);

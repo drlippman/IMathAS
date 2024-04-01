@@ -103,7 +103,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
                 // if time limit not expired, need to rewrite assess_versions[last]['timelimit_end']
                 //   and add timelimit_ext to note use of extension.
                 // if time limit is expired, then set eligibleForTimeExt
-                $adata = json_decode(gzdecode($row[0]), true);
+                $adata = json_decode(Sanitize::gzexpand($row[0]), true);
                 $lastver = &$adata['assess_versions'][count($adata['assess_versions'])-1];
                 if ($lastver['status']==0 && $lastver['timelimit_end'] > $now) {
                     // not submitted and time limit still active; extend now.
@@ -113,7 +113,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
                     }
                     $lastver['timelimit_ext'][] = $timelimitext;
                     $iarupdate = $DBH->prepare('UPDATE imas_assessment_records SET scoreddata=? WHERE userid=? AND assessmentid=?');
-                    $iarupdate->execute([gzencode(json_encode($adata)), $aid, $uid]);
+                    $iarupdate->execute([gzcompress(json_encode($adata)), $aid, $uid]);
                     $timelimitext *= -1; // mark as used
                 }
             }

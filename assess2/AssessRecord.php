@@ -181,7 +181,7 @@ class AssessRecord
         echo '{"error": "encoding_error"}';
         exit;
       }
-      $qarr[':scoreddata'] = gzencode($encoded);
+      $qarr[':scoreddata'] = gzcompress($encoded);
     }
     if ($this->is_practice && !empty($this->data)) {
       $fields[] = 'practicedata';
@@ -190,7 +190,7 @@ class AssessRecord
         echo '{"error": "encoding_error"}';
         exit;
       }
-      $qarr[':practicedata'] = gzencode($encoded);
+      $qarr[':practicedata'] = gzcompress($encoded);
     }
 
     if ($this->hasRecord) {
@@ -299,7 +299,7 @@ class AssessRecord
     $waspractice = $this->is_practice;
     if ($this->is_practice) {
       $this->buildAssessData($recordStart);
-      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
+      $practicetosave = (!empty($this->data)) ? gzcompress(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
       $this->assessRecord['practicedata'] = $practicetosave;
       $this->setInPractice(false);
     } else {
@@ -308,7 +308,7 @@ class AssessRecord
 
     //generate scored data
     $this->buildAssessData($recordStart && !$waspractice);
-    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
+    $scoredtosave = (!empty($this->data)) ? gzcompress(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
     $this->assessRecord['scoreddata'] = $scoredtosave;
 
     // switch back to practice if started that way
@@ -556,6 +556,19 @@ class AssessRecord
   }
 
   /**
+   * Determine if they've started the current version yet
+   * * @return boolean true if they've started
+   */
+  public function hasStartedAssess() {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return false;
+    }
+    $aver = $this->getAssessVer('last');
+    return ($aver['starttime'] > 0);
+  }
+
+  /**
    * Update the LTI sourcedid if needed
    * @param  string $sourcedid  The full IMathAS-format sourcedid
    * @return void
@@ -676,7 +689,7 @@ class AssessRecord
         $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
       } else if (!$active && $submitby == 'by_assessment') {
         // for by-assess, set "accept work after" status on end
-        if ($accept_work_after) {
+        if ($accept_work_after && $this->data['assess_versions'][$lastver]['starttime'] > 0) {
           $this->assessRecord['status'] |= 128;
         } else {
           $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
@@ -2454,6 +2467,9 @@ class AssessRecord
     $aScoredVer = 0;
     $allAssessVerScores = array();
     $totalTime = 0;
+    if (!isset($this->data['assess_versions'])) {
+        return 0;
+    }
     $lastAver = count($this->data['assess_versions']) - 1;
     // loop through all the assessment versions
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
@@ -2817,6 +2833,7 @@ class AssessRecord
     if ($by_question) {
       $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
       $tries = $qvers[count($qvers) - 1]['tries'];
+      $answeights = $qvers[count($qvers) - 1]['answeights'] ?? [];
       if (!empty($qvers[count($qvers)-1]['jumptoans'])) {
         // jump to answer has been clicked - submission not allowed
         foreach ($partssubmitted as $pn) {
@@ -2828,6 +2845,7 @@ class AssessRecord
     } else {
       $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
+      $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'] ?? [];
     }
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
 
@@ -2836,7 +2854,7 @@ class AssessRecord
       if (!isset($tries[$pn])) {
         $out[$pn] = true;
       } else {
-        $out[$pn] = (count($tries[$pn]) < $tries_max);
+        $out[$pn] = (count($tries[$pn]) < $tries_max || ($answeights[$pn] ?? 1) == 0);
       }
     }
 
@@ -3977,10 +3995,11 @@ class AssessRecord
    * Clears any Latepass blocks (review or gb) for current student
    */
   public function clearLPblocks() {
+    $cid = $this->assess_info->getCourseId();
     $query = "UPDATE imas_content_track SET type=IF(type = 'assessreview', 'assessreviewub', 'gbviewsafe')
-        WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')";
+        WHERE typeid=:typeid AND courseid=:courseid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')";
     $stm = $this->DBH->prepare($query);
-    $stm->execute([':typeid' => $this->curAid, ':userid' => $this->curUid]);
+    $stm->execute([':typeid' => $this->curAid, ':courseid' => $cid, ':userid' => $this->curUid]);
   }
 
   /**
@@ -4151,11 +4170,11 @@ class AssessRecord
     if (empty($this->data)) {
       if ($this->is_practice) {
         if ($this->assessRecord['practicedata'] != '') {
-          $this->data = json_decode(gzdecode($this->assessRecord['practicedata']), true);
+          $this->data = json_decode(Sanitize::gzexpand($this->assessRecord['practicedata']), true);
         }
       } else {
         if ($this->assessRecord['scoreddata'] != '') {
-          $this->data = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
+          $this->data = json_decode(Sanitize::gzexpand($this->assessRecord['scoreddata']), true);
         }
       }
       if (empty($this->data)) {

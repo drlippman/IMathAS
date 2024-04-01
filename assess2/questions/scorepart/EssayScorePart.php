@@ -35,6 +35,9 @@ class EssayScorePart implements ScorePart
         require_once dirname(__FILE__)."/../../../includes/htmLawed.php";
 
         $givenans = myhtmLawed($givenans);
+        if (strlen($givenans)>30000) {
+            $givenans = substr($givenans,0,30000) . ' (remainder truncated due to length)';
+        }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
         $scoremethod = getOptionVal($options, 'scoremethod', $multi, $partnum);

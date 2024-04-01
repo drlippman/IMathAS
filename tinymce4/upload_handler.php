@@ -29,11 +29,15 @@ if (isset($_POST['remove'])) {
 
 
   reset ($_FILES);
+  if (count($_FILES)==0) {
+    header("HTTP/1.0 500 Upload failed.");
+    exit;
+  }
   $tempkey = key($_FILES);
   $temp = current($_FILES);
   if (Sanitize::isFilenameBlacklisted(str_replace(' ','_',$temp['name']))) {
     header("HTTP/1.0 500 Invalid file name.");
-    return;
+    exit;
   }
   $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
   if (is_uploaded_file($temp['tmp_name'])){
@@ -48,7 +52,7 @@ if (isset($_POST['remove'])) {
     // Sanitize input
     if (preg_match("/([^\w\s\d\-_~,;:\[\]\(\).])|([\.]{2,})/", $temp['name'])) {
         header("HTTP/1.0 500 Invalid file name.");
-        return;
+        exit;
     }
 
     // Verify extension
@@ -61,7 +65,7 @@ if (isset($_POST['remove'])) {
       // already checked for blacklisted earlier
     } else if (!in_array($extension, array("gif", "jpg", "png", "jpeg", "svg"))) {
         header("HTTP/1.0 500 Invalid extension.");
-        return;
+        exit;
     }
 
     // Accept upload if there was no origin, or if it is an accepted origin

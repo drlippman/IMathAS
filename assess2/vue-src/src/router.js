@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import { nextTick } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import { store, actions } from './basicstore';
 import Launch from './views/Launch.vue';
 import Closed from './views/Closed.vue';
@@ -18,11 +18,10 @@ import FullPaged from './views/FullPaged.vue';
 const Videocued = () => import(/* webpackChunkName: "special" */ './views/Videocued.vue');
 const Livepoll = () => import(/* webpackChunkName: "special" */ './views/Livepoll.vue');
 
-Vue.use(Router);
-
-const router = new Router({
-  base: process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/',
-  // mode: 'history',
+const router = createRouter({
+  history: createWebHashHistory(
+    process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/' // base
+  ),
   routes: [
     {
       path: '/',
@@ -218,6 +217,6 @@ router.beforeEach((to, from, next) => {
   }
 });
 router.afterEach((to, from) => {
-  Vue.nextTick(window.sendLTIresizemsg);
+  nextTick(window.sendLTIresizemsg);
 });
 export default router;

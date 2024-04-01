@@ -1969,7 +1969,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    function generatemoveselect($num,$count,$blk,$blocklist) {
    	   global $toolset;
-   	   if (($toolset&4)==4) {return '';}
 	$num = $num+1;  //adjust indexing
 	$html = "<select class=\"mvsel\" id=\"$blk-$num\" onchange=\"moveitem($num,'$blk')\">\n";
 	for ($i = 1; $i <= $count; $i++) {

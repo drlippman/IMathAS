@@ -205,7 +205,7 @@ if (!empty($createcourse)) {
 			$atitle = $stm->fetchColumn(0);
 			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
 
-			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
+			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -213,7 +213,7 @@ if (!empty($createcourse)) {
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
 			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0";
-			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
+			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else if (isset($_SESSION['lti_selection_return']) && $_SESSION['lti_selection_return_format'] == "IMSdeeplink") {

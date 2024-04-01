@@ -641,7 +641,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-$placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
 
  require_once "../header.php";
 
@@ -666,8 +666,9 @@ div.highlight {
 	padding-top: 4px;
 	background-color: #e1f5ec;
 	border-left: 2px solid #19925b;
-	margin-left: -2px;
+	margin-left: -4px;
 	margin-bottom: 2px;
+	padding-left: 2px;
 }
 div.warn {
 	padding-top: 4px;

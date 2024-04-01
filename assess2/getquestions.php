@@ -61,6 +61,9 @@ if ($assess_info->getSetting('submitby') == 'by_assessment' &&
 ) {
   echo '{"error": "active_attempt"}';
   exit;
+} else if (!$assess_record->hasStartedAssess()) {
+  echo '{"error": "not_ready"}';
+  exit;
 }
 
 // grab all questions settings and scores, based on end-of-assessment settings

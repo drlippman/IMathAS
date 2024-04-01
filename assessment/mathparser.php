@@ -125,10 +125,10 @@ class MathParser
    * @param string $fvlist   A comma-separated list of variables to treat as functions
    */
   public function __construct($variables, $allowedfuncs = array(), $fvlist = '', $docomplex = false) {
-    if ($variables != '') {
+    if ($variables !== '') {
       $this->variables = array_values(array_filter(array_map('trim', explode(',', $variables)), 'strlen'));
     }
-    if ($fvlist != '') {
+    if ($fvlist !== '') {
         $this->funcvariables = array_values(array_filter(array_map('trim', explode(',', $fvlist)), 'strlen'));
     }
     //treat pi and e as variables for parsing
@@ -220,7 +220,7 @@ class MathParser
           if ($this->docomplex) {
             if (!is_array($a)) { $a = [$a,0]; }
             if (!is_array($b)) { $b = [$b,0]; }
-            if ($b[1] == 0) {
+            if ($b[1] === 0) {
               $m = safepow($a[0]*$a[0]+$a[1]*$a[1], $b[0]/2);
               $t = atan2($a[1],$a[0]);
               return [$m*cos($t*$b[0]), $m*sin($t*$b[0])];
@@ -328,7 +328,7 @@ class MathParser
    */
   public function evaluate($variableValues = array()) {
     foreach ($this->variables as $v) {
-      if ($v == 'pi' || $v == 'e' || ($this->docomplex && $v == 'i')) { continue; }
+      if ($v === 'pi' || $v === 'e' || ($this->docomplex && $v === 'i')) { continue; }
       if (!isset($variableValues[$v])) {
         throw new MathParserException("Missing value for variable $v");
       } else if (!is_numeric($variableValues[$v])) {
@@ -380,15 +380,15 @@ class MathParser
     if ($a['type'] !== $b['type']) {
       return false;
     }
-    if ($a['type'] == 'number') {
+    if ($a['type'] === 'number') {
       return (abs($a['symbol'] - $b['symbol']) < .000001);
-    } else if ($a['type'] == 'variable') {
-      return $a['symbol'] == $b['symbol'];
-    } else if ($a['type'] == 'function') {
-      return ($a['symbol'] == $b['symbol']) &&
+    } else if ($a['type'] === 'variable') {
+      return $a['symbol'] === $b['symbol'];
+    } else if ($a['type'] === 'function') {
+      return ($a['symbol'] === $b['symbol']) &&
         $this->compareTrees($a['input'], $b['input']);
     } else {
-      return ($a['symbol'] == $b['symbol']) &&
+      return ($a['symbol'] === $b['symbol']) &&
         $this->compareTrees($a['left'], $b['left']) &&
         (!isset($a['right']) || $this->compareTrees($a['right'], $b['right']));
     }
@@ -412,17 +412,20 @@ class MathParser
       if (ctype_space($c)) {
         // skip spaces
         continue;
-      } else if (ctype_digit($c) || $c=='.') {
+      } else if (ctype_digit($c) || $c==='.') {
         // if it's a number/decimal value
         preg_match('/^(\d*\.?\d*(E\+?-?\d+)?)/', substr($str,$n), $matches);
+        if ($matches[1] === '.') { // special case for lone period
+            continue;
+        }
         $tokens[] = [
           'type'=>'number',
-          'symbol'=> $matches[1]
+          'symbol'=> (float) $matches[1]
         ];
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
         continue;
-      } else if (($c=='|' || $c=='&' || $c=='#' || $c=='<' || $c=='>') &&
+      } else if (($c==='|' || $c==='&' || $c==='#' || $c==='<' || $c==='>') &&
         isset($this->operators[substr($str,$n,2)])
       ) {
         $tokens[] = [
@@ -446,7 +449,7 @@ class MathParser
           $nextSymbol = $matches[1];
           if (in_array($nextSymbol, $this->funcvariables) &&
             strlen($str) > $n+strlen($nextSymbol) &&
-            $str[$n+strlen($nextSymbol)] == '('
+            $str[$n+strlen($nextSymbol)] === '('
           ) {
             // found a variable acting as a function 
             $tokens[] = [
@@ -465,21 +468,21 @@ class MathParser
             $lastTokenType = 'variable';
           } else {
             // found a function.  We'll handle a couple special cases here too
-            if ($nextSymbol == 'log') {
+            if ($nextSymbol === 'log') {
               $tokens[] = [
                 'type'=>'function',
                 'symbol'=>'log',
                 'input'=>null,
                 'index'=>['type'=>'number', 'symbol'=>10]
               ];
-            } else if ($matches[1] == 'ln') {
+            } else if ($matches[1] === 'ln') {
               $tokens[] = [
                 'type'=>'function',
                 'symbol'=>'log',
                 'input'=>null,
                 'index'=>['type'=>'number', 'symbol'=>M_E]
               ];
-            } else if ($matches[1] == 'degree' || $matches[1] == 'degrees') {
+            } else if ($matches[1] === 'degree' || $matches[1] === 'degrees') {
                 $tokens[] = [
                     'type'=>'number',
                     'symbol'=> M_PI/180
@@ -503,7 +506,7 @@ class MathParser
           //      For sin^p(x) we can rewrite as sin(x)^p
           if ($lastTokenType === 'function' && $n < $len - 2) {
             $peek = $str[$n+1];  // look at upcoming character
-            if ($nextSymbol == 'log' && $peek == '_') {
+            if ($nextSymbol === 'log' && $peek === '_') {
               // found a log_n
               if (preg_match($this->numvarregex, substr($str,$n+2), $sub)) {
                 // set the index on the log
@@ -512,19 +515,19 @@ class MathParser
                   'symbol'=> $sub[1]
                 ];
                 $n += strlen($sub[1]) + 1;
-              } else if ($str[$n+2] == '(') { // handle later
+              } else if ($str[$n+2] === '(') { // handle later
                 $tokens[count($tokens)-1]['symbol'] .= '_';
                 $n += 1;
               }
-            } else if ($peek == '^') {
+            } else if ($peek === '^') {
               // found something like sin^2; append power to symbol for now
-              if (preg_match('/^(\-?\d+|\((\-\d+)\))/', substr($str,$n+2), $sub)) {
+              if (preg_match('/^(\-?\d+|\((\-?\d+)\))/', substr($str,$n+2), $sub)) {
                 $tokens[count($tokens)-1]['symbol'] .= '^' . (isset($sub[2]) ? $sub[2] : $sub[1]);
                 $n += strlen($sub[1]) + 1;
               }
-            } else if ($nextSymbol == 'root') {
+            } else if ($nextSymbol === 'root') {
               // found a root.  Parse the index
-              if (preg_match('/^[\(\[]?(-?\d+)[\)\]]?/', substr($str,$n+1), $sub)) {
+              if (preg_match('/^[\(\[]*(-?\d+)[\)\]]*/', substr($str,$n+1), $sub)) {
                 // replace the last node with an nthroot node
                 $tokens[count($tokens)-1] = [
                   'type' => 'function',
@@ -539,7 +542,7 @@ class MathParser
               } else {
                 throw new MathParserException("Invalid root index");
               }
-            } else if ($nextSymbol == 'funcvar') {
+            } else if ($nextSymbol === 'funcvar') {
                 // handle variables acting as functions
                 if (preg_match('/^[\(\[](.+?)[\)\]]/', substr($str,$n+1), $sub)) {
                     if (in_array($sub[1], $this->variables)) {
@@ -582,21 +585,21 @@ class MathParser
     $lastToken = ['type'=>'','symbol'=>''];
     foreach ($this->tokens as $token) {
       if (
-        ($lastToken['type'] == 'number' ||
-          $lastToken['type'] == 'variable' ||
-          $lastToken['symbol'] == '!' ||
-          $lastToken['symbol'] == ')'
+        ($lastToken['type'] === 'number' ||
+          $lastToken['type'] === 'variable' ||
+          $lastToken['symbol'] === '!' ||
+          $lastToken['symbol'] === ')'
         ) &&
-        ($token['type'] == 'number' ||
-          $token['type'] == 'variable' ||
-          $token['type'] == 'function' ||
-          $token['symbol'] == '('
+        ($token['type'] === 'number' ||
+          $token['type'] === 'variable' ||
+          $token['type'] === 'function' ||
+          $token['symbol'] === '('
         )
       ) {
         // implicit multiplication - add *
         $out[] = ['type'=>'operator', 'symbol'=>'*'];
         $out[] = $token;
-      } else if ($lastToken['type'] == 'function' && $token['symbol'] != '(') {
+      } else if ($lastToken['type'] === 'function' && $token['symbol'] !== '(') {
         //fix implicit functions, like sin3
         $out[] = ['type'=>'operator', 'symbol'=>'('];
         $out[] = $token;
@@ -621,27 +624,27 @@ class MathParser
     $lastNode = null;
 
     foreach ($this->tokens as $tokenindex => &$token) {
-      if ($token['symbol'] == ')') {
+      if ($token['symbol'] === ')') {
         // end of sub expression - handle it
         $this->handleSubExpression($tokenindex);
-      } else if ($token['type'] == 'number' || $token['type'] == 'variable') {
+      } else if ($token['type'] === 'number' || $token['type'] === 'variable') {
         $this->operandStack[] = $token;
-      } else if ($token['type'] == 'function') {
+      } else if ($token['type'] === 'function') {
         $this->operatorStack[] = $token;
-      } else if ($token['symbol'] == '(') {
+      } else if ($token['symbol'] === '(') {
         $this->operatorStack[] = $token;
-      } else if ($token['symbol'] == '!') {
+      } else if ($token['symbol'] === '!') {
         $unary = $this->isUnary($token, $lastNode);
         if ($unary) { //treat as logical not
           $token['symbol'] = 'not';
           $this->operatorStack[] = $token;
-          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol']=='*') {
+          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol']==='*') {
             //remove implicit multiplication
             unset($this->tokens[$tokenindex+1]);
           }
         } else { // treat as factorial
           // check to make sure there's something to take factorial of
-          if (count($this->operandStack) == 0) {
+          if (count($this->operandStack) === 0) {
             throw new MathParserException("Syntax error: ! without something to apply it to");
           }
           $op = array_pop($this->operandStack);
@@ -652,13 +655,13 @@ class MathParser
             'input' => $op
           ];
         }
-      } else if ($token['type'] == 'operator') {
+      } else if ($token['type'] === 'operator') {
         $unary = $this->isUnary($token, $lastNode);
         if ($unary) {
-          if ($token['symbol'] == '+') {
+          if ($token['symbol'] === '+') {
             // ignore it by replacing with a blank symbol
             $token = ['type'=>'', 'symbol'=>''];
-          } else if ($token['symbol'] == '-') {
+          } else if ($token['symbol'] === '-') {
             // unary minus; change to ~ to distinguish it.
             $token['symbol'] = '~';
           }
@@ -677,8 +680,8 @@ class MathParser
             //if lower precedence, or equal and left assoc
             if (
               $tokeninfo['precedence'] < $peekinfo['precedence'] ||
-              ($tokeninfo['precedence'] == $peekinfo['precedence'] &&
-                $tokeninfo['assoc'] == 'left'
+              ($tokeninfo['precedence'] === $peekinfo['precedence'] &&
+                $tokeninfo['assoc'] === 'left'
               )
             ) {
               $popped = array_pop($this->operatorStack);
@@ -718,13 +721,13 @@ class MathParser
    */
   private function isUnary($token, $lastNode) {
     // only possible unary symbols are + and -
-    if ($token['symbol'] != '-' && $token['symbol'] != '+' && $token['symbol'] != '!') {
+    if ($token['symbol'] !== '-' && $token['symbol'] !== '+' && $token['symbol'] !== '!') {
       return false;
     }
     // if at very start, or last node was starting paren or unary minus or div
     if ((count($this->operandStack)==0 && count($this->operatorStack)==0) ||
-      ($lastNode['type'] == 'operator' && $lastNode['symbol'] != ')' &&
-      $lastNode['symbol'] != '!')
+      ($lastNode['type'] === 'operator' && $lastNode['symbol'] !== ')' &&
+      $lastNode['symbol'] !== '!')
     ) {
       return true;
     }
@@ -737,11 +740,11 @@ class MathParser
    * @return array  Built up node
    */
   private function handleExpression($node) {
-    if ($node['type'] == 'function' || $node['symbol'] == '(') {
+    if ($node['type'] === 'function' || $node['symbol'] === '(') {
       throw new MathParserException("Syntax error - parentheses mismatch");
     }
 
-    if ($node['symbol'] == '~' || $node['symbol'] == 'not') { //unary negation or not
+    if ($node['symbol'] === '~' || $node['symbol'] === 'not') { //unary negation or not
       $left = array_pop($this->operandStack);
       if ($left === null) {
         throw new MathParserException("Syntax error - unary negative with nothing following");
@@ -769,7 +772,7 @@ class MathParser
   private function handleSubExpression($tokenindex) {
     $clean = false;
     while ($popped = array_pop($this->operatorStack)) {
-      if ($popped['symbol'] == '(') {
+      if ($popped['symbol'] === '(') {
         $clean = true;
         break;
       }
@@ -784,17 +787,17 @@ class MathParser
     //see if was function application
     if (count($this->operatorStack) > 0) {
       $previous = end($this->operatorStack);
-      if ($previous['type'] == 'function') {
+      if ($previous['type'] === 'function') {
         $node = array_pop($this->operatorStack); //this is the function node
         $operand = array_pop($this->operandStack);
-        if ($node['symbol'] == 'log_') {
+        if ($node['symbol'] === 'log_') {
           if ($operand === null) {
             throw new MathParserException("Syntax error - missing index");
           }
           $node['symbol'] = 'log';
           $node['index'] = $operand;
           $this->operatorStack[] = $node;
-          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol'] == '*') {
+          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol'] === '*') {
             unset($this->tokens[$tokenindex+1]); // remove implicit mult
           };
           return;
@@ -908,12 +911,12 @@ class MathParser
             }
             break;
           case 'nthroot':
-            if ($indexval%2==0 && $insideval<0) {
+            if ($indexval%2===0 && $insideval<0) {
               throw new MathParserException("no even root of negative");
             }
             break;
           case 'factorial':
-            if ((int)$insideval != $insideval || $insideval<0) {
+            if (round($insideval) !== floor($insideval) || $insideval<0) {
               throw new MathParserException("invalid factorial input ($insideval)");
             } else if ($insideval > 150) {
               throw new MathParserException("too big of factorial input ($insideval)");
@@ -967,7 +970,7 @@ class MathParser
    * @return boolean
    */
   private function isMultiple($a,$b) {
-    if ($b==0) {
+    if ($b===0) {
       return false;
     }
     $v = abs($a)/abs($b);
@@ -987,12 +990,12 @@ class MathParser
    * @return string  A string representation of the function
    */
   private function toString($node) {
-    if ($node['type'] == 'number' || $node['type'] == 'variable') {
+    if ($node['type'] === 'number' || $node['type'] === 'variable') {
       return $node['symbol'];
-    } else if ($node['type'] == 'function') {
+    } else if ($node['type'] === 'function') {
       return $node['symbol'] . '(' . $this->toString($node['input']) . ')';
-    } else if ($node['type'] == 'operator') {
-      if ($node['symbol'] == '~') {
+    } else if ($node['type'] === 'operator') {
+      if ($node['symbol'] === '~') {
         return '-'.$this->toString($node['left']);
       }
       return $this->toString($node['left']) .
@@ -1007,12 +1010,12 @@ class MathParser
    * @return string
    */
   public function toOutputString($node) {
-    if ($node['type'] == 'number' || $node['type'] == 'variable') {
+    if ($node['type'] === 'number' || $node['type'] === 'variable') {
       return $node['symbol'];
-    } else if ($node['type'] == 'function') {
+    } else if ($node['type'] === 'function') {
       return $node['symbol'] . '(' . $this->toOutputString($node['input']) . ')';
-    } else if ($node['type'] == 'operator') {
-      if ($node['symbol'] == '~') {
+    } else if ($node['type'] === 'operator') {
+      if ($node['symbol'] === '~') {
         return '-('.$this->toOutputString($node['left']).')';
       }
       return '('.$this->toOutputString($node['left']) .
@@ -1056,15 +1059,15 @@ class MathParser
     // first compare types.  For negated nodes, we'll use the type of the
     // node being negated
     $typecmp = strcmp(
-      $a['symbol'] == '~' ? $a['left']['type'] : $a['type'],
-      $b['symbol'] == '~' ? $b['left']['type'] : $b['type']
+      $a['symbol'] === '~' ? $a['left']['type'] : $a['type'],
+      $b['symbol'] === '~' ? $b['left']['type'] : $b['type']
     );
-    if ($typecmp == 0) {
+    if ($typecmp === 0) {
       // compare strings.  We'll ignore the negative, whether it comes from
       // a negated node or a negative number node.
       return strcmp(
-        $a['string'][0] == '-' ? substr($a['string'],1) : $a['string'],
-        $b['string'][0] == '-' ? substr($b['string'],1) : $b['string']
+        $a['string'][0] === '-' ? substr($a['string'],1) : $a['string'],
+        $b['string'][0] === '-' ? substr($b['string'],1) : $b['string']
       );
     } else {
       return $typecmp;
@@ -1079,69 +1082,71 @@ class MathParser
    * @return array  normalized AST node
    */
   private function normalizeNode($node) {
-    if ($node['type'] == 'number' || $node['type'] == 'variable') {
+    if ($node['type'] === 'number' || $node['type'] === 'variable') {
       // nothing to normalize for these
       return $node;
-    } else if ($node['type'] == 'function') {
+    } else if ($node['type'] === 'function') {
       // recurse into input
       $node['input'] = $this->normalizeNode($node['input']);
       return $node;
-    } else if ($node['symbol'] == '~') {
+    } else if ($node['symbol'] === '~') {
       // recurse in
       $node['left'] = $this->normalizeNode($node['left']);
-      if ($node['left']['symbol'] == '*') {
+      if ($node['left']['symbol'] === '*') {
         // if we have the opposite of a product, move the negative to the first element of the product
         $node['left']['left'] = $this->negNode($node['left']['left']);
         return $node['left'];
-      } else if ($node['left']['type'] == 'number') {
+      } else if ($node['left']['type'] === 'number') {
         $node['left']['symbol'] = -1*$node['left']['symbol'];
         return $node['left'];
       } else {
         return $node;
       }
-    } else if ($node['symbol'] == '^') {
+    } else if ($node['symbol'] === '^') {
       // recurse in. We're not doing any reordering for these
       $node['left'] = $this->normalizeNode($node['left']);
       $node['right'] = $this->normalizeNode($node['right']);
       return $node;
     } else {
-      $node['left'] = $this->normalizeNode($node['left']);
-      $node['right'] = $this->normalizeNode($node['right']);
+      //$node['left'] = $this->normalizeNode($node['left']);
+      //$node['right'] = $this->normalizeNode($node['right']);
       // for +- and */ we're going to gather all the equal-precendence
       // elements then sort them into a standardized order and rebuild tree
-      if ($node['symbol'] == '+' || $node['symbol'] == '-') {
+      if ($node['symbol'] === '+' || $node['symbol'] === '-') {
         $basesym = '+';
-      } else if ($node['symbol'] == '*' || $node['symbol'] == '/') {
+      } else if ($node['symbol'] === '*' || $node['symbol'] === '/') {
         $basesym = '*';
       }
       $allSums = [];
+
+
       // walk into node to gather elements
       $this->treeWalk($node, $allSums);
 
       $invert = false;
       usort($allSums, 'self::nodeSort');
-
-      if ($basesym == '+' && ($allSums[0]['symbol'] == '~' ||
-        ($allSums[0]['type'] == 'number' && $allSums[0]['symbol'] < 0))
+      
+      if ($basesym === '+' && ($allSums[0]['symbol'] === '~' ||
+        ($allSums[0]['type'] === 'number' && $allSums[0]['symbol'] < 0))
       ) {
         // if first element of sum is negative, we'll invert it
         $invert = true;
         for ($i=0;$i<count($allSums);$i++) {
           $allSums[$i] = $this->negNode($allSums[$i]);
         }
-      } else if ($basesym == '*') {
+      } else if ($basesym === '*') {
         $flip = 1;
         // for set of products, make all positive except first, then adjust
         // the first to keep in balanced
         for ($i=1;$i<count($allSums);$i++) {
-          if (($allSums[$i]['symbol'] == '~' ||
-            ($allSums[$i]['type'] == 'number' && $allSums[$i]['symbol'] < 0))
+          if (($allSums[$i]['symbol'] === '~' ||
+            ($allSums[$i]['type'] === 'number' && $allSums[$i]['symbol'] < 0))
           ) {
             $flip *= -1;
             $allSums[$i] = $this->negNode($allSums[$i]);
           }
         }
-        if ($flip == -1) {
+        if ($flip === -1) {
           $allSums[0] = $this->negNode($allSums[0]);
         }
       }
@@ -1153,7 +1158,7 @@ class MathParser
           'symbol' => $basesym,
           'right' => $allSums[$i]
         ];
-        if ($i == 1) {
+        if ($i === 1) {
           $tmpnode['left'] = $allSums[0];
         } else {
           $tmpnode['left'] = $newNode;
@@ -1174,12 +1179,12 @@ class MathParser
    * @return array negated node
    */
   private function negNode($node) {
-    if ($node['symbol'] == '~') {
+    if ($node['symbol'] === '~') {
       return $node['left'];
-    } else if ($node['type'] == 'number') {
+    } else if ($node['type'] === 'number') {
       $node['symbol'] *= -1;
       return $node;
-    } else if ($node['symbol'] == 'div') {
+    } else if ($node['symbol'] === 'div') {
       // for pseudo-division, negate the inside instead
       $node['input'] = $this->negNode($node['input']);
       return $node;
@@ -1204,54 +1209,55 @@ class MathParser
    * @return string   string representation of normalized AST node
    */
   private function normalizeNodeToString($node) {
-    if ($node['type'] == 'number' || $node['type'] == 'variable') {
+    if ($node['type'] === 'number' || $node['type'] === 'variable') {
       // nothing to normalize for these
       return $node['symbol'];
-    } else if ($node['type'] == 'function') {
+    } else if ($node['type'] === 'function') {
       // recurse into input
       return $node['symbol'].'('.$this->normalizeNodeToString($node['input']).')';
-    } else if ($node['symbol'] == '~') {
+    } else if ($node['symbol'] === '~') {
       // recurse in
       return '-('.$this->normalizeNodeToString($node['left']).')';
-    } else if ($node['symbol'] == '^') {
+    } else if ($node['symbol'] === '^') {
       // recurse in. We're not doing any reordering for these
       return $this->normalizeNodeToString($node['left']) . '^' .
         $this->normalizeNodeToString($node['right']);
     } else {
       // for +- and */ we're going to gather all the equal-precendence
       // elements then sort them into a standardized order and rebuild tree
-      if ($node['symbol'] == '+' || $node['symbol'] == '-') {
+      if ($node['symbol'] === '+' || $node['symbol'] === '-') {
         $basesym = '+';
-      } else if ($node['symbol'] == '*' || $node['symbol'] == '/') {
+      } else if ($node['symbol'] === '*' || $node['symbol'] === '/') {
         $basesym = '*';
       }
       $allSums = [];
       // walk into node to gather elements
       $this->treeWalk($node, $allSums);
+      
       $invert = false;
       usort($allSums, 'self::nodeSort');
       $invert = false;
-      if ($basesym == '+' && ($allSums[0]['symbol'] == '~' ||
-        ($allSums[0]['type'] == 'number' && $allSums[0]['symbol'] < 0))
+      if ($basesym === '+' && ($allSums[0]['symbol'] === '~' ||
+        ($allSums[0]['type'] === 'number' && $allSums[0]['symbol'] < 0))
       ) {
         // if first element of sum is negative, we'll invert it
         $invert = true;
         for ($i=0;$i<count($allSums);$i++) {
           $allSums[$i] = $this->negNode($allSums[$i]);
         }
-      } else if ($basesym == '*') {
+      } else if ($basesym === '*') {
         $flip = 1;
         // for set of products, make all positive except first, then adjust
         // the first to keep in balanced
         for ($i=1;$i<count($allSums);$i++) {
-          if (($allSums[$i]['symbol'] == '~' ||
-            ($allSums[$i]['type'] == 'number' && $allSums[$i]['symbol'] < 0))
+          if (($allSums[$i]['symbol'] === '~' ||
+            ($allSums[$i]['type'] === 'number' && $allSums[$i]['symbol'] < 0))
           ) {
             $flip *= -1;
             $allSums[$i] = $this->negNode($allSums[$i]);
           }
         }
-        if ($flip == -1) {
+        if ($flip === -1) {
           $allSums[0] = $this->negNode($allSums[0]);
         }
       }
@@ -1280,11 +1286,12 @@ class MathParser
    * @return void
    */
   private function treeWalk(&$node, &$collection) {
-    if ($node['symbol'] == '-') {
+
+    if ($node['symbol'] === '-') {
       // convert 3-4 to 3 + -4
       $node['symbol'] = '+';
       $node['right'] = $this->negNode($node['right']);
-    } else if ($node['symbol'] == '/') {
+    } else if ($node['symbol'] === '/') {
       // convert 3/4 to 3*div(4)
       $node['symbol'] = '*';
       $node['right'] = [
@@ -1294,16 +1301,19 @@ class MathParser
       ];
     }
     $sym1 = '';
-    if ($node['symbol'] == '+') {
+    if ($node['symbol'] === '+') {
       $sym1 = '+';
       $sym2 = '-';
-    } else if ($node['symbol'] == '*') {
+    } else if ($node['symbol'] === '*') {
       $sym1 = '*';
       $sym2 = '/';
     }
 
-    if ($sym1 != '') {
-      if ($node['left']['symbol'] == $sym1 || $node['left']['symbol'] == $sym2) {
+    if ($sym1 !== '') {
+      if ($node['left']['symbol'] === '~' && ($node['left']['left']['symbol'] === $sym1 || $node['left']['left']['symbol'] === $sym2)) {
+        $node['left'] = $this->normalizeNode($node['left']);
+      }
+      if ($node['left']['symbol'] === $sym1 || $node['left']['symbol'] === $sym2) {
         // same precedence - recurse into node
         $this->treeWalk($node['left'], $collection);
       } else {
@@ -1313,11 +1323,15 @@ class MathParser
         $node['left']['string'] = (string) $this->toString($node['left']);
         $collection[] = $node['left'];
       }
-      if ($node['right']['symbol'] == $sym1 || $node['right']['symbol'] == $sym2) {
+      if ($node['right']['symbol'] === '~' && ($node['right']['left']['symbol'] === $sym1 || $node['right']['left']['symbol'] === $sym2)) {
+        $node['right'] = $this->normalizeNode($node['right']);
+      }
+      if ($node['right']['symbol'] === $sym1 || $node['right']['symbol'] === $sym2) {
         // same precedence - recurse into node
         $this->treeWalk($node['right'], $collection);
       } else {
         // add node to collection
+        
         $node['right']= $this->normalizeNode($node['right']);
         $node['right']['string'] = (string) $this->toString($node['right']);
         $collection[] = $node['right'];
@@ -1326,28 +1340,28 @@ class MathParser
   }
 
   private function walkRemoveOne(&$node) {
-    if ($node['symbol'] == '*') {
-      if ($node['right']['symbol'] == '1') {
+    if ($node['symbol'] === '*') {
+      if ($node['right']['symbol'] === '1') {
         $node = $node['left'];
         $this->walkRemoveOne($node);
         return;
-      } else if ($node['left']['symbol'] == '1') {
+      } else if ($node['left']['symbol'] === '1') {
         $node = $node['right'];
         $this->walkRemoveOne($node);
         return;
-      } else if ($node['left']['symbol'] == '~' &&
-        $node['left']['left']['symbol'] == '1'
+      } else if ($node['left']['symbol'] === '~' &&
+        $node['left']['left']['symbol'] === '1'
       ) {
-        if ($node['right']['symbol'] == '~') { // both neg; remove both negs
+        if ($node['right']['symbol'] === '~') { // both neg; remove both negs
           $node = $node['right']['left'];
         } else { // make right neg and remove a level
           $node['left']['left'] = $node['right'];
           $node = $node['left'];
         }
-      } else if ($node['right']['symbol'] == '~' &&
-        $node['right']['left']['symbol'] == '1'
+      } else if ($node['right']['symbol'] === '~' &&
+        $node['right']['left']['symbol'] === '1'
       ) {
-        if ($node['left']['symbol'] == '~') { // both neg; remove both negs
+        if ($node['left']['symbol'] === '~') { // both neg; remove both negs
           $node = $node['left']['left'];
         } else { // make left neg and remove a level
           $node['right']['left'] = $node['left'];
@@ -1393,15 +1407,15 @@ function factorial($x) {
 	for ($i=$x-1;$i>0;$i--) {
 		$x *= $i;
 	}
-	return ($x<0?false:($x==0?1:$x));
+	return ($x<0?false:($x===0?1:$x));
 }
 
 function nthroot($x,$n) {
-	if ($x==0) {
+	if ($x===0) {
       return 0;
-    } else if ($n%2==0 && $x<0) { //if even root and negative base
+    } else if ($n%2===0 && $x<0) { //if even root and negative base
       throw new MathParserException("Can't take even root of negative value");
-	} else if ($n==0) {
+	} else if ($n===0) {
       throw new MathParserException("Can't take 0th root");
     } else if ($x<0) { //odd root of negative base - negative result
 		return -1*exp(1/$n*log(abs($x)));
@@ -1416,34 +1430,37 @@ function funcvar ($input, $v) {
 
 // a safer power function that can handle (-8)^(1/3)
 function safepow($base,$power) {
-	if ($base==0) {
-    if($power==0) {
-      throw new MathParserException("0^0 is undefined");
+	if ($base===0) {
+    if($power===0) {
+      echo "0^0 is undefined";
+      return NAN;
     } else {
       return 0;
     }
   }
   if (!is_numeric($base) || !is_numeric($power)) {
-    throw new MathParserException("cannot evaluate powers with nonnumeric values");
+    echo "cannot evaluate powers with nonnumeric values";
+    return NAN;
   }
 	if ($base<0 && floor($power)!=$power) {
 		for ($j=3; $j<50; $j+=2) {
 			if (abs(round($j*$power)-($j*$power))<.000001) {
-				if (round($j*$power)%2==0) {
+				if (round($j*$power)%2===0) {
 					return exp($power*log(abs($base)));
 				} else {
 					return -1*exp($power*log(abs($base)));
 				}
 			}
 		}
-		throw new MathParserException("invalid power for negative base");
+		echo "invalid power for negative base";
+        return NAN;
 	}
 	if (floor($base)==$base && floor($power)==$power && $power>0) { //whole # exponents
 		$result = pow(abs($base),$power);
 	} else { //fractional & negative exponents (pow can't handle?)
 		$result = exp($power*log(abs($base)));
 	}
-	if (($base < 0) && ($power % 2 != 0)) {
+	if (($base < 0) && ($power % 2 !== 0)) {
 		$result = -($result);
 	}
 	return $result;
@@ -1452,103 +1469,129 @@ function safepow($base,$power) {
 function sec($x) {
   $val = cos($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for sec");
+    echo "Invalid input for sec";
+    return NAN;
   }
 	return (1/$val);
 }
 function csc($x) {
   $val = sin($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for csc");
+    echo "Invalid input for csc";
+    return NAN;
   }
 	return (1/$val);
 }
 function cot($x) {
   $val = tan($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for cot");
+    echo "Invalid input for cot";
+    return NAN;
   }
 	return (1/$val);
 }
 function sech($x) {
   $val = cosh($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for sech");
+    echo "Invalid input for sech";
+    return NAN;
   }
 	return (1/$val);
 }
 function csch($x) {
   $val = sinh($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for csch");
+    echo "Invalid input for csch";
+    return NAN;
   }
 	return (1/$val);
 }
 function coth($x) {
   $val = tanh($x);
   if (abs($val)<1e-16) {
-    throw new MathParserException("Invalid input for coth");
+    echo "Invalid input for coth";
+    return NAN;
   }
 	return (1/$val);
 }
 function asec($x) {
   if (abs($x)<1e-16) {
-    throw new MathParserException("Invalid input for arcsec");
+    echo "Invalid input for arcsec";
+    return NAN;
   }
   $inv = round(1/$x, 12);
   if ($inv < -1 || $inv > 1) {
-    throw new MathParserException("Invalid input for arcsec");
+    echo "Invalid input for arcsec";
+    return NAN;
   }
   return acos($inv);
 }
 function acsc($x) {
   if (abs($x)<1e-16) {
-    throw new MathParserException("Invalid input for arccsc");
+    echo "Invalid input for arccsc";
+    return NAN;
   }
   $inv = round(1/$x, 12);
   if ($inv < -1 || $inv > 1) {
-    throw new MathParserException("Invalid input for arccsc");
+    echo "Invalid input for arccsc";
+    return NAN;
   }
   return asin($inv);
 }
 function acot($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arccot");
+        echo "Invalid input for arccot";
+        return NAN;
     }
     return atan(1/$x);
 }
 function asech($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arcsech");
+        echo "Invalid input for arcsech";
+        return NAN;
     }
     $inv = round(1/$x, 12);
     if ($inv < 1) {
-        throw new MathParserException("Invalid input for arcsech");
+        echo "Invalid input for arcsech";
+        return NAN;
     }
     return acosh($inv);
 }
 function acsch($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arccsch");
+        echo "Invalid input for arccsch";
+        return NAN;
     }
     $inv = round(1/$x, 12);
     return asinh($inv);
 }
 function acoth($x) {
     if (abs($x)<1e-16) {
-        throw new MathParserException("Invalid input for arccoth");
+        echo "Invalid input for arccoth";
+        return NAN;
     }
     $inv = round(1/$x, 12);
     if ($inv < -1 || $inv > 1) {
-        throw new MathParserException("Invalid input for arccoth");
+        echo "Invalid input for arccoth";
+        return NAN;
     }
     return atanh($inv);
 }
 function safeasin($x) {
-  return asin(round($x,12));  
+  $inp = round($x, 12);
+  if ($inp < -1 || $inp > 1) {
+    echo "Invalid input for arcsin";
+    return NAN;
+  }
+  return asin($inp);  
 }
 function safeacos($x) {
-  return acos(round($x,12));  
+  $inp = round($x, 12);
+  if ($inp < -1 || $inp > 1) {
+    echo "Invalid input for arccos";
+    return NAN;
+  }
+  return acos($inp);  
 }
 function sign($a,$str=false) {
 	if ($str==="onlyneg") {
@@ -1560,7 +1603,7 @@ function sign($a,$str=false) {
 	}
 }
 function sgn($a) {
-	return ($a==0)?0:(($a<0)?-1:1);
+	return ($a===0)?0:(($a<0)?-1:1);
 }
 
 
@@ -1572,7 +1615,7 @@ function cplx_mult($a,$b) {
 }
 function cplx_div($n,$d) {
   $ds = $d[0]*$d[0] + $d[1]*$d[1];
-  if ($ds == 0) {
+  if ($ds === 0) {
     throw new MathParserException("Cannot divide by zero in complex division");
   }
   return [($n[0]*$d[0] + $n[1]*$d[1])/$ds, ($n[1]*$d[0]-$n[0]*$d[1])/$ds];
@@ -1608,6 +1651,44 @@ function cplx_csc($z) {
 }
 function cplx_cot($z) {
   return cplx_div(cplx_cos($z), cplx_sin($z));
+}
+function cplx_sinh($z) {
+  return [sinh($z[0])*cos($z[1]), cosh($z[0])*sin($z[1])];
+}
+function cplx_cosh($z) {
+  return [cosh($z[0])*cos($z[1]), sinh($z[0])*sin($z[1])];
+}
+function cplx_tanh($z) {
+  return cplx_div(cplx_sinh($z), cplx_cosh($z));
+}
+function cplx_sech($z) {
+  return cplx_div([1,0], cplx_cosh($z));
+}
+function cplx_csch($z) {
+  return cplx_div([1,0], cplx_sinh($z));
+}
+function cplx_coth($z) {
+  return cplx_div(cplx_cosh($z), cplx_sinh($z));
+}
+function cplx_asinh($z) {
+  $r = cplx_sqrt([$z[0]*$z[0] - $z[1]*$z[1] + 1,2*$z[0]*$z[1]]);
+  return cplx_log([$z[0] + $r[0], $z[1] + $r[1]]);
+}
+function cplx_acosh($z) {
+    $r = cplx_sqrt([$z[0]*$z[0] - $z[1]*$z[1] - 1,2*$z[0]*$z[1]]);
+    return cplx_log([$z[0] + $r[0], $z[1] + $r[1]]);
+}
+function cplx_atanh($z) {
+    return cplx_mult([.5,1], cplx_log(cplx_div([1+$z[0],$z[1]], [1-$z[0],-1*$z[1]])));
+}
+function cplx_asech($z) {
+    return cplx_acosh(cplx_div([1,0],$z));
+}
+function cplx_acsch($z) {
+    return cplx_asinh(cplx_div([1,0],$z));
+}
+function cplx_acoth($z) {
+    return cplx_mult([.5,1], cplx_log(cplx_div([$z[0]+1,$z[1]], [$z[0]-1,$z[1]])));
 }
 function cplx_asin($z) {
   // -i*  ln(iz + sqrt(1-z^2))  

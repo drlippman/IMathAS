@@ -678,7 +678,11 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 
         $num1=$num[$i];
         $sq=round($num[$i][0]**2+$num[$i][1]**2,12);
-        $r= reduceradical($sq);
+        if (round($sq)==round($sq,8)) { // close enough to int
+            $r= reduceradical($sq);
+        } else {
+            $r = round(sqrt($sq),$roundto);
+        }
         //$r= round(cx_modul($num1),$roundto);
 
         if ($argin=="rad"){
@@ -687,7 +691,7 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
                 $th1=makexxpretty("$th1 pi"); 
         }
             else {
-                $th1=round(cx_arg($num1,"deg"),$rounto);
+                $th1=round(cx_arg($num1,"deg"),$roundto);
         }
         
         $A[$i]=makexpretty("$r (cos($th1)+isin($th1))");

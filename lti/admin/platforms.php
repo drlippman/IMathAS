@@ -164,8 +164,8 @@ echo '<li><label>'._('Issuer/Platform ID:').' <input name=other_issuer size=50/>
 echo '<li><label>'._('Client ID:').' <input name=other_clientid size=50/></label></li>';
 echo '<li><label>'._('Keyset URL:').' <input name=other_keyseturl size=50/></label></li>';
 echo '<li><label>'._('Token URL:').' <input name=other_tokenurl size=50/></label></li>';
-echo '<li><label>'._('Authentication URL:').' <input name=other_authurl size=50/></label></li>';
-echo '<li><label>'._('The u= from the OpenID Connect URL:').' <input size=15 name=other_uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" /></label></li>';
+echo '<li><label>'._('Authentication / OIDC Authorization URL:').' <input name=other_authurl size=50/></label></li>';
+echo '<li><label>'._('The u= from the OpenID Connect URL from above put in the LMS:').' <input size=15 name=other_uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" /></label></li>';
 echo '</ul>';
 echo '<button type=submit>'._('Add Platform').'</button></p>';
 echo '</div>';

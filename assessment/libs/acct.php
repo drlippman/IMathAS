@@ -1878,7 +1878,7 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 	}
 	for ($j=$c; $j<$numrows;$j++) {
 		$out .= '<tr><td>[AB'.$sn.']</td>';
-		$anstypes[$sn] = 'string'; $displayformat[$sn] = 'typeahead'; $questions[$sn] = $ops;  $answer[$sn] = $dt[$i]; $answerboxsize[$sn] = $maxsizedescr;
+		$anstypes[$sn] = 'string'; $displayformat[$sn] = 'typeahead'; $questions[$sn] = $ops;  $answer[$sn] = ''; $answerboxsize[$sn] = $maxsizedescr;
 		$sn++;
 		$out .= '<td class="r">[AB'.$sn.']</td>';
 		$anstypes[$sn] = 'string'; $displayformat[$sn] = 'alignright'; $answer[$sn] = ''; $answerboxsize[$sn] = 8;

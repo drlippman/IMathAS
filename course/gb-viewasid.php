@@ -205,10 +205,11 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		}
 	}
 	if (isset($_REQUEST['clearreviewview']) && $isteacher) {
-		$stm = $DBH->prepare("DELETE FROM imas_content_track WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='assessreview')");
+		$stm = $DBH->prepare("DELETE FROM imas_content_track WHERE typeid=:typeid AND courseid=:courseid AND userid=:userid AND (type='gbviewasid' OR type='assessreview')");
 		$stm->execute(array(
 			':typeid' => Sanitize::onlyInt($_REQUEST['aid']),
-			':userid' => $get_uid
+			':userid' => $get_uid,
+            ':courseid' => $cid
 		));
 		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
 

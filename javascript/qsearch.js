@@ -217,6 +217,11 @@ var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong 
     '</span> ';
 var wrongLibState = {};
 function displayQuestionList(results) {
+    if (typeof results === 'string') {  // error message
+        $("#searcherror").html(results).show();
+        $("#search").focus();
+        return;
+    }
     var searchtype = 'libs';
     var colcnt = 9;
     var thead = '<thead><tr>'
@@ -325,8 +330,11 @@ function displayQuestionList(results) {
         var actions2 = '<button role="button" class="dropdown-toggle arrow-down secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
             '<span class="sr-only">More</span></button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
             '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>' +
-            '<li><a href="' + editqaddr + '">' + (q['mine']==1 ? _('Edit') : _('View Code')) + '</a></li>' + 
-            '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>';
+            '<li><a href="' + editqaddr + '&viewonly=1">' + _('View Code') + '</a></li>';
+        if (q['mine']==1) {
+            actions2 += '<li><a href="' + editqaddr + '">' + _('Edit Code') + '</a></li>';
+        } 
+        actions2 += '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>';
         if (results.type=='libs') {
             actions2 += '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
                 ((q['junkflag'] == 1) ? _('Un-mark as in wrong library') : _('Mark as in wrong library')) +

@@ -68,6 +68,7 @@ $a2->setState($state);
 $disp = $a2->displayQuestion($qn, [
     'showallparts' => true,
     'showans' => false,
+    'hideans' => true,
     'showhints' => 0
 ]);
 if ($showq) {

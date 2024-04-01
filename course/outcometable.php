@@ -762,7 +762,7 @@ function outcometable() {
 
 		$gb[$row][1][$col][3] = $l['userid'];; //in place of assessment session id
 
-		$scoreddata = json_decode(gzdecode($l['scoreddata']), true);
+		$scoreddata = json_decode(Sanitize::gzexpand($l['scoreddata']), true);
 		$assessver = $scoreddata['assess_versions'][$scoreddata['scored_version']];
 		$pts = array();
 		$ptsposs = array();

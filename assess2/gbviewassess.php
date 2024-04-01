@@ -2,7 +2,7 @@
 // IMathAS: Assess2 gradebook details page
 // (c) 2019 David Lippman
 
-$lastupdate = '20230201';
+$lastupdate = '20240316';
 
 require_once '../init.php';
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -44,12 +44,10 @@ if ($isltilimited || $inTreeReader) {
 }
 
 $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesiteurl'].'/assess2/";</script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20230818" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20240107" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/rubric_min.js?v=022223" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
@@ -97,9 +95,12 @@ if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$i
 </noscript>
 <div id="app"></div>
 
-<script type="text/javascript" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess.js?v=<?php echo $lastupdate;?>"></script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.legacy.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.legacy.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess.legacy.js?v=<?php echo $lastupdate;?>"></script>
 
 <?php
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">

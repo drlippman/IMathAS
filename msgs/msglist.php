@@ -611,6 +611,7 @@ If deleted on both ends, delete from DB
 		$actbar[] = "<a href=\"allstumsglist.php?cid=$cid\">Student Messages</a>";
 	}
 	$actbar[] = '<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available" />';
+    $actbar[] = '<a href="cleanupmsgs.php?cid='.$cid.'">' . _('Delete old messages') . '</a>';
 	echo '<div class="cpmid">'.implode(' | ',$actbar).'</div>';
 
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND deleted<2";

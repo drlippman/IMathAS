@@ -477,10 +477,14 @@ function initPicture(x_min,x_max,y_min,y_max) {
  node.setAttribute("y","0");
  node.setAttribute("width",width);
  node.setAttribute("height",height);
- node.setAttribute("style","stroke-width:1;fill:white");
+ node.setAttribute("fill","white");
  svgpicture.appendChild(node);
 }
 
+function setBackgroundColor(color) {
+    var bgrect = svgpicture.getElementsByTagName("rect")[0];
+    bgrect.setAttribute("fill", color);
+}
 function setStrokeFill(node) {
   node.setAttribute("stroke-width", strokewidth);
   if (strokedasharray!=null)
@@ -1008,15 +1012,16 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   }
   pnode = myCreateElementSVG("path");
   st="";
-  if (dox) {
+  
+  if (dox && ymin < 1e-8 && ymax > -1e-8) {
 	  st="M"+(fqonlyx?origin[0]:winxmin)+","+(height-origin[1])+" "+winxmax+","+
     (height-origin[1]);
   }
-  if (doy) {
+  if (doy && xmin < 1e-8 && xmax > -1e-8) {
 	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+(fqonlyy?height-origin[1]:winymax);
   }
 
-  if (dox && dx>0) {
+  if (dox && dx>0 && ymin < 1e-8 && ymax > -1e-8) {
 	  for (x = origin[0]; x<winxmax; x = x+dx)
 	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
 		   (height-origin[1]-ticklength);
@@ -1026,7 +1031,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	  	  	(height-origin[1]-ticklength);
 	  }
   }
-  if (doy && dy>0) {
+  if (doy && dy>0 && xmin < 1e-8 && xmax > -1e-8) {
 	   if (!fqonlyy) {
 	     for (y = height-origin[1]; y<winymax; y = y+dy)
 	      if (y>=winymin) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;

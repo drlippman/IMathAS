@@ -42,16 +42,17 @@ function setCourseRuleSets($cid, $rulesets) {
 	$stm->execute(array(json_encode($jsondata, JSON_INVALID_UTF8_IGNORE), $cid));
 }
 function runRuleSet($ruleset) {
-	global $cid;
+	global $cid, $userid, $DBH;
+    global $isteacher,$canviewall,$includeduedate,$includelastchange,$iuncludecategoryID,$hidelocked,$alwaysshowIP,$secfilter;
 
-	$GLOBALS['isteacher'] = true;
-	$GLOBALS['canviewall'] = true;
-	$GLOBALS['includeduedate'] = true;
-	$GLOBALS['includelastchange'] = true;
-	$GLOBALS['includecategoryID'] = true;
-	$GLOBALS['hidelocked'] = true;
-	$GLOBALS['alwaysshowIP'] = true;
-	$GLOBALS['secfilter'] = -1;
+	$isteacher = true;
+	$canviewall = true;
+	$includeduedate = true;
+	$includelastchange = true;
+	$includecategoryID = true;
+	$hidelocked = true;
+	$alwaysshowIP = true;
+	$secfilter = -1;
 
 	require_once "gbtable2.php";
 
@@ -228,7 +229,11 @@ function runRuleSet($ruleset) {
 					}
 					break;
 				case 'score':
-					$percent = 100*$tot/$poss;
+                    if ($poss > 0) {
+					    $percent = 100*$tot/$poss;
+                    } else {
+                        $percent = 0;
+                    }
 					if (($rule['abovebelow']==0 && $percent>=$rule['scorebreak']) ||
 					    ($rule['abovebelow']==1 && $percent<$rule['scorebreak'])) {
 						$stugrouped[$i] = $grpnum;

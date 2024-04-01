@@ -45,7 +45,8 @@ function hideNA() {
 	}
 	$(".notanswered").toggle();
 }
-function showallans() {
+function showallans(el) {
+    if (el) { el.disabled = true; }
 	$("span[id^='ans']").toggleClass("hidden", false).show();
     $(".sabtn").replaceWith("<span>Answer: </span>");
     $("div[id^=dsbox]").toggleClass("hidden", false).attr("aria-hidden", false)
@@ -55,16 +56,23 @@ function showallans() {
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
 }
-function previewallfiles() {
+function previewallfiles(el) {
+    if (el) { el.disabled = true; }
 	$("span.clickable").trigger("click");
 	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").trigger("click");
 }
-function showallwork() {
+function showallwork(el) {
+    if (el) { el.disabled = true; }
 	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
     if (confirm(_('Are you SURE you want to give all students full credit?'))) {
 	    $(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    }
+}
+function allmanualfullcred() {
+    if (confirm(_('Are you SURE you want to give all students full credit on manually-graded parts?'))) {
+	    $(".fullcredmanuallink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
     }
 }
 function allvisnocred() {
@@ -174,6 +182,7 @@ function clearfeedback() {
 			els[i].value = '';
 		}
 	}
+    $("div.fbbox").empty();
 }
 function cleardeffeedback() {
 	var els=document.getElementsByTagName("textarea");
@@ -182,6 +191,11 @@ function cleardeffeedback() {
 			els[i].value = '';
 		}
 	}
+    $("div.fbbox").each(function(i,el) {
+        if (el.innerHTML==GBdeffbtext) {
+            $(el).empty();
+        }
+    });
 }
 
 function showgraphtip(el, la, init) {
@@ -267,7 +281,8 @@ function initAnswerboxHighlights() {
 };
 
 var sidebysideenabled = false;
-function sidebysidegrading() {
+function sidebysidegrading(el) {
+    if (el) { el.disabled = true; }
     if (sidebysideenabled) { return; }
     sidebysideenabled = true;
 	$("body").removeClass("fw1000").removeClass("fw1920");
@@ -295,14 +310,16 @@ function sidebysidegrading() {
 }
 
 var scrollingscoreboxes = false;
-function toggleScrollingScoreboxes() {
+function toggleScrollingScoreboxes(el) {
     if (scrollingscoreboxes) {
         $(window).off('scroll.scoreboxes');
         $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);
         $(".biquestionwrap .scrollpane").css("margin-bottom","0");
+        if (el) {el.innerText = _('Floating Scoreboxes')}
     } else {
         $(window).on('scroll.scoreboxes', updatescoreboxscroll);
         updatescoreboxscroll();
+        if (el) {el.innerText = _('Fixed Scoreboxes')}
     }
     scrollingscoreboxes = !scrollingscoreboxes;
 }

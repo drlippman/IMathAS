@@ -20,10 +20,18 @@
       <router-link
           v-if = "qn == -1"
           :to="'/skip/1'"
-          tag="button"
+          custom
+          v-slot="{ navigate }"
       >
-        <icons name="right" alt=""/>
-        {{ $t('question.firstq') }}
+        <button
+          type="button"
+          @click="navigate"
+          @keypress.enter="navigate"
+          role="link"
+        >
+          <icons name="right" alt=""/>
+          {{ $t('question.firstq') }}
+        </button>
       </router-link>
       <inter-question-text-skiplist
         pos = "before"

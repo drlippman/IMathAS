@@ -226,6 +226,9 @@ class AssessStandalone {
     if (!empty($options['printformat'])) {
         $questionParams->setPrintFormat(true);
     }
+    if (!empty($options['showteachernotes'])) {
+        $questionParams->setTeacherInGb(true);
+    }
 
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
@@ -270,7 +273,8 @@ class AssessStandalone {
         'html' => $qout, 
         'jsparams' => $jsparams, 
         'errors'=>$question->getErrors(),
-        'soln'=>$question->getSolutionContentDetailed()
+        'soln'=>$question->getSolutionContentDetailed(),
+        'solnopts'=> $this->qdata[$qsid]['solutionopts']
     );
   }
 

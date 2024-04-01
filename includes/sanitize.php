@@ -98,6 +98,7 @@ class Sanitize
 	public static function encodeStringForDisplay($string, $doubleencode = false)
 	{
         if ($string === null) { return '';}
+        $string = (string) $string; //force to string type
 		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), $doubleencode);
 	}
 
@@ -231,6 +232,7 @@ class Sanitize
 			? preg_replace('/[^\da-z\.-]/i', '', $parsed_url['host']) : '';
 		$port = isset($parsed_url['port']) ? preg_replace('/[^\d]/', '', $parsed_url['port']) : '';
 		$fragment = isset($parsed_url['fragment']) ? rawurlencode(rawurldecode($parsed_url['fragment'])) : '';
+        $fragment = str_replace('%3D', '=', $fragment);
 
         // Sanitize the path
         if (isset($parsed_url['path'])) {
@@ -484,7 +486,7 @@ class Sanitize
 	 */
 	public static function courseId($courseId)
 	{
-		if ("admin" == strtolower(trim($courseId))) {
+		if ("admin" == strtolower(trim($courseId ?? ''))) {
 			return "admin";
 		} else {
 			return self::onlyInt($courseId);
@@ -599,4 +601,11 @@ class Sanitize
         return preg_replace('/(<p>(&nbsp;)?<\/p>\s*)+$/','', $str);
     }
 
+    public static function gzexpand($data) {
+        if (mb_strpos($data , "\x1f" . "\x8b" . "\x08") === 0) {
+            return gzdecode($data);
+        } else {
+            return gzuncompress($data);
+        }
+    }
 }

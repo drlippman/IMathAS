@@ -295,7 +295,8 @@ class ComplexScorePart implements ScorePart
         }
         $a = $func(['i' => 0]);
         $apb = $func(['i' => 4]);
-        if (isNaN($a) || isNaN($apb)) {
+        $amb = $func(['i' => -4]); // catch i's inside sqrt, log
+        if (isNaN($a) || isNaN($apb) || isNaN($amb)) {
             return false;
         }
         return array($a, ($apb - $a) / 4);

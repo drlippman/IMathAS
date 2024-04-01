@@ -170,7 +170,7 @@
 	}
 
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-	    $scoredData = json_decode(gzdecode($row['scoreddata']), true);
+	    $scoredData = json_decode(Sanitize::gzexpand($row['scoreddata']), true);
 
 	    $scoredAssessmentIndex = $scoredData['scored_version'];
 	    $scoredAssessment = $scoredData['assess_versions'][$scoredAssessmentIndex];

@@ -67,6 +67,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         if (empty($variables)) { $variables = "x";}
         list($variables, $tps, $flist) = numfuncGenerateTestpoints($variables, $domain);
+
         $givenans = numfuncPrepForEval($givenans, $variables);
         $answer = numfuncPrepForEval($answer, $variables);
 
@@ -375,10 +376,12 @@ class FunctionExpressionScorePart implements ScorePart
                                 $stunan++;
                             } else {
                                 $diffs[] = $givenansvals[$i] - $realans;
+                                /*
                                 $realanss[] = $realans;
                                 $ysqr = $realans*$realans;
                                 $ysqrtot += 1/($ysqr+.0001);
                                 $reldifftot += ($givenansvals[$i] - $realans)/($ysqr+.0001);
+                                */
                             }
                         } else if ($isComplex) { // compare complex points
                             if (!is_array($givenansvals[$i])) {
@@ -402,7 +405,7 @@ class FunctionExpressionScorePart implements ScorePart
                     }
 
                     if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
-                        echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
+                        echo _('Debug info: function evaled to Not-a-number at all test points.  Check $domain');
                     }
                     if ($stunan>1) { //if more than 1 student NaN response
                         $correct = false; continue;
@@ -446,8 +449,9 @@ class FunctionExpressionScorePart implements ScorePart
                         } else {
                             $correct = false;
                         }
-                    } else if (!$isComplex && in_array('toconst',$ansformats)) {
-                        if ($abstolerance !== '') {
+                    } else if (!$isComplex && in_array('toconst',$ansformats) && count($diffs)>0) {
+                       /* old method. Messy, confusing tolerances
+                       if ($abstolerance !== '') {
                             //if abs, use mean diff - will minimize error in abs diffs
                             $meandiff = array_sum($diffs)/count($diffs);
                         } else {
@@ -463,6 +467,21 @@ class FunctionExpressionScorePart implements ScorePart
                             } else {
                                 //if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
                                 if ((abs($diffs[$i]-$meandiff)/(abs($realanss[$i])+0.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                            }
+                        }
+                        */
+                        $meandiff = array_sum($diffs)/count($diffs);
+                        // do same comparison as for regular funcs, but subtracting meandiff
+                        foreach ($realanstmp as $i=>$realans) {
+                            if (isNaN($realans)) {
+                                continue;
+                            }
+                            if (isNaN($givenansvals[$i])) {
+                                continue;
+                            } else if ($abstolerance !== '') {
+                                if (abs($givenansvals[$i]-$meandiff-$realans) > $abstolerance+1E-12) { $correct = false; break;}
+                            } else {
+                                if ((abs($givenansvals[$i]-$meandiff-$realans)/(abs($realans)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
                             }
                         }
                     }

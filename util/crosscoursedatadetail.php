@@ -97,8 +97,8 @@ $assessdata = array();
 $courses = array();
 $days = intval($_REQUEST['days']);
 $old = time() - (empty($days)?30:$days)*24*60*60;
-$anregex1 = '[[:<:]]'.$basecourse.':'.$baseassess.'[[:>:]]';
-$anregex2 = '^'.$baseassess.'[[:>:]]';
+$anregex1 = MYSQL_LEFT_WRDBND.$basecourse.':'.$baseassess.MYSQL_RIGHT_WRDBND;
+$anregex2 = '^'.$baseassess.MYSQL_RIGHT_WRDBND;
 $query = 'SELECT ia.id,ia.courseid,ia.itemorder,ia.ptsposs FROM imas_assessments AS ia ';
 $query .= 'JOIN imas_courses AS ic ON ic.id=ia.courseid ';
 $query .= 'JOIN imas_users AS iu ON ic.ownerid=iu.id ';
@@ -279,7 +279,7 @@ $query .= "assessmentid IN ($phcopyaids)";
 $stm = $DBH->prepare($query);
 $stm->execute(array_keys($assessdata));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    $data = json_decode(gzdecode($row['scoreddata']), true);
+    $data = json_decode(Sanitize::gzexpand($row['scoreddata']), true);
     if (empty($data)) { continue; }
     $thisaid = $row['assessmentid'];
 

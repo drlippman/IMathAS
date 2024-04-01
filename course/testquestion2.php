@@ -175,7 +175,6 @@ $nologo = true;
 $useeqnhelper = $eqnhelper;
 $lastupdate = '20221027';
 $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=112822" type="text/javascript"></script>';
@@ -188,7 +187,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=071122" type="text/javascript"></script>';
 } else {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112822" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20230818" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20240107" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
@@ -370,7 +369,8 @@ if ($overwriteBody==1) {
   $starttime = microtime(true);
   $disp = $a2->displayQuestion($qn, [
     'showans' => true,
-    'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
+    'showallparts' => ($hasSeqParts && !empty($_GET['showallparts'])),
+    'showteachernotes' => true
   ]);
   $gentime = microtime(true) - $starttime;
   if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
@@ -427,6 +427,10 @@ if ($overwriteBody==1) {
 		}
 	}
 
+    if (strpos($disp['html'], 'dsboxTN') !== false) {
+        echo '<p class=small>' . _('Note: Instructor Notes only show in the gradebook for instructors. They will not display to students ever.') . '</p>';
+    }
+
 	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
 	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
     echo '<span class="small subdued">'._('Generated in ').round(1000*$gentime).'ms</span> ';
@@ -479,7 +483,11 @@ if ($overwriteBody==1) {
 
 	if ($line['ancestors']!='') {
         $line['ancestors'] = str_replace(',',', ',$line['ancestors']);
-		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);
+		$line['ancestors'] = explode(',', $line['ancestors']);
+		foreach ($line['ancestors'] as $k=>$ancestorqsid) {
+			$line['ancestors'][$k] = '<a href="testquestion2.php?cid='.$cid.'&qsetid='.intval($ancestorqsid).'">'.intval($ancestorqsid).'</a>';
+		}
+		echo "<p>"._("Derived from:")." ".implode(', ', $line['ancestors']);
 		if ($line['ancestorauthors']!='') {
 			echo '<br/>'._('Created by: ').Sanitize::encodeStringForDisplay($line['ancestorauthors']);
 		}

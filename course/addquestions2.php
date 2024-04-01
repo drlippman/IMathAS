@@ -384,8 +384,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=062423\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=011923\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=011224\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=021124\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -554,7 +554,7 @@ if ($overwriteBody==1) {
     echo '<li>',_('If you choose <b>All Libraries</b>, you must provide a search term then click Search. '),'</li></ul>';
 
     echo "<p>",_("To select questions and add them:"),"</p><ul>";
-    echo " <li>",_("Click the eye-shaped <b>Preview</b> icon to view an example of the question"),"</li>";
+    echo " <li>",_("Click the <b>Preview</b> button to view an example of the question"),"</li>";
     echo " <li>",_("Use the checkboxes to mark the questions you want to use"),"</li>";
     echo " <li>",_("Click the <b>Add</b> button to add the questions to your assessment"),"</li> ";
     echo "  </ul>";

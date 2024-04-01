@@ -360,10 +360,9 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022223"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=020223"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=021924"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
     if (!empty($CFG['assess2-use-vue-dev'])) {
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
@@ -376,7 +375,7 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
-        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20230818" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=20240107" type="text/javascript"></script>';
     }
     
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
@@ -409,6 +408,7 @@
 	$(function() {
 		$(".viewworkwrap img").on("click", rotateimg);
 	})
+    var scoretool_page = "aq";
 	';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
@@ -494,11 +494,11 @@
         echo '<p>';
 		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
     }
-    echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
-    echo ' <button type="button" onclick="showallwork()">'._('Show All Work').'</button>';
-    echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
-    echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
-    echo ' <button type="button" onclick="toggleScrollingScoreboxes()">'._('Floating Scoreboxes').'</button>';
+    echo ' <button type="button" id="showanstoggle" onclick="showallans(this)">'._('Show All Answers').'</button>';
+    echo ' <button type="button" onclick="showallwork(this)">'._('Show All Work').'</button>';
+    echo ' <button type="button" onclick="previewallfiles(this)">'._('Preview All Files').'</button>';
+    echo ' <button type="button" onclick="sidebysidegrading(this)">'._('Side-by-Side').'</button>';
+    echo ' <button type="button" onclick="toggleScrollingScoreboxes(this)">'._('Floating Scoreboxes').'</button>';
 	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
 		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
@@ -506,7 +506,8 @@
     echo '</p>';
 	if ($canedit) {
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
-		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
+		echo '<button type=button onclick="allmanualfullcred();">'._('Full Credit manually-graded parts').'</button> ';
+        echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
     }
     if ($page==-1) {
         echo '<p>'._('Sort by').': <button type=button onclick="sortByLastChange()">'._('Last Changed').'</button>';
@@ -772,10 +773,14 @@
                     echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
                     if (count($togr)>0) {
                         $togr = implode(',',$togr);
-                        echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
+                        echo ' | <a href="#" class="fullcredmanuallink" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
                     }
                 } else if ($canedit) {
-                    echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
+                    $class = 'fullcredlink';
+                    if (!empty($qdata['parts'][0]['req_manual'])) {
+                        $class .= ' fullcredmanuallink';
+                    }
+                    echo '<br/>Quick grade: <a href="#" class="'.$class.'" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
                 }
 
                 if (!empty($qdata['other_tries'])) {

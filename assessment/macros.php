@@ -18,14 +18,14 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "prettyint","prettyreal","prettysigfig","roundsigfig","arraystodots","subarray",
  "showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray",
  "array_reverse","root","getsnapwidthheight","is_numeric","is_nan","sign","sgn","prettynegs",
- "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod",
+ "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod","fmod",
  "numtowords","randname","randnamewpronouns","randmalename","randfemalename",
  "randnames","randmalenames","randfemalenames","randcity","randcities","prettytime",
  "definefunc","evalfunc","evalnumstr","safepow","arrayfindindices","stringtoarray","strtoupper",
  "strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend",
  "stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today",
  "numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction",
- "ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots",
+ "ifthen","cases","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots",
  "jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace",
  "makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes",
  "comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp",
@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
+ "array_values","array_keys","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform","splicearray",
  "getsigfigs","checksigfigs");
 
@@ -230,15 +230,29 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	} else {
 		$commands .= ');';
 	}
-
+    $xvar = 'x';
+    $yvar = 'y';
+    $hasaxislabels = false;
 	if (isset($lbl) && count($lbl)>3) {
-		$commands .= "text([{$winxmax},0],\"{$lbl[2]}\",\"aboveleft\");";
-		$commands .= "text([0,{$ymax}],\"{$lbl[3]}\",\"belowright\");";
+        $xvar = $lbl[2];
+        $yvar = $lbl[3];
+        if ($xvar != '') {
+		    $commands .= "text([{$winxmax},0],\"{$xvar}\",\"aboveleft\");";
+        }
+        if ($yvar != '') {
+		    $commands .= "text([0,{$ymax}],\"{$yvar}\",\"belowright\");";
+        }
+        $hasaxislabels = true;
 	}
 	$absymin = 1E10;
 	$absymax = -1E10;
+    $globalalt = '';
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
+        if (substr($function,0,4) == 'alt:') {
+            $globalalt = substr($function, 4);
+            continue;
+        }
         $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
         if (!isset($function[0]) || $function[0]==='') { continue; }
@@ -388,7 +402,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			if (isset($function[3]) && $function[3]!='') {
 				$thisymax = $function[3];
 			} else {$thisymax = $yymax;}
-			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+			$alt .= "<table class=stats><thead><tr><th>$xvar</th><th>$yvar</th></thead></tr><tbody>";
 			$alt .= "<tr><td>$val</td><td>$thisymin</td></tr>";
 			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
@@ -448,7 +462,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$stopat = 11;//($domainlimited?10:11);
 			}
 			if ($xmax != $xmin) {
-				$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+				$alt .= "<table class=stats><thead><tr><th>$xvar</th><th>$yvar</th></thead></tr><tbody>";
 			} else {
 				$alt .= '. ';
 			}
@@ -714,10 +728,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$ymax = min($absymax,$ymax);
 	}
 	$commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});".$commands;
-	$alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. ".$alt;
+    if ($hasaxislabels) {
+	    $alt = "Graphing window shows horizontal axis" .
+            ($xvar == '' ? '' : " labeled $xvar") . ": {$winxmin} to {$winxmax}, vertical axis" .
+            ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}. ".$alt;
+    } else {
+	    $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. ".$alt;
+    }
 
 	if ($_SESSION['graphdisp']==0) {
-		return $alt;
+		return ($globalalt == '') ? $alt : $globalalt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
 	}
@@ -1822,7 +1842,7 @@ function sortarray($a) {
 		$dir = func_get_arg(1);
 	}
 	if (isset($dir) && $dir=="rev") {
-		if (is_numeric($a[0])) {
+		if (isset($a[0]) && is_numeric($a[0])) {
 			rsort($a, SORT_NUMERIC);
 		} else {
 			rsort($a);
@@ -1968,6 +1988,9 @@ function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 		$n = $n*-1;
 		$d = $d*-1;
 	}
+    if ($dblslash === 'parts') {
+        return [$n,$d];
+    }
 	if ($varinnum!==false) {
 		if ($n==1) {
 			$n = '';
@@ -3123,6 +3146,36 @@ function ifthen($c,$t,$f) {
 	return $c?$t:$f;
 }
 
+function cases($val, $inputs, $outputs, $default = '', $tol = .0015) {
+    if (is_array($val)) {
+        echo "First input to cases must be a number or string";
+        return '';
+    } else if (!is_array($inputs) || !is_array($outputs)) {
+        echo "Second and third inputs to cases must be arrays";
+        return '';
+    } else if (count($inputs) != count($outputs)) {
+        echo "Second and third inputs to cases must have same number of elements";
+        return '';
+    }
+    $abstol = false;
+    if (strval($tol)[0]=='|') {
+		$tol = floatval(substr($tol,1));
+        $abstol = true;
+	}
+    foreach ($inputs as $k=>$x) {
+        if (is_numeric($x) && is_numeric($val)) {
+            if ($abstol) {
+                if (abs($x-$val) < $tol+1E-12) {return $outputs[$k];}
+            } else {
+                if (abs($x-$val)/(abs($x)+.0001) < $tol+1E-12) {return $outputs[$k];}
+            }
+        } else if ((string) $x === (string) $val) {
+            return $outputs[$k];
+        }
+    }
+    return $default;
+}
+
 
 //adapted from http://www.mindspring.com/~alanh/fracs.html
 function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
@@ -3179,8 +3232,12 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 	if ($format=="mixednumber") {
 		$w = floor($numerators[$i]/$denominators[$i]);
 		if ($w>0) {
+            $out = "{$sign}$w";
 			$n = $numerators[$i] - $w*$denominators[$i];
-			return "{$sign}$w $n/".$denominators[$i];
+            if (abs($n)>1e-12) {
+                $out .= " $n/".$denominators[$i];
+            }
+			return $out;
 		} else {
 			return $sign.$numerators[$i].'/'.$denominators[$i];
 		}
@@ -3413,7 +3470,7 @@ function intervaltoineq($str,$var) {
                 return $var . ' != ' . $pts[0];
             }
 		} else {
-			$out[] = $pts[0] . ($sm=='['?'le':'lt') . $var . ($em==']'?'le':'lt') . $pts[1];
+			$out[] = $pts[0] . ($sm=='['?' le ':' lt ') . $var . ($em==']'?' le ':' lt ') . $pts[1];
 		}
 	}
 	return implode(' \\ "or" \\ ',$out);
@@ -3465,6 +3522,18 @@ function cleanbytoken($str,$funcs = array()) {
             if (count($out)==0 && $i>0) {
                 $finalout[] = '0';
             } else {
+                /* Disabled for now - causing issues with badly written questions
+                // try to strip extraneous parens
+                $cout = count($out);
+                for ($j=0;$j<$cout;$j++) {
+                    if (is_string($out[$j]) && strlen($out[$j])>2 && $out[$j][0]=='(' && $out[$j][strlen($out[$j])-1]==')' && strpos($out[$j],',')===false) {
+                        if (($j==0 || $out[$j-1]=='+') &&
+                            ($j==$cout-1 || $out[$j+1]=='+' || $out[$j+1]=='-')) {
+                                $out[$j] = substr($out[$j],1,-1);
+                        }
+                    }
+                }
+                */
                 $finalout[] = implode('',$out);
             }
             $finalout[] = $token[0];
@@ -3477,7 +3546,7 @@ function cleanbytoken($str,$funcs = array()) {
             if ($lastout>-1) { //if not first character
                 if ($out[$lastout] == '^') {
                     $isone = 2;
-                    if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
+                    if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-'|| $out[$lastout-2]=='pm')) {
                         //4x+x^0 -> 4x+1
                         array_splice($out,-2);
                         $out[] = 1;
@@ -3494,7 +3563,7 @@ function cleanbytoken($str,$funcs = array()) {
                     continue;
                 } else {
                     //( )0, + 0, x0
-                    while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
+                    while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-' && $out[$lastout]!= 'pm') {
                         array_pop($out);
                         $lastout--;
                     }
@@ -3510,7 +3579,7 @@ function cleanbytoken($str,$funcs = array()) {
                     //0^3
                     $i+=2; //skip over ^ and 3
                 } else if ($isone) {
-                    if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
+                    if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= 'pm' && $tokens[$i+1][0]!= '/') {
                         if ($isone==2) {
                             array_pop($out);  //pop the 1 we added since it apperears to be multiplying
                         }
@@ -3519,7 +3588,7 @@ function cleanbytoken($str,$funcs = array()) {
                         }
                     }
                 } else {
-                    while ($i<$grplasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
+                    while ($i<$grplasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= 'pm') {
                         $i++;
                     }
                 }
@@ -3530,7 +3599,7 @@ function cleanbytoken($str,$funcs = array()) {
         } else if ($token[1]==3 && $token[0]==='1') {
             $dontuse = false;
             if ($lastout>-1) { //if not first character
-                if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!=' ' && $out[$lastout]!='_') {
+                if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!='pm' && $out[$lastout]!=' ' && $out[$lastout]!='_') {
                     //( )1, x1,*1
                     if ($out[$lastout]=='*') { //elim *
                         array_pop($out);
@@ -3556,7 +3625,7 @@ function cleanbytoken($str,$funcs = array()) {
                 } else if ($tokens[$i+1][0]=='*') {
                     $i++;  //skip over *
                     $dontuse = true;
-                } else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
+                } else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= 'pm' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
                     // 1x, 1(), 1sin
                     if ($lastout<2 || (($out[$lastout-1] != '^' && $out[$lastout-1] != '/') || $out[$lastout] != '-')) { //exclude ^-1 case and /-1 case
                         $dontuse = true;
@@ -3572,7 +3641,7 @@ function cleanbytoken($str,$funcs = array()) {
         } else {
             $out[] = $token[0];
         }
-        if ($i<$grplasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && $tokens[$i+1][1]==4))) {
+        if ($i<$grplasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && ($tokens[$i+1][1]==4 || $tokens[$i+1][1]==2)))) {
             $out[] = ' ';
         }
     }
@@ -3583,6 +3652,18 @@ function cleanbytoken($str,$funcs = array()) {
     if (count($out)==0 && $lastout == -1) {
         $finalout[] = '0';
     } else {
+        /* Disabled for now - causing issues with badly written questions
+        // try to strip extraneous parens
+        $cout = count($out);
+        for ($i=0;$i<$cout;$i++) {
+            if (is_string($out[$i]) && strlen($out[$i])>2 && $out[$i][0]=='(' && $out[$i][strlen($out[$i])-1]==')' && strpos($out[$i],',')===false) {
+                if (($i==0 || $out[$i-1]=='+') &&
+                    ($i==$cout-1 || $out[$i+1]=='+' || $out[$i+1]=='-')) {
+                        $out[$i] = substr($out[$i],1,-1);
+                }
+            }
+        }
+        */
         $finalout[] = implode('',$out);
     }
 	
@@ -3657,6 +3738,8 @@ function cleantokenize($str,$funcs) {
 				$intype = 3;
 			} else if ($out=='gt' || $out=='lt' || $out=='ge' || $out=='le' || $out=='geq' || $out=='leq' || $out=='ne' || $out=='or') {
                 $intype = 12; // separator
+            } else if ($out=='pm') {
+                $intype = 0;
             } else {
 				//eat whitespace
 				while ($c==' ') {
@@ -4346,10 +4429,11 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
+            $eps = (($partial[$i]==0||abs($partial[$i])>1)?1E-12:(abs($partial[$i])*1E-12));
 			if ($abstol) {
-				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+				if (abs($stu-$partial[$i]) < $tol + $eps) { $match = $i; break;}
 			} else {
-				if (abs($stu - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+				if (abs($stu - $partial[$i])/(abs($partial[$i])+$eps) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
 		if ($match>-1 && isset($fbtxt[$match/2])) {
@@ -4411,10 +4495,11 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathParser($partial[$i]);
 			}
+            $eps = (($partial[$i]==0||abs($partial[$i])>1)?1E-12:(abs($partial[$i])*1E-12));
 			if ($abstol) {
-				if (abs($stunum-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+				if (abs($stunum-$partial[$i]) < $tol + $eps) { $match = $i; break;}
 			} else {
-				if (abs($stunum - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+				if (abs($stunum - $partial[$i])/(abs($partial[$i])+$eps) < $tol+ 1E-12) {$match = $i; break;}
 			}
 		}
 		if ($match>-1) {
@@ -4747,6 +4832,8 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
   $x = (!empty($eqnvars[1])) ? $eqnvars[1] : 'x';
   $y = (!empty($eqnvars[2])) ? $eqnvars[2] : 'y';
   $pts = gettwopointdata($str,$type,$xmin,$xmax,$ymin,$ymax,$w,$h);
+  $outexps = [];
+  $outeqs = [];
   if (!empty($pts)) {
     if ($type=='line' || $type=='lineseg' || $type=='ray') {
   		foreach ($pts as $key => $pt) {
@@ -5211,23 +5298,36 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
         }
     }
 
+    $swapindices = [];
+    if (!is_array($swap)) {
+        $swap = [$swap];
+    }
+	foreach ($swap as $k=>$sw) {
+		$swap[$k] = explode(';', $sw);
+		foreach ($swap[$k] as $i=>$s) {
+			$swap[$k][$i] = listtoarray($s);
+            $swapindices[] = $swap[$k][$i][0];
+		}
+    }
+
     $newans = $answer;
+    $newansval = [];
     if ($type == 'calculated') {
-        $newansval = [];
-        foreach ($newans as $k=>$v) {
+        foreach ($swapindices as $k) {
+            $v = $newans[$k];
             $newansval[$k] = evalMathParser($v);
         }
     } else if ($type == 'complex' || $type == 'calccomplex') {
-        $newansval = [];
-        foreach ($newans as $k=>$v) {
+        foreach ($swapindices as $k) {
+            $v = $newans[$k];
             $newansval[$k] = parsesloppycomplex($v);
         }
         foreach ($stua as $k=>$v) {
             $stua[$k] = parsesloppycomplex($v);
         }
     } else if ($type == 'ntuple' || $type == 'calcntuple') {
-        $newansval = [];
-        foreach ($newans as $k=>$v) {
+        foreach ($swapindices as $k) {
+            $v = $newans[$k];
             $newansval[$k] = explode(',', substr($v,1,-1));
             if ($type == 'calcntuple') {
                 foreach ($newansval[$k] as $j=>$vv) {
@@ -5244,15 +5344,6 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             $weights = explode(',', $weights);
         }
         $newweights = $weights;
-    }
-    if (!is_array($swap)) {
-        $swap = [$swap];
-    }
-	foreach ($swap as $k=>$sw) {
-		$swap[$k] = explode(';', $sw);
-		foreach ($swap[$k] as $i=>$s) {
-			$swap[$k][$i] = listtoarray($s);
-		}
     }
 
 	foreach ($swap as $sw) {
@@ -5288,7 +5379,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $tmpw[$k] = $newweights[$v];
                     }
-                    if (isset($newansval)) {
+                    if (isset($newansval[$v])) {
                         $tmpv[$k] = $newansval[$v];
                     }
 				}
@@ -5297,7 +5388,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $newweights[$sw[$i][$k]] = $newweights[$v];
                     }
-                    if (isset($newansval)) {
+                    if (isset($newansval[$v])) {
                         $newansval[$sw[$i][$k]] = $newansval[$v];
                     }
 				}
@@ -5306,13 +5397,14 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $newweights[$sw[$loc][$k]] = $tmpw[$k];
                     }
-                    if (isset($newansval)) {
+                    if (isset($tmpv[$k])) {
                         $newansval[$sw[$loc][$k]] = $tmpv[$k];
                     }
 				}
 			}
 		}
     }
+
     if ($weights !== null) {
         return array($newans, $newweights);
     } else {
@@ -5642,8 +5734,8 @@ function comparelogic($a,$b,$vars) {
     }
     $varlist = implode(',', $vars);
 
-	$keywords = ['and', '^^', 'xor', 'oplus', 'or', 'vv', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
-	$replace = 	['#a',  '#a', '#x',  '#x',    '#o', '#o', '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
+	$keywords = ['\\', 'and', '^^', 'wedge', 'xor', 'oplus', 'or', 'vv', 'vee', '~', '¬', 'neg', 'iff', '<->', '<=>', 'implies', '->', '=>', 'rarr', 'to'];
+	$replace = 	['',   '#a',  '#a', '#a',    '#x',  '#x',    '#o', '#o', '#o',  '!', '!', '!',   '#b',  '#b',	 '#b',  '#i',      '#i', '#i', '#i',   '#i'];
     $a = str_replace($keywords,$replace,$a);
     $b = str_replace($keywords,$replace,$b);
 
@@ -5947,7 +6039,22 @@ function parseMatrixToArray($str) {
         return [explode('|',$str), null];
     } else if (strpos($str,',')===false) {
         // 1x1 matrix
-        return [[substr($str,1,-1)], 1];
+        $val = substr($str,1,-1);
+        if (strlen($val)>2 && $val[0]=='(') {
+            $depth = 0;
+            for ($i=0;$i<strlen($val);$i++) {
+                if ($val[$i] == '(') { $depth++; }
+                if ($val[$i] == ')') { $depth--; }
+                if ($depth == 0) {
+                    if ($i == strlen($val)-1) {
+                        $val = substr($val,1,-1);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return [[$val], 1];
     } else {
         $out = [];
         $rowcnt = 0;
@@ -5955,6 +6062,7 @@ function parseMatrixToArray($str) {
         $lastcut = 1;
 		$bracketpairs = ['('=>')','['=>']'];
 		$rowbracket = '';
+        $rowendbracket = '';
         for ($i=1;$i<strlen($str)-1;$i++) {
             $c = $str[$i];
 			if ($rowbracket === '' && ($c == '(' || $c == '[')) {

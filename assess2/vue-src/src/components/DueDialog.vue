@@ -128,7 +128,7 @@ export default {
       this.$refs.dialog.style.top = Math.max(20, lastHeight - this.$refs.dialog.offsetHeight) + 'px';
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     window.$(document).off('keyup.dialog');
     this.dialog.destroy();
   }

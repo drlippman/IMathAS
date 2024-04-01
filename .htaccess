@@ -27,6 +27,13 @@ Options -Indexes
   php_value max_input_time 300
   php_value memory_limit 128M
 </IfModule>
+<IfModule mod_php.c>
+  php_value upload_max_filesize 15M
+  php_value post_max_size 128M
+  php_value max_input_vars 5000
+  php_value max_input_time 300
+  php_value memory_limit 128M
+</IfModule>
 
 <Files "composer.json">
 deny from all

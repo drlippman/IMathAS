@@ -139,9 +139,10 @@ class ScoreEngine
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
         $currentseed = $scoreQuestionParams->getQuestionSeed();
         try {
-          eval(interpret('control', $quesData['qtype'], $quesData['control']));
+          $db_qsetid = $scoreQuestionParams->getDbQuestionSetId();
+          eval(interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]));
           $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
-          eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
+          eval(interpret('answer', $quesData['qtype'], $quesData['answer'], 1, [$db_qsetid]));
         } catch (\Throwable $t) {
             $this->addError(
                 _('Caught error while evaluating the code in this question: ')
@@ -183,9 +184,6 @@ class ScoreEngine
             }
             if (is_array($reqdecimals)) {
                 foreach ($reqdecimals as $kidx => $vval) {
-                    if (substr((string)$vval, 0, 1) == '=') {
-                        continue;
-                    } //skip '=2' style $reqdecimals
                     list($vval, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($vval);
                     if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!isset($reltolerance) || !is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
                         if (count($reqdecscoretype)==2) {
@@ -199,7 +197,7 @@ class ScoreEngine
                         }
                     }
                 }
-            } else if (substr((string)$reqdecimals, 0, 1) != '=') { //skip '=2' style $reqdecimals
+            } else { 
                 list($parsedreqdec, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs((string)$reqdecimals);
                 if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
                     if (count($reqdecscoretype)==2) {

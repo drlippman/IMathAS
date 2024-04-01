@@ -79,7 +79,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 
 $useeditor = 1;
 
-if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$testsettings['courseid']])) {
+if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$_GET['cid']])) {
   $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
-  $stm->execute(array(':lastaction'=>time(), ':id'=>$_GET['cid']));
+  $stm->execute(array(':lastaction'=>time(), ':id'=>$_SESSION['loginlog' . $_GET['cid']]));
 }

@@ -225,6 +225,9 @@ if (!$canViewAll) {
     }
 }
 
+// set session expiration time
+$assessInfoOut['session_life'] = $CFG['GEN']['sessionmaxlife'] ?? 432000;
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

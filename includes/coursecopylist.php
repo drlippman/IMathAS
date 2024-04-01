@@ -105,12 +105,12 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	if ($line['termsurl']!='') {
 		$itemclasses[] = 'termsurl';
 	}
-	echo '<input type="radio" name="ctc" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ' . ((count($itemclasses)>0)?'class="' . implode(' ',$itemclasses) . '"':'');
+	echo '<label><input type="radio" name="ctc" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ' . ((count($itemclasses)>0)?'class="' . implode(' ',$itemclasses) . '"':'');
 	if ($line['termsurl']!='') {
 		echo ' data-termsurl="'.Sanitize::url($line['termsurl']).'"';
 	}
 	echo '>';
-	echo Sanitize::encodeStringForDisplay($line['name']);
+	echo Sanitize::encodeStringForDisplay($line['name']) . '</label>';
 
 	if ($line['copyrights']<$skipcopyright) {
 		echo "&copy;\n";

@@ -592,11 +592,16 @@ if ($overwriteBody==1) {
 		}
 		echo '<a href="coursemap.php?cid='.$cid.'">'._('Course Map').'</a>';
 		echo '</p>';
+        if (($toolset&4)==0) {
+            echo '<p><a href="gradebook.php?cid='. $cid .'" class="essen">' . _('Gradebook') . '</a> ';
+            if (($coursenewflag&1)==1) {
+                echo '<span class="noticetext">', _('New'), '</span>';
+            }
+            echo '</p>';
+        }
 	?>
 
-			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?>
-			</p>
+			
 	<?php
 		if (count($stuLeftNavBlocks)>0) {
 			echo '<p class=leftnavp><b>'._('Quick Links').'</b>';

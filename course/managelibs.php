@@ -98,39 +98,41 @@ if ($myrights<20) {
 					}
 					//get a list of questions with no more library items
 					$qidstofix = array_values(array_diff($qidstocheck,$okqids));
-					$qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
-					$qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
-					if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-						//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
-						$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=? WHERE id IN ($qlist_query_placeholders)");
-						$stm->execute(array_merge(array($now),$qlist));
-							//echo "del: $qlist";
-							/*foreach ($qidstofix as $qid) {
-								delqimgs($qid);
-							}*/
-					} else if (count($qidstofix)>0) {
-						//see which questions with no active lib items already have an unassigned lib item we can undeleted
-						$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
-						$stm->execute($qlist);
-						$toundelqids = array();
-						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-							$toundelqids[] = $row[0];
-						}
-						//undelete those lib items
-						if (count($toundelqids)>0) {
-							$toundel_query_placeholders = Sanitize::generateQueryPlaceholders($toundelqids);
-							//$undellist = implode(',', $toundelqids);
-							$stm = $DBH->prepare("UPDATE `imas_library_items` SET deleted=0,lastmoddate=? WHERE qsetid IN ($toundel_query_placeholders) AND libid=0");
-							$stm->execute(array_merge(array($now),$toundelqids));
-						}
+                    if (count($qidstofix)>0) {
+                        $qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
+                        $qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+                        if ($_POST['delq']=='yes') {
+                            //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+                            $stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=? WHERE id IN ($qlist_query_placeholders)");
+                            $stm->execute(array_merge(array($now),$qlist));
+                                //echo "del: $qlist";
+                                /*foreach ($qidstofix as $qid) {
+                                    delqimgs($qid);
+                                }*/
+                        } else {
+                            //see which questions with no active lib items already have an unassigned lib item we can undeleted
+                            $stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
+                            $stm->execute($qlist);
+                            $toundelqids = array();
+                            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                                $toundelqids[] = $row[0];
+                            }
+                            //undelete those lib items
+                            if (count($toundelqids)>0) {
+                                $toundel_query_placeholders = Sanitize::generateQueryPlaceholders($toundelqids);
+                                //$undellist = implode(',', $toundelqids);
+                                $stm = $DBH->prepare("UPDATE `imas_library_items` SET deleted=0,lastmoddate=? WHERE qsetid IN ($toundel_query_placeholders) AND libid=0");
+                                $stm->execute(array_merge(array($now),$toundelqids));
+                            }
 
-						//for questions with no active lib items or unassigned to undelete, add an unassigned lib item
-						$qidstoadd = array_values(array_diff($qidstofix, $toundelqids));
-						$stm = $DBH->prepare("INSERT INTO imas_library_items ( qsetid,libid,lastmoddate) VALUES (:qsetid, :libid, :lastmoddate)");
-						foreach($qidstoadd as $qid) {
-							$stm->execute(array(':qsetid'=>$qid, ':libid'=>0, ':lastmoddate'=>$now));
-						}
-					}
+                            //for questions with no active lib items or unassigned to undelete, add an unassigned lib item
+                            $qidstoadd = array_values(array_diff($qidstofix, $toundelqids));
+                            $stm = $DBH->prepare("INSERT INTO imas_library_items ( qsetid,libid,lastmoddate) VALUES (:qsetid, :libid, :lastmoddate)");
+                            foreach($qidstoadd as $qid) {
+                                $stm->execute(array(':qsetid'=>$qid, ':libid'=>0, ':lastmoddate'=>$now));
+                            }
+                        }
+                    }
 				}
 				$DBH->commit();
 			}

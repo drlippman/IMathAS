@@ -47,6 +47,8 @@ class DrawingScorePart implements ScorePart
             } else {
                 $reltolerance = 1;
             }
+        } else if ($reltolerance == 0) {
+            $reltolerance = 1e-12; // give some wiggle room for arithmetic errors
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -303,10 +305,14 @@ class DrawingScorePart implements ScorePart
                 } else {
                     $scoretype[$key] = 0;
                 }
+                if ($function[0][0] === 'x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
                 if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
                     $leftrightdir = $function[1][0];
                     array_pop($function);
                 }
+
                 //curves: function
                 //    function, xmin, xmax
                 //dot:  x,y
@@ -372,14 +378,18 @@ class DrawingScorePart implements ScorePart
                         $xp = $xtopix(substr($function[0],2));
                         if (count($function)==3) { //line segment or ray
                             if ($function[1]=='-oo') { //ray down
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix(floatval($function[2])-1);
                                 $y2p = $ytopix(floatval($function[2]));
                                 $ansvecs[$key] = array('r', $xp, $y2p, $xp, $y1p);
                             } else if ($function[2]=='oo') { //ray up
+                                $function[1] = evalbasic($function[1],true);
                                 $y1p = $ytopix(floatval($function[1]));
                                 $y2p = $ytopix(floatval($function[1])+1);
                                 $ansvecs[$key] = array('r', $xp, $y1p, $xp, $y2p);
                             } else { //line seg
+                                $function[1] = evalbasic($function[1],true);
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix(floatval($function[1]));
                                 $y2p = $ytopix(floatval($function[2]));
                                 $ansvecs[$key] = array('ls', $xp, $y1p, $xp, $y2p);
@@ -638,14 +648,18 @@ class DrawingScorePart implements ScorePart
                         //colinear
                         if (count($function)==3) { //line segment or ray
                             if ($function[1]=='-oo') { //ray to left
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
                                 $y2p = $ytopix($func(['x'=>floatval($function[2])]));
                                 $ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
                             } else if ($function[2]=='oo') { //ray to right
+                                $function[1] = evalbasic($function[1],true);
                                 $y1p = $ytopix($func(['x'=>floatval($function[1])]));
                                 $y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
                                 $ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
                             } else { //line seg
+                                $function[1] = evalbasic($function[1],true);
+                                $function[2] = evalbasic($function[2],true);
                                 if ($function[1]>$function[2]) {  //if xmin>xmax, swap
                                     $tmp = $function[2];
                                     $function[2] = $function[1];
@@ -1461,6 +1475,9 @@ class DrawingScorePart implements ScorePart
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
+                if ($function[0][0]=='x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
                 if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
                     $isxequals = true;
                     $function[0] = substr($function[0],1);
@@ -1744,7 +1761,11 @@ class DrawingScorePart implements ScorePart
                     $dots[$k] = explode(',',$pt);
                 }
                 //remove duplicate dots
-                for ($k=count($dots)-1;$k>0;$k--) {
+                for ($k=count($dots)-1;$k>=0;$k--) {
+                    if (!is_nicenumber($dots[$k][0]) || !is_nicenumber($dots[$k][1])) {
+                        unset($dots[$k]);
+                        continue;
+                    }
                     for ($j=0;$j<$k;$j++) {
                         if (abs($dots[$k][0]-$dots[$j][0])<$defpttol && abs($dots[$k][1]==$dots[$j][1])<$defpttol) {
                             unset($dots[$k]);
@@ -1763,22 +1784,25 @@ class DrawingScorePart implements ScorePart
                 }
                 //remove duplicate odots, and dots below odots
                 for ($k=count($odots)-1;$k>=0;$k--) {
+                    if (!is_nicenumber($odots[$k][0]) || !is_nicenumber($odots[$k][1])) {
+                        unset($odots[$k]);
+                        continue;
+                    }
                     foreach ($dots as $j=>$thisdot) {
-                        if (abs($odots[$k][0]-$thisdot[0])<$defpttol && abs($odots[$k][1]==$thisdot[1])<$defpttol) {
+                        if (abs($odots[$k][0]-$thisdot[0])<$defpttol && abs($odots[$k][1]-$thisdot[1])<$defpttol) {
                             unset($dots[$j]);
                             break;
                         }
                     }
                     for ($j=0;$j<$k;$j++) {
                         if (!isset($odots[$j])) { continue; }
-                        if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]==$odots[$j][1])<$defpttol) {
+                        if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]-$odots[$j][1])<$defpttol) {
                             unset($odots[$k]);
                             continue 2;
                         }
                     }
                 }
             }
-
             $scores = array();
             if ((count($dots)+count($odots))==0) {
                 $extradots = 0;

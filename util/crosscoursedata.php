@@ -64,7 +64,7 @@ $ts = microtime(true);
 //pull ancestor courses
 $days = intval($_REQUEST['days']);
 $old = time() - (empty($days)?30:$days)*24*60*60;
-$anregex = '[[:<:]]'.$basecourse.'[[:>:]]';
+$anregex = MYSQL_LEFT_WRDBND.$basecourse.MYSQL_RIGHT_WRDBND;
 $query = 'SELECT ic.id,ic.ancestors,ic.name FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id
 	  JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
 	  iu.groupid=? AND ic.ancestors REGEXP ?

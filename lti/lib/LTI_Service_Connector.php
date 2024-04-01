@@ -66,6 +66,7 @@ class LTI_Service_Connector {
           curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         }
         $resp = curl_exec($ch);
+        $error = curl_error($ch);
         $token_data = json_decode($resp, true);
         curl_close ($ch);
 
@@ -75,10 +76,15 @@ class LTI_Service_Connector {
 
           return $this->access_tokens[$scope_key] = $token_data['access_token'];
         } else {
+          $failures++;
+          if ($failures == 2) {
+            // log failure response
+            $this->db->record_log('Grade token failure t2 for platform '. $this->registration->get_id() . ', response: ' . $resp . ', error: ' . $error);
+          }
           // record the failure in the token store
           $token_data = [
             'access_token' => 'failed'.$failures,
-            'expires_in' => min(pow(3, $failures-1), 24*60*60)
+            'expires_in' => min(300*$failures*$failures, 24*60*60)
           ];
           $this->db->record_token($this->registration->get_id(), $scope_key, $token_data);
           return false;

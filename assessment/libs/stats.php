@@ -10,7 +10,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
- "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t");
+ "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t",
+ "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson");
 
 //nCr(n,r)
 //The Choose function
@@ -597,7 +598,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$startlabel = $start;
 	} //else {
-    $maxx = 2*max($a);
+    $maxx = 2*max(abs(max($a)), abs(min($a)));
 		$outst .= "axes($maxx,$step,1,null,$gdy); fill=\"$fill\"; stroke=\"$stroke\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
@@ -625,12 +626,23 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 // fill (optional) = the fill color of the bins; default is blue
 // stroke (optional) = the color of the bin line; default is black
 
-function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200,$showgrid=true,$fill='blue',$stroke='black') {
+function fdhistogram($freq,$label,$start,$cw,$labelstart=false,$upper=false,$width=300,$height=200,$showgrid=true,$fill='blue',$stroke='black') {
 	if (!is_array($freq)) {echo "freqarray must be an array"; return 0;}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
-	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
+    $vertlabel = 'Frequency';
+    if (is_array($labelstart)) {
+        $opts = $labelstart;
+        $labelstart = false;
+        foreach (['labelstart','upper','width','height','showgrid','fill','stroke','vertlabel'] as $v) {
+            if (isset($opts[$v])) {
+                ${$v} = $opts[$v];
+            }
+        }
+    }
+	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
+    
 	if ($upper===false) {
 		$dx = $cw;
 		$dxdiff = 0;
@@ -665,12 +677,12 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	}
 	
 	
-	if ($startlabel===false) {
+	if ($labelstart===false) {
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
-		$startlabel = $start;
+		$labelstart = $start;
 	} //else {
-		$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
-		$x = $startlabel;
+		$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\";";
+		$x = $labelstart;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
 		for ($curr=0; $curr<count($freq)+1; $curr++) {
@@ -680,7 +692,8 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	//}
 	//$outst .= "text([".($start-.1*($x-$start)).",".(.5*$maxfreq)."],\"Freq\",,90)";
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
-	$outst .= "textabs([0,". ($height/2+15)  ."],\"Frequency\",\"right\",90);";
+
+	$outst .= "textabs([". ($width/2+15)  .",0],\"$label\",\"above\");textabs([0,". ($height/2+15)  ."],\"$vertlabel\",\"right\",90);";
 	$outst .= $st;
 	return showasciisvg($outst,$width,$height);
 }
@@ -874,11 +887,11 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 	return $out;
 }
 
-//normrand(mu,sigma,n, [rnd])
+//normrand(mu,sigma,n, [rnd,posonly,skew])
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false,$skew=0) {
 	if (!is_nicenumber($mu) || !is_nicenumber($sig) || !is_nicenumber($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
@@ -886,6 +899,8 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
     global $RND;
     $icnt = 0;
     $z = [];
+    $d = $skew/sqrt(1+$skew*$skew);
+    $d2 = sqrt(1-$d*$d);
     while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
@@ -895,6 +910,15 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
         $r = sqrt(-2*log($r)/$r);
         $v1 = $sig*$a*$r + $mu;
         $v2 = $sig*$b*$r + $mu;
+        if ($skew != 0) {
+            $v3 = $d*$v1 + $d2*$v2;
+            $v3 = $v1 >=0 ? $v3 : -$v3;
+            if (!$pos || $v3 > 0) {
+                $z[] = round($v3, $rnd);
+            }
+            $icnt += 0.5;
+            continue;
+        }
         if (!$pos || $v1 > 0) {
             $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
         }
@@ -1523,20 +1547,12 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 //alpha: for confidence bound.  defaults to .05
 //grid:  If you've modified the grid, include it here
 //return array(answer, showanswer) to be used to set $answer and $showanswer
-function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.05, $gridi="-5,5,-5,5,1,1,300,300") {
+function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.05, $gridi="-5,5,-5,5,1,1,300,300",$snaptogrid=null) {
 	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
-	$gridi = explode(',',$gridi);
-	$grid=array(-5,5,-5,5,1,1,300,300);
-	foreach ($gridi as $i=>$v) {
-		$grid[$i] = $v;
-	}
-  if (strpos($grid[0],'0:')!==false) {
-		$grid[0] = substr($grid[0],2);
-	}
-  if (strpos($grid[2],'0:')!==false) {
-		$grid[2] = substr($grid[2],2);
-	}
+
+    list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($gridi,$snaptogrid);
+    $grid = explode(',', $gridi);
 
 	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
@@ -1550,7 +1566,8 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	$answers = array();
 	$showanswer = null;
 	list($r,$m,$b) = linreg($xarr,$yarr);
-    $lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3],$grid[6],$grid[7]);
+    $lines = gettwopointlinedata($line,$xmin,$xmax,$ymin,$ymax,$w,$h);
+
 	if (isset($lines[0])) {
 		if ($lines[0][0]==$lines[0][2]) {
 			$stum = 100000;
@@ -1567,7 +1584,7 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 		}
 		$eqns = arraystodoteqns($xarr,$yarr);
 		$eqns[] = "$m*x+$b,blue";
-		$showanswer = showplot($eqns,$grid[0],$grid[1],$grid[2],$grid[3],$grid[4],$grid[5],$grid[6],$grid[7]);
+		$showanswer = showplot($eqns,$xmin,$xmax,$ymin,$ymax,$grid[4],$grid[5],$w,$h);
 	} else {
 		if ($gradedots) {
 			$answers = arraystodots($xarr,$yarr);
@@ -2416,6 +2433,9 @@ function csvdownloadlink() {
       }
     }
   }
+  if (!preg_match('/[^",]/',$rows[0])) {
+    array_shift($rows);
+  }
   foreach ($rows as $i=>$row) {
     $rows[$i] = rtrim($row,',');
   }
@@ -2502,8 +2522,18 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
     $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
     $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
     for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
-        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+        if ($dotspace >= $labelspace) {
+            $outst .= "line([$x,$tm],[$x,$tx]);";
+        }
+        $outst .= "text([$x,0],\"$x\",\"below\");";
     }  
+    if ($dotspace < $labelspace) {
+        $startdot = min(floor($start/$dotspace+1e-12),floor($start/$labelspace+1e-12)*$labelspace/$dotspace)*$dotspace;
+        $enddot = max(ceil($maxx/$dotspace-1e-12)*$dotspace, $endlabel);
+        for ($x=$startdot; $x<=$enddot; $x+=$dotspace) {
+            $outst .= "line([$x,$tm],[$x,$tx]);";
+        }
+    }
 	
 	//initializes SVG frame and canvas.
 	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
@@ -2948,5 +2978,104 @@ function student_t($arr1, $arr2, bool $equalVar = False, bool $paired = False, i
 	$p = 1- tcdf($t,$df,$roundto);
 
 	return [$t,$p,$df];//[$F_a,$p_a]
+}
+
+function stats_randg($shape,$n) {
+    // from jStat, Returns a Gamma deviate by the method of Marsaglia and Tsang
+    // limited to case where $shape >= 1
+    global $RND;
+    if ($shape < 1) {
+        echo 'Invalid input to randg: ' . $shape;
+        return 0;
+    }
+    $a1 = $shape - 1/3;
+    $a2 = 1/sqrt(9*$a1);
+    // get norm rand data, with extras
+    $d = normrand(0,1,2*$n);
+    $out = [];
+    for ($i=0;$i<$n;$i++) {
+        do {
+            do {
+                $x = array_pop($d);
+                $v = 1 + $a2 * $x;
+            } while ($v <= 0);
+            $v = $v*$v*$v;
+            $u = rrand(0,.999999,.000001); 
+        } while ($u > 1 - 0.331 * pow($x,4) &&
+            log($u) > 0.5*$x*$x + $a1*(1-$v + log($v)));
+        $out[] = $a1 * $v;
+    }
+    return $out;
+}
+
+function stats_randF($df1,$df2,$n) {
+    $x1 = stats_randg($df1 / 2, $n);
+    $x2 = stats_randg($df2 / 2, $n);
+    $out = [];
+    for ($i=0;$i<$n;$i++) {
+        $out[] = ($x1[$i]*2/$df1) / ($x2[$i]*2/$df2);
+    }
+    return $out;
+}
+function stats_randchi2($df,$n) {
+    $x = stats_randg($df / 2, $n);
+    array_walk($x, function($i) { return $i*2; });
+    return $x;
+}
+
+function stats_randt($mu,$sig,$df,$n) {
+    $x = normrand(0,1,$n);
+    $g = stats_randg($df/2, $n);
+    $out = [];
+    for ($i=0;$i<$n;$i++) {
+        $out[] = $sig*($x[$i] * sqrt($df/(2*$g[$i]))) + $mu;
+    }
+    return $out;
+}
+
+function stats_randpoisson($l,$n) {
+    global $RND;
+    $out = [];
+    if ($l < 10) {
+        $L = exp(-1*$l);
+        for ($i=0;$i<$n;$i++) {
+            $k = 0;
+            $p = 1;
+            do {
+                $k++;
+                $r = rrand(0,.999999,.000001); 
+                $p *= $r;
+            } while ($p > $L);
+            
+            $out[] = $k-1;
+        }
+    } else {
+        $lam = $l;
+        $slam = sqrt($lam);
+        $loglam = log($lam);
+        $b = 0.931 + 2.53 * $slam;
+        $a = -0.059 + 0.02483 * $b;
+        $invalpha = 1.1239 + 1.1328/($b - 3.4);
+        $vr = 0.9277 - 3.6224 / ($b-2);
+
+        while (count($out) < $n) {
+            $u = rrand(0,.999999,.000001) - 0.5;
+            $v = rrand(0,.999999,.000001); 
+            $us = 0.5 - abs($u);
+            $k = floor((2*$a/$us + $b)*$u + $lam + 0.43);
+            if ($us >= 0.07 && $v < $vr) {
+                $out[] = $k;
+                continue;
+            }
+            if ($k < 0 || ($us < 0.013 && $v > $us)) {
+                continue;
+            }
+            if (log($v) + log($invalpha) - log($a/($us*$us) + $b) <=
+                (-$lam + $k*$loglam - gamma_log($k+1))) {
+                    $out[] = $k;
+            }
+        }
+    }
+    return $out;
 }
 ?>

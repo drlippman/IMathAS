@@ -20,7 +20,7 @@ import { store } from '../basicstore';
 
 export default {
   name: 'VideocuedNav',
-  props: ['cue', 'toshow'],
+  props: ['cue', 'toshow', 'showfollowup'],
   components: {
     MenuButton,
     VideocuedNavListItem
@@ -67,7 +67,8 @@ export default {
             subitem: true
           });
         }
-        if (cuedata.hasOwnProperty('followuptime')) {
+        if (cuedata.hasOwnProperty('followuptime') &&
+          (cuedata.followuplink || this.showfollowup.includes(i))) {
           out.push({
             // internallink: '/videocued/' + cuen + '/f',
             onclick: () => this.$emit('jumpto', i, 'f'),
@@ -111,31 +112,6 @@ export default {
     }
   }
 };
-/* Next/Prev buttons, removed since they don't make much sense in this view
-
-<router-link
-  :to="prevLink"
-  tag="button"
-  :disabled="curOption <= 0"
-  class="secondarybtn"
-  id="qprev"
-  :aria-label="$t('previous')"
-  v-if = "showNextPrev"
->
-  <icons name="left"/>
-</router-link>
-<router-link
-  :to="nextLink"
-  tag="button"
-  :disabled="curOption>=navOptions.length-1"
-  class="secondarybtn"
-  id="qnext"
-  :aria-label="$t('next')"
-  v-if = "showNextPrev"
->
-  <icons name="right" />
-</router-link>
- */
 </script>
 
 <style>

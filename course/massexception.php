@@ -58,7 +58,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
                     // if time limit not expired, need to rewrite assess_versions[last]['timelimit_end']
                     //   and add timelimit_ext to note use of extension.
                     // if time limit is expired, then set eligibleForTimeExt
-                    $adata = json_decode(gzdecode($row[2]), true);
+                    $adata = json_decode(Sanitize::gzexpand($row[2]), true);
                     $lastver = &$adata['assess_versions'][count($adata['assess_versions'])-1];
                     if ($lastver['status']==0 && $lastver['timelimit_end'] > $now) {
                         // not submitted and time limit still active; extend now.
@@ -67,7 +67,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
                             $lastver['timelimit_ext'] = [];
                         }
                         $lastver['timelimit_ext'][] = $timelimitext;
-                        $iarupdate->execute([gzencode(json_encode($adata)), $row[0], $row[1]]);
+                        $iarupdate->execute([gzcompress(json_encode($adata)), $row[0], $row[1]]);
                         $eligibleForTimeExt[$row[0].'-'.$row[1]] = -1;
                     } else {
                         $eligibleForTimeExt[$row[0].'-'.$row[1]] = 1;

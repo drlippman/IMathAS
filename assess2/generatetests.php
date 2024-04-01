@@ -229,8 +229,8 @@ foreach ($assessGroups as $gn=>$agroup) {
         $udata['score'],
         $udata['status'],
         isset($udata['timeontask']) ? $udata['timeontask'] : 0,
-        gzencode($udata['scoreddata']),
-        $studata['source']=='hw1' ? gzencode($udata['scoreddata']) : ''
+        gzcompress($udata['scoreddata']),
+        $studata['source']=='hw1' ? gzcompress($udata['scoreddata']) : ''
       ));
     }
   }

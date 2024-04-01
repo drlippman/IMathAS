@@ -129,43 +129,54 @@ export default {
       this.filelist = out;
     },
     updateValue: function (value) {
+      if (value.length > 30000) {
+        value = value.substr(0, 30000);
+      }
       this.$emit('input', value);
     },
     focus: function () {
       this.objTinymce.focus();
     },
     uploadFile: function () {
-      const data = new FormData();
-      data.append('type', 'attach');
-      data.append('file', this.$refs.fileinput.files[0]);
-      this.uploading = true;
-      window.$.ajax({
-        url: store.APIbase.replace(/\/\w+\/$/, '') + '/tinymce4/upload_handler.php',
-        type: 'POST',
-        dataType: 'json',
-        data: data,
-        processData: false,
-        contentType: false,
-        xhrFields: {
-          withCredentials: true
-        },
-        crossDomain: true
-      })
-        .done(response => {
-          if (response.location) {
-            this.filelist.push(response.location);
-            this.updateValueFromFilelist();
-          } else {
+      window.doImageUploadResize(this.$refs.fileinput, (el) => {
+        if (el.files[0].size > 15000 * 1024) {
+          actions.handleError('file_toolarge');
+          this.$refs.fileinput.value = '';
+          return;
+        }
+
+        const data = new FormData();
+        data.append('type', 'attach');
+        data.append('file', el.files[0]);
+        this.uploading = true;
+        window.$.ajax({
+          url: store.APIbase.replace(/\/\w+\/$/, '') + '/tinymce4/upload_handler.php',
+          type: 'POST',
+          dataType: 'json',
+          data: data,
+          processData: false,
+          contentType: false,
+          xhrFields: {
+            withCredentials: true
+          },
+          crossDomain: true
+        })
+          .done(response => {
+            if (response.location) {
+              this.filelist.push(response.location);
+              this.updateValueFromFilelist();
+            } else {
+              actions.handleError('file_upload_error');
+            }
+          })
+          .fail(response => {
             actions.handleError('file_upload_error');
-          }
-        })
-        .fail(response => {
-          actions.handleError('file_upload_error');
-        })
-        .always(() => {
-          this.$refs.fileinput.value = null;
-          this.uploading = false;
-        });
+          })
+          .always(() => {
+            this.$refs.fileinput.value = null;
+            this.uploading = false;
+          });
+      });
     },
     removeFile: function (index) {
       store.confirmObj = {

@@ -3304,7 +3304,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
             } else {
                 $bge = '';
             }
-			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid,''];";
 			if (isset($GLOBALS['capturedrawinit'])) {
 				if (!isset($GLOBALS['drawinitdata'])) {
 					$GLOBALS['drawinitdata'] = array();

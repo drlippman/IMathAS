@@ -153,10 +153,15 @@ class DrawingAnswerBox implements AnswerBox
 
             }
         } else {
+            $xname = '';
+            $yname = '';
             if (strpos($settings[4], ':') !== false) {
                 $settings[4] = explode(':', $settings[4]);
                 $xlbl = $settings[4][0];
                 $xgrid = $settings[4][1];
+                if (count($settings[4])>2) {
+                    $xname = $settings[4][2];
+                }
             } else {
                 $xlbl = $settings[4];
                 $xgrid = $settings[4];
@@ -165,13 +170,20 @@ class DrawingAnswerBox implements AnswerBox
                 $settings[5] = explode(':', $settings[5]);
                 $ylbl = $settings[5][0];
                 $ygrid = $settings[5][1];
+                if (count($settings[5])>2) {
+                    $yname = $settings[5][2];
+                }
             } else {
                 $ylbl = $settings[5];
                 $ygrid = $settings[5];
             }
             $sclinglbl = "$xlbl:$ylbl";
+            if ($xname != '' || $yname != '') {
+                $sclinglbl .= ":$xname:$yname";
+            }
             $sclinggrid = "$xgrid:$ygrid";
         }
+        
         if ($snaptogrid !== 0) {
             list($newwidth, $newheight) = getsnapwidthheight($settings[0], $settings[1], $settings[2], $settings[3], $settings[6], $settings[7], $snaptogrid);
             if (abs($newwidth - $settings[6]) / $settings[6] < .1) {
@@ -203,12 +215,6 @@ class DrawingAnswerBox implements AnswerBox
         } else {
             $plot = showplot($background, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
         }
-        if (is_array($xsclgridpts) && count($xsclgridpts) > 2) {
-            $plot = addlabel($plot, $settings[1], 0, $xsclgridpts[2], "black", "aboveleft");
-        }
-        if (is_array($settings[5]) && count($settings[5]) > 2) {
-            $plot = addlabel($plot, 0, $settings[3], $settings[5][2], "black", "belowright");
-        }
         if (!empty($grid) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
             $plot = addfractionaxislabels($plot, $xsclgridpts[0]);
         }
@@ -232,7 +238,7 @@ class DrawingAnswerBox implements AnswerBox
                 }
                 $out .= '<p class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() .
                     (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '') . '</p>';
-                $out .= '<p>' . _('Graph to add drawings to:') . '</p>';
+                $out .= '<p>' . _('Graphing window to add drawings to:') . '</p>';
                 if ($_SESSION['graphdisp'] > 0) {
                     $plot = str_replace('<embed', '<embed data-nomag=1', $plot); //hide mag
                     //overlay canvas over SVG.
@@ -560,6 +566,9 @@ class DrawingAnswerBox implements AnswerBox
                     array_shift($function);
                     $defcolor = 'grey';
                 }
+                if ($function[0][0] === 'x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
                 if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
                     $val = substr($function[1],1);
                     if ($function[1][0]==='<') {
@@ -695,7 +704,7 @@ class DrawingAnswerBox implements AnswerBox
                 if (!is_array($background) && substr($background, 0, 5) == "draw:") {
                     $sa = showplot($saarr, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
                     $insat = strpos($sa, ');', strpos($sa, 'axes')) + 2;
-                    $sa = substr($sa, 0, $insat) . str_replace("'", '"', substr($background, 5)) . substr($sa, $insat);
+                    $sa = substr($sa, 0, $insat) . str_replace("'", '"', substr($background, 5)) . ';' . substr($sa, $insat);
                 } else if (!is_array($background) && ($background == 'none' || $background == 'transparent')) {
                     $sa = showasciisvg("initPicture(0,10,0,10);", $settings[6], $settings[7]);
                 } else {

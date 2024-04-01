@@ -1669,6 +1669,18 @@ function generateTable() {
                         curaid +
                         "&cid=" +
                         curcid +
+                        '&from=addq2&viewonly=1">' +
+                        _("View Code") +
+                        "</a></li>"; //edit
+                    html +=
+                        '<li><a href="moddataset.php?id=' +
+                        curitems[j][1] +
+                        "&qid=" +
+                        curitems[j][0] +
+                        "&aid=" +
+                        curaid +
+                        "&cid=" +
+                        curcid +
                         '&from=addq2">' +
                         _("Edit Code") +
                         "</a></li>"; //edit

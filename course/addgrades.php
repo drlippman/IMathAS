@@ -214,7 +214,7 @@
                     $attper = 0;
                     $att = 0;
                     if ($row[2] !== '') {
-                        $data = json_decode(gzdecode($row[2]), true);
+                        $data = json_decode(Sanitize::gzexpand($row[2]), true);
                         if ($data !== false) {
                             $av = $data['assess_versions'][$data['scored_version']];
                             $qcnt = 0;

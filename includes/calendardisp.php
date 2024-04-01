@@ -573,9 +573,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 
 if ($editingon) {
-    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND avail>0 AND courseid=:courseid ORDER BY name";
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE (enddate>$exlowertime OR avail=2) AND avail>0 AND courseid=:courseid ORDER BY name";
 } else {
-    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE (enddate>$exlowertime OR avail=2) AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
 }
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
@@ -712,7 +712,7 @@ foreach ($itemsimporder as $item) {
 				$assess[$moday][$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][4];
 				//if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
-				if ($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {  //hide link and grey if not current
+				if (($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) || isset($hiddenitems[$item])) {  //hide link and grey if not current
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 				}
@@ -735,7 +735,7 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
-				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
+				if (($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) || isset($hiddenitems[$item])) {
 					$colors[$k] = '#ccc';
                     $assess[$moday][$k]['color'] = '#ccc';
 				}
@@ -761,7 +761,10 @@ foreach ($itemsimporder as $item) {
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 					unset($assess[$moday][$k]['id']);
-				}
+				} else if (isset($hiddenitems[$item])) {
+                    $colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+                }
 				$k++;
 			}
 		}
@@ -781,7 +784,10 @@ foreach ($itemsimporder as $item) {
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 					unset($assess[$moday][$k]['id']);
-				}
+				} else if (isset($hiddenitems[$item])) {
+                    $colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+                }
 				$k++;
 			}
 		}
@@ -801,7 +807,10 @@ foreach ($itemsimporder as $item) {
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 					unset($assess[$moday][$k]['id']);
-				}
+				} else if (isset($hiddenitems[$item])) {
+                    $colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+                }
 				$k++;
 			}
 		}

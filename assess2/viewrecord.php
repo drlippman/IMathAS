@@ -29,7 +29,7 @@ if (isset($_GET['uid']) && isset($_GET['aid'])) {
 }
 
 $row = $stm->fetch(PDO::FETCH_ASSOC);
-print_r(gzdecode($row['scoreddata']));
+print_r(Sanitize::gzexpand($row['scoreddata']));
 echo "\n";
-print_r(json_decode(gzdecode($row['scoreddata']), true));
-print_r(json_decode(gzdecode($row['practicedata']), true));
+print_r(json_decode(Sanitize::gzexpand($row['scoreddata']), true));
+print_r(json_decode(Sanitize::gzexpand($row['practicedata']), true));

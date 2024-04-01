@@ -139,7 +139,7 @@ function migrateAssessSettings1to2($settings) {
     $settings['ansingb'] = 'after_due';
   }
   // fix possible invalid settings
-  if ($settings['showscores'] == 'during') {
+  if ($settings['showscores'] == 'during' || $settings['showscores'] == 'at_end') {
     if ($settings['submitby'] == 'by_question') {
       $settings['scoresingb'] = 'immediately';
     } else {

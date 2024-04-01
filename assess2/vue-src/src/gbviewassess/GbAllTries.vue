@@ -87,10 +87,9 @@ export default {
             }
             la = '[[' + la.join('],[') + ']]';
             const id = this.qn + '-' + pn + '-' + tn;
-            if (this.tries[pn][tn][2][0] === null) {
-              this.tries[pn][tn][2][0] = '';
-            }
-            window.canvases['GBR' + id] = this.tries[pn][tn][2].slice();
+            const ref = this.tries[pn][tn][2] || [];
+
+            window.canvases['GBR' + id] = ref.slice();
             window.canvases['GBR' + id].unshift('GBR' + id);
             window.drawla['GBR' + id] = JSON.parse(la);
             window.imathasDraw.initCanvases('GBR' + id);

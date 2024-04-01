@@ -2209,6 +2209,23 @@ for ($i=0..4) {
 }
 </pre>
 
+<p>For associative arrays (arrays with non-numeric or non-consecutive keys) you can use a "foreach" loop:</p>
+
+<pre>foreach ($arr as $k=>$v) { action }</pre>
+<p>
+Here <em>$arr</em> is the associative array, and as it loops the keys will be assigned
+to <em>$k</em> and the values to <em>$v</em>.
+</p>
+<p>Example:</p>
+<pre>
+$arr = ['red' => 3, 'green' => 5, 'blue' => 2]
+
+$str = ''
+for ($arr as $color=>$num) {
+  $str .= "There are $num balls that are $color. "
+}
+</pre>
+
 <p>Conditions can be used <em>inside</em> a for loop, but not outside without explicit blocking</p>
 <pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
@@ -2331,7 +2348,7 @@ The following macros create graphs or tables:
 	<li><strong>xmin,xmax,ymin,ymax</strong>: Graphing window.  Defaults to -5 to 5 for both. Use "0:-n" (for some value of n) for xmin or ymin to only
 	       have gridlines and labels after 0, while still using -n to adjust spacing. This is an alternative to using addplotborder to create
 	       first quadrant graphs.</li>
-	<li><strong>labels</strong>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis.</li>
+	<li><strong>labels</strong>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis. Use "xlbl:ylbl:xname:yname" to put a named label on the axes.</li>
 	<li><strong>grid</strong>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><strong>width,height</strong>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
 	</ul></li>
@@ -2462,7 +2479,9 @@ The following macros help with formatting values for display:
 <li><strong>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
     reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".  Set variable in numerator to put a variable
     in the numerator, such as pi.</li>
-<li><strong>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>:  Same as dispreducefraction, but not already in display form</li>
+<li><strong>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>:  Same as dispreducefraction, but not already in display form.<br>
+    An alternate input form of makereducefraction(numerator,denominator,'parts') will return an array of the 
+    reduced numerator and denominator.</li>
 <li><strong>decimaltofraction(decimal,[format,maxden])</strong>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.
     Only works for denominators up to maxden (default 5000)</li>
 <li><strong>htmldisp(string,[variables])</strong>:  Uses HTML instead of the math typesetter to display simple exponents and subscripts, and to italicize variables</li>
@@ -2533,8 +2552,9 @@ These macros are for working with arrays:
 <li><strong>unionarrays(array,array)</strong>:  Unions two arrays, preventing duplicates, into a new array</li>
 <li><strong>intersectarrays(array,array)</strong>:  Finds the intersection of two arrays</li>
 <li><strong>diffarrays(array1,array2)</strong>: Returns all elements in array1 that are not also in array2</li>
-<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values</li>
+<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values. Beware this doesn't re-index the array, so you may want to then use array_values if you need consecutive array keys.</li>
 <li><strong>array_values(array)</strong>: Returns the values of an array, reindexing with consecutive numeric indices.</li>
+<li><strong>array_keys(array)</strong>: Returns the keys of an associative array.</li>
 <li><strong>count(array)</strong>:  Counts the number of entries in the array</li>
 <li><strong>is_array(variable)</strong>:  Determines if the variable is an array</li>
 <li><strong>sumarray(array)</strong>: Adds the entries in an array</li>
@@ -2550,6 +2570,13 @@ These macros are for working with arrays:
 These macros are fairly general purpose:
 <ul>
 <li><strong>ifthen(condition,trueval,falseval)</strong>:  Takes a comparison condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
+<li><strong>cases(testvalue,comparearray,outputarray,[defaultoutput, tolerance])</strong>:  Compares the 
+  testvalue to each of the comparearray entries, and if a match is found, returns the corresponding 
+  entry of outputarray. If there is no match, the defaultoutput is returned. Note that if both values 
+  are numeric, the comparison is made with tolerance, otherwise the values are compared using string 
+  matching (meaning 0.5 will not be considered equivalent to "1/2").  Tolerance defaults to 0.0015 
+  relative error. Prefix with |, like "|0.1" for absolute tolerance.  Example: 
+  <code>cases(3,[1,2,3,4],["a","b","c","d"])</code> would return "c".</code></li>
 <li><strong>formhoverover(label,tip)</strong>:  Creates a hover-over definition or other tip</li>
 <li><strong>formpopup(label,content,[width,height,style,scrollbars])</strong>:  Creates a link or button leading to a popup window.  Content can
   be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
@@ -2749,8 +2776,9 @@ available in each library</p>
 <tr><td>* / + -</td><td>Multiply, divide, add, subtract</td></tr>
 <tr><td>^</td><td>Powers.  2^3 = 8.</td></tr>
 <tr><td>e, pi</td><td>The standard constants</td></tr>
-<tr><td>%</td><td>Modulus (remainder after division.  5%2 = 1)</td></tr>
-<tr><td>mod(p,n)</td><td>Modulus. This version gives positive results for modulus of negative numbers.</td></tr>
+<tr><td>%</td><td>Modulus of integers (remainder after division.  5%2 = 1)</td></tr>
+<tr><td>mod(p,n)</td><td>Modulus of integers. This version gives positive results for modulus of negative numbers.</td></tr>
+<tr><td>fmod(p,n)</td><td>Modulus of decimal values. May give negative results from negative inputs.</td></tr>
 <tr><td>!</td><td>Factorial</td></tr>
 <tr><td>sqrt</td><td>Square root</td></tr>
 <tr><td>sin,cos,tan,cot,sinh,cosh</td><td>Standard trig function.  Be sure to enter as sin(2), not sin 2</td></tr>
@@ -2971,6 +2999,18 @@ somewhere in the Question Text portion of the question.
     Do this by wrapping the teacher note in the [teachernote] shortcode like this: <code>[teachernote]This is the note[/teachernote]</code>
 </p>
 
+<h3>Hiding/Toggling content</h3>
+<p>If you need to hide content from view, you can wrap it in <code>&lt;div class="hidden"&gt;&lt;/div&gt;</code>.
+  Be aware the content is still in the page, so a student can still view the hidden content
+  using the browser inspector, so don't use this to hide secret info, but it can be helpful 
+  if you need to hide an answerbox that is being populated by some other means.</p>
+<p>If you want to toggle a block of content, one option for shorter content is to use 
+    forminlinebutton.  For longer content, you can wrap the content in a block using 
+    <code>&lt;div data-toggler="Title for button"&gt;&lt;/div&gt;</code>.  That will
+    hide the wrapped content, and add a button with the specified title for toggling the 
+    content.  You can optionally add a <code>data-toggler-hide</code> attribute as well 
+    if you want a different button label once the content is showing.
+</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -3019,7 +3059,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	the correct answer.  To override the tolerance use +- in the setting, like this:
 	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
 	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $reltolerance = .01)</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "units", "nosoln", or "nosolninf"</dt>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "set", "integer, "units", "nosoln", or "nosolninf"</dt>
 	<dd>
         <ul>
             <li>Answerformats can be combined, like $answerformat = "nosoln,list"</li>
@@ -3027,6 +3067,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
             <li>If $answerformat="list", then duplicate values are ignored.</li>
             <li>If $answerformat="exactlist", then duplicate values are not ignored.</li>
             <li>If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</li>
+            <li>$answerformat = "set" behaves like "list", but expects the answer list to be wrapped in curly braces as a set.</li>
             <li>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)</li>
             <li>$answerformat = "units" adds unit checking.  Supply the answer like <code>$answer = "3 kg/m^2"</code>.  
                 The student's answer can be in other equivalent units, so "300 cm" is considered equivalent to "3 m".
@@ -3313,8 +3354,8 @@ A student is asked to match answers with questions
 <dt>$noshuffle = "questions" or "answers"</dt>
 	<dd>Retains original order of questions or answers, and only shuffles the other.  By default, both lists are shuffled</dd>
 <dt>$displayformat = "select" or "2columnselect"</dt>
-	<dd>Only displays the $answers, with select boxes next to each containing the $questions.  This should only be used with
-    pure text $questions.</dd>
+	<dd>Only displays the $questions, with select boxes next to each containing the $answers.  This should only be used with
+    pure text $answers.</dd>
 <dt>$scoremethod = "allornothing" </dt>
 	<dd>Setting "allornothing" will mean no partial credit is given, and the student must match all parts 
         correctly to get credit.</dd>
@@ -3517,8 +3558,9 @@ None - the essay type is not computer graded.
 <dl>
 <dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" </dt>
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
-<dt>$displayformat = "editor" </dt>
-	<dd>Use the rich text editor for the essay answer box.</dd>
+<dt>$displayformat = "editor" or "editornopaste" or "pre" </dt>
+	<dd>"editor" to use the rich text editor for the essay answer box, or "editornopaste" for the rich text editor with paste disabled.<br>
+    "pre" to use standard text entry, and to display in gradebook as preformatted text.</dd>
 <dt>$scoremethod = "takeanything" or "takeanythingorblank" or "nomanual"</dt>
 	<dd>The first two sets the problem to give full credit for any answer.  The second also counts
 	blank answers as correct.  The "nomanual" option will give no credit for any answer, but doesn't 
@@ -3901,9 +3943,10 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult" or "ref" or "anyroworder"</dt>
+<dt>$answerformat = "scalarmult" or "ref" or "rowequiv" or "anyroworder"</dt>
 	<dd>If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
 	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
+    If "rowequiv" is used, any matrix that is row equivalent will be accepted.<br/>
     If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
@@ -3957,12 +4000,13 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult","ref","anyroworder",fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt>$answerformat = "scalarmult","ref","rowequiv","anyroworder",fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
 	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
 	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
+    If "rowequiv" is used, any matrix that is row equivalent will be accepted.<br/>
     If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
@@ -4028,7 +4072,7 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
 <dt>$answerformat = "normalcurve" or "list" or "allowsloppyintervals"</dt>
-	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
+	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the open interval that should be
     shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.
     <br/>
     "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"

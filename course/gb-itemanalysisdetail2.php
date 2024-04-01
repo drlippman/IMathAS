@@ -118,7 +118,7 @@ if ($type=='notstart') {
 	$sturegens = array();
 	$stuatt = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
-		$scoredData = json_decode(gzdecode($line['scoreddata']), true);
+		$scoredData = json_decode(Sanitize::gzexpand($line['scoreddata']), true);
 		$scoredAssessmentIndex = $scoredData['scored_version'];
 		$scoredAssessment = $scoredData['assess_versions'][$scoredAssessmentIndex];
 

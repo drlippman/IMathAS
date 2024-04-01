@@ -72,7 +72,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 
     $searchand = [];
     $searchvals = [];
-    $stopwords = ['about','from','that','this','what','when','where','will','with'];
+    $stopwords = ['about','are','com','for','from','how','that','the','this','was','what','when','where','will','with','und','www'];
 
     if ($searchtype != 'all' && !is_array($libs)) {
         $libs = explode(',', $libs);
@@ -114,7 +114,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $wholewords = array();
         $haspos = false;
         foreach ($search['terms'] as $k => $v) {
-            if ($v[0] != '!' && ctype_alnum($v) && strlen($v) > 3) {
+            if ($v[0] != '!' && ctype_alnum($v) && strlen($v) > 2) {
                 $haspos = true;
                 break;
             }
@@ -126,7 +126,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                     $sgn = '-';
                     $v = substr($v, 1);
                 }
-                if (ctype_alnum($v) && strlen($v) > 3 && !in_array($v, $stopwords)) {
+                if (ctype_alnum($v) && strlen($v) > 2 && !in_array($v, $stopwords)) {
                     $wholewords[] = $sgn . $v . '*';
                     unset($search['terms'][$k]);
                 }
@@ -148,6 +148,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             }
         }
     }
+
     if (!empty($search['avgtime'])) {
         $avgtimeparts = explode(',', $search['avgtime']);
         if (!empty($avgtimeparts[0])) {
@@ -211,6 +212,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
     // do this last, since this will be an OR with other stuff
     // TODO: extend to allow searching for multiple IDs
+    $basicidsearch = false;
     if (isset($search['id'])) {
         $ids = explode(',', $search['id']);
         $idors = [];
@@ -221,6 +223,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $idsearch = implode(' OR ', $idors);
         if ($searchquery === '') {
             $searchquery = '(' . $idsearch . ')';
+            $basicidsearch = true;
         } else {
             $searchquery = '(' . $searchquery . ' OR ' . $idsearch . ')';
         }
@@ -303,12 +306,20 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $rightsquery = '';
     }
 
+    if (empty($wholewords) && $libquery === '' && isset($search['terms'])) {
+        return _('Cannot search all libraries without at least one 3+ letter word in the search terms');
+    }
     if ($searchquery === '' && $libquery === '') {
         return 'Cannot search all libraries without a search term';
     }
 
-    $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,
-    MIN(ili.libid) AS libid, iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
+    $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,';
+    if ($searchtype == 'libs' && count($libs) == 1) {
+        $query .= 'ili.libid,';
+    } else {
+        $query .= 'MIN(ili.libid) AS libid,';
+    }
+    $query .= 'iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
     imas_users.LastName, imas_users.FirstName, imas_users.groupid,
     LENGTH(iq.solution) AS hassolution,iq.solutionopts,
     ili.junkflag, iq.broken, ili.id AS libitemid ';
@@ -357,9 +368,19 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $query .= ' GROUP BY iaq.id,ili.qsetid ';
         $query .= ' ORDER BY ia.id ';
     } else {
-        $query .= ' GROUP BY ili.qsetid ';
+        if ($searchtype == 'libs' && count($libs) == 1) {
+            // don't need group by
+        } else {
+            $query .= ' GROUP BY ili.qsetid ';
+        }
         if (!empty($search['order']) && $search['order']=='newest') {
-            $query .= ' ORDER BY iq.lastmoddate DESC ';
+            if ($searchtype == 'libs') {
+                $query .= ' ORDER BY libid,iq.lastmoddate DESC ';
+            } else {
+                $query .= ' ORDER BY iq.lastmoddate DESC ';
+            }
+        } else if ($searchtype == 'libs' && count($libs) > 1) {
+            $query .= ' ORDER BY libid ';
         }
     }
     if (!empty($max) && intval($max) > 0) {
