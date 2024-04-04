@@ -4,7 +4,7 @@
 // licensed under GPL version 2 or later
 //
 
-include_once("fractions.php");  // fraction routine
+require_once "fractions.php";  // fraction routine
 
 function simplexver() {
 	return 48;
@@ -1194,7 +1194,7 @@ function simplexdisplaycolortable() {
 
 	// show objective ;
 	if((count($args)>8)&&(!is_null($args[8]))) {
-		$ShowObjective  = verifyshowobjective("simplexdisplaycolortable",$args[8],1,1);
+		$ShowObjective  = verifyshowobjective("simplexdisplaycolortable",$args[8],1);
 	}
 	else {
 		$ShowObjective = 1;
@@ -1431,7 +1431,7 @@ function simplexdisplaylatex() {
 
 	// show objective ;
 	if((count($args)>4)&&(!is_null($args[4]))) {
-		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[4],1,1);
+		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[4],1);
 	}
 	else {
 		$ShowObjective = 1;
@@ -1597,7 +1597,7 @@ function simplexdisplaylatex2() {
 
     // show objective ;
 	if((count($args)>3)&&(!is_null($args[3]))) {
-		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[3],1,1);
+		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[3],1);
 	}
 	else {
 		$ShowObjective = 1;
@@ -1803,7 +1803,7 @@ function simplexdisplaytable2() {
 
 	// show objective ;
 	if((count($args)>10)&&(!is_null($args[10]))) {
-		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[10],1,1);
+		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[10],1);
 	}
 	else {
 		$ShowObjective = 1;
@@ -1974,8 +1974,7 @@ function simplexfindpivotpoint($sm) {
 	$ratiotest = array();
 
 	if($ColumnMinValue[0]<0) {
-		#region Find all columns that are equal to the min value
-
+		// Find all columns that are equal to the min value
 		$ColumnMinIndexList = array();
 
 		// Find all columns that are equal with the maximum negative values
@@ -2043,11 +2042,9 @@ function simplexfindpivotpoint($sm) {
                 }
             }
 		}
-		#endregion
     }
     else {
-		#region check for multiple solutions
-
+        // check for multiple solutions
         // look at all zero indicator (non-basic) variables and see if the objective row is zero
         // and there are nonnegative ratios in the column
         // there are $lastrow number of slack variables
@@ -2132,7 +2129,6 @@ function simplexfindpivotpoint($sm) {
                 }
             }
         }
-		#endregion
     }
 
     // return the status and the list of points, if any.
@@ -2801,8 +2797,6 @@ function simplexsolve2() {
 	//TODO - verify this for max mixed constraints
 	//TODO - verify this for min mixed constraints
 
-	//TODO - verify that it always checks once for multiple solutions
-
 	do {
 		// check for mixed constraints
         $hasmixedconstraints = simplexhasmixedconstrants($sm);
@@ -2844,7 +2838,7 @@ function simplexsolve2() {
 			//								   , all pivot points
 			//								   , simplex matrix
 			//								   , soluiton
-            if(is_null($simplexsets[$rows])) {
+            if(!isset($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 			//2021-03-29 fixed typo row-->rows
@@ -2859,7 +2853,7 @@ function simplexsolve2() {
 
 		if(count($pivotpoints) > 1) {
 			// add the multiple pivot point matrix to the output
-			if(is_null($simplexsets[$rows])) {
+			if(!isset($simplexsets[$rows])) {
                 $simplexsets[$rows] = array();
 			}
 
@@ -2888,7 +2882,7 @@ function simplexsolve2() {
 		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
         if(array_key_exists($rows, $simplexsets)) {
-			if(is_null($simplexsets[$rows])) {
+			if(!isset($simplexsets[$rows])) {
 				$simplexsets[] = array();
             }
         } else {
@@ -3657,9 +3651,7 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 //Change log
-// 2023-0x-xx ver 49
-//
-// 2023-09-19 ver 48 - Identical sub-expressions bug fixes.
+// 2023-09-2  ver 48 - 
 //
 // 2022-12-12 ver 47 - Fixed logic bug in simplexreadsolutionarray - mixed constraints do not work
 //                     in the library. Working on a TODO list to add mixed constraints.
@@ -3772,6 +3764,3 @@ function simplexsolve($sm,$type,$showfractions=1) {
 //     simplexconverttofraction
 //     simplexdisplaycolortable
 //     simplexsolutionconverttofraction
-
-
-?>

@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26.5;
+	return 26.6;
 }
 
 global $allowedmacros;
@@ -321,6 +321,7 @@ function get_unit_capacity_abbreviations() {
 function get_unit_liquids() {
     $unit = array();
 
+    $unit["US Barrel"] = _("US Barrel");
     $unit["British Barrel"] = _("British Barrel");
     $unit["Hogshead"] = _("Hogshead");
     $unit["Barrique"] = _("Barrique");
@@ -409,6 +410,8 @@ function get_unit_weight_abbreviations() {
 
     $unitabbr["Ounces"] = _("oz");
     $unitabbr["ounces"] = _("oz");
+    $unitabbr["Ounce"] = _("oz");
+    $unitabbr["ounce"] = _("oz");
 
     $unitabbr["Pounds"] = _("lbs");
     $unitabbr["pounds"] = _("lbs");
@@ -1379,8 +1382,8 @@ function conversionCapacity2() {
             $retval[5] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
         } else {
             $retval[0] = array("",1,$unit["Cup"],8,$unit["Fluid ounces"]);
-            $retval[1] = array("",1,$unit["Tablespoons"],3,$unit["Teaspoons"]);
-            $retval[2] = array("",1,$unit["Cup"],16,$unit["Tablespoons"]);
+            $retval[1] = array("",1,$unit["cup"],3,$unit["teaspoons"]);
+            $retval[2] = array("",1,$unit["tablespoon"],16,$unit["tablespoons"]);
             $retval[3] = array("",1,$unit["Pint"],2,$unit["Cups"]);
             $retval[4] = array("",1,$unit["Quart"],2,$unit["Pints"]);
             $retval[5] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
@@ -3068,7 +3071,8 @@ function conversionWeight() {
 
 //  WAMAP Question ID: 201697
 
-// 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+// 2024-xx-xx ver 27 - TODO: add a make fraction converion function
+// 2024-04-03 ver26.6- US Barrel
 //
 // 2023-06-06 ver26.5- tablespoon, teaspoon
 //
