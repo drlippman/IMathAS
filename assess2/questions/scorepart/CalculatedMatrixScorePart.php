@@ -104,11 +104,12 @@ class CalculatedMatrixScorePart implements ScorePart
             if ($hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
             } else {
+                $givenanslistvals = [];
                 foreach ($givenanslist as $j=>$v) {
                     $givenanslistvals[$j] = evalMathParser($v);
                 }
             }
-            
+
             //this may not be backwards compatible
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
