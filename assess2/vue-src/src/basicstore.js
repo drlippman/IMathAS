@@ -390,7 +390,6 @@ export const actions = {
       }
       if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
         changedWork = true;
-        break;
       }
     }
     if (Object.keys(changedQuestions).length === 0 && !changedWork && !endattempt) {
