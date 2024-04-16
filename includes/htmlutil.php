@@ -31,6 +31,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 	if (isset($defaultLabel)) {
 		echo " <option value=\"null\" selected=\"selected\">".Sanitize::encodeStringForDisplay($defaultLabel)."</option>\n";
 	}
+	$val = array();
 	if (is_array($valList[0])) {//has a group structure
 		$ingrp = false;
 		foreach ($valList as $oc) {
@@ -45,7 +46,6 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 		}
 		if ($ingrp) { echo '</optgroup>';}
 	} else {
-		$val = array();
 		for ($i=0;$i<count($valList);$i++) {
             if ($valList[$i] === '') { continue; }
 			$val[$valList[$i]] = $labelList[$i];
@@ -55,7 +55,10 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 	echo '</select><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
 	if (count($selectedVals)>0) {
 		foreach ($selectedVals as $v) {
-            if ($v === '' || !isset($val[$v])) { continue; }
+            if ($v === '' || 
+				(!is_array($valList[0]) && !isset($val[$v])) ||
+				(is_array($valList[0]) && !isset($labelList[$v]))
+			 ) { continue; }
 			echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';
 			echo '<input type="hidden" name="'.$name.'[]" value="'.Sanitize::encodeStringForDisplay($v).'"/>'
 				.(is_array($valList[0])?Sanitize::encodeStringForDisplay($labelList[$v]):Sanitize::encodeStringForDisplay($val[$v]));
