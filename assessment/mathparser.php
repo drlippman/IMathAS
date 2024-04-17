@@ -232,6 +232,23 @@ class MathParser
               return [$m*cos($in), $m*sin($in)];
             }
           } else {
+            if ($a == 0 && $b == 0) {
+                throw new MathParserException("0^0 is undefined");
+            } else if (!is_numeric($a) || !is_numeric($b)) {
+                throw new MathParserException("cannot evaluate powers with nonnumeric values");
+            } else if ($a < 0 && floor($b) != $b) {
+                // some code replication here, but allows us to throw proper exception for invalid inputs
+                for ($j=3; $j<50; $j+=2) {
+                    if (abs(round($j*$b)-($j*$b))<.000001) {
+                        if (round($j*$b)%2===0) {
+                            return exp($b*log(abs($a)));
+                        } else {
+                            return -1*exp($b*log(abs($a)));
+                        }
+                    }
+                }
+                throw new MathParserException("invalid power for negative base");
+            }
             return safepow($a,$b);
           }
         }],
@@ -354,7 +371,10 @@ class MathParser
    */
   public function evaluateQuiet($variableValues = array()) {
     try {
-      return $this->evaluate($variableValues);
+      ob_start(); // buffer any echos so we can ditch them to keep this quiet 
+      $out = $this->evaluate($variableValues);
+      ob_clean(); // ditch buffer contents 
+      return $out;
     } catch (Throwable $t) {
       return sqrt(-1);
     } 
