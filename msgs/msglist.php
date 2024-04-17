@@ -217,6 +217,9 @@ If deleted on both ends, delete from DB
 			list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
 			if ($msgnotify==1) {
       	  		require_once "../includes/email.php";
+                if (!empty($studentinfo['section'])) {
+                    $cname .= ' (' . $studentinfo['section'] . ')';
+                }
       	  		send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subjectPost, $cidP, $cname, $msgid);
 			}
 			if ($FCMtokenTo != '') {
