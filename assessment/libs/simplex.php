@@ -2882,7 +2882,7 @@ function simplexsolve2() {
 		#region step 6 - add to $simplexsets (parent column, pivot, all pivot points, simplex matrix, solution)
 
         if(array_key_exists($rows, $simplexsets)) {
-			if(!isset($simplexsets[$rows])) {
+			if(is_null($simplexsets[$rows])) {
 				$simplexsets[] = array();
             }
         } else {
