@@ -327,6 +327,15 @@ function draw_circle() {
         }
       }
     }
+      
+    if ($in[0] == "colorfill") {
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+            $in[1] = "none";
+        }
+        $args = "fill='$in[1]';".$args;
+      }
+    }
 
     if ($in[0]=="angle") {
       if (array_key_exists(1,$in)) {
@@ -698,6 +707,7 @@ function draw_circle() {
   } else {
     $alt = $userAltText;
   }
+  
   $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt);
   return $gr;
 }
@@ -726,6 +736,7 @@ function draw_circlesector() {
   $altNumPts = 0;
   $altPointLab = "";
   $hasUserAltText = false;
+  $colorFill = 'none';
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -745,6 +756,15 @@ function draw_circlesector() {
       echo "Eek! draw_circlesector cannot start with an empty argument.";
       return '';
     }
+    if ($in[0] == "colorfill") {
+      $colorFill = 'none';
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+          $in[1] = 'none';
+        }
+        $colorFill = $in[1];
+      }
+    }
     if (array_key_exists(0,$in) && trim($in[0]) === "") {
       echo "Eek! draw_circlesector cannot start with an empty argument.";
       return '';
@@ -763,6 +783,7 @@ function draw_circlesector() {
       $angs[] = $in[1];
     }
   }
+  $maxAng = !empty($angs) ? max($angs) : 0;
   $xs = calconarray($angs,"cos(M_PI*x/180)");
   $ys = calconarray($angs,"sin(M_PI*x/180)");
   if (max($angs)<=90) {
@@ -840,10 +861,15 @@ function draw_circlesector() {
       }
       $args = $args."dot([0,0]);".$lab;
     }
-    
+    ///
     if ($in[0]=="angle") {
       $ang = $in[1];
       $lab = "";
+        if ($ang == $maxAng) {
+            $args = $args . "fill='$colorFill'; sector([0,0], 1, 0, 3.14159 * $ang / 180); fill='none';";
+        } else {
+            $args = $args . "sector([0,0], 1, 0, 3.14159 * $ang / 180);";
+        }
       if ($ang > 360 || $ang < 0) {
         echo 'Eek! Angles should be between 0 and 360.';
         return '';
@@ -867,7 +893,8 @@ function draw_circlesector() {
         $arc = "arc([$arcRad,0],[-$arcRad,0],$arcRad);arc([-$arcRad,0],[$arcRad*$x,$arcRad*$y],$arcRad);";
       }
       $args = $args.$sectorArc.$arc;
-      if (isset($in[2])) {
+        
+      if (isset($in[2]) && !empty($in[2])) {
         if (preg_match('/rad/',$in[2])) {
           $in[2] = str_replace('rad','',$in[2]);
           $degSymbol = "";
@@ -903,7 +930,8 @@ function draw_circlesector() {
         $lab = "text([$xlab,$ylab],'".$in[2]."$degSymbol');";
       }
       $args = $args.$lab;
-      $args = $args."line([0,0],[1,0]);line([0,0],[$x,$y]);";
+        
+
       $numAngles = $numAngles + 1;
     }
     
@@ -1034,6 +1062,7 @@ function draw_square() {
   $altPoint = "";
   $altBase = "";
   $altHeight = "";
+  $colorFill = 'none';
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -1053,6 +1082,15 @@ function draw_square() {
         $userAltText = $in[1];
       }
     }
+    if ($in[0] == "colorfill") {
+      $colorFill = 'none';
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+          $in[1] = 'none';
+        }
+        $colorFill = $in[1];
+      }
+    }
     if ($in[0]=="size" && isset($in[1])) {
       $size = $in[1];
     }
@@ -1069,7 +1107,7 @@ function draw_square() {
       $pointKey = $key;
     }
   }
-  
+  $args = "fill='$colorFill';rect([-1,-1],[1,1]);fill='none';";
   //echo $baseKey . $argsArray[$baseKey][1];
   if (!isset($argsArray[$baseKey][1])) {
     $argsArray[$baseKey][1] = "";
@@ -1126,7 +1164,7 @@ function draw_square() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);rect([-1,-1],[1,1]);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt);
   return $gr;
 }
 
@@ -1147,6 +1185,7 @@ function draw_rectangle() {
   $altBase = "";
   $altHeight = "";
   $hasUserAltText = false;
+  $colorFill = 'none';
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -1179,6 +1218,15 @@ function draw_rectangle() {
     if ($in[0]=="height") {
       $hasHeight = true;
       $hasHeightLab = (!empty($in[2])) ? true : false;
+    }
+    if ($in[0] == "colorfill") {
+      $colorFill = 'none';
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+          $in[1] = 'none';
+        }
+        $colorFill = $in[1];
+      }
     }
     } else {
       echo "Eek! Cannot use an empty argument for draw_rectangle.";
@@ -1277,7 +1325,7 @@ function draw_rectangle() {
   $args = $args."text([0,".$ymin."],'".$baseLab."',below);";
   $args = $args."text([".$xmax.",0],'".$heightLab."',right);";
 
-  $args = $args."rect([".$xmin.",".$ymin."],[".$xmax.",".$ymax."]);";
+  $args = "fill='$colorFill';".$args."rect([".$xmin.",".$ymin."],[".$xmax.",".$ymax."]);fill='none';";
   
   // Build alt text
   $altPoint = '';
@@ -1370,6 +1418,7 @@ function draw_triangle() {
   $hasAltSidLab = false;
   $hasUserAltText = false;
   $size = 350;
+  $colorFill = 'none';
   $args = '';
   
   foreach ($argsArray as $key => $in) {
@@ -1391,6 +1440,15 @@ function draw_triangle() {
           $rotateTriangleBy = true;
           $rotateTriangleByAngle = ($in[1] >= 0) ? $in[1]%360 : 360+$in[1]%360;
         }
+      }
+    }
+    if ($in[0] == "colorfill") {
+      $colorFill = 'none';
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+          $in[1] = 'none';
+        }
+        $colorFill = $in[1];
       }
     }
   }
@@ -1759,7 +1817,7 @@ function draw_triangle() {
   }
   
   // DRAW TRIANGLE SIDES
-  $args = $args."strokewidth=2;line([$x[0],$y[0]],[$x[1],$y[1]]);line([$x[1],$y[1]],[$x[2],$y[2]]);line([$x[2],$y[2]],[$x[0],$y[0]]);strokewidth=1;";
+  $args = $args."fill='$colorFill';strokewidth=2;path([[$x[0],$y[0]], [$x[1],$y[1]], [$x[2],$y[2]], [$x[0],$y[0]]]);strokewidth=1;fill='none';";
   
   // PLACE ANGLE LABELS
   //For angles labeled outside the triangle, this is the fraction of distance between vertex and (xDraw,yDraw) point.
@@ -2274,6 +2332,7 @@ function draw_polygon() {
   $size = 300;
   $rotatePolygon = false;
   $hasUserAltText = false;
+  $colorFill = 'none';
   
   $input = func_get_args();
   $argsArray = [];
@@ -2315,6 +2374,15 @@ function draw_polygon() {
       $hasPoints = true;
       $pointKey = $key;
     }
+    if ($in[0] == "colorfill") {
+      $colorFill = 'none';
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+          $in[1] = 'none';
+        }
+        $colorFill = $in[1];
+      }
+    }
     if (in_array("axes",$in)) {
       $args = "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
     }
@@ -2347,7 +2415,7 @@ function draw_polygon() {
   }
   $x[0] = cos($randAng);
   $y[0] = sin($randAng);
-  $args = $args . "path([[$x[0],$y[0]]";
+  $args = $args . "fill='$colorFill';path([[$x[0],$y[0]]";
   for ($i=0;$i<$n;$i++) {
     $partialSum[$i] = array_sum(array_slice($ang,0,$i));
     $x[$i] = cos($partialSum[$i] + $randAng);
@@ -2364,7 +2432,7 @@ function draw_polygon() {
       }
     }
   }
-  $args = $args . ",[$x[0],$y[0]]]);";
+  $args = $args . ",[$x[0],$y[0]]]);fill='none';";
   // keep track of which points and sides are labeled
   $pointLabKeys = [];
   $sideLabKeys = [];
@@ -2443,6 +2511,7 @@ function draw_polygon() {
 
 
 //--------------------------------------------draw_prismcubes()----------------------------------------------------
+// NEED TO RECODE THIS TO ACCOUNT FOR FORESHORTENING
 // draw_prismcubes("cubes,length,height,depth",["labels,lab1,lab2,lab3"],["size,length"])
 // draw_prismcubes() will draw a cube with no labels.
 // Options include:
@@ -2457,6 +2526,7 @@ function draw_prismcubes() {
   $labels = ["","",""];
   $hasLabels = false;
   $hasUserAltText = false;
+  $colorFill = 'none';
 
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -2480,6 +2550,15 @@ function draw_prismcubes() {
       if (isset($in[1])) {
         $hasUserAltText = true;
         $userAltText = $in[1];
+      }
+    }
+    if ($in[0] == "colorfill") {
+      $colorFill = 'none';
+      if (array_key_exists(1,$in)) {
+        if ($in[1] == "") {
+          $in[1] = 'none';
+        }
+        $colorFill = $in[1];
       }
     }
     if ($in[0]=="cubes") {
@@ -2540,25 +2619,27 @@ function draw_prismcubes() {
   $xyMax = max($xMax,$yMax);
   $xyLabDiff = $xyMax/12;
   $xyMin = $xyMax/8;
+  $depthFS = 0.9 * $depth; // To show foreshortening
+  $denFS = sqrt(3);
+
+  $args .= "fill='$colorFill'; path([ [0,0], [$length,0], [$length + $depthFS/$denFS, $depth/$denFS], [$length + $depthFS/$denFS, $height + $depthFS/$denFS], [$depth/$denFS, $height + $depthFS/$denFS], [0,$height], [0,0] ]); fill='none';";
   
   for ($i=0;$i<($height+1);$i++) {
     $args = $args . "line([0,$i],[$length,$i]);";
-    $args = $args . "line([$length,$i],[$length+$depth/sqrt(2),$i+$depth/sqrt(2)]);";
+    $args = $args . "line([$length,$i],[$length + $depthFS/$denFS, $depth/$denFS + ($height + $depthFS/$denFS - $depth/$denFS) / $height * $i]);";
   }
   for ($i=0;$i<($length+1);$i++) {
     $args = $args . "line([$i,0],[$i,$height]);";
-    $args = $args . "line([$i,$height],[$i+$depth/sqrt(2),$height+$depth/sqrt(2)]);";
+    $args = $args . "line([$i,$height],[$depth/$denFS + ($length + $depthFS/$denFS - $depth/$denFS) / $length * $i, $height + $depthFS/$denFS]);";
   }
   for ($i=0;$i<($depth+1);$i++) {
-    $args = $args . "line([$i/sqrt(2),$height+$i/sqrt(2)],[$length+$i/sqrt(2),$height+$i/sqrt(2)]);";
-    $args = $args . "line([$length+$i/sqrt(2),$i/sqrt(2)],[$length+$i/sqrt(2),$height+$i/sqrt(2)]);";
+    $args = $args . "line([$length + ($depthFS/$denFS) / $depth * $i, ($depth/$denFS) / $depth * $i], [$length + ($depthFS/$denFS) / $depth * $i, $height + ($depthFS/$denFS) / $depth * $i]);";
+    $args = $args . "line([($depth/$denFS) / $depth * $i, $height + ($depthFS/$denFS) / $depth * $i], [$length + ($depthFS/$denFS) / $depth * $i, $height + ($depthFS/$denFS) / $depth * $i]);";
   }
-  $args = $args . "line([$depth/sqrt(2),$height+$depth/sqrt(2)],[$length+$depth/sqrt(2),$height+$depth/sqrt(2)]);";
-  $args = $args . "line([$length+$depth/sqrt(2),$depth/sqrt(2)],[$length+$depth/sqrt(2),$height+$depth/sqrt(2)]);";
   
   $args = $args . "text([$length/2,-$xyLabDiff],'$labels[0]');";
-  $args = $args . "text([$length+$depth/sqrt(2)+$xyLabDiff,$depth/sqrt(2)+$height/2],'$labels[1]');";
-  $args = $args . "text([$length+$xyLabDiff+0.5*$depth/sqrt(2),0.5*$depth/sqrt(2)],'$labels[2]');";
+  $args = $args . "text([$length + $depthFS/$denFS, $depth/$denFS + ($height + $depthFS/$denFS - $depth/$denFS) / 2],'$labels[1]','right');";
+  $args = $args . "text([$length + ($depthFS/$denFS) / 2, ($depth/$denFS) / 2],'$labels[2]','right');";
   
   // build the alt text
   if ($hasUserAltText !== true) {
@@ -2603,6 +2684,7 @@ function draw_cylinder() {
   $hasHeightLab = false;
   $hasUserAltText = false;
   $altFill = "";
+  $colorFill = 'lightblue';
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -2629,7 +2711,7 @@ function draw_cylinder() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
-      if (!isset($in[1]) || !is_numeric($in[1])) {
+      if (!isset($in[1]) || (!is_numeric($in[1]) && $in[1] == "")) {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
       } elseif (is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
@@ -2639,6 +2721,9 @@ function draw_cylinder() {
           $fillPercent = $in[1];
         }
         $altFill = ($fillPercent > 0) ? true : false;
+      }
+      if (isset($in[2]) && $in[2] != "") {
+          $colorFill = str_replace("trans", "" ,$in[2]);
       }
     }
     } else {
@@ -2680,7 +2765,7 @@ function draw_cylinder() {
   if ($hasFill === true) {
     $fillHeight = $fillPercent/100*$height;
     $fillColor = 'slategray';
-    $args = $args . "strokewidth=0; fill='lightblue'; fillopacity=0.5; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,2*pi); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); rect([-$diameter/2,-$height/2],[$diameter/2,-$height/2+$fillHeight]); strokewidth=1; fill='none'; stroke='steelblue'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); stroke='black';";
+    $args = $args . "strokewidth=0; fill='$colorFill'; fillopacity=0.5; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,2*pi); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); rect([-$diameter/2,-$height/2],[$diameter/2,-$height/2+$fillHeight]); strokewidth=1; fill='none'; stroke='steelblue'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); stroke='black';";
   }
   // Draw the cylinder
   $args = $args . "strokewidth=2.5; strokedasharray='4 4'; stroke='$fillColor'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,pi); stroke='black'; strokedasharray='1 0'; fill='none'; ellipse([0,$height/2],$diameter/2,$diameter/$af); fill='none'; line([-$diameter/2,-$height/2],[-$diameter/2,$height/2]); line([$diameter/2,-$height/2],[$diameter/2,$height/2]); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],pi,2*pi);";
@@ -2779,6 +2864,7 @@ function draw_cone() {
   $hasSlant = false;
   $fillPercent = 0;
   $hasUserAltText = false;
+  $colorFill = 'lightblue';
 
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -2811,7 +2897,7 @@ function draw_cone() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
-      if (!isset($in[1]) || !is_numeric($in[1])) {
+      if (!isset($in[1]) || !is_numeric($in[1]) || $in[1] == "") {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
       } elseif (is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
@@ -2819,6 +2905,9 @@ function draw_cone() {
           echo 'Eek! Fill percent must be between 0 and 100.';
         }
         $fillPercent = $in[1];
+      }
+      if (isset($in[2]) && $in[2] != "") {
+        $colorFill = $in[2];
       }
     }
     } else {
@@ -2873,12 +2962,12 @@ function draw_cone() {
   [$dashTLX,$dashTLY] = [$diameter/2*((1-2*$fillPercent/100)/2*($inv+1)+$fillPercent/100)*cos($t2),$baseRad*((1-2*$fillPercent/100)/2*($inv+1)+$fillPercent/100)*sin($t2)+$fillHeight];
   if ($hasFill === true && $fillPercent > 0) {
     if ($inverted) {
-      $args .= "strokewidth=0; fill='lightblue'; fillopacity=0.5; plot(['$diameter/2*$fillPercent/100*cos(t)','$baseRad*$fillPercent/100*sin(t)+$fillHeight'],
+      $args .= "strokewidth=0; fill='$colorFill'; fillopacity=0.5; plot(['$diameter/2*$fillPercent/100*cos(t)','$baseRad*$fillPercent/100*sin(t)+$fillHeight'],
       $t1,$t2); path([[0,-$height/2],[$dashTLX,$dashTLY],[$dashTRX,$dashTRY],[0,-$height/2]]); fill='none';";
       $args .= "strokewidth=1; fill='none'; stroke='steelblue'; plot(['$diameter/2*($fillPercent/100)*cos(t)','$baseRad*($fillPercent/100)*sin(t)+$fillHeight'],0,2*pi);";
     } else {
       $fillColor = "slategray";
-      $args .= "strokewidth=0; fill='lightblue'; fillopacity=0.5; plot(['$diameter/2*cos(t)','$inv*(-$height/2+$baseRad*sin(t))'],pi-$t1,2*pi+$t1); plot(['$diameter/2*(1-$fillPercent/100)*cos(t)','$baseRad*(1-$fillPercent/100)*sin(t)+$inv*$fillHeight'],
+      $args .= "strokewidth=0; fill='$colorFill'; fillopacity=0.5; plot(['$diameter/2*cos(t)','$inv*(-$height/2+$baseRad*sin(t))'],pi-$t1,2*pi+$t1); plot(['$diameter/2*(1-$fillPercent/100)*cos(t)','$baseRad*(1-$fillPercent/100)*sin(t)+$inv*$fillHeight'],
       $t1,$t2); path([[$dashBRX,$dashBRY],[$dashBLX,$dashBLY],[$dashTLX,$dashTLY],[$dashTRX,$dashTRY],[$dashBRX,$dashBRY]]); fill='none';";
       $args .= "strokewidth=1; fill='none'; stroke='steelblue'; plot(['$diameter/2*(1-$fillPercent/100)*cos(t)','$baseRad*(1-$fillPercent/100)*sin(t)+$fillHeight'],0,2*pi);";
     }
@@ -3017,6 +3106,7 @@ function draw_sphere() {
   $hasRadiusLab = false;
   $hasFill = false;
   $hasUserAltText = false;
+  $colorFill = 'lightblue';
 
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -3060,20 +3150,23 @@ function draw_sphere() {
     if ($in[0] == "fill") {
       $hasFill = true;
       if (isset($in[1])) {
-      if (!is_numeric($in[1])) {
-        $fillPercent = $GLOBALS['RND']->rand(20,80);
-      } elseif (is_numeric($in[1])) {
-          if ($in[1]<0) {
-            $fillPercent = 0;
-          } elseif ($in[1]>100) {
-            $fillPercent = 100;
-          } else {
-        $fillPercent = $in[1];
-      }
-    }
-      } else {
-        $fillPercent = $GLOBALS['RND']->rand(20,80);
+        if (!is_numeric($in[1]) || $in[1] == "") {
+          $fillPercent = $GLOBALS['RND']->rand(20,80);
+        } elseif (is_numeric($in[1])) {
+            if ($in[1]<0) {
+              $fillPercent = 0;
+            } elseif ($in[1]>100) {
+              $fillPercent = 100;
+            } else {
+              $fillPercent = $in[1];
+            }
+          }
+        } else {
+          $fillPercent = $GLOBALS['RND']->rand(20,80);
         }
+      if (isset($in[2]) && $in[2] != "") {
+        $colorFill = $in[2];
+      }
       $fillHeight = -1 + 2*$fillPercent/100;
     }
     
@@ -3087,7 +3180,7 @@ function draw_sphere() {
       $radFact = ($fillPercent >= 50) ? -1 : -0.5;
       $heightFactX = ($fillPercent >= 50) ? 0 : 0.08;
       $heightFactY = ($fillPercent <= 15) ? 1 : 0;
-      $args = "fill='lightblue'; stroke='lightblue'; strokewidth=2; plot(['($xfill-$heightFactX*(50-$fillPercent)/100)*cos(t)','$fillHeight+(0.2*(1-$heightFactY*(0.8-0.7/15*$fillPercent))*(1+$radFact*abs($fillHeight)))*sin(t)'],-0.02,pi+0.02);";
+      $args = "fill='$colorFill'; stroke='$colorFill'; strokewidth=2; plot(['($xfill-$heightFactX*(50-$fillPercent)/100)*cos(t)','$fillHeight+(0.2*(1-$heightFactY*(0.8-0.7/15*$fillPercent))*(1+$radFact*abs($fillHeight)))*sin(t)'],-0.02,pi+0.02);";
       if ($fillPercent <= 50) {
         $args .= "arc([-1*$xfill,$fillHeight],[$xfill,$fillHeight],1); fill='none';";
       } elseif ($fillPercent > 50) {
@@ -3169,7 +3262,7 @@ function draw_pyramid() {
   $hasFill = false;
   $fillPercent = 0;
   $hasUserAltText = false;
-
+  $colorFill = 'lightblue';
 
   foreach ($input as $list) {
     if (!is_array($list)) {
@@ -3197,7 +3290,7 @@ function draw_pyramid() {
     }
     if ($in[0] == "fill") {
       $hasFill = true;
-      if (isset($in[1]) && !is_numeric($in[1])) {
+      if (isset($in[1]) && (!is_numeric($in[1]) || $in[1] == "") ) {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
       } elseif (isset($in[1]) && is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
@@ -3205,6 +3298,9 @@ function draw_pyramid() {
           return '';
         }
         $fillPercent = $in[1];
+      }
+      if (isset($in[2]) && $in[2] != "") {
+        $colorFill = str_replace("trans", "", $in[2]);
       }
     }
   }
@@ -3268,7 +3364,7 @@ function draw_pyramid() {
       [$fblx,$fbly] = [$blx+($ptx-$blx)*((1-1*$inv)/2+$inv*$fillPercent/100),$bly+($pty-$bly)*((1-1*$inv)/2+$inv*$fillPercent/100)];
     }
     if ($inv == 1) {
-      $args .= "strokewidth=0; fill='lightblue'; path([[$fbrx,$fbry],[$fblx,$fbly],[$fflx,$ffly],[$flx,$fly],[$frx,$fry],[$brx,$bry],[$fbrx,$fbry]]);";
+      $args .= "strokewidth=0; fill='$colorFill'; path([[$fbrx,$fbry],[$fblx,$fbly],[$fflx,$ffly],[$flx,$fly],[$frx,$fry],[$brx,$bry],[$fbrx,$fbry]]);";
       if ($blx != $flx && $ptx != $flx) {
         if (($bly-$fly)*($ptx-$flx) > ($blx-$flx)*($pty-$fly)) {
           $args .= "path([[$flx,$fly],[$blx,$bly],[$fblx,$fbly],[$fflx,$ffly],[$flx,$fly]]);";
@@ -3278,7 +3374,7 @@ function draw_pyramid() {
         $args .= "path([[$blx,$bly],[$brx,$bry],[$fbrx,$fbry],[$fblx,$fbly],[$blx,$bly]]);";
       }
     } elseif ($inv == -1) {
-      $args .= "strokewidth=0; fill='lightblue'; path([[$ptx,$pty],[$fflx,$ffly],[$fblx,$fbly],[$fbrx,$fbry],[$ptx,$pty]]);";
+      $args .= "strokewidth=0; fill='$colorFill'; path([[$ptx,$pty],[$fflx,$ffly],[$fblx,$fbly],[$fbrx,$fbry],[$ptx,$pty]]);";
       if ($frx != $brx) {
         if (($bry-$pty)*($frx-$ptx) > ($fry-$pty)*($brx-$ptx)) {
           $args .= "path([[$ptx,$pty],[$ffrx,$ffry],[$fbrx,$fbry],[$ptx,$pty]]);";
@@ -3482,6 +3578,8 @@ function draw_rectprism() {
   $hasLabels = false;
   $altFillText = "";
   $hasUserAltText = false;
+  $colorFill = 'lightblue';
+    
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -3495,7 +3593,7 @@ function draw_rectprism() {
   if (array_key_exists(0,$argsArray)) {
     if (isset($argsArray[0][0]) && is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && isset($argsArray[1][0]) && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0 && isset($argsArray[2][0]) && is_numeric($argsArray[2][0]) && $argsArray[2][0]>0) {
     $length = $argsArray[0][0];
-    $depth = $argsArray[1][0];
+    $depth = 0.8 * $argsArray[1][0];
     $height = $argsArray[2][0];
   } else {
       //echo "Warning! Must include length, depth and height.";
@@ -3529,6 +3627,9 @@ function draw_rectprism() {
         $fillPercent = $GLOBALS['RND']->rand(20,80);
       }
       $altFillText = " partially filled with colored material.";
+      if (isset($in[2]) && $in[2] != "") {
+        $colorFill = $in[2];
+      }
     }
   }
   }
@@ -3564,11 +3665,21 @@ function draw_rectprism() {
   $xMax = $length+$depth/2;
   $yMax = $height+$depth*sqrt(3)/2;
   $xyMax = max($xMax,$yMax);
+    
+    $ratio = $yMax/$xMax;
+    if ($ratio > 1) {
+     $sizeh = $size;
+     $sizew = ($size-20)/$ratio + 60;
+    } else {
+     $sizew = $size;
+     $sizeh = ($size-60)*$ratio + 20;
+    }
+    
   $args = "";
   // Fill the prism
   if ($hasFill === true) {
     $fillHeight = $height*$fillPercent/100;
-    $args .= "fill='lightblue'; stroke='none';";
+    $args .= "fill='$colorFill'; stroke='none';";
     $args .= "path([[0,0],[0,$fillHeight],[$depth/2,$fillHeight+$depth*sqrt(3)/2],[$length+$depth/2,$fillHeight+$depth*sqrt(3)/2],[$length+$depth/2,$depth*sqrt(3)/2],[$length,0],[0,0]]);";
     $args .= "fill='none'; stroke='steelblue';";
     $args .= "path([[0,$fillHeight],[$depth/2,$fillHeight+$depth*sqrt(3)/2],[$length+$depth/2,$fillHeight+$depth*sqrt(3)/2],[$length,$fillHeight],[0,$fillHeight]]);";
@@ -3593,7 +3704,8 @@ function draw_rectprism() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(10);initPicture(-$xyMax/10,1.1*$xyMax,-$xyMax/10,1.1*$xyMax);$args;",$size,$size,$alt);
+
+  $gr = showasciisvg("setBorder(10,10,40,10);initPicture(-0.2*$xMax,1.2*$xMax,-0.2*$yMax,1.2*$yMax);$args;",$sizew,$sizeh,$alt);
   return $gr;
 }
 

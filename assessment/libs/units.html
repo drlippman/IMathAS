@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <title>units help</title>
+</head>
+<body>
+<h1>Macro Library units</h1>
+<p>Contributed by Nick Chura</p>
+<p>Also check out the comparenumberswithunits function in the
+    <a href="../../help.php?section=writingquestions#conditionalmacros">
+    Conditional Test Macros</a> section.</p>
+
+
+<h3>parseunits(input)</h3>
+<p>This function takes a string of a number with units, like "10 kg" or "5 m/s^2" and returns
+    an array: <b>[number in base units, units array, entry number, conversion factor]</b>.
+</p>
+<p>The <b>number in base units</b> is the entry converted to base units, where base units 
+    are 'kg','m','sec','rad','degC','degF','degK','mol','amp','cd'.  For example,
+    <ul>
+        <li>"10 g" would return 0.01 (converted to kg)</li>
+        <li>"1 hour" would return 3600 (converted to seconds)</li>
+        <li>"1 km/min" would return 16.66666 (converted to m/sec)</li>
+    </ul>
+</p>
+<p>The <b>units array</b> is an array of units in the input, in this order: 
+    ['kg','m','sec','rad','degC','degF','degK','mol','amp','cd'].  
+    There will be a 0 if the unit is not present, 
+    and a number corresponding to the power of the unit.  Some examples:
+    <ul>
+        <li>"10 g" would return [1,0,0,0,0,0,0,0,0,0]</li>
+        <li>"5 m/s^2" would return [0,1,-2,0,0,0,0,0,0,0]</li>
+    </ul>
+</p>
+<p>The <b>entry number</b> is the number in the student's entry, so 5 if they enter "5 km/min".</p>
+
+<p>A common way to use this function would be check that the units array matches the expected,
+    then use the number in base units.  For example, if you wanted the student to enter 
+    a number with units that is at least 10cm, you could write a Conditional question using:
+</p>
+<pre>
+$anstypes = "number"
+loadlibrary("units")
+$correct = parseunits("10 cm")
+if (stuansready($stuanswers,$thisq,[0])) {
+  $stu = parseunits($stuanswers[$thisq][0])
+  if ($correct[1] === $stu[1] && $stu[0] >= $correct[0]) {
+    $answer = true
+  }
+}
+</pre>
+
+<p>The <code>$correct[1] === $stu[1]</code> checks the units arrays match, and
+<code>$stu[0] >= $correct[0]</code> checks the value in base units meets the 
+desired condition.</p>
+
