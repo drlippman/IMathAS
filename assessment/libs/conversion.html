@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <title>Conversion help</title>
+</head><body>
+<h1>Macro Library Conversion</h1>
+&nbsp;Conversion - american, metric and between american and metric units
+<BR>&nbsp;Mike Jenck, Originally developed Jan 29-31, 2021
+<BR>&nbsp;licensed under GPL version 2 or later
+<BR>&nbsp;
+<BR>&nbsp;File Version : 26.6
+<BR>
+<BR><ul>
+    <li><a href="#conversionVer">conversionVer</a></li>
+    <li><a href="#conversionAbbreviations">conversionAbbreviations</a></li>
+    <li><a href="#conversionDisplay">conversionDisplay</a></li>
+    <li><a href="#conversionDisplay2HTML">conversionDisplay2HTML</a></li>
+    <li><a href="#conversionDisplay2HTMLwithBorder">conversionDisplay2HTMLwithBorder</a></li>
+    <li><a href="#conversionFormulaAbbreviations">conversionFormulaAbbreviations</a></li>
+    <li><a href="#conversionFormulaGeometry">conversionFormulaGeometry</a></li>
+    <li><a href="#conversionFormulaTemperature">conversionFormulaTemperature</a></li>
+    <li><a href="#conversionPrefix">conversionPrefix</a></li>
+    <li><a href="#conversionUnits2ScreenReader1">conversionUnits2ScreenReader1</a></li>
+    <li><a href="#conversionUnits2ScreenReader2">conversionUnits2ScreenReader2</a></li>
+    <li><a href="#conversion_extract_column_array">conversion_extract_column_array</a></li>
+    <li><a href="#conversionArea2">conversionArea2</a></li>
+    <li><a href="#conversionCapacity2">conversionCapacity2</a></li>
+    <li><a href="#conversionLength2">conversionLength2</a></li>
+    <li><a href="#conversionLiquid2">conversionLiquid2</a></li>
+    <li><a href="#conversionTime2">conversionTime2</a></li>
+    <li><a href="#conversionVolume2">conversionVolume2</a></li>
+    <li><a href="#conversionWeight2">conversionWeight2</a></li>
+</ul>
+***** DEPRECIATED Functions ***** 
+<BR><ul>
+    <li><a href="#conversionArea">conversionArea</a></li>
+    <li><a href="#conversionCapacity">conversionCapacity</a></li>
+    <li><a href="#conversionLength">conversionLength</a></li>
+    <li><a href="#conversionLiquid">conversionLiquid</a></li>
+    <li><a href="#conversionTime">conversionTime</a></li>
+    <li><a href="#conversionVolume">conversionVolume</a></li>
+    <li><a href="#conversionWeight">conversionWeight</a></li>
+</ul>
+<!-- -----------------------------------------------------  -->
+<h3><a name="conversionVer">conversionVer</a></h3>
+&nbsp;function conversionVer()
+<BR>&nbsp;Returns the file version number
+<BR>
+<BR><h3><a name="conversionAbbreviations">conversionAbbreviations</a></h3>
+&nbsp;function conversionAbbreviations(system,type[,tick,Fullname])
+<BR> Returns the Abbreviations to words
+<BR>
+<BR>&nbsp;INPUTS:
+<BR>   system: "A" - American
+<BR>           "M" - Metric
+<BR>           "T" - Time
+<BR>
+<BR>     type: Length
+<BR>           Capacity
+<BR>           Weight
+<BR>           Area
+<BR>           Volume
+<BR>
+<BR>     tick: add a tick mark around items with exponents
+<BR>
+<BR>           0 = Kilometer squared/Kilometer cube
+<BR>           1 = Square kilometer/Cubic kilometer
+<BR>
+<BR>           3 = add extra conversion factors to metric area Kilometer squared
+<BR>           4 = add extra conversion factors to metric area Square kilometer
+<BR>
+<BR> Fullname: determines the order of the word square/cube in the full name of the words
+<BR>           e.g.Inches squared/Square inches
+<BR>
+<BR> Examples
+<BR>
+<BR> use conversionAbbreviations("A","Length") returns an array of strings that have american abbreviations of length
+<BR>
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionDisplay">conversionDisplay</a></h3>
+&nbsp;function  conversionDisplay(Title1,Factors1,[Title2,Factors2,...])
+<BR>&nbsp;
+    <BR>
+    <BR>&nbsp;INPUTS:
+<BR>     Title: string like Length, Capacity, etc.
+<BR>   Factors: An array of strings that are displayed
+<BR>
+<BR> RETURNS: an array of HTML code to diplay the results.
+<BR>
+<BR> Examples
+<BR>
+<BR> use  ConversionDisplay("Length Conversions",ConversionLength("A")); returns an array of length 1 of the HTML to
+<BR>                                                                     display the american length conversion factors
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionDisplay2HTML">conversionDisplay2HTML</a></h3>
+    &nbsp;function conversionDisplay2HTML(CellValueArray,$cellPadding=4)
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>     CellValueArray: an array of strings that are stored 1 per cell
+    <BR>
+    <BR> RETURNS: HTML code to diplay the results.
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use  ConversionDisplay2HTML(array("cell 1","Cell 2"); returns the HTML to display the
+    
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionDisplay2HTMLwithBorder">conversionDisplay2HTMLwithBorder</a></h3>
+    &nbsp;function conversionDisplay2HTMLwithBorder(CellValueArray,cellPadding=7)
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>     CellValueArray: an array of strings that are stored 1 per cell
+    <BR>        cellPadding: space around the content of the cell default 7px
+    <BR>
+    <BR> RETURNS: HTML code to diplay the results.
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use  conversionDisplay2HTMLwithBorder(array("cell 1","Cell 2"); returns the HTML to display with a border
+    
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionFormulaAbbreviations">conversionFormulaAbbreviations</a></h3>
+    &nbsp;function conversionFormulaAbbreviations(system)
+    <BR> Returns the Abbreviations to words
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "C" = Circle (default)
+    <BR>           "T" = Triangle
+    <BR>           "R" = Rectangle
+    <BR>           "S" = Square
+    <BR>           "A" = Area
+    <BR>           "V" = Volume
+    <BR>           "F" = Temperature
+    <BR>
+    
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionFormulaGeometry">conversionFormulaGeometry</a></h3>
+    &nbsp;function conversionFormulaGeometry(type,[tick=y,pi])
+    <BR> Returns the Abbreviations to words
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "C" = Circle (default)
+    <BR>           "T" = Triangle
+    <BR>           "R" = Rectangle
+    <BR>           "S" = Square
+    <BR>           "A" = Surface Area
+    <BR>           "V" = Volume
+    <BR>
+    <BR>        pi - blank = the letters pi
+    <BR>           - h = the html entity for pi
+    <BR>
+    
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionFormulaTemperature">conversionFormulaTemperature</a></h3>
+    &nbsp;function conversionFormulaTemperature(type[,tick])
+    <BR> Returns the Abbreviations to words
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "C" = to Celsius (default)
+    <BR>           "F" = to Fahrenheit
+    <BR>           "K" = to Kelvin
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use ConversionFormulaTemperature("F") returns the formula for F = 9/5C+32
+    
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionPrefix">conversionPrefix</a></h3>
+    &nbsp;function conversionPrefix(type [,Abbreviations])
+    <BR> Returns the Abbreviations to words
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>           type: "M" - Meter
+    <BR>                 "L" - Liter
+    <BR>                 "G" - Gram
+    <BR>
+    <BR>   Abbreviations: 0 = no abb
+    <BR>                  1 = show abb
+    <BR> Examples
+    <BR>
+    <BR> use conversionPrefix("G") returns the prefix with a base of grams
+    
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionUnits2ScreenReader1">conversionUnits2ScreenReader1</a></h3>
+    &nbsp;function conversionUnits2ScreenReader1(number,units,dimensions=2,tick="y",html="n") - INTERNAL ONLY
+    <BR> Returns the Abbreviations to words
+    <BR>&nbsp;
+    <BR>
+    <BR>&nbsp;INPUTS: number: the amount of units
+    <BR>           units: ft - feet
+    <BR>                  in - inch
+    <BR>                  m = meter
+    <BR>                  etc.
+    <BR>      dimensions: 1   - does not show an exponent
+    <BR>                  2,3 - add ^dimensions1 to units1
+    <BR>             tick: y - add tick marks
+    <BR>                   n - do not add tick marks<BR>
+    <BR>             sign: add this to the end (default of '')
+    <BR>
+    
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionUnits2ScreenReader2">conversionUnits2ScreenReader2</a></h3>
+    &nbsp;function conversionUnits2ScreenReader2(number1,units1,dimensions1,number2,units2,dimensions2,sign="=",tick="y",html="n")
+    <BR> Returns the Abbreviations to words
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS: number1: the amount of units1
+    <BR>           units1: ft - feet
+    <BR>                   in - inch
+    <BR>                   m = meter
+    <BR>                   etc.
+    <BR>      dimensions1: 1   - does not show an exponent
+    <BR>                   2,3 - add ^dimensions1 to units1
+    <BR>
+    <BR>          number2: the amount of units2
+    <BR>           units2: ft - feet
+    <BR>                   in - inch
+    <BR>                   m = meter
+    <BR>                   etc.
+    <BR>
+    <BR>       dimensions2: 1   - does not show an exponent
+    <BR>                    2,3 - add ^dimensions2 to units2
+    <BR>             sign: add this between the two factors (default of '=')
+    <BR>             tick: y - add tick marks
+    <BR>                   n - do not add tick marks
+    <BR>
+    <BR>
+    
+
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversion_extract_column_array">conversion_extract_column_array</a></h3>
+    &nbsp;function conversion_extract_column_array($v2,$columnindex)
+    <BR> Returns returns an array of strings from the selected column
+    <BR>        the array is in the form of
+    <BR>
+    <BR> $retval[] = array([0] the complete output conversion factor (version 1)
+    <BR>                   [1], left hand side number (almost always 1)
+    <BR>                   [2], left hand side units
+    <BR>                   [3], right hand side number
+    <BR>                   [4], right hand side units)
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   vs = version 2 array
+    <BR>
+    <BR> columnindex: column to be extracted
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> conversion_extract_column_array($v2,0) extracts the complete output conversion factor (version 1)
+    <BR>
+    
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionArea2">conversionArea2</a></h3>
+    &nbsp;function conversionArea2(type [,FullWords,Rounding,Sign,tick])
+    <BR> returns an array of strings with the conversion factors
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "A" - American (rounding is ignored)
+    <BR>           "M" - Metric   (rounding is ignored)
+    <BR>           "AM - American to Metric
+    <BR>           "MA - Metric to American
+    <BR>
+    <BR> FullWords: 0 = use Abbreviations
+    <BR>            1 = use Full name (feet squared) size <- ELIMINATED replaced with square feet
+    <BR>            2 = use Full name (square feet) Area
+    <BR>            3 = add extra conversion factors to version 1 setting of 0
+    <BR>            4 = add extra conversion factors to version 1 setting of 2
+    <BR> Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+    <BR>     Sign: use an = or html approximately equal symbol
+    <BR>     tick: y = add a tick mark around items with exponents
+    <BR>           n = don't add
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use conversionArea2("A") returns an array of strings that have Abbreviations for the units that can be used for display
+    
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionCapacity2"></a>conversionCapacity2</h3>
+    &nbsp;function conversionCapacity2(type [,FullWords,Rounding,Sign,tick])
+    <BR> returns an array of strings with the conversion factors
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "A" - American (rounding is ignored)
+    <BR>           "M" - Metric   (rounding is ignored)
+    <BR>           "AM - American to Metric
+    <BR>           "MA - Metric to American
+    <BR>
+    <BR> FullWords: 0 = use Abbreviations
+    <BR>            1 = use Full name
+    <BR>
+    <BR> Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+    <BR>     Sign: = gives you =
+    <BR>           ~ gives you ~~
+    <BR>          "" gives you html approximately equal symbol
+    <BR>     tick: y = add a tick mark around items with exponents
+    <BR>           n = don't add
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use conversionCapacity2("A") returns an array of strings that have Abbreviations for the units that can be used for display
+    
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionLength2">conversionLength2</a></h3>
+    &nbsp;function conversionLength2(type [,FullWords,Rounding,Sign,tick])
+    <BR> returns an array of strings with the conversion factors
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "A" - American (rounding is ignored)
+    <BR>           "M" - Metric   (rounding is ignored)
+    <BR>           "AM - American to Metric
+    <BR>           "MA - Metric to American
+    <BR>
+    <BR> FullWords: 0 = use Abbreviations
+    <BR>            1 = use Full name
+    <BR>
+    <BR> Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+    <BR>     Sign: = gives you =
+    <BR>           ~ gives you ~~
+    <BR>          "" gives you html approximately equal symbol
+    <BR>     tick: y = add a tick mark around items with exponents
+    <BR>           n = don't add
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use conversionLength2("A") returns an array of strings that have Abbreviations for the units that can be used for display
+    
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionLiquid2">conversionLiquid2</a></h3>
+    &nbsp;function conversionLiquid2(type [,FullWords,Rounding,Sign,tick])
+    <BR> returns an array of strings with the conversion factors
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:
+    <BR>   system: "C" - Casks  (rounding is ignored)
+    <BR>
+    <BR> FullWords: 0 = use Abbreviations
+    <BR>            1 = use Full name
+    <BR>
+    <BR> The following are currently not used (2022-05-31)
+    <BR>
+    <BR> Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+    <BR>     Sign: = gives you =
+    <BR>           ~ gives you ~~
+    <BR>          "" gives you html approximately equal symbol
+    <BR>     tick: y = add a tick mark around items with exponents
+    <BR>           n = don't add<BR>
+    <BR> Examples
+    <BR>
+    <BR> use conversionLiquid2("C") returns an array of strings that have Abbreviations for the units that can be used for display
+    
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionTime2">conversionTime2</a></h3>
+<BR> conversionTime2() count of argument = 0 - use Abbreviations
+<BR> conversionTime2("y") count of argument != 0 - use full name
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionVolume2">conversionVolume2</a></h3>
+    &nbsp;function conversionVolume(type [,FullWords,Rounding,Sign,tick])
+    <BR> returns an array of strings with the conversion factors
+    <BR>
+    <BR> INPUTS:
+    <BR>   system: "A" - American (rounding is ignored)
+    <BR>           "M" - Metric   (rounding is ignored)
+    <BR>           "AM - American to Metric
+    <BR>           "MA - Metric to American
+    <BR>
+    <BR> FullWords: 0 = use Abbreviations
+    <BR>            1 = use Full name
+    <BR>
+    <BR> Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+    <BR>     Sign: = gives you =
+    <BR>           ~ gives you ~~
+    <BR>           "" gives you html approximately equal symbol
+    <BR>     tick: y = add a tick mark around items with exponents
+    <BR>           n = don't add
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use conversionVolume2("A") returns an array of strings that have Abbreviations for the units that can be used for display
+    <BR>&nbsp;
+    <BR>
+    <BR>&nbsp;INPUTS:
+        
+<!-- -----------------------------------------------------  -->
+
+<BR><h3><a name="conversionWeight2">conversionWeight2</a></h3>
+    &nbsp;function conversionWeight2(type [,FullWords,Rounding,Sign,tick])
+    <BR> returns an array of strings with the conversion factors
+    <BR>&nbsp;
+        <BR>
+        <BR>&nbsp;INPUTS:  
+    <BR>   system: "A" - American (rounding is ignored)
+    <BR>           "M" - Metric   (rounding is ignored)
+    <BR>           "AM - American to Metric
+    <BR>           "MA - Metric to American
+    <BR>
+    <BR>      NOTE: This ignores the fact that the metric system uses mass and the Americam system uses a force for weight.
+    <BR>
+    <BR> FullWords: 0 = use Abbreviations
+    <BR>            1 = use Full name
+    <BR>
+    <BR> Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+    <BR>     Sign: = gives you =
+    <BR>           ~ gives you ~~
+    <BR>           "" gives you html approximately equal symbol
+    <BR>     tick: y = add a tick mark around items with exponents
+    <BR>           n = don't add
+    <BR>
+    <BR> Examples
+    <BR>
+    <BR> use conversionWeight2("A") returns an array of strings that have Abbreviations for the units that can be used for display
+         
