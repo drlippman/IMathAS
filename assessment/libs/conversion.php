@@ -20,7 +20,7 @@
 
 function conversionVer() {
 	// File version
-	return 26.5;
+	return 26.7;
 }
 
 global $allowedmacros;
@@ -321,6 +321,7 @@ function get_unit_capacity_abbreviations() {
 function get_unit_liquids() {
     $unit = array();
 
+    $unit["US Barrel"] = _("US Barrel");
     $unit["British Barrel"] = _("British Barrel");
     $unit["Hogshead"] = _("Hogshead");
     $unit["Barrique"] = _("Barrique");
@@ -409,6 +410,8 @@ function get_unit_weight_abbreviations() {
 
     $unitabbr["Ounces"] = _("oz");
     $unitabbr["ounces"] = _("oz");
+    $unitabbr["Ounce"] = _("oz");
+    $unitabbr["ounce"] = _("oz");
 
     $unitabbr["Pounds"] = _("lbs");
     $unitabbr["pounds"] = _("lbs");
@@ -1035,19 +1038,18 @@ function conversionAbbreviations() {
 }
 
 // Version 2 functions:
-// Inputs - identical silimar to version 1 with the exception that all functions have the same order
+// Inputs - identical similar to version 1 with the exception that all functions have the same order
 //
-// Outputs and array of arrays of strings with array format
+
+// function conversion_extract_column_array($v2,$columnindex)
+// Returns returns an array of strings from the selected column
+//        the array is in the form of
 //
-// $retval[] = array([0] version 1 output conversion factor
+// $retval[] = array([0] the complete output conversion factor (version 1)
 //                   [1], left hand side number (almost always 1)
 //                   [2], left hand side units
 //                   [3], right hand side number
 //                   [4], right hand side units)
-
-// function conversion_extract_column_array($v2,$columnindex)
-// returns an array of strings from the selected column
-//
 // INPUTS:
 //   vs = version 2 array
 //
@@ -1055,7 +1057,7 @@ function conversionAbbreviations() {
 //
 // Examples
 //
-// conversion_extract_column_array($v2,0) extracts the version 1 conversion strings
+// conversion_extract_column_array($v2,0) extracts the complete output conversion factor (version 1)
 //
 function conversion_extract_column_array($v2,$columnindex) {
     $retval = array();
@@ -1075,8 +1077,8 @@ function conversion_extract_column_array($v2,$columnindex) {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name (feet squared) size <- ELIMINATED replaced with square feet
@@ -1294,8 +1296,8 @@ function conversionArea2() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
@@ -1379,8 +1381,8 @@ function conversionCapacity2() {
             $retval[5] = array("",1,$unitabbr["gallon"],4,$unitabbr["quarts"]);
         } else {
             $retval[0] = array("",1,$unit["Cup"],8,$unit["Fluid ounces"]);
-            $retval[1] = array("",1,$unit["Tablespoons"],3,$unit["Teaspoons"]);
-            $retval[2] = array("",1,$unit["Cup"],16,$unit["Tablespoons"]);
+            $retval[1] = array("",1,$unit["cup"],3,$unit["teaspoons"]);
+            $retval[2] = array("",1,$unit["tablespoon"],16,$unit["tablespoons"]);
             $retval[3] = array("",1,$unit["Pint"],2,$unit["Cups"]);
             $retval[4] = array("",1,$unit["Quart"],2,$unit["Pints"]);
             $retval[5] = array("",1,$unit["Gallon"],4,$unit["Quarts"]);
@@ -1565,7 +1567,7 @@ function conversionDisplay2HTMLwithBorder($CellValueArray,$cellPadding=7) {
 	return $HTML;
 }
 
-// function conversionFormulaAbbreviations(type)
+// function conversionFormulaAbbreviations(system)
 // Returns the Abbreviations to words
 //
 // INPUTS:
@@ -1779,8 +1781,8 @@ function conversionFormulaTemperature() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
@@ -1794,7 +1796,7 @@ function conversionFormulaTemperature() {
 //
 // Examples
 //
-// use conversionLength("A") returns an array of strings that have Abbreviations for the units that can be used for display
+// use conversionLength2("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionLength2() {
 
     $args = func_get_args();
@@ -2120,9 +2122,8 @@ function conversionPrefix() {
 	return $retval;
 }
 
-// conversionTime() no
-// conversionTime() use Abbreviations
-// conversionTime("y") use full name
+// conversionTime2() count of argument = 0 - use Abbreviations
+// conversionTime2("y") count of argument != 0 - use full name
 function conversionTime2() {
 
     // Get array values
@@ -2295,14 +2296,14 @@ function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$u
     }
 }
 
-// function conversionVolume(type [,FullWords,Rounding,Sign,tick])
+// function conversionVolume2(type [,FullWords,Rounding,Sign,tick])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
@@ -2316,7 +2317,7 @@ function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$u
 //
 // Examples
 //
-// use conversionVolume("A") returns an array of strings that have Abbreviations for the units that can be used for display
+// use conversionVolume2("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionVolume2() {
 
     $args = func_get_args();
@@ -2481,14 +2482,14 @@ function conversionVolume2() {
 	return $retval;
 }
 
-// function conversionWeight(type [,FullWords,Rounding,Sign,tick])
+// function conversionWeight2(type [,FullWords,Rounding,Sign,tick])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 //      NOTE: This ignores the fact that the metric system uses mass and the Americam system uses a force for weight.
 //
@@ -2504,7 +2505,7 @@ function conversionVolume2() {
 //
 // Examples
 //
-// use conversionWeight("A") returns an array of strings that have Abbreviations for the units that can be used for display
+// use conversionWeight2("A") returns an array of strings that have Abbreviations for the units that can be used for display
 function conversionWeight2() {
 
 	$args = func_get_args();
@@ -2662,8 +2663,8 @@ function conversionTime() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name (feet squared) size <- ELIMINATED replaced with square feet
@@ -2741,8 +2742,8 @@ function conversionArea() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
@@ -2805,8 +2806,8 @@ function conversionCapacity() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
@@ -2926,8 +2927,8 @@ function conversionLiquid() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
@@ -3005,8 +3006,8 @@ function conversionVolume() {
 // INPUTS:
 //   system: "A" - American (rounding is ignored)
 //           "M" - Metric   (rounding is ignored)
-//           "AM - Americian to Metric
-//           "MA - Metric to Americian
+//           "AM - American to Metric
+//           "MA - Metric to American
 //
 //      NOTE: This ignores the fact that the metric system uses mass and the Americam system uses a force for weight.
 //
@@ -3068,7 +3069,11 @@ function conversionWeight() {
 
 //  WAMAP Question ID: 201697
 
-// 2022-xx-xx ver 27 - TODO: add a make fraction converion function
+// 2024-xx-xx ver 27 - TODO: add a make fraction converion function
+//
+// 2024-04-12 ver26.7- Fixed typos in comments
+//
+// 2024-04-03 ver26.6- US Barrel
 //
 // 2023-06-06 ver26.5- tablespoon, teaspoon
 //
