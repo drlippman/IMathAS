@@ -44,9 +44,9 @@ if (isset($_POST['mergefrom'])) {
 	$qcnt = 0;
 
 	for ($i=0;$i<count($seta);$i++) {
-		$stm = $DBH->prepare("SELECT itemorder,intro,name FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT itemorder,intro,name,defpoints FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$seta[$i]));
-		list($itemorder, $curintro, $thisname) = $stm->fetch(PDO::FETCH_NUM);
+		list($itemorder, $curintro, $thisname, $thisdefpoints) = $stm->fetch(PDO::FETCH_NUM);
 
 		$thisintroraw = $curintro;
         $thistexts = [];
@@ -77,6 +77,9 @@ if (isset($_POST['mergefrom'])) {
 					$stm = $DBH->prepare("SELECT questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,fixedseeds,showwork,extracredit FROM imas_questions WHERE id=:id");
 					$stm->execute(array(':id'=>$aitem));
 					$row = $stm->fetch(PDO::FETCH_ASSOC);
+                    if ($row['points'] == 9999 && $thisdefpoints !== $defpoints) {
+                        $row['points'] = $thisdefpoints;
+                    }
 					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,
                         regen,showans,showhints,rubric,fixedseeds,showwork,extracredit) ";
 					$query .= "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -99,6 +102,9 @@ if (isset($_POST['mergefrom'])) {
                         $stm = $DBH->prepare("SELECT questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,fixedseeds,showwork,extracredit FROM imas_questions WHERE id=:id");
 						$stm->execute(array(':id'=>$subi));
 						$row = $stm->fetch(PDO::FETCH_ASSOC);
+                        if ($row['points'] == 9999 && $thisdefpoints !== $defpoints) {
+                            $row['points'] = $thisdefpoints;
+                        }
                         $query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,
                             regen,showans,showhints,rubric,fixedseeds,showwork,extracredit) ";
 					    $query .= "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
