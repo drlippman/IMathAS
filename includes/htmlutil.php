@@ -41,6 +41,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 				echo '<optgroup label="'.$optionGroupLabel.'">';
 				$ingrp = true;
 			} else {
+                if ($ingrp && $oc[1]==0) { echo '</optgroup>';}
 				echo '<option value="'.Sanitize::encodeStringForDisplay($oc[0]).'">'.Sanitize::encodeStringForDisplay($labelList[$oc[0]]).'</option>';
 			}
 		}

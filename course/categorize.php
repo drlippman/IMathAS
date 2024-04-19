@@ -121,17 +121,17 @@ END;
 	}
 
 	$outcomes = array();
-	function flattenarr($ar) {
-		global $outcomes;
-		foreach ($ar as $v) {
-			if (is_array($v)) { //outcome group
-				$outcomes[] = array($v['name'], 1);
-				flattenarr($v['outcomes']);
-			} else {
-				$outcomes[] = array($v, 0);
-			}
-		}
-	}
+	function flattenarr($ar, $deftype = 0) {
+        global $outcomes;
+        foreach ($ar as $v) {
+            if (is_array($v)) { //outcome group
+                $outcomes[] = array($v['name'], 1);
+                flattenarr($v['outcomes'], 2);
+            } else {
+                $outcomes[] = array($v, $deftype);
+            }
+        }
+    }
 	flattenarr($outcomearr);
 	$query = "SELECT imas_questions.id,imas_libraries.id,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
 	$query .= "WHERE imas_questions.assessmentid=:assessmentid AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
@@ -228,6 +228,7 @@ END;
 				echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 				$ingrp = true;
 			} else {
+                if ($ingrp && $oc[1]==0) { echo '</optgroup>';}
 				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '" ';
 				if ($category[$qid] == $oc[0]) { echo "selected=1"; $issel = true;}
 				echo '>' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';
