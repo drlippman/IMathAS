@@ -124,6 +124,9 @@
         <span v-if="showViewAsStu">|</span>
         <a :href="viewAsStuUrl + '#/print'">
           {{ $t('gradebook.print') }}
+        </a> |
+        <a :href="activityLogUrl" target="_blank">
+          {{ $t('gradebook.activitylog') }}
         </a>
       </div>
 
@@ -595,6 +598,9 @@ export default {
     },
     viewAsStuUrl () {
       return 'index.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
+    },
+    activityLogUrl () {
+      return '../course/viewactionlog.php?cid=' + store.cid + '&uid=' + store.uid;
     },
     showQuestion () {
       const out = {};
