@@ -190,7 +190,10 @@ export default {
       if (!this.qdata.answeights || this.qdata.singlescore) { // if answeights not generated yet
         return [1];
       } else {
-        const answeights = this.qdata.answeights.map(x => parseFloat(x));
+        const answeights = [];
+        for (const x in this.qdata.answeights) {
+          answeights[x] = parseFloat(this.qdata.answeights[x]);
+        }
         const answeightTot = answeights.reduce((a, c) => a + c);
         return answeights.map(x => x / answeightTot);
       }

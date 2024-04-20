@@ -370,6 +370,7 @@ class QuestionHtmlGenerator
                             return evalbasic($v);
                         }
                     }, $answeights);
+                    ksort($answeights);
                 } else {
                     if (count($anstypes)>1) {
                         $answeights = array_fill_keys(array_keys($anstypes), 1);

@@ -629,6 +629,7 @@ class ScoreEngine
                     return evalbasic($v);
                 }
             }, $answeights);
+            ksort($answeights);
             if (array_sum($answeights)==0) {
                 $answeights = array_fill_keys(array_keys($anstypes), 1); 
             }

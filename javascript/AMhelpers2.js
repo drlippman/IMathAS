@@ -114,6 +114,7 @@ function init(paramarr, enableMQ, baseel) {
     params = paramarr[qn];
     if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix|chemeqn)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
+      if (!el) { continue; }
       str = params.qtype;
       if (params.calcformat) {
         str += ','+params.calcformat;
