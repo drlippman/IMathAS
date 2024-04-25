@@ -287,11 +287,11 @@ class QuestionHtmlGenerator
             if (isset($displayformat)) {
                 if (is_array($displayformat)) {
                     foreach ($displayformat as $kidx => $iidx) {
-                        if ($iidx == 'select') {
+                        if ($iidx == 'select' || preg_match('/\dcolumn/', $iidx)) {
                             unset($displayformat[$kidx]);
                         }
                     }
-                } else if ($displayformat == 'select') {
+                } else if ($displayformat == 'select' || preg_match('/\dcolumn/', $displayformat)) {
                     unset($displayformat);
                 }
             }
