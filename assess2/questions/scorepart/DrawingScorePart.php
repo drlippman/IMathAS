@@ -196,8 +196,12 @@ class DrawingScorePart implements ScorePart
             $matchstu = array();
             for ($i=0; $i<count($ansdots); $i++) {
                 for ($j=0;$j<count($line);$j++) {
+                    if (in_array($j, $matchstu)) { continue; }
                     if (($ansdots[$i][0]-$line[$j][0])*($ansdots[$i][0]-$line[$j][0]) + ($ansdots[$i][1]-$line[$j][1])*($ansdots[$i][1]-$line[$j][1]) <=25*max(1,$reltolerance)) {
                         $matchstu[$i] = $j;
+                        if (isset($matchstu[$i-1]) && abs($matchstu[$i] - $matchstu[$i-1])==1) {
+                            break; // match has adjancy; don't look for another match
+                        }
                     }
                 }
             }
