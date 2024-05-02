@@ -17,18 +17,28 @@
                 .setChemToolButtons(["manipulate", "erase", "bond", "atomAndFormula", "ring", "charge"])
                 .setStyleToolComponentNames([]);
         });
-        function getAns() {
+        function getAns(docopy) {
             var mol = composer.exportObjs(Kekule.Molecule)[0];
             var smi = Kekule.IO.saveFormatData(mol, 'smi');
             var cml = Kekule.IO.saveFormatData(mol, 'cml');
-            document.getElementById("out").value = "$answer = '" + smi + '~~~' + cml + "'";
+            var text = "$answer = '" + smi + '~~~' + cml + "'";
+            document.getElementById("out").value = text;
+            if (docopy) {
+                navigator.clipboard.writeText(text).then(() => {
+                    document.getElementById("notice").innerText = "Copied";
+                },() => {
+                    document.getElementById("notice").innerText = "Unable to copy";
+                });
+            }
         }
     </script>
 </head>
 <body>
     <p>Draw a molecule here. The Molecule question type currently only supports a single molecule.</p>
     <div id="chemdraw"></div>
-    <p><button type=button onclick="getAns()">Get $answer</button></p>
+    <p><button type=button onclick="getAns(false)">Get $answer</button>
+        <button type=button onclick="getAns(true)">Copy $answer to clipboard</button>
+        <span id="notice" style="color:red"></span></p>
     <textarea style="width:100%" rows=10 id="out"></textarea>
 </body>
 </html>
