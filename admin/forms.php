@@ -413,7 +413,16 @@ switch($_GET['action']) {
 			echo '<span id="newgroup" style="display:none"><br/>New group name: ';
 			echo ' <input name=newgroupname size=20 onblur="checkgroupisnew()"/></span>';
 			echo "</span><br class=form />\n";
-		}
+		} else if ($myrights == 75 && $oldgroup == $groupid) {
+			$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=?");
+			$stm->execute(array($oldgroup));
+			$groupname = $stm->fetchColumn(0);
+			echo "<span class=form>Group: </span>";
+			echo "<span class=formright>";
+			echo '<b>'.Sanitize::encodeStringForDisplay($groupname).'</b> ';
+			echo '<label><input name=removefromgroup type=checkbox value=1> '._('Remove from group') .'</label>';
+			echo "</span><br class=form />\n";
+		} 
 		if ($myrights >= 75 || ($myspecialrights&32)==32) {
 			echo '<span class=form>'._('Add a course').'</span>';
 			echo '<span class=formright><label><input type=checkbox name=addnewcourse value=1> ';

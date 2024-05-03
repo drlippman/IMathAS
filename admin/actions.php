@@ -181,12 +181,22 @@ switch($_POST['action']) {
             if ($chgJsondata) {
                 $query .= ',jsondata=:jsondata';
             }
+			if (!empty($_POST['removefromgroup'])) {
+				$query .= ',groupid=0'; // move to default group
+				$newgroup = 0;
+			}
 			if (isset($_POST['doresetpw'])) {
 				$query .= ',password=:password';
 			}
 			$query .= " WHERE id=:id AND groupid=:groupid AND rights<100";
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
+
+			if (!empty($_POST['removefromgroup'])) {
+				// fix library group
+				$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=0 WHERE ownerid=:ownerid");
+				$stm->execute(array(':ownerid'=>$_GET['id']));
+			}
 		}
 
 		//if student being promoted, enroll in teacher enroll courses
