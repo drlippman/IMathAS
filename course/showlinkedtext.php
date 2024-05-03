@@ -92,6 +92,9 @@
 	if ($shownav) {
 		echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
+		if ($isteacher) {
+			echo '<div class=cp><a href="addlinkedtext.php?cid='.$cid.'&id='.$linkedtextid.'">'._('Edit Page').'</a></div>';
+		}
 		echo '<div id="headershowlinkedtext" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($titlesimp).'</h1></div>';
 	}
 	echo '<div class="linkedtextholder" style="padding-left:10px; padding-right: 10px;'.$pad.'">';
