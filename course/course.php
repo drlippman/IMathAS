@@ -511,11 +511,12 @@ if ($overwriteBody==1) {
 		echo '<a href="showcalendar.php?cid=' . $cid . '">' . _('Calendar') . '</a><br/>';
 		echo '<a href="coursemap.php?cid=' . $cid . '">' . _('Course Map') . '</a><br/>';
 		echo '<a href="#" class="togglecontrol" aria-controls="navtoolmore">' . _('More...') . '</a>';
-	  echo '<span id="navtoolmore" style="display:none">';
+	  	echo '<span id="navtoolmore" style="display:none">';
 		echo '<br/>&nbsp;<a href="coursereports.php?cid=' . $cid . '">' . _('Reports') . '</a><br/>';
 		echo '&nbsp;<a href="managestugrps.php?cid=' . $cid . '">' . _('Groups') . '</a><br/>';
 		echo '&nbsp;<a href="addoutcomes.php?cid=' . $cid . '">' . _('Outcomes') . '</a><br/>';
-		echo '&nbsp;<a href="addrubric.php?cid=' . $cid . '">' . _('Rubrics') . '</a>';
+		echo '&nbsp;<a href="addrubric.php?cid=' . $cid . '">' . _('Rubrics') . '</a><br/>';
+		echo '&nbsp;<a href="mergeassess2.php?cid=' . $cid . '">' . _('Merge Assessments') . '</a><br/>';
 		echo '</span>';
 		echo '</p>';
 	}

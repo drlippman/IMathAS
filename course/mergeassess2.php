@@ -15,6 +15,12 @@ if (isset($_POST['mergefrom'])) {
 			$seta[$n - 1] = $aid;
 		}
 	}
+	for ($i=0;$i<count($seta);$i++) {
+		if (!isset($seta[$i])) {
+			echo "Invalid numbering. Make sure numbers are sequential starting at 1 with no duplicates.";
+			exit;
+		}
+	}
 	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,date_by_lti,LPcutoff,';
 	$fieldstocopy .= 'timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,';
 	$fieldstocopy .= 'defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,';
@@ -197,8 +203,9 @@ if (isset($_POST['mergefrom'])) {
 	echo '<div class="pagetitle"><h1>Merge Assessments</h1></div>';
 
 	echo '<form method="post" action="mergeassess2.php?cid='.$cid.'">';
-	echo '<p><b>Number the assessments you want to merge into a new assessment</b>.  Note that assessment settings and summary will be taken from the first assessment.</p>';
-	echo '<ul>';
+	echo '<p><b>'._('Number the assessments you want to merge into a new assessment, in the order you want them added (1,2,etc.)').'</b>. ';  
+	echo _('Note that assessment settings and summary will be taken from the first assessment.').'</p>';
+	echo '<ul class=nomark>';
 	foreach ($itemsimporder as $item) {
 		if (!isset($itemsassoc[$item])) { continue; }
 		$id = $itemsassoc[$item];
@@ -207,7 +214,7 @@ if (isset($_POST['mergefrom'])) {
 	echo '</ul>';
 	echo '<input type="hidden" name="mergetype" value="0"/>';
 
-	echo '<input type="submit" value="Go">';
+	echo '<button type="submit">'._('Go').'</button>';
 	echo '</form>';
 	require_once "../footer.php";
 }
