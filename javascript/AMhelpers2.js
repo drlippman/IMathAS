@@ -2012,9 +2012,13 @@ function singlevalsyntaxcheck(str,format) {
 		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)([eE]\-?\d+)?$/)) {
 			return (_(" not a valid integer or decimal number")+". ");
 		}
-	} else if (!onlyAscii.test(str)) {
+	} else if (format.indexOf('integer')!=-1) {
+    if (!str.match(/^\s*\-?\d+(\.0*)?\s*$/)) {
+      return (_(" not an integer number")+". ");
+    }
+  } else if (!onlyAscii.test(str)) {
 		return _("Your answer contains an unrecognized symbol")+". ";
-  	} 
+  } 
 	return '';
 }
 

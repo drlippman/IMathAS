@@ -489,6 +489,12 @@ function checkanswerformat($tocheck,$ansformats) {
 			return false;
 		}
 	}
+	if (in_array("integer", $ansformats)) {
+		$totest = str_replace(' ','',$tocheck);
+		if (!is_numeric($totest) || preg_match('/\..*[1-9]/',$totest)) {
+			return false;
+		}
+	}
 	if (in_array("scinotordec",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
 		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
@@ -590,6 +596,9 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 	} else if (in_array('decimal',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as an integer or decimal value (like 5 or 3.72)'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of integer or decimal values'), $listtype):_('Enter an integer or decimal value');
+	} else if (in_array('integer',$ansformats)) {
+		$tip .= sprintf(_('Enter %s as an integer value (like 5 or -2)'), $eword);
+		$shorttip = $islist?sprintf(_('Enter a %s of integer values'), $listtype):_('Enter an integer value');
 	} else if (in_array('scinotordec',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as a decimal or in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of numbers using decimals or scientific notation'), $listtype):_('Enter a number using decimals or scientific notation');
