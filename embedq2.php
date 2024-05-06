@@ -190,7 +190,7 @@ if (isset($QS['showscored'])) {
         $state['showans'] = 0;
     }
 }
-if (isset($QS['includeans']) && !empty($state['showans']) && $issigned) {
+if (isset($QS['includeans']) && $issigned) {
     $state['includeans'] = 1;
 }
 if (isset($QS['allowregen'])) {
