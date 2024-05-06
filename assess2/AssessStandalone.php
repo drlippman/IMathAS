@@ -269,13 +269,18 @@ class AssessStandalone {
       $jsparams['disabled'] = $disabled;
     }
 
-    return array(
+    $outarr = array(
         'html' => $qout, 
         'jsparams' => $jsparams, 
-        'errors'=>$question->getErrors(),
-        'soln'=>$question->getSolutionContentDetailed(),
-        'solnopts'=> $this->qdata[$qsid]['solutionopts']
+        'errors'=>$question->getErrors()
     );
+
+    if (!empty($options['includeans'])) {
+        $outarr['soln'] = $question->getSolutionContentDetailed();
+        $outarr['solnopts'] = $this->qdata[$qsid]['solutionopts'];
+    }
+
+    return $outarr;
   }
 
   /*
