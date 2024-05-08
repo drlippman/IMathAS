@@ -1202,7 +1202,13 @@ function generateTable() {
                             html += "ea";
                         }
                         html += (curitems[0][9] > 0 ? ECmark : '');
-                        html += "</td><td></td>";
+                        html +=
+                            '</td><td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                        html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+                        html += '<li><a href="#" onclick="return togglegroupEC(' + i + ');">' +
+                            _("Toggle Extra Credit") +
+                            "</a></li>";
+                        html += '</ul></div></td>';
                         html += "</tr><tr class=" + curclass + ">";
                     }
                     html += "<td>&nbsp;Q" + (curqnum + 1) + "-" + (j + 1);
@@ -1326,7 +1332,7 @@ function generateTable() {
                             '<li><a href="#" onclick="return togglegroupEC(' + i + ');">' +
                             _("Toggle Extra Credit") +
                             "</a></li>";
-                        html += '</ul></div></tr>';
+                        html += '</ul></div></td></tr>';
 
                         if (itemarray[i][3] == 0) {
                             //collapsed group
@@ -1916,6 +1922,8 @@ function submitChanges() {
         outdata["pts"] = JSON.stringify(data[2]);
         outdata["extracredit"] = JSON.stringify(data[3]);
         outdata["defpts"] = $("#defpts").val();
+    } else {
+        outdata["extracredit"] = JSON.stringify(data[3]);
     }
     $.ajax({
         type: "POST",

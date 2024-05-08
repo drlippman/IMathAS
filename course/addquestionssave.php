@@ -278,7 +278,18 @@
 				$ptschanged = true;
 			}
 		}
-	}
+	} else if (isset($_POST['extracredit'])) {
+        $newextracredit = json_decode($_POST['extracredit'], true);
+		$upd_pts = $DBH->prepare("UPDATE imas_questions SET extracredit=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,extracredit FROM imas_questions WHERE assessmentid=?");
+		$stm->execute(array($aid));
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['extracredit'] != $newextracredit['qn'.$row['id']]) {
+				$upd_pts->execute(array($newextracredit['qn'.$row['id']], $row['id']));
+				$ptschanged = true;
+			}
+		}
+    }
 
 	$qarr = array(':itemorder'=>$_REQUEST['order'], ':viddata'=>$viddata, ':intro'=>$new_intro, ':id'=>$aid, ':courseid'=>$cid);
 	$query = "UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata,intro=:intro";
