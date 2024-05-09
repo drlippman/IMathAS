@@ -144,6 +144,7 @@ if ($myrights<20) {
 					$tlist = $_GET['transfer'];
 				}
 			}
+            /*
             if ($isadmin) {
 			    $stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND lastaccess>? ORDER BY LastName,FirstName");
                 $stm->execute([time()-30*24*60*60]);
@@ -158,7 +159,7 @@ if ($myrights<20) {
 				$page_transferUserList['label'][$i] = $row[2] . ", " . $row[1];
 				$i++;
 			}
-
+            */
 		}
 	} else if (isset($_POST['chglib'])) {
 		if (isset($_POST['qtochg'])) {
@@ -575,6 +576,7 @@ if ($myrights<20) {
 		$pagetitle = "Transfer Ownership";
 		$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 		$curBreadcrumb .= " &gt; Transfer QSet";
+        /*
 		$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
 		$i=0;
 		$page_transferUserList = array();
@@ -583,7 +585,7 @@ if ($myrights<20) {
 			$page_transferUserList['label'][$i] = $row[2] . ", " . $row[1];
 			$i++;
 		}
-
+        */
 
 	} else { //DEFAULT DATA MANIPULATION
 		$curBreadcrumb .= " &gt; Manage Question Set";
@@ -1072,9 +1074,11 @@ function getnextprev(formn,loc) {
 ?>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
-			Transfer question ownership to:
 
-			<?php writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
+			<?php //writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
+            <?php require_once '../includes/userlookupform.php'; 
+                generateUserLookupForm(_('Transfer question ownership to:'), 'newowner');
+            ?>
 
 			<p>
 				<input type=submit value="Transfer">
@@ -1244,10 +1248,11 @@ function getnextprev(formn,loc) {
 
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=transfer value="<?php echo Sanitize::onlyInt($_GET['transfer']); ?>">
-			Transfer question ownership to:
-
-			<?php writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
-
+			
+			<?php //writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
+            <?php require_once '../includes/userlookupform.php'; 
+                generateUserLookupForm(_('Transfer question ownership to:'), 'newowner');
+            ?>
 			<p>
 				<input type=submit value="Transfer">
 				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">

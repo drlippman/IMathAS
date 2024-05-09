@@ -286,13 +286,14 @@ if ($myrights<20) {
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
 				$tlist = implode(",", array_map('intval', $_POST['nchecked']));
-				$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+				/*$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
 				$i=0;
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$page_newOwnerList['val'][$i] = $row[0];
 					$page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
 					$i++;
 				}
+                */
 			}
 		}
 	} else if (isset($_POST['setparent'])) {
@@ -363,7 +364,8 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Transfer Library";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+			/*
+            $stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
 			$i=0;
 			$page_newOwnerList = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -371,6 +373,7 @@ if ($myrights<20) {
 				$page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
 				$i++;
 			}
+            */
 
 		}
 
@@ -614,8 +617,11 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
-		Transfer library ownership to:
-		<?php writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
+		
+		<?php //writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
+        <?php require_once '../includes/userlookupform.php'; 
+            generateUserLookupForm(_('Transfer library ownership to:'), 'newowner');
+        ?>
 
 		<p>
 			<input type=submit value="Transfer">
