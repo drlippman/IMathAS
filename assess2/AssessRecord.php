@@ -1422,6 +1422,7 @@ class AssessRecord
 
     // set tries
     $parts = array();
+    $subsby = [];
     $score = -1;
     $raw = -1;
     $try = 0;
@@ -1475,6 +1476,15 @@ class AssessRecord
           // if any parts are unattempted, mark question as such
           $status = 'unattempted';
         }
+        /* not ready yet
+        if ($parttry > 0 && !empty($this->data['submissionby'])) {
+            $thissub = $this->data['submissions'][$curq['tries'][$pn][$parttry-1]['sub']];
+            $thissubby = $this->data['submissionby'][$thissub];
+            if (!in_array($thissubby, $subsby)) {
+                $subsby[] = $thissubby;
+            }
+        }
+        */
         if ($parttry > 0 && $curq['tries'][$pn][$parttry-1]['sub'] > $lastsub) {
             $lastsub = $curq['tries'][$pn][$parttry-1]['sub'];
         }
@@ -1552,6 +1562,11 @@ class AssessRecord
       if ($this->teacherInGb && $lastsub > -1) {
           $out['lastchange'] = tzdate("n/j/y, g:i a", 
             $this->data['submissions'][$lastsub] + $this->assessRecord['starttime']);
+          /* not ready yet
+          if (!empty($subsby)) {
+            $out['subsby'] = $subsby;
+          }
+          */
       }
     } else {
       $out['html'] = null;
@@ -2090,6 +2105,10 @@ class AssessRecord
 
     $this->parsedata();
     $this->data['submissions'][] = $seconds;
+    if ($this->assessRecord['agroupid'] > 0) {
+        // record who made submission
+        $this->data['submissionby'][$seconds] = $this->curUid;
+    }
     return count($this->data['submissions']) - 1;
   }
 
