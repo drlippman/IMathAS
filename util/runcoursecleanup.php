@@ -186,6 +186,11 @@ if (!$skip) {
 		unenrollstu($cidtoclean, $stus, true, false, true, 2);
         $stm = $DBH->prepare("DELETE FROM imas_tutors WHERE courseid=?");
 	    $stm->execute(array($cidtoclean));
+        // delete any lingering assessment records (likely belonging to teacher)
+        $stm = $DBH->prepare("DELETE ias FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ia.courseid=?");
+	    $stm->execute(array($cidtoclean));
+        $stm = $DBH->prepare("DELETE iar FROM imas_assessment_records AS iar JOIN imas_assessments AS ia ON iar.assessmentid=ia.id WHERE ia.courseid=?");
+	    $stm->execute(array($cidtoclean));
 		$DBH->commit();
 	}
 } else {
