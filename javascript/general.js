@@ -1567,14 +1567,12 @@ function initSageCell(base) {
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
-            code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'')
-                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+            code = jQuery(ta).html();
 		} else {
 			ta = $this.find("textarea");
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
-                    code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+                    code = $this.find("pre").html();
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {
@@ -1584,12 +1582,13 @@ function initSageCell(base) {
 					return false;
 				}
 			} else {
-				code = jQuery(ta[0]).val().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+				code = jQuery(ta[0]).val();
 				ta = ta[0];
 			}
 			inp = $this.find("input[id^=qn]");
 		}
+        code = code.replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&amp;/g,'&');
 		if (m = code.match(/^\s+/)) {
 			var chop = m[0].length;
 			var re = new RegExp('\\n\\s{'+chop+'}',"g");
