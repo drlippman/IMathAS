@@ -125,13 +125,13 @@ class AssessUtils
   public static function isIPinRange($userip, $range) {
     $ips = array_map('trim', explode(',', $range));
     $userip = explode('.', $userip);
-		$isoneIPok = false;
+	$isoneIPok = false;
     foreach ($ips as $ip) {
       $ip = explode('.', $ip);
       $thisIPok = true;
       for ($i=0;$i<4;$i++) {
         $pts = explode('-', $ip[$i]);
-        if (count($pts) == 2 && $userip[$i] >= $pts[0] && $userip[$i] <= $pts[0]) {
+        if (count($pts) == 2 && $userip[$i] >= $pts[0] && $userip[$i] <= $pts[1]) {
           continue;
         } else if ($ip[$i] == '*') {
           continue;
@@ -143,9 +143,9 @@ class AssessUtils
         }
       }
       if ($thisIPok) {
-				$isoneIPok = true;
-				break;
-			}
+            $isoneIPok = true;
+            break;
+        }
     }
     return $isoneIPok;
   }
