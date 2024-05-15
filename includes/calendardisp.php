@@ -1,4 +1,6 @@
 <?php
+
+// Function to show calendar, used by showcalendar and courseshowitems
 $cid = Sanitize::courseId($_GET['cid']);
 
 

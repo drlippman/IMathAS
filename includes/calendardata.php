@@ -2,7 +2,8 @@
 
 require_once __DIR__.'/exceptionfuncs.php';
 
-//light calendar data collection function
+// light calendar data collection function
+// used in canvascalexport and calendarfeed
 
 function getCalendarEventData($cid, $userid, $stuview = false) {
 	global $DBH;
