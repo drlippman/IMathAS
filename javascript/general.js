@@ -1200,9 +1200,25 @@ function initlinkmarkup(base) {
     setupToggler(base);
 	setupToggler2(base);
     setupPopuplinks(base);
+    //setupToggleResize(base);
 	$(base).fitVids();
     resizeResponsiveIframes(base, true);
 }
+
+/* seems to be crashing browser for some reason
+function setupToggleResize(base) {
+    $(base).find("details").on("toggle", function() {
+        $(this).find("iframe").each(function(i,el) {
+            console.log(el);
+            sendResizeToIframe(el);
+        })
+        
+    })
+}
+function sendResizeToIframe(el) {
+    el.contentWindow.postMessage('requestResize','*');
+}
+*/
 
 function setIframeSpinner(base) {
     jQuery(base).find('iframe').each(function(i,el) {
