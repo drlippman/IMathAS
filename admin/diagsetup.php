@@ -76,7 +76,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$sel1list = implode(',', array_map('encodeSelector',$sel1));
 	$iplist = implode(',',$ips);
 	$pwlist = implode(',',$pws) . ';'. implode(',',$spws);
-	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'];
+	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'] + 8*$_POST['reentrysame'];
 
 	if ($_POST['termtype']=='mo') {
 		$_POST['term'] = '*mo*';
@@ -420,7 +420,11 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<input type=radio name="reentry" value="0" <?php writeHtmlChecked(4,($public&4),1); ?> /> No
 
 	<input type=radio name="reentry" value="1" <?php writeHtmlChecked(4,($public&4),0); ?> /> Yes, within
-	  <input type="text" name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($reentrytime); ?>" size="4" /> minutes (0 for no limit)
+	  <input type="text" name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($reentrytime); ?>" size="4" /> minutes (0 for no limit),
+      to <select name="reentrysame">
+        <option value=0 <?php writeHtmlSelected(0,($public&8)); ?>>any first-level selector</option>
+        <option value=1 <?php writeHtmlSelected(8,($public&8)); ?>>only same first-level selector</option>
+        </select>
 
 	</p>
 

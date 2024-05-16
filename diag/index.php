@@ -29,7 +29,7 @@
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
 		<ul class=\"nomark\">";
-		$stm = $DBH->query("SELECT id,name FROM imas_diags WHERE public=3 OR public=7");
+		$stm = $DBH->query("SELECT id,name FROM imas_diags WHERE public&3=3");
 		if ($stm->rowCount()==0) {
 			echo "<li>", _('No diagnostics are available through this page at this time'), "</li>";
 		}
@@ -230,13 +230,13 @@ if (isset($_POST['SID'])) {
 	$stm2->execute(array(':assessmentid'=>$paid));
 	$aVer = $stm2->fetchColumn(0);
 
-	$query = "SELECT iu.id,istu.id FROM imas_users AS iu ";
+	$query = "SELECT iu.id,istu.id,iu.email FROM imas_users AS iu ";
 	$query .= "LEFT JOIN imas_students AS istu ON iu.id=istu.userid ";
 	$query .= "AND istu.courseid=? WHERE iu.SID=?";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($pcid, $diagSID));
 	if ($stm->rowCount()>0) {
-		list($userid, $stuid) = $stm->fetch(PDO::FETCH_NUM);
+		list($userid, $stuid, $stuemail) = $stm->fetch(PDO::FETCH_NUM);
 		if ($stuid == null) { // was unenrolled from course. reenroll
 			if (!isset($_POST['timelimitmult'])) {
 				$_POST['timelimitmult'] = 1;
@@ -245,6 +245,15 @@ if (isset($_POST['SID'])) {
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 		}
 		$allowreentry = ($line['public']&4);
+        if ($allowreentry && !in_array(strtolower($_POST['passwd'] ?? ''),$superpw) && $line['public']&8) {
+            // only allow reentry into original diagnostic
+            $emailpts = explode('@', $stuemail);
+            if ($emailpts[0] != $sel1[$_POST['course']]) {
+                echo sprintf(_('You can only continue on the original diagnostic, %s'), Sanitize::encodeStringForDisplay($emailpts[0]));
+                echo " <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Back'), "</a>\n";
+                exit;
+            }
+        }
 		if (!in_array(strtolower($_POST['passwd'] ?? ''),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$d = null;
 			$stm2 = $DBH->prepare("SELECT id,starttime FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
