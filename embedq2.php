@@ -191,7 +191,7 @@ if (isset($QS['showscored'])) {
     }
 }
 if (isset($QS['includeans']) && $issigned) {
-    $state['includeans'] = 1;
+    $overrides['includeans'] = 1;
 }
 if (isset($QS['allowregen'])) {
     $state['allowregen'] = $QS['allowregen'];

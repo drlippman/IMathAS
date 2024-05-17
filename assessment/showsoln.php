@@ -69,8 +69,10 @@ $disp = $a2->displayQuestion($qn, [
     'showallparts' => true,
     'showans' => false,
     'hideans' => true,
-    'showhints' => 0
+    'showhints' => 0,
+    'includeans' => true
 ]);
+
 if ($showq) {
     echo printfilter(filter($disp['html']), false);
 }
