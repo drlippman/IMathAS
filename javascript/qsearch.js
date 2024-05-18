@@ -31,7 +31,7 @@ $(function() {
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore|isrand)(:|=)("[^"]+?"|\w+)/g)) {
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
             pts = matches[i].split(/(:|=)/);
@@ -54,10 +54,18 @@ function parseAdvSearch() {
                 var avgt = pts[2].split(/,/);
                 $("#search-lastmod-min").val(avgt[0]);
                 $("#search-lastmod-max").val(avgt[1]);
+            } else if (pts[0] == 'created') {
+                var avgt = pts[2].split(/,/);
+                $("#search-created-min").val(avgt[0]);
+                $("#search-created-max").val(avgt[1]);
             } else if (pts[0] == 'mine') {
                 $("#search-mine").prop('checked', pts[2] == 1)
             } else if (pts[0] == 'unused') {
                 $("#search-unused").prop('checked', pts[2] == 1)
+            } else if (pts[0] == 'private') {
+                $("#search-nopriv").prop('checked', pts[2] == 0);
+            } else if (pts[0] == 'public') {
+                $("#search-nopub").prop('checked', pts[2] == 0);
             } else if (pts[0] == 'isrand') {
                 $("#search-nounrand").prop('checked', pts[2] == 1)
             } else if (pts[0] == 'res') {
@@ -67,10 +75,14 @@ function parseAdvSearch() {
                 }
             } else if (pts[0] == 'order') {
                 $("#search-newest").prop('checked', pts[2] == 'newest');
+            } else if (pts[0] == 'isbroken') {
+                $("#search-broken").prop('checked', pts[2] == 1);
+            } else if (pts[0] == 'wronglib') {
+                $("#search-wronglib").prop('checked', pts[2] == 1);
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore|isrand)(:|=)("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -124,6 +136,13 @@ function doAdvSearch() {
     if (lastmodmin != '' || lastmodmax != '') {
         outstr += 'lastmod:"' + lastmodmin + ',' + lastmodmax + '" ';
     }
+    if (document.getElementById("search-created-min")) {
+        var createdmin = $("#search-created-min").val();
+        var createdmax = $("#search-created-max").val();
+        if (createdmin != '' || createdmax != '') {
+            outstr += 'created:"' + createdmin + ',' + createdmax + '" ';
+        }
+    }
     if ($("#search-mine").is(':checked')) {
         outstr += 'mine:1 ';
     }
@@ -135,6 +154,18 @@ function doAdvSearch() {
     }
     if ($("#search-nounrand").is(':checked')) {
         outstr += 'isrand:1 ';
+    }
+    if ($("#search-nopriv").is(':checked')) {
+        outstr += 'private:0 ';
+    }
+    if ($("#search-nopub").is(':checked')) {
+        outstr += 'public:0 ';
+    }
+    if ($("#search-broken").is(':checked')) {
+        outstr += 'isbroken:1 ';
+    }
+    if ($("#search-wronglib").is(':checked')) {
+        outstr += 'wronglib:1 ';
     }
     var helps = [];
     $("input[id^=search-res-]:checked").each(function(i,el) {
@@ -232,7 +263,9 @@ function displayQuestionList(results) {
         + '<th>'+_('ID')+'</th>'
         + '<th>'+_('Type')+'</th>'
         + '<th>'+_('Times Used')+'</th>'
-        + '<th>'+_('Avg Time')+'</th>'
+        + (curaid > 0 ? '<th>'+_('Avg Time')+'</th>' :
+            '<th>'+_('Last Mod')+'</th>')
+        + (curcid == 'admin' ? '<th>'+_('Owner')+'</th>' : '')
         + '</tr></thead>';
     var tbody = '<tbody>';
     var i,q,row,features,descrclass,descricon;
@@ -313,6 +346,8 @@ function displayQuestionList(results) {
             descricon = wronglibicon;
         } else if (existingq.indexOf(parseInt(q['id'])) !== -1) {
             descrclass = ' class="qinassess"';
+        } else if (q['userights'] == 0) {
+            descrclass = ' class="qisprivate"';
         }
         // build action dropdown
 
@@ -323,22 +358,33 @@ function displayQuestionList(results) {
             "&cid=" + curcid +
             '&from=addq2';
         var editqaddr = 'moddataset.php?id=' + q['id'] +
-            "&aid=" + curaid +
+            (curaid > 0 ? ("&aid=" + curaid) : "") +
             "&cid=" + curcid +
-            '&from=addq2&frompot=1';
+            (curaid > 0 ? ('&from=addq2&frompot=1') : "");
 
         var actions2 = '<button role="button" class="dropdown-toggle arrow-down secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
-            '<span class="sr-only">More</span></button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
-            '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>' +
-            '<li><a href="' + editqaddr + '&viewonly=1">' + _('View Code') + '</a></li>';
-        if (q['mine']==1) {
+            '<span class="sr-only">More</span></button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+        if (curaid > 0) { 
+            actions2 += '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>';
+        }
+        actions2 += '<li><a href="' + editqaddr + '&viewonly=1">' + _('View Code') + '</a></li>';
+        if (q['canedit']==1) {
             actions2 += '<li><a href="' + editqaddr + '">' + _('Edit Code') + '</a></li>';
         } 
-        actions2 += '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>';
+        actions2 += '<li><a href="' + editqaddr + '&template=true">' + _('Template (Copy)') + '</a></li>';
         if (results.type=='libs') {
             actions2 += '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
                 ((q['junkflag'] == 1) ? _('Un-mark as in wrong library') : _('Mark as in wrong library')) +
                 '</a></li>';
+        }
+        if (q['canedit']==1) {
+            actions2 += '<li class=divider></li>';
+            actions2 += '<li><a href="manageqset.php?cid=' + curcid + 
+                '&transfer=' + q['id'] + '">' + 
+                _('Transfer') + '</a></li>';
+            actions2 += '<li><a href="manageqset.php?cid=' + curcid + 
+                '&remove=' + q['id'] + '">' + 
+                _('Delete') + '</a></li>';
         }
         actions2 += '</ul>';
 
@@ -353,13 +399,21 @@ function displayQuestionList(results) {
             + '<td class="nowrap">' + features + '</td>'
             + '<td>' + q['id'] + '</td>'
             + '<td>' + q['qtype'] + '</td>'
-            + '<td class="c">' + q['times'] + '</td>'
-            + '<td class="c">' + (q['meantimen'] > 3 ? 
+            + '<td class="c">' + q['times'] + '</td>';
+
+        if (curaid > 0) {
+            tbody += '<td class="c">' + (q['meantimen'] > 3 ? 
                 ('<span onmouseenter="tipshow(this,\''+_('Avg score on first try: ')+q['meanscore']+'%'
                 + '<br/>'+_('Avg time on first try: ') + q['meantime'] + _(' min') + 
                 '<br/>N='+q['meantimen']+'\')" onmouseleave="tipout()">' + q['meantime'] + '</span>') :
-                '') + '</td>'
-            + '</tr>';
+                '') + '</td>';
+        } else {
+            tbody += '<td>' + q['lastmod'] + '</td>';
+        }
+        if (curcid == 'admin') {
+            tbody += '<td>' + q['ownershort'] + '</td>';
+        }
+        tbody += '</tr>';
     }
     tbody += '</tbody>';
     document.getElementById("myTable").innerHTML = thead + tbody;

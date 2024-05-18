@@ -7,7 +7,7 @@ if (!isset($teacherid)) {
     exit;
 }
 
-$aid = intval($_GET['aid']);
+$aid = intval($_GET['aid'] ?? 0);
 if (!empty($_GET['curassess'])) {
     $cur = explode(',', $_GET['curassess']);
 } else {
