@@ -103,7 +103,7 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 		foreach ($callback as $com) {
 			$out .= '  ansparts.push(ggb'.$ggbid.'.'.$com.');';
 		}
-		$out .= '   document.getElementById("qn"+'.$qn.').value = ansparts.join(",");';
+		$out .= '   $("#qn"+'.$qn.').val(ansparts.join(",")).trigger("input").trigger("change");';
 		$out .= '};</script>';
 	}
 	$GLOBALS['geogebracount']++;

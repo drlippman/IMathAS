@@ -66,6 +66,8 @@ to question output or something.
  */
 var initstack = [];
 var loadedscripts = [];
+var scriptqueue = [];
+var processingscriptsqueue = false;
 var callbackstack = {};
 
 var imathasAssess = (function($) {
@@ -242,35 +244,46 @@ function init(paramarr, enableMQ, baseel) {
   initClearScoreMarkers();
   
   if (paramarr.scripts) {
-    function handleScript(arr, cnt) {
-      if (arr[cnt][0] == 'code') {
-        try {
-          window.eval(arr[cnt][1]);
-        } catch (e) { console.log("Error executing question script:" + arr[cnt][1]);}
-        if (arr.length > cnt+1) {
-          handleScript(arr, cnt+1);
+    for (var i in paramarr.scripts) {
+        if (paramarr.scripts[i][0] == 'code') {
+            scriptqueue.push(paramarr.scripts[i]);
+        } else if (loadedscripts.indexOf(paramarr.scripts[i][1]) == -1) {
+            scriptqueue.push(paramarr.scripts[i]);
+            loadedscripts.push(paramarr.scripts[i][1]);
         }
-      } else if (loadedscripts.indexOf(arr[cnt][1]) == -1) {
-        jQuery.getScript(arr[cnt][1]).always(function() {
-          loadedscripts.push(arr[cnt][1]);
-          if (arr.length > cnt+1) {
-            handleScript(arr, cnt+1);
-          }
-        });
-      } else {
-        if (arr.length > cnt+1) {
-          handleScript(arr, cnt+1);
-        }
-      }
-      if (arr.length <= cnt+1) {
-        for (var i=0; i<initstack.length; i++) {
-              var foo = initstack[i]();
-        }
-        initstack.length = 0;
-      }
     }
-    handleScript(paramarr.scripts, 0);
+    if (scriptqueue.length > 0 && processingscriptsqueue === false) {
+        processScriptQueue();
+    }
   }
+}
+
+function processScriptQueue() {
+    processingscriptsqueue = true;
+    if (scriptqueue.length == 0) { return; }
+    var nextscript = scriptqueue.shift();
+
+    if (nextscript[0] == 'code') {
+      try {
+        window.eval(nextscript[1]);
+      } catch (e) { console.log("Error executing question script:" + nextscript[1]);}
+      processScriptQueueNext()
+    } else {
+      jQuery.getScript(nextscript[1]).always(function() { // force sync
+        processScriptQueueNext()
+      });
+    }
+}
+function processScriptQueueNext() {
+    for (var i=0; i<initstack.length; i++) {
+        var foo = initstack[i]();
+    }
+    initstack.length = 0;
+    if (scriptqueue.length == 0) {
+        processingscriptsqueue = false;
+    } else {
+        processScriptQueue();
+    }
 }
 
 // setup tip focus/blur handlers

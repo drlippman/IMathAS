@@ -178,6 +178,7 @@ export const actions = {
       });
   },
   loadQuestion (qn, regen, jumptoans, skipdirtycheck) {
+    this.prepForSave('all');
     if (store.inTransit) {
       window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans), 20);
       return;
@@ -203,6 +204,7 @@ export const actions = {
     if (store.assessInfo.preview_all) {
       data.append('preview_all', true);
     }
+
     if (Object.keys(store.autosaveQueue).length > 0) {
       actions.clearAutosaveTimer();
       this.addAutosaveData(data);
@@ -242,6 +244,15 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  prepForSave (qns) { // qns is array of ids, or 'all' to callback on all
+    for (let k in window.callbackstack) {
+      k = parseInt(k);
+      if (qns === 'all' || qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
+        window.callbackstack[k](k);
+      }
+    }
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
   },
   submitAssessment () {
     let warnMsg = 'header.confirm_assess_submit';
@@ -370,13 +381,8 @@ export const actions = {
     if (typeof qns !== 'object') {
       qns = [qns];
     }
-    for (let k in window.callbackstack) {
-      k = parseInt(k);
-      if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
-        window.callbackstack[k](k);
-      }
-    }
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+
+    this.prepForSave(qns);
 
     // figure out non-blank questions to submit
     const lastLoaded = [];
@@ -713,7 +719,8 @@ export const actions = {
     store.inTransit = true;
     store.autoSaving = true;
 
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    this.prepForSave(Object.keys(store.autosaveQueue));
+
     const data = new FormData();
     this.addAutosaveData(data);
 
@@ -774,7 +781,7 @@ export const actions = {
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
       store.errorMsg = 'timesup_submitting';
-      if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+      this.prepForSave('all');
       setTimeout(() => {
         const tosub = Object.keys(this.getChangedQuestions());
         this.submitQuestion(tosub, true);
