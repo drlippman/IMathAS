@@ -162,6 +162,20 @@ class QuestionHtmlGenerator
                 $doShowAnswer = true;
             }
         }
+        $stulastentry = null;
+        if (isset($stuanswers[$thisq])) {
+            $stulastentry = $stuanswers[$thisq];
+        }
+        if (isset($autosaves[$thisq])) {
+            if (is_array($autosaves[$thisq])) {
+              foreach ($autosaves[$thisq] as $iidx=>$kidx) {
+                $stulastentry[$iidx] = $kidx;
+              }
+            } else {
+                $stulastentry = $autosaves[$thisq];
+            }
+        }
+
         if ($quesData['qtype'] == "multipart") {
             // if multipart only has one part, need to re-array scoreiscorrect
             if (isset($scoreiscorrect[$thisq]) && !is_array($scoreiscorrect[$thisq])) {
