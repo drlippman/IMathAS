@@ -64,7 +64,7 @@ $delay = 24*60*60*(isset($CFG['cleanup']['delay'])?$CFG['cleanup']['delay']:120)
 $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
 $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:1;
 $clearpw = 24*60*60*(isset($CFG['cleanup']['clearoldpw'])?$CFG['cleanup']['clearoldpw']:365);
-$delaudit = 24*60*60*($CFG['cleanup']['deloldaudit'] ?? 730);
+$delaudit = 24*60*60*($CFG['cleanup']['deloldaudit'] ?? 0);
 
 //run notifications 10 in a batch
 
