@@ -89,10 +89,10 @@ if ($canViewAll) {
 
 // check password, if needed
 if (!$in_practice && !$canViewAll &&
-  (!isset($_SESSION['assess2-'.$aid]) || 
+  ($assess_info->getSetting('noprint') === 1 || (!isset($_SESSION['assess2-'.$aid]) || 
     (!is_array($_SESSION['assess2-'.$aid]) && $_SESSION['assess2-'.$aid] != $in_practice) || // backward compat needed for a while
     (is_array($_SESSION['assess2-'.$aid]) && ($_SESSION['assess2-'.$aid][0] != $in_practice || !$assess_info->checkPassword($_SESSION['assess2-'.$aid][1])))
-  ) &&
+  )) &&
   !$assess_info->checkPassword($_POST['password'])
 ) {
   echo '{"error": "invalid_password"}';
