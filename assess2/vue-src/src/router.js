@@ -212,6 +212,8 @@ router.beforeEach((to, from, next) => {
       store.queryString += '&uid=' + store.uid;
     }
     actions.loadAssessData(() => next());
+  } else if (store.inPrintView && to.name !== '/print') {
+    next({ path: '/print', replace: true });
   } else {
     next();
   }
