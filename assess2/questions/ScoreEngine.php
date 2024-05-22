@@ -244,7 +244,7 @@ class ScoreEngine
                 continue;
             }
 
-            if ('answerformat' == $optionKey && is_scalar($answerformat)) {
+            if ('answerformat' == $optionKey) {
                 $answerformat = str_replace(' ', '', $answerformat);
             }
 
