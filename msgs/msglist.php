@@ -128,7 +128,32 @@ If deleted on both ends, delete from DB
 		echo json_encode($opts, JSON_INVALID_UTF8_IGNORE);
 		exit;
 	}
+    if (isset($_POST['searchstu'])) {
+        $words = preg_split('/\s+/', str_replace(',',' ',trim($_POST['searchstu'])));
+        $query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
+        $query .= "imas_students as istu on iu.id=istu.userid AND istu.courseid=? ";
+        // todo: add section limit?
+        if (count($words)==1) {
+            $query .= "AND (iu.LastName LIKE ? OR iu.FirstName Like ?)";
+            $stm = $DBH->prepare($query);
+            $stm->execute([$cid, $words[0].'%', $words[0].'%']);
+        } else {
+            $query .= " AND ((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
+            $stm = $DBH->prepare($query);
+            $stm->execute([$cid, $words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%']);
+        }
+        $opts = [];
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $opts[] = sprintf('<option value="%d"><span class="pii-first-name">%s, %s</span></option>',
+                $row[0], Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
+        }
+        echo json_encode($opts, JSON_INVALID_UTF8_IGNORE);
+		exit;
+    }
 	if (isset($_GET['add'])) {
+        if (isset($_POST['to']) && $_POST['to'] == 'search') {
+            $_POST['to'] = $_POST['to2']; // use result from search selector
+        }
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
             $msgToPost = Sanitize::onlyInt($_POST['to']);
             $cidP = Sanitize::courseId($_POST['courseid']);
@@ -243,6 +268,10 @@ If deleted on both ends, delete from DB
 					if (document.getElementById("to").value=="0") {
 						alert("No recipient selected");
 						return false;
+					} else if (document.getElementById("to").value=="search" && 
+                        (document.getElementById("to2").value=="0" || document.getElementById("to2").value=="")) {
+						alert("No recipient selected");
+						return false;
 					} else {
 						return true;
 					}
@@ -256,7 +285,7 @@ If deleted on both ends, delete from DB
 							url: "msglist.php?cid=0&getstulist="+newcid,
 							dataType: "json",
 						}).done(function(optarr) {
-							$("#to").empty().append("<option value=\'0\'>Select a recipient...</option>");
+							$("#to").empty().append("<option value=\'0\'>'._('Select a recipient...').'</option>");
 							for (var i=0;i<optarr.length;i++) {
 								$("#to").append($(optarr[i]));
 							}
@@ -267,7 +296,39 @@ If deleted on both ends, delete from DB
 						$("#to").val(0);
 					}
 				}
-				</script>';
+                function checkTo(el) {
+                    if ($(el).val() == "search") {
+                        $("#stusearchwrap").show();
+                    } else {
+                        $("#stusearchwrap,#stusearchresultwrap").hide();
+                        $("#to2").empty();
+                    }
+                }
+                function searchForStu() {
+                    var stu = $("#stusearch").val();
+                    if (stu !== "") {
+                        $("#stusearchresultwrap").hide();
+                        $("#stusearchwrap").after($("<img>", {src: staticroot+"/img/updating.gif", alt: "Loading recipients..."}));
+                        $.ajax({
+							url: "msglist.php?cid='.$cid.'",
+                            type: "POST",
+                            data: {searchstu: $("#stusearch").val()},
+                            dataType: "json",
+                        }).done(function(optarr) {
+                            $("#to2").empty();
+                            if (optarr.length > 1) {
+                                $("#to2").append("<option value=\'0\'>'._('Select a recipient...').'</option>");
+                            }
+                            for (var i=0;i<optarr.length;i++) {
+                                $("#to2").append($(optarr[i]));
+                            }
+                            $("#stusearchresultwrap").show();
+                            $("#stusearchwrap").siblings("img").remove();
+                        });
+                    }
+                }
+                </script>';
+
 			require_once "../header.php";
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
@@ -432,8 +493,8 @@ If deleted on both ends, delete from DB
 				echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
 			} else {
 				if ($filtercid>0) {
-					echo '<select class="pii-full-name" name="to" id="to" aria-label="'._('Select an individual').'">';
-					echo '<option value="0">Select a recipient...</option>';
+					echo '<select class="pii-full-name" name="to" id="to" aria-label="'._('Select an individual').'" onchange="checkTo(this)">';
+					echo '<option value="0">' . _('Select a recipient...') . '</option>';
 					if ($isteacher || $msgset<2) {
 						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
 						$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
@@ -470,17 +531,32 @@ If deleted on both ends, delete from DB
 
 					}
 					if ($isteacher || $msgset==0 || $msgset==2) {
-						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
-						$query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
-						$query .= "imas_students.courseid=:courseid ORDER BY imas_users.LastName";
-						$stm = $DBH->prepare($query);
-						$stm->execute(array(':courseid'=>$courseid));
-						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-							printf('<option value="%d">%s, %s</option>', $row[0],
-                                Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
-						}
+                        $query = "SELECT count(id) FROM imas_students WHERE courseid=?";
+                        $stm = $DBH->prepare($query);
+						$stm->execute([$courseid]);
+                        $numstu = $stm->fetchColumn(0);
+                        if ($numstu > 200) {
+                            echo '<option value="search">' . _('Search for a student...') . '</option>';
+                        } else {
+                            $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+                            $query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
+                            $query .= "imas_students.courseid=:courseid ORDER BY imas_users.LastName";
+                            $stm = $DBH->prepare($query);
+                            $stm->execute(array(':courseid'=>$courseid));
+                            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                                printf('<option value="%d">%s, %s</option>', $row[0],
+                                    Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
+                            }
+                        }
 					}
 					echo "</select>";
+                    echo '<span style="display:none" id="stusearchwrap"><br/>';
+                    echo '<label for="stusearch">' .  _('Search for:') . '</label>';
+                    echo ' <input size=30 id="stusearch"> ';
+                    echo '<button type="button" onclick="searchForStu()">' . _('Search') . '</button>';
+                    echo '</span>';
+                    echo '<span style="display:none" id="stusearchresultwrap"><br/>';
+                    echo '<select name="to2" id="to2"></select></span>';
 					echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
 				} else {
 					echo '<select name="courseid" onchange="updateTo(this)" aria-label="'._('Select a course').'">';
@@ -488,7 +564,7 @@ If deleted on both ends, delete from DB
 					echo $courseopts;
 					echo '</select><br/>';
 					echo '<select name="to" id="to" style="display:none;" aria-label="'._('Select an individual').'">';
-					echo '<option value="0">Select an individual...</option></select>';
+					echo '<option value="0">'._('Select a recipient...').'</option></select>';
 				}
 
 			}
