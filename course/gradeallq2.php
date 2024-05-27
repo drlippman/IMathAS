@@ -523,7 +523,7 @@
 		echo '</div>';
 	}
 	echo "<form id=\"mainform\" method=post action=\"gradeallq2.php?stu=" . Sanitize::generateQueryStringFromMap($qsmap) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
-	if ($isgroup>0) {
+	if ($isgroup>0 && $page == -1) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
 	}
 
@@ -551,13 +551,15 @@
 			$stulist[] = $row[0].', '.$row[1];
 		}
 
-		echo '<p>Jump to <select id="stusel" onchange="jumptostu()">';
+		echo '<p>'._('Jump to').' <select id="stusel" onchange="jumptostu()" aria-label="Jump to student">';
 		foreach ($stulist as $i=>$st) {
 			echo '<option value="'.$i.'" ';
 			if ($i==$page) {echo 'selected="selected"';}
 			echo '>'.Sanitize::encodeStringForDisplay($st).'</option>';
 		}
-		echo '</select></p>';
+		echo '</select> ';
+        echo sprintf('Grading %d of %d', $page+1, count($stulist));
+        echo '</p>';
 	}
 
 	$qarr = array(':courseid'=>$cid, ':assessmentid'=>$aid);
