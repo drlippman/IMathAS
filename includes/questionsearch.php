@@ -470,7 +470,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             !empty($options['isadmin']) ||
             (!empty($options['isgroupadmin']) && $options['isgroupadmin'] == $row['groupid'])
         ) ? 1 : 0;
-        if ($options['includelastmod']) {
+        if (!empty($options['includelastmod'])) {
             $row['lastmod'] = tzdate("m/d/y", $row['lastmoddate']);
         }
         $res[] = $row;

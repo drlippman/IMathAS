@@ -114,9 +114,10 @@ function init(paramarr, enableMQ, baseel) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
+
     if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix|chemeqn)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
-      if (!el) { continue; }
+      if (!el && !params.matrixsize) { continue; }
       str = params.qtype;
       if (params.calcformat) {
         str += ','+params.calcformat;
@@ -129,11 +130,11 @@ function init(paramarr, enableMQ, baseel) {
         $("input[id^=qn"+qn+"-]").attr("data-mq", str);
       } else {
         el.setAttribute("data-mq", str);
+        if (params.vars) {
+          el.setAttribute("data-mq-vars", params.vars);
+        }
       }
-      if (params.vars) {
-        el.setAttribute("data-mq-vars", params.vars);
-      }
-      //TODO: Need to adjust behavior for calcmatrix with answersize
+
       if (enableMQ) {
         if (params.matrixsize) {
           MQeditor.toggleMQAll("input[id^=qn"+qn+"-]", true, true);
