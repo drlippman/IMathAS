@@ -1923,13 +1923,13 @@ class AssessRecord
         if (is_string($autosave['stuans'][$pn]) && strpos($autosave['stuans'][$pn], '@FILE') !== false) {
           // it's  a file autosave.  As a bit of a hack we'll make an array
           // with both the last submitted answer and the autosave
-          if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
+          if (is_array($stuanswers[$qn+1]) || $numPartsAutosave > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
             $autosaves[$qn+1][$pn] = array($stuanswers[$qn+1][$pn] ?? '', $autosave['stuans'][$pn]);
           } else {
             $autosaves[$qn+1] = array($stuanswers[$qn+1] ?? '', $autosave['stuans'][$pn]);
           }
         } else {
-          if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
+          if (is_array($stuanswers[$qn+1]) || $numPartsAutosave > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
             if (isset($autosaves[$qn+1]) && !is_array($autosaves[$qn+1])) { // isn't array yet for some reason; make it one
                 $autosaves[$qn+1] = array($autosaves[$qn+1]);
             }
@@ -1941,6 +1941,7 @@ class AssessRecord
         $usedAutosave[] = $pn;
       }
     }
+
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
       $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
@@ -3237,6 +3238,7 @@ class AssessRecord
     $GLOBALS['drawinitdata'] = array();
     $GLOBALS['capturechoices'] = true;
     $GLOBALS['capturedrawinit'] = true;
+
     $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver, $showScores ? 'scored' : 'last', true);
     $out['showscores'] = $scoresInGb;
     $this->dispqn = null;
