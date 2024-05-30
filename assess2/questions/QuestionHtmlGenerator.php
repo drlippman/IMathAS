@@ -644,7 +644,8 @@ class QuestionHtmlGenerator
 
         // replace $showanswerloc[n] with [SABn] for later processing after eval
         $toevalqtxt = preg_replace('/\$showanswerloc\[(.*?)\]/','[SAB$1]', $toevalqtxt);
-        
+        // same with single $showanswerloc
+        $toevalqtxt = str_replace('$showanswerloc', '[SAB]', $toevalqtxt);
 
         // incorporate $showanswer.  Really this should be done prior to the last line,
         // and remove the redundant logic from that function, but I don't want to refactor 
