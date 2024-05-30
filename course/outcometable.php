@@ -193,6 +193,7 @@ function outcometable() {
 	$startdate = array();
 	$enddate = array();
 	$LPcutoff = array();
+    $LPenddate = [];
 	$allowlate = array();
 	$timelimits = array();
 	$avail = array();
@@ -241,6 +242,14 @@ function outcometable() {
 			// $sa = scoresingb setting
 			$assessmenttype[$kcnt] = $line['viewingb'];
 			$sa[$kcnt] = $line['scoresingb'];
+            if ($line['scoresingb'] == 'after_lp') {
+                $adjusted_allowlate = ($line['allowlate'] % 10) - 1; // ignore "allow use after"
+                $LPenddate[$kcnt] = strtotime("+".($GLOBALS['latepasshrs']*$adjusted_allowlate)." hours", $line['enddate']);
+                $LPenddate[$kcnt] = min($LPenddate[$kcnt], $GLOBALS['courseenddate']);
+                if ($line['LPcutoff'] > 0) {
+                    $LPenddate[$kcnt] = min($LPenddate[$kcnt], $line['LPcutoff']);
+                }
+            }
 		} else {
 			$deffeedback = explode('-',$line['deffeedback']);
 			$assessmenttype[$kcnt] = $deffeedback[0];
@@ -821,6 +830,7 @@ function outcometable() {
 		if (!$canviewall && (
 			($sa[$i]=="never") ||
 		 	($sa[$i]=='after_due' && $now < $thised) ||
+            ($sa[$i]=='after_lp' && $now < max($thised,$LPenddate[$i])) ||
 			($sa[$i]=='after_take' && !$hasSubmittedTake)
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available

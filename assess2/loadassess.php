@@ -73,7 +73,7 @@ $include_from_assess_info = array(
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
   'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue', 
-  'attemptext', 'showworktype'
+  'attemptext', 'showworktype', 'latepass_enddate'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -224,6 +224,8 @@ if (!$canViewAll) {
         $assessInfoOut['excused'] = 1;
     }
 }
+
+$assessInfoOut['can_viewingb'] = $assess_info->reshowQuestionsInGb() ? 1 : 0;
 
 // set session expiration time
 $assessInfoOut['session_life'] = $CFG['GEN']['sessionmaxlife'] ?? 432000;

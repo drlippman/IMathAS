@@ -342,6 +342,7 @@ function gbtable() {
 	$startdate = array();
 	$enddate = array();
 	$LPcutoff = array();
+    $LPenddate = array();
 	$tutoredit = array();
 	$isgroup = array();
 	$avail = array();
@@ -409,6 +410,15 @@ function gbtable() {
 			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']), 'calctype'=>($line['reqscoretype']&2));
 		}
 		$defFb[$kcnt] = $line['deffeedbacktext'];
+
+        if ($line['viewingb'] == 'after_lp' || $line['scoresingb'] == 'after_lp') {
+            $adjusted_allowlate = ($line['allowlate'] % 10) - 1; // ignore "allow use after"
+            $LPenddate[$kcnt] = strtotime("+".($GLOBALS['latepasshrs']*$adjusted_allowlate)." hours", $line['enddate']);
+            $LPenddate[$kcnt] = min($LPenddate[$kcnt], $GLOBALS['courseenddate']);
+            if ($line['LPcutoff'] > 0) {
+                $LPenddate[$kcnt] = min($LPenddate[$kcnt], $line['LPcutoff']);
+            }
+        }
 
 		$k = 0;
 
@@ -1398,7 +1408,8 @@ function gbtable() {
 		if ($canviewall ||
 			$assessmenttype[$i] == 'immediately' || //viewingb
 			($assessmenttype[$i] == 'after_take' && $hasSubmittedTake && !$hastimeext) ||
-			($assessmenttype[$i] == 'after_due' && $now > $thised)
+			($assessmenttype[$i] == 'after_due' && $now > $thised) ||
+            ($assessmenttype[$i] == 'after_lp' && $now > max($thised,$LPenddate[$i]))
 		) {
 			$gb[$row][1][$col][2] = 1; //show link
 		} else {
@@ -1410,6 +1421,7 @@ function gbtable() {
 		if (!$canviewall && (
 			($sa[$i]=="never") ||
 		 	($sa[$i]=='after_due' && $now < $thised) ||
+            ($sa[$i]=='after_lp' && $now < max($thised,$LPenddate[$i])) ||
 			($sa[$i]=='after_take' && !$hasSubmittedTake && ($l['status']&1) == 1) // does not have a submitted attempt, but does have an unsubmitted attempt
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available

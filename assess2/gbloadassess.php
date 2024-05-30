@@ -165,12 +165,13 @@ if (!$assess_record->hasRecord()) {
 $include_from_assess_info = array(
   'name', 'submitby', 'enddate', 'available', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
-  'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
+  'latepass_extendto', 'latepass_enddate', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
   'scoresingb', 'viewingb', 'latepass_status', 'help_features', 'attemptext'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
-if ($isstudent && $viewInGb == 'after_due' && $now < $assessInfoOut['enddate']) {
+if ($isstudent && (($viewInGb == 'after_due' && $now < $assessInfoOut['enddate']) ||
+    ($viewInGb == 'after_lp' && $now < $assessInfoOut['latepass_enddate'])))  {
   echo '{"error": "not_ready"}';
   exit;
 }
@@ -190,6 +191,8 @@ if ($isstudent) {
     if ($ansingb === 'never' || $ansingb === 'after_take') {
       $LPblockingView = false;
     } else if ($ansingb === 'after_due' && $now < $assessInfoOut['enddate']) {
+      $LPblockingView = false;
+    } else if ($ansingb === 'after_lp' && $now < $assessInfoOut['latepass_enddate']) {
       $LPblockingView = false;
     }
   }

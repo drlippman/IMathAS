@@ -1546,6 +1546,10 @@ class AssessRecord
           && time() > $this->assess_info->getSetting('enddate')
           && !$this->assess_info->getSetting('can_use_latepass')
         ) ||
+        ($ansInGb == 'after_lp'
+          && !$this->is_practice
+          && time() > $this->assess_info->getSetting('latepass_enddate')
+        ) ||
         $this->teacherInGb;
       $out['info'] = $generate_html;
       $out += $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html === 2);
@@ -3017,7 +3021,8 @@ class AssessRecord
 
     if (!$this->teacherInGb && (
       $scoresInGb == 'never' ||
-      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')))
+      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb =='after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')))
     ) {
       // don't show overall score;
       $out['gbscore'] = "N/A";
@@ -3061,7 +3066,8 @@ class AssessRecord
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     if (!$this->teacherInGb && (
       $scoresInGb == 'never' ||
-      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')))
+      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb =='after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')))
     ) {
       $scored_aver = 0;
     }
@@ -3104,7 +3110,8 @@ class AssessRecord
     if ($this->teacherInGb ||
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
-      ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
+      ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate'))
     ) {
       $out['score'] = $aver['score'];
       $showScores = true;
@@ -3223,7 +3230,8 @@ class AssessRecord
     if ($this->teacherInGb ||
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $this->data['assess_versions'][$aver]['status'] == 1) ||
-      ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
+      ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate'))
     ) {
       $showScores = true;
     } else {

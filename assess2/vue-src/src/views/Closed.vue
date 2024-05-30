@@ -242,7 +242,7 @@ export default {
     canViewScored () {
       return (
         !this.canViewAll &&
-        this.settings.viewingb !== 'never' &&
+        this.settings.can_viewingb === 1 &&
         this.settings.prev_attempts.length > 0 &&
         (this.settings.available === 'practice' || this.settings.available === 'pastdue')
       );
