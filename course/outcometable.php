@@ -244,7 +244,11 @@ function outcometable() {
 			$sa[$kcnt] = $line['scoresingb'];
             if ($line['scoresingb'] == 'after_lp') {
                 $adjusted_allowlate = ($line['allowlate'] % 10) - 1; // ignore "allow use after"
-                $LPenddate[$kcnt] = strtotime("+".($GLOBALS['latepasshrs']*$adjusted_allowlate)." hours", $line['enddate']);
+                if ($adjusted_allowlate == 0) { // this is now "unlimited"
+                    $LPenddate[$kcnt] = 2000000000;
+                } else {
+                    $LPenddate[$kcnt] = strtotime("+".($GLOBALS['latepasshrs']*$adjusted_allowlate)." hours", $line['enddate']);
+                }
                 $LPenddate[$kcnt] = min($LPenddate[$kcnt], $GLOBALS['courseenddate']);
                 if ($line['LPcutoff'] > 0) {
                     $LPenddate[$kcnt] = min($LPenddate[$kcnt], $line['LPcutoff']);

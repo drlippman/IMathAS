@@ -856,7 +856,11 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                 if ($line['ver'] > 1) {
                     if ($line['scoresingb'] == 'after_lp') {
                         $adjusted_allowlate = ($line['allowlate'] % 10) - 1; // ignore "allow use after"
-                        $LPenddate = strtotime("+" . ($GLOBALS['latepasshrs'] * $adjusted_allowlate) . " hours", $line['enddate']);
+                        if ($adjusted_allowlate == 0) { // this is now "unlimited"
+                            $LPenddate = 2000000000;
+                        } else {
+                            $LPenddate = strtotime("+" . ($GLOBALS['latepasshrs'] * $adjusted_allowlate) . " hours", $line['enddate']);
+                        }
                         $LPenddate = min($LPenddate, $GLOBALS['courseenddate']);
                         if ($line['LPcutoff'] > 0) {
                             $LPenddate = min($LPenddate, $line['LPcutoff']);
