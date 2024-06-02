@@ -59,11 +59,15 @@ function previewall() {
 function previewallfiles(el) {
     if (el) { el.disabled = true; }
 	$("span.clickable").trigger("click");
-	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").trigger("click");
+	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").each(function(i,el) {
+        togglefileembed(el.id,true);
+    });
 }
 function showallwork(el) {
     if (el) { el.disabled = true; }
-	$(".viewworkwrap > button").trigger("click");
+	$(".viewworkwrap > button").each(function(i,el) {
+        toggleWork(el,true);
+    });
 }
 function allvisfullcred() {
     if (confirm(_('Are you SURE you want to give all students full credit?'))) {
@@ -90,12 +94,12 @@ function updatefilters() {
     }
     $(".bigquestionwrap .headerpane,.scoredetails .person").toggle(!document.getElementById('filter-names').checked);
 }
-function toggleWork(el) {
+function toggleWork(el, state) {
 	var next = $(el).next();
-	if (next.is(':hidden')) {
+	if (next.is(':hidden') && state !== false) {
 		el.innerText = _('Hide Work');
         next.show();
-	} else {
+	} else if (state !== true) {
 		el.innerText = _('Show Work');
 		next.hide();
 	}

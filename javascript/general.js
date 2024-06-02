@@ -907,7 +907,7 @@ function setuppreviewembeds(i,el) {
 			title: _("Preview file"),
 			"aria-label": _("Preview file"),
 			id: 'fileembedbtn'+fileembedcounter,
-			click: togglefileembed,
+			click: function() {togglefileembed(this.id);},
 			keydown: function (e) {if (e.which == 13) { $(this).click();}},
 			tabindex: 0,
 			"class": "videoembedbtn"
@@ -928,23 +928,27 @@ function supportsPdf() {
 	return false;
 }
 
-function togglefileembed() {
-	var id = this.id.substr(12);
+function togglefileembed(id, newstate) {
 	var els = jQuery('#fileiframe'+id);
+    var toggleel = jQuery('#'+id);
 	if (els.length>0) {
 		if (els.css('display')=='none') {
+            if (newstate === false) {return;} // keep closed
 			els.show();
-			jQuery(this).text(' [-]');
-			jQuery(this).attr('title',_("Hide preview"));
-			jQuery(this).attr('aria-label',_("Hide file preview"));
+			toggleel.text(' [-]');
+			toggleel.attr('title',_("Hide preview"));
+			toggleel.attr('aria-label',_("Hide file preview"));
 		} else {
+            if (newstate === true) {return;} // keep open
 			els.hide();
-			jQuery(this).text(' [+]');
-			jQuery(this).attr('title',_("Preview file"));
-			jQuery(this).attr('aria-label',_("Preview file"));
+			toggleel.text(' [+]');
+			toggleel.attr('title',_("Preview file"));
+			toggleel.attr('aria-label',_("Preview file"));
 		}
-	} else {
-		var href = jQuery(this).prev().attr('href');
+	} else if (newstate === false) {
+      return; // want closed; already is  
+    } else {
+		var href = toggleel.prev().attr('href');
 		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)($|\?)/i)) {
 			var src;
 			if (href.match(/\.pdf/) && supportsPdf()) {
@@ -961,12 +965,12 @@ function togglefileembed() {
 				src: src,
 				frameborder: 0,
 				allowfullscreen: 1
-			}).insertAfter(jQuery(this));
+			}).insertAfter(toggleel);
 		} else if (href.match(/\.(heic)($|\?)/i)) {
 			jQuery('<div>', {
 				id: 'fileiframe' + id,
 				text: 'Converting HEIC file (this may take a while)...'
-			}).insertAfter(jQuery(this));
+			}).insertAfter(toggleel);
 			if (!window.heic2any) {
 				jQuery.getScript(staticroot+'/javascript/heic2any.min.js')
 				 .done(function() { convertheic(href, 'fileiframe' + id); });
@@ -978,14 +982,14 @@ function togglefileembed() {
 					id: 'fileiframe'+id,
 					src: href
 				}).css('display','block').on('click', rotateimg)
-		  ).insertAfter(jQuery(this));
+		  ).insertAfter(toggleel);
 		}
-		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]');
-		jQuery(this).attr('title',_("Hide preview"));
-		if (jQuery(this).prev().attr("data-base")) {
-			var inf = jQuery(this).prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		jQuery('<br/>').insertAfter(toggleel);
+		toggleel.text(' [-]');
+		toggleel.attr('title',_("Hide preview"));
+		if (toggleel.prev().attr("data-base")) {
+			var inf = toggleel.prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, toggleel.prev().text());
 		}
 	}
 }
