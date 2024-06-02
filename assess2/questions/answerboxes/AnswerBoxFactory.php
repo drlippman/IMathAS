@@ -21,6 +21,7 @@ require_once __DIR__ . '/NTupleAnswerBox.php';
 require_once __DIR__ . '/NumberAnswerBox.php';
 require_once __DIR__ . '/StringAnswerBox.php';
 require_once __DIR__ . '/ChemEquationAnswerBox.php';
+require_once(__DIR__ . '/MoleculeAnswerBox.php');
 
 use OutOfBoundsException;
 
@@ -51,6 +52,7 @@ use Sanitize;
  * - Essay: "essay"
  * - File Upload: "file"
  * - String: "string"
+ * - Molecule: "molecule"
  */
 class AnswerBoxFactory
 {
@@ -125,6 +127,9 @@ class AnswerBoxFactory
                 break;
             case 'chemeqn':
                 return new ChemEquationAnswerBox($answerBoxParams);
+                break;
+            case 'molecule':
+                return new MoleculeAnswerBox($answerBoxParams);
                 break;
             default:
                 // This will be caught by our custom exception handler to be

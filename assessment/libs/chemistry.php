@@ -10,7 +10,8 @@ array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp",
 "chem_randelementbyfamily","chem_diffrandelementsbyfamily", 
 "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound",
 "chem_getcompoundmolmass","chem_randanion","chem_randcation",
-"chem_makeioniccompound","chem_getsolubility","chem_balancereaction", "chem_eqndisp");
+"chem_makeioniccompound","chem_getsolubility","chem_balancereaction", "chem_eqndisp",
+"chem_showmolecule");
 
 //chem_disp(compound)
 //formats a compound for display in as HTML
@@ -1278,3 +1279,28 @@ $GLOBALS['chem_compounds'] = array(
 		array('Zinc cyanide','Zn (C N)_2')
 	)
 );
+
+function chem_showmolecule($data, $width=300, $height=225, $alt='') {
+    $data = explode('~~~', $data);
+    if ($_SESSION['graphdisp']==0) {
+        if ($alt != '') { 
+            return $alt; 
+        }
+        return _('Molecule in SMILES format:') . $data[0];
+    }
+    $out = '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/kekule.min.js?module=chemWidget,IO"></script>';
+    $out .= '<script type="text/javascript">
+        if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css\']").length) {
+            $(\'<link href="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css" rel="stylesheet">\').appendTo("head");
+        }
+    </script>';
+    $uniqid = uniqid('mol');
+    $out .= '<div id="'.$uniqid.'" width='.Sanitize::onlyInt($width).' height='.Sanitize::onlyInt($height).' ></div>';
+    $out .= '<script>
+        var chemSAViewer'.$uniqid.' = new Kekule.ChemWidget.Viewer(document.getElementById("'.$uniqid.'"), null, Kekule.Render.RendererType.R2D);
+        chemSAViewer'.$uniqid.'.setPredefinedSetting("static")
+        .setPadding(20)
+        .setChemObj(Kekule.IO.loadFormatData("'.Sanitize::encodeStringForJavascript($data[1]).'", "cml"));
+        </script>';
+    return $out;
+}

@@ -1212,6 +1212,7 @@ if ($olnames !== '') {
 	<option value="complex" <?php if ($line['qtype']=="complex") {echo "SELECTED";} ?>>Complex</option>
 	<option value="calccomplex" <?php if ($line['qtype']=="calccomplex") {echo "SELECTED";} ?>>Calculated Complex</option>
 	<option value="chemeqn" <?php if ($line['qtype']=="chemeqn") {echo "SELECTED";} ?>>Chemical Equation</option>
+	<option value="molecule" <?php if ($line['qtype']=="molecule") {echo "SELECTED";} ?>>Chemical Molecule (experimental)</option>
 	<option value="file" <?php if ($line['qtype']=="file") {echo "SELECTED";} ?>>File Upload</option>
 	<option value="multipart" <?php if ($line['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
 	<option value="conditional" <?php if ($line['qtype']=="conditional") {echo "SELECTED";} ?>>Conditional</option>

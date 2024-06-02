@@ -184,7 +184,7 @@ dd {
 		<li><a href="#multiple-choice">Multiple-Choice</a></li>
 		<li><a href="#multiple-answer">Multiple-Answer</a></li>
 		<li><a href="#matching">Matching</a></li>
-		<li><a href="#function">Function</a></li>
+		<li><a href="#function">Function (Algebraic Expression/Equation)</a></li>
 		<li><a href="#string">String</a></li>
 		<li><a href="#essay">Essay</a></li>
 		<li><a href="#draw">Drawing</a></li>
@@ -198,6 +198,7 @@ dd {
 		<li><a href="#interval">Interval</a></li>
 		<li><a href="#calcinterval">Calculated Interval</a></li>
         <li><a href="#chemeqn">Chemical Equation</a></li>
+        <li><a href="#molecule">Chemical Molecule Drawing</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
         <li><a href="#conditional">Conditional</a></li>
@@ -4203,6 +4204,35 @@ or if the question type gives away critical info to the student.</dd>
     
 </div> <!-- h3 -->
 <div class=h3>
+    <h3 id="molecule">Chemical Molecule Drawing</h3>
+    
+    <p>
+    A student is asked to enter a sketch a molecule, using the Kekule drawing tool.
+    If the student has enabled the keyboard-based drawing accessibility option, they will be
+    presented with a textbox for them to write out a description instead.
+    </p>
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = "SMILES~~~CML"</dt>
+        <dd>Defines the answer, which includes the SMILES representation of the molecule, 
+            as well as the CML representation used for displaying the answer key.
+            Use our <a href="assessment/libs/moleculehelper.html">answer generator</a> to
+            draw the answer and generate the $answer string.
+        </dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to a drawing of the correct answer.
+        Use this to substitute a detailed answer.</dd>
+    </dl>
+    
+</div> <!-- h3 -->
+<div class=h3>
 <h3 id="fileupload">File Upload</h3>
 
 <p>
@@ -4265,6 +4295,7 @@ This type of question can contain multiple parts, where each part is one of the 
 	<li>Interval: "interval"</li>
 	<li>Calculated Interval: "calcinterval"</li>
     <li>Chemical Equation: "chemeqn"</li>
+    <li>Chemical Molecule Drawing: "molecule"</li>
 	<li>Essay: "essay"</li>
 	<li>File Upload: "file"</li>
 	<li>String: "string"</li>

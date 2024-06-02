@@ -73,6 +73,7 @@ var callbackstack = {};
 var imathasAssess = (function($) {
 
 var allParams = {};
+var allKekule = {};
 
 function clearparams(paramarr) {
   var qn;
@@ -204,6 +205,9 @@ function init(paramarr, enableMQ, baseel) {
     }
     if (params.qtype === 'multans') {
       initMultAns(qn);
+    }
+    if (params.qtype === 'molecule') { // do after scripts are loaded
+      initMolecule(qn);
     }
     if (params.usetinymce) {
       if (document.getElementById("qn"+qn).disabled &&
@@ -588,6 +592,76 @@ function initMultAns(qn) {
         boxes.last().prop('checked', false);
       }
     });
+  }
+}
+
+function initMolecule(qn) {
+  if (typeof Kekule === 'undefined') {
+    var curqn = qn;
+    setTimeout( function(){ initMolecule(curqn);}.bind(this), 100);
+    return;
+  }
+  // ref: https://partridgejiang.github.io/Kekule.js/documents/tutorial/examples/composer.html
+  allKekule[qn] = new Kekule.Editor.Composer(document.getElementById("chemdraw" + qn));
+  allKekule[qn]
+    .setEnableOperHistory(true)
+    .setEnableLoadNewFile(false)
+    .setEnableCreateNewDoc(false)
+    .setAllowCreateNewChild(false)
+    .setCommonToolButtons(["undo", "redo", "copy", "cut", "paste", "zoomIn", "reset", "zoomOut", ]) 
+    .setChemToolButtons(["manipulate", "erase", "bond", "atomAndFormula", "ring", "charge"])
+    .setStyleToolComponentNames([]);
+  allKekule[qn].getEditor().on('editObjsUpdated', function(e) {
+    processMolecule(qn);
+  });
+  if (allParams[qn].chemla) {
+    allKekule[qn].setChemObj(Kekule.IO.loadFormatData(allParams[qn].chemla, "cml"));
+    window.setTimeout(function () {
+      let editor = allKekule[qn].getEditor();  // suppose this.widget is a composer
+      editor.scrollClientToObject(editor.getChemObj().getChildren());  // centers the current loaded molecules (childen of chemDocument)
+    }, 100);
+
+
+    /*  
+    Notes:
+    
+Hi @sowiso, you can change the default size of chem document by the config object of editor:
+
+composer.getEditorConfigs().getChemSpaceConfigs().setDefScreenSize2D({x: 600, y: 400});
+composer.newDoc();
+Or using the changeChemSpaceScreenSize method to modify the screen size of an opened document:
+
+composer.getEditor().changeChemSpaceScreenSize({x: 600, y: 400});
+
+
+The following code may help to shrink the large structures to fit the client of composer:
+
+var editor = composer.getEditor();
+var objBox = editor.getObjectsContainerBox(editor.getChemSpace().getChildren());
+var visualBox = chemEditor.getVisibleClientScreenBox();
+if (objBox && visualBox)
+{
+  var sx = (visualBox.x2 - visualBox.x1) / (objBox.x2 - objBox.x1);
+  var sy = (visualBox.y2 - visualBox.y1) / (objBox.y2 - objBox.y1);
+  var ratio = Math.min(sx, sy);
+  if (ratio < 1)
+  {
+    chemEditor.setZoom(chemEditor.getCurrZoom() * ratio);
+    chemEditor.scrollClientToObject(chemEditor.getChemSpace().getChildren());
+  }
+}
+
+
+
+    */
+    
+  }
+  var SAel = document.getElementById('chemsa' + qn);
+  if (SAel) { // has show answer el
+    var chemSAViewer = new Kekule.ChemWidget.Viewer(SAel, null, Kekule.Render.RendererType.R2D);
+    chemSAViewer.setEnableToolbar(false)
+      .setPadding(20)
+      .setChemObj(Kekule.IO.loadFormatData(SAel.getAttribute('data-cmldata'), "cml"));
   }
 }
 
@@ -980,6 +1054,9 @@ function processByType(qn) {
     return {};
   } else if (params.hasOwnProperty('matrixsize')) {
     res = processSizedMatrix(qn);
+  } else if (params.qtype == 'molecule') {
+    processMolecule(qn);
+    return {};
   } else {
     var el = document.getElementById('qn'+qn);
     if (!el) {
@@ -1794,6 +1871,17 @@ function processNumfunc(qn, fullstr, format) {
   return {
     err: err
   };
+}
+
+function processMolecule(qn) {
+  var mol = allKekule[qn].exportObjs(Kekule.Molecule)[0];
+  if (typeof mol === 'undefined') {
+    document.getElementById("qn" + qn).value = '';
+  } else {
+    var smi = Kekule.IO.saveFormatData(mol, 'smi');
+    var cml = Kekule.IO.saveFormatData(mol, 'cml');
+    document.getElementById("qn" + qn).value = smi + '~~~' + cml;
+  }
 }
 
 function simplifyVariable(str) {
