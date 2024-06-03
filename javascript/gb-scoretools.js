@@ -285,32 +285,69 @@ function initAnswerboxHighlights() {
 };
 
 var sidebysideenabled = false;
-function sidebysidegrading(el) {
-    if (el) { el.disabled = true; }
-    if (sidebysideenabled) { return; }
-    sidebysideenabled = true;
-	$("body").removeClass("fw1000").removeClass("fw1920");
-	$(".scrollpane").wrap('<div class="sidebyside">');
-	$(".sidebyside").append('<div class="sidepreview">');
-	$(".sidebyside").css('display','flex').css('flex-wrap','nowrap');
-	$(".sidepreview").css('border-left','1px solid #ccc').css('padding','10px');
-	$(".scrollpane,.sidepreview").css('width','50%');
-	// will have to adjust fileembedbtn to open in sidepreview
-	$(".question div.introtext").each(function(i,el) {
-		$(el).find(".keywrap.inwrap").insertAfter($(el));
-		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
-		$(el).after('<div class="subdued">('+(i+1)+')</div>');
-		tgt.append('<div class="subdued">('+(i+1)+') </div>').append(el);
-	});
-	$(".lastfilesub").each(function(i,el) {
-		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
-		$(el).after('<span class="subdued">('+(i+1)+')</span>');
-		tgt.append('<span class="subdued">('+(i+1)+') </span>').append(el);
-	});
-	$(".viewworkwrap").each(function(i,el) {
-		$(el).css('margin','0');
-		$(el).closest(".sidebyside").find('.sidepreview').append(el);
-	});
+function sidebysidegrading(state) {
+    if (typeof state === 'undefined') {
+        sidebysideenabled = !sidebysideenabled;
+    } else {
+        if (state == sidebysideenabled) { return; }
+        sidebysideenabled = state;
+    }
+    if (sidebysideenabled) {
+        if ($("body").hasClass("fw1000")) { $("body").data("origfw", "fw1000");}
+        if ($("body").hasClass("fw1920")) { $("body").data("origfw", "fw1920");}
+        $("body").removeClass("fw1000").removeClass("fw1920");
+    } else {
+        if ($("body").data("origfw")) { $("body").addClass($("body").data("origfw")); }
+    }
+	if (sidebysideenabled && $(".sidebyside").length == 0) {
+        $(".scrollpane").wrap('<div class="sidebyside">');
+        $(".sidebyside").append('<div class="sidepreview">');
+        $(".sidebyside").css('display','flex').css('flex-wrap','nowrap');
+    }
+    if (sidebysideenabled) {
+        $(".sidepreview").css('border-left','1px solid #ccc').css('padding','10px');
+	    $(".scrollpane,.sidepreview").css('width','50%');
+    } else {
+        $(".sidepreview").css('border-left','').css('padding','0px');
+	    $(".scrollpane").css('width','100%');
+        $(".sidepreview").css('width','0%');
+    }
+    if (sidebysideenabled) {
+        $(".question div.introtext").each(function(i,el) {
+            $(el).find(".keywrap.inwrap").insertAfter($(el));
+            var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+            $(el).after('<div class="subdued" id="it_s'+i+'">('+(i+1)+')</div>');
+            tgt.append('<div class="subdued" id="it_d'+i+'">('+(i+1)+') </div>').append(el);
+        });
+        $(".lastfilesub").each(function(i,el) {
+            var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+            $(el).after('<span class="subdued" id="lf_s'+i+'">('+(i+1)+')</span>');
+            tgt.append('<span class="subdued" id="lf_d'+i+'">('+(i+1)+') </span>').append(el);
+        });
+        $(".viewworkwrap").each(function(i,el) {
+            $(el).css('margin','0');
+            $(el).closest(".sidebyside").find('.sidepreview').append(el);
+        });
+    } else {
+        $("div[id^=it_s").each(function(i,el) {
+            let n = el.id.substr(4);
+            let srcnum = $('#it_d'+n);
+            let tomove = srcnum.next();
+            el.replaceWith(tomove[0]);
+            srcnum.remove();
+        });
+        $("span[id^=lf_s").each(function(i,el) {
+            let n = el.id.substr(4);
+            let srcnum = $('#lf_d'+n);
+            let tomove = srcnum.next();
+            el.replaceWith(tomove[0]);
+            srcnum.remove();
+        });
+        $(".viewworkwrap").each(function(i,el) {
+            $(el).css('margin','');
+            $(el).closest(".sidebyside").find('.scrollpane').append(el);
+        });
+    }
 }
 
 var scrollingscoreboxes = false;

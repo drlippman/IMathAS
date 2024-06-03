@@ -88,11 +88,11 @@ class EssayAnswerBox implements AnswerBox
             if ($displayformat == 'pre') {
                 $out .= '<pre>';
                 $out .= $la;
+                $out .= '</pre>';
             } else {
                 $out .= filter($la);
             }
             
-            $out .= '</pre>';
             $out .= "</div>";
         } else {
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
