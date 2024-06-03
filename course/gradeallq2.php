@@ -360,7 +360,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022223"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060224"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060324"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
@@ -409,6 +409,29 @@
 		$(".viewworkwrap img").on("click", rotateimg);
 	})
     var scoretool_page = "aq";
+
+    $(function() {
+        let filtercookie = readCookie("gaqf'.$aid.'");
+        if (filtercookie !== null && filtercookie.length > 0) {
+            $("#filtersdiv").show();
+            filtercookie = filtercookie.split(",");
+            for (let i=0; i<filtercookie.length; i++) {
+                if (filtercookie[i].length > 0) {
+                    $("#"+filtercookie[i]).prop("checked",true).trigger("change");
+                }
+            }
+        }
+        $("#filtersdiv input[type=checkbox]").on("change", updatefiltercookie);
+    });
+    function updatefiltercookie() {
+        let vals = [];
+        $("#filtersdiv input[type=checkbox]").each(function(i,el) {
+            if (el.checked) {
+                vals.push(el.id);
+            }
+        });
+        document.cookie = "gaqf'.$aid.'=" + vals.join(",");
+    }
 	';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
@@ -417,6 +440,7 @@
 	$placeinhead .= '<style type="text/css"> 
         .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
         .hoverbox { background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);}
+        #filtersdiv label { margin-right: 5px; user-select:none;}
 		</style>';
 	require_once "../includes/rubric.php";
 	$_SESSION['coursetheme'] = $coursetheme;
@@ -494,11 +518,18 @@
         echo '<p>';
 		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
     }
+    /*
     echo ' <button type="button" id="showanstoggle" onclick="showallans(this)">'._('Show All Answers').'</button>';
     echo ' <button type="button" onclick="showallwork(this)">'._('Show All Work').'</button>';
     echo ' <button type="button" onclick="previewallfiles(this)">'._('Preview All Files').'</button>';
     echo ' <button type="button" onclick="sidebysidegrading(this)">'._('Side-by-Side').'</button>';
     echo ' <button type="button" onclick="toggleScrollingScoreboxes(this)">'._('Floating Scoreboxes').'</button>';
+    */
+    echo ' <label><input type="checkbox" onchange="toggleshowallans(this.checked)" id="op-showans"/>'._('Show All Answers').'</label>';
+    echo ' <label><input type="checkbox" onchange="toggleshowallwork(this.checked)" id="op-showwork"/>'._('Show All Work').'</label>';
+    echo ' <label><input type="checkbox" onchange="togglepreviewallfiles(this.checked)" id="op-prevwork"/>'._('Preview All Files').'</label>';
+    echo ' <label><input type="checkbox" onchange="sidebysidegrading(this.checked)" id="op-sbs"/>'._('Side-by-Side').'</label>';
+    echo ' <label><input type="checkbox" onchange="toggleScrollingScoreboxState(this.checked)" id="op-floatsb"/>'._('Floating Scoreboxes').'</label>';
 	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
 		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
