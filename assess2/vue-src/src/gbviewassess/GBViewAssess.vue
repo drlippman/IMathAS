@@ -191,7 +191,7 @@
           <button @click = "showFilters = !showFilters">
             {{ $t('gradebook.filters') }}
           </button>
-          <div v-if = "showFilters" class="tabpanel">
+          <div v-if = "showFilters" class="tabpanel" @change="storeFilters">
             <p>{{ $t('gradebook.hide') }}:</p>
             <ul style="list-style-type: none; margin:0; padding-left: 15px;">
               <li>
@@ -243,31 +243,34 @@
                 </label>
               </li>
             </ul>
-            <p>
-              <button
-                type="button"
-                @click = "showAllAns"
-              >
-                {{ $t('gradebook.show_all_ans') }}
-              </button>
-              <button
-                type="button"
-                @click = "showAllWork = !showAllWork"
-              >
-                {{ $t('gradebook.show_all_work') }}
-              </button>
-              <button
-                type="button"
-                @click = "previewFiles"
-              >
-                {{ $t('gradebook.preview_files') }}
-              </button>
-              <button
-                type="button"
-                @click="toggleFloatingScoreboxes"
-              >
-                {{ $t('gradebook.floating_scoreboxes') }}
-              </button>
+            <p id="showopts">
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_showans"
+                  @change = "showAllAns"
+                />{{ $t('gradebook.show_all_ans') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="showAllWork"
+                />{{ $t('gradebook.show_all_work') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_previewFiles"
+                  @change = "previewFiles"
+                />{{ $t('gradebook.preview_files') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_floatingSB"
+                  @change = "toggleFloatingScoreboxes"
+                />{{ $t('gradebook.floating_scoreboxes') }}
+              </label>
             </p>
           </div>
         </div>
@@ -468,7 +471,7 @@ export default {
   data: function () {
     return {
       showOverride: false,
-      assessOverride: '',
+      assessOverride: false,
       hide100: false,
       hidePerfect: false,
       hideNonzero: false,
@@ -480,7 +483,10 @@ export default {
       showEndmsg: false,
       showExcused: false,
       showAllWork: false,
-      hidetexts: true
+      hidetexts: true,
+      op_previewFiles: false,
+      op_floatingSB: false,
+      op_showans: false
     };
   },
   computed: {
@@ -779,14 +785,6 @@ export default {
       url += '&from=gb';
       window.location = url;
     },
-    showAllAns () {
-      window.$('span[id^=ans]').toggleClass('hidden', false).show();
-      window.$('.sabtn').replaceWith('<span>Answer: </span>');
-      window.$('.keybtn').attr('aria-expanded', 'true');
-      window.$('div[id^=dsbox]').toggleClass('hidden', false).attr('aria-hidden', false)
-        .attr('aria-expanded', true);
-      window.$('input[aria-controls^=dsbox]').attr('aria-expanded', true);
-    },
     beforeUnload (evt) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
@@ -802,16 +800,32 @@ export default {
     closeConfirm () {
       store.confirmObj = null;
     },
+    showAllAns () {
+      window.console.log('calling showallans with ' + this.op_showans);
+      window.toggleshowallans(this.op_showans);
+    },
     previewFiles () {
-      window.previewallfiles();
+      window.togglepreviewallfiles(this.op_previewFiles);
     },
     toggleFloatingScoreboxes () {
-      window.toggleScrollingScoreboxes();
+      window.toggleScrollingScoreboxState(this.op_floatingSB);
     },
     loadTexts () {
       if (!store.assessInfo.hasOwnProperty('intro')) {
         actions.loadGbTexts();
       }
+    },
+    storeFilters () {
+      const tocheck = ['hide100', 'hidePerfect', 'hideNonzero', 'hideZero', 'hideUnanswered',
+        'hideFeedback', 'hideNowork', 'showEndmsg', 'showExcused', 'showAllWork',
+        'hidetexts', 'op_previewFiles', 'op_floatingSB', 'op_showans'];
+      const out = [];
+      for (const v of tocheck) {
+        if ((v === 'hidetexts' && this[v] === false) || (v !== 'hidetexts' && this[v] === true)) {
+          out.push(v);
+        }
+      }
+      window.document.cookie = 'gvaf' + store.aid + '=' + out.join(',');
     }
   },
   created () {
@@ -838,6 +852,30 @@ export default {
       store.stu = querystu;
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
       actions.loadGbAssessData();
+    }
+  },
+  mounted () {
+    const filtercookie = window.readCookie('gvaf' + store.aid);
+    if (filtercookie !== null && filtercookie.length > 0) {
+      this.showFilters = true;
+      const cookieparts = filtercookie.split(',');
+      for (const v of cookieparts) {
+        if (v === 'hidetexts') {
+          this[v] = false;
+        } else {
+          this[v] = true;
+        }
+        // setTimeout is hacky, but there doesn't seem to be an easy way to tell if all
+        // children are mounted yet; 200ms should be enough, hopefully.
+        if (v === 'op_previewFiles') {
+          window.setTimeout(function () { window.togglepreviewallfiles(true); }, 200);
+        } else if (v === 'op_floatingSB') {
+          window.setTimeout(function () { window.toggleScrollingScoreboxState(true); }, 200);
+        } else if (v === 'op_showans') {
+          window.setTimeout(function () { window.toggleshowallans(true); }, 200);
+        }
+      }
+      this.$nextTick(window.sendLTIresizemsg);
     }
   },
   updated () {
@@ -871,5 +909,9 @@ export default {
 }
 .hoverbox {
   background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);
+}
+#showopts label {
+  margin-right: 8px;
+  user-select: none;
 }
 </style>
