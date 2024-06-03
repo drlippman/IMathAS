@@ -329,12 +329,12 @@ function sidebysidegrading(state) {
             $(el).after('<div class="subdued" id="it_s'+i+'">('+(i+1)+')</div>');
             tgt.append('<div class="subdued" id="it_d'+i+'">('+(i+1)+') </div>').append(el);
         });
-        $(".lastfilesub").each(function(i,el) {
+        $(".question .lastfilesub").each(function(i,el) {
             var tgt = $(el).closest(".sidebyside").find('.sidepreview');
             $(el).after('<span class="subdued" id="lf_s'+i+'">('+(i+1)+')</span>');
             tgt.append('<span class="subdued" id="lf_d'+i+'">('+(i+1)+') </span>').append(el);
         });
-        $(".viewworkwrap").each(function(i,el) {
+        $(".scrollpane .viewworkwrap").each(function(i,el) {
             $(el).css('margin','0');
             $(el).closest(".sidebyside").find('.sidepreview').append(el);
         });
@@ -353,7 +353,7 @@ function sidebysidegrading(state) {
             el.replaceWith(tomove[0]);
             srcnum.remove();
         });
-        $(".viewworkwrap").each(function(i,el) {
+        $(".sidepreview .viewworkwrap").each(function(i,el) {
             $(el).css('margin','');
             $(el).closest(".sidebyside").find('.scrollpane').append(el);
         });
