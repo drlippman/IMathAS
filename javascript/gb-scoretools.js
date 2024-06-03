@@ -47,11 +47,15 @@ function hideNA() {
 }
 function showallans(el) {
     if (el) { el.disabled = true; }
-	$("span[id^='ans']").toggleClass("hidden", false).show();
+	$("span[id^='ans']").show();
     $(".sabtn").replaceWith("<span>Answer: </span>");
-    $("div[id^=dsbox]").toggleClass("hidden", false).attr("aria-hidden", false)
-        .attr("aria-expanded", true);
-    $("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', true);
+    toggleshowallans(true);
+}
+function toggleshowallans(state) {
+    $("span[id^='ans']").toggleClass("hidden", !state);
+    $("div[id^=dsbox]").toggleClass("hidden", !state).attr("aria-hidden", !state)
+        .attr("aria-expanded", state);
+    $("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', state);
 }
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
@@ -59,14 +63,20 @@ function previewall() {
 function previewallfiles(el) {
     if (el) { el.disabled = true; }
 	$("span.clickable").trigger("click");
-	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").each(function(i,el) {
-        togglefileembed(el.id,true);
+	togglepreviewallfiles(true);
+}
+function togglepreviewallfiles(state) {
+    $(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").each(function(i,el) {
+        togglefileembed(el.id,state);
     });
 }
 function showallwork(el) {
     if (el) { el.disabled = true; }
-	$(".viewworkwrap > button").each(function(i,el) {
-        toggleWork(el,true);
+    toggleshowallwork(true);
+}
+function toggleshowallwork(state) {
+    $(".viewworkwrap > button").each(function(i,el) {
+        toggleWork(el,state);
     });
 }
 function allvisfullcred() {
@@ -353,16 +363,24 @@ function sidebysidegrading(state) {
 var scrollingscoreboxes = false;
 function toggleScrollingScoreboxes(el) {
     if (scrollingscoreboxes) {
-        $(window).off('scroll.scoreboxes');
-        $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);
-        $(".biquestionwrap .scrollpane").css("margin-bottom","0");
         if (el) {el.innerText = _('Floating Scoreboxes')}
     } else {
-        $(window).on('scroll.scoreboxes', updatescoreboxscroll);
-        updatescoreboxscroll();
         if (el) {el.innerText = _('Fixed Scoreboxes')}
     }
     scrollingscoreboxes = !scrollingscoreboxes;
+    toggleScrollingScoreboxState(scrollingscoreboxes);
+}
+
+function toggleScrollingScoreboxState(state) {
+    if (!state) {
+        $(window).off('scroll.scoreboxes');
+        $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);
+        console.log("here");
+        $(".bigquestionwrap .scrollpane").css("margin-bottom","0");
+    } else {
+        $(window).on('scroll.scoreboxes', updatescoreboxscroll);
+        updatescoreboxscroll();
+    }
 }
 
 function updatescoreboxscroll() {
