@@ -229,26 +229,26 @@ graphmaketable(g,[op])
 <BR>makes a weights table based on a given graph
 <BR><h3><a name="graphspringlayout">graphspringlayout</a></h3>
 graphspringlayout(g,[options])
-<BR>draws a graph based on a graph incidence matrix
+<BR>draws a graph based on a graph adjacency matrix
 <BR>using a randomized spring layout engine.  Doesn't work great.
 <BR>g is a 2-dimensional upper triangular matrix
 <BR>g[i][j] &gt; 0 if vertices i and j are connected
 <BR>not a digraph
 <BR><h3><a name="graphcirclelayout">graphcirclelayout</a></h3>
 graphcirclelayout(graph,[options])
-<BR>draws a graph based on a graph incidence matrix
+<BR>draws a graph based on a graph adjacency matrix
 <BR>using a circular layout
 <BR>g is a 2-dimensional upper triangular matrix
 <BR>g[i][j] &gt; 0 if vertexes i and j are connected
 <BR><h3><a name="graphcircledstarlayout">graphcircledstarlayout</a></h3>
 graphcircledstarlayout(graph,[options])
-<BR>draws a graph based on a graph incidence matrix
+<BR>draws a graph based on a graph adjacency matrix
 <BR>using a circular layout with the first vertex in the center of the circle
 <BR>g is a 2-dimensional upper triangular matrix
 <BR>g[i][j] &gt; 0 if vertexes i and j are connected
 <BR><h3><a name="graphgridlayout">graphgridlayout</a></h3>
 graphgridlayout(graph,[options])
-<BR>draws a graph based on a graph incidence matrix
+<BR>draws a graph based on a graph adjacency matrix
 <BR>using a rectangular grid layout.  Could hide
 <BR>some edges that connect colinear vertices
 <BR>use options['wiggle'] = true to perterb off exact grid
@@ -256,7 +256,7 @@ graphgridlayout(graph,[options])
 <BR>g[i][j] &gt; 0 if vertexes i and j are connected
 <BR><h3><a name="graphpathlayout">graphpathlayout</a></h3>
 graphpathlayout(graph,[options])
-<BR>draws a graph based on a graph incidence matrix
+<BR>draws a graph based on a graph adjacency matrix
 <BR>using a backflow to place the vertices in approximate
 <BR>order of incidence.  Could hide
 <BR>some edges that connect colinear vertices
