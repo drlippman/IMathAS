@@ -271,6 +271,13 @@
                   @change = "toggleFloatingScoreboxes"
                 />{{ $t('gradebook.floating_scoreboxes') }}
               </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="sidebysideon"
+                  @change = "sidebysideAction"
+                />{{ $t('gradebook.sidebyside') }}
+              </label>
             </p>
           </div>
         </div>
@@ -330,18 +337,31 @@
                 </span>
 
               </div>
-              <div class="scrollpane">
-                <gb-question
-                  :class = "{'inactive':!showQuestion[qn]}"
-                  :qdata = "qdata[curQver[qn]]"
-                  :qn = "qn"
-                  :disabled = "!canEdit"
-                />
-                <gb-showwork
-                  :work = "qdata[curQver[qn]].work"
-                  :worktime = "qdata[curQver[qn]].worktime"
-                  :showall = "showAllWork"
-                />
+              <div class="sidebyside" :class="{sidebysideon:sidebysideon}">
+                <div class="scrollpane">
+                  <gb-question
+                    :class = "{'inactive':!showQuestion[qn]}"
+                    :qdata = "qdata[curQver[qn]]"
+                    :qn = "qn"
+                    :disabled = "!canEdit"
+                  />
+                  <gb-showwork
+                    v-if="!sidebysideon"
+                    :work = "qdata[curQver[qn]].work"
+                    :worktime = "qdata[curQver[qn]].worktime"
+                    :showall = "showAllWork"
+                  />
+                </div>
+                <div class="sidepreview">
+                  <div class="sidepreviewtarget">
+                  </div>
+                  <gb-showwork
+                    v-if="sidebysideon"
+                    :work = "qdata[curQver[qn]].work"
+                    :worktime = "qdata[curQver[qn]].worktime"
+                    :showall = "showAllWork"
+                  />
+                </div>
               </div>
               <gb-score-details
                 :showfull = "showQuestion[qn]"
@@ -486,7 +506,8 @@ export default {
       hidetexts: true,
       op_previewFiles: false,
       op_floatingSB: false,
-      op_showans: false
+      op_showans: false,
+      sidebysideon: false
     };
   },
   computed: {
@@ -801,7 +822,6 @@ export default {
       store.confirmObj = null;
     },
     showAllAns () {
-      window.console.log('calling showallans with ' + this.op_showans);
       window.toggleshowallans(this.op_showans);
     },
     previewFiles () {
@@ -809,6 +829,9 @@ export default {
     },
     toggleFloatingScoreboxes () {
       window.toggleScrollingScoreboxState(this.op_floatingSB);
+    },
+    sidebysideAction () {
+      window.sidebysidemoveels(this.sidebysideon);
     },
     loadTexts () {
       if (!store.assessInfo.hasOwnProperty('intro')) {
@@ -818,7 +841,7 @@ export default {
     storeFilters () {
       const tocheck = ['hide100', 'hidePerfect', 'hideNonzero', 'hideZero', 'hideUnanswered',
         'hideFeedback', 'hideNowork', 'showEndmsg', 'showExcused', 'showAllWork',
-        'hidetexts', 'op_previewFiles', 'op_floatingSB', 'op_showans'];
+        'hidetexts', 'op_previewFiles', 'op_floatingSB', 'op_showans', 'sidebysideon'];
       const out = [];
       for (const v of tocheck) {
         if ((v === 'hidetexts' && this[v] === false) || (v !== 'hidetexts' && this[v] === true)) {
@@ -873,6 +896,8 @@ export default {
           window.setTimeout(function () { window.toggleScrollingScoreboxState(true); }, 200);
         } else if (v === 'op_showans') {
           window.setTimeout(function () { window.toggleshowallans(true); }, 200);
+        } else if (v === 'sidebysideon') {
+          window.setTimeout(function () { window.sidebysidemoveels(true); }, 200);
         }
       }
       this.$nextTick(window.sendLTIresizemsg);
@@ -913,5 +938,25 @@ export default {
 #showopts label {
   margin-right: 8px;
   user-select: none;
+}
+.sidebyside {
+  display:flex;
+  flex-wrap:nowrap;
+}
+.scrollpane {
+  width: 100%;
+}
+.sidepreview {
+  width: 0%;
+}
+.sidebysideon .sidepreview {
+  border-left: 1px solid #ccc;
+  padding: 10px;
+}
+.sidebysideon > div {
+  width: 50%;
+}
+.sidepreview .viewworkwrap {
+  margin: 15px 0;
 }
 </style>

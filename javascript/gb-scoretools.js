@@ -322,21 +322,37 @@ function sidebysidegrading(state) {
 	    $(".scrollpane").css('width','100%');
         $(".sidepreview").css('width','0%');
     }
+    sidebysidemoveels(sidebysideenabled);
     if (sidebysideenabled) {
+        $(".scrollpane .viewworkwrap").each(function(i,el) {
+            $(el).css('margin','0');
+            $(el).closest(".sidebyside").find('.sidepreview').append(el);
+        });
+    } else {
+        $(".sidepreview .viewworkwrap").each(function(i,el) {
+            $(el).css('margin','');
+            $(el).closest(".sidebyside").find('.scrollpane').append(el);
+        });
+    }
+}
+function sidebysidemoveels(state) {
+    if (state) {
         $(".question div.introtext").each(function(i,el) {
             $(el).find(".keywrap.inwrap").insertAfter($(el));
             var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+            if (tgt.find(".sidepreviewtarget").length > 0) {
+                tgt = tgt.find(".sidepreviewtarget");
+            }
             $(el).after('<div class="subdued" id="it_s'+i+'">('+(i+1)+')</div>');
             tgt.append('<div class="subdued" id="it_d'+i+'">('+(i+1)+') </div>').append(el);
         });
         $(".question .lastfilesub").each(function(i,el) {
             var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+            if (tgt.find(".sidepreviewtarget").length > 0) {
+                tgt = tgt.find(".sidepreviewtarget");
+            }
             $(el).after('<span class="subdued" id="lf_s'+i+'">('+(i+1)+')</span>');
             tgt.append('<span class="subdued" id="lf_d'+i+'">('+(i+1)+') </span>').append(el);
-        });
-        $(".scrollpane .viewworkwrap").each(function(i,el) {
-            $(el).css('margin','0');
-            $(el).closest(".sidebyside").find('.sidepreview').append(el);
         });
     } else {
         $("div[id^=it_s").each(function(i,el) {
@@ -352,10 +368,6 @@ function sidebysidegrading(state) {
             let tomove = srcnum.next();
             el.replaceWith(tomove[0]);
             srcnum.remove();
-        });
-        $(".sidepreview .viewworkwrap").each(function(i,el) {
-            $(el).css('margin','');
-            $(el).closest(".sidebyside").find('.scrollpane').append(el);
         });
     }
 }

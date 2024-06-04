@@ -477,6 +477,7 @@
     "preview_files": "Preview All Files",
     "introtexts": "Intro and between-question text",
     "floating_scoreboxes": "Floating Scoreboxes",
+    "sidebyside": "Side-by-Side",
     "no_edit": "You are in the gradebook. You cannot edit answers or submit questions from here.",
     "activitylog": "Activity Log"
   },
