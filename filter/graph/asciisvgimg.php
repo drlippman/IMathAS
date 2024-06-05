@@ -996,7 +996,7 @@ function ASdot2($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
 	$pt = $this->pt2arr($arg[0]);
 	$color = $this->stroke;
-	if (isset($arg[1]) && $arg[1]=='closed') {
+	if (!isset($arg[1]) || $arg[1]!='open') {
 		if ($this->usegd2) {
 			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
 		} else {
