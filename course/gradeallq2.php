@@ -332,7 +332,7 @@
 		$points = $defpoints;
 	}
 */
-    $lastupdate = '20240603';
+    $lastupdate = '20240606';
 	function formatTry($try,$cnt,$pn,$tn) {
 		if (is_array($try) && $try[0] === 'draw') {
 			$id = $cnt.'-'.$pn.'-'.$tn;
@@ -360,7 +360,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022223"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060324"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060624"></script>';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
@@ -411,19 +411,6 @@
 	})
     var scoretool_page = "aq";
 
-    $(function() {
-        let filtercookie = readCookie("gaqf'.$aid.'");
-        if (filtercookie !== null && filtercookie.length > 0) {
-            $("#filtersdiv").show();
-            filtercookie = filtercookie.split(",");
-            for (let i=0; i<filtercookie.length; i++) {
-                if (filtercookie[i].length > 0) {
-                    $("#"+filtercookie[i]).prop("checked",true).trigger("change");
-                }
-            }
-        }
-        $("#filtersdiv input[type=checkbox]").on("change", updatefiltercookie);
-    });
     function updatefiltercookie() {
         let vals = [];
         $("#filtersdiv input[type=checkbox]").each(function(i,el) {
@@ -929,5 +916,20 @@
   	</div>
 		<div id="eh" class="eh"></div>';
 	$useeqnhelper = 0;
+    echo '<script type="text/javascript">
+    $(function() {
+        let filtercookie = readCookie("gaqf'.$aid.'");
+        if (filtercookie !== null && filtercookie.length > 0) {
+            $("#filtersdiv").show();
+            filtercookie = filtercookie.split(",");
+            for (let i=0; i<filtercookie.length; i++) {
+                if (filtercookie[i].length > 0) {
+                    $("#"+filtercookie[i]).prop("checked",true).trigger("change");
+                }
+            }
+        }
+        $("#filtersdiv input[type=checkbox]").on("change", updatefiltercookie);
+    });
+    </script>'; // must be run at the end, after answerboxes have been inited
 	require_once "../footer.php";
 ?>

@@ -51,11 +51,12 @@ function showallans(el) {
     $(".sabtn").replaceWith("<span>Answer: </span>");
     toggleshowallans(true);
 }
-function toggleshowallans(state) {
-    $("span[id^='ans']").toggleClass("hidden", !state);
-    $("div[id^=dsbox]").toggleClass("hidden", !state).attr("aria-hidden", !state)
+function toggleshowallans(state, base) {
+    if (typeof base === 'undefined') { base = 'body'; }
+    $(base).find("span[id^='ans']").toggleClass("hidden", !state);
+    $(base).find("div[id^=dsbox]").toggleClass("hidden", !state).attr("aria-hidden", !state)
         .attr("aria-expanded", state);
-    $("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', state);
+    $(base).find("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', state);
 }
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
@@ -65,8 +66,9 @@ function previewallfiles(el) {
 	$("span.clickable").trigger("click");
 	togglepreviewallfiles(true);
 }
-function togglepreviewallfiles(state) {
-    $(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").each(function(i,el) {
+function togglepreviewallfiles(state, base) {
+    if (typeof base === 'undefined') { base = 'body'; }
+    $(base).find(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").each(function(i,el) {
         togglefileembed(el.id,state);
     });
 }
@@ -335,9 +337,11 @@ function sidebysidegrading(state) {
         });
     }
 }
-function sidebysidemoveels(state) {
+
+function sidebysidemoveels(state,base) {
+    if (typeof base === 'undefined') { base = 'body'; }
     if (state) {
-        $(".question div.introtext").each(function(i,el) {
+        $(base).find(".question div.introtext").each(function(i,el) {
             $(el).find(".keywrap.inwrap").insertAfter($(el));
             var tgt = $(el).closest(".sidebyside").find('.sidepreview');
             if (tgt.find(".sidepreviewtarget").length > 0) {
@@ -346,7 +350,7 @@ function sidebysidemoveels(state) {
             $(el).after('<div class="subdued" id="it_s'+i+'">('+(i+1)+')</div>');
             tgt.append('<div class="subdued" id="it_d'+i+'">('+(i+1)+') </div>').append(el);
         });
-        $(".question .lastfilesub").each(function(i,el) {
+        $(base).find(".question .lastfilesub").each(function(i,el) {
             var tgt = $(el).closest(".sidebyside").find('.sidepreview');
             if (tgt.find(".sidepreviewtarget").length > 0) {
                 tgt = tgt.find(".sidepreviewtarget");
@@ -355,14 +359,14 @@ function sidebysidemoveels(state) {
             tgt.append('<span class="subdued" id="lf_d'+i+'">('+(i+1)+') </span>').append(el);
         });
     } else {
-        $("div[id^=it_s").each(function(i,el) {
+        $(base).find("div[id^=it_s").each(function(i,el) {
             let n = el.id.substr(4);
             let srcnum = $('#it_d'+n);
             let tomove = srcnum.next();
             el.replaceWith(tomove[0]);
             srcnum.remove();
         });
-        $("span[id^=lf_s").each(function(i,el) {
+        $(base).find("span[id^=lf_s").each(function(i,el) {
             let n = el.id.substr(4);
             let srcnum = $('#lf_d'+n);
             let tomove = srcnum.next();
@@ -383,7 +387,10 @@ function toggleScrollingScoreboxes(el) {
     toggleScrollingScoreboxState(scrollingscoreboxes);
 }
 
+var scrollingscoreboxesstate = false;
 function toggleScrollingScoreboxState(state) {
+    if (state == scrollingscoreboxesstate) { return; }
+    scrollingscoreboxesstate = state;
     if (!state) {
         $(window).off('scroll.scoreboxes');
         $(".scoredetails").removeClass("hoverbox").css("position","static").css("width","auto").css("margin-left",0);

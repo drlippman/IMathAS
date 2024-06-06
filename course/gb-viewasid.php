@@ -544,7 +544,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		if ($isteacher || $istutor) {
 			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
 			require_once "../includes/rubric.php";
-			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060224"></script>';
+			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060624"></script>';
 			if ($_SESSION['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}

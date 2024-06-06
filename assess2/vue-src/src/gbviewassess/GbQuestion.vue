@@ -36,6 +36,7 @@ export default {
       window.initlinkmarkup(this.$refs.thisqwrap);
       window.imathasAssess.init(this.qdata.jsparams, true, this.$refs.thisqwrap);
       this.rendered = true;
+      this.$emit('qloaded', this.$refs.thisqwrap);
     }
   },
   mounted () {

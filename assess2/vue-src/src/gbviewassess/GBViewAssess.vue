@@ -344,6 +344,7 @@
                     :qdata = "qdata[curQver[qn]]"
                     :qn = "qn"
                     :disabled = "!canEdit"
+                    @qloaded = "questionLoaded"
                   />
                   <gb-showwork
                     v-if="!sidebysideon"
@@ -849,6 +850,18 @@ export default {
         }
       }
       window.document.cookie = 'gvaf' + store.aid + '=' + out.join(',');
+    },
+    questionLoaded (base) {
+      if (this.op_previewFiles) {
+        window.togglepreviewallfiles(true, base);
+      }
+      if (this.op_showans) {
+        window.toggleshowallans(true, base);
+      }
+      if (this.sidebysideon) {
+        window.sidebysidemoveels(true, base);
+      }
+      this.$nextTick(window.sendLTIresizemsg);
     }
   },
   created () {
@@ -888,16 +901,8 @@ export default {
         } else {
           this[v] = true;
         }
-        // setTimeout is hacky, but there doesn't seem to be an easy way to tell if all
-        // children are mounted yet; 200ms should be enough, hopefully.
-        if (v === 'op_previewFiles') {
-          window.setTimeout(function () { window.togglepreviewallfiles(true); }, 200);
-        } else if (v === 'op_floatingSB') {
-          window.setTimeout(function () { window.toggleScrollingScoreboxState(true); }, 200);
-        } else if (v === 'op_showans') {
-          window.setTimeout(function () { window.toggleshowallans(true); }, 200);
-        } else if (v === 'sidebysideon') {
-          window.setTimeout(function () { window.sidebysidemoveels(true); }, 200);
+        if (v === 'op_floatingSB') {
+          window.toggleScrollingScoreboxState(true);
         }
       }
       this.$nextTick(window.sendLTIresizemsg);

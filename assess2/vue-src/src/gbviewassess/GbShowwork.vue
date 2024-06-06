@@ -45,6 +45,7 @@ export default {
   },
   mounted () {
     this.renderInit();
+    this.show = this.showall;
   },
   watch: {
     work: function (newVal, oldVal) {
