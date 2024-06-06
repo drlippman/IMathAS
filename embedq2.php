@@ -284,8 +284,9 @@ if (isset($_GET['theme'])) {
     $coursetheme = $theme . '.css';
 }
 
-$lastupdate = '20200422';
-$placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastupdate . '" />';
+$lastupdate = '20240603';
+$placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastupdate . '" media="print">';
 $placeinhead .= '<script src="' . $staticroot . '/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
 if (!empty($CFG['assess2-use-vue-dev'])) {
