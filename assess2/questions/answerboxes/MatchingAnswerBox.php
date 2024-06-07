@@ -46,7 +46,7 @@ class MatchingAnswerBox implements AnswerBox
         $preview = '';
 
         $optionkeys = ['questiontitle', 'answertitle', 'matchlist', 'noshuffle',
-            'displayformat', 'readerlabel'];
+            'displayformat', 'readerlabel', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -152,7 +152,7 @@ class MatchingAnswerBox implements AnswerBox
             if ($laval == '-' || strcmp($laval, '') == 0) {
                 $out .= 'selected="1"';
             }
-            $out .= '>-</option>';
+            $out .= '>' . ($ansprompt !== '' ? $ansprompt : '-') . '</option>';
             if ($displayformat == "select") {
                 for ($j = 0; $j < count($randakeys); $j++) {
                     $out .= "<option value=\"" . $j . "\" ";
