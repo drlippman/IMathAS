@@ -71,6 +71,11 @@ function togglepreviewallfiles(state, base) {
     $(base).find(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").each(function(i,el) {
         togglefileembed(el.id,state);
     });
+    if ($(base).hasClass("viewworkwrap")) {
+        $(base).find("span[id^=fileembedbtn]").each(function(i,el) {
+            togglefileembed(el.id,state);
+        });
+    }
 }
 function showallwork(el) {
     if (el) { el.disabled = true; }

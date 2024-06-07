@@ -1,5 +1,5 @@
 <template>
-  <div class = "questionpane viewworkwrap" v-if="!!work">
+  <div class = "questionpane viewworkwrap" v-if="!!work" ref="wrap">
     <div>
       <button type="button" class="slim"
         @click = "show = !show"
@@ -19,7 +19,7 @@
 <script>
 export default {
   name: 'GbShowwork',
-  props: ['work', 'worktime', 'showall'],
+  props: ['work', 'worktime', 'showall', 'previewfiles'],
   data: function () {
     return {
       show: false,
@@ -41,6 +41,9 @@ export default {
       window.initlinkmarkup(this.$refs.workbox);
       window.$(this.$refs.workbox).find('img').on('click', window.rotateimg);
       this.rendered = true;
+      if (this.previewfiles) {
+        window.togglepreviewallfiles(true, this.$refs.wrap);
+      }
     }
   },
   mounted () {

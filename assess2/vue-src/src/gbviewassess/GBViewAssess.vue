@@ -351,6 +351,7 @@
                     :work = "qdata[curQver[qn]].work"
                     :worktime = "qdata[curQver[qn]].worktime"
                     :showall = "showAllWork"
+                    :previewfiles = "op_previewFiles"
                   />
                 </div>
                 <div class="sidepreview">
@@ -361,6 +362,7 @@
                     :work = "qdata[curQver[qn]].work"
                     :worktime = "qdata[curQver[qn]].worktime"
                     :showall = "showAllWork"
+                    :previewfiles = "op_previewFiles"
                   />
                 </div>
               </div>
@@ -889,8 +891,6 @@ export default {
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
       actions.loadGbAssessData();
     }
-  },
-  mounted () {
     const filtercookie = window.readCookie('gvaf' + store.aid);
     if (filtercookie !== null && filtercookie.length > 0) {
       this.showFilters = true;
@@ -901,9 +901,15 @@ export default {
         } else {
           this[v] = true;
         }
-        if (v === 'op_floatingSB') {
-          window.toggleScrollingScoreboxState(true);
-        }
+      }
+    }
+  },
+  mounted () {
+    const filtercookie = window.readCookie('gvaf' + store.aid);
+    if (filtercookie !== null && filtercookie.length > 0) {
+      const cookieparts = filtercookie.split(',');
+      if (cookieparts.indexOf('op_floatingSB') !== -1) {
+        window.toggleScrollingScoreboxState(true);
       }
       this.$nextTick(window.sendLTIresizemsg);
     }
