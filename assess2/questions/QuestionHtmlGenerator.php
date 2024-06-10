@@ -866,7 +866,7 @@ class QuestionHtmlGenerator
           $sadiv .= '<div>'.$showanswerloc.'</div>';
         } else if (is_array($showanswerloc)) {
           foreach ($showanswerloc as $iidx => $saloc) {
-            if (($doShowAnswer || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) &&
+            if (((!is_array($doShowAnswerParts) && $doShowAnswer) || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) &&
               strpos($toevalqtxt,'$showanswerloc['.$iidx.']')===false
             ) {
               $sadiv .= '<div>'.$saloc.'</div>';

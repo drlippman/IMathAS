@@ -1993,6 +1993,8 @@ class AssessRecord
           $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] == 1
         ) {
           // don't block showans
+        } else if (isset($qver['answeights']) && $qver['answeights'][$pn] == 0) {
+          // don't want answeight 0 to block general showans
         } else {
           $showans = false;
         }
