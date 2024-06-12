@@ -76,7 +76,7 @@ export default {
     }
   },
   updated: function () {
-    if (this.active && this.worktype === 0) {
+    if (this.active && this.worktype === 0 && this.objTinymce === null) {
       this.initEditor();
     }
   },
