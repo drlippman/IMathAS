@@ -228,7 +228,7 @@ if ($oktoshow) {
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
-	$isstu = array();
+	$isstu = array(); $stus = []; $posttoforumaid = null;
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -240,6 +240,9 @@ if ($oktoshow) {
 			$newviews = $line['views']+1;
 		}
 		$isstu[$line['id']] = ($line['stuid'] !== null);
+        if ($line['stuid'] !== null) {
+            $stus[] = $line['userid'];
+        }
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['postdate'];
 		$n = 0;
@@ -285,6 +288,20 @@ if ($oktoshow) {
 		$likes[$line['id']] = array(0,0,0);
 
 	}
+    $posttoforumaidver = -1; $posttoforumqn = 0;
+    if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$children[0][0]],$matches)) {
+        $query = "SELECT ia.ver,ia.id,ias.id AS asid FROM imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+        $query .= "AND ias.userid=:ownerid WHERE ia.courseid=:courseid AND (ia.name=:name OR ia.name=:name2) ORDER BY asid DESC";
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':courseid'=>$cid, ':name'=>$matches[2], ':name2'=>htmlentities($matches[2]), ':ownerid'=>intval($children[0][0])));
+        if ($stm->rowCount()>0) {
+            $posttoforumqn = intval($matches[1]);
+            $r = $stm->fetch(PDO::FETCH_ASSOC);
+            $posttoforumaidver = intval($r['ver']);
+            $posttoforumaid = intval($r['id']);
+        }
+    }
+				
 
 	if ($allowlikes) {
 		//get likes
@@ -486,7 +503,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore, $isstu,$staticroot;
+	global $canviewall, $caneditscore, $canviewscore, $isstu, $posttoforumaidver, $posttoforumqn, $posttoforumaid, $staticroot;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -574,7 +591,13 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
 			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_blank\">[GB]</a>";
-			if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
+            if ($posttoforumaidver > 1) { 
+                // is post to forum post, ver > 1 so can make link for all students
+                if ($isstu[$child]) {
+                    echo " <a class=\"small\" href=\"$imasroot/assess2/gbviewassess.php?cid=$cid&uid={$ownerid[$child]}&aid={$posttoforumaid}#qwrap$posttoforumqn\" target=\"_blank\">[assignment]</a>";
+                }
+            } else if ($base==0 && $posttoforumaidver == 1 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
+                // old assess ver. Need asid
 				$query = "SELECT ia.ver,ia.id,ias.id AS asid FROM imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 				$query .= "AND ias.userid=:ownerid WHERE ia.courseid=:courseid AND (ia.name=:name OR ia.name=:name2) ORDER BY asid DESC";
 				$stm = $DBH->prepare($query);
@@ -582,11 +605,7 @@ function printchildren($base,$restricttoowner=false) {
 				if ($stm->rowCount()>0) {
 					$qn = $matches[1];
 					$r = $stm->fetch(PDO::FETCH_ASSOC);
-					if ($r['ver'] > 1) {
-						echo " <a class=\"small\" href=\"$imasroot/assess2/gbviewassess.php?cid=$cid&uid={$ownerid[$child]}&aid={$r['id']}#qwrap$qn\" target=\"_blank\">[assignment]</a>";
-					} else if ($r['asid'] !== null) {
-						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r['asid']}#qwrap$qn\" target=\"_blank\">[assignment]</a>";
-					}
+					echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r['asid']}#qwrap$qn\" target=\"_blank\">[assignment]</a>";
 				}
 			}
 		}

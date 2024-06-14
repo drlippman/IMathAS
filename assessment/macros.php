@@ -5118,6 +5118,7 @@ function getlinesdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$
 		$pts = explode('),(', substr($line,1,strlen($line)-2));
 		foreach ($pts as $k=>$pt) {
 			 $pt =  explode(',',$pt);
+             if (count($pt) != 2) { continue; }
 			 $pt[0] = ($pt[0] - $imgborder)/$pixelsperx + $xmin;
 			 $pt[1] = ($h - $pt[1] - $imgborder)/$pixelspery + $ymin;
 			 $out[$i][$k] = array($pt[0],$pt[1]);
