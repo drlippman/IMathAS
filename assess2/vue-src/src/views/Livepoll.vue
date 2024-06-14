@@ -253,7 +253,9 @@ export default {
         newstate: 1,
         forceregen: 1
       });
-      store.livepollResults.splice(this.curqn, 1);
+      if (store.livepollResults.hasOwnProperty(this.curqn)) {
+        delete store.livepollResults[this.curqn];
+      }
     },
     updateShowAnswers () {
       // if already showing results, need to call the server with new state
