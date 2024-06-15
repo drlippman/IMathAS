@@ -65,7 +65,7 @@ if (empty($QS['id'])) {
 
 // set user preferences
 $prefdefaults = array(
-    'mathdisp' => 6, //default is katex
+    'mathdisp' => 7, //default is MJ3
     'graphdisp' => 1,
     'drawentry' => 1,
     'useed' => 1,
