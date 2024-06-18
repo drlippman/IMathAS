@@ -344,7 +344,7 @@ $placeinhead .= '<script type="text/javascript">
      window.katexDoneCallback = sendresizemsg;
   } else if (typeof MathJax != "undefined") {
     if (MathJax.startup) {
-        MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+        MathJax.startup.promise = MathJax.startup.promise.then(sendresizemsg);
     } else if (MathJax.Hub) {
         MathJax.Hub.Queue(function () {
             sendresizemsg();
