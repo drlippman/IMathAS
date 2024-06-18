@@ -357,13 +357,20 @@ $placeinhead .= '<script type="text/javascript">
   }
   </script>
   <style>
-  body { margin: 0; overflow-y: hidden;}
+  body { 
+    margin: 0; padding: 0; overflow-y: hidden;
+    background-color: transparent !important;
+    }
   .question {
       margin-top: 0 !important;
   }
   .questionpane {
-    margin-top: 0 !important;
-    }
+    margin: 0 !important;
+    padding-top: .5em !important;
+  }
+  .questionpane > .question > p:first-child {
+    padding-top: 0 !important;
+  }
   .questionpane>.question { 
   	background-image: none !important;
   }
