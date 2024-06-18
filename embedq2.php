@@ -208,6 +208,11 @@ if (isset($QS['autoseq'])) {
 } else {
     $state['autoseq'] = 1;
 }
+if (isset($QS['hidescoreval'])) {
+    $state['hidescoreval'] = intval($QS['hidescoreval']);
+} else {
+    $state['hidescoreval'] = 0;
+}
 
 
 if (isset($_POST['regen']) && !$issigned) {
@@ -393,7 +398,7 @@ require_once "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 echo '<div class="questionwrap">';
-if (!$state['jssubmit']) {
+if (!$state['jssubmit'] && !$state['hidescoreval']) {
     echo '<div id="results'.$qn.'"></div>';
 }
 echo '<div class="questionpane">';
