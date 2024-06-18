@@ -1364,7 +1364,7 @@ class AssessRecord
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean|int $generate_html Whether to generate question HTML (def: false) 2 to also grab correct ans
-   * @param int|string  $ver               Which version to grab data for, or 'last' for most recent
+   * @param int|string  $ver               Which version to grab data for, or 'last' for most recent, or 'scored' for scored
    * @param string   $try       Which try to show: 'last' (def) or 'scored'
    * @param boolean $record_answeights  True to record answeights into record (needed in GB loads in case not scored) def: false
    * @return array  The question object
@@ -1674,7 +1674,7 @@ class AssessRecord
   /**
    * get question part score details
    * @param  int  $qn             The question number
-   * @param  string  $ver         The attempt to use, or 'last' for most recent
+   * @param  string  $ver         The attempt to use, or 'last' for most recent, or 'scored' for scored
    * @param  string  $try         'last' for last try, or 'all' to pick best try per-part
    * @param  array   $overrides   By-part score overrides
    * @return array (question Score, question Rawscore, parts details)
@@ -1694,11 +1694,14 @@ class AssessRecord
     if ($this->is_practice) {
       $assessver = $this->data['assess_versions'][0];
       $regen = 0;
-    } else if ($by_question || !is_numeric($ver)) {
+    } else if ($by_question || $ver === 'last') {
       $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       if (!$by_question) {
         $regen = count($this->data['assess_versions']) - 1;
       } 
+    } else if (!$by_question && $ver === 'scored') {
+      $regen = $this->data['scored_version'];
+      $assessver = $this->data['assess_versions'][$regen];
     } else {
       $assessver = $this->data['assess_versions'][$ver];
       $regen = $ver;

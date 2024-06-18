@@ -438,6 +438,8 @@
 				$avg2 = "NA";
 				$avgatt = "NA";
 				$avgreg = "NA";
+                $avgtot = "NA";
+                $avgtota = "NA";
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
 
