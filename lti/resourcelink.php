@@ -99,7 +99,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       //no default due date set yet, or is the instructor:  set the default due date
       $db->set_assessment_dates($link->get_typeid(), $lms_duedate, $newdatebylti);
     }
-    if ($lms_duedate !== false && $role == 'Learner') {
+    if ($lms_duedate !== false && $role == 'Learner' && $link->get_date_by_lti() > 0) {
       $db->set_or_update_duedate_exception($localuserid, $link, $lms_duedate);
     }
     // if no due date provided, but we're expecting one, throw error

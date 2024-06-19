@@ -286,31 +286,24 @@ class LTI_Message_Launch {
         } else {
           return $duedate;
         }
-      } else if (!empty($custom['link_user_end_sub_time'])) {
-        $duedate = strtotime($custom['link_user_end_sub_time']);
-        if ($duedate === false) {
-          return 2000000000;
-        } else {
-          return $duedate;
-        }
+      } else if (!empty($custom['link_user_end_sub_time']) && 
+        ($duedate = strtotime($custom['link_user_end_sub_time'])) !== false) {
+        // use user-based sub time if set and valid
+        return $duedate;
       } else if (!empty($custom['link_end_sub_time'])) {
+        // if general sub time is set but invalid, and avail_time values aren't set or valid either
+        // then treat as available always
         $duedate = strtotime($custom['link_end_sub_time']);
         if ($duedate === false) {
-          return 2000000000;
-        } else {
-          return $duedate;
-        }
-      } else if (!empty($custom['link_user_end_avail_time'])) {
-        $duedate = strtotime($custom['link_user_end_avail_time']);
-        if ($duedate === false) {
-          return 2000000000;
-        } else {
-          return $duedate;
-        }
-      } else if (!empty($custom['link_end_avail_time'])) {
-        $duedate = strtotime($custom['link_end_avail_time']);
-        if ($duedate === false) {
-          return 2000000000;
+          if (!empty($custom['link_user_end_avail_time']) &&
+            ($duedate = strtotime($custom['link_user_end_avail_time'])) !== false) {
+            return $duedate;
+          } else if (!empty($custom['link_end_avail_time']) && 
+            ($duedate = strtotime($custom['link_end_avail_time'])) !== false) {
+            return $duedate;
+          } else {
+            return 2000000000;
+          }
         } else {
           return $duedate;
         }
