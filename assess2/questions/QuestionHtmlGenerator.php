@@ -866,11 +866,15 @@ class QuestionHtmlGenerator
           $sadiv .= '<div>'.$showanswerloc.'</div>';
         } else if (is_array($showanswerloc)) {
           foreach ($showanswerloc as $iidx => $saloc) {
-            if (((!is_array($doShowAnswerParts) && $doShowAnswer) || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) &&
+            // show part solution if $doShowAnswerParts for that part is enabled,
+            // or if $doShowAnswer is set and $doShowAnswerParts isn't explicitly disabled
+            if ((($doShowAnswer && (!isset($doShowAnswerParts[$iidx]) || $doShowAnswerParts[$iidx])) || 
+                (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))
+              ) &&
               strpos($toevalqtxt,'$showanswerloc['.$iidx.']')===false
             ) {
               $sadiv .= '<div>'.$saloc.'</div>';
-            }
+            } 
           }
         }
         // display detailed solution, if allowed and set
