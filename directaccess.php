@@ -301,6 +301,7 @@ if ($page_newaccounterror!='') {
 	echo '<p class=noticetext>' . Sanitize::encodeStringForDisplay($page_newaccounterror) . '</p>';
 }
 ?>
+<div id="errorlive" aria-live="polite" class="sr-only"></div>
 <span class=form><label for="SID"><?php echo $longloginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID <?php if (isset($_POST['SID'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['SID'])); } ?>><BR class=form>
 <span class=form><label for="pw1"><?php echo _("Choose a password:"); ?></label></span><input class=form type=password size=20 id=pw1 name=pw1 <?php if (isset($_POST['pw1'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['pw1'])); } ?>><BR class=form>
 <span class=form><label for="pw2"><?php echo _("Confirm password:"); ?></label></span> <input class=form type=password size=20 id=pw2 name=pw2 <?php if (isset($_POST['pw2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['pw2'])); } ?>><BR class=form>

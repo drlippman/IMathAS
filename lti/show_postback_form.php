@@ -76,6 +76,7 @@ function show_postback_form($launch, $db, $err='') {
   }
   echo '<form id=postbackform method=post class="limitaftervalidate" action="finishlogin.php">';
   echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
+  echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
 
   if ($promptForLogin) {
     echo '<p>'.sprintf(_('If you already have an account on %s, please enter your username and password below to enable automated signin.'), $installname).'</p>';

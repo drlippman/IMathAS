@@ -162,6 +162,7 @@ switch($_GET['action']) {
     echo "<form method=post id=userform class=limitaftervalidate action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if ($_GET['action']=="chgrights") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
+        echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
 			echo '<div class="pagetitle"><h1>'._('New User').'</h1></div>';

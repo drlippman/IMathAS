@@ -19,6 +19,14 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
   echo '<script type="text/javascript">
   $(function() {
 	$("#'.Sanitize::simpleString($formname).'").validate({
+    showErrors: function(m, l) {
+        let txt = "";
+        for (const id in m) {
+            txt += m[id] + " ";
+        }
+        $("#errorlive").text(txt);
+        this.defaultShowErrors();
+    },
     rules: {
       SID: {
         required: '.(isset($requiredrules['SID'])?$requiredrules['SID']:'true').',

@@ -284,6 +284,7 @@ if ($overwriteBody==1) {
   	  echo '<p class=noticetext>'.$errors.'</p>';
   }
   echo '<form method="post" id="pwform" class=limitaftervalidate>';
+  echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
   echo '<p><a href="#" onclick="$(\'#pwreset\').show();return false;">';
   echo _('Reset Password').'</a>';
   echo ' <span style="display:none;" id="pwreset"><label>'._('Set temporary password to: ');
