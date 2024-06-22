@@ -1327,6 +1327,9 @@ export const actions = {
         this.disableMQ();
       }
     }
+    if (data.hasOwnProperty('name')) {
+      window.document.title = data.name;
+    }
     return data;
   }
 };
