@@ -894,14 +894,15 @@ function chgfilter() {
 		} else {
 			echo 'class="'.$stripe.'"';
 		}
-		echo "><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid=".Sanitize::onlyInt($line['id'])."\">";
+		echo "><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\" id=\"cb".Sanitize::onlyInt($line['id'])."\"/></td><td>";
+		echo '<label for="cb' . Sanitize::onlyInt($line['id']). '">';
+        echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid=".Sanitize::onlyInt($line['id'])."\">";
 		if ($line['viewed']==0) {
 			echo "<b>" . $line['title']. "</b>";
 		} else {
 			echo $line['title'];
 		}
-		echo "</a></td><td>";
+		echo "</a></label></td><td>";
 		if ($line['replied']==1) {
 			echo "Yes";
 		}
