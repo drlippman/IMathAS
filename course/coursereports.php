@@ -46,6 +46,7 @@ if ($overwriteBody==1) {
     echo '<li><a href="report-recentchg.php?cid='.$cid.'">'._('Recent Submissions Report').'</a></li>';
     echo '<li><a href="report-brokenq.php?cid='.$cid.'">'._('Broken Questions Report').'</a></li>';
     echo '<li><a href="report-withdrawnq.php?cid='.$cid.'">'._('Withdrawn Questions Report').'</a></li>';
+    echo '<li><a href="report-a11y.php?cid='.$cid.'">'._('Accessibility Report').'</a></li>';
 
 	echo '</ul>';
 
