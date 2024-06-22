@@ -395,9 +395,12 @@ require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath
 ?>
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo Sanitize::onlyInt($diagid); ?>">
-<span class=form><?php echo Sanitize::encodeStringForDisplay($line['idprompt']); ?></span> <input class=form type=text size=12 name=SID><BR class=form>
-<span class=form><?php echo _('Enter First Name:'); ?></span> <input class=form type=text size=20 name=firstname><BR class=form>
-<span class=form><?php echo _('Enter Last Name:'); ?></span> <input class=form type=text size=20 name=lastname><BR class=form>
+<span class=form><label for="SID"><?php echo Sanitize::encodeStringForDisplay($line['idprompt']); ?></label></span> 
+<input class=form type=text size=12 name=SID id=SID><BR class=form>
+<span class=form><label for="firstname"><?php echo _('Enter First Name:'); ?></label></span> 
+<input class=form type=text size=20 name=firstname id=firstname><BR class=form>
+<span class=form><label for="lastname"><?php echo _('Enter Last Name:'); ?></label></span> 
+<input class=form type=text size=20 name=lastname id=lastname><BR class=form>
 
 <script type="text/javascript">
 var teach = new Array();
@@ -427,7 +430,7 @@ function getteach() {
 
 </script>
 
-<span class=form><?php echo Sanitize::encodeStringForDisplay($line['sel1name']); ?></span><span class=formright>
+<span class=form><label for=course><?php echo Sanitize::encodeStringForDisplay($line['sel1name']); ?></label></span><span class=formright>
 <select name="course" id="course" onchange="getteach()">
 <option value="-1"><?php echo Sanitize::encodeStringForDisplay($line['sel1name']); ?></option>
 <?php
@@ -437,7 +440,7 @@ for ($i=0;$i<count($sel1);$i++) {
 ?>
 </select></span><br class=form>
 
-<span class=form><?php echo Sanitize::encodeStringForDisplay($line['sel2name']); ?></span><span class=formright>
+<span class=form><label for="teachers"><?php echo Sanitize::encodeStringForDisplay($line['sel2name']); ?></label></span><span class=formright>
 <select name="teachers" id="teachers">
 <option value="not selected"><?php echo Sanitize::encodeStringForDisplay($line['sel1name']); ?></option>
 </select></span><br class=form>
@@ -450,10 +453,10 @@ for ($i=0;$i<count($sel1);$i++) {
 		$stm->execute($aids);
 		$hasTimeLimit = ($stm->fetchColumn(0)>0);
 		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b><br/>\n";
-		echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+		echo "<span class=form><label for=passwd>", _('Access password:'), "</label></span>  <input class=form type=password size=40 name=passwd id=passwd><BR class=form>";
 		if ($hasTimeLimit) {
-			echo "<span class=form>", _('Time limit (if timed):'), "</span>  ";
-			echo '<select name=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
+			echo "<span class=form><label for=timelimitmult>", _('Time limit (if timed):'), "</label></span>  ";
+			echo '<select name=timelimitmult id=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
 			echo '<option value="2">'._('2x standard').'</option></select><BR class=form>';
 		}
 
@@ -474,7 +477,7 @@ $allowreentry = ($line['public']&4);
 $pws = explode(';',$line['pws']);
 if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line['reentrytime']>0)) {
 	echo "<p>", _('No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.'), "<br/>\n";
-	echo "<span class=form>", _('Override password'), ":</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+	echo "<span class=form><label for=passwd>", _('Override password'), "</label>:</span>  <input class=form type=password size=40 id=passwd name=passwd><BR class=form>";
 }
 ?>
 </form>
