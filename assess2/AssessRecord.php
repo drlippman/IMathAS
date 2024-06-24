@@ -3514,6 +3514,7 @@ class AssessRecord
   public function setGbFeedbacks($feedback) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
 
+    $hasfeedback = false;
     $this->parseData();
     foreach ($feedback as $key=>$fb) {
       $pts = explode('-', $key);
@@ -3538,9 +3539,12 @@ class AssessRecord
         $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
         $qdata['feedback'] = Sanitize::incomingHtml($fb);
       }
+      $hasfeedback |= !empty($fb);
     }
-    if (!empty($feedback)) {
+    if ($hasfeedback) {
       $this->assessRecord['status'] |= 8; // indicate we have feedback
+    } else {
+      $this->assessRecord['status'] &= ~8; // indicate we have do not have feedback
     }
   }
 
