@@ -72,13 +72,15 @@ if ($myrights<20) {
 				//remlist now only contains questions ok to remove
 				$now = time();
 
-				//delete all library items for that question, regardless of owner
-				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE qsetid IN ($remlist) AND deleted=0");
-				$stm->execute(array(':now'=>$now));
+                if ($remlist != '') {
+                    //delete all library items for that question, regardless of owner
+                    $stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE qsetid IN ($remlist) AND deleted=0");
+                    $stm->execute(array(':now'=>$now));
 
-				//now delete the questions
-				$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=:now WHERE id IN ($remlist)");
-				$stm->execute(array(':now'=>$now));
+                    //now delete the questions
+                    $stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=:now WHERE id IN ($remlist)");
+                    $stm->execute(array(':now'=>$now));
+                }
 
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
