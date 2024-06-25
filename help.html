@@ -2468,11 +2468,18 @@ The following macros help with formatting values for display:
 <li><strong>prettyreal(number,decimals,[comma])</strong>:  Adds commas in thousands spaces of number, and displays the value to a fixed number of decimals places (rounding if needed).
    Example: prettyreal(1234.567,2) will return "1,234.57", and prettyreal(1.8,3) will return "1.800".  The result is a string, which
    can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li>
+<li><strong>prettyreal_instring(string,decimals,[comma])</strong>:  Formats any number in the string
+   using the same process as prettyreal.</li>
+<li><strong>round_instring(string,[decimals])</strong>: Rounds any number in the string 
+   to the specified number of decimal places (nearest whole number if decimal is left out)</li>
 <li><strong>prettysmallnumber(number, [space])</strong>:  Prevents very small numbers from being displayed as scientific notation.
    Set space to true to add space in groups of 3, like 0.000 000 02</li>
 <li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" to override.
    Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant. Set scinot to true to display in scientific notation. Set sigfigbar to true to put line over last significant, non-terminating zero, such as 42<span style="text-decoration: overline">0</span>0 having three sig figs (use only in math display).
    This is for display; to round a number for calculations, use roundsigfig.</li>
+<li><strong>prettysigfig_instring(string,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>:  
+    Rounds any number in the string to sigfigs significant figures. The rest of the options are the same 
+    as for prettysigfig.</li>
 <li><strong>makescinot(number,[decimals,format])</strong>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
 <li><strong>prettytime(value,informat,outformat)</strong>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
     value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat

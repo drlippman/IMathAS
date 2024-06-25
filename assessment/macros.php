@@ -38,7 +38,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","array_keys","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","intval","comparesameform","splicearray",
- "getsigfigs","checksigfigs");
+ "getsigfigs","checksigfigs","prettysigfig_instring","prettyreal_instring","round_instring");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -2206,6 +2206,7 @@ function prettyint($n) {
     }
 	return number_format($n);
 }
+
 function prettyreal($aarr,$d=0,$comma=',') {
     if (!is_array($aarr)) {
 		$arrayout = false;
@@ -2228,6 +2229,16 @@ function prettyreal($aarr,$d=0,$comma=',') {
 	} else {
 		return $out[0];
 	}
+}
+function prettyreal_instring($str,$d=0,$comma=',') {
+    return preg_replace_callback('/\d*\.?\d+/', function($m) use ($d,$comma) {
+        return prettyreal($m[0],$d,$comma);
+    }, $str);
+}
+function round_instring($str,$d=0) {
+    return preg_replace_callback('/\d*\.?\d+/', function($m) use ($d) {
+        return round($m[0],$d);
+    }, $str);
 }
 function prettysmallnumber($n, $space=false) {
 	if (abs($n)<.01) {
@@ -2331,6 +2342,12 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 	} else {
 		return $out[0];
 	}
+}
+
+function prettysigfig_instring($str,$sigfig,$comma=',',$choptrailing=false,$orscinot=false,$sigfigbar=false) {
+    return preg_replace_callback('/\d*\.?\d+/', function($m) use ($sigfig,$comma,$choptrailing,$orscinot,$sigfigbar) {
+        return prettysigfig($m[0],$sigfig,$comma=',',$choptrailing=false,$orscinot=false,$sigfigbar=false);
+    }, $str);
 }
 
 function makescinot($n,$d=8,$f="x") {
