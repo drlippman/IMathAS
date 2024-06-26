@@ -66,7 +66,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 }
 
 // scan questionset control, qtext
-$query = 'SELECT iqs.control,iqs.qtext,ia.name,iqs.id FROM imas_questionset AS iqs 
+$query = 'SELECT iqs.control,iqs.qtext,ia.name,iqs.id,iqs.extref FROM imas_questionset AS iqs 
     JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
     JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
     WHERE ia.courseid=?';
@@ -75,6 +75,10 @@ $stm->execute([$cid]);
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
         _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+    if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
+        adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+    }
 }
 
 // scan qimages alttext for blank
@@ -105,7 +109,7 @@ echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
 echo '<p>'._('This report scans items in your course for accessibility issues.').' ';
-echo _('Currently it will only identify images that are missing alt text.'). '</p>';
+echo _('Currently it will only identify images that are missing alt text, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
 echo '<ul>';
