@@ -835,7 +835,8 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1,$quotetype='"',$in
 			if ($depth==0) {
 				if ($inbraces) {
 					//interpret stuff in braces as code
-					$insidebrace = interpretline(substr($str,$startmarker+1,$c-$startmarker-1),$anstype,$countcnt+1,$included_qs);
+                    $insidetext = str_replace('\"','"',substr($str,$startmarker+1,$c-$startmarker-1));
+					$insidebrace = interpretline($insidetext,$anstype,$countcnt+1,$included_qs);
 					if ($insidebrace!='error') {
 						$outstr .= '".('.$insidebrace.')."';
 					}
