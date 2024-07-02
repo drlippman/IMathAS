@@ -2610,19 +2610,20 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 		$out .= 'negative ';
 		$num = abs($num);
 	}
+    $num = round($num, 9);
 	$int = floor($num);
-	$dec = 	$num-$int;
-
+	$dec = round($num-$int,9);
+    
 	if ($int>0) {
 		$out .= convertTri($int,0,$doth,$addcommas);
-		if (abs($dec)>1e-9) {
+		if (abs($dec)>1e-10) {
 			$out .= " and ";
 		}
 	}
-	if (abs($dec)>1e-9) {
+	if (abs($dec)>1e-10) {
 		$cnt = 0;
-		while (abs($dec-round($dec))>1e-9 && $cnt<9) {
-			$dec *= 10;
+		while (abs($dec-round($dec))>1e-10 && $cnt<9) {
+			$dec = round(10*$dec, 9);
 			$cnt++;
 		}
 		$out .= convertTri(round($dec),0);
