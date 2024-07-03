@@ -177,7 +177,6 @@ function mbxfilter($str) {
 		'&ge;'=>'<m>\ge</m>',
 		'&hellip;'=>'<ellipsis/>',
 		'…'=>'<ellipsis/>',
-		'#'=>'<hash/>',
 		'$'=>'<dollar/>',
 		'%'=>'<percent/>',
 		'^'=>'<circumflex/>',
@@ -193,7 +192,7 @@ function mbxfilter($str) {
 		'&rdquo;'=>'<rq/>',
 		'&lsquo;'=>'<lsq/>',
 		'&rsquo;'=>'<rsq/>',
-		'&amp'=>'<ampersand/>',
+		'&amp'=>'&',
 		'“'=>'<lq/>',
 		'”'=>'<rq/>',
 		'‘'=>'<lsq/>',
@@ -203,7 +202,7 @@ function mbxfilter($str) {
 
 //attempt to convert any remaining entities to unicode, then convert & to <ampersand/>
 	$str = html_entity_decode($str);
-	$str = str_replace('&','<ampersand />',$str);
+	$str = str_replace(['#','&'],['<hash/>','<ampersand />'],$str);
 
 //restore tags
     $str = preg_replace_callback('|<t(\d+)>|', function($m) {
