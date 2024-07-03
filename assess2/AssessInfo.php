@@ -202,6 +202,7 @@ class AssessInfo
       }
 
       $this->assessData['can_use_latepass'] = $LPneeded;
+      $this->assessData['latepass_after'] = ($this->assessData['allowlate']>10);
       $this->assessData['latepasses_avail'] = $latepasses;
 
       $LPcutoff = $this->assessData['LPcutoff'];

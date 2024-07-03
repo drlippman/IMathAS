@@ -21,7 +21,7 @@
           <p>
             {{ $t('duedialog.nowdue') }}
           </p>
-          <p v-if="settings.can_use_latepass > 0">
+          <p v-if="settings.can_use_latepass > 0 && settings.latepass_after">
             {{ $tc('closed.latepassn', settings.latepasses_avail) }}
             <br/>
             {{ latepassExtendMsg }}
