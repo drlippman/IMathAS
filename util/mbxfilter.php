@@ -40,8 +40,6 @@ function mbxfilter($str) {
 	$str = preg_replace('#</?div[^>]*>#','',$str);
 	//strip scripts - don't want to see insides left behind
 	$str = preg_replace('#<script.*?</script>\s*#s','',$str);
-	//force p in li
-	$str = str_replace(array('<li>','</li>'),array('<li><p>','</p></li>'),$str);
 	//if not editor-generated, wrap in <p> and rewrite double line breaks.
 	if (substr($str,0,2)!='<p') {
 		$str = '<p>'.$str.'</p>';
@@ -55,8 +53,6 @@ function mbxfilter($str) {
 	$C = array('elements'=>'a,b,br,canvas,em,h1,h2,h3,h4,h5,h6,i,img,input,li,ol,option,p,pre,select,strong,sub,sup,table,tbody,td,textarea,th,thead,tr,u,ul,statement,solution,hint');
 	$str = htmLawed($str, $C);
 	$str = str_replace("\n\n","\n",$str);
-
-
 
 //rewrite input boxes, select, textarea, etc.
 	$str = preg_replace('/<input[^>]*Preview[^>]*>\s*/','',$str); //strip preview buttons
@@ -146,8 +142,11 @@ function mbxfilter($str) {
 	$str = preg_replace_callback('/`(.*?)`/s', function($m) {
 		global $mathexp, $mathexpcnt, $AMT;
 		$mathexpcnt++;
-		$m[1] = str_replace(array('&ne;','&quot;','&le;','&ge;','<','>','&lt;','&gt;'),array('ne','"','le','ge','lt','gt','lt','gt'),$m[1]);
-		$tex = $AMT->convert($m[1]);
+        $m[1] = normalizemathunicode($m[1]);
+        $m[1] = str_replace('&amp;','&',$m[1]);
+		$m[1] = str_replace(array('&ne;','&quot;','&le;','&ge;','<','>','&lt;','&gt;','&#8321;','&#8322;','&sup2;','&sup3;','&sup2','&sup3'),
+                            array('ne','"','le','ge','lt','gt','lt','gt','_1','_2','^2','^3','^2','^3'),$m[1]);
+        $tex = $AMT->convert($m[1]);
 		$tex = str_replace('&','\amp',$tex);  //need to use \amp macro for array enviro & symbols
 		$mathexp[$mathexpcnt] = $tex;
 		return '<m>'.$mathexpcnt.'</m>';
