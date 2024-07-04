@@ -2636,7 +2636,8 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 	return trim($out);
 }
 
-function fractowords($numer,$denom,$options='no') { //options can combine 'mixed','over','by' and 'literal'
+function fractowords($numer,$denom,$options='no') { //options can combine 'hyphen','mixed','over','by' and 'literal'
+  global $placevals;
 
   if (strpos($options,'mixed')===false) {
     $int='';
@@ -2706,14 +2707,17 @@ function fractowords($numer,$denom,$options='no') { //options can combine 'mixed
         } else {
           $bot='negative halve';
         }
+      } else if (abs(round(log10(abs($denom))) - log10(abs($denom)))<1e-12) { // is multiple of 10
+        $bot = $placevals[round(log10(abs($denom)))];
       } else {
-        $bot=numtowords($denom,$doth=true);
+        $bot=str_replace(' ','-',numtowords($denom,true));
       }
 
+      $dohypen = (strpos($options,'hyphen')!==false && strpos($top,'-')===false && strpos($bot,'-')===false);
       if (abs($numer)==1) {
-        return $int.$top.' '.$bot;
+        return $int.$top.($dohypen?'-':' ').$bot;
       } else {
-        return $int.$top.' '.$bot.'s';
+        return $int.$top.($dohypen?'-':' ').$bot.'s';
       }
 
     } elseif (strpos($options,'over')!==false) {//over or overby, prefers over
