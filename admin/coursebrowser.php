@@ -137,8 +137,12 @@ $placeinhead = '<script type="text/javascript">';
 $placeinhead .= 'var courses = '.getCourseBrowserJSON().';';
 $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'";';
 $placeinhead .= '</script>';
-$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
+$placeinhead .= '<script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
 $pagetitle = _('Course Browser');

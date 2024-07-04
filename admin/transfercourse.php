@@ -64,7 +64,11 @@ if (!empty($_POST['newowner'])) {
 	exit;
 }
 
-$placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.global.prod.min.js" integrity="sha512-dJsT2VK9KxehzZYzxzUELznI6velu2pAOwpkL5jj4TQQhTNGXZUMup7aLqgqNwVPSUF/Ntcdfla3BEcfC7zwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .fade-enter-active {
