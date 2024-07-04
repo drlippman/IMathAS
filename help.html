@@ -2451,7 +2451,7 @@ The following macros help with formatting values for display:
    numtowords(1203,false,false,true) returns "one thousand, two hundred three"
   </li>
 <li><strong>fractowords(numerator,denominator,[options])</strong>: Creates a string containing fraction numerator/denominator written out in words. By default, fractions will be reduced to integers if possible,
-	and pos/neg signs will be reduced. Options is a string that can include combinations of 'mixed' or 'literal', and 'over' or 'by'. Using 'over' or 'by' will connect numerator and denominator with that word.
+	and pos/neg signs will be reduced. Options is a string that can include combinations of 'mixed' or 'literal', and 'over' or 'by'. Using 'over' or 'by' will connect numerator and denominator with that word. Using 'hyphen' will put a hyphen between numerator and denominator.
 	Using 'mixed' will output a mixed number, and 'literal' overrides the default simplifications. Does not allow division by zero. If 'over' and 'by' both used, defaults to 'over'. If 'mixed' and 'literal' both used,
 	defaults to 'mixed'.<br/>
 	fractowords(5,-2) returns "negative five halves"<br/>
@@ -2460,6 +2460,7 @@ The following macros help with formatting values for display:
 	fractowords(-7,4,'mixed over') returns "negative one and three over four"<br/>
 	fractowords(6,3,'literal') returns "six thirds"<br/>
 	fractowords(6,3,'literal over') returns "six over three"<br/>
+    fractowords(2,3,'hyphen') returns "two-thirds"<br/>
 </li>
 <li><strong>numtoroman(number,[uppercase])</strong>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
     produce lowercase</li>
