@@ -2709,11 +2709,15 @@ function fractowords($numer,$denom,$options='no') { //options can combine 'mixed
       } else {
         $bot=numtowords($denom,$doth=true);
       }
-
-      if (abs($numer)==1) {
-        return $int.$top.' '.$bot;
+      if (strpos($options,'hyphen') !== false) {
+        $space = '-';
       } else {
-        return $int.$top.' '.$bot.'s';
+        $space = ' ';
+      }
+      if (abs($numer)==1) {
+        return $int.$top.$space.$bot;
+      } else {
+        return $int.$top.$space.$bot.'s';
       }
 
     } elseif (strpos($options,'over')!==false) {//over or overby, prefers over
