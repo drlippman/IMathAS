@@ -2227,13 +2227,17 @@ for ($arr as $color=>$num) {
 }
 </pre>
 
-<p>Conditions can be used <em>inside</em> a for loop, but not outside without explicit blocking</p>
+<p>Conditions after the statement can be used <em>inside</em> a for loop, but not outside without explicit blocking</p>
 <pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 {for ($i=1..5) {$a = $a+$i} } if ($a>2)    WORKS
 </pre>
 
-<p>Inside a for loop, <code>break</code> can be used to break out of the loop, and 
+<p>Conditions using blocking inside a loop are fine</p>
+<pre>for ($i=1..5) { if ($i>2) {$a = $a+$i} }   WORKS</pre>
+
+<p>Inside a <code>for</code> or <code>foreach</code> loop, 
+   <code>break</code> can be used to break out of the loop, and 
    <code>continue</code> can be used to move on to the next iteration without executing 
    any further code in the block.
 </p>
