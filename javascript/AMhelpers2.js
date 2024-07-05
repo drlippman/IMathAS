@@ -465,6 +465,9 @@ function initShowAnswer2() {
           var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
           e.currentTarget.setAttribute('aria-expanded', curstate ? 'false' : 'true');
           $("#ans"+qref).toggleClass("hidden", curstate);
+          if (!curstate) {
+            $("#ans"+qref).attr("tabindex","-1").focus();
+          }
         })
         .html(icon)
     );

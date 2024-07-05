@@ -193,11 +193,17 @@ switch($_GET['action']) {
             function togglechgpw(el) {
                 document.getElementById("pwinfo").style.display=el.checked?"":"none"; 
                 el.setAttribute("aria-expanded", el.checked);
+                if (checked) {
+                    $("#pwinfo").focus();
+                }
             } 
             function togglechgmfa(el) { 
                 if (document.getElementById("mfainfo")) {
                     $("#mfainfo").toggle(el.value>0);
                     el.setAttribute("aria-expanded", el.value>0);
+                    if (el.value > 0) {
+                        $("#mfainfo").focus();
+                    }
                 }
             }
             var oldemail = "'.Sanitize::encodeStringForJavascript($line['email']).'";
@@ -244,7 +250,7 @@ switch($_GET['action']) {
 		}
 		echo '<span class="form"><label for="dochgpw">',_('Change Password?'),'</label></span> ';
         echo '<span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this)" aria-controls="pwinfo" aria-expanded="false"/></span><br class="form" />';
-		echo '<div style="display:none" id="pwinfo">';
+		echo '<div style="display:none" id="pwinfo" tabindex="-1">';
 		echo "<span class=form><label for=\"pw1\">",_('Enter new password:'),"</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">",_('Verify new password:'),"</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
         echo '</div>';
@@ -268,7 +274,7 @@ switch($_GET['action']) {
             $MFA = new GoogleAuthenticator();
             $mfasecret = $MFA->createSecret();
             $mfaurl = $MFA->getOtpauthUrl($installname.':'.$line['SID'], $mfasecret, $installname);
-            echo '<div style="display:none" id="mfainfo">';
+            echo '<div style="display:none" id="mfainfo" tabindex="-1">';
             echo '<script type="text/javascript" src="javascript/jquery.qrcode.min.js"></script>';
             echo '<script type="text/javascript">$(function(){$("#mfaqrcode").qrcode({width:128,height:128,text:"'.Sanitize::encodeStringForJavascript($mfaurl).'"})});</script>';
             echo '<input type=hidden name=mfasecret value="'.Sanitize::encodeStringForDisplay($mfasecret).'" />';
