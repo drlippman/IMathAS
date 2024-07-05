@@ -190,11 +190,15 @@ switch($_GET['action']) {
             }
         }
         echo '<script type="text/javascript">
-            function togglechgpw(val) { 
-                document.getElementById("pwinfo").style.display=val?"":"none"; 
+            function togglechgpw(el) {
+                document.getElementById("pwinfo").style.display=el.checked?"":"none"; 
+                el.setAttribute("aria-expanded", el.checked);
             } 
-            function togglechgmfa(val) { 
-                $("#mfainfo").toggle(val>0);
+            function togglechgmfa(el) { 
+                if (document.getElementById("mfainfo")) {
+                    $("#mfainfo").toggle(el.value>0);
+                    el.setAttribute("aria-expanded", el.value>0);
+                }
             }
             var oldemail = "'.Sanitize::encodeStringForJavascript($line['email']).'";
             $(function () {
@@ -202,6 +206,11 @@ switch($_GET['action']) {
                     var needchk = $("#dochgpw").prop("checked") ||
                         $("#email").val() != oldemail ||
                         ($("#dochgmfa").val() < '.$mfatype.');
+                    if (needchk && !$("#seccheck").is(":visible")) {
+                      $("#infolive").html("'._('The changes you are making require additional security verification. Re-enter your password later in the form.').'");
+                    } else if (!needchk) {
+                      $("#infolive").html("");
+                    }
                     $("#seccheck").toggle(needchk);
                     $("#oldpw,#oldmfa").prop("required", needchk);
                 });
@@ -224,6 +233,7 @@ switch($_GET['action']) {
 		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>',_('Profile Settings'),'</legend>';
         echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
+        echo '<div id="infolive" aria-live="polite" class="sr-only"></div>';
 		echo "<span class=form><label for=\"firstname\">",_('Enter First Name'),":</label></span> <input class=\"form pii-first-name\" type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">",_('Enter Last Name'),":</label></span> <input class=\"form pii-first-name\" type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
 		if ($myrights>10 && $groupid>0) {
@@ -232,13 +242,18 @@ switch($_GET['action']) {
 			$r = $stm->fetch(PDO::FETCH_NUM);
 			echo '<span class="form">'._('Group').':</span><span class="formright">'.Sanitize::encodeStringForDisplay($r[0]).'</span><br class="form"/>';
 		}
-		echo '<span class="form"><label for="dochgpw">',_('Change Password?'),'</label></span> <span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
+		echo '<span class="form"><label for="dochgpw">',_('Change Password?'),'</label></span> ';
+        echo '<span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this)" aria-controls="pwinfo" aria-expanded="false"/></span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo">';
 		echo "<span class=form><label for=\"pw1\">",_('Enter new password:'),"</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">",_('Verify new password:'),"</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
         echo '</div>';
         echo '<span class=form><label for="dochgmfa">'._('2-factor Authentication').'</label></span>';
-        echo '<span class="formright"><select name="dochgmfa" id="dochgmfa" onchange="togglechgmfa(this.value)" /> ';
+        echo '<span class="formright"><select name="dochgmfa" id="dochgmfa" onchange="togglechgmfa(this)" ';
+        if ($line['mfa']=='') {
+            echo 'aria-controls="mfainfo" aria-expanded=false ';
+        }
+        echo '/> ';
         echo '<option value=0 '.($mfatype == 0 ? 'selected':'').'>'._('Disable').'</option>';
         if ($line['rights'] > 74) {
             echo '<option value=1 '.($mfatype == 1 ? 'selected':'').'>'._('Enable for admin actions').'</option>';

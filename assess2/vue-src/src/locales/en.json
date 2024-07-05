@@ -137,7 +137,7 @@
     "score": "Score: {pts}/{poss}",
     "practicescore": "Practice score: {pts}/{poss}",
     "possible": "1 point possible | {n} points possible",
-    "answered": "{n}/{tot} answered",
+    "answered": "Answered: {n}/{tot}",
     "assess_submit": "Submit and End",
     "done": "Done",
     "resources_header": "Resources",

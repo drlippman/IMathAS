@@ -9,8 +9,9 @@
           :class="{practicenotice: ainfo.in_practice}"
         >
           {{ curScorePoints }}
+        </span> <span class="med-left subdued">
+          {{ curAnswered }}
         </span>
-        <span class="med-left subdued">{{ curAnswered }}</span>
       </div>
     </div>
 
@@ -100,7 +101,7 @@
         label = "lti.forum"
         :cnt = "ainfo.lti_forumcnt"
       />
-      <lti-menu v-if="ainfo.is_lti" />
+      <lti-menu v-if="ainfo.is_lti || ainfo.is_diag" />
     </div>
 
   </div>

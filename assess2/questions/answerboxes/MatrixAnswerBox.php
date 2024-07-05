@@ -55,7 +55,7 @@ class MatrixAnswerBox implements AnswerBox
             $out .= $ansprompt;
         }
         if (!empty($answersize)) {
-            $tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
+            $tip = _('Enter each element of the matrix as number (like 5, -3, 2.2)');
             $shorttip = _('Enter an integer or decimal number');
             if ($reqdecimals!=='') {
                 list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
@@ -74,7 +74,9 @@ class MatrixAnswerBox implements AnswerBox
             } else {
                 $out .= '<div class="' . $colorbox . '" id="qnwrap' . $qn . '"' . $style . '>';
             }
+            $answersize = explode(",", $answersize);
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
+                ' ' . sprintf(_('matrix entry with %d rows and %d columns'), $answersize[0], $answersize[1]) .
                 (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
             $out .= '<table role="group" aria-label="' . $arialabel . '">';
             if (in_array('det', $dispformats)) {
@@ -82,7 +84,6 @@ class MatrixAnswerBox implements AnswerBox
             } else {
                 $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
             }
-            $answersize = explode(",", $answersize);
             if (isset($GLOBALS['capturechoices'])) {
                 $GLOBALS['answersize'][$qn] = $answersize;
             }
@@ -104,8 +105,7 @@ class MatrixAnswerBox implements AnswerBox
                     ];
 
                     $out .= '<input ' .
-                    'aria-label="' . sprintf(_('Cell %d of %d'), $count + 1, $cellcnt) . '" ' .
-                    Sanitize::generateAttributeString($attributes) .
+                        Sanitize::generateAttributeString($attributes) .
                         '" />';
 
                     $out .= "</td>\n";

@@ -79,7 +79,9 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             } else {
                 $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
             }
+            
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
+                ' ' . sprintf(_('matrix entry with %d rows and %d columns'), $answersize[0], $answersize[1]) .
                 (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
             $out .= '<table role="group" aria-label="' . $arialabel . '">';
             $count = 0;
@@ -102,8 +104,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
                     $params['matrixsize'] = $answersize;
 
                     $out .= '<input ' .
-                    'aria-label="' . sprintf(_('Cell %d of %d'), $count + 1, $cellcnt) . '" ' .
-                    Sanitize::generateAttributeString($attributes) .
+                        Sanitize::generateAttributeString($attributes) .
                         '" />';
 
                     $out .= "</td>\n";

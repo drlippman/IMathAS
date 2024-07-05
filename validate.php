@@ -497,7 +497,8 @@ if ($hasusername) {
             header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?r=" . Sanitize::randomQueryStringParam());
             exit;
         } else if ($_SESSION['diag_aver'][0] > 1 &&
-            strpos($_SERVER['PHP_SELF'], 'assess2/') === false
+            strpos($_SERVER['PHP_SELF'], 'assess2/') === false &&
+            !in_array(basename($urlparts['path']), array('ltiuserprefs.php'))
         ) {
             $querystr = 'cid=' . Sanitize::onlyInt($_SESSION['diag_aver'][1]);
             $querystr .= '&aid=' . Sanitize::onlyInt($_SESSION['diag_aver'][2]);
