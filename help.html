@@ -3514,6 +3514,11 @@ A student is asked to enter a string (a word or list of letters).
 		<li>ignore_order: treats ABC and CBA as equivalent</li>
 		<li>ignore_commas: removes commas</li>
 		<li>partial_credit: awards partial credit based on Levenshtein distance between strings</li>
+        <li>all_words: gives credit the student answer contains a list of key words.  $answer 
+            should provide a comma-separated list of words to look for, and partial credit 
+            will be given for each word found. Cannot be combined 
+            with $answerformat="list" or $partialcredit.
+        </li>
 		<li>allow_diff=n: gives full credit for answers with Levenshtein distance between strings &le; n </li>
 		<li>in_answer: gives credit if $answer is contained anywhere in the student answer</li>
 		<li>regex: interprets $answer as a <a href="https://www.youtube.com/watch?v=c-Ov1JUMDv4">regular expression</a> (pattern) to evaluate the student's answer.  For example, $answer="cost.*increas" will give credit if the word <em>cost</em> appears before <em>increas</em> in the student's answer.  $answer="increas|ris" will accept any of the following: <em>increas</em>ing, <em>increas</em>es, <em>ris</em>ing, or <em>ris</em>en etc.</li>
@@ -3536,6 +3541,13 @@ A student is asked to enter a string (a word or list of letters).
     defining $variables.<br><br>
 	"setexp" enables a separate grading algorithm for set expression statements, ignoring $strflags. The $answer should be given using
 	 'nn' for intersection, 'uu' for union, '-' for set difference, '^c' for set complement, and 'oplus' for symmetric difference.</dd>
+<dt>$partialcredit = array(string,score,[string,score,...]) </dt>
+     <dd>Allows you to specify partial credit for other answers.  The array should be 
+     given in the form array(string,score,string,score,...), where
+     string is the value to compare to the student answer, and score is a proportion 
+     between 0 and 1 to award as partial credit.  Note this only works for single 
+     string answers; list answers and "all_words" are not supported.</dd>
+ <dt>$ansprompt = string </dt>
 <dt>$displayformat = "usepreview" or "typeahead" or "usepreviewnomq"</dt>
     <dd>"usepreview" enables mathquill entry for mathematical answers.<br/>
         "usepreviewnomq" adds a preview button for previewing mathematical answers in asciimath.<br/>

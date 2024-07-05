@@ -36,7 +36,10 @@ class StringScorePart implements ScorePart
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-
+        $optionkeys = ['partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
+        }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
         
@@ -57,15 +60,6 @@ class StringScorePart implements ScorePart
             return $scorePartResult;
         }
         
-        if ($answerformat=='list') {
-            $gaarr = array_map('trim',explode(',',$givenans));
-            $anarr = array_map('trim',explode(',',$answer));
-            $gaarrcnt = count($gaarr);
-        } else {
-            $gaarr = array($givenans);
-            $anarr = array($answer);
-            $gaarrcnt = 1;
-        }
         $strflags = str_replace(' ','',$strflags);
         $flags = [];
         $torem = [];
@@ -104,6 +98,27 @@ class StringScorePart implements ScorePart
         }
         if (!isset($flags['ignore_case'])) {
             $flags['ignore_case']=true;
+        }
+        if (!empty($flags['all_words'])) {
+            $flags['in_answer'] = true;
+        }
+
+        if ($answerformat=='list' || !empty($flags['all_words'])) {
+            $gaarr = array_map('trim',explode(',',$givenans));
+            $anarr = array_map('trim',explode(',',$answer));
+            $gaarrcnt = count($gaarr);
+        } else {
+            $gaarr = array($givenans);
+            $anarr = array($answer);
+            $gaarrcnt = 1;
+            if (is_array($partialcredit)) {
+                $partialvals = [1];
+                
+                for ($i=0;$i<count($partialcredit);$i+=2) {
+                    $anarr[] = $partialcredit[$i];
+                    $partialvals[] = $partialcredit[$i+1];
+                }
+            }
         }
 
 
@@ -186,10 +201,13 @@ class StringScorePart implements ScorePart
                     if (!empty($flags['remove_whitespace'])) {
                         $anans = trim(preg_replace('/\s+/','',$anans));
                     }
-                    if (!empty($flags['partial_credit']) && $answerformat!='list' && strlen($givenans)<250) {
+                    if (!empty($flags['partial_credit']) && $answerformat!='list' && empty($flags['all_words']) && strlen($givenans)<250) {
                         $poss = strlen($anans);
                         $dist = levenshtein($anans,$givenans);
                         $score = ($poss - $dist)/$poss;
+                        if ($answerformat != 'list' && empty($flags['all_words']) && is_array($partialcredit)) {
+                            $score *= $partialvals[$i];
+                        }
                         if ($score>$correct) { $correct = $score;}
                     } else if (isset($flags['allow_diff']) && strlen($givenans)<250) {
                         if (levenshtein($anans,$givenans) <= 1*$flags['allow_diff']) {
@@ -200,8 +218,10 @@ class StringScorePart implements ScorePart
                     } else if (isset($flags['in_answer'])) {
                         if (strpos($givenans,$anans)!==false) {
                             $correct += 1;
-                            $foundloc = $j;
-                            break 2;
+                            if (empty($flags['all_words'])) {
+                                $foundloc = $j;
+                                break 2;
+                            }
                         }
                     } else if (isset($flags['regex'])) {
                         $regexstr = '/'.str_replace('/','\/',$anans).'/'.($flags['ignore_case']?'i':'');
@@ -221,12 +241,17 @@ class StringScorePart implements ScorePart
             }
             if ($foundloc>-1) {
                 array_splice($gaarr,$foundloc,1); //remove from list
+                if ($answerformat != 'list' && empty($flags['all_words']) && is_array($partialcredit)) {
+                    $correct *= $partialvals[$i];
+                }
                 if (count($gaarr)==0) {
                     break; //stop if no student answers left
                 }
             }
         }
-        if ($gaarrcnt <= count($anarr)) {
+        if ($answerformat != 'list' && empty($flags['all_words']) && is_array($partialcredit)) {
+            $score = $correct;
+        } else if ($gaarrcnt <= count($anarr)) {
             $score = $correct/count($anarr);
         } else {
             $score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/($gaarrcnt+count($anarr));
