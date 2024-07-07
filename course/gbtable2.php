@@ -1765,6 +1765,7 @@ function gbtable() {
 		$cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
 		$cattotattemptedec[$ln] = $cattotcurec[$ln];
 		foreach($assessidx as $aid=>$i) {
+            if (!isset($assesscol[$aid])) { continue; }
 			$col = $assesscol[$aid];
 			if (!empty($gb[$ln][1][$col][14]) && $cntingb[$i] == 1) {
 				unset($cattotpast[$ln][$category[$i]][$col]);
@@ -1805,6 +1806,7 @@ function gbtable() {
 			}
 		}
 		foreach($gradeidx as $aid=>$i) {
+            if (!isset($gradecol[$aid])) { continue; }
 			$col = $gradecol[$aid];
 			if (!empty($gb[$ln][1][$col][14]) && $cntingb[$i] == 1){
 				unset($cattotpast[$ln][$category[$i]][$col]);
@@ -1834,6 +1836,7 @@ function gbtable() {
 			}
 		}
 		foreach($exttoolidx as $aid=>$i) {
+            if (!isset($exttoolcol[$aid])) { continue; }
 			$col = $exttoolcol[$aid];
 			if (!empty($gb[$ln][1][$col][14]) && $cntingb[$i] == 1) {
 				unset($cattotpast[$ln][$category[$i]][$col]);
@@ -1863,6 +1866,7 @@ function gbtable() {
 			}
 		}
 		foreach($discussidx as $aid=>$i) {
+            if (!isset($discusscol[$aid])) { continue; }
 			$col = $discusscol[$aid];
 			if (!empty($gb[$ln][1][$col][14]) && $cntingb[$i] == 1) {
 				unset($cattotpast[$ln][$category[$i]][$col]);
@@ -2066,6 +2070,7 @@ function gbtable() {
 
 		//remove excused and non-attempted
 		foreach($assessidx as $aid=>$i) {
+            if (!isset($assesscol[$aid])) { continue; }
             $col = $assesscol[$aid];
             if (!empty($sectionlimit[$col]) && 
                 (empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
@@ -2129,6 +2134,7 @@ function gbtable() {
 		}
 
 		foreach($gradeidx as $aid=>$i) {
+            if (!isset($gradecol[$aid])) { continue; }
 			$col = $gradecol[$aid];
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
 				for ($j=0;$j<4;$j++) {
@@ -2137,6 +2143,7 @@ function gbtable() {
 			}
 		}
 		foreach($exttoolidx as $aid=>$i) {
+            if (!isset($exttoolcol[$aid])) { continue; }
 			$col = $exttoolcol[$aid];
 			//remove excused
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
@@ -2154,6 +2161,7 @@ function gbtable() {
 			}
 		}
 		foreach($discussidx as $aid=>$i) {
+            if (!isset($discusscol[$aid])) { continue; }
             $col = $discusscol[$aid];
             if (!empty($sectionlimit[$col]) && 
                 (empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
