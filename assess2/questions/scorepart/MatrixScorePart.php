@@ -116,7 +116,14 @@ class MatrixScorePart implements ScorePart
         }
         foreach ($answerlist as $k=>$v) {
             $v = evalMathParser($v);
-            $answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
+            if (is_nan($v)) {
+                if (isset($GLOBALS['teacherid'])) {
+                    echo _('Debug info: invalid $answer');
+                }
+                $answerlist[$k] = 0;
+            } else {
+                $answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
+            }
         }
 
         if ($fullmatrix && in_array('scalarmult',$ansformats)) {
