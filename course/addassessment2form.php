@@ -1,5 +1,18 @@
 <?php
 
+if ($line['workcutoff'] == 0) {
+    $workcutofftype = 'hr';
+    $workcutoffval = 1;
+} else if ($line['workcutoff'] < 120 && $line['workcutoff']%60 != 0) {
+    $workcutofftype = 'min';
+    $workcutoffval = $line['workcutoff'];
+} else if ($line['workcutoff'] < 48*60 && $line['workcutoff']%1440 != 0) {
+    $workcutofftype = 'hr';
+    $workcutoffval = round($line['workcutoff']/60, 2);
+} else {
+    $workcutofftype = 'day';
+    $workcutoffval = round($line['workcutoff']/1440, 2);
+}
 $vueData = array(
 	'name' => $line['name'],
 	'summary' => $line['summary'],
@@ -53,6 +66,9 @@ $vueData = array(
 	'showhints' => ($line['showhints']&1) > 0,
     'showwork' => ($line['showwork']&3),
     'showworktype' => ($line['showwork']&4),
+    'doworkcutoff' => ($line['workcutoff'] > 0),
+    'workcutofftype' => $workcutofftype,
+    'workcutoffval' => $workcutoffval,
 	'showextrefs' => ($line['showhints']&2) > 0,
     'showwrittenex' => ($line['showhints']&4) > 0,
 	'msgtoinstr' => $line['msgtoinstr'] > 0,
@@ -409,12 +425,29 @@ $vueData = array(
 					<option value="2"><?php echo _('After assessment');?></option>
 					<option value="3"><?php echo _('During or after assessment');?></option>
                 </select>
-                <br>
-                <label for="showworktype"><?php echo _('Work entry type');?>:</label>
-                <select name="showworktype" id="showworktype" v-model="showworktype">
-                    <option value="0"><?php echo _('Essay');?></option>
-                    <option value="4"><?php echo _('File upload');?></option>
-                </select>
+                <span v-if="showwork > 1">
+                    <br>
+                    <input type="checkbox" v-model="doworkcutoff" name="doworkcutoff" id="doworkcutoff" value="1"> 
+                    <label for="doworkcutoff"><?php echo _('Add work cutoff') . '. ';  ?></label>
+                    <span v-if="doworkcutoff">
+                        <label for="workcutoffval"><?php echo _('Work must be added within:') . ' '; ?></label>
+                        <input name="workcutoffval" id="workcutoffval" v-model="workcutoffval" style="width:5.5ch" 
+                            type="number" min="0" :max="workcutofftype=='day'?45:1000"/>
+                        <select name="workcutofftype" id="workcutofftype" v-model="workcutofftype" aria-label="<?php echo _('units for work added within time');?>">
+                            <option value="min"><?php echo _('minutes');?></option>
+                            <option value="hr"><?php echo _('hours');?></option>
+                            <option value="day"><?php echo _('days');?></option>
+                        </select>
+                    </span>
+                </span>
+                <span v-if="showwork >0">
+                    <br>
+                    <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                    <select name="showworktype" id="showworktype" v-model="showworktype">
+                        <option value="0"><?php echo _('Essay');?></option>
+                        <option value="4"><?php echo _('File upload');?></option>
+                    </select>
+                </span>
             </span><br class=form />
 
 			<span class=form><?php echo _('Options');?></span>

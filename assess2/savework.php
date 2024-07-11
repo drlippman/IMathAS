@@ -48,19 +48,32 @@ $assess_record->loadRecord($uid);
 // grab all questions settings
 $assess_info->loadQuestionSettings('all', false, false);
 
+$workafterCutoff = $assess_record->getShowWorkAfterCutoff();
+
 // if have active scored record end it
 if (!$assess_record->hasRecord()) {
-  echo '{"error": "not_ready"}';
+    $out['error'] = 'not_ready';
 } else if ($assess_info->getSetting('submitby') === 'by_assessment' && 
     $assess_record->hasActiveAttempt()
 ) {
-  echo '{"error": "active_attempt"}';
+  $out['error'] = 'active_attempt';
+} else if ($workafterCutoff > 0 && $now > $workafterCutoff + 30) {
+  $out['error'] = 'workafter_expired';
 } else {
   $res = $assess_record->saveWork($_POST['work']);
   $assess_record->saveRecordIfNeeded();
   if ($res !== true) {
-    echo '{"error": $res}';
+    $out['error'] = 'error';
   } else {
-    echo '{"success": true}';
+    $out['success'] = true;
   }
 }
+
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($out, $assess_record, $assess_info);
+
+//prep date display
+prepDateDisp($out);
+
+//output JSON object
+echo json_encode($out);

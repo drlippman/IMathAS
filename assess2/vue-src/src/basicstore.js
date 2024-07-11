@@ -31,6 +31,8 @@ export const store = reactive({
   timelimit_grace_expired: false,
   timelimit_restricted: 0,
   enddate_timer: null,
+  showwork_timer: null,
+  showwork_expired: false,
   show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
@@ -319,6 +321,7 @@ export const actions = {
     }
     if (Object.keys(data).length === 0) { // nothing to submit
       store.inTransit = false;
+      store.errorMsg = null;
       if (store.inAssess) {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
@@ -339,7 +342,7 @@ export const actions = {
       crossDomain: true
     })
       .done(response => {
-        if (response.hasOwnProperty('error')) {
+        if (response.hasOwnProperty('error') && response.error !== 'workafter_expired') {
           this.handleError(response.error);
           if (response.error === 'already_submitted') {
             response = this.processSettings(response);
@@ -788,6 +791,14 @@ export const actions = {
       }, 1000);
     }
     // store.timelimit_expired = true;
+  },
+  handleShowworklimitUp () {
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    store.errorMsg = 'workafter_submitting';
+    store.showwork_expired = true;
+    setTimeout(() => {
+      this.submitWork();
+    }, 1000);
   },
   handleDueDate () { // due date has hit
     actions.submitAutosave();
@@ -1249,6 +1260,18 @@ export const actions = {
       const dueat = data.enddate_in * 1000;
       data.enddate_local = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
+    }
+    if (data.hasOwnProperty('showwork_cutoff_in')) {
+      window.clearTimeout(store.showwork_timer);
+      const now = new Date().getTime();
+      const expires = data.showwork_cutoff_in * 1000;
+      data.showwork_local_cutoff_expires = now + expires;
+      if (expires > 0) {
+        store.showwork_timer = setTimeout(() => { this.handleShowworklimitUp(); }, expires);
+        store.showwork_expired = false;
+      } else {
+        store.showwork_expired = true;
+      }
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       window.clearTimeout(store.timelimit_timer);

@@ -80,7 +80,7 @@ row[0][1][0][12] = allowlate (in general)
 row[1][1][0][13] = timelimit if requested through $includetimelimit
 row[0][1][0][14] = LP cutoff
 row[0][1][0][15] = assess UI version (online only)
-row[0][1][0][16] = accepts work after assess
+row[0][1][0][16] = accepts work after assess (and is within cutoff)
 row[0][1][0][17] = section limit, if any 
 
 row[0][2] category totals
@@ -303,7 +303,7 @@ function gbtable() {
 	$now = time();
 	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti,ver,viewingb,scoresingb,deffeedbacktext";
 	if ($limuser>0) {
-		$query .= ',reqscoreaid,reqscore,reqscoretype';
+		$query .= ',reqscoreaid,reqscore,reqscoretype,workcutoff';
 	}
 	if (isset($includeendmsg) && $includeendmsg) {
 		$query .= ',endmsg';
@@ -342,6 +342,7 @@ function gbtable() {
 	$startdate = array();
 	$enddate = array();
 	$LPcutoff = array();
+    $workcutoff = array();
     $LPenddate = array();
 	$tutoredit = array();
 	$isgroup = array();
@@ -386,6 +387,7 @@ function gbtable() {
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
 		$LPcutoff[$kcnt] = $line['LPcutoff'];
+        $workcutoff[$kcnt] = $line['workcutoff']*60; // convert to seconds
 		if ($now<$line['startdate'] || $line['date_by_lti']==1) {
 			$avail[$kcnt] = 2;
 		} else if ($now < $line['enddate']) {
@@ -1527,7 +1529,9 @@ function gbtable() {
 			}
 		}
 
-		if (($l['status']&128)>0) { // accepting showwork after assess
+		if (($l['status']&128)>0 && 
+          ($workcutoff[$i] == 0 || $now < $l['lastchange'] + $workcutoff[$i])
+        ) { // accepting showwork after assess and within cutoff
 			$gb[$row][1][$col][16] = 1;
 		} else {
             $gb[$row][1][$col][16] = 0;

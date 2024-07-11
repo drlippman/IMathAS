@@ -193,7 +193,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									'reqscore','reqscoretype','reqscoreaid','showhints',
 									'msgtoinstr','eqnhelper','posttoforum','extrefs','showtips',
 									'cntingb','minscore','deffeedbacktext','tutoredit','exceptionpenalty',
-									'defoutcome','isgroup','groupsetid','groupmax','showwork');
+									'defoutcome','isgroup','groupsetid','groupmax','showwork','workcutoff');
 			$fieldlist = implode(',', $fields);
 			$stm = $DBH->prepare("SELECT $fieldlist FROM imas_assessments WHERE id=:id AND courseid=:cid");
 			$stm->execute(array(':id'=>intval($_POST['copyfrom']), ':cid'=>$cid));
@@ -285,32 +285,42 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
 			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
 			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
+            if (!empty($_POST['doworkcutoff'])) {
+                $toset['workcutoff'] = Sanitize::onlyInt($_POST['workcutoffval']);
+                if ($_POST['workcutofftype'] == 'hr') {
+                    $toset['workcutoff'] *= 60;
+                } else if ($_POST['workcutofftype'] == 'day') {
+                    $toset['workcutoff'] *= 60*24;
+                } 
+            } else {
+                $toset['workcutoff'] = 0;
+            }
 
 			// time limit and access control
 			$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);
-	    if (isset($_POST['latepassafterdue']) && $toset['allowlate']>0) {
-	      $toset['allowlate'] += 10;
-	    }
+            if (isset($_POST['latepassafterdue']) && $toset['allowlate']>0) {
+            $toset['allowlate'] += 10;
+            }
 
-	    if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
-	    	$toset['LPcutoff'] = parsedatetime($_POST['lpdate'],$_POST['lptime'],0);
-	    	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $toset['LPcutoff']) ||
-					$toset['LPcutoff'] < $toset['enddate']
-				) {
-	    		$toset['LPcutoff'] = 0; //don't really set if it matches course end date or is before
-	    	}
-	    } else {
-	    	$toset['LPcutoff'] = 0;
-	    }
+            if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
+                $toset['LPcutoff'] = parsedatetime($_POST['lpdate'],$_POST['lptime'],0);
+                if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $toset['LPcutoff']) ||
+                        $toset['LPcutoff'] < $toset['enddate']
+                    ) {
+                    $toset['LPcutoff'] = 0; //don't really set if it matches course end date or is before
+                }
+            } else {
+                $toset['LPcutoff'] = 0;
+            }
 
 			$toset['timelimit'] = -1*round(Sanitize::onlyFloat($_POST['timelimit'])*60);
 			$toset['overtime_grace'] = 0;
 			$toset['overtime_penalty'] = 0;
-	    if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
-	        $toset['timelimit'] = -1*$toset['timelimit'];
-					$toset['overtime_grace'] = round(Sanitize::onlyFloat($_POST['overtimegrace'])*60);
-					$toset['overtime_penalty'] = Sanitize::onlyInt($_POST['overtimepenalty']);
-	    }
+            if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
+                $toset['timelimit'] = -1*$toset['timelimit'];
+                $toset['overtime_grace'] = round(Sanitize::onlyFloat($_POST['overtimegrace'])*60);
+                $toset['overtime_penalty'] = Sanitize::onlyInt($_POST['overtimepenalty']);
+            }
 
 			$toset['password'] = trim(Sanitize::stripHtmlTags($_POST['assmpassword']));
 
@@ -655,6 +665,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']:0;
 					$line['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']:0;
 					$line['showwork'] = isset($CFG['AMS']['showwork'])?$CFG['AMS']['showwork']:0;
+                    $line['workcutoff'] = isset($CFG['AMS']['workcutoff'])?$CFG['AMS']['workcutoff']:0;
           $line['istutorial'] = 0;
 					$line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:11;
           $line['LPcutoff'] = 0;

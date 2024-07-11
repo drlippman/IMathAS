@@ -507,6 +507,22 @@ class AssessRecord
   }
 
   /**
+   * Get show work cutoff timestamp
+   * @return int
+   */
+  public function getShowWorkAfterCutoff() {
+    if (empty($this->assessRecord) || ($this->assessRecord['status'] & 128) != 128) {
+      return 0;
+    }
+    $workcutoff = $this->assess_info->getSetting('workcutoff');
+    if ($workcutoff == 0) {
+        return 0;
+    } else {
+        return $this->assessRecord['lastchange'] + $workcutoff*60;
+    }
+  }
+
+  /**
    * Get final score and assessment scored_version
    * @return array with 'score' and 'scored_version'
    */
@@ -4051,10 +4067,14 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     // always saving work for last version
     $assessver = &$this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+    $workafterCutoff = $this->getShowWorkAfterCutoff();
+    $acceptWorkAfter = ($workafterCutoff == 0 || $this->now < $workafterCutoff + 30);
     foreach ($work as $qn=>$val) {
       $question_versions = &$assessver['questions'][$qn]['question_versions'];
       $curq = &$question_versions[count($question_versions) - 1];
-      if ($during || ($this->assess_info->getQuestionSetting($curq['qid'], 'showwork') & 2) == 2) {
+      if ($during || 
+        (($this->assess_info->getQuestionSetting($curq['qid'], 'showwork') & 2) == 2 && $acceptWorkAfter)
+      ) {
         $newwork = Sanitize::incomingHtml($val);
         if (!isset($curq['work']) || $curq['work'] != $newwork) {
             $curq['work'] = $newwork;

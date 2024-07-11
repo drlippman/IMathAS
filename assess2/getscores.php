@@ -101,6 +101,8 @@ if ($assessInfoOut['submitby'] == 'by_question') {
     $assess_info->getSetting('points_possible')
   );
 
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
 
 //prep date display
 prepDateDisp($assessInfoOut);

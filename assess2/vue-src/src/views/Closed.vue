@@ -262,7 +262,9 @@ export default {
       );
     },
     canAddWork () {
-      return (store.assessInfo.showwork_after);
+      return (store.assessInfo.showwork_after &&
+        (store.assessInfo.showwork_cutoff === 0 || store.assessInfo.showwork_cutoff_in > 0)
+      );
     },
     showTutorLinks () {
       return store.assessInfo.hasOwnProperty('tutor_gblinks');

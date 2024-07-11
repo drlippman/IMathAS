@@ -116,6 +116,9 @@ $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
 
 $assessInfoOut['newexcused'] = $assess_record->get_new_excused();
 
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

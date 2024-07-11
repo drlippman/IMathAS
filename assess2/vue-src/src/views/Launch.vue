@@ -230,7 +230,8 @@ export default {
     canAddWork () {
       return ((!this.aInfo.has_active_attempt ||
         this.aInfo.submitby === 'by_question') &&
-        this.aInfo.showwork_after
+        this.aInfo.showwork_after &&
+        (this.aInfo.showwork_cutoff === 0 || this.aInfo.showwork_cutoff_in > 0)
       );
     },
     showTutorLinks () {

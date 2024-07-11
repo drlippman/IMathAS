@@ -391,6 +391,11 @@ $assess_record->saveRecordIfNeeded();
 // password at some point
 $_SESSION['assess2-'.$aid] = [$in_practice, $assess_info->getSetting('password')];
 
+if ($in_practice) {
+    $assessInfoOut['showwork_after'] = 0;
+    $assessInfoOut['showwork_cutoff'] = 0;
+}
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

@@ -107,6 +107,17 @@ if (!(isset($teacherid))) {
 			if ($_POST['showwork'] !== 'DNC') {
 				$sets[] = "showwork=:showwork";
 				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
+                $sets[] = "workcutoff=:workcutoff";
+                if (!empty($_POST['doworkcutoff'])) {
+                    $qarr[':workcutoff'] = Sanitize::onlyInt($_POST['workcutoffval']);
+                    if ($_POST['workcutofftype'] == 'hr') {
+                        $qarr[':workcutoff'] *= 60;
+                    } else if ($_POST['workcutofftype'] == 'day') {
+                        $qarr[':workcutoff'] *= 60*24;
+                    } 
+                } else {
+                    $qarr[':workcutoff'] = 0;
+                }
 			}
 
 			if ($_POST['displaymethod'] !== 'DNC') {

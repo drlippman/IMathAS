@@ -72,6 +72,9 @@ $reshowQs = $assess_info->reshowQuestionsInGb();
 $assess_info->loadQuestionSettings('all', $reshowQs);
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs);
 
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

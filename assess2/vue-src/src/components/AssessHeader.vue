@@ -190,7 +190,7 @@ export default {
     assessSubmitLabel () {
       if (this.ainfo.submitby === 'by_assessment') {
         return this.$t('header.assess_submit');
-      } else if (this.hasShowWorkAfter) {
+      } else if (this.hasShowWorkAfter && !this.ainfo.in_practice) {
         return this.$t('work.add');
       } else if (this.ainfo.showscores === 'during') {
         return this.$t('header.done');
@@ -225,6 +225,9 @@ export default {
     },
     hasShowWorkAfter () {
       let hasShowWorkAfter = false;
+      if (store.assessInfo.hasOwnProperty('showwork_cutoff_in') && store.assessInfo.showwork_cutoff_in < 0) {
+        return false;
+      }
       for (let k = 0; k < store.assessInfo.questions.length; k++) {
         if (store.assessInfo.questions[k].showwork & 2) {
           hasShowWorkAfter = true;

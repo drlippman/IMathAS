@@ -4,6 +4,11 @@
       <div style="flex-grow: 1">
         <h1>{{ $t('work.add') }}: {{ ainfo.name }}</h1>
       </div>
+      <timer v-if="ainfo.showwork_cutoff > 0"
+        :total="ainfo.showwork_cutoff * 60"
+        :end="ainfo.showwork_local_cutoff_expires"
+        :grace="0">
+      </timer>
       <div>
         <button @click = "save" class="primary">
           {{ saveLabel }}
@@ -11,6 +16,9 @@
       </div>
     </div>
     <div v-if="readyToShow">
+      <p v-if="ainfo.showwork_cutoff > 0">
+        {{ $tc('work.duein', {date: ainfo.showwork_cutoff_expires_disp}) }}
+      </p>
       <p v-if="questions.length === 0">
         {{ $t('work.noquestions') }}
       </p>
@@ -51,13 +59,15 @@ import { store, actions } from '../basicstore';
 import Question from '@/components/question/Question.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import ShowworkInput from '@/components/ShowworkInput.vue';
+import Timer from '@/components/Timer.vue';
 
 export default {
   name: 'Summary',
   components: {
     Question,
     FullQuestionHeader,
-    ShowworkInput
+    ShowworkInput,
+    Timer
   },
   data: function () {
     return {

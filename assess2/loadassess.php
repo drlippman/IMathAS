@@ -162,7 +162,8 @@ if (!$assessInfoOut['has_active_attempt']) {
   }
 }
 
-$assessInfoOut['showwork_after'] = $assess_record->getShowWorkAfter();
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
 
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
