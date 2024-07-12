@@ -387,7 +387,7 @@ function gbtable() {
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
 		$LPcutoff[$kcnt] = $line['LPcutoff'];
-        $workcutoff[$kcnt] = $line['workcutoff']*60; // convert to seconds
+        $workcutoff[$kcnt] = ($line['workcutoff'] ?? 0)*60; // convert to seconds
 		if ($now<$line['startdate'] || $line['date_by_lti']==1) {
 			$avail[$kcnt] = 2;
 		} else if ($now < $line['enddate']) {
