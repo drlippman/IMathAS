@@ -41,6 +41,7 @@ $vueData = array(
 	'showcat' => 'DNC',
 	'samever' => 'DNC',
 	'noprint' => 'DNC',
+    'lockforassess' => 'DNC',
     'showwork' => 'DNC',
     'showworktype' => 0,
     'doworkcutoff' => 0,
@@ -431,6 +432,19 @@ $vueData = array(
 				</span><br class=form />
 			</div>
 
+            <div :class="{highlight:lockforassess != 'DNC'}">
+				<label class=form for="lockforassess"><?php echo _('Lock student out of the rest of the course until submitted'); ?></label>
+				<span class=formright>
+					<select name="lockforassess" id="lockforassess" v-model="lockforassess">
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="2"><?php echo _('Yes'); ?></option>
+					</select>
+                    <span class=small>
+                        <?php echo _('Only applies to Quiz-style assessments'); ?>
+                    </span>
+				</span><br class=form />
+			</div>
 			<div :class="{highlight:noprint != 'DNC'}">
 				<label class=form for="noprint"><?php echo _('Make hard to print'); ?></label>
 				<span class=formright>

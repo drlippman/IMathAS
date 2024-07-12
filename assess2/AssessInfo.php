@@ -1220,6 +1220,10 @@ class AssessInfo
     }
     $settings['timelimit_multiplier'] = 1;
 
+    //unpack noprint
+    $settings['lock_for_assess'] = ($settings['noprint'] & 2);
+    $settings['noprint'] = ($settings['noprint'] & 1);
+
     //unpack intro
     $introjson = json_decode($settings['intro'], true);
     $pagebreaks = [];

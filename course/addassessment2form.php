@@ -47,7 +47,8 @@ $vueData = array(
 	'caltag' => ($line['caltag'] === 'use_name' ? '?' : $line['caltag']),
 	'caltagradio' => ($line['caltag'] === 'use_name' ? 'usename' : 'usetext'),
 	'shuffle' => ($line['shuffle']&(1+16+32)),
-	'noprint' => $line['noprint'] > 0,
+	'noprint' => ($line['noprint']&1) > 0,
+    'lockforassess' => ($line['noprint']&2) > 0,
 	'sameseed' => ($line['shuffle']&2) > 0,
 	'samever' => ($line['shuffle']&4) > 0,
 	'istutorial' => $line['istutorial'] > 0,
@@ -452,6 +453,11 @@ $vueData = array(
 
 			<span class=form><?php echo _('Options');?></span>
 			<span class=formright>
+                <label v-if="subtype == 'by_assessment'">
+					<input type="checkbox" value="2" name="lockforassess" v-model="lockforassess" />
+					<?php echo _('Lock student out of the rest of the course until submitted');?>
+                    <br/>
+				</label>
 				<label>
 					<input type="checkbox" value="1" name="noprint" v-model="noprint" />
 					<?php echo _('Make hard to print');?>

@@ -599,7 +599,7 @@ if ($hasusername) {
         } else {
             $cid = Sanitize::courseId($_SESSION['courseid']);
         }
-        $stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess,lticourseid FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+        $stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess,lticourseid,lockaid FROM imas_students WHERE userid=:userid AND courseid=:courseid");
         $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
         if ($line != false) {
@@ -607,6 +607,7 @@ if ($hasusername) {
             $studentinfo['timelimitmult'] = $line['timelimitmult'];
             $studentinfo['section'] = $line['section'];
             $studentinfo['latepasses'] = $line['latepass'];
+            $studentinfo['lockaid'] = $line['lockaid'];
             if ($line['lticourseid'] > 0) {
                 $studentinfo['lticourseid'] = $line['lticourseid'];
             }
@@ -714,25 +715,55 @@ if ($hasusername) {
                 echo _("This course is not available at this time");
                 exit;
             }
-            $lockaid = $crow['lockaid']; //ysql_result($result,0,2);
+            $lockaid = $crow['lockaid']; 
+            if (!empty($studentinfo['lockaid'])) {
+                $lockaid = $studentinfo['lockaid'];
+            }
             if (isset($studentid) && $lockaid > 0) {
-                if (($courseUIver == 1 && strpos(basename($_SERVER['PHP_SELF']), 'showtest.php') === false) ||
+                if ((($courseUIver == 1 && strpos(basename($_SERVER['PHP_SELF']), 'showtest.php') === false) ||
                     ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'], 'assess2/') === false ||
                         strpos($_SERVER['QUERY_STRING'], '&aid=' . $lockaid) === false))
+                    ) && strpos(basename($_SERVER['PHP_SELF']), 'ltiuserprefs.php') === false
                 ) {
-                    require_once __DIR__."/header.php";
-                    echo '<p>', _('This course is currently locked for another assessment'), '</p>';
-
-                    if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0) {
-                        echo "<p>" . _('Go back to the LMS and open the correct assessment') . "</p>";
-                    } else if ($courseUIver > 1) {
-                        echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=" . Sanitize::encodeUrlParam($lockaid) . "\">", _("Go to Assessment"), "</a> | <a href=\"$imasroot/index.php\">", _("Go Back"), "</a></p>";
-                    } else {
-                        echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=" . Sanitize::encodeUrlParam($lockaid) . "\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">", _("Go Back"), "</a></p>";
+                    $stm = $DBH->prepare('SELECT name,msgtoinstr,posttoforum FROM imas_assessments WHERE id=?');
+                    $stm->execute([$lockaid]);
+                    $lockaiddata = $stm->fetch(PDO::FETCH_ASSOC);
+                    $lockaidname =  $lockaiddata['name'];
+                    $showlockmsg = true;
+                    if ($lockaiddata['msgtoinstr'] > 0 && strpos($_SERVER['PHP_SELF'], '/msgs/') !== false) {
+                        $showlockmsg = false;
+                    } else if ($lockaiddata['posttoforum'] > 0 && strpos($_SERVER['PHP_SELF'], '/forums/') !== false) {
+                        $showlockmsg = false;
+                    } 
+                    if ($showlockmsg) {
+                        require_once __DIR__."/header.php";
+                        echo '<p>', sprintf(_('This course is currently locked for an assessment, <b>%s</b>'),
+                            Sanitize::encodeStringForDisplay($lockaidname)), '</p>';
+                        
+                        if (!empty($studentinfo['lockaid'])) {
+                            echo '<p>' , _('That assessment must be submitted before you can open anything else in the course.') , '</p>';
+                        }
+                        if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0) {
+                            echo "<p>" . _('Go back to the LMS and open the correct assessment') . ".</p>";
+                            if (!empty($studentinfo['lockaid'])) {
+                                echo '<p>' . sprintf(_('Or, if you are done with <b>%s</b>, you can submit it now.'),
+                                    Sanitize::encodeStringForDisplay($lockaidname)), '</p>';
+                                echo '<p><form method=post action="'.$imasroot.'/assess2/endassess.php?cid='.$cid.'&aid='.Sanitize::encodeUrlParam($lockaid).'" ';
+                                echo 'onsubmit="return confirm(\''._('Are you SURE you want to submit the assessment for scoring now? If you do, you will not be able to continue working on the assessment later.').'\')">';
+                                echo '<input type=hidden name=redirect value="'.Sanitize::encodeStringForDisplay($_GET['aid']).'"/>';
+                                echo '<button type=submit>';
+                                echo sprintf(_('Submit <em>%s</em> Now'), Sanitize::encodeStringForDisplay($lockaidname)) . '</button>';
+                                echo '</form>';
+                            }
+                        } else if ($courseUIver > 1) {
+                            echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=" . Sanitize::encodeUrlParam($lockaid) . "\">", _("Go to Assessment"), "</a> | <a href=\"$imasroot/index.php\">", _("Home"), "</a></p>";
+                        } else {
+                            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=" . Sanitize::encodeUrlParam($lockaid) . "\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">", _("Home"), "</a></p>";
+                        }
+                        require_once __DIR__ . '/footer.php';
+                        //header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
+                        exit;
                     }
-                    require_once __DIR__ . '/footer.php';
-                    //header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
-                    exit;
                 }
             }
             unset($lockaid);

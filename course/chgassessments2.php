@@ -252,8 +252,12 @@ if (!(isset($teacherid))) {
 			}
 
 			if ($_POST['noprint'] !== 'DNC') {
-				$sets[] = "noprint=:noprint";
-				$qarr[':noprint'] = Sanitize::onlyInt($_POST['noprint']);
+                if (!empty($_POST['noprint'])) {
+                    $sets[] = "noprint=(noprint | 1)";
+                } else {
+                    $sets[] = "noprint=(noprint & ~1)";
+                }
+                $metadata['noprint'] = $_POST['noprint'];
 			}
 
 			if ($_POST['istutorial'] !== 'DNC') {
@@ -460,6 +464,16 @@ if (!(isset($teacherid))) {
 				unset($metadata[':cid']);
 			}
 		}
+        if ($_POST['lockforassess'] !== 'DNC') {
+            // handle separately since must be limited to by_assess
+            if (!empty($_POST['lockforassess'])) {
+                $stm = $DBH->prepare("UPDATE imas_assessments SET noprint=(noprint | 2) WHERE id IN ($checkedlist) AND courseid=:cid AND submitby='by_assessment'");
+            } else {
+                $stm = $DBH->prepare("UPDATE imas_assessments SET noprint=(noprint & ~2) WHERE id IN ($checkedlist) AND courseid=:cid");
+            }
+            $stm->execute([':cid'=>$cid]);
+            $metadata['lockforassess'] = $_POST['lockforassess'];
+        }
 		if ($_POST['intro'] !== 'DNC') {
 			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['intro'])));

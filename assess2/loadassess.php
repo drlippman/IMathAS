@@ -148,6 +148,10 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 // if not available, see if there is an unsubmitted scored attempt
 if ($assessInfoOut['available'] !== 'yes') {
   $assessInfoOut['has_unsubmitted_scored'] = $assess_record->hasUnsubmittedScored();
+  if ($assessInfoOut['available'] === 'practice') {
+    // disable practice while unsubmitted scored attempt exists
+    $assessInfoOut['available'] = 'pastdue';
+  }
 }
 
 //get prev attempt info
