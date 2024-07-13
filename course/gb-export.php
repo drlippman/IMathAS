@@ -47,6 +47,7 @@
 		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include comments <br/>  <input type="radio" name="commentloc" value="1"> Separate set of columns at the end <br/><input type="radio" name="commentloc" value="0"> After each score column</span><br class="form" />';
 		echo '<span class="form">Assessment times:</span><span class="formright"> <input type="radio" name="timestype" value="0" checked="checked"> Don\'t include assessment times <br/>  <input type="radio" name="timestype" value="1"> Include total assessment time <br/><input type="radio" name="timestype" value="2"> Include time in questions</span><br class="form" />';
+        echo '<span class="form">Include assessment last changed dates?:</span><span class="formright"> <input type="radio" name="lastchanged" value="0" checked="checked"> No <input type="radio" name="lastchanged" value="1" > Yes </span><br class="form" />';
 
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
@@ -81,6 +82,7 @@
     $includeemail = !empty($_POST['emailcol']);
 	$hidelocked = ($_POST['locked']=='hide')?true:false;
 	$includetimes = intval($_POST['timestype']); //1 total time, 2 time on task
+    $includelastchange = $_POST['lastchanged']; //0: no, 1 yes
 
 	$catfilter = -1;
 	$secfilter = -1;
@@ -376,7 +378,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 	}
 }
 function gbinstrdisp() {
-	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
+	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes,$includelastchange;
 
 	if ($availshow==4) {
 		$availshow=1;
@@ -457,6 +459,11 @@ function gbinstrdisp() {
 				$pointsrow .= '<th></th>';
 				$n++;
 			}
+            if ($includelastchange && $gbt[0][1][$i][6]==0) {
+                echo '<th>'. $gbt[0][1][$i][0].': Last Changed'.'</th>';
+                $pointsrow .= '<th></th>';
+				$n++;
+            }
 		}
 	}
 	if (!$totonleft && !$hidepast) {
@@ -613,6 +620,14 @@ function gbinstrdisp() {
 					}
 					$n++;
 				}
+                if ($includelastchange>0 && $gbt[0][1][$j][6]==0) {
+                    if (!empty($gbt[$i][1][$j][9])) {
+                        echo '<td>'.date('Y-m-d g:i a', $gbt[$i][1][$j][9]).'</td>';
+                    } else {
+                        echo '<td></td>';
+                    }
+                    $n++;
+                }
 			}
 		}
 		if (!$totonleft && !$hidepast) {
