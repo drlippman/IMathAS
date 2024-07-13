@@ -466,13 +466,18 @@ if (!(isset($teacherid))) {
 		}
         if ($_POST['lockforassess'] !== 'DNC') {
             // handle separately since must be limited to by_assess
-            if (!empty($_POST['lockforassess'])) {
+            if (intval($_POST['lockforassess']) == 2) {
                 $stm = $DBH->prepare("UPDATE imas_assessments SET noprint=(noprint | 2) WHERE id IN ($checkedlist) AND courseid=:cid AND submitby='by_assessment'");
             } else {
                 $stm = $DBH->prepare("UPDATE imas_assessments SET noprint=(noprint & ~2) WHERE id IN ($checkedlist) AND courseid=:cid");
             }
             $stm->execute([':cid'=>$cid]);
             $metadata['lockforassess'] = $_POST['lockforassess'];
+            if (intval($_POST['lockforassess']) == 0) {
+                // no lock: clear any existing locks
+                $stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE courseid=? AND lockaid in ($checkedlist)");
+                $stm->execute([$cid]);
+            }
         }
 		if ($_POST['intro'] !== 'DNC') {
 			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
