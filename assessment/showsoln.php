@@ -28,7 +28,10 @@ $isdiag = false;
 $useeqnhelper = false;
 $useeditor = 0;
 $isfw = false;
-require_once "header.php";
+$placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastvueupdate.'" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastvueupdate . '" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastvueupdate . '" media="print">';
+require_once "../header.php";
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
 if ($sig != md5($id.$_SESSION['secsalt'])) {
 	echo "invalid signature - not authorized to view the solution for this problem";
