@@ -386,7 +386,7 @@ div.question img, div.intro img, div.sidepreview img {
 }
 
 div.txtimgwrap > img {
-	max-width: none;
+	max-width: none !important;
 }
 
 div.question td img, div.question th img {
