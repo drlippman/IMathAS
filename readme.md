@@ -250,6 +250,10 @@ Options:
 - `$CFG['cleanup']['msgfrom']`:  the userid to send notification message from (def: 0)
 - `$CFG['cleanup']['keepsent']`:   set =0 to keep a copy of sent notifications in sent list
 - `$CFG['cleanup']['allowoptout']`:   (default: true) set to false to prevent teachers opting out
+- `$CFG['cleanup']['deloldaudit']`:  a number of days after which to delete 
+    teacher audit log data.  (def: 0 (don't use))
+- `$CFG['cleanup']['deloldltiqueue']`:  a number of days after which to delete 
+    LTI failure timesouts.  (def: 180)
 - `$CFG['cleanup']['groups']`: You can specify different old/delay values for different groups by defining
 `$CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));`
 - `$CFG['cleanup']['oldstu']`: a number of days of inactivity in a student account after which the account is 

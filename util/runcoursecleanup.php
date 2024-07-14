@@ -25,7 +25,8 @@ $CFG['cleanup']['clearoldpw']:
    forcing a reset.  Set =0 to not use. (def: 365)
 $CFG['cleanup']['deloldaudit']:  a number of days after which to delete 
     teacher audit log data.  (def: 0 (don't use))
-   
+$CFG['cleanup']['deloldltiqueue']:  a number of days after which to delete 
+    LTI failure timesouts.  (def: 180)
 
 You can specify different old/delay values for different groups by defining
 $CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));
@@ -65,6 +66,7 @@ $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
 $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:1;
 $clearpw = 24*60*60*(isset($CFG['cleanup']['clearoldpw'])?$CFG['cleanup']['clearoldpw']:365);
 $delaudit = 24*60*60*($CFG['cleanup']['deloldaudit'] ?? 0);
+$delltiqueue = 24*60*60*($CFG['cleanup']['deloldltiqueue'] ?? 180);
 
 //run notifications 10 in a batch
 
@@ -216,4 +218,14 @@ if ($delaudit > 0) {
     $query = "DELETE FROM imas_audit_log WHERE time<?";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($now - $delaudit));
+}
+
+if ($delltiqueue > 0) {
+    $query = "DELETE FROM imas_ltiqueue WHERE failures>6 AND sendon < ?";
+    $stm = $DBH->prepare($query);
+	$stm->execute(array($now - $delltiqueue));
+
+    $query = "DELETE FROM imas_log WHERE time < ? AND log LIKE 'LTI update giving up%'";
+    $stm = $DBH->prepare($query);
+	$stm->execute(array($now - $delltiqueue));
 }
