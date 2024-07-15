@@ -34,6 +34,8 @@ $GLOBALS['texdisp'] = true;
 
 $showtips = 0;
 $useeqnhelper = 0;
+$hidedrawcontrols = true;
+$GLOBALS['hide-sronly'] = true;
 $_SESSION['drill']['cid'] = 0;
 $_SESSION['drill']['sa'] = 0;
 $_SESSION['secsalt'] = "12345";
