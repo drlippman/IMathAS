@@ -32,6 +32,7 @@ $allowedmacros[] = "jsxPolar";
 $allowedmacros[] = "jsxText";
 $allowedmacros[] = "jsxCircle";
 $allowedmacros[] = "jsxLine";
+$allowedmacros[] = "jsxImage";
 $allowedmacros[] = "jsxSegment";
 $allowedmacros[] = "jsxRay";
 $allowedmacros[] = "jsxVector";
@@ -742,6 +743,79 @@ function jsxLine (&$board, $param, $ops=array()) {
 		
 	} else {
 		echo "Eek! Invalid parameters for JSX Line. Start point and end point expected.";
+	}
+}  
+
+###########################################################################
+##
+## Function to draw an image on a JSX board
+##
+###########################################################################
+
+function jsxImage (&$board, $param, $ops=array()) {
+
+	$id = "image_".uniqid();
+	$boardID = jsx_getboardname($board);
+	$inputerror = false;
+
+	// Validate input values
+
+	if (!is_array($param) || count($param) != 3) {
+		$inputerror = true;
+	} else {
+		if (!is_string($param[0]) || !is_jsxpoint($param[1]) || !is_jsxpoint($param[2])) {
+            $inputerror = true;
+        }
+        if (substr($param[0],0,4) === '<img') {
+            $param[0] = preg_replace('/^.*src="(.*?)".*$/', '$1', $param[0]);
+        }
+        if (substr($param[0],0,4) !== 'http') {
+            $inputerror = true;
+        }
+	}
+
+	if (!$inputerror) {
+
+		// Set default values
+		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
+		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
+		$haslabel = isset($ops['label']) ? 'true' : 'false';
+		$label = isset($ops['label']) ? $ops['label'] : '';
+        $fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
+		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : 'black';
+		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
+
+		// Begin object creation
+
+		$out = "window.{$id} = board_{$boardID}.create('image', ['";
+        $out .= Sanitize::encodeStringForJavascript($param[0])."', ";
+		$out .= jsx_pointToJS($param[1]).", ";
+		$out .= jsx_pointToJS($param[2])."],";
+
+		// Set attributes 
+		
+		$out .= "{
+            highlight: {$highlight},
+            fixed: {$fixed},
+			withLabel: {$haslabel},
+			label: { color:'{$fontcolor}', fontSize: {$fontsize}, highlight: false },
+			visible: {$visible}
+		})";
+		
+		if (isset($ops['attributes'])) { 
+			$out .= ".setAttribute({$ops['attributes']});";
+		} else {
+			$out .= ";";
+		}
+
+		$out .= jsx_setlabel($id, $label);	
+
+		// Append new output string to the board string
+		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
+		return $id;
+		
+	} else {
+		echo "Eek! Invalid parameters for JSX Image. URL, corner point, and dimensions expected.";
 	}
 }  
 

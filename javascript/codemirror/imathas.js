@@ -129,7 +129,7 @@
     // JSXG
     imathasBuiltin += " loadJSX JSXG_createAxes JSXG_createPolarAxes JSXG_addPolar JSXG_addFunction JSXG_addParametric JSXG_addText JSXG_addSlider JSXG_addTangent JSXG_setAttribute JSXG_createBlankBoard JSXG_addArrow JSXG_addPoint JSXG_addSegment JSXG_addLine JSXG_addRay JSXG_addAngle JSXG_addCircle JSXG_addPolygon JSXG_addGlider";
     // jsxgraph
-    imathasBuiltin += " jsxBoard jsxSlider jsxPoint jsxGlider jsxIntersection jsxFunction jsxParametric jsxPolar jsxText jsxCircle jsxLine jsxSegment jsxRay jsxVector jsxAngle jsxPolygon jsxTangent jsxIntegral jsxRiemannSum jsx_getXCoord jsx_getYCoord jsx_getCoords jsxSuspendUpdate jsxUnsuspendUpdate jsxSetChild";
+    imathasBuiltin += " jsxBoard jsxSlider jsxPoint jsxGlider jsxIntersection jsxFunction jsxParametric jsxPolar jsxText jsxCircle jsxLine jsxImage jsxSegment jsxRay jsxVector jsxAngle jsxPolygon jsxTangent jsxIntegral jsxRiemannSum jsx_getXCoord jsx_getYCoord jsx_getCoords jsxSuspendUpdate jsxUnsuspendUpdate jsxSetChild";
     // lineutil
     imathasBuiltin += " lineboundarycoord";
     // logistic

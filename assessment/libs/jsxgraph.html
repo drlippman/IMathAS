@@ -95,6 +95,7 @@
 	<li><a href="#jsxTangent">jsxTangent</a></li>
     <li><a href="#jsxAngle">jsxAngle</a></li>
 	<li><a href="#jsxText">jsxText</a></li>
+    <li><a href="#jsxImage">jsxImage</a></li>
 	<li><a href="#jsxIntegral">jsxIntegral</a></li>
 	<li><a href="#jsxRiemannSum">jsxRiemannSum</a></li>
 	<li><a href="#jsxSuspendUpdate">jsxSuspendUpdate</a></li>
@@ -760,6 +761,22 @@ loadlibrary("jsxgraph")
 $board = jsxBoard('geometry')
 $p1 = jsxPoint($board, [4, 0])
 $text = jsxText($board, [[-4.5, 4.5], "'`x = `' + $p1.X().toFixed(2)"])
+  </pre>
+
+  <!-- addImage -->
+  <h2><a style="color:blue" name="jsxImage">jsxImage($board, [URL, [$x, $y], [$width, $height]], <i>[$options]</i>)</a></h2>
+  <p>Adds an image to a jsx $board. The URL should be a string URL to an image, or the variable for an added image.
+    $x,$y are the coordinates of the bottom-left corner of the image.</p>
+  <p><i>$options</i> is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+	<li><i>visible</i> (boolean) - Makes the image visible or invisible</li>
+	<li><i>attributes</i> (json) - A json object encoded as a string that contains the value of any additional attributes you can modify from the jsxgraph API.</li>
+  </ul>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("jsxgraph")
+$board = jsxBoard('rectangular')
+$img = jsxImage($board, ['https://somesite.com/imagefile.jpg', [1, 2], [2,2]])
   </pre>
 
   <!-- jsxIntegral -->
