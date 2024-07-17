@@ -10,6 +10,10 @@ require_once __DIR__ . '/lib/lti.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
+if (isset($GLOBALS['CFG']['hooks']['lti/setupcourse'])) {
+    require_once $GLOBALS['CFG']['hooks']['lti/setupcourse'];
+}
+
 use \IMSGlobal\LTI;
 
 if (!isset($_POST['launchid'])) {
@@ -47,6 +51,12 @@ if ($_POST['linktype'] == 'assoc') {
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
   $tocopycourse = intval($_POST['copyselect']);
   $destcid = copycourse($tocopycourse, $contexttitle, $newUIver);
+
+  //call hook, if defined
+  if (function_exists('onCopyCourse')) {
+    onCopyCourse($destcid, $userid, $myrights, $groupid);
+  }
+
   $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contexttitle, $tocopycourse);
   $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
