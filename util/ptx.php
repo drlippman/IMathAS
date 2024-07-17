@@ -32,6 +32,7 @@ foreach(array('graphdisp','mathdisp','useed') as $key) {
 }
 $GLOBALS['texdisp'] = true;
 
+$myrights = 0;
 $showtips = 0;
 $useeqnhelper = 0;
 $hidedrawcontrols = true;

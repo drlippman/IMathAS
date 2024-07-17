@@ -287,7 +287,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $toset['noprint'] += 2;
             } 
 			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
-			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
+			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']);
+            if (isset($_POST['showworktype'])) {
+                $toset['showwork'] += Sanitize::onlyInt($_POST['showworktype']);
+            } 
             if (!empty($_POST['doworkcutoff'])) {
                 $toset['workcutoff'] = Sanitize::onlyInt($_POST['workcutoffval']);
                 if ($_POST['workcutofftype'] == 'hr') {

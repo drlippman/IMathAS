@@ -106,7 +106,10 @@ if (!(isset($teacherid))) {
 
 			if ($_POST['showwork'] !== 'DNC') {
 				$sets[] = "showwork=:showwork";
-				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
+				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']);
+                if (isset($_POST['showworktype'])) {
+                    $qarr[':showwork'] += Sanitize::onlyInt($_POST['showworktype']);
+                }
                 $sets[] = "workcutoff=:workcutoff";
                 if (!empty($_POST['doworkcutoff'])) {
                     $qarr[':workcutoff'] = Sanitize::onlyInt($_POST['workcutoffval']);
