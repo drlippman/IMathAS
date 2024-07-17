@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -32,7 +32,7 @@ class ConditionalScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $answer = $options['answer'];
+        $answer = $options['answer'] ?? false;
         if (isset($options['abstolerance'])) {$abstolerance = $options['abstolerance'];}
         if (isset($options['reltolerance'])) {$reltolerance = $options['reltolerance'];}
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
@@ -62,7 +62,7 @@ class ConditionalScorePart implements ScorePart
                 } else if ($answer > 1) {
                   $answer = 1;
                 }
-                $scorePartResult->setRawScore($answer);
+                $scorePartResult->setRawScore(floatval($answer));
                 return $scorePartResult;
             }
         }
@@ -71,7 +71,7 @@ class ConditionalScorePart implements ScorePart
         }
         foreach ($answer as $ans) {
             if (is_array($ans)) {
-                if ($ans[0]{0}=='!') {
+                if ($ans[0][0]=='!') {
                     $flip = true;
                     $ans[0] = substr($ans[0],1);
                 } else {

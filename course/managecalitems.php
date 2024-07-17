@@ -3,7 +3,7 @@
 //(c) 2008 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid)) {
 	echo _("You must be a teacher to access this page");
@@ -86,7 +86,7 @@ $placeinhead .= '<script type="text/javascript">
 		return true;
 	});
 	var nextnewcnt = 0;
-	function addnewevent() {
+	function addnewevent(date) {
 		var html = "<tr><td><input type=text size=10 id=\"datenew-"+nextnewcnt+"\" name=\"datenew-"+nextnewcnt+"\"> ";
 		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"'.$staticroot.'/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 		html += "<td><input name=\"tagnew-"+nextnewcnt+"\" id=\"tagnew-"+nextnewcnt+"\" type=text size=8 /></td>";
@@ -101,10 +101,15 @@ $placeinhead .= '<script type="text/javascript">
           + "<label><input type=\"checkbox\" value=\"6\" name=\"repeat"+nextnewcnt+"[]\">'._('Sa').'</label> "
           + "<label><input type=\"checkbox\" value=\"0\" name=\"repeat"+nextnewcnt+"[]\">'._('Su').'</label> "
           + "'._('for').' <input size=2 name=\"repeatN"+nextnewcnt+"\" value=1> '._('weeks').'</span></td></tr>";
-		$("#newEventsTable tbody").append(html);
-		$("#datenew-"+nextnewcnt).val($("#datenew-"+(nextnewcnt-1)).val());
-		$("#tagnew-"+nextnewcnt).val($("#tagnew-"+(nextnewcnt-1)).val());
-		$("#txtnew-"+nextnewcnt).val($("#txtnew-"+(nextnewcnt-1)).val());
+        $("#newEventsTable tbody").append(html);
+        if (typeof date != "undefined") {
+            $("#datenew-"+nextnewcnt).val(date);
+            $("#tagnew-"+nextnewcnt).val("!");
+        } else {
+            $("#datenew-"+nextnewcnt).val($("#datenew-"+(nextnewcnt-1)).val());
+            $("#tagnew-"+nextnewcnt).val($("#tagnew-"+(nextnewcnt-1)).val());
+            $("#txtnew-"+nextnewcnt).val($("#txtnew-"+(nextnewcnt-1)).val());
+        }
 		nextnewcnt++;
 		if (!haschanged) {
 			haschanged = true;
@@ -121,7 +126,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
     </script>
     <style> td { white-space: nowrap;}</style>';
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=="cal") {
@@ -137,6 +142,7 @@ $stm->execute(array(':courseid'=>$cid));
 <form method=post action="managecalitems.php?cid=<?php echo $cid.'&amp;from='.$from;?>">
 <h3>Manage Events</h3>
 <table class="gb">
+<caption class="sr-only">Calendar Events</caption>
 <thead>
 <tr><th>Delete?</th><th>Date</th><th>Tag</th><th>Event Details</th></tr>
 </thead>
@@ -164,8 +170,6 @@ echo '<table class="gb" id="newEventsTable">
 </thead>
 <tbody>';
 $now = time();
-/*echo '<tr>';
-//echo '<td></td>';
 if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$_GET['addto']);
 } else if (isset($datenew)) {
@@ -173,6 +177,9 @@ if (isset($_GET['addto'])) {
 } else  {
 	$date = tzdate("m/d/Y",$now);
 }
+echo '<script>$(function() { addnewevent("'.$date.'");});</script>';
+/*echo '<tr>';
+//echo '<td></td>';
 echo "<td><input type=text size=10 id=\"datenew-0\" name=\"datenew-0\" value=\"$date\" oninput=\"txtchg()\"/> ";
 echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
@@ -188,5 +195,5 @@ echo '<tr/>';
 </form>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -3,8 +3,8 @@
 // Mass set assessment prereqs
 // David Lippman
 
-require('../init.php');
-require("../includes/htmlutil.php");
+require_once '../init.php';
+require_once "../includes/htmlutil.php";
 
 if (!isset($teacherid)) {
     echo 'You are not authorized to view this page';
@@ -76,7 +76,9 @@ $itemmap = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
 function flattenitems($items, &$itemmap, &$assessorder) {
     foreach ($items as $item) {
         if (is_array($item)) { // block
-            flattenitems($item['items'], $itemmap, $assessorder);
+            if (!empty($item['items'])) {
+                flattenitems($item['items'], $itemmap, $assessorder);
+            }
         } else if (isset($itemmap[$item])) { // is an assessment
             $assessorder[] = $itemmap[$item];
         }
@@ -85,13 +87,13 @@ function flattenitems($items, &$itemmap, &$assessorder) {
 $assessorder = array();
 flattenitems($itemorder, $itemmap, $assessorder);
 
-$from = Sanitize::simpleString($_GET['from']);
+$from = Sanitize::simpleString($_GET['from'] ?? '');
 
 // HTML display
 
 $pagetitle = _('Mass Change Prereqs');
 $placeinhead = '<script type="text/javascript" src="'. $staticroot . '/javascript/tablesorter.js"></script>';
-require('../header.php');
+require_once '../header.php';
 
 echo '<div class=breadcrumb>';
 echo $breadcrumbbase . '<a href="course.php?cid='.$cid.'">'
@@ -187,7 +189,7 @@ initSortTable('myTable',Array('S',false),true);
 </script>
 <?php
 
-require('../footer.php');
+require_once '../footer.php';
 
 
 

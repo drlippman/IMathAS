@@ -1,5 +1,5 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 
 
 $isadmin = false;
@@ -16,9 +16,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 }
 
 if ($err != '') {
-	require("../header.php");
+	require_once "../header.php";
 	echo $err;
-	require("../footer.php");
+	require_once "../footer.php";
 }
 
 $cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin";
@@ -103,7 +103,7 @@ if (isset($_POST['tname'])) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom&r=" .Sanitize::randomQueryStringParam());
 	exit;
 } else {
-	require("../header.php");
+	require_once "../header.php";
 	if ($isteacher) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if (isset($_GET['ltfrom'])) {
@@ -112,7 +112,6 @@ if (isset($_POST['tname'])) {
 	} else {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> \n";
 	}
-	$id = Sanitize::simpleString($_GET['id']); //can be ID int or string "new"
 	if (isset($_GET['delete'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";
 		echo "<h1>Delete Tool</h1>";
@@ -127,7 +126,8 @@ if (isset($_POST['tname'])) {
 		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
 		echo '</form>';
 
-	} else if (!empty($id)) {
+	} else if (!empty($_GET['id'])) {
+        $id = Sanitize::simpleString($_GET['id']); //can be ID int or string "new"
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Edit Tool</div>";
 		echo "<h1>Edit Tool</h1>";
 		if ($id=='new') {
@@ -231,5 +231,5 @@ if (isset($_POST['tname'])) {
 		echo '</ul>';
 		echo '<p><a href="externaltools.php?cid='.$cid.'&amp;id=new">Add a Tool</a></p>';
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 }

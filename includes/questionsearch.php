@@ -15,16 +15,23 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
-            $out[$match[1]] = str_replace('"', '', $match[2]);
+            $out[$match[1]] = str_replace('"', '', $match[3]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
     foreach ($out['terms'] as $k => $v) {
+        if ($v=='') { 
+            unset($out['terms'][$k]);
+        }
+        if ($v == 'isbroken') {
+            $out['isbroken'] = 1;
+            unset($out['terms'][$k]);
+        }
         if (ctype_digit($v) && !isset($out['id'])) {
             $out['id'] = $v;
             if (count($out['terms']) == 1) { // only id, remove as keyword
@@ -47,6 +54,13 @@ function parseSearchString($str)
  *    mine:     1 to limit to mine only
  *    unused:   1 to exclude existing
  *    private:  0 to exclude private questions
+ *    public:   0 to exclude public questions
+ *    isrand:   1 to exclude non-rand
+ *    isbroken: 1 to limit to broken questions
+ *    wronglib: 1 to limit to questions marked as in wrong library
+ *    res:      resources
+ *    lastmod:  lastmod date range: "lower,upper"
+ *    created:  created date range: "lower,upper"
  *    terms:    array of keywords
  * @param int  $userid   userid of searcher
  * @param string $searchtype  'all' to search all libs, 'libs' to search libs, 'assess' to search assessments
@@ -68,6 +82,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 
     $searchand = [];
     $searchvals = [];
+    $stopwords = ['about','are','com','for','from','how','that','the','this','was','what','when','where','will','with','und','www'];
 
     if ($searchtype != 'all' && !is_array($libs)) {
         $libs = explode(',', $libs);
@@ -90,14 +105,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $names = preg_split('/([,\s]+)/', trim($search['author']), -1, PREG_SPLIT_DELIM_CAPTURE);
             if (count($names) == 1) {
                 $searchand[] = 'iq.author LIKE ?';
-                $searchvals[] = $names[0] . '%';
+                $searchvals[] = $names[0] . ',' . '%';
             } else if (trim($names[1]) == ',') {
                 $searchand[] = 'iq.author LIKE ?';
-                $searchvals[] = $names[0] . ',' . $names[1] . '%';
+                $searchvals[] = $names[0] . ',' . $names[2] . '%';
             } else {
                 $searchand[] = '(iq.author LIKE ? OR iq.author LIKE ?)';
-                $searchvals[] = $names[0] . ',' . $names[1] . '%';
-                $searchvals[] = $names[1] . ',' . $names[0] . '%';
+                $searchvals[] = $names[0] . ',' . $names[2] . '%';
+                $searchvals[] = $names[2] . ',' . $names[0] . '%';
             }
         }
     }
@@ -107,20 +122,29 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
     if (!empty($search['terms'])) {
         $wholewords = array();
+        $haspos = false;
         foreach ($search['terms'] as $k => $v) {
-            $sgn = '+';
-            if ($v[0] == '!') {
-                $sgn = '-';
-                $v = substr($v, 1);
-            }
-            if (ctype_alnum($v) && strlen($v) > 3) {
-                $wholewords[] = $sgn . $v . '*';
-                unset($search['terms'][$k]);
+            if ($v[0] != '!' && ctype_alnum($v) && strlen($v) > 2) {
+                $haspos = true;
+                break;
             }
         }
-        if (count($wholewords) > 0) {
-            $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
-            $searchvals[] = implode(' ', $wholewords);
+        if ($haspos) {
+            foreach ($search['terms'] as $k => $v) {
+                $sgn = '+';
+                if ($v[0] == '!') {
+                    $sgn = '-';
+                    $v = substr($v, 1);
+                }
+                if (ctype_alnum($v) && strlen($v) > 2 && !in_array($v, $stopwords)) {
+                    $wholewords[] = $sgn . $v . '*';
+                    unset($search['terms'][$k]);
+                }
+            }
+            if (count($wholewords) > 0) {
+                $searchand[] = 'MATCH(iq.description) AGAINST(? IN BOOLEAN MODE)';
+                $searchvals[] = implode(' ', $wholewords);
+            }
         }
         if (count($search['terms']) > 0) {
             foreach ($search['terms'] as $k => $v) {
@@ -134,6 +158,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             }
         }
     }
+
     if (!empty($search['avgtime'])) {
         $avgtimeparts = explode(',', $search['avgtime']);
         if (!empty($avgtimeparts[0])) {
@@ -144,6 +169,45 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.meantime < ?';
             $searchvals[] = $avgtimeparts[1];
         }
+        $searchand[] = 'iq.meantimen > 3';
+    }
+    if (!empty($search['avgscore'])) {
+        $avgscoreparts = explode(',', $search['avgscore']);
+        if (!empty($avgscoreparts[0])) {
+            $searchand[] = 'iq.meanscore > ?';
+            $searchvals[] = $avgscoreparts[0];
+        }
+        if (!empty($avgscoreparts[1])) {
+            $searchand[] = 'iq.meanscore < ?';
+            $searchvals[] = $avgscoreparts[1];
+        }
+        $searchand[] = 'iq.meanscoren > 3';
+    }
+    if (!empty($search['lastmod'])) {
+        $lastmodparts = explode(',', $search['lastmod']);
+        if (!empty($lastmodparts[0])) {
+            $searchand[] = 'iq.lastmoddate > ?';
+            $searchvals[] = strtotime($lastmodparts[0]);
+        }
+        if (!empty($lastmodparts[1])) {
+            $searchand[] = 'iq.lastmoddate < ?';
+            $searchvals[] = strtotime($lastmodparts[1]);
+        }
+    }
+    if (!empty($search['created'])) {
+        $createdparts = explode(',', $search['created']);
+        if (!empty($createdparts[0])) {
+            $searchand[] = 'iq.uniqueid > ?';
+            $searchvals[] = strtotime($createdparts[0]) . '000000';
+        }
+        if (!empty($createdparts[1])) {
+            $searchand[] = 'iq.uniqueid < ?';
+            $searchvals[] = strtotime($createdparts[1]) . '999999';
+        }
+    }
+    if (!empty($search['mine'])) {
+        $searchand[] = 'iq.ownerid=?';
+        $searchvals[] = $userid;
     }
     if (!empty($search['res'])) {
         $helps = explode(',', $search['res']);
@@ -160,12 +224,22 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = '(LENGTH(iq.solution) > 0 AND (iq.solutionopts&2)=2)';
         }
     }
+    if (isset($search['isrand'])) {
+        $searchand[] = 'iq.isrand=' . ($search['isrand'] == '0' ? 0 : 1);
+    }
+    if (isset($search['isbroken'])) {
+        $searchand[] = 'iq.broken=' . ($search['isbroken'] == '0' ? 0 : 1);
+    }
+    if (isset($search['wronglib'])) {
+        $searchand[] = 'ili.junkflag=' . ($search['wronglib'] == '0' ? 0 : 1);
+    }
     $searchquery = '';
     if (count($searchand) > 0) {
         $searchquery = '(' . implode(' AND ', $searchand) . ')';
     }
     // do this last, since this will be an OR with other stuff
     // TODO: extend to allow searching for multiple IDs
+    $basicidsearch = false;
     if (isset($search['id'])) {
         $ids = explode(',', $search['id']);
         $idors = [];
@@ -176,21 +250,25 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $idsearch = implode(' OR ', $idors);
         if ($searchquery === '') {
             $searchquery = '(' . $idsearch . ')';
+            $basicidsearch = true;
         } else {
-            $searchquery = '(' . $searchquery . ' OR ' . $idors . ')';
+            $searchquery = '(' . $searchquery . ' OR ' . $idsearch . ')';
         }
     }
 
     $libquery = '';
+    $libnames = [];
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $libquery = "ili.libid IN ($llist)";
-        $libnames = [];
         $sortorder = [];
         $stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];
+        }
+        if (in_array(0, $libs)) {
+            $libnames[0] = _('Unassigned');
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
@@ -216,34 +294,43 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
             }
+            if (isset($search['public']) && $search['public'] == 0) {
+                $rightsand[] = 'iq.userights=0';
+            }
         } else if (!empty($options['isgroupadmin'])) {
             $groupid = $options['isgroupadmin'];
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $groupid;
+            }
+            if (isset($search['public']) && $search['public'] == 0) {
+                $rightsand[] = 'iq.userights=0';
             }
             if (isset($search['id'])) {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
                 $searchvals[] = $groupid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
                 $searchvals[] = $groupid;
             }
         } else {
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals[] = $userid;
+            }
+            if (isset($search['public']) && $search['public'] == 0) {
+                $rightsand[] = 'iq.userights=0';
             }
             if (isset($search['id'])) {
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
                 $searchvals[] = $userid;
                 $searchvals[] = $search['id'];
-            } else {
+            } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
                 $searchvals[] = $userid;
             }
@@ -255,17 +342,28 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $rightsquery = '';
     }
 
+    if (empty($wholewords) && $libquery === '' && !empty($search['terms'])) {
+        return _('Cannot search all libraries without at least one 3+ letter word in the search terms');
+    }
     if ($searchquery === '' && $libquery === '') {
         return 'Cannot search all libraries without a search term';
     }
 
-    $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,
-    MIN(ili.libid) AS libid, iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,
+    $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,';
+    if ($searchtype == 'libs' && count($libs) == 1) {
+        $query .= 'ili.libid,';
+    } else {
+        $query .= 'MIN(ili.libid) AS libid,';
+    }
+    $query .= 'iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
     imas_users.LastName, imas_users.FirstName, imas_users.groupid,
     LENGTH(iq.solution) AS hassolution,iq.solutionopts,
     ili.junkflag, iq.broken, ili.id AS libitemid ';
     if ($searchtype == 'assess') {
         $query .= ',iaq.id AS qid ';
+    }
+    if ((!empty($search['order']) && $search['order']=='newest') || !empty($options['includelastmod'])) {
+        $query .= ',iq.lastmoddate ';
     }
     $query .= 'FROM imas_questionset AS iq JOIN imas_library_items AS ili ON
     ili.qsetid=iq.id AND ili.deleted=0 ';
@@ -306,7 +404,20 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $query .= ' GROUP BY iaq.id,ili.qsetid ';
         $query .= ' ORDER BY ia.id ';
     } else {
-        $query .= ' GROUP BY ili.qsetid ';
+        if ($searchtype == 'libs' && count($libs) == 1) {
+            // don't need group by
+        } else {
+            $query .= ' GROUP BY ili.qsetid ';
+        }
+        if (!empty($search['order']) && $search['order']=='newest') {
+            if ($searchtype == 'libs') {
+                $query .= ' ORDER BY libid,iq.lastmoddate DESC ';
+            } else {
+                $query .= ' ORDER BY iq.lastmoddate DESC ';
+            }
+        } else if ($searchtype == 'libs' && count($libs) > 1) {
+            $query .= ' ORDER BY libid ';
+        }
     }
     if (!empty($max) && intval($max) > 0) {
         $query .= ' LIMIT ' . intval($max);
@@ -314,6 +425,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= ' OFFSET ' . intval($offset);
         }
     }
+    //echo $query;
+    //print_r($searchvals);
     $stm = $DBH->prepare($query);
     $stm->execute($searchvals);
     $res = [];
@@ -322,6 +435,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $row['description'] = Sanitize::encodeStringForDisplay($row['description']);
         if (!empty($options['getowner'])) {
             $row['ownername'] = Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']);
+        }
+        if (!empty($options['includeowner'])) {
+            $row['ownershort'] = Sanitize::encodeStringForDisplay($row['LastName'].','.substr($row['FirstName'],0,1));
         }
         unset($row['LastName']);
         unset($row['FirstName']);
@@ -350,6 +466,13 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $row['meantime'] = round($row['meantime']/60,1);
         $row['meanscore'] = round($row['meanscore']);
         $row['mine'] = ($row['ownerid'] == $userid) ? 1 : 0;
+        $row['canedit'] = ($row['ownerid'] == $userid || 
+            !empty($options['isadmin']) ||
+            (!empty($options['isgroupadmin']) && $options['isgroupadmin'] == $row['groupid'])
+        ) ? 1 : 0;
+        if (!empty($options['includelastmod'])) {
+            $row['lastmod'] = tzdate("m/d/y", $row['lastmoddate']);
+        }
         $res[] = $row;
         $qsids[] = $row['id'];
     }
@@ -373,25 +496,29 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $res[$k]['grp'] = $qidmap[$v['qid']][0];
             $res[$k]['qn'] = $qidmap[$v['qid']][1];
         }
-        usort($res, function ($a, $b) {
+        usort($res, function ($a, $b) use ($search) {
             if ($a['grp'] != $b['grp']) {
                 return ($a['grp'] < $b['grp']) ? -1 : 1;
             } else if ($a['qn'] != $b['qn']) {
                 return ($a['qn'] < $b['qn']) ? -1 : 1;
+            } else if (!empty($search['order']) && $search['order']=='newest') {
+                return ($b['lastmoddate'] - $a['lastmoddate']);
             } else {
                 return ($a['id'] < $b['id']) ? -1 : 1;
             }
         });
         $out = ['qs' => $res, 'names' => $aidnames, 'type'=>'assess'];
     } else if ($searchtype == 'libs') {
-        usort($res, function ($a, $b) use ($sortorder) {
+        usort($res, function ($a, $b) use ($sortorder,$search) {
             if ($a['libid'] != $b['libid']) {
                 return ($a['libid'] < $b['libid']) ? -1 : 1;
             } else if ($a['broken'] != $b['broken']) {
                 return ($a['broken'] < $b['broken']) ? -1 : 1;
             } else if ($a['junkflag'] != $b['junkflag']) {
                 return ($a['junkflag'] < $b['junkflag']) ? -1 : 1;
-            } else if ($sortorder[$a['libid']] == 1) { // alpha
+            } else if (!empty($search['order']) && $search['order']=='newest') {
+                return ($b['lastmoddate'] - $a['lastmoddate']);
+            } else if (!empty($sortorder[$a['libid']])) { // alpha
                 return strnatcasecmp($a['descr'], $b['descr']);
             } else {
                 return ($a['id'] < $b['id']) ? -1 : 1;
@@ -399,7 +526,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         });
         $out = ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
     } else {
-        $out = ['qs' => $res, 'type'=>'all'];
+        $out = ['qs' => $res, 'type'=>'all', 'names' => []];
     }
     $out['offset'] = $offset;
     if (count($res) == $max) {

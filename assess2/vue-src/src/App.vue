@@ -82,13 +82,13 @@ export default {
         }
       }
       if (store.noUnload) {
-
+        // do nothing
       } else if (!store.inProgress && Object.keys(store.work).length > 0 && !this.prewarned) {
         evt.preventDefault();
         this.prewarned = false;
         return this.$t('unload.unsubmitted_work');
       } else if (!store.inProgress) {
-
+        // do nothing
       } else if (Object.keys(actions.getChangedQuestions()).length > 0 &&
         !this.prewarned
       ) {
@@ -120,7 +120,7 @@ export default {
       store.lastPos = e.pageY;
     });
     window.$(document).on('focusin', function (e) {
-      if (e.target) {
+      if (e.target && e.target.getBoundingClientRect) {
         store.lastPos = e.target.getBoundingClientRect().top;
       }
     });

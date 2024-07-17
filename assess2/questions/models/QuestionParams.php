@@ -40,6 +40,7 @@ class QuestionParams
     private $scoreNonZero;
     // Orig: $scoreiscorrect - hashmap, from macros.php:getiscorrect() - Used in question eval.
     private $scoreIsCorrect;
+    private $teacherInGb = false;
 
     /**
      * Get the question's database row ID from imas_questionset.
@@ -559,6 +560,28 @@ class QuestionParams
     public function setPrintFormat(bool $printFormat): QuestionParams
     {
         $this->printFormat = $printFormat;
+        return $this;
+    }
+
+    /**
+     * Get whether is teacher in gradebook.
+     *
+     * @return array
+     */
+    public function getTeacherInGb(): bool
+    {
+        return $this->teacherInGb;
+    }
+
+    /**
+     * Set whether is teacher in gradebook.
+     *
+     * @param bool $teacherInGb
+     * @return QuestionParams
+     */
+    public function setTeacherInGb(bool $teacherInGb): QuestionParams
+    {
+        $this->teacherInGb = $teacherInGb;
         return $this;
     }
 }

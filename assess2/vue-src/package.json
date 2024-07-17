@@ -5,33 +5,23 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "preinstall": "npx npm-force-resolutions"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "core-js": "^3.6.4",
-    "vue": "^2.6.11",
-    "vue-i18n": "^8.16.0",
-    "vue-router": "^3.1.6"
+    "@rushstack/eslint-patch": "^1.6.1",
+    "@vue/eslint-config-standard": "^8.0.1",
+    "core-js": "^3.34.0",
+    "vue": "^3.2.37",
+    "vue-i18n": "^9.8.0",
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.3.0",
-    "@vue/cli-plugin-eslint": "~4.3.0",
-    "@vue/cli-service": "~4.3.0",
-    "@vue/eslint-config-standard": "^5.1.2",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-i18n-loader2": "^0.1.3",
-    "vue-template-compiler": "^2.6.11",
-    "webpack-cli": "^3.3.11"
-  },
-  "resolutions": {
-    "minimist": "1.2.3",
-    "mkdir": "0.5.3"
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "eslint": "^8.0.1",
+    "vue-i18n-loader2": "^0.1.3"
   }
 }

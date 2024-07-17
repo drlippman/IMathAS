@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/copyiteminc.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/htmlutil.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
 

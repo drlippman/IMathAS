@@ -2,7 +2,7 @@
 //IMathAS:  include with posts.php and postsbyname.php for handling deletes, replies, etc.
 //(c) 2006 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 
 ini_set("max_execution_time", "60");
@@ -17,8 +17,7 @@ if ($caller=="posts") {
 	$returnurl = "posts.php?view=$view&cid=$cid&page=$page&forum=$forumid&thread=$threadid";
 	$returnname = "Posts";
 } else if ($caller=="byname") {
-	$threadid = Sanitize::onlyInt($_GET['thread']);
-	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid&thread=$threadid";
+	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid";
 	$returnname = "Posts by Name";
 
 } else if ($caller=='thread') {
@@ -45,7 +44,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		if ($isteacher) {
-			$type = $_POST['type'];
+			$type = $_POST['type'] ?? 0;
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
 				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
@@ -53,7 +52,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else if ($_POST['replyby']=="Never") {
 				$replyby = 0;
 			} else {
-				require_once("../includes/parsedatetime.php");
+				require_once "../includes/parsedatetime.php";
 				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime'],null);
 			}
 		} else {
@@ -67,16 +66,15 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$_POST['subject'] = htmlentities($_POST['subject']);
 
-		require_once("../includes/htmLawed.php");
-		$_POST['message'] = myhtmLawed($_POST['message']);
+        $_POST['message'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['message']));
 		$_POST['subject'] = trim(strip_tags($_POST['subject']));
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';
 		}
 		$thisposttime = $now-1;
 		if ($isteacher) {
-			if ($_POST['releaseon']=='Date') {
-				require_once("../includes/parsedatetime.php");
+			if (isset($_POST['releaseon']) && $_POST['releaseon']=='Date') {
+				require_once "../includes/parsedatetime.php";
 				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
 		}
@@ -115,7 +113,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'forumpost', ':typeid'=>$threadid, ':viewtime'=>$now, ':info'=>$forumid));
 			}
-			if (isset($studentid) && $autoscore != '' && strlen(strip_tags($_POST['message']))>1) {
+			if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 				$autoscore = explode(',',$autoscore);
 				if ($autoscore[0]>0) { //assigning points
 					$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent=0");
@@ -136,7 +134,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($stm->rowCount()==0) {
 
 				$sendemail = false;
-				require("../header.php");
+				require_once "../header.php";
 				echo '<h1>Error:</h1><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
 				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::url($returnurl).'">Continue</a></p>';
 				echo '<hr>';
@@ -144,7 +142,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<p>Message:</p><div class="editor">'.Sanitize::outgoingHtml(filter($_POST['message'])).'</div>';
 				echo '<p>HTML format:</p>';
 				echo '<div class="editor">'.Sanitize::encodeStringForDisplay($_POST['message']).'</div>';
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			} else {
 				$uid = $stm->fetchColumn(0);
@@ -167,17 +165,21 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'forumreply', ':typeid'=>$_GET['modify'], ':viewtime'=>$now, ':info'=>"$forumid;$threadid"));
 				}
-				if (isset($studentid) && $autoscore != '' && strlen(strip_tags($_POST['message']))>1) {
+				if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 					$autoscore = explode(',',$autoscore);
 					if ($autoscore[2]>0) { //assigning points
-						$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
-						$stm->execute(array($forumid, $userid));
-						if ($stm->fetchColumn(0) <= $autoscore[3]) {
-							$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
-							$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
-							$stm = $DBH->prepare($query);
-							$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
-						}
+                        $stm = $DBH->prepare("SELECT userid FROM imas_forum_posts WHERE id=?");
+                        $stm->execute([$threadid]);
+                        if ($stm->fetchColumn(0) != $userid) { // only give points for replies if not own thread
+                            $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
+                            $stm->execute(array($forumid, $userid));
+                            if ($stm->fetchColumn(0) <= $autoscore[3]) {
+                                $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+                                $query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
+                                $stm = $DBH->prepare($query);
+                                $stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
+                            }
+                        }
 					}
 				}
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
@@ -255,7 +257,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($sendemail) {
-			require_once("../includes/email.php");
+			require_once "../includes/email.php";
 
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid=:forumid AND iu.id<>:userid";
@@ -290,12 +292,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if (isset($_FILES['newfile-0'])) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$i = 0;
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
 				$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['newfile-'.$i]['name'])));
-				if (trim($_POST['newfiledesc-'.$i])=='') {
+				if (trim($_POST['newfiledesc-'.$i] ?? '')=='') {
 					$_POST['newfiledesc-'.$i] = $userfilename;
 				}
 				$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
@@ -325,8 +327,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$useeditor = "message";
 		$loadgraphfilter = true;
 		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-
-		require("../header.php");
+        if (!empty($_GET['embed'])) {
+            $placeinhead .= '<script>function submitpost() { document.getElementsByTagName("form")[0].submit();}</script>';
+        }
+		require_once "../header.php";
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
             if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -351,13 +355,20 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$stm->execute(array(':id'=>$_GET['modify']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$replyby = $line['replyby'];
-			if ($groupsetid>0 && $isteacher && $line['parent']==0) {
+			if (!empty($groupsetid) && $isteacher && $line['parent']==0) {
 				$stm = $DBH->prepare("SELECT stugroupid FROM imas_forum_threads WHERE id=:id");
 				$stm->execute(array(':id'=>$line['threadid']));
 				$curstugroupid = $stm->fetchColumn(0);
 			}
 			echo '<div id="headerposthandler" class="pagetitle"><h1>Modify Post</h1></div>';
 		} else {
+            $line['subject'] = "";
+            $line['message'] = "";
+            $line['posttype'] = 0;
+            $line['files'] = '';
+            $line['tag'] = '';
+            $line['isanon'] = 0;
+            $replyby = null;
 			if ($_GET['modify']=='reply') {
 
 					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
@@ -369,9 +380,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 				$sub = str_replace('"','&quot;',$sub);
 				$line['subject'] = "Re: $sub";
-				$line['message'] = "";
-				$line['files'] = '';
-				$replyby = $line['replyby'];
+				
 				if ($isteacher) {
 					$stm = $DBH->prepare("SELECT points FROM imas_forums WHERE id=:id");
 					$stm->execute(array(':id'=>$forumid));
@@ -385,11 +394,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						exit;
 					}
 				}
-				$line['subject'] = "";
-				$line['message'] = "";
-				$line['posttype'] = 0;
-				$line['files'] = '';
-                $line['tag'] = '';
+
                 if (isset($_SESSION['ffilter'.$forumid])) {
                     $curstugroupid = $_SESSION['ffilter'.$forumid];
                     if ($curstugroupid == -1) {
@@ -398,14 +403,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
                 } else {
                     $curstugroupid = 0;
                 }
-				$replyby = null;
+
 				echo "<h1>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
 					$showa = false;
 					$parts = explode('-',$_GET['quoteq']);
 					$GLOBALS['assessver'] = $parts[4];
                     if ($courseUIver > 1) {
-                        include('../assess2/AssessStandalone.php');
+                        require_once '../assess2/AssessStandalone.php';
                         $a2 = new AssessStandalone($DBH);
                         $state = array(
                             'seeds' => array($parts[0] => $parts[2]),
@@ -417,12 +422,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
                         $message = $res['html'];
                         $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
                     } else {
-                        require("../assessment/displayq2.php");
+                        require_once "../assessment/displayq2.php";
                         $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
                     }
 					$message = printfilter(forcefiltergraph($message));
 					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-						require_once("../includes/filehandler.php");
+						require_once "../includes/filehandler.php";
 						$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
 							$curdir = rtrim(dirname(__FILE__), '/\\');
 							return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
@@ -467,8 +472,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 							$stm->execute($array);
 							// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 							if ($stm->rowCount()>0) {
-								$notice =  '<span class=noticetext style="font-weight:bold">This question has already been posted about.</span><br/>';
-								$notice .= 'Please read and participate in the existing discussion.';
+								$notice =  _('This question has already been posted about. Please read and participate in the existing discussion using the link below.');
 								while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread=" . Sanitize::encodeUrlParam($row[0]) . "\">".Sanitize::encodeStringForDisplay($line['subject'])."</a>";
 								}
@@ -503,10 +507,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			// $forumsettings['replyinstr'] contains HTML.
 			echo '<div class="intro">'.Sanitize::outgoingHtml($forumsettings['replyinstr']).'</div><br/>';
 		}
-		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify'])."&replyto=".Sanitize::encodeUrlParam($_GET['replyto'])."\">\n";
+        echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify']);
+        if (isset($_GET['replyto'])) {
+            echo "&replyto=".Sanitize::encodeUrlParam($_GET['replyto']);
+        }
+        echo "\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
 		if (isset($notice) && $notice!='') {
-			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
+			echo '<p>'.$notice.'</p>';
 		} else {
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
@@ -522,12 +530,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<span class=form>Files:</span>";
 				echo "<span class=formright>";
 				if ($line['files']!='') {
-					require_once('../includes/filehandler.php');
+					require_once '../includes/filehandler.php';
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
 						echo '<input type="text" name="filedesc['.$i.']" value="'.Sanitize::encodeStringForDisplay($files[2*$i]).'" aria-label="'._('Description').'"/>';
 						// $_GET['modify'] will be sanitized by getuserfileurl().
-						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
+						echo '<a href="'.Sanitize::encodeStringForDisplay(getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1])).'" target="_blank">View</a> ';
 						echo '<label for="filedel['.$i.']">Delete?</label> <input type="checkbox" name="filedel['.$i.']" id="filedel['.$i.']" value="1"/><br/>';
 					}
 				}
@@ -562,7 +570,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else if ($allowanon==1 && $line['isanon']==1) { //teacher editing an anonymous post, perhaps
 				echo '<input type=hidden name=postanon value=1 />';
 			}
-			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
+            if ($isteacher && 
+                ($_GET['modify']=='new' || (isset($line['userid']) && $line['userid']==$userid)) && 
+                ($_GET['modify']=='new' || $_GET['modify']==$threadid || ($_GET['modify']!='reply' && $line['parent']==0))
+            ) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";
 				echo "<input type=radio name=type id=type0 value=0 ";
 				if ($line['posttype']==0) { echo "checked=1 ";}
@@ -580,16 +591,16 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 				echo "<span class=form id=allowreplieslabel>Allow replies: </span><span class=formright role=radiogroup aria-labelledby=allowreplieslabel>\n";
 				echo "<input type=radio name=replyby id=replyby0 value=\"null\" ";
-				if ($line['replyby']==null) { echo "checked=1 ";}
+				if ($replyby==null) { echo "checked=1 ";}
 				echo "/> <label for=replyby0>Use default</label><br/>";
 				echo "<input type=radio name=replyby id=replyby1 value=\"Always\" ";
-				if ($line['replyby']==2000000000) { echo "checked=1 ";}
+				if ($replyby==2000000000) { echo "checked=1 ";}
 				echo "/> <label for=replyby1>Always</label><br/>";
 				echo "<input type=radio name=replyby id=replyby2 value=\"Never\" ";
-				if ($line['replyby']==='0') { echo "checked=1 ";}
+				if ($replyby==='0') { echo "checked=1 ";}
 				echo "/> <label for=replyby2>Never</label><br/>";
 				echo "<input type=radio name=replyby id=replyby3 value=\"Date\" ";
-				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1 ";}
+				if ($replyby!==null && $replyby<2000000000 && $replyby>0) { echo "checked=1 ";}
 				echo "/> <label for=replyby3>Before:</label> ";
 				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybydate)."\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
@@ -629,7 +640,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=releasetime value=\"$releasebytime\" aria-label=\"post release time\"></span><br class=\"form\" />";
 			}
-			if ($groupsetid >0 && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {
+			if (!empty($groupsetid) && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {
                 if ($isSectionGroups) {
                     echo '<script>function onstugroupchg(el) {
                         $("#nonsectionwarn").toggle(el.value==0);
@@ -675,7 +686,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
                 }
                 echo '</span><br class="form" />';
 			}
-			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
+			if ($isteacher && !empty($haspoints) && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
 				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::encodeStringForDisplay($points).'" /></span><br class="form" />';
 			}
@@ -729,7 +740,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } else if (isset($_GET['remove']) && $allowdel) {// $isteacher) { //removing post
@@ -743,7 +754,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($go) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$stm = $DBH->prepare("SELECT parent,files FROM imas_forum_posts WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['remove']));
 			list($parent,$files) = $stm->fetch(PDO::FETCH_NUM);
@@ -798,13 +809,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm->execute(array(':id'=>$_GET['remove']));
 		$parent = $stm->fetchColumn(0);
 
-		require("../header.php");
+		require_once "../header.php";
 		if (!$isteacher) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
 			$stm->execute(array(':parent'=>$_GET['remove']));
 			if ($stm->rowCount()>0) {
 			echo "Someone has replied to this post, so you cannot remove it.  <a href=\"$returnurl\">Back</a>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -827,7 +838,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '<p><button type=submit name=confirm value=true>'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 } else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum   NEW ONE
@@ -841,7 +852,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$tochange = array();
 
 		function addchildren($b,&$tochange,$children) {
-			if (count($children[$b])>0) {
+			if (!empty($children[$b])) {
 				foreach ($children[$b] as $child) {
 					$tochange[] = $child;
 					if (isset($children[$child]) && count($children[$child])>0) {
@@ -912,7 +923,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}</script>';
 		$pagetitle = "Move Thread";
 
-		require("../header.php");
+		require_once "../header.php";
 		if (empty($_GET['embed'])) {
             echo "<div class=breadcrumb>";
             if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -971,7 +982,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo "<p><input type=submit value=\"Move\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo "</form>";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 	}

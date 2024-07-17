@@ -54,7 +54,6 @@
         {{ showWorkInput ? $t('work.hide') : $t('work.add') }}
       </button>
       <div v-show="getwork === 2 || showWorkInput">
-        {{ $t("question.showwork") }}
         <showwork-input
           :id="'sw' + qn"
           :value = "questionData.work"
@@ -91,12 +90,20 @@
     <div v-else-if="showNext"  class="submitbtnwrap">
       <router-link
         :to="'/skip/'+ (this.qn + 2)"
-        tag="button"
-        class="secondarybtn"
-        :disabled = "!canSubmit"
+        custom
+        v-slot="{ navigate }"
       >
-        <icons name="right" />
-        {{ $t('question.next') }}
+        <button
+          type="button"
+          @click="navigate"
+          @keypress.enter="navigate"
+          role="link"
+          class="secondarybtn"
+          :disabled = "!canSubmit"
+        >
+          <icons name="right" />
+          {{ $t('question.next') }}
+        </button>
       </router-link>
     </div>
   </div>
@@ -123,7 +130,8 @@ export default {
     return {
       work: '',
       lastWorkVal: '',
-      showWorkInput: false
+      showWorkInput: false,
+      loadingAttempted: false
     };
   },
   computed: {
@@ -173,8 +181,9 @@ export default {
         this.qn < store.assessInfo.questions.length - 1);
     },
     submitClass () {
-      return (store.assessInfo.submitby === 'by_assessment')
-        ? 'secondary' : 'primary';
+      return (store.assessInfo.submitby === 'by_assessment' || !this.questionData.canretry_primary)
+        ? 'secondary'
+        : 'primary';
     },
     showScore () {
       return (store.inProgress &&
@@ -236,7 +245,14 @@ export default {
   },
   methods: {
     loadQuestionIfNeeded (skiprender) {
-      if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
+      if (this.questionContentLoaded && !this.loadingAttempted) {
+        // if question content is loaded, mark it as loading attempted
+        this.loadingAttempted = this.questionContentLoaded;
+      }
+      if (!this.questionContentLoaded && !this.loadingAttempted &&
+        this.active && store.errorMsg === null
+      ) {
+        this.loadingAttempted = true;
         actions.loadQuestion(this.qn, false, false);
       } else if (this.questionContentLoaded && this.active &&
         !this.questionData.rendered && skiprender !== true) {
@@ -308,15 +324,21 @@ export default {
     },
     disableOutOfTries () {
       const trymax = this.questionData.tries_max;
+      let qpartcount = 0;
+      for (const pkey in this.questionData.jsparams) {
+        if (pkey.match(/^\d+$/)) {
+          qpartcount++;
+        }
+      }
       for (const pn in this.questionData.parts) {
         var regex;
-        if (this.questionData.parts[pn].try >= trymax) {
+        if (this.questionData.parts[pn].try >= trymax && this.questionData.answeights[pn] > 0) {
           // out of tries - disable inputs
-          if (Object.keys(this.questionData.parts).length === 1 && Object.keys(this.questionData.jsparams).length > 1) {
+          if (Object.keys(this.questionData.parts).length === 1 && qpartcount > 1) {
             // Only one "part" listed, but multiple input boxes.
             // Probably conditional. Disable all boxes
             regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + (this.qn + 1) + '\\d{3}\\b)');
-          } else if (pn === 0) {
+          } else if (parseInt(pn) === 0) {
             regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + ((this.qn + 1) * 1000 + pn * 1) + '\\b)');
           } else {
             regex = new RegExp('^(qn|tc|qs)' + ((this.qn + 1) * 1000 + pn * 1) + '\\b');
@@ -337,6 +359,7 @@ export default {
       window.rendermathnode(this.$refs.thisqwrap);
       window.initSageCell(this.$refs.thisqwrap);
       window.initlinkmarkup(this.$refs.thisqwrap);
+      window.setupSeqPartToggles(this.$refs.thisqwrap);
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists
@@ -359,7 +382,7 @@ export default {
       actions.setRendered(this.qn, true);
     },
     setInitValues () {
-      var regex = new RegExp('^(qn|tc|qs)\\d');
+      var regex = /^(qn|tc|qs)\d/;
       var thisqn = this.qn;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function (index, el) {
@@ -396,7 +419,6 @@ export default {
       }
     },
     workFocused () {
-      actions.clearAutosaveTimer();
       this.lastWorkVal = this.work;
     },
     trySimilar () {
@@ -423,7 +445,7 @@ export default {
       this.renderAndTrack();
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     actions.setRendered(this.qn, false);
   },
   watch: {
@@ -452,89 +474,3 @@ export default {
   }
 };
 </script>
-<style>
-input[type=text] {
-  height: 20px;
-}
-.haseqneditor {
-  margin-right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  height: 20px;
-}
-.eqneditortrigger {
-  margin: 0;
-  border-left: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  height: 30px;
-  padding: 4px;
-  vertical-align: bottom;
-}
-input.green {
-  margin-left: 0;
-  border-color: #090;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-input.red {
-  margin-left: 0;
-  border-color: #900;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.scoremark {
-  display: inline-block;
-  height: 20px;
-  padding: 4px;
-  margin-right: 0;
-  border: 1px solid;
-  border-right: 0;
-  border-radius: 4px 0 0 4px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  height: 20px;
-}
-.scoremark.red {
-  border-color: #900;
-  color: #900;
-}
-.scoremark.green {
-  border-color: #090;
-  color: #090;
-}
-.submitbtnwrap {
-  margin: 16px 0;
-}
-.ansgrn {
-  border: 1px solid #090 !important;
-}
-.ansred {
-  border: 1px solid #900 !important;
-}
-.ansyel {
-  border: 1px solid #fb0 !important;
-}
-.ansorg {
-  border: 1px solid #f50 !important;
-}
-div.ansgrn, div.ansred, div.ansyel, div.ansorg {
-  margin: -1px;
-}
-input[type=text].ansgrn, .mathquill-math-field.ansgrn {
-  padding-right: 17px;
-  background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwb2x5bGluZSBwb2ludHM9IjIwIDYgOSAxNyA0IDEyIj48L3BvbHlsaW5lPjwvc3ZnPg==");
-}
-input[type=text].ansred, .mathquill-math-field.ansred {
-  padding-right: 17px;
-  background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigxNTMsMCwwKSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTggNiBMNiAxOCBNNiA2IEwxOCAxOCIgLz48L3N2Zz4=");
-}
-input[type=text].ansyel, .mathquill-math-field.ansyel {
-  padding-right: 17px;
-  background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsMTg3LDApIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0gNS4zLDEwLjYgOSwxNC4yIDE4LjUsNC42IDIxLjQsNy40IDksMTkuOCAyLjcsMTMuNSB6IiAvPjwvc3ZnPg==");
-}
-input[type=text].ansorg, .mathquill-math-field.ansorg {
-  padding-right: 17px;
-  background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsODUsMCkiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTE4IDYgTDYgMTggTTYgNiBMMTggMTgiIC8+PC9zdmc+");
-}
-</style>

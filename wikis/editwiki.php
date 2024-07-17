@@ -4,8 +4,8 @@
 
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -65,12 +65,12 @@ if ($cid==0) {
 		} else {
 			$groupid = 0;
 		}
-		if ($_POST['wikicontent']!= null) { //FORM SUBMITTED, DATA PROCESSING
+		if (!empty($_POST['wikicontent'])) { //FORM SUBMITTED, DATA PROCESSING
 			$inconflict = false;
 			$stugroupid = 0;
 
 			//clean up wiki content
-			require_once("../includes/htmLawed.php");
+			require_once "../includes/htmLawed.php";
 			$wikicontent = myhtmLawed($_POST['wikicontent']);
 			$wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
 			$wikicontent = preg_replace('/\s+/',' ',$wikicontent);
@@ -98,7 +98,7 @@ if ($cid==0) {
 					$lasteditedby = $row['LastName'].', '.$row['FirstName'];
 
 				} else { //we're all good for a diff calculation
-					require("../includes/diff.php");
+					require_once "../includes/diff.php";
 
 					$diff = diffsparsejson($wikicontent,$revisiontext);
 
@@ -193,7 +193,7 @@ if ($cid==0) {
 
  /******* begin html output ********/
  $pagetitle = _("Edit Wiki").': '.Sanitize::encodeStringForDisplay($wikiname);
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -220,7 +220,7 @@ if ($inconflict) {
 <?php
 }
 if (isset($lasteditedby)) {
-	printf("<p>Last Edited by %s on %s</p>", Sanitize::encodeStringForDisplay($lasteditedby), $lastedittime);
+	printf("<p>Last Edited by <span class='pii-full-name'>%s</span> on %s</p>", Sanitize::encodeStringForDisplay($lasteditedby), $lastedittime);
 }
 ?>
 	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo Sanitize::onlyInt($id); ?>&grp=<?php echo Sanitize::onlyInt($groupid) . Sanitize::encodeUrlParam($framed); ?>">
@@ -235,5 +235,5 @@ if (isset($lasteditedby)) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

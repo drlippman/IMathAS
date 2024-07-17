@@ -1,14 +1,14 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 if ($myrights < 100) {
   exit;
 }
 
 echo '<pre>';
 if (isset($_GET['retotal'])) {
-  require('AssessInfo.php');
-  require('AssessRecord.php');
+  require_once 'AssessInfo.php';
+  require_once 'AssessRecord.php';
   $aid = intval($_GET['aid']);
   $uid = intval($_GET['uid']);
   $assess_info = new AssessInfo($DBH, $aid, $cid, true);
@@ -29,7 +29,7 @@ if (isset($_GET['uid']) && isset($_GET['aid'])) {
 }
 
 $row = $stm->fetch(PDO::FETCH_ASSOC);
-print_r(gzdecode($row['scoreddata']));
+print_r(Sanitize::gzexpand($row['scoreddata']));
 echo "\n";
-print_r(json_decode(gzdecode($row['scoreddata']), true));
-print_r(json_decode(gzdecode($row['practicedata']), true));
+print_r(json_decode(Sanitize::gzexpand($row['scoreddata']), true));
+print_r(json_decode(Sanitize::gzexpand($row['practicedata']), true));

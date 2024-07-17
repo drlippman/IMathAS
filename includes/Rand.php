@@ -71,6 +71,7 @@ class Rand {
 			}
 			return;
 		}
+        $arr = array_values($arr);
 		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
 			for ($i=count($arr)-1;$i>0;$i--) {
 				if ($GLOBALS['assessver']>1) {

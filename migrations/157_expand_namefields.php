@@ -19,7 +19,7 @@ $DBH->beginTransaction();
 	return false;
  }
  
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Expanded First and Last Name fields to 50 chars</p>";
 

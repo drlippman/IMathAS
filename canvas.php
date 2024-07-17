@@ -1,6 +1,6 @@
 <?php
 $init_skip_csrfp = true;
-require("init_without_validate.php");
+require_once "init_without_validate.php";
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https') || isset($CFG['GEN']['forcecanvashttps']))  {
 	 $urlmode = 'https://';
  } else {

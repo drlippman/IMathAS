@@ -10,10 +10,14 @@ ini_set("max_execution_time", "900");
 
 
 /*** master php includes *******/
-require("../init.php");
-require_once(__DIR__ . "/../includes/htmLawed.php");
-require("../includes/safeunserialize.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once __DIR__ . "/../includes/htmLawed.php";
+require_once "../includes/safeunserialize.php";
+require_once "../includes/filehandler.php";
+
+if ($myrights < 100) {
+    echo "This page is only accessible by admins";
+}
 
 /*** pre-html data manipulation, including function code *******/
 function getsubinfo($items,$parent,$pre) {
@@ -42,7 +46,7 @@ $newqcnt = 0;
 $updateqcnt = 0;
 function additem($itemtoadd,$item,$questions,$qset) {
 
-	global $DBH,$newlibs;
+	global $DBH,$newlibs,$myrights;
 	global $userid, $userights, $cid, $missingfiles, $newqcnt, $updateqcnt, $sourceinstall;
 	$mt = microtime();
 	if ($item[$itemtoadd]['type'] == "Assessment") {
@@ -701,7 +705,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -834,6 +838,6 @@ function chkgrp(frm, arr, mark) {
 	}
 	echo "</form>\n";
 }
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -10,8 +10,8 @@ if (!isset($myrights)) {
 error_reporting(0);
 $loadmathfilter = 1;
 $loadgraphfilter = 1;
-require_once("../filter/filter.php");
-require_once("../includes/filehandler.php");
+require_once "../filter/filter.php";
+require_once "../includes/filehandler.php";
 if (substr($mathimgurl,0,4) !== 'http') {
     // need to make an absolute url
     if (strlen($imasroot) > 0) { 
@@ -194,7 +194,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$module_meta .= '<module identifier="BLOCK'.$blockid.'">'."\n";
 					$module_meta .= '  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$module_meta .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
-					if ($item['avail'] == 1 && $item['SH']{0} == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
+					if ($item['avail'] == 1 && $item['SH'][0] == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
 						$module_meta .= '  <unlock_at>'.gmdate("Y-m-d\TH:i:s", $item['startdate']).'</unlock_at>'."\n";
 					}
 					$module_meta .= '  <items>';
@@ -372,7 +372,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 				fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 				fwrite($fp,' <title >'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
-				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res)).'</text>');
+				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res),ENT_XML1,'UTF-8',false).'</text>');
 				fwrite($fp,'</topic>');
 				fclose($fp);
 
@@ -406,7 +406,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[8]==-1) {
-					require_once("../includes/updateptsposs.php");
+					require_once "../includes/updateptsposs.php";
 					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);
 				}
 				//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
@@ -458,6 +458,9 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$usedcats[$row[5]]++;
 					fwrite($fp,'<submission_types>external_tool</submission_types>'."\n");
 					fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>'."\n");
+					if (isset($_POST['newtab'])) {
+						fwrite($fp, '<external_tool_new_tab>true</external_tool_new_tab>');
+					}
 					fwrite($fp,'</assignment>');
 					fclose($fp);
 					$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');

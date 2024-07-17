@@ -2,13 +2,13 @@
 //IMathAS:  Drill Assess player (updated quickdrill)
 //(c) 2011 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 $courseUIver = 1; // Doesn't quite work right yet
 if ($courseUIver > 1) {
-    include('../assess2/AssessStandalone.php');
+    require_once '../assess2/AssessStandalone.php';
     $a2 = new AssessStandalone($DBH);
 } else {
-    require("../assessment/displayq2.php");
+    require_once "../assessment/displayq2.php";
 }
 
 if (!isset($teacherid) && !isset($studentid) && !isset($tutorid)) {
@@ -235,19 +235,19 @@ $showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
 $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 if ($courseUIver > 1) {
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assessment/mathtest.css" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+    $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assessment/mathtest.css" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastvueupdate.'" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastvueupdate.'" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
     $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
-    $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
         <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
     $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
-    require("../header.php");
+    require_once "../header.php";
 } else {
-    require("../assessment/header.php");
+    require_once "../assessment/header.php";
 }
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">" . Sanitize::encodeStringForDisplay($coursename) . "</a> ";
 echo "&gt; " . _("Drill Assessment") . "</div>";
@@ -463,7 +463,7 @@ if ($courseUIver > 1) {
     </div>
     <div id="eh" class="eh"></div>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 
 

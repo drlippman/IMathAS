@@ -2,7 +2,7 @@
 //(c) 2013 David Lippman.  Part of IMathAS
 //Display outcome alignment table
 
-require("../init.php");
+require_once "../init.php";
 
 
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
@@ -37,8 +37,8 @@ $stm = $DBH->prepare($query);
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
-	if (!is_numeric($row['category'])) {continue;}
-	if ($row['category']==0) {
+	if (!is_numeric($row['category']) && $row['defoutcome']==0) {continue;}
+	if (!is_numeric($row['category']) || $row['category']==0) {
 		$outc = $row['defoutcome'];
 	} else {
 		$outc = $row['category'];
@@ -169,8 +169,8 @@ if (count($cats)>0) {
 	}
 }
 natsort($catnames);
-$placeinhead .= '<style type="text/css"> td { line-height: 150%;} .icon {background-color: #0f0;}</style>';
-require("../header.php");
+$placeinhead = '<style type="text/css"> td { line-height: 150%;} .icon {background-color: #0f0;}</style>';
+require_once "../header.php";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 
@@ -180,7 +180,7 @@ echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Outcomes Map")."</h1
 
 if ($outcomelinks==0) {
 	echo '<p>No items have been associated with outcomes yet</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -242,5 +242,5 @@ function printoutcome($arr,$ind) {
 printoutcome($outcomes,0);
 echo '</tbody></table>';
 echo '<p>'._('Key:  L: Links, I: Inline Text, A: Assessments, F: Forums, O: Offline Grades').'</p>';
-require("../footer.php");
+require_once "../footer.php";
 ?>

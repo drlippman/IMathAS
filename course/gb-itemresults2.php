@@ -7,12 +7,12 @@
 
 // does NOT work for randomized questions or matching.
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid) && !isset($tutorid)) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You need to log in as a teacher or tutor to access this page";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -54,7 +54,7 @@ $qdata = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $GLOBALS['assessver'] = $row['ver'];
 
-    $scoredData = json_decode(gzdecode($row['scoreddata']), true);
+    $scoredData = json_decode(Sanitize::gzexpand($row['scoreddata']), true);
 
     $scoredAssessmentIndex = $scoredData['scored_version'];
     $scoredAssessment = $scoredData['assess_versions'][$scoredAssessmentIndex];
@@ -99,7 +99,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $scorebarwidth = 60;
 $placeinhead = ' <style type="text/css">
-
 .scorebarinner {
 	height:10px;
 	font-size:80%;
@@ -111,7 +110,8 @@ $placeinhead = ' <style type="text/css">
 
 }
 </style>';
-require("../assessment/header.php");
+$useeqnhelper = 0;
+require_once "../assessment/header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
@@ -122,7 +122,7 @@ list ($defpoints, $aname, $itemorder,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
 echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 if (isset($tutorid) && $tutoredit==2) {
 	echo 'You do not have access to view scores for this assessment.';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 $itemarr = array();
@@ -144,7 +144,7 @@ foreach (explode(',',$itemorder) as $k=>$itel) {
 }
 echo '<p style="color:#f00;">Warning: Results are not accurate or meaningful for randomized questions</p>';
 
-include('../assess2/AssessStandalone.php');
+require_once '../assess2/AssessStandalone.php';
 $a2 = new AssessStandalone($DBH);
 foreach ($qsdata as $k=>$v) {
     $a2->setQuestionData($k, $v);
@@ -170,7 +170,7 @@ foreach ($itemarr as $k=>$q) {
 	echo '<br class="clear"/>';
 	echo '</div>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 function sandboxeval($control, $qtype) {
 	try {
@@ -261,7 +261,7 @@ function showresults($q,$qtype) {
 	}
 }
 
-function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
+function disp($q,$qtype,$part=-1,$answer='',$questions=array()) {
 	global $qdata,$qsdata,$qsids,$scorebarwidth;
 	$res = array();
 	$correct = array();

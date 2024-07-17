@@ -229,6 +229,12 @@ td.l, table.stats tbody td.l {
   text-align: left;
 }
 
+.choicesflexrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
 @media only screen and (max-width: 700px) {
   table[role=presentation] > tbody > tr > td,
 	table[role=presentation] > tbody > tr > th,
@@ -305,6 +311,8 @@ input, .mq-editable-field, .mathquill-math-field {
   padding: 4px 6px;
   border-radius: 4px;
   margin: 1px 0;
+  background-color: #fff;
+  color: #000;
 }
 
 input[type=radio], input[type=checkbox] {
@@ -378,7 +386,7 @@ div.question img, div.intro img, div.sidepreview img {
 }
 
 div.txtimgwrap > img {
-	max-width: none;
+	max-width: none !important;
 }
 
 div.question td img, div.question th img {
@@ -444,16 +452,23 @@ table.tchart {
 table.tchart td {
 	min-width: 3em;
 }
+table.tchart caption {
+    font-weight: bold;
+}
 table.acctstatement {
 	border-collapse: collapse;
 }
-table.acctstatement th, table.acctstatement td {
+table.acctstatement th, table.acctstatement td, table.acctstatement caption {
 	border: 1px solid #eee;
 	background-color: #fff;
 	padding: 1px 5px;
 }
+table.acctstatement tbody th {
+    font-weight: normal;
+}
 
-table.acctstatement thead th {
+
+table.acctstatement thead th, table.acctstatement caption {
 	text-align: center;
 	z-index: 20;
 	background-color: #eef;
@@ -497,6 +512,9 @@ span.inlinebtn:hover {
   font-size: 1em;
   display: inline;
 }
+.textright {
+  text-align: right;
+}
 #GB_window {
     box-shadow: 1px 3px 8px 0 rgba(0,0,0,0.65);
     border: 0;
@@ -508,3 +526,94 @@ span.inlinebtn:hover {
 #GB_title {
     padding-left: 6px;
 }
+
+  input[type=text] {
+    height: 20px;
+  }
+  .haseqneditor {
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 20px;
+  }
+  .eqneditortrigger {
+    margin: 0;
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    height: 30px;
+    padding: 4px;
+    vertical-align: bottom;
+  }
+  input.green {
+    margin-left: 0;
+    border-color: #090;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  input.red {
+    margin-left: 0;
+    border-color: #900;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .scoremark {
+    display: inline-block;
+    height: 20px;
+    padding: 4px;
+    margin-right: 0;
+    border: 1px solid;
+    border-right: 0;
+    border-radius: 4px 0 0 4px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .scoremark.red {
+    border-color: #900;
+    color: #900;
+  }
+  .scoremark.green {
+    border-color: #090;
+    color: #090;
+  }
+  .submitbtnwrap {
+    margin: 16px 0;
+  }
+  .ansgrn {
+    border: 1px solid #090 !important;
+  }
+  .ansred {
+    border: 1px solid #900 !important;
+  }
+  .ansyel {
+    border: 1px solid #fb0 !important;
+  }
+  .ansorg {
+    border: 1px solid #f50 !important;
+  }
+  div.ansgrn, div.ansred, div.ansyel, div.ansorg {
+    margin: -1px;
+  }
+  input[type=text].ansgrn, .mathquill-math-field.ansgrn,
+  input[type=text].ansred, .mathquill-math-field.ansred,
+  input[type=text].ansyel, .mathquill-math-field.ansyel,
+  input[type=text].ansorg, .mathquill-math-field.ansorg {
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+  input[type=text].ansgrn, .mathquill-math-field.ansgrn {
+    padding-right: 17px;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwb2x5bGluZSBwb2ludHM9IjIwIDYgOSAxNyA0IDEyIj48L3BvbHlsaW5lPjwvc3ZnPg==");
+  }
+  input[type=text].ansred, .mathquill-math-field.ansred {
+    padding-right: 17px;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigxNTMsMCwwKSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTggNiBMNiAxOCBNNiA2IEwxOCAxOCIgLz48L3N2Zz4=");
+  }
+  input[type=text].ansyel, .mathquill-math-field.ansyel {
+    padding-right: 17px;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsMTg3LDApIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0gNS4zLDEwLjYgOSwxNC4yIDE4LjUsNC42IDIxLjQsNy40IDksMTkuOCAyLjcsMTMuNSB6IiAvPjwvc3ZnPg==");
+  }
+  input[type=text].ansorg, .mathquill-math-field.ansorg {
+    padding-right: 17px;
+    background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsODUsMCkiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTE4IDYgTDYgMTggTTYgNiBMMTggMTgiIC8+PC9zdmc+");
+  }

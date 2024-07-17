@@ -18,12 +18,12 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
-require_once('../includes/TeacherAuditLog.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
+require_once '../includes/TeacherAuditLog.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -44,11 +44,25 @@ $feedbacks = json_decode($_POST['feedback'], true);
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 if ($istutor) {
   $tutoredit = $assess_info->getSetting('tutoredit');
-  if ($tutoredit != 1) { // no Access for editing scores
+  if (($tutoredit&1) != 1) { // no Access for editing scores
     echo '{"error": "no_access"}';
     exit;
   }
 }
+
+// get user info
+$query = 'SELECT iu.FirstName, iu.LastName, istu.latepass, istu.timelimitmult ';
+$query .= 'FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id ';
+$query .= 'WHERE iu.id=? AND istu.courseid=?';
+$stm = $DBH->prepare($query);
+$stm->execute(array($uid, $cid));
+$studata = $stm->fetch(PDO::FETCH_ASSOC);
+if ($studata === false) {
+  echo '{"error": "invalid_uid"}';
+  exit;
+}
+$assess_info->loadException($uid, true, $studata['latepass'], $latepasshrs, $courseenddate);
+$assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
 
 // load question settings
 $assess_info->loadQuestionSettings('all', false, false);
@@ -83,7 +97,7 @@ if (!empty($changes)) {
 }
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, false);
 
 //prep date display
 prepDateDisp($assessInfoOut);

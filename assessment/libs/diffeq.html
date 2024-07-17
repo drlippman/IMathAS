@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>diffeq help</title>
+    </head><body>
+<h1>Macro Library diffeq</h1>
+<p>Differential equations functions, Jan 2023</p>
+<ul>
+    <li><a href="#diffeq_slopefield">diffeq_slopefield</a></li>
+    <li><a href="#diffeq_comparegensoln">diffeq_comparegensoln</a></li>
+</ul>
+<h3><a name="diffeq_slopefield">diffeq_slopefield</a></h3>
+<p><strong>diffeq_slopefield(function, [options])</strong></p>
+<p>Draws a slopefield for the given differential equation.</p>
+<p><b>function</b>: For a first order ODE, like dy/dx=x*y^2, use a single string, like <code>"x*y^2"</code>.<br>
+  For an autonomous system, like x'=x+y, y'=y-2x, list both parts, like <code>"x+y,y-2x"</code></p>
+<p><b>options</b> is an optional associative array of parameters. You can define none or several of them.
+  There are two common ways to define these:</p>
+<p>Inline: <code>$g = diffeq_slopefield("xy",['dx'=>0.5, 'arrows'=>1])</code></p>
+<p>As a separate array:</p>
+<pre>
+    $ops['dx'] = 0.5
+    $ops['arrows'] = 1
+    $g = diffeq_slopefield("xy",$ops)
+</pre>
+<p>The options you can set are:</p>
+<ul>
+    <li>dx: x spacing of slopes. default 1</li>
+    <li>dy: y spacing of slopes. defaults to match dx</li>
+    <li>vars: The variables of the diffeq. default "x,y"</li>
+    <li>arrows: Set to 1 to show arrows on slopes. default 0</li>
+    <li>xmin: default -4</li>
+    <li>xmax: default 4</li>
+    <li>ymin: default -4</li>
+    <li>ymax: default 4</li>
+    <li>xgrid: x spacing of grids. defaults to 0 (off)</li>
+    <li>ygrid: y spacing of grids. defaults to match xgrid</li>
+    <li>xlbl: x spacing of ticks/labels. defaults to 1</li>
+    <li>ylbl: y spacing of ticks/labels. defaults to match xlbl</li>
+    <li>labels: set to 0 to hide axis labels. default 1</li>
+    <li>linewidth: width of slope lines. default 1</li>
+    <li>color: color of lines. default blue</li>
+    <li>length: length of slope lines, as a fraction of dx. default 0.75</li>
+    <li>width: drawing width. default 300</li>
+    <li>height: drawing height. default 300</li>
+</ul>
+
+<h3><a name="diffeq_comparegensoln">diffeq_comparegensoln</a></h3>
+<p><strong>diffeq_comparegensoln(expr1, expr2, vars, constants, [tolerance, domain])</strong></p>
+<p>Compares two general solutions to an ODE which contain arbitrary constants. They
+    are compared in a way that allows swapping which constant goes where, and 
+    accomodates absorbed constants.
+</p>
+<p><strong>expr1</strong>: the first general solution, like "cos(t)+c_1*e^t+c_2*e^(-t)"</p>
+<p><strong>expr2</strong>: the second general solution</p>
+<p><strong>vars</strong>: the independent variables in the expression, like "t"</p>
+<p><strong>constants</strong>: the arbitrary constants in the expression, like "c_1,c_2"</p>
+<p><strong>tolerance</strong>: the relative tolerance to compare with. Default 0.001.</p>
+<p><strong>domain</strong>: the domain to compare on. Default "-10,10".</p>
+</strong></p>
+</body>
+</html>

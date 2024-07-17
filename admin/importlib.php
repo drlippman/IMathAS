@@ -10,8 +10,8 @@ ini_set("max_execution_time", "3600");
 
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/filehandler.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -34,7 +34,7 @@ function printlist($parent) {
 
 function parseqs($file,$touse,$rights) {
 	function writeq($qd,$rights,$qn) {
-		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin;
+		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin, $importuserid, $importgroupid, $sourceinstall;
 		$now = time();
 		$toundel = array();
 		$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");
@@ -121,12 +121,12 @@ function parseqs($file,$touse,$rights) {
 			if (isset($GLOBALS['mapusers']) && isset($GLOBALS['mapusers'][$sourceinstall][$qd['ownerid']])) {
 				$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$qd['ownerid']]['id'];
 			} else {
-				$thisownerid = $userid;
+				$thisownerid = $importuserid;
 			}
 			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) VALUES ";
 			$query .= "(:uniqueid, :adddate, :lastmoddate, :ownerid, :userights, :description, :author, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$userid, ':userights'=>$thisqrights,
+			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$thisownerid, ':userights'=>$thisqrights,
 				':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'], ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'],
 				':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'], ':extref'=>$qd['extref'],
 				':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'], ':otherattribution'=>$qd['otherattribution'], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
@@ -136,8 +136,25 @@ function parseqs($file,$touse,$rights) {
 				$qimgs = explode("\n",$qd['qimgs']);
 				foreach($qimgs as $qimg) {
 					$p = explode(',',$qimg);
-					$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-					$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1]));
+                    if (count($p)<2) {continue;}
+                    if (count($p)<3) {
+                        $alttext = '';
+                    } else if (count($p)>3) {
+                        $alttext = implode(',', array_slice($p, 2));
+                    } else {
+                        $alttext = $p[2];
+                    }
+
+                    if (strpos($qd['qtext'],'$'.$p[0])===false && strpos($qd['qcontrol'],'$'.$p[0])===false) {
+                        //skip if not actually used in question
+                        continue;
+                    }
+                    //rehost image
+                    $newfn = rehostfile($p[1], 'qimages', $qsetid.'-');
+                    if ($newfn!==false) {
+					    $stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
+					    $stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+                    }
 				}
 			}
 			return $qsetid;
@@ -344,7 +361,22 @@ if ($myrights < 100) {
 		$filekey = Sanitize::simplestring($_POST['filekey']);
 		$uploadfile = getimportfilepath($filekey);
 
-		$libstoadd = array_map('intval',$_POST['libs']);
+        $libstoadd = array_map('intval',$_POST['libs']);
+        
+        $importuserid = $userid;
+        $importgroupid = $groupid;
+        if ($_POST['owner'] == 'other' && !empty($_POST['ownertouse'])) {
+            $stm = $DBH->prepare('SELECT id,groupid FROM imas_users WHERE SID=?');
+            $stm->execute(array($_POST['ownertouse']));
+            $row = $stm->fetch(PDO::FETCH_ASSOC);
+            if ($row === false) {
+                echo 'Invalid owner username';
+                exit;
+            } else {
+                $importuserid = $row['id'];
+                $importgroupid = $row['groupid'];
+            }
+        } 
 
 		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($uploadfile);
 
@@ -421,8 +453,8 @@ if ($myrights < 100) {
 					$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]]['id'];
 					$thisgroupid = $GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]]['groupid'];
 				} else {
-					$thisownerid = $userid;
-					$thisgroupid = $groupid;
+					$thisownerid = $importuserid;
+					$thisgroupid = $importgroupid;
 				}
 				$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :parent, :groupid)";
@@ -533,7 +565,7 @@ if ($myrights < 100) {
 		$page_uploadSuccessMsg .= "New Library items: $newli.<br>";
 			$page_uploadSuccessMsg .=  "<a href=\"" . $GLOBALS['basesiteurl'] . "/admin/admin2.php\">Return to Admin page</a>";
 
-	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION
+	} elseif (!empty($_FILES['userfile']['name'])) { // STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
 		if ($filekey = storeimportfile('userfile')) {
 	    $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
@@ -556,7 +588,7 @@ if ($myrights < 100) {
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/course/libtree.css\" type=\"text/css\" />";
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -600,7 +632,7 @@ if ($overwriteBody==1) {
 	<form enctype="multipart/form-data" method=post action="importlib.php?cid=<?php echo $cid ?>">
 
 <?php
-		if ($_FILES['userfile']['name']=='') { //STEP 1 DISPLAY
+		if (empty($_FILES['userfile']['name'])) { //STEP 1 DISPLAY
 ?>
 			<input type="hidden" name="MAX_FILE_SIZE" value="9000000" />
 			<span class=form>Import file: </span>
@@ -660,6 +692,11 @@ if ($overwriteBody==1) {
 				in the parent selected above.
 			</p>
 
+            <p>For new libraries and questions, set owner to:<br>
+                <input type=radio name=owner value="self" CHECKED>Self<br/>
+                <input type=radio name=owner value="other">Username: <input size=15 name=ownertouse />
+            </p>
+
 			Base
 			<ul class=base>
 <?php printlist(0); ?>
@@ -672,5 +709,5 @@ if ($overwriteBody==1) {
 		echo "</form>\n";
 	}
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

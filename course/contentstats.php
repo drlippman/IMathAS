@@ -2,7 +2,7 @@
 //IMathAS: Content view statistics for an item
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 
 
 $overwritebody = false;
@@ -25,7 +25,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F','D'))) {
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type='inlinetext' AND typeid=:typeid");
 		$stm2 = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
 	} else if ($stype=='L') {
-		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid=:typeid");
+		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('linkedsum','linkedlink','linkedintext','linkedviacal') AND typeid=:typeid");
 		$stm2 = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
 	} else if ($stype=='A') {
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('assessintro','assesssum','assess') AND typeid=:typeid");
@@ -104,7 +104,7 @@ function sendMsg(tolist) {
 	GB_show("Send Message", "masssend.php?embed=true&nolimit=true&cid="+cid+"&to="+tolist, 760,"auto");
 }
 </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwritebody) {
 	echo $body;
@@ -117,6 +117,7 @@ if ($overwritebody) {
 	echo '</div>';
 
 	$idents = array_keys($descrips);
+    $cid = Sanitize::courseId($cid);
 
 	if (count($idents)==0) {
 		if ($stype=='I') {
@@ -170,19 +171,19 @@ if ($overwritebody) {
 			if (!isset($didview[$i])) {
 				echo '<td></td><td style="border-right:1px solid"></td>';
 			} else {
-				echo '<td>'.$didview[$i][0].'</td>';
+				echo '<td><a href="viewactionlog.php?cid='.$cid.'&uid='.$didviewIDs[$i].'">'.$didview[$i][0].'</a></td>';
 				echo '<td style="border-right:1px solid">'.$didview[$i][1].'</td>';
 			}
 			if (!isset($notview[$i])) {
 				echo '<td></td>';
 			} else {
-				echo '<td>'.$notview[$i].'</td>';
+				echo '<td><a href="viewactionlog.php?cid='.$cid.'&uid='.$notviewIDs[$i].'">'.$notview[$i].'</td>';
 			}
 			echo '</tr>';
 		}
 		echo '</tbody></table>';
 	}
 }
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -90,11 +90,11 @@ function tipshow(el,tip, e) {
 		return;
 	}
 	if (typeof tipobj!= 'object') {
-        tipobj = document.createElement("div");
-        if (window.imathasAssess) {
+		tipobj = document.createElement("div");
+        if (typeof window.imathasAssess != 'undefined') {
             tipobj.className = "dropdown-pane tooltip-pane";
         } else {
-            tipobj.className = "tips";
+		tipobj.className = "tips";
         }
 		tipobj.setAttribute("role","tooltip");
 		tipobj.id = "hovertipsholder";
@@ -172,14 +172,18 @@ jQuery(function() {
 var popupwins = [];
 function popupwindow(id,content,width,height,scroll) {
 	if (height=='fit') {
-		height = window.height - 80;
+		height = window.innerHeight - 80;
 	}
 	var attr = "width="+width+",height="+height+",status=0,resizable=1,directories=0,menubar=0";
 	if (scroll!=null && scroll==true) {
 		attr += ",scrollbars=1";
 	}
+
 	if (typeof(popupwins[id])!="undefined" && !popupwins[id].closed) {
 		popupwins[id].focus();
+        if (popupwins[id].location.href == content) {
+            return;
+        }
 	}
 	if (content.match(/^http/)) {
 		popupwins[id] = window.open(content,id,attr);
@@ -308,7 +312,8 @@ function GB_resize(e) {
 
 	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
 	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
-	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - 36);
+    
+	jQuery("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
 }
 function GB_endresize(e) {
 	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
@@ -317,7 +322,15 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+var GB_sourceel = null;
+function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
+	if (document.activeElement) {
+        GB_sourceel = document.activeElement;
+        if ($(GB_sourceel).closest(".dropdown-menu").length > 0) {
+            GB_sourceel = $(GB_sourceel).closest(".dropdown").find("a,button")[0];
+        }
+    }
+	url = rewriteVideoUrl(url);
     posstyle = posstyle || '';
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
@@ -329,7 +342,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
-		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_resizehandle"></div>';
+		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_footer"></div><div id="GB_resizehandle"></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
 		jQuery("#GB_caption").on('mousedown touchstart', function(e) {
@@ -370,7 +383,8 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 			  .css("top", gbwin.getBoundingClientRect().top)
 			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
-			  .data("original_h", $(gbwin).height())
+              .data("original_h", $(gbwin).height())
+              .data("footer_h", ($("#GB_footer:visible").outerHeight() || 0) + $("#GB_caption").outerHeight())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
 
@@ -385,7 +399,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 				 .on('mouseup.GBresize', GB_endresize);
 			}
 		});
-    }
+	}
     document.getElementById("GB_loading").style.display = "block";
 	if (url.charAt(0)=='<') {
 		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
@@ -397,35 +411,39 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
         document.getElementById("GB_frame").src.replace(/\/$/,'') !=
             url.replace(/\/$/,'')
     ) {
-		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'" data-noresize=1></iframe>';
 	} else {
         document.getElementById("GB_loading").style.display = 'none';
-    }
-	jQuery("#GB_frameholder").isolatedScroll();
+	}
+    jQuery("#GB_frameholder").isolatedScroll();
+    document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 	if (url.match(/libtree/)) {
-		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
-		document.getElementById("GB_caption").innerHTML = btnhtml;
-		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setlib()">Use Libraries</button> <button type=button onclick="GB_hide()">Close</button>';
+		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
 	} else if (url.match(/assessselect/)) {
-		var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
-		document.getElementById("GB_caption").innerHTML = btnhtml;
-		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setassess()">Use Assessments</button> <button type=button onclick="GB_hide()">Close</button>';
+		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
+	} else if (callback) {
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.'+callback.func+'()">'+callback.label+'</button> <button type=button onclick="GB_hide()">Close</button>';
+		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;		
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
+        document.getElementById("GB_footer").innerHTML = '<button type=button class="primary" onclick="GB_hide()">Close</button>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
-            var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+			var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
 		} else {
 			var h = height;
 		}
-	}
-    document.getElementById("GB_window").style.display = "block";
+    }
+
+	document.getElementById("GB_window").style.display = "block";
     if (overlay !== false) {
         document.getElementById("GB_overlay").style.display = "block";
+        document.getElementById("GB_footer").style.display = "block";
+        document.getElementsByTagName("body")[0].style.overflow = "hidden";
     } else {
         document.getElementById("GB_overlay").style.display = "none";
+        document.getElementById("GB_footer").style.display = "none";
     }
 
 	//var de = document.documentElement;
@@ -433,7 +451,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 	var w = $(document).width();
 	if (width > w-20) {
 		width = w-20;
-    }
+	}
     if (!posstyle.match(/noreset/) || 
         !jQuery("#GB_window").data("original_mouse_x") || 
         document.getElementById("GB_window").style.left==''
@@ -443,7 +461,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
             var belowel;
             for (var i in showbelow) {
                 if (belowel = document.getElementById(showbelow[i])) {
-                    inittop = belowel.getBoundingClientRect().bottom + 10;
+                    inittop = Math.max(0, belowel.getBoundingClientRect().bottom + 10);
                     if (height=='auto') {
 						h = (window.self !== window.top) ? Math.min(600,self.innerHeight) : self.innerHeight;
 						h = Math.max(200, h - inittop - 20);
@@ -452,6 +470,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
                 }
             }
         }
+
         $("#GB_window").css("margin","").css("left","").css("top",inittop);
         if (posstyle.match(/left/) && document.getElementById("GB_window").style.left=='') {
             if ($("body").hasClass("fw1000") && w > 1000) {
@@ -466,30 +485,54 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
             document.getElementById("GB_window").style.width = width + "px";
         }
         
-        document.getElementById("GB_window").style.height = (h-30) + "px";
-        //document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-        if (url.charAt(0)!='<') {
-            document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
-        } else {
-            document.getElementById("GB_frameholder").style.height = "auto";
-        }
+	document.getElementById("GB_window").style.height = h + "px";
+	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+	if (url.charAt(0)!='<') {
+        var capheight = $("#GB_caption").outerHeight();
+        var footheight = $("#GB_footer:visible").outerHeight() || 0;
+        document.getElementById("GB_frameholder").style.height = 
+            (h - capheight - footheight)+"px";
+	} else {
+		document.getElementById("GB_frameholder").style.height = "auto";
+	}
     }
-	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
 			GB_hide();
-		}
-	});
+		} else if (evt.keyCode == 9 && overlay !== false) {
+            GB_retainfocus(evt);
+        }
+    });
+    document.getElementById("GB_window").focus();
 }
 function GB_doneload() {
 	document.getElementById("GB_loading").style.display = "none";
 }
 function GB_hide() {
-	document.getElementById("GB_window").style.display = "none";
+    document.getElementById("GB_window").style.display = "none";
 	if (document.getElementById("GB_overlay")) {
-		document.getElementById("GB_overlay").style.display = "none";
+        document.getElementById("GB_overlay").style.display = "none";
+        document.getElementsByTagName("body")[0].style.overflow = "";
 	}
-	$(document).off('keydown.GB');
+    $(document).off('keydown.GB');
+    if (GB_sourceel) {
+        GB_sourceel.focus();
+    }
+    GB_sourceel = null;
+}
+
+function GB_retainfocus(evt) {
+    if (!document.getElementById("GB_window").contains(document.activeElement)) {
+        $("#GB_window").find("a,button,input").first().focus();
+    } else {
+        if (evt.shiftKey && $("#GB_window").find("a,button,input").first()[0] == document.activeElement) {
+            $("#GB_window").find("a,button,input").last().focus();
+            evt.preventDefault();
+        } else if (!evt.shiftKey && $("#GB_window").find("a,button,input").last()[0] == document.activeElement) {
+            $("#GB_window").find("a,button,input").first().focus();
+            evt.preventDefault();
+        }
+    }
 }
 
 function chkAllNone(frmid, arr, mark, skip) {
@@ -510,7 +553,7 @@ function chkAllNone(frmid, arr, mark, skip) {
 }
 
 var tinyMCEPreInit = {base: staticroot+"/tinymce4"};
-function initeditor(edmode,edids,css,inline,setupfunction){
+function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 	var cssmode = css || 0;
 	var inlinemode = inline || 0;
 	var selectorstr = '';
@@ -530,7 +573,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor snippet",
 			"media table paste rollups colorpicker"
-        ],
+		],
         external_plugins: {
             "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
             "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
@@ -558,7 +601,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-        snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
@@ -601,6 +644,9 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 	if (setupfunction) {
 		edsetup.setup = setupfunction;
 	}
+    if (extendsetup) {
+        edsetup = Object.assign(edsetup, extendsetup);
+    }
 	//for (var i in tinymce.editors) {
 	//	tinymce.editors[i].remove();
 	//}
@@ -695,13 +741,24 @@ function recclick(type,typeid,info,txt) {
 		var extradata = '',m;
 		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
 			extradata = '&unloadinglinked='+m[1];
-			recordedunload = true;
-		}
-		jQuery.ajax({
-			type: "POST",
-			url: imasroot+'/course/rectrack.php?cid='+cid,
-			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
-		});
+            recordedunload = true;
+        }
+        if (navigator.sendBeacon) {
+            var fd = new FormData();
+            fd.append('type', type);
+            fd.append('typeid', typeid);
+            fd.append('info',info+'::'+txt);
+            if (extradata != '') {
+                fd.append('unloadinglinked', m[1]);
+            }
+            navigator.sendBeacon(imasroot+'/course/rectrack.php?cid='+cid, fd);
+        } else {
+            jQuery.ajax({
+                type: "POST",
+                url: imasroot+'/course/rectrack.php?cid='+cid,
+                data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
+            });
+        }
 	}
 }
 function setuptracklinks(i,el) {
@@ -731,21 +788,51 @@ function togglevideoembed() {
 	if (els.length>0) {
 		if (els.css('display')=='none') {
 			els.show();
-			els.parent('.fluid-width-video-wrapper').show();
+			els.closest('.video-wrapper-wrapper').show();
 			jQuery(this).text(' [-]')
 				.attr('title',_("Hide video"))
 				.attr('aria-label',_("Hide embedded video"));
 		} else {
 			els.hide();
 			els.get(0).contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
-			els.parent('.fluid-width-video-wrapper').hide();
+			els.closest('.video-wrapper-wrapper').hide();
 			jQuery(this).text(' [+]');
 			jQuery(this).attr('title',_("Watch video here"));
 			jQuery(this).attr('aria-label',_("Embed video") + ' ' + jQuery(this).prev().text());
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
-		var qsconn = '?';
+		href = rewriteVideoUrl(href);
+        var viframe = jQuery('<iframe/>', {
+			id: 'videoiframe'+id,
+			width: 640,
+			height: 400,
+			src: href,
+			frameborder: 0,
+			allowfullscreen: 1
+        });
+        var $this = jQuery(this);
+        if ($this.closest('.itemhdr').length == 0) {
+            viframe.insertAfter($this);
+            $this.parent().fitVids();
+            //jQuery('<br/>').insertAfter($this);
+        } else {
+            var par = $this.closest('.itemhdr').next();
+            par.prepend(viframe);
+            par.fitVids();
+        }
+		
+		$this.text(' [-]')
+			.attr('title',_("Hide video"))
+			.attr('aria-label',_("Hide embedded video"));
+		if ($this.prev().attr("data-base")) {
+			var inf = $this.prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, $this.prev().text());
+		}
+	}
+}
+function rewriteVideoUrl(href) {
+	var qsconn = '?';
 		href = href.replace(/%3F/g,'?').replace(/%3D/g,'=');
 		if (href.match(/youtube\.com/)) {
 			if (href.indexOf('playlist?list=')>-1) {
@@ -762,11 +849,18 @@ function togglevideoembed() {
 		} else if (href.match(/youtu\.be/)) {
 			var vidid = href.split('.be/')[1].split(/[#&]/)[0];
 			var vidsrc = 'www.youtube.com/embed/';
+            if (vidid.indexOf('?') > -1) {
+                qsconn = '&';
+            }
 		} else if (href.match(/vimeo/)) {
 			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
 			var vidsrc = 'player.vimeo.com/video/';
+		} else if (href.match(/loom/)) {
+            return href.replace('/share/','/embed/');
+        } else { // not video
+			return href;
 		}
-		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s)?.*/);
+		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s?)?.*/);
 		if (m == null) {
 			var timeref = qsconn+'rel=0';
 			m = href.match(/.*start=(\d+)/);
@@ -781,34 +875,8 @@ function togglevideoembed() {
 			timeref += '&end='+m[1];
 		}
 		timeref += '&enablejsapi=1';
-        var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
-        var viframe = jQuery('<iframe/>', {
-			id: 'videoiframe'+id,
-			width: 640,
-			height: 400,
-			src: loc_protocol+'//'+vidsrc+vidid+timeref,
-			frameborder: 0,
-			allowfullscreen: 1
-        });
-        var $this = jQuery(this);
-        if ($this.closest('.itemhdr').length == 0) {
-            viframe.insertAfter($this);
-            $this.parent().fitVids();
-            jQuery('<br/>').insertAfter($this);
-        } else {
-            var par = $this.closest('.itemhdr').next();
-            par.prepend(viframe);
-            par.fitVids();
-        }
-		
-		$this.text(' [-]')
-			.attr('title',_("Hide video"))
-			.attr('aria-label',_("Hide embedded video"));
-		if ($this.prev().attr("data-base")) {
-			var inf = $this.prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href, $this.prev().text());
-		}
-	}
+		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
+		return loc_protocol+'//'+vidsrc+vidid+timeref;
 }
 function setupvideoembeds(i,el) {
 
@@ -839,7 +907,7 @@ function setuppreviewembeds(i,el) {
 			title: _("Preview file"),
 			"aria-label": _("Preview file"),
 			id: 'fileembedbtn'+fileembedcounter,
-			click: togglefileembed,
+			click: function() {togglefileembed(this.id);},
 			keydown: function (e) {if (e.which == 13) { $(this).click();}},
 			tabindex: 0,
 			"class": "videoembedbtn"
@@ -860,23 +928,27 @@ function supportsPdf() {
 	return false;
 }
 
-function togglefileembed() {
-	var id = this.id.substr(12);
+function togglefileembed(id, newstate) {
 	var els = jQuery('#fileiframe'+id);
+    var toggleel = jQuery('#'+id);
 	if (els.length>0) {
 		if (els.css('display')=='none') {
+            if (newstate === false) {return;} // keep closed
 			els.show();
-			jQuery(this).text(' [-]');
-			jQuery(this).attr('title',_("Hide preview"));
-			jQuery(this).attr('aria-label',_("Hide file preview"));
+			toggleel.text(' [-]');
+			toggleel.attr('title',_("Hide preview"));
+			toggleel.attr('aria-label',_("Hide file preview"));
 		} else {
+            if (newstate === true) {return;} // keep open
 			els.hide();
-			jQuery(this).text(' [+]');
-			jQuery(this).attr('title',_("Preview file"));
-			jQuery(this).attr('aria-label',_("Preview file"));
+			toggleel.text(' [+]');
+			toggleel.attr('title',_("Preview file"));
+			toggleel.attr('aria-label',_("Preview file"));
 		}
-	} else {
-		var href = jQuery(this).prev().attr('href');
+	} else if (newstate === false) {
+      return; // want closed; already is  
+    } else {
+		var href = toggleel.prev().attr('href');
 		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)($|\?)/i)) {
 			var src;
 			if (href.match(/\.pdf/) && supportsPdf()) {
@@ -893,12 +965,12 @@ function togglefileembed() {
 				src: src,
 				frameborder: 0,
 				allowfullscreen: 1
-			}).insertAfter(jQuery(this));
+			}).insertAfter(toggleel);
 		} else if (href.match(/\.(heic)($|\?)/i)) {
 			jQuery('<div>', {
 				id: 'fileiframe' + id,
 				text: 'Converting HEIC file (this may take a while)...'
-			}).insertAfter(jQuery(this));
+			}).insertAfter(toggleel);
 			if (!window.heic2any) {
 				jQuery.getScript(staticroot+'/javascript/heic2any.min.js')
 				 .done(function() { convertheic(href, 'fileiframe' + id); });
@@ -910,14 +982,14 @@ function togglefileembed() {
 					id: 'fileiframe'+id,
 					src: href
 				}).css('display','block').on('click', rotateimg)
-		  ).insertAfter(jQuery(this));
+		  ).insertAfter(toggleel);
 		}
-		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]');
-		jQuery(this).attr('title',_("Hide preview"));
-		if (jQuery(this).prev().attr("data-base")) {
-			var inf = jQuery(this).prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		jQuery('<br/>').insertAfter(toggleel);
+		toggleel.text(' [-]');
+		toggleel.attr('title',_("Hide preview"));
+		if (toggleel.prev().attr("data-base")) {
+			var inf = toggleel.prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, toggleel.prev().text());
 		}
 	}
 }
@@ -942,7 +1014,7 @@ jQuery(function() {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
 			}
 		}
-	});
+    });
 });
 
 function convertheic(href, divid) {
@@ -963,9 +1035,6 @@ function convertheic(href, divid) {
 function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
-	}
-	if (el.target && jQuery(el).find('.openext').length == 0) {
-		jQuery(el).append('<span class="sr-only openext">Opens externally</span>');
 	}
 }
 function addBlankTarget(i,el) {
@@ -1084,7 +1153,10 @@ jQuery(document).ready(function($) {
 		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {
 			var edata = JSON.parse(e.originalEvent.data);
 			if ("frame_id" in edata) {
-				$("#"+edata["frame_id"]).height(edata.height);
+                $("#"+edata["frame_id"]).height(edata.height);
+                if (edata.wrapheight) {
+                    $("#"+edata["frame_id"]+"wrap").height(edata.wrapheight);
+                }
 			} else if ("iframe_resize_id" in edata) {
 				$("#"+edata["iframe_resize_id"]).height(edata.height);
 			} else {
@@ -1126,11 +1198,41 @@ function initlinkmarkup(base) {
 	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
+    $(base).find('a[href*="loom.com/share"],a[href*="loom.com/embed"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
-	setupToggler(base);
+	setIframeSpinner(base);
+    setupToggler(base);
 	setupToggler2(base);
-    $(base).fitVids();
+    setupPopuplinks(base);
+    //setupToggleResize(base);
+	$(base).fitVids();
     resizeResponsiveIframes(base, true);
+}
+
+/* seems to be crashing browser for some reason
+function setupToggleResize(base) {
+    $(base).find("details").on("toggle", function() {
+        $(this).find("iframe").each(function(i,el) {
+            console.log(el);
+            sendResizeToIframe(el);
+        })
+        
+    })
+}
+function sendResizeToIframe(el) {
+    el.contentWindow.postMessage('requestResize','*');
+}
+*/
+
+function setIframeSpinner(base) {
+    jQuery(base).find('iframe').each(function(i,el) {
+        if (el.style.background == '') {
+            el.style.background = 'url('+staticroot+'/img/updating.gif) center center no-repeat';
+        }
+        $(el).on("load", function() {
+            this.style.backgroundImage = 'none';
+        });
+    });
 }
 
 function resizeResponsiveIframes(base, init) {
@@ -1145,8 +1247,28 @@ function resizeResponsiveIframes(base, init) {
     });
 }
 jQuery(document).ready(function($) {
-    initlinkmarkup('body');
+	initlinkmarkup('body');
     $(window).on('resize', function () {resizeResponsiveIframes('body');});
+});
+
+jQuery(function($) {
+	$("#ltimenubutton").on('click', function() {
+		var btn = $("#ltimenubutton");
+		if (!btn.attr("data-loaded")) {
+			$.ajax({
+					type: "GET",
+					url: imasroot+'/lti/ltimenu.php?launchid=' +
+						encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'))
+			}).done(function(msg) {
+				$("#ltimenudiv").html(msg);
+                btn.attr("data-loaded",1);
+                document.cookie = "fromltimenu=1;" 
+                    + 'path=' + ((imasroot=='') ? '/' : imasroot) + ';'
+                    + ((window.location.protocol=='https:') ? "secure; samesite=none" : "");
+				sendLTIresizemsg();
+			});
+		}
+	});
 });
 
 jQuery.fn.isolatedScroll = function() {
@@ -1265,6 +1387,26 @@ function setupToggler2(base) {
 		});
 	});
 }
+function setupPopuplinks(base) {
+    var allowedprops = ['popup','width','innerWidth','height','innerHeight','left','screenX','top','screenY'];
+	$(base).find("a[data-popup]").each(function(i,el) {
+		if (!el.id) { el.id = 'link' + Math.random().toString(16).slice(2); }
+        $(el).off("click.popup").on("click.popup", function(e) {
+            e.preventDefault();
+            var attr = el.getAttribute('data-popup').split(/,/);
+            var attrout = [];
+            for (let i=0;i < attr.length; i++) {
+                let pts = attr[i].split(/=/);
+                if (pts.length == 2 && allowedprops.includes(pts[0])) {
+                    attrout.push(pts[0] + '=' + parseInt(pts[1]));
+                }
+            }
+            console.log(attrout.join(','));
+            window.open(el.href, 'popup_'+el.id, attrout.join(','));
+            return false;
+        });
+    });
+}
 
 //generic grouping block toggle
 function groupToggleAll(dir) {
@@ -1313,18 +1455,22 @@ function initFileAlt(el) {
 		.on("blur.filealt", function(e) { jQuery(e.target).removeClass("has-focus");} )
 		.on("click.filealt", function(e) { label.html(origLabel); } )
 		.on("change.filealt", function(e) {
-			var fileName = '';
-			fileName = e.target.value.split(/(\\|\/)/g).pop();
-			if (fileName) {
-				var maxFileSize = 10000*1024; // 10MB
-        if (this.files[0].size > maxFileSize) {
-          alert(_('This file is too large - maximum size is 10MB'));
-          $(this).val('');
-        } else {
-					label.html(fileName);
-				}
-			}
-		});
+            label.html(_('Preparing file...'));
+            doImageUploadResize(this,function(el) {
+                var fileName = '';
+                fileName = el.value.split(/(\\|\/)/g).pop();
+                if (fileName) {
+                    var maxFileSize = 10000*1024; // 10MB
+                    if (el.files[0].size > maxFileSize) {
+                        alert(_('This file is too large - maximum size is 10MB'));
+                        $(el).val('');
+                        label.html('');
+                    } else {
+                        label.html(fileName);
+                    }
+                }
+            });
+        });
 }
 jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
 
@@ -1339,7 +1485,8 @@ jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
       var selectors = [
         "iframe[src*='player.vimeo.com']",
         "iframe[src*='youtube.com']",
-        "iframe[src*='youtube-nocookie.com']"
+        "iframe[src*='youtube-nocookie.com']",
+        "iframe[src*='loom.com']"
       ];
 
       var $allVideos = $(this).find(selectors.join(','));
@@ -1435,19 +1582,17 @@ jQuery(document).ready(function($) {
 });
 var sagecellcounter = 0;
 function initSageCell(base) {
-	jQuery(base).find(".converttosagecell").each(function() {
-		var ta, code;
+	jQuery(base).find(".converttosagecell:visible:not(.inited)").each(function() {
+		var ta, inp, code;
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
-            code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'')
-                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+            code = jQuery(ta).html();
 		} else {
 			ta = $this.find("textarea");
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
-                    code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
-                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                    code = $this.find("pre").html();
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {
@@ -1460,7 +1605,10 @@ function initSageCell(base) {
 				code = jQuery(ta[0]).val();
 				ta = ta[0];
 			}
+			inp = $this.find("input[id^=qn]");
 		}
+        code = code.replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&amp;/g,'&');
 		if (m = code.match(/^\s+/)) {
 			var chop = m[0].length;
 			var re = new RegExp('\\n\\s{'+chop+'}',"g");
@@ -1470,11 +1618,21 @@ function initSageCell(base) {
 		sagecellcounter++;
 		var url = imasroot+'/assessment/libs/sagecellframe.html?frame_id='+frame_id;
 		url += '&code='+encodeURIComponent(code);
+        ['lang', 'hide', 'autoeval'].forEach(function(dattribute) {
+            if ($this[0].hasAttribute('data-'+dattribute)) {
+                url += '&' + dattribute + '=' + encodeURIComponent($this.attr('data-'+dattribute));
+            }
+        });
 		var returnid = null;
 		if (typeof jQuery(ta).attr("id") != "undefined") {
-				url += '&update_id='+jQuery(ta).attr("id");
+			url += '&update_id='+jQuery(ta).attr("id");
+		}
+		if (inp !== null) {
+			url += '&update_out='+jQuery(inp).attr("id");
+			jQuery(inp).addClass("allowupdate").hide();
 		}
 		url += '&evallabel=' + encodeURIComponent(_('Evaluate'));
+        $this.addClass("inited");
 		jQuery(ta).addClass("allowupdate").hide()
 		.after(jQuery("<iframe/>", {
 				id: frame_id,
@@ -1510,160 +1668,222 @@ function setActiveTab(el) {
 
 
 +function ($) {
-    'use strict';
-  
-    // DROPDOWN CLASS DEFINITION
-    // =========================
-  
-    var backdrop = '.dropdown-backdrop'
-    var toggle   = '[data-toggle="dropdown"]'
-    var Dropdown = function (element) {
-      $(element).on('click.bs.dropdown', this.toggle)
-    }
-  
+  'use strict';
+
+  // DROPDOWN CLASS DEFINITION
+  // =========================
+
+  var backdrop = '.dropdown-backdrop'
+  var toggle   = '[data-toggle="dropdown"]'
+  var Dropdown = function (element) {
+    $(element).on('click.bs.dropdown', this.toggle);
+    $(element).next('.dropdown-menu').children("li").attr("role","menuitem");
+  }
+
     Dropdown.VERSION = '3.4.1'
-  
-    function getParent($this) {
-      var selector = $this.attr('data-target')
-  
-      if (!selector) {
-        selector = $this.attr('href')
-        selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
-      }
-  
+
+  function getParent($this) {
+    var selector = $this.attr('data-target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
       var $parent = selector !== '#' ? $(document).find(selector) : null
-  
-      return $parent && $parent.length ? $parent : $this.parent()
-    }
-  
-    function clearMenus(e) {
-      if (e && e.which === 3) return
-      $(backdrop).remove()
-      $(toggle).each(function () {
-        var $this         = $(this)
-        var $parent       = getParent($this)
-        var relatedTarget = { relatedTarget: this }
-  
-        if (!$parent.hasClass('open')) return
-  
-        if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
-  
-        $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
-  
-        if (e.isDefaultPrevented()) return
-  
-        $this.attr('aria-expanded', 'false')
+
+    return $parent && $parent.length ? $parent : $this.parent()
+  }
+
+  function clearMenus(e) {
+    if (e && e.which === 3) return
+    $(backdrop).remove()
+    $(toggle).each(function () {
+      var $this         = $(this)
+      var $parent       = getParent($this)
+      var relatedTarget = { relatedTarget: this }
+
+      if (!$parent.hasClass('open')) return
+
+      if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+
+      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this.attr('aria-expanded', 'false')
         $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
-      })
-    }
-  
-    Dropdown.prototype.toggle = function (e) {
-      var $this = $(this)
-      if ($this.is('.disabled, :disabled')) return
-  
-      var $parent  = getParent($this)
-      var isActive = $parent.hasClass('open')
-  
-      clearMenus()
-  
-      if (!isActive) {
-        if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-          // if mobile we use a backdrop because click events don't delegate
-          $(document.createElement('div'))
-            .addClass('dropdown-backdrop')
-            .insertAfter($(this))
-            .on('click', clearMenus)
-        }
-  
-        var relatedTarget = { relatedTarget: this }
-        $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
-  
-        if (e.isDefaultPrevented()) return
-  
-        $this
-          .trigger('focus')
-          .attr('aria-expanded', 'true')
-  
-        $parent
-          .toggleClass('open')
+    })
+  }
+
+  Dropdown.prototype.toggle = function (e) {
+    var $this = $(this)
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    clearMenus()
+
+    if (!isActive) {
+      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+        // if mobile we use a backdrop because click events don't delegate
+        $(document.createElement('div'))
+          .addClass('dropdown-backdrop')
+          .insertAfter($(this))
+          .on('click', clearMenus)
+      }
+
+      var relatedTarget = { relatedTarget: this }
+      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this.next('.dropdown-menu').children("li").attr("role","menuitem");
+
+      $this
+        .trigger('focus')
+        .attr('aria-expanded', 'true')
+
+      $parent
+        .toggleClass('open')
           .trigger($.Event('shown.bs.dropdown', relatedTarget))
-      }
-  
-      return false
     }
-  
-    Dropdown.prototype.keydown = function (e) {
-      if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
-  
-      var $this = $(this)
-  
-      e.preventDefault()
-      e.stopPropagation()
-  
-      if ($this.is('.disabled, :disabled')) return
-  
-      var $parent  = getParent($this)
-      var isActive = $parent.hasClass('open')
-  
-      if (!isActive && e.which != 27 || isActive && e.which == 27) {
-        if (e.which == 27) $parent.find(toggle).trigger('focus')
-        return $this.trigger('click')
-      }
-  
-      var desc = ' li:not(.disabled):visible a'
+
+    return false
+  }
+
+  Dropdown.prototype.keydown = function (e) {
+    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+
+    var $this = $(this)
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    if (!isActive && e.which != 27 || isActive && e.which == 27) {
+      if (e.which == 27) $parent.find(toggle).trigger('focus')
+      return $this.trigger('click')
+    }
+
+    var desc = ' li:not(.disabled):visible a'
       var $items = $this.next('.dropdown-menu' + desc);
       if (!$items.length) {
         $items = $parent.find('.dropdown-menu' + desc);
       }
-  
-      if (!$items.length) return
-  
-      var index = $items.index(e.target)
-  
-      if (e.which == 38 && index > 0)                 index--         // up
-      if (e.which == 40 && index < $items.length - 1) index++         // down
-      if (!~index)                                    index = 0
-  
-      $items.eq(index).trigger('focus')
+
+    if (!$items.length) return
+
+    var index = $items.index(e.target)
+
+    if (e.which == 38 && index > 0)                 index--         // up
+    if (e.which == 40 && index < $items.length - 1) index++         // down
+    if (!~index)                                    index = 0
+
+    $items.eq(index).trigger('focus')
+  }
+
+
+  // DROPDOWN PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.dropdown')
+
+      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+      if (typeof option == 'string') data[option].call($this)
+    })
+  }
+
+  var old = $.fn.dropdown
+
+  $.fn.dropdown             = Plugin
+  $.fn.dropdown.Constructor = Dropdown
+
+
+  // DROPDOWN NO CONFLICT
+  // ====================
+
+  $.fn.dropdown.noConflict = function () {
+    $.fn.dropdown = old
+    return this
+  }
+
+
+  // APPLY TO STANDARD DROPDOWN ELEMENTS
+  // ===================================
+
+  $(document)
+    .on('click.bs.dropdown.data-api', clearMenus)
+    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+}(jQuery);
+
+// from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js
+
+function doImageUploadResize(el, callback) {
+    const that = el; // input node
+    const originalFile = el.files[0];
+
+    if (!originalFile || !originalFile.type.startsWith('image')) {
+        callback(el);
+        return;
     }
-  
-  
-    // DROPDOWN PLUGIN DEFINITION
-    // ==========================
-  
-    function Plugin(option) {
-      return this.each(function () {
-        var $this = $(this)
-        var data  = $this.data('bs.dropdown')
-  
-        if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
-        if (typeof option == 'string') data[option].call($this)
-      })
+
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var img = document.createElement('img');
+        var canvas = document.createElement('canvas');
+
+        img.src = e.target.result
+        img.onload = function () {
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            var width = img.width;
+            var height = img.height;
+            var prefix = '';
+            if (img.width > 1000 || img.height > 1000) {
+                const ratio = Math.min(1000 / img.width, 1000 / img.height);
+                width = Math.round(img.width * ratio);
+                height = Math.round(img.height * ratio);
+                prefix = 'resized_';
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(function (blob) {
+                var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
+
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(resizedFile);
+
+                // temporary remove event listener, change and restore
+                var currentOnChange = that.onchange;
+
+                that.onchange = null;
+                that.files = dataTransfer.files;
+                that.onchange = currentOnChange;
+                if (typeof callback === 'function') {
+                    callback(that);
+                }
+            }, 'image/jpeg', .95);
+        }
     }
-  
-    var old = $.fn.dropdown
-  
-    $.fn.dropdown             = Plugin
-    $.fn.dropdown.Constructor = Dropdown
-  
-  
-    // DROPDOWN NO CONFLICT
-    // ====================
-  
-    $.fn.dropdown.noConflict = function () {
-      $.fn.dropdown = old
-      return this
-    }
-  
-  
-    // APPLY TO STANDARD DROPDOWN ELEMENTS
-    // ===================================
-  
-    $(document)
-      .on('click.bs.dropdown.data-api', clearMenus)
-      .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-      .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
-      .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
-      .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-  
-  }(jQuery);
+    reader.readAsDataURL(originalFile);
+}

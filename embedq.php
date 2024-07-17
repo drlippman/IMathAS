@@ -3,7 +3,7 @@
 //(c) 2010 David Lippman
 $init_skip_csrfp = true;
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
-require("./init_without_validate.php");
+require_once "./init_without_validate.php";
 unset($init_skip_csrfp);
 
 header('P3P: CP="ALL CUR ADM OUR"');
@@ -15,7 +15,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  	 $urlmode = 'http://';
  }
 
-require("./assessment/displayq2.php");
+require_once "./assessment/displayq2.php";
 
 $_SESSION = array();
 $prefdefaults = array(
@@ -24,7 +24,7 @@ $prefdefaults = array(
 	'drawentry'=>1,
 	'useed'=>1,
 	'livepreview'=>1);
-$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"] ?? '', true);
 $_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {
@@ -44,6 +44,7 @@ $_SESSION['drill']['cid'] = 0;
 $_SESSION['drill']['sa'] = 0;
 $_SESSION['secsalt'] = "12345";
 $cid = "embedq";
+$myrights = 5;
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;
@@ -107,7 +108,6 @@ if (isset($_POST['seed']) && isset($_POST['check'])) {
 	if (empty($_GET['noresults'])) {
 		$qcol = explode('~',$rawscores[0]);
 	}
-	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
 	$pts = getpts($after);
 	$page_scoreMsg .= '<script type="text/javascript">
@@ -159,27 +159,31 @@ if (isset($_GET['frame_id'])) {
 		if (mathRenderer == "Katex") {
 			window.katexDoneCallback = sendresizemsg;
 		} else if (typeof MathJax != "undefined") {
-			MathJax.Hub.Queue(function () {
-				sendresizemsg();
-			});
+            if (MathJax.startup) {
+                MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+            } else if (MathJax.Hub) {
+                MathJax.Hub.Queue(function () {
+                    sendresizemsg();
+                });
+            } 
 		} else {
 			$(function() {
 				sendresizemsg();
 			});
 		}
-		</script>';
-	if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
-		//in case MathJax isn't loaded yet
-		$placeinhead .= '<script type="text/x-mathjax-config">
-			MathJax.Hub.Queue(function () {
-				sendresizemsg();
-			});
-			</script>';
-	}
+        </script>';
+    if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+        //in case MathJax isn't loaded yet
+        $placeinhead .= '<script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function () {
+                sendresizemsg();
+            });
+            </script>';
+    }
 }
 
 
-require("./assessment/header.php");
+require_once "./assessment/header.php";
 
 if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 	echo '<div class="review">' . _('Score on last question:') . $page_scoreMsg;
@@ -212,7 +216,7 @@ if ($showans) {
 }
 */
 
-require("./footer.php");
+require_once "./footer.php";
 
 
 function getansweights($code,$seed) {

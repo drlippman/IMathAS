@@ -2,7 +2,7 @@
 //IMathAS - User Details page
 //(c) 2017 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 function getRoleNameByRights($rights) {
   switch ($rights) {
@@ -66,7 +66,7 @@ if ($myrights < 75) {
     $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist ";
     $query .= "FROM imas_courses JOIN imas_users ON imas_courses.ownerid=imas_users.id ";
     $query .= "JOIN imas_teachers ON imas_teachers.courseid=imas_courses.id WHERE imas_teachers.userid=:uid ";
-    $query .= " ORDER BY imas_courses.name";
+    $query .= " ORDER BY imas_courses.available>3,imas_courses.name";
     $stm = $DBH->prepare($query);
   	$stm->execute(array(':uid'=>$uid));
     $courses_teaching = array();
@@ -109,10 +109,10 @@ if ($myrights < 75) {
       $newrow['status'] = array(($row['available']==0)?_('Available to students'):_('Hidden from students'));
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       $newrow['canedit'] = ($myrights==100 || $row['groupid']==$groupid);
-      if ($newrow['lockaid']>0) {
+      if (!empty($newrow['lockaid'])) {
         $newrow['status'][] = _('Locked for Assessment');
       }
-      if ($newrow['hidefromcourselist']==1) {
+      if (!empty($newrow['hidefromcourselist'])) {
         $newrow['status'][] = '<span class="hocp">'._("Hidden on User's Home Page").'</span>';
       }
       $courses_tutoring[] = $newrow;
@@ -135,10 +135,10 @@ if ($myrights < 75) {
       $newrow['status'] = array(($row['available']==0)?_('Available to students'):_('Hidden from students'));
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       $newrow['canedit'] = ($myrights==100 || $row['groupid']==$groupid);
-      if ($newrow['lockaid']>0) {
+      if ($row['lockaid']>0) {
         $newrow['status'][] = _('Locked for Assessment');
       }
-      if ($newrow['hidefromcourselist']==1) {
+      if ($row['hidefromcourselist']==1) {
         $newrow['status'][] = '<span class="hocp">'._("Hidden on User's Home Page").'</span>';
       }
       $courses_taking[] = $newrow;
@@ -159,21 +159,25 @@ td.hocptd li.hide {
   display: none;
 }
 </style>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
 	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('User Detail').': ';
+  echo '<span class="pii-full-name">';
   echo Sanitize::encodeStringForDisplay($userinfo['LastName'].', '.$userinfo['FirstName']);
+  echo '</span>';
   echo '</h1></div>';
 
 
   //sub nav links
   echo '<div class="cpmid"><a href="forms.php?from=ud'.$uid.'&action=chgrights&id='.$uid.'">'._('Edit User').'</a>';
   echo ' | <a href="addcourse.php?for='.$uid.'">'. _('Add Course').'</a>';
-  echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
+  if ($userinfo['rights'] <= $myrights) {
+    echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
+  }
   if (!empty($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
     echo " | <a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$uid&sendtype=msg&cid=";
     echo $CFG['GEN']['sendquestionproblemsthroughcourse'] . "',800,'auto')\" title=\"Send Message\">", _('Message'), "</a>";
@@ -194,7 +198,7 @@ if ($overwriteBody==1) {
       echo ' ('._('Subgroup of').': '.Sanitize::encodeStringForDisplay(trim($userinfo['parentgroup'])).')';
     }
   }
-  echo '<br/>'._('Email').': '.Sanitize::encodeStringForDisplay($userinfo['email']);
+  echo '<br/>'._('Email').': <span class="pii-email">'.Sanitize::encodeStringForDisplay($userinfo['email']).'</span>';
   echo '<br/>'._('Last Login').': '.Sanitize::encodeStringForDisplay($userinfo['lastaccess']).'</p>';
 
   if ((count($courses_teaching)>0 || count($courses_tutoring)>0) && count($courses_taking)>0) {
@@ -248,7 +252,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
@@ -288,7 +292,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
@@ -329,7 +333,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
@@ -392,7 +396,7 @@ if ($overwriteBody==1) {
   $(function() {
     var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
     html += \'<ul role="menu" class="dropdown-menu">\';
-    $("tr td:first-child").css("clear","both").each(function (i,el) {
+    $("#courses-teaching tr td:first-child").css("clear","both").each(function (i,el) {
       var cid = $(el).attr("data-cid");
       var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
       thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
@@ -405,10 +409,19 @@ if ($overwriteBody==1) {
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);
     });
+    $("#courses-taking tr td:first-child").css("clear","both").each(function (i,el) {
+        var cid = $(el).attr("data-cid");
+        var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
+        thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
+          thishtml += \' <li><a href="../course/listusers.php?action=lock&uid='.$uid.'&from=ud'.$uid.'&cid=\'+cid+\'">'._('Lock User').'</a></li>\';
+          thishtml += \' <li><a href="../course/listusers.php?action=unenroll&uid='.$uid.'&from=ud'.$uid.'&cid=\'+cid+\'">'._('Unenroll').'</a></li>\';
+          thishtml += \'</ul></span> \';
+          $(el).find("img").replaceWith(thishtml);
+      });
     $(".dropdown-toggle").dropdown();
     });
     </script>';
 }
 
 echo '<p>&nbsp;</p><p>&nbsp;</p>';
-require("../footer.php");
+require_once "../footer.php";

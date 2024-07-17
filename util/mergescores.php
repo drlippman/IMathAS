@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {
     exit;
@@ -11,7 +11,7 @@ if ($cid==0) {
     exit;
 }
 
-require("../header.php");
+require_once "../header.php";
 if (isset($_POST['assess'])) {
     $dc = 0;
     $source = array();
@@ -125,7 +125,7 @@ if (isset($_POST['assess'])) {
     echo '<p><input type="submit" value="Submit"/></p>';
     echo '</form>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {

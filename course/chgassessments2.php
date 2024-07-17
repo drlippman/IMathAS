@@ -3,11 +3,11 @@
 //(c) 2019 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/copyiteminc.php");
-require("../includes/loaditemshowdata.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/loaditemshowdata.php";
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -16,7 +16,11 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
 $cid = Sanitize::courseId($_GET['cid']);
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Assessment Settings";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _('Mass Change Assessment Settings');
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
@@ -48,6 +52,7 @@ if (!(isset($teacherid))) {
 
 		$sets = array();
 		$qarr = array();
+        $coreOK = true;
 		if ($_POST['copyopts'] != 'DNC') {
             $copyreqscore = !empty($_POST['copyreqscore']);
 			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
@@ -70,6 +75,7 @@ if (!(isset($teacherid))) {
                     $sets[] = "$item=:$item";
                 }
             }
+            $submitby = $qarr['submitby'];
 		} else {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
@@ -101,6 +107,20 @@ if (!(isset($teacherid))) {
 			if ($_POST['showwork'] !== 'DNC') {
 				$sets[] = "showwork=:showwork";
 				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']);
+                if (isset($_POST['showworktype'])) {
+                    $qarr[':showwork'] += Sanitize::onlyInt($_POST['showworktype']);
+                }
+                $sets[] = "workcutoff=:workcutoff";
+                if (!empty($_POST['doworkcutoff'])) {
+                    $qarr[':workcutoff'] = Sanitize::onlyInt($_POST['workcutoffval']);
+                    if ($_POST['workcutofftype'] == 'hr') {
+                        $qarr[':workcutoff'] *= 60;
+                    } else if ($_POST['workcutofftype'] == 'day') {
+                        $qarr[':workcutoff'] *= 60*24;
+                    } 
+                } else {
+                    $qarr[':workcutoff'] = 0;
+                }
 			}
 
 			if ($_POST['displaymethod'] !== 'DNC') {
@@ -114,7 +134,6 @@ if (!(isset($teacherid))) {
 			}
 
 			// check the core settings for consistency
-			$coreOK = true;
 			if ($_POST['subtype'] === 'DNC') {
 				$coreOK = false;
 			} else {
@@ -144,7 +163,7 @@ if (!(isset($teacherid))) {
 					$defregenpenalty = 0;
 				}
 			}
-			if ($submitby == 'by_assessment' && $defregens > 1) {
+			if ($coreOK && $submitby == 'by_assessment' && $defregens > 1) {
 				if ($_POST['keepscore'] === 'DNC') {
 					$coreOK = false;
 				} else {
@@ -236,8 +255,12 @@ if (!(isset($teacherid))) {
 			}
 
 			if ($_POST['noprint'] !== 'DNC') {
-				$sets[] = "noprint=:noprint";
-				$qarr[':noprint'] = Sanitize::onlyInt($_POST['noprint']);
+                if (!empty($_POST['noprint'])) {
+                    $sets[] = "noprint=(noprint | 1)";
+                } else {
+                    $sets[] = "noprint=(noprint & ~1)";
+                }
+                $metadata['noprint'] = $_POST['noprint'];
 			}
 
 			if ($_POST['istutorial'] !== 'DNC') {
@@ -288,7 +311,7 @@ if (!(isset($teacherid))) {
 				}
 				$sets[] = "reqscoreaid=:reqscoreaid";
 				$qarr[':reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
-				if ($_POST['reqscorecalctype']==1) {
+				if (!empty($_POST['reqscorecalctype'])) {
 					$sets[] = "reqscoretype=(reqscoretype | 2)";
 				} else {
 					$sets[] = "reqscoretype=(reqscoretype & ~2)";
@@ -303,9 +326,11 @@ if (!(isset($teacherid))) {
 				}
 			}
 
-			if ($_POST['showhints'] !== 'DNC') {
+			if (isset($_POST['dochgshowhints'])) {
 				$sets[] = "showhints=:showhints";
-				$qarr[':showhints'] = Sanitize::onlyInt($_POST['showhints']);
+				$qarr[':showhints'] = empty($_POST['showhints']) ? 0 : 1;
+                $qarr[':showhints'] |= empty($_POST['showextrefs']) ? 0 : 2;
+                $qarr[':showhints'] |= empty($_POST['showwrittenex']) ? 0 : 4;
 			}
 
 			if ($_POST['msgtoinstr'] !== 'DNC') {
@@ -372,7 +397,7 @@ if (!(isset($teacherid))) {
 				$qarr[':exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
 			}
 
-			if ($_POST['defoutcome'] !== 'DNC') {
+			if (isset($_POST['defoutcome']) && $_POST['defoutcome'] !== 'DNC') {
 				$sets[] = "defoutcome=:defoutcome";
 				$qarr[':defoutcome'] = Sanitize::onlyInt($_POST['defoutcome']);
 			}
@@ -442,6 +467,21 @@ if (!(isset($teacherid))) {
 				unset($metadata[':cid']);
 			}
 		}
+        if ($_POST['lockforassess'] !== 'DNC') {
+            // handle separately since must be limited to by_assess
+            if (intval($_POST['lockforassess']) == 2) {
+                $stm = $DBH->prepare("UPDATE imas_assessments SET noprint=(noprint | 2) WHERE id IN ($checkedlist) AND courseid=:cid AND submitby='by_assessment'");
+            } else {
+                $stm = $DBH->prepare("UPDATE imas_assessments SET noprint=(noprint & ~2) WHERE id IN ($checkedlist) AND courseid=:cid");
+            }
+            $stm->execute([':cid'=>$cid]);
+            $metadata['lockforassess'] = $_POST['lockforassess'];
+            if (intval($_POST['lockforassess']) == 0) {
+                // no lock: clear any existing locks
+                $stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE courseid=? AND lockaid in ($checkedlist)");
+                $stm->execute([$cid]);
+            }
+        }
 		if ($_POST['intro'] !== 'DNC') {
 			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['intro'])));
@@ -473,7 +513,7 @@ if (!(isset($teacherid))) {
 			$metadata['perq'] = "Removed per-question settings";
 			$updated_settings = true;
 		}
-		if ($updated_settings === true) {
+		if (!empty($updated_settings)) {
 			TeacherAuditLog::addTracking(
 				$cid,
 				"Mass Assessment Settings Change",
@@ -481,37 +521,34 @@ if (!(isset($teacherid))) {
 				$metadata
 			);
 		}
-		if ($_POST['copyopts'] != 'DNC' || $_POST['defpoints'] !== '' || isset($_POST['removeperq'])) {
-			//update points possible
-			require_once("../includes/updateptsposs.php");
+        if ($_POST['copyopts'] != 'DNC' || $_POST['defpoints'] !== '' || 
+            isset($_POST['removeperq']) || $_POST['exceptionpenalty'] !== '' ||
+            $_POST['subtype'] !== 'DNC'
+        ) {
+            require_once "../includes/updateptsposs.php";
+            require_once "../assess2/AssessHelpers.php";
 			foreach ($checked as $aid) {
-				updatePointsPossible($aid);
-			}
-			// re-total existing assessment attempts to adjust scores
-			require("../assess2/AssessInfo.php");
-			require("../assess2/AssessRecord.php");
-			$DBH->beginTransaction();
-			$stm = $DBH->query("SELECT * FROM imas_assessment_records WHERE assessmentid IN ($checkedlist) ORDER BY assessmentid FOR UPDATE");
-			$lastAid = 0;
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				if ($row['assessmentid'] != $lastAid) {
-					$assess_info = new AssessInfo($DBH, $row['assessmentid'], $cid, false);
-					$assess_info->loadQuestionSettings('all', false, false);
-					$lastAid = $row['assessmentid'];
-				}
-				$assess_record = new AssessRecord($DBH, $assess_info, false);
-				$assess_record->setRecord($row);
-				if ($coreOK && $submitby!==$cursumitby[$row['assessmentid']]) {
+                //update points possible
+                updatePointsPossible($aid);
+                // re-total existing assessment attempts to adjust scores
+                if ($coreOK && $submitby!==$cursubmitby[$aid]) {
 					// convert data format
-					$assess_record->convertSubmitBy($submitby);
-				}
-				$assess_record->reTotalAssess();
-				$assess_record->saveRecord();
+                    AssessHelpers::retotalAll($cid, $aid, true, false, $submitby);
+				} else {
+                    AssessHelpers::retotalAll($cid, $aid);
+                }
 			}
-			$DBH->commit();
-		}
+        }
+        if ($_POST['showwork'] != 'DNC') {
+            require_once "../assess2/AssessHelpers.php";
+            // update "show work after" status flags
+            foreach ($checked as $aid) {
+                $thissubby = $coreOK ? $submitby : $cursubmitby[$aid];
+                AssessHelpers::updateShowWorkStatus($aid, $_POST['showwork'], $thissubby);
+            }
+        }
 		if (isset($_POST['chgendmsg'])) {
-			include("assessendmsg.php");
+			require_once "assessendmsg.php";
 		} else {
 			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']) .$btf. "&r=" . Sanitize::randomQueryStringParam());
@@ -528,12 +565,12 @@ if (!(isset($teacherid))) {
 
 		$stm = $DBH->prepare("SELECT id,name,gbcategory FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
+        $page_assessSelect = array();
 		if ($stm->rowCount()==0) {
 			$page_assessListMsg = "<li>No Assessments to change</li>\n";
 		} else {
 			$page_assessListMsg = "";
 			$i=0;
-			$page_assessSelect = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_assessSelect[] = array(
 					'val' => $row[0],
@@ -620,7 +657,7 @@ if (!(isset($teacherid))) {
 							$out .= '<ul class="assessnest">'.$sub.'</ul></li>';
 						}
 					}
-				} else if ($itemshowdata[$item]['itemtype'] == 'Assessment') {
+				} else if (isset($itemshowdata[$item]['itemtype']) && $itemshowdata[$item]['itemtype'] == 'Assessment') {
 					$aid = $itemshowdata[$item]['id'];
 					$out .= '<li>';
 					$out .= '<label><img src="'.$staticroot.'/img/assess_tiny.png"/> ';
@@ -637,9 +674,12 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-$placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
-
- require("../header.php");
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -662,8 +702,9 @@ div.highlight {
 	padding-top: 4px;
 	background-color: #e1f5ec;
 	border-left: 2px solid #19925b;
-	margin-left: -2px;
+	margin-left: -4px;
 	margin-bottom: 2px;
+	padding-left: 2px;
 }
 div.warn {
 	padding-top: 4px;
@@ -801,7 +842,7 @@ function tabToSettings() {
 	<h2>Change Settings</h2>
 
 <?php
-	require('chgassessments2form.php');
+	require_once 'chgassessments2form.php';
 ?>
 
 
@@ -810,5 +851,5 @@ function tabToSettings() {
 	</form>
 <?php
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

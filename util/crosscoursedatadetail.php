@@ -6,7 +6,7 @@
 ini_set("max_execution_time", "600");
 
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<75) {
 	echo 'You do not have the authority for this action';
@@ -22,16 +22,16 @@ $curBreadcrumb .= ' &gt; Cross-Course Results';
 
 function reporterror($err) {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<h1>Cross-Course Question Results</h1>';
 	echo '<p class=noticetext>'.$err.'</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
 if (empty($_REQUEST['baseassess'])) {
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<h1>Cross-Course Assessment Question Results</h1>';
 	echo '<p>This utility allows you to output question averages from all copies of the specified assessment.</p>';
@@ -42,7 +42,7 @@ if (empty($_REQUEST['baseassess'])) {
 	echo '<p>Output format: <select name=output><option value=html selected>Online</option><option value=csv>CSV download</option></select></p>';
 	echo '<p><button type=submit>Generate</button></p>';
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -53,7 +53,7 @@ $stm = $DBH->prepare('SELECT name,courseid,itemorder,ptsposs,defpoints FROM imas
 $stm->execute(array($baseassess));
 list($assessname,$basecourse,$itemorder,$ptsposs,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 if ($ptsposs==-1) {
-	require_once("../includes/updateptsposs.php");
+	require_once "../includes/updateptsposs.php";
 	$ptsposs = updatePointsPossible($baseassess);
 }
 $qarr = array();
@@ -97,8 +97,8 @@ $assessdata = array();
 $courses = array();
 $days = intval($_REQUEST['days']);
 $old = time() - (empty($days)?30:$days)*24*60*60;
-$anregex1 = '[[:<:]]'.$basecourse.':'.$baseassess.'[[:>:]]';
-$anregex2 = '^'.$baseassess.'[[:>:]]';
+$anregex1 = MYSQL_LEFT_WRDBND.$basecourse.':'.$baseassess.MYSQL_RIGHT_WRDBND;
+$anregex2 = '^'.$baseassess.MYSQL_RIGHT_WRDBND;
 $query = 'SELECT ia.id,ia.courseid,ia.itemorder,ia.ptsposs FROM imas_assessments AS ia ';
 $query .= 'JOIN imas_courses AS ic ON ic.id=ia.courseid ';
 $query .= 'JOIN imas_users AS iu ON ic.ownerid=iu.id ';
@@ -114,7 +114,48 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		continue;
 	}
 	if ($row['ptsposs']==-1) {
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
+		$row['ptsposs'] = updatePointsPossible($row['id']);
+	}
+	if ($row['ptsposs'] != $ptsposs) {
+		//wrong points possible
+		continue;	
+	}
+	$assessdata[$row['id']] = $row;
+	$courses[$row['id']] = $row['courseid'];
+	$qmap = $qmap + array_flip($row['itemorder']);	
+}
+// pull descendents looking at new assessment data
+$query = 'SELECT ia.id,ia.courseid,ia.itemorder,ia.ptsposs,ia.ancestors FROM imas_assessments AS ia ';
+$query .= 'JOIN imas_courses AS ic ON ic.id=ia.courseid ';
+$query .= 'JOIN imas_users AS iu ON ic.ownerid=iu.id ';
+$query .= 'JOIN imas_assessment_records AS iar ON ia.id=iar.assessmentid ';
+$query .= 'WHERE iu.groupid=? AND (ia.ancestors REGEXP ? OR ia.ancestors REGEXP ?)';
+$query .= 'GROUP BY ia.id HAVING MAX(iar.lastchange)>?';
+$stm = $DBH->prepare($query);
+$stm->execute(array($lookupgroup, $anregex1, $anregex2, $old));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['courseid'] == $basecourse) { continue; } // don't want to include any assess from the basecourse.
+    $ancestors = explode(',', $row['ancestors']);
+    foreach ($ancestors as $ancestor) {
+        $pts = explode(':', $ancestor);
+        if (count($pts)==2 && $pts[0] == $basecourse) {
+            // found first copy from basecourse
+            if ($pts[1] != $baseassess) {
+                // most direct ancestor from basecourse is not baseassess,
+                // so basecourse must have had copies of the assess
+                continue 2;
+            } 
+            break; // found a copy, don't need to continue loop
+        } 
+    }
+	$row['itemorder'] = explode(',', str_replace('~',',',preg_replace('/\d+\|\d+~/','',$row['itemorder'])));
+	if ($qcnt != count($row['itemorder'])) {
+		//invalid question count
+		continue;
+	}
+	if ($row['ptsposs']==-1) {
+		require_once "../includes/updateptsposs.php";
 		$row['ptsposs'] = updatePointsPossible($row['id']);
 	}
 	if ($row['ptsposs'] != $ptsposs) {
@@ -232,6 +273,29 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 }
 
+//pull new assessment data
+$query = 'SELECT assessmentid,scoreddata FROM imas_assessment_records WHERE ';
+$query .= "assessmentid IN ($phcopyaids)";
+$stm = $DBH->prepare($query);
+$stm->execute(array_keys($assessdata));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $data = json_decode(Sanitize::gzexpand($row['scoreddata']), true);
+    if (empty($data)) { continue; }
+    $thisaid = $row['assessmentid'];
+
+    $avertouse = isset($data['scored_version']) ? $data['scored_version'] : 0;
+    $aver = $data['assess_versions'][$avertouse];
+    foreach ($aver['questions'] as $qdata) {
+        $qvertouse = isset($qdata['scored_version']) ? $qdata['scored_version'] : 0;
+        $qid = $qdata['question_versions'][$qvertouse]['qid'];
+        $qn = $qmap[$qid];
+		if (!isset($assessresults[$qn][$thisaid])) {
+			$assessresults[$qn][$thisaid] = array();
+		}
+		$assessresults[$qn][$thisaid][] = $qdata['score'];
+    }
+}
+
 //echo "Assess data processing done: ".(microtime(true)-$ts).'<br>';
 
 //form output rows
@@ -257,7 +321,7 @@ foreach ($qarr as $loc=>$qid) {
 }
 
 if ($_REQUEST['output']=='html') {
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 	echo '<h1>Cross-Course Assessment Results</h1>';
 	echo '<h2>'.Sanitize::encodeStringForDisplay($assessname).'</h2>';
@@ -275,7 +339,7 @@ if ($_REQUEST['output']=='html') {
 		'days'=>$days,
 		'baseassess'=>$baseassess));
 	echo '<p><a href="crosscoursedatadetail.php?'.$qs.'">Download as CSV</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 } else {
 	header('Content-type: text/csv');
 	header("Content-Disposition: attachment; filename=\"gradebook-$cid.csv\"");

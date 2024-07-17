@@ -3,7 +3,7 @@ if (empty($_GET['cid']) || empty($_GET['postid']) || !isset($_GET['like'])) {
 	echo "fail";
 	exit;
 }
-require("../init.php");
+require_once "../init.php";
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	echo "fail";
 	exit;

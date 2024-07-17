@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Item Analysis (averages)
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -57,9 +57,9 @@
 		exit;
 	}
 	if ($istutor && $tutoredit==2) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You not have access to view scores for this assessment";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -71,17 +71,20 @@
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
-	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+    require_once "../header.php";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+    }
 	if ($stu==-1) {
-		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
+		echo "<a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> &gt; ";
 	} else if ($from=='isolate') {
-		echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> ";
+		echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> &gt; ";
 	} else if ($from=='gisolate') {
-		echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> ";
+		echo "<a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> &gt; ";
 	}
-	echo "&gt; Item Analysis</div>";
+	echo "Item Analysis</div>";
 
 	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a></div>';
 
@@ -381,7 +384,7 @@
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
 	if ($stm->fetchColumn(0)>0) {
-		include("../assessment/catscores.php");
+		require_once "../assessment/catscores.php";
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
 	if ($isteacher) {
@@ -390,7 +393,7 @@
 
 		echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {

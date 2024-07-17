@@ -2,13 +2,13 @@
 //IMathAS:  Add/modify gradebook comments
 //(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -28,11 +28,14 @@
 	}
 
 	if (isset($_GET['upload'])) {
-		require("../header.php");
+		require_once "../header.php";
 
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
-		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Gradebook Comments</a> &gt; Upload Comments</div>";
+        echo "<div class=breadcrumb>$breadcrumbbase ";
+        if (empty($_COOKIE['fromltimenu'])) {
+            echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        }
+        echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid\">Gradebook</a> ";
+		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Gradebook Comments</a> &gt; Upload Comments</div>";
 
 		if ($comtype=='stu') {
 			echo '<div id="headergbcomments" class="pagetitle"><h1>Upload Student Comments</h1></div>';
@@ -102,8 +105,8 @@
 					echo '</p>';
 				}
 				if ($successes>0) {
-					echo "<a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Return to comments list</a></p>";
-					require("../footer.php");
+					echo "<a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Return to comments list</a></p>";
+					require_once "../footer.php";
 					exit;
 				}
 
@@ -113,7 +116,7 @@
 			}
 		}
 
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"gbcomments.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&comtype=".Sanitize::encodeUrlParam($comtype)."&upload=true\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"gbcomments.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&comtype=".Sanitize::encodeUrlParam($comtype)."&upload=true\">\n";
 
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />\n";
 		echo "<span class=form>Grade file (CSV): </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
@@ -134,7 +137,7 @@
 
 		echo "</form>";
 
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 
@@ -155,11 +158,11 @@
 				}
 			//}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 	echo '<script type="text/javascript">function sendtoall(type) {'."\n";
 	echo '  var form=document.getElementById("mainform");'."\n";
 	echo '  for (var e = 0; e<form.elements.length; e++) {'."\n";
@@ -172,21 +175,23 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
 	if ($comtype=='stu') {
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=instr\">View/Edit Instructor notes</a></div>";
 		echo '<h1>Modify Gradebook Comments</h1>';
 		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
 
 	} else if ($comtype=='instr') {
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=stu\">View/Edit Student comments</a></div>";
 		echo '<h1>Modify Instructor Notes</h1>';
 		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";
 	}
-	echo "<p><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&upload=true&comtype=".Sanitize::encodeUrlParam($comtype)."\">Upload comments</a></p>";
+	echo "<p><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&upload=true&comtype=".Sanitize::encodeUrlParam($comtype)."\">Upload comments</a></p>";
 
 	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=".Sanitize::encodeUrlParam($comtype)."&record=true\">";
 	echo "<span class=form>Add/Replace to all:</span><span class=formright><textarea cols=50 rows=3 id=\"toall\" ></textarea>";
@@ -201,10 +206,10 @@
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<span class=form>".Sanitize::encodeStringForDisplay($row[1]).", ". Sanitize::encodeStringForDisplay($row[2])."</span><span class=formright><textarea cols=50 rows=3 name=\"".Sanitize::encodeStringForDisplay($row[0])."\">".Sanitize::encodeStringForDisplay($row[3], true)."</textarea></span><br class=form>";
+		echo "<span class='form pii-full-name'>".Sanitize::encodeStringForDisplay($row[1]).", ". Sanitize::encodeStringForDisplay($row[2])."</span><span class=formright><textarea cols=50 rows=3 name=\"".Sanitize::encodeStringForDisplay($row[0])."\">".Sanitize::encodeStringForDisplay($row[3], true)."</textarea></span><br class=form>";
 	}
 	echo '<div class="submit"><input type="submit" value="'._('Save Comments').'"/></div>';
 	echo "</form>";
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

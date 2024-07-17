@@ -1,9 +1,14 @@
 <?php
 //Polynomial functions.  Version 1.1, Nov 11, 2007
 
-
 global $allowedmacros;
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly");
+
+// COMMENT OUT BEFORE UPLOADING
+if(!is_array($allowedmacros)) {
+	$allowedmacros = array();
+}
+
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree");
 
 
 //formpoly(coefficients,powers or degree)
@@ -22,12 +27,19 @@ function formpoly($coef,$deg) {
 		if (!is_array($deg)) {
 			$deg = explode(',',$deg);
 		}
-		for ($i=0;$i<min(count($deg),count($coef));$i++) {
+        if (count($coef) != count($deg)) {
+            echo "formpoly: coef and deg should have equal lengths";
+        }
+        $max = max(array_keys($coef));
+		for ($i=0;$i<=$max;$i++) {
+            if (!isset($coef[$i]) || !isset($deg[$i])) { continue; }
 			$poly[$i][0] = $coef[$i]*1;
 			$poly[$i][1] = $deg[$i];
-		}	
+		}
 	} else {
-		for ($i=0;$i<count($coef);$i++) {
+        $max = max(array_keys($coef));
+		for ($i=0;$i<=$max;$i++) {
+            if (!isset($coef[$i])) { $deg--; continue; }
 			$poly[$i][0] = $coef[$i]*1;
 			$poly[$i][1] = $deg;
 			$deg--;
@@ -41,11 +53,17 @@ function formpoly($coef,$deg) {
 //use writepoly to create a display form of the polynomial
 //stretch:  a stretch factor; the A in A*(x-root)(x-root)...
 //roots: an array of the roots (zeros, x-intercepts) of the polynomial
-//multiplicites (optional): an array of multiplicites of the roots.  Assumed to 
+//       for a complex root pair a+-bi give a single array [a,b] as the root.
+//multiplicites (optional): an array of multiplicites of the roots.  Assumed to
 //  be all 1 if not provided
 function formpolyfromroots($a,$roots,$mult=1) {
+    if (count($roots)==0) { return [[$a,0]]; }
 	for($i=0; $i<count($roots); $i++) {
-		$newpoly = formpoly(array(1,-1*$roots[$i]),1);
+        if (is_array($roots[$i])) { // complex a+bi as [a,b]
+            $newpoly = formpoly(array(1,-2*$roots[$i][0],($roots[$i][0])**2 + ($roots[$i][1])**2),2);
+        } else {
+            $newpoly = formpoly(array(1,-1*$roots[$i]),1);
+        }
 		if (is_array($mult) && $mult[$i]>1) {
 			$newpoly = polypower($newpoly,$mult[$i]);
 		}
@@ -56,7 +74,7 @@ function formpolyfromroots($a,$roots,$mult=1) {
 		}
 	}
 	$outpoly = scalepoly($outpoly,$a);
-	return $outpoly;	
+	return $outpoly;
 }
 
 //writepoly(poly,[var,showzeros])
@@ -66,26 +84,26 @@ function formpolyfromroots($a,$roots,$mult=1) {
 //showzeros:  optional, defaults to false.  If true, shows zero coefficients
 function writepoly($poly,$var="x",$sz=false) {
 	$po = '';
-	$first = true;
-	for ($i=0;$i<count($poly);$i++) {
-		if (!$sz && $poly[$i][0]==0) {continue;}
+    $first = true;
+    foreach ($poly as $p) {
+		if (!$sz && $p[0]==0) {continue;}
 		if (!$first) {
-			if ($poly[$i][0]<0) {
+			if ($p[0]<0) {
 				$po .= ' - ';
 			} else {
 				$po .= ' + ';
 			}
 		} else {
-			if ($poly[$i][0]<0) {
+			if ($p[0]<0) {
 				$po .= ' - ';
 			}
 		}
-		if (abs($poly[$i][0])!=1 || $poly[$i][1]==0) {
-			$po .= abs($poly[$i][0]);
+		if (abs($p[0])!=1 || $p[1]==0) {
+			$po .= abs($p[0]);
 		}
-		if ($poly[$i][1]>1) {
-			$po .= " $var^". $poly[$i][1];
-		} else if ($poly[$i][1]>0) {
+		if ($p[1]>1) {
+			$po .= " $var^". $p[1];
+		} else if ($p[1]>0) {
 			$po .= " $var";
 		}
 		$first = false;
@@ -238,6 +256,16 @@ function getcoef($p,$deg) {
 	return $coef;
 }
 
+function polys_getdegree($p) {
+    $deg = 0;
+    for ($i=0;$i<count($p);$i++) {
+        if ($p[$i][1]>$deg) {
+            $deg = $p[$i][1];
+        }
+    }
+    return $deg;
+}
+
 //checkpolypowerorder(polystring,[order])
 //checks to make sure the degree order of polynomial powers is decreasing
 //set order='inc' to instead check if they're increasing
@@ -269,12 +297,14 @@ function checkpolypowerorder($p,$ord='dec') {
 // derivative of polynomial
 function derivepoly($p) {
 	$out = array();
+	$j=-1; // this is to prevent index skipping - MPJ 2/28/2021
 	for ($i=0;$i<count($p);$i++) {
 		if ($p[$i][1] == 0) { continue; }
-		$out[$i] = array();
-		$out[$i][0] = $p[$i][0]*$p[$i][1];
-		$out[$i][1] = $p[$i][1]-1;
-	}
+		$j++;
+		$out[$j] = array();
+		$out[$j][0] = $p[$i][0]*$p[$i][1];
+		$out[$j][1] = $p[$i][1]-1;
+    }
 	return $out;
 }
 

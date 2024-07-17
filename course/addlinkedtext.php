@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/parsedatetime.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/parsedatetime.php";
 
 
 
@@ -22,9 +22,10 @@ $body = "";
 $useeditor = "text,summary";
 
 $cid = Sanitize::courseId($_GET['cid']);
-$linkid = Sanitize::onlyInt($_GET['id']);
+
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-if (!empty($linkid)) {
+if (!empty($_GET['id'])) {
+    $linkid = Sanitize::onlyInt($_GET['id']);
 	$curBreadcrumb .= "&gt; "._("Modify Link")."\n";
 	$pagetitle = _("Modify Link");
 } else {
@@ -37,7 +38,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_linkedtext WHERE id=?");
 	$stm->execute(array($linkid));
 	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
@@ -53,16 +54,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = _("You need to access this page from the course page menu");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$block = $_GET['block'];
+	$block = $_GET['block'] ?? '0';
 	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
-            'cid' => $cid, 'folder' => $_GET['folder']));
+            'cid' => $cid, 'folder' => ($_GET['folder'] ?? '0')));
 	$page_formActionTag .= (!empty($linkid)) ? "&id=" . $linkid : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
+	
 	$points = 0;
 
-	if ($_POST['title']!= null) { //if the form has been submitted
+    if (!empty($_POST['title'])) { //if the form has been submitted
+        $caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 		$DBH->beginTransaction();
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -97,9 +99,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$processingerror = false;
 		$newfileid = 0;
 		if ($_POST['linktype']=='text') {
-			$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
+			$_POST['text'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['text']));
 		} else if ($_POST['linktype']=='file') {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			if ($_FILES['userfile']['name']!='') {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
@@ -194,7 +196,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':gradetypeid'=>$linkid));
 		}
 		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-
+        $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
 		if ($_POST['summary']=='<p>'._('Enter summary here (displays on course page)').'</p>' || $_POST['summary']=='<p></p>') {
 			$_POST['summary'] = '';
 		} else {
@@ -298,7 +300,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<p><a href=\"addlinkedtext.php?cid=" . $cid;
 			if (!empty($linkid)) {
 				$body .= "&id=" . $linkid;
-			} else {
+			} else if (isset($newtextid)) {
 				$body .= "&id=$newtextid";
 			}
 			$body .= "\">Try Again</a></p>\n";
@@ -310,6 +312,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else {
 		$toolcustom = '';
+        $toolcustomurl = '';
 		$selectedtool = 0;
 		$filename = '';
 		$webaddr = '';
@@ -344,9 +347,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$toolcustom = $toolparts[1];
 				if (isset($toolparts[2])) {
 					$toolcustomurl = $toolparts[2];
-				} else {
-					$toolcustomurl = '';
-				}
+				} 
 				if (isset($toolparts[3])) {
 					$gbcat = $toolparts[3];
 					$cntingb = $toolparts[4];
@@ -384,7 +385,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$cntingb = 1;
 			$gbcat = 0;
 			$tutoredit = 0;
-			$gradesecret = uniqid();
+            $gradesecret = uniqid();
 		}
 
 		$hr = floor($coursedeftime/60)%12;
@@ -432,7 +433,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
-		$page_gbcatSelect = array();
+		$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 		$i=0;
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -462,14 +463,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		$outcomes = array();
-		function flattenarr($ar) {
+		function flattenarr($ar, $deftype = 0) {
 			global $outcomes;
 			foreach ($ar as $v) {
 				if (is_array($v)) { //outcome group
 					$outcomes[] = array($v['name'], 1);
-					flattenarr($v['outcomes']);
+					flattenarr($v['outcomes'], 2);
 				} else {
-					$outcomes[] = array($v, 0);
+					$outcomes[] = array($v, $deftype);
 				}
 			}
 		}
@@ -500,7 +501,7 @@ $placeinhead .= '<script type="text/javascript">
  </script>';
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -549,7 +550,7 @@ if ($overwriteBody==1) {
 			<input type="hidden" name="MAX_FILE_SIZE" value="15000000" />
 			<span class="formright">
 			<?php if ($filename != '') {
-				require_once("../includes/filehandler.php");
+				require_once "../includes/filehandler.php";
 				echo '<input type="hidden" name="curfile" value="'.Sanitize::encodeStringForDisplay($filename).'"/>';
 				$alink = getcoursefileurl($filename);
 				echo _('Current file:').' <a target="_blank" href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>'._('Replace').' ';
@@ -573,7 +574,7 @@ if ($overwriteBody==1) {
 			}
 			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
 				echo '<a href="../admin/externaltools.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-                        'ltfrom' => $linkid)) .'">'._('Add or edit an external tool').'</a>';
+                        'ltfrom' => ($linkid ?? 0))) .'">'._('Add or edit an external tool').'</a>';
 			}
 			?>
 			</span><br class="form"/>
@@ -679,5 +680,5 @@ if ($overwriteBody==1) {
 	<p>&nbsp;</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

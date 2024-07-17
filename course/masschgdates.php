@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -86,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		];
 
 		for ($i=0; $i<$cnt; $i++) {
-			require_once("../includes/parsedatetime.php");
+			require_once "../includes/parsedatetime.php";
 
 			$data = explode(',',$_POST['data'.$i]);
 
@@ -172,6 +172,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = $data[6]; // $_POST['type'.$i];
 			$id = $data[7]; // $_POST['id'.$i];
 			$avail = intval($data[8]);
+			if ($avail == 2) {
+				$enddate =  2000000000;
+				if ($type != 'Link' && $type != 'InlineText') {
+					$startdate = 0;
+				}
+			}
 
 			$new = [
 				'id' => $id,
@@ -249,6 +255,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			} else if ($type=='Block') {
 				$blocktree = explode('-',$id);
+                $bid = array_pop($blocktree);
 				$sub =& $items;
 				if (count($blocktree)>1) {
 					for ($j=1;$j<count($blocktree)-1;$j++) {
@@ -256,6 +263,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				$sub =& $sub[$blocktree[$j]-1];
+                if (empty($sub['id']) || $sub['id'] != $bid) {
+                    continue; // if block id is wrong
+                }
 				$old = [
 					'id' => $id,
 					'startdate' => $sub['startdate'],
@@ -349,7 +359,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/masschgdates.js?v=100319\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/masschgdates.js?v=121422\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }
@@ -359,7 +369,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 if ($overwriteBody==1) {
-	require("../header.php");
+	require_once "../header.php";
 	echo $body;
 } else {
 
@@ -413,7 +423,7 @@ if ($overwriteBody==1) {
 		$placeinhead .= '<script type="text/javascript">var includeforums = true;</script>';
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Mass Change Dates</div>\n";
@@ -529,7 +539,9 @@ if ($overwriteBody==1) {
 				if (is_array($item)) {
 					$addto[] = 'Block'.$parent.'-'.($k+1);
 					$prefix['Block'.$parent.'-'.($k+1)] = $pre;
-					flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.' ');
+                    if (!empty($item['items'])) {
+					    flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.' ');
+                    }
 				} else {
 					$addto[] = $itemsassoc[$item];
 					$prefix[$itemsassoc[$item]] = $pre;
@@ -648,7 +660,7 @@ if ($overwriteBody==1) {
 			global $ids,$types,$names,$startdates,$enddates,$LPcutoffs,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
-					$ids[] = $parent.'-'.($k+1);
+					$ids[] = $parent.'-'.($k+1).'-'.$item['id'];
 					$types[] = "Block";
 					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
 					$names[] = $item['name'];
@@ -962,6 +974,6 @@ if ($overwriteBody==1) {
 	//echo "<script>var acnt = $cnt;</script>";
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -2,13 +2,13 @@
 	//Lists forum posts by Student name
 	//(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	/*if (!isset($teacherid) && !isset($tutorid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You must be a teacher to access this page\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}*/
 	if (isset($teacherid)) {
@@ -18,23 +18,29 @@
 	}
 
 	$forumid = Sanitize::onlyInt($_GET['forum']);
-	$cid = Sanitize::courseId($_GET['cid']);
+    $cid = Sanitize::courseId($_GET['cid']);
+    $page = Sanitize::onlyInt($_GET['page'] ?? 0);
 
 	if (isset($_GET['markallread'])) {
 		$stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid=:forumid");
 		$stm->execute(array(':forumid'=>$forumid));
 		$now = time();
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$stm2 = $DBH->prepare("SELECT id FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
+            /*
+            $stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) 
+                VALUES (:userid, :threadid, :lastview)
+                ON DUPLICATE KEY UPDATE lastview=:lastview2");
+		    $stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now, ':lastview2'=>$now));
+            */
+            $stm2 = $DBH->prepare("SELECT lastview FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 			$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0]));
 			if ($stm2->rowCount()>0) {
-				$r2id = $stm2->fetchColumn(0);
-				$stm2 = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE id=:id");
-				$stm2->execute(array(':lastview'=>$now, ':id'=>$r2id));
+				$stm2 = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid=:threadid");
+				$stm2->execute(array(':lastview'=>$now, ':userid'=>$userid, ':threadid'=>$row[0]));
 			} else{
 				$stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
 				$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now));
-		}
+		    }
 		}
 	}
 	$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid,autoscore FROM imas_forums WHERE id=:id");
@@ -47,23 +53,23 @@
 	$haspoints = ($pointspos>0);
 
 	$canviewall = (isset($teacherid) || isset($tutorid));
-	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
-	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit<2));
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
+	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
 	$allowreply = ($canviewall || (time()<$replyby));
 
 	$caller = "byname";
-	include("posthandler.php");
+	require_once "posthandler.php";
 
 	$placeinhead = '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=082911" type="text/css" />';
 	if ($haspoints && $caneditscore && $rubric != 0) {
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=113016"></script>';
-		require("../includes/rubric.php");
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
+		require_once "../includes/rubric.php";
 	}
 	if ($caneditscore && $_SESSION['useed']!=0) {
 		$useeditor = "noinit";
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
         echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -78,7 +84,7 @@
 		$stm->execute(array(':forumid'=>$forumid, ':userid'=>$userid));
 		if ($stm->rowCount()==0) {
 			echo '<p>This page is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -139,51 +145,24 @@
 			$(".reply").addClass("pseudohidden");
 		}
 	}
-	function onarrow(e,field) {
-		if (window.event) {
-			var key = window.event.keyCode;
-		} else if (e.which) {
-			var key = e.which;
-		}
+    $(function () {
+        $("input[type=text][id^=score]").on('keyup', function() {
+            var visel = $("input[type=text][id^=score]:visible");
+            var idx = visel.index(this);
+            if (idx != -1) {
+                if (event.which == 38 && idx > 0) { 
+                    idx--; 
+                } else if ((event.which == 40 || event.which == 13) && idx < visel.length-1) {
+                    idx++;
+                }
+                visel[idx].focus();
+            }
+        }).on('keypress', function() {
+            if (event.which == 13) { event.preventDefault(); }
+        });
+    })
+	
 
-		if (key==40 || key==38) {
-			var i;
-			for (i = 0; i < field.form.elements.length; i++)
-			   if (field == field.form.elements[i])
-			       break;
-
-		      if (key==38) {
-			      i = i-2;
-			      if (i<0) { i=0;}
-		      } else {
-			      i = (i + 2) % field.form.elements.length;
-		      }
-		      if (field.form.elements[i].type=='text') {
-			      field.form.elements[i].focus();
-		      }
-		      return false;
-		} else {
-			return true;
-		}
-	}
-	function onenter(e,field) {
-		if (window.event) {
-			var key = window.event.keyCode;
-		} else if (e.which) {
-			var key = e.which;
-		}
-		if (key==13) {
-			var i;
-			for (i = 0; i < field.form.elements.length; i++)
-			   if (field == field.form.elements[i])
-			       break;
-		      i = (i + 2) % field.form.elements.length;
-		      field.form.elements[i].focus();
-		      return false;
-		} else {
-			return true;
-		}
-	}
 	function GBviewThread(threadid) {
 		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
 		GB_show(_("Thread"),"posts.php?"+qsb,800,"auto");
@@ -191,7 +170,7 @@
 	}
 	function GBdoReply(threadid,postid) {
 		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
-		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto");
+		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto",true,'','',{'func':'submitpost','label':'<?php echo _('Post Reply');?>'});
 		return false;
 	}
 	</script>
@@ -268,26 +247,28 @@
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	function printuserposts($name, $uid, $content, $postcnt, $replycnt) {
-		printf("<b>%s</b> (", Sanitize::encodeStringForDisplay($name));
+	function printuserposts($name, $uid, $content, $postcnt, $replycnt, $hasuserimg) {
+        global $imasroot, $urlmode;
+		printf("<b><pii class='pii-full-name'>%s</span></b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
-		if ($line['hasuserimg']==1) {
+		if ($hasuserimg==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			} else {
-				echo "<img src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			}
 		}
 		echo '<div class="forumgrp">'.$content.'</div>';
 	}
-	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = '';
+	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = ''; $lasthasuserimg = 0;
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
-				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt);
+				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg);
 				$content = '';  $postcnt = 0; $replycnt = 0;
 			}
-			$laststu = $line['userid'];
+            $laststu = $line['userid'];
+            $lasthasuserimg = $line['hasuserimg'];
 			$lastname = Sanitize::encodeStringForDisplay($line['LastName']).", " . Sanitize::encodeStringForDisplay($line['FirstName']);
 		}
 
@@ -304,7 +285,7 @@
 		$content .= '<span class="right">';
 		if ($haspoints) {
 			if ($caneditscore && $line['stuid']!==null) {
-				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" value=\"";
 				if (isset($scores[$line['id']])) {
 					$content .= Sanitize::encodeStringForDisplay($scores[$line['id']]);
 				}
@@ -358,18 +339,18 @@
 				*/
 				if ($_SESSION['useed']==0) {
 					$content .= "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback".Sanitize::onlyInt($line['id'])."\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
-					if ($feedback[$line['id']]!==null) {
+					if (!empty($feedback[$line['id']])) {
 						$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
 					}
 					$content .= "</textarea>";
 				} else {
 					$content .= '<div class="fbbox" id="feedback'.Sanitize::onlyInt($line['id']).'">';
-					if ($feedback[$line['id']]!==null) {
+					if (!empty($feedback[$line['id']])) {
 						$content .= Sanitize::outgoingHtml($feedback[$line['id']]);
 					}
 					$content .= '</div>';
 				}
-			} else if (($line['userid']==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
+			} else if (($line['userid']==$userid || $canviewscore) && !empty($feedback[$line['id']])) {
 				$content .= '<div class="signup">Private Feedback: ';
 				$content .= '<div>'.Sanitize::outgoingHtml($feedback[$line['id']]).'</div>';
 				$content .= '</div>';
@@ -378,7 +359,7 @@
 		$content .= '</div></div>';
 		$cnt++;
 	}
-	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt);
+	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg);
 	echo "<script>var bcnt = $cnt;</script>";
 	if ($caneditscore && $haspoints) {
 		echo "<div><input type=submit value=\"Save Grades\" /></div>";
@@ -387,8 +368,8 @@
 
 	echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
 
-	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($_GET['page'])."\">Back to Thread List</a></p>";
+	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Thread List</a></p>";
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

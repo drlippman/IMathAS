@@ -14,11 +14,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -32,11 +32,18 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
+if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0
+  && $_SESSION['ltiitemid'] != $aid
+) {
+  echo '{"error": "need_relaunch"}';
+  exit;
+}
+
 $now = time();
 
 // option to reset assessment entirely
 if ($isActualTeacher && $uid == $userid && isset($_GET['reset'])) {
-  require_once(__DIR__ . '/../includes/filehandler.php');
+  require_once __DIR__ . '/../includes/filehandler.php';
   deleteAssess2FilesOnUnenroll(array($uid), array($aid), array());
   $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=? AND assessmentid=?");
   $stm->execute(array($uid, $aid));
@@ -65,7 +72,8 @@ $include_from_assess_info = array(
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb', 'scoresingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
-  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue'
+  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue', 
+  'attemptext', 'showworktype', 'latepass_enddate', 'latepass_after'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -77,8 +85,8 @@ if ($assessInfoOut['displaymethod'] === 'livepoll') {
 // indicate if teacher or tutor user
 $assessInfoOut['can_view_all'] = $canViewAll;
 $assessInfoOut['is_teacher'] = $isteacher;
-if ($istutor && $assess_info->getSetting('tutoredit') < 2) {
-    // tutor can edit
+if ($istutor && $assess_info->getSetting('tutoredit') != 2) {
+    // tutor can view
     $assessInfoOut['tutor_gblinks'] = [
         $basesiteurl . '/course/isolateassessgrade.php?cid=' . $cid . '&aid=' . $aid,
         $basesiteurl . '/course/gb-itemanalysis2.php?cid=' . $cid . '&aid=' . $aid
@@ -96,7 +104,9 @@ if ($canViewAll && $userid !== $uid) {
     echo '{"error": "invalid_uid"}';
     exit;
   }
-  $assessInfoOut['stu_fullname'] = $row['LastName'] . ', ' . $row['FirstName'];
+  $userfullname = $row['LastName'] . ', ' . $row['FirstName'];
+  $assessInfoOut['stu_fullname'] = $userfullname;
+  $assessInfoOut['noprint'] = 0;
 }
 
 // set userid
@@ -114,6 +124,19 @@ $assessInfoOut['has_password'] = $assess_info->hasPassword();
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+
+// get time limit extension info 
+if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'))) {
+    $assessInfoOut['timelimit_ext'] = $assess_info->getSetting('timeext');
+    if (!$assessInfoOut['has_active_attempt'] && ($assess_record->getStatus()&64)==64 &&
+      $assessInfoOut['timelimit_ext'] > 0
+    ) {
+        // has a previously submitted attempt; mark as active since we have a time 
+        // limit extension available
+        $assessInfoOut['has_active_attempt'] = true;
+    }
+}
+
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
@@ -125,6 +148,13 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 // if not available, see if there is an unsubmitted scored attempt
 if ($assessInfoOut['available'] !== 'yes') {
   $assessInfoOut['has_unsubmitted_scored'] = $assess_record->hasUnsubmittedScored();
+  if ($assessInfoOut['has_unsubmitted_scored'] && 
+    $assessInfoOut['available'] === 'practice' &&
+    $assessInfoOut['submitby'] === 'by_assessment'
+  ) {
+    // disable practice while unsubmitted scored attempt exists
+    $assessInfoOut['available'] = 'pastdue';
+  }
 }
 
 //get prev attempt info
@@ -139,12 +169,14 @@ if (!$assessInfoOut['has_active_attempt']) {
   }
 }
 
-$assessInfoOut['showwork_after'] = $assess_record->getShowWorkAfter();
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
 
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&
-  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires'])
+  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires']) && 
+  intval($assess_info->getSetting('timeext')) <= 0
 ) {
   $assessInfoOut['has_active_attempt'] = false;
   $assessInfoOut['can_retake'] = false;
@@ -200,6 +232,11 @@ if (!$canViewAll) {
         $assessInfoOut['excused'] = 1;
     }
 }
+
+$assessInfoOut['can_viewingb'] = $assess_info->reshowQuestionsInGb() ? 1 : 0;
+
+// set session expiration time
+$assessInfoOut['session_life'] = $CFG['GEN']['sessionmaxlife'] ?? 432000;
 
 //prep date display
 prepDateDisp($assessInfoOut);

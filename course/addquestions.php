@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-include("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -14,12 +14,15 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = _("Add/Remove Questions");
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid']) . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">"._("Add/Remove Questions")."</a> &gt; Confirm\n";
+	$curBreadcrumb .= " <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">"._("Add/Remove Questions")."</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";
 } else {
-	$curBreadcrumb .= "&gt; "._("Add/Remove Questions")."\n";
+	$curBreadcrumb .= _("Add/Remove Questions")."\n";
 	//$pagetitle = "Add Inline Text";
 }
 
@@ -46,7 +49,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
     $aver = $row['ver'];
     $submitby = $row['submitby'];
-	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
+    $modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
+    
+    if ($aver > 1) {
+		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	} else {
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	}
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+	if ($stm->rowCount() > 0) {
+		$beentaken = true;
+	} else {
+		$beentaken = false;
+	}
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -57,15 +75,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 
-	if (isset($teacherid) && isset($_GET['addset'])) {
+	if (isset($teacherid) && isset($_GET['addset']) && !$beentaken) {
 		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 			$overwriteBody = 1;
 			$body = _("No questions selected").".  <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else if (isset($_POST['add'])) {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -123,8 +141,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
-			require_once("../includes/updateptsposs.php");
-			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			require_once "../includes/updateptsposs.php";
+			updatePointsPossible($aid, $itemorder, $row[2]);
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
@@ -136,9 +154,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -148,16 +166,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	if (isset($_REQUEST['clearattempts'])) {
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-			require_once('../includes/filehandler.php');
+			require_once '../includes/filehandler.php';
 			deleteallaidfiles($aid);
 			$grades = array();
 			if ($aver > 1) {
 				$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			    $grades[$row['userid']]=$row["score"];
-				}
-				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+			        $grades[$row['userid']]=$row["score"];
+                }
+                // clear out time limit extensions
+                $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+                $stm->execute(array($aid));
+                
+                $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+
 			} else {
 				$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
         $stm->execute(array(':assessmentid'=>$aid));
@@ -338,7 +361,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
 				//update points possible
-				require_once("../includes/updateptsposs.php");
+				require_once "../includes/updateptsposs.php";
 				updatePointsPossible($aid, $itemorder, $defpoints);
 			}
 
@@ -352,8 +375,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				//need to re-score assessment attempts based on withdrawal
-				require_once('../assess2/AssessInfo.php');
-				require_once('../assess2/AssessRecord.php');
+				require_once '../assess2/AssessInfo.php';
+				require_once '../assess2/AssessRecord.php';
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 				$assess_info->loadQuestionSettings('all', false, false);
 				$DBH->beginTransaction();
@@ -372,8 +395,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
-						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
+						require_once "../includes/ltioutcomes.php";
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true, -1, false);
 					}
 				}
 				$DBH->commit();
@@ -416,8 +439,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
-						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
+						require_once "../includes/ltioutcomes.php";
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true, -1, false);
 					}
 				}
 			}
@@ -460,7 +483,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=090220\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=090821\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -470,24 +493,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/../filter/filter.php");
-	if ($aver > 1) {
-		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
-		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
-	} else {
-		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
-	}
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
-	if ($stm->rowCount() > 0) {
-		$beentaken = true;
-	} else {
-		$beentaken = false;
-	}
+	require_once "$curdir/../filter/filter.php";
+	
 	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
+    $showworkdef = ($showworkdef & 3);
 	$ln = 1;
 
 	// Format of imas_assessments.intro is a JSON representation like
@@ -531,7 +542,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
 	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
     $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
-    $query .= "iqs.meantimen FROM imas_questions AS iq ";
+    $query .= "iqs.meantimen,iq.extracredit FROM imas_questions AS iq ";
 	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
 	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
@@ -540,7 +551,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line===false) { continue; } //this should never happen, but avoid issues if it does
 		$existingq[] = $line['questionsetid'];
 		//output item array
-		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
+		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || !empty($adminasteacher)) { //can edit without template?
 			$canedit = 1;
 		} else {
 			$canedit = 0;
@@ -605,7 +616,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			(int)$canedit,
 			(int)Sanitize::onlyInt($line['withdrawn']),
 			(int)$extrefval,
-            $timeout
+            $timeout,
+            (int)Sanitize::onlyInt($line['extracredit'])
         );
 
 	}
@@ -618,7 +630,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$items = explode(",",$itemorder);
 	} else {
 		$items = array();
-	}
+    }
+    $alt = 0;
 	for ($i = 0; $i < count($items); $i++) {
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {
@@ -706,9 +719,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$searchall = $_SESSION['searchall'.$cid];
-			$searchmine = $_SESSION['searchmine'.$cid];
-			$newonly = $_SESSION['searchnewonly'.$cid];
+			$searchall = $_SESSION['searchall'.$cid] ?? 0;
+			$searchmine = $_SESSION['searchmine'.$cid] ?? 0;
+			$newonly = $_SESSION['searchnewonly'.$cid] ?? 0;
 		} else {
 			$search = '';
 			$searchall = 0;
@@ -933,7 +946,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_useavgtimes = true;
 							$page_questionTable[$i]['meantime'] = round($line['meantime']/60,1);
 							$page_questionTable[$i]['qdata'] = array($line['meanscore'],$line['meantime'],$line['meantimen']);
-						}
+						} 
 
 						$page_questionTable[$i]['broken'] = intval($line['broken']);
 
@@ -969,7 +982,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							}
 						}
 						if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
-							$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/assess_tiny.png\" alt=\""._("Detailed Solution")."\"/>";
+							$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/assess_tiny.png\" alt=\""._("Written Example")."\"/>";
 						}
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1070,7 +1083,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			$x=0;
-			$page_assessmentQuestions = array();
+			$page_assessmentQuestions = array('aiddesc' => []);
 			foreach ($_SESSION['aidstolist'.$aid] as $aidq) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
@@ -1098,7 +1111,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 
-				$page_assessmentQuestions['aiddesc'][$x] = $aidnames[$aidq];
+				$page_assessmentQuestions['aiddesc'][] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
@@ -1190,7 +1203,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 /******* begin html output ********/
 //hack to prevent the page breaking on accessible mode
 $_SESSION['useed'] = 1;
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -1203,7 +1216,7 @@ if ($overwriteBody==1) {
 		var curaid = <?php echo $aid ?>;
 		var defpoints = <?php echo (int) Sanitize::onlyInt($defpoints); ?>;
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
-		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
+		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs ?? ''); ?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 
@@ -1229,8 +1242,9 @@ if ($overwriteBody==1) {
     if ($aver > 1 && $submitby == 'by_assessment') {
         echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define Auto-Excuse').'</a>';
     }
+    echo '<br><a href="findquestion.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Find Question in Course').'</a>';
     if ($aver > 1) {
-        echo '<br><a href="addquestions2.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Try New Add/Remove (Beta)').'</a>';
+        echo '<br><a href="addquestions2.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Use New Add/Remove').'</a>';
     }
     echo '</span><br class=clear /></div>';
 	if ($beentaken) {
@@ -1308,7 +1322,8 @@ if ($overwriteBody==1) {
 	<script>
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var lastitemhash = "<?php echo md5($itemorder); ?>";
 		//$(refreshTable);
 		refreshTable();
 	</script>
@@ -1321,7 +1336,7 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>" onclick="return prePageChange()"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
 			if ($aver > 1) {
 				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;
@@ -1367,7 +1382,7 @@ if ($overwriteBody==1) {
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				echo _("Must provide a search term when searching all libraries");
 			} elseif (isset($search)) {
-				if ($noSearchResults) {
+				if (!empty($noSearchResults)) {
 					echo "<p>",_("No Questions matched search"),"</p>\n";
 				} else {
 ?>
@@ -1430,10 +1445,9 @@ if ($overwriteBody==1) {
 					if (isset($page_questionTable[$qid]['qdata'])) {
 						echo '<span onmouseenter="tipshow(this,\''._('Avg score on first try: ').round($page_questionTable[$qid]['qdata'][0]).'%';
 						echo '<br/>'._('Avg time on first try: ').round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseleave="tipout()">';
-					} else {
-						echo '<span>';
+                        echo $page_questionTable[$qid]['meantime'].'</span>';
 					}
-					echo $page_questionTable[$qid]['meantime'].'</span>'; ?></td> <?php }?>
+					?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td><div class="dropdown">
 					  <a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1601,5 +1615,5 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

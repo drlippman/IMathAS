@@ -6,10 +6,10 @@ ini_set("max_execution_time", "1600");
 
 
 
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) {exit;}
 
-require("../header.php");
+require_once "../header.php";
 if (!empty($_POST['from']) && !empty($_POST['to'])) {
 	$from = trim($_POST['from']);
 	$to = trim($_POST['to']);
@@ -113,5 +113,5 @@ echo '<p>Replace URL: <input type="text" name="from" size="50"/><br/>with URL: <
 echo '<p>Or, paste from a spreadsheet (current URL in first column, replacement in second column)<br/><textarea cols=80 rows=6 name="list"></textarea></p>';
 echo '<p><input type="submit" value="Replace"/></p>';
 echo '</form>';
-require("../footer.php");
+require_once "../footer.php";
 ?>

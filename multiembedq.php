@@ -21,12 +21,13 @@
 
 $init_skip_csrfp = true;
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
-require("./init_without_validate.php");
+require_once "./init_without_validate.php";
 unset($init_skip_csrfp);
 
-require("includes/JWT.php");
+require_once "includes/JWT.php";
 header('P3P: CP="ALL CUR ADM OUR"');
 $_SESSION = array();
+$myrights = 5;
 /*
 if (isset($_GET['graphdisp'])) {
 	$_SESSION['graphdisp'] = intval($_GET['graphdisp']);
@@ -45,7 +46,7 @@ $prefdefaults = array(
 	'useed'=>1,
 	'livepreview'=>1);
 
-$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"] ?? '', true);
 $_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {
@@ -130,6 +131,10 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	$theme = $JWTsess->theme;
 	$targetid = $JWTsess->targetid;
 } else {
+    if (empty($_GET['id'])) {
+        echo 'Need to supply an id';
+        exit;
+    }
 	$qids = explode("-",$_GET['id']);
 
 	if (isset($_GET['sameseed']) && $_GET['sameseed']==1) {
@@ -159,13 +164,14 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 $qids = array_map('Sanitize::onlyInt',$qids);
 $seeds = array_map('Sanitize::onlyInt',$seeds);
 
-require("./assessment/displayq2.php");
+require_once "./assessment/displayq2.php";
 $GLOBALS['assessver'] = 2;
+$showhints = true;
 
 if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	//load filter
 	$loadgraphfilter = true;
-	require_once("./filter/filter.php");
+	require_once "./filter/filter.php";
 
 	//need question ids, attempts, seeds.  Put in query string, or??
 	$qn = Sanitize::onlyInt($_POST['toscore']);
@@ -225,9 +231,13 @@ if ($targetid != '') {
 	if (mathRenderer == "Katex") {
 		window.katexDoneCallback = sendresizemsg;
 	} else if (typeof MathJax != "undefined") {
-		MathJax.Hub.Queue(function () {
-			sendresizemsg();
-		});
+		if (MathJax.startup) {
+            MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+        } else if (MathJax.Hub) {
+            MathJax.Hub.Queue(function () {
+                sendresizemsg();
+            });
+        } 
 	} else {
 		$(function() {
 			sendresizemsg();
@@ -236,20 +246,20 @@ if ($targetid != '') {
 	$(function() {
 		$(window).on("ImathasEmbedReload", sendresizemsg);
 	});
-	</script>';
-	if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
-		//in case MathJax isn't loaded yet
-		$placeinhead .= '<script type="text/x-mathjax-config">
-			MathJax.Hub.Queue(function () {
-				sendresizemsg();
-			});
-			</script>';
-	}
+    </script>';
+    if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+        //in case MathJax isn't loaded yet
+        $placeinhead .= '<script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function () {
+                sendresizemsg();
+            });
+            </script>';
+    }
 }
 if ($theme != '') {
 	$_SESSION['coursetheme'] = $theme.'.css';
 }
-require("./assessment/header.php");
+require_once "./assessment/header.php";
 if ($_SESSION['graphdisp'] == 1) {
 	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';
 }
@@ -264,7 +274,6 @@ if (count($qids)>1) {
 } else {
 	echo _('Try Another Version of This Question').'</a></p>';
 }
-$showhints = true;
 
 //preload qsdata
 $placeholders = Sanitize::generateQueryPlaceholders($qids);
@@ -289,6 +298,6 @@ foreach ($qids as $i=>$qid) {
 }
 
 
-require("./footer.php");
+require_once "./footer.php";
 
 ?>

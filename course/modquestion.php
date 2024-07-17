@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -32,7 +32,7 @@ if (!(isset($teacherid))) {
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 	$curBreadcrumb .= _("Modify Question Settings");
 
-	if ($_GET['process']== true) {
+	if (!empty($_GET['process'])) {
 		if (isset($_GET['usedef'])) {
 			$points = 9999;
 			$attempts=9999;
@@ -103,7 +103,7 @@ if (!(isset($teacherid))) {
 				$_GET['qsetid'] = $stm->fetchColumn(0);
 			}
 		}
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		if (isset($_GET['qsetid'])) { //new - adding
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -146,11 +146,11 @@ if (!(isset($teacherid))) {
 			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($line['penalty']{0}==='L') {
+			if ($line['penalty'][0]==='L') {
 				$line['penalty'] = substr($line['penalty'],1);
 				$skippenalty = 10;
-			} else if ($line['penalty']{0}==='S') {
-				$skippenalty = $line['penalty']{1};
+			} else if ($line['penalty'][0]==='S') {
+				$skippenalty = $line['penalty'][1];
 				$line['penalty'] = substr($line['penalty'],2);
 			} else {
 				$skippenalty = 0;
@@ -204,11 +204,11 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$aid));
 		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
 		list($deffeedback,$defshowans) = explode('-',$defaults['deffeedback']);
-		if ($defaults['defpenalty']{0}==='L') {
+		if ($defaults['defpenalty'][0]==='L') {
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],1);
 			$skippenaltystr=_('on last possible attempt only');
-		} else if ($defaults['defpenalty']{0}==='S') {
-			$skippenaltystr = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty']{1});
+		} else if ($defaults['defpenalty'][0]==='S') {
+			$skippenaltystr = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty'][1]);
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],2);
 		} else {
 			$skippenaltystr = _('per missed attempt');
@@ -242,7 +242,7 @@ function previewq(qn) {
   previewpop.focus();
 }
 </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -379,5 +379,5 @@ if (!isset($_GET['id'])) {
 	echo '</form>';
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

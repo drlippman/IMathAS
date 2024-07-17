@@ -240,9 +240,9 @@ export default {
       }
     },
     canViewScored () {
-      return (this.settings.is_lti &&
+      return (
         !this.canViewAll &&
-        this.settings.viewingb !== 'never' &&
+        this.settings.can_viewingb === 1 &&
         this.settings.prev_attempts.length > 0 &&
         (this.settings.available === 'practice' || this.settings.available === 'pastdue')
       );
@@ -262,7 +262,9 @@ export default {
       );
     },
     canAddWork () {
-      return (store.assessInfo.showwork_after);
+      return (store.assessInfo.showwork_after &&
+        (store.assessInfo.showwork_cutoff === 0 || store.assessInfo.showwork_cutoff_in > 0)
+      );
     },
     showTutorLinks () {
       return store.assessInfo.hasOwnProperty('tutor_gblinks');

@@ -1,15 +1,23 @@
 <?php
 //A collection of chemistry routines
 //
-//Version 0.2 April 16, 2014
+//Version 0.31 May 7, 2022
 
 global $allowedmacros;
-array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
+array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp",
+"chem_getsymbol","chem_getnumber","chem_getname","chem_getweight",
+"chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily",
+"chem_randelementbyfamily","chem_diffrandelementsbyfamily", 
+"chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound",
+"chem_getcompoundmolmass","chem_randanion","chem_randcation",
+"chem_makeioniccompound","chem_getsolubility","chem_balancereaction", "chem_eqndisp",
+"chem_showmolecule");
 
 //chem_disp(compound)
 //formats a compound for display in as HTML
 function chem_disp($c) {
 	$c = preg_replace('/_(\d+)/','<sub>$1</sub>',$c);
+	$c = preg_replace('/\^(\d+\+|\d+\-|\+|\-)/','<sup>$1</sup>',$c);
 	return str_replace(' ','',$c);
 }
 
@@ -52,6 +60,10 @@ function chem_isotopedisp($el,$sup,$sub,$noitalic=false) {
 //returns the chemical symbol given the atomic number
 function chem_getsymbol($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getsymbol: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][0];
 }
 
@@ -59,13 +71,20 @@ function chem_getsymbol($n) {
 //returns the atomic number given the chemical symbol
 function chem_getnumber($s) {
 	global $chem_numberbyatom;
-	return $chem_numberbyatom[$s];
+    if (!isset($chem_numberbyatom[$s])) {
+        echo "chem_getnumber: unknown symbol $s";
+    }
+	return ($chem_numberbyatom[$s] ?? 0);
 }
 
 //chem_getname(atomic number)
 //returns the chemical name given the atomic number
 function chem_getname($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getname: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][1];
 }
 
@@ -73,6 +92,10 @@ function chem_getname($n) {
 //returns the chemical standard atomic weight given the atomic number
 function chem_getweight($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getweight: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][3];
 }
 
@@ -81,6 +104,10 @@ function chem_getweight($n) {
 //beware: some elements return weird non-numeric values
 function chem_getmeltingpoint($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getmeltingpoint: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][4];
 }
 
@@ -89,6 +116,10 @@ function chem_getmeltingpoint($n) {
 //beware: some elements return weird non-numeric values
 function chem_getboilingpoint($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getboilingpoint: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][5];
 }
 
@@ -98,6 +129,10 @@ function chem_getboilingpoint($n) {
 //    "Transition Metal", "Lanthanide",  or "Actinide"
 function chem_getfamily($n) {
 	global $chem_periodic_table;
+    if (!isset($chem_periodic_table[$n])) {
+        echo "chem_getfamily: unknown symbol $n";
+        return '';
+    }
 	return $chem_periodic_table[$n][6];
 }
 
@@ -185,20 +220,22 @@ function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens")
 
 //chem_decomposecompound(compound)
 //breaks a compound into an array of elements and an array of atom counts
-function chem_decomposecompound($c) {
+function chem_decomposecompound($c, $assoc = false) {
 	$cout = array();
-	if (preg_match('/\(([^\)]*)\)_(\d+)/',$c,$matches)) {
-		$p = explode(' ',$matches[1]);
-		foreach ($p as $cb) {
-			$cbp = explode('_',$cb);
-			if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
-			if (count($cbp)==1) {
-				$cout[$cbp[0]] += $matches[2];
-			} else {
-				$cout[$cbp[0]] += $matches[2]*$cbp[1];
-			}
-		}
-		$c = str_replace($matches[0],'',$c);
+	if (preg_match_all('/\(([^\)]*)\)_(\d+)/',$c,$matcharr, PREG_SET_ORDER)) {
+        foreach ($matcharr as $matches) {
+            $p = explode(' ',$matches[1]);
+            foreach ($p as $cb) {
+                $cbp = explode('_',$cb);
+                if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
+                if (count($cbp)==1) {
+                    $cout[$cbp[0]] += $matches[2];
+                } else {
+                    $cout[$cbp[0]] += $matches[2]*$cbp[1];
+                }
+            }
+            $c = str_replace($matches[0],'',$c);
+        }
 	}
 	$p = explode(' ',trim($c));
 	foreach ($p as $cb) {
@@ -211,9 +248,148 @@ function chem_decomposecompound($c) {
 			$cout[$cbp[0]] += $cbp[1];
 		}
 	}
-	return array(array_keys($cout),array_values($cout));
+	if ($assoc) { 
+		return $cout;
+	} else {
+		return array(array_keys($cout),array_values($cout));
+	}
 }
 
+//chem_balanceraction($reactants,$products)
+function chem_balancereaction($reactants,$products) {
+	$allcompounds = [];
+	foreach ($reactants as $i=>$v) {
+		$reactants[$i] = chem_decomposecompound($v, true);
+		array_push($allcompounds, ...array_keys($reactants[$i]));
+	}
+	foreach ($products as $i=>$v) {
+		$products[$i] = chem_decomposecompound($v, true);
+		array_push($allcompounds, ...array_keys($products[$i]));
+	}
+	$allcompounds = array_values(array_unique($allcompounds));
+	$compoundrow = array_flip($allcompounds);
+	require_once "matrix.php";
+	$countreact = count($reactants);
+	$countprods = count($products);
+	$colcnt = $countreact + $countprods;
+	$compoundcnt = count($allcompounds);
+	$m = matrix(
+		array_fill(0, $compoundcnt*$colcnt, 0),
+		$compoundcnt,
+		$colcnt
+	);
+	// in m, row is compound, column is element in equation
+	foreach ($allcompounds as $i=>$c) {
+		$r = $compoundrow[$c];
+		foreach ($reactants as $i=>$v) {
+			if (isset($v[$c])) {
+				$m[$r][$i] = $v[$c];
+			}
+		}
+		foreach ($products as $i=>$v) {
+			if (isset($v[$c])) {
+				$m[$r][$countreact + $i] = -$v[$c];
+			}
+		}
+	}
+	// now, reduce matrix
+	$m = matrixreduce($m, true, true);
+	/*  each row corresponds to an atom, each column to a compound
+		determine the number of free variable columns
+		    if many more compounds than atoms, might have multiple free vars
+			if unbalancable, might have zero free variables (only solution all zeros)
+			start at last row, ignore any all-zero rows.  
+			in first non-zero row, find pivot and count remaining cols to find free vars
+			assumption: free variables in these equations will always be in end columns
+		parse each value to fraction
+		find LCM of denominators in each column; set free variable to that
+		calculate values of basic variables
+	*/
+	$freevars = 0;
+	for ($r=$compoundcnt-1;$r>=0;$r--) {
+		if (!arrayIsZeroVector($m[$r])) {
+			for ($c=0;$c<$colcnt;$c++) {
+				if ($m[$r][$c] != 0) {
+					$freevars = $colcnt - $c - 1;
+					break 2;
+				}
+			}
+		}
+	}
+	if ($freevars == 0) { // un-balanceable; return array of zeros
+		return array_fill(0, $colcnt, 0);
+	}
+	$coeffs = [];
+	$freevarvals = [];
+	for ($c = 0; $c < $freevars; $c++) {
+		$coeffs[$c] = [];
+		$d = 1;
+		for ($r = 0; $r < $compoundcnt; $r++) {
+			$coeffs[$c][$r] = fractionparse($m[$r][$colcnt - $freevars + $c]);
+			// find lcm of denominators - that'll be our free variable value
+			$d = lcm($d, $coeffs[$c][$r][1]);
+		}
+		$freevarvals[$c] = $d;
+	}
+	$out = [];
+	for ($r=0; $r < $colcnt - $freevars; $r++) {
+		$out[$r] = 0;
+		for ($c = 0; $c < $freevars; $c++) {
+			$out[$r] -= $coeffs[$c][$r][0]*$freevarvals[$c]/$coeffs[$c][$r][1];
+		}
+	}
+	foreach ($freevarvals as $v) {
+		$out[] = $v;
+	}
+	if ($freevars > 1) {
+		$g = gcd(array_filter($out));
+		if ($g > 1) {
+			for ($i=0; $i<count($out); $i++) {
+				$out[$i] /= $g;
+			}
+		}
+	}
+	return $out;
+}
+
+function chem_eqndisp($reactants, $products, $coefficients, $arrow = "->", $phases = null) {
+	$out = '';
+	$n = -1;
+	foreach ($reactants as $i=>$r) {
+		$n++;
+		if ($coefficients[$n] == 0) {
+			continue;
+		} 
+		if ($i>0) {
+			$out .= ' + ';
+		}
+		if ($coefficients[$n] > 1) { 
+			$out .= $coefficients[$n] . ' ';
+		}
+		$out .= $r;
+		if (is_array($phases) && !empty($phases[$n])) {
+			$out .= ' ('. trim($phases[$n], ' ()') .')';
+		}
+	}
+	$out .= " $arrow ";
+	foreach ($products as $i=>$r) {
+		$n++;
+		if ($coefficients[$n] == 0) {
+			continue;
+		} 
+		if ($i>0) {
+			$out .= ' + ';
+		}
+		if ($coefficients[$n] > 1) { 
+			$out .= $coefficients[$n] . ' ';
+		}
+		$out .= $r;
+		if (is_array($phases) && !empty($phases[$n])) {
+			$out .= ' ('. trim($phases[$n], ' ()') .')';
+		}
+	}
+	return $out;
+}
 
 //chem_getcompoundmolmass(compound, [round])
 //gets the molecular mass of the given compound
@@ -328,7 +504,9 @@ function chem_makeioniccompound($cation,$anion) {
 			echo "Anion not found.";
 		}
 	}
-
+    if (!isset($cation) || !isset($anion)) {
+        return false;
+    }
 	$lcm = lcm($cation[1],$anion[1]);
 	$catsub = $lcm/$cation[1];
 	if ($catsub==1) {
@@ -367,7 +545,254 @@ function chem_makeioniccompound($cation,$anion) {
 	return array($formula,$name);
 }
 
+//chem_getsolubility(cation, anion)
+//	takes a cation array and anion array
+//	returns the solubility state using Wikipedia's Solubility Chart https://en.wikipedia.org/wiki/Solubility_chart
+//		ex. array('soluble', '(aq)') 
+//returns array(stateName, abbreviation)
+function chem_getsolubility($receive_cation, $receive_anion){
+	[$cation, $cat_charge] = $receive_cation;
+	[$anion, $an_charge] = $receive_anion;
+	// possible state arrays
+	$state_aq = array('soluble', '(aq)');
+	$state_i = array('insoluble', '(s)');
+	$state_sS = array('slightly soluble', '(aq)');
+	$state_r = array('reaction', '(l)');
+	$state_unknown = array('unavailable', '(?)');
+	$state_missing = array('This info is missing from MOM', '(TODO)');
 
+	// Rule 0: Unknown States
+	// Currently Missing Cations: Cd, Fr, Ra, Cr 2+, Mn 3+, Co 3+, Ni 3+, Cu 1+, Au 1+, Sn 4+, Pb 4+, Hg_2
+	$unknown_cations = array('Cd', 'Fr', 'Ra', 'Hg_2');
+	if (in_array($cation, $unknown_cations)){
+		return $state_unknown;
+	}
+	if ($cat_charge > 3) {
+		return $state_unknown;
+	}
+	if ($cat_charge == 3){
+		if ($cation == 'Mn' or $cation == 'Co' or $cation == 'Ni'){
+			return $state_unknown;
+		}
+	}
+	if ($cat_charge == 2 and $cation == 'Cr'){
+		return $state_unknown;
+	}
+	if ($cat_charge == 1 and $cation == 'Au'){
+		return $state_unknown;
+	}
+	// Currently Missing Anions: N, P, C, Se, ClO, ClO_2, ClO_3, HCO_3, H_2PO_4, HSO_3, HSO_4, IO_3, MnO_4, NO_2, CrO_4, Cr_2O_7, HPO_4, SO_3, SiO_3, AsO_4, PO_3, O_2
+	$unknown_anions = array('N', 'P', 'C', 'Se', 'Cl O', 'Cl O_2', 'Cl O_3', 'H C O_3', 'H_2 P O_4', 'H S O_3', 'H S O_4', 'I O_3', 'Mn O_4', 'N O_2', 'Cr O_4', 'Cr_2 O_7', 'H P O_4', 'S O_3', 'Si O_3', 'As O_4', 'P O_4', 'O_2');
+
+	// Rule 1: Nitrate is always soluble
+	if ($anion == 'N O_3'){
+		return $state_aq;
+	}
+	// Rule 1.1: Ammonium and Hydrogen are mostly soluble (Hopefully speed up computing)
+	if ($cation == 'N H_4' or $cation == 'H'){
+		if ($anion == 'S'){
+			if ($cation == 'N H_4'){
+				return $state_r;
+			} else {
+				return $state_sS;
+			}
+		}
+		else {
+			return $state_aq;
+		}
+	}
+
+	// Rule 2: Bromide and Chloride are mostly soluble
+	if ($anion == 'Cl' or $anion == 'Br'){
+		if ($cation == 'Pb') {
+			return $state_sS;
+		}
+		if ($cation == 'Cr' and $anion == 'Br') {
+			return $state_sS;
+		}
+		if ($cation == 'Au' and $anion == 'Br') {
+			return $state_sS;
+		}
+		if ($cation == 'Ag') {
+			return $state_i;
+		}
+		return $state_aq;
+	}
+	// Rule 3: Iodide is mostly soluble
+	if ($anion == 'I'){
+		if ($cation == 'Be' or $cation == 'Ga'){
+			return $state_r;
+		}
+		elseif($cation == 'Fe' and $cat_charge == 3){
+			return $state_r;
+		}
+		elseif ($cation == 'Cu'){
+			return $state_unknown;
+		}
+		elseif ($cation == 'Ag' or $cation == 'Hg' or $cation == 'Au'){
+			return $state_i;
+		}
+		else{return $state_aq;}
+	}
+	// Rule 4: Fluoride is mostly soluble
+	if ($anion == 'F'){
+		$f_slightlySoluble = array('Li', 'Mg', 'Sr', 'Ba', 'Al', 'Mn', 'Co', 'Cu', 'Zn', 'Pb', 'Cr');
+		$f_insoluble = array('Ca', 'Ga', 'V', 'Au');
+		if (in_array($cation, $f_slightlySoluble)){
+			return $state_sS;
+		}
+		elseif (in_array($cation, $f_insoluble)){
+			return $state_i;
+		}
+		elseif ($cation == 'Hg'){
+			return $state_r;
+		}
+		elseif($cation == 'Fe' and $cat_charge == 2){
+			return $state_sS;
+		}
+		return $state_aq;
+	}
+	// Rule 5: Sulfide and Oxide mostly insoluble
+	if ($anion == 'O' or $anion == 'S'){
+		$s_and_o_reactive = array('Li', 'Na', 'K', 'Rb', 'Cs', 'Ca', 'Sr', 'Ba');
+		if (in_array($cation, $s_and_o_reactive)){
+			return $state_r;
+		}
+		elseif ($cation == 'N H_4'){
+			if ($anion == 'O'){
+				return $state_aq;
+			} else {
+				return $state_r;
+			}
+		}
+		elseif ($cation == 'H'){
+			if ($anion == 'O'){
+				return $state_aq;
+			} else {
+				return $state_sS;
+			}
+		}
+		elseif ($cation == 'Be' or $cation == 'Mg' or $cation == 'Al' or $cation == 'Ga'){
+			if ($anion == 'O'){
+				return $state_i;
+			} else {
+				return $state_r;
+			}
+		}
+		return $state_i;
+	}
+	// Rule 6: Hydroxide is mostly insoluble
+	if ($anion == 'O H'){
+		$hydroxide_solubility = array('N H_4', 'H', 'Li', 'Na', 'K', 'Rb', 'Cs', 'Ba');
+		if (in_array($cation, $hydroxide_solubility)){
+			return $state_aq;
+		}
+		elseif ($cation == 'Ca' or $cation == 'Sr' or $cation == 'Pb'){
+			return $state_sS;
+		}
+		elseif ($cation == 'V'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	// Rule 7: Cyanide is mostly soluble
+	if ($anion == 'C N'){
+		// check reactive
+		if ($cation == 'Be' or $cation == 'Mg' or $cation == 'Ca' or $cation == 'Al'){
+			return $state_r;
+		} elseif ($cation == 'Ga' or $cation == 'Sn' or $cation == 'V'){
+			return $state_unknown;
+		} elseif ($cation == 'Pb'){
+			return $state_sS;
+		} elseif ($cation == 'Co' or $cation == 'Ni' or $cation == 'Cu' or $cation == 'Zn' or $cation == 'Ag'){
+			return $state_i;
+		}
+		return $state_aq;
+	}
+	// Rule 8: Thiocyanate (SCN) is mostly soluble
+	if ($anion == 'S C N'){
+		if ($cation == 'Mn' or $cation == 'Cu' or $cation == 'Sn' or $cation == 'Ag'){
+			return $state_i;
+		} elseif ($cation == 'Hg' or $cation == 'Pb'){
+			return $state_sS;
+		} elseif ($cation == 'Au'){
+			return $state_unknown;
+		}
+		return $state_aq;
+	}
+	// Rule 9: Perchlorate and Acetate are mostly soluble
+	if ($anion == 'Cl O_4' or $anion == 'C_2 H_3 O_2'){
+		if ($anion == 'Cl O_4'){
+			if ($cation == 'K' or $cation == 'Rb' or $cation == 'Cs'){
+				return $state_sS;
+			} elseif ($cation == 'Au'){
+				return $state_unknown;
+			}
+		} else {
+			if ($cation == 'Sn'){
+				return $state_r;
+			} elseif ($cation == 'V'){
+				return $state_unknown;
+			} elseif ($cation == 'Fe' and $cat_charge == 3){
+				return $state_i;
+			} elseif ($cation == 'Ag'){
+				return $state_sS;
+			}
+		}
+		return $state_aq;
+	}
+	// Rule 10: Carbonate is mostly insoluble
+	if ($anion == 'C O_3'){
+		if ($cation == 'N H_4' or $cation == 'H' or $cation == 'Na' or $cation == 'K' or $cation == 'Rb' or $cation == 'Cs'){
+			return $state_aq;
+		} elseif ($cation == 'Li' or $cation == 'Be' or $cation == 'Mg' or $cation == 'Sr'){
+			return $state_sS;
+		} elseif ($cation == 'Al' or $cation == 'Ga' or $cation == 'Cu'){
+			return $state_r;
+		} elseif ($cation == 'Fe' and $cat_charge == 3){
+			return $state_r;
+		} elseif ($cation == 'V'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	// Rule 11: Sulfate is mostly soluble
+	if ($anion == 'S O_4'){
+		if ($cation == 'Ca' or $cation == 'Sr' or $cation == 'Ga' or $cation == 'V' or $cation == 'Ag'){
+			return $state_sS;
+		} elseif ($cation == 'Ba' or $cation == 'Pb'){
+			return $state_i;
+		} elseif ($cation == 'Hg'){
+			return $state_r;
+		}
+		return $state_aq;
+	}
+	// Rule 12: Oxalate is mostly insoluble
+	if ($anion == 'C_2 O_4'){
+		if ($cation == 'N H_4' or $cation == 'H' or $cation == 'Li' or $cation == 'Na' or $cation == 'K'){
+			return $state_aq;
+		} elseif ($cation == 'Mg' or $cation == 'Ca' or $cation == 'Fe' or $cation == 'Sn' or $cation == 'Hg'){// Both Fe work!
+			return $state_sS;
+		} elseif ($cation == 'Ga' or $cation == 'V' or $cation == 'Cr' or $cation == 'Au'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	// Rule 13: Phosphate is mostly insoluble
+	if ($anion == 'P O_4'){
+		if ($cation == 'Na' or $cation == 'K' or $cation == 'Rb' or $cation == 'Cs' or $cation == 'Be'){
+			return $state_aq;
+		} elseif ($cation == 'Li' or $cation == 'Sr'){
+			return $state_sS;
+		} elseif ($cation == 'Fe' and $cat_charge == 3){
+			return $state_sS;
+		} elseif ($cation == 'Au'){
+			return $state_unknown;
+		}
+		return $state_i;
+	}
+	return $state_missing;
+}
 $GLOBALS['chem_periodic_table'] = array(
 	1=>array("H", "Hydrogen", 1,1.0079, "-255.34", "-252.87", ""),
         2=>array("He", "Helium", 2,4.00260, "< -272.2", "-268.934", "Noble gas"),
@@ -419,7 +844,7 @@ $GLOBALS['chem_periodic_table'] = array(
         48=>array("Cd", "Cadmium", 48,112.41, "320.9", "765", "Transition Metal"),
         49=>array("In", "Indium", 49,114.82, "156.61", "2080", ""),
         50=>array("Sn", "Tin", 50,118.69, "231.97", "2270", ""),
-        51=>array("Sb", "Antimony", 51,121.79, "630.74", "1750", ""),
+        51=>array("Sb", "Antimony", 51,121.76, "630.74", "1750", ""),
         52=>array("Te", "Tellurium", 52,127.60, "449.5", "4877", ""),
         53=>array("I", "Iodine", 53,126.9045, "113.5", "184.35", "Halogen"),
         54=>array("Xe", "Xenon", 54,131.29, "-111.9", "-107.1", "Noble gas"),
@@ -477,7 +902,17 @@ $GLOBALS['chem_periodic_table'] = array(
         106=>array("Sg", "Seaborgium", 106,263.118, "unknown", "unknown", ""),
         107=>array("Bh", "Bohrium", 107,264, "unknown", "unknown", ""),
         108=>array("Hs", "Hassium", 108,269, "unknown", "unknown", ""),
-        109=>array("Mt", "Meitnerium", 109,268, "unknown", "unknown", "")
+        109=>array("Mt", "Meitnerium", 109,268, "unknown", "unknown", ""),
+		110=>array("Ds", "Darmstadtium", 110,281, "unknown", "unknown", ""), //110 t0 118 updated in Oct 2021; Source: https://ptable.com/
+		111=>array("Rg", "Roentgenium", 111,282, "unknown", "unknown", ""),
+		112=>array("Cn", "Copernicium", 112,285, "unknown", "unknown", ""),
+		113=>array("Nh", "Nihonium", 113,286, "unknown", "unknown", ""),
+		114=>array("Fl", "Flerovium", 114,289, "unknown", "unknown", ""),
+		115=>array("Mc", "Moscovium", 115,290, "unknown", "unknown", ""),
+		116=>array("Lv", "Livermorium", 116,293, "unknown", "unknown", "Chalcogen"),
+		117=>array("Ts", "Tennessine", 117,294, "unknown", "unknown", "Halogen"),
+		118=>array("Og", "Oganesson", 118,294, "unknown", "unknown", "Noble gas")
+
     );
 
 $GLOBALS['chem_families'] = array(
@@ -779,7 +1214,7 @@ $GLOBALS['chem_compounds'] = array(
 		array('Ammonium chloride','N H_4 Cl'),
 		array('Ammonium chlorate','N H_4 Cl O_3'),
 		array('Ammonium perchlorate','N H_4 Cl O_4'),
-		array('Ammonium bicarbonate','N H_4 H CO_3'),
+		array('Ammonium bicarbonate','N H_4 H C O_3'),
 		array('Ammonium nitrate','N H_4 N O_3'),
 		array('Ammonium hydroxide','N H_4 O H'),
 		array('Sodium borohydride','Na B H_4'),
@@ -798,7 +1233,7 @@ $GLOBALS['chem_compounds'] = array(
 		array('Sodium nitrate','Na N O_3'),
 		array('Sodium hypochlorite','Na O Cl'),
 		array('Sodium hydroxide','Na O H'),
-		array('Sodium thiocyanate','Na S CN'),
+		array('Sodium thiocyanate','Na S C N'),
 		array('Sodium hydrosulfide','Na S H'),
 		array('Sodium carbonate','Na_2 C O_3'),
 		array('Sodium sulfite','Na_2 S O_3'),
@@ -844,3 +1279,28 @@ $GLOBALS['chem_compounds'] = array(
 		array('Zinc cyanide','Zn (C N)_2')
 	)
 );
+
+function chem_showmolecule($data, $width=300, $height=225, $alt='') {
+    $data = explode('~~~', $data);
+    if ($_SESSION['graphdisp']==0) {
+        if ($alt != '') { 
+            return $alt; 
+        }
+        return _('Molecule in SMILES format:') . $data[0];
+    }
+    $out = '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/kekule.min.js?module=chemWidget,IO"></script>';
+    $out .= '<script type="text/javascript">
+        if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css\']").length) {
+            $(\'<link href="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css" rel="stylesheet">\').appendTo("head");
+        }
+    </script>';
+    $uniqid = uniqid('mol');
+    $out .= '<div id="'.$uniqid.'" width='.Sanitize::onlyInt($width).' height='.Sanitize::onlyInt($height).' ></div>';
+    $out .= '<script>
+        var chemSAViewer'.$uniqid.' = new Kekule.ChemWidget.Viewer(document.getElementById("'.$uniqid.'"), null, Kekule.Render.RendererType.R2D);
+        chemSAViewer'.$uniqid.'.setPredefinedSetting("static")
+        .setPadding(20)
+        .setChemObj(Kekule.IO.loadFormatData("'.Sanitize::encodeStringForJavascript($data[1]).'", "cml"));
+        </script>';
+    return $out;
+}

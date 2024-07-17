@@ -4,10 +4,10 @@
 
 header("Content-Type: text/plain");
 
-require("../init_without_validate.php");
+require_once "../init_without_validate.php";
 
-require("mbxfilter.php");
-require("../assessment/displayq2.php");
+require_once "mbxfilter.php";
+require_once '../assess2/AssessStandalone.php';
 
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
  	 $urlmode = 'https://';
@@ -32,8 +32,11 @@ foreach(array('graphdisp','mathdisp','useed') as $key) {
 }
 $GLOBALS['texdisp'] = true;
 
+$myrights = 0;
 $showtips = 0;
 $useeqnhelper = 0;
+$hidedrawcontrols = true;
+$GLOBALS['hide-sronly'] = true;
 $_SESSION['drill']['cid'] = 0;
 $_SESSION['drill']['sa'] = 0;
 $_SESSION['secsalt'] = "12345";
@@ -58,7 +61,7 @@ function mbxproc($qn,$qsetid,$seed) {
   global $DBH,$RND,$imasroot,$basesiteurl,$urlmode;
   $isbareprint = true;
   $RND->srand($seed);
-  $stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id=:id");
+  $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
   $stm->execute(array(':id'=>$qsetid));
   $qdata = $stm->fetch(PDO::FETCH_ASSOC);
   if ($qdata['hasimg']>0) {
@@ -72,6 +75,7 @@ function mbxproc($qn,$qsetid,$seed) {
 			}
 		}
   }
+  /*
   try {
   	  eval(interpret('control',$qdata['qtype'],$qdata['control']));
   	  eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
@@ -167,7 +171,24 @@ function mbxproc($qn,$qsetid,$seed) {
 	  	  $soln = mbxfilter('<p><ul><li>'.implode('</li><li>',$shansout).'</li></ul></p>');
 	  }
   }
-
+  */
+    $a2 = new AssessStandalone($DBH);
+    $a2->setQuestionData($qdata['id'], $qdata);
+    $state = array(
+        'seeds' => array(0 => $seed),
+        'qsid' => array(0 => $qsetid)
+    );
+    $a2->setState($state);
+    $res = $a2->displayQuestion(0, ['includeans'=>true, 'printformat'=>true, 'showallparts'=>true, 'hideans'=>true]);
+    $statement = mbxfilter($res['html']);
+    if (is_array($res['jsparams']['ans'])) {
+        $soln = mbxfilter('<p><ul><li>'.implode('</li><li>',$res['jsparams']['ans']).'</li></ul></p>');
+    } else {
+        $soln = mbxfilter('<p>'.$res['jsparams']['ans'].'</p>');
+    }
+    if (($res['solnopts']&5)==5) {
+        $soln .= mbxfilter('<p>'.$res['soln'].'</p>');
+    }
 
 
 echo "<myopenmath id=\"" . Sanitize::onlyInt($qsetid) . "\">

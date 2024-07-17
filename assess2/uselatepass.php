@@ -16,11 +16,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -53,11 +53,17 @@ $studentinfo['latepasses'] -= $assess_info->getSetting('can_use_latepass');
 // reload exception info (hacky, but this doesn't happen often)
 $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
 
+//check to see if prereq has been met
+if ($isstudent) {
+    $assess_info->checkPrereq($uid);
+}
+
 // grab any assessment info fields that may have updated
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate',
   'extended_with', 'latepasses_avail', 'latepass_extendto',
-  'can_use_latepass', 'enddate_in'
+  'can_use_latepass', 'enddate_in', 'timelimit',
+  'reqscorename', 'reqscorevalue' 
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 

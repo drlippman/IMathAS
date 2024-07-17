@@ -2,16 +2,14 @@
 //IMathAS:  GB view for testing center staff
 //(c) 2008 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 
 $cid = Sanitize::courseId($_GET['cid']);
-if (isset($teacherid)) {
-	$isteacher = true;
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
+$stu = 0;
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
+
 if ($isteacher || $istutor) {
 	$canviewall = true;
 } else {
@@ -60,8 +58,8 @@ if ($isteacher || $istutor) {
 }
 
 //DISPLAY
-require("gbtable2.php");
-require("../includes/htmlutil.php");
+require_once "gbtable2.php";
+require_once "../includes/htmlutil.php";
 
 $placeinhead = '';
 
@@ -122,7 +120,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 }
 
-require("../header.php");
+require_once "../header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
 
@@ -147,11 +145,11 @@ echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="displ
 echo "</form>";
 echo "</div>";
 
-$gbt = gbinstrdisp();
+gbinstrdisp();
 
 echo "<p>Meanings:   NC-no credit</p>";
 //echo "</div>";
-require("../footer.php");
+require_once "../footer.php";
 //echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
 
 /*if ($isteacher) {
@@ -167,7 +165,7 @@ require("../footer.php");
 
 
 function gbinstrdisp() {
-	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$staticroot,
 		$tutorsection,$includeendmsg,$assessGbUrl;
 	$hidenc = 1;
 	$includeendmsg = true;
@@ -265,7 +263,7 @@ function gbinstrdisp() {
 		echo '<td class="locked" scope="row">';
 
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
-		echo $gbt[$i][0][0];
+		echo '<span class="pii-full-name">'.$gbt[$i][0][0].'</span>';
 		echo '</a></td>';
 
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
@@ -336,7 +334,7 @@ function gbinstrdisp() {
 				}
 				if (isset($gbt[$i][1][$j][0])) {
 					echo $gbt[$i][1][$j][0];
-					if ($gbt[$i][1][$j][3]==1) {
+					if (!empty($gbt[$i][1][$j][3])) {
 						echo ' (NC)';
 					}
 				} else {
@@ -345,7 +343,7 @@ function gbinstrdisp() {
 				if ($isteacher) {
 					echo '</a>';
 				}
-				if ($gbt[$i][1][$j][1]==1) {
+				if (!empty($gbt[$i][1][$j][1])) {
 					echo '<sup>*</sup>';
 				}
 			} else if ($gbt[0][1][$j][6]==2) { //discuss

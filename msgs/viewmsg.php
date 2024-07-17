@@ -2,13 +2,13 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
@@ -28,8 +28,8 @@
 	}
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	$page = Sanitize::onlyInt($_GET['page']);
-	$type = $_GET['type'];
+	$page = Sanitize::onlyInt($_GET['page'] ?? 0);
+	$type = $_GET['type'] ?? '';
 
 	$teacherof = array();
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE userid=:userid");
@@ -62,7 +62,7 @@
 			}
 		}
 		</script>';
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -92,6 +92,7 @@
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto=:msgto OR imas_msgs.msgfrom=:msgfrom)";
 	}
+
 	$stm = $DBH->prepare($query);
 	if ($type!='allstu' || !$isteacher) {
 		$stm->execute(array(':courseid'=>$cid, ':id'=>$msgid, ':msgto'=>$userid, ':msgfrom'=>$userid));
@@ -100,7 +101,7 @@
 	}
 	if ($stm->rowCount()==0) {
 		echo "Message not found";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -111,9 +112,9 @@
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo " <img style=\"float:left;\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+			echo " <img style=\"float:left;\" class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 		} else {
-			echo " <img style=\"float:left;\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+			echo " <img style=\"float:left;\" class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 		}
 	}
 	echo "<table class=gb ><tbody>";
@@ -123,7 +124,8 @@
 		echo '<tr><td><b>'._('From').':</b></td>';
 	}
 	if ($line['FirstName']!==null) {
-		printf("<td>%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),Sanitize::encodeStringForDisplay($line['FirstName']));
+		printf("<td><span class='pii-full-name'>%s, %s</span>",
+			Sanitize::encodeStringForDisplay($line['LastName']),Sanitize::encodeStringForDisplay($line['FirstName']));
 	} else if ($type!='sent' && $line['msgfrom']==0) {
 		echo '<td>'._('[System Message]');
 	} else {
@@ -134,8 +136,8 @@
 	}
 	if (isset($teacherof[$line['courseid']])) {
 		if ($line['email'] !== null) {
-			echo " <a href=\"mailto:".Sanitize::emailAddress($line['email'])."\">email</a> | ";
-			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_popoutgradebook\">gradebook</a>";
+			echo " <a class=\"pii-email\" href=\"mailto:".Sanitize::emailAddress($line['email'])."\"><span class='pii-safe'>email</span></a> | ";
+			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_blank\">gradebook</a>";
 		}
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$qn = $matches[1];
@@ -151,7 +153,7 @@
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$adata['id']));
 				if ($stm->rowCount()>0) {
 					$exception = $stm->fetch(PDO::FETCH_NUM);
-					require_once("../includes/exceptionfuncs.php");
+					require_once "../includes/exceptionfuncs.php";
 					$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 					$useexception = $exceptionfuncs->getCanUseAssessException($exception, $adata, true);
 					if ($useexception) {
@@ -163,7 +165,7 @@
 					$stm = $DBH->prepare("SELECT userid FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
-						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_blank\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
@@ -173,7 +175,7 @@
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
 						$asid = $stm->fetchColumn(0);
-						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_blank\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
@@ -186,9 +188,10 @@
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
 	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title']);
 	if ($myrights>=20 && preg_match('/Question\s+ID\s+(\d+),\s+seed\s+(\d+)/',$line['message'],$matches)) {
-		$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
-		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=0&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
-		echo " | <a href=\"$imasroot/course/moddataset.php?cid=0&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
+        $qcid = isset($teacherof[$line['courseid']]) ? intval($line['courseid']) : 0;
+        $testqpage = ($qcid == 0 || $cid == 0 || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=$qcid&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
+		echo " | <a href=\"$imasroot/course/moddataset.php?cid=$qcid&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
 	}
 	echo "</td></tr>";
 	echo "</tbody></table>";
@@ -250,7 +253,7 @@
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?"
 				. Sanitize::generateQueryStringFromMap(array('cid' => $line['courseid'], 'stu' => $line['msgfrom']))
-			."\">Gradebook</a>";
+			."\" target=\"_blank\">Gradebook</a>";
 		}
 
 	} else if ($type=='sent' && $type!='allstu') {
@@ -265,5 +268,5 @@
 		$stm->execute(array(':id'=>$msgid));
 	}
 	echo '<p>&nbsp;</p>';
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

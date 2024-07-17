@@ -8,8 +8,8 @@
 ini_set("max_execution_time", "120");
 
 /*** master php includes *******/
-require("../init.php");
-include("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 function shiftsub(&$itema) {
 	global $shiftstring;
@@ -163,6 +163,7 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid AND enddate<2000000000 ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
+        $page_assessmentList = ['val' => [], 'label' => []];
 		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			$page_assessmentList['val'][$i] = $line['id'];
 			$page_assessmentList['label'][$i] = $line['name'];
@@ -175,7 +176,7 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -210,7 +211,7 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 
 ?>

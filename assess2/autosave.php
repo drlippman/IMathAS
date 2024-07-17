@@ -19,11 +19,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 //error_reporting(E_ALL);
 
@@ -38,6 +38,7 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 } else {
   $uid = $userid;
 }
+$qns = null;
 
 if (isset($_POST['autosave-tosaveqn'])) {
     check_for_required('POST', array('autosave-tosaveqn', 'autosave-lastloaded'));
@@ -49,7 +50,7 @@ if (isset($_POST['autosave-tosaveqn'])) {
     } else {
         $timeactive = json_decode($_POST['autosave-timeactive'], true);
     }
-} else { // deprecated
+} else if (isset($_POST['tosaveqn'])) { // deprecated
     check_for_required('POST', array('tosaveqn', 'lastloaded'));
     $qns = json_decode($_POST['tosaveqn'], true);
     $lastloaded = json_decode($_POST['lastloaded'], true);
@@ -136,6 +137,7 @@ if ($in_practice) {
 // Verify confirmation values (to ensure it hasn't been submitted since)
 if (!$assess_record->checkVerification($verification)) {
   // grab question settings data with HTML to update front-end
+  $assess_info->loadQuestionSettings($toloadqids, true, false);
   $showscores = $assess_info->showScoresDuring();
   $assessInfoOut['questions'] = array();
   foreach ($qns as $qn=>$parts) {
@@ -153,18 +155,30 @@ foreach ($qns as $qn=>$parts) {
   }
   $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
   foreach ($parts as $part) {
-    if ($ok_to_save === true || $ok_to_save[$part]) {
+    if ($ok_to_save === true || !empty($ok_to_save[$part])) {
       $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
     }
   }
   if (isset($_POST['sw' . $qn])) {  //autosaving work
     $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
   }
-  $k++;
 }
 
 // save record if needed
 $assess_record->saveRecordIfNeeded();
 
+// get settings for LTI if needed
+$assess_info->loadLTIMsgPosts($userid, $canViewAll);
+
+$include_from_assess_info = array(
+    'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt'
+);
+$out = $assess_info->extractSettings($include_from_assess_info);
+
 //output JSON object
-echo '{"autosave": "done"}';
+$out['autosave'] = 'done';
+if ($assess_record->hasActiveAttempt() && $assess_info->getSetting('timelimit') > 0) {
+    $out['timelimit_expiresin'] = $assess_record->getTimeLimitExpires() - $now;
+    $out['timelimit_gracein'] = max($assess_record->getTimeLimitGrace() - $now, 0);
+}
+echo json_encode($out);

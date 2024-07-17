@@ -79,7 +79,7 @@ class Migrator
           return false;
       }
 
-      $result = require($migrationFilename);
+      $result = require_once $migrationFilename;
 
       if ($result !== true && $result !== false) {
           printf("<p style='color: #ff0000'>Invalid result returned from migration: %s</p>\n", $migrationFilename);

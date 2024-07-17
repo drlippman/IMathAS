@@ -2363,6 +2363,46 @@
       }
       return url;
     };
+    var resizeImage = function (o, callback) {
+        var imgURL;
+        if (typeof o.blobUri == 'function') {
+            imgURL = o.blobUri();
+        } else if (typeof o.blob == 'function') {
+            imgURL = URL.createObjectURL(o.blob());
+        } else {
+            imgURL = URL.createObjectURL(o.blob);
+        }
+        var image = new Image();
+        image.onload = function (imageEvent) {
+            // Resize the image
+            var canvas = document.createElement('canvas'),
+                max_size = 1000,
+                width = image.width,
+                height = image.height;
+                if (width < max_size && height < max_size) {
+                    // no need to resize
+                    callback(false);
+                }
+            if (width > height) {
+                if (width > max_size) {
+                    height *= max_size / width;
+                    width = max_size;
+                }
+            } else {
+                if (height > max_size) {
+                    width *= max_size / height;
+                    height = max_size;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+            var resizedImage = canvas.toBlob(function(b) {
+                callback(true,b);
+            }, 'image/jpeg');
+        }
+        image.src = imgURL;
+    }
     var Tools = {
       trim: trim,
       isArray: ArrUtils.isArray,
@@ -2380,7 +2420,8 @@
       createNS: createNS,
       resolve: resolve$1,
       explode: explode,
-      _addCacheSuffix: _addCacheSuffix
+      _addCacheSuffix: _addCacheSuffix,
+      resizeImage: resizeImage
     };
 
     var doc = domGlobals.document, push$2 = Array.prototype.push, slice$2 = Array.prototype.slice;
@@ -15167,6 +15208,12 @@
         }
         return path2;
       };
+      var removeOnFailure = function () {
+        var editor = tinymce.activeEditor;
+        var img = $(editor.dom.doc).find('img[src^="blob:"]').get(0);
+        if (img)
+            editor.execCommand('mceRemoveNode', false, img);
+      };
       var defaultHandler = function (blobInfo, success, failure, progress) {
         var xhr, formData;
         xhr = XMLHttpRequest();
@@ -15176,24 +15223,33 @@
           progress(e.loaded / e.total * 100);
         };
         xhr.onerror = function () {
+          removeOnFailure();
           failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
         };
         xhr.onload = function () {
           var json;
           if (xhr.status < 200 || xhr.status >= 300) {
+            removeOnFailure();
             failure('HTTP Error: ' + xhr.status);
             return;
           }
           json = JSON.parse(xhr.responseText);
           if (!json || typeof json.location !== 'string') {
+            removeOnFailure();
             failure('Invalid JSON: ' + xhr.responseText);
             return;
           }
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        xhr.send(formData);
+        Tools.resizeImage(blobInfo, function(resized,resizedblob) {
+            if (resized) {
+                formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+            } else {
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+            }
+            xhr.send(formData);
+        });
       };
       var noUpload = function () {
         return new promiseObj(function (resolve) {
@@ -29330,9 +29386,20 @@ var image = (function (domGlobals) {
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        formData.append('file', blobInfo.blob, blobInfo.name);
         formData.append('type', 'attach');
-        xhr.send(formData);
+        if (blobInfo.blob.type.startsWith('image')) {
+            global$2.resizeImage(blobInfo, function(resized,resizedblob) {
+                if (resized) {
+                    formData.append('file', resizedblob, blobInfo.name.replace(/\.\w+$/,'.jpg'));
+                } else {
+                    formData.append('file', blobInfo.blob, blobInfo.name);
+                }
+                xhr.send(formData);
+            });
+        } else {
+            formData.append('file', blobInfo.blob, blobInfo.name);
+            xhr.send(formData);
+        }
       };
       var uploadBlob = function (blobInfo, handler) {
         return new global$1(function (resolve, reject) {
@@ -30700,8 +30767,14 @@ var image = (function (domGlobals) {
           success(pathJoin(settings.basePath, json.location));
         };
         formData = new domGlobals.FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        xhr.send(formData);
+        global$2.resizeImage(blobInfo, function(resized,resizedblob) {
+            if (resized) {
+                formData.append('file', resizedblob, blobInfo.filename().replace(/\.\w+$/,'.jpg'));
+            } else {
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+            }
+            xhr.send(formData);
+        });
       };
       var uploadBlob = function (blobInfo, handler) {
         return new global$1(function (resolve, reject) {
@@ -46679,15 +46752,22 @@ var paste = (function (domGlobals) {
 			//ed.on('PreProcess', function (o) {   //tiny 4 doesn't seem to use this anymore
 			//luckily, there is a special paste callback
 			ed.on('PastePostProcess', function(o) {
+                var AMtags, MJtags;
 				//if (o.get) {
-					AMtags = ed.dom.select('span.AM', o.node);
+                    AMtags = ed.dom.select('span.AM', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						t.math2ascii(AMtags[i]);
 					}
 					MJtags = ed.dom.select('span[data-asciimath]', o.node);
 					for (var i=0; i<MJtags.length; i++) {
 						t.mathjax2ascii(MJtags[i]);
-					}
+                    }
+                    MJtags = ed.dom.select('mjx-container[data-asciimath]', o.node);
+                    for (var i=0; i<MJtags.length; i++) {
+                        var newspan = ed.dom.create('span', {'data-asciimath': MJtags[i].getAttribute("data-asciimath")});
+                        MJtags[i].parentNode.replaceChild(newspan, MJtags[i]);
+						t.mathjax2ascii(newspan);
+                    }
 					/*AMtags = ed.dom.select('span.AMedit', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						var myAM = AMtags[i].innerHTML;
@@ -46710,7 +46790,7 @@ var paste = (function (domGlobals) {
 					AMtags = ed.dom.select('span.AMedit', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						var myAM = AMtags[i].innerHTML;
-						myAM = "`"+myAM.replace(/\`/g,"")+"`";
+						myAM = "`"+t.cleanmath(myAM)+"`";
 						AMtags[i].innerHTML = myAM;
 						AMtags[i].className = "AM";
 					}
@@ -46888,7 +46968,7 @@ var paste = (function (domGlobals) {
 				//myAM = myAM.replace(/&lt;/g,"<");
 				myAM = myAM.replace(/>/g,"&gt;");
 				myAM = myAM.replace(/</g,"&lt;");
-				myAM = "`"+myAM.replace(/\`/g,"")+"`";
+				myAM = "`"+this.cleanmath(myAM)+"`";
 				el.innerHTML = myAM;
 			}
 		},
@@ -46908,7 +46988,8 @@ var paste = (function (domGlobals) {
 
 		nodeToAM : function(outnode) {
 			var str = outnode.innerHTML.replace(/\`/g,"");
-			str = str.replace(/<span[^>]*>(.*?)<\/span>/,"$1").replace(/<br\s*\/>/," ");
+            str = str.replace(/<span[^>]*>(.*?)<\/span>/,"$1").replace(/<br\s*\/>/," ")
+                .replace(/<img[^>]*title="(.*?)".*?>/g,"$1");
 			str = str.replace(/[\u200B-\u200D\uFEFF]/g, '');
 			if (tinymce.isIE) {
 				  //str.replace(/\"/,"&quot;");
@@ -46921,13 +47002,27 @@ var paste = (function (domGlobals) {
 			  } else {
 				  //doesn't work on IE, probably because this script is in the parent
 				  //windows, and the node is in the iframe.  Should it work in Moz?
-				 var myAM = "`"+str+"`"; //next 2 lines needed to make caret
+				 var myAM = "`"+this.cleanmath(str)+"`"; //next 2 lines needed to make caret
 				 outnode.innerHTML = myAM;     //move between `` on Firefox insert math
 				 AMprocessNode(outnode);
 				 outnode.title=myAM.replace(/\`/g,""); //add title to <span class="AM"> with equation for cut-and-paste
 			  }
 
-		},
+        },
+        
+        cleanmath: function(str) {
+            return str.replace(/\`/g,"")
+                .replace(/<([^>]*)>/g,"")
+                .replace(/&(m|n)dash;/g,"-")
+                .replace(/&?nbsp;?/g," ")
+                .replace(/&(.*?);/g, function(m,p) {
+                    if (p=='lt' || p=='gt') {
+                        return m;
+                    } else {
+                        return p;
+                    }
+                });
+        },
 
 		imgwrap : function(ed, imgnode) {
 			p = ed.dom.getParent(imgnode,this.testAMclass);
@@ -52131,6 +52226,8 @@ var modern = (function (domGlobals) {
           layoutRect = windows[i].layoutRect();
           var newy;
           if (inIframe()) {
+            //var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
+            //newy = contpos.y;
             newy = global$1.activeEditor.editorContainer.getBoundingClientRect().y;
           } else {
             newy = Math.max(0, rect.h / 2 - layoutRect.h / 2);
@@ -52258,6 +52355,8 @@ var modern = (function (domGlobals) {
         layoutRect.x = self.settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2);
         layoutRect.y = self.settings.y || Math.max(0, rect.h / 2 - layoutRect.h / 2);
         if (inIframe()) {
+            //var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
+            //layoutRect.y = contpos.y;
             layoutRect.y = global$1.activeEditor.editorContainer.getBoundingClientRect().y;
         }
         return layoutRect;

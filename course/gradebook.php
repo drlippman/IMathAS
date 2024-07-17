@@ -17,15 +17,11 @@
 
 
 
-require("../init.php");
+require_once "../init.php";
 $cid = Sanitize::courseId($_GET['cid']);
-if (isset($teacherid)) {
-	$isteacher = true;
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
 
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
 if (!$isteacher && !$istutor && !isset($studentid)) {
 	echo _('Error - you are not a student, teacher, or tutor for this course');
 	exit;
@@ -121,7 +117,8 @@ if ($canviewall) {
 	$showpercents = 0;
 	$lastlogin = false;
 	$includeduedate = false;
-	$includelastchange = false;
+    $includelastchange = false;
+    $gbmode = '';
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
@@ -137,6 +134,12 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 	$assessUrl = "../assess2/";
 }
+
+$curBreadcrumb = $breadcrumbbase ?? '';
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$pagetitle = _('Gradebook');
 
 //HANDLE ANY POSTS
 if ($isteacher) {
@@ -159,46 +162,44 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
-		include("masssend.php");
+		require_once "masssend.php";
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
 		$calledfrom='gb';
-		include("massexception.php");
+		require_once "massexception.php";
 	}
 	if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
 		$calledfrom='gb';
-		include("gb-excuse.php");
+		require_once "gb-excuse.php";
 	}
 	if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
 		$calledfrom='gb';
-		include("gb-excuse.php");
+		require_once "gb-excuse.php";
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
-		include("unenroll.php");
-		include("../footer.php");
+		require_once "unenroll.php";
+		require_once "../footer.php";
 		exit;
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
-		include("lockstu.php");
-		include("../footer.php");
+		require_once "lockstu.php";
+		require_once "../footer.php";
 		exit;
 	}
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
 		//based on a contribution by Cam Joyce
-		require_once("gbtable2.php");
+		require_once "gbtable2.php";
 
 		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
 		$placeinhead .= '<script type="text/javascript">addLoadEvent(print);</script>';
 		$flexwidth = true;
-		require("../header.php");
+		require_once "../header.php";
 
 		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
 		echo '<a href="gradebook.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">', _('Back to Gradebook'), '</a></div>';
@@ -215,7 +216,7 @@ if ($isteacher) {
 
 			echo "</div></div></div>";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 
 	}
@@ -241,11 +242,11 @@ if ($isteacher) {
 		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
-			$toins[] = "(?,?,?,?,?)";
-			array_push($qarr, $id, 'offline', $stu, $val, $_POST['feedback'][$id]);
+			$toins[] = "(?,?,?,?)";
+			array_push($qarr, $id, 'offline', $stu, $val);
 		}
 		if (count($toins)>0) {
-			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
+			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score) VALUES ".implode(',',$toins);
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 		}
@@ -259,8 +260,8 @@ if ($isteacher) {
 
 
 //DISPLAY
-require_once("gbtable2.php");
-require("../includes/htmlutil.php");
+require_once "gbtable2.php";
+require_once "../includes/htmlutil.php";
 
 $placeinhead = '<script type="text/javascript">
 var cid = '.Sanitize::onlyInt($cid).';
@@ -292,7 +293,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -318,16 +319,19 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}
 	</script>';
 
-	require("../header.php");
+	require_once "../header.php";
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt ", _('Student Grade Detail'), "</div>\n";
 	} else if ($isteacher || $istutor) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
 	} else {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; ", _('Gradebook'), "</div>";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
 		echo '<div id="headergradebook" class="pagetitle"><h1>', _('Grade Book Averages'), ' </h1></div>';
@@ -380,13 +384,16 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('PT-practice test').'</li>';
 	echo '<li>'._('EC-extra credit').'</li>';
 	echo '<li>'._('NC-no credit').'</li>';
+    echo '<li>'._('NS-no submission').'</li>';
+    echo '<li>'._('N/A-Not Available').'</li>';
 	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
 	echo '<li>'._('<sup>e</sup> Has exception').'</li>';
 	echo '<li>'._('<sup>LP</sup> Used latepass').'</li>';
+    echo '<li>'._('<sup>AP</sup> Total is calculated using averaged percents').'</li>';
 	echo '</ul></div>';
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
@@ -415,9 +422,10 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } div.trld {display:table-cell;vertical-align:middle;white-space: nowrap;} </style>";
 	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
-	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; ", _('Gradebook'), "</div>";
+	require_once "../header.php";
+    echo "<div class=breadcrumb>";
+    echo $curBreadcrumb;
+    echo _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
 	echo '<div id="headergradebook" class="pagetitle"><h1>', _('Gradebook'), ' <span class="noticetext" id="newflag" style="font-size: 70%" >';
@@ -495,6 +503,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="-1:-1" ';
 		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
 		echo '>', _('Active'), '</option>';
+        echo '<option value="-2:-2" ';
+		if ($colorize == "-2:-2") { echo 'selected="selected" ';}
+		echo '>', _('NC'), '</option>';
 		echo '</select> &nbsp; ';
 		//echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
@@ -591,11 +602,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 		*/
 	}
 	$includelastchange = false;  //don't need it for instructor view
-	$gbt = gbinstrdisp();
+	gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
-	require("../footer.php");
+	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NS-no submission<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	require_once "../footer.php";
 
 	/*if ($isteacher) {
 		echo "<div class=cp>";
@@ -616,7 +627,9 @@ function gbstudisp($stu) {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$equivavailshow = $availshow;
 	if ($availshow == 3) {
 		$equivavailshow = 1; // treat past & attempted like past & available
@@ -640,7 +653,7 @@ function gbstudisp($stu) {
 		$stm->execute(array(':id'=>$stu, ':courseid'=>$_GET['cid']));
 		if ($stm->rowCount()==0) { //shouldn't happen
 			echo 'Invalid student id';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
@@ -648,6 +661,10 @@ function gbstudisp($stu) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 
 	$gbt = gbtable($stu);
+
+    if ($GLOBALS['myrights'] === 100 && !empty($_GET['showgbt'])) {
+        print_r($gbt);
+    }
 
 	if ($stu>0) {
 		echo '<div style="font-size:1.1em;font-weight:bold">';
@@ -662,14 +679,14 @@ function gbstudisp($stu) {
 
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-					echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/> ";
+					echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/> ";
 				} else {
-					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/>";
+					echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/>";
 				}
 			}
 			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
 			if ($hidelocked) {
-				$query .= "AND istu.locked=0 ";
+				$query .= "AND (istu.locked=0 OR iu.id=:uid) ";
 			}
 			if ($usersort==0) {
 				$query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
@@ -677,9 +694,13 @@ function gbstudisp($stu) {
 				$query .= "ORDER BY iu.LastName,iu.FirstName";
 			}
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid));
+			if ($hidelocked) {
+				$stm->execute(array(':courseid'=>$cid, ':uid'=>$stu));
+			} else {
+				$stm->execute(array(':courseid'=>$cid));
+			}
 
-			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
+			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
 			$lastsec = '';
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
@@ -721,7 +742,7 @@ function gbstudisp($stu) {
 			}
 
 			//echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
-			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=msg&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
+			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=msg&cid=" . Sanitize::courseId($cid) . "',800,'auto',true,'',null,{label:'"._('Send Message')."',func:'sendmsg'})\" title=\"Send Message\">", _('Message'), "</a> | ";
 			//remove since redundant with Make Exception button "with selected"
 			//echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
 			echo "<a href=\"listusers.php?cid=" . Sanitize::courseId($cid) . "&chgstuinfo=true&uid=" . Sanitize::onlyInt($stu) . "\">", _('Change Info'), "</a> | ";
@@ -818,7 +839,11 @@ function gbstudisp($stu) {
 			}
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
-			}
+            }
+            if (isset($gbt[0][1][$i][17]) && $gbt[0][1][$i][17] != $stusection) {
+                // is section limited, and this student isn't in the section
+                continue;
+            }
 
 			echo '<tr class="grid">';
 			if ($stu>0 && $isteacher) {
@@ -883,7 +908,7 @@ function gbstudisp($stu) {
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
 				//not started, so no canuselatepass record
-				$gbt[1][1][$i][10] = $exceptionfuncs->getCanUseAssessLatePass(array('enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12], 'LPcutoff'=>$gbt[0][1][$i][14]));
+				$gbt[1][1][$i][10] = $exceptionfuncs->getCanUseAssessLatePass(array('id'=>$gbt[0][1][$i][7], 'enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12], 'LPcutoff'=>$gbt[0][1][$i][14]));
 			}
 			/*if (!$isteacher && !$istutor && $latepasses>0  &&	(
 				(isset($gbt[1][1][$i][10]) && $gbt[1][1][$i][10]>0 && !in_array($gbt[0][1][$i][7],$viewedassess)) ||  //started, and already figured it's ok
@@ -897,7 +922,7 @@ function gbstudisp($stu) {
 					$afterduelatepass = true;
 				}
 			}
-			if (!$isteacher && !$istutor && $gbt[1][1][$i][16] == 1) {
+			if (!$isteacher && !$istutor && !empty($gbt[1][1][$i][16])) {
 				echo ' <span class="small"><a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'#/showwork">[';
 				echo _('Attach Work') .']</a></span>';
 			}
@@ -920,7 +945,7 @@ function gbstudisp($stu) {
 
 			$haslink = false;
 
-			if ($isteacher || $istutor || $gbt[1][1][$i][2]==1) { //show link
+			if ($isteacher || $istutor || !empty($gbt[1][1][$i][2])) { //show link
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
 						if (isset($gbt[1][1][$i][0])) { //has score
@@ -1034,21 +1059,25 @@ function gbstudisp($stu) {
 				}
 			}
 			if (isset($gbt[1][1][$i][0])) {
-				if ($gbt[1][1][$i][3]>9) {
-					$gbt[1][1][$i][3] -= 10;
-				}
-				echo $gbt[1][1][$i][0];
-				if ($gbt[1][1][$i][3]==1) {
-					echo ' (NC)';
-				} else if ($gbt[1][1][$i][3]==2) {
-					echo ' (IP)';
-				} else if ($gbt[1][1][$i][3]==5) {
-					echo ' (UA)';
-				} else if ($gbt[1][1][$i][3]==3) {
-					echo ' (OT)';
-				} else if ($gbt[1][1][$i][3]==4) {
-					echo ' (PT)';
-				}
+                echo $gbt[1][1][$i][0];
+                if (isset($gbt[1][1][$i][3])) {
+                    if ($gbt[1][1][$i][3]>9) {
+                        $gbt[1][1][$i][3] -= 10;
+                    }
+                    if ($gbt[1][1][$i][3]==1 && $gbt[1][1][$i][0] !== 'NC') {
+                        echo ' (NC)';
+                    } else if ($gbt[1][1][$i][3]==2) {
+                        echo ' (IP)';
+                    } else if ($gbt[1][1][$i][3]==5) {
+                        echo ' (UA)';
+                    } else if ($gbt[1][1][$i][3]==3) {
+                        // echo ' (OT)';
+                    } else if ($gbt[1][1][$i][3]==4) {
+                        echo ' (PT)';
+                    } else if ($gbt[1][1][$i][3]==6) {
+                        echo ' (NS)';
+                    }
+                }
 			} else {
 				echo '-';
 			}
@@ -1091,13 +1120,13 @@ function gbstudisp($stu) {
 			echo '</td>';
 
 			if ($stu>0 && $isteacher) {
-				if ($gbt[1][1][$i][7] > -1) {
+				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7] > -1) {
 					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
 				} else {
 					echo '<td></td>';
 				}
 				if ($includelastchange) {
-					if ($gbt[1][1][$i][9]>0) {
+					if (!empty($gbt[1][1][$i][9]) && $gbt[1][1][$i][9]>0) {
 						echo '<td>'.tzdate('n/j/y g:ia', $gbt[1][1][$i][9]);
 					} else {
 						echo '<td></td>';
@@ -1121,7 +1150,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
+				if ((empty($gbt[1][1][$i][1])) || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
@@ -1164,6 +1193,7 @@ function gbstudisp($stu) {
 		}
 		echo '</tr>';
 		echo '</thead><tbody>';
+        
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			//$donedbltop = false;
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
@@ -1178,7 +1208,11 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]).'</span>';
+				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]);
+                if ($gbt[0][2][$i][13]==1) { //averaged percents
+                    echo '<sup>AP</sup>';
+                }
+                echo '</span>';
 				if (isset($gbt[0][2][$i][11])) {  //category weight
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
@@ -1315,7 +1349,7 @@ function gbstudisp($stu) {
 			$outcometype = 1;
 		}
 		if (($show&4)==4) {
-			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '</dd><br/>';
+			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t started working on them yet.'), '</dd><br/>';
 		}
 		if (($show&8)==8) {
 			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '</dd><br/>';
@@ -1391,7 +1425,7 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 					echo '<br/>'.$gbt[0][2][$i][11].'%';
 				}
 			}
-			if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
+			if (isset($collapsegbcat[$gbt[0][2][$i][1]]) && $collapsegbcat[$gbt[0][2][$i][1]]==0) {
 				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
 			} else {
 				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
@@ -1411,8 +1445,12 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 	//total totals
 	$tot = '';
 	if ($catfilter<0) {
-		$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
-		if ($gbt[$i][3][4+$availshow]>0) {
+        if (isset($gbt[0][3][3+$availshow])) {
+            $fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+        } else {
+            $fivenum = '<span>';
+        }
+		if (!empty($gbt[$i][3][4+$availshow]) && $gbt[$i][3][4+$availshow]>0) {
 			$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
 		} else {
 			$pct = 0;
@@ -1493,7 +1531,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 						} else {
 							echo $gbt[$i][2][$j][$availshow];
 						}
-					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops or attempted
+					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops/excused or attempted
 						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
 					} else {
 						echo $gbt[$i][2][$j][$availshow];
@@ -1522,7 +1560,9 @@ function gbinstrdisp() {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$equivavailshow = $availshow;
 	if ($availshow == 3) {
 		$equivavailshow = 1; // treat past & attempted like past & available
@@ -1616,7 +1656,7 @@ function gbinstrdisp() {
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
 			}
-			if ($collapsegbcat[$gbt[0][1][$i][1]]==2) {
+			if (isset($collapsegbcat[$gbt[0][1][$i][1]]) && $collapsegbcat[$gbt[0][1][$i][1]]==2) {
 				continue;
 			}
 			//name and points
@@ -1692,25 +1732,29 @@ function gbinstrdisp() {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
-		if ($gbt[$i][4][1]>0) {
-			echo '<span class="greystrike">'.$gbt[$i][0][0].'</span>';
+		if (!empty($gbt[$i][4][1]) && $gbt[$i][4][1]>0) {
+			echo '<span class="greystrike pii-full-name">'.$gbt[$i][0][0].'</span>';
 		} else {
-			echo Sanitize::encodeStringForDisplay($gbt[$i][0][0]);
+			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($gbt[$i][0][0]).'</span>';
 		}
 		echo '</a>';
-		if ($gbt[$i][4][3]==1) {
+		if (!empty($gbt[$i][4][3]) &&  $gbt[$i][4][3]==1) {
 			echo '<sup>*</sup>';
 		}
 		echo '</div></td>';
-		if ($showpics==1 && $gbt[$i][4][2]==1) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
-		} else if ($showpics==2 && $gbt[$i][4][2]==1) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+		if ($showpics==1 && !empty($gbt[$i][4][2])) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
+			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+		} else if ($showpics==2 && !empty($gbt[$i][4][2])) {
+			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
 		} else {
 			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
+            if (isset($gbt[$i][0][$j])) {
+                echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
+            } else {
+                echo '<td class="c">'.$insdiv.$enddiv .'</td>';
+            }
 		}
 
 		if ($totonleft && !$hidepast) {
@@ -1733,11 +1777,15 @@ function gbinstrdisp() {
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
 					continue;
 				}
-				if ($collapsegbcat[$gbt[0][1][$j][1]]==2) {
+				if (isset($collapsegbcat[$gbt[0][1][$j][1]]) && $collapsegbcat[$gbt[0][1][$j][1]]==2) {
 					continue;
 				}
 				//if online, not average, and either score exists and active, or score doesn't exist and assess is current,
-				if ($gbt[0][1][$j][6]==0 && $gbt[$i][1][$j][4]!='average' && ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))) {
+                if (isset($gbt[$i][1][$j][4]) && $gbt[$i][1][$j][4]!='average' && 
+                    $gbt[0][1][$j][6]==0 && 
+                    ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || 
+                    (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))
+                ) {
 					echo '<td class="c isact">'.$insdiv;
 				} else {
 					echo '<td class="c">'.$insdiv;
@@ -1768,41 +1816,44 @@ function gbinstrdisp() {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 							}
 						}
-
+                        
 						echo $gbt[$i][1][$j][0];
 
 						echo '</a>';
 
-						if ($gbt[$i][1][$j][3]>9) {
-							$gbt[$i][1][$j][3] -= 10;
-						}
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						} else if ($gbt[$i][1][$j][3]==2) {
-							echo ' (IP)';
-						} else if ($gbt[$i][1][$j][3]==5) {
-							echo ' (UA)';
-						} else if ($gbt[$i][1][$j][3]==3) {
-							echo ' (OT)';
-						} else if ($gbt[$i][1][$j][3]==4) {
-							echo ' (PT)';
-						}
+						
+                        if (isset($gbt[$i][1][$j][3])) {
+                            if ($gbt[$i][1][$j][3]>9) {
+                                $gbt[$i][1][$j][3] -= 10;
+                            }
+                            if ($gbt[$i][1][$j][3]==1) {
+                                echo ' (NC)';
+                            } else if ($gbt[$i][1][$j][3]==2) {
+                                echo ' (IP)';
+                            } else if ($gbt[$i][1][$j][3]==5) {
+                                echo ' (UA)';
+                            } else if ($gbt[$i][1][$j][3]==3) {
+                                // echo ' (OT)';
+                            } else if ($gbt[$i][1][$j][3]==4) {
+                                echo ' (PT)';
+                            } else if ($gbt[$i][1][$j][3]==6) {
+                                echo ' (NS)';
+                            }
+                        }
 
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
-						} else if ($isteacher) {
+						} else {
 							if ($gbt[0][1][$j][15] > 1) { // assess2
 								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							} else {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							}
-						} else {
-							echo '-';
 						}
 					}
 					if (isset($gbt[$i][1][$j][6]) ) {
@@ -1819,7 +1870,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							if ($gbt[0][1][$j][2]>0) {
+							if (!empty($gbt[0][1][$j][2]) && $gbt[0][1][$j][2]>0 && isset($gbt[$i][1][$j][0])) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
 								$avgtip = '';
@@ -1842,7 +1893,7 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
 
-						if ($gbt[$i][1][$j][3]==1) {
+						if (isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
 					} else {
@@ -1851,7 +1902,7 @@ function gbinstrdisp() {
 					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
@@ -1872,7 +1923,7 @@ function gbinstrdisp() {
 
 							echo '</span>';
 						}
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 					} else {
@@ -1886,7 +1937,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==3) { //exttool
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							if ($gbt[0][1][$j][2]>0) {
+							if (isset($gbt[$i][1][$j][0]) && $gbt[0][1][$j][2]>0) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
 								$avgtip = '';
@@ -1917,7 +1968,7 @@ function gbinstrdisp() {
 					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				}

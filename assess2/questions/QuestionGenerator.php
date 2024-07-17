@@ -2,15 +2,15 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . "/../../assessment/mathphp2.php");
-require_once(__DIR__ . "/../../assessment/mathparser.php");
-require_once(__DIR__ . "/../../assessment/interpret5.php");
-require_once(__DIR__ . "/../../assessment/macros.php");
-require_once(__DIR__ . "/answerboxhelpers.php");
-require_once(__DIR__ . "/../../includes/sanitize.php");
+require_once __DIR__ . "/../../assessment/mathphp2.php";
+require_once __DIR__ . "/../../assessment/mathparser.php";
+require_once __DIR__ . "/../../assessment/interpret5.php";
+require_once __DIR__ . "/../../assessment/macros.php";
+require_once __DIR__ . "/answerboxhelpers.php";
+require_once __DIR__ . "/../../includes/sanitize.php";
 
-require_once(__DIR__ . "/ErrorHandler.php");
-require_once(__DIR__ . "/QuestionHtmlGenerator.php");
+require_once __DIR__ . "/ErrorHandler.php";
+require_once __DIR__ . "/QuestionHtmlGenerator.php";
 
 use PDO;
 use RuntimeException;
@@ -39,6 +39,7 @@ class QuestionGenerator
     private $questionParams;
 
     private $errors = array();  // Populated by this class' error handlers.
+    private $silenterrors = array(); 
 
     /**
      * Question constructor.
@@ -81,6 +82,7 @@ class QuestionGenerator
             $this->questionParams->setQuestionData($this->loadQuestionData());
         }
 
+        $GLOBALS['curqsetid'] = $this->questionParams->getDbQuestionSetId();
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
 
@@ -93,6 +95,26 @@ class QuestionGenerator
 
         restore_error_handler();
         restore_exception_handler();
+        unset($GLOBALS['curqsetid']);
+
+        if (!empty($GLOBALS['CFG']['logquestionerrors']) && 
+            (count($question->getErrors()) > 0 || count($this->silenterrors) > 0) &&
+            (time() - $question->getQuestionLastMod()) > 10000
+        ) {
+            // only log if hasn't been edited in a few hours
+            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
+                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
+            $stm = $this->dbh->prepare($query);
+            $stm->execute([
+                $this->questionParams->getDbQuestionSetId(),
+                $this->questionParams->getQuestionSeed(),
+                0,
+                time(),
+                implode('; ', $question->getErrors()) . 
+                    ((count($question->getErrors())>0 && count($this->silenterrors)>0) ? '; ' : '') . 
+                    implode('; ', $this->silenterrors)
+            ]);
+        }
 
         return $question;
     }
@@ -181,14 +203,42 @@ class QuestionGenerator
      * @return bool
      */
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
-                                     int $errline, array $errcontext): bool
+                                     int $errline, array $errcontext = []): bool
     {
-        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+        if ($errstr == 'Trying to access array offset on value of type null') {
+            $errstr = 'Trying to access array offset of undefined variable';
+        }
 
-        if (E_WARNING == $errno || E_ERROR == $errno) {
+        $showallerrors = (!empty($GLOBALS['isquestionauthor']) || $GLOBALS['myrights']===100);
+        $errsource = basename($errfile);
+        if (preg_match('/QuestionHtmlGenerator\.php\((\d+)\)\s*:\s*eval/', $errsource, $m)) {
+            if (!isset($GLOBALS['qgenbreak1']) || $m[1] < $GLOBALS['qgenbreak1']) {
+                $errsource = _('Common Control');
+            } else if (!isset($GLOBALS['qgenbreak2']) || $m[1] < $GLOBALS['qgenbreak2']) {
+                $errsource = _('Question Text');
+            } else {
+                $errsource = _('Detailed Solution');
+            }
+        }
+        if (E_ERROR == $errno || (E_WARNING == $errno &&
+            (
+                ($showallerrors || 
+                    ($errstr != 'Trying to access array offset of undefined variable' &&
+                    strpos($errstr, 'Undefined array key') === false
+                    )) &&
+                ($showallerrors || empty($GLOBALS['CFG']['suppress_question_warning_display']))
+            )
+        )) {
+          ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+
           $this->addError(sprintf(
-              _('Caught warning in the question code: %s on line %d in file %s'),
-              $errstr, $errline, $errfile));
+              _('Caught warning in the question code: %s on line %d in %s'),
+              $errstr, $errline, $errsource));
+        } else if (E_WARNING == $errno) {
+            // log warnings that have been silenced
+            $this->silenterrors[] = sprintf(
+                _('Caught warning in the question code: %s on line %d in %s'),
+                $errstr, $errline, $errsource);
         }
 
         // True = Don't execute the PHP internal error handler.
@@ -207,8 +257,12 @@ class QuestionGenerator
         ErrorHandler::evalExceptionHandler($t);
 
         $this->addError(
-            _('<p>Caught error while evaluating this question: ')
-            . Sanitize::encodeStringForDisplay($t->getMessage())
-            . '</p>');
+            _('Caught error while evaluating this question: ')
+            . $t->getMessage()
+            . ' on line '
+            . $t->getLine()
+            . ' of '
+            . basename($t->getFile())
+          );
     }
 }

@@ -2,24 +2,26 @@
 
 namespace IMathAS\assess2\questions\answerboxes;
 
-require_once(__DIR__ . '/CalculatedAnswerBox.php');
-require_once(__DIR__ . '/CalculatedComplexAnswerBox.php');
-require_once(__DIR__ . '/CalculatedIntervalAnswerBox.php');
-require_once(__DIR__ . '/CalculatedMatrixAnswerBox.php');
-require_once(__DIR__ . '/CalculatedNTupleAnswerBox.php');
-require_once(__DIR__ . '/ChoicesAnswerBox.php');
-require_once(__DIR__ . '/ComplexAnswerBox.php');
-require_once(__DIR__ . '/DrawingAnswerBox.php');
-require_once(__DIR__ . '/EssayAnswerBox.php');
-require_once(__DIR__ . '/FileUploadAnswerBox.php');
-require_once(__DIR__ . '/FunctionExpressionAnswerBox.php');
-require_once(__DIR__ . '/IntervalAnswerBox.php');
-require_once(__DIR__ . '/MatchingAnswerBox.php');
-require_once(__DIR__ . '/MatrixAnswerBox.php');
-require_once(__DIR__ . '/MultipleAnswerAnswerBox.php');
-require_once(__DIR__ . '/NTupleAnswerBox.php');
-require_once(__DIR__ . '/NumberAnswerBox.php');
-require_once(__DIR__ . '/StringAnswerBox.php');
+require_once __DIR__ . '/CalculatedAnswerBox.php';
+require_once __DIR__ . '/CalculatedComplexAnswerBox.php';
+require_once __DIR__ . '/CalculatedIntervalAnswerBox.php';
+require_once __DIR__ . '/CalculatedMatrixAnswerBox.php';
+require_once __DIR__ . '/CalculatedNTupleAnswerBox.php';
+require_once __DIR__ . '/ChoicesAnswerBox.php';
+require_once __DIR__ . '/ComplexAnswerBox.php';
+require_once __DIR__ . '/DrawingAnswerBox.php';
+require_once __DIR__ . '/EssayAnswerBox.php';
+require_once __DIR__ . '/FileUploadAnswerBox.php';
+require_once __DIR__ . '/FunctionExpressionAnswerBox.php';
+require_once __DIR__ . '/IntervalAnswerBox.php';
+require_once __DIR__ . '/MatchingAnswerBox.php';
+require_once __DIR__ . '/MatrixAnswerBox.php';
+require_once __DIR__ . '/MultipleAnswerAnswerBox.php';
+require_once __DIR__ . '/NTupleAnswerBox.php';
+require_once __DIR__ . '/NumberAnswerBox.php';
+require_once __DIR__ . '/StringAnswerBox.php';
+require_once __DIR__ . '/ChemEquationAnswerBox.php';
+require_once(__DIR__ . '/MoleculeAnswerBox.php');
 
 use OutOfBoundsException;
 
@@ -50,6 +52,7 @@ use Sanitize;
  * - Essay: "essay"
  * - File Upload: "file"
  * - String: "string"
+ * - Molecule: "molecule"
  */
 class AnswerBoxFactory
 {
@@ -121,6 +124,12 @@ class AnswerBoxFactory
                 break;
             case 'string':
                 return new StringAnswerBox($answerBoxParams);
+                break;
+            case 'chemeqn':
+                return new ChemEquationAnswerBox($answerBoxParams);
+                break;
+            case 'molecule':
+                return new MoleculeAnswerBox($answerBoxParams);
                 break;
             default:
                 // This will be caught by our custom exception handler to be

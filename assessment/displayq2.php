@@ -6,12 +6,13 @@
 $GLOBALS['noformatfeedback'] = true;
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
-require_once("mathphp2.php");
-require_once("mathparser.php");
-require("interpret5.php");
-require("macros.php");
-require_once(__DIR__ . "/../includes/sanitize.php");
-
+require_once "mathphp2.php";
+require_once "mathparser.php";
+require_once "interpret5.php";
+require_once "macros.php";
+require_once __DIR__ . "/../includes/sanitize.php";
+// This script is no longer officially supported, so don't bother recording errors
+error_reporting(0);
 
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
@@ -171,6 +172,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 
 	$preevalerror = error_get_last();
+
 	try {
 		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
 		$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
@@ -182,10 +184,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			echo Sanitize::encodeStringForDisplay($t->getMessage());
 			echo '</p>';
 		}
-	} catch (Exception $e) {
-		$res1 = false;
-		$res2 = false;
-	}
+	} 
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -275,6 +274,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	//pack options
 
+    $optionsPack = [];
 	if (isset($ansprompt)) {$optionsPack['ansprompt'] = $ansprompt;}
 	if (isset($displayformat)) {$optionsPack['displayformat'] = $displayformat;}
 	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $optionsPack['answerformat'] = $answerformat;}
@@ -320,7 +320,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				}
 			} else {
 				if (count($anstypes)>1) {
-					if ($qnpointval==0) {$qnpointval=1;}
+					if (empty($qnpointval)) {$qnpointval=1;}
 					$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),3));
 					$answeights[] = $qnpointval-array_sum($answeights);
 					foreach ($answeights as $kidx=>$vval) {
@@ -336,7 +336,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 		foreach ($anstypes as $kidx=>$anstype) {
 			$qcol = ($qdata['qtype']=="multipart" && isset($qcolors[$kidx]))?(is_numeric($qcolors[$kidx])?rawscoretocolor(Sanitize::encodeStringForDisplay($qcolors[$kidx]),$answeights[$kidx]):Sanitize::encodeStringForDisplay($qcolors[$kidx])):'';
-			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$optionsPack,$qnidx+1,$qcol);
+			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx] ?? '',$optionsPack,$qnidx+1,$qcol);
 		}
 	} else {
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor(Sanitize::encodeStringForDisplay($qcolors[0]),1):Sanitize::encodeStringForDisplay($qcolors[0])):'';
@@ -506,14 +506,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 
-	if ($returnqtxt===2) {
-		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
-	} else if ($returnqtxt===3) {
-		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
-	}
-	if (($qdata['solutionopts']&1)==0) {
-		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
-	}
+	
 
 	if (strpos($evaledqtext,'[AB')!==false) {
 		if (is_array($answerbox)) {
@@ -542,6 +535,14 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$evaledqtext = str_replace('[SAB]', $showanswerloc, $evaledqtext);
 			$toevalqtxt .= '$showanswerloc';
 		}
+	}
+    if ($returnqtxt===2) {
+		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
+	} else if ($returnqtxt===3) {
+		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
+	}
+	if (($qdata['solutionopts']&1)==0) {
+		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
 	}
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
@@ -593,14 +594,13 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize'])?$GLOBALS['CFG']['GEN']['extrefsize'][1]:500;
 		$vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize'])?$GLOBALS['CFG']['GEN']['vidextrefsize'][0]:873;
 		$vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize'])?$GLOBALS['CFG']['GEN']['vidextrefsize'][1]:500;
-		if ($qdata['extref']!= '') {
+		$qref = '';
+        if ($qdata['extref']!= '') {
 			$extref = explode('~~',$qdata['extref']);
 
 			if (isset($GLOBALS['questions']) && (!isset($_SESSION['isteacher']) || $_SESSION['isteacher']==false) && !isset($_SESSION['stuview'])) {
 				$qref = $GLOBALS['questions'][$qnidx].'-'.($qnidx+1);
-			} else {
-				$qref = '';
-			}
+			} 
 			for ($i=0;$i<count($extref);$i++) {
 				$extrefpt = explode('!!',$extref[$i]);
 				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
@@ -920,10 +920,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			echo Sanitize::encodeStringForDisplay($t->getMessage());
 			echo '</p>';
 		}
-	} catch (Exception $e) {
-		$res1 = false;
-		$res2 = false;
-	}
+	} 
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -985,6 +982,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 
 	$RND->srand($seed+2);
 	//pack options from eval
+    $optionsPack = [];
 	if (isset($answer)) {$optionsPack['answer'] = $answer;}
 	if (isset($reltolerance)) {$optionsPack['reltolerance'] = $reltolerance;}
 	if (isset($abstolerance)) {$optionsPack['abstolerance'] = $abstolerance;}
@@ -1050,7 +1048,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
         }
 		foreach ($anstypes as $kidx=>$anstype) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
-			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn".Sanitize::onlyInt($partnum)],$optionsPack,$qnidx+1);
+			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn".Sanitize::onlyInt($partnum)] ?? '',$optionsPack,$qnidx+1);
 			if (isset($scoremethod) && $scoremethod=='acct') {
 				if (($anstype=='string' || $anstype=='number') && $answer[$kidx]==='') {
 					$scores[$kidx] = $raw[$kidx]-1;  //0 if correct, -1 if wrong
@@ -1122,7 +1120,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 	if ($anstype == "number") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {if (isset($options['answerformat'][$qn])) { $answerformat = $options['answerformat'][$qn];}} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
@@ -1345,7 +1343,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}
-
+        $style = '';
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 			$out .= "<span $style id=\"qnwrap$qn\" role=radiogroup aria-label=\""._('Select an answer')."\">";
@@ -1484,6 +1482,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$displayformat = 'column';
 		}
 
+        $style = '';
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
@@ -1556,8 +1555,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['questiontitle'])) {if (is_array($options['questiontitle'])) {$questiontitle = $options['questiontitle'][$qn];} else {$questiontitle = $options['questiontitle'];}}
 		if (isset($options['answertitle'])) {if (is_array($options['answertitle'])) {$answertitle = $options['answertitle'][$qn];} else {$answertitle = $options['answertitle'];}}
 		if (isset($options['matchlist'])) {if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}}
-		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
-		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = '';}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}} else {$displayformat = '';}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
@@ -1622,7 +1621,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			$out .= "<select name=\"qn$qn-$i\" id=\"qn$qn-$i\">";
 			$out .= '<option value="-" ';
-			if ($las[$i]=='-' || strcmp($las[$i],'')==0) {
+			if (isset($las[$i]) && ($las[$i]=='-' || strcmp($las[$i],'')==0)) {
 				$out .= 'selected="1"';
 			}
 			$out .= '>-</option>';
@@ -1639,7 +1638,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				foreach ($letters as $j=>$v) {
 					//$out .= "<option value=\"$v\" ";
 					$out .= "<option value=\"$j\" ";
-					if (strcmp($las[$i],$j)==0 || $las[$i]==$v) {
+					if (isset($las[$i]) && (strcmp($las[$i],$j)==0 || $las[$i]==$v)) {
 						$out .= 'selected="1"';
 					}
 					$out .= ">$v</option>";
@@ -1691,7 +1690,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
-		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}} else {$displayformat = '';}
 
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2012,7 +2011,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain = $options['domain'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {if (isset($options['answerformat'][$qn])) {$answerformat = $options['answerformat'][$qn];}} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 
 		if (!isset($sz)) { $sz = 20;}
@@ -2454,7 +2453,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 
 		$la = preg_replace('/%(\w+;)/',"&$1",$la);
-		$la = str_replace('&tilde;', '~', $la);
+        $la = str_replace('&tilde;', '~', $la);
 
 		if ($answerformat=='list') {
 			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
@@ -2468,7 +2467,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			foreach ($questions as $i=>$v) {
 				$out .= '<option value="'.htmlentities($v).'"';
 				//This is a hack.  Need to figure a better way to deal with & in answers
-				if (str_replace('&','',$v)==$la) {
+				if (str_replace(['&amp;','&'],'',$v)==str_replace(['&amp;','&'],'',$la)) {
 					$out .= ' selected="selected"';
 				}
 				$out .= '>'.htmlentities($v).'</option>';
@@ -2677,7 +2676,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}} else {$answerformat = '';}
 
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
@@ -2974,7 +2973,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$settings[3] = 0;
 			if (strpos($settings[4],':')!==false) {
 				$settings[4] = explode(':',$settings[4]);
-				if ($settings[4][0]{0}=='h') {
+				if ($settings[4][0][0]=='h') {
 					$sclinglbl = substr($settings[4][0],1).':0:off';
 				} else {
 					$sclinglbl = $settings[4][0];
@@ -3305,7 +3304,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
             } else {
                 $bge = '';
             }
-			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid,''];";
 			if (isset($GLOBALS['capturedrawinit'])) {
 				if (!isset($GLOBALS['drawinitdata'])) {
 					$GLOBALS['drawinitdata'] = array();
@@ -3337,14 +3336,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if ($ans=='') { continue;}
 				$function = array_map('trim',explode(',',$ans));
 				if ($answerformat[0]=='inequality') {
-					if ($function[0]{2}=='=') {
+					if ($function[0][2]=='=') {
 						$type = 10;
 						$c = 3;
 					} else {
 						$type = 10.2;
 						$c = 2;
 					}
-					$dir = $function[0]{1};
+					$dir = $function[0][1];
 					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
 				} else {
 					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
@@ -3535,7 +3534,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 			}
 			if (!empty($s3asid)) {
-				require_once(dirname(__FILE__)."/../includes/filehandler.php");
+				require_once dirname(__FILE__)."/../includes/filehandler.php";
 
 				if (substr($la,0,5)=="Error") {
 					$out .= "<br/>$la";
@@ -3573,13 +3572,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {if (isset($options['answerformat'][$qn])) { $answerformat = $options['answerformat'][$qn];}} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 
-		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
+        if (isset($options['partialcredit'][$qn])) {
+		    if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
+        }
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -3690,8 +3691,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$islist = true;
 		} else {
-			$givenan = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenan);
-			$givenan = str_replace(',','99999999',$givenan); //force wrong ans on lingering commas
+			$givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
+			$givenans = str_replace(',','99999999',$givenans); //force wrong ans on lingering commas
 			$gaarr = array($givenans);
 
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
@@ -3798,7 +3799,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		if (!in_array('orderedlist',$ansformats)) {
+		if (!in_array('orderedlist',$ansformats) && isset($gaarrcnt)) {
 			if ($gaarrcnt<=count($anarr)) {
 				$score = $correct/count($anarr);
 			} else {
@@ -3837,7 +3838,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
-		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
+        if (isset($options['partialcredit'][$qn])) {
+		    if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
+        }
 
 		if (isset($partialcredit)) {
 			if (!is_array($partialcredit)) {
@@ -3875,7 +3878,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
 		}
-		if ($givenans==='NA' || $givenans === null) {
+		if ($givenans==='NA' || $givenans === null || $givenans === '') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else {
 			$GLOBALS['partlastanswer'] = $givenans.'$!$'.$randkeys[$givenans];
@@ -3957,8 +3960,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (isset($options['answers'])) {if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
 			else if (isset($options['answer'])) {if (is_array($options['answer'][$qn])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
-		if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}
-		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
+		if (isset($options['matchlist'])) {
+            if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}
+        }
+		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = '';}
 
 		if (!is_array($questions) || !is_array($answers)) {
 			echo _('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.');
@@ -4018,7 +4023,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
@@ -4124,7 +4129,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -4277,7 +4282,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
 			//test for correct format, if specified
-			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+			if (isset($requiretimes) && checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
 				return 0;
 			}
 			$tocheck = str_replace(' ','',$_POST["tc$qn"]);
@@ -4525,7 +4530,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if (!is_array($cpts)) {
 						return 0;
 					}
-					if ($cpts[1]{0}=='+') {
+					if ($cpts[1][0]=='+') {
 						$cpts[1] = substr($cpts[1],1);
 					}
 					if ($cpts[1]!='' && $cpts[1][strlen($cpts[1])-1]=='*') {
@@ -4645,8 +4650,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}} else {$answerformat = '';}
+		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}} else {$requiretimes = '';}
 		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 
@@ -4654,7 +4659,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$givenans = normalizemathunicode($givenans);
 		$ansformats = array_map('trim',explode(',',$answerformat));
-
 
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -4913,7 +4917,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-		if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}
+        if (isset($options['variables'])) {
+		    if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}
+        }
 
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain= $options['domain'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
@@ -4928,14 +4934,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else {
 				$requiretimes = $options['requiretimes'];
 			}
-		}
+		} else {
+            $requiretimes = '';
+        }
 
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {if (isset($options['answerformat'][$qn])) {$answerformat = $options['answerformat'][$qn];}} else {$answerformat = $options['answerformat'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 
-		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
+        if (isset($options['partialcredit'][$qn])) {
+		    if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
+        }
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
@@ -5347,7 +5357,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return ($score);
 		//return $correct;
 	} else if ($anstype == "essay") {
-		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
+		require_once dirname(__FILE__)."/../includes/htmLawed.php";
 		$givenans = myhtmLawed($givenans);
 		$givenans = str_replace('~', '&tilde;', $givenans);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
@@ -5370,6 +5380,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}}
 		if (!isset($variables)) { $variables = 'x';}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
+        if (!isset($answerformat)) { $answerformat = '';}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -5560,7 +5571,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 
 		if (!isset($reltolerance)) {
 			if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
@@ -5896,12 +5907,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else {
 						$xop = $x2p;
 					}
-					$settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+					
 					if (($logloc = strpos($function[0],'log'))!==false ||
 						($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
 						$nestd = 0; $vertasy = 0;
-						$startloc = strpos($function[0],'(',$logloc!==false?$loglog:$lnloc);
+						$startloc = strpos($function[0],'(',$logloc!==false?$logloc:$lnloc);
 						for ($i = $startloc; $i<strlen($function[0]); $i++) {
 							if ($function[0][$i]=='(') {
 								$nestd++;
@@ -6738,11 +6749,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($adjdiff>$defpttol*$reltolerance) {
 						continue;
 					}
-					$adjdiff = abs($anscos[1]-$coss[$i][1]);
-					$adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-					if ($adjdiff>$defpttol*$reltolerance) {
-						continue;
-					}
+					// check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
+                        continue;
+                    }
 					if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
 						continue;
 					}
@@ -6794,20 +6805,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
 				$function = array_map('trim',explode(',',$function));
-				if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+				if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
 					$isxequals = true;
 					$function[0] = substr($function[0],1);
 				} else {
 					$isxequals = false;
 				}
-				if ($function[0]{1}=='=') {
+				if ($function[0][1]=='=') {
 					$type = 10;
 					$c = 2;
 				} else {
 					$type = 10.2;
 					$c = 1;
 				}
-				$dir = $function[0]{0};
+				$dir = $function[0][0];
 				if ($isxequals) {
 					$anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
 				} else {
@@ -7148,7 +7159,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$linepts++;
 					}
 				}
-				$linecnt++;
 			}
 			//break apart student entry
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
@@ -7260,7 +7270,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
 			}
 			//divide up over all the lines
-			$percentunmatcheddrawn = $percentunmatcheddrawn;
+
 			//if ($GLOBALS['myrights']==100) {
 			//	print_r($anslines);
 			//	print_r($linedata);
@@ -7354,7 +7364,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		$hasfile = false;
-		require_once(dirname(__FILE__)."/../includes/filehandler.php");
+		require_once dirname(__FILE__)."/../includes/filehandler.php";
 		if (trim($filename)=='') {
 			$found = false;
 			if ($_POST["lf$qn"]!='') {
@@ -7605,7 +7615,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		foreach ($answer as $ans) {
 			if (is_array($ans)) {
-				if ($ans[0]{0}=='!') {
+				if ($ans[0][0]=='!') {
 					$flip = true;
 					$ans[0] = substr($ans[0],1);
 				} else {
@@ -7624,7 +7634,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($pt==false) {
 				return 0;
-				break;
 			}
 		}
 		return 1;
@@ -7797,12 +7806,6 @@ function checkreqtimes($tocheck,$rtimes) {
 	return 1;
 }
 
-function parsesloppycomplex($v) {
-	$func = makeMathFunction($v, 'i');
-	$a = $func(['i'=>0]);
-	$apb = $func(['i'=>1]);
-	return array($a,$apb-$a);
-}
 
 //parses complex numbers.  Can handle anything, but only with
 //one i in it.
@@ -8153,7 +8156,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 			$infsoln = $anspromptp[2];
 		}
 	}
-	$out .= '<div class="'.$colorbox.'">';
+	$out = '<div class="'.$colorbox.'">';
 	$out .= '<ul class="likelines">';
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
 	if ($la=='DNE' || $la=='oo') {
@@ -8235,15 +8238,52 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
-	$str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
-	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
-	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
-	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
-	//these are the slim vector unicodes: u2329 and u232a
-	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
-	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
-	$str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
-	$str = preg_replace('/\bOO\b/i','oo', $str);
+    $str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
+    $str = str_replace(array('‒','–','—','―','−'),'-',$str);
+    $str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
+    $str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
+    //these are the slim vector unicodes: u2329 and u232a
+    $str = str_replace(array('⟨','⟩'), array('<','>'), $str);
+    $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
+    $str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
+    $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
+    $greekLetters = array(
+        'Α' => 'Alpha',   'α' => 'alpha',
+        'Β' => 'Beta',    'β' => 'beta',
+        'Γ' => 'Gamma',   'γ' => 'gamma',
+        'Δ' => 'Delta',   'δ' => 'delta',
+        'Ε' => 'Epsilon', 'ε' => 'epsilon',
+        'Ζ' => 'Zeta',    'ζ' => 'zeta',
+        'Η' => 'Eta',     'η' => 'eta',
+        'Θ' => 'Theta',   'θ' => 'theta',
+        'Ι' => 'Iota',    'ι' => 'iota',
+        'Κ' => 'Kappa',   'κ' => 'kappa',
+        'Λ' => 'Lambda',  'λ' => 'lambda',
+        'Μ' => 'Mu',      'μ' => 'mu',
+        'Ν' => 'Nu',      'ν' => 'nu',
+        'Ξ' => 'Xi',      'ξ' => 'xi',
+        'Ο' => 'Omicron', 'ο' => 'omicron',
+        'Π' => 'Pi',      'π' => 'pi',
+        'Ρ' => 'Rho',     'ρ' => 'rho',
+        'Σ' => 'Sigma',   'σ' => 'sigma',
+        'Τ' => 'Tau',     'τ' => 'tau',
+        'Υ' => 'Upsilon', 'υ' => 'upsilon',
+        'Φ' => 'Phi',     'φ' => 'phi',
+        'Χ' => 'Chi',     'χ' => 'chi',
+        'Ψ' => 'Psi',     'ψ' => 'psi',
+        'Ω' => 'Omega',   'ω' => 'omega'
+    );
+    $str = str_replace(array_keys($greekLetters), array_values($greekLetters), $str);
+
+    $str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
+    $str = str_replace('&ZeroWidthSpace;', '', $str);
+    if (strtoupper(trim($str))==='DNE') {
+        $str = 'DNE';
+    }
+    // truncate excessively long answer
+    if (strlen($str)>8000) {
+        $str = substr($str,0,8000);
+    }
 	return $str;
 }
 

@@ -2,9 +2,9 @@
 //IMathAS:  Drill Assess creator (rough version)
 //(c) 2011 David Lippman
 
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/parsedatetime.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/parsedatetime.php";
 
 
 if (!isset($teacherid)) {
@@ -14,16 +14,19 @@ if (!isset($teacherid)) {
 
 $pagetitle = "Add/Modify Drill Assessment";
 $cid = Sanitize::courseId($_GET['cid']);
-$daid = Sanitize::onlyInt($_GET['daid']);
+
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
 } else {
 	$totb = 'b';
 }
-$block = $_GET['block'];
-$stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
-$stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
-if ($stm->rowCount()==0) {
+$block = $_GET['block'] ?? '0';
+if (isset($_GET['daid'])) {
+    $daid = Sanitize::onlyInt($_GET['daid']);
+    $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
+    $stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
+}
+if (!isset($_GET['daid']) || $stm->rowCount()==0) {
 	//new to invalid
 	$itemdescr = array();
 	$itemids = array();
@@ -37,7 +40,7 @@ if ($stm->rowCount()==0) {
 	$startdate = time();
 	$enddate = time() + 7*24*60*60;
 	$avail = 1;
-	$caltag = 'D';
+    $caltag = 'D';
 } else {
 	$dadata = $stm->fetch(PDO::FETCH_ASSOC);
 	$n = $dadata['n'];
@@ -87,7 +90,7 @@ if (isset($_GET['record'])) {
 		$enddate =  2000000000;
 	}
 	$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-
+    $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
 	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>' || $_POST['summary']=='<p></p>') {
 		$_POST['summary'] = '';
 	} else {
@@ -247,13 +250,13 @@ if (isset($_GET['record'])) {
 		}
 		$searchlibs = Sanitize::encodeStringForDisplay($_POST['libs']);
 		//$_SESSION['lastsearchlibs'] = implode(",",$searchlibs);
-		$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
+		$_SESSION['lastsearchlibsD'.$daid] = $searchlibs;
 	} else if (isset($_GET['listlib'])) {
 		$searchlibs = $_GET['listlib'];
-		$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
+		$_SESSION['lastsearchlibsD'.$daid] = $searchlibs;
 		$searchall = 0;
-		$_SESSION['searchall'.$aid] = $searchall;
-		$_SESSION['lastsearch'.$aid] = '';
+		$_SESSION['searchallD'.$daid] = $searchall;
+		$_SESSION['lastsearchD'.$daid] = '';
 		$searchlikes = '';
 		$search = '';
 		$safesearch = '';
@@ -286,7 +289,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/a
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
-require("../header.php");
+require_once "../header.php";
 
 /*  Get data for question searching */
 //remember search
@@ -310,25 +313,65 @@ $searchlikevals = array();
 if (trim($safesearch)=='') {
 	$searchlikes = '';
 } else {
-	$searchterms = explode(" ",$safesearch);
-	$searchlikes = "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-	foreach ($searchterms as $t) {
-		$searchlikevals[] = "%$t%";
-	}
+    $isIDsearch = false;
 	if (substr($safesearch,0,3)=='id=') {
-		$searchlikes = "imas_questionset.id=? AND ";
-		$searchlikevals = array(substr($safesearch,3));
-	} else if (is_numeric($safesearch)) {
-		$searchlikes .= "OR imas_questionset.id=?) AND ";
-		$searchlikevals[] = $safesearch;
-	} else {
-		$searchlikes .= ") AND";
-	}
+        $searchlikes = "imas_questionset.id=? AND ";
+        $searchlikevals = array(substr($safesearch,3));
+        $isIDsearch = substr($safesearch,3);
+    } else if (ctype_digit(trim($safesearch))) {
+        $searchlikes = "imas_questionset.id=? AND ";
+        $searchlikevals = [trim($safesearch)];
+        $isIDsearch = trim($safesearch);
+    } else {
+        $searchterms = explode(" ",$safesearch);
+        $searchlikes = '';
+        foreach ($searchterms as $k=>$v) {
+            if (substr($v,0,5) == 'type=') {
+                $searchlikes .= "imas_questionset.qtype=? AND ";
+                $searchlikevals[] = substr($v,5);
+                unset($searchterms[$k]);
+            }
+        }
+        $wholewords = array();
+        foreach ($searchterms as $k=>$v) {
+            if (ctype_alnum($v) && strlen($v)>2) {
+                $wholewords[] = '+'.$v.'*';
+                unset($searchterms[$k]);
+            }
+        }
+        if (count($wholewords)==0 && !$isIDsearch && $searchall===1 && $searchmine===0) {
+            echo _('Cannot search all libraries without at least one 3+ letter word in the search terms');
+            $_SESSION['searchall'.$cid] = 0;
+            exit;
+        }
+        if (count($wholewords)>0 || count($searchterms)>0) {
+                $searchlikes .= '(';
+                if (count($wholewords)>0) {
+                    $searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+                }
+                if (count($searchterms)>0) {
+                    if (count($wholewords)>0) {
+                        $searchlikes .= 'AND ';
+                    }
+                    $searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+                    foreach ($searchterms as $t) {
+                        $searchlikevals[] = "%$t%";
+                    }
+                }
+                if (ctype_digit($safesearch)) {
+                    $searchlikes .= "OR imas_questionset.id=?) AND ";
+                    $searchlikevals[] = $safesearch;
+                    $isIDsearch = $safesearch;
+                } else {
+                    $searchlikes .= ") AND";
+                }
+        }
+    }
 }
 
-if (isset($_SESSION['lastsearchlibs'.$aid])) {
+if (isset($_SESSION['lastsearchlibsD'.$daid])) {
 	//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
-	$searchlibs = $_SESSION['lastsearchlibs'.$aid];
+	$searchlibs = $_SESSION['lastsearchlibsD'.$daid];
 } else {
 	$searchlibs = $userdeflib;
 }
@@ -373,15 +416,19 @@ if (!$beentaken) {
 			$qarr[] = $userid;
 		}
 		$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
-
+        if ($searchall==1) {
+			$query .= " LIMIT 300";
+		}
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);
 		if ($stm->rowCount()==0) {
 			$noSearchResults = true;
 		} else {
+            $searchlimited = ($stm->rowCount()==300);
 			$alt=0;
 			$lastlib = -1;
-			$i=0;
+            $i=0;
+            $ln = 0;
 			$page_questionTable = array();
 			$page_libstouse = array();
 			$page_libqids = array();
@@ -428,15 +475,15 @@ if (!$beentaken) {
 				}
 				$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform','qo$ln',". Sanitize::onlyInt($line['id']).",true,false)\"/>";
 				$page_questionTable[$i]['type'] = $line['qtype'];
-				if ($line['avgtime']>0) {
+				if ($line['meantime']>0) {
 					$page_useavgtimes = true;
-					$page_questionTable[$i]['avgtime'] = round($line['avgtime']/60,1);
+					$page_questionTable[$i]['avgtime'] = round($line['meantime']/60,1);
 				} else {
 					$page_questionTable[$i]['avgtime'] = '';
 				}
 				if ($searchall==1) {
-					$page_questionTable[$i]['lib'] = sprintf("<a href=\"addquestions.php?cid=%s&aid=%d&listlib=%s\">List lib</a>",
-                        $cid, $aid, Sanitize::encodeUrlParam($line['libid']));
+					$page_questionTable[$i]['lib'] = sprintf("<a href=\"addquestions.php?cid=%s&listlib=%s\">List lib</a>",
+                        $cid, Sanitize::encodeUrlParam($line['libid']));
 				} else {
 					$page_questionTable[$i]['junkflag'] = $line['junkflag'];
 					$page_questionTable[$i]['libitemid'] = $line['libitemid'];
@@ -458,7 +505,9 @@ if (!$beentaken) {
 					if ($hasother) {
 						$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 					}
-				}
+				} else {
+                    $page_questionTable[$i]['extref'] = '';
+                }
 
 				/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 				$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -716,14 +765,14 @@ if (!$beentaken) {
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
 		Exclude added</span>
 		<input type=submit value=Search>
-		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
+		<input type=button value="Add New Question" onclick="window.location='moddataset.php?cid=<?php echo $cid ?>'">
 
 	<br/>
 <?php
 			if ($searchall==1 && trim($search)=='') {
 				echo "Must provide a search term when searching all libraries";
 			} elseif (isset($search)) {
-				if ($noSearchResults) {
+				if (!empty($noSearchResults)) {
 					echo "<p>No Questions matched search</p>\n";
 				} else {
 ?>
@@ -790,7 +839,10 @@ if (!$beentaken) {
 				</tr>
 <?php
 					}
-				}
+                }
+                if ($searchlimited) {
+                    echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
+                }
 ?>
 			</tbody>
 		</table>
@@ -820,6 +872,6 @@ echo '</form>';
 	echo "<p>Link to view results: <a href=\"$url\">$url</a></p>" ;
 
 }*/
-require('../footer.php');
+require_once '../footer.php';
 
 ?>

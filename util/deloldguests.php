@@ -8,9 +8,9 @@
 ini_set("max_execution_time", "300");
 
 
-require("../init_without_validate.php");
-require("../includes/unenroll.php");
-require("../includes/AWSSNSutil.php");
+require_once "../init_without_validate.php";
+require_once "../includes/unenroll.php";
+require_once "../includes/AWSSNSutil.php";
 
 if (php_sapi_name() == "cli") {
 	//running command line - no need for auth code

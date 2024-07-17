@@ -22,11 +22,13 @@
         :class="{inactive: pagenum !== page}"
         :aria-hidden = "pagenum !== page"
       >
-        <div v-if = "pageData[0].questions.length === 0">
+        <div v-if = "pageData[0].questions.length === 0" class="noqtext">
           <inter-question-text-list
             pos="all"
-            :page="pagenum"
+            :textlist = "pageData"
+            :lastq = "lastQ[pagenum]"
             :active = "pagenum === page"
+            :key="'iqtp'+pagenum"
           />
         </div>
         <div v-else>
@@ -38,7 +40,8 @@
               pos="beforeexact"
               :qn="curqn"
               :key="'iqt'+curqn"
-              :page="pagenum"
+              :textlist = "pageData"
+              :lastq = "lastQ[pagenum]"
               :active = "pagenum === page"
             />
             <div>
@@ -53,9 +56,12 @@
           </div>
 
           <inter-question-text-list
+            id="aftertext"
             pos="after"
             :qn="pageData[0].questions[pageData[0].questions.length - 1]"
-            :page="pagenum"
+            :key="'iqte'+pagenum"
+            :textlist = "pageData"
+            :lastq = "lastQ[pagenum]"
             :active = "pagenum === page"
           />
         </div>
@@ -117,6 +123,15 @@ export default {
     },
     showSubmit () {
       return (store.assessInfo.submitby === 'by_assessment');
+    },
+    lastQ () {
+      const out = [];
+      let qlist;
+      for (const i in this.allPages) {
+        qlist = this.allPages[i][0].questions;
+        out[i] = qlist[qlist.length - 1];
+      }
+      return out;
     }
   },
   methods: {

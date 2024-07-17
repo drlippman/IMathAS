@@ -12,7 +12,7 @@ $query = 'CREATE TABLE `imas_federation_peers` (
 	  `secret` VARCHAR(32) NOT NULL,
 	  `url` VARCHAR(254) NOT NULL,
 	  `lastpull` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -28,7 +28,7 @@ $query = 'CREATE TABLE `imas_federation_peers` (
 	  `step` TINYINT(2) NOT NULL,
 	  `fileurl` VARCHAR(254) NOT NULL,
 	  `record` TEXT NOT NULL
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -126,7 +126,7 @@ $query = "ALTER TABLE  `imas_instr_files` CHANGE  `filename`  `filename` VARCHAR
 	return false;
  }
 			 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Federation tables added.</p>";		
 

@@ -20,6 +20,7 @@
 */
 
 function diff($old, $new){
+    $maxlen = 0;
 	foreach($old as $oindex => $ovalue){
 		$nkeys = array_keys($new, $ovalue);
 		foreach($nkeys as $nindex){
@@ -70,7 +71,7 @@ function diffsparsejson($old, $new) {
 		if (function_exists('json_encode')) {
 			return json_encode($out, JSON_INVALID_UTF8_IGNORE);
 		} else {
-			require_once("JSON.php");
+			require_once "JSON.php";
 			$jsonser = new Services_JSON();
 			return $jsonser->encode($out);
 		}
@@ -81,7 +82,7 @@ function diffapplydiff($base,$diff) {
 	if (function_exists('json_encode')) {
 		$diffs = json_decode($diff);
 	} else {
-		require_once("JSON.php");
+		require_once "JSON.php";
 		$jsonser = new Services_JSON();
 		return $jsonser->decode($diff);
 	}
@@ -178,6 +179,7 @@ function htmlDiff($old, $new){
 */
 function htmlDiff($old, $new){
 	$diff = diff(explode(' ', $old), explode(' ', $new));
+    $ret = '';
 	foreach($diff as $k){
 		if(is_array($k))
 			$ret .= (!empty($k['d'])?"<del>".implode(' ',$k['d'])."</del> ":'').

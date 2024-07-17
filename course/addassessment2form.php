@@ -1,5 +1,18 @@
 <?php
 
+if ($line['workcutoff'] == 0) {
+    $workcutofftype = 'hr';
+    $workcutoffval = 1;
+} else if ($line['workcutoff'] < 120 && $line['workcutoff']%60 != 0) {
+    $workcutofftype = 'min';
+    $workcutoffval = $line['workcutoff'];
+} else if ($line['workcutoff'] < 48*60 && $line['workcutoff']%1440 != 0) {
+    $workcutofftype = 'hr';
+    $workcutoffval = round($line['workcutoff']/60, 2);
+} else {
+    $workcutofftype = 'day';
+    $workcutoffval = round($line['workcutoff']/1440, 2);
+}
 $vueData = array(
 	'name' => $line['name'],
 	'summary' => $line['summary'],
@@ -31,9 +44,11 @@ $vueData = array(
 	'ansingb' => $line['ansingb'],
 	'gbcategory' => $line['gbcategory'],
 	'gbcatOptions' => $gbcats,
-	'caltag' => $line['caltag'],
+	'caltag' => ($line['caltag'] === 'use_name' ? '?' : $line['caltag']),
+	'caltagradio' => ($line['caltag'] === 'use_name' ? 'usename' : 'usetext'),
 	'shuffle' => ($line['shuffle']&(1+16+32)),
-	'noprint' => $line['noprint'] > 0,
+	'noprint' => ($line['noprint']&1) > 0,
+    'lockforassess' => ($line['noprint']&2) > 0,
 	'sameseed' => ($line['shuffle']&2) > 0,
 	'samever' => ($line['shuffle']&4) > 0,
 	'istutorial' => $line['istutorial'] > 0,
@@ -50,8 +65,13 @@ $vueData = array(
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
 	'showhints' => ($line['showhints']&1) > 0,
-	'showwork' => $line['showwork'],
+    'showwork' => ($line['showwork']&3),
+    'showworktype' => ($line['showwork']&4),
+    'doworkcutoff' => ($line['workcutoff'] > 0),
+    'workcutofftype' => $workcutofftype,
+    'workcutoffval' => $workcutoffval,
 	'showextrefs' => ($line['showhints']&2) > 0,
+    'showwrittenex' => ($line['showhints']&4) > 0,
 	'msgtoinstr' => $line['msgtoinstr'] > 0,
 	'doposttoforum' => $line['posttoforum'] > 0,
 	'posttoforum' => $line['posttoforum']>0 ? $line['posttoforum'] :
@@ -144,7 +164,7 @@ $vueData = array(
 				<?php echo _('Due');?>
 			</label>
 			<input type=text size=10 name="edate" v-model="edate">
-			<a href="#" onClick="displayDatePicker('edate', this); return false">
+			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', '<?php echo _('Start date');?>'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
 		</span><br class="form"/>
@@ -166,7 +186,7 @@ $vueData = array(
 		</span><br class=form />
 	</div>
 
-	<div v-show="avail==1 && edatetype=='edate'">
+	<div v-show="avail==1 && (edatetype=='edate' || datesbylti==1 || (datesbylti>0 && enddate<2000000000))">
 		<span class=form><?php echo _('Practice mode');?>:</span>
 		<span class=formright>
 			<label>
@@ -211,7 +231,7 @@ $vueData = array(
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All');?></a>
 		</div>
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.gif" alt="Collapse" />
 			<?php echo _('Core Options');?>
 		</div>
 		<div class="blockitems">
@@ -294,7 +314,7 @@ $vueData = array(
 					<?php echo _('per try');?>
 					<span v-show="defattemptpenalty>0">
 						<?php echo _('after');?>
-						<input type=number min=1 :max="Math.min(defattempts,9)" size=3 id="defattemptpenaltyaftern"
+						<input type=number min=1 :max="defattemptpenalty>0 ? Math.min(defattempts,9) : 9" size=3 id="defattemptpenaltyaftern"
 							name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern" />
 						<?php echo _('full-credit tries');?>
 					</span>
@@ -376,15 +396,15 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 			<?php echo _('Additional Display Options');?>
 		</div>
 		<div class="blockitems hidden">
 			<label class="form" for="caltag"><?php echo _('Calendar icon');?>:</label>
 			<span class="formright">
-                <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>><?php echo _('Use Text');?>:</label>
-                 <input aria-label="<?php echo _('Calendar icon text');?>" name="caltag" id="caltag" v-model="caltag" type=text size=8 <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /> <br />
-				<label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>><?php echo _('Use Assessment Name');?></label>
+                <label><input name="caltagradio" type="radio" value="usetext" v-model="caltagradio"><?php echo _('Use Text');?>:</label>
+                 <input aria-label="<?php echo _('Calendar icon text');?>" v-show="caltagradio=='usetext'" name="caltag" id="caltag" v-model="caltag" type=text size=8  /> <br />
+				<label><input name="caltagradio" type="radio" value="usename" v-model="caltagradio"><?php echo _('Use Assessment Name');?></label>
 			</span><br class="form" />
 
 			<label class=form for="shuffle"><?php echo _('Shuffle item order');?>:</label>
@@ -405,11 +425,39 @@ $vueData = array(
 					<option value="1"><?php echo _('During assessment');?></option>
 					<option value="2"><?php echo _('After assessment');?></option>
 					<option value="3"><?php echo _('During or after assessment');?></option>
-				</select>
-			</span><br class=form />
+                </select>
+                <span v-if="showwork > 1">
+                    <br>
+                    <input type="checkbox" v-model="doworkcutoff" name="doworkcutoff" id="doworkcutoff" value="1"> 
+                    <label for="doworkcutoff"><?php echo _('Add work cutoff') . '. ';  ?></label>
+                    <span v-if="doworkcutoff">
+                        <label for="workcutoffval"><?php echo _('Work must be added within:') . ' '; ?></label>
+                        <input name="workcutoffval" id="workcutoffval" v-model="workcutoffval" style="width:5.5ch" 
+                            type="number" min="0" :max="workcutofftype=='day'?45:1000"/>
+                        <select name="workcutofftype" id="workcutofftype" v-model="workcutofftype" aria-label="<?php echo _('units for work added within time');?>">
+                            <option value="min"><?php echo _('minutes');?></option>
+                            <option value="hr"><?php echo _('hours');?></option>
+                            <option value="day"><?php echo _('days');?></option>
+                        </select>
+                    </span>
+                </span>
+                <span v-if="showwork >0">
+                    <br>
+                    <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                    <select name="showworktype" id="showworktype" v-model="showworktype">
+                        <option value="0"><?php echo _('Essay');?></option>
+                        <option value="4"><?php echo _('File upload');?></option>
+                    </select>
+                </span>
+            </span><br class=form />
 
 			<span class=form><?php echo _('Options');?></span>
 			<span class=formright>
+                <label v-if="subtype == 'by_assessment'">
+					<input type="checkbox" value="2" name="lockforassess" v-model="lockforassess" />
+					<?php echo _('Lock student out of the rest of the course until submitted');?>
+                    <br/>
+				</label>
 				<label>
 					<input type="checkbox" value="1" name="noprint" v-model="noprint" />
 					<?php echo _('Make hard to print');?>
@@ -438,7 +486,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 			<?php echo _('Time Limit and Access Control');?>
 		</div>
 		<div class="blockitems hidden">
@@ -529,7 +577,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 			<?php echo _('Help and Hints');?>
 		</div>
 		<div class="blockitems hidden">
@@ -543,6 +591,11 @@ $vueData = array(
 				<label>
 					<input type="checkbox" name="showextrefs" value="2" v-model="showextrefs" />
 					<?php echo _('Show video/text buttons when available?');?>
+				</label>
+                <br/>
+				<label>
+					<input type="checkbox" name="showwrittenex" value="4" v-model="showwrittenex" />
+					<?php echo _('Show written example buttons when available?');?>
 				</label>
 			</span><br class=form />
 
@@ -603,7 +656,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 			<?php echo _('Grading and Feedback');?>
 		</div>
 		<div class="blockitems hidden">
@@ -646,6 +699,7 @@ $vueData = array(
 						<option value="2"><?php echo _('No Access');?></option>
 						<option value="0"><?php echo _('View Scores');?></option>
 						<option value="1"><?php echo _('View and Edit Scores');?></option>
+                        <option value="3"><?php echo _('View and Edit Scores, Make Exceptions');?></option>
 					</select>
 				</span><br class="form" />
 			</div>
@@ -674,7 +728,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 			<?php echo _('Group Assessment');?>
 		</div>
 		<div class="blockitems hidden">
@@ -747,10 +801,10 @@ $vueData = array(
 	</div>
 </div>
 <script type="text/javascript">
-var app = new Vue({
-	el: '#app',
-  data: <?php echo json_encode($vueData, JSON_INVALID_UTF8_IGNORE); ?>,
-	computed: {
+const { createApp } = Vue;
+createApp({
+  data: function() { return <?php echo json_encode($vueData, JSON_INVALID_UTF8_IGNORE); ?>;},
+  computed: {
 		showscoresOptions: function() {
 			var during = {
 				'value': 'during',
@@ -853,6 +907,10 @@ var app = new Vue({
 					'value': 'after_due',
 					'text': '<?php echo _('After the due date');?>'
 				},
+                {
+                    'value': 'after_lp',
+                    'text': '<?php echo _('After Latepass period');?>'
+                },
 				{
 					'value': 'immediately',
 					'text': '<?php echo _('Immediately - they can always view it');?>'
@@ -896,6 +954,10 @@ var app = new Vue({
 					'value': 'after_due',
 					'text': '<?php echo _('After the due date');?>'
 				},
+                {
+                    'value': 'after_lp',
+                    'text': '<?php echo _('After Latepass period');?>'
+                },
 				{
 					'value': 'never',
 					'text': '<?php echo _('Never');?>'
@@ -940,16 +1002,24 @@ var app = new Vue({
  				return [];
  			} else {
  				var out = [
- 					{
- 						'value': 'after_due',
- 						'text': '<?php echo _('After the due date');?>'
+                    {
+ 						'value': 'after_lp',
+ 						'text': '<?php echo _('After Latepass period');?>'
  					},
  					{
  						'value': 'never',
  						'text': '<?php echo _('Never');?>'
  					}
  				];
- 				if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
+                if (this.viewingb !== 'after_lp' && this.scoresingb !== 'after_lp') {
+                    out.unshift({
+ 						'value': 'after_due',
+ 						'text': '<?php echo _('After the due date');?>'
+ 					});
+                }
+                 if ((this.viewingb === 'after_take' || this.viewingb === 'immediately') && 
+                    this.subtype == 'by_assessment'
+                 ) {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted');?>'
@@ -963,27 +1033,6 @@ var app = new Vue({
 		}
 	},
 	methods: {
-		initCalTagRadio: function() {
-			// bind to caltagradio controls
-            // this is a hacky non-Vue approach, but sufficient
-            $('input[type=radio][name=caltagradio]').change(function() {
-                if (this.value == 'usename') {
-                    $('input[type=text][name=caltag]')
-                        .attr('data-prev', function() {return this.value;})
-                        .prop('readonly', true)
-                        .css({'color':'#FFFFFF', 'opacity':'0.6'})
-                        .val('use_name');
-                }
-                else if (this.value == 'usetext') {
-                    $('input[type=text][name=caltag]')
-                        .prop('readonly', false)
-                        .css({'color':'inherit', 'opacity':'1.0'})
-                        .val(function() {
-                            return this.getAttribute('data-prev') || '?';
-                        });
-                }
-            });
-		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -1013,10 +1062,6 @@ var app = new Vue({
 			this.showDisplayDialog = false;
 			$("#dispdetails").focus();
 		}
-	},
-    mounted: function() {
-    	// call init method
-        this.initCalTagRadio();
-    },
-});
+	}
+}).mount('#app');
 </script>

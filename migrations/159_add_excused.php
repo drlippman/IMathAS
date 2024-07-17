@@ -16,7 +16,7 @@ $query = 'CREATE TABLE `imas_excused` (
 	  INDEX (`courseid`),
 	  INDEX (`type`, `typeid`),
 	  UNIQUE (`userid`, `type`, `typeid`)
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -24,7 +24,7 @@ $query = 'CREATE TABLE `imas_excused` (
 	return false;
  }
 	 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ table imas_excused created.</p>";		
 

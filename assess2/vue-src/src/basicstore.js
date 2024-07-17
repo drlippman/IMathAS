@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { reactive, nextTick } from 'vue';
 import Router from './router';
+import { mapInterquestionTexts, mapInterquestionPages } from '@/mixins/maptexts';
 
-export const store = Vue.observable({
+export const store = reactive({
   assessInfo: null,
   APIbase: null,
   aid: null,
@@ -30,6 +31,8 @@ export const store = Vue.observable({
   timelimit_grace_expired: false,
   timelimit_restricted: 0,
   enddate_timer: null,
+  showwork_timer: null,
+  showwork_expired: false,
   show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
@@ -176,9 +179,14 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  loadQuestion (qn, regen, jumptoans) {
+  loadQuestion (qn, regen, jumptoans, skipdirtycheck) {
+    this.prepForSave('all');
     if (store.inTransit) {
       window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans), 20);
+      return;
+    } else if (store.somethingDirty && skipdirtycheck == null) {
+      // if somethingDirty, wait a bit for change event to add to autosavequeue first
+      window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans, true), 50);
       return;
     }
     store.inTransit = true;
@@ -198,10 +206,12 @@ export const actions = {
     if (store.assessInfo.preview_all) {
       data.append('preview_all', true);
     }
+
     if (Object.keys(store.autosaveQueue).length > 0) {
       actions.clearAutosaveTimer();
       this.addAutosaveData(data);
     }
+
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
@@ -229,14 +239,6 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
-        // clear drawing last answer if regen
-        if (regen && store.assessInfo.questions[qn].jsparams) {
-          for (const i in store.assessInfo.questions[qn].jsparams) {
-            if (store.assessInfo.questions[qn].jsparams[i].qtype === 'draw') {
-              window.imathasDraw.clearcanvas(i);
-            }
-          }
-        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -244,6 +246,15 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  prepForSave (qns) { // qns is array of ids, or 'all' to callback on all
+    for (let k in window.callbackstack) {
+      k = parseInt(k);
+      if (qns === 'all' || qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
+        window.callbackstack[k](k);
+      }
+    }
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
   },
   submitAssessment () {
     let warnMsg = 'header.confirm_assess_submit';
@@ -310,6 +321,7 @@ export const actions = {
     }
     if (Object.keys(data).length === 0) { // nothing to submit
       store.inTransit = false;
+      store.errorMsg = null;
       if (store.inAssess) {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
@@ -330,7 +342,7 @@ export const actions = {
       crossDomain: true
     })
       .done(response => {
-        if (response.hasOwnProperty('error')) {
+        if (response.hasOwnProperty('error') && response.error !== 'workafter_expired') {
           this.handleError(response.error);
           if (response.error === 'already_submitted') {
             response = this.processSettings(response);
@@ -342,7 +354,7 @@ export const actions = {
         }
         // copy into questions for reload later if needed
         for (const qn in store.work) {
-          Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
+          store.assessInfo.questions[parseInt(qn)].work = store.work[qn];
           delete store.work[qn];
         }
 
@@ -372,13 +384,8 @@ export const actions = {
     if (typeof qns !== 'object') {
       qns = [qns];
     }
-    for (let k in window.callbackstack) {
-      k = parseInt(k);
-      if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
-        window.callbackstack[k](k);
-      }
-    }
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+
+    this.prepForSave(qns);
 
     // figure out non-blank questions to submit
     const lastLoaded = [];
@@ -392,7 +399,6 @@ export const actions = {
       }
       if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
         changedWork = true;
-        break;
       }
     }
     if (Object.keys(changedQuestions).length === 0 && !changedWork && !endattempt) {
@@ -550,7 +556,7 @@ export const actions = {
         } else if (qns.length === 1) {
           store.assessInfo.questions[qns[0]].hadSeqNext = hasSeqNext;
           // scroll to score result
-          Vue.nextTick(() => {
+          nextTick(() => {
             var el;
             if (!hasSeqNext) {
               el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
@@ -592,15 +598,21 @@ export const actions = {
     }
   },
   doAutosave (qn, partnum, timeactive) {
+    if (store.inTransit) {
+      // wait until not in transit; don't want to add to autosavequeue then
+      // have queue cleared when intransit returns
+      window.setTimeout(() => this.doAutosave(qn, partnum, timeactive), 20);
+      return;
+    }
     store.somethingDirty = false;
     // this.clearAutosaveTimer()
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
-      Vue.set(store.autosaveQueue, qn, []);
+      store.autosaveQueue[qn] = [];
     }
     if (store.autosaveQueue[qn].indexOf(partnum) === -1) {
       store.autosaveQueue[qn].push(partnum);
     }
-    Vue.set(store.autosaveTimeactive, qn, timeactive);
+    store.autosaveTimeactive[qn] = timeactive;
     if (store.autosaveTimer === null) {
       store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 60 * 1000);
     }
@@ -608,7 +620,7 @@ export const actions = {
   clearAutosave (qns) {
     for (const i in qns) {
       if (store.autosaveQueue.hasOwnProperty(qns[i])) {
-        Vue.delete(store.autosaveQueue, qns[i]);
+        delete store.autosaveQueue[qns[i]];
       }
     }
     if (Object.keys(store.autosaveQueue).length === 0) {
@@ -624,13 +636,22 @@ export const actions = {
     // adds autosave data to existing FormData
     const lastLoaded = {};
     const tosaveqn = {};
+    let valstr;
     for (const qn in store.autosaveQueue) {
       if (skip.indexOf(qn) !== -1) {
         continue; // skip it
       }
       tosaveqn[qn] = store.autosaveQueue[qn];
+      if (store.autosaveQueue[qn].length === 1 && store.autosaveQueue[qn][0] === 0) {
+        // one part, might be single part
+        valstr = window.imathasAssess.preSubmit(qn);
+        if (valstr !== false) {
+          data.append('qn' + qn + '-val', valstr);
+        }
+      }
       // build up regex to match the inputs for all the parts we want to save
       const regexpts = [];
+      let subqn;
       for (const k in store.autosaveQueue[qn]) {
         const pn = store.autosaveQueue[qn][k];
         if (pn === 'sw') {
@@ -640,7 +661,12 @@ export const actions = {
         if (pn === 0) {
           regexpts.push(qn);
         }
-        regexpts.push((qn * 1 + 1) * 1000 + pn * 1);
+        subqn = (qn * 1 + 1) * 1000 + pn * 1;
+        regexpts.push(subqn);
+        valstr = window.imathasAssess.preSubmit(subqn);
+        if (valstr !== false) {
+          data.append('qn' + subqn + '-val', valstr);
+        }
       }
       var regex = new RegExp('^(qn|tc|qs)(' + regexpts.join('\\b|') + '\\b)');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
@@ -696,7 +722,8 @@ export const actions = {
     store.inTransit = true;
     store.autoSaving = true;
 
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    this.prepForSave(Object.keys(store.autosaveQueue));
+
     const data = new FormData();
     this.addAutosaveData(data);
 
@@ -738,7 +765,12 @@ export const actions = {
           }
           return;
         }
-        this.markAutosavesDone();
+        if (response.autosave === 'done') {
+          this.markAutosavesDone();
+          delete response.autosave;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -752,12 +784,21 @@ export const actions = {
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
       store.errorMsg = 'timesup_submitting';
+      this.prepForSave('all');
       setTimeout(() => {
         const tosub = Object.keys(this.getChangedQuestions());
         this.submitQuestion(tosub, true);
       }, 1000);
     }
     // store.timelimit_expired = true;
+  },
+  handleShowworklimitUp () {
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    store.errorMsg = 'workafter_submitting';
+    store.showwork_expired = true;
+    setTimeout(() => {
+      this.submitWork();
+    }, 1000);
   },
   handleDueDate () { // due date has hit
     actions.submitAutosave();
@@ -789,6 +830,7 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        store.inProgress = false;
         if (typeof callback === 'function') {
           callback();
         }
@@ -949,7 +991,7 @@ export const actions = {
   },
   setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {
-      Vue.set(store.initValues, qn, {});
+      store.initValues[qn] = {};
     }
     // only record initvalue if we don't already have one
     let pn = 0;
@@ -1132,7 +1174,7 @@ export const actions = {
         ) {
           response.questions[i].category = store.assessInfo.questions[iint].category;
         }
-        Vue.set(store.assessInfo.questions, iint, response.questions[i]);
+        store.assessInfo.questions[iint] = response.questions[i];
       }
       delete response.questions;
     }
@@ -1145,19 +1187,34 @@ export const actions = {
         const thisq = data.questions[i];
 
         data.questions[i].canretry = (thisq.try < thisq.tries_max);
+        data.questions[i].canretry_primary = data.questions[i].canretry;
         data.questions[i].tries_remaining = thisq.tries_max - thisq.try;
         if (thisq.hasOwnProperty('parts')) {
           let trymin = 1e10;
           let trymax = 0;
+          let canretrydet = false;
           for (const pn in thisq.parts) {
             const remaining = thisq.tries_max - thisq.parts[pn].try;
-            if (remaining < trymin) {
+            const parthasnoval = (thisq.hasOwnProperty('answeights') &&
+             parseFloat(thisq.answeights[pn]) === 0) ||
+              (thisq.parts[pn].hasOwnProperty('points_possible') &&
+              parseFloat(thisq.parts[pn].points_possible) === 0);
+            if (remaining < trymin && !parthasnoval) {
               trymin = remaining;
             }
-            if (remaining > trymax) {
+            if (remaining > trymax && !parthasnoval) {
               trymax = remaining;
             }
+            if (remaining > 0 &&
+              (!thisq.parts[pn].hasOwnProperty('rawscore') ||
+                thisq.parts[pn].rawscore < 1 ||
+                thisq.parts[pn].req_manual
+              )
+            ) {
+              canretrydet = true;
+            }
           }
+          data.questions[i].canretry_primary = canretrydet;
           if (trymin !== trymax) {
             data.questions[i].tries_remaining_range = [trymin, trymax];
           }
@@ -1204,6 +1261,18 @@ export const actions = {
       data.enddate_local = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
     }
+    if (data.hasOwnProperty('showwork_cutoff_in')) {
+      window.clearTimeout(store.showwork_timer);
+      const now = new Date().getTime();
+      const expires = data.showwork_cutoff_in * 1000;
+      data.showwork_local_cutoff_expires = now + expires;
+      if (expires > 0) {
+        store.showwork_timer = setTimeout(() => { this.handleShowworklimitUp(); }, expires);
+        store.showwork_expired = false;
+      } else {
+        store.showwork_expired = true;
+      }
+    }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       window.clearTimeout(store.timelimit_timer);
       window.clearTimeout(store.enddate_timer); // no need for it w timelimit timer
@@ -1247,92 +1316,16 @@ export const actions = {
         store.timelimit_restricted = 1;
       } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
         store.timelimit_restricted = 2;
+      } else {
+        store.timelimit_restricted = 0;
       }
     }
     if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {
       // map and override previous interquestion_text, if map defined
-      let lasttext = -1;
-      const origtexts = data.interquestion_text;
-      const newtexts = [];
-      for (const i in data.questions) {
-        if (data.questions[i].hasOwnProperty('text')) {
-          const thistext = data.questions[i].text;
-          if (JSON.stringify(thistext) === JSON.stringify(lasttext)) { // same one
-            for (let j = 0; j < thistext.length; j++) {
-              newtexts[newtexts.length - 1 - j].displayUntil = i;
-            }
-          } else {
-            for (let j = 0; j < thistext.length; j++) {
-              newtexts.push(Object.assign({ orig: 1e5 }, origtexts[thistext[j]]));
-              newtexts[newtexts.length - 1].displayBefore = i;
-              newtexts[newtexts.length - 1].displayUntil = i;
-            }
-            lasttext = thistext.slice();
-          }
-        } else {
-          lasttext = -1;
-        }
-      }
-      for (const i in origtexts) {
-        if (origtexts[i].hasOwnProperty('displayBefore')) {
-          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
-        }
-        if (origtexts[i].hasOwnProperty('atend')) {
-          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
-          newtexts[newtexts.length - 1].displayBefore = data.questions.length;
-          newtexts[newtexts.length - 1].displayUntil = data.questions.length;
-        }
-      }
-      if (newtexts.length > 0) {
-        newtexts.sort(function (a, b) {
-          if (parseInt(a.displayBefore) === parseInt(b.displayBefore)) {
-            return (a.orig - b.orig);
-          } else {
-            return a.displayBefore - b.displayBefore;
-          }
-        });
-        data.interquestion_text = newtexts;
-      }
+      mapInterquestionTexts(data, data.questions);
     }
     if (data.hasOwnProperty('interquestion_text')) {
-      data.interquestion_pages = [];
-      let lastDisplayBefore = 0;
-      // ensure proper data type on these
-      for (const i in data.interquestion_text) {
-        data.interquestion_text[i].displayBefore = parseInt(data.interquestion_text[i].displayBefore);
-        data.interquestion_text[i].displayUntil = parseInt(data.interquestion_text[i].displayUntil);
-        data.interquestion_text[i].forntype = (parseInt(data.interquestion_text[i].forntype) > 0);
-        data.interquestion_text[i].ispage = (parseInt(data.interquestion_text[i].ispage) > 0);
-        if (data.interquestion_text[i].ispage) {
-          // if a new page, start a new array in interquestion_pages
-          // first, add a question list to the previous page
-          if (data.interquestion_pages.length > 0) {
-            const qs = [];
-            for (let j = lastDisplayBefore; j < data.interquestion_text[i].displayBefore; j++) {
-              qs.push(j);
-            }
-            lastDisplayBefore = data.interquestion_text[i].displayBefore;
-            data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
-          }
-          // now start new page
-          data.interquestion_pages.push([data.interquestion_text[i]]);
-        } else if (data.interquestion_pages.length > 0) {
-          // if we've already started pages, push this to the current page
-          data.interquestion_pages[data.interquestion_pages.length - 1].push(data.interquestion_text[i]);
-        }
-      }
-      // if we have pages, add a question list to the last page
-      if (data.interquestion_pages.length > 0) {
-        const qs = [];
-        for (let j = lastDisplayBefore; j < data.questions.length; j++) {
-          qs.push(j);
-        }
-        data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
-        // don't delete, as we may use it for print version
-        // delete data.interquestion_text;
-      } else {
-        delete data.interquestion_pages;
-      }
+      mapInterquestionPages(data, data.questions);
     }
     if (data.hasOwnProperty('noprint') && data.noprint === 1) {
       // want to block printing - inject print styles
@@ -1356,6 +1349,9 @@ export const actions = {
       } else if (data.useMQ === false && store.enableMQ) {
         this.disableMQ();
       }
+    }
+    if (data.hasOwnProperty('name')) {
+      window.document.title = data.name;
     }
     return data;
   }

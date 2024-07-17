@@ -3,11 +3,11 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
-if ($courseUIver > 1) {
+if (isset($courseUIver) && $courseUIver > 1) {
 	if (!isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));
@@ -51,7 +51,7 @@ if (isset($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 	$stm->execute(array(intval($_GET['id'])));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($row === null || $row['courseid'] != $_GET['cid']) {
+	if ($row === false || $row['courseid'] != $_GET['cid']) {
 		echo "Invalid ID";
 		exit;
 	} else if ($row['ver']>1) {
@@ -60,7 +60,7 @@ if (isset($_GET['id'])) {
 			exit;
 		}
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
-			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
+			$GLOBALS['basesiteurl'], $cid, Sanitize::onlyInt($_GET['id'])));
 	}
 }
 
@@ -71,19 +71,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-        $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
-        $block = $_GET['block'];
+        $block = $_GET['block'] ?? '';
 
-				if (isset($_GET['id'])) {
-					$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-					$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
-					$taken = ($stm->fetchColumn(0)>0);
-				} else {
-					$taken = false;
-				}
+        if (isset($_GET['id'])) {
+            $assessmentId = Sanitize::onlyInt($_GET['id']);
+            $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+            $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
+            $taken = ($stm->fetchColumn(0)>0);
+        } else {
+            $taken = false;
+        }
 
         $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
         $stm->execute(array($cid));
@@ -92,7 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
             	$DBH->beginTransaction();
-                require_once('../includes/filehandler.php');
+                require_once '../includes/filehandler.php';
                 deleteallaidfiles($assessmentId);
 								$grades = array();
 								$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -145,7 +145,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        	$assessName = _('Unnamed Assessment');
 	        }
 	        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-	        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
+	        $defpoints = Sanitize::onlyInt($_POST['defpoints'] ?? 0);
 	        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
 	        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
 	        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
@@ -157,12 +157,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
 	        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
 	        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
-	        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
+	        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret'] ?? '');
 	        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
 	        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
         	$DBH->beginTransaction();
-            require_once("../includes/parsedatetime.php");
+            require_once "../includes/parsedatetime.php";
             if ($_POST['avail']==1) {
                 if ($_POST['sdatetype']=='0') {
                     $startdate = 0;
@@ -450,7 +450,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 				//update ptsposs field
 				if (isset($_POST['defpoints'])) {
-					require_once("../includes/updateptsposs.php");
+					require_once "../includes/updateptsposs.php";
 					updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
 				}
 			}
@@ -636,6 +636,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $line['ltisecret'] = '';
                 $line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
                 $line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
+                $line['istutorial'] = 0;
                 $usedeffb = false;
                 $deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
                 $gbcat = 0;
@@ -707,11 +708,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $lptime = $deftime;
             }
 
-            if ($line['defpenalty']{0}==='L') {
+            if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='L') {
                 $line['defpenalty'] = substr($line['defpenalty'],1);
                 $skippenalty=10;
-            } else if ($line['defpenalty']{0}==='S') {
-                $skippenalty = $line['defpenalty']{1};
+            } else if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
+                $skippenalty = $line['defpenalty'][1];
                 $line['defpenalty'] = substr($line['defpenalty'],2);
             } else {
                 $skippenalty = 0;
@@ -741,7 +742,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             if (isset($_GET['id'])) {
                 $page_formActionTag .= "&id=" . Sanitize::onlyInt($_GET['id']);
             }
-            $page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder']), Sanitize::encodeUrlParam($_GET['from']));
+            $page_formActionTag .= sprintf("&from=%s", Sanitize::encodeUrlParam($_GET['from'] ?? ''));
             $page_formActionTag .= "&tb=" . Sanitize::encodeUrlParam($totb);
             $stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
             $stm->execute(array(':courseid'=>$cid));
@@ -756,7 +757,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
             $stm->execute(array(':courseid'=>$cid));
-            $page_gbcatSelect = array();
+            $page_gbcatSelect = array('val'=>[], 'label'=>[]);
             $i=0;
             if ($stm->rowCount()>0) {
                 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -853,7 +854,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -1187,7 +1188,7 @@ if ($overwriteBody==1) {
 		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Additional Display Options
 		 </div>
 		 <div class="blockitems hidden">
@@ -1238,7 +1239,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand"/>
 		   Time Limit and Access Control
 		 </div>
 		 <div class="blockitems hidden">
@@ -1294,7 +1295,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand"/>
 		   Help and Hints
 		 </div>
 		 <div class="blockitems hidden">
@@ -1355,7 +1356,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Grading and Feedback
 		 </div>
 		 <div class="blockitems hidden">
@@ -1428,7 +1429,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
 		   Group Assessment
 		 </div>
 		 <div class="blockitems hidden">
@@ -1464,5 +1465,5 @@ if ($overwriteBody==1) {
 	</form>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

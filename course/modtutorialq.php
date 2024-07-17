@@ -1,12 +1,12 @@
 <?php
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 if ($myrights<20) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You need to log in as a teacher to access this page";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -43,6 +43,7 @@ if (!isset($_GET['aid'])) {
 }
 $now = time();
 $editmsg = '';
+$frompot = 0;
 
 if (isset($_POST['text'])) {
 	if (!isset($_GET['id'])) {
@@ -369,10 +370,10 @@ if (isset($_POST['text'])) {
 		$editmsg .=  "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 	} else {
 		if ($frompot==1) {
-			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
+			$editmsg .=  "<a href=\"modquestion2.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+			$editmsg .=  "<a href=\"modquestion2.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
 		}
-		$editmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
+		$editmsg .=  "<a href=\"addquestions2.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 	}
 
 	//update libraries
@@ -759,9 +760,9 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	} else {
 		$author = implode(", mb ",$namelist);
 	}
-	foreach ($line as $k=>$v) {
+	/*foreach ($line as $k=>$v) {
 		$line[$k] = str_replace('&','&amp;',$v);
-	}
+	}*/
 
 	$inlibs = array();
 
@@ -864,25 +865,27 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
-	require_once("../assessment/interpret5.php");
+	require_once "../assessment/interpret5.php";
 	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $answerformat, $scoremethod, $qshuffle, $variables, $keepcode, $randvars) = getqvalues($code,$type);
 	$partial = array();
 	for ($n=0;$n<$nparts;$n++) {
 		$partial[$n] = array();
-		for ($i=0;$i<count($partialcredit[$n]);$i+=2) {
-			if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
-				$questions[$n][floor($i/2)] = $partialcredit[$n][$i];
-				if ($partialcredit[$n][$i]==$answer[$n]) {
-					$answerloc[$n] = floor($i/2);
-				}
-				$partial[$n][floor($i/2)] = $partialcredit[$n][$i+1];
-			} else if ($qtype[$n]=="choices") {
-				$partial[$n][$partialcredit[$n][$i]] = $partialcredit[$n][$i+1];
-			}
-		}
-		if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
-			$answer[$n] = $answerloc[$n];
-		}
+        if (isset($partialcredit[$n])) {
+            for ($i=0;$i<count($partialcredit[$n]);$i+=2) {
+                if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
+                    $questions[$n][floor($i/2)] = $partialcredit[$n][$i];
+                    if ($partialcredit[$n][$i]==$answer[$n]) {
+                        $answerloc[$n] = floor($i/2);
+                    }
+                    $partial[$n][floor($i/2)] = $partialcredit[$n][$i+1];
+                } else if ($qtype[$n]=="choices") {
+                    $partial[$n][$partialcredit[$n][$i]] = $partialcredit[$n][$i+1];
+                }
+            }
+            if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
+                $answer[$n] = $answerloc[$n];
+            }
+        }
 	}
 	if ($nhints>0) { //strip out hints para
 		$qtext = substr($qtext, strpos($qtext,'</p>')+4);
@@ -980,9 +983,9 @@ $ansfmtlbl = array("none","any fraction","reduced fraction","fraction or decimal
 
 $useeditor = "text,popuptxt";
 
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js"></script>';
-$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror.css">';
 $placeinhead .= '<style type="text/css">
   .txted {
     padding-left: 1px;
@@ -1000,11 +1003,11 @@ $placeinhead .= '<style type="text/css">
  </style>';
 
 $flexwidth = true;
-require("../header.php");
+require_once "../header.php";
 
 if (isset($_GET['aid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+	echo "&gt; <a href=\"addquestions2.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 
 } else if (isset($_GET['daid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -1027,7 +1030,7 @@ echo '<div id="headermoddataset" class="pagetitle">';
 echo "<h1>$addmod Tutorial Question</h1>\n";
 echo '</div>';
 
-if ($editmsg != '' || $_GET['id']!='new') {
+if ($editmsg != '' || $id!='new') {
 	echo '<p>'.$editmsg;
 	if ($id!='new') {
 		echo ' <a href="moddataset.php?cid='.$cid.'&id='.$id.'">Open in the regular question editor</a>';
@@ -1314,7 +1317,7 @@ if (trim($randvars)=='') {
 calculations you'll need to display simplified values below. <a href="#" onclick="$('#randvarsexamples').show();return false;">Example</a></p>
 <div id="randvarsexamples" style="display:none;">
 <p>Example: Suppose we wanted to ask a Numeric expression randomized question like: Add 2/3 + 3/5</p>
-<table>
+<table role="presentation">
 <tr><td><code>$d1,$d2 = diffrands(3,7,2)</code></td><td> Pick two different random values for the denominators</br>
 <tr><td><code>$n1 = rand(1,$d1-1) where (gcd($n1,$d1)==1)</code></td><td>Pick a numerator that is relatively prime with the denominator</br>
 <tr><td><code>$n2 = rand(1,$d2-1) where (gcd($n2,$d2)==1)</code></td><td>ditto</br>
@@ -1338,7 +1341,7 @@ parts.</p>
 
 <?php
 for ($n=0;$n<10;$n++) {
-	if (!isset($qparts[$n])) { $qparts[$n] = 4;}
+	if (!isset($qparts[$n])) { $qparts[$n] = 4; $qtype[$n] = 'choices';}
 	echo '<div id="partwrapper'.$n.'"';
 	if ($n>=$nparts) {echo ' style="display:none;"';};
 	echo '>';
@@ -1361,15 +1364,15 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'mc" ';
 	if (isset($qtype[$n]) && $qtype[$n]!='choices') {echo ' style="display:none;"';};
 	echo '> choices.  Display those ';
-	writeHtmlSelect("qdisp$n",$dispval,$displbl, $qdisp[$n]);
+	writeHtmlSelect("qdisp$n",$dispval,$displbl, $qdisp[$n] ?? 'vert');
 	echo '. Shuffle: ';
-	writeHtmlSelect("qshuffle$n",$shuffleval,$shufflelbl, $qshuffle[$n]);
+	writeHtmlSelect("qshuffle$n",$shuffleval,$shufflelbl, $qshuffle[$n] ?? 'all');
 	echo '</span>';
 	//numeric
 	echo '<span id="qti'.$n.'num" ';
 	if ($qtype[$n]!='number') {echo ' style="display:none;"';};
 	echo '> values that will receive feedback. Use a(n) ';
-	writeHtmlSelect("qtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	writeHtmlSelect("qtol$n",$qtolval,$qtollbl, $qtol[$n] ?? 'abs');
 
 	echo ' tolerance of <input autocomplete="off" name="tol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="numboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):5).'"/>.';
@@ -1379,7 +1382,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'calc" ';
 	if ($qtype[$n]!='calculated') {echo ' style="display:none;"';};
 	echo '> numeric expressions that will receive feedback. Use a(n) ';
-	writeHtmlSelect("calcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	writeHtmlSelect("calcqtol$n",$qtolval,$qtollbl, $qtol[$n] ?? 'abs');
 	echo ' tolerance of <input autocomplete="off" name="calctol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="calcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
 	echo ' Answer format: ';// <select name="answerformat'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?$variables[$n]:'x').'"/>.';
@@ -1390,7 +1393,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'func" ';
 	if ($qtype[$n]!='numfunc') {echo ' style="display:none;"';};
 	echo '> algebraic expressions that will receive feedback. Use a(n) ';
-	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n] ?? 'abs');
 	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
 	echo ' Variables: <input autocomplete="off" name="variables'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?Sanitize::encodeStringForDisplay($variables[$n]):'x').'"/>.';
@@ -1422,12 +1425,12 @@ for ($n=0;$n<10;$n++) {
 	} else {
 		echo '<div class="hasparts'.$n.'" style="display:none;">';
 	}
-	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
+	echo '<table class="choicetbl"><caption class="sr-only">Answers</caption><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
 	for ($i=0;$i<6;$i++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};
 		echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
-		if (($qtype[$n]=='choices' && $i==$answer[$n]) || ($qtype[$n]!='choices' && isset($partial[$n][$i]) && $partial[$n][$i]==1)) {echo 'checked="checked"';}
+		if (($qtype[$n]=='choices' && isset($answer[$n]) && $i==$answer[$n]) || ($qtype[$n]!='choices' && isset($partial[$n][$i]) && $partial[$n][$i]==1)) {echo 'checked="checked"';}
 		echo '/></td>';
 		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?Sanitize::encodeStringForDisplay($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?Sanitize::encodeStringForDisplay($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
@@ -1500,5 +1503,5 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 
 </form>
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

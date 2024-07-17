@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use DOMDocument;
 use ZipArchive;
@@ -36,23 +36,35 @@ class FileScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
-        if (isset($options['answer'])) {if ($multi) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        $optionkeys = ['answerformat', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $answer = getOptionVal($options, 'answer', $multi, $partnum, 1);
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
+        $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name'] ?? ''));
         $filename = preg_replace('/[^\w\.]/','',$filename);
         $hasfile = false;
-        require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
+        require_once dirname(__FILE__)."/../../../includes/filehandler.php";
         if (trim($filename)=='') {
             if (is_string($givenans) && substr($givenans,0,5) === '@FILE') { // has an autosaved file
                 $scorePartResult->setLastAnswerAsGiven($givenans);
                 if ($answerformat=='excel') {
                   // TODO if we want to resurrect this
-                    /*$zip = new ZipArchive;
-                    if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
+                    $filepath = getasidfilepath(substr($givenans,6,-1));
+                    $fileloc = 'local';
+                    if (substr($filepath,0,4)=='http') {
+                        $fileloc = 'remote';
+                        //remote file; make temp local copy
+                        $tempFile = tempnam(sys_get_temp_dir(), 'excelfile');
+                        copy($filepath, $tempFile);
+                        $filepath = $tempFile;
+                    }
+                    
+                    $zip = new ZipArchive;
+                    if ($zip->open($filepath)) {
                         $doc = new DOMDocument();
                         $doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
                         $zip->close();
@@ -60,12 +72,18 @@ class FileScorePart implements ScorePart
                         $scorePartResult->addScoreMessage(_(' Unable to open Excel file'));
                         $scorePartResult->setRawScore(0);
                         return $scorePartResult;
-                    }*/
+                    }
+                    if ($fileloc == 'remote') {
+                        unlink($filepath);
+                    }
                 }
                 $hasfile = true;
+                if ($scoremethod == 'filesize') {
+                    $filesize = getfilesize('adata', 'adata/'.substr($givenans,6,-1));
+                }
             } else {
                 $scorePartResult->setLastAnswerAsGiven('');
-                if (isset($scoremethod) && $scoremethod=='takeanythingorblank') {
+                if (!empty($scoremethod) && $scoremethod=='takeanythingorblank') {
                     $scorePartResult->setRawScore(1);
                     return $scorePartResult;
                 } else {
@@ -122,10 +140,10 @@ class FileScorePart implements ScorePart
                 if ($answerformat=='excel') {
                     $zip = new ZipArchive;
                     if ($zip->open($_FILES["qn$qn"]['tmp_name'])) {
-                        echo "opened excel";
+                        //echo "opened excel";
                         $doc = new DOMDocument();
                         if ($doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'))) {
-                            echo "read into doc";
+                            //echo "read into doc";
                         }
 
                         $zip->close();
@@ -137,6 +155,9 @@ class FileScorePart implements ScorePart
                 }
 
                 $s3object = "adata/$s3asid/$filename";
+                if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+                    $filesize = $_FILES["qn$qn"]['size'];
+                }
                 if (storeuploadedfile("qn$qn",$s3object)) {
                     $scorePartResult->setLastAnswerAsGiven("@FILE:$s3asid/$filename@");
                     $scorePartResult->addScoreMessage(_("Successful"));
@@ -162,18 +183,20 @@ class FileScorePart implements ScorePart
                 return $scorePartResult;
             }
         }
-        if (isset($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
+        if (!empty($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+        } else if ($scoremethod=='filesize' && $filesize == $answer) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else {
-            if ($answerformat=='excel') {
+            if ($answerformat=='excel' && is_array($answer) && !empty($doc)) {
                 $doccells = array();
                 $els = $doc->getElementsByTagName('c');
                 foreach ($els as $el) {
                     $doccells[$el->getAttribute('r')] = $el->getElementsByTagName('v')->item(0)->nodeValue;
                 }
                 $pts = 0;
-
                 foreach ($answer as $cell=>$val) {
                     if (!isset($doccells[$cell])) {continue;}
                     if (is_numeric($val)) {

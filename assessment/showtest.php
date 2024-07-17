@@ -2,11 +2,11 @@
 //IMathAS:  Frontend of testing engine - manages administration of assessments
 //(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 	//Look to see if a hook file is defined, and include if it is
 	if (isset($CFG['hooks']['assessment/showtest'])) {
-		require(__DIR__.'/../'.$CFG['hooks']['assessment/showtest']);
+		require_once __DIR__.'/../'.$CFG['hooks']['assessment/showtest'];
 	}
 
 	if (!isset($CFG['TE']['navicons'])) {
@@ -33,14 +33,14 @@
 	$actas = false;
 	$isreview = false;
 	if (isset($teacherid) && isset($_GET['actas'])) {
-		$userid = $_GET['actas'];
+		$userid = Sanitize::onlyInt($_GET['actas']);
 		unset($teacherid);
 		$actas = true;
 	}
 	$isRealStudent = (isset($studentid) && !$actas && !isset($_SESSION['stuview']));
 	$latepasses = 0;
 	if (!isset($_SESSION['stuview'])) { //want to load for actas too
-		require_once("../includes/exceptionfuncs.php");
+		require_once "../includes/exceptionfuncs.php";
 		if ($isRealStudent) {
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 			$latepasses = $studentinfo['latepasses'];
@@ -52,9 +52,9 @@
 	$inexception = false;
 	$exceptionduedate = 0;
 
-	include("displayq2.php");
-	include("testutil.php");
-	include("asidutil.php");
+	require_once "displayq2.php";
+	require_once "testutil.php";
+	require_once "asidutil.php";
 
 	//error_reporting(0);  //prevents output of error messages
 
@@ -130,7 +130,7 @@
 		}
 		if ($isreview && $canuselatepass && !isset($_GET['goreview'])) {
 			//ask them if they're sure they want review mode vs latepass
-			require("header.php");
+			require_once "header.php";
 			showEnterAssessmentBreadcrumbs($adata['name']);
 			echo '<p>'._('This assessment is past the due date, and is now in un-graded review mode where no scores will be saved.').'</p>';
 			echo '<p>'.sprintf(_('You have %d LatePass(es) available which you could use to re-open the assignment for scored work.'), $latepasses).'</p>';
@@ -138,11 +138,11 @@
 			echo _('This will re-open the assessment for graded work').'</p>';
 			echo '<p><a href="showtest.php?cid='.$cid.'&id='.$aid.'&goreview=true">'.('Continue in Review Mode').'</a> ';
 			echo '<span class="noticetext">'._('If you open the assessment in un-graded review mode now, you will not be able to use a LatePass later').'</span></p>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		if ($assessmentclosed) {
-			require("header.php");
+			require_once "header.php";
 			showEnterAssessmentBreadcrumbs($adata['name']);
 			if ($now<$activestartdate) {
 				echo '<p>', _('This assessment is not available yet'), '</p>';
@@ -171,7 +171,7 @@
 					}
 				}
 			}
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 		//check reqscore
@@ -198,7 +198,7 @@
 
 				if ($adata['reqscoretype']&2) { //using percent-based
 					if ($reqscoreptsposs==-1) {
-						require("../includes/updateptsposs.php");
+						require_once "../includes/updateptsposs.php";
 						$reqscoreptsposs = updatePointsPossible($adata['reqscoreaid']);
 					}
 					if (round(100*$prereqscoretot/$reqscoreptsposs,1)+.02<abs($adata['reqscore'])) {
@@ -209,7 +209,7 @@
 				}
 			}
 			if ($isBlocked) {
-				require("header.php");
+				require_once "header.php";
 				echo '<h2>'._('You cannot start this assessment yet.').'</h2>';
 				echo '<p>';
 				printf(_('Access to this assessment requires a score of %d%s on %s'),
@@ -217,7 +217,7 @@
 					($adata['reqscoretype']&2)?'%':_(' points'),
 					Sanitize::encodeStringForDisplay($reqscorename));
 				echo '</p>';
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 
@@ -259,7 +259,7 @@
 				$adata['password'] = '';
 			} else {
 				echo "<p>Not authorized from this computer</p>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -279,7 +279,7 @@
 				}
 			}
 			if ($pwfail) {
-				require("../header.php");
+				require_once "../header.php";
 				showEnterAssessmentBreadcrumbs($adata['name']);
 				echo $out;
 				echo '<h1>'.$adata['name'].'</h1>';
@@ -287,12 +287,12 @@
 					echo '<p>' . _("This assessment requires the use of Remote Proctor Now (RPNow).") . '</p>';
 				} else {
 					echo '<p>', _('Password required for access.'), '</p>';
-					echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&amp;id={$_GET['id']}\">";
+					echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&amp;id=$aid\">";
 					echo "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
 					echo '<input type=submit value="', _('Submit'), '" />';
 					echo "</form>";
 				}
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 		}
@@ -422,12 +422,12 @@
 				$_SESSION['isteacher']=false;
 			}
 			if ($actas) {
-				$_SESSION['actas']=$_GET['actas'];
+				$_SESSION['actas']=Sanitize::onlyInt($_GET['actas']);
 				$_SESSION['isreview'] = false;
 			} else {
 				unset($_SESSION['actas']);
 			}
-			if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
+			if (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader')!==false) {
 				$_SESSION['intreereader'] = true;
 			} else {
 				$_SESSION['intreereader'] = false;
@@ -460,7 +460,7 @@
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" ||
 			if ($myrights<6 || isset($teacherid) || isset($tutorid)) {  // is teacher or guest - delete out out assessment session
-				require_once("../includes/filehandler.php");
+				require_once "../includes/filehandler.php";
 				//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
 				deleteasidfilesbyquery2('userid',$userid,$aid,1);
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
@@ -477,7 +477,7 @@
 				$_SESSION['isteacher']=false;
 			}
 			if ($actas) {
-				$_SESSION['actas']=$_GET['actas'];
+				$_SESSION['actas']=Sanitize::onlyInt($_GET['actas']);
 				$_SESSION['isreview'] = false;
 			} else {
 				unset($_SESSION['actas']);
@@ -805,7 +805,7 @@
 		//check for past time limit, with some leniency for javascript timing.
 		//want to reject if javascript was bypassed
 		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],10)) {
-			require("header.php");
+			require_once "header.php";
 			showEnterAssessmentBreadcrumbs($testsettings['name']);
 			echo '<p>';
 			if (isset($_POST['asidverify'])) {
@@ -922,7 +922,7 @@
 				}
 			}
 		} else {
-			$toclear = $_GET['reattempt'];
+			$toclear = Sanitize::onlyInt($_GET['reattempt']);
 			if ($attempts[$toclear]<$qi[$questions[$toclear]]['attempts'] || $qi[$questions[$toclear]]['attempts']==0) {
 				//$scores[$toclear] = -1;
 				if (!in_array($toclear,$reattempting)) {
@@ -981,7 +981,7 @@
 		$_SESSION['lastregen'] = $now;
 		if ($doexit) { exit;}
 		srand();
-		$toregen = $_GET['regen'];
+		$toregen = Sanitize::onlyInt($_GET['regen']);
 
 		if ($qi[$questions[$toregen]]['fixedseeds'] !== null && $qi[$questions[$toregen]]['fixedseeds'] != '') {
 			$fs = explode(',',$qi[$questions[$toregen]]['fixedseeds']);
@@ -1096,7 +1096,7 @@
 				}
 			}
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
 			deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
@@ -1109,7 +1109,7 @@
 
 	}
 	if (isset($_GET['jumptoans']) && $testsettings['showans']==='J') {
-		$tojump = $_GET['jumptoans'];
+		$tojump = Sanitize::onlyInt($_GET['jumptoans']);
 		$attempts[$tojump]=$qi[$questions[$tojump]]['attempts'];
 		if ($scores[$tojump]<0){
 			$scores[$tojump] = 0;
@@ -1184,15 +1184,15 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			.LPshowcorrect .LPresbar, .LPshowwrong  .LPresbar {background-color: #FFFFFF;}
 			</style>';
 	}
-	if ($_SESSION['intreereader']) {
+	if (!empty($_SESSION['intreereader'])) {
 		$flexwidth = true;
 	}
-	require("header.php");
+	require_once "header.php";
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
 
-	if (!$isdiag && !$isltilimited && !$_SESSION['intreereader']) {
+	if (!$isdiag && !$isltilimited && empty($_SESSION['intreereader'])) {
 		if (isset($_SESSION['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$_SESSION['coursename']}</a> ";
 			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$_SESSION['actas']}\">", _('Gradebook Detail'), "</a> ";
@@ -1283,7 +1283,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
 			$loginfo = "$userfullname creating group. ";
 			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("../includes/password.php");
+				require_once "../includes/password.php";
 			}
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
@@ -1307,7 +1307,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					if ($stm->rowCount()>0) {
 						$row = $stm->fetch(PDO::FETCH_NUM);
 						if ($row[1]>0) {
-							echo "<p>", _(sprintf('%s already has a group.  No change made'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
+							echo "<p>", _(sprintf('%s already has a group.  No change made', Sanitize::encodeStringForDisplay($thisusername))), "</p>";
 							$loginfo .= "$thisusername already in group. ";
 						} else {
 							$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid,:stugroupid)");
@@ -1327,7 +1327,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
 							//$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
 							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
-							echo "<p>", _(sprintf('%s added to group, overwriting existing attempt.'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
+							echo "<p>", _(sprintf('%s added to group, overwriting existing attempt.', Sanitize::encodeStringForDisplay($thisusername))), "</p>";
 							$loginfo .= "$thisusername switched to group. ";
 						}
 					} else {
@@ -1338,7 +1338,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES (:userid,$fieldphs)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':userid'=>$_POST['user'.$i]) + $rowgrptest);
-						echo "<p>", _(sprintf('%s added to group.'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
+						echo "<p>", _(sprintf('%s added to group.', Sanitize::encodeStringForDisplay($thisusername))), "</p>";
 						$loginfo .= "$thisusername added to group. ";
 					}
 				}
@@ -1417,7 +1417,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 			echo '<p><input type=submit name="grpsubmit" value="', _('Record Group and Continue'), '"/></p>';
 			echo '</form>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -1447,7 +1447,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		$stm = $DBH->prepare("SELECT LastName, FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_SESSION['actas']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo $row[1].' '.$row[0];
+		echo '<span class="pii-full-name">'.$row[1].' '.$row[0].'</span>';
 		echo '<p>';
 	}
 	echo '<div class="clear"></div>';
@@ -1580,7 +1580,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		//}
 	}
 } else {
-	require_once("../filter/filter.php");
+	require_once "../filter/filter.php";
 }
 	//identify question-specific  intro/instruction
 	//comes in format [Q 1-3] in intro
@@ -1678,7 +1678,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 		} else if ($_GET['action']=="shownext") {
 			if (isset($_GET['score'])) {
-				$last = $_GET['score'];
+				$last = intval($_GET['score']);
 
 				if ($_POST['verattempts']!=$attempts[$last]) {
 					echo "<p>", _('The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.'), "</p>";
@@ -1732,7 +1732,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					$done = true;
 				}
 			} else if (isset($_GET['to'])) {
-				$toshow = $_GET['to'];
+				$toshow = intval($_GET['to']);
 				$done = false;
 			}
 
@@ -1776,7 +1776,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		} else if ($_GET['action']=="skip") {
 
 			if (isset($_GET['score'])) { //score a problem
-				$qn = $_GET['score'];
+				$qn = Sanitize::onlyInt($_GET['score']);
 
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>", _('This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.'), "</p>";
@@ -1941,7 +1941,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo "</div>\n";
 			    }
 			} else if (isset($_GET['to'])) { //jump to a problem
-				$next = $_GET['to'];
+				$next = Sanitize::onlyInt($_GET['to']);
 				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\"  class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
 
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat'],$testsettings['extrefs']);
@@ -2053,7 +2053,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 		} else if ($_GET['action']=="seq") {
 			if (isset($_GET['score'])) { //score a problem
-				$qn = $_GET['score'];
+				$qn = intval($_GET['score']);
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>", _('The last question has been submitted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.'), "</p>";
 				} else {
@@ -2138,7 +2138,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			}
 			if (isset($_GET['to'])) { //jump to a problem
-				$toshow = $_GET['to'];
+				$toshow = intval($_GET['to']);
 			}
 			if ($done || isset($_GET['done'])) { //are all done
 
@@ -2196,9 +2196,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			endtest($testsettings);
 			if ($shown) {leavetestmsg();}
 		} else if ($_GET['action']=='scoreembed') {
-			$qn = $_POST['toscore'];
+			$qn = intval($_POST['toscore']);
 			$colors = array();
-			$page = $_GET['page'];
+			$page = intval($_GET['page']);
 			$divopen = false;
 			if ($_POST['verattempts']!=$attempts[$qn]) {
 				echo '<div class="prequestion">';
@@ -2354,7 +2354,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			showqinfobar($qn,true,false,true);
 
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
-			if ($introhaspages || $_SESSION['intreereader']) {
+			if ($introhaspages || !empty($_SESSION['intreereader'])) {
 				echo 'embedattemptedtrack["q'.$qn.'"][1]=0;';
 				if (false && $showeachscore) {
 					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn) ? "1":"0") . ';';
@@ -2370,7 +2370,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 		} else if ($_GET['action']=='livepollscoreq') {
 			//TODO:  Check curattempt
-			$qn = $_POST['toscore'];
+			$qn = intval($_POST['toscore']);
 
 			if ($LPinf['curquestion'] != $qn || $LPinf['curstate'] != 2) {
 				echo '{error: "Wrong question or not open for submissions"}';
@@ -2418,7 +2418,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$qn = Sanitize::onlyInt($_GET['qn']);
 			$aid = $testsettings['id'];
 			$seed = Sanitize::onlyInt($_GET['seed']);
-			$startt = $_GET['startt'];
+			$startt = Sanitize::onlyInt($_GET['startt']);
 			$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=2,seed=:seed,startt=:startt WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':curquestion'=>$qn, ':seed'=>$seed, ':startt'=>$startt, ':assessmentid'=>$aid));
 
@@ -2526,7 +2526,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 			exit;
 		} else if ($_GET['action']=='livepollshowqscore') {
-			$qn = $_GET['qn'];
+			$qn = Sanitize::onlyInt($_GET['qn']);
 			if ($LPinf['curquestion'] != $qn || $LPinf['curstate'] != 4) {
 				echo _('wrong question or not open for displaying scored result');
 				exit;
@@ -2968,11 +2968,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							if ($showcorrectnow) {
 								$msg .= _(" and correct answer");
 							}
-							if ($showcorrectnow) {
-								echo $msg . _(', is displayed below') . '</p>';
-							} else {
-								echo $msg . _(', is displayed below') . '</p>';
-							}
+							echo $msg . _(', is displayed below') . '</p>';
 						}
 						echo '</div>';
 					}
@@ -3134,13 +3130,17 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 	//IP:  eqntips
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 	function showembedupdatescript() {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 
 		$jsonbits = array();
 		$pgposs = 0;
+        $pgpts = 0;
+        $cntunans = 0;
+        $cntcanimp = 0;
+
 		for($j=0;$j<count($scores);$j++) {
 			$bit = "\"q$j\":[0,";
 			if (unans($scores[$j])) {
@@ -3229,7 +3229,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 
 	function showembednavbar($pginfo,$curpg) {
-		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
+		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings,$isdiag;
 
 		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
 		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
@@ -3691,7 +3691,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 			}
 			if ($hascatset) {
-				include("../assessment/catscores.php");
+				require_once "../assessment/catscores.php";
 				catscores($questions,$bestscores,$testsettings['defpoints'],$testsettings['defoutcome'],$testsettings['courseid']);
 			}
 		}
@@ -3744,7 +3744,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo ' '._('or').' ';
 			}
 			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a>\n";
-		} else if ($isltilimited || $_SESSION['intreereader']) {
+		} else if ($isltilimited || !empty($_SESSION['intreereader'])) {
 
 		} else {
 			if ($or != '') {

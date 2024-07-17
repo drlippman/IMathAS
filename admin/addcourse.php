@@ -3,7 +3,7 @@
 //(c) 2018 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights < 40) {
 	echo "You don't have authorization to access this page";
@@ -14,7 +14,7 @@ if ($myrights < 40) {
 $placeinhead = '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree.js"></script>';
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Add New Course').'</div>';
 echo '<div class="pagetitle"><h1>'._('Add New Course').'</h1></div>';
@@ -26,9 +26,9 @@ if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_GET['for']) && $_G
 	$stm->execute(array($_GET['for']));
 	$forinfo = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($myrights==100 || ($myspecialrights&32)==32 || $forinfo['groupid']==$groupid) {
-		echo '<p>'._('Adding Course For').': ';
+		echo '<p>'._('Adding Course For').': <span class="pii-full-name">';
 		echo Sanitize::encodeStringforDisplay($forinfo['LastName'].', '.$forinfo['FirstName']);
-		echo '<input type=hidden name=for value="'.Sanitize::onlyInt($_GET['for']).'" />';
+		echo '</span><input type=hidden name=for value="'.Sanitize::onlyInt($_GET['for']).'" />';
 		echo '</p>';
 		$dispgroup = $forinfo['groupid'];
 	}
@@ -66,7 +66,7 @@ echo '<div id=copyoptions style="display:none; padding-left: 20px">';
 echo '<p>',_('Select a course to copy'),'</p>';
 $skipthiscourse = true;
 $cid = 0;
-require("../includes/coursecopylist.php");
+require_once "../includes/coursecopylist.php";
 echo '</div>';
 writeEkeyField();
 echo '<button type=submit id=continuebutton disabled style="display:none">'._('Continue').'</button>';

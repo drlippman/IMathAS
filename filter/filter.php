@@ -5,18 +5,18 @@
 
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
-	//include("$filterdir/simplelti/simplelti.php");
+	//require_once "$filterdir/simplelti/simplelti.php";
 	if ((isset($_SESSION['mathdisp']) && $_SESSION['mathdisp']==2 ) || isset($loadmathfilter)) { //use image fallback for math
-		include("$filterdir/math/ASCIIMath2TeX.php");
+		require_once "$filterdir/math/ASCIIMath2TeX.php";
 		$AMT = new AMtoTeX;
 	}
 	if ((isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
-		include("$filterdir/graph/asciisvgimg.php");
+		require_once "$filterdir/graph/asciisvgimg.php";
 		$AS = new AStoIMG;
-		require_once("$filterdir/../includes/filehandler.php");
+		require_once "$filterdir/../includes/filehandler.php";
 	}
 	if ((!isset($_SESSION['graphdisp']) || $_SESSION['graphdisp']==0)) {
-		include_once("$filterdir/graph/sscrtotext.php");
+		require_once "$filterdir/graph/sscrtotext.php";
 	}
 	function mathfiltercallback($arr) {
 		global $AMT,$mathimgurl,$coursetheme;
@@ -29,7 +29,7 @@
 			if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {
 				$tex = '\\reverse '.$tex;
 			}
-			if ($GLOBALS['texdisp']==true) {
+			if (!empty($GLOBALS['texdisp'])) {
 				if (isset($GLOBALS['texdoubleescape'])) {
 					return ' \\\\('.htmlentities($tex).'\\\\) ';
 				} else {
@@ -49,7 +49,7 @@
 		if (trim($arr[2])=='') {return $arr[0];}
 
 		if (!isset($AS) || $AS===null) {
-			include("$filterdir/graph/asciisvgimg.php");
+			require_once "$filterdir/graph/asciisvgimg.php";
 			$AS = new AStoIMG;
 		}
 
@@ -74,7 +74,7 @@
 		if (trim($arr[2])=='') {return $arr[0];}
 
 		if (!isset($AS) || $AS===null) {
-			include("$filterdir/graph/asciisvgimg.php");
+			require_once "$filterdir/graph/asciisvgimg.php";
 			$AS = new AStoIMG;
 		}
 
@@ -104,6 +104,7 @@
 		if ($urlmode == 'https://') {
 			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
 		}
+        $str = str_replace('"http://quietube.com/v.php/http','"http', $str);
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}
@@ -113,6 +114,7 @@
 				//$str = preg_replace('/<embed[^>]*sscr[^>]*>/',"[Graph with no description]", $str);
 				$str = preg_replace_callback('/<\s*embed[^>]*?sscr=(.)(.+?)\1.*?>/s','svgsscrtotextcallback',$str);
 			}
+            $str = preg_replace('/<canvas[^>]*aria-label="([^"]*)"[^>]*>.*?<\/canvas>/',"[$1]", $str);
 		}
 		if ($_SESSION['mathdisp']==2) {
 			$str = str_replace('\\`','&grave;',$str);
@@ -144,10 +146,26 @@
 
 		if (strpos($str,'[EMBED')!==false) {
 			$search = '/\[EMBED:\s*([^\]]+)\]/';
-
+            $zindex = 50;
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
-					$respt = explode(',',$resval[1]);
+                    $respt = explode(',',$resval[1]);
+                    
+                    if (substr($respt[0],0,3)=='QID') {
+                        $url = implode('&',$respt);
+                        $w = '100%';
+                        $h = '200';
+                        $qs = preg_replace('/[^\w=&]/','', trim(substr($url,3)));
+                        $uniqid = uniqid('eq2');
+                        $url = $GLOBALS['basesiteurl'] . '/embedq2.php?frame_id='.$uniqid.'&id='.$qs;
+                        $tag = '<div id="'.$uniqid.'wrap" class="embedwrap">';
+                        $tag .= "<iframe id=\"$uniqid\" width=\"$w\" height=\"$h\" src=\"$url\" style=\"z-index:$zindex\" frameborder=\"0\">";
+                        $tag .= '</iframe></div>';
+                        $str = str_replace($resval[0], $tag, $str);
+                        $zindex--;
+                        continue;
+                    }
+
 					if (isset($respt[3])) {
 						$nobord = true;
 						array_pop($respt);
@@ -165,8 +183,8 @@
 							list ($url,$w,$h) = $respt;
 						}
 					}
-					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
-					if (substr($url,0,18)=='https://tegr.it/y/') {
+                    $url = trim(str_replace(array('"','&nbsp;'),'',$url));
+                    if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
 						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".Sanitize::encodeUrlParam($url);
@@ -255,11 +273,16 @@
 		$arr[1] = str_replace(array('<','>'),array('&lt;','&gt;'),$arr[1]);
 		return '`'.$arr[1].'`';
 	}
-	function printfilter($str) {
+	function printfilter($str, $stripbuttons = true) {
 		global $imasroot;
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1" alt="Graph"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
         $str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
+		if ($stripbuttons) {
+			$str = preg_replace('/<input[^>]*button[^>]*>/','',$str); //strip buttons
+			$str = preg_replace('/<button[^>]*>.*?<\/button>/','',$str); //strip buttons
+		}
+
 		if (isset($_POST['hidetxtboxes'])) {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);
 			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','',$str);
@@ -270,7 +293,7 @@
 			$str = preg_replace('/<select.*?\/select>/s','____',$str);
 		}
 		$str = preg_replace('/<table/','<table cellspacing="0"',$str);
-		$str = preg_replace('/`\s*(\w)\s*`/','<i>$1</i>',$str);
+		$str = preg_replace('/`\s*([a-zA-Z])\s*`/','<i>$1</i>',$str);
 
 		$str = preg_replace('/<input[^>]*hidden[^>]*>/','',$str); //strip hidden fields
 		if (strpos($str,'`')!==FALSE) {

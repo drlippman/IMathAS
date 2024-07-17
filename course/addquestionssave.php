@@ -1,13 +1,14 @@
 <?php
 //IMathAS:  Save changes to addquestions submitted through AHAH
 //(c) 2007 IMathAS/WAMAP Project
-	require("../init.php");
+	require_once "../init.php";
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (!isset($teacherid)) {
         echo "error: validation";
         exit;
-	}
+    }
+    
 	$stm = $DBH->prepare("SELECT itemorder,viddata,intro,defpoints,courseid,ver,showhints,showwork FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($rawitemorder, $viddata,$current_intro_json, $defpoints,$assesscourseid,$aver,$showhints,$showwork) = $stm->fetch(PDO::FETCH_NUM);
@@ -15,10 +16,36 @@
 		echo "error: invalid ID";
 		exit;
     }
+    
+    $showwork = ($showwork & 3);
+    if ($aver > 1) {
+		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	} else {
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	}
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+	if ($stm->rowCount() > 0) {
+		$beentaken = true;
+	} else {
+		$beentaken = false;
+	}
 
     if (isset($_POST['addnewdef'])) {
+        if (!isset($_POST['lastitemhash']) || md5($rawitemorder) !== $_POST['lastitemhash']) {
+            echo '{"error": "assessment questions have changed elsewhere. Reload the page and try again."}';
+            exit;
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        if ($beentaken) {
+            echo '{"error": "'._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page').'"}';
+            exit;
+        }
         $DBH->beginTransaction();
         $newqs = array_map('intval', $_POST['addnewdef']);
+        $qids = [];
         foreach ($newqs as $qsetid) {
             if ($qsetid == 0) { continue; }
             $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid,showhints) ";
@@ -53,7 +80,7 @@
                     }
                 }
             }
-            $numnew= count($checked);
+            $numnew= count($qids);
             $viddata = unserialize($viddata);
             if (!isset($viddata[count($viddata)-1][1])) {
                 $finalseg = array_pop($viddata);
@@ -71,11 +98,11 @@
         $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
         $stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
-        require_once("../includes/updateptsposs.php");
+        require_once "../includes/updateptsposs.php";
         updatePointsPossible($aid, $itemorder, $defpoints);
         $DBH->commit();
 
-        require('../includes/addquestions2util.php');
+        require_once '../includes/addquestions2util.php';
         list($jsarr, $existingqs, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, [
             'intro' => $current_intro_json,
             'itemorder' => $itemorder,
@@ -83,17 +110,27 @@
             'showhints' => $showhints
         ]);
         
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
+        echo json_encode(['itemarray'=>$jsarr, 'lastitemhash'=>md5($itemorder)], 
+            JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
         exit;
     } else if (isset($_POST['addnew'])) {
 
     } 
 
-	if (!isset($_POST['order']) || !isset($_POST['text_order'])) {
+	if (!isset($_POST['order']) || !isset($_POST['text_order']) || !isset($_POST['lastitemhash'])) {
 		echo "error: missing required values";
 		exit;
-	}
+    }
+    if ($beentaken && $rawitemorder != $_REQUEST['order']) {
+        echo 'error: '._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page');
+        exit;
+    }
+    if (md5($rawitemorder) !== $_POST['lastitemhash']) {
+        echo "error: assessment questions have changed elsewhere. Reload the page and try again.";
+        exit;
+    }
+    
+
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
 	foreach (explode(',',$itemorder) as $qid) {
@@ -113,7 +150,7 @@
 		exit;
 	}
 	if (count($new_text_segments_json)>0) {
-		require_once("../includes/htmLawed.php");
+		require_once "../includes/htmLawed.php";
 		foreach ($new_text_segments_json as $k=>$seg) {
 			$new_text_segments_json[$k]['text'] = myhtmlawed($seg['text']);
 			if (isset($new_text_segments_json[$k]['pagetitle'])) {
@@ -228,19 +265,31 @@
 	$ptschanged = false;
 	if (isset($_POST['pts'])) {
 		$newpts = json_decode($_POST['pts'], true);
-		$upd_pts = $DBH->prepare("UPDATE imas_questions SET points=? WHERE id=?");
-		$stm = $DBH->prepare("SELECT id,points FROM imas_questions WHERE assessmentid=?");
+        $newextracredit = json_decode($_POST['extracredit'], true);
+		$upd_pts = $DBH->prepare("UPDATE imas_questions SET points=?,extracredit=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,points,extracredit FROM imas_questions WHERE assessmentid=?");
 		$stm->execute(array($aid));
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($newpts['qn'.$row['id']])) {
 				continue;  //shouldn't happen
 			}
-			if ($row['points'] != $newpts['qn'.$row['id']]) {
-				$upd_pts->execute(array($newpts['qn'.$row['id']], $row['id']));
+			if ($row['points'] != $newpts['qn'.$row['id']] || $row['extracredit'] != $newextracredit['qn'.$row['id']]) {
+				$upd_pts->execute(array($newpts['qn'.$row['id']], $newextracredit['qn'.$row['id']], $row['id']));
 				$ptschanged = true;
 			}
 		}
-	}
+	} else if (isset($_POST['extracredit'])) {
+        $newextracredit = json_decode($_POST['extracredit'], true);
+		$upd_pts = $DBH->prepare("UPDATE imas_questions SET extracredit=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,extracredit FROM imas_questions WHERE assessmentid=?");
+		$stm->execute(array($aid));
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['extracredit'] != $newextracredit['qn'.$row['id']]) {
+				$upd_pts->execute(array($newextracredit['qn'.$row['id']], $row['id']));
+				$ptschanged = true;
+			}
+		}
+    }
 
 	$qarr = array(':itemorder'=>$_REQUEST['order'], ':viddata'=>$viddata, ':intro'=>$new_intro, ':id'=>$aid, ':courseid'=>$cid);
 	$query = "UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata,intro=:intro";
@@ -260,7 +309,7 @@
 			$stm = $DBH->query("DELETE FROM imas_questions WHERE id IN ($toremove)");
 		}
 		//update points possible
-		require_once("../includes/updateptsposs.php");
+		require_once "../includes/updateptsposs.php";
 		updatePointsPossible($aid, $_REQUEST['order'], $defpoints);
 
 		// Delete any teacher or tutor attempts on this assessment
@@ -275,7 +324,8 @@
 		$stm = $DBH->prepare($query);
 		$stm->execute(array($cid, $aid));
 
-		echo "OK";
+        echo md5($_REQUEST['order']);
+		//echo "OK";
 	} else {
 		echo "error: not saved";
 	}

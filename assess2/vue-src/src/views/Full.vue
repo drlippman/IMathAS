@@ -20,6 +20,8 @@
       >
         {{ textToggleLabel }}
       </button>
+      <a :href="settingsLink">{{ $t("links.settings") }}</a>&nbsp;
+      <a :href="questionsLink">{{ $t("links.questions") }}</a>
     </p>
     <div
       class="scrollpane fulldisp"
@@ -42,6 +44,8 @@
           pos="beforeexact"
           :qn="curqn"
           :key="'iqt'+curqn"
+          :textlist = "textList"
+          :lastq = "lastQ"
           :active = "showTexts"
         />
         <full-question-header :qn = "curqn" />
@@ -56,6 +60,8 @@
         v-show="showTexts"
         pos="after"
         :qn="lastQ"
+        :textlist = "textList"
+        :lastq = "lastQ"
         :active = "showTexts"
       />
     </div>
@@ -118,6 +124,19 @@ export default {
     },
     textToggleLabel () {
       return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
+    },
+    settingsLink () {
+      return '../course/addassessment2.php?id=' + store.aid + '&cid=' + store.cid;
+    },
+    questionsLink () {
+      return '../course/addquestions2.php?aid=' + store.aid + '&cid=' + store.cid;
     }
   },
   methods: {

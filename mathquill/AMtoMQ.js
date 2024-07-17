@@ -79,25 +79,29 @@ var AMQsymbols = [
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
-//{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
+{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
+{input:"xor",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"oplus",  tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"ominus",  tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
+{input:"neg",  tag:"mo", output:"\u00AC", tex:"neg", ttype:CONST},
 //{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", ttype:UNDEROVER},
-//{input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
+{input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
 //{input:"vvv", tag:"mo", output:"\u22C1", tex:"bigvee", ttype:UNDEROVER},
 {input:"nn",  tag:"mo", output:"\u2229", tex:"cap", ttype:CONST},
 //{input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
-{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
+//{input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 //{input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
 {input:"xx", tex:"times", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
 //{input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
-{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
-{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+//{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
+//{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
-{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
-{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
+//{input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
+//{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
 {input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 //{input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
@@ -125,8 +129,8 @@ var AMQsymbols = [
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
 {input:"<<", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:">>", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
-//{input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
-//{input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
+{input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
+{input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
 
 //miscellaneous symbols
 {input:"int",  tag:"mo", output:"\u222B", tex:null, ttype:CONST},
@@ -135,6 +139,9 @@ var AMQsymbols = [
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
+{input:"=>",  tag:"mo", output:"\u21D2", tex:"implies", ttype:CONST},
+{input:"<=>", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
+{input:"rightleftharpoons", tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
 //{input:"CC",  tag:"mo", output:"\u2102", tex:"mathbb{C}", ttype:CONST, notexcopy:true},
 //{input:"NN",  tag:"mo", output:"\u2115", tex:"mathbb{N}", ttype:CONST, notexcopy:true},
 //{input:"QQ",  tag:"mo", output:"\u211A", tex:"mathbb{Q}", ttype:CONST, notexcopy:true},
@@ -290,9 +297,9 @@ function AMQgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
+    k++;
     if ("0"<=st && st<="9") {
       integ = false;
-      k++;
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;
@@ -307,7 +314,7 @@ function AMQgetSymbol(str) {
     st = str.slice(0,1); //take 1 character
     tagst = (("A">st || st>"Z") && ("a">st || st>"z")?"mo":"mi");
   }
-  if (st=="-" && AMQpreviousSymbol==INFIX) {
+  if (st=="-" && str.charAt(1)!==' ' && AMQpreviousSymbol==INFIX) {
     AMQcurrentSymbol = INFIX;
     return {input:st, tag:tagst, output:st, ttype:UNARY, func:true, val:true};
   }
@@ -441,7 +448,8 @@ function AMQTparseSexpr(str) { //parses str and returns [node,tailstr]
 	    }
     } else {
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible)
-		    node = '{\\left.'+result[0]+'}';
+            //node = '{\\left.'+result[0]+'}';
+            node = '{'+result[0]+'}';
 	    else {
 		    node = '{\\left'+AMQTgetTeXbracket(symbol) + result[0]+'}';
 	    }
@@ -587,6 +595,7 @@ function AMQTparseIexpr(str) {
   return [node,str];
 }
 
+var AMQTallowmatrices = true;
 function AMQTparseExpr(str,rightbracket) {
   var symbol, node, result, i, nodeList = [],
   newFrag = '';
@@ -617,7 +626,7 @@ function AMQTparseExpr(str,rightbracket) {
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
 //    if (AMQnestingDepth > 0) AMQnestingDepth--;
 	var len = newFrag.length;
-	if (len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
+	if (AMQTallowmatrices && len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
 		var right = newFrag.charAt(len - 2);
 		if (right==')' || right==']') {
 			var left = newFrag.charAt(6);
@@ -696,34 +705,48 @@ function AMQTparseExpr(str,rightbracket) {
       newFrag += node;
       addedright = true;
     } else {
-	    newFrag += '\\right.';
+	    //newFrag += '\\right.';
 	    addedright = true;
     }
 
   }
   if(AMQnestingDepth>0 && !addedright) {
-	  newFrag += '\\right.'; //adjust for non-matching left brackets
-	  //todo: adjust for non-matching right brackets
+      newFrag += '\\right)'; //adjust for non-matching left brackets.  should be \\right. but MQ can't handle that
+      //todo: adjust for non-matching right brackets
   }
   return [newFrag,str];
 }
 
 AMQinitSymbols();
 
-return function(str) {
+return function(str,elid,nomatrices) {
  AMQnestingDepth = 0;
-  str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
-  str = str.replace(/^\s*<([^<].*?[^>])>\s*$/,"<<$1>>");
+ if (nomatrices === true) { 
+    AMQTallowmatrices = false;
+ }
+  str = str.replace(/(&nbsp;|\u00a0|&#160;|{::})/g,"");
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/(ntuple|string)/)
+  ) {
+    str = str.replace(/<([^<].*?,.*?[^>])>/g,"<<$1>>");
+  }
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
   str = str.replace(/all\s+real\s+numbers/g,'"all real numbers"');
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
   str = str.replace(/\bDNE\b/gi,'"DNE"');
+  if (document.getElementById(elid) && 
+    document.getElementById(elid).getAttribute("data-mq").match(/interval/)
+  ) {
+      str = str.replace(/\bU\b/g,'cup');
+  }  
+ 
   if (str.match(/\S/)==null) {
 	  return "";
   }
-  return AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  var out = AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  return out;
 }
 }();
 
@@ -741,7 +764,7 @@ n\frac{num}{denom} to n num/denom
 function MQtoAM(tex,display) {
   var nested,lb,rb,isfuncleft,curpos,c,i;
 	tex = tex.replace(/\\:/g,' ');
-  tex = tex.replace(/\\operatorname{(\w+)}/g,'\\$1');
+  tex = tex.replace(/\\operatorname{(\w+)}/g,' $1');
 	if (!display) {
     while ((i = tex.lastIndexOf('\\left|'))!=-1) { //found a left |)
       rb = tex.indexOf('\\right|',i+1);
@@ -764,13 +787,18 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\begin{.?matrix}(.*?)\\end{.?matrix}/g, function(m, p) {
     return '[(' + p.replace(/\\\\/g,'),(').replace(/&/g,',') + ')]';
   });
-	tex = tex.replace(/\\le(?!f)/g,'<=');
-	tex = tex.replace(/\\ge/g,'>=');
-  tex = tex.replace(/\\ne/g,'!=');
+	tex = tex.replace(/\\le(?=(\b|\d))/g,'<=');
+	tex = tex.replace(/\\ge(?=(\b|\d))/g,'>=');
+  tex = tex.replace(/\\ne(?=(\b|\d))/g,'!=');
+  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
-    tex = tex.replace(/\\cup/g,'U');
+    tex = tex.replace(/\\rightleftharpoons/g,'rightleftharpoons');
+    // move to intervalscorepart tex = tex.replace(/\\cup/g,'U');
+    tex = tex.replace(/\\sim/g,'~');
+    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,' ^^ ');
+    tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');
 	tex = tex.replace(/\\left\\{/g,'lbrace').replace(/\\right\\}/g,'rbrace');
 	tex = tex.replace(/\\left/g,'');
@@ -784,6 +812,8 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');
+    tex = tex.replace(/degree/g,'degree '); // prevent degreesin from becoming degree in
+    
 	while ((i=tex.indexOf('frac{'))!=-1) { //found a fraction start
 		nested = 1;
 		curpos = i+5;
@@ -798,9 +828,11 @@ function MQtoAM(tex,display) {
 		} else {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
-	}
-	//separate un-braced subscripts using latex rules
-	tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
+    }
+    
+    //separate un-braced subscripts using latex rules
+    tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
+    tex = tex.replace(/(\^|_)([+\-])([^\^])/g, '$1$2 $3');  
 	tex = tex.replace(/\^(\w)(\w)/g, '^$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
 	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');
@@ -808,16 +840,17 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/_{(\w+)}$/g,'_($1)');
 	tex = tex.replace(/{/g,'(').replace(/}/g,')');
 	tex = tex.replace(/lbrace/g,'{').replace(/rbrace/g,'}');
-	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
+	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2 ');  //change (2)/(3) to 2/3
 	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
 	tex = tex.replace(/\(([\d\.]+)\)\//g,'$1/');  //change (3)/ to 3/
-	tex = tex.replace(/\/\(([\a-zA-Z])\)/g,'/$1');  //change /(x) to /x
-	tex = tex.replace(/\(([\a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
+	tex = tex.replace(/\/\(([a-zA-Z])\)/g,'/$1');  //change /(x) to /x
+	tex = tex.replace(/\(([a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
+  tex = tex.replace(/\^\((-?[\d\.]+)\)(\d)/g,'^$1 $2');
   tex = tex.replace(/\^\(-1\)/g,'^-1');
-	tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
-  tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2');  //change /(x^n) to /x^n
-	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
-  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
-
-	return tex;
+  tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
+  tex = tex.replace(/\/\(([a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2 ');  //change /(x^n) to /x^n
+	tex = tex.replace(/\(([a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
+  tex = tex.replace(/text\(([^)]*)\)/g, '$1');
+  tex = tex.replace(/\(\s*(\w)/g,'($1').replace(/(\w)\s*\)/g,'$1)');
+  return tex.replace(/^\s+|\s+$/g,'');
 }

@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -206,7 +206,7 @@ $placeinhead .= '$(".sl").attr("title","'._("Modify course settings").'");$(".tr
 $placeinhead .= '</script>';
 
  /******* begin html output ********/
- require("../header.php");
+ require_once "../header.php";
 
  if ($overwriteBody==1) {
 	echo $body;
@@ -215,12 +215,13 @@ $placeinhead .= '</script>';
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeradmin" class="pagetitle"><h1><?php echo $installname ?> Administration</h1></div>
-	<b>Hello <?php echo $username ?></b>
+    <b>Hello <span class="pii-username"><?php echo $username ?></span></b>
 
 <?php //WRITE OUT COURSES BLOCK ?>
 	<h2>Courses</h2>
 	<div class=item>
 	<table class=gb border=0 width="90%">
+        <caption class="sr-only">Table of Courses</caption>
 		<thead>
 			<tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Settings</th><th>Teachers</th><th>Transfer</th><th>Delete</th>
 			</tr>
@@ -257,7 +258,7 @@ $placeinhead .= '</script>';
 				</a>
 				</td>
 				<td class=c><?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></td>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></span></td>
 				<td class=c><a href="forms.php?action=modify&id=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>" class="sl">Settings</a></td>
 				<td class=c><?php echo $page_courseList[$i]['addRemove']; ?></td>
 				<td class=c><?php echo $page_courseList[$i]['transfer']; ?></td>
@@ -347,6 +348,7 @@ $placeinhead .= '</script>';
 	<h3>Diagnostics</h3>
 	<div class=item>
 	<table class=gb width="90%" id="diagTable">
+        <caption class="sr-only">Table of Diagnostics</caption>
 		<thead>
 		<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
 		</thead>
@@ -383,6 +385,7 @@ $placeinhead .= '</script>';
 	<h3><?php echo $page_userBlockTitle ?></h3>
 	<div class=item>
 		<table class=gb width="90%" id="myTable">
+        <caption class="sr-only">Table of Users</caption>
 		<thead>
 			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Delete</th></tr>
 		</thead>
@@ -391,9 +394,9 @@ $placeinhead .= '</script>';
 		for ($i=0;$i<count($page_userDataId);$i++) {
 			if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></td>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></span></td>
+                <td><span class="pii-username"><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></span></td>
+                <td><span class="pii-email"><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></span></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataType[$i]); ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastAccess[$i]); ?></td>
 				<td class=c><a href="forms.php?action=chgrights&id=<?php echo Sanitize::onlyInt($page_userDataId[$i]); ?>">Change</a></td>
@@ -422,5 +425,5 @@ $placeinhead .= '</script>';
 <?php
 	}
 }
- require("../footer.php");
+ require_once "../footer.php";
 ?>

@@ -73,7 +73,7 @@ span.leftbtns img {
 	background-color: #0f0;
 }
 .fixedonscroll[data-fixed=true] {
-	z-index: 50;
+	z-index: 100;
 	margin-top: -5px;
 	padding: 5px 0px;;
 	background-color: #fff;

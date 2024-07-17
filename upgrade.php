@@ -2,7 +2,7 @@
 //Database and data storage upgrade script
 //Call this script via the web as an admin each time you update the code
 
-require('migrator.php');
+require_once 'migrator.php';
 
 //don't use this anymore:  create files in the /migrations/ directory
 //old approach: change counter; increase by 1 each time a change is made
@@ -53,10 +53,10 @@ unset($dbpassword);
 	//$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
 		$init_skip_csrfp = true;
-		require("init_without_validate.php");
+		require_once "init_without_validate.php";
 	} else {
 		$init_skip_csrfp = true;
-		require("init.php");
+		require_once "init.php";
 		if ($myrights<100) {
 			echo "No rights, aborting";
 			exit;
@@ -239,7 +239,7 @@ unset($dbpassword);
 				`time` INT( 10 ) UNSIGNED NOT NULL ,
 				`code` VARCHAR( 9 ) NOT NULL ,
 				INDEX (`diag`), INDEX(`time`), INDEX(`code`)
-				) ENGINE = InnoDB;";
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC;";
 			$DBH->query($query);
 		}
 		if ($last < 14) {
@@ -311,7 +311,7 @@ unset($dbpassword);
 				. ' `name` VARCHAR(254) NOT NULL, '
 				. ' INDEX (`courseid`)'
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Student Group Sets\';';
 			$res = $DBH->query($query);
 			if ($res===false) {
@@ -325,7 +325,7 @@ unset($dbpassword);
 				. ' `name` VARCHAR(254) NOT NULL, '
 				. ' INDEX (`groupsetid`)'
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Student Groups\';';
 			$res = $DBH->query($query);
 			if ($res===false) {
@@ -339,7 +339,7 @@ unset($dbpassword);
 				. ' `userid` INT(10) UNSIGNED NOT NULL, '
 				. ' INDEX (`stugroupid`), INDEX (`userid`)'
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Student Group Members\';';
 			$res = $DBH->query($query);
 			if ($res===false) {
@@ -417,7 +417,7 @@ unset($dbpassword);
 				. ' INDEX (`courseid`), '
 				. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`editbydate`) '
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Wikis\';';
 			 $res = $DBH->query($sql);
 			 if ($res===false) {
@@ -433,7 +433,7 @@ unset($dbpassword);
 				. ' `revision` TEXT NOT NULL, '
 				. ' INDEX (`wikiid`), INDEX(`stugroupid`), INDEX(`time`) '
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Wiki revisions\';';
 			 $res = $DBH->query($sql);
 			 if ($res===false) {
@@ -447,7 +447,7 @@ unset($dbpassword);
 				. ' `lastview` INT(10) UNSIGNED NOT NULL,'
 				 . ' INDEX (`userid`), INDEX(`wikiid`)'
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Wiki last viewings\';';
 			 $res = $DBH->query($sql);
 			 if ($res===false) {
@@ -505,7 +505,7 @@ unset($dbpassword);
 				$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
 				$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
 				$stm = $DBH->query($query);
-				require_once("./includes/filehandler.php");
+				require_once "./includes/filehandler.php";
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$doneagroups = array();
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,bestlastanswers=:bestlastanswers,reviewlastanswers=:reviewlastanswers WHERE id=:id");
@@ -688,7 +688,7 @@ unset($dbpassword);
 				. ' `rubric` TEXT NOT NULL, '
 				 . ' INDEX(`ownerid`), INDEX(`groupid`)'
 				. ' )'
-				. ' ENGINE = InnoDB'
+				. ' ENGINE = InnoDB ROW_FORMAT=DYNAMIC'
 				. ' COMMENT = \'Rubrics\';';
 			 $res = $DBH->query($sql);
 			 if ($res===false) {
@@ -782,7 +782,7 @@ unset($dbpassword);
 				`classbests` TEXT NOT NULL ,
 				`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
 				INDEX ( `courseid` )
-				) ENGINE = InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC;';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -797,7 +797,7 @@ unset($dbpassword);
 				`starttime` INT( 10 ) UNSIGNED NOT NULL ,
 				`scorerec` TEXT NOT NULL ,
 				INDEX ( `drillassessid`), INDEX(`userid` )
-				) ENGINE = InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC;';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -825,7 +825,7 @@ unset($dbpassword);
 				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 				`logintime` INT( 10 ) UNSIGNED NOT NULL ,
 				 INDEX(`userid` ), INDEX(`courseid`)
-				) ENGINE = InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC;';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -845,7 +845,7 @@ unset($dbpassword);
 				`contextid` VARCHAR( 255 ) NOT NULL ,
 				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 				 INDEX(`org`,`contextid`)
-				) ENGINE = InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC;';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -858,7 +858,7 @@ unset($dbpassword);
 				`typeid` INT( 10 ) UNSIGNED NOT NULL ,
 				`placementtype` VARCHAR( 10 ) NOT NULL ,
 				 INDEX(`org`, `contextid`, `linkid`)
-				) ENGINE = InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC;';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1038,7 +1038,7 @@ unset($dbpassword);
 				  `courseid` int(10) unsigned NOT NULL,
 				  `requirements` text NOT NULL,
 				  INDEX(`courseid`)
-				) ENGINE=InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1050,7 +1050,7 @@ unset($dbpassword);
 				  `badgeid` int(10) unsigned NOT NULL,
 				  `data` text NOT NULL,
 				  INDEX (`userid`), INDEX(`badgeid`)
-				) ENGINE=InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1072,7 +1072,7 @@ unset($dbpassword);
 				`name` VARCHAR( 128 ) NOT NULL ,
 				`value` TEXT NOT NULL ,
 				INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1096,7 +1096,7 @@ unset($dbpassword);
 			$query = 'CREATE TABLE `imas_dbschema` (
 				`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
 				`ver` SMALLINT( 4 ) UNSIGNED NOT NULL
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1111,7 +1111,7 @@ unset($dbpassword);
 				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 				`time` INT( 10 ) UNSIGNED NOT NULL ,
 				`log` TEXT NOT NULL
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1126,7 +1126,7 @@ unset($dbpassword);
 			 }
 			 $hasimg = array();
 			 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				require_once("includes/filehandler.php");
+				require_once "includes/filehandler.php";
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$arr = $s3->getBucket($GLOBALS['AWSbucket'],"cfiles/");
 				if ($arr!=false) {
@@ -1177,7 +1177,7 @@ unset($dbpassword);
 				`threadid` INT(10) UNSIGNED NOT NULL,
 				`postid` INT(10) UNSIGNED NOT NULL,
 				`type` TINYINT(1) UNSIGNED NOT NULL
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1205,7 +1205,7 @@ unset($dbpassword);
 				`viewtime` INT(10) UNSIGNED NOT NULL,
 				`info` VARCHAR(254) NOT NULL,
 				INDEX ( `courseid`) , INDEX( `userid`)
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1245,7 +1245,7 @@ unset($dbpassword);
 				`name` VARCHAR(255) NOT NULL,
 				`ancestors` TEXT NOT NULL,
 				INDEX ( `courseid`)
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1319,7 +1319,7 @@ unset($dbpassword);
 				`scoredet` TEXT NOT NULL,
 				`timespent` SMALLINT(5) UNSIGNED NOT NULL,
 				INDEX ( `courseid`), INDEX(`qsetid`)
-				) ENGINE = InnoDB';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC';
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -1758,7 +1758,7 @@ unset($dbpassword);
 				  `curstate` TINYINT(1) unsigned NOT NULL,
 				  `seed` INT(10) unsigned NOT NULL,
 				  `startt` BIGINT(13) unsigned NOT NULL
-				) ENGINE=InnoDB;';
+				) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 			$res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";

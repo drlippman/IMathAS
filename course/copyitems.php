@@ -7,9 +7,9 @@
 ini_set("max_execution_time", "600");
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/copyiteminc.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/copyiteminc.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -17,9 +17,13 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
-$ctc = Sanitize::onlyInt($_POST['ctc']);
+$ctc = Sanitize::onlyInt($_POST['ctc'] ?? 0);
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Copy Course Items");
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _("Copy Course Items");
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
@@ -63,7 +67,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 		}
-		if ($termsurl != '' && $_GET['action']=="select") {
+		if (!empty($termsurl) && $_GET['action']=="select") {
 			if (!isset($_POST['termsagree'])) {
 				$oktocopy = 0;
 				$overwriteBody = 1;
@@ -83,7 +87,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
-			if (isset($_POST['checked']) && count($_POST['checked'])>0) {
+			if (!empty($_POST['checked'])) {
 				$checked = $_POST['checked'];
 				$chklist = implode(',', array_map('intval',$checked));
 				$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid=:courseid");
@@ -144,6 +148,7 @@ if (!(isset($teacherid))) {
 				$row[':id'] = $cid;
 				$stm->execute($row);
 			}
+            $gbcats = array();
 			if (isset($_POST['copygbsetup'])) {
 				$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$ctc));
@@ -180,7 +185,6 @@ if (!(isset($teacherid))) {
 					}
 				}
 			} else {
-				$gbcats = array();
 				$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid=:courseid AND ";
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
@@ -196,11 +200,6 @@ if (!(isset($teacherid))) {
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$ctc, ':courseid2'=>$cid));
-				if ($stm->rowCount()>0) {
-					$hasoutcomes = true;
-				} else {
-					$hasoutcomes = false;
-				}
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$outcomes[$row[0]] = $row[1];
 				}
@@ -225,7 +224,10 @@ if (!(isset($teacherid))) {
 					$newoutcomes[] = $outcomes[$row[0]];
 				}
 
-				if ($hasoutcomes) {
+                $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$cid));
+				$row = $stm->fetch(PDO::FETCH_NUM);
+				if ($row[0] != '') {
 					//already has outcomes, so we'll just add to the end of the existing list new outcomes
 					$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 					$stm->execute(array(':id'=>$cid));
@@ -250,8 +252,8 @@ if (!(isset($teacherid))) {
 						}
 					}
 					$outcomesarr = unserialize($row[0]);
-					if (!is_array($outcomearr)) {
-						$outcomearr = array();
+					if (!is_array($outcomesarr)) {
+						$outcomesarr = array();
 					}
 					updateoutcomes($outcomesarr);
 				}
@@ -287,7 +289,11 @@ if (!(isset($teacherid))) {
 			}
 
 			if (isset($_POST['checked']) || $_POST['whattocopy']=='all') {
-				$checked = $_POST['checked'];
+                if ($ctc != $cid) {
+                    prepopulate_forumtrack($ctc,$cid);
+                }
+
+				$checked = $_POST['checked'] ?? [];
 				$stm = $DBH->prepare("SELECT blockcnt,dates_by_lti FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
 				list($blockcnt,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
@@ -359,7 +365,7 @@ if (!(isset($teacherid))) {
 				copyrubrics($offlinerubrics);
 			}
 			if (isset($_POST['copystudata']) && ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64)) {
-				require("../util/copystudata.php");
+				require_once "../util/copystudata.php";
 				copyStuData($cid, $_POST['ctc']);
 			}
 			$DBH->commit();
@@ -405,12 +411,12 @@ if (!(isset($teacherid))) {
 			$names = array();
 			$sums = array();
 			$parents = array();
-			require_once("../includes/loaditemshowdata.php");
+			require_once "../includes/loaditemshowdata.php";
 			$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
 			getsubinfo($items,'0','',false,' ');
 
 			$i=0;
-			$page_blockSelect = array();
+			$page_blockSelect = array('val'=>[], 'label'=>[]);
 
 			foreach ($existblocks as $k=>$name) {
 				$page_blockSelect['val'][$i] = $k;
@@ -421,7 +427,10 @@ if (!(isset($teacherid))) {
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
 			//contained in coursecopylist.php
 		}
-	}
+	} else {
+        $overwriteBody = 1;
+        $body = 'Unable to copy this course';
+    }
 }
 
 /******* begin html output ********/
@@ -430,7 +439,7 @@ if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
 $placeinhead .= '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
-require("../header.php");
+require_once "../header.php";
 }
 if ($overwriteBody==1) {
 	echo $body;
@@ -451,6 +460,7 @@ if ($overwriteBody==1) {
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 	<table cellpadding=5 class=gb>
+    <caption class="sr-only">Calendar Items</caption>
 		<thead>
 		<tr><th></th><th>Date</th><th>Tag</th><th>Text</th></tr>
 		</thead>
@@ -529,6 +539,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<p><?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a></p>
 
 	<table cellpadding=5 class=gb>
+    <caption class="sr-only">Course Items</caption>
 		<thead>
 		<?php
 			echo '<tr><th></th><th>'._('Title').'</th><th>'._('Summary').'</th></tr>';
@@ -585,7 +596,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<p> </p>
 <div id="copyoptions" style="display:none;">
 	<fieldset><legend><?php echo _('Options'); ?></legend>
-	<table>
+	<table role="presentation">
 	<tbody>
 	<tr class="allon"><td class="r"><?php echo _('Copy course settings?'); ?></td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
 	<tr class="allon"><td class="r"><?php echo sprintf(_('Copy gradebook scheme and categories %s (%s will overwrite current scheme %s)?'),'<br/>','<i>','</i>'); ?> </td><td>
@@ -594,8 +605,8 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<tr><td class="r"><?php echo _('Copy offline grade items?'); ?></td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
 	<tr><td class="r"><?php echo _('Remove any withdrawn questions from assessments?'); ?></td><td> <input type=checkbox name="removewithdrawn"  value="1" checked="checked"/></td></tr>
 	<tr><td class="r"><?php echo _('Use any suggested replacements for old questions?'); ?></td><td> <input type=checkbox name="usereplaceby"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r"><?php echo _('Copy rubrics?'); ?> </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r"><?php echo _('Copy outcomes?'); ?> </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
+	<tr><td class="r"><?php echo _('Copy rubrics?'); ?> </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked" /></td></tr>
+	<tr><td class="r"><?php echo _('Copy outcomes?'); ?> </td><td><input type=checkbox name="copyoutcomes"  value="1" checked="checked" /></td></tr>
 	<tr><td class="r"><?php echo _('Select calendar items to copy?'); ?></td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
 
 	<tr><td class="r"><?php echo _('Copy "display at top" instructor forum posts?'); ?> </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
@@ -652,7 +663,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		echo '<p>'._('Course List').'</p>';
 	}
 	//this displays the actual course list
-	require("../includes/coursecopylist.php");
+	require_once "../includes/coursecopylist.php";
 
 	writeEkeyField()
 ?>
@@ -663,6 +674,6 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	}
 }
-require ("../footer.php");
+require_once "../footer.php";
 
 ?>

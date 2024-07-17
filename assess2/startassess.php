@@ -20,11 +20,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -40,17 +40,25 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 
 $now = time();
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // load settings including question info
-$assess_info = new AssessInfo($DBH, $aid, $cid, 'all');
+$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all || !empty($_POST['in_print']));
 $assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+//check to see if prereq has been met
+if ($isstudent) {
+  $assess_info->checkPrereq($uid);
+}
 
 // reject if not available
-if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
+if ($assess_info->getSetting('noprint') === 1 && !empty($_POST['in_print'])) {
+  echo '{"error": ""not_ready""}';
+  exit;
+} else if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
 } else if ($assess_info->getSetting('available') === 'yes' && !empty($_POST['practice'])) {
   echo '{"error": "not_practice"}';
@@ -58,7 +66,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || !empty($_POST['in_print']));
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -78,14 +86,40 @@ if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
-
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 // check password, if needed
-if (!$in_practice && !$canViewAll &&
-  (!isset($_SESSION['assess2-'.$aid]) || $_SESSION['assess2-'.$aid] != $in_practice) &&
-  !$assess_info->checkPassword($_POST['password'])
+$doCheckPassword = true;
+if ($in_practice || $canViewAll) {
+    $doCheckPassword = false;
+} else if ($assess_info->getSetting('noprint') === 0 && // if print version is allowed
+    !empty($_POST['in_print']) && // is print version
+    isset($_SESSION['assess2-'.$aid]) && // have session store of PW
+    $_SESSION['assess2-'.$aid][0] == $in_practice && // practice setting matches stored PW
+    $assess_info->checkPassword($_SESSION['assess2-'.$aid][1]) // stored PW matches
 ) {
+    $doCheckPassword = false;
+}
+if ($doCheckPassword && !$assess_info->checkPassword($_POST['password'])) {
   echo '{"error": "invalid_password"}';
   exit;
+} 
+
+if (!$in_practice && $assess_info->getSetting('timelimit') > 0 && 
+    $assess_info->getSetting('timeext') > 0
+) {
+    // apply time limit extension
+    if ($assess_record->hasActiveAttempt()) {
+        // has unsubmitted attempt
+        $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
+    } else if (($assess_record->getStatus()&64)==64) {
+        // has submitted quiz-style attempt
+        // un-submit it
+        $assess_record->setStatus(true, true);
+        // apply time limit extension
+        $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
+    }
 }
 
 // reject start if has current attempt, time limit expired, and is kick out
@@ -146,7 +180,8 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
     $current_members = array_merge($current_members, $available_new_members);
 
     // if we already have an assess record, need to copy it to new group members
-    if ($assess_record->hasRecord()) {
+    if ($assess_record->hasRecord() && count($available_new_members) > 0) {
+        $sourcedids = AssessUtils::formLTIsourcedId($available_new_members, $aid, true);
         // get current record
         $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
         $query = "SELECT $fieldstocopy FROM ";
@@ -156,16 +191,22 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
         $rowgrpdata = $stm->fetch(PDO::FETCH_NUM);
         // now copy it to others
         $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
-        $query = "REPLACE INTO imas_assessment_records (userid,$fieldstocopy) ";
-        $query .= "VALUES (?,$ph)";
+        $query = "REPLACE INTO imas_assessment_records (userid,lti_sourcedid,$fieldstocopy) ";
+        $query .= "VALUES (?,?,$ph)";
         $stm = $DBH->prepare($query);
         foreach ($available_new_members as $gm_uid) {
-        $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+            if (is_array($sourcedids) && isset($sourcedids[$gm_uid])) {
+                $thissourcedid = $sourcedids[$gm_uid];
+            } else {
+                $thissourcedid = '';
+            }
+            $stm->execute(array_merge(array($gm_uid, $thissourcedid), $rowgrpdata));
         }
     }
   }
 }
 
+$set_lti_sourcedid = false;
 // if there is no active assessment record, time to create one
 if (!$assess_record->hasRecord()) {
   // if it's a user-created group, we've already gotten group members above
@@ -182,14 +223,16 @@ if (!$assess_record->hasRecord()) {
   }
 
   // time to create a new record!
-  $lti_sourcedid = '';
-  if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll) {
+  if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll && !empty($current_members)) {
     // creating for group
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($current_members, $aid, true);
     $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid);
   } else {
     // creating for self
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($uid, $aid);
     $assess_record->createRecord(false, 0, true, $lti_sourcedid);
   }
+  $set_lti_sourcedid = true;
 }
 
 // if there's no active assessment attempt, generate one
@@ -198,7 +241,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
     // for practice, if we don't have unsubmitted attempt, then
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
-  } else {
+  } else if (!($canViewAll && !empty($_POST['in_print']))) { // only mark as started if student
     if ($assess_record->hasUnstartedAttempt()) {
       // has an assessment attempt they haven't started yet
       $assess_record->setStatus(true, true);
@@ -224,18 +267,12 @@ if ($isRealStudent) {
 }
 
 // update lti_sourcedid if needed
-if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
-  !empty($_SESSION['lti_outcomeurl'])
-) {
-  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
-  $assess_record->updateLTIsourcedId($altltisourcedid);
+if (!$set_lti_sourcedid) {
+    $altltisourcedid = AssessUtils::formLTIsourcedId($uid, $aid);
+    if ($altltisourcedid != '') {
+        $assess_record->updateLTIsourcedId($altltisourcedid);
+    }
 }
-/*
-else if (isset($_SESSION['lti_lis_result_sourcedid'])) {
-  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
-  $assess_record->updateLTIsourcedId($altltisourcedid);
-}
-*/
 
 $assessInfoOut = array();
 
@@ -251,6 +288,9 @@ if ($in_practice) {
 // See if we need to do anything to the intro, since we're sending it
 $assess_info->processIntro();
 
+// get settings for LTI if needed
+$assess_info->loadLTIMsgPosts($userid, $canViewAll);
+
 // grab any assessment info fields that may have updated:
 // has_active_attempt, timelimit_expires,
 // prev_attempts (if we just closed out a version?)
@@ -260,7 +300,8 @@ $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
   'showscores', 'intro', 'interquestion_text', 'resources', 'category_urls',
-  'help_features', 'points_possible', 'showcat', 'enddate_in', 'displaymethod'
+  'help_features', 'points_possible', 'showcat', 'enddate_in', 'displaymethod',
+  'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt'
 );
 if ($in_practice) {
   array_push($include_from_assess_info, 'showscores', 'allowed_attempts');
@@ -274,6 +315,9 @@ if ($preview_all) {
   $assess_info->overrideSetting('displaymethod','full');
   $assess_record->setTeacherInGb(true); // enables answers showing
   $assessInfoOut['preview_all'] = true;
+  foreach ($assessInfoOut['interquestion_text'] as $k=>$v) {
+    unset($assessInfoOut['interquestion_text'][$k]['ispage']); // hide pages on preview all
+  }
 } else {
   $assessInfoOut['preview_all'] = false;
 }
@@ -288,7 +332,9 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
 
 //get attempt info
-$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+$assessInfoOut['has_active_attempt'] = ($assess_record->hasActiveAttempt() ||
+    ($canViewAll && !empty($_POST['in_print']))  // for GB print view, fake an active attempt
+  );
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   // These values are adjusted for timelimit multiplier, but are not limited
@@ -300,9 +346,11 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 // grab video cues if needed
 if ($assess_info->getSetting('displaymethod') === 'video_cued') {
   $viddata = $assess_info->getVideoCues();
-  $assessInfoOut['videoid'] = $viddata['vidid'];
-  $assessInfoOut['videoar'] = $viddata['vidar'];
-  $assessInfoOut['videocues'] = $viddata['cues'];
+  if (isset($viddata['vidid'])) {
+    $assessInfoOut['videoid'] = $viddata['vidid'];
+    $assessInfoOut['videoar'] = $viddata['vidar'];
+    $assessInfoOut['videocues'] = $viddata['cues'];
+  }
 }
 
 // grab livepoll status if needed.  If doesn't exist, create record
@@ -328,36 +376,9 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   }
 }
 
-// get settings for LTI if needed
-if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
-  if ($coursemsgset < 4 && $assessInfoOut['help_features']['message']==true) {
-    $assessInfoOut['lti_showmsg'] = 1;
-    // get msg count
-    $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
-		$stm->execute(array(':msgto'=>$uid, ':courseid'=>$cid));
-		$assessInfoOut['lti_msgcnt'] = intval($stm->fetchColumn(0));
-  }
-  if (!empty($assessInfoOut['help_features']['forum'])) {
-    // get new post count
-    $query = "SELECT COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-    $query .= "WHERE imas_forum_threads.forumid=:forumid AND ";
-    $query .= "imas_forum_threads.lastposttime<:now AND ";
-    $query .= "(imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	$qarr = array(':now'=>$now, ':forumid'=>$assessInfoOut['help_features']['forum'], ':userid'=>$userid);
-	if (!isset($teacherid)) {
-		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2 )) ";
-		$qarr[':userid2']=$userid;
-	}
-    $stm = $DBH->prepare($query);
-    $stm->execute($qarr);
-	$assessInfoOut['lti_forumcnt'] = intval($stm->fetchColumn(0));
-  }
-}
-
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
-$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || $_POST['in_print'] == 1);
+$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || !empty($_POST['in_print']));
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
 
 // if practice, add that
@@ -368,7 +389,12 @@ $assess_record->saveRecordIfNeeded();
 
 // store assessment start in session data, so we know if they've gotten past
 // password at some point
-$_SESSION['assess2-'.$aid] = $in_practice;
+$_SESSION['assess2-'.$aid] = [$in_practice, $assess_info->getSetting('password')];
+
+if ($in_practice) {
+    $assessInfoOut['showwork_after'] = 0;
+    $assessInfoOut['showwork_cutoff'] = 0;
+}
 
 //prep date display
 prepDateDisp($assessInfoOut);

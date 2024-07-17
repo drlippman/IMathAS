@@ -193,7 +193,7 @@ function showcalcontentsid(elid) {
 				if (caleventsarr[elid].data[i].editlink!=null) {
           if (caleventsarr[elid].data[i].ver > 1) {
             html += ' <a href="addassessment2.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
-            html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
+            html += ' <a href="addquestions2.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
             html += ' <a href="gb-itemanalysis2.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
           } else {
   					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
@@ -313,7 +313,7 @@ function showcalcontentsid(elid) {
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='CD') {
 				html += '<li><span class="calitem">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				html += caleventsarr[elid].data[i].name;
+				html += caleventsarr[elid].data[i].name.replace(/https?:\/\/[^\s<]*/g, '<a href="$&" target="_blank">$&</a>');
 				html += '</li>';
 			}
 		}

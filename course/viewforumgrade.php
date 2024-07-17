@@ -2,7 +2,7 @@
 //IMathAS: View of forum grade details, to be linked from gradebook
 //(c) 2011 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	$cid = intval($_GET['cid']);
@@ -14,7 +14,7 @@
 	}
 	$istutor = isset($tutorid);
 
-	$stu = intval($_GET['stu']);
+	$stu = intval($_GET['stu'] ?? 0);
 
 	if ($isteacher || $istutor) {
 		$uid = intval($_GET['uid']);
@@ -98,13 +98,13 @@
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$possiblepoints = $row[3];
 	$tutoredit = $row[4];
-	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
 	$showlink = ($caneditscore || time()<$row[5]);
 
 	$pagetitle = "View Forum Grade";
 	if ($caneditscore && $_SESSION['useed']!=0) {
 		$useeditor = "noinit";
-		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
+		$placeinhead = '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 		$placeinhead .= '<style type="text/css">
 		 .fbbox {
 		 	min-width: 15em;
@@ -124,7 +124,7 @@
 		$nologo = true;
 		$showlink = false;
 	}
-	require("../header.php");
+	require_once "../header.php";
 	if (!$embedded) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($stu)."&cid=".Sanitize::encodeUrlParam($cid)."\">Gradebook</a> ";
@@ -136,7 +136,7 @@
 
 	if ($istutor && $tutoredit==2) {
 		echo '<p>No access to scores for this forum</p>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -191,7 +191,7 @@
 				echo "</textarea></td>";
 			} else {
 				echo '<td><div class="fbbox" id="feedback'.$postid.'">';
-				if ($scores[$row[0]][1]!==null) {
+				if (!empty($scores[$row[0]][1])) {
 					echo Sanitize::outgoingHtml($scores[$row[0]][1]);
 				}
 				echo '</div></td>';
@@ -199,10 +199,11 @@
 		} else {
 			if (isset($scores[$row[0]])) {
 				echo '<td>'.Sanitize::encodeStringForDisplay($scores[$row[0]][0]).'</td>';
+                echo '<td>'.Sanitize::outgoingHtml($scores[$row[0]][1]).'</td>';
 			} else {
-				echo "<td>-</td>";
+				echo "<td>-</td><td></td>";
 			}
-			echo '<td>'.Sanitize::outgoingHtml($scores[$row[0]][1]).'</td>';
+			
 		}
 		echo "</tr>";
 	}
@@ -219,13 +220,13 @@
 			//echo "<td><textarea cols=40 rows=1 id=\"feedback0\" name=\"feedback[0]\">".Sanitize::encodeStringForDisplay($scores[0][1])."</textarea></td>";
 			if ($_SESSION['useed']==0) {
 				echo "<td><textarea class=scorebox cols=\"40\" rows=\"1\" name=\"feedback0\" id=\"feedback0\">";
-				if ($scores[0][1]!==null) {
+				if (isset($scores[0][1])) {
 					echo Sanitize::encodeStringForDisplay($scores[0][1]);
 				}
 				echo "</textarea></td>";
 			} else {
 				echo '<td><div class="fbbox" id="feedback0">';
-				if ($scores[0][1]!==null) {
+				if (isset($scores[0][1])) {
 					echo Sanitize::outgoingHtml($scores[0][1]);
 				}
 				echo '</div></td>';
@@ -241,5 +242,5 @@
 		echo '<p><input type="submit" value="Save Scores" /></p>';
 		echo '</form>';
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

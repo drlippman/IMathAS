@@ -7,13 +7,13 @@
      tagged: 0 no, 1 yes
 */
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
@@ -46,7 +46,7 @@
 	}
 
 	$pagetitle = "New Messages";
-	require("../header.php");
+	require_once "../header.php";
 
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
@@ -119,7 +119,8 @@
 			} else {
 				$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 			}
-			printf("</td><td>%s</td>", Sanitize::encodeStringForDisplay($line['fullname']));
+			printf("</td><td><span class='pii-full-name'>%s</span></td>",
+                Sanitize::encodeStringForDisplay($line['fullname']));
 			if ($line['name']==null) {
 				$line['name'] = "[Deleted]";
 			}
@@ -135,5 +136,5 @@
 
 	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

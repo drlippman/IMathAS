@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -76,7 +76,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$sel1list = implode(',', array_map('encodeSelector',$sel1));
 	$iplist = implode(',',$ips);
 	$pwlist = implode(',',$pws) . ';'. implode(',',$spws);
-	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'];
+	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'] + 8*$_POST['reentrysame'];
 
 	if ($_POST['termtype']=='mo') {
 		$_POST['term'] = '*mo*';
@@ -295,7 +295,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/diag.js\"></script>\n";
 
  /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) { //NO AUTHORITY
 	echo $body;
@@ -349,7 +349,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<input type=text id="in<?php echo $k ?>"  onkeypress="return onenter(event,'in<?php echo $k ?>','out<?php echo $k ?>')"/>
 			<input type="button" value="Add" onclick="additem('in<?php echo $k ?>','out<?php echo $k ?>')"/><br/>
 
-			<table >
+			<table role="presentation">
 			<tbody id="out<?php echo $k ?>">
 
 <?php
@@ -420,7 +420,11 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<input type=radio name="reentry" value="0" <?php writeHtmlChecked(4,($public&4),1); ?> /> No
 
 	<input type=radio name="reentry" value="1" <?php writeHtmlChecked(4,($public&4),0); ?> /> Yes, within
-	  <input type="text" name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($reentrytime); ?>" size="4" /> minutes (0 for no limit)
+	  <input type="text" name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($reentrytime); ?>" size="4" /> minutes (0 for no limit),
+      to <select name="reentrysame">
+        <option value=0 <?php writeHtmlSelected(0,($public&8)); ?>>any first-level selector</option>
+        <option value=1 <?php writeHtmlSelected(8,($public&8)); ?>>only same first-level selector</option>
+        </select>
 
 	</p>
 
@@ -443,7 +447,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	Enter IP address: <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
 	<input type=button value="Add" onclick="additem('ipin','ipout')"/>
 
-	<table>
+	<table role="presentation">
 	<tbody id="ipout">
 <?php
 		if (trim($ips)!='') {
@@ -481,7 +485,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<input type=text id="pwin"  onkeypress="return onenter(event,'pwin','pwout')">
 	<input type=button value="Add" onclick="additem('pwin','pwout')"/>
 
-	<table>
+	<table role="presentation">
 	<tbody id="pwout">
 <?php
 		$pws = explode(';',$pws);
@@ -521,7 +525,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<input type=text id="pwsin"  onkeypress="return onenter(event,'pwsin','pwsout')">
 	<input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
 
-	<table>
+	<table role="presentation">
 	<tbody id="pwsout">
 <?php
 		if (count($pws)>1 && trim($pws[1])!='') {
@@ -564,7 +568,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 		<input type=button value="Add" onclick="additem('sellist','selout')"/>
 
 
-		<table>
+		<table role="presentation">
 		<tbody id="selout">
 <?php
 		if (trim($sel1list)!='') {
@@ -603,5 +607,5 @@ if ($overwriteBody==1) { //NO AUTHORITY
 <?php
 	}
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

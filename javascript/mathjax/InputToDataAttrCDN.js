@@ -25,7 +25,7 @@
 (function (AJAX,CALLBACK,HUB,HTML) {
 
   var InputToDataAttr = MathJax.Extension["InputToDataAttr"] = {
-    version: "2.6.1",
+    version: "2.7.9",
 
     Config: function () {
       HUB.Register.MessageHook("End Math",function (msg) {
@@ -73,6 +73,12 @@
   MathJax.Hub.Register.StartupHook("End Config", InputToDataAttr.Config);
 
   HUB.Startup.signal.Post("InputToDataAttr Ready");
+
+  HUB.Register.StartupHook("AsciiMath Jax Ready", function () {
+    AM = MathJax.InputJax.AsciiMath.AM;
+    AM.newsymbol({ input: "~", tag: "mo", output: "\u223C", ttype: AM.TOKEN.CONST });
+    AM.newsymbol({ input: "sim", tag: "mo", output: "\u223C", ttype: AM.TOKEN.CONST });
+  });
 
 })(MathJax.Ajax,MathJax.Callback,MathJax.Hub,MathJax.HTML);
 

@@ -2,17 +2,17 @@
 //IMathAS:  Item Analysis addon - get student list for different features; assess2 ver
 //(c) 2019 David Lippman for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 
 $isteacher = isset($teacherid);
 $istutor = isset($tutorid);
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-$qid = $_GET['qid'];
+$qid = $_GET['qid'] ?? '';
 $type = $_GET['type'];
 if (!$isteacher && !$istutor) {
 	echo "This page not available to students";
@@ -75,7 +75,7 @@ if ($type=='notstart') {
 	natsort($stunames);
 	echo '<h2>Students who have not started this assessment</h2><ul>';
 	foreach ($stunames as $name) {
-		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
+		echo sprintf('<li><span class="pii-full-name">%s</span></li>', Sanitize::encodeStringForDisplay($name));
 	}
 	echo '</ul>';
 } else if ($type=='help') {
@@ -96,7 +96,7 @@ if ($type=='notstart') {
 	natsort($stunames);
 	echo '<h2>Students who clicked on help for this question</h2><ul>';
 	foreach ($stunames as $name) {
-		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
+		echo sprintf('<li><span class="pii-full-name">%s</span></li>', Sanitize::encodeStringForDisplay($name));
 	}
 	echo '</ul>';
 } else {
@@ -118,7 +118,7 @@ if ($type=='notstart') {
 	$sturegens = array();
 	$stuatt = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
-		$scoredData = json_decode(gzdecode($line['scoreddata']), true);
+		$scoredData = json_decode(Sanitize::gzexpand($line['scoreddata']), true);
 		$scoredAssessmentIndex = $scoredData['scored_version'];
 		$scoredAssessment = $scoredData['assess_versions'][$scoredAssessmentIndex];
 
@@ -155,7 +155,7 @@ if ($type=='notstart') {
 		natsort($stunames);
 		echo '<h2>Students who have started the assignment, but have not completed this question</h2><ul>';
 		foreach ($stunames as $name) {
-			echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
+			echo sprintf('<li><span class="pii-full-name">%s</span></li>', Sanitize::encodeStringForDisplay($name));
 		}
 		echo '</ul>';
 	} else if ($type=='score') {
@@ -163,7 +163,8 @@ if ($type=='notstart') {
 		asort($stuscores);
 		echo '<h2>Students with lowest scores</h2><table class="gb"><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody>';
 		foreach ($stuscores as $uid=>$sc) {
-			echo sprintf('<tr><td>%s</td><td>%s%%</td></tr>', Sanitize::encodeStringForDisplay($stunames[$uid]),
+			echo sprintf('<tr><td><span class="pii-full-name">%s</span></td><td>%s%%</td></tr>',
+				Sanitize::encodeStringForDisplay($stunames[$uid]),
 				Sanitize::encodeStringForDisplay(round(100*$sc)));
 		}
 		echo '</tbody></table>';
@@ -181,13 +182,14 @@ if ($type=='notstart') {
 
 		$rows = array();
 		foreach ($stuatt as $uid=>$sc) {
-			$rows[] = sprintf('<td>%s</td><td>%s</td><td>&nbsp;</td>',
+			$rows[] = sprintf('<td><span class="pii-full-name">%s</span></td><td>%s</td><td>&nbsp;</td>',
 				Sanitize::encodeStringForDisplay($stunames[$uid]), Sanitize::encodeStringForDisplay($sc));
 		}
 		if ($type=='attr') {
 			$rrc = 0;
 			foreach ($sturegens as $uid=>$sc) {
-				$rows[$rrc] .= sprintf('<td style="border-left:1px solid">%s</td><td>%s</td>', Sanitize::encodeStringForDisplay($stunames[$uid]),
+				$rows[$rrc] .= sprintf('<td style="border-left:1px solid"><span class="pii-full-name">%s</span></td><td>%s</td>',
+					Sanitize::encodeStringForDisplay($stunames[$uid]),
 					Sanitize::encodeStringForDisplay($sc));
 				$rrc++;
 			}
@@ -203,7 +205,8 @@ if ($type=='notstart') {
 		arsort($stutimes);
 		echo '<h2>Students with most time spent on this question</h2><table class="gb"><thead><tr><th>Name</th><th>Time</th></tr></thead><tbody>';
 		foreach ($stutimes as $uid=>$sc) {
-			echo sprintf('<tr><td>%s</td><td>', Sanitize::encodeStringForDisplay($stunames[$uid]));
+			echo sprintf('<tr><td><span class="pii-full-name">%s</span></td><td>',
+				Sanitize::encodeStringForDisplay($stunames[$uid]));
 			if ($sc<60) {
 				$sc .= ' sec';
 			} else {
@@ -215,7 +218,7 @@ if ($type=='notstart') {
 		echo '</tbody></table>';
 	}
 }
-require("../footer.php");
+require_once "../footer.php";
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {

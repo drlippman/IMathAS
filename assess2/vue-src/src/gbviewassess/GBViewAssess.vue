@@ -5,7 +5,7 @@
     </div>
     <div v-else class="gbmainview">
       <h1>{{ $t('gradebook.detail_title')}}</h1>
-      <h2>{{ aData.userfullname }}</h2>
+      <h2><span class="pii-full-name">{{ aData.userfullname }}</span></h2>
       <h3>{{ aData.name }}</h3>
 
       <div>
@@ -16,12 +16,17 @@
           {{ $tc('gradebook.time_onscreen', attemptCount) }}:
           {{ totalTimeOnTask }}
         </span>
+        <span v-if="aData.hasOwnProperty('timelimit_ext')">
+          <br/>
+          {{ $t('gradebook.'+ (aData.timelimit_ext > 0 ? 'has_timeext' : 'used_timeext'),
+            {n: Math.abs(aData.timelimit_ext)}) }}
+        </span>
       </div>
 
       <div>
         {{ $t('gradebook.due')}}: {{ aData.enddate_disp }}
           <button
-            v-if = "canEdit"
+            v-if = "canEdit && aData.can_make_exception"
             type="button"
             class="slim"
             @click = "makeException"
@@ -34,11 +39,16 @@
             {{ aData.original_enddate_disp }}.
           {{ extensionString }}
         </span>
+        <span v-if="aData.hasOwnProperty('attemptext')">
+          <br/>
+          {{ $t('gradebook.attemptext', {n: aData.attemptext}) }}
+        </span>
       </div>
 
-      <div v-if="canEdit && aData.latepass_blocked_by_practice">
-        {{ $t('gradebook.latepass_blocked_practice') }}
+      <div v-if="canEdit && aData.latepass_status > 1">
+        {{ latepassBlockMsg }}
         <button
+          v-if="aData.latepass_status > 6"
           type="button"
           @click="clearLPblock"
         >
@@ -52,6 +62,7 @@
             <input id="assessoverride" size=4
               :value = "aData.scoreoverride"
               @input = "setScoreOverride"
+              @keyup.enter="submitForm"
             />/{{ aData.points_possible }}
           </span>
           <span v-else>
@@ -76,7 +87,7 @@
           </button>
           <span v-if="showOverride">
             <label for="assessoverride">{{ $t('gradebook.override') }}</label>:
-            <input id="assessoverride" size=4 v-model="assessOverride" />
+            <input id="assessoverride" size=4 v-model="assessOverride" @keyup.enter="submitForm" />
           </span>
         </span>
         <button
@@ -106,12 +117,16 @@
         </ul>
       </div>
 
-      <div v-if="canEdit && aData.has_active_attempt">
-        <a :href="viewAsStuUrl">
+      <div v-if="canEdit">
+        <a v-if="showViewAsStu" :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
-        </a> |
+        </a>
+        <span v-if="showViewAsStu">|</span>
         <a :href="viewAsStuUrl + '#/print'">
           {{ $t('gradebook.print') }}
+        </a> |
+        <a :href="activityLogUrl" target="_blank">
+          {{ $t('gradebook.activitylog') }}
         </a>
       </div>
 
@@ -121,16 +136,26 @@
       <div v-else class="gbmainview">
         <div>
           {{ scoreCalc }}
-          <gb-assess-select
-            v-if = "viewFull || aData.submitby === 'by_assessment'"
-            :versions = "aData.assess_versions"
-            :submitby = "aData.submitby"
-            :haspractice = "aData.has_practice"
-            :selected = "curAver"
-            @setversion = "changeAssessVersion"
-          />
+          <div>
+            <gb-assess-select
+              style = "display: inline-block"
+              v-if = "viewFull || aData.submitby === 'by_assessment'"
+              :versions = "aData.assess_versions"
+              :submitby = "aData.submitby"
+              :haspractice = "aData.has_practice"
+              :selected = "curAver"
+              @setversion = "changeAssessVersion"
+            />
+            <button
+              v-if = "!isByQuestion && canEdit && aData.assess_versions[curAver].status != -1"
+              type="button"
+              @click="clearAttempts('attempt')"
+            >
+              {{ $t('gradebook.clear_attempt') }}
+            </button>
+          </div>
           <div v-if="isUnsubmitted">
-            {{ $t('gradebook.unsubmitted') }}.
+            {{ $t('gradebook.unsubmitted') }}
             <button
               type="button"
               @click="submitVersion"
@@ -147,7 +172,7 @@
           </div>
         </div>
 
-        <div v-if="curEndmsg !== ''">
+        <div v-if = "curEndmsg !== ''">
           <button
             v-if = "viewFull"
             type="button"
@@ -162,90 +187,207 @@
           />
         </div>
 
-        <div v-if="canEdit">
-          <button
-            type="button"
-            @click = "hidePerfect = !hidePerfect"
-          >
-            {{ hidePerfectLabel }}
+        <div v-if="canEdit && viewFull">
+          <button @click = "showFilters = !showFilters">
+            {{ $t('gradebook.filters') }}
           </button>
-          <button
-            type="button"
-            @click = "hideCorrect = !hideCorrect"
-          >
-            {{ hideCorrectLabel }}
+          <div v-if = "showFilters" class="tabpanel" @change="storeFilters">
+            <p>{{ $t('gradebook.hide') }}:</p>
+            <ul style="list-style-type: none; margin:0; padding-left: 15px;">
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideUnanswered">
+                  {{ $t('gradebook.hide_unans') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideZero">
+                  {{ $t('gradebook.hide_zero') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideNonzero">
+                  {{ $t('gradebook.hide_nonzero') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hidePerfect">
+                  {{ $t('gradebook.hide_perfect') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hide100">
+                  {{ $t('gradebook.hide_100') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideFeedback">
+                  {{ $t('gradebook.hide_fb') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideNowork">
+                  {{ $t('gradebook.hide_nowork') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hidetexts" @change="loadTexts">
+                  {{ $t('gradebook.introtexts') }}
+                </label>
+              </li>
+            </ul>
+            <p id="showopts">
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_showans"
+                  @change = "showAllAns"
+                />{{ $t('gradebook.show_all_ans') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="showAllWork"
+                />{{ $t('gradebook.show_all_work') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_previewFiles"
+                  @change = "previewFiles"
+                />{{ $t('gradebook.preview_files') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_floatingSB"
+                  @change = "toggleFloatingScoreboxes"
+                />{{ $t('gradebook.floating_scoreboxes') }}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="sidebysideon"
+                  @change = "sidebysideAction"
+                />{{ $t('gradebook.sidebyside') }}
+              </label>
+            </p>
+          </div>
+        </div>
+        <div v-else-if="viewFull">
+          <button @click="hidetexts = !hidetexts; loadTexts()">
+            {{ $t(hidetexts ? 'print.show_text' : 'print.hide_text') }}
           </button>
-          <button
-            type="button"
-            @click = "hideUnanswered = !hideUnanswered"
-          >
-            {{ hideUnansweredLabel }}
-          </button>
-          <button
-            type="button"
-            @click = "showAllAns"
-          >
-            {{ $t('gradebook.show_all_ans') }}
-          </button>
-          <button
-            v-if = "!isByQuestion"
-            type="button"
-            @click="clearAttempts('attempt')"
-          >
-            {{ $t('gradebook.clear_attempt') }}
-          </button>
+          <p class="noticetext">
+            {{ $t('gradebook.no_edit') }}
+          </p>
         </div>
 
         <div v-if="viewFull">
+          <inter-question-text
+            v-if = "aData.hasOwnProperty('intro') && aData.intro !== ''"
+            v-show = "!hidetexts"
+            :active = "!hidetexts"
+            :textobj = "{html: aData.intro}"
+            class = "questionpane introtext"
+          />
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
-            class = "bigquestionwrap"
             :id = "'qwrap' + (qn+1)"
           >
-            <div class="headerpane">
-              <strong>
-                {{ $tc('question_n', qn+1) }}.
-              </strong>
-
-              <gb-question-select
-                v-if = "aData.submitby === 'by_question'"
-                :versions="qdata"
-                :selected="curQver[qn]"
-                :qn="qn"
-                @setversion = "changeQuestionVersion"
-                class = "med-left"
-              />
-              <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
-                {{ $t('gradebook.score') }}:
+            <inter-question-text-list
+              pos="beforeexact"
+              :qn="qn"
+              :key="'iqt'+qn"
+              v-show = "!hidetexts"
+              :active = "!hidetexts"
+              :lastq = "lastQ"
+              :textlist = "textList"
+            />
+            <div class = "bigquestionwrap">
+              <div class="headerpane">
                 <strong>
-                  {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
+                  {{ $tc('question_n', qn+1) }}.
                 </strong>
-              </span>
+                <em v-if="qdata[curQver[qn]].extracredit" class="small subdued">
+                  {{ $t('extracredit') }}
+                </em>
 
-            </div>
-            <div class="scrollpane">
-              <gb-question
-                :class = "{'inactive':!showQuestion[qn]}"
+                <gb-question-select
+                  v-if = "aData.submitby === 'by_question'"
+                  :versions="qdata"
+                  :selected="curQver[qn]"
+                  :qn="qn"
+                  @setversion = "changeQuestionVersion"
+                  class = "med-left"
+                />
+                <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
+                  {{ $t('gradebook.score') }}:
+                  <strong>
+                    {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
+                  </strong>
+                </span>
+
+              </div>
+              <div class="sidebyside" :class="{sidebysideon:sidebysideon}">
+                <div class="scrollpane">
+                  <gb-question
+                    :class = "{'inactive':!showQuestion[qn]}"
+                    :qdata = "qdata[curQver[qn]]"
+                    :qn = "qn"
+                    :disabled = "!canEdit"
+                    @qloaded = "questionLoaded"
+                  />
+                  <gb-showwork
+                    v-if="!sidebysideon"
+                    :work = "qdata[curQver[qn]].work"
+                    :worktime = "qdata[curQver[qn]].worktime"
+                    :showall = "showAllWork"
+                    :previewfiles = "op_previewFiles"
+                  />
+                </div>
+                <div class="sidepreview">
+                  <div class="sidepreviewtarget">
+                  </div>
+                  <gb-showwork
+                    v-if="sidebysideon"
+                    :work = "qdata[curQver[qn]].work"
+                    :worktime = "qdata[curQver[qn]].worktime"
+                    :showall = "showAllWork"
+                    :previewfiles = "op_previewFiles"
+                  />
+                </div>
+              </div>
+              <gb-score-details
+                :showfull = "showQuestion[qn]"
+                :canedit = "canEdit"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
-              />
-              <gb-showwork
-                :work = "qdata[curQver[qn]].work"
-                :worktime = "qdata[curQver[qn]].worktime"
+                @submitform = "submitForm"
               />
             </div>
-            <gb-score-details
-              :showfull = "showQuestion[qn]"
-              :canedit = "canEdit"
-              :qdata = "qdata[curQver[qn]]"
-              :qn = "qn"
-            />
           </div>
+          <inter-question-text-list
+            pos="after"
+            :qn="lastQ"
+            :active = "!hidetexts"
+            v-show = "!hidetexts"
+            :lastq = "lastQ"
+            :textlist = "textList"
+          />
         </div>
         <gb-feedback
           qn="gen"
-          :show="viewFull"
+          :username="aData.userfullname"
+          :show="viewFull && (canEdit || assessFeedback !== '')"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
@@ -260,6 +402,15 @@
             @click = "submitChanges(true)"
           >
             {{ $t('gradebook.save') }}
+          </button>
+          <button
+            v-if = "canEdit && aData.nextstu"
+            type = "button"
+            :disabled = "!canSubmit"
+            class = "primary"
+            @click = "submitChanges(false,true)"
+          >
+            {{ $t('gradebook.savenext') }}
           </button>
           <span v-if="savedMsg !== ''" class="noticetext">
             {{ savedMsg }}
@@ -320,6 +471,9 @@ import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import InterQuestionText from '@/components/InterQuestionText.vue';
+
 import '../assess2.css';
 
 export default {
@@ -333,17 +487,30 @@ export default {
     SummaryCategories,
     ErrorDialog,
     GbFeedback,
-    ConfirmDialog
+    ConfirmDialog,
+    InterQuestionTextList,
+    InterQuestionText
   },
   data: function () {
     return {
       showOverride: false,
-      assessOverride: '',
+      assessOverride: false,
+      hide100: false,
       hidePerfect: false,
-      hideCorrect: false,
+      hideNonzero: false,
+      hideZero: false,
       hideUnanswered: false,
+      hideFeedback: false,
+      hideNowork: false,
+      showFilters: false,
       showEndmsg: false,
-      showExcused: false
+      showExcused: false,
+      showAllWork: false,
+      hidetexts: true,
+      op_previewFiles: false,
+      op_floatingSB: false,
+      op_showans: false,
+      sidebysideon: false
     };
   },
   computed: {
@@ -452,40 +619,42 @@ export default {
         return '';
       }
     },
+    showViewAsStu () {
+      // show if there's an active attempt, or if there's only an instructor-generated
+      // non-started assessment version
+      return (this.aData.has_active_attempt ||
+        (this.aData.scored_version === 0 && this.aData.assess_versions[0].status === -1)
+      );
+    },
     viewAsStuUrl () {
       return 'index.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
     },
+    activityLogUrl () {
+      return '../course/viewactionlog.php?cid=' + store.cid + '&uid=' + store.uid;
+    },
     showQuestion () {
-      // 1 to hide perfect, 2 correct, 4 unanswered
       const out = {};
       for (let i = 0; i < this.curQuestions.length; i++) {
         const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hidePerfect && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
+        if (this.hide100 && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
           showit = false;
-        } else if (this.hideCorrect && Math.abs(qdata.rawscore - 1) < 0.002) {
+        } else if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
-        } else if (this.hideUnanswered && qdata.try === 0) {
+        } else if (this.hideUnanswered && qdata.parts.reduce((a, c) => Math.max(a, c.try), 0) === 0) {
+          showit = false;
+        } else if (this.hideZero && Math.abs(qdata.rawscore) < 0.002) {
+          showit = false;
+        } else if (this.hideNonzero && Math.abs(qdata.rawscore) > 0.002 && Math.abs(qdata.rawscore) < 0.998) {
+          showit = false;
+        } else if (this.hideFeedback && qdata.feedback !== null && qdata.feedback !== '') {
+          showit = false;
+        } else if (this.hideNowork && (!qdata.hasOwnProperty('work') || qdata.work === null || qdata.work === '')) {
           showit = false;
         }
         out[i] = showit;
       }
       return out;
-    },
-    hidePerfectLabel () {
-      return this.hidePerfect
-        ? this.$t('gradebook.show_perfect')
-        : this.$t('gradebook.hide_perfect');
-    },
-    hideCorrectLabel () {
-      return this.hideCorrect
-        ? this.$t('gradebook.show_correct')
-        : this.$t('gradebook.hide_correct');
-    },
-    hideUnansweredLabel () {
-      return this.hideUnanswered
-        ? this.$t('gradebook.show_unans')
-        : this.$t('gradebook.hide_unans');
     },
     exceptionActionLabel () {
       if (this.aData.hasexception) {
@@ -504,6 +673,19 @@ export default {
         return this.$t('gradebook.' + store.saving);
       }
     },
+    latepassBlockMsg () {
+      var m;
+      switch (this.aData.latepass_status) {
+        case 7: m = 'practice'; break;
+        case 8: m = 'gb'; break;
+        case 2: m = 'lpcutoff'; break;
+        case 3: m = 'courseend'; break;
+        case 4: m = 'pastdue'; break;
+        case 5: m = 'toolate'; break;
+        case 6: m = 'toofew'; break;
+      }
+      return this.$t('gradebook.latepass_blocked_' + m);
+    },
     isUnsubmitted () {
       return (this.aData.submitby === 'by_assessment' &&
         this.aData.assess_versions[store.curAver].status === 0);
@@ -516,6 +698,16 @@ export default {
     },
     confirmObj () {
       return store.confirmObj;
+    },
+    lastQ () {
+      return this.aData.assess_versions[store.curAver].questions.length - 1;
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {
@@ -536,6 +728,7 @@ export default {
     },
     doChangeAssessVersion (val) {
       if (val !== store.curAver) {
+        this.hidetexts = true;
         if (this.aData.assess_versions[val].status === 3) {
           // requesting the practice version
           actions.loadGbAssessVersion(0, true);
@@ -580,7 +773,7 @@ export default {
       }
       store.saving = '';
     },
-    submitChanges (exit) {
+    submitChanges (exit, nextstu) {
       if (!this.aData.hasOwnProperty('scoreoverride') && this.showOverride) {
         if (this.assessOverride !== '') {
           store.scoreOverrides.gen = this.assessOverride;
@@ -588,7 +781,11 @@ export default {
         this.showOverride = false;
       }
       var doexit = (exit === true);
-      actions.saveChanges(doexit);
+      var donextstu = (nextstu === true);
+      actions.saveChanges(doexit, donextstu);
+    },
+    submitForm () {
+      this.submitChanges(true);
     },
     exit () {
       window.location = window.exiturl;
@@ -612,11 +809,6 @@ export default {
       url += '&from=gb';
       window.location = url;
     },
-    showAllAns () {
-      window.$("span[id^='ans']").removeClass('hidden').show();
-      window.$('.sabtn').replaceWith('<span>Answer: </span>');
-      window.$('.keybtn').attr('aria-expanded', 'true');
-    },
     beforeUnload (evt) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
@@ -631,6 +823,47 @@ export default {
     },
     closeConfirm () {
       store.confirmObj = null;
+    },
+    showAllAns () {
+      window.toggleshowallans(this.op_showans);
+    },
+    previewFiles () {
+      window.togglepreviewallfiles(this.op_previewFiles);
+    },
+    toggleFloatingScoreboxes () {
+      window.toggleScrollingScoreboxState(this.op_floatingSB);
+    },
+    sidebysideAction () {
+      window.sidebysidemoveels(this.sidebysideon);
+    },
+    loadTexts () {
+      if (!store.assessInfo.hasOwnProperty('intro')) {
+        actions.loadGbTexts();
+      }
+    },
+    storeFilters () {
+      const tocheck = ['hide100', 'hidePerfect', 'hideNonzero', 'hideZero', 'hideUnanswered',
+        'hideFeedback', 'hideNowork', 'showEndmsg', 'showExcused', 'showAllWork',
+        'hidetexts', 'op_previewFiles', 'op_floatingSB', 'op_showans', 'sidebysideon'];
+      const out = [];
+      for (const v of tocheck) {
+        if ((v === 'hidetexts' && this[v] === false) || (v !== 'hidetexts' && this[v] === true)) {
+          out.push(v);
+        }
+      }
+      window.document.cookie = 'gvaf' + store.aid + '=' + out.join(',');
+    },
+    questionLoaded (base) {
+      if (this.op_previewFiles) {
+        window.togglepreviewallfiles(true, base);
+      }
+      if (this.op_showans) {
+        window.toggleshowallans(true, base);
+      }
+      if (this.sidebysideon) {
+        window.sidebysidemoveels(true, base);
+      }
+      this.$nextTick(window.sendLTIresizemsg);
     }
   },
   created () {
@@ -658,6 +891,31 @@ export default {
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
       actions.loadGbAssessData();
     }
+    const filtercookie = window.readCookie('gvaf' + store.aid);
+    if (filtercookie !== null && filtercookie.length > 0) {
+      this.showFilters = true;
+      const cookieparts = filtercookie.split(',');
+      for (const v of cookieparts) {
+        if (v === 'hidetexts') {
+          this[v] = false;
+        } else {
+          this[v] = true;
+        }
+      }
+    }
+  },
+  mounted () {
+    const filtercookie = window.readCookie('gvaf' + store.aid);
+    if (filtercookie !== null && filtercookie.length > 0) {
+      const cookieparts = filtercookie.split(',');
+      if (cookieparts.indexOf('op_floatingSB') !== -1) {
+        window.toggleScrollingScoreboxState(true);
+      }
+      this.$nextTick(window.sendLTIresizemsg);
+    }
+  },
+  updated () {
+    this.$nextTick(window.sendLTIresizemsg);
   }
 };
 </script>
@@ -674,6 +932,7 @@ export default {
   right: 10px;
   bottom: 10px;
   text-align: center;
+  z-index: 10;
 }
 .bigquestionwrap {
   border: 1px solid #ccc;
@@ -683,5 +942,32 @@ export default {
 .bigquestionwrap .headerpane {
   padding: 8px;
   background-color: #eee;
+}
+.hoverbox {
+  background-color: #fff; z-index: 9; box-shadow: 0px -3px 5px 0px rgb(0 0 0 / 75%);
+}
+#showopts label {
+  margin-right: 8px;
+  user-select: none;
+}
+.sidebyside {
+  display:flex;
+  flex-wrap:nowrap;
+}
+.scrollpane {
+  width: 100%;
+}
+.sidepreview {
+  width: 0%;
+}
+.sidebysideon .sidepreview {
+  border-left: 1px solid #ccc;
+  padding: 10px;
+}
+.sidebysideon > div {
+  width: 50%;
+}
+.sidepreview .viewworkwrap {
+  margin: 15px 0;
 }
 </style>

@@ -39,8 +39,8 @@ if (!$isRealStudent) {
  */
 function check_for_required($method, $required) {
   foreach ($required as $r) {
-    if (($method == 'POST' && !isset($_POST[$r]) && $_POST[$r] !== '') ||
-      ($method == 'GET' && !isset($_GET[$r]) && $_GET[$r] !== '')
+    if (($method == 'POST' && (!isset($_POST[$r]) || $_POST[$r] === '')) ||
+      ($method == 'GET' && (!isset($_GET[$r]) || $_GET[$r] === ''))
     ) {
       echo '{"error": "missing_param", "error_details": "Missing parameter '.sanitize::encodeStringForJavascript($r).'"}';
       exit;
@@ -49,7 +49,7 @@ function check_for_required($method, $required) {
 }
 
 function prepDateDisp(&$out) {
-  $tochg = ['startdate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto'];
+  $tochg = ['startdate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto', 'showwork_cutoff_expires'];
   foreach ($tochg as $key) {
     if (isset($out[$key])) {
       if ($out[$key] == 2000000000) {
@@ -61,6 +61,19 @@ function prepDateDisp(&$out) {
   }
 }
 
+function getShowWorkAfter(&$out, $assess_record, $assess_info) {
+    $out['showwork_after'] = $assess_record->getShowWorkAfter();
+    $workcutoff = $assess_record->getShowWorkAfterCutoff();
+    if ($workcutoff > 0) {
+        // time allowed for work after (in min)
+        $out['showwork_cutoff'] = $assess_info->getSetting('workcutoff');
+        // timestamp of work cutoff for this student
+        $out['showwork_cutoff_expires'] = $workcutoff;
+        $out['showwork_cutoff_in'] = $workcutoff - time();
+    } else {
+        $out['showwork_cutoff'] = 0;
+    }
+}
 
 // normalize $_POST['practice'] to boolean
 if (!empty($_POST['practice']) && $_POST['practice'] === 'false') {
@@ -79,7 +92,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 
 $useeditor = 1;
 
-if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$testsettings['courseid']])) {
+if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$_GET['cid']])) {
   $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
-  $stm->execute(array(':lastaction'=>time(), ':id'=>$_GET['cid']));
+  $stm->execute(array(':lastaction'=>time(), ':id'=>$_SESSION['loginlog' . $_GET['cid']]));
 }

@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -32,19 +32,26 @@ class EssayScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        require_once(dirname(__FILE__)."/../../../includes/htmLawed.php");
+        require_once dirname(__FILE__)."/../../../includes/htmLawed.php";
 
         $givenans = myhtmLawed($givenans);
+        if (strlen($givenans)>30000) {
+            $givenans = substr($givenans,0,30000) . ' (remainder truncated due to length)';
+        }
         $scorePartResult->setLastAnswerAsGiven($givenans);
+
+        $scoremethod = getOptionVal($options, 'scoremethod', $multi, $partnum);
         
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
-        if (isset($scoremethod) &&
+        if (!empty($scoremethod) &&
             (($scoremethod=='takeanything'  && trim($givenans)!='') ||
                 $scoremethod=='takeanythingorblank')
         ) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else if (trim($givenans)=='') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        } else if (!empty($scoremethod) && $scoremethod=='nomanual') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         } else {

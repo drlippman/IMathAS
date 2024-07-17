@@ -1,14 +1,14 @@
 <?php
 //IMathAS:  Add/remove class tutors
 //(c) 2009 David Lippman
-	require("../init.php");
-	require("../includes/htmlutil.php");
-
+	require_once "../init.php";
+	require_once "../includes/htmlutil.php";
+    require_once '../includes/TeacherAuditLog.php';
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	if (isset($CFG['GEN']['allowinstraddtutors']) &&  $CFG['GEN']['allowinstraddtutors']==false) {
@@ -21,13 +21,22 @@
 	$err = '';
 	if (isset($_POST['submit'])) {
 		//remove any selected tutors
-		if (count($_POST['remove'])>0) {
+		if (!empty($_POST['remove'])) {
 			$toremove = implode(',', array_map('intval', $_POST['remove']));
 			$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE id IN ($toremove) AND courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
+            TeacherAuditLog::addTracking(
+				$cid,
+				"Roster Action",
+				null,
+				array(
+					'action' => 'Remove Tutors',
+					'ids' => array_map('intval', $_POST['remove'])
+				)
+			);
 		}
 		//update sections
-		if (count($_POST['section'])>0) {
+		if (isset($_POST['section']) && count($_POST['section'])>0) {
 			foreach ($_POST['section'] as $id=>$val) {
 				$stm = $DBH->prepare("UPDATE imas_tutors SET section=:section WHERE id=:id AND courseid=:courseid");
 				$stm->execute(array(':section'=>$val, ':id'=>$id, ':courseid'=>$cid));
@@ -35,7 +44,7 @@
 		}
 		//add new tutors
 		if (isset($_POST['promotetotutor'])) {
-			require_once("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			$ph = Sanitize::generateQueryPlaceholders($_POST['promotetotutor']);
 			$stm = $DBH->prepare("SELECT u.id,u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=? AND u.id IN ($ph)");
 			$stm->execute(array_merge(array($cid), $_POST['promotetotutor']));
@@ -95,6 +104,17 @@
 						}
 						$err .= '</p>';
 					}
+                    if (!empty($foundsid)) {
+                        TeacherAuditLog::addTracking(
+                            $cid,
+                            "Roster Action",
+                            null,
+                            array(
+                                'action' => 'Add Tutors',
+                                'SIDs' => $foundsid
+                            )
+                        );
+                    }
 				} else {
 					$err .= "<p>No usernames provided were found</p>";
 				}
@@ -163,10 +183,13 @@
 
 	//*** DISPLAY ***
 	$pagetitle = "Manage Tutors";
-	require("../header.php");
+	require_once "../header.php";
 	$cid = Sanitize::courseId($_GET['cid']);
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Users</a> &gt; Manage Tutors</div>";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Manage Tutors</div>";
 
 ?>
 
@@ -178,6 +201,7 @@
 	<form id="curform" method=post action="managetutors.php?cid=<?php echo $cid ?>">
 	
 	<table class="gb">
+    <caption class="sr-only">Tutors</caption>
 	<thead>
 		<tr>
 			<th>Tutor name</th>
@@ -195,7 +219,7 @@ if (count($tutorlist)==0) {
 }
 foreach ($tutorlist as $tutor) {
 	echo '<tr>';
-	echo '<td>'.Sanitize::encodeStringForDisplay($tutor['name']).'</td>';
+	echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($tutor['name']).'</span></td>';
 	echo '<td>';
 	//section
 	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']">';
@@ -229,5 +253,5 @@ foreach ($tutorlist as $tutor) {
 	</form>
 
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

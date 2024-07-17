@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100 && ($myspecialrights&(32+64))==0) {
 	exit;
@@ -81,7 +81,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 if (count($reqdates)==0) {
     htmlHeader();
 	echo "No requests found";
-	require("../footer.php");
+	require_once "../footer.php";
 } else {
 	$ph = Sanitize::generateQueryPlaceholders($reqdates);
 
@@ -98,7 +98,7 @@ if (count($reqdates)==0) {
 	if ('html' == $outputFormat) {
 		htmlHeader();
 		outputHtml();
-		require("../footer.php");
+		require_once "../footer.php";
 	} elseif ('csv' == $outputFormat) {
 		outputCsv();
 	}
@@ -108,7 +108,7 @@ function htmlHeader() {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
 
 	$placeinhead = '<script type="text/javascript" src="'.$GLOBALS['staticroot'].'/javascript/tablesorter.js"></script>';
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class=breadcrumb>';
 	echo $GLOBALS['breadcrumbbase'] .' <a href="../admin/userreports.php">'._('User Reports').'</a> &gt; ';
 	echo _('New Instructor Accounts').'</div>';
@@ -155,10 +155,10 @@ function outputHtml() {
 		if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 		echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
 		echo '<td>';
-		echo '<a href="../admin/userdetails.php?id='.$row['id'].'" target="_blank">';
-		echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</a></td>';
-		echo '<td>'.Sanitize::encodeStringForDisplay($row['SID']).'</td>';
-		echo '<td>'.Sanitize::encodeStringForDisplay($row['email']).'</td>';
+		echo '<a href="../admin/userdetails.php?id='.$row['id'].'" target="_blank"><span class="pii-full-name">';
+		echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></a></td>';
+		echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></td>';
+		echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($row['email']).'</span></td>';
 		echo '<td>'.getFormattedRequestDate($row).'</td>';
 		echo '<td>'.getFormattedApprovalDate($row).'</td>';
 		echo '<td>'.Sanitize::encodeStringForDisplay($GLOBALS['reqhow'][$row['id']]).'</td>';

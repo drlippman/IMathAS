@@ -1,5 +1,6 @@
 <template>
-  <table class="LPres">
+  <table class="LPres" ref="main">
+    <caption class="sr-only">Results</caption>
     <thead>
       <tr>
         <th>{{ $t('livepoll.answer') }}</th>
@@ -12,7 +13,7 @@
         :key = "i"
         :class = "[showans ? (results.scoredata[i] > 0 ? 'LPshowcorrect' : 'LPshowwrong') : '']"
       >
-        <td>{{ choice }}</td>
+        <td v-html="choice"></td>
         <td>
           <span class="LPresbarwrap">
             <span class="LPresbar" :style="{width: Math.round(100*results.datatots[i]/results.maxfreq) +'%'}">

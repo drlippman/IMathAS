@@ -99,6 +99,7 @@ array( 'input'=>'divide', 'output'=>'-:', 'definition'=>TRUE),
 array( 'input'=>'&deg;', 'output'=>'^@', 'definition'=>TRUE),
 array( 'input'=>'@', 'tex'=>'circ'),
 array( 'input'=>'o+', 'tex'=>'oplus'),
+array( 'input'=>'o-', 'tex'=>'ominus'),
 array( 'input'=>'ox', 'tex'=>'otimes'),
 array( 'input'=>'o.', 'tex'=>'odot'),
 array( 'input'=>'sum', 'underover'=>TRUE),
@@ -136,16 +137,19 @@ array( 'input'=>'~=', 'tex'=>'stackrel{\sim}{=}', 'notexcopy'=>TRUE),
 array( 'input'=>'cong', 'output'=>'~=', 'definition'=>TRUE),
 array( 'input'=>'~~', 'tex'=>'approx'),
 array( 'input'=>'prop', 'tex'=>'propto'),
+array( 'input'=>'~', 'tex' => 'sim'),
 
 // Logical symbols
 array( 'input'=>'and', 'space'=>TRUE),
 array( 'input'=>'or', 'space'=>TRUE),
+array( 'input'=>'xor', 'tex'=>'oplus'),
 array( 'input'=>'not', 'tex'=>'neg'),
 array( 'input'=>'=>', 'tex'=>'Rightarrow'),
 array( 'input'=>'implies', 'output'=>'=>', 'definition'=>TRUE),
 array( 'input'=>'if', 'space'=>TRUE),
 array( 'input'=>'<=>', 'tex'=>'Leftrightarrow'), 
 array( 'input'=>'iff', 'output'=>'<=>', 'definition'=>TRUE),
+array( 'input'=>'rightleftharpoons', 'tex'=>'rightleftharpoons'),
 array( 'input'=>'AA', 'tex'=>'forall'),
 array( 'input'=>'EE', 'tex'=>'exists'),
 array( 'input'=>'_|_', 'tex'=>'bot'),
@@ -161,6 +165,7 @@ array( 'input'=>'dt', 'output'=>'{:d t:}', 'definition'=>TRUE),
 array( 'input'=>'oint'),
 array( 'input'=>'del', 'tex'=>'partial'),
 array( 'input'=>'grad', 'tex'=>'nabla'),
+array( 'input'=>'hbar'),
 array( 'input'=>'+-', 'tex'=>'pm'),
 array( 'input'=>'O/', 'tex'=>'emptyset'),
 array( 'input'=>'oo', 'tex'=>'infty'),
@@ -201,6 +206,9 @@ array( 'input'=>'tan', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'arcsin', 'unary'=>TRUE, 'func'=>TRUE), 
 array( 'input'=>'arccos', 'unary'=>TRUE, 'func'=>TRUE), 
 array( 'input'=>'arctan', 'unary'=>TRUE, 'func'=>TRUE), 
+array( 'input'=>'arcsec', 'tex'=>'text{arcsec}', 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'arccsc', 'tex'=>'text{arccsc}', 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'arccot', 'tex'=>'text{arccot}',  'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'sinh', 'tex'=>'text{sinh}', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'cosh', 'tex'=>'text{cosh}', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'tanh', 'tex'=>'text{tanh}',  'unary'=>TRUE, 'func'=>TRUE),
@@ -528,7 +536,7 @@ function AMTparseSexpr($str) {
 		$this->AMnestingDepth--;
 		$leftchop = 0;
 		if (substr($result[0],0,6)=='\\right') {
-			$st = $result[0]{6};
+			$st = $result[0][6];
 			if ($st==")" || $st=="]" || $st=="}") {
 				$leftchop = 6;
 			} else if ($st==".") {
@@ -567,11 +575,11 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
-		if ($st[0]== " ") {
+		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$newFrag .= '\\text{'.$st.'}';
-		if ($st[strlen($st)-1]== " ") {
+		if (strlen($st)>0 && $st[strlen($st)-1]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$str = $this->AMremoveCharsAndBlanks($str,$i+1);
@@ -636,7 +644,7 @@ function AMTparseSexpr($str) {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$result = $this->AMTparseExpr($str,false);
 		$this->AMnestingDepth--;
-		$st = $result[0]{strlen($result[0])-1};
+		$st = $result[0][strlen($result[0])-1];
 		if ($st == '|') {
 			$node = '{\\left|'.$result[0].'}';
 			return array($node,$result[1]);
@@ -647,7 +655,7 @@ function AMTparseSexpr($str) {
 	} else {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$texsymbol = $this->AMTgetTeXsymbol($symbol);
-		if ($texsymbol[0]=='\\' || (isset($symbol['isop']) && $symbol['isop']==true)) {
+		if ((strlen($texsymbol)>0 && $texsymbol[0]=='\\') || (isset($symbol['isop']) && $symbol['isop']==true)) {
 			return array($texsymbol,$str);
 		} else {
 			return array('{'.$texsymbol.'}',$str);

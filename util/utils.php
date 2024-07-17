@@ -1,27 +1,38 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 if (isset($_SESSION['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])) {
 	$_SESSION['userid'] = $_SESSION['emulateuseroriginaluser'];
+    $userid = $_SESSION['userid'];
 	unset($_SESSION['emulateuseroriginaluser']);
+    //reload prefs for original user
+    require_once "../includes/userprefs.php";
+    generateuserprefs($userid);
+    if (isset($_POST['tzname'])) {
+        $_SESSION['tzname'] = $_POST['tzname'];
+    }
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" .Sanitize::randomQueryStringParam());
 	exit;
 }
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['util/utils'])) {
-	require($CFG['hooks']['util/utils']);
+	require_once $CFG['hooks']['util/utils'];
 }
 
 if ($myrights >= 75 && isset($_GET['emulateuser'])) {
     $emu_id = Sanitize::onlyInt($_GET['emulateuser']);
 	if ($myrights<100) {
-		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT groupid,rights FROM imas_users WHERE id=?");
 		$stm->execute(array($emu_id));
-		if ($stm->fetchColumn(0) != $groupid) {
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($row['groupid'] != $groupid) {
 			echo "You can only emulate teachers from your own group";
 			exit;
-		}
+		} else if ($row['rights']>$myrights) {
+            echo "Cannot emulate a user of higher rights";
+            exit;
+        }
 	}
 	$_SESSION['emulateuseroriginaluser'] = $userid;
 	$_SESSION['userid'] = $emu_id;
@@ -74,12 +85,31 @@ if (isset($_GET['fixorphanqs'])) {
 	echo '<p><a href="utils.php">Utils</a></p>';
 	exit;
 }
+if (isset($_POST['setupfcm'])) {
+    $data = json_decode($_POST['setupfcm'], true);
+    if ($data === null || !isset($data['client_email']) || !isset($data['private_key'])) {
+        echo '<p>Error: invalid data</p>';
+    } else {
+        $stm = $DBH->query("SELECT kid,privatekey FROM imas_lti_keys WHERE key_set_url='https://oauth2.googleapis.com/token'");
+        if ($stm->rowCount() > 0) {
+            $stm = $DBH->prepare("UPDATE imas_lti_keys set kid=?,privatekey=? WHERE 'https://oauth2.googleapis.com/token'");
+            $stm->execute([$data['client_email'], $data['private_key']]);
+        } else {
+            $stm = $DBH->prepare("INSERT INTO imas_lti_keys (key_set_url,kid,privatekey) VALUES (?,?,?)");
+            $stm->execute(['https://oauth2.googleapis.com/token', $data['client_email'], $data['private_key']]);
+        }
+        echo '<p>Key information stored.</p>';
+    }
+    echo '<p><a href="utils.php">Utils</a></p>';
+	exit;
+}
 if (isset($_POST['updatecaption'])) {
 	$vidid = trim($_POST['updatecaption']);
 	if (strlen($vidid)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$vidid)) {
 		echo 'Invalid video ID';
 		exit;
 	}
+    $vidid = Sanitize::simpleASCII($vidid);
 	$ctx = stream_context_create(array('http'=>
 	    array(
 		'timeout' => 1
@@ -90,7 +120,7 @@ if (isset($_POST['updatecaption'])) {
 	if ($captioned==1) {
 		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
-		$stm->execute(array('[[:<:]]'.$vidid.'[[:>:]]'));
+		$stm->execute(array(MYSQL_LEFT_WRDBND.$vidid.MYSQL_RIGHT_WRDBND));
 		$chg = 0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$parts = explode('~~', $row[1]);
@@ -132,10 +162,14 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['aid'])) {
 		$aid = Sanitize::onlyInt($_POST['aid']);
-		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+		$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 		$stm->execute(array($aid));
-		$destcid = $stm->fetchColumn(0);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+		list($destcid,$aver) = $stm->fetch(PDO::FETCH_NUM);
+        if ($aver > 1) {
+		    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment2.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+        } else {
+		    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
+        }
 	} else if (!empty($_POST['pqid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion2.php?qsetid=".Sanitize::onlyInt($_POST['pqid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['eqid'])) {
@@ -145,45 +179,45 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 }
 if (isset($_GET['listadmins'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a>\n";
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Admin List</div>';
 	echo '<h1>Admin List</h1>';
 	$query = 'SELECT iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id ';
 	$stm = $DBH->query($query.' WHERE iu.rights=100 ORDER BY LastName,FirstName');
 	echo '<h2>Full Admins</h2><ul>';
 	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
 	echo '<h2>Group Admins</h2><ul>';
 	$stm = $DBH->query($query.' WHERE iu.rights=75 ORDER BY LastName,FirstName');
 	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
 	echo '<h2>Global Account Approvers</h2><ul>';
 	$stm = $DBH->query($query.' WHERE iu.rights>39 AND (iu.specialrights&64)=64 ORDER BY LastName,FirstName');
 	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+		echo '<li><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</span></li>';
 	}
 	echo '</ul>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 if (isset($_GET['form'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
 
 	if ($_GET['form']=='emu') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Emulate User</div>';
 		echo '<form method="post" action="'.$imasroot.'/admin/actions.php">';
 		echo '<input type=hidden name=action value="emulateuser" />';
 		echo 'Emulate user with userid: <input type="text" size="5" name="uid"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 	} else if ($_GET['form']=='jumptoitem') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Jump to Item</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo '<input type=hidden name=action value="jumptoitem" />';
@@ -194,26 +228,44 @@ if (isset($_GET['form'])) {
 		echo 'Edit Question ID: <input type="text" size="8" name="eqid"/><br/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 
 	} else if ($_GET['form']=='rescue') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Recover Items</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/rescuecourse.php">';
 		echo 'Recover lost items in course ID: <input type="text" size="5" name="cid"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 	} else if ($_GET['form']=='updatecaption') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo 'YouTube video ID: <input type="text" size="11" name="updatecaption"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
+	} else if ($_GET['form']=='setupfcm') {
+		require_once "../header.php";
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Setup FCM</div>';
+		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
+        echo '<p>To enabled Firebase Cloud Messaging for push notifications, you need to 
+            set up an app with Firebase, enable the FireBase Cloud Messaging API, and
+            generate a private key, which will be downloaded as a .json file.  You will 
+            need to add the FCM project id to your config.php by setting 
+            <code>$CFG[\'FCM\'][\'project_id\']</code>.  Then copy the contents of the
+            .json file into the box below.</p>';
+        $stm = $DBH->query("SELECT kid,privatekey FROM imas_lti_keys WHERE key_set_url='https://oauth2.googleapis.com/token'");
+        if ($stm->rowCount() > 0) {
+            echo '<p><b>NOTE</b>: it appears you already have a configuration loaded. You can load a new one if you need to overwrite the existing.</p>';
+        }
+        echo '<textarea name=setupfcm id=setupfcm rows=30 style="width:100%"></textarea>';
+		echo '<input type="submit" value="Save"/>';
+		echo '</form>';
+		require_once "../footer.php";
 	} else if ($_GET['form']=='lookup') {
-		require("../header.php");
+		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; User Lookup</div>';
 
 		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID']) || !empty($_POST['email'])) {
@@ -250,10 +302,10 @@ if (isset($_GET['form'])) {
 				$teach_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
 				$lti_stm = $DBH->prepare("SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=:userid");
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
+					echo '<p><b><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</span></b></p>';
 					echo '<form method="post" action="../admin/actions.php?id='.Sanitize::encodeUrlParam($row['id']).'">';
 					echo '<input type=hidden name=action value="resetpwd" />';
-					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.Sanitize::encodeUrlParam($row['id']).'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
+					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.Sanitize::encodeUrlParam($row['id']).'"><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></a></li>';
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
 						echo '<li>Group: '.Sanitize::encodeStringForDisplay($row['name']);
@@ -269,7 +321,7 @@ if (isset($_GET['form'])) {
 						}
 					}
 					echo '<li><a href="utils.php?emulateuser='.Sanitize::encodeUrlParam($row['id']).'">Emulate User</li>';
-					echo '<li>Email: '.Sanitize::encodeStringForDisplay($row['email']).'</li>';
+					echo '<li>Email: <span class="pii-email">'.Sanitize::encodeStringForDisplay($row['email']).'</span></li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.Sanitize::encodeStringForDisplay($row['rights']).' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.Sanitize::encodeUrlParam($row['id']).'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
@@ -325,18 +377,18 @@ if (isset($_GET['form'])) {
 
 		} else {
 			echo '<form method="post" action="utils.php?form=lookup">';
-			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>, or email: <input type="text" name="email"/>';
+			echo 'Look up user:  LastName: <input type="text" class="pii-last-name" name="LastName" />, FirstName: <input type="text" class="pii-first-name" name="FirstName" />, or username: <input type="text" class="pii-username" name="SID"/>, or email: <input type="text" class="pii-email" name="email"/>';
 			echo '<input type="submit" value="Go"/>';
 			echo '</form>';
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 
 	}
 
 
 } else {
 	//listing of utilities
-	require("../header.php");
+	require_once "../header.php";
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Utilities</div>';
 	echo '<h2>Admin Utilities </h2>';
 	if (isset($_GET['debug'])) {
@@ -366,7 +418,8 @@ if (isset($_GET['form'])) {
 	echo '<a href="listwronglibs.php">List WrongLibFlags</a><br/>';
 	echo '<a href="updatewronglibs.php">Update WrongLibFlags</a><br/>';
 	echo '<a href="blocksearch.php">Search Block titles</a><br/>';
-	echo '<a href="itemsearch.php">Search inline/linked items</a>';
-	require("../footer.php");
+	echo '<a href="itemsearch.php">Search inline/linked items</a><br/>';
+    echo '<a href="utils.php?form=setupfcm">Set up FCM for push notifications</a><br/>';
+	require_once "../footer.php";
 }
 ?>

@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use Sanitize;
 
@@ -35,11 +35,12 @@ class MatchingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-        if (isset($options['answers'])) {if (is_array($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
-        else if (isset($options['answer'])) {if (is_array($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
-        if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$partnum];} else {$matchlist = $options['matchlist'];}
-        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
+        $optionkeys = ['matchlist', 'noshuffle', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        $answers = getOptionVal($options, 'answers', $multi, $partnum, 2);
 
         if (!is_array($questions) || !is_array($answers)) {
             $scorePartResult->addScoreMessage(_('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.'));
@@ -52,24 +53,30 @@ class MatchingScorePart implements ScorePart
         if ($noshuffle=="questions" || $noshuffle=='all') {
             $randqkeys = array_keys($questions);
         } else {
-            $randqkeys = $RND->array_rand($questions,count($questions));
+            $randqkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randqkeys);
         }
         if ($noshuffle=="answers" || $noshuffle=='all') {
             $randakeys = array_keys($answers);
         } else {
-            $randakeys = $RND->array_rand($answers,count($answers));
+            $randakeys = (array) $RND->array_rand($answers,count($answers));
             $RND->shuffle($randakeys);
         }
-        if (isset($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}
+        if (!empty($matchlist)) {
+            $matchlist = explode(',',$matchlist);
+            array_walk($matchlist, function(&$v) {
+                $v = array_map('trim', explode(' or ', $v));
+            });
+        }
 
         $origla = array();
         for ($i=0;$i<count($questions);$i++) {
           if ($isRescore) {
             $origla = explode('|', $givenans);
-            if ($origla[$i] != '') {
-              if (isset($matchlist)) {
-                if ($matchlist[$i] != $origla[$i]) {
+            if (isset($origla[$i]) && $origla[$i] !== '') {
+              if (!empty($matchlist)) {
+                if ((count($matchlist[$i])==1 && $matchlist[$i][0] != $origla[$i]) ||
+                    (count($matchlist[$i])>1 && !in_array($origla[$i], $matchlist[$i]))) {
                   $score -= $deduct;
                 }
               } else {
@@ -81,11 +88,13 @@ class MatchingScorePart implements ScorePart
               $score -= $deduct;
             }
           } else {
-            if ($_POST["qn$qn-$i"]!="" && $_POST["qn$qn-$i"]!="-") {
+            if (isset($_POST["qn$qn-$i"]) && $_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
-                if (isset($matchlist)) {
-                    if ($matchlist[$randqkeys[$i]]!=$randakeys[$qa]) {
+                if (!empty($matchlist)) {
+                    //if ($matchlist[$randqkeys[$i]]!=$randakeys[$qa]) {
+                    if ((count($matchlist[$randqkeys[$i]])==1 && $matchlist[$randqkeys[$i]][0] != $randakeys[$qa]) ||
+                        (count($matchlist[$randqkeys[$i]])>1 && !in_array($randakeys[$qa], $matchlist[$randqkeys[$i]]))) {
                         $score -= $deduct;
                     }
                 } else {
@@ -100,6 +109,11 @@ class MatchingScorePart implements ScorePart
 
         // only store unrandomized
         $scorePartResult->setLastAnswerAsGiven(implode('|', $origla));
+        if (!empty($scoremethod) && $scoremethod=='allornothing') {
+            if ($score<.99) {
+                $score = 0;
+            } 
+        }
         $scorePartResult->setRawScore($score);
         return $scorePartResult;
     }

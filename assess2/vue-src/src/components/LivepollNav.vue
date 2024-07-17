@@ -50,7 +50,7 @@
       </button>
       <button
         class = "secondary"
-        v-if = "curstate > 2 && dispqn > 0"
+        v-if = "(curstate == 1 || curstate > 2) && dispqn > 0"
         @click = "newVersion"
       >
         <icons name="retake" />

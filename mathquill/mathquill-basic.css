@@ -96,6 +96,7 @@
   line-height: 1;
   display: -moz-inline-box;
   display: inline-block;
+  text-indent: 0;
 }
 .mq-math-mode .mq-non-leaf,
 .mq-math-mode .mq-scaled {
@@ -541,4 +542,8 @@
 .mq-math-mode i,
 .mq-math-mode i.mq-font {
   font-family: KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
+}
+.mq-chem var {
+    font-style: normal;
+    font-family: "Times New Roman", Symbola, serif;
 }

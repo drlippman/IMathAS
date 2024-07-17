@@ -19,6 +19,10 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 	 $now = time();
 	 foreach ($items as $item) {
 		 if (is_array($item)) { //only add content from open blocks
+            if (empty($item['items'])) { continue; } // skip empty blocks
+            if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+			}
 			 $turnonpublic = false;
 			 if ($ispublic && !$inpublic) {
 			 	 if (isset($item['public']) && $item['public']==1) {
@@ -27,7 +31,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 	 	 continue;
 			 	 }
 			 }
-			 if (!$viewall && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
+			 if (!$viewall && !empty($studentinfo) && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
 				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
 					 continue;
 				 }
@@ -35,10 +39,15 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 				($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
 					if ($onlyopen==1) {
-						if (in_array($item['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
+						if (!empty($item['id']) && in_array($item['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 						if ($firstload && (strlen($item['SH'])==1 || $item['SH'][1]=='O')) {$isopen=true;}
 					}
-					if ($onlyopen==0 || ($onlyopen==-1 && $item['SH'][1]!='T') || ($onlyopen==1 && $isopen && $item['SH'][1]!='T' && $item['SH'][1]!='F')) {
+					if ($onlyopen==0 || 
+                        ($onlyopen==-1 && (strlen($item['SH'])==1 || $item['SH'][1]!='T')) || 
+                        ($onlyopen==1 && $isopen && 
+                            (strlen($item['SH'])==1 || ($item['SH'][1]!='T' && $item['SH'][1]!='F'))
+                        )
+                    ) {
 						getitemstolookup($item['items'],$inpublic||$turnonpublic,$viewall,$tolookup,$onlyopen,$ispublic);
 					}
 			 }
@@ -105,7 +114,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
-			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&3 || $viewall)) {
+			if (isset($line['reqscoreaid']) && ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&3 || $viewall))) {
 				if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
 					$assessPreReqsToLookup[$line['reqscoreaid']] = array();
 				}
@@ -149,7 +158,8 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	if (count($assessPreReqsToLookup)>0 && !$limited) {
 		//see which ones we already have data for
 		foreach (array_keys($assessPreReqsToLookup) as $tolookup) {
-			if (isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
+            if (isset($typelookups['Assessment'][$tolookup]) &&
+                isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
 				isset($itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsposs'])) {
 				foreach ($assessPreReqsToLookup[$tolookup] as $aidtoupdate) {
 					$itemshowdata[$typelookups['Assessment'][$aidtoupdate]]['reqscorename'] = $itemshowdata[$typelookups['Assessment'][$tolookup]]['name'];
@@ -170,7 +180,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 				foreach ($assessPreReqsToLookup[$line['id']] as $refaid) {
 					$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscorename'] = $line['name'];
 					if ($line['ptsposs']==-1) {
-						require_once(__DIR__."/updateptsposs.php");
+						require_once __DIR__."/updateptsposs.php";
 						$line['ptsposs'] = updatePointsPossible($line['id']);
 					}
 					$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscoreptsposs'] = $line['ptsposs'];
@@ -288,6 +298,7 @@ function upsendexceptions(&$items) {
 	   $maxedate = 0;
 	   foreach ($items as $k=>$item) {
 		   if (is_array($item)) {
+              if (empty($item['items'])) { continue; }
 			  $hasexc = upsendexceptions($items[$k]['items']);
 			  if ($hasexc!=FALSE) {
 				  if ($hasexc[0]<$items[$k]['startdate']) {

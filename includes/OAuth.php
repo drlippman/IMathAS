@@ -612,7 +612,7 @@ class OAuthServer {
 
     $consumer = $this->data_store->lookup_consumer($consumer_key);
     if (!$consumer) {
-      throw new OAuthException("Invalid consumer - your LTI tool is not configured correctly. Check your LTI key and secret.");
+      throw new OAuthException("Invalid consumer - your LTI tool is not configured correctly. Check your LTI key and secret. Key sent: " . $consumer_key);
     }
 
     return $consumer;

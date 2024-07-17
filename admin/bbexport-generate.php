@@ -10,9 +10,9 @@ if (!isset($myrights)) {
 error_reporting(0);
 $loadmathfilter = 1;
 $loadgraphfilter = 1;
-require_once("../includes/filehandler.php");
-require_once("../filter/filter.php");
-require("bbexport-templates.php");
+require_once "../includes/filehandler.php";
+require_once "../filter/filter.php";
+require_once "bbexport-templates.php";
 if (substr($mathimgurl,0,4) !== 'http') {
     // need to make an absolute url
     if (strlen($imasroot) > 0) { 
@@ -32,7 +32,7 @@ function leftpad($str) {
 function xmlstr($str) {
 	//remove newlines
 	$str = str_replace(array(">\r\n<", ">\n<", "\r\n", "\n"), array('><','><',' ',' '), $str);
-	return htmlentities($str,ENT_XML1,'UTF-8',false);
+	return htmlentities($str,ENT_QUOTES|ENT_XML1,'UTF-8',false);
 }
 function bbdate($time) {
 	return date("Y-m-d H:i:s T", $time);
@@ -394,7 +394,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[8]==-1) {
-					require_once("../includes/updateptsposs.php");
+					require_once "../includes/updateptsposs.php";
 					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);
 				}
 

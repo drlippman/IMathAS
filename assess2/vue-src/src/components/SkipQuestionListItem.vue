@@ -7,6 +7,9 @@
         :title = "nameHover"
       >
         {{ nameDisp }}
+        <em v-if="option.extracredit" class="small subdued">
+          {{ $t('extracredit') }}
+        </em>
       </span>
     </span>
     <span v-if="scoreDisplay !== '' && !selected" class="subdued">

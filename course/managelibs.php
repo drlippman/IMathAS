@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -65,6 +65,10 @@ if ($myrights<20) {
 					}
 					$remlist = implode(',', $oklib);
 				}
+                if ($remlist == '') {
+                    echo _("No selected libraries can be deleted");
+                    exit;
+                }
 				$DBH->beginTransaction();
 				// $remlist now only contains libraries that are OK to delete
 				//now actually delete the libraries
@@ -94,39 +98,41 @@ if ($myrights<20) {
 					}
 					//get a list of questions with no more library items
 					$qidstofix = array_values(array_diff($qidstocheck,$okqids));
-					$qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
-					$qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
-					if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-						//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
-						$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=? WHERE id IN ($qlist_query_placeholders)");
-						$stm->execute(array_merge(array($now),$qlist));
-							//echo "del: $qlist";
-							/*foreach ($qidstofix as $qid) {
-								delqimgs($qid);
-							}*/
-					} else if (count($qidstofix)>0) {
-						//see which questions with no active lib items already have an unassigned lib item we can undeleted
-						$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
-						$stm->execute($qlist);
-						$toundelqids = array();
-						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-							$toundelqids[] = $row[0];
-						}
-						//undelete those lib items
-						if (count($toundelqids)>0) {
-							$toundel_query_placeholders = Sanitize::generateQueryPlaceholders($toundelqids);
-							//$undellist = implode(',', $toundelqids);
-							$stm = $DBH->prepare("UPDATE `imas_library_items` SET deleted=0,lastmoddate=? WHERE qsetid IN ($toundel_query_placeholders) AND libid=0");
-							$stm->execute(array_merge(array($now),$toundelqids));
-						}
+                    if (count($qidstofix)>0) {
+                        $qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
+                        $qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+                        if ($_POST['delq']=='yes') {
+                            //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+                            $stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=? WHERE id IN ($qlist_query_placeholders)");
+                            $stm->execute(array_merge(array($now),$qlist));
+                                //echo "del: $qlist";
+                                /*foreach ($qidstofix as $qid) {
+                                    delqimgs($qid);
+                                }*/
+                        } else {
+                            //see which questions with no active lib items already have an unassigned lib item we can undeleted
+                            $stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
+                            $stm->execute($qlist);
+                            $toundelqids = array();
+                            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                                $toundelqids[] = $row[0];
+                            }
+                            //undelete those lib items
+                            if (count($toundelqids)>0) {
+                                $toundel_query_placeholders = Sanitize::generateQueryPlaceholders($toundelqids);
+                                //$undellist = implode(',', $toundelqids);
+                                $stm = $DBH->prepare("UPDATE `imas_library_items` SET deleted=0,lastmoddate=? WHERE qsetid IN ($toundel_query_placeholders) AND libid=0");
+                                $stm->execute(array_merge(array($now),$toundelqids));
+                            }
 
-						//for questions with no active lib items or unassigned to undelete, add an unassigned lib item
-						$qidstoadd = array_values(array_diff($qidstofix, $toundelqids));
-						$stm = $DBH->prepare("INSERT INTO imas_library_items ( qsetid,libid,lastmoddate) VALUES (:qsetid, :libid, :lastmoddate)");
-						foreach($qidstoadd as $qid) {
-							$stm->execute(array(':qsetid'=>$qid, ':libid'=>0, ':lastmoddate'=>$now));
-						}
-					}
+                            //for questions with no active lib items or unassigned to undelete, add an unassigned lib item
+                            $qidstoadd = array_values(array_diff($qidstofix, $toundelqids));
+                            $stm = $DBH->prepare("INSERT INTO imas_library_items ( qsetid,libid,lastmoddate) VALUES (:qsetid, :libid, :lastmoddate)");
+                            foreach($qidstoadd as $qid) {
+                                $stm->execute(array(':qsetid'=>$qid, ':libid'=>0, ':lastmoddate'=>$now));
+                            }
+                        }
+                    }
 				}
 				$DBH->commit();
 			}
@@ -187,7 +193,8 @@ if ($myrights<20) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
-				$tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+                $tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+                $rights = 0;
 				$page_libRights = array();
 				$page_libRights['val'][0] = 0;
 				$page_libRights['val'][1] = 1;
@@ -279,13 +286,14 @@ if ($myrights<20) {
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
 				$tlist = implode(",", array_map('intval', $_POST['nchecked']));
-				$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+				/*$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
 				$i=0;
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$page_newOwnerList['val'][$i] = $row[0];
 					$page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
 					$i++;
 				}
+                */
 			}
 		}
 	} else if (isset($_POST['setparent'])) {
@@ -319,7 +327,8 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Set Parent";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Set Parent ";
-			$parent1 = "";
+            $parent1 = "";
+            $parent = '';
 
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
@@ -355,7 +364,8 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Transfer Library";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+			/*
+            $stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
 			$i=0;
 			$page_newOwnerList = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -363,6 +373,7 @@ if ($myrights<20) {
 				$page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
 				$i++;
 			}
+            */
 
 		}
 
@@ -546,14 +557,14 @@ if ($myrights<20) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
 } else {
 ?>
 	<script>
-	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1); ?>';
+	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1 ?? ''); ?>';
 	function libselect() {
 		window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&select=parent&selectrights=1&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 	}
@@ -595,7 +606,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="delq" value="yes" >
 			Also delete questions in library
 		</p>
-		<input type=hidden name=remove value="<?php echo $rlist ?>">
+		<input type=hidden name=remove value="<?php echo Sanitize::encodeStringForDisplay($rlist); ?>">
 		<p>
 			<input type=submit value="Really Delete">
 			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
@@ -606,8 +617,11 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
-		Transfer library ownership to:
-		<?php writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
+		
+		<?php //writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
+        <?php require_once '../includes/userlookupform.php'; 
+            generateUserLookupForm(_('Transfer library ownership to:'), 'newowner');
+        ?>
 
 		<p>
 			<input type=submit value="Transfer">
@@ -771,7 +785,7 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 function delqimgs($qsid) {
   global $DBH;
@@ -795,7 +809,7 @@ function printlist($parent) {
 	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin,$federated;
 	$arr = $ltlibs[$parent];
 
-	if ($sortorder[$parent]==1) {
+	if (!empty($sortorder[$parent]) && $sortorder[$parent]==1) {
 		$orderarr = array();
 		foreach ($arr as $child) {
 			$orderarr[$child] = $names[$child];
@@ -824,7 +838,12 @@ function printlist($parent) {
 			continue;
 		}
 		//if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
-		if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
+        if ($rights[$child]>2 || 
+            ($rights[$child]>0 && isset($groupids[$child]) && $groupids[$child]==$groupid) || 
+            (isset($ownerids[$child]) && $ownerids[$child]==$userid) || 
+            ($isgrpadmin && isset($groupids[$child]) && $groupids[$child]==$groupid) ||
+            $isadmin
+        ) {
 			if (!$isadmin) {
 				if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
 					$rights[$child]=4;  //adjust coloring
@@ -837,7 +856,7 @@ function printlist($parent) {
 					echo "<input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> ";
 				}
 				echo "<span class=hdr onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
-				if ($federated[$child]) {
+				if (!empty($federated[$child])) {
 					echo ' <span class=fedico title="Federated">&lrarr;</span>';
 				}
 				echo "</span> </span>\n";
@@ -890,6 +909,9 @@ function addupchildqs($p) {
 	global $qcount,$ltlibs;
 	if (isset($ltlibs[$p])) { //if library has children
 		foreach ($ltlibs[$p] as $child) {
+            if (!isset($qcount[$p])) {
+                $qcount[$p] = 0;
+            }
 			$qcount[$p] += addupchildqs($child);
 		}
 	}
@@ -898,8 +920,8 @@ function addupchildqs($p) {
 
 function setparentrights($alibid) {
 	global $rights,$parents;
-	if ($parents[$alibid]>0) {
-		if ($rights[$parents[$alibid]] < $rights[$alibid]) {
+	if (!empty($parents[$alibid])) {
+		if (!isset($rights[$parents[$alibid]]) || $rights[$parents[$alibid]] < $rights[$alibid]) {
 		//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
 			$rights[$parents[$alibid]] = $rights[$alibid];
 		}

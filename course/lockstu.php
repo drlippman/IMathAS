@@ -8,13 +8,13 @@
 ini_set("max_execution_time", "600");
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	
-	$get_uid = Sanitize::simpleString($_GET['uid']);
+	$get_uid = Sanitize::simpleString($_GET['uid'] ?? 'selected');
 	
 	if (isset($_POST['dolockstu']) || isset($_POST['lockinstead'])) { //do lockout - postback
 		if ($get_uid=="selected") {
@@ -38,7 +38,7 @@ ini_set("max_execution_time", "600");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
@@ -47,7 +47,7 @@ ini_set("max_execution_time", "600");
 		}
 
 		if ($get_uid=="selected") {
-			if (count($_POST['checked'])>0) {
+			if (!empty($_POST['checked'])) {
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
 				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
@@ -57,11 +57,11 @@ ini_set("max_execution_time", "600");
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$get_uid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$lockConfirm =  "Are you SURE you want to lock {$row[0]} {$row[1]} ($row[2]) out of the course?";
+			$lockConfirm =  "Are you SURE you want to lock <span class='pii-full-name'>{$row[0]} {$row[1]}</span> (<span class='pii-username'>$row[2]</span>) out of the course?";
 		}
 
 		/**** confirmation page body *****/
-		require("../header.php");
+		require_once "../header.php";
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
@@ -71,7 +71,7 @@ ini_set("max_execution_time", "600");
 
 
 		if ($get_uid=="selected") {
-				if (count($_POST['checked'])==0) {
+				if (empty($_POST['checked'])) {
 					if ($calledfrom=='lu') {
 						echo "No users selected.  <a href=\"listusers.php?cid=$cid\">Try again</a></form>";
 					}
@@ -82,7 +82,7 @@ ini_set("max_execution_time", "600");
 		<ul>
 <?php
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						printf("			<li>%s, %s (%s)</li>",
+						printf("			<li><span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)</li>",
                             Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
                             Sanitize::encodeStringForDisplay($row[2]));
 					}
@@ -102,7 +102,7 @@ ini_set("max_execution_time", "600");
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "'\">";
 			}
 ?>
 		</p>

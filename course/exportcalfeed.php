@@ -1,7 +1,7 @@
 <?php
 
-require("../init.php");
-require("../includes/JWT.php");
+require_once "../init.php";
+require_once "../includes/JWT.php";
 
 //grab user's hashed password to sign request with
 $stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
@@ -11,16 +11,16 @@ if (isset($_POST['textitemstype'])) {
 	//this is the AJAX callback to update the feed link
 	$payload = array('uid'=>$userid, 'cid'=>$cid);
 	if ($_POST['textitemstype']!='no') {
-		$payload['T'] = strtoupper($_POST['textitemstype']{0}).intval($_POST['textitems']);
+		$payload['T'] = strtoupper($_POST['textitemstype'][0]).intval($_POST['textitems']);
 	}
 	if ($_POST['assesstype']!='no') {
-		$payload['A'] = strtoupper($_POST['assesstype']{0}).intval($_POST['assess']);
+		$payload['A'] = strtoupper($_POST['assesstype'][0]).intval($_POST['assess']);
 	}
 	if ($_POST['forumtype']!='no') {
-		$payload['F'] = strtoupper($_POST['forumtype']{0}).intval($_POST['forum']);
+		$payload['F'] = strtoupper($_POST['forumtype'][0]).intval($_POST['forum']);
 	}
 	if ($_POST['caltype']!='no') {
-		$payload['C'] = strtoupper($_POST['caltype']{0}).intval($_POST['cal']);
+		$payload['C'] = strtoupper($_POST['caltype'][0]).intval($_POST['cal']);
 	}
 	$token = JWT::encode($payload, $key); //token is URL safe from JWT
 	$url = $GLOBALS['basesiteurl'] . '/admin/calendarfeed.php?t='.$token;
@@ -52,8 +52,8 @@ function updatecallink() {
 	});
 }
 </script>';
-require("../header.php");
-require("../includes/htmlutil.php");
+require_once "../header.php";
+require_once "../includes/htmlutil.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 echo '&gt; <a href="showcalendar.php?cid='.$cid.'">'._('Calendar').'</a> ';
@@ -110,5 +110,5 @@ echo _('Go to Settings, then "Mail, Contacts, and Calendars". Tap "Add Account",
 echo '</p>';
 
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

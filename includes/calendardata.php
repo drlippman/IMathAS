@@ -1,17 +1,18 @@
 <?php
 
-require_once(__DIR__.'/exceptionfuncs.php');
+require_once __DIR__.'/exceptionfuncs.php';
 
-//light calendar data collection function
+// light calendar data collection function
+// used in canvascalexport and calendarfeed
 
 function getCalendarEventData($cid, $userid, $stuview = false) {
 	global $DBH;
 
 	$studentinfo = array();
-	$stm = $DBH->prepare("SELECT id,section,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+	$stm = $DBH->prepare("SELECT id,section,latepass,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 	$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($line != null) {
+	if ($line != false) {
 		$studentid = $line['id'];
 		$studentinfo['timelimitmult'] = $line['timelimitmult'];
 		$studentinfo['section'] = $line['section'];
@@ -21,7 +22,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		if ($line != null) {
+		if ($line != false) {
 			$teacherid = $line['id'];
 		} else {
 			$stm = $DBH->prepare("SELECT id,section FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
@@ -90,7 +91,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		$typeids = implode(',', array_keys($itemlist['Assessment']));
 		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,LPcutoff,reqscore,reqscoreaid,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			require_once("../includes/exceptionfuncs.php");
+			require_once "../includes/exceptionfuncs.php";
 			if (isset($exceptions[$row['id']])) {
 				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row, true);
 				if ($useexception) {
@@ -134,7 +135,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 					}
 					if ($row['reqscoretype']&2) { //using percent-based
 						if ($reqscoreptsposs==-1) {
-							require("../includes/updateptsposs.php");
+							require_once "../includes/updateptsposs.php";
 							$reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
 						}
 						if (round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
@@ -173,8 +174,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 	if (isset($itemlist['InlineText'])) {
 		$typeids = implode(',', array_keys($itemlist['InlineText']));
 		if (isset($teacherid) && !$stuview) {
-			$stm = $DBH->prepare("SELECT id,title,enddate,startdate,oncal,text FROM imas_inlinetext WHERE ((oncal=2 AND enddate>0 AND enddate<2000000000) OR (oncal=1 AND startdate<2000000000 AND startdate>0)) AND (avail=1 OR (avail=2 AND startdate>0)) AND id IN ($typeids)");
-			$stm->execute(array(':courseid'=>$cid));
+			$stm = $DBH->query("SELECT id,title,enddate,startdate,oncal,text FROM imas_inlinetext WHERE ((oncal=2 AND enddate>0 AND enddate<2000000000) OR (oncal=1 AND startdate<2000000000 AND startdate>0)) AND (avail=1 OR (avail=2 AND startdate>0)) AND id IN ($typeids)");
 		} else {
 			$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,text FROM imas_inlinetext WHERE ";
 			$query .= "((avail=1 AND ((oncal=2 AND enddate>0 AND enddate<2000000000 AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>0))) OR ";
@@ -234,13 +234,13 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 
 	if (isset($itemlist['Forum'])) {
 		$typeids = implode(',', array_keys($itemlist['Forum']));
-		$query = "SELECT id,name,postby,replyby,startdate,enddate FROM imas_forums WHERE enddate>0 AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000)) AND avail>0 AND id IN ($typeids) ORDER BY name";
+		$query = "SELECT id,name,postby,replyby,startdate,enddate,allowlate FROM imas_forums WHERE enddate>0 AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000)) AND avail>0 AND id IN ($typeids) ORDER BY name";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['startdate']>$now && (!isset($teacherid) || $stuview)) {
 				continue;
 			}
-			require_once("../includes/exceptionfuncs.php");
+			require_once "../includes/exceptionfuncs.php";
 			list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = $exceptionfuncs->getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
 
 			if ($row['postby']!=2000000000) {
@@ -265,6 +265,7 @@ function flattenitems($items,&$addto,$viewall, $studentinfo) {
 	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
+            if (empty($item['items'])) { continue; } // skip empty blocks
 			if (!isset($item['avail'])) { //backwards compat
 				$item['avail'] = 1;
 			}
@@ -275,7 +276,9 @@ function flattenitems($items,&$addto,$viewall, $studentinfo) {
 			}
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 				($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
-				flattenitems($item['items'],$addto,$viewall, $studentinfo);
+                if (!empty($item['items'])) {
+				    flattenitems($item['items'],$addto,$viewall, $studentinfo);
+                }
 			}
 		} else {
 			$addto[] = $item;

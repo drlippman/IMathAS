@@ -17,7 +17,7 @@ $query = 'CREATE TABLE `imas_ipeds` (
   FULLTEXT `agency` (`agency`),
   INDEX `zip` (`zip`),
   INDEX `loc` (`country`,`state`)
-) CHARACTER SET UTF8 COLLATE utf8_general_ci ENGINE=InnoDB;';
+) CHARACTER SET UTF8 COLLATE utf8_general_ci ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -31,7 +31,7 @@ $query = 'CREATE TABLE `imas_ipeds_group` (
   `groupid` INT(10) NOT NULL,
   PRIMARY KEY `link` (`type`,`ipedsid`,`groupid`),
   INDEX `groupid` (`groupid`)
-) CHARACTER SET UTF8 COLLATE utf8_general_ci ENGINE=InnoDB;';
+) CHARACTER SET UTF8 COLLATE utf8_general_ci ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -39,7 +39,7 @@ if ($res===false) {
     return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 echo '<p>tables imas_ipeds, imas_ipeds_group created</p>';
 
 return true;

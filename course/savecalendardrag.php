@@ -1,7 +1,7 @@
 <?php
 //save calendar drag-and-drop
 
-require("../init.php");
+require_once "../init.php";
 
 header('Content-Type: application/json');
 
@@ -14,8 +14,8 @@ if (!isset($_GET['item']) || !isset($_GET['dest'])) {
 	exit;
 }
 
-$itemtype = $_GET['item']{0};
-$itempart = $_GET['item']{1};
+$itemtype = $_GET['item'][0];
+$itempart = $_GET['item'][1];
 $itemid = intval(substr($_GET['item'],2));
 if ($itemid==0) {
 	echo '{"res":"error", "error":"invalid item id"}';
@@ -49,13 +49,14 @@ if ($itemtype == 'B') {
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$items = unserialize($stm->fetchColumn(0));
-	$idpts = explode(';', substr($_GET['item'],2));
+	$idpts = explode(':', substr($_GET['item'],2));
 	$blocktree = explode('-', $idpts[1]);
 	$sub = &$items;
 	for ($i = 1; $i < count($blocktree)-1; $i++) {
-		$sub = &$items[$blocktree[$i]]['items'];
+		$sub = &$sub[$blocktree[$i]]['items'];
 	}
 	$block = &$sub[$blocktree[count($blocktree)-1]];
+
 	if ($block['id'] == $idpts[0]) {
 		if ($itempart == 'S') {
 			$block['startdate'] = adjustDate($block['startdate'], $year,$month,$day);

@@ -2,9 +2,7 @@
 // IMathAS: Main launch page for assess2 assessment player
 // (c) 2019 David Lippman
 
-$lastupdate = '20201002';
-
-require('../init.php');
+require_once '../init.php';
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
   echo 'Error - need to specify course ID and assessment ID in URL';
   exit;
@@ -17,7 +15,7 @@ $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 
 $isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
-$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'] ?? '','treereader') !== false);
 $isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
   $diagid = Sanitize::onlyInt($_SESSION['isdiag']);
@@ -32,13 +30,13 @@ if ($isltilimited || $inTreeReader) {
 $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesiteurl'].'/assess2/";';
 $placeinhead .= 'var inTreeReader = ' . ($inTreeReader ? 1 : 0) . ';';
 $placeinhead .= '</script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100120" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=100320b" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
-  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=092120">';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastvueupdate.'" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastvueupdate.'" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
+$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112822" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
+  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=081122">';
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';
 } else if ($isdiag) {
@@ -48,10 +46,15 @@ if ($isltilimited || $inTreeReader) {
 }
 $nologo = true;
 $useeditor = 1;
-require('../header.php');
+require_once '../header.php';
 
 if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
+  if ((!isset($usernameinheader) || $usernameinheader==false) && $userfullname != ' ') {
+    echo '<span class="floatright hideinmobile">';
+    echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
+    echo '</span>';
+  }
   if ($isltilimited) {
     echo "$breadcrumbbase ", _('Assessment'), "</div>";
   } else {
@@ -66,9 +69,12 @@ if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$i
 </noscript>
 <div id="app"></div>
 
-<script type="text/javascript" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=<?php echo $lastupdate;?>"></script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.js?v=<?php echo $lastupdate;?>"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastvueupdate;?>"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.js?v=<?php echo $lastvueupdate;?>"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=<?php echo $lastvueupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-vendors.legacy.js?v=<?php echo $lastvueupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/chunk-common.legacy.js?v=<?php echo $lastvueupdate;?>"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index.legacy.js?v=<?php echo $lastvueupdate;?>"></script>
 
 <?php
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
@@ -76,4 +82,4 @@ $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
-require('../footer.php');
+require_once '../footer.php';

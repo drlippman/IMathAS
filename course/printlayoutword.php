@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
  //set some page specific variables and counters
@@ -39,13 +39,16 @@ $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 
 if ($overwriteBody==1) {
-	require("../header.php");
+	require_once "../header.php";
 	echo $body;
 } if (!isset($_REQUEST['versions'])) {
 
-	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
+	require_once "../header.php";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 
     echo '<div class="cpmid">';
@@ -68,6 +71,8 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> Use PAGEBREAK for a page break</span><br class="form"/>';
 	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
 	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
+	echo '<span class="form">Include between-question text?</span><span class="formright"><input type=checkbox name=showtexts ></span><br class="form"/>';
+	echo '<span class="form">Include detailed solutions?</span><span class="formright"><input type=checkbox name=detsoln ></span><br class="form"/>';
 
 	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
 	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
@@ -78,6 +83,7 @@ if ($overwriteBody==1) {
 } else {
   $GLOBALS['texdisp'] = true;
   $GLOBALS['texdoubleescape'] = true;
+  $GLOBALS['hide-sronly'] = true;
   $texusealignsformatrix = true;
 
   $origmathdisp = $_SESSION['mathdisp'];
@@ -90,12 +96,14 @@ if ($overwriteBody==1) {
 
 	//load filter
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/../filter/filter.php");
+	require_once "$curdir/../filter/filter.php";
 
 	$out = '<!DOCTYPE html><html><body>';
 
-	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
-		$line['intro'] = $introjson[0];
+    $texts = [];
+	if (($introjson=json_decode($line['intro'], true))!==null) { //is json intro
+        $line['intro'] = $introjson[0];
+        $texts = array_slice($introjson, 1);
 	}
 
 	$ioquestions = explode(",",$line['itemorder']);
@@ -155,7 +163,7 @@ if ($overwriteBody==1) {
 	$numq = count($questions);
 
 	if ($courseUIver > 1) {
-		include('../assess2/AssessStandalone.php');
+		require_once '../assess2/AssessStandalone.php';
 		$a2 = new AssessStandalone($DBH);
 		$stm = $DBH->prepare("SELECT iqs.* FROM imas_questionset AS iqs JOIN imas_questions ON imas_questions.questionsetid=iqs.id WHERE imas_questions.assessmentid=:id");
 		$stm->execute(array(':id'=>$aid));
@@ -163,7 +171,7 @@ if ($overwriteBody==1) {
 			$a2->setQuestionData($qdata['id'], $qdata);
 		}
 	} else {
-		include("../assessment/displayq2.php");
+	require_once "../assessment/displayq2.php";
 	}
 
 	if (is_numeric($_REQUEST['versions'])) {
@@ -178,13 +186,13 @@ if ($overwriteBody==1) {
 	for ($j=0; $j<$copies; $j++) {
 		$seeds[$j] = array();
 		if ($line['shuffle']&2) {  //all questions same random seed
-			if ($shuffle&4) { //all students same seed
+			if ($line['shuffle']&4) { //all students same seed
 				$seeds[$j] = array_fill(0,count($questions),$aid+$j);
 			} else {
 				$seeds[$j] = array_fill(0,count($questions),rand(1,9999));
 			}
 		} else {
-			if ($shuffle&4) { //all students same seed
+			if ($line['shuffle']&4) { //all students same seed
 				for ($i = 0; $i<count($questions);$i++) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
@@ -211,7 +219,8 @@ if ($overwriteBody==1) {
 	}
 	}
 
-
+    $sa = [];
+    $detsol = [];
 	if ($_REQUEST['format']=='trad') {
 		for ($j=0; $j<$copies; $j++) {
 			if ($j>0) { $out .= '<p>'.$_REQUEST['vsep'].'</p>';}
@@ -235,11 +244,21 @@ if ($overwriteBody==1) {
 
 
 			for ($i=0; $i<$numq; $i++) {
-				if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
+                if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
+                if (!empty($_REQUEST['showtexts'])) {
+                    foreach ($texts as $k=>$v) {
+                        if ($v['displayBefore'] == $i) {
+                            if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
+                                $out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
+                            }
+                            $out .= '<div>'.printfilter(filter($v['text'])).'</div>';
+                        }
+                    }
+                }
 				if ($courseUIver > 1) {
-					list($newout,$sa[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[$j][$i],$detsol[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				} else {
-					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
 			}
@@ -258,6 +277,9 @@ if ($overwriteBody==1) {
 					} else {
 						$out .= printfilter(filter($sa[$j][$i]));
 					}
+                    if (!empty($_REQUEST['detsoln']) && !empty($detsol[$j][$i])) {
+                        $out .= printfilter(filter($detsol[$j][$i]));
+                    }
 					$out .= "</li>\n";
 				}
 				$out .= "</ol>\n";
@@ -282,13 +304,23 @@ if ($overwriteBody==1) {
 		$out .= "</div>\n";
 		$out .= "</div>\n";
 		for ($i=0; $i<$numq; $i++) {
-			if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
+            if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
+            if (!empty($_REQUEST['showtexts'])) {
+                foreach ($texts as $k=>$v) {
+                    if ($v['displayBefore'] == $i) {
+                        if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
+                            $out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
+                        }
+                        $out .= '<div>'.printfilter(filter($v['text'])).'</div>';
+                    }
+                }
+            }
 			for ($j=0; $j<$copies;$j++) {
 				if ($j>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
 				if ($courseUIver > 1) {
-					list($newout,$sa[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[],$detsol[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				} else {
-					list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
 			}
@@ -304,6 +336,9 @@ if ($overwriteBody==1) {
 				} else {
 					$out .= printfilter(filter($sa[$i]));
 				}
+                if (!empty($_REQUEST['detsoln']) && !empty($detsol[$i])) {
+                    $out .= printfilter(filter($detsol[$i]));
+                }
 				$out .= "</li>\n";
 			}
 			$out .= "</ol>\n";
@@ -321,7 +356,7 @@ if ($overwriteBody==1) {
 		$pandocurl = 'http://'.$CFG['GEN']['pandocserver'];
 	}
 
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
@@ -377,7 +412,7 @@ if ($overwriteBody==1) {
 	*/
   $_SESSION['mathdisp'] = $origmathdisp;
   $_SESSION['graphdisp'] = $origgraphdisp;
-  require("../footer.php");
+  require_once "../footer.php";
 	exit;
 }
 
@@ -389,7 +424,7 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
 	);
 	$a2->setState($state);
 	// TODO: Some way to override or rewrite matrix answersize, and choices list numbering
-	$res = $a2->displayQuestion($qn, ['includeans'=>true, 'printformat'=>true]);
+	$res = $a2->displayQuestion($qn, ['includeans'=>true, 'printformat'=>true, 'showallparts'=>true, 'hideans'=>true]);
 
 	$retstrout = "<div class=q>";
 	if ($isfinal) {
@@ -404,7 +439,7 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
 	$retstrout .= printfilter($res['html']) . '</div>';
 	$retstrout .= '</div></div>';
 
-	return array($retstrout, $res['jsparams']['ans']);
+	return array($retstrout, $res['jsparams']['ans'], (($res['solnopts']&5)==5)?$res['soln']:'');
 }
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
@@ -501,19 +536,19 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
         $showanswer[$kidx] = $shans[$kidx];
       }
 		}
-	} else {
-		if ($qdata['qtype']=='matrix' || $qdata['qtype']=='calcmatrix') {
-			unset($options['answersize']); //pandoc doesn't like nested tables
-		}
-		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
-    if ($qdata['qtype']=='choices' || $qdata['qtype']=='multans') {
-      $answerbox = str_replace(['<ul class=nomark>','</ul>'],
-        ['<ol style="list-style-type:upper-alpha">', '</ol>'],
-        $answerbox);
-    }
-    if (!isset($showanswer)) {
-      $showanswer = $shans[0];
-    }
+    } else {
+        if ($qdata['qtype']=='matrix' || $qdata['qtype']=='calcmatrix') {
+            unset($options['answersize']); //pandoc doesn't like nested tables
+        }
+        list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+        if ($qdata['qtype']=='choices' || $qdata['qtype']=='multans') {
+            $answerbox = str_replace(['<ul class=nomark>','</ul>'],
+                ['<ol style="list-style-type:upper-alpha">', '</ol>'],
+                $answerbox);
+        }
+        if (!isset($showanswer)) {
+        $showanswer = $shans[0];
+        }
 	}
 
 	$retstrout .= "<div class=q>";

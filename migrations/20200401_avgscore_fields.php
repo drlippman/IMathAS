@@ -34,7 +34,7 @@ $DBH->beginTransaction();
 
  // Drop avgtime later
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added new meantime,meanscore columns to imas_questionset</p>";
 

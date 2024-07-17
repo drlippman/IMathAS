@@ -1,5 +1,5 @@
 <?php
-require_once("sanitize.php");
+require_once "sanitize.php";
 //IMathAS: HTML utility functions
 
 //$name is the html name&id for the select list
@@ -15,7 +15,8 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
 	}
 	if (is_array($valList)) {
 		for ($i=0;$i<count($valList);$i++) {
-			if ((isset($selectedVal)) && (strcmp($valList[$i],$selectedVal)==0)) {
+            if (!isset($valList[$i]) || !isset($labelList[$i])) { continue; }
+			if (isset($selectedVal) && (strcmp($valList[$i],$selectedVal)==0)) {
 				echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\" selected>".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
 			} else {
 				echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\">".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
@@ -30,6 +31,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 	if (isset($defaultLabel)) {
 		echo " <option value=\"null\" selected=\"selected\">".Sanitize::encodeStringForDisplay($defaultLabel)."</option>\n";
 	}
+	$val = array();
 	if (is_array($valList[0])) {//has a group structure
 		$ingrp = false;
 		foreach ($valList as $oc) {
@@ -39,13 +41,14 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 				echo '<optgroup label="'.$optionGroupLabel.'">';
 				$ingrp = true;
 			} else {
+                if ($ingrp && $oc[1]==0) { echo '</optgroup>';}
 				echo '<option value="'.Sanitize::encodeStringForDisplay($oc[0]).'">'.Sanitize::encodeStringForDisplay($labelList[$oc[0]]).'</option>';
 			}
 		}
 		if ($ingrp) { echo '</optgroup>';}
 	} else {
-		$val = array();
 		for ($i=0;$i<count($valList);$i++) {
+            if ($valList[$i] === '') { continue; }
 			$val[$valList[$i]] = $labelList[$i];
 			echo "	<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\">".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
 		}
@@ -53,6 +56,10 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 	echo '</select><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
 	if (count($selectedVals)>0) {
 		foreach ($selectedVals as $v) {
+            if ($v === '' || 
+				(!is_array($valList[0]) && !isset($val[$v])) ||
+				(is_array($valList[0]) && !isset($labelList[$v]))
+			 ) { continue; }
 			echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';
 			echo '<input type="hidden" name="'.$name.'[]" value="'.Sanitize::encodeStringForDisplay($v).'"/>'
 				.(is_array($valList[0])?Sanitize::encodeStringForDisplay($labelList[$v]):Sanitize::encodeStringForDisplay($val[$v]));

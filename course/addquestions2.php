@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-include("../includes/htmlutil.php");
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -50,6 +50,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $defpoints = $row['defpoints'];
     $assessmentname = $row['name'];
     $displaymethod = $row['displaymethod'];
+    $itemorder = $row['itemorder'];
+    $row['showwork'] = ($row['showwork'] & 3);
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -66,9 +68,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else if (isset($_POST['add'])) {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -126,8 +128,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
-			require_once("../includes/updateptsposs.php");
-			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			require_once "../includes/updateptsposs.php";
+			updatePointsPossible($aid, $itemorder, $row[2]);
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
@@ -139,9 +141,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else {
 			if ($aver > 1) {
-				include("modquestiongrid2.php");
+				require_once "modquestiongrid2.php";
 			} else {
-				include("modquestiongrid.php");
+				require_once "modquestiongrid.php";
 			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
@@ -151,7 +153,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	if (isset($_REQUEST['clearattempts'])) {
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-			require_once('../includes/filehandler.php');
+			require_once '../includes/filehandler.php';
 			deleteallaidfiles($aid);
 			$grades = array();
 			if ($aver > 1) {
@@ -159,7 +161,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm->execute(array(':assessmentid'=>$aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			    $grades[$row['userid']]=$row["score"];
-				}
+                }
+                // clear out time limit extensions
+                $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+                $stm->execute(array($aid));
+                
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 			} else {
 				$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -254,7 +260,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
 				//update points possible
-				require_once("../includes/updateptsposs.php");
+				require_once "../includes/updateptsposs.php";
 				updatePointsPossible($aid, $itemorder, $defpoints);
 			}
 
@@ -268,8 +274,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				//need to re-score assessment attempts based on withdrawal
-				require_once('../assess2/AssessInfo.php');
-				require_once('../assess2/AssessRecord.php');
+				require_once '../assess2/AssessInfo.php';
+				require_once '../assess2/AssessRecord.php';
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 				$assess_info->loadQuestionSettings();
 				$DBH->beginTransaction();
@@ -288,8 +294,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
-						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
+						require_once "../includes/ltioutcomes.php";
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true, -1, false);
 					}
 				}
 				$DBH->commit();
@@ -332,8 +338,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
-						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
+						require_once "../includes/ltioutcomes.php";
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true, -1, false);
 					}
 				}
 			}
@@ -378,11 +384,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090320\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=092820\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=050824\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=052224\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
-    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=092020\" type=\"text/css\" />";
+    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
     $placeinhead .= '<script>
         $(function() {
             if (window.top != window.self) {
@@ -396,7 +403,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	require_once("$curdir/../filter/filter.php");
+	require_once "$curdir/../filter/filter.php";
 	if ($aver > 1) {
 		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
 		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
@@ -412,7 +419,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$beentaken = false;
 	}
     
-    require_once('../includes/addquestions2util.php');
+    require_once '../includes/addquestions2util.php';
     list($jsarr, $existingq, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, $row);
 
     if (isset($_SESSION['searchtype'.$aid])) {
@@ -443,6 +450,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         } else {
             $searchin = [$userdeflib];
         }
+        $_SESSION['searchin'.$aid] = $searchin;
+        $_SESSION['lastsearchlibs'.$aid] = implode(',', $searchin);
     } else {
         $searchin = [];
     }
@@ -454,7 +463,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
     // do initial search
-    require('../includes/questionsearch.php');
+    require_once '../includes/questionsearch.php';
     $search_parsed = parseSearchString($searchterms);
     $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
         'existing' => $existingq
@@ -465,7 +474,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 /******* begin html output ********/
 //hack to prevent the page breaking on accessible mode
 $_SESSION['useed'] = 1;
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -505,6 +514,7 @@ if ($overwriteBody==1) {
     if ($aver > 1 && $submitby == 'by_assessment') {
         echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'&from=addq2">'._('Define Auto-Excuse').'</a>';
     }
+    echo '<br><a href="findquestion.php?aid='.$aid.'&amp;cid='.$cid.'&amp;from=addq2">'._('Find Question in Course').'</a>';
     echo '<br><a href="addquestions.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Use Classic Add/Remove').'</a>';
 
     echo '</span><br class=clear /></div>';
@@ -514,6 +524,9 @@ if ($overwriteBody==1) {
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
 	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions2.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<a href="isolateassessgrade.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>" target="_blank">
+		<?php echo _('View Scores');?>
+	</a>
 	</p>
 <?php
 	}
@@ -541,7 +554,7 @@ if ($overwriteBody==1) {
     echo '<li>',_('If you choose <b>All Libraries</b>, you must provide a search term then click Search. '),'</li></ul>';
 
     echo "<p>",_("To select questions and add them:"),"</p><ul>";
-    echo " <li>",_("Click the eye-shaped <b>Preview</b> icon to view an example of the question"),"</li>";
+    echo " <li>",_("Click the <b>Preview</b> button to view an example of the question"),"</li>";
     echo " <li>",_("Use the checkboxes to mark the questions you want to use"),"</li>";
     echo " <li>",_("Click the <b>Add</b> button to add the questions to your assessment"),"</li> ";
     echo "  </ul>";
@@ -582,20 +595,21 @@ if ($overwriteBody==1) {
 	<script>
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var lastitemhash = "<?php echo md5($itemorder); ?>";
 		//$(refreshTable);
 		refreshTable();
 	</script>
 <?php
     
 	if ($displaymethod=='VideoCue' || $displaymethod == 'video_cued') {
-		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
+		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&from=addq2&aid='.$aid.'\'"/></p>';
 	} else if ($displaymethod == 'full') {
 		echo '<p>'._('You can break your assessment into pages by using the +Text button and selecting the New Page option.').'</p>';
 	}
 ?>
 	<p>
-		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>" onclick="return prePageChange()"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
 			if ($aver > 1) {
 				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;
@@ -603,7 +617,9 @@ if ($overwriteBody==1) {
 				echo $imasroot . '/assessment/showtest.php?cid=' . $cid . '&id=' . $aid;
 			}
         ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"><?php echo _("Preview"); ?></button>
-        <a href="moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'"><?php echo _("Add New Question") ?></a>
+        <?php if (!$beentaken) { ?>
+        <a href="moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>&from=addq2"><?php echo _("Add New Question") ?></a>
+        <?php } ?>
 
 	</p>
 
@@ -629,7 +645,7 @@ if ($overwriteBody==1) {
             }
             ?>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" id="searchtypemenu">
             <li><a href="#" role="button" onclick="alllibs(); return false;">
                 <?php echo _('All Libraries'); ?>
             </a></li>
@@ -649,7 +665,7 @@ if ($overwriteBody==1) {
                 id="searchclear" aria-label="Clear Search">&times;</button>
         </div>
         <div class="dropdown splitbtn" id="searchbtngrp" >
-            <button type="button" class="primary" onclick="doQuestionSearch()">
+            <button type="button" class="primary" onclick="startQuestionSearch()">
                 <?php echo _('Search');?>
             </button><button type="button" id="advsearchbtn" class="primary dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only"><?php echo _('Advanced Search'); ?></span>
@@ -657,15 +673,15 @@ if ($overwriteBody==1) {
 
             <div class="dropdown-menu dropdown-menu-right advsearch">
                 <form class="mform" id="advsearchform">
-                    <div><label><?php echo _('Has words');?>:</label> 
+                    <div><label for="search-words"><?php echo _('Has words');?>:</label>
                         <input id="search-words"/></div>
-                    <div><label><?php echo _('Doesn\'t have');?>:</label> 
+                    <div><label for="search-exclude"><?php echo _('Doesn\'t have');?>:</label> 
                         <input id="search-exclude"/></div>
-                    <div><label><?php echo _('Author');?>:</label> 
+                    <div><label for="search-author"><?php echo _('Author');?>:</label> 
                         <input id="search-author"/></div>
-                    <div><label><?php echo _('ID');?>:</label> 
+                    <div><label for="search-id"><?php echo _('ID');?>:</label> 
                         <input id="search-id"></div>
-                    <div><label><?php echo _('Type');?>:</label> 
+                    <div><label for="search-type"><?php echo _('Type');?>:</label> 
                         <select id="search-type">
                             <option value=""><?php echo _('All');?></option>
                             <option value="number">Number</option>
@@ -685,15 +701,30 @@ if ($overwriteBody==1) {
                             <option value="calcinterval">Calculated Interval</option>
                             <option value="complex">Complex</option>
                             <option value="calccomplex">Calculated Complex</option>
+							<option value="chemeqn">Chemical Equation</option>
                             <option value="file">File Upload</option>
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>
                         </select></div>
-                    <div><label><?php echo _('Avg Time');?>:</label> <div>
+                    <div><label for="search-avgtime-min"><?php echo _('Avg Time');?>:</label> <div>
                         <input size=2 id="search-avgtime-min"> to <input size=2 id="search-avgtime-max">
                     </div></div>
-                    <p><input type=checkbox id="search-mine"><?php echo _('Mine Only');?> 
-                        <input type=checkbox id="search-unused"><?php echo _('Exclude Added');?>
+                    <div><label for="search-avgscore-min"><?php echo _('Avg Score');?>:</label> <div>
+                        <input size=2 id="search-avgscore-min">% to <input size=2 id="search-avgscore-max">%
+                    </div></div>
+                    <div><label for="search-lastmod-min"><?php echo _('Last Modified');?>:</label> <div>
+                        <input size=8 id="search-lastmod-min" name="search-lastmod-min">
+                        <a href="#" onClick="displayDatePicker('search-lastmod-min', this); return false">
+			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+                        to 
+                        <input size=8 id="search-lastmod-max" name="search-lastmod-max">
+                        <a href="#" onClick="displayDatePicker('search-lastmod-max', this); return false">
+			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+                    </div></div>
+                    <p><label><input type=checkbox id="search-mine"><?php echo _('Mine Only');?></label> 
+                        <label><input type=checkbox id="search-unused"><?php echo _('Exclude Added');?></label> 
+                        <label><input type=checkbox id="search-newest"><?php echo _('Newest First');?></label> 
+                        <label><input type=checkbox id="search-nounrand"><?php echo _('Exclude non-randomized');?></label> 
                     </p>
                     <p><?php echo _('Helps');?>: 
                         <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 
@@ -722,6 +753,8 @@ if ($overwriteBody==1) {
     </button>
 </div>
 </div>
+
+<div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img alt="" src="../img/updating.gif"/></div>
 
 <div id="addbar" class="footerbar sr-only">
     <div class="dropup inlinediv splitbtn">
@@ -767,7 +800,7 @@ if ($overwriteBody==1) {
 </div>
         
 <form id="selq">
-	<table cellpadding="5" id="myTable" class="gb zebra" style="clear:both; position:relative;" tabindex="-1">
+	<table cellpadding="5" id="myTable" class="gb zebra potential-question-list" style="clear:both; position:relative;" tabindex="-1">
     </table>
     <p><span id="searchnums"><?php echo _('Showing');?> <span id="searchnumvals"></span></span>
       <a href="#" id="searchprev" style="display:none"><?php echo _('Previous Results');?></a>
@@ -778,6 +811,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
     $(function() {
         displayQuestionList(<?php echo json_encode($search_results, JSON_INVALID_UTF8_IGNORE); ?>);
+        setlibhistory();
     });
 </script>
 </div>
@@ -785,4 +819,4 @@ if ($overwriteBody==1) {
     }
 }
 
-require("../footer.php");
+require_once "../footer.php";

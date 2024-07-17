@@ -24,8 +24,10 @@
           type="text"
           size="4"
           :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
+          pattern="N\/A|\d*\.?\d*"
           v-model="curScores[i]"
           @input="updateScore(i, $event)"
+          @keyup.enter="$emit('submitform')"
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
         <button
           v-if="canedit && !isPractice && qdata.rubric > 0"
@@ -53,6 +55,14 @@
         {{ fullCreditLabel }}
       </button>
       <button
+        v-if="canedit && hasManual && !isPractice"
+        type="button"
+        @click="manualFull"
+        class="slim"
+      >
+        {{ $t('gradebook.full_manual_parts') }}
+      </button>
+      <button
         v-if="canedit && !isPractice && showfeedback === false"
         type="button"
         class="slim"
@@ -74,7 +84,11 @@
     <div v-if="showfull">
       <span v-if="qdata.timeactive.total > 0">
         {{ $t('gradebook.time_on_version') }}:
-        {{ timeSpent }}
+        {{ timeSpent }}.
+      </span>
+      <span v-if="qdata.lastchange">
+        {{ $t('gradebook.lastchange') }}
+        {{ qdata.lastchange }}.
       </span>
       <button
         v-if="maxTry > 1"
@@ -127,6 +141,20 @@
         target="_blank"
       >{{ help.title }}</a>
     </div>
+    <div v-if="qdata.category">
+      {{ $t('qdetails.category') }}:
+      {{ qdata.category }}
+    </div>
+    <div>
+      <a :href="messageHref" target="help" v-if="showMessage">
+        <icons name="message" />
+        {{ $t('helps.message_instructor') }}
+      </a>
+      <a :href="forumHref" target="help" v-if="postToForum > 0">
+        <icons name="forum" />
+        {{ $t('helps.post_to_forum') }}
+      </a>
+    </div>
   </div>
 </template>
 
@@ -150,7 +178,7 @@ export default {
   },
   data: function () {
     return {
-      curScores: false,
+      curScores: [],
       showfeedback: false,
       showAllTries: false,
       showPenalties: false,
@@ -162,7 +190,10 @@ export default {
       if (!this.qdata.answeights || this.qdata.singlescore) { // if answeights not generated yet
         return [1];
       } else {
-        const answeights = this.qdata.answeights.map(x => parseFloat(x));
+        const answeights = [];
+        for (const x in this.qdata.answeights) {
+          answeights[x] = parseFloat(this.qdata.answeights[x]);
+        }
         const answeightTot = answeights.reduce((a, c) => a + c);
         return answeights.map(x => x / answeightTot);
       }
@@ -171,30 +202,6 @@ export default {
       var out = [];
       for (let i = 0; i < this.answeights.length; i++) {
         out[i] = Math.round(1000 * this.qdata.points_possible * this.answeights[i]) / 1000;
-      }
-      return out;
-    },
-    initScores () {
-      var out = [];
-      for (let i = 0; i < this.answeights.length; i++) {
-        if (this.qdata.singlescore) {
-          out.push(this.qdata.score);
-        } else if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
-          // handle the case of a single override
-          let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
-          partscore = Math.round(1000 * partscore) / 1000;
-          out.push(partscore);
-        } else if (this.qdata.scoreoverride && this.qdata.scoreoverride.hasOwnProperty(i)) {
-          if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
-            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible) / 1000);
-          } else {
-            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
-          }
-        } else if (this.maxTry === 0 || !this.qdata.parts[i].hasOwnProperty('score')) { // not attempted or not showing
-          out.push('N/A');
-        } else {
-          out.push(this.qdata.parts[i].score);
-        }
       }
       return out;
     },
@@ -275,7 +282,8 @@ export default {
         },
         {
           label: (store.assessInfo.hasOwnProperty('qerrortitle')
-            ? store.assessInfo.qerrortitle : this.$t('gradebook.msg_owner')),
+            ? store.assessInfo.qerrortitle
+            : this.$t('gradebook.msg_owner')),
           link: this.questionErrorUrl
         }
       ];
@@ -291,6 +299,19 @@ export default {
       for (let pn = 0; pn < this.qdata.parts.length; pn++) {
         if (this.qdata.parts[pn].hasOwnProperty('penalties') &&
           this.qdata.parts[pn].penalties.length > 0
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
+    hasManual () {
+      if (this.qdata.parts.length === 1) {
+        return false;
+      }
+      for (let pn = 0; pn < this.qdata.parts.length; pn++) {
+        if (this.qdata.parts[pn].hasOwnProperty('req_manual') &&
+          this.qdata.parts[pn].req_manual === true
         ) {
           return true;
         }
@@ -325,6 +346,43 @@ export default {
       } else {
         return [];
       }
+    },
+    showMessage () {
+      return (store.assessInfo.hasOwnProperty('help_features') &&
+        store.assessInfo.help_features.message === true &&
+        !store.assessInfo.can_edit_scores
+      );
+    },
+    postToForum () {
+      return (store.assessInfo.hasOwnProperty('help_features') &&
+        store.assessInfo.help_features.forum
+      );
+    },
+    quoteQ () {
+      const qsid = this.qdata.questionsetid;
+      const seed = this.qdata.seed;
+      const ver = 2; // TODO: send from backend
+      return this.qn + '-' + qsid + '-' + seed + '-' + store.aid + '-' + ver;
+    },
+    messageHref () {
+      let href = window.imasroot + '/msgs/msglist.php?';
+      href += window.$.param({
+        cid: store.cid,
+        add: 'new',
+        quoteq: this.quoteQ,
+        to: 'instr'
+      });
+      return href;
+    },
+    forumHref () {
+      let href = window.imasroot + '/forums/thread.php?';
+      href += window.$.param({
+        cid: store.cid,
+        forum: store.assessInfo.help_features.forum,
+        modify: 'new',
+        quoteq: this.quoteQ
+      });
+      return href;
     }
   },
   methods: {
@@ -345,8 +403,18 @@ export default {
     },
     allFull () {
       for (let i = 0; i < this.answeights.length; i++) {
-        this.$set(this.curScores, i, this.partPoss[i]);
+        this.curScores[i] = this.partPoss[i];
         actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+      }
+    },
+    manualFull () {
+      for (let i = 0; i < this.answeights.length; i++) {
+        if (this.qdata.parts[i] && this.qdata.parts[i].hasOwnProperty('req_manual') &&
+          this.qdata.parts[i].req_manual === true
+        ) {
+          this.curScores[i] = this.partPoss[i];
+          actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+        }
       }
     },
     clearWork () {
@@ -355,7 +423,28 @@ export default {
       store.clearAttempts.show = true;
     },
     initCurScores () {
-      this.$set(this, 'curScores', this.initScores);
+      var out = [];
+      for (let i = 0; i < this.answeights.length; i++) {
+        if (this.qdata.singlescore) {
+          out.push(this.qdata.score);
+        } else if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
+          // handle the case of a single override
+          let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
+          partscore = Math.round(1000 * partscore) / 1000;
+          out.push(partscore);
+        } else if (this.qdata.scoreoverride && this.qdata.scoreoverride.hasOwnProperty(i)) {
+          if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
+            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible) / 1000);
+          } else {
+            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
+          }
+        } else if (this.maxTry === 0 || !this.qdata.parts[i].hasOwnProperty('score')) { // not attempted or not showing
+          out.push('N/A');
+        } else {
+          out.push(this.qdata.parts[i].score);
+        }
+      }
+      this.curScores = out;
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
     },
     showRubric (pn) {

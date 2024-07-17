@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -33,12 +33,16 @@ class ChoicesScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        $optionkeys = ['answer', 'noshuffle'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $optionkeys = ['questions', 'partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
+        }
 
-        if (isset($partialcredit)) {
+        if (!empty($partialcredit)) {
             if (!is_array($partialcredit)) {
                 $partialcredit = explode(',',$partialcredit);
             }
@@ -56,7 +60,7 @@ class ChoicesScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if ($noshuffle == "last") {
-            $randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+            $randkeys = (array) $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
             $RND->shuffle($randkeys);
             array_push($randkeys,count($questions)-1);
         } else if ($noshuffle == "all") {
@@ -66,23 +70,30 @@ class ChoicesScorePart implements ScorePart
             if ($n>count($questions)) {
                 $n = count($questions);
             }
-            $randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
+            $randkeys = (array) $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
             $RND->shuffle($randkeys);
             for ($i=count($questions)-$n;$i<count($questions);$i++) {
                 array_push($randkeys,$i);
             }
         } else {
-            $randkeys = $RND->array_rand($questions,count($questions));
+            $randkeys = (array) $RND->array_rand($questions,count($questions));
             $RND->shuffle($randkeys);
         }
 
-        if ($givenans==='NA' || $givenans === null || $isRescore) {
+        if ($givenans==='NA' || $givenans === null || $givenans === '' || $isRescore) {
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else {
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
         }
 
-        if ($givenans ==='NA' || $givenans === null) {
+        if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part'])) {
+            require_once $GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part'];
+            if (isset($onGetResult) && is_callable($onGetResult)) {
+                $onGetResult();
+            }
+        }
+
+        if ($givenans ==='NA' || $givenans === null || $givenans === '') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
@@ -92,12 +103,12 @@ class ChoicesScorePart implements ScorePart
             $anss[$k] = intval($v);
         }
         //if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
-        $adjGiven = $isRescore ? $givenans : $randkeys[$givenans];
+        $adjGiven = ($isRescore || !isset($randkeys[$givenans])) ? $givenans : $randkeys[$givenans];
 
         if (in_array($adjGiven,$anss)) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
-        } else if (isset($partialcredit) && isset($creditweight[$adjGiven])) {
+        } else if (!empty($partialcredit) && !empty($creditweight[$adjGiven])) {
             $scorePartResult->setRawScore($creditweight[$adjGiven]);
             return $scorePartResult;
         } else {

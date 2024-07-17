@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import { nextTick } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import { store, actions } from './basicstore';
 import Launch from './views/Launch.vue';
 import Closed from './views/Closed.vue';
@@ -18,11 +18,10 @@ import FullPaged from './views/FullPaged.vue';
 const Videocued = () => import(/* webpackChunkName: "special" */ './views/Videocued.vue');
 const Livepoll = () => import(/* webpackChunkName: "special" */ './views/Livepoll.vue');
 
-Vue.use(Router);
-
-const router = new Router({
-  base: process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/',
-  // mode: 'history',
+const router = createRouter({
+  history: createWebHashHistory(
+    process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/' // base
+  ),
   routes: [
     {
       path: '/',
@@ -144,7 +143,8 @@ const router = new Router({
         if (!store.assessInfo.in_practice &&
           (!store.assessInfo.has_active_attempt ||
             store.assessInfo.submitby === 'by_question'
-          )
+          ) &&
+          !store.showwork_expired
         ) {
           next();
         } else {
@@ -213,11 +213,13 @@ router.beforeEach((to, from, next) => {
       store.queryString += '&uid=' + store.uid;
     }
     actions.loadAssessData(() => next());
+  } else if (store.inPrintView && to.name !== '/print') {
+    next({ path: '/print', replace: true });
   } else {
     next();
   }
 });
 router.afterEach((to, from) => {
-  Vue.nextTick(window.sendLTIresizemsg);
+  nextTick(window.sendLTIresizemsg);
 });
 export default router;

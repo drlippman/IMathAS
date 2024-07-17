@@ -2,7 +2,7 @@
 // Add/remove Teachers
 // IMathAS (c) 2018 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -44,8 +44,8 @@ if (!empty($_GET['from'])) {
 }
 
 //process transfer
-$ownerid = Sanitize::onlyInt($_POST['newowner']);
-if (!empty($ownerid)) {
+if (!empty($_POST['newowner'])) {
+    $ownerid = Sanitize::onlyInt($_POST['newowner']);
 	$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
 	$stm->execute(array(':ownerid'=>$ownerid, ':id'=>$cid));
 	if ($stm->rowCount()>0) {
@@ -64,31 +64,11 @@ if (!empty($ownerid)) {
 	exit;
 }
 
-//process AJAX post-backs
-if (isset($_POST['loadgroup'])) {
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
-	$stm->execute(array($courseownerid, $coursegroupid));
-	$out = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if ($row['rights']==76 || $row['rights']==77) {continue;}
-		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
-	}
-	echo json_encode($out, JSON_HEX_TAG);
-	exit;
-} else if (isset($_POST['search'])) {
-	require("../includes/userutils.php");
-	$search = (string) trim($_POST['search']);
-	$possible_teachers = searchForUser($search, true, true);
-	$out = array();
-	foreach ($possible_teachers as $row) {
-		if ($row['id']==$courseownerid) { continue; }
-		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
-	}
-	echo json_encode($out, JSON_HEX_TAG);
-	exit;
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
 }
-
-$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .fade-enter-active {
@@ -112,7 +92,7 @@ $placeinhead .= '<style type="text/css">
 
 $pagetitle = _('Transfer Course Ownership');
 
-require("../header.php");
+require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if ($from == 'admin') {
@@ -134,7 +114,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p><button type=button @click="loadGroup()">List my group members</button>
 	or lookup a teacher: <input v-model="toLookup" size=30>
 	<button type=button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
+	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
 </p>
 <p>
 	<button type=submit :disabled="selectedTeacher == 0">Transfer</button>
@@ -143,21 +123,23 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p v-if="searchResults !== null && searchResults.length==0">No teachers found</p>
 <transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
 	<li v-for="teacher in searchResults" :key="teacher.id">
-		<input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> {{teacher.name}}
+        <input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> <span class="pii-full-name">{{teacher.name}}</span>
 	</li>
 </transition-group>
 </div>
 </form>
 <script type="text/javascript">
-var app = new Vue({
-	el: '#app',
-	data: {
-		processingSearch: false,
-		courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
-		toLookup: "",
-		searchResults: null,
-		lastSearchType: '',
-		selectedTeacher: 0
+const { createApp } = Vue;
+createApp({
+	data: function() {
+        return {
+            processingSearch: false,
+            courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
+            toLookup: "",
+            searchResults: null,
+            lastSearchType: '',
+            selectedTeacher: 0
+        };
 	},
 	methods: {
 		loadGroup: function() {
@@ -167,8 +149,8 @@ var app = new Vue({
 			$.ajax({
 				dataType: "json",
 				type: "POST",
-				url: window.location.href,
-				data: {loadgroup: 1},
+				url: "<?php echo $basesiteurl;?>/util/userlookup.php",
+				data: {loadgroup: 1, cid: <?php echo $cid;?>},
 			}).done(function(msg) {
 				self.searchResults = msg;
 			}).always(function() {
@@ -184,8 +166,8 @@ var app = new Vue({
 				$.ajax({
 					dataType: "json",
 					type: "POST",
-					url: window.location.href,
-					data: {search: this.toLookup},
+					url: "<?php echo $basesiteurl;?>/util/userlookup.php",
+					data: {search: this.toLookup, cid: <?php echo $cid;?>},
 				}).done(function(msg) {
 					self.searchResults = msg;
 				}).always(function() {
@@ -198,7 +180,7 @@ var app = new Vue({
 			window.location.href = '<?php echo $imasroot.$backloc;?>';
 		}
 	}
-});
+}).mount('#app');
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

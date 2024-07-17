@@ -3,8 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -16,7 +16,7 @@ $useeditor = "description,postinstr,replyinstr";
 $cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Forum\n";
 	$pagetitle = "Modify Forum";
 } else {
@@ -29,7 +29,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_forums WHERE id=?");
 	$stm->execute(array(intval($_GET['id'])));
 	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $_GET['cid']) {
@@ -46,11 +46,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = $_GET['block'];
+	$block = $_GET['block'] ?? '0';
 
-	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
+	if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
 		$DBH->beginTransaction();
-		require_once("../includes/parsedatetime.php");
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -151,17 +151,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$outcomes = implode(',',$outcomes);
 
 		$forumname = Sanitize::stripHtmlTags($_POST['name']);
-
+        $_POST['description'] = Sanitize::trimEmptyPara($_POST['description']);
 		if ($_POST['description']=='<p>Enter forum description here</p>' || $_POST['description']=='<p></p>') {
 			$forumdesc = '';
 		} else {
 			$forumdesc = Sanitize::incomingHtml($_POST['description']);
-		}
+        }
+        $_POST['postinstr'] = Sanitize::trimEmptyPara($_POST['postinstr']);
 		if (!isset($_POST['postinstr']) || trim($_POST['postinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['postinstr'])) {
 			$postinstruction = '';
 		} else {
 			$postinstruction = Sanitize::incomingHtml($_POST['postinstr']);
-		}
+        }
+        $_POST['replyinstr'] = Sanitize::trimEmptyPara($_POST['replyinstr']);
 		if (!isset($_POST['replyinstr']) || trim($_POST['replyinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['replyinstr'])) {
 			$replyinstruction = '';
 		} else {
@@ -180,16 +182,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$forumtype = Sanitize::onlyInt($_POST['forumtype']);
 		}
-        $forumid = Sanitize::onlyInt($_GET['id']);
         
         // handle groupsetid
         if ($_POST['groupsetid'] === 'bysec') {
             // want to use by-section groups.  Create
-            require_once('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             $groupsetid = createSectionGroupset($cid);
         }
 
-		if (!empty($forumid)) {  //already have id; update
+		if (!empty($_GET['id'])) {  //already have id; update
+            $forumid = Sanitize::onlyInt($_GET['id']);
 			$stm = $DBH->prepare("SELECT groupsetid FROM imas_forums WHERE id=:id");
 			$stm->execute(array(':id'=>$forumid));
 			$oldgroupsetid = $stm->fetchColumn(0);
@@ -208,7 +210,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				':postby'=>$postby, ':groupsetid'=>$groupsetid, ':points'=>$points, ':cntingb'=>$graded, ':tutoredit'=>$tutoredit,
 				':gbcategory'=>$gradebookcategory, ':avail'=>$available, ':sortby'=>$sortby, ':forumtype'=>$forumtype, ':taglist'=>$taglist,
 				':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate, ':autoscore'=>$autoscore, ':id'=>$forumid));
-			$newforumid = $_GET['id'];
+			$newforumid = $forumid;
 
 		} else { //add new
 			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes,allowlate,autoscore) VALUES ";
@@ -260,7 +262,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
-		if (isset($_GET['id'])) { //MODIFY MODE
+		if (!empty($_GET['id'])) { //MODIFY MODE
 			$forumid = Sanitize::onlyInt($_GET['id']);
 			$hassubscrip = false;
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_subscriptions WHERE forumid=:forumid AND userid=:userid");
@@ -343,15 +345,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$autopostpts = 0;
 			$autopostn = 0;
 			$autoreplypts = 0;
-			$autoreplyn = 0;
+            $autoreplyn = 0;
+            $defdisplay = 0;
 			$line['tutoredit'] = 0;
 			$savetitle = _("Create Forum");
 		}
 
 		list($posttag,$replytag) = explode('--',$line['caltag']);
 
-		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
-		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $forumid : "";
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder'] ?? '0');
+		$page_formActionTag .= (!empty($_GET['id'])) ? "&id=" . $forumid : "";
 		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
 		$hr = floor($coursedeftime/60)%12;
@@ -392,7 +395,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$postbytime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
 		}
 
-		if (!isset($_GET['id'])) {
+		if (empty($_GET['id'])) {
 			$stime = $defstime;
 			$etime = $deftime;
 			$replybytime = $deftime;
@@ -418,7 +421,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
-		$page_gbcatSelect = array();
+		$page_gbcatSelect = array('val'=>[], 'label'=>[]);
 		$i=0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_gbcatSelect['val'][$i] = $row[0];
@@ -428,7 +431,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$groupid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -451,14 +454,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		$outcomes = array();
-		function flattenarr($ar) {
+		function flattenarr($ar, $deftype = 0) {
 			global $outcomes;
 			foreach ($ar as $v) {
 				if (is_array($v)) { //outcome group
 					$outcomes[] = array($v['name'], 1);
-					flattenarr($v['outcomes']);
+					flattenarr($v['outcomes'], 2);
 				} else {
-					$outcomes[] = array($v, 0);
+					$outcomes[] = array($v, $deftype);
 				}
 			}
 		}
@@ -494,7 +497,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { if (v) {$("#gbdetail").slideDown();} else {$("#gbdetail").slideUp();} }</script>';
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -587,7 +590,7 @@ if ($overwriteBody==1) {
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
 
-		<span class=form>New post notifcation:</span>
+		<span class=form>New post notification:</span>
 		<span class=formright>
 			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
 			Get email notification of new posts
@@ -721,8 +724,8 @@ if ($overwriteBody==1) {
 		<span class=form>Use Scoring Rubric</span><span class=formright>
 <?php
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'])."\">Add new rubric</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'])."\">Edit rubrics</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'] ?? '')."\">Add new rubric</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'] ?? '')."\">Edit rubrics</a> ";
 ?>
     		</span><br class="form"/>
 <?php
@@ -742,5 +745,5 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

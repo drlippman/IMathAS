@@ -7,6 +7,7 @@
     <videocued-nav
       :cue="cue"
       :toshow="toshow"
+      :showfollowup="showfolloup"
       @jumpto="jumpTo"
     >
       <videocued-result-nav
@@ -14,6 +15,7 @@
         :qn = "qn"
         :cue = "cue"
         @jumpto="jumpTo"
+        @addfollowup="addShowFollowup"
       />
     </videocued-nav>
     <div
@@ -51,6 +53,8 @@
           pos = "before"
           :qn = "curqn"
           :active="curqn == qn"
+          :textlist = "textList"
+          :lastq = "lastQ"
         />
         <full-question-header
           v-show = "curqn == qn"
@@ -65,6 +69,8 @@
           pos = "after"
           :qn = "curqn"
           :active="curqn == qn"
+          :textlist = "textList"
+          :lastq = "lastQ"
         />
       </div>
     </div>
@@ -115,7 +121,8 @@ export default {
       ytplayer: null,
       timer: null,
       cue: 0,
-      toshow: 'v'
+      toshow: 'v',
+      showfolloup: []
     };
   },
   computed: {
@@ -168,20 +175,30 @@ export default {
         qnArray[i] = i;
       }
       return qnArray;
+    },
+    lastQ () {
+      return store.assessInfo.questions.length - 1;
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {
     createPlayer () {
       const supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
       const pVarsInternal = {
-        'autoplay': 0,
-        'wmode': 'transparent',
-        'fs': supportsFullScreen ? 1 : 0,
-        'controls': 2,
-        'rel': 0,
-        'modestbranding': 1,
-        'showinfo': 0,
-        'origin': window.location.protocol + '//' + window.location.host
+        autoplay: 0,
+        wmode: 'transparent',
+        fs: supportsFullScreen ? 1 : 0,
+        controls: 2,
+        rel: 0,
+        modestbranding: 1,
+        showinfo: 0,
+        origin: window.location.protocol + '//' + window.location.host
       };
       const ar = store.assessInfo.videoar.split(':');
       const videoHeight = window.innerHeight - 50;
@@ -193,9 +210,9 @@ export default {
         videoId: store.assessInfo.videoid,
         playerVars: pVarsInternal,
         events: {
-          'onReady': () => this.handlePlayerReady(),
-          'onStateChange': (event) => this.handlePlayerStateChange(event),
-          'onError': (event) => this.handlePlayerError(event)
+          onReady: () => this.handlePlayerReady(),
+          onStateChange: (event) => this.handlePlayerStateChange(event),
+          onError: (event) => this.handlePlayerError(event)
         }
       });
     },
@@ -259,7 +276,7 @@ export default {
     handlePlayerError (event) {
       store.errorMsg = event.data;
     },
-    jumpTo (newCueNum, newToshow) {
+    jumpTo (newCueNum, newToshow, failed = 0) {
       if (newCueNum === -1 || newToshow === 'q') {
         // if showing a question, pause the video
         this.exitFullscreen();
@@ -268,8 +285,15 @@ export default {
         }
       } else {
         if (this.ytplayer === null || typeof this.ytplayer.seekTo !== 'function') {
-          store.errorMsg = 'ytnotready';
+          if (failed === 0) {
+            store.errorMsg = 'ytnotready';
+          }
+          window.setTimeout(() => {
+            this.jumpTo(newCueNum, newToshow, 1);
+          }, 100);
           return;
+        } else if (failed > 0) {
+          store.errorMsg = null;
         }
         const newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
@@ -294,6 +318,9 @@ export default {
       }
       this.cue = newCueNum;
       this.toshow = newToshow;
+    },
+    addShowFollowup (val) {
+      this.showfolloup.push(val);
     }
   },
   mounted () {
@@ -304,9 +331,12 @@ export default {
         this.createPlayer();
       };
       // async load YouTube API
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/player_api';
-      document.head.appendChild(tag);
+      if (!document.getElementById('yt_player_api')) {
+        const tag = document.createElement('script');
+        tag.id = 'yt_player_api';
+        tag.src = 'https://www.youtube.com/player_api';
+        document.head.appendChild(tag);
+      }
     }
   },
   created () {

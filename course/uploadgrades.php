@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
@@ -106,7 +106,7 @@ if (!(isset($teacherid))) {
 			$body = "<p>Grades uploaded.  $successes records.</p> ";
 			if (count($failures)>0) {
 				$body .= "<p>Grade upload failure on: <br/>";
-				$body .= implode('<br/>', Sanitize::encodeStringForDisplay($failures));
+				$body .= implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$failures));
 				$body .= '</p>';
 			}
 			if ($successes>0) {
@@ -125,7 +125,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -166,6 +166,6 @@ if ($overwriteBody==1) {
 <?php
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

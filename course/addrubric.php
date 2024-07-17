@@ -3,8 +3,8 @@
 //(c) 2011 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -13,10 +13,11 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $cid = Sanitize::courseId($_GET['cid']);
-$from = $_GET['from'];
+$from = $_GET['from'] ?? '';
+$fromstr = '';
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-if ($from=='modq') {
+if ($from=='modq' && !empty($_GET['qid'])) {
 	$fromstr = '&amp;' . Sanitize::generateQueryStringFromMap(array('from' => 'modq', 'aid' => $_GET['aid'],
 			'qid' => $_GET['qid']));
 	$returnstr = 'modquestion.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
@@ -39,7 +40,7 @@ if (isset($_GET['id'])) {
 	if ($_GET['id']=='new') {
 		$curBreadcrumb .= "&gt; Add Rubric\n";
 		$pagetitle = "Add Rubric";
-	} else if ($_GET['do'] === 'delete') {
+	} else if (isset($_GET['do']) && $_GET['do'] === 'delete') {
 		$curBreadcrumb .= "&gt; Delete Rubric\n";
 		$pagetitle = "Delete Rubric";
 	} else {
@@ -145,7 +146,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
 /******* begin html output ********/
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=113016"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
 $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
@@ -163,7 +164,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
 	  $(".dropdown-toggle").dropdown();
 	});
   </script>';
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -187,7 +188,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 
 	}
 	echo '</p>';
-} else if ($_GET['do'] === 'delete') { // deleting
+} else if (isset($_GET['do']) && $_GET['do'] === 'delete') { // deleting
 	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
 	echo '<p>Are you SURE you want to delete rubric <b>'.Sanitize::encodeStringForDisplay($rubname).'</b>?</p>';
 	echo '<input type="hidden" name="delete" value="1" />';
@@ -253,5 +254,5 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 
 }
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

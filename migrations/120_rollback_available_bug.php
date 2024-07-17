@@ -15,7 +15,7 @@ if ($res===false) {
 }
 echo '<p>Rollback of incorrect course available value change</p>';
  
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 return true;
 

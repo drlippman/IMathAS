@@ -453,3 +453,26 @@ function editinplaceun() {
 	el.style.display = 'inline';
 	this.style.display = "none";
 }
+
+var newblockcnt = 0;
+function addnewblock() {
+    $("#qviewtree").prepend(
+        $("<li>", {id: "newblock" + newblockcnt, class: "blockli"}).append(
+            $("<img>", {
+                alt: _("block"),
+                src: blockiconsrc,
+                class: "mida icon"
+            })
+        ).append(" ").append(
+            $("<b>").append(
+                $("<span>", {
+                    text: _("New Block"),
+                    id: "NB" + newblockcnt,
+                    onclick: "editinplace(this)"
+                })
+            )
+        )
+    );
+    newblockcnt++;
+    document.getElementById('recchg').disabled = false;
+}

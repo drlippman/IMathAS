@@ -1,6 +1,6 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {
 	exit;
@@ -12,14 +12,14 @@ if (empty($_POST['from']) || empty($_POST['to'])) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$ops .= '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[2]).' ('.Sanitize::encodeStringForDisplay($row[3]).') '.Sanitize::encodeStringForDisplay(tzdate('n/j/y',$row[4])).'</option>';
 	}
-	require("../header.php");
+	require_once "../header.php";
 	echo "<h1>Merge Teacher Accounts</h1>";
 	echo '<form method="post">';
 	echo 'Move everything from <select name="from">'.$ops.'</select><br/>';
 	echo 'to <select name="to">'.$ops.'</select><br/>';
 	echo '<input type="submit" value="Go"/>';
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 
 } else {
 	$from = intval($_POST['from']);

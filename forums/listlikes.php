@@ -2,7 +2,7 @@
 //IMathAS 2014
 //list forum thread likes
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($_GET['post'])) {
 	echo "No post specified";
@@ -19,7 +19,7 @@ if ($stm->rowCount()==0) {
 }
 $flexwidth = true;
 $nologo = true;
-require("../header.php");
+require_once "../header.php";
 
 echo '<h3>'._('Post Likes').'</h3>';
 $query = "SELECT iu.LastName,iu.FirstName FROM imas_users AS iu JOIN ";
@@ -31,10 +31,11 @@ if ($stm->rowCount()==0) {
 } else {
 	echo '<ul class="nomark">';
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		printf('<li>%s, %s</li>', Sanitize::encodeStringForDisplay($row['LastName']),
+		printf('<li><span class="pii-full-name">%s, %s</span></li>',
+			Sanitize::encodeStringForDisplay($row['LastName']),
 			Sanitize::encodeStringForDisplay($row['FirstName']));
 	}
 	echo '</ul>';
 }
-require("../footer.php");
+require_once "../footer.php";
 ?>

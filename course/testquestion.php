@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../assessment/displayq2.php");
-require("../assessment/testutil.php");
+require_once "../init.php";
+require_once "../assessment/displayq2.php";
+require_once "../assessment/testutil.php";
 $assessver = 2;
 
  //set some page specific variables and counters
@@ -116,7 +116,7 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $useeqnhelper = $eqnhelper;
 $useOldassessUI = true;
 
-require("../assessment/header.php");
+require_once "../assessment/header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -317,7 +317,8 @@ if ($overwriteBody==1) {
   }
   echo '</p>';
 
-	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
+	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." <span class='pii-full-name'>%s</span></p>",
+        Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>"._("Last Modified:")." $lastmod</p>";
 	if ($line['deleted']==1) {
@@ -344,7 +345,8 @@ if ($overwriteBody==1) {
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {
-			printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+			printf(' (<span class="pii-full-name">%s, %s</span>)',
+                Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 		}
 		echo '</li>';
 	}
@@ -366,6 +368,6 @@ if ($overwriteBody==1) {
   echo ' <a href="testquestion2.php?cid='.$cid.'&qsetid='.$qsetid.'">';
   echo _('Test in new interface').'</a></p>';
 }
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

@@ -86,7 +86,6 @@ button.text-segment-button-global, button.text-segment-button-global:hover, butt
 	background-color: #586EEA; /* or #6E9ADC; #7798f9;*/
 	border-color: #586EEA;
 	font-family: sans-serif;
-	font-color: #fff;
 	font-weight: bold;
 	color: #fff;
 }
@@ -244,4 +243,23 @@ tr.textsegmentrow td {
   }
   td.qinassess {
       color: #999;
+  }
+  #searchspinner {
+      position: fixed;
+      width: 50%;
+      left: 25%;
+      top: 25%;
+      text-align: center;
+      background-color: white;
+      z-index: 1000;
+      padding: 30px 0;
+      border: 1px solid #ccc;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
   }

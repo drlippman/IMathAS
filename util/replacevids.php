@@ -1,8 +1,8 @@
 <?php
-require("../init.php");
+require_once "../init.php";
 if ($myrights<100) {exit;}
 
-require("../header.php");
+require_once "../header.php";
 if (!empty($_POST['from']) && !empty($_POST['to'])) {
 	$from = trim($_POST['from']);
 	$to = trim($_POST['to']);
@@ -62,5 +62,5 @@ echo '<form method="post">';
 echo '<p>Replace video ID <input type="text" name="from" size="11"/> with video ID <input type="text" name="to" size="11"/></p>';
 echo '<p><input type="submit" value="Replace"/></p>';
 echo '</form>';
-require("../footer.php");
+require_once "../footer.php";
 ?>

@@ -4,8 +4,8 @@
 
 $flexwidth = true;
 $nologo = true;
-require("../init.php");
-require("../header.php");
+require_once "../init.php";
+require_once "../header.php";
 
 if (!isset($studentid) && !isset($tutorid) && !isset($teacherid)) {
 	echo "You are not registered in this course";
@@ -61,7 +61,7 @@ if ($type=='A') {
 	$stm->execute(array($id, $uid, $cid));
 
 	list($aname, $submitby, $deffb, $scoreddata) = $stm->fetch(PDO::FETCH_NUM);
-	$scoreddata = json_decode(gzdecode($scoreddata), true);
+	$scoreddata = json_decode(Sanitize::gzexpand($scoreddata), true);
 	$by_question = ($submitby == 'by_question');
 
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
@@ -124,4 +124,4 @@ if ($type=='A') {
 	echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback).'</div>';
 }
 
-require("../footer.php");
+require_once "../footer.php";

@@ -21,7 +21,7 @@
           <p>
             {{ $t('duedialog.nowdue') }}
           </p>
-          <p v-if="settings.can_use_latepass > 0">
+          <p v-if="settings.can_use_latepass > 0 && settings.latepass_after">
             {{ $tc('closed.latepassn', settings.latepasses_avail) }}
             <br/>
             {{ latepassExtendMsg }}
@@ -97,9 +97,7 @@ export default {
     },
     submitNow () {
       actions.endAssess(() => {
-        if (this.settings.submitby === 'by_question') {
-          this.exit();
-        }
+        this.exit();
       });
     },
     useLatepass () {
@@ -108,6 +106,7 @@ export default {
       });
     },
     exit () {
+      this.closeDialog();
       if (window.exiturl && window.exiturl !== '') {
         store.noUnload = true;
         window.location = window.exiturl;
@@ -129,7 +128,7 @@ export default {
       this.$refs.dialog.style.top = Math.max(20, lastHeight - this.$refs.dialog.offsetHeight) + 'px';
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     window.$(document).off('keyup.dialog');
     this.dialog.destroy();
   }

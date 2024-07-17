@@ -44,11 +44,13 @@ var border = defaultborder;
 var strokewidth, strokedasharray, stroke, fill;
 var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill, fontbackground;
 var fillopacity = .5;
-var markerstrokewidth = "1";
+var markerstrokewidth = 1;
 var markerstroke = "black";
 var markerfill = "yellow";
 var marker = "none";
 var arrowfill = stroke;
+var arrowrelsize = 1;
+var arrowoffset = 0;
 var dotradius = 4;
 var ticklength = 4;
 var axesstroke = "black";
@@ -77,7 +79,7 @@ function chop(x,n) {
 function prepWithMath(str) {
   // avoid double-prep cased by script wrap of prepWithMath followed by
   // secondary after prepWithMath
-  str = str.replace(/Ma(t|\(t\)\*)h\./,'');
+  str = str.replace(/Ma(t|\(t\)\*)h\./g,'');
 	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
 	str = str.replace(/\(E\)/g,'(Math.E)');
 	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
@@ -254,7 +256,7 @@ function updatePicture(obj) {
 //alert(src);
   try {
     eval(prepWithMath(src));
-  } catch(err) {alert(err+"\n"+src)}
+  } catch(err) {console.log(err+"\n"+src)}
 }
 
 
@@ -475,10 +477,14 @@ function initPicture(x_min,x_max,y_min,y_max) {
  node.setAttribute("y","0");
  node.setAttribute("width",width);
  node.setAttribute("height",height);
- node.setAttribute("style","stroke-width:1;fill:white");
+ node.setAttribute("fill","white");
  svgpicture.appendChild(node);
 }
 
+function setBackgroundColor(color) {
+    var bgrect = svgpicture.getElementsByTagName("rect")[0];
+    bgrect.setAttribute("fill", color);
+}
 function setStrokeFill(node) {
   node.setAttribute("stroke-width", strokewidth);
   if (strokedasharray!=null)
@@ -845,9 +851,9 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
     u = [u[0]/d, u[1]/d];
     up = [-u[1],u[0]];
     var node = myCreateElementSVG("path");
-    node.setAttribute("d","M "+(w[0]-15*u[0]-4*up[0])+" "+
-      (w[1]-15*u[1]-4*up[1])+" L "+(w[0]-3*u[0])+" "+(w[1]-3*u[1])+" L "+
-      (w[0]-15*u[0]+4*up[0])+" "+(w[1]-15*u[1]+4*up[1])+" z");
+    node.setAttribute("d","M "+(w[0]-arrowrelsize*15*u[0]-arrowrelsize*4*up[0]-1*arrowoffset*u[0])+" "+
+      (w[1]-arrowrelsize*15*u[1]-arrowrelsize*4*up[1]-1*arrowoffset*u[1])+" L "+(w[0]-(1*markerstrokewidth+1*arrowoffset)*u[0])+" "+(w[1]-(1*markerstrokewidth+1*arrowoffset)*u[1])+" L "+
+      (w[0]-arrowrelsize*15*u[0]+arrowrelsize*4*up[0]-1*arrowoffset*u[0])+" "+(w[1]-arrowrelsize*15*u[1]+arrowrelsize*4*up[1]-1*arrowoffset*u[1])+" z");
     node.setAttribute("stroke-width", markerstrokewidth);
     node.setAttribute("stroke", stroke); /*was markerstroke*/
     node.setAttribute("fill", stroke); /*was arrowfill*/
@@ -1005,15 +1011,17 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     svgpicture.appendChild(pnode);
   }
   pnode = myCreateElementSVG("path");
-  if (dox) {
+  st="";
+  
+  if (dox && ymin < 1e-8 && ymax > -1e-8) {
 	  st="M"+(fqonlyx?origin[0]:winxmin)+","+(height-origin[1])+" "+winxmax+","+
     (height-origin[1]);
   }
-  if (doy) {
+  if (doy && xmin < 1e-8 && xmax > -1e-8) {
 	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+(fqonlyy?height-origin[1]:winymax);
   }
 
-  if (dox && dx>0) {
+  if (dox && dx>0 && ymin < 1e-8 && ymax > -1e-8) {
 	  for (x = origin[0]; x<winxmax; x = x+dx)
 	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
 		   (height-origin[1]-ticklength);
@@ -1023,7 +1031,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	  	  	(height-origin[1]-ticklength);
 	  }
   }
-  if (doy && dy>0) {
+  if (doy && dy>0 && xmin < 1e-8 && xmax > -1e-8) {
 	   if (!fqonlyy) {
 	     for (y = height-origin[1]; y<winymax; y = y+dy)
 	      if (y>=winymin) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
@@ -1095,6 +1103,11 @@ function drawPictures() {
 	drawPics()
 }
 
+function prepmath(str) {
+    if (str === 'null') { return 'null';}
+    return prepWithMath(mathjs(str));
+}
+
 //ShortScript format:
 //xmin,xmax,ymin,ymax,xscl,yscl,labels,xgscl,ygscl,width,height plotcommands(see blow)
 //plotcommands: type,eq1,eq2,startmaker,endmarker,xmin,xmax,color,strokewidth,strokedash
@@ -1124,8 +1137,8 @@ function parseShortScript(sscript,gw,gh) {
 	if (sa.length > 10) {
 		commands = 'setBorder(5);';
 		commands += 'width=' +sa[9] + '; height=' +sa[10] + ';';
-		commands += 'initPicture(' + sa[0] +','+ sa[1] +','+ sa[2] +','+ sa[3] + ');';
-		commands += 'axes(' + sa[4] +','+ sa[5] +','+ sa[6] +','+ sa[7] +','+ sa[8]+ ');';
+		commands += 'initPicture(' + prepmath(sa[0]) +','+ prepmath(sa[1]) +','+ prepmath(sa[2]) +','+ prepmath(sa[3]) + ');';
+		commands += 'axes(' + prepmath(sa[4]) +','+ prepmath(sa[5]) +','+ prepmath(sa[6]) +','+ prepmath(sa[7]) +','+ prepmath(sa[8]) + ');';
 
 		var inx = 11;
 		var varlet = '';
@@ -1173,7 +1186,7 @@ function parseShortScript(sscript,gw,gh) {
 			if (typeof eval(sa[inx+5]) == "number") {
 		//	if ((sa[inx+5]!='null')&&(sa[inx+5].length>0)) {
 				//commands += 'myplot(' + eqn +',"' + sa[inx+3] +  '","' + sa[inx+4]+'",' + sa[inx+5] + ',' + sa[inx+6]  +');';
-				commands += 'plot(' + eqn +',' + sa[inx+5] + ',' + sa[inx+6] +',null,null,' + sa[inx+3] +  ',' + sa[inx+4] +');';
+				commands += 'plot(' + eqn +',' + prepmath(sa[inx+5]) + ',' + prepmath(sa[inx+6]) +',null,null,' + prepmath(sa[inx+3]) +  ',' + prepmath(sa[inx+4]) +');';
 				eqnlist += " from " + varlet + '='+sa[inx+5]+ ' ';
 				if (sa[inx+3]==1) {
 					eqnlist += 'with an arrow ';
@@ -1191,7 +1204,7 @@ function parseShortScript(sscript,gw,gh) {
 					eqnlist += 'with a closed dot ';
 				}
 			} else {
-				commands += 'plot(' + eqn +',null,null,null,null,' + sa[inx+3] +  ',' + sa[inx+4]+');';
+				commands += 'plot(' + eqn +',null,null,null,null,' + prepmath(sa[inx+3]) +  ',' + prepmath(sa[inx+4])+');';
 			}
 			eqnlist += '. ';
 		   }
@@ -1207,16 +1220,16 @@ function parseShortScript(sscript,gw,gh) {
 			}
 		} catch (e) {
 			if (picture.hasAttribute("data-failedrenders")) {
-				var fails = picture.getAttribute("data-failedrenders");
+				var fails = 1*picture.getAttribute("data-failedrenders");
 				if (fails>3) {
 					return commands;
 				} else {
-					picture.setAttribute("data-failedrenders",fails+1);
+					picture.setAttribute("data-failedrenders",fails + 1);
 				}
 			} else {
 				picture.setAttribute("data-failedrenders",1);
 			}
-			var tofixid = picture.getAttribute("id");
+			var tofixid = svgpicture.getAttribute("id");
 			setTimeout(function() {switchTo(tofixid);parseShortScript(sscript,gw,gh)},100);
 		}
 
@@ -1279,7 +1292,7 @@ function drawPics(base) {
 					  if (!picture.hasAttribute("data-enlarged") && !picture.hasAttribute("data-nomag")) {
 					  	  addMagGlass();
 					  }
-				  } catch(err) {alert(err+"\n"+src)}
+				  } catch(err) {console.log(err+"\n"+src)}
 			  }
 		  }
 	  } else {

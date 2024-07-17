@@ -12,7 +12,7 @@ $query = 'CREATE TABLE IF NOT EXISTS `php_sessions` (
 	`data` text,
 	PRIMARY KEY (`id`),
 	INDEX (`access`)
-) ENGINE=InnoDB';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ';
 
 $res = $DBH->query($query);
 if ($res === false) {
@@ -21,7 +21,7 @@ if ($res === false) {
 	return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Database updated.</p>";
 

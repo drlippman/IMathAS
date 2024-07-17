@@ -3,8 +3,8 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -53,8 +53,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$curBreadcrumb .= " &gt; Clear all Wiki Revisions\n";
 			$pagetitle = "Confirm Page Contents Delete";
 		}
-	} else if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
-		require_once("../includes/parsedatetime.php");
+	} else if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
+		require_once "../includes/parsedatetime.php";
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -78,9 +78,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$revisedate = parsedatetime($_POST['rdate'],$_POST['rtime'],2000000000);
 		}
 
-		$settings = intval($_POST['settings']);
+		$settings = intval($_POST['settings'] ?? 0);
 		$_POST['name'] = Sanitize::stripHtmlTags($_POST['name']);
 
+        $_POST['description'] = Sanitize::trimEmptyPara($_POST['description']);
 		if ($_POST['description']=='<p>Enter Wiki description here</p>') {
 			$_POST['description'] = '';
 		} else {
@@ -88,7 +89,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         }
         if ($_POST['groupsetid'] === 'bysec') {
             // want to use by-section groups.  Create
-            require_once('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             $_POST['groupsetid'] = createSectionGroupset($cid);
         }
 		if (isset($_GET['id'])) {  //already have id - update
@@ -177,7 +178,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$savetitle = _("Create Wiki");
 		}
 
-		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder'] ?? '0');
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
 		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
@@ -240,7 +241,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -340,5 +341,5 @@ if ($started) {
 }//default display
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

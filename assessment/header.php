@@ -5,6 +5,9 @@
 } else {
 	echo '<html lang="en">';
 }
+if (!isset($myrights)) { 
+    $myrights = 0; // avoid errors in headercontent if not defined
+}
 ?>
 <head>
 
@@ -16,7 +19,7 @@
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
 $loadgraphfilter = true;
-require("$curdir/../filter/filter.php");
+require_once "$curdir/../filter/filter.php";
 ?>
 <script type="text/javascript">
 var isImathasAssessment = true;
@@ -50,8 +53,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 } else {
-	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
-	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
+	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
 
@@ -82,7 +84,7 @@ if (isset($_SESSION['coursetheme'])) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/themes/$coursetheme?v=042217\"/>\n";
 }
 echo '<link rel="stylesheet" href="'.$staticroot.'/handheld.css?v=101817" media="handheld,only screen and (max-width:480px)"/>';
-if ($isdiag) {
+if (!empty($isdiag)) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/diag/print.css\" media=\"print\"/>\n";
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/assessment/print.css\" media=\"print\"/>\n";
@@ -96,13 +98,13 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=092020" type="text/javascript"></script>';
+echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=110223" type="text/javascript"></script>';
 
 
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 /*
 echo '<script src="' . $imasroot . '/javascript/general.js?v=042220" type="text/javascript"></script>';
-echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=033120" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=20230729" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=060920" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/drawing.js?v=042920" type="text/javascript"></script>';
@@ -125,10 +127,10 @@ if (!isset($_SESSION['mathdisp'])) {
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
-} else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+} else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3 || $_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">
@@ -139,7 +141,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; var mathRenderer = "MathJax"; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>';
 	echo '<style type="text/css">span.MathJax { font-size: 105%;}</style>';
@@ -166,7 +168,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	} else {
 		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">';
 		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>';
-		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=120118"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
@@ -183,11 +185,11 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
-if ($_SESSION['graphdisp']==1) {
+if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==0) {
+    echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
+} else {
 	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=052520\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
-} else {
-	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 ?>
 <!--[if lte IE 6]>
@@ -211,7 +213,7 @@ div { zoom: 1; }
 
 <?php
 
-if (isset($useeditor) && $_SESSION['useed']==1) {
+if (isset($useeditor) && !empty($_SESSION['useed'])) {
 	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
@@ -233,6 +235,8 @@ if ((isset($useeditor) && $_SESSION['useed']==1) || isset($loadiconfont)) {
 	echo '<link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
 	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
+if (!isset($useeqnhelper)) { $useeqnhelper = 0; }
+
 if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';
 	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/eqnhelper.js?v=062216\"></script>";
@@ -259,7 +263,7 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($CFG['GEN']['headerscriptinclude'])) {
-	require("$curdir/../{$CFG['GEN']['headerscriptinclude']}");
+	require_once "$curdir/../{$CFG['GEN']['headerscriptinclude']}";
 }
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
@@ -274,7 +278,7 @@ if (isset($_SESSION['ltiitemtype'])) {
 	</script>';
 	}
 echo '</head>';
-if ($isfw!==false) {
+if (!empty($isfw)) {
 	echo "<body class=\"fw$isfw\">\n";
 } else {
 	echo "<body>\n";
@@ -290,7 +294,7 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 }
 
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
-	require("$curdir/../{$CFG['GEN']['headerinclude']}");
+	require_once "$curdir/../{$CFG['GEN']['headerinclude']}";
 }
 
 if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !$isdiag && (!isset($_SESSION['intreereader']) || $_SESSION['intreereader']==false)) {

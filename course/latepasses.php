@@ -2,13 +2,13 @@
 //IMathAS:  Manage LatePasses
 //(c) 2007 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	if (!(isset($teacherid))) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -26,10 +26,12 @@
 		exit;
 	}
 
-	require("../header.php");
-    printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
-        Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
-	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> ";
+    require_once "../header.php";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"listusers.php?cid=$cid\">Roster</a> ";
 	echo "&gt; Manage LatePasses</div>";
 
 	echo "<form id=\"mainform\" method=post action=\"latepasses.php?&cid=$cid\">";
@@ -157,7 +159,7 @@ function sendtoall(type) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</td>";
+			echo "<tr><td><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</span></td>";
 			if ($hassection) {
 				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
@@ -179,5 +181,5 @@ function sendtoall(type) {
 </form>
 
 <?php
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

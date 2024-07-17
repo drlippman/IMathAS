@@ -199,7 +199,7 @@ if (!extension_loaded("pdo_mysql")) {
 	echo '<p><b>Warning</b>:  It appears your PHP does not have the pdo_mysql extension installed, and it is required.</p>';
 }
 if (!function_exists('gd_info')) {
-	echo '<p><b>Warning</b>:  It appears your PHP does not have the gb extension installed, which is needed for some functionality.</p>';
+	echo '<p><b>Warning</b>:  It appears your PHP does not have the gd extension installed, which is needed for some functionality.</p>';
 }
 if (!function_exists('curl_init')) {
 	echo '<p><b>Warning</b>:  It appears your PHP does not have the curl extension installed, which is needed for some functionality.</p>';
@@ -288,7 +288,7 @@ Color shift icons from green to red as deadlines approach?<br/>
 <p>
 Path to IMathAS install.  Blank if install is in web root directory.  Might be something like "/imathas" if in a
 subdirectory.<br/>
-<input type="text" name="imasroot" value="<?php echo rtrim(dirname($_SERVER['PHP_SELF']), ' /'); ?>" />
+<input type="text" name="imasroot" value="<?php echo htmlspecialchars(rtrim(dirname($_SERVER['PHP_SELF']), ' /'), ENT_QUOTES | ENT_HTML401); ?>" />
 </p>
 
 <p>

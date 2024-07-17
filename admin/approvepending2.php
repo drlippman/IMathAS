@@ -1,24 +1,25 @@
 <?php
 
-require("../init.php");
-require_once('../includes/filehandler.php');
+require_once "../init.php";
+require_once '../includes/filehandler.php';
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/approvepending'])) {
-	require($CFG['hooks']['admin/approvepending']);
+	require_once $CFG['hooks']['admin/approvepending'];
 }
 
-$newStatus = Sanitize::onlyInt($_POST['newstatus']);
-$instId = Sanitize::onlyInt($_POST['userid']);
 $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
 
 //handle ajax postback
-if (!empty($newStatus)) {
-	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
-	$stm->execute(array($instId));
-	$reqdata = json_decode($stm->fetchColumn(0), true);
+if (!empty($_POST['newstatus'])) {
+    $newStatus = Sanitize::onlyInt($_POST['newstatus']);
+    $instId = Sanitize::onlyInt($_POST['userid']);
+	$stm = $DBH->prepare("SELECT status,reqdata FROM imas_instr_acct_reqs WHERE userid=?");
+    $stm->execute(array($instId));
+    list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
+	$reqdata = json_decode($reqdata, true);
 
 	if (!isset($reqdata['actions'])) {
 		$reqdata['actions'] = array();
@@ -47,7 +48,7 @@ if (!empty($newStatus)) {
 			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
 		}
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
 			$installname._(' Account Status'), $message,
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -57,38 +58,38 @@ if (!empty($newStatus)) {
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
-			require("../includes/unenroll.php");
+			require_once "../includes/unenroll.php";
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
 				unenrollstu($rcid, array(intval($instId)));
 			}
 		}
+        if ($oldstatus != 4) {
+            $stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
+            $stm->execute(array(':id'=>$instId));
+            $row = $stm->fetch(PDO::FETCH_ASSOC);
 
-		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$instId));
-		$row = $stm->fetch(PDO::FETCH_ASSOC);
+            //call hook, if defined
+            if (function_exists('getDenyMessage')) {
+                $message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+            } else {
+                $message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
+                $message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
+                $message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status, ';
+                $message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
+                $message .= 'you are welcome to reply to this email with additional verification information.</p>';
+            }
 
-		//call hook, if defined
-		if (function_exists('getDenyMessage')) {
-			$message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
-		} else {
-			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
-			$message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
-			$message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status, ';
-			$message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
-			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
-		}
+            //call hook, if defined
+            if (function_exists('getDenyBcc')) {
+                $CFG['email']['new_acct_bcclist'] = getDenyBcc();
+            }
 
-		//call hook, if defined
-		if (function_exists('getDenyBcc')) {
-			$CFG['email']['new_acct_bcclist'] = getDenyBcc();
-		}
-
-		require_once("../includes/email.php");
-		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
-			$installname._(' Account Status'), $message,
-			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
-			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
-
+            require_once "../includes/email.php";
+            send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
+                $installname._(' Account Status'), $message,
+                !empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
+                !empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
+        }
 	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
 			$group = Sanitize::onlyInt($_POST['group']);
@@ -117,7 +118,26 @@ if (!empty($newStatus)) {
 
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
-		$row = $stm->fetch(PDO::FETCH_ASSOC);
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+        
+        // enroll in courses, if not already
+        if (isset($CFG['GEN']['enrollonnewinstructor']) || isset($CFG['GEN']['enrolloninstructorapproval'])) {
+            $allInstrEnroll = array_unique(array_merge($CFG['GEN']['enrollonnewinstructor'] ?? [], $CFG['GEN']['enrolloninstructorapproval'] ?? [])); 
+            $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
+            $stm->execute([$instId]);
+            $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+            $toEnroll = array_diff($allInstrEnroll, $existingEnroll);
+            if (count($toEnroll) > 0) {
+                $valbits = array();
+                $valvals = array();
+                foreach ($toEnroll as $ncid) {
+                    $valbits[] = "(?,?)";
+                    array_push($valvals, $instId, $ncid);
+                }
+                $stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+                $stm->execute($valvals);
+            }
+        }
 
 		//call hook, if defined
 		if (function_exists('getApproveMessage')) {
@@ -132,7 +152,7 @@ if (!empty($newStatus)) {
 			$CFG['email']['new_acct_bcclist'] = getApproveBcc();
 		}
 
-		require_once("../includes/email.php");
+		require_once "../includes/email.php";
 		send_email($row['email'], !empty($accountapproval)?$accountapproval:$sendfrom,
 			$installname._(' Account Approval'), $message,
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
@@ -143,7 +163,7 @@ if (!empty($newStatus)) {
 	exit;
 }
 
-$countries = ['AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AD'=>'Andorra', 'AO'=>'Angola', 'AI'=>'Anguilla', 'AQ'=>'Antarctica', 'AG'=>'Antigua and Barbuda', 'AR'=>'Argentina', 'AM'=>'Armenia', 'AW'=>'Aruba', 'AU'=>'Australia', 'AT'=>'Austria', 'AZ'=>'Azerbaijan', 'BS'=>'Bahamas (the)', 'BH'=>'Bahrain', 'BD'=>'Bangladesh', 'BB'=>'Barbados', 'BY'=>'Belarus', 'BE'=>'Belgium', 'BZ'=>'Belize', 'BJ'=>'Benin', 'BM'=>'Bermuda', 'BT'=>'Bhutan', 'BO'=>'Bolivia (Plurinational State of)', 'BQ'=>'Bonaire, Sint Eustatius and Saba', 'BA'=>'Bosnia and Herzegovina', 'BW'=>'Botswana', 'BV'=>'Bouvet Island', 'BR'=>'Brazil', 'IO'=>'British Indian Ocean Territory (the)', 'BN'=>'Brunei Darussalam', 'BG'=>'Bulgaria', 'BF'=>'Burkina Faso', 'BI'=>'Burundi', 'CV'=>'Cabo Verde', 'KH'=>'Cambodia', 'CM'=>'Cameroon', 'CA'=>'Canada', 'KY'=>'Cayman Islands (the)', 'CF'=>'Central African Republic (the)', 'TD'=>'Chad', 'CL'=>'Chile', 'CN'=>'China', 'CX'=>'Christmas Island', 'CC'=>'Cocos (Keeling) Islands (the)', 'CO'=>'Colombia', 'KM'=>'Comoros (the)', 'CD'=>'Congo (the Democratic Republic of the)', 'CG'=>'Congo (the)', 'CK'=>'Cook Islands (the)', 'CR'=>'Costa Rica', 'HR'=>'Croatia', 'CU'=>'Cuba', 'CW'=>'Curaçao', 'CY'=>'Cyprus', 'CZ'=>'Czechia', 'CI'=>'Côte d\'Ivoire', 'DK'=>'Denmark', 'DJ'=>'Djibouti', 'DM'=>'Dominica', 'DO'=>'Dominican Republic (the)', 'EC'=>'Ecuador', 'EG'=>'Egypt', 'SV'=>'El Salvador', 'GQ'=>'Equatorial Guinea', 'ER'=>'Eritrea', 'EE'=>'Estonia', 'SZ'=>'Eswatini', 'ET'=>'Ethiopia', 'FK'=>'Falkland Islands (the) [Malvinas]', 'FO'=>'Faroe Islands (the)', 'FJ'=>'Fiji', 'FI'=>'Finland', 'FR'=>'France', 'GF'=>'French Guiana', 'PF'=>'French Polynesia', 'TF'=>'French Southern Territories (the)', 'GA'=>'Gabon', 'GM'=>'Gambia (the)', 'GE'=>'Georgia', 'DE'=>'Germany', 'GH'=>'Ghana', 'GI'=>'Gibraltar', 'GR'=>'Greece', 'GL'=>'Greenland', 'GD'=>'Grenada', 'GP'=>'Guadeloupe', 'GT'=>'Guatemala', 'GG'=>'Guernsey', 'GN'=>'Guinea', 'GW'=>'Guinea-Bissau', 'GY'=>'Guyana', 'HT'=>'Haiti', 'HM'=>'Heard Island and McDonald Islands', 'VA'=>'Holy See (the)', 'HN'=>'Honduras', 'HK'=>'Hong Kong', 'HU'=>'Hungary', 'IS'=>'Iceland', 'IN'=>'India', 'ID'=>'Indonesia', 'IR'=>'Iran (Islamic Republic of)', 'IQ'=>'Iraq', 'IE'=>'Ireland', 'IM'=>'Isle of Man', 'IL'=>'Israel', 'IT'=>'Italy', 'JM'=>'Jamaica', 'JP'=>'Japan', 'JE'=>'Jersey', 'JO'=>'Jordan', 'KZ'=>'Kazakhstan', 'KE'=>'Kenya', 'KI'=>'Kiribati', 'KP'=>'Korea (the Democratic People\'s Republic of)', 'KR'=>'Korea (the Republic of)', 'KW'=>'Kuwait', 'KG'=>'Kyrgyzstan', 'LA'=>'Lao People\'s Democratic Republic (the)', 'LV'=>'Latvia', 'LB'=>'Lebanon', 'LS'=>'Lesotho', 'LR'=>'Liberia', 'LY'=>'Libya', 'LI'=>'Liechtenstein', 'LT'=>'Lithuania', 'LU'=>'Luxembourg', 'MO'=>'Macao', 'MG'=>'Madagascar', 'MW'=>'Malawi', 'MY'=>'Malaysia', 'MV'=>'Maldives', 'ML'=>'Mali', 'MT'=>'Malta', 'MQ'=>'Martinique', 'MR'=>'Mauritania', 'MU'=>'Mauritius', 'YT'=>'Mayotte', 'MX'=>'Mexico', 'MD'=>'Moldova (the Republic of)', 'MC'=>'Monaco', 'MN'=>'Mongolia', 'ME'=>'Montenegro', 'MS'=>'Montserrat', 'MA'=>'Morocco', 'MZ'=>'Mozambique', 'MM'=>'Myanmar', 'NA'=>'Namibia', 'NR'=>'Nauru', 'NP'=>'Nepal', 'NL'=>'Netherlands (the)', 'NC'=>'New Caledonia', 'NZ'=>'New Zealand', 'NI'=>'Nicaragua', 'NE'=>'Niger (the)', 'NG'=>'Nigeria', 'NU'=>'Niue', 'NF'=>'Norfolk Island', 'NO'=>'Norway', 'OM'=>'Oman', 'PK'=>'Pakistan', 'PS'=>'Palestine, State of', 'PA'=>'Panama', 'PG'=>'Papua New Guinea', 'PY'=>'Paraguay', 'PE'=>'Peru', 'PH'=>'Philippines (the)', 'PN'=>'Pitcairn', 'PL'=>'Poland', 'PT'=>'Portugal', 'QA'=>'Qatar', 'MK'=>'Republic of North Macedonia', 'RO'=>'Romania', 'RU'=>'Russian Federation (the)', 'RW'=>'Rwanda', 'RE'=>'Réunion', 'BL'=>'Saint Barthélemy', 'SH'=>'Saint Helena, Ascension and Tristan da Cunha', 'KN'=>'Saint Kitts and Nevis', 'LC'=>'Saint Lucia', 'MF'=>'Saint Martin (French part)', 'PM'=>'Saint Pierre and Miquelon', 'VC'=>'Saint Vincent and the Grenadines', 'WS'=>'Samoa', 'SM'=>'San Marino', 'ST'=>'Sao Tome and Principe', 'SA'=>'Saudi Arabia', 'SN'=>'Senegal', 'RS'=>'Serbia', 'SC'=>'Seychelles', 'SL'=>'Sierra Leone', 'SG'=>'Singapore', 'SX'=>'Sint Maarten (Dutch part)', 'SK'=>'Slovakia', 'SI'=>'Slovenia', 'SB'=>'Solomon Islands', 'SO'=>'Somalia', 'ZA'=>'South Africa', 'GS'=>'South Georgia and the South Sandwich Islands', 'SS'=>'South Sudan', 'ES'=>'Spain', 'LK'=>'Sri Lanka', 'SD'=>'Sudan (the)', 'SR'=>'Suriname', 'SJ'=>'Svalbard and Jan Mayen', 'SE'=>'Sweden', 'CH'=>'Switzerland', 'SY'=>'Syrian Arab Republic', 'TW'=>'Taiwan', 'TJ'=>'Tajikistan', 'TZ'=>'Tanzania, United Republic of', 'TH'=>'Thailand', 'TL'=>'Timor-Leste', 'TG'=>'Togo', 'TK'=>'Tokelau', 'TO'=>'Tonga', 'TT'=>'Trinidad and Tobago', 'TN'=>'Tunisia', 'TR'=>'Turkey', 'TM'=>'Turkmenistan', 'TC'=>'Turks and Caicos Islands (the)', 'TV'=>'Tuvalu', 'UG'=>'Uganda', 'UA'=>'Ukraine', 'AE'=>'United Arab Emirates (the)', 'GB'=>'United Kingdom of Great Britain and Northern Ireland (the)', 'UM'=>'United States Minor Outlying Islands (the)', 'UY'=>'Uruguay', 'UZ'=>'Uzbekistan', 'VU'=>'Vanuatu', 'VE'=>'Venezuela (Bolivarian Republic of)', 'VN'=>'Viet Nam', 'VG'=>'Virgin Islands (British)', 'WF'=>'Wallis and Futuna', 'EH'=>'Western Sahara', 'YE'=>'Yemen', 'ZM'=>'Zambia', 'ZW'=>'Zimbabwe', 'AX'=>'Åland Islands'];
+$countries = ['AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AD'=>'Andorra', 'AO'=>'Angola', 'AI'=>'Anguilla', 'AQ'=>'Antarctica', 'AG'=>'Antigua and Barbuda', 'AR'=>'Argentina', 'AM'=>'Armenia', 'AW'=>'Aruba', 'AU'=>'Australia', 'AT'=>'Austria', 'AZ'=>'Azerbaijan', 'BS'=>'Bahamas (the)', 'BH'=>'Bahrain', 'BD'=>'Bangladesh', 'BB'=>'Barbados', 'BY'=>'Belarus', 'BE'=>'Belgium', 'BZ'=>'Belize', 'BJ'=>'Benin', 'BM'=>'Bermuda', 'BT'=>'Bhutan', 'BO'=>'Bolivia (Plurinational State of)', 'BQ'=>'Bonaire, Sint Eustatius and Saba', 'BA'=>'Bosnia and Herzegovina', 'BW'=>'Botswana', 'BV'=>'Bouvet Island', 'BR'=>'Brazil', 'IO'=>'British Indian Ocean Territory (the)', 'BN'=>'Brunei Darussalam', 'BG'=>'Bulgaria', 'BF'=>'Burkina Faso', 'BI'=>'Burundi', 'CV'=>'Cabo Verde', 'KH'=>'Cambodia', 'CM'=>'Cameroon', 'CA'=>'Canada', 'KY'=>'Cayman Islands (the)', 'CF'=>'Central African Republic (the)', 'TD'=>'Chad', 'CL'=>'Chile', 'CN'=>'China', 'CX'=>'Christmas Island', 'CC'=>'Cocos (Keeling) Islands (the)', 'CO'=>'Colombia', 'KM'=>'Comoros (the)', 'CD'=>'Congo (the Democratic Republic of the)', 'CG'=>'Congo (the)', 'CK'=>'Cook Islands (the)', 'CR'=>'Costa Rica', 'HR'=>'Croatia', 'CU'=>'Cuba', 'CW'=>'Curaçao', 'CY'=>'Cyprus', 'CZ'=>'Czechia', 'CI'=>'Côte d\'Ivoire', 'DK'=>'Denmark', 'DJ'=>'Djibouti', 'DM'=>'Dominica', 'DO'=>'Dominican Republic (the)', 'EC'=>'Ecuador', 'EG'=>'Egypt', 'SV'=>'El Salvador', 'GQ'=>'Equatorial Guinea', 'ER'=>'Eritrea', 'EE'=>'Estonia', 'SZ'=>'Eswatini', 'ET'=>'Ethiopia', 'FK'=>'Falkland Islands (the) [Malvinas]', 'FO'=>'Faroe Islands (the)', 'FJ'=>'Fiji', 'FI'=>'Finland', 'FR'=>'France', 'GF'=>'French Guiana', 'PF'=>'French Polynesia', 'TF'=>'French Southern Territories (the)', 'GA'=>'Gabon', 'GM'=>'Gambia (the)', 'GE'=>'Georgia', 'DE'=>'Germany', 'GH'=>'Ghana', 'GI'=>'Gibraltar', 'GR'=>'Greece', 'GL'=>'Greenland', 'GD'=>'Grenada', 'GP'=>'Guadeloupe', 'GT'=>'Guatemala', 'GG'=>'Guernsey', 'GN'=>'Guinea', 'GW'=>'Guinea-Bissau', 'GY'=>'Guyana', 'HT'=>'Haiti', 'HM'=>'Heard Island and McDonald Islands', 'VA'=>'Holy See (the)', 'HN'=>'Honduras', 'HK'=>'Hong Kong', 'HU'=>'Hungary', 'IS'=>'Iceland', 'IN'=>'India', 'ID'=>'Indonesia', 'IR'=>'Iran (Islamic Republic of)', 'IQ'=>'Iraq', 'IE'=>'Ireland', 'IM'=>'Isle of Man', 'IL'=>'Israel', 'IT'=>'Italy', 'JM'=>'Jamaica', 'JP'=>'Japan', 'JE'=>'Jersey', 'JO'=>'Jordan', 'KZ'=>'Kazakhstan', 'KE'=>'Kenya', 'KI'=>'Kiribati', 'KP'=>'Korea (the Democratic People\'s Republic of)', 'KR'=>'Korea (the Republic of)', 'KW'=>'Kuwait', 'KG'=>'Kyrgyzstan', 'LA'=>'Lao People\'s Democratic Republic (the)', 'LV'=>'Latvia', 'LB'=>'Lebanon', 'LS'=>'Lesotho', 'LR'=>'Liberia', 'LY'=>'Libya', 'LI'=>'Liechtenstein', 'LT'=>'Lithuania', 'LU'=>'Luxembourg', 'MO'=>'Macao', 'MG'=>'Madagascar', 'MW'=>'Malawi', 'MY'=>'Malaysia', 'MV'=>'Maldives', 'ML'=>'Mali', 'MT'=>'Malta', 'MQ'=>'Martinique', 'MR'=>'Mauritania', 'MU'=>'Mauritius', 'YT'=>'Mayotte', 'MX'=>'Mexico', 'MD'=>'Moldova (the Republic of)', 'MC'=>'Monaco', 'MN'=>'Mongolia', 'ME'=>'Montenegro', 'MS'=>'Montserrat', 'MA'=>'Morocco', 'MZ'=>'Mozambique', 'MM'=>'Myanmar', 'NA'=>'Namibia', 'NR'=>'Nauru', 'NP'=>'Nepal', 'NL'=>'Netherlands (the)', 'NC'=>'New Caledonia', 'NZ'=>'New Zealand', 'NI'=>'Nicaragua', 'NE'=>'Niger (the)', 'NG'=>'Nigeria', 'NU'=>'Niue', 'NF'=>'Norfolk Island', 'NO'=>'Norway', 'OM'=>'Oman', 'PK'=>'Pakistan', 'PS'=>'Palestine, State of', 'PA'=>'Panama', 'PG'=>'Papua New Guinea', 'PY'=>'Paraguay', 'PE'=>'Peru', 'PH'=>'Philippines (the)', 'PN'=>'Pitcairn', 'PL'=>'Poland', 'PT'=>'Portugal', 'QA'=>'Qatar', 'MK'=>'Republic of North Macedonia', 'RO'=>'Romania', 'RU'=>'Russian Federation (the)', 'RW'=>'Rwanda', 'RE'=>'Réunion', 'BL'=>'Saint Barthélemy', 'SH'=>'Saint Helena, Ascension and Tristan da Cunha', 'KN'=>'Saint Kitts and Nevis', 'LC'=>'Saint Lucia', 'MF'=>'Saint Martin (French part)', 'PM'=>'Saint Pierre and Miquelon', 'VC'=>'Saint Vincent and the Grenadines', 'WS'=>'Samoa', 'SM'=>'San Marino', 'ST'=>'Sao Tome and Principe', 'SA'=>'Saudi Arabia', 'SN'=>'Senegal', 'RS'=>'Serbia', 'SC'=>'Seychelles', 'SL'=>'Sierra Leone', 'SG'=>'Singapore', 'SX'=>'Sint Maarten (Dutch part)', 'SK'=>'Slovakia', 'SI'=>'Slovenia', 'SB'=>'Solomon Islands', 'SO'=>'Somalia', 'ZA'=>'South Africa', 'GS'=>'South Georgia and the South Sandwich Islands', 'SS'=>'South Sudan', 'ES'=>'Spain', 'LK'=>'Sri Lanka', 'SD'=>'Sudan (the)', 'SR'=>'Suriname', 'SJ'=>'Svalbard and Jan Mayen', 'SE'=>'Sweden', 'CH'=>'Switzerland', 'SY'=>'Syrian Arab Republic', 'TW'=>'Taiwan', 'TJ'=>'Tajikistan', 'TZ'=>'Tanzania, United Republic of', 'TH'=>'Thailand', 'TL'=>'Timor-Leste', 'TG'=>'Togo', 'TK'=>'Tokelau', 'TO'=>'Tonga', 'TT'=>'Trinidad and Tobago', 'TN'=>'Tunisia', 'TR'=>'Turkey', 'TM'=>'Turkmenistan', 'TC'=>'Turks and Caicos Islands (the)', 'TV'=>'Tuvalu', 'UG'=>'Uganda', 'UA'=>'Ukraine', 'AE'=>'United Arab Emirates (the)', 'GB'=>'United Kingdom of Great Britain and Northern Ireland (the)', 'UM'=>'United States Minor Outlying Islands (the)', 'UY'=>'Uruguay', 'UZ'=>'Uzbekistan', 'VU'=>'Vanuatu', 'VE'=>'Venezuela (Bolivarian Republic of)', 'VN'=>'Viet Nam', 'VG'=>'Virgin Islands (British)', 'WF'=>'Wallis and Futuna', 'EH'=>'Western Sahara', 'YE'=>'Yemen', 'ZM'=>'Zambia', 'ZW'=>'Zimbabwe', 'AX'=>'Åland Islands', 'us'=>'USA'];
 
 function getReqData() {
 	global $DBH, $countries;
@@ -182,7 +202,7 @@ function getReqData() {
                 } 
                 $userdata['school'] = $ipedname;
             } else if ($userdata['ipeds'] == '0') {
-                $userdata['school'] = $userdata['otherschool'].' ('.$countries[$userdata['schoolloc']].')';
+                $userdata['school'] = $userdata['otherschool'].' ('.($countries[$userdata['schoolloc']] ?? $userdata['schoolloc']).')';
             }
         }
         $urlformatted = false;
@@ -221,7 +241,9 @@ function getReqData() {
 		$out[$row['status']][] = $userdata;
 	}
 	array_walk_recursive($out, function(&$item) {
-		$item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+        if (!is_null($item)) {
+		    $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+        }
 	});
 	return $out;
 }
@@ -243,9 +265,11 @@ if (empty($reqFields)) {
         );
     }
 }
-
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
-//$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .userdata, .userlist {
@@ -281,7 +305,7 @@ if (!isset($_GET['from'])) {
 	$curBreadcrumb .= "&gt; <a href=\"../util/utils.php\">Utilities</a> &gt; ";
 }
 
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . $pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -290,88 +314,88 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 <div id="app" v-cloak>
   <div style="float:right" class="noticetext">{{statusMsg}}</div>
   <div v-if="toApprove.length==0">No requests to process</div>
-  <div v-for="(users,status) in toApprove" v-if="users.length>0">
-    <h3>{{ statusTitle[status] }}</h3>
-    <ul class="userlist">
-      <li v-for="(user,userindex) in users">
-        <span @click="toggleActiveUser(user.id, status, userindex)">
-          <span v-if="activeUser==user.id">[-]</span>
-          <span v-else>[+]</span>
-          {{user.name}} ({{user.school}})
-        </span>
-      	<ul class="userdata" v-if="activeUser==user.id">
-      	  <li>Request Made: {{user.reqdate}}</li>
-          <li>Username: {{user.username}}</li>
-      	  <li>Email: {{user.email}}</li>
-      	  <li v-for="(title,fieldindex) in fieldTitles">
-      	    <span v-if="fieldindex=='url' || fieldindex=='search'" v-html="user[fieldindex]"></span>
-      	    <span v-else>{{title}}: {{user[fieldindex]}}</span>
-      	  </li>
-      	  <li>
-      	    <span v-if="status!=1">
-      	    	<button @click="chgStatus(status, userindex, 1)">Needs Investigation</button>
-      	    </span>
-      	    <span v-if="status!=2">
-      	    	<button @click="chgStatus(status, userindex, 2)">Waiting for Confirmation</button>
-      	    </span>
-      	    <span v-if="status!=3">
-      	    	<button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
-      	    </span>
-      	  </li>
-          <li v-if="!fixedgroups">Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
-            <button type=button @click="searchGroups">Search</button>
-          </li>
-      	  <li v-show="groups !== null">Group: <select v-model="group">
-      	  	<optgroup label="groups">
-      	  		<option value="-1" v-if="!fixedgroups">New group</option>
-      	  		<option value=0 v-if="!fixedgroups">Default</option>
-      	  		<option v-for="group in groups" :value="group.id">{{group.name}}</option>
-      	  	</optgroup>
-      	  	</select>
-      	  	<span v-if="group==-1">New group name: <input size=30 v-model="newgroup" @blur="checkgroupname"></span>
-      	  </li>
-      	  <li>
-      	    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
-      	    <button @click="chgStatus(status, userindex, 10)">Deny Request</button>
-						<span v-if="status!=4">
-      	    	<button @click="chgStatus(status, userindex, 4)">Request More Info</button>
-      	    </span>
-      	    <br/>
-      	    With an Approve, Deny, or Request More Info, an email is automatically sent to the requester.
-      	  </li>
-      	</ul>
-      </li>
-    </ul>
+  <div v-for="(users,status) in toApprove">
+    <div v-if="users.length>0">
+        <h3>{{ statusTitle[status] }}</h3>
+        <ul class="userlist">
+        <li v-for="(user,userindex) in users">
+            <span @click="toggleActiveUser(user.id, status, userindex)">
+            <span v-if="activeUser==user.id">[-]</span>
+            <span v-else>[+]</span>
+            <span class="pii-full-name">{{user.name}}</span> ({{user.school}})
+            </span>
+            <ul class="userdata" v-if="activeUser==user.id">
+                <li>Request Made: {{user.reqdate}}</li>
+                <li>Username: <span class="pii-username">{{user.username}}</span></li>
+                <li>Email: <span class="pii-email">{{user.email}}</span></li>
+                <li v-for="(title,fieldindex) in fieldTitles">
+                    <span v-if="fieldindex=='url' || fieldindex=='search'" v-html="user[fieldindex]"></span>
+                    <span v-else>{{title}}: {{user[fieldindex]}}</span>
+                </li>
+                <li>
+                    <span v-if="status!=1">
+                        <button @click="chgStatus(status, userindex, 1)">Needs Investigation</button>
+                    </span>
+                    <span v-if="status!=2">
+                        <button @click="chgStatus(status, userindex, 2)">Waiting for Confirmation</button>
+                    </span>
+                    <span v-if="status!=3">
+                        <button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
+                    </span>
+                </li>
+                <li v-if="!fixedgroups">Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
+                    <button type=button @click="searchGroups">Search</button>
+                </li>
+                <li v-show="groups !== null">Group: <select v-model="group">
+                    <optgroup label="groups">
+                        <option value="-1" v-if="!fixedgroups">New group</option>
+                        <option value=0 v-if="!fixedgroups">Default</option>
+                        <option v-for="group in groups" :value="group.id">{{group.name}}</option>
+                    </optgroup>
+                    </select>
+                    <span v-if="group==-1">New group name: <input size=30 v-model="newgroup" @blur="checkgroupname"></span>
+                </li>
+                <li>
+                    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
+                    <button @click="chgStatus(status, userindex, 10)">Deny Request</button>
+                                <span v-if="status!=4">
+                        <button @click="chgStatus(status, userindex, 4)">Request More Info</button>
+                    </span>
+                    <br/>
+                    With an Approve, Deny, or Request More Info, an email is automatically sent to the requester.
+                </li>
+            </ul>
+        </li>
+        </ul>
+    </div>
   </div>
 
 </div>
 
 <script type="text/javascript">
-
-var app = new Vue({
-	el: '#app',
-	data: {
-		groups: null,
-		grpsearch: '',
-		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>,
-		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);?>,
-		activeUser: -1,
-		activeUserStatus: -1,
-		activeUserIndex: -1,
-		statusTitle: {
-			0: 'New Account Request',
-			1: 'Needs Investigation',
-			2: 'Waiting for Confirmation',
-			3: 'Probably should be denied',
-			4: 'Waiting for more info'
-		},
-		statusMsg: "",
-        group: 0,
-        fixedgroups: false,
-		newgroup: ""
-	},
-	computed: {
-
+const { createApp } = Vue;
+createApp({
+	data: function () {
+        return {
+            groups: null,
+            grpsearch: '',
+            toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>,
+            fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);?>,
+            activeUser: -1,
+            activeUserStatus: -1,
+            activeUserIndex: -1,
+            statusTitle: {
+                0: 'New Account Request',
+                1: 'Needs Investigation',
+                2: 'Waiting for Confirmation',
+                3: 'Probably should be denied',
+                4: 'Waiting for more info'
+            },
+            statusMsg: "",
+            group: 0,
+            fixedgroups: false,
+            newgroup: ""
+        };
 	},
 	methods: {
 		toggleActiveUser: function(userid, status, userindex) {
@@ -478,9 +502,9 @@ var app = new Vue({
 			return true;
 		}
 	}
-});
+}).mount('#app');
 
 </script>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";

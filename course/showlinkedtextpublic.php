@@ -6,28 +6,30 @@
 		echo "Need course id";
 		exit;
 	}
+    if (!isset($_GET['id'])) { exit; }
 	$cid = intval($_GET['cid']);
 
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($_GET['from']);
 		$_GET['cid'] = intval($_GET['from']);
-		require("../init.php");
+		require_once "../init.php";
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else if (isset($_SERVER['HTTP_REFERER']) && preg_match('/cid=(\d+)/',$_SERVER['HTTP_REFERER'],$matches) && $matches[1]!=$cid) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($matches[1]);
 		$_GET['cid'] = intval($matches[1]);
-		require("../init.php");
+		require_once "../init.php";
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else {
 		$fcid = 0;
-		require("../init_without_validate.php");
+		require_once "../init_without_validate.php";
 	}
 
 	function findinpublic($items,$id) {
+        if (!is_array($items)) { return false; }
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
 				if ($item['public']==1) {
@@ -40,6 +42,7 @@
 		return false;
 	}
 	function finditeminblock($items,$id) {
+        if (!is_array($items)) { return false; }
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
 				if (finditeminblock($item['items'],$id)) {
@@ -58,7 +61,9 @@
 	$itemid = $stm->fetchColumn(0);
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	list($itemorder,$itemcoursename,$itemcoursetheme) = $stm->fetch(PDO::FETCH_NUM);
+	$row = $stm->fetch(PDO::FETCH_NUM);
+    if ($row === false) { exit; }
+    list($itemorder,$itemcoursename,$itemcoursetheme) = $row;
 	$items = unserialize($itemorder);
 	if ($fcid==0) {
 		$coursename = $itemcoursename;
@@ -69,9 +74,9 @@
 	}
 
 	if (!findinpublic($items,$itemid)) {
-		require("../header.php");
+		require_once "../header.php";
 		echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 	$ispublic = true;
@@ -89,7 +94,7 @@
 	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
-	require("../header.php");
+	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
 
 	echo '<div id="headershowlinkedtext" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($titlesimp).'</h1></div>';
@@ -104,6 +109,6 @@
 	} else {
 		echo "<div class=right><a href=\"public.php?cid=$cid\">Return to the Public Course Page</a></div>\n";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

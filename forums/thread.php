@@ -2,11 +2,11 @@
 //Displays forum threads
 //(c) 2006 David Lippman
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	require("../header.php");
+	require_once "../header.php";
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 if (isset($teacherid)) {
@@ -14,6 +14,7 @@ if (isset($teacherid)) {
 } else {
 	$isteacher = false;
 }
+$istutor = isset($tutorid);
 
 $threadsperpage = $listperpage;
 
@@ -139,7 +140,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 $duedates = '';
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$exception = null; $latepasses = 0;
-	require_once("../includes/exceptionfuncs.php");
+	require_once "../includes/exceptionfuncs.php";
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 		$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
@@ -182,9 +183,9 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 }
 
 if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
-	require("../header.php");
+	require_once "../header.php";
 		echo '<p>This forum is closed.  <a href="../course/course.php?cid='.$cid.'">Return to the course page</a></p>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -201,7 +202,8 @@ if ($groupsetid>0) {
 	if (isset($_GET['ffilter'])) {
 		$_SESSION['ffilter'.$forumid] = $_GET['ffilter'];
 	}
-	if (!$isteacher) {
+	// TODO: if isSectionGroups, restrict tutor to section group
+    if (!$canviewall) {
 		$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 		$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 		$stm = $DBH->prepare($query);
@@ -223,7 +225,7 @@ if ($groupsetid>0) {
 	}
 	if ($dofilter) {
 		$limthreads = array();
-		if ($isteacher || $groupid==0) {
+		if ($canviewall || $groupid==0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE stugroupid=:stugroupid AND forumid=:forumid AND lastposttime<:now");
 			$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
 		} else {
@@ -273,11 +275,11 @@ if ($tagfilter != '') {
 
 $caller = 'thread';
 if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
-	require("posthandler.php");
+	require_once "posthandler.php";
 }
 
 if (isset($_GET['search']) && trim($_GET['search'])!='') {
-	require("../header.php");
+	require_once "../header.php";
     echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 		echo "$breadcrumbbase  <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -292,7 +294,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		$oktoshow = ($stm->rowCount()>0);
 		if (!$oktoshow) {
 			echo '<p>'._('This search is blocked. In this forum, you must post your own thread before you can read those posted by others.').'</p>';
-			require("../footer.php");
+			require_once "../footer.php";
 			exit;
 		}
 	}
@@ -310,7 +312,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		$query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid=? ";
 		$array[] = $cid;
 	} else {
-		$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
+		$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,1,imas_forum_posts.isanon ";
 		$query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid=? AND imas_users.id=imas_forum_posts.userid ";
 		$array = array($forumid);
 	}
@@ -342,7 +344,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		    $name = sprintf("%s %s", Sanitize::encodeStringForDisplay($row[4]),
                 Sanitize::encodeStringForDisplay($row[5]));
 		}
-		printf("<br/>Posted by: %s, ", Sanitize::encodeStringForDisplay($name));
+		printf("<br/>Posted by: <span class='pii-full-name'>%s</span>, ", Sanitize::encodeStringForDisplay($name));
 		echo tzdate("F j, Y, g:i a",$row[6]);
 
 		echo "</div><div class=blockitems>";
@@ -350,7 +352,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		echo "<p><a href=\"posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeUrlParam($row[0])."&thread=".Sanitize::encodeUrlParam($row[1])."\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
 
@@ -364,27 +366,117 @@ if (isset($_GET['markallread'])) {
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$now = time();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$stm2 = $DBH->prepare("SELECT id FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
-		$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0]));
-		if ($stm2->rowCount()>0) {
-			$r2id = $stm2->fetchColumn(0);
-			$stm2 = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE id=:id");
-			$stm2->execute(array(':lastview'=>$now, ':id'=>$r2id));
-		} else{
-			$stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
-			$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now));
-		}
+        /*
+        $stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) 
+            VALUES (:userid, :threadid, :lastview)
+            ON DUPLICATE KEY UPDATE lastview=:lastview2");
+		$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now, ':lastview2'=>$now));
+        */
+        $stm2 = $DBH->prepare("SELECT lastview FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
+        $stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0]));
+        if ($stm2->rowCount()>0) {
+            $stm2 = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid=:threadid");
+            $stm2->execute(array(':lastview'=>$now, ':userid'=>$userid, ':threadid'=>$row[0]));
+        } else{
+            $stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
+            $stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now));
+        }
 	}
 }
 
+/* pull data */
+
+// pull main thread data
+$qarr = [':forumid'=>$forumid, ':now'=>$canviewall?2000000000:$now];
+$query = "SELECT ifp.id,ifp.threadid,ifp.posttype,ifp.tag,ifp.userid,ifp.forumid,ifp.isanon,ifp.subject,";
+$query .= "imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid,imas_forum_threads.lastposttime ";
+$query .= "FROM imas_forum_posts AS ifp JOIN imas_users ON ifp.userid=imas_users.id ";
+$query .= "JOIN imas_forum_threads ON ifp.threadid=imas_forum_threads.id ";
+if ($page < 0) {
+    $query .= 'LEFT JOIN imas_forum_views ON imas_forum_views.threadid=imas_forum_threads.id AND imas_forum_views.userid=:userid ';
+    $qarr[':userid'] = $userid;
+}
+$query .= "WHERE ifp.parent=0 AND ifp.forumid=:forumid ";
+$query .= "AND imas_forum_threads.lastposttime<:now ";
+if ($dofilter) {
+    $query .= "AND ifp.threadid IN ($limthreads) ";
+}
+if ($page==-1) {
+    //$query .= "AND ifp.threadid IN ($newpostlist) ";
+    $query .= "AND (imas_forum_views.lastview IS NULL OR imas_forum_views.lastview < imas_forum_threads.lastposttime) ";
+} else if ($page==-2) {
+    //$query .= "AND ifp.threadid IN ($flaggedlist) ";
+    $query .= "AND imas_forum_views.tagged=1 "; 
+}
+if ($sortby==0) {
+    $query .= "ORDER BY ifp.posttype DESC,ifp.postdate DESC ";
+} else if ($sortby==1) {
+    $query .= "ORDER BY ifp.posttype DESC,imas_forum_threads.lastposttime DESC ";
+}
+$offset = intval(($page-1)*$threadsperpage);
+$threadsperpage =intval($threadsperpage);
+if ($page>0) {
+    $query .= "LIMIT $offset,$threadsperpage";
+}
+$stm = $DBH->prepare($query);
+$stm->execute($qarr);
+$threaddata = [];
+$shownthreadids = [];
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $threaddata[] = $row;
+    $shownthreadids[] = $row['threadid'];
+}
+$shownthreadlist = implode(',', $shownthreadids);
+
+// pull unique views
+$uniqviews = [];
+$postcount = array();
+$maxdate = array();
+$lastview = array();
+$flags = array();
+if (count($threaddata) > 0) {
+   $query = "SELECT threadid,count(userid) FROM imas_forum_views ";
+    $query .= "WHERE threadid IN ($shownthreadlist) GROUP BY threadid";
+    $stm = $DBH->query($query);
+    // $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+        $uniqviews[$row[0]] = $row[1];
+    }
+    
+    // pull views, last date
+    $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+    $query .= "WHERE threadid IN ($shownthreadlist) ";
+    $query .= "GROUP BY threadid";
+    $stm = $DBH->query($query);
+
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+        $postcount[$row[0]] = $row[1] -1;
+        $maxdate[$row[0]] = $row[2];
+    }
+
+// pull tagged
+    $query = "SELECT threadid,lastview,tagged FROM imas_forum_views ";
+    $query .= "WHERE userid=:userid AND threadid IN ($shownthreadlist)";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':userid'=>$userid));
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+        $lastview[$row[0]] = $row[1];
+        if ($row[2]==1) {
+            $flags[$row[0]] = 1;
+        }
+    }
+    $flaggedlist = implode(',', array_map('intval', array_keys($flags)));
+}
+
+/* start output */
 
 $pagetitle = "Threads";
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
-$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
-require("../header.php");
+$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid';</script>";
+require_once "../header.php";
 
 
 if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -434,36 +526,7 @@ if ($postinstr != '' || $replyinstr != '') {
 	echo '</a>';
 }
 
-$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
-$query .= "WHERE forumid=:forumid ";
-if ($dofilter) {
-	$query .= "AND threadid IN ($limthreads) ";
-}
-$query .= "GROUP BY threadid";
-$stm = $DBH->prepare($query);
-$stm->execute(array(':forumid'=>$forumid));
-$postcount = array();
-$maxdate = array();
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$postcount[$row[0]] = $row[1] -1;
-	$maxdate[$row[0]] = $row[2];
-}
-$query= "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid=:userid";
-if ($dofilter) {
-	$query .= " AND threadid IN ($limthreads)";
-}
-$stm = $DBH->prepare($query);
-$stm->execute(array(':userid'=>$userid));
-// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-$lastview = array();
-$flags = array();
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$lastview[$row[0]] = $row[1];
-	if ($row[2]==1) {
-		$flags[$row[0]] = 1;
-	}
-}
-$flaggedlist = implode(',', array_map('intval', array_keys($flags)));
+
 //make new list
 $newpost = array();
 foreach (array_keys($maxdate) as $tid) {
@@ -472,11 +535,11 @@ foreach (array_keys($maxdate) as $tid) {
 	}
 }
 $newpostlist = implode(',', array_map('intval', $newpost));
-if ($page==-1 && count($newpost)==0) {
+/*if ($page==-1 && count($newpost)==0) {
 	$page = 1;
 } else if ($page==-2 && count($flags)==0) {
 	$page = 1;
-}
+}*/
 $prevnext = '';
 if ($page>0) {
 	$query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid=:forumid";
@@ -544,7 +607,7 @@ echo "<input type=hidden name=forum value=\"$forumid\"/>";
 <input type="submit" value="Search"/>
 </form>
 <?php
-if ($isteacher && $groupsetid>0) {
+if ($canviewall && $groupsetid>0) {
 	if (isset( $_SESSION['ffilter'.$forumid])) {
 		$curfilter = $_SESSION['ffilter'.$forumid];
 	} else {
@@ -602,7 +665,7 @@ if ($isteacher && $groupsetid>0) {
 }
 echo '<p>';
 $toshow = array();
-if (($myrights > 5 && time()<$postby) || $isteacher) {
+if (($myrights > 5 && time()<$postby) || $canviewall) {
 	$toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=". Sanitize::onlyInt($page)."&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button>";
 }
 //if ($isteacher || isset($tutorid)) {
@@ -653,7 +716,7 @@ echo "</p>";
 	<thead>
 		<tr><th>Topic</th><th>Started By</th>
 			<?php
-			if ($isteacher && $groupsetid>0 && !$dofilter) {
+			if ($canviewall && $groupsetid>0 && !$dofilter) {
                 if ($isSectionGroups) {
                     echo '<th>Section</th>';
                 } else {
@@ -665,53 +728,11 @@ echo "</p>";
 		</thead>
 		<tbody>
 			<?php
-			$query = "SELECT imas_forum_posts.id,count(imas_forum_views.userid) FROM imas_forum_views,imas_forum_posts ";
-			$query .= "WHERE imas_forum_views.threadid=imas_forum_posts.id AND imas_forum_posts.parent=0 AND ";
-			$query .= "imas_forum_posts.forumid=:forumid ";
-			if ($dofilter) {
-				$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+			
+			if (count($threaddata)==0) {
+				echo '<tr><td colspan='.(($canviewall && $groupsetid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 			}
-			if ($page==-1) {
-				$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
-			} else if ($page==-2) {
-				$query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
-			}
-			$query .= "GROUP BY imas_forum_posts.id";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':forumid'=>$forumid));
-			// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$uniqviews[$row[0]] = $row[1];
-			}
-			$query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid,imas_forum_threads.lastposttime ";
-			$query .= "FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
-			$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid=:forumid ";
-			$query .= "AND imas_forum_threads.lastposttime<:now ";
-			if ($dofilter) {
-				$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
-			}
-			if ($page==-1) {
-				$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
-			} else if ($page==-2) {
-				$query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
-			}
-			if ($sortby==0) {
-				$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
-			} else if ($sortby==1) {
-				$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_threads.lastposttime DESC ";
-			}
-			$offset = intval(($page-1)*$threadsperpage);
-			$threadsperpage =intval($threadsperpage);
-			if ($page>0) {
-				$query .= "LIMIT $offset,$threadsperpage";
-			}
-			// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
-			if ($stm->rowCount()==0) {
-				echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
-			}
-			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+			foreach ($threaddata as $line) {
 				if (isset($postcount[$line['id']])) {
 					$posts = $postcount[$line['id']];
 					$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
@@ -744,7 +765,7 @@ echo "</p>";
 				} else {
 					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
 				}
-				if ($isteacher) {
+				if ($canviewall) {
 					if ($line['posttype']==2) {
 						echo "<img class=mida src=\"$staticroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
 					} else if ($line['posttype']==3) {
@@ -782,9 +803,9 @@ echo "</p>";
 				if ($line['lastposttime']>$now) {
 					echo '</i>';
 				}
-				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
+				printf("<td><span class='pii-full-name'>%s</span></td>\n", Sanitize::encodeStringForDisplay($name));
 
-				if ($isteacher && $groupsetid>0 && !$dofilter) {
+				if ($canviewall && $groupsetid>0 && !$dofilter) {
 					echo '<td class=c>'.Sanitize::encodeStringForDisplay($groupnames[$line['stugroupid']]).'</td>';
 				}
 
@@ -796,7 +817,7 @@ echo "</p>";
 					echo '<td class="c">';
 				}
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']]).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
-				if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {
+				if ($lastpost=='' || !isset($lastview[$line['id']]) || !isset($maxdate[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
 					echo " <span class=\"noticetext\">New</span>";
 				}
 				echo "</td></tr>\n";
@@ -805,12 +826,12 @@ echo "</p>";
 		</tbody>
 	</table>
 	<?php
-	if (($myrights > 5 && time()<$postby) || $isteacher) {
+	if (($myrights > 5 && time()<$postby) || $canviewall) {
 		echo "<p><button type=\"button\" onclick=\"window.location.href='thread.php?page=".Sanitize::onlyInt($page)."&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button></p>\n";
 	}
 	if ($prevnext!='') {
 		echo "<p>$prevnext</p>";
 	}
 
-	require("../footer.php");
+	require_once "../footer.php";
 	?>

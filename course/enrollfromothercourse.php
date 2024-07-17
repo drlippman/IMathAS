@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -40,7 +40,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$vals = array();
 			$qarr = array();
             $_POST['section'] = trim($_POST['section']);
-            require('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
 			foreach ($todo as $stu) {
 				if (in_array($stu,$dontdo)) {continue;}
 				$vals[] = "(?,?,?,?)";
@@ -71,13 +71,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 /******* begin html output ********/
 
 $pagetitle = "Enroll Students From Another Course";
-require("../header.php");
+require_once "../header.php";
 $curBreadcrumb .= '&gt; Enroll From Another Course';
 
 /***** page body *****/
-if ($overwriteBody==1) {
+if (!empty($overwriteBody)) {
 	if (strlen($body)<2) {
-		include("./$fileToInclude");
+		require_once "./$fileToInclude";
 	} else {
 		echo $body;
 	}
@@ -105,7 +105,7 @@ if ($overwriteBody==1) {
 		echo '<p>';
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 			echo '<input type=checkbox name="checked[]" value="' . Sanitize::encodeStringForDisplay($line['id']) . '"/>';
-			printf('%s, %s<br/>', Sanitize::encodeStringForDisplay($line['LastName']),
+			printf('<span class="pii-full-name">%s, %s</span><br/>', Sanitize::encodeStringForDisplay($line['LastName']),
                 Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		echo '</p><p>Assign to section: <input type="text" name="section" />  (optional)</p>';
@@ -115,5 +115,5 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

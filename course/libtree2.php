@@ -1,14 +1,14 @@
 <?php
-	require_once("../init.php");
+	require_once "../init.php";
 
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		$isadmin = false;
 		$isgrpadmin = false;
 		if (isset($_GET['cid']) && $_GET['cid']=="admin") {
 			if ($myrights <75) {
-				require("../header.php");
+				require_once "../header.php";
 				echo "You need to log in as an admin to access this page";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			} else if ($myrights < 100) {
 				$isgrpadmin = true;
@@ -30,9 +30,9 @@ END;
 	echo <<<END
 <script type="text/javascript">var imasroot = "$imasroot";var staticroot = "$staticroot";</script>
 <link rel="stylesheet" href="$staticroot/course/libtree.css?v=090317" type="text/css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="$staticroot/javascript/general.js?v=031111"></script>
-<script type="text/javascript" src="$staticroot/javascript/libtree2.js?v=101717"></script>
+<script type="text/javascript" src="$staticroot/javascript/libtree2.js?v=041422"></script>
 </head>
 <body>
 <form id="libselectform">
@@ -108,8 +108,8 @@ END;
 	//if parent has lower userights, up them to match child library
 	function setparentrights($alibid) {
 		global $rights,$parents;
-		if ($parents[$alibid]>0) {
-			if ($rights[$parents[$alibid]] < $rights[$alibid]) {
+		if (!empty($parents[$alibid])) {
+			if (!isset($rights[$parents[$alibid]]) || $rights[$parents[$alibid]] < $rights[$alibid]) {
 			//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
 
 				$rights[$parents[$alibid]] = $rights[$alibid];
@@ -136,9 +136,9 @@ END;
 	$toopen = array();
 
 	$treearr = array();
-	if ($_GET['type']=="radio" && $select == "child") {
+	if (isset($_GET['type']) && $_GET['type']=="radio" && $select == "child") {
 		$treearr[0] = array(array(0,8,_('Unassigned'),0,in_array(0,$checked)?1:0));
-	} else if ($_GET['type']=="radio" && $select == "parent") {
+	} else if (isset($_GET['type']) && $_GET['type']=="radio" && $select == "parent") {
 		$treearr[0] = array(array(0,8,_('Unassigned'),-1,0,0));
 	} else {
 		$treearr[0] = array(array(0,8,_('Unassigned'),0,0,0));
@@ -170,7 +170,7 @@ END;
 		if (!isset($treearr[$parent])) {
 			$treearr[$parent] = array();
 		}
-		if ($sortorder[$parent]==1) {
+		if (isset($sortorder[$parent]) && $sortorder[$parent]==1) {
 			$orderarr = array();
 			foreach ($arr as $child) {
 				$orderarr[$child] = $names[$child];
@@ -200,7 +200,7 @@ END;
 					}
 					$newchildren[] = $child;
 				} else { // no children
-					if ($select == "child" || $select=="all" || $isempty[$child]==true) {
+					if ($select == "child" || $select=="all" || !empty($isempty[$child])) {
 						$thisjson[3] = in_array($child,$locked)?1:0;
 						$thisjson[4] = in_array($child,$checked)?1:0;
 					} else {
@@ -272,7 +272,7 @@ END;
 				setshow($parents[$child]);
 			}
 		} else {
-			if ($parents[$child]!=0) {
+			if (!empty($parents[$child])) {
 				setshow($parents[$child]);
 			}
 		}

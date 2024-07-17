@@ -2,19 +2,19 @@
 	//Displays Message list of students
 	//(c) 2008 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 	if (isset($teacherid)) {
 		$isteacher = true;
 	} else {
-	   require("../header.php");
+	   require_once "../header.php";
 	   echo "You must be a teacher, and access this page from the course page Messages link.\n";
-	   require("../footer.php");
+	   require_once "../footer.php";
 	   exit;
 	}
 
@@ -35,7 +35,7 @@
 	if (isset($_POST['remove'])) {
 		$goodmsgs = array();
 		foreach ($_POST['checked'] as $msgid) {
-			if (in_numeric($msgid) && $msgid!=0) {
+			if (is_numeric($msgid) && $msgid!=0) {
 				$goodmsgs[] = intval($msgid);
 			}
 		}
@@ -50,7 +50,7 @@
 	}
 
 	$pagetitle = "Student Messages";
-	require("../header.php");
+	require_once "../header.php";
 
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
@@ -120,15 +120,15 @@ function chgfilter() {
 }
 </script>
 	<form id="qform" method=post action="allstumsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
-	<p>Filter by student: <select id="filterstu" onchange="chgfilter()">
+	<p>Filter by student: <select id="filterstu" class='pii-full-name' onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
-	if ($filtercid==0) {
+	if ($filterstu==0) {
 		echo "selected=1 ";
 	}
 	echo ">All students</option>";
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_students WHERE ";
-	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid=:courseid";
+	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid=:courseid ORDER BY imas_users.LastName,imas_users.FirstName";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	$stulist = array();
@@ -164,7 +164,7 @@ function chgfilter() {
 	$query .= "FROM imas_msgs,imas_courses WHERE imas_courses.id=imas_msgs.courseid AND ";
 	$query .= "imas_msgs.deleted<2 AND imas_msgs.courseid=:courseid ";
 	if ($filterstu>0) {
-		$query .= "AND imas_msgs.msgto=:msgto";
+		$query .= "AND imas_msgs.msgto=:msgto ";
 	}
 	$query .= "ORDER BY senddate DESC LIMIT $offset,$threadsperpage";// these are INT vals
 	$stm = $DBH->prepare($query);
@@ -186,16 +186,26 @@ function chgfilter() {
 			$n++;
 		}
 		if ($n==1) {
-			$line['title'] = 'Re: '.$line['title'];
+			$line['title'] = 'Re: '.Sanitize::encodeStringForDisplay($line['title']);
 		} else if ($n>1) {
-			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+			$line['title'] = "Re<sup>$n</sup>: ".Sanitize::encodeStringForDisplay($line['title']);
 		}
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"" . Sanitize::onlyInt($line['id']) . "\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page" . Sanitize::onlyInt($page) . "&cid=$cid&filterstu=" . Sanitize::encodeStringForDisplay($filterstu) . "&type=msg&msgid=" . Sanitize::onlyInt($line['id']) . "&type=allstu\">";
-		echo Sanitize::encodeStringForDisplay($line['title']);
-		echo "</a></td><td>";
-		echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
-		echo "</td><td>" . Sanitize::encodeStringForDisplay($stulist[$line['msgto']]) . "</td>";
+		echo $line['title']; // sanitized above
+        echo "</a></td><td>";
+        if (isset($stulist[$line['msgfrom']])) {
+            echo '<span class="pii-full-name">';
+            echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
+            echo '</span>';
+        }
+        echo "</td><td>";
+        if (isset($stulist[$line['msgto']])) {
+            echo '<span class="pii-full-name">';
+            echo Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
+            echo '</span>';
+        }
+        echo "</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
 	}
@@ -209,5 +219,5 @@ function chgfilter() {
 	}
 	echo "<p><a href=\"msglist.php?cid=$cid\">Back to My Messages</a></p>";
 
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

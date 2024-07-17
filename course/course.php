@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("courseshowitems.php");
-require("../includes/htmlutil.php");
-require("../includes/calendardisp.php");
+require_once "../init.php";
+require_once "courseshowitems.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/calendardisp.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -20,7 +20,9 @@ function buildBlockLeftNav($items, $parent, &$blocklist) {
 					$blocklist[] = array($item['name'], $parent.'-'.($k+1), $item['SH'][1]);
 				}
 			}
-			buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            if (!empty($item['items'])) {
+			    buildBlockLeftNav($item['items'], $parent .'-'.($k+1), $blocklist);
+            }
 		}
 	}
 }
@@ -33,10 +35,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-
+    if (!empty($_COOKIE['fromltimenu'])) {
+        setcookie('fromltimenu', '', time()-3600);
+    }
 	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment
-		require_once("../includes/filehandler.php");
+		require_once "../includes/filehandler.php";
 		//deleteasidfilesbyquery(array('id'=>$_SESSION['sessiontestid']),1);
 		deleteasidfilesbyquery2('id',$_SESSION['sessiontestid'],null,1);
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");
@@ -186,7 +190,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$now = time();
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
-        $exceptions = loadExceptions($cid, $userid);
+		$exceptions = loadExceptions($cid, $userid);
         $excused = loadExcusals($cid, $userid);
 	}
 	//update block start/end dates to show blocks containing items with exceptions
@@ -199,19 +203,29 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		buildBlockLeftNav($items, '0', $stuLeftNavBlocks);
 	}
 
+    $contentbehavior = 0;
 	if ($_GET['folder']!='0') {
 		$now = time();
 		$blocktree = array_map('intval', explode('-',$_GET['folder']));
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
-			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+			if (!isset($items[$blocktree[$i]-1]['name']) || (
+                !isset($teacherid) && !isset($tutorid) && 
+                $items[$blocktree[$i]-1]['avail']<2 && 
+                $items[$blocktree[$i]-1]['SH'][0]!='S' && (
+                    $now<$items[$blocktree[$i]-1]['startdate'] || 
+                    $now>$items[$blocktree[$i]-1]['enddate'] || 
+                    $items[$blocktree[$i]-1]['avail']=='0'
+                )
+            )) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
 				unset($blocktree);
 				break;
 			}
+            $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+
 			if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
 				if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
 					echo 'Not authorized';
@@ -238,7 +252,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
 
-	$curBreadcrumb = $breadcrumbbase;
+	$curBreadcrumb = $breadcrumbbase ?? '';
 	if (isset($backtrack) && count($backtrack)>0) {
 		if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 			array_unshift($backtrack, array($coursename, '0'));
@@ -296,7 +310,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	   } else {
 		   $newmsgs = '';
 	   }
-	}
+	} else {
+        $newmsgs = '';
+    }
 	/* very old
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
@@ -359,13 +375,13 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=070620\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=011823\"></script>";
 if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
 
 /******* begin html output ********/
-require("../header.php");
+require_once "../header.php";
 
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -388,7 +404,7 @@ if ($overwriteBody==1) {
 		//	}
 		//}
 		function moveDialog(block,item) {
-			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto");
+			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto", true, '', null, {'label':_('Move'),'func':'moveitem'});
 			return false;
 		}
 		function additem(blk,tb) {
@@ -418,12 +434,12 @@ if ($overwriteBody==1) {
 <?php
 	//check for course layout
 	if (isset($CFG['GEN']['courseinclude'])) {
-		require($CFG['GEN']['courseinclude']);
+		require_once $CFG['GEN']['courseinclude'];
 		if ($firstload) {
 			echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 			echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
 		}
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 ?>
@@ -439,10 +455,10 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_SESSION['ltiitemtype'])) {
 			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
-			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
+			echo "<span id=\"myname\" class=\"pii-full-name\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
 			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a>";
 		} else {
-			echo Sanitize::encodeStringForDisplay($userfullname);
+			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($userfullname).'</span>';
 		}
 		?>
 		</span>
@@ -495,11 +511,12 @@ if ($overwriteBody==1) {
 		echo '<a href="showcalendar.php?cid=' . $cid . '">' . _('Calendar') . '</a><br/>';
 		echo '<a href="coursemap.php?cid=' . $cid . '">' . _('Course Map') . '</a><br/>';
 		echo '<a href="#" class="togglecontrol" aria-controls="navtoolmore">' . _('More...') . '</a>';
-	  echo '<span id="navtoolmore" style="display:none">';
+	  	echo '<span id="navtoolmore" style="display:none">';
 		echo '<br/>&nbsp;<a href="coursereports.php?cid=' . $cid . '">' . _('Reports') . '</a><br/>';
 		echo '&nbsp;<a href="managestugrps.php?cid=' . $cid . '">' . _('Groups') . '</a><br/>';
 		echo '&nbsp;<a href="addoutcomes.php?cid=' . $cid . '">' . _('Outcomes') . '</a><br/>';
-		echo '&nbsp;<a href="addrubric.php?cid=' . $cid . '">' . _('Rubrics') . '</a>';
+		echo '&nbsp;<a href="addrubric.php?cid=' . $cid . '">' . _('Rubrics') . '</a><br/>';
+		echo '&nbsp;<a href="mergeassess2.php?cid=' . $cid . '">' . _('Merge Assessments') . '</a><br/>';
 		echo '</span>';
 		echo '</p>';
 	}
@@ -576,11 +593,16 @@ if ($overwriteBody==1) {
 		}
 		echo '<a href="coursemap.php?cid='.$cid.'">'._('Course Map').'</a>';
 		echo '</p>';
+        if (($toolset&4)==0) {
+            echo '<p><a href="gradebook.php?cid='. $cid .'" class="essen">' . _('Gradebook') . '</a> ';
+            if (($coursenewflag&1)==1) {
+                echo '<span class="noticetext">', _('New'), '</span>';
+            }
+            echo '</p>';
+        }
 	?>
 
-			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?>
-			</p>
+			
 	<?php
 		if (count($stuLeftNavBlocks)>0) {
 			echo '<p class=leftnavp><b>'._('Quick Links').'</b>';
@@ -623,11 +645,12 @@ if ($overwriteBody==1) {
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
+           echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=011522\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
-		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
-
+		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
+		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';
@@ -659,7 +682,7 @@ if ($overwriteBody==1) {
    }
 }
 
-require("../footer.php");
+require_once "../footer.php";
 
 function makeTopMenu() {
 	global $teacherid;

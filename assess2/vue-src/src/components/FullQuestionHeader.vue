@@ -6,6 +6,9 @@
         :class="{inlineheader: true, greystrike: curQData.withdrawn !==0}"
       >
         {{ $t('question_n', { n: dispqn }) }}
+        <em v-if="curQData.extracredit" class="small subdued">
+          {{ $t('extracredit') }}
+        </em>
       </h2>
     </div>
     <question-header-icons

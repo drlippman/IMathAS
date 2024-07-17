@@ -21,7 +21,7 @@ $DBH->beginTransaction();
 	return false;
  }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added indices</p>";
 

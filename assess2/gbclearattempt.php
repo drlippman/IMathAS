@@ -21,12 +21,12 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
-require_once("../includes/TeacherAuditLog.php");
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
+require_once "../includes/TeacherAuditLog.php";
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -54,13 +54,13 @@ if ($type == 'qver') {
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 if ($istutor) {
   $tutoredit = $assess_info->getSetting('tutoredit');
-  if ($tutoredit != 1) { // no Access for editing scores
+  if (($tutoredit&1) != 1) { // no Access for editing scores
     echo '{"error": "no_access"}';
     exit;
   }
 }
 // get question point values for retotal later
-$assess_info->loadQuestionSettings('all', false, false);
+$assess_info->loadQuestionSettings('all', true, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -70,6 +70,7 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
+$replacedDeleted = false;
 if ($type == 'all' && $keepver == 0) {
   $stm = $DBH->prepare('SELECT score FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
@@ -85,10 +86,13 @@ if ($type == 'all' && $keepver == 0) {
   );
   $stm = $DBH->prepare('DELETE FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
+  $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A' AND userid=?");
+  $stm->execute(array($aid, $uid));
+  $assess_record->clearLPblocks();
   // update LTI grade
   $lti_sourcedid = $assess_record->getLTIsourcedId();
   if (strlen($lti_sourcedid) > 1) {
-    require_once("../includes/ltioutcomes.php");
+    require_once "../includes/ltioutcomes.php";
     updateLTIgrade('delete',$lti_sourcedid,$aid,$uid);
   }
   $assess_record->saveRecordIfNeeded(); //to commit
@@ -101,11 +105,7 @@ if ($type == 'all' && $keepver == 0) {
 } else if ($type == 'qver') {
   $replacedDeleted = $assess_record->gbClearAttempts($type, $keepver, $aver, $qn, $qver);
 } else if ($type == 'practiceview') {
-  $stm = $DBH->prepare("DELETE FROM imas_content_track WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')");
-  $stm->execute(array(
-    ':typeid' => $aid,
-    ':userid' => $uid
-  ));
+  $assess_record->clearLPblocks();
 }
 // recalculated totals based on removed attempts
 $assess_record->reTotalAssess();
@@ -125,13 +125,13 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
     $assessInfoOut['newver'] = $assess_record->getGbQuestionVersionData($qn, true, $by_question ? $qver : $aver);
   }
 } else if ($type == 'practiceview') {
-  $assessInfoOut['latepass_blocked_by_practice'] = false;
+  $assessInfoOut['latepass_status'] = 1; // hacky - TODO: should recalculate
 }
 
 $assess_record->saveRecord();
 
 // update LTI grade
-$assess_record->updateLTIscore();
+$assess_record->updateLTIscore(true, false);
 
 //output JSON object
 echo json_encode($assessInfoOut);

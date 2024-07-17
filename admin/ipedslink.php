@@ -1,7 +1,7 @@
 <?php 
 
 // TODO: 
-require('../init.php');
+require_once '../init.php';
 
 if ($myrights < 40) {
     echo 'You are not authorized for this page';
@@ -54,6 +54,35 @@ if (isset($_POST['postback'])) {
             Sanitize::stripHtmlTags($_POST['otherschool']), 
             Sanitize::simpleString($_POST['country'])
         ));
+    } else if ($myrights == 100 && !empty($_POST['otherschool']) &&
+        (!empty($_POST['otheragency']) || $_POST['schooltype'] != 'pubk12') &&
+        ($_POST['schoolloc']=='us' && $_POST['ipeds']=='0')
+    ) {
+        // create new ipeds record for an intl school 
+        if ($_POST['schooltype'] == 'coll') {
+            $type = 'I';
+            $newipedsid = md5($_POST['otherschool'].'US');
+            $agency = '';
+        } else if ($_POST['schooltype'] == 'pubk12') {
+            $type = 'A';
+            $newipedsid = md5($_POST['otheragency'].'US');
+            $agency = Sanitize::stripHtmlTags($_POST['otheragency']);
+        } else {
+            $type = 'S';
+            $newipedsid = md5($_POST['otherschool'].'US');
+            $agency = '';
+        }
+        
+        $query = 'INSERT INTO imas_ipeds (type,ipedsid,school,agency,country,state) VALUES (?,?,?,?,?,?)';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(
+            $type, 
+            $newipedsid,
+            Sanitize::stripHtmlTags($_POST['otherschool']),
+            $agency, 
+            'US',
+            Sanitize::stripHtmlTags($_POST['state'])
+        ));
     } else if (!empty($_POST['ipeds']) && $_POST['ipeds'] != '0') {
         list($type,$newipedsid) = explode('-', $_POST['ipeds']);
     } else if (!empty($_POST['intlipeds']) && $_POST['intlipeds'] != '0') {
@@ -80,7 +109,7 @@ $stm->execute(array($grp));
 $ipeds = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/ipedssearch.js"></script>';
-require('../header.php');
+require_once '../header.php';
 echo '<div class=breadcrumb>'.$breadcrumbbase.' IPEDS/NCES Association</div>';
 echo '<form method=post action="ipedslink.php">';
 if ($myrights == 100) {
@@ -193,6 +222,10 @@ if ($myrights == 100 || empty($ipeds)) {
         <label for=otherschool>Give a school name to create a new custom record:</label><br>
         <input name=otherschool size=40 />
         </p>';
+        echo '<p id=otheragency style="display:none">
+        <label for=otheragency>Give a school district name to create a new custom record:</label><br>
+        <input name=otheragency size=40 />
+        </p>';
     }
     ?>
     <script type="text/javascript">
@@ -234,8 +267,13 @@ if ($myrights == 100 || empty($ipeds)) {
             var val = this.value;
             if (val == '0') {
                 $('#otherschool').slideDown();
+                if ($('#schooltype').val() == 'pubk12') {
+                    $('#otheragency').slideDown();
+                } else {
+                    $('#otheragency').slideUp();
+                }
             } else {
-                $('#otherschool').slideUp();
+                $('#otherschool,#otheragency').slideUp();
             }
             
         });
@@ -267,4 +305,4 @@ if ($myrights == 100 || empty($ipeds)) {
     <?php
 }
 
-require('../footer.php');
+require_once '../footer.php';

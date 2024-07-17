@@ -4,8 +4,8 @@
  * (c) 2019 David Lippman
  */
 
-require_once(__DIR__ . '/../includes/exceptionfuncs.php');
-require_once(__DIR__ . '/../includes/Rand.php');
+require_once __DIR__ . '/../includes/exceptionfuncs.php';
+require_once __DIR__ . '/../includes/Rand.php';
 /**
  * Primary class for working with assessment settings
  */
@@ -19,6 +19,7 @@ class AssessInfo
   private $questionSetData = array();
   private $exception = null;
   private $exceptionfunc = null;
+  private $resetdata = array();
 
 
  /**
@@ -29,14 +30,15 @@ class AssessInfo
   * @param mixed $questions   questions to load settings for.
   *                           accepts false for no load, 'all' for all,
   *                           or an array of question IDs.
+  * @param bool $forcecodeload true to force load of question code
   */
-  function __construct($DBH, $aid, $cid, $questions = false) {
+  public function __construct($DBH, $aid, $cid, $questions = false, $forcecodeload = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
     $this->cid = $cid;
     $this->loadAssessSettings();
     if ($questions !== false) {
-      $get_code = ($this->assessData['displaymethod'] === 'full');
+      $get_code = ($this->assessData['displaymethod'] === 'full' || $forcecodeload);
       $this->loadQuestionSettings($questions, $get_code);
     }
   }
@@ -89,23 +91,56 @@ class AssessInfo
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
-      $this->exception = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+      $this->setException($uid, array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else if (!$isstu) {
-      $this->exception = false;
+      $this->setException($uid, false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
-      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
+      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
-      $this->exception = $stm->fetch(PDO::FETCH_NUM);
+      $this->setException($uid, $stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
     }
+  }
+
+  /**
+   * Sets an exception
+   * @param  integer  $uid   The user ID
+   * @param  array|false   $exception   array of exception data, or false for none.
+   * @param  boolean  $isstu      Whether the user is a student
+   * @param  integer $latepasses  The number of latepasses the user has
+   * @param  integer $latepasshrs How many hours latepasses extend due dates
+   * @param  integer $courseenddate The course end date
+   * @return void
+   */
+  public function setException($uid, $exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
+
+    // resets, in case we're using setException multiple times
+    $resetkeys = ['exceptionpenalty','original_enddate','extended_with',
+        'timeext','attemptext', 'startdate', 'enddate', 'enddate_in',
+        'latepasses_avail', 'latepass_extendto', 'latepass_enddate'];
+    if (empty($this->resetdata)) { // set reset data on first run
+        foreach ($resetkeys as $key) {
+            $this->resetdata[$key] = isset($this->assessData[$key]) ? $this->assessData[$key] : null;
+        }
+    } else {
+        foreach ($resetkeys as $key) {
+            if ($this->resetdata[$key] === null) {
+                unset($this->assessData[$key]);
+            } else {
+                $this->assessData[$key] = $this->resetdata[$key];
+            }
+        }
+    }
+
+    $this->exception = $exception;
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 
-    if ($this->exception !== false && $this->exception[4] !== null) {
+    if ($this->exception !== false && isset($this->exception[4]) && $this->exception[4] !== null) {
       //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
-    }
+    } 
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
@@ -115,6 +150,25 @@ class AssessInfo
     } else {
       $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
       $canuselatepass = false;
+    }
+
+    // use time limit extension even if rest of exception isn't used
+    if ($this->exception !== false && !empty($this->exception[6])) {
+        $this->assessData['timeext'] = intval($this->exception[6]);
+    }
+    if ($this->exception !== false && !empty($this->exception[7])) {
+        $this->assessData['attemptext'] = intval($this->exception[7]);
+        // apply additional attempts
+        if ($this->assessData['submitby'] == 'by_assessment') {
+            $this->assessData['allowed_attempts'] += $this->assessData['attemptext'];
+        } else {
+            // if question settings already loaded, apply extension
+            foreach ($this->questionData as $i=>$set) {
+                if ($set['regen'] != 1) {
+                    $this->questionData[$i]['regens_max'] += $this->assessData['attemptext'];
+                }
+            }
+        }
     }
 
     if ($useexception) {
@@ -133,6 +187,8 @@ class AssessInfo
       $this->assessData['startdate'] = intval($this->exception[0]);
       $this->assessData['enddate'] = intval($this->exception[1]);
       $this->assessData['enddate_in'] = $this->assessData['enddate'] - time() - 5;
+
+      $this->assessData['latepass_enddate'] = max($this->assessData['latepass_enddate'], $this->assessData['enddate']);
       $this->setAvailable();
     }
 
@@ -146,6 +202,7 @@ class AssessInfo
       }
 
       $this->assessData['can_use_latepass'] = $LPneeded;
+      $this->assessData['latepass_after'] = ($this->assessData['allowlate']>10);
       $this->assessData['latepasses_avail'] = $latepasses;
 
       $LPcutoff = $this->assessData['LPcutoff'];
@@ -172,7 +229,7 @@ class AssessInfo
    * Also sets assessData['latepass_blocked_by_practice']
    * @return boolean
    */
-  public function getLatePassBlockedByView() {
+  public function getLatePassStatus() {
     if ($this->assessData['hasexception']) {
       list($useexception,$LPblocked) =
         $this->exceptionfunc->getCanUseAssessException(
@@ -182,10 +239,11 @@ class AssessInfo
           true
         );
     } else {
-      $LPblocked = $this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
+      $LPblocked = $this->exceptionfunc->getCanUseAssessLatePass($this->assessData, 0, true);
+      //$this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
     }
-    $this->assessData['latepass_blocked_by_practice'] = $LPblocked;
-    return $this->assessData['latepass_blocked_by_practice'];
+    $this->assessData['latepass_status'] = $LPblocked;
+    return $this->assessData['latepass_status'];
   }
 
   /**
@@ -193,7 +251,7 @@ class AssessInfo
    * @return boolean true if prereq is waived
    */
   private function waiveReqScore () {
-      if ($this->exception === null) {
+      if ($this->exception === null || $this->exception === false) {
         return false;
       } else {
         return $this->exception[5];
@@ -256,7 +314,7 @@ class AssessInfo
       }
       foreach ($tolookupAids as $qid=>$aid) {
         // TODO: include enough for link to assessment too
-        $this->questionData[$qid]['category'] = $aidmap[$aid];
+        $this->questionData[$qid]['category'] = $aidmap[$aid] ?? null;
       }
     }
     if (count($tolookupOutcomes) > 0 && $get_cats) {
@@ -269,7 +327,7 @@ class AssessInfo
         $outcomemap[$row['id']] = $row['name'];
       }
       foreach ($tolookupOutcomes as $qid=>$oid) {
-        $this->questionData[$qid]['category'] = $outcomemap[$oid];
+        $this->questionData[$qid]['category'] = $outcomemap[$oid] ?? null;
       }
     }
     if ($get_code && count($qsids) > 0) {
@@ -316,9 +374,12 @@ class AssessInfo
   public function getQuestionSettings($id) {
     $by_q = array('regens_max');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
-      'showans','showans_aftern','points_possible','questionsetid',
+      'showans','showans_aftern','points_possible','extracredit','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
+    if (!isset($this->questionData[$id])) {
+        return false;
+    }
     foreach ($base as $field) {
         if (isset($this->questionData[$id][$field])) {
             $out[$field] = $this->questionData[$id][$field];
@@ -386,7 +447,7 @@ class AssessInfo
   public function getAllQuestionPointsAndCats() {
     $out = array();
     foreach ($this->questionData as $qid=>$v) {
-      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>$v['origcategory']];
+      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>($v['origcategory'] ?? 0)];
     }
     return $out;
   }
@@ -519,10 +580,18 @@ class AssessInfo
    * @return void
    */
   public function checkPrereq($uid) {
+    if ($this->assessData['available'] == 'practice') { return; } // don't block in practice mode
     if ($this->assessData['reqscore'] > 0 &&
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
     ) {
+      $stm = $this->DBH->prepare("SELECT id FROM imas_excused WHERE userid=? AND type='A' AND typeid=?");
+      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
+      if ($stm->rowCount() > 0) {
+          // has excusal for prereq - ignore prereq score
+          return;
+      }
+
       $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";
@@ -534,12 +603,12 @@ class AssessInfo
 			} else {
         $isBlocked = false;
         if ($this->assessData['reqscoretype']&2) { //using percent-based
-					if (round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
-						$isBlocked = true;
-					}
-				} else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
-					$isBlocked = true;
-				}
+            if ($reqscoreptsposs>0 && round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
+                $isBlocked = true;
+            }
+        } else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
+            $isBlocked = true;
+        }
       }
       if ($isBlocked) {
         $this->assessData['available'] = 'needprereq';
@@ -576,7 +645,9 @@ class AssessInfo
     //return ($showscores == 'at_end' || $showscores == 'during');
     $viewingb = $this->assessData['viewingb'];
     return ($viewingb == 'immediately' || $viewingb == 'after_take' ||
-      ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
+      ($viewingb == 'after_due' && time() > $this->assessData['enddate']) ||
+      ($viewingb == 'after_lp' && time() > $this->assessData['latepass_enddate'])
+    );
   }
 
   /**
@@ -588,7 +659,8 @@ class AssessInfo
     $viewingb = $this->assessData['viewingb'];
     return ($showscores == 'at_end' || $showscores == 'during' ||
       $viewingb == 'immediately' || $viewingb == 'after_take' ||
-      ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
+      ($viewingb == 'after_due' && time() > $this->assessData['enddate']) ||
+      ($viewingb == 'after_lp' && time() > $this->assessData['latepass_enddate']));
   }
 
 
@@ -712,7 +784,7 @@ class AssessInfo
     } else {
       if ($this->assessData['shuffle']&4) { //all students same seed
         foreach ($qout as $i=>$qid) {
-          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
             //using fixed seed list
             $n = count($this->questionData[$qid]['fixedseeds']);
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
@@ -723,7 +795,7 @@ class AssessInfo
         }
       } else { //regular selection
         foreach ($qout as $i=>$qid) {
-          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
             //using fixed seed list
             if ($oldseeds !== false && count($this->questionData[$qid]['fixedseeds']) > 1) {
               //if we have oldseeds, remove it from selection
@@ -764,8 +836,11 @@ class AssessInfo
       //the question must be in a grouping.  Find the group.
       foreach ($this->assessData['itemorder'] as $qid) {
         if (is_array($qid) && in_array($oldquestion, $qid['qids'])) {
-          $group = $qid['qids'];
-          $grouptype = $qid['type'];
+          if ($qid['type'] == 'pool' && $qid['n'] < count($qid['qids'])) {
+            // only do redraw if not picking n from n
+            $group = $qid['qids'];
+            $grouptype = $qid['type'];
+          }
           break;
         }
       }
@@ -780,16 +855,23 @@ class AssessInfo
         $newq = $unused[array_rand($unused,1)];
       }
     }
+    if (!isset($this->questionData[$newq])) {
+        $this->loadQuestionSettings([$newq], true);
+    }
 
-    if ($this->assessData['shuffle']&4 || $this->assessData['shuffle']&2) {
-      //all students same seed or all questions same seed - don't regen
+    if ($this->assessData['shuffle']&2) {
+      //all questions same seed - don't regen
       $newseed = $oldseeds[0];
     } else {
-      if ($this->questionData[$newq]['fixedseeds'] !== null) {
+      if (!empty($this->questionData[$newq]['fixedseeds'])) {
         //using fixed seed list. find any unused seeds
         if (count($this->questionData[$newq]['fixedseeds']) == 1) {
           //only one seed so use it
           $newseed = $this->questionData[$newq]['fixedseeds'][0];
+        } else if ($this->assessData['shuffle']&4) {
+          //all stu same seed using fixed seed list, pick next in list
+          $n = count($this->questionData[$newq]['fixedseeds']);
+          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds)) % $n];
         } else {
           $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
           if (count($unused) == 0) {
@@ -798,6 +880,9 @@ class AssessInfo
           }
           $newseed = $unused[array_rand($unused, 1)];
         }
+      } else if ($this->assessData['shuffle']&4) {
+        // all stu same seed - increment seed by 1
+        $newseed = max($oldseeds) + 1;
       } else {
         //regular seed pick
         $looplimit = 0;
@@ -821,9 +906,17 @@ class AssessInfo
     if ($this->assessData['displaymethod'] != 'video_cued') {
       $this->assessData['displaymethod'] = 'skip';
     }
+    if ($this->assessData['ansingb'] == 'never') {
+        $newshowans = 'never';
+    } else {
+        $newshowans = 'after_n';
+    }
     $this->assessData['submitby'] = 'by_question';
     $this->assessData['showscores'] = 'during';
-    $this->assessData['showans'] = 'with_score';
+    $this->assessData['showans'] = $newshowans;
+    if ($newshowans == 'after_n') {
+        $this->assessData['showans_aftern'] = 1;
+    }
     $this->assessData['deftries'] = 999; // unlimited
     $this->assessData['defregens'] = 999; // unlimited
     $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
@@ -834,7 +927,10 @@ class AssessInfo
       $this->questionData[$i]['tries_max'] = 999; // unlimited
       $this->questionData[$i]['regens_max'] = 999; // unlimited
       $this->questionData[$i]['retry_penalty'] = 0;
-      $this->questionData[$i]['showans'] = 'with_score';
+      $this->questionData[$i]['showans'] = $newshowans;
+      if ($newshowans == 'after_n') {
+        $this->questionData[$i]['showans_aftern'] = 1;
+      }
     }
   }
 
@@ -849,6 +945,11 @@ class AssessInfo
     $now = time();
     if ($this->assessData['can_use_latepass'] > 0) {
       $LPneeded = $this->assessData['can_use_latepass'];
+      $LPcutoff = $this->assessData['LPcutoff'];
+      $enddate = $this->getSetting('original_enddate');
+      if ($LPcutoff < $enddate) { 
+        $LPcutoff = 0; // ignore nonsensical cutoff
+      }
       $stm = $this->DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
       $stm->execute(array(
         ':lps'=>$LPneeded,
@@ -930,7 +1031,7 @@ class AssessInfo
   * @param  array $defaults  Assessment settings assoc array.
   * @return array            Normalized $settings array.
   */
-  static function normalizeQuestionSettings($settings, $defaults) {
+  public static function normalizeQuestionSettings($settings, $defaults) {
 
     if ($settings['points'] == 9999) {
       $settings['points_possible'] = $defaults['defpoints'];
@@ -947,6 +1048,7 @@ class AssessInfo
       $settings['retry_penalty'] = $defaults['defpenalty'];
       $settings['retry_penalty_after'] = $defaults['defpenalty_after'];
     } else {
+      if ($settings['penalty'] === '') { $settings['penalty'] = '0'; }
       if ($settings['penalty'][0]==='L') {
         $settings['retry_penalty_after'] = 'last';
         $settings['retry_penalty'] = intval(substr($settings['penalty'], 1));
@@ -963,6 +1065,10 @@ class AssessInfo
       $settings['regens_max'] = 1;
     } else {
       $settings['regens_max'] = $defaults['defregens'];
+      if (!empty($defaults['attemptext'])) {
+          // extend attempts if exception set
+          $settings['regens_max'] += $defaults['attemptext'];
+      }
     }
 
     $settings['jump_to_answer'] = false;
@@ -1025,7 +1131,7 @@ class AssessInfo
   * @param  array $settings   Assessment settings assoc array from the database.
   * @return array             Normalized $settings.
   */
-  static function normalizeSettings($settings) {
+  public static function normalizeSettings($settings) {
     // set global assessUIver
     $GLOBALS['assessUIver'] = $settings['ver'];
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
@@ -1037,6 +1143,9 @@ class AssessInfo
     $settings['deftries'] = $settings['defattempts'];
 
     //break apara defpenalty, defregenpenalty
+    if ($settings['defpenalty'] === '') {
+        $settings['defpenalty'] = '0';
+    }
     if ($settings['defpenalty'][0]==='L') {
       $settings['defpenalty_after'] = 'last';
       $settings['defpenalty'] = intval(substr($settings['defpenalty'], 1));
@@ -1047,6 +1156,9 @@ class AssessInfo
       $settings['defpenalty_after'] = 1;
     }
 
+    if ($settings['defregenpenalty'] === '') {
+        $settings['defregenpenalty'] = '0';
+    }
     if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);
       $settings['defregenpenalty'] = intval(substr($settings['defregenpenalty'], 2));
@@ -1064,6 +1176,13 @@ class AssessInfo
     if ($settings['displaymethod'] === 'livepoll') {
       $settings['shuffle'] = $settings['shuffle'] | 4;
       $settings['submitby'] = 'by_question';
+    }
+
+    //if video cued but no viddata, override
+    if ($settings['displaymethod'] === 'video_cued' &&
+        $settings['viddata'] == ''
+    ) {
+        $settings['displaymethod'] = 'skip';
     }
 
     //if by-assessment, define attempt values
@@ -1100,6 +1219,10 @@ class AssessInfo
       $settings['timelimit_type'] = 'allow_overtime';
     }
     $settings['timelimit_multiplier'] = 1;
+
+    //unpack noprint
+    $settings['lock_for_assess'] = ($settings['noprint'] & 2);
+    $settings['noprint'] = ($settings['noprint'] & 1);
 
     //unpack intro
     $introjson = json_decode($settings['intro'], true);
@@ -1155,9 +1278,13 @@ class AssessInfo
     }
 
     //handle IP-form passwords
+    $userIP = $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? $_SERVER['HTTP_CLIENT_IP']
+        ?? '';
     if ($settings['password'] != '' &&
       preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/', $settings['password']) &&
-      AssessUtils::isIPinRange($_SERVER['REMOTE_ADDR'], $settings['password'])
+      AssessUtils::isIPinRange($userIP, $settings['password'])
     ) {
       $settings['password'] = '';
     }
@@ -1170,32 +1297,60 @@ class AssessInfo
       }
     }
 
+    // fix old-format reqscore "grey out"
+    if ($settings['reqscore'] < 0) {
+        $settings['reqscoretype'] |= 1;
+        $settings['reqscore'] = abs($settings['reqscore']);
+    }
+
+    // get latest date latepass can extend to
+    $allowlate = $settings['allowlate'];
+    if ($settings['allowlate'] == 0) {
+        $lp_enddate = $settings['enddate'];
+    } else {
+        $allowlate = ($settings['allowlate'] % 10) - 1; // ignore "allow use after"
+        if ($allowlate == 0) { // this is now "unlimited"
+            $lp_enddate = 2000000000;
+        } else {
+            $lp_enddate = strtotime("+".($GLOBALS['latepasshrs']*$allowlate)." hours", $settings['enddate']);
+        }
+    }
+    
+    $settings['latepass_enddate'] = min($lp_enddate, $GLOBALS['courseenddate']);
+    if ($settings['LPcutoff'] > 0) {
+        $settings['latepass_enddate'] = min($settings['latepass_enddate'], $settings['LPcutoff']);
+    }
+
     //unpack itemorder
     $itemorder = json_decode($settings['itemorder'], true);
     //temp handling of old format
     if ($itemorder === null) {
-      $order = explode(',', $settings['itemorder']);
-      foreach ($order as $k=>$v) {
-        $sub = explode('~', $v);
-        if (count($sub)>1) {
-          $pts = explode('|', $sub[0]);
-          if (count($pts)==1) { //really old assessment format
-            $order[$k] = array(
-              'type' => 'pool',
-              'n' => 1,
-              'replace' => 0,
-              'qids' => array_map('intval', $sub)
-            );
-          } else {
-            $order[$k] = array(
-              'type' => 'pool',
-              'n' => $pts[0],
-              'replace' => ($pts[1]==1),
-              'qids' => array_map('intval', array_slice($sub, 1))
-            );
-          }
-        } else {
-          $order[$k] = intval($v);
+      if ($settings['itemorder'] === '') {
+        $order = [];
+      } else {
+        $order = explode(',', $settings['itemorder']);
+        foreach ($order as $k=>$v) {
+            $sub = explode('~', $v);
+            if (count($sub)>1) {
+            $pts = explode('|', $sub[0]);
+            if (count($pts)==1) { //really old assessment format
+                $order[$k] = array(
+                'type' => 'pool',
+                'n' => 1,
+                'replace' => 0,
+                'qids' => array_map('intval', $sub)
+                );
+            } else {
+                $order[$k] = array(
+                'type' => 'pool',
+                'n' => $pts[0],
+                'replace' => ($pts[1]==1),
+                'qids' => array_map('intval', array_slice($sub, 1))
+                );
+            }
+            } else {
+            $order[$k] = intval($v);
+            }
         }
       }
       $settings['itemorder'] = $order;
@@ -1211,6 +1366,9 @@ class AssessInfo
         $settings[$k] = $v + 0;
       }
     }
+
+    $settings['showworktype'] = ($settings['showwork'] & 4);
+    $settings['showwork'] = ($settings['showwork'] & 3);
 
     return $settings;
   }
@@ -1297,6 +1455,40 @@ class AssessInfo
         $this->assessData['intro'] = str_replace($matches[0], $vals[0], $this->assessData['intro']);
       }
   	}
+  }
+
+  /**
+   * Loads new message and forum post counts for LTI users
+   * @return void
+   */
+  public function loadLTIMsgPosts($uid, $canviewall) {
+    global $coursemsgset;
+
+    if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
+      if ($coursemsgset < 4 && $this->assessData['help_features']['message']==true) {
+        $this->assessData['lti_showmsg'] = 1;
+        // get msg count
+        $stm = $this->DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
+            $stm->execute(array(':msgto'=>$uid, ':courseid'=>$this->cid));
+            $this->assessData['lti_msgcnt'] = intval($stm->fetchColumn(0));
+      }
+      if (!empty($this->assessData['help_features']['forum'])) {
+        // get new post count
+        $query = "SELECT COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+        $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
+        $query .= "WHERE imas_forum_threads.forumid=:forumid AND ";
+        $query .= "imas_forum_threads.lastposttime<:now AND ";
+        $query .= "(imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+        $qarr = array(':now'=>time(), ':forumid'=>$this->assessData['help_features']['forum'], ':userid'=>$uid);
+        if (!$canviewall) {
+            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2 )) ";
+            $qarr[':userid2']=$uid;
+        }
+        $stm = $this->DBH->prepare($query);
+        $stm->execute($qarr);
+        $this->assessData['lti_forumcnt'] = intval($stm->fetchColumn(0));
+      }
+    }
   }
 
 }

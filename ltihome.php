@@ -2,7 +2,8 @@
 //IMathAS: LTI instructor home page
 //(c) 2011 David Lippman
 
-require("init.php");
+$init_skip_csrfp = true;
+require_once "init.php";
 if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 	echo _("Not authorized to view this page");
 	exit;
@@ -10,7 +11,14 @@ if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['ltihome'])) {
-	require($CFG['hooks']['ltihome']);
+	require_once $CFG['hooks']['ltihome'];
+}
+
+$hasplacement = false;
+
+if (!isset($_SESSION['ltiitemtype'])) {
+    echo _('Missing assessment information. Try opening from the LMS again');
+    exit;
 }
 
 //decide what we need to display
@@ -30,8 +38,9 @@ if ($_SESSION['ltiitemtype']==0) {
 		$role = 'teacher';
 	}
 } else {
-	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org=:org");
-	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>$_SESSION['ltiorg']));
+    $shortorg = explode(':', $_SESSION['ltiorg'])[0];
+	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+    $stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
 	if ($stm->rowCount()==0) {
 		$hascourse = false;
 		if (isset($_SESSION['lti_launch_get']) && isset($_SESSION['lti_launch_get']['cid'])) {
@@ -47,10 +56,11 @@ if ($_SESSION['ltiitemtype']==0) {
 		$cid = $stm->fetchColumn(0);
 	}
 	if ($hascourse) {
+        $shortorg = explode(':', $_SESSION['ltiorg'])[0];
 		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid=:contextid ";
-		$query .= "AND org=:org AND linkid=:linkid";
+		$query .= "AND org LIKE :org AND linkid=:linkid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>$_SESSION['ltiorg'], ':linkid'=>$_SESSION['lti_resource_link_id']));
+		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%", ':linkid'=>$_SESSION['lti_resource_link_id']));
 		if ($stm->rowCount()==0) {
 			$hasplacement = false;
 			if (isset($_SESSION['lti_launch_get']) && isset($_SESSION['lti_launch_get']['aid'])) {
@@ -75,7 +85,7 @@ if ($_SESSION['ltiitemtype']==0) {
 }
 
 //handle form postbacks
-$createcourse = Sanitize::onlyInt($_POST['createcourse']);
+$createcourse = Sanitize::onlyInt($_POST['createcourse'] ?? 0);
 if (!empty($createcourse)) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
 	$stm->execute(array(':courseid'=>$createcourse, ':userid'=>$userid));
@@ -148,7 +158,8 @@ if (!empty($createcourse)) {
 		$stm->execute(array(':id'=>$createcourse));
 		$items = unserialize($stm->fetchColumn(0));
 		$newitems = array();
-		require("includes/copyiteminc.php");
+        $_POST['ctc'] = $createcourse;
+		require_once "includes/copyiteminc.php";
 		copyallsub($items,'0',$newitems,$gbcats);
 		$itemorder = serialize($newitems);
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
@@ -160,13 +171,22 @@ if (!empty($createcourse)) {
 		if (function_exists('onAddCourse')) {
 			onAddCourse($cid, $userid);
 		}
-	}
-	$stm = $DBH->prepare("UPDATE imas_lti_courses SET courseid=:courseid WHERE org=:org AND contextid=:contextid");
-	$stm->execute(array(':courseid'=>$cid, ':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id']));
-	if ($stm->rowCount()==0) {
+    }
+    
+    $shortorg = explode(':', $_SESSION['ltiorg'])[0];
+    $stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+    $stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+    $oldcourseid = $stm->fetchColumn(0);
+    if ($oldcourseid === false) { // no existing course connection
 		$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
 		$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$cid));
-	}
+    } else if (!empty($cid) && $oldcourseid != $cid) {
+        $stm = $DBH->prepare("UPDATE imas_lti_courses SET courseid=:courseid WHERE org LIKE :org AND contextid=:contextid");
+        $stm->execute(array(':courseid'=>$cid, ':org'=>"$shortorg:%", ':contextid'=>$_SESSION['lti_context_id']));
+        // if we're changing courses, we should delete any existing placements.
+        $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE contextid=:contextid AND org LIKE :org");
+        $stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+	} // otherwise, same course; do nothing
 	$hascourse = true;
 
 } else if (isset($_POST['setplacement'])) {
@@ -185,7 +205,7 @@ if (!empty($createcourse)) {
 			$atitle = $stm->fetchColumn(0);
 			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
 
-			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
+			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -193,7 +213,7 @@ if (!empty($createcourse)) {
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
 			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0";
-			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
+			header('Location: '.$_SESSION['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else if (isset($_SESSION['lti_selection_return']) && $_SESSION['lti_selection_return_format'] == "IMSdeeplink") {
@@ -312,7 +332,7 @@ if ($hasplacement && $placementtype=='course') {
 
 //HTML Output
 $pagetitle = "LTI Home";
-require("header.php");
+require_once "header.php";
 if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '<script type="text/javscript">
 	function updateCourseSelector(el) {
@@ -412,7 +432,8 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '</select>';
 	echo '<input type="Submit" value="'._('Make Placement').'"/>';
 	echo "<p>".sprintf(_('If you want to create new assessments, log directly into %s'),$installname)."</p>";
-	echo "<p>".sprintf(_("If your LMS course is linked with the wrong course on %s, "),$installname);
+    echo "<p>".sprintf(_('Your LMS course is currently linked with %s course ID %d. '),$installname, $cid);
+    echo sprintf(_("If your LMS course is linked with the wrong course on %s, "),$installname);
 	echo '<a href="ltihome.php?chgcourselink=true" onclick="return confirm(\''._('Are you SURE you want to do this? This may break existing placements.').'\');">'._('Change course link').'</a></p>';
 	echo '</form>';
 } else if ($placementtype=='course') {
@@ -423,6 +444,10 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line === false) {
+        echo 'Invalid assessment ID';
+        exit;
+    }
 	echo "<h2>".sprintf(_("LTI Placement of %s"), Sanitize::encodeStringForDisplay($line['name'])) . "</h2>";
 	if ($line['ver'] > 1) {
 		echo "<p><a href=\"assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a> | ";
@@ -470,14 +495,18 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 			$addassess = 'addassessment.php';
 		}
 		echo "<p><a href=\"course/$addassess?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a> | ";
-		echo "<a href=\"course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
+		echo "<a href=\"course/addquestions2.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
 		if ($_SESSION['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">'._('Change placement').'</a></p>';
 		}
-		echo '<p>&nbsp;</p><p class=small>'.sprintf(_('This assessment is housed in course ID %s'),Sanitize::courseId($cid)).'</p>';
+		echo '<p>&nbsp;</p><p class=small>'.sprintf(_('This assessment is housed in course ID %s'),Sanitize::courseId($cid)).'. ';
+        if (empty($CFG['LTI']['hideSelfServiceLink'])) {
+            echo '<a href="admin/userlti.php">'._('Edit course link').'</a>';
+        }
+        echo '</p>';
 	}
 }
-require("footer.php");
+require_once "footer.php";
 
 function formatdate($date) {
 	if ($date==0 || $date==2000000000) {

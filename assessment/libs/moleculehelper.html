@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@0.9.7/dist/kekule.min.js?module=chemWidget,IO"></script>
+    <link href="https://cdn.jsdelivr.net/npm/kekule@0.9.7/dist/themes/default/kekule.css" rel="stylesheet">
+    <script type="text/javascript">
+        var composer;
+        $(function() {
+            composer = new Kekule.Editor.Composer(document.getElementById("chemdraw"));
+            composer
+                .setEnableOperHistory(true)
+                .setEnableLoadNewFile(false)
+                .setEnableCreateNewDoc(false)
+                .setAllowCreateNewChild(false)
+                .setCommonToolButtons(["undo", "redo", "copy", "cut", "paste", "zoomIn", "reset", "zoomOut"]) 
+                .setChemToolButtons(["manipulate", "erase", "bond", "atomAndFormula", "ring", "charge"])
+                .setStyleToolComponentNames([]);
+        });
+        function getAns(docopy) {
+            var mol = composer.exportObjs(Kekule.Molecule)[0];
+            var smi = Kekule.IO.saveFormatData(mol, 'smi');
+            var cml = Kekule.IO.saveFormatData(mol, 'cml');
+            var text = "$answer = '" + smi + '~~~' + cml + "'";
+            document.getElementById("out").value = text;
+            if (docopy) {
+                navigator.clipboard.writeText(text).then(() => {
+                    document.getElementById("notice").innerText = "Copied";
+                },() => {
+                    document.getElementById("notice").innerText = "Unable to copy";
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <p>Draw a molecule here. The Molecule question type currently only supports a single molecule.</p>
+    <div id="chemdraw"></div>
+    <p><button type=button onclick="getAns(false)">Get $answer</button>
+        <button type=button onclick="getAns(true)">Copy $answer to clipboard</button>
+        <span id="notice" style="color:red"></span></p>
+    <textarea style="width:100%" rows=10 id="out"></textarea>
+</body>
+</html>

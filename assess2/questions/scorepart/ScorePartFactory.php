@@ -2,22 +2,24 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/CalculatedMatrixScorePart.php');
-require_once(__DIR__ . '/CalculatedScorePart.php');
-require_once(__DIR__ . '/ChoicesScorePart.php');
-require_once(__DIR__ . '/ComplexScorePart.php');
-require_once(__DIR__ . '/ConditionalScorePart.php');
-require_once(__DIR__ . '/DrawingScorePart.php');
-require_once(__DIR__ . '/EssayScorePart.php');
-require_once(__DIR__ . '/FileScorePart.php');
-require_once(__DIR__ . '/FunctionExpressionScorePart.php');
-require_once(__DIR__ . '/IntervalScorePart.php');
-require_once(__DIR__ . '/MatchingScorePart.php');
-require_once(__DIR__ . '/MatrixScorePart.php');
-require_once(__DIR__ . '/MultipleAnswerScorePart.php');
-require_once(__DIR__ . '/NTupleScorePart.php');
-require_once(__DIR__ . '/NumberScorePart.php');
-require_once(__DIR__ . '/StringScorePart.php');
+require_once __DIR__ . '/CalculatedMatrixScorePart.php';
+require_once __DIR__ . '/CalculatedScorePart.php';
+require_once __DIR__ . '/ChoicesScorePart.php';
+require_once __DIR__ . '/ComplexScorePart.php';
+require_once __DIR__ . '/ConditionalScorePart.php';
+require_once __DIR__ . '/DrawingScorePart.php';
+require_once __DIR__ . '/EssayScorePart.php';
+require_once __DIR__ . '/FileScorePart.php';
+require_once __DIR__ . '/FunctionExpressionScorePart.php';
+require_once __DIR__ . '/IntervalScorePart.php';
+require_once __DIR__ . '/MatchingScorePart.php';
+require_once __DIR__ . '/MatrixScorePart.php';
+require_once __DIR__ . '/MultipleAnswerScorePart.php';
+require_once __DIR__ . '/NTupleScorePart.php';
+require_once __DIR__ . '/NumberScorePart.php';
+require_once __DIR__ . '/StringScorePart.php';
+require_once __DIR__ . '/ChemEquationScorePart.php';
+require_once(__DIR__ . '/MoleculeScorePart.php');
 
 use OutOfBoundsException;
 
@@ -113,6 +115,12 @@ class ScorePartFactory
                 break;
             case 'string':
                 return new StringScorePart($scoreQuestionParams);
+                break;
+            case 'chemeqn':
+                return new ChemEquationScorePart($scoreQuestionParams);
+                break;
+            case 'molecule':
+                return new MoleculeScorePart($scoreQuestionParams);
                 break;
             default:
                 // This will be caught by our custom exception handler to be

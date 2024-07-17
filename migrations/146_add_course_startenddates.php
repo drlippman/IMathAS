@@ -27,7 +27,7 @@ $DBH->beginTransaction();
 	return false;
  }
  
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added startdate and enddate fields to imas_courses</p>";
 

@@ -89,6 +89,12 @@ export default {
         } else {
           return 'after_due';
         }
+      } else if (this.ainfo.viewingb === 'after_lp') {
+        if (this.ainfo.scoresingb === 'never') {
+          return 'work_after_lp';
+        } else {
+          return 'after_lp';
+        }
       } else { // after_take or immediately
         if (this.ainfo.scoresingb === 'never') {
           return 'work';

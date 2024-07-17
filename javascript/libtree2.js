@@ -132,7 +132,7 @@ function setlib() {
 			if(frm.elements[i].name == 'libs[]' || frm.elements[i].name=='libs') {
 				if (frm.elements[i].checked == true && frm.elements[i].disabled == false) {
 					chlibs[cnt] = frm.elements[i].value;
-					chlibsn[cnt] = document.getElementById('n'+chlibs[cnt]).innerHTML;
+					chlibsn[cnt] = document.getElementById('n'+chlibs[cnt]).innerHTML.replace(/\s+/g,' ').trim();
 					cnt++;
 				}
 			}

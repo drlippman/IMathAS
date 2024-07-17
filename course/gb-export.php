@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Export or email Gradebook
 //(c) 2007 David Lippman
-	require("../init.php");
+	require_once "../init.php";
 
 	$isteacher = isset($teacherid);
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -24,9 +24,12 @@
 	}
 
 	if (!isset($_POST['commentloc'])) {
-		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
+		require_once "../header.php";
+        echo "<div class=breadcrumb>$breadcrumbbase ";
+        if (empty($_COOKIE['fromltimenu'])) {
+            echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        }
+        echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
 		echo '<div id="headergb-export" class="pagetitle"><h1>Export Gradebook</h1></div>';
 
 		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode);
@@ -36,7 +39,7 @@
 			echo "&emailgb=" . Sanitize::encodeUrlParam($_GET['emailgb']);
 		}
 		echo '" class="nolimit">';
-		if ($_GET['emailgb']=="ask") {
+		if (isset($_GET['emailgb']) && $_GET['emailgb']=="ask") {
 			echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
 		}
 
@@ -44,9 +47,11 @@
 		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include comments <br/>  <input type="radio" name="commentloc" value="1"> Separate set of columns at the end <br/><input type="radio" name="commentloc" value="0"> After each score column</span><br class="form" />';
 		echo '<span class="form">Assessment times:</span><span class="formright"> <input type="radio" name="timestype" value="0" checked="checked"> Don\'t include assessment times <br/>  <input type="radio" name="timestype" value="1"> Include total assessment time <br/><input type="radio" name="timestype" value="2"> Include time in questions</span><br class="form" />';
+        echo '<span class="form">Include assessment last changed dates?:</span><span class="formright"> <input type="radio" name="lastchanged" value="0" checked="checked"> No <input type="radio" name="lastchanged" value="1" > Yes </span><br class="form" />';
 
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
+		echo '<span class="form">Include email address?</span><span class="formright"><input type="radio" name="emailcol" value="0" checked="checked"> No <input type="radio" name="emailcol" value="1" > Yes </span><br class="form" />';
 
 
 		if (isset($_GET['export'])) {
@@ -61,7 +66,7 @@
 			echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+		require_once "../footer.php";
 		exit;
 	}
 
@@ -73,9 +78,11 @@
 	$commentloc = $_POST['commentloc'];  //0: interleve, 1: at end
 	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
 	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
-	$logincnt = $_POST['logincnt']; //0: no, 1 yes
+    $logincnt = $_POST['logincnt']; //0: no, 1 yes
+    $includeemail = !empty($_POST['emailcol']);
 	$hidelocked = ($_POST['locked']=='hide')?true:false;
 	$includetimes = intval($_POST['timestype']); //1 total time, 2 time on task
+    $includelastchange = $_POST['lastchanged']; //0: no, 1 yes
 
 	$catfilter = -1;
 	$secfilter = -1;
@@ -86,7 +93,7 @@
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 
-	require("gbtable2.php");
+	require_once "gbtable2.php";
 	$includecomments = true;
 	if ($_POST['submit']=="Download Gradebook for Excel") {
 		header('Content-type: application/vnd.ms-excel');
@@ -95,8 +102,8 @@
 		header('Pragma: public');
 		echo '<html><head>';
 		echo '<style type="text/css">';
-		require("../imascore.css");
-		require("../themes/modern.css");
+		require_once "../imascore.css";
+		require_once "../themes/modern.css";
 		echo '</style></head><body>';
 		gbinstrdisp();
 		echo '</body></html>';
@@ -110,6 +117,7 @@
 		$gb = preg_replace('/<su(p|b)>.*?<\/su(p|b)>/', '', $gb);
 		$gb = preg_replace('/<\/tr>.*?<tr.*?>/',';;tr;;', $gb);
 		$gb = preg_replace('/<\/t(d|h)>\s*<t(d|h).*?>/',';;td;;', $gb);
+        $gb = preg_replace('/\(\w\w\)/','', $gb);
 		$gb = strip_tags($gb);
 		$gb = explode(';;tr;;', $gb);
 		foreach ($gb as $k=>$row) {
@@ -177,9 +185,9 @@
 			}
 			if ($_GET['emailgb']!='') {
 				mail(Sanitize::emailAddress($_GET['emailgb']), "Gradebook for $coursename", $message, $headers);
-				require("../header.php");
+				require_once "../header.php";
 				echo "Gradebook Emailed.  <a href=\"gradebook.php?cid=$cid\">Return to Gradebook</a>";
-				require("../footer.php");
+				require_once "../footer.php";
 				exit;
 			}
 
@@ -370,14 +378,16 @@ function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 	}
 }
 function gbinstrdisp() {
-	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
+	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes,$includelastchange;
 
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$gbt = gbtable();
-	echo '<table class="gb" id="myTable"><thead><tr>';
+	echo '<table class="gb" id="myTable"><caption class="sr-only">Gradebook</caption><thead><tr>';
 	$n=0;
 	$pointsrow = '<th>Points Possible</th>';
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
@@ -449,6 +459,11 @@ function gbinstrdisp() {
 				$pointsrow .= '<th></th>';
 				$n++;
 			}
+            if ($includelastchange && $gbt[0][1][$i][6]==0) {
+                echo '<th>'. $gbt[0][1][$i][0].': Last Changed'.'</th>';
+                $pointsrow .= '<th></th>';
+				$n++;
+            }
 		}
 	}
 	if (!$totonleft && !$hidepast) {
@@ -505,7 +520,7 @@ function gbinstrdisp() {
 		echo $gbt[$i][0][0];
 		echo '</td>';
 		for ($j=1;$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
+			echo '<td class="c">'.($gbt[$i][0][$j] ?? '').'</td>';  // most empty on averages row
 		}
 		if ($totonleft && !$hidepast) {
 			gbInstrCatCols($gbt, $i);
@@ -535,22 +550,23 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][1][$j][0])) {
 
 						echo $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						} else if ($gbt[$i][1][$j][3]==2) {
-							echo ' (IP)';
-						} else if ($gbt[$i][1][$j][3]==3) {
-							echo ' (OT)';
-						} else if ($gbt[$i][1][$j][3]==4) {
-							echo ' (PT)';
-						}
+						if (isset($gbt[$i][1][$j][3])) { // unset on averages row
+                            if ($gbt[$i][1][$j][3]>9) {
+                                $gbt[$i][1][$j][3] -= 10;
+                            }
+                            if ($gbt[$i][1][$j][3]==1) {
+                                echo ' (NC)';
+                            } else if ($gbt[$i][1][$j][3]==2) {
+                                echo ' (IP)';
+                            } else if ($gbt[$i][1][$j][3]==3) {
+                                echo ' (OT)';
+                            } else if ($gbt[$i][1][$j][3]==4) {
+                                echo ' (PT)';
+                            }
+                        }
 
 					} else { //no score
-						if ($gbt[$i][0][0]=='Averages') {
-							echo '-';
-						} else {
-							echo '-';
-						}
+						echo '-';
 					}
 					if (isset($gbt[$i][1][$j][6]) ) {
 						if ($gbt[$i][1][$j][6]>1) {
@@ -562,19 +578,16 @@ function gbinstrdisp() {
 						} else {
 							echo '<sup>e</sup>';
 						}
-					}
+                    }
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						}
 					} else {
 						echo '-';
 					}
 
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
@@ -583,6 +596,9 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
+                }
+                if (!empty($gbt[$i][1][$j][14])) { //excused
+					echo '<sup>x</sup>';
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';
@@ -590,7 +606,7 @@ function gbinstrdisp() {
 				echo '</td>';
 				if ($commentloc==0) {
 					if (isset($gbt[$i][1][$j][1])) {
-						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
+						echo '<td>'.strip_tags($gbt[$i][1][$j][1]).'</td>';
 					} else {
 						echo '<td></td>';
 					}
@@ -598,20 +614,28 @@ function gbinstrdisp() {
 				}
 				if ($includetimes>0 && $gbt[0][1][$j][6]==0) {
 					if ($includetimes==1) {
-						echo '<td>'.$gbt[$i][1][$j][7].'</td>';
+						echo '<td>'.($gbt[$i][1][$j][7] ?? '').'</td>';
 					} else if ($includetimes==2) {
-						echo '<td>'.$gbt[$i][1][$j][8].'</td>';
+						echo '<td>'.($gbt[$i][1][$j][8] ?? '').'</td>';
 					}
 					$n++;
 				}
+                if ($includelastchange>0 && $gbt[0][1][$j][6]==0) {
+                    if (!empty($gbt[$i][1][$j][9])) {
+                        echo '<td>'.date('Y-m-d g:i a', $gbt[$i][1][$j][9]).'</td>';
+                    } else {
+                        echo '<td></td>';
+                    }
+                    $n++;
+                }
 			}
 		}
 		if (!$totonleft && !$hidepast) {
 			gbInstrCatCols($gbt, $i);
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
-			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][0]) . '</td>';
-			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][1]) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay(strip_tags($gbcomments[$gbt[$i][4][0]][0])) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay(strip_tags($gbcomments[$gbt[$i][4][0]][1])) . '</td>';
 		} else {
 			echo '<td></td>';
 			echo '<td></td>';
@@ -632,7 +656,7 @@ function gbinstrdisp() {
 						continue;
 					}
 					if (isset($gbt[$i][1][$j][1])) {
-						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
+						echo '<td>'.strip_tags($gbt[$i][1][$j][1]).'</td>';
 					} else {
 						echo '<td></td>';
 					}

@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -32,46 +32,65 @@ class StringScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['strflags'])) {if (is_array($options['strflags'])) {$strflags = $options['strflags'][$partnum];} else {$strflags = $options['strflags'];}}
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-
+        $optionkeys = ['answer', 'strflags', 'scoremethod', 'answerformat', 'variables', 'requiretimes'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $optionkeys = ['partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
+        }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
-
+        
+        if ($answerformat=='list') {
+            $givenans = trim($givenans, " ,");
+        }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
-        if (isset($scoremethod) &&
+        if (!empty($scoremethod) &&
             (($scoremethod=='takeanything' && trim($givenans)!='') ||
                 $scoremethod=='takeanythingorblank')
         ) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         }
-
-        if (!isset($answerformat)) { $answerformat = "normal";}
-        if ($answerformat=='list') {
-            $gaarr = array_map('trim',explode(',',$givenans));
-            $anarr = array_map('trim',explode(',',$answer));
-            $gaarrcnt = count($gaarr);
-        } else {
-            $gaarr = array($givenans);
-            $anarr = array($answer);
+        if ($requiretimes !== '' && checkreqtimes($givenans,$requiretimes)==0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
+        
         $strflags = str_replace(' ','',$strflags);
-        $strflags = explode(",",$strflags);
-        $torem = array();
-        foreach($strflags as $flag) {
-            $pc = array_map('trim',explode('=',$flag));
-            if ($pc[0]=='ignore_symbol') {
-                $torem[] = $pc[1];
-                continue;
+        $flags = [];
+        $torem = [];
+        if ($strflags !== '') {
+            $strflags = explode(",",$strflags);
+            foreach($strflags as $flag) {
+                $pc = array_map('trim',explode('=',$flag,2));
+                if (!isset($pc[1])) {
+                    if ($pc[0]=='ignore_symbol' || $pc[0] == 'allow_diff' || $pc[0] == 'regex') {
+                        echo "Missing = in strflag";
+                        continue;
+                    } else {
+                        $pc[1] = 1;
+                    }
+                }
+                if ($pc[0]=='ignore_symbol') {
+                    $torem[] = $pc[1];
+                    continue;
+                }
+                if (!isset($pc[1])) {  // if val not specified, turn on
+                    $pc[1] = true;
+                }
+                if ($pc[0] == 'allow_diff') {
+                    $pc[1] = intval($pc[1]);
+                } else if ($pc[1]==='true' || $pc[1]==='1' || $pc[1]===1) {
+                    $pc[1] = true;
+                } else {
+                    $pc[1] = false;
+                }
+                $flags[$pc[0]] = $pc[1];
             }
-            if ($pc[1]==='true' || $pc[1]==='1' || $pc[1]===1) {
-                $pc[1] = true;
-            }
-            $flags[$pc[0]] = $pc[1];
         }
 
         if (!isset($flags['compress_whitespace'])) {
@@ -79,6 +98,27 @@ class StringScorePart implements ScorePart
         }
         if (!isset($flags['ignore_case'])) {
             $flags['ignore_case']=true;
+        }
+        if (!empty($flags['all_words'])) {
+            $flags['in_answer'] = true;
+        }
+
+        if ($answerformat=='list' || !empty($flags['all_words'])) {
+            $gaarr = array_map('trim',explode(',',$givenans));
+            $anarr = array_map('trim',explode(',',$answer));
+            $gaarrcnt = count($gaarr);
+        } else {
+            $gaarr = array($givenans);
+            $anarr = array($answer);
+            $gaarrcnt = 1;
+            if (is_array($partialcredit)) {
+                $partialvals = [1];
+                
+                for ($i=0;$i<count($partialcredit);$i+=2) {
+                    $anarr[] = $partialcredit[$i];
+                    $partialvals[] = $partialcredit[$i+1];
+                }
+            }
         }
 
 
@@ -90,30 +130,44 @@ class StringScorePart implements ScorePart
             }
             foreach($gaarr as $j=>$givenans) {
                 $givenans = trim($givenans);
-
+                
+                if ($answerformat == "logic") {
+                    if (comparelogic($givenans, $answer, $variables)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } 
+                    continue; // skip normal processing
+                }
+                if ($answerformat == "setexp") {
+                    if (comparesetexp($givenans, $answer, $variables)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } 
+                    continue; // skip normal processing
+                }
                 if (count($torem)>0) {
                     $givenans = str_replace($torem,' ',$givenans);
                 }
-                if ($flags['ignore_commas']===true) {
+                if (!empty($flags['ignore_commas'])) {
                     $givenans = str_replace(',','',$givenans);
                     $answer = str_replace(',','',$answer);
                 }
-                if ($flags['compress_whitespace']===true) {
+                if (!empty($flags['compress_whitespace'])) {
                     $givenans = preg_replace('/\s+/',' ',$givenans);
                     $answer = preg_replace('/\s+/',' ',$answer);
                 }
-                if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
+                if (!empty($flags['trim_whitespace']) || !empty($flags['compress_whitespace'])) {
                     $givenans = trim($givenans);
                     $answer = trim($answer);
                 }
-                if ($flags['remove_whitespace']===true) {
+                if (!empty($flags['remove_whitespace'])) {
                     $givenans = trim(preg_replace('/\s+/','',$givenans));
                 }
                 $specialor = false;
-                if ($flags['special_or']===true) {
+                if (!empty($flags['special_or'])) {
                     $specialor = true;
                 }
-                if ($flags['ignore_case']===true && !isset($flags['regex'])) {
+                if (!empty($flags['ignore_case']) && !isset($flags['regex'])) {
                     $givenans = strtoupper($givenans);
                     $answer = strtoupper($answer);
                     if ($specialor) {
@@ -129,28 +183,31 @@ class StringScorePart implements ScorePart
                     }
                 }
 
-                if ($flags['ignore_order']) {
+                if (!empty($flags['ignore_order'])) {
                     $givenans = explode("\n",chunk_split($givenans,1,"\n"));
                     sort($givenans,SORT_STRING);
                     $givenans = implode('',$givenans);
                 }
 
                 foreach ($anss as $anans) {
-                    if ($flags['ignore_order']===true) {
+                    if (!empty($flags['ignore_order'])) {
                         $anans = explode("\n",chunk_split($anans,1,"\n"));
                         sort($anans,SORT_STRING);
                         $anans = implode('',$anans);
                     }
-                    if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
+                    if (!empty($flags['trim_whitespace']) || !empty($flags['compress_whitespace'])) {
                         $anans = trim($anans);
                     }
-                    if ($flags['remove_whitespace']===true) {
+                    if (!empty($flags['remove_whitespace'])) {
                         $anans = trim(preg_replace('/\s+/','',$anans));
                     }
-                    if ($flags['partial_credit']===true && $answerformat!='list' && strlen($givenans)<250) {
+                    if (!empty($flags['partial_credit']) && $answerformat!='list' && empty($flags['all_words']) && strlen($givenans)<250) {
                         $poss = strlen($anans);
                         $dist = levenshtein($anans,$givenans);
                         $score = ($poss - $dist)/$poss;
+                        if ($answerformat != 'list' && empty($flags['all_words']) && is_array($partialcredit)) {
+                            $score *= $partialvals[$i];
+                        }
                         if ($score>$correct) { $correct = $score;}
                     } else if (isset($flags['allow_diff']) && strlen($givenans)<250) {
                         if (levenshtein($anans,$givenans) <= 1*$flags['allow_diff']) {
@@ -161,8 +218,10 @@ class StringScorePart implements ScorePart
                     } else if (isset($flags['in_answer'])) {
                         if (strpos($givenans,$anans)!==false) {
                             $correct += 1;
-                            $foundloc = $j;
-                            break 2;
+                            if (empty($flags['all_words'])) {
+                                $foundloc = $j;
+                                break 2;
+                            }
                         }
                     } else if (isset($flags['regex'])) {
                         $regexstr = '/'.str_replace('/','\/',$anans).'/'.($flags['ignore_case']?'i':'');
@@ -182,12 +241,17 @@ class StringScorePart implements ScorePart
             }
             if ($foundloc>-1) {
                 array_splice($gaarr,$foundloc,1); //remove from list
+                if ($answerformat != 'list' && empty($flags['all_words']) && is_array($partialcredit)) {
+                    $correct *= $partialvals[$i];
+                }
                 if (count($gaarr)==0) {
                     break; //stop if no student answers left
                 }
             }
         }
-        if ($gaarrcnt <= count($anarr)) {
+        if ($answerformat != 'list' && empty($flags['all_words']) && is_array($partialcredit)) {
+            $score = $correct;
+        } else if ($gaarrcnt <= count($anarr)) {
             $score = $correct/count($anarr);
         } else {
             $score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/($gaarrcnt+count($anarr));

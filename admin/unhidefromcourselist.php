@@ -1,6 +1,6 @@
 <?php
-require("../init.php");
-$tohide = Sanitize::courseId($_GET['tohide']);
+require_once "../init.php";
+
 if (!isset($_GET['type'])) {
 	$type = 'take';
 } else {
@@ -18,7 +18,7 @@ if ($type=='teach') {
 	$type = 'take';
 }
 $actionuserid = $userid;
-$userIdInt = Sanitize::onlyInt(trim($_GET['user']));
+$userIdInt = Sanitize::onlyInt($_GET['user'] ?? 0);
  if ($myrights==100 && !empty($userIdInt)) {
 	$actionuserid = $userIdInt;
 } else if ($myrights>=75 && !empty($userIdInt)) {
@@ -29,6 +29,7 @@ $userIdInt = Sanitize::onlyInt(trim($_GET['user']));
 	}
 }
 if (isset($_GET['tohide'])) {
+    $tohide = Sanitize::courseId($_GET['tohide']);
 	if ($tohide>0) {
 		$stm = $DBH->prepare("UPDATE $table SET hidefromcourselist=0 WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':courseid'=>$tohide, ':userid'=>$actionuserid));
@@ -57,7 +58,7 @@ if (!empty($_GET['toundel'])) {
 
 $pagetitle = "View Hidden Courses You're $typename from Course List";
 $curBreadcrumb = "$breadcrumbbase Unhide Courses\n";
-require("../header.php");
+require_once "../header.php";
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<h1>View Hidden Courses You\'re '.$typename.'</h1>';
@@ -100,7 +101,7 @@ if ($stm->rowCount()==0) {
 				echo ' <li><a href="forms.php?from=home&action=modify&id='.$row['id'].'">'._('Settings').'</a></li>';
 				echo '<li><a href="addremoveteachers.php?from=home&id='.$row['id'].'">'._('Add/remove teachers').'</a></li>';
 				echo ' <li><a href="transfercourse.php?from=home&id='.$row['id'].'">'._('Transfer ownership').'</a></li>';
-				echo ' <li><a href="forms.php?from=home&action=delete&id='.$row['id'].'">'._('Delete').'</a></li>';
+				echo ' <li><a href="forms.php?from=unhide&action=delete&id='.$row['id'].'">'._('Delete').'</a></li>';
 			} else if ($row['ownerid']!==$userid) {
 				echo '<li><a href="#" onclick="removeSelfAsCoteacher(this,'.$row['id'].');return false;">'._('Remove yourself as a co-teacher').'</a></li>';
 			}
@@ -141,6 +142,6 @@ if (count($deleted) > 0) {
     echo '</ul>';
 }
 echo '<p><a href="../index.php">Back to Home Page</a></p>';
-require("../footer.php");
+require_once "../footer.php";
 
 ?>

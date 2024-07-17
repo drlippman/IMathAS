@@ -4,7 +4,7 @@
 //(c) 2010 David Lippman
 
 /*** master includes ***/
-require("./init.php");
+require_once "./init.php";
 $now = time();
 
 //0: classes you're teaching
@@ -366,9 +366,13 @@ if ($myrights==100) {
 		$brokencnt[$row[0]] = $row[1];
 	}
 }
-
+if (!empty($CFG['logquestionerrors']) && $myrights >= 20) {
+    $stm = $DBH->prepare('SELECT count(DISTINCT iqe.qsetid) FROM imas_questionerrors AS iqe JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id WHERE iqs.ownerid=?');
+    $stm->execute([$userid]);
+    $qerrcnt = $stm->fetchColumn(0);
+}
 /*** done pulling stuff.  Time to display something ***/
-require("header.php");
+require_once "header.php";
 $msgtotal = array_sum($newmsgcnt);
 if (!isset($CFG['GEN']['homelinkbox'])) {
 	echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
@@ -408,7 +412,8 @@ echo '<div class="pagetitle" id="headerhome" role="banner"><h1>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
-	echo _('Welcome to'), " $installname, " . Sanitize::encodeStringForDisplay($userfullname);
+	echo _('Welcome to'), " $installname, ";
+    printf('<span class="pii-full-name">%s</span>', Sanitize::encodeStringForDisplay($userfullname));
 }
 echo '</h1>';
 echo '</div>';
@@ -418,6 +423,9 @@ if (isset($_SESSION['emulateuseroriginaluser'])) {
 
 if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
+}
+if (!empty($CFG['logquestionerrors']) && $myrights>=20 && $qerrcnt>0) {
+    echo '<div><span class="noticetext">'.Sanitize::onlyInt($qerrcnt).'</span> ' . _('of your questions have logged errors') . '. <a target="_blank" href="util/questionerrors.php">' . _('View errors') . '</a></div>';
 }
 if ($myrights<75 && ($myspecialrights&(16+32))!=0) {
 	echo '<div>';
@@ -434,7 +442,8 @@ if ($myrights==100 || ($myspecialrights&64)!=0) {
 	}
 	if (count($newreqs)>0) {
 		echo '<div> There are <span class=noticetext>'.(isset($newreqs[0])?$newreqs[0]:0).'</span> new account requests';
-		if (count($newreqs)>1 || !isset($newreqs[0])) {
+		unset($newreqs[0]); // don't count below
+        if (count($newreqs)>0) {
 			echo ' and <span class=noticetext>'.array_sum($newreqs).'</span> pending requests';
 		}
 		echo '. <a href="admin/approvepending2.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
@@ -487,10 +496,10 @@ for ($i=0; $i<3; $i++) {
 	}
 }
 
-require('footer.php');
+require_once 'footer.php';
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
-	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $courseListOrder;
+	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $username, $courseListOrder, $myspecialrights;
 	if (count($data)==0 && $type=='tutor' && !$hashiddencourses) {return;}
 
 	echo '<div role="navigation" aria-label="'.$title.'">';
@@ -526,11 +535,11 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			}
 		}
 		if ($hasCleanup) {
-			echo '<p class="small info"><span style="color:orange;">**</span> ';
+			echo '<p class="small info"><span class="warn">**</span> ';
 			echo _('course is scheduled for cleanup').'</p>';
 		}
 	}
-    if ($type=='take') {
+    if ($type=='take' && substr($username, 0, 4) != 'lti-') {
         echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
     } else if ($type=='teach' && $myrights>39) {
         echo '<div class="center"><a class="abutton" href="admin/addcourse.php">', _('Add New Course'), '</a></div>';
@@ -658,8 +667,8 @@ function printMessagesGadget() {
 		} else {
 			$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 		}
-		echo '<td>'.Sanitize::encodeStringForDisplay($line['fullname']).'</td>';
-		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
+		echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($line['fullname']).'</span></td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']] ?? '').'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
 		echo '</tr>';
 	}
@@ -716,7 +725,7 @@ function printPostsGadget() {
 		if ($threaddata[$line['threadid']]['isanon']==1) {
 			echo '<td>', _('Anonymous'), '</td>';
 		} else {
-			echo '<td>'.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['LastName']).', '.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['FirstName']).'</td>';
+			echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['LastName']).', '.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['FirstName']).'</span></td>';
 		}
 		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';

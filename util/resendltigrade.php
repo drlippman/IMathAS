@@ -1,13 +1,13 @@
 <?php
 
-require("../init.php");
+require_once "../init.php";
 
 if ($myrights<100) {
 	echo "You are not authorized to view this page";
 	exit;
 }
 
-require("../header.php");
+require_once "../header.php";
 
 if (!isset($_POST['aid']) || !isset($_POST['uid'])) {
 	echo '<form method="post">';
@@ -18,7 +18,7 @@ if (!isset($_POST['aid']) || !isset($_POST['uid'])) {
 	$aid = Sanitize::onlyInt($_POST['aid']);
   $uid = Sanitize::onlyInt($_POST['uid']);
 
-	require("../includes/ltioutcomes.php");
+	require_once "../includes/ltioutcomes.php";
 
 	$stm = $DBH->prepare("SELECT ver,ptsposs FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
@@ -102,4 +102,4 @@ function getpts($scs) {
 	return $tot;
 }
 
-require("../footer.php");
+require_once "../footer.php";

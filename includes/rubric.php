@@ -2,7 +2,7 @@
 //IMathAS:  utility functions for rubrics
 //(c) 2011 David Lippman
 
-require_once(__DIR__ . "/sanitize.php");
+require_once __DIR__ . "/sanitize.php";
 
 //printrubrics
 //returns javascript string for rubric data

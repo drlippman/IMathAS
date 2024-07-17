@@ -11,7 +11,7 @@ if ($res===false) {
 	return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added level column to imas_courses</p>";
 

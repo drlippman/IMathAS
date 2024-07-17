@@ -2,7 +2,7 @@
 
 namespace Idealstack\DynamoDbSessionsDependencyFree;
 
-require_once(__DIR__ . '/AwsClient.php');
+require_once __DIR__ . '/AwsClient.php';
 
 /**
  * Class DynamoDbClient

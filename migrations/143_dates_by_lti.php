@@ -43,7 +43,7 @@ $DBH->beginTransaction();
  }
  
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added dates by LTI fields</p>";
 

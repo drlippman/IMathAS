@@ -4,9 +4,9 @@
 
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/diff.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/diff.php";
 
 
 
@@ -18,7 +18,7 @@ $body = "";
 
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
-$groupid = intval($_GET['grp']);
+$groupid = intval($_GET['grp'] ?? 0);
 $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 
 if (isset($_GET['framed'])) {
@@ -105,7 +105,7 @@ if ($cid==0) {
 	} else { //just viewing
 		$curBreadcrumb .= " &gt; View Wiki";
 
-		require_once("../filter/filter.php");
+		require_once "../filter/filter.php";
 
 		if (isset($teacherid) || $now<$row['editbydate']) {
 			$canedit = true;
@@ -171,6 +171,7 @@ if ($cid==0) {
 				}
 			}
 		} else {
+            $isgroup = false;
 			$groupid = 0;
 		}
 
@@ -244,7 +245,7 @@ if ($cid==0) {
 	$placeinhead .= '</script>';
  }
 
- require("../header.php");
+ require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -330,7 +331,7 @@ if (isset($teacherid)) {
 }
 echo '<p><span id="revisioninfo">Revision '.$numrevisions;
 if ($numrevisions>0) {
-	echo ".  Last edited by $lasteditedby on $lastedittime.";
+	echo ".  Last edited by <span class='pii-full-name'>$lasteditedby</span> on $lastedittime.";
 }
 echo '</span>';
 
@@ -362,5 +363,5 @@ if ($isgroup) {
 }
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

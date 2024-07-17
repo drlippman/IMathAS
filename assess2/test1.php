@@ -1,7 +1,7 @@
 <?php
 
-include("../init_without_validate.php");
-include('AssessInfo.php');
+require_once "../init_without_validate.php";
+require_once 'AssessInfo.php';
 
 $t = new AssessInfo($DBH, 527357, 'all');
 

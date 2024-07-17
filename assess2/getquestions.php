@@ -15,11 +15,11 @@
 
 
 $no_session_handler = 'json_error';
-require_once("../init.php");
-require_once("./common_start.php");
-require_once("./AssessInfo.php");
-require_once("./AssessRecord.php");
-require_once('./AssessUtils.php');
+require_once "../init.php";
+require_once "./common_start.php";
+require_once "./AssessInfo.php";
+require_once "./AssessRecord.php";
+require_once './AssessUtils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -49,6 +49,9 @@ if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';
   exit;
 }
+if ($canViewAll) {
+    $assess_record->setIncludeErrors(true); //only show errors to teachers/tutors
+}
 
 $assessInfoOut = array();
 
@@ -58,6 +61,9 @@ if ($assess_info->getSetting('submitby') == 'by_assessment' &&
 ) {
   echo '{"error": "active_attempt"}';
   exit;
+} else if (!$assess_record->hasStartedAssess()) {
+  echo '{"error": "not_ready"}';
+  exit;
 }
 
 // grab all questions settings and scores, based on end-of-assessment settings
@@ -65,6 +71,9 @@ $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsInGb();
 $assess_info->loadQuestionSettings('all', $reshowQs);
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs);
+
+// get showwork_after, showwork_cutoff (min), showwork_cutoff_in (timestamp)
+getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
 
 //prep date display
 prepDateDisp($assessInfoOut);

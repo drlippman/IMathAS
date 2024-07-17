@@ -170,13 +170,13 @@ function disableInputs(qn, disabled) {
    window.rendermathnode(qwrap);
    window.initSageCell(qwrap);
    window.initlinkmarkup(qwrap);
-   window.setInitValues(qwrap);
+   window.setInitValues(qwrap, jsparams);
 
    if (jsparams.disabled) {
      disableInputs(qn, jsparams.disabled);
    }
-
-   window.imathasAssess.init(jsparams, true, qwrap);
+   var useMQ = !jsparams.noMQ;
+   window.imathasAssess.init(jsparams, useMQ, qwrap);
 
    if (jsparams.helps && jsparams.helps.length > 0) {
      addHelps(qwrap, jsparams.helps);
@@ -214,7 +214,7 @@ function disableInputs(qn, disabled) {
    }
  }
 
- function setInitValues(qwrap) {
+ function setInitValues(qwrap, jsparams) {
    var regex = new RegExp('^(qn|tc|qs)\\d');
    window.$(qwrap).find('input,select,textarea').each(function (index, el) {
      if (el.name.match(regex)) {
@@ -223,7 +223,12 @@ function disableInputs(qn, disabled) {
            el.setAttribute('data-initval', el.value);
          }
        } else {
-         el.setAttribute('data-initval', el.value);
+         const qref = parseInt(el.name.substr(2));
+         if (jsparams[qref].qtype == 'draw' && el.value === '') {
+            el.setAttribute('data-initval', ';;;;;;;;');
+         } else {
+            el.setAttribute('data-initval', el.value);
+         }
        }
      }
    });
@@ -238,7 +243,7 @@ function disableInputs(qn, disabled) {
      const qn = qns[k];
      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
-       if ((m = el.name.match(regex)) !== null) {
+       if ((m = el.name.match(regex)) !== null && !el.name.match(/-val/)) {
          let thisChanged = false;
          if (el.type === 'radio' || el.type === 'checkbox') {
            if (el.checked && el.value !== el.getAttribute('data-initval')) {
@@ -310,17 +315,20 @@ function disableInputs(qn, disabled) {
      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
        if (el.name.match(regex)) {
-         valstr = window.imathasAssess.preSubmit(el.name.substr(2));
-         if (valstr !== false) {
-           if (forbackground) {
-             data.append(el.name + '-val', valstr);
-           } else {
-             $('#questionwrap' + qn).append($('<input>', {
-               type: 'hidden',
-               name: el.name + '-val',
-               value: valstr
-             }));
-           }
+         var namepts = el.name.split(/-/);
+         if (namepts.length == 1 || namepts[1] == '0') {
+            valstr = window.imathasAssess.preSubmit(namepts[0].substr(2));
+            if (valstr !== false) {
+                if (forbackground) {
+                    data.append(namepts[0] + '-val', valstr);
+                } else {
+                    $('#questionwrap' + qn).append($('<input>', {
+                    type: 'hidden',
+                    name: namepts[0] + '-val',
+                    value: valstr
+                    }));
+                }
+            }
          }
          if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
            if (el.type === 'file' && el.files.length > 0) {

@@ -3,10 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
-require("../includes/htmlutil.php");
-require("../includes/parsedatetime.php");
-require_once("../includes/filehandler.php");
+require_once "../init.php";
+require_once "../includes/htmlutil.php";
+require_once "../includes/parsedatetime.php";
+require_once "../includes/filehandler.php";
 
 
 
@@ -67,12 +67,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = Sanitize::encodeStringForDisplay($_GET['block']);
+	$block = Sanitize::encodeStringForDisplay($_GET['block'] ?? '0');
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
-            'cid' => $cid, 'folder' => $_GET['folder']));
+            'cid' => $cid, 'folder' => ($_GET['folder'] ?? 0)));
 	$page_formActionTag .= "&tb=$totb";
-	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
-	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
+	
+    if (!empty($_POST['title']) || !empty($_POST['text']) || !empty($_POST['sdate'])) { //if the form has been submitted
+        $caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 		$DBH->beginTransaction();
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -111,7 +112,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-		$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
+		$_POST['text'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['text']));
 
 		$outcomes = array();
 		if (isset($_POST['outcomes'])) {
@@ -162,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "(:courseid, :title, :text, :startdate, :enddate, :avail, :oncal, :caltag, :outcomes, :isplaylist);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':title'=>$_POST['title'], ':text'=>$_POST['text'], ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':avail'=>$_POST['avail'], ':oncal'=>$_POST['oncal'], ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist));
+				':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist));
 			$newtextid = $DBH->lastInsertId();
 			$_GET['id'] = $newtextid;
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
@@ -265,7 +266,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 
-	if ($_POST['submitbtn']=='Submit') {
+	if (isset($_POST['submitbtn']) && $_POST['submitbtn']=='Submit') {
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) .$btf."&r=" .Sanitize::randomQueryStringParam());
 		exit;
@@ -279,7 +280,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['title']=='##hidden##') {
 			$hidetitle = true;
 			$line['title']='';
-		}
+		} else {
+            $hidetitle = false;
+        }
 		$startdate = $line['startdate'];
 		$enddate = $line['enddate'];
 		$fileorder = explode(',',$line['fileorder']);
@@ -300,7 +303,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$line['text'] = "";
 		$line['avail'] = 1;
 		$line['oncal'] = 0;
-		$line['caltag'] = '!';
+        $line['caltag'] = '!';
+        $line['isplaylist'] = 0;
 		$altoncal = 0;
 		$startdate = time();
 		$enddate = time() + 7*24*60*60;
@@ -379,17 +383,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 	$outcomes = array();
-	function flattenarr($ar) {
-		global $outcomes;
-		foreach ($ar as $v) {
-			if (is_array($v)) { //outcome group
-				$outcomes[] = array($v['name'], 1);
-				flattenarr($v['outcomes']);
-			} else {
-				$outcomes[] = array($v, 0);
-			}
-		}
-	}
+	function flattenarr($ar, $deftype = 0) {
+        global $outcomes;
+        foreach ($ar as $v) {
+            if (is_array($v)) { //outcome group
+                $outcomes[] = array($v['name'], 1);
+                flattenarr($v['outcomes'], 2);
+            } else {
+                $outcomes[] = array($v, $deftype);
+            }
+        }
+    }
 	flattenarr($outcomearr);
 
 	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $gid : "";
@@ -398,7 +402,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -407,7 +411,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . $gid ?>";
+	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . ($gid ?? 0) ?>";
 
 	if (to != from) {
 		$("#ms-"+from).after('<input type=hidden name=movefile value="'+from+'" />')
@@ -550,5 +554,5 @@ $(function() { chghidetitle(); });
 	<p><sup>*</sup>Avoid quotes in the filename</p>
 <?php
 }
-	require("../footer.php");
+	require_once "../footer.php";
 ?>

@@ -15,7 +15,7 @@ $query = 'CREATE TABLE `imas_teacher_audit_log` (
   INDEX `courseuser` (`courseid`,`userid`),
   INDEX `actionid` (`action`, `itemid`),
   INDEX `created_at` (`created_at`)
-) ENGINE=InnoDB;';
+) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
 $res = $DBH->query($query);
 if ($res===false) {
     echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
@@ -23,7 +23,7 @@ if ($res===false) {
     return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 echo '<p>table imas_teacher_audit_log created</p>';
 
 return true;

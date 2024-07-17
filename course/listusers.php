@@ -5,7 +5,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../init.php");
+require_once "../init.php";
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -34,15 +34,20 @@ $showSID = (($rmode&2)==2);
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
+$placeinhead = "";
 $hasInclude = 0;
+$istutor = isset($tutorid);
+$isteacher = isset($teacherid);
 if (!isset($CFG['GEN']['allowinstraddstus'])) {
 	$CFG['GEN']['allowinstraddstus'] = true;
 }
 if (!isset($CFG['GEN']['allowinstraddtutors'])) {
 	$CFG['GEN']['allowinstraddtutors'] = true;
 }
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
@@ -61,11 +66,11 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 	if (isset($_GET['assigncode'])) {
 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
 		$pagetitle = "Assign Section/Code Numbers";
 
 		if (isset($_POST['submit'])) {
-			$keys = array_keys($_POST['sec']);
+			$keys = array_keys($_POST['sec'] ?? []);
 			foreach ($keys as $stuid) {
 				if ($_POST['sec'][$stuid]=='') {
 					$_POST['sec'][$stuid] = null;
@@ -74,7 +79,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$_POST['code'][$stuid] = null;
 				}
             }
-            require('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
 			foreach ($keys as $stuid) {
 				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
                 $stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
@@ -92,7 +97,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 	} elseif (isset($_GET['enroll']) && ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true))) {
 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
 
 		if (isset($_POST['username'])) {
@@ -135,7 +140,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-                require('../includes/setSectionGroups.php');
+                require_once '../includes/setSectionGroups.php';
                 setSectionGroups($id, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
@@ -143,19 +148,19 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		}
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
-			require_once("../includes/newusercommon.php");
+			require_once "../includes/newusercommon.php";
 			$errors = checkNewUserValidation(array('SID','firstname','lastname','email','pw1'));
 			if ($errors != '') {
 				$overwriteBody = 1;
 				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
 				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once("../includes/password.php");
+					require_once "../includes/password.php";
 					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
 					$md5pw = md5($_POST['pw1']);
@@ -181,16 +186,16 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-                require('../includes/setSectionGroups.php');
+                require_once '../includes/setSectionGroups.php';
                 setSectionGroups($newuserid, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
 		}
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
 			$ulist = implode(',', array_map('intval', $_POST['checked']));
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
 			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid AND imas_users.id IN ($ulist) ";
@@ -206,10 +211,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 
 		if (isset($_POST['timelimitmult'])) {
 			$msgout = '';
@@ -226,7 +231,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$updateusername = false;
 				}
 				if ($updateusername) {
-					$msgout .= '<p>Username changed to '.Sanitize::encodeStringForDisplay($un).'</p>';
+					$msgout .= '<p>Username changed to <span class="pii-username">'.Sanitize::encodeStringForDisplay($un).'</span></p>';
 				} else {
 					$msgout .= '<p>Username left unchanged</p>';
 				}
@@ -249,7 +254,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 						$msgout .= '<p>Invalid password - left unchanged</p>';
 					} else {
 						if (isset($CFG['GEN']['newpasswords'])) {
-							require_once("../includes/password.php");
+							require_once "../includes/password.php";
 							$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 						} else {
 							$newpw = md5($_POST['pw1']);
@@ -302,10 +307,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
 				$stm->execute(array(':locked'=>$locked, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
             }
-            require('../includes/setSectionGroups.php');
+            require_once '../includes/setSectionGroups.php';
             setSectionGroups($_GET['uid'], $cid, $section);
 
-			require('../includes/userpics.php');
+			require_once '../includes/userpics.php';
 
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
@@ -325,13 +330,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 
 
-			require("../header.php");
+			require_once "../header.php";
 			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 			echo '<div id="headerlistusers" class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			echo "<p>User info updated. ";
 			echo $msgout;
 			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
-			require("../footer.php");
+			require_once "../footer.php";
 
 			//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
@@ -353,16 +358,14 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "massexception.php";
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "unenroll.php";
 
 	} elseif (isset($_GET['action']) && $_GET['action']=="lock") {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "LockStudents";
 		$calledfrom='lu';
 		$overwriteBody = 1;
@@ -384,7 +387,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION HERE
 
-		$curBreadcrumb .= " &gt; Roster\n";
+		$curBreadcrumb .= " Roster\n";
 		$pagetitle = "Student Roster";
 		$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL ORDER BY section");
 		$stm->execute(array(':courseid'=>$cid));
@@ -456,7 +459,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 //$pagetitle = "Student List";
 
 /******* begin html output ********/
-if ($fileToInclude==null || $fileToInclude=="") {
+if (empty($fileToInclude)) {
 
 $placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgsecfilter() { ';
@@ -500,7 +503,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   }
   </script>';
 
-require("../header.php");
+require_once "../header.php";
 $curdir = rtrim(dirname(__FILE__), '/\\');
 }
 /**** post-html data manipulation ******/
@@ -510,7 +513,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 /***** php display blocks are interspersed throughout the html as needed ****/
 if ($overwriteBody==1) {
 	if (strlen($body)<2) {
-		include("./$fileToInclude");
+		require_once "./$fileToInclude";
 	} else {
 		echo $body;
 	}
@@ -524,6 +527,7 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&assigncode=1">
 		<table class=gb>
+        <caption class="sr-only">Students</caption>
 			<thead>
 			<tr>
 				<th>Name</th><th>Section</th><th>Code</th>
@@ -534,7 +538,7 @@ if ($overwriteBody==1) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
-				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></span>
                     <input type="hidden" name="uid[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" />
                 </td>
 				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
@@ -552,7 +556,7 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="listusers.php?enroll=student&cid=<?php echo $cid ?>">
 		<span class=form>Username to enroll:</span>
-		<span class=formright><input type="text" name="username"></span><br class=form>
+		<span class=formright><input type="text" class="pii-username" name="username"></span><br class=form>
 		<span class=form>Section (optional):</span>
 		<span class=formright><input type="text" name="section"></span><br class=form>
 		<span class=form>Code (optional):</span>
@@ -564,11 +568,12 @@ if ($overwriteBody==1) {
 ?>
 
 	<form method=post id=pageform class=limitaftervalidate action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
-		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>
-	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=text size=20 id=pw1 name=pw1><BR class=form>
-	<span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname><BR class=form>
-	<span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>
-	<span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>
+    <div id="errorlive" aria-live="polite" class="sr-only"></div>
+	<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class="form pii-username" type=text size=12 id=SID name=SID><BR class=form>
+	<span class=form><label for="pw1">Choose a password:</label></span><input class="form pii-security" type=text size=20 id=pw1 name=pw1><BR class=form>
+	<span class=form><label for="firstname">Enter First Name:</label></span> <input class="form pii-first-name" type=text size=20 id=firstname name=firstname><BR class=form>
+	<span class=form><label for="lastname">Enter Last Name:</label></span> <input class="form pii-last-name" type=text size=20 id=lastname name=lastname><BR class=form>
+	<span class=form><label for="email">Enter E-mail address:</label></span>  <input class="form pii-email" type=text size=60 id=email name=email><BR class=form>
 	<span class=form>Section (optional):</span>
 		<span class=formright><input type="text" name="section"></span><br class=form>
 	<span class=form>Code (optional):</span>
@@ -577,10 +582,10 @@ if ($overwriteBody==1) {
 	</form>
 
 <?php
-		require_once("../includes/newusercommon.php");
+		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform");
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
-		if (count($_POST['checked'])==0) {
+		if (empty($_POST['checked'])) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
 		} else {
 			echo '<textarea id="emails" rows="30" cols="60">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
@@ -595,24 +600,25 @@ if ($overwriteBody==1) {
 		}
 ?>
 		<form enctype="multipart/form-data" id=pageform method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>" class="limitaftervalidate"/>
-			<span class=form><label for="SID">User Name (login name):</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=20 id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
+            <div id="errorlive" aria-live="polite" class="sr-only"></div>
+            <span class=form><label for="SID">User Name (login name):</label></span>
+			<input <?php echo $disabled;?> class="form pii-username" type=text size=20 id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
 			<span class=form><label for="firstname">First Name:</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
+			<input <?php echo $disabled;?> class="form pii-first-name" type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
 			<span class=form><label for="lastname">Last Name:</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=20 id=lastname name=lastname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['LastName']); ?>"/><BR class=form>
+			<input <?php echo $disabled;?> class="form pii-last-name" type=text size=20 id=lastname name=lastname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['LastName']); ?>"/><BR class=form>
 			<span class=form><label for="email">E-mail address:</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=60 id=email name=email value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['email']); ?>"/><BR class=form>
+			<input <?php echo $disabled;?> class="form pii-email" type=text size=60 id=email name=email value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['email']); ?>"/><BR class=form>
 			<span class=form><label for="stupic">Picture:</label></span>
 			<span class="formright">
 			<?php
 		if ($lineStudent['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
-				echo "<img src=\"$imasroot/course/files/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			}
 		} else {
 			echo "No Pic ";
@@ -641,8 +647,11 @@ if ($overwriteBody==1) {
 		</form>
 
 <?php
-		$requiredrules = array('pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}');
-		require_once("../includes/newusercommon.php");
+		$requiredrules = array(
+            'pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}',
+            'email' => 'function(el) { return $("#SID").val().substring(0,4) != "lti-" }'
+        );
+		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
 	} else {
 ?>
@@ -694,19 +703,21 @@ if ($overwriteBody==1) {
 	if ($CFG['GEN']['allowinstraddtutors']) {
 		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
 	}
-	echo '</span>';
-	echo '<span class="column" style="width:auto;">';
-	if ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true)) {
-		echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
-	}
-	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
-	if (isset($CFG['GEN']['allowinstraddstus']) && $CFG['GEN']['allowinstraddstus']==true) {
-		echo '</span><span class="column" style="width:auto;">';
-		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
-		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
-	}
-	echo '</span>';
-	echo '<br class="clear"/>';
+    echo '</span>';
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo '<span class="column" style="width:auto;">';
+        if ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true)) {
+            echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+        }
+        echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
+        if (isset($CFG['GEN']['allowinstraddstus']) && $CFG['GEN']['allowinstraddstus']==true) {
+            echo '</span><span class="column" style="width:auto;">';
+            echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
+            echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
+        }
+        echo '</span>';
+    }
+    echo '<br class="clear"/>';
 	echo '</div>';
 	echo '<p>Pictures: <select id="picsize" onchange="chgpicsize()">';
 	echo "<option value=0 selected>", _('None'), "</option>";
@@ -742,6 +753,7 @@ if ($overwriteBody==1) {
 		</p>
 
 	<table class=gb id=myTable>
+    <caption class="sr-only">Roster</caption>
 		<thead>
 		<tr>
 			<th></th>
@@ -798,9 +810,9 @@ if ($overwriteBody==1) {
 
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
+			echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		} else {
-			echo "<img src=\"$imasroot/course/files/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
+			echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		}
 	}
 ?>
@@ -812,23 +824,23 @@ if ($overwriteBody==1) {
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
 				if ($line['locked']>0) {
-					echo '<span class="greystrike">'.$nameline.'</span></td>';
+					echo '<span class="greystrike pii-full-name">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
-						echo '<td><span class="greystrike">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
+						echo '<td><span class="greystrike pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
 					}
 					if ($showemail) {
 						echo '<td><span class="greystrike">'.Sanitize::emailAddress($line['email']).'</span></td>';
 					}
 					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
-					echo $nameline.'</td>';
+					echo '<span class="pii-full-name">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
-						echo '<td>'.Sanitize::encodeStringForDisplay($line['SID']).'</td>';
+						echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
 					}
 					if ($showemail) {
-						echo '<td>'.Sanitize::emailAddress($line['email']).'</td>';
+						echo '<td><span class="pii-email">'.Sanitize::emailAddress($line['email']).'</span></td>';
 					}
 					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></td>';
 				}
@@ -889,5 +901,5 @@ if ($overwriteBody==1) {
 	}
 }
 
-require("../footer.php");
+require_once "../footer.php";
 ?>

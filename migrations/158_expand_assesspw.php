@@ -11,7 +11,7 @@ $DBH->beginTransaction();
 	return false;
  }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Expanded assessment password field to 254 chars</p>";
 

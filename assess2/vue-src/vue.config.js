@@ -1,4 +1,6 @@
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+    .BundleAnalyzerPlugin;
 
 module.exports = {
   outputDir: path.resolve(__dirname, '../vue'),
@@ -19,6 +21,17 @@ module.exports = {
       config.plugins.delete('preload');
       config.plugins.delete('prefetch');
       config.plugins.delete('copy');
+    }
+    //config.plugin("webpack-bundle-analyzer").use(BundleAnalyzerPlugin);
+  },
+  // see https://github.com/vuejs/vue-cli/issues/1768 for handling legacy naming
+  configureWebpack () {
+    const legacy = process.env.VUE_CLI_MODERN_BUILD ? "" : ".legacy";
+    return {
+      output: {
+        filename: 'js/[name]' + legacy + '.js',
+        chunkFilename: 'js/[name]' + legacy + '.js?v=[chunkhash]'
+      }
     }
   },
   // in dev server mode, proxy all requests to localhost

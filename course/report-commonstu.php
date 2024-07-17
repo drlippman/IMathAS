@@ -2,8 +2,8 @@
 //IMathAS: Student sorting report
 //(c) 2018 David Lippman
 
-require("../init.php");
-require("../includes/report-commonstu-funcs.php");
+require_once "../init.php";
+require_once "../includes/report-commonstu-funcs.php";
 
 if (!isset($teacherid)) {
 	echo "Not authorized";
@@ -30,7 +30,11 @@ $now = time();
 $defsdate = tzdate('n/j/Y', $now);
 $defedate = tzdate('n/j/Y', $now+7*24*60*60);
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>';
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
@@ -63,7 +67,7 @@ $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDi
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 
-require("../header.php");
+require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -246,8 +250,8 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 </div>
 
 <script type="text/javascript">
-var app = new Vue({
-	el: '#app',
+const { createApp } = Vue;
+createApp({
 	computed: {
 		rulePhrases: function() {
 			var phrases = [];
@@ -319,56 +323,58 @@ var app = new Vue({
 			return out;
 		}
 	},
-	data: {
-		activeRuleSet: -1,
-		selectedRuleSet: 0,
-		editingRuleSet: -1,
-		allRules: [],
-		curRuleSetName: '',
-		ruleSets: <?php echo json_encode($rulesets, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>,
-		currentRule: {
-			ruleType: 'none',
-			abovebelow: 0,
-			scorebreak: 75,
-			gbcat: 0,
-			timeframe: 'inlast',
-			inlastDays: 5,
-			innextDays: 1,
-			closeTime: 24,
-			numassn: 1,
-			numLP: 1,
-			dayofweek: 1,
-			tocnt: 0,
-			sdate: '<?php echo $defsdate;?>',
-			edate: '<?php echo $defedate;?>',
-			editIndex: -1
-		},
-		ruleTypes: {
-			'none': _('Select...'),
-			'score': _('Score average'),
-			'scores': _('Scores'),
-			'comp': _('Completion'),
-			'start': _('Starting'),
-			'late': _('LatePass'),
-			'close': _('Last Minute')
-		},
-		abovebelowTypes: ['above','below'],
-		gbcatTypes: <?php echo json_encode($gbcats, JSON_INVALID_UTF8_IGNORE); ?>,
-		timeframeTypes: {
-			'since': _('since'),
-			'between': _('between'),
-			'inlast': _('in the last'),
-			'thisweek': _('this week, since'),
-			'week': _('last week, ending on'),
-			'due': _('due by midnight in')
-		},
-		numassnTypes: ['no','one','all'],
-		cntTypes: ['past due','past due or available','attempted','past due or attempted'],
-		dayofweekTypes: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-		results: [],
-		showResults: false,
-		resultMessage: '',
-		resultRuleSet: -1
+	data: function () {
+        return {
+            activeRuleSet: -1,
+            selectedRuleSet: 0,
+            editingRuleSet: -1,
+            allRules: [],
+            curRuleSetName: '',
+            ruleSets: <?php echo json_encode($rulesets, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>,
+            currentRule: {
+                ruleType: 'none',
+                abovebelow: 0,
+                scorebreak: 75,
+                gbcat: 0,
+                timeframe: 'inlast',
+                inlastDays: 5,
+                innextDays: 1,
+                closeTime: 24,
+                numassn: 1,
+                numLP: 1,
+                dayofweek: 1,
+                tocnt: 0,
+                sdate: '<?php echo $defsdate;?>',
+                edate: '<?php echo $defedate;?>',
+                editIndex: -1
+            },
+            ruleTypes: {
+                'none': _('Select...'),
+                'score': _('Score average'),
+                'scores': _('Scores'),
+                'comp': _('Completion'),
+                'start': _('Starting'),
+                'late': _('LatePass'),
+                'close': _('Last Minute')
+            },
+            abovebelowTypes: ['above','below'],
+            gbcatTypes: <?php echo json_encode($gbcats, JSON_INVALID_UTF8_IGNORE); ?>,
+            timeframeTypes: {
+                'since': _('since'),
+                'between': _('between'),
+                'inlast': _('in the last'),
+                'thisweek': _('this week, since'),
+                'week': _('last week, ending on'),
+                'due': _('due by midnight in')
+            },
+            numassnTypes: ['no','one','all'],
+            cntTypes: ['past due','past due or available','attempted','past due or attempted'],
+            dayofweekTypes: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+            results: [],
+            showResults: false,
+            resultMessage: '',
+            resultRuleSet: -1
+        };
 	},
 	methods: {
 		move: function(index,delta) {
@@ -480,8 +486,8 @@ var app = new Vue({
 			GB_show('Emails', 'viewemails.php?cid='+cid+'&ids='+this.resultsStuList[index], 760,'auto');
 		}
 	}
-});
+}).mount('#app');
 </script>
 
 <?php
-require("../footer.php");
+require_once "../footer.php";

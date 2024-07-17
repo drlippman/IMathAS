@@ -2,8 +2,8 @@
 //Calendar export for import into Canvas
 //(c) 2017 David Lippman for IMathAS
 
-require("../init.php");
-require("../includes/calendardata.php");
+require_once "../init.php";
+require_once "../includes/calendardata.php";
 
 if (!isset($teacherid)) {
 	echo "You are not authorized to view this page";

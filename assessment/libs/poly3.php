@@ -14,7 +14,7 @@ if(!is_array($allowedmacros)) {
 
 array_push($allowedmacros, "formpoly3fromstring", "formpoly3fromresults", "dividepoly3", "longdivisionpoly3", "writepoly3");
 
-include_once("fractions.php");  // fraction routine
+require_once "fractions.php";  // fraction routine
 
 // function formpoly3fromstring(variable, polynomialstring, [IsFraction=TRUE])
 // Creates an array of coefficients whose position in the array
@@ -162,7 +162,7 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 //
 function formpoly3fromresults($results, $IsFraction=TRUE)
 {
-	if(is_null(results)) {
+	if(is_null($results)) {
 		echo "formpoly3fromresults - the polynomial is null - FAIL.<br/>\r\n";
         return null;
 	}
@@ -361,7 +361,7 @@ function poly3_fractionsubtract($minuend,$subtrahend){
 	$powerminuend = count($minuend)-1;
 	$powersubtrahend = count($subtrahend)-1;
 	if($powerminuend!=$powersubtrahend) {
-    	echo "poly3_fractionsubtract - polynomials are different - ERROR.<br/>\r\n minuend=".var_dump($minuend)."<br/>\r\n subtrahend=".var_dump($subtrahend)."<br/>\r\n";
+    	echo "poly3_fractionsubtract - polynomials are different - ERROR.";
 	}
 
 	$power = max($powerminuend,$powersubtrahend);
@@ -442,7 +442,7 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 	$powerminuend = count($minuend)-1;
 	$powersubtrahend = count($subtrahend)-1;
 	if($powerminuend!=$powersubtrahend) {
-    	echo "poly3_fractionsubtract - polynomials are different - ERROR.<br/>\r\n minuend=".var_dump($minuend)."<br/>\r\n subtrahend=".var_dump($subtrahend)."<br/>\r\n";
+    	echo "poly3_fractionsubtract - polynomials are different - ERROR,";
 	}
 
 	$power = max($powerminuend,$powersubtrahend);

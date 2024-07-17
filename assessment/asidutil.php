@@ -2,7 +2,7 @@
 //IMathAS:  Assessment Session utility functions
 //(c) 2007 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
+require_once __DIR__ . "/../includes/sanitize.php";
 
 function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 	global $DBH;

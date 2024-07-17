@@ -26,13 +26,14 @@ class ErrorHandler
      * @return bool
      */
     public static function evalErrorHandler(int $errno, string $errstr, string $errfile,
-                                            int $errline, array $errcontext): bool
+                                            int $errline, array $errcontext = []): bool
     {
       if (E_WARNING == $errno || E_ERROR == $errno) {
-        error_log(sprintf('Caught error by QuestionGenerator in %s:%s -- %s',
-            $errfile, $errline, $errstr));
+        error_log(sprintf('Caught error by QuestionGenerator in %s in QSID %d:%s -- %s',
+            $errfile, $GLOBALS['curqsetid'], $errline, $errstr));
 
         if (extension_loaded('newrelic')) {
+            newrelic_add_custom_parameter('cur_qsid', $GLOBALS['curqsetid']);
             newrelic_notice_error($errno, $errstr, $errfile, $errline, $errcontext);
         }
       }
@@ -52,10 +53,12 @@ class ErrorHandler
      */
     public static function evalExceptionHandler(Throwable $t): void
     {
-        error_log(sprintf('Caught exception by QuestionGenerator from %s:%d -- %s',
-            $t->getFile(), $t->getLine(), $t->getMessage()));
+
+        error_log(sprintf('Caught exception by QuestionGenerator from %s in QSID %d:%s -- %s',
+            $t->getFile(), $GLOBALS['curqsetid'], $t->getLine(), $t->getMessage()));
 
         if (extension_loaded('newrelic')) {
+            newrelic_add_custom_parameter('cur_qsid', $GLOBALS['curqsetid']);
             newrelic_notice_error($t);
         }
     }

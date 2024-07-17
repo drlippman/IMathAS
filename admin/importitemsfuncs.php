@@ -3,9 +3,9 @@
 //JSON edition
 //(c) 2017 David Lippman
 
-require_once("../includes/htmLawed.php");
-require_once("../includes/updateptsposs.php");
-require_once("../includes/migratesettings.php");
+require_once "../includes/htmLawed.php";
+require_once "../includes/updateptsposs.php";
+require_once "../includes/migratesettings.php";
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {
@@ -104,7 +104,10 @@ public function importdata($data, $cid, $checked, $options) {
 	}
 	if (!isset($this->options['importlib'])) {
 		$this->options['importlib'] = 0;
-	}
+    }
+    if (!isset($this->options['skipcopyrighted'])) {
+		$this->options['skipcopyrighted'] = 1;
+    }
 
 	$stm = $DBH->prepare("SELECT itemorder,blockcnt,ownerid,dates_by_lti FROM imas_courses WHERE id=?");
 	$stm->execute(array($this->cid));
@@ -225,12 +228,12 @@ public function importdata($data, $cid, $checked, $options) {
 	return array(
 		'Questions Added'=>$this->qsadded,
 		'Questions Updated'=>$this->qmodcnt,
-		'InlineText Imported'=>ecount($this->typemap['InlineText']),
-		'Linked Imported'=>ecount($this->typemap['LinkedText']),
-		'Forums Imported'=>ecount($this->typemap['Forum']),
-		'Assessments Imported'=>ecount($this->typemap['Assessment']),
-		'Drills Imported'=>ecount($this->typemap['Drill']),
-		'Wikis Imported'=>ecount($this->typemap['Wiki'])
+		'InlineText Imported'=>ecount($this->typemap['InlineText'] ?? 0),
+		'Linked Imported'=>ecount($this->typemap['LinkedText'] ?? 0),
+		'Forums Imported'=>ecount($this->typemap['Forum'] ?? 0),
+		'Assessments Imported'=>ecount($this->typemap['Assessment'] ?? 0),
+		'Drills Imported'=>ecount($this->typemap['Drill'] ?? 0),
+		'Wikis Imported'=>ecount($this->typemap['Wiki'] ?? 0)
 		);
 }
 
@@ -376,7 +379,10 @@ private function importQuestionSet() {
 		if ($this->data['items'][$item]['type']=='Assessment') {
 			$qids = $this->getAssessQids($this->data['items'][$item]['data']['itemorder']);
 			foreach ($qids as $qid) {
-				$qsid = $this->data['questions'][$qid]['questionsetid'];
+                $qsid = $this->data['questions'][$qid]['questionsetid'];
+                if ($this->data['questionset'][$qsid]['license'] == 0 && $this->options['skipcopyrighted']) {
+                    continue; // skip it
+                }
 				$qstoimport[] = $qsid;
 				if (isset($this->data['questionset'][$qsid]['dependencies'])) {
 					$qstoimport = array_merge($qstoimport, $this->data['questionset'][$qsid]['dependencies']);
@@ -460,7 +466,7 @@ private function importQuestionSet() {
 		foreach ($db_fields['questionset'] as $field) {
 			$exarr[] = $this->data['questionset'][$exportqid][$field];
 		}
-		if ($this->data['questionset'][$exportqid]['hasimg']==1 && count($this->data['questionset'][$exportqid]['qimgs'])>0) {
+		if ($this->data['questionset'][$exportqid]['hasimg']==1 && !empty($this->data['questionset'][$exportqid]['qimgs'])) {
 			$qimgs[$exportqid] = $this->data['questionset'][$exportqid]['qimgs'];
 		}
 		if (count($exarr)>2000) { //do a batch add
@@ -619,8 +625,7 @@ private function insertLinked() {
 			if ($newfn!==false) {
 				$this->data['items'][$toimport]['data']['text'] = 'file:'.$this->cid.'/'.$newfn;
 			}else {
-				echo "fail on rehost";
-				exit;
+				echo "fail on rehost of file " . Sanitize::encodeStringforDisplay($this->data['items'][$toimport]['data']['text']) . ' in linked item ' . Sanitize::encodeStringForDisplay($this->data['items'][$toimport]['data']['title']);
 			}
 		} else if (substr($this->data['items'][$toimport]['data']['text'],0,8)=='exttool:') {
 			//remap gbcategory
@@ -849,11 +854,16 @@ private function insertAssessment() {
 	}
 	$this->qmap = array();
 	$qpoints = array();
+    $qec = array();
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$tomap = array();
 		$qids = $this->getAssessQids($this->data['items'][$toimport]['data']['itemorder']);
 		$exarr = array();
 		foreach ($qids as $qid) {
+            if (!isset($this->qsmap[$this->data['questions'][$qid]['questionsetid']])) {
+                // if question was skipped in import, skip here too
+                continue;
+            }
 			$tomap[] = $qid;
 			//remap questionsetid
 			$this->data['questions'][$qid]['questionsetid'] = $this->qsmap[$this->data['questions'][$qid]['questionsetid']];
@@ -861,6 +871,9 @@ private function insertAssessment() {
 			if ($this->data['questions'][$qid]['points']<9999) {
 				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
 			}
+            if (!empty($this->data['questions'][$qid]['extracredit'])) {
+                $qec[$qid] = $this->data['questions'][$qid]['extracredit'];
+            }
 			// adjust settings if needed
 			if (!isset($this->data['items'][$toimport]['data']['ver'])) {
 				$this->data['items'][$toimport]['data']['ver'] = 1;
@@ -902,27 +915,51 @@ private function insertAssessment() {
 		}
 		//remap itemorder and collapse
 		$mappedqpoints = array();
-		$aitems = $thisitemdata['itemorder'];
+        $mappedqec = array();
+        $aitems = $thisitemdata['itemorder'];
+        $newitems = [];
 		foreach ($aitems as $i=>$q) {
 			if (is_array($q)) {
+                $newsub = []; 
+                $haspreamble = false;
 				foreach ($q as $k=>$subq) {
-					if ($k==0 && strpos($subq,'|')!==false) {continue;}
+                    if ($k==0 && strpos($subq,'|')!==false) { // is start of group marker
+                        $newsub[] = $subq;
+                        $haspreamble = true;
+                        continue;
+                    }
 					if (isset($qpoints[$subq])) {
 						$mappedqpoints[$this->qmap[$subq]] = $qpoints[$subq];
-					}
-					$q[$k] = $this->qmap[$q[$k]];
-				}
-				$aitems[$i] = implode('~',$q);
-			} else {
-				$aitems[$i] = $this->qmap[$q];
+                    }
+                    if (isset($qec[$subq])) {
+                        $mappedqec[$this->qmap[$subq]] = $qec[$subq];
+                    }
+                    if (isset($this->qmap[$q[$k]])) {
+                        $newsub[] = $this->qmap[$q[$k]];
+                    }
+                }
+                if (count($newsub) == 1) { // if only one in group, ungroup
+                    if (!$haspreamble) {
+                        $newitems[] = $newsub[0];
+                    }
+                } else if ($haspreamble && count($newsub) == 2) {
+                    $newitems[] = $newsub[1];
+                } else {
+                    $newitems[] = implode('~',$newsub);
+                }
+			} else if (isset($this->qmap[$q])) {
+				$newitems[] = $this->qmap[$q];
 				if (isset($qpoints[$q])) {
 					$mappedqpoints[$this->qmap[$q]] = $qpoints[$q];
 				}
+                if (isset($qec[$q])) {
+                    $mappedqec[$this->qmap[$q]] = $qec[$q];
+                }
 			}
 		}
-		$aitemorder = implode(',', $aitems);
+		$aitemorder = implode(',', $newitems);
 		if (!isset($thisitemdata['ptsposs']) || $thisitemdata['ptsposs']==-1) {
-			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $thisitemdata['defpoints']);
+			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $mappedqec, $thisitemdata['defpoints']);
 		}
 		$a_upd_stm->execute(array($rsaid, $aitemorder, $thisitemdata['ptsposs'], $this->typemap['Assessment'][$toimport]));
 	}

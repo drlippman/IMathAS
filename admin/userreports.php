@@ -2,7 +2,7 @@
 //IMathAS: User reports front page view
 //(c) David Lippman 2018 for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 
 
 function getRoleNameByRights($rights) {
@@ -46,7 +46,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     $curBreadcrumb = $curBreadcrumb . ' <a href="userreports.php">' . _('User Reports') . '</a> &gt; ' . _("Group Members");
 
   } else if (!empty($_GET['findteacher'])) {
-    require("../includes/userutils.php");
+    require_once "../includes/userutils.php";
     
     //search for a user (teacher or regular)
     $limitToTeacher = true;
@@ -124,7 +124,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-require("../header.php");
+require_once "../header.php";
 
 if ($overwriteBody==1) {
  echo $body;
@@ -138,7 +138,7 @@ if ($overwriteBody==1) {
   	echo '<a href="userreports.php?listgroups=true">',_('Groups List'),'</a> <br/>';
   	echo '<a href="../util/listnewteachers.php">',_('New Instructors Report');
   	echo '</span><span class="column">';
-  	echo '<a href="forms.php?from=userreports&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
+  	echo '<a href="forms.php?from=userreports&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup ?? 0).'">'._('Add New User').'</a>';
     echo '<br/><a href="../util/batchcreateinstr.php?from=userreports">'._('Batch Add Instructors').'</a>';
   	echo '</span>';
   	echo '<div class=clear></div></div>';
@@ -163,10 +163,10 @@ if ($overwriteBody==1) {
         foreach ($possible_users as $user) {
           $priorityclass = "p".Sanitize::onlyInt($user['priority']);
           if ($alt==0) {echo "<tr class=\"even $priorityclass\">"; $alt=1;} else {echo "<tr class=\"odd $priorityclass\">"; $alt=0;}
-          echo '<td><a href="userreportdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
-          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']) . '</a></td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['SID']).'</td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['email']).'</td>';
+          echo '<td><a href="userreportdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'"><span class="pii-full-name">';
+          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']) . '</span></a></td>';
+          echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($user['SID']).'</span></td>';
+          echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($user['email']).'</span></td>';
           echo '<td>'.Sanitize::encodeStringForDisplay(getRoleNameByRights($user['rights'])).'</td>';
           if ($user['name']===null) {
           	  echo '<td></td>';
@@ -233,9 +233,10 @@ if ($overwriteBody==1) {
           } else {
             echo '<td><a href="userdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
           }
-          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']).'</a></td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['SID']).'</td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['email']).'</td>';
+          echo '<span class="pii-full-name">';
+          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']).'</span></a></td>';
+          echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($user['SID']).'</span></td>';
+          echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($user['email']).'</span></td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['role']).'</td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['lastaccess']).'</td>';
           echo '</tr>';
@@ -269,4 +270,4 @@ if ($overwriteBody==1) {
 
 }
 
-require("../footer.php");
+require_once "../footer.php";

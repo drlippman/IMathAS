@@ -14,7 +14,7 @@
 //use "sortby" with consecutive values to specify order in characteristics
 //should be used to sort values. Use negative for a descending sort
 
-require("../init.php");
+require_once "../init.php";
 if (!isset($CFG['coursebrowser'])) {
 	echo "Course Browser is not enabled on this site";
 	exit;
@@ -97,6 +97,7 @@ function getCourseBrowserJSON() {
   	  	  	  	  $orderref[$k] = $i;
   	  	  	  	  $i++;
   	  	  	  }
+              $orderref['undef'] = $i;
   	  	  	  $sortby[$loc]['ref'] = $orderref;
   	  	  }
   	  }
@@ -112,10 +113,10 @@ function getCourseBrowserJSON() {
   			continue;
   		}
   		$aval = $a[$sortinf['prop']];
-  		if (is_array($aval)) { $aval = $aval[0];}
+  		if (is_array($aval)) { $aval = $aval[0] ?? 'undef';}
   		$bval = $b[$sortinf['prop']];
-  		if (is_array($bval)) { $bval = $bval[0];}
-  		if (isset($sortinf['ref'])) {
+  		if (is_array($bval)) { $bval = $bval[0] ?? 'undef';}
+  		if (isset($sortinf['ref']) && isset($sortinf['ref'][$aval]) && isset($sortinf['ref'][$bval])) {
   			if ($sortinf['ref'][$aval] != $sortinf['ref'][$bval]) {
   				return (($sortinf['ref'][$aval] < $sortinf['ref'][$bval])? -1 : 1)*($sortinf['asc']?1:-1);
   			}
@@ -136,12 +137,16 @@ $placeinhead = '<script type="text/javascript">';
 $placeinhead .= 'var courses = '.getCourseBrowserJSON().';';
 $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'";';
 $placeinhead .= '</script>';
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>
-<script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
+if (!empty($CFG['GEN']['uselocaljs'])) {
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
+} else {
+    $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+}
+$placeinhead .= '<script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
 $pagetitle = _('Course Browser');
-require("../header.php");
+require_once "../header.php";
 
 if (!isset($_GET['embedded'])) {
   $curBreadcrumb = $breadcrumbbase . _('Course Browser');
@@ -196,7 +201,9 @@ if (!isset($_GET['embedded'])) {
   		<b>{{ course.name }}</b>
   	</div>
 	<div class="card-main">
-		<table class="proplist"><tbody>
+		<table class="proplist">
+        <caption class="sr-only">Course Details</caption>
+        <tbody>
 		<tr v-for="(propval,propname) in courseOut(course)">
 			<th>{{ courseBrowserProps[propname].name }}</th>
 			<td v-if="!Array.isArray(propval)"> {{ propval }} </td>
@@ -210,8 +217,7 @@ if (!isset($_GET['embedded'])) {
 		</tr>
 
 		</tbody></table>
-		<p v-for="(propval,propname) in course"
-		   v-if="courseBrowserProps[propname] && courseBrowserProps[propname].type && courseBrowserProps[propname].type=='textarea'"
+		<p v-for="(propval,propname) in courseText(course)"
 		   class="pre-line"
 		>{{ propval }}</p>
 	</div>
@@ -226,16 +232,18 @@ if (!isset($_GET['embedded'])) {
 
 </div>
 <script type="text/javascript">
-new Vue({
-	el: '#app',
-	data: {
-		selectedItems: [],
-		courseBrowserProps: courseBrowserProps,
-		showFilters: false,
-		showFilter: '',
-		filterLeft: 0,
-		courseTypes: courseBrowserProps.meta.courseTypes,
-		activeTab: 0,
+const { createApp } = Vue;
+createApp({
+	data: function() {
+        return {
+            selectedItems: [],
+            courseBrowserProps: courseBrowserProps,
+            showFilters: false,
+            showFilter: '',
+            filterLeft: 0,
+            courseTypes: courseBrowserProps.meta.courseTypes,
+            activeTab: 0,
+        }
 	},
 	methods: {
 		clickaway: function(event) {
@@ -266,6 +274,17 @@ new Vue({
 					} else if (courseBrowserProps[propname].type && courseBrowserProps[propname].type=='string' && propname!='name') {
 						courseout[propname] = course[propname];
 					}
+				}
+			}
+			return courseout;
+		},
+        courseText: function (course) {
+			var courseout = {};
+			for (propname in course) {
+				if (this.courseBrowserProps[propname] && 
+                    this.courseBrowserProps[propname].type &&
+                    this.courseBrowserProps[propname].type == 'textarea') {
+							courseout[propname] = course[propname];
 				}
 			}
 			return courseout;
@@ -395,10 +414,12 @@ new Vue({
 		document.addEventListener('click', this.clickaway);
 	},
 	mounted: function() {
-		$("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
+        this.$nextTick(function() {
+		    $("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
+        });
 	}
 
-});
+}).mount('#app');
 </script>
 <?php
-require("../footer.php");
+require_once "../footer.php";

@@ -12,7 +12,7 @@ if ($res===false) {
 	return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Fixed bad attempts values in imas_questions</p>";
 

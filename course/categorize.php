@@ -2,11 +2,11 @@
 //IMathAS:  Categorize questions used in an assessment
 //(c) 2006 David Lippman
 
-	require("../init.php");
+	require_once "../init.php";
 
 
 	$aid = Sanitize::onlyInt($_GET['aid']);
-    $cid = Sanitize::courseId($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid']);
     if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
         $addq = 'addquestions2';
         $from = 'addq2';
@@ -33,7 +33,7 @@
 
 	$pagetitle = _("Categorize Questions");
 	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
-	require("../header.php");
+	require_once "../header.php";
 	$warn_cat=_("Are you SURE you want to reset all categories to Uncategorized/Default?");
 	$custom=_("Custom");
 	echo <<<END
@@ -94,10 +94,14 @@ function getnextprev(formn,loc) {
 	}
 	return ([[prevl,prevq],[nextl,nextq]]);
 }
+function sethighlightrow() {}
 </script>
 END;
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"$addq.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Categorize Questions")."</div>\n";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Categorize Questions")."</div>\n";
 	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$outcomenames = array();
@@ -117,17 +121,17 @@ END;
 	}
 
 	$outcomes = array();
-	function flattenarr($ar) {
-		global $outcomes;
-		foreach ($ar as $v) {
-			if (is_array($v)) { //outcome group
-				$outcomes[] = array($v['name'], 1);
-				flattenarr($v['outcomes']);
-			} else {
-				$outcomes[] = array($v, 0);
-			}
-		}
-	}
+	function flattenarr($ar, $deftype = 0) {
+        global $outcomes;
+        foreach ($ar as $v) {
+            if (is_array($v)) { //outcome group
+                $outcomes[] = array($v['name'], 1);
+                flattenarr($v['outcomes'], 2);
+            } else {
+                $outcomes[] = array($v, $deftype);
+            }
+        }
+    }
 	flattenarr($outcomearr);
 	$query = "SELECT imas_questions.id,imas_libraries.id,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
 	$query .= "WHERE imas_questions.assessmentid=:assessmentid AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
@@ -204,6 +208,7 @@ END;
 	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>'._('Description').'</th><th class="sr-only">'._('Preview').'</th><th>'._('Category').'</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
+        if (!isset($qsetids[$qid])) { continue; }
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
 		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td>';
 		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td>";
@@ -223,6 +228,7 @@ END;
 				echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 				$ingrp = true;
 			} else {
+                if ($ingrp && $oc[1]==0) { echo '</optgroup>';}
 				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '" ';
 				if ($category[$qid] == $oc[0]) { echo "selected=1"; $issel = true;}
 				echo '>' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';
@@ -288,6 +294,6 @@ echo _("for all uncategorized questions").": <input type=button value=\""._("Qui
 	echo '<p><input type=submit value="'._('Record Categorizations').'"> '._('and return to the Add/Remove Questions page').'.  <input type="button" class="secondarybtn" value="'._('Reset').'" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 
-	require("../footer.php");
+	require_once "../footer.php";
 
 ?>

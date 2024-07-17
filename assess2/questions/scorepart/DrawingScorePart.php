@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -32,48 +32,34 @@ class DrawingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if ($multi) {
-            if (isset($options['grid'])) {
-                if (is_array($options['grid']) && isset($options['grid'][$partnum])) {
-                    $grid = $options['grid'][$partnum];
-                } else if (!is_array($options['grid'])) {
-                    $grid = $options['grid'];
-                }
-            }
-            if (isset($options['snaptogrid'])) {
-                if (is_array($options['snaptogrid']) && isset($options['snaptogrid'][$partnum])) {
-                    $snaptogrid = $options['snaptogrid'][$partnum];
-                } else if (!is_array($options['snaptogrid'])) {
-                    $snaptogrid = $options['snaptogrid'];
-                }
-            }
-            if (isset($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];}
-            else if (isset($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];}
-            if (isset($options['partweights'][$partnum])) {$partweights = $options['partweights'][$partnum];}
-        } else {
-            if (isset($options['grid'])) { $grid = $options['grid'];}
-            if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
-            if (isset($options['answers'])) {$answers = $options['answers'];}
-            else if (isset($options['answer'])) {$answers = $options['answer'];}
-            if (isset($options['partweights'])) {$partweights = $options['partweights'];}
+        $optionkeys = ['grid', 'snaptogrid', 'answerformat', 'scoremethod', 'reltolerance', 'abstolerance'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        $optionkeys = ['answers','partweights'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 1);
+        }
 
-        if (!isset($reltolerance)) {
+        if ($reltolerance === '') {
             if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
                 $reltolerance =  $GLOBALS['CFG']['AMS']['defaultdrawtol'];
             } else {
                 $reltolerance = 1;
             }
+        } else if ($reltolerance == 0) {
+            $reltolerance = 1e-12; // give some wiggle room for arithmetic errors
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
-        if (isset($scoremethod) && $scoremethod=='takeanything') {
+        if ($givenans=='') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+
+        if (!empty($scoremethod) && $scoremethod=='takeanything') {
           if ($givenans==';;;;;;;;') {
               $scorePartResult->setRawScore(0);
               return $scorePartResult;
@@ -83,7 +69,7 @@ class DrawingScorePart implements ScorePart
           }
         }
         $imgborder = 5; $step = 5;
-        if (!isset($answerformat)) {
+        if (empty($answerformat)) {
             $answerformat = array('line','dot','opendot');
         } else if (!is_array($answerformat)) {
             $answerformat = explode(',',$answerformat);
@@ -93,7 +79,7 @@ class DrawingScorePart implements ScorePart
         } else {
             $settings = array(-5,5,-5,5,1,1,300,300);
         }
-        if (isset($grid)) {
+        if (!empty($grid)) {
             if (!is_array($grid)) {
                 $grid = array_map('trim',explode(',',$grid));
             } else if (strpos($grid[0],',')!==false) {//forgot to set as multipart?
@@ -104,11 +90,11 @@ class DrawingScorePart implements ScorePart
                     if (strpos($grid[$i],':')!==false) {
                         $pts = explode(':',$grid[$i]);
                         foreach ($pts as $k=>$v) {
-                            $pts[$k] = evalbasic($v);
+                            $pts[$k] = evalbasic($v,true);
                         }
                         $settings[$i] = implode(':',$pts);
                     } else {
-                        $settings[$i] = evalbasic($grid[$i]);
+                        $settings[$i] = evalbasic($grid[$i],true);
                     }
                 }
             }
@@ -123,7 +109,7 @@ class DrawingScorePart implements ScorePart
             $settings[2] = -0.5;
             $settings[3] = 0.5;
         }
-        if (!isset($snaptogrid)) {
+        if (empty($snaptogrid)) {
     			$snaptogrid = 0;
         } else {
           $snapparts = explode(':', $snaptogrid);
@@ -169,10 +155,20 @@ class DrawingScorePart implements ScorePart
         if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
             foreach ($answers as $key=>$function) {
                 $function = array_map('trim',explode(',',$function));
-                $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                 $ansdots[$key] = array($pixx,$pixy);
             }
+
+            if (!empty($ansdots)) {
+              for ($i=0; $i<count($ansdots)-1; $i++) {
+                if (isset($ansdots[$i+1]) && abs($ansdots[$i][0] - $ansdots[$i+1][0])<1E-9 && abs($ansdots[$i][1] - $ansdots[$i+1][1])<1E-9) {
+                    unset($ansdots[$i]);
+                }
+              }
+              $ansdots = array_values($ansdots);
+            }
+
             $isclosed = false;
             $stuclosed = false;
             if (abs($ansdots[0][0]-$ansdots[count($ansdots)-1][0])<.01 && abs($ansdots[0][1]-$ansdots[count($ansdots)-1][1])<.01) {
@@ -200,8 +196,12 @@ class DrawingScorePart implements ScorePart
             $matchstu = array();
             for ($i=0; $i<count($ansdots); $i++) {
                 for ($j=0;$j<count($line);$j++) {
+                    if (in_array($j, $matchstu)) { continue; }
                     if (($ansdots[$i][0]-$line[$j][0])*($ansdots[$i][0]-$line[$j][0]) + ($ansdots[$i][1]-$line[$j][1])*($ansdots[$i][1]-$line[$j][1]) <=25*max(1,$reltolerance)) {
                         $matchstu[$i] = $j;
+                        if (isset($matchstu[$i-1]) && abs($matchstu[$i] - $matchstu[$i-1])==1) {
+                            break; // match has adjancy; don't look for another match
+                        }
                     }
                 }
             }
@@ -239,7 +239,11 @@ class DrawingScorePart implements ScorePart
                 $vals = (count($matchstu))/max(count($line),count($ansdots));
             }
 
-            $adjv = $correctadj/$totaladj;
+            if ($totaladj > 0) {
+                $adjv = $correctadj/$totaladj;
+            } else {
+                $adjv = 0;
+            }
 
             $totscore = ($vals+$adjv)/2;
             if ($extrapolys>0) {
@@ -247,7 +251,7 @@ class DrawingScorePart implements ScorePart
             }
             //echo "Vals score: $vals, adj score: $adjv. </p>";
 
-            if (isset($abstolerance)) {
+            if ($abstolerance !== '') {
                 if ($totscore<$abstolerance) {
                     $scorePartResult->setRawScore(0);
                     return $scorePartResult;
@@ -288,17 +292,39 @@ class DrawingScorePart implements ScorePart
             $x4p = $xtopix($x4); //($x4 - $settings[0])*$pixelsperx + $imgborder;
             $ymid = ($settings[2]+$settings[3])/2;
             $ymidp = $ytopix($ymid); //$settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
+            $yop = $imgborder + $settings[3]*$pixelspery;
+            if ($settings[0]<0 && $settings[1]>0) {
+                $xop = $xtopix(0);
+            } else {
+                $xop = $x2p;
+            }
+            $scoretype = array();
+            $leftrightdir = '';
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
+                if ($function[0] == 'optional') {
+                    $scoretype[$key] = 1;
+                    array_shift($function);
+                } else {
+                    $scoretype[$key] = 0;
+                }
+                if ($function[0][0] === 'x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
+                if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {
+                    $leftrightdir = $function[1][0];
+                    array_pop($function);
+                }
+
                 //curves: function
                 //    function, xmin, xmax
                 //dot:  x,y
                 //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                    $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                    $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
                     } else {
@@ -307,9 +333,9 @@ class DrawingScorePart implements ScorePart
                     continue;
                 } else if ($function[0]=='vector') {
                     if (count($function)>4) { // form "vector, x_start, y_start, x_end, y_end"
-                        $ansvecs[$key] = array('p', $xtopix($function[1]), $ytopix($function[2]), $xtopix($function[3]), $ytopix($function[4]));
+                        $ansvecs[$key] = array('p', $xtopix(evalbasic($function[1],true)), $ytopix(evalbasic($function[2],true)), $xtopix(evalbasic($function[3],true)), $ytopix(evalbasic($function[4],true)));
                     } else if (count($function)>2) {  //form "vector, dx, dy"
-                        $ansvecs[$key] = array('d', $function[1]*$pixelsperx, -1*$function[2]*$pixelspery);
+                        $ansvecs[$key] = array('d', evalbasic($function[1],true)*$pixelsperx, -1*evalbasic($function[2],true)*$pixelspery);
                     }
                 } else if ($function[0]=='circle') {  // form "circle,x_center,y_center,radius"
                     //$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
@@ -330,6 +356,7 @@ class DrawingScorePart implements ScorePart
                         $y3p = $ytopix($y3);
                         $func = makepretty(substr($function[0],2));
                         $func = makeMathFunction($func, 'y');
+                        if ($func === false) { continue; }
                         $Lx1p = $xtopix(@$func(['y'=>$y1]));
                         $Lx2p = $xtopix(@$func(['y'=>$y2]));
                         $Lx3p = $xtopix(@$func(['y'=>$y3]));
@@ -355,14 +382,18 @@ class DrawingScorePart implements ScorePart
                         $xp = $xtopix(substr($function[0],2));
                         if (count($function)==3) { //line segment or ray
                             if ($function[1]=='-oo') { //ray down
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix(floatval($function[2])-1);
                                 $y2p = $ytopix(floatval($function[2]));
                                 $ansvecs[$key] = array('r', $xp, $y2p, $xp, $y1p);
                             } else if ($function[2]=='oo') { //ray up
+                                $function[1] = evalbasic($function[1],true);
                                 $y1p = $ytopix(floatval($function[1]));
                                 $y2p = $ytopix(floatval($function[1])+1);
                                 $ansvecs[$key] = array('r', $xp, $y1p, $xp, $y2p);
                             } else { //line seg
+                                $function[1] = evalbasic($function[1],true);
+                                $function[2] = evalbasic($function[2],true);
                                 $y1p = $ytopix(floatval($function[1]));
                                 $y2p = $ytopix(floatval($function[2]));
                                 $ansvecs[$key] = array('ls', $xp, $y1p, $xp, $y2p);
@@ -372,28 +403,9 @@ class DrawingScorePart implements ScorePart
                             $anslines[$key] = array('x',10000, $xp);
                         }
                     }
-                } else if (count($function)==3) { //line segment or ray
-                    $func = makeMathFunction(makepretty($function[0]), 'x');
-                    if ($function[1]=='-oo') { //ray to left
-                        $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
-                        $y2p = $ytopix($func(['x'=>floatval($function[2])]));
-                        $ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
-                    } else if ($function[2]=='oo') { //ray to right
-                        $y1p = $ytopix($func(['x'=>floatval($function[1])]));
-                        $y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
-                        $ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
-                    } else { //line seg
-                        if ($function[1]>$function[2]) {  //if xmin>xmax, swap
-                            $tmp = $function[2];
-                            $function[2] = $function[1];
-                            $function[1] = $tmp;
-                        }
-                        $y1p = $ytopix($func(['x'=>floatval($function[1])]));
-                        $y2p = $ytopix($func(['x'=>floatval($function[2])]));
-                        $ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
-                    }
                 } else {
                     $func = makeMathFunction(makepretty($function[0]), 'x');
+                    if ($func === false) { continue; }
 
                     $y1 = @$func(['x'=>$x1]);
                     $y2 = @$func(['x'=>$x2]);
@@ -402,18 +414,12 @@ class DrawingScorePart implements ScorePart
                     $y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
                     $y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
                     $y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-                    $yop = $imgborder + $settings[3]*$pixelspery;
-
-                    if ($settings[0]<0 && $settings[1]>0) {
-                        $xop = $xtopix(0);
-                    } else {
-                        $xop = $x2p;
-                    }
+                    
                     if (($logloc = strpos($function[0],'log'))!==false ||
                         ($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
                         $nestd = 0; $vertasy = 0;
-                        $startloc = strpos($function[0],'(',$logloc!==false?$loglog:$lnloc);
+                        $startloc = strpos($function[0],'(',$logloc!==false?$logloc:$lnloc);
                         if ($function[0][$startloc-1] == '_') {
                             // is parens for base; skip to next paren
                             $startloc = strpos($function[0],'(',$startloc+1);
@@ -434,6 +440,7 @@ class DrawingScorePart implements ScorePart
                                         }
                                     }
                                     $inlogfunc = makeMathFunction(makepretty($loginside), 'x');
+                                    if ($func === false) { continue; }
                                     //We're going to assume inside is linear
                                     //Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
                                     //solve for when this is =0
@@ -523,6 +530,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+5,$i-$p-5));
                             $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $xint = -$y0/($y1-$y0);
@@ -546,6 +554,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
                             $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $period = 2*M_PI/($y1-$y0); //slope of inside function
@@ -596,7 +605,7 @@ class DrawingScorePart implements ScorePart
                         $h = $x2p - $invstr*safepow($y2p-$k,3);
                         //$str = 1/safepow($invstr,1/3);
                         $anscuberoots[$key] = array($h, $k, 1/$invstr);
-                    } else if (preg_match('/\^[^2]/',$function[0])) { //exponential
+                    } else if (preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
                         /*
             To do general exponential, we'll need 3 points.
             Need to solve y = ab^x + c for a, b, c
@@ -611,7 +620,6 @@ class DrawingScorePart implements ScorePart
 
             y = ab^x
             */
-
                         $base = safepow(($y3p-$y2p)/($y2p-$y1p), 1/($x3p-$x2p));
                         $str = ($y1p - $y2p)/(safepow($base, $x2p-$xop) - safepow($base, $x1p-$xop));
                         $asy = $y1p + $str*safepow($base, $x1p-$xop);
@@ -623,26 +631,57 @@ class DrawingScorePart implements ScorePart
 
                         $ansexps[$key] = array($str, $base, $asy);
 
-                    } else if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
-                        $h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
-                        $k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
-                        $c = ($y1-$k)*($x1-$h) * $pixelspery/$pixelsperx; // adjust for scaling
+                    } else if (strpos($function[0],'/x')!==false || preg_match('|/\s*\([^\)]*x|', $function[0])) {
+                        $denom = round(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2, 10);
+                        if ($denom == 0) {
+                            $y = (($x1*$y1-$x2*$y2))/($x1-$x2);
+                            $anslines[$key] = array('y',0,$y);
+                        } else {
+                            $h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/($denom);
+                            $k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
+                            $c = ($y1-$k)*($x1-$h) * $pixelspery/$pixelsperx; // adjust for scaling
 
-                        $hp = ($h - $settings[0])*$pixelsperx + $imgborder;
-                        $kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
-                        //eval at point on graph closest to (h,k), at h+sqrt(c)
-                        $np = $settings[7] - (@$func(['x'=>$h+sqrt(abs($c))])-$settings[2])*$pixelspery - $imgborder;
-                        $ansrats[$key] = array($hp,$kp,$np);
+                            $hp = ($h - $settings[0])*$pixelsperx + $imgborder;
+                            $kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
+                            //eval at point on graph closest to (h,k), at h+sqrt(c)
+                            $np = $settings[7] - (@$func(['x'=>$h+sqrt(abs($c))])-$settings[2])*$pixelspery - $imgborder;
+                            $ansrats[$key] = array($hp,$kp,$np);
+                        }
 
                     } else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
                         //colinear
-                        $slope = ($y2p-$y1p)/($x2p-$x1p);
-                        if (abs($slope)>1.4) {
-                            //use x value at ymid
-                            $anslines[$key] = array('x',$slope,$x1p+($ymidp-$y1p)/$slope);
+                        if (count($function)==3) { //line segment or ray
+                            if ($function[1]=='-oo') { //ray to left
+                                $function[2] = evalbasic($function[2],true);
+                                $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
+                                $y2p = $ytopix($func(['x'=>floatval($function[2])]));
+                                $ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
+                            } else if ($function[2]=='oo') { //ray to right
+                                $function[1] = evalbasic($function[1],true);
+                                $y1p = $ytopix($func(['x'=>floatval($function[1])]));
+                                $y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
+                                $ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
+                            } else { //line seg
+                                $function[1] = evalbasic($function[1],true);
+                                $function[2] = evalbasic($function[2],true);
+                                if ($function[1]>$function[2]) {  //if xmin>xmax, swap
+                                    $tmp = $function[2];
+                                    $function[2] = $function[1];
+                                    $function[1] = $tmp;
+                                }
+                                $y1p = $ytopix($func(['x'=>floatval($function[1])]));
+                                $y2p = $ytopix($func(['x'=>floatval($function[2])]));
+                                $ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
+                            }
                         } else {
-                            //use y value at x2
-                            $anslines[$key] = array('y',$slope,$y2p);
+                            $slope = ($y2p-$y1p)/($x2p-$x1p);
+                            if (abs($slope)>1.4) {
+                                //use x value at ymid
+                                $anslines[$key] = array('x',$slope,$x1p+($ymidp-$y1p)/$slope);
+                            } else {
+                                //use y value at x2
+                                $anslines[$key] = array('y',$slope,$y2p);
+                            }
                         }
                     } else {
                         //assume parabolic for now
@@ -658,15 +697,16 @@ class DrawingScorePart implements ScorePart
                         $yatxt = $A*$xt*$xt+$B*$xt+$C;
                         if (abs($yatxt - $yv)<20) {
                             $xatyt = sign($A)*sqrt(abs(20/$A))+$xv;
-                            $ansparabs[$key] = array('x', $xv, $yv, $xatyt);
+                            $ansparabs[$key] = array('x', $xv, $yv, $xatyt, $leftrightdir);
                         } else {
                             //use vertex and y value at x of vertex + 20 pixels
-                            $ansparabs[$key] = array('y', $xv, $yv, $yatxt);
+                            $ansparabs[$key] = array('y', $xv, $yv, $yatxt, $leftrightdir);
                         }
                         //**finish me!!
                     }
                 }
             }
+            
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
             $lines = array();
             $parabs = array();
@@ -713,7 +753,11 @@ class DrawingScorePart implements ScorePart
                         $vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'ls');
                     } else if ($pts[0]==5.4) {
                         $vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'v');
-                    } else if ($pts[0]==6) {
+                    } else if ($pts[0]==6 || $pts[0] == 6.2) {
+                        $leftrightdir = '';
+                        if ($pts[0] == 6.2) {
+                            $leftrightdir = ($pts[3] < $pts[1]) ? '<' : '>';
+                        }
                         //parab
                         //for y at x+20, y=a(x-h)^2+k is y=a*20^2+k
                         //for x at y+-20, y=a(x-h)^2+k
@@ -725,7 +769,7 @@ class DrawingScorePart implements ScorePart
                             $a = ($pts[4]-$pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
                             $y = $pts[2]+$a*400;
                             $x = $pts[1]+sign($a)*sqrt(abs(20/$a));
-                            $parabs[] = array($pts[1],$pts[2],$y,$x);
+                            $parabs[] = array($pts[1],$pts[2],$y,$x,$leftrightdir);
                         }
                     } else if ($pts[0]==6.1) {
                         //same as above, but swap x and y
@@ -739,11 +783,13 @@ class DrawingScorePart implements ScorePart
                         }
                     } else if ($pts[0]==6.5) {//sqrt
                         $flip = ($pts[3] < $pts[1])?-1:1;
-                        $stretch = ($pts[4] - $pts[2])/sqrt($flip*($pts[3]-$pts[1]));
+                        if ($pts[3]!=$pts[1]) {
+                            $stretch = ($pts[4] - $pts[2])/sqrt($flip*($pts[3]-$pts[1]));
 
-                        $secxp = $pts[1] + ($x4p-$x0p)/5*$flip;  //over 1/5 of grid width
-                        $secyp = $stretch*sqrt($flip*($secxp - $pts[1]))+($pts[2]);
-                        $sqrts[] = array($pts[1],$pts[2],$secyp,$flip);
+                            $secxp = $pts[1] + ($x4p-$x0p)/5*$flip;  //over 1/5 of grid width
+                            $secyp = $stretch*sqrt($flip*($secxp - $pts[1]))+($pts[2]);
+                            $sqrts[] = array($pts[1],$pts[2],$secyp,$flip);
+                        }
                     } else if ($pts[0]==6.3) {
                         //cubic
                         if ($pts[4]==$pts[2]) {
@@ -846,7 +892,7 @@ class DrawingScorePart implements ScorePart
                             $rats[] = array($pts[1],$pts[2],$yp);
                         }
                     } else if ($pts[0]==9 || $pts[0]==9.1) {
-                        if ($pts[0]==9.1) {
+                        if ($pts[0]==9.1) { // sine, convert to cos points
                             $pts[1] -= ($pts[3] - $pts[1]);
                             $pts[2] -= ($pts[4] - $pts[2]);
                         }
@@ -875,32 +921,35 @@ class DrawingScorePart implements ScorePart
                 }
             }
 
-            $scores = array();
+            $scores = array(array(), array());
 
             foreach ($ansdots as $key=>$ansdot) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($dots); $i++) {
                     if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= 25*max(1,$reltolerance)) {
-                        $scores[$key] = 1;
+                        $scores[$scoretype[$key]][$key] = 1;
                         break;
                     }
                 }
             }
             foreach ($ansodots as $key=>$ansodot) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($odots); $i++) {
                     if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= 25*max(1,$reltolerance)) {
-                        $scores[$key] = 1;
+                        $scores[$scoretype[$key]][$key] = 1;
                         break;
                     }
                 }
             }
+
             $deftol = .1;
             $defpttol = 5;
 
+            $usedline = [];
             foreach ($anslines as $key=>$ansline) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($lines); $i++) {
+                    if (!empty($usedline[$i])) { continue; }
                     //check slope
                     $toladj = pow(10,-1-6*abs($ansline[1]));
                     if (abs($ansline[1]-$lines[$i][1])/(abs($ansline[1])+$toladj)>$deftol*$reltolerance) {
@@ -920,13 +969,17 @@ class DrawingScorePart implements ScorePart
                             continue;
                         }
                     }
-                    $scores[$key] = 1;
+                    $usedline[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+
+            $usedcirc = [];
             foreach ($anscircs as $key=>$anscirc) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($circs); $i++) {
+                    if (!empty($usedcirc[$i])) { continue; }
                     if (abs($anscirc[0]-$circs[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -936,13 +989,17 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscirc[2]-$circs[$i][2])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $usedcirc[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+
+            $usedellipse = [];
             foreach ($ansellipses as $key=>$ansellipse) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($ellipses); $i++) {
+                    if (!empty($usedellipse[$i])) { continue; }
                     if (abs($ansellipse[0]-$ellipses[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -955,13 +1012,17 @@ class DrawingScorePart implements ScorePart
                     if (abs($ansellipse[3]-$ellipses[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $usedellipse[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+
+            $usedhyperbola = [];
             foreach ($anshyperbolas as $key=>$anshyperbola) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($hyperbolas); $i++) {
+                    if (!empty($usedhyperbola[$i])) { continue; }
                     if ($anshyperbola[4]!=$hyperbolas[$i][4]) {continue;}
                     if (abs($anshyperbola[0]-$hyperbolas[$i][0])>$defpttol*$reltolerance) {
                         continue;
@@ -975,14 +1036,57 @@ class DrawingScorePart implements ScorePart
                     if (abs($anshyperbola[3]-$hyperbolas[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $usedhyperbola[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
 
+            if ($scoremethod == 'direction' || $scoremethod == 'relativelength') {
+                $veclen = [];
+                foreach ($vecs as $i=>$vec) {
+                    $vecs[$i][5] = atan2($vec[3]-$vec[1], $vec[2]-$vec[0]); // angle
+                    $vecs[$i][6] = sqrt(($vec[3]-$vec[1])**2 + ($vec[2]-$vec[0])**2); // length
+                }
+                $rellengths = [];
+            }
+
             foreach ($ansvecs as $key=>$ansvec) {
-                $scores[$key] = 0;
-                if ($ansvec[0]=='p') {  //point
+                $scores[$scoretype[$key]][$key] = 0;
+                if (($scoremethod == 'direction' || $scoremethod == 'relativelength') &&
+                    ($ansvec[0]=='p' || $ansvec[0] == 'd')
+                ) {
+                    if ($ansvec[0]=='p') {
+                        $ansvec[5] = atan2($ansvec[4]-$ansvec[2], $ansvec[3]-$ansvec[1]);
+                        $ansvec[6] = sqrt(($ansvec[4]-$ansvec[2])**2 + ($ansvec[3]-$ansvec[1])**2); // length
+                    } else if ($ansvec[0]=='d') {
+                        $ansvec[5] = atan2($ansvec[2], $ansvec[1]);
+                        $ansvec[6] = sqrt(($ansvec[2])**2 + ($ansvec[1])**2); // length
+                    }
+                    for ($i=0; $i<count($vecs); $i++) {
+                        if ($vecs[$i][4]!='v') {continue;}
+                        if ($ansvec[0]=='p') { 
+                            // check starting point
+                            if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
+                                continue;
+                            }
+                            if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
+                                continue;
+                            }
+                        }
+                        // check direction; allow about 4 degree error
+                        if (abs($ansvec[5] - $vecs[$i][5]) > 0.07*$reltolerance) {
+                            continue;
+                        }
+                        if ($ansvec[6] == 0) {
+                            $rellengths[$key] = 0;
+                        } else {
+                            $rellengths[$key] = $vecs[$i][6]/$ansvec[6];
+                        }
+                        $scores[$scoretype[$key]][$key] = 1;
+                        break;
+                    }
+                } else if ($ansvec[0]=='p') {  //point
                     for ($i=0; $i<count($vecs); $i++) {
                         if ($vecs[$i][4]!='v') {continue;}
                         if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
@@ -997,7 +1101,7 @@ class DrawingScorePart implements ScorePart
                         if (abs($ansvec[4]-$vecs[$i][3])>$defpttol*$reltolerance) {
                             continue;
                         }
-                        $scores[$key] = 1;
+                        $scores[$scoretype[$key]][$key] = 1;
                         break;
                     }
                 } else if ($ansvec[0]=='r') {  //ray
@@ -1010,12 +1114,16 @@ class DrawingScorePart implements ScorePart
                         if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
                             continue;
                         }
-
+                        
                         //compare slopes
                         $correctdx = $ansvec[3] - $ansvec[1];
                         $correctdy = $ansvec[4] - $ansvec[2];
                         $studx = $vecs[$i][2] - $vecs[$i][0];
                         $study = $vecs[$i][3] - $vecs[$i][1];
+
+                        if ($correctdx*$studx < 0) { // pointing opposite directions
+                            continue;
+                        }
 
                         //find angle between correct ray and stu ray
                         $cosang = ($studx*$correctdx+$study*$correctdy)/(sqrt($studx*$studx+$study*$study)*sqrt($correctdx*$correctdx+$correctdy*$correctdy));
@@ -1038,7 +1146,7 @@ class DrawingScorePart implements ScorePart
               continue;
             }
             */
-                        $scores[$key] = 1;
+                        $scores[$scoretype[$key]][$key] = 1;
                         break;
                     }
                 } else if ($ansvec[0]=='ls') { //line segment
@@ -1061,10 +1169,10 @@ class DrawingScorePart implements ScorePart
                         } else {
                             continue;
                         }
-                        $scores[$key] = 1;
+                        $scores[$scoretype[$key]][$key] = 1;
                         break;
                     }
-                } else {  //direction vector
+                } else if ($ansvec[0]=='d') {  //direction vector
                     for ($i=0; $i<count($vecs); $i++) {
                         if ($vecs[$i][4]!='v') {continue;}
                         if (abs($ansvec[1]-($vecs[$i][2] - $vecs[$i][0]))>$defpttol*$reltolerance) {
@@ -1073,19 +1181,48 @@ class DrawingScorePart implements ScorePart
                         if (abs($ansvec[2]-($vecs[$i][3] - $vecs[$i][1]))>$defpttol*$reltolerance) {
                             continue;
                         }
-                        $scores[$key] = 1;
+                        $scores[$scoretype[$key]][$key] = 1;
                         break;
                     }
                 }
             }
+            // check rellengths
+            if ($scoremethod == 'relativelength' && count($rellengths) > 1) {
+                // want to make sure all rellengths values are the same (within reasonable tolerance)
+                asort($rellengths);
+                $lastval = -1;
+                $freqs = [];
+                foreach ($rellengths as $k=>$v) {
+                    if (($v==0 && $lastval==0) || ($lastval>0 && abs($v-$lastval)/$lastval<.001)) {
+                        $freqs[$lastval]++;
+                    } else {
+                        $freqs[$v] = 1;
+                        $lastval = $v;
+                    }
+                }
+                if (count($freqs)>1) { // one different than others
+                    arsort($freqs);
+                    $bestlen = array_key_first($freqs);
+                    foreach ($rellengths as $k=>$v) {
+                        if ($v != $bestlen) {
+                            $scores[$scoretype[$key]][$k] = 0;
+                        }
+                    }
+                }
+            }
 
+            $usedparab = [];
             foreach ($ansparabs as $key=>$ansparab) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($parabs); $i++) {
+                    if (!empty($usedparab[$i])) { continue; }
                     if (abs($ansparab[1]-$parabs[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
                     if (abs($ansparab[2]-$parabs[$i][1])>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    if ($ansparab[4] !== $parabs[$i][4]) {
                         continue;
                     }
                     if ($ansparab[0]=='x') { //compare x at yv+-20
@@ -1097,14 +1234,17 @@ class DrawingScorePart implements ScorePart
                             continue;
                         }
                     }
-                    $scores[$key] = 1;
+                    $usedparab[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
 
+            $usedhparab = [];
             foreach ($anshparabs as $key=>$ansparab) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($hparabs); $i++) {
+                    if (!empty($usedhparab[$i])) { continue; }
                     if (abs($ansparab[1]-$hparabs[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -1120,13 +1260,16 @@ class DrawingScorePart implements ScorePart
                             continue;
                         }
                     }
-                    $scores[$key] = 1;
+                    $usedhparab[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+            $usedcubic = [];
             foreach ($anscubics as $key=>$anscubic) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($cubics); $i++) {
+                    if (!empty($usedcubic[$i])) { continue; }
                     if (abs($anscubic[0]-$cubics[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -1136,16 +1279,18 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscubic[2]-$cubics[$i][2])/abs($anscubic[2]) > $deftol*$reltolerance) {
                         continue;
                     }
-
-                    $scores[$key] = 1;
+                    $usedcubic[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
             //print_r($anscuberoots);
             //print_r($cuberoots);
+            $usedcuberoot = [];
             foreach ($anscuberoots as $key=>$anscuberoot) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($cuberoots); $i++) {
+                    if (!empty($usedcuberoot[$i])) { continue; }
                     if (abs($anscuberoot[0]-$cuberoots[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -1155,13 +1300,16 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscuberoot[2]-$cuberoots[$i][2])/abs($anscuberoot[2]) > $deftol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $usedcuberoot[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+            $usedsqrt = [];
             foreach ($anssqrts as $key=>$anssqrt) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($sqrts); $i++) {
+                    if (!empty($usedsqrt[$i])) { continue; }
                     if ($anssqrt[3] !== $sqrts[$i][3]) { //horiz flip doesn't match
                         continue;
                     }
@@ -1174,13 +1322,16 @@ class DrawingScorePart implements ScorePart
                     if (abs($anssqrt[2]-$sqrts[$i][2])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $usedsqrt[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+            $usedrat = [];
             foreach ($ansrats as $key=>$ansrat) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($rats); $i++) {
+                    if (!empty($usedrat[$i])) { continue; }
                     if (abs($ansrat[0]-$rats[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -1190,14 +1341,17 @@ class DrawingScorePart implements ScorePart
                     if (sqrt(2)*abs($ansrat[2]-$rats[$i][2])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $usedrat[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+            $usedexp = [];
 
             foreach ($ansexps as $key=>$ansexp) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($exps); $i++) {
+                    if (!empty($usedexp[$i])) { continue; }
                     //if (abs($ansexp[0]-$exps[$i][0])>$defpttol*$reltolerance) {
                     //  continue;
                     //}
@@ -1217,15 +1371,16 @@ class DrawingScorePart implements ScorePart
                     if ($ansexp[1]<=1 && abs($ansexp[0]*safepow($ansexp[1],$exps[$i][2]) - $exps[$i][3]) >$defpttol*$reltolerance) {
                         continue;
                     }
-
-                    $scores[$key] = 1;
+                    $usedexp[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
-
+            $usedlogs = [];
             foreach ($anslogs as $key=>$anslog) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($logs); $i++) {
+                    if (!empty($usedlogs[$i])) { continue; }
                     //check base
                     if (abs($anslog[1]-$logs[$i][4])/(abs($anslog[1]-1)+1e-18)>$deftol*$reltolerance) {
                         continue;
@@ -1242,23 +1397,26 @@ class DrawingScorePart implements ScorePart
                     if ($anslog[1]<=1 && abs($anslog[0]*safepow($anslog[1],$logs[$i][2]) - $logs[$i][3]) >$defpttol*$reltolerance) {
                         continue;
                     }
-
-                    $scores[$key] = 1;
+                    $usedlogs[$i] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
                     break;
                 }
             }
+            $usedcos = [];
             foreach ($anscoss as $key=>$anscos) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($coss); $i++) {
+                    if (!empty($usedcos[$i])) { continue; }
                     $per = abs($anscos[0] - $anscos[1])*2;
+                    // make sure horizontal shift is ok
                     $adjdiff = abs($anscos[0]-$coss[$i][0]);
                     $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
                     if ($adjdiff>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $adjdiff = abs($anscos[1]-$coss[$i][1]);
-                    $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-                    if ($adjdiff>$defpttol*$reltolerance) {
+                    // check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
                         continue;
                     }
                     if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
@@ -1267,14 +1425,16 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscos[3]-$coss[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
+                    $usedcos[$i] = 1;
                     break;
                 }
             }
-
+            $usedabs = [];
             foreach ($ansabs as $key=>$aabs) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($abs); $i++) {
+                    if (!empty($usedabs[$i])) { continue; }
                     if (abs($aabs[0]-$abs[$i][0])>$defpttol*$reltolerance) {
                         continue;
                     }
@@ -1286,11 +1446,15 @@ class DrawingScorePart implements ScorePart
                     if (abs($aabs[2]-$abs[$i][2])/(abs($aabs[2])+$toladj)>$deftol*$reltolerance) {
                         continue;
                     }
-                    $scores[$key] = 1;
+                    $scores[$scoretype[$key]][$key] = 1;
+                    $usedabs[$i] = 1;
                     break;
                 }
             }
-            $extrastuffpenalty = max((count($tplines)+count($dots)+count($odots)-count($answers))/(max(count($answers),count($tplines)+count($dots)+count($odots))),0);
+            //extra stuff is total count of drawn items - # of scored items - # of correct optional items
+            $extrastuffpenalty = max((count($tplines)+count($dots)+count($odots)-count($scores[0])-array_sum($scores[1]))/(max(count($scores[0]),count($tplines)+count($dots)+count($odots))),0);
+            // don't need optional scores anymore
+            $scores = $scores[0];
         } else if ($answerformat[0]=="inequality") {
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
             /*$x1 = 1/3*$settings[0] + 2/3*$settings[1];
@@ -1315,25 +1479,29 @@ class DrawingScorePart implements ScorePart
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
-                if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+                if ($function[0][0]=='x') {
+                    $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
+                }
+                if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
                     $isxequals = true;
                     $function[0] = substr($function[0],1);
                 } else {
                     $isxequals = false;
                 }
-                if ($function[0]{1}=='=') {
+                if ($function[0][1]=='=') {
                     $type = 10;
                     $c = 2;
                 } else {
                     $type = 10.2;
                     $c = 1;
                 }
-                $dir = $function[0]{0};
+                $dir = $function[0][0];
                 if ($isxequals) {
                     $anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
                 } else {
                     $func = makepretty(substr($function[0],$c));
                     $func = makeMathFunction($func, 'x');
+                    if ($func === false) { continue; }
                     $y1 = $func(['x'=>$x1]);
                     $y2 = $func(['x'=>$x2]);
                     $y3 = $func(['x'=>$x3]);
@@ -1414,14 +1582,16 @@ class DrawingScorePart implements ScorePart
                             }
                         }
                     } else if($pts[0]<10.5){//quadratic
-                        $aUser = ($pts[4] - $pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
-                        $yatpt5 = $aUser*($pts[5]-$pts[1])*($pts[5]-$pts[1])+$pts[2];
-                        if($yatpt5 < $pts[6]){
-                            $dir = '<';
-                        } else {
-                            $dir = '>';
+                        if ($pts[3]!=$pts[1]) {
+                            $aUser = ($pts[4] - $pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
+                            $yatpt5 = $aUser*($pts[5]-$pts[1])*($pts[5]-$pts[1])+$pts[2];
+                            if($yatpt5 < $pts[6]){
+                                $dir = '<';
+                            } else {
+                                $dir = '>';
+                            }
+                            $ineqlines[$k] = array('y',$dir,$pts[0],$aUser,$pts[1],$pts[2]);
                         }
-                        $ineqlines[$k] = array('y',$dir,$pts[0],$aUser,$pts[1],$pts[2]);
                     } else { //abs 
                         if ($pts[3]!=$pts[1]) {
                             $slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
@@ -1506,9 +1676,9 @@ class DrawingScorePart implements ScorePart
 
         } else if ($answerformat[0]=='numberline') {
             foreach ($answers as $key=>$function) {
-                if ($function=='') { continue; }
-                $function = array_map('trim',explode(',',$function));
-                if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+               if ($function=='') { continue; }
+               $function = array_map('trim',explode(',',$function));
+               if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
                 $pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
                 $pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;
                 $newdot = array($pixx, $pixy);
@@ -1522,6 +1692,10 @@ class DrawingScorePart implements ScorePart
                   }
                 }
               } else {
+                if (!isset($function[1]) || !isset($function[2])) {
+                    echo "Need min and max for numberline line";
+                    continue;
+                }
                 if (trim($function[1])==='-oo') {
                     $xminpix = 1;
                 } else {
@@ -1591,7 +1765,11 @@ class DrawingScorePart implements ScorePart
                     $dots[$k] = explode(',',$pt);
                 }
                 //remove duplicate dots
-                for ($k=count($dots)-1;$k>0;$k--) {
+                for ($k=count($dots)-1;$k>=0;$k--) {
+                    if (!is_nicenumber($dots[$k][0]) || !is_nicenumber($dots[$k][1])) {
+                        unset($dots[$k]);
+                        continue;
+                    }
                     for ($j=0;$j<$k;$j++) {
                         if (abs($dots[$k][0]-$dots[$j][0])<$defpttol && abs($dots[$k][1]==$dots[$j][1])<$defpttol) {
                             unset($dots[$k]);
@@ -1610,21 +1788,25 @@ class DrawingScorePart implements ScorePart
                 }
                 //remove duplicate odots, and dots below odots
                 for ($k=count($odots)-1;$k>=0;$k--) {
-                    for ($j=0;$j<count($dots);$j++) {
-                        if (abs($odots[$k][0]-$dots[$j][0])<$defpttol && abs($odots[$k][1]==$dots[$j][1])<$defpttol) {
+                    if (!is_nicenumber($odots[$k][0]) || !is_nicenumber($odots[$k][1])) {
+                        unset($odots[$k]);
+                        continue;
+                    }
+                    foreach ($dots as $j=>$thisdot) {
+                        if (abs($odots[$k][0]-$thisdot[0])<$defpttol && abs($odots[$k][1]-$thisdot[1])<$defpttol) {
                             unset($dots[$j]);
                             break;
                         }
                     }
                     for ($j=0;$j<$k;$j++) {
-                        if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]==$odots[$j][1])<$defpttol) {
+                        if (!isset($odots[$j])) { continue; }
+                        if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]-$odots[$j][1])<$defpttol) {
                             unset($odots[$k]);
                             continue 2;
                         }
                     }
                 }
             }
-
             $scores = array();
             if ((count($dots)+count($odots))==0) {
                 $extradots = 0;
@@ -1634,8 +1816,8 @@ class DrawingScorePart implements ScorePart
 
             foreach ($ansdots as $key=>$ansdot) {
                 $scores[$key] = 0;
-                for ($i=0; $i<count($dots); $i++) {
-                    if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
+                foreach ($dots as $i=>$gdot) {
+                    if (($gdot[0]-$ansdot[0])*($gdot[0]-$ansdot[0]) + ($gdot[1]-$ansdot[1])*($gdot[1]-$ansdot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
                         $scores[$key] = 1-$extradots;
                         break;
                     }
@@ -1643,8 +1825,8 @@ class DrawingScorePart implements ScorePart
             }
             foreach ($ansodots as $key=>$ansodot) {
                 $scores[$key] = 0;
-                for ($i=0; $i<count($odots); $i++) {
-                    if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
+                foreach ($odots as $i=>$godot) {
+                    if (($godot[0]-$ansodot[0])*($godot[0]-$ansodot[0]) + ($godot[1]-$ansodot[1])*($godot[1]-$ansodot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
                         $scores[$key] = 1-$extradots;
                         break;
                     }
@@ -1664,6 +1846,7 @@ class DrawingScorePart implements ScorePart
                     break;
                 }
             }
+
             $extrastuffpenalty = max((count($lines)-count($anslines))/(max(count($answers),count($anslines))),0);
 
         } else {
@@ -1678,8 +1861,8 @@ class DrawingScorePart implements ScorePart
                 //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
+                    $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
+                    $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
                     } else {
@@ -1689,7 +1872,8 @@ class DrawingScorePart implements ScorePart
                 }
                 $anslines[$key] = array();
                 $func = makeMathFunction(makepretty($function[0]), 'x');
-
+                if ($func === false) { continue; }
+                
                 if (!isset($function[1])) {
                     $function[1] = $settings[0];
                 }
@@ -1718,7 +1902,6 @@ class DrawingScorePart implements ScorePart
                         $linepts++;
                     }
                 }
-                $linecnt++;
             }
             //break apart student entry
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
@@ -1755,7 +1938,7 @@ class DrawingScorePart implements ScorePart
             //interp the lines
             $linedata = array();
             $totinterp = 0;
-            foreach ($lines as $k=>$line) {
+            foreach ($lines as $line) {
                 for ($i=1;$i<count($line);$i++) {
                     $leftx = round(max(min($line[$i][0],$line[$i-1][0]), 2*$imgborder));
                     $rightx = round(min(max($line[$i][0],$line[$i-1][0]), $settings[6]-2*$imgborder));
@@ -1765,16 +1948,18 @@ class DrawingScorePart implements ScorePart
                         $m = ($line[$i][1] - $line[$i-1][1])/($line[$i][0]-$line[$i-1][0]);
                     }
                     for ($k = ceil($leftx/$step); $k*$step<=$rightx; $k++) {
+                        if (!isset($linedata[$k])) { $linedata[$k] = []; }
                         $x = $k*$step;
-                        $y = $line[$i-1][1] + $m*($x-$line[$i-1][0]);
+                        $y = round($line[$i-1][1] + $m*($x-$line[$i-1][0]),10);
                         if ($y>$imgborder && $y<($settings[7]-$imgborder)) {
-                            $linedata[$k][] = $y;
-                            $totinterp++;
+                            if ($scoremethod != 'ignoreoverlap' || !in_array($y,$linedata[$k])) {
+                                $linedata[$k][] = $y;
+                                $totinterp++;
+                            }
                         }
                     }
                 }
             }
-
             $stdevs = array();
             $stcnts = array();
             $scores = array();
@@ -1813,7 +1998,7 @@ class DrawingScorePart implements ScorePart
                     $minerr = $settings[7];
                     $minerrkey = -1;
                     foreach ($anslines as $key=>$answerline) {
-                        if (abs($answerline[$k]-$linedata[$k][$i])<$minerr) {
+                        if (isset($answerline[$k]) && abs($answerline[$k]-$linedata[$k][$i])<$minerr) {
                             $minerr = abs($answerline[$k]-$linedata[$k][$i]);
                             $minerrkey = $key;
                         }
@@ -1830,7 +2015,7 @@ class DrawingScorePart implements ScorePart
                 $percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
             }
             //divide up over all the lines
-            $percentunmatcheddrawn = $percentunmatcheddrawn;
+            
             //if ($GLOBALS['myrights']==100) {
             //  print_r($anslines);
             //  print_r($linedata);
@@ -1889,23 +2074,29 @@ class DrawingScorePart implements ScorePart
             }
 
         }
-        if (!isset($partweights)) {
-            $partweights = array_fill(0,count($scores),1/count($scores));
+        if (empty($partweights)) {
+            $scores = array_values($scores); // re-index so partweights applies right
+            if (count($scores) > 0) {
+                $partweights = array_fill(0,count($scores),1/count($scores));
+            } else {
+                $partweights = [];
+            }
         } else {
             if (!is_array($partweights)) {
                 $partweights = array_map('trim',explode(',',$partweights));
             }
         }
         $totscore = 0;
-        $pcnt = 0;
         foreach ($scores as $key=>$score) {
-            $totscore += $score*$partweights[$pcnt];
-            $pcnt++;
+            if (!isset($partweights[$key])) {
+                echo "Missing \$partweights for key $key. ";
+            }
+            $totscore += $score*($partweights[$key] ?? 0);
         }
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);
         }
-        if (isset($abstolerance)) {
+        if ($abstolerance !== '') {
             if ($totscore<$abstolerance) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;

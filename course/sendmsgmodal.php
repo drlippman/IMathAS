@@ -2,12 +2,12 @@
 //IMathAS:  A greybox modal for sending a single message or email
 //(c) 2014 David Lippman for Lumen Learning
 
-require("../init.php");
+require_once "../init.php";
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
-	 require("../header.php");
+	 require_once "../header.php";
 	 echo sprintf(_("You are not enrolled in this course.  Please return to the %s Home Page%s and enroll"),"<a href=\"../index.php\">","</a>")."\n";
-	 require("../footer.php");
+	 require_once "../footer.php";
 	 exit;
 }
 
@@ -15,7 +15,7 @@ $flexwidth = true;
 $nologo = true;
 
 if (isset($_POST['message'])) {
-	require_once("../includes/email.php");
+	require_once "../includes/email.php";
 
 	$origmessage = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
@@ -56,7 +56,7 @@ if (isset($_POST['message'])) {
 				send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subject, $cid, $coursename, $msgid);
 			}
 			if ($FCMtokenTo != '') {
-				require_once("../includes/FCM.php");
+				require_once "../includes/FCM.php";
 				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
 				sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
 						Sanitize::encodeStringForDisplay($subject), $url);
@@ -76,7 +76,7 @@ if (isset($_POST['message'])) {
 				$origgraphdisp = $_SESSION['graphdisp'];
 				$_SESSION['mathdisp']=2;
 				$_SESSION['graphdisp']=2;
-				require("../filter/filter.php");
+				require_once "../filter/filter.php";
 				$message = filter($message);
 				$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
 				$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
@@ -102,18 +102,22 @@ if (isset($_POST['message'])) {
 		$stm->execute(array(Sanitize::onlyInt($_POST['markbroken'])));
 		$success .= '<script>$(function(){window.parent.$("#brokenmsgbad").show();});</script>';
 	}
-	require("../header.php");
+	require_once "../header.php";
 	if ($error=='') {
 		echo $success;
 	} else {
 		echo $error;
 	}
 	echo '. <input type="button" onclick="top.GB_hide()" value="'._('Done').'" />';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 } else {
 	$useeditor = "message";
-	require("../header.php");
+    $placeinhead = '<script>function sendmsg() { 
+        $("form").submit(); 
+        parent.$("#GB_footer button.primary").hide();
+    }</script>';
+	require_once "../header.php";
 
 	$iserrreport = false;
 
@@ -122,7 +126,7 @@ if (isset($_POST['message'])) {
 		$parts = explode('-',$quoteq);
         $GLOBALS['assessver'] = $parts[4];
         if ($courseUIver > 1) {
-            include('../assess2/AssessStandalone.php');
+            require_once '../assess2/AssessStandalone.php';
             $a2 = new AssessStandalone($DBH);
             $state = array(
                 'seeds' => array($parts[0] => $parts[2]),
@@ -134,12 +138,12 @@ if (isset($_POST['message'])) {
             $message = $res['html'];
             $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
         } else {
-            require("../assessment/displayq2.php");
+            require_once "../assessment/displayq2.php";
             $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
         }
 		$message = printfilter(forcefiltergraph($message));
 		if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-			require_once("../includes/filehandler.php");
+			require_once "../includes/filehandler.php";
 			$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
@@ -165,9 +169,15 @@ if (isset($_POST['message'])) {
 				}
 			}
 			if ($_GET['to'] == 0) {
-				$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
+                $query = 'SELECT iqs.ownerid,iu.lastaccess FROM imas_questionset AS iqs
+                    JOIN imas_users AS iu ON iqs.ownerid=iu.id WHERE iqs.id=:id';
+				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$parts[1]));
-				$_GET['to'] = $stm->fetchColumn(0);
+                $r = $stm->fetch(PDO::FETCH_ASSOC);
+                $_GET['to'] = $r['ownerid'];
+                if (!empty($CFG['GEN']['qerroronold']) && $r['lastaccess'] < time() - 60*60*24*$CFG['GEN']['qerroronold'][0]) {
+                    $_GET['to'] = $CFG['GEN']['qerroronold'][1];
+                }
 			}
 		} else if (isset($parts[3])) {  //sending to instructor
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
@@ -206,7 +216,7 @@ if (isset($_POST['message'])) {
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
 	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
-	echo _("To:")." $to<br/>\n";
+	echo _("To:")." <span class='pii-mixed'>$to</span><br/>\n";
 	echo _("Subject:")." <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
 	echo _("Message:")." <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);
@@ -224,6 +234,6 @@ if (isset($_POST['message'])) {
 		echo '<div class="submit"><input type="submit" value="'._('Send Email').'"></div>';
 	}
 	echo '</form>';
-	require("../footer.php");
+	require_once "../footer.php";
 	exit;
 }
