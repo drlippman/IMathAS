@@ -909,7 +909,7 @@ function showPreview(qn) {
     outstr = '`' + htmlEntities(res.str) + '`';
   }
   if (res.dispvalstr && res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
-    outstr += (outstr==''?'':' = ') + '`' + htmlEntities(res.dispvalstr) + '`';
+    outstr += (outstr==''?'':' &asymp; ') + '`' + htmlEntities(res.dispvalstr) + '`';
   }
   if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
@@ -955,10 +955,10 @@ function showSyntaxCheckMQ(qn) {
   var res = processByType(qn);
   var outstr = '';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
-    if (params.qtype == 'calcmatrix') {
-        outstr += ' = `' + htmlEntities(res.dispvalstr) + '` ';
+    if (params.qtype == 'calcmatrix' || (params.qtype == 'calcinterval' && params.calcformat.match(/inequality/))) {
+        outstr += ' &asymp; `' + htmlEntities(res.dispvalstr) + '` ';
     } else {
-        outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+        outstr += ' &asymp; ' + htmlEntities(res.dispvalstr) + ' ';
     }
   }
   if (res.err && res.err != '' && res.str != '') {
@@ -1284,6 +1284,24 @@ function AMnumfuncPrepVar(qn,str) {
   return [str,dispstr,vars.join("|"),submitstr];
 }
 
+/**
+ * Rounds values for showval display to 4 decimal places or 4 sigfigs, no trailing zeros.
+ * @param number|array vals 
+ * @returns 
+ */
+function roundForDisp(val) {
+    if (Array.isArray(val)) {
+        return val.map(roundForDisp);
+    } else if (typeof val == 'number') {
+        if (Math.abs(val) < 1) {
+            return val.toPrecision(4).replace(/\.?0+$/,'');
+        } else {
+            return val.toFixed(4).replace(/\.?0+$/,'');
+        }
+    } else {
+        return val;
+    }
+}
 
 /**
  *  These functions should return:
@@ -1387,8 +1405,8 @@ function AMnumfuncPrepVar(qn,str) {
                     // get matches
                     unitsregexmatch = pts[i].match(unitsregexfull101);
                     let unitsbadcase = false;
-                    // It should have three matches:  [fullmatch, prefix, unit]
-                    if (unitsregexmatch && unitsregexmatch.length == 3) {
+                    // It should have three defined matches:  [fullmatch, prefix, unit]
+                    if (unitsregexmatch && typeof unitsregexmatch[1] !== 'undefined') {
                         // check that the prefix match is case sensitive
                         var unitsregexabbprefixfull = new RegExp("^" + unitsregexabbprefix + "$");
                         if (!unitsregexabbprefixfull.test(unitsregexmatch[1])) {
@@ -1439,7 +1457,7 @@ function processCalculated(fullstr, format) {
     err += res[1];
     outvals.push(res[0]);
   }
-  var dispstr = outvals.join(', ');
+  var dispstr = roundForDisp(outvals).join(', ');
   if (format.indexOf('set')!=-1) {
     dispstr = '{' + dispstr + '}';
   }
@@ -1486,7 +1504,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
      strarr = fullstr.split(/\s*U\s*/i);
   }
 
-  var err = ''; var str, vals, res, calcvals = [];
+  var err = ''; var str, vals, res, calcvals = [], calcvalsdisp = [];
   for (i=0; i<strarr.length; i++) {
     str = strarr[i];
     sm = str.charAt(0);
@@ -1516,7 +1534,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
         calcvals[j] = res[0];
       }
     }
-
+    calcvalsdisp = roundForDisp(calcvals);
     submitstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
     if (format.indexOf('inequality')!=-1) {
       // reformat as inequality
@@ -1524,13 +1542,15 @@ function processCalcInterval(fullstr, format, ineqvar) {
         if (calcvals[1].toString().match(/oo/)) {
           dispstrarr[i] = 'RR';
         } else {
-          dispstrarr[i] = ineqvar + (em==']'?'le':'lt') + calcvals[1];
+          dispstrarr[i] = ineqvar + (em==']'?' le ':' lt ') + calcvalsdisp[1];
         }
       } else if (calcvals[1].toString().match(/oo/)) {
-        dispstrarr[i] = ineqvar + (sm=='['?'ge':'gt') + calcvals[0];
+        dispstrarr[i] = ineqvar + (sm=='['?' ge ':' gt ') + calcvalsdisp[0];
       } else {
-        dispstrarr[i] = calcvals[0] + (sm=='['?'le':'lt') + ineqvar + (em==']'?'le':'lt') + calcvals[1];
+        dispstrarr[i] = calcvalsdisp[0] + (sm=='['?' le ':' lt ') + ineqvar + (em==']'?' le ':' lt ') + calcvalsdisp[1];
       }
+    } else {
+        dispstrarr[i] = sm + calcvalsdisp[0] + ',' + calcvalsdisp[1] + em;
     }
   }
   if (format.indexOf('inequality')!=-1) {
@@ -1542,7 +1562,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   } else {
     return {
       err: err,
-      dispvalstr: submitstrarr.join(' uu '),
+      dispvalstr: dispstrarr.join(' uu '),
       submitstr: submitstrarr.join(joinchar)
     };
   }
@@ -1550,6 +1570,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
 
 function processCalcNtuple(fullstr, format) {
   var outcalced = '';
+  var outcalceddisp = '';
   var NCdepth = 0;
   var lastcut = 0;
   var err = "";
@@ -1566,6 +1587,7 @@ function processCalcNtuple(fullstr, format) {
     dec = false;
     if (NCdepth==0) {
       outcalced += fullstr.charAt(i);
+      outcalceddisp += fullstr.charAt(i);
       lastcut = i+1;
       if (fullstr.charAt(i)==',') {
         if (!fullstr.substring(i+1).match(/^\s*[\(\[\<\{]/) ||
@@ -1591,7 +1613,9 @@ function processCalcNtuple(fullstr, format) {
       res = singlevaleval(sub, format);
       err += res[1];
       outcalced += res[0];
+      outcalceddisp += roundForDisp(res[0]);
       outcalced += fullstr.charAt(i);
+      outcalceddisp += fullstr.charAt(i);
       lastcut = i+1;
     }
   }
@@ -1603,7 +1627,7 @@ function processCalcNtuple(fullstr, format) {
   }
   return {
     err: err,
-    dispvalstr: outcalced,
+    dispvalstr: outcalceddisp,
     submitstr: outcalced
   };
 }
@@ -1616,7 +1640,9 @@ function processCalcComplex(fullstr, format) {
   var arr = fullstr.split(',');
   var str = '';
   var outstr = '';
+  var outstrdisp = '';
   var outarr = [];
+  var outarrdisp = [];
   var real, imag, imag2, prep;
   for (var cnt=0; cnt<arr.length; cnt++) {
     str = arr[cnt].replace(/^\s+/,'').replace(/\s+$/,'');
@@ -1649,8 +1675,11 @@ function processCalcComplex(fullstr, format) {
     if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
       imag -= real;
       outstr = Math.abs(real)<1e-16?'':real;
+      outstrdisp = Math.abs(real)<1e-16?'':roundForDisp(real);
       outstr += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+imag+'i');
+      outstrdisp += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+roundForDisp(imag)+'i');
       outarr.push(outstr);
+      outarrdisp.push(outstrdisp);
     }
   }
   if (format.indexOf("generalcomplex")!=-1) {
@@ -1661,7 +1690,7 @@ function processCalcComplex(fullstr, format) {
   } else {
     return {
       err: err,
-      dispvalstr: outarr.join(', '),
+      dispvalstr: outarrdisp.join(', '),
       submitstr: outarr.join(',')
     };
   }
@@ -1698,7 +1727,7 @@ function processSizedMatrix(qn) {
       count++;
     }
     out[row] = '(' + out[row].join(',') + ')';
-    outcalc[row] = '(' + outcalc[row].join(',') + ')';
+    outcalc[row] = '(' + roundForDisp(outcalc[row]).join(',') + ')';
   }
   return {
     err: err,
@@ -1765,7 +1794,7 @@ function processCalcMatrix(fullstr, format) {
         err += singlevalsyntaxcheck(str,format);
         res = singlevaleval(str, format);
         err += res[1];
-        outcalc[i][j] = res[0];
+        outcalc[i][j] = roundForDisp(res[0]);
         outsub.push(res[0]);
       }
     }
