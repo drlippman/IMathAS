@@ -11,7 +11,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
  "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t",
- "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson");
+ "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson","cluster_bargraph");
 
 //nCr(n,r)
 //The Choose function
@@ -3078,4 +3078,220 @@ function stats_randpoisson($l,$n) {
     }
     return $out;
 }
+
+// cluster_bargraph(var1labels, var2labels,freqarray,label,[width,height,options])
+// var1labels : array of labels for the categories for variable 1 which appear on the horizontal axis 
+// var2labels: array of labels for the categories for variable 2 which appears in the legend.
+/*
+   freqarray: array of arrays holding the frequencies/heights for each bar. Note: freqarray should have the form [[1,3,5],[5,3,5],[1,3,2],[3,6,4]] or
+ 	 array(array(1,3,5),array(5,3,5),array(1,3,2),array(3,6,4)), which corresponds to variable 1 having 3 categories (3 clusters) and variable 2 having 
+	 4 categories (4 bars for each cluster).
+*/
+// label: general label for bars
+// width,height (optional): width and height for graph
+// options (optional): array of options:
+//  options['valuelabels'] = array of value labels, to be placed above each bar
+//  options['showgrid'] = false to hide the horizontal grid lines
+//  options['vertlabel'] = label for vertical axis. Defaults to none
+//  options['gap'] = gap (0 &le; gap &lt; 1) between bars
+//  options['toplabel'] = label for top of chart
+//  options['colors'] = array of colors for each bar in the clusters
+//  options['stroke'] = line color of the bars; default is black
+//  options['var1name'] = a string for the variable 1 name for alternative text 
+//  options['var2name'] = a string for the variable 2 name for alternative text 
+
+function cluster_bargraph($var1,$var2,$freq,$label,$width=450,$height=300,$options=array()) {
+	
+	if (!is_array($var1) || !is_array($var2)|| !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
+	if (count($var2) != count($freq)) { echo "var2labels and freqarray must have same length"; return 0;}
+	$n = array();
+	foreach($freq as $a){
+		if(!is_array($a)){
+			echo "freqarray is not an array of arrays";
+			return 0;
+		} else{
+			$n[] = count($a);
+		}
+	}
+	if (count(array_unique($n))>1){ echo "arrays within freqarray have to have the same length"; return 0;}
+	if (count($var1) != $n[0]) {echo "each array in freqarray must have same length as var1labels"; return 0;}
+
+	if(isset($options['colors'])){
+		$colors = $options['colors'];
+		if(count($colors) < count($var2)){
+			"You need to specify more colors. Color array should be same length as var2labels";
+			return 0;
+		}
+	} else{
+		// a blue scale for first 5 bars, then a green scale for the next five bars. if exceeds 10 bars, user needs to supply the colors
+		if(count($var2)>10){
+			echo "User needs to provide the colors for each bar";
+			return 0;
+		} else{
+			$colors = array("#8BC1F7","#519DE9","#06C","#004B95","#002F5D","#BDE2B9","#7CC674","#4CB140","#38812F","#23511E");
+		}
+		
+	}
+	if (isset($options['valuelabels'])) {
+		$valuelabels = $options['valuelabels'];
+		$idx = 0;
+		if(count($options['valuelabels']) != (count($var1)*count($var2))){
+			echo "Valuelabels array should have a label for each bar"; return 0;
+		}		
+	} else {
+		$valuelabels = false;
+	}
+	if (isset($options['vertlabel'])) {
+		$vertlabel = $options['vertlabel'];
+		$usevertlabel = true;
+	} else {
+		$vertlabel = 'Bar Height';
+		$usevertlabel = false;
+	}
+	if (isset($options['gap'])) {
+		$gap = $options['gap'];
+	} else {
+		$gap = 0;
+	}
+
+	if (isset($options['fill'])) {
+		$fill = $options['fill'];
+	} else {
+		$fill = 'blue';
+	}
+
+	if (isset($options['stroke'])) {
+		$stroke = $options['stroke'];
+	} else {
+		$stroke = 'black';
+	}
+	if(isset($options['var1name'])){
+		$var1name = $options['var1name'];
+	} else {
+		$var1name = "Variable 1";
+	}
+	if(isset($options['var2name'])){
+		$var2name = $options['var2name'];
+	} else {
+		$var2name = "Variable 2";
+	}
+
+	$alt = "Cluster bar graph for $label comparing variables $var1name and  $var2name. <table class=stats><thead><tr><th>$var1name / $var2name</th>";
+	for($curr = 0; $curr < count($var2); $curr++){
+		$alt .= "<th>{$var2[$curr]}</th>";
+	}
+	
+	$alt .= "</tr></thead>\n<tbody>\n";
+
+	$st = '';
+    $start = 0;
+	$x = $start+1;
+	$maxfreq = 0;
+	$midarr = array($x);
+	
+	for ($curr=0; $curr<count($var1); $curr++) {
+		
+		for($curr2=0; $curr2<count($var2); $curr2++){
+			if ($curr2==0){
+				$alt .= "<tr><td>{$var1[$curr]}</td>";
+			}
+			
+		 	$alt .= "<td>{$freq[$curr2][$curr]}</td>";
+			$st .= "fill='$colors[$curr2]';rect([$x,0],";
+			$x += 2;
+			$st .= "[$x,{$freq[$curr2][$curr]}]);";
+			$midarr[] = $x;
+			$y = $x-1;
+			
+			if ($valuelabels!==false) {
+				if (is_array($valuelabels)) {
+					$st .= "text([$y,{$freq[$curr2][$curr]}],\"{$valuelabels[$idx]}\",\"above\");";
+					$idx++;
+				} else {
+					$st .= "text([$x,{$freq[$curr2][$curr]},\"{$freq[$curr2][$curr]}\",\"above\");";
+				}
+			}
+			if ($freq[$curr2][$curr]>$maxfreq) { $maxfreq = $freq[$curr2][$curr];}		
+			
+		}
+		$alt .= "</tr>";
+		$mid = mean($midarr);
+		$st .= "text([$mid,0],\"{$var1[$curr]}\",\"below\");";	
+		$x += 1 + 2*$gap;
+		$midarr = array();
+		$midarr[0] = $x;
+	
+	}
+	$x -= 2*$gap;
+	$alt .= "</tbody></table>\n";
+	
+	if ($_SESSION['graphdisp']==0) {
+		return $alt;
+	}
+	$x++;
+
+	$strarr = array();
+	for($i=0; $i<count($var2); $i++){
+		$strarr[] = strlen($var2[$i]);
+	}
+	
+	//$x++;
+	
+	$power = floor(log10($maxfreq))-1;
+	$base = $maxfreq/pow(10,$power);
+
+	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
+
+	$legendmax = max($strarr);
+
+	if($legendmax < 10){$x2 = $x+1.95+0.7*$legendmax;} else if($legendmax < 20){$x2 = $x+1.95+0.8*$legendmax;} else if($legendmax <30){$x2 = $x+1.95+0.8*$legendmax;} else { $x2 = $x+1.95+$legendmax;}
+	$h1 = $maxfreq - $step*(count($var2)+0.25); 
+	$h2 = $maxfreq - 0.5*$step;
+	$legendstr ="fill='white';rect([$x,$h1],[$x2,$h2]);";
+	$x3 = $x +0.5;
+	$x4 = $x +0.9;
+	$h3 = $h2 - 0.7*$step;
+	$h4 = $h2 - 0.3*$step;
+	$x5 = $x+1;
+	$h5 = $h2 - 0.5*$step;
+
+	for($i=0;$i< count($var2); $i++){
+		$legendstr .= "fill='{$colors[$i]}';rect([$x3,$h3],[$x4,$h4]);text([$x5,$h5],'{$var2[$i]}','right');";
+		$h3 -= 0.75*$step;
+		$h4 -= 0.75*$step; 
+		$h5 -= 0.75*$step;
+	}
+
+	$topborder = ($valuelabels===false?10:25) + (isset($options['toplabel'])?20:0);
+	$leftborder = min(60, 9*max(strlen($maxfreq),strlen($maxfreq-$step))+10) + ($usevertlabel?30:0);
+	$bottomborder = 25+($label===''?0:20);	
+	$xmax =$x2+1;
+	
+
+	$outst = "setBorder($leftborder,$bottomborder,0,$topborder);  initPicture(".$start.",$xmax,0,$maxfreq);";
+
+	if (isset($options['showgrid']) && $options['showgrid']==false) {
+		$gdy = 0;		
+	} else {
+		$gdy = $step;
+	} 
+
+	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"$fill\"; stroke=\"$stroke\";";
+	if ($label!=='') {
+		$outst .= "textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+	}
+	if ($usevertlabel) {
+		$outst .= "textabs([0,". ($height/2+20) . "],\"$vertlabel\",\"right\",90);";
+	}
+	if (isset($options['toplabel'])) {
+		$outst .= "textabs([". ($width/2+15)  .",$height],\"{$options['toplabel']}\",\"below\");";
+	}
+
+	$outst .= $st.$legendstr;
+
+	
+	return showasciisvg($outst,$width,$height);
+	
+}
+
 ?>
