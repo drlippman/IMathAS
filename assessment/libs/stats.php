@@ -3244,15 +3244,15 @@ function cluster_bargraph($var1,$var2,$freq,$label,$width=450,$height=300,$optio
 
 	$legendmax = max($strarr);
 
-	if($legendmax < 10){$x2 = $x+1.95+0.7*$legendmax;} else if($legendmax < 20){$x2 = $x+1.95+0.8*$legendmax;} else if($legendmax <30){$x2 = $x+1.95+0.8*$legendmax;} else { $x2 = $x+1.95+$legendmax;}
+	if($legendmax < 10){$x2 = $x+2.25+0.7*$legendmax;} else if($legendmax < 20){$x2 = $x+2.25+0.8*$legendmax;} else if($legendmax <30){$x2 = $x+2.25+0.8*$legendmax;} else { $x2 = $x+2.25+$legendmax;}
 	$h1 = $maxfreq - $step*(count($var2)+0.25); 
 	$h2 = $maxfreq - 0.5*$step;
 	$legendstr ="fill='white';rect([$x,$h1],[$x2,$h2]);";
 	$x3 = $x +0.5;
-	$x4 = $x +0.9;
+	$x4 = $x +1.4;
 	$h3 = $h2 - 0.7*$step;
 	$h4 = $h2 - 0.3*$step;
-	$x5 = $x+1;
+	$x5 = $x+1.3;
 	$h5 = $h2 - 0.5*$step;
 
 	for($i=0;$i< count($var2); $i++){

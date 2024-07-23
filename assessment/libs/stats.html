@@ -29,6 +29,7 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#histogram">histogram</a></li>
 <li><a href="#fdhistogram">fdhistogram</a></li>
 <li><a href="#fdbargraph">fdbargraph</a></li>
+<li><a href="#cluster_bargraph">cluster_bargraph</a></li>
 <li><a href="#piechart">piechart</a></li>
 <li><a href="#normrand">normrand</a></li>
 <li><a href="#expdistrand">expdistrand</a></li>
@@ -66,7 +67,7 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#anova2way_f">Two-way ANOVA: F ratios/P values </a></li>
 <li><a href="#anova_table">ANOVA Table</a></li>
 <li><a href="#student_t">Two-sample student t-test</a></li>
-<li><a href="#cluster_bargraph">cluster_bargraph</a></li>
+
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -212,6 +213,34 @@ fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>&nbsp;&nbsp;options['toplabel'] = label for top of chart
 <BR>&nbsp;&nbsp;options['fill'] = fill color of the bars; default is blue
 <BR>&nbsp;&nbsp;options['stroke'] = line color of the bars; default is black
+
+<h3><a name="cluster_bargraph"></a><strong>cluster_bargraph</strong>(var1labels, var2labels,freqarray,label,[width,height,options])</h3>
+<p>The function cluster_bargraph() graphs a cluster bar graph also known as group bar chart or mult-series bar chart. </p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>var1labels</strong>: array of labels for the categories for variable 1 which appear on the horizontal axis </li>
+    <li><strong>var2labels</strong>: array of labels for the categories for variable 2 which appears in the legend.</li>
+    <li><strong>freqarray</strong>: array of arrays holding the frequencies/heights for each bar. Note: freqarray should have the form [[1,3,5],[5,3,5],[1,3,2],[3,6,4]] or 
+    array(array(1,3,5),array(5,3,5),array(1,3,2),array(3,6,4)), which corresponds to variable 1 having 3 categories (3 clusters) and variable 2 having 4 categories (4 bars for each cluster).</li>
+    <li><strong>label</strong>: general label for bars</li>
+    <li><strong>width</strong>,<strong>height</strong>(optional): width and height for graph</li>
+    <li><strong>options</strong>(optional): array of options:</li>
+    <ul>
+        <li>options['valuelabels'] = array of value labels, to be placed above each bar</li>
+        <li>options['showgrid'] = false to hide the horizontal grid lines</li>
+        <li>options['vertlabel'] = label for vertical axis. Defaults to none</li>
+        <li>options['gap'] = gap (0 &le; gap &lt; 1) between bars</li>
+        <li>options['toplabel'] = label for top of chart</li>
+        <li>options['colors'] = array of colors for each bar in the clusters</li>
+        <li>options['stroke'] = line color of the bars; default is black</li>
+        <li>options['var1name'] = a string for the variable 1 name for alternative text </li>
+        <li>options['var2name'] = a string for the variable 2 name for alternative text </li>
+    </ul>
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>Cluster bargraph</p>
+<p>&nbsp;</p>
+     
 <BR><h3><a name="piechart">piechart</a></h3>
 piechart(percents, labels, {width, height})
 <BR>create a piechart
@@ -476,29 +505,4 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   <p>t statistic, corresponding P-value (area to the right of t-value -  one-tail), and degree of freedom for two sample student t-test as an array in the form [t, P-value, df].</p>
   <p>&nbsp;</p> 
 
-  <p><h3><a name="cluster_bargraph"></a><strong>cluster_bargraph</strong>(var1labels, var2labels,freqarray,label,[width,height,options])</h3></p>
-  <p>The function cluster_bargraph() graphs a cluster bar graph also known as group bar chart or mult-series bar chart. </p>
-  <p><em>Parameters:</em></p>
-  <ul>
-    <li><strong>var1labels</strong>: array of labels for the categories for variable 1 which appear on the horizontal axis </li>
-    <li><strong>var2labels</strong>: array of labels for the categories for variable 2 which appears in the legend.</li>
-    <li><strong>freqarray</strong>: array of arrays holding the frequencies/heights for each bar. Note: freqarray should have the form [[1,3,5],[5,3,5],[1,3,2],[3,6,4]] or 
-      array(array(1,3,5),array(5,3,5),array(1,3,2),array(3,6,4)), which corresponds to variable 1 having 3 categories (3 clusters) and variable 2 having 4 categories (4 bars for each cluster).</li>
-     <li><strong>label</strong>: general label for bars</li>
-     <li><strong>width</strong>,<strong>height</strong>(optional): width and height for graph</li>
-     <li><strong>options</strong>(optional): array of options:</li>
-     <ul>
-        <li>options['valuelabels'] = array of value labels, to be placed above each bar</li>
-        <li>options['showgrid'] = false to hide the horizontal grid lines</li>
-        <li>options['vertlabel'] = label for vertical axis. Defaults to none</li>
-        <li>options['gap'] = gap (0 &le; gap &lt; 1) between bars</li>
-        <li>options['toplabel'] = label for top of chart</li>
-        <li>options['colors'] = array of colors for each bar in the clusters</li>
-        <li>options['stroke'] = line color of the bars; default is black</li>
-        <li>options['var1name'] = a string for the variable 1 name for alternative text </li>
-        <li>options['var2name'] = a string for the variable 2 name for alternative text </li>
-     </ul>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>Cluster bargraph</p>
-  <p>&nbsp;</p> 
+  

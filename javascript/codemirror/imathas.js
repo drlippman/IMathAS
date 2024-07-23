@@ -159,7 +159,7 @@
     // solvers
     imathasBuiltin += " discretenewtons bisectionsolve";
     // stats
-    imathasBuiltin += " nCr nPr mean stdev variance absmeandev percentile interppercentile Nplus1percentile quartile TIquartile Excelquartile Excelquartileexc Nplus1quartile allquartile median freqdist frequency histogram fdhistogram fdbargraph normrand expdistrand boxplot normalcdf tcdf invnormalcdf invtcdf invtcdf2 linreg expreg countif binomialpdf binomialcdf chicdf invchicdf chi2cdf invchi2cdf fcdf invfcdf piechart mosaicplot checklineagainstdata chi2teststat checkdrawnlineagainstdata csvdownloadlink modes forceonemode dotplot gamma_cdf gamma_inv beta_cdf beta_inv anova1way_f anova1way anova2way anova_table anova2way_f student_t";
+    imathasBuiltin += " nCr nPr mean stdev variance absmeandev percentile interppercentile Nplus1percentile quartile TIquartile Excelquartile Excelquartileexc Nplus1quartile allquartile median freqdist frequency histogram fdhistogram fdbargraph normrand expdistrand boxplot normalcdf tcdf invnormalcdf invtcdf invtcdf2 linreg expreg countif binomialpdf binomialcdf chicdf invchicdf chi2cdf invchi2cdf fcdf invfcdf piechart mosaicplot checklineagainstdata chi2teststat checkdrawnlineagainstdata csvdownloadlink modes forceonemode dotplot gamma_cdf gamma_inv beta_cdf beta_inv anova1way_f anova1way anova2way anova_table anova2way_f student_t cluster_bargraph";
     // timedate
     imathasBuiltin += " timetominutes thisyear";
     // units
