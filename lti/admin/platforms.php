@@ -37,9 +37,18 @@ if (!empty($_POST['lms']) &&
             $_POST['canvas_'.$key] = str_replace('canvas.', 'canvas.'.$_POST['canvasenv'].'.', $_POST['canvas_'.$key]);
         }
     }
-    if (empty(trim($_POST[$lms.'_authserver']))) {
+    if (empty($_POST[$lms.'_authserver'])) {
       $_POST[$lms.'_authserver'] = '';
     }
+
+  // check if already exists
+  $stm = $DBH->prepare("SELECT * FROM imas_lti_platforms WHERE issuer=? AND client_id=?");
+  $stm->execute([trim($_POST[$lms.'_issuer']), trim($_POST[$lms.'_clientid'])]);
+  $existingplatform = $stm->fetch();
+  if ($existingplatform !== false) {
+    echo 'Error: a registration already exists with that issuer and client_id';
+    exit;
+  }
   $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,auth_server,key_set_url,uniqid,created_by) VALUES (?,?,?,?,?,?,?,?)");
   $stm->execute(array(
     trim($_POST[$lms.'_issuer']),

@@ -23,7 +23,7 @@ function calculusdiffquotient($func,$var,$ainputval,$hval) {
 //n subdivisions using specified method
 //method = left, right, midpoint, trapezoidal, or simpsons
 function calculusnumint($func,$var,$a,$b,$n,$method) {
-	if ($n<=0 || $a>=$b) {
+	if ($n<=0) {
 		echo "invalid params to calculusnumint";
 		return false;
 	}
@@ -31,10 +31,13 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 		echo "simpsons requires even n";
 		return false;
 	}
+    if ($a == $b) {
+        return 0;
+    }
 	$func = makeMathFunction(makepretty($func), $var);
 	if ($func===false) { return 0;}
 	$dx = ($b-$a)/$n;
-	if ($method=='right') {
+	if (($method=='right' && $a < $b) || ($method=='left' && $b < $a)) {
 		$x = $a+$dx;
 	} else if ($method=='midpoint') {
 		$x = $a+.5*$dx;

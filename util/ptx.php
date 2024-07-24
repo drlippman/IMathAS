@@ -182,7 +182,7 @@ function mbxproc($qn,$qsetid,$seed) {
     $res = $a2->displayQuestion(0, ['includeans'=>true, 'printformat'=>true, 'showallparts'=>true, 'hideans'=>true]);
     $statement = mbxfilter($res['html']);
     if (is_array($res['jsparams']['ans'])) {
-        $soln = mbxfilter('<p><ul><li>'.implode('</li><li>',$res['jsparams']['ans']).'</li></ul></p>');
+        $soln = mbxfilter('<ul><li>'.implode('</li><li>',$res['jsparams']['ans']).'</li></ul>');
     } else {
         $soln = mbxfilter('<p>'.$res['jsparams']['ans'].'</p>');
     }

@@ -3570,7 +3570,27 @@ class AssessRecord
     if ($hasfeedback) {
       $this->assessRecord['status'] |= 8; // indicate we have feedback
     } else {
-      $this->assessRecord['status'] &= ~8; // indicate we have do not have feedback
+      $hasFB = false;
+      // need to check if there is feedback on other questions than the one recorded
+      foreach ($this->data['assess_versions'] as $aver) {
+        if (!empty($aver['feedback'])) {
+            $hasFB = true;
+            break;
+        }
+        foreach ($aver['questions'] as $question) {
+          foreach ($question['question_versions'] as $qver) {
+            if (!empty($qver['feedback'])) {
+                $hasFB = true;
+                break 3;
+            }
+          }
+        }
+      }
+      if ($hasFB) {
+        $this->assessRecord['status'] |= 8; // indicate we have feedback
+      } else {
+        $this->assessRecord['status'] &= ~8; // indicate we have do not have feedback
+      }
     }
   }
 

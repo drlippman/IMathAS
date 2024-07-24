@@ -13,7 +13,9 @@ class Resource_Message_Validator implements Message_Validator {
         if (empty($jwt_body['https://purl.imsglobal.org/spec/lti/claim/context'])) {
             throw new LTI_Exception('Must have a context');
         }
-        if ($jwt_body['https://purl.imsglobal.org/spec/lti/claim/version'] !== '1.3.0') {
+        if (!isset($jwt_body['https://purl.imsglobal.org/spec/lti/claim/version']) || 
+            $jwt_body['https://purl.imsglobal.org/spec/lti/claim/version'] !== '1.3.0'
+        ) {
             throw new LTI_Exception('Incorrect version, expected 1.3.0');
         }
         if (!isset($jwt_body['https://purl.imsglobal.org/spec/lti/claim/roles'])) {
