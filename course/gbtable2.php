@@ -1033,7 +1033,7 @@ function gbtable() {
 			if (!isset($assesscol[$r['typeid']])) {
 				continue; //assessment is hidden
 			}
-			if ($r['exceptionenddate'] > $courseenddate && $now > $courseenddate) { //for grading purposes, cutoff exceptions at courseenddate
+			if ($r['exceptionenddate'] > $courseenddate && ($now > $courseenddate || $r['islatepass'] > 0)) { //for grading purposes, cutoff exceptions at courseenddate
 				$r['exceptionenddate'] = $courseenddate;
 			}
 			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass'],$r['timeext']);

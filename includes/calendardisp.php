@@ -18,7 +18,7 @@ require_once "filehandler.php";
 function showcalendar($refpage) {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
-global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver, $excused;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver, $excused, $courseenddate;
 
 $now= time();
 
@@ -117,6 +117,9 @@ if (!isset($teacherid)) {
 	$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid");
 	$stm->execute(array(':userid'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if ($row[2] > $courseenddate && $row[3] > 0) {
+			$row[2] = $courseenddate;
+		}
 		if ($row[5]=='A') {
 			$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
 		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
