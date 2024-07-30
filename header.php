@@ -192,7 +192,7 @@ if (!isset($_SESSION['mathdisp'])) {
 					callback = function () {};
 				}
                 MathJax.typesetClear([node]);
-                MathJax.typesetPromise([node]).then(callback);
+                MathJax.typesetPromise([node]).then(sendLTIresizemsg).then(callback);
 			} else {
 				setTimeout(function() {rendermathnode(node, callback);}, 100);
 			}

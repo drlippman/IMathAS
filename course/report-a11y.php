@@ -8,7 +8,9 @@ if (!isset($teacherid)) {
 }
 
 $errors = [];
+$asciisvgpattern = '/^showasciisvg\(\s*((("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])+,\s*){0,2}("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])?\s*)?\)$/';
 function a11yscan($content, $field, $type, $itemname, $link='') {
+    global $asciisvgpattern;
     // ensure regex considers \" as well as " to account for encoding
     $content = str_replace(['\\\'','\\"', "'"], ['"','"','"'], $content);
     // look for empty text, or missing alt text.  sloppy, but works
@@ -18,6 +20,12 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
         } else if (trim($matches[2]) == '') {
             adderror(_('Blank alt text'), $field, $type, $itemname, $link); 
         }
+    }
+    // look for asciisvg call with undefined alt text.
+    // we'll assume if alt text is defined but blank that it was intentional
+    // does not account for use of replacealttext later in the question
+    if (preg_match($asciisvgpattern, $content)) {
+        adderror(_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link); 
     }
 }
 function adderror($descr, $loc, $itemtype, $itemname, $link) {

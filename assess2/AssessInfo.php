@@ -115,6 +115,9 @@ class AssessInfo
    */
   public function setException($uid, $exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
 
+    if ($courseenddate == 2000000000) {
+        $courseenddate = $GLOBALS['courseenddate'] ?? 2000000000;
+    }
     // resets, in case we're using setException multiple times
     $resetkeys = ['exceptionpenalty','original_enddate','extended_with',
         'timeext','attemptext', 'startdate', 'enddate', 'enddate_in',
@@ -131,6 +134,11 @@ class AssessInfo
                 $this->assessData[$key] = $this->resetdata[$key];
             }
         }
+    }
+
+    // if latepass exception, and enddate is past course enddate, move back
+    if ($exception !== false && $exception[1] > $courseenddate && $exception[2] > 0) {
+        $exception[1] = $courseenddate;
     }
 
     $this->exception = $exception;

@@ -778,6 +778,13 @@ switch($_POST['action']) {
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':cid'=>$_GET['id']));
 				}
+                // fix any latepass-based exceptions to not exceed course end date
+                $query = "UPDATE imas_exceptions JOIN imas_assessments ";
+                $query .= "ON imas_exceptions.assessmentid=imas_assessments.id ";
+                $query .= "SET imas_exceptions.enddate = ? ";
+                $query .= "WHERE imas_exceptions.enddate > ? AND imas_exceptions.islatepass>0 AND imas_assessments.courseid=?";
+                $stm = $DBH->prepare($query);
+                $stm->execute([$enddate,$enddate,$_GET['id']]);
 			}
 		} else { //new course
 

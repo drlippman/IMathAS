@@ -378,7 +378,7 @@ export default {
       };
 
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ, this.$refs.thisqwrap);
-
+      setTimeout(window.sendLTIresizemsg, 100);
       actions.setRendered(this.qn, true);
     },
     setInitValues () {
