@@ -28,6 +28,7 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#countif">countif</a></li>
 <li><a href="#histogram">histogram</a></li>
 <li><a href="#fdhistogram">fdhistogram</a></li>
+<li><a href="#stem_plot">stem_plot</a></li>
 <li><a href="#fdbargraph">fdbargraph</a></li>
 <li><a href="#cluster_bargraph">cluster_bargraph</a></li>
 <li><a href="#piechart">piechart</a></li>
@@ -199,6 +200,23 @@ fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height,showgrid,fil
 <p>To fill in only some optional parameters, the 5th argument can instead be an associate array 
  of values to fill in, like ['width'=>500, 'fill'=>'blue'].  When used this way, 'vertlabel' can 
  be used to change the vertical axis label.</p>
+ <h3><a name="stem_plot"></a><strong>stem_plot</strong>(data, [options])</h3>
+ <p>The function stem_plot() produces a basic stem-and-leaf display. </p>
+ <p><em>Parameters:</em></p>
+ <ul>
+     <li><strong>data</strong>: array of data.</li>
+     <li><strong>options</strong>(optional): array of options:</li>
+     <ul>
+         <li>options['key'] = false will remove key. For example, by default there is a key such as Key: 3|4 means 34 and will be removed if false. If $options['customkey'] is set, then options['key'] will be ignored.</li>
+         <li>options['customkey'] = string for a custom key.</li>
+         <li>options['space'] = false will remove the space between each leaf digit. By default the spacing looks like 3| 1 2 2 3 4 5, setting to false will yield 3|122345.</li>
+         <li>options['stemlabel'] = string for a custom label for Stem.</li>
+         <li>options['leaflabel'] = string for a custom label for Leaf.</li>
+         <li>options['split'] = true will make a split stem-and-leaf display. For example, a stem such as 3|2345789 will be split to two stems 3|234 and 3|5789.</li>
+     </ul>
+ </ul>
+ <p>&nbsp;<em>Returns:</em></p>
+ <p>Stem-and-leaf display</p>
 <BR><h3><a name="fdbargraph">fdbargraph</a></h3>
 fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>barlabels: array of labels for the bars
