@@ -580,7 +580,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 if ($editingon) {
     $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE (enddate>$exlowertime OR avail=2) AND avail>0 AND courseid=:courseid ORDER BY name";
 } else {
-    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE (enddate>$exlowertime OR avail=2) AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+    $query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE avail>0 AND courseid=:courseid ORDER BY name";
+	// removed to allow for exceptions:
+	// (enddate>$exlowertime OR avail=2) AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND 
 }
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
@@ -602,7 +604,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$posttag = htmlentities($posttag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$replytag = htmlentities($replytag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	if ($row['postby']!=2000000000) { //($row['postby']>$now || isset($teacherid))
+	if (($editingon && $row['postby']!=2000000000) ||
+		($row['postby']>$exlowertime && $row['postby']<$uppertime)) { //($row['postby']>$now || isset($teacherid))
 
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['postby']));
 		$colors = makecolor2($row['startdate'],$row['postby'],$now);
@@ -627,7 +630,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json,$row['name'],$status);
 	}
-	if ($row['replyby']!=2000000000) { //($row['replyby']>$now || isset($teacherid))
+	if (($editingon && $row['replyby']!=2000000000) ||
+		($row['replyby']>$exlowertime && $row['replyby']<$uppertime)) { //($row['replyby']>$now || isset($teacherid))
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['replyby']));
 		$colors = makecolor2($row['startdate'],$row['replyby'],$now);
 		if ($editingon) {$colors='';}
