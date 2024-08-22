@@ -230,7 +230,7 @@ class NumberScorePart implements ScorePart
                 //has a variable - don't strip
             } else {
                 //strip out units. Must start with a letter
-                $gaarr[$k] = preg_replace('/^((-|\+)?(\d+\.?\d*|\.\d+)[Ee]?[+\-]?\d*)\s*[a-zA-Z][^+\-]*$/','$1',$gaarr[$k]);
+                $gaarr[$k] = preg_replace('/^((-|\+)?(\d+\.?\d*|\.\d+)([Ee]([+\-]\d+|\d+)))?\s*[a-zA-Z][^+\-]*$/','$1',$gaarr[$k]);
             }
         }
         if (in_array('orderedlist',$ansformats)) {
