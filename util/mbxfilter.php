@@ -63,6 +63,7 @@ function mbxfilter($str) {
 
 //rewrite input boxes, select, textarea, etc.
 	$str = preg_replace('/<input[^>]*Preview[^>]*>\s*/','',$str); //strip preview buttons
+    $str = preg_replace('/<button[^>]*>Preview.*?<\/button>/','',$str); //strip preview buttons
 	$str = preg_replace('/<input[^>]*hidden[^>]*>\s*/','',$str); //strip hidden fields
 
 	//assume we've bypassed any $displayformat options for choices,multans,matching
