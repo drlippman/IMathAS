@@ -892,6 +892,9 @@ function setupvideoembeds(i,el) {
 		"class": "videoembedbtn"
 	}).insertAfter(el);
 	jQuery(el).addClass("prepped");
+    if (el.getAttribute("data-def") === 'open') {
+        jQuery(el).next().trigger("click");
+    }
 	videoembedcounter++;
 }
 
