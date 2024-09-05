@@ -55,14 +55,36 @@ function initcell() {
 	observeDOM($(".sagecell_input")[0], frameresize);
 	observeDOM($(".sagecell_output")[0], frameresize);
 	if (update_id != "") {
-			observeDOM($(".sagecell_input")[0], function() {
-				var code = $(".sagecell_commands").val();
-				window.parent.postMessage( JSON.stringify({
-					subject: "imathas.update",
-					id: update_id,
-					value: code.replace(/</g,'&lt;').replace(/>/g,'&gt;')
-				}), "*");
+            const { get, set } = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+            const scc = $(".sagecell_commands")[0];
+            Object.defineProperty(scc, 'value', {
+                get() {
+                    return get.call(this);
+                },
+                set(newVal) {
+                    window.parent.postMessage( JSON.stringify({
+                        subject: "imathas.update",
+                        id: update_id,
+                        value: newVal.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                    }), "*");
+                    return set.call(this, newVal);
+                }
+            });
+
+			/*
+            observeDOM approach seemed to be one update behind.
+            setTimeout worked, but required a long delay
+
+            observeDOM($(".sagecell_input")[0], function() {
+                var code = $(".sagecell_commands").val();
+                console.log(code);
+                window.parent.postMessage( JSON.stringify({
+                    subject: "imathas.update",
+                    id: update_id,
+                    value: code.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                }), "*");
 			});
+            */
 	}
 	if (update_out != "") {
 			observeDOM($(".sagecell_output")[0], function() {
