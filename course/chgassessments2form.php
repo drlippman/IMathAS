@@ -421,7 +421,7 @@ $vueData = array(
                             </select>
                         </span>
                     </span>
-                    <span v-show="showwork != 'DNC' && showwork > 0">
+                    <span v-show="showwork != 'DNC'">
                         <br>
                         <label for="showworktype"><?php echo _('Work entry type');?>:</label>
                         <select name="showworktype" id="showworktype" v-model="showworktype">

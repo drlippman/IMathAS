@@ -441,7 +441,7 @@ $vueData = array(
                         </select>
                     </span>
                 </span>
-                <span v-if="showwork >0">
+                <span>
                     <br>
                     <label for="showworktype"><?php echo _('Work entry type');?>:</label>
                     <select name="showworktype" id="showworktype" v-model="showworktype">
