@@ -113,7 +113,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
                     }
                     $lastver['timelimit_ext'][] = $timelimitext;
                     $iarupdate = $DBH->prepare('UPDATE imas_assessment_records SET scoreddata=? WHERE userid=? AND assessmentid=?');
-                    $iarupdate->execute([gzcompress(json_encode($adata)), $aid, $uid]);
+                    $iarupdate->execute([gzcompress(json_encode($adata)), $uid, $aid]);
                     $timelimitext *= -1; // mark as used
                 }
             }
