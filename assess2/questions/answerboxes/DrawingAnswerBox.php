@@ -566,7 +566,7 @@ class DrawingAnswerBox implements AnswerBox
                     array_shift($function);
                     $defcolor = 'grey';
                 }
-                if ($function[0][0] === 'x') {
+                if (!empty($function[0]) && $function[0][0] === 'x') {
                     $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
                 }
                 if (count($function)==2 && ($function[1][0]==='<' || $function[1][0]==='>')) {

@@ -499,7 +499,7 @@ class FunctionExpressionScorePart implements ScorePart
                                 continue;
                             }
                         }
-                        $correctscores[] = $partialpts[$ansidx];
+                        $correctscores[] = $partialpts[$ansidx] ?? 1;
                         $givenansused[$gaidx] = 1;
                         continue 3; // skip to next answer list entry
                     }
