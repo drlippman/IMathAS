@@ -1149,8 +1149,25 @@ function drawTarget(x,y,skipencode) {
 			}
 			if (x2 != null && (x2!=tplines[curTarget][i][0][0] || y2!=tplines[curTarget][i][0][1])) {
 				if (tptypes[curTarget][i]==7) { //is a tp circle
-					var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
-					ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
+                    // old code: required square grid
+					//var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
+					//ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
+                    // new code: draw as ellipse
+                    var dx = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var dy = Math.abs(y2-tplines[curTarget][i][0][1]);
+                    // convert to coordinate values to find radius
+                    var dxv = dx / targets[curTarget].pixperx;
+                    var dyv = dy / targets[curTarget].pixpery;
+                    var rad = Math.sqrt(dxv*dxv+dyv*dyv);
+                    ctx.save(); // save state
+					ctx.beginPath();
+                    // scale to grid
+                    var rx = rad*targets[curTarget].pixperx;
+                    var ry = rad*targets[curTarget].pixpery;
+					ctx.translate(tplines[curTarget][i][0][0]-rx, tplines[curTarget][i][0][1]-ry);
+					ctx.scale(rx, ry);
+					ctx.arc(1, 1, 1, 0, 2 * Math.PI, false);
+					ctx.restore(); // restore to original state
 				} else if (tptypes[curTarget][i]==7.2) { //if a tp ellipse
 					var rx = Math.abs(x2-tplines[curTarget][i][0][0]);
 					var ry = Math.abs(y2-tplines[curTarget][i][0][1]);

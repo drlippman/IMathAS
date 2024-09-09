@@ -408,14 +408,12 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 8.6;}
                         $out .= ' alt="General Logarithm"/>';
                     }
-                    if ($settings[6] * ($settings[3] - $settings[2]) == $settings[7] * ($settings[1] - $settings[0])) {
-                        //only circles if equal spacing in x and y
-                        if (count($answerformat) == 1 || in_array('circle', $answerformat)) {
-                            $out .= "<img src=\"$staticroot/img/tpcirc.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7\" ";
-                            if (count($answerformat) > 1 && $answerformat[1] == 'circle') {$out .= 'class="sel" ';
-                                $def = 7;}
-                            $out .= ' alt="Circle"/>';
-                        }
+
+                    if (count($answerformat) == 1 || in_array('circle', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tpcirc.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'circle') {$out .= 'class="sel" ';
+                            $def = 7;}
+                        $out .= ' alt="Circle"/>';
                     }
                     if (in_array('ellipse', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpellipse.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.2\" ";
