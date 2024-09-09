@@ -143,7 +143,7 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'funcvar,arcsinh,arccosh,arctanh,arcsech,arccsch,arccoth,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'funcvar,arcsinh,arccosh,arctanh,arcsech,arccsch,arccoth,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,div,ln');
     }
 
     //build regex's for matching symbols
@@ -486,6 +486,12 @@ class MathParser
               'symbol'=>$nextSymbol
             ];
             $lastTokenType = 'variable';
+          } else if ($nextSymbol === 'div') {
+            $tokens[] = [
+                'type'=>'operator',
+                'symbol'=>'/'
+            ];
+            $lastTokenType = 'operator';
           } else {
             // found a function.  We'll handle a couple special cases here too
             if ($nextSymbol === 'log') {

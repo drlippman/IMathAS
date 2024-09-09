@@ -145,6 +145,8 @@ function mathjs(st,varlist) {
 
   st = st.replace(/\*?\s*degrees?/g,"*((pi)/180)");
 
+  st = st.replace(/div/,'/');
+
   //convert named constants
   st = st.replace(/e/g, "(E)");
 
