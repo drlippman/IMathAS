@@ -161,6 +161,21 @@ class QuestionHtmlGenerator
             if (!empty($doShowAnswerParts[0])) {
                 $doShowAnswer = true;
             }
+            if (isset($stuanswers[$thisq]) && is_array($stuanswers[$thisq])) {
+                // shouldn't be. Log and fix.
+                $db_qsetid = $this->questionParams->getDbQuestionSetId();
+                $logdata = "stuanswers is array in qid $db_qsetid: " . 
+                    print_r($stuanswers[$thisq], true) . 
+                    '; in script ' . $_SERVER['REQUEST_URI'] . 
+                    ' with post params ' . print_r($_POST, true);
+                $stm = $this->dbh->prepare("INSERT INTO imas_log (log,time) VALUES (?,?)");
+                $stm->execute([$logdata, time()]);
+                unset($stm);
+                $stuanswers[$thisq] = $stuanswers[$thisq][0];
+                if (isset($stuanswersval[$thisq]) && is_array($stuanswersval[$thisq])) {
+                  $stuanswersval[$thisq] = $stuanswersval[$thisq][0];
+                }
+            }
         }
         $stulastentry = null;
         if (isset($stuanswers[$thisq])) {
