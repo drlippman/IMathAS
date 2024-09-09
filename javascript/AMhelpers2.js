@@ -2244,7 +2244,7 @@ function singlevaleval(evalstr, format) {
   }
   try {
     var res = scopedmatheval(evalstr);
-    if (res === '') {
+    if (res === '' || typeof res === 'undefined') {
       return [NaN, _("syntax incomplete")+". "];
     }
     return [res, ''];
