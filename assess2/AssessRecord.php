@@ -3547,7 +3547,21 @@ class AssessRecord
       if ($pts[1] === 'g') {
         // assessment-level feedback
         $av = intval($pts[0]);
-        $this->data['assess_versions'][$av]['feedback'] = Sanitize::incomingHtml($fb);
+        if ($av >= count($this->data['assess_versions'])) {
+            //is feedback for practice version
+            // need to do some hacky stuff to switch to practice version then back
+            $this->saveRecord();
+            $this->is_practice = true;
+            $this->data = null;
+            $this->parseData();
+            $this->data['assess_versions'][0]['feedback'] = Sanitize::incomingHtml($fb);
+            $this->saveRecord();
+            $this->data = null;
+            $this->is_practice = false;
+            $this->parseData();
+        } else {
+            $this->data['assess_versions'][$av]['feedback'] = Sanitize::incomingHtml($fb);
+        }
       } else if ($pts[0] === 'scored') {
         $qn = intval($pts[1]);
         if ($by_question) {
