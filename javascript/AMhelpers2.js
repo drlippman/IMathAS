@@ -468,6 +468,7 @@ function initShowAnswer2() {
           if (!curstate) {
             $("#ans"+qref).attr("tabindex","-1").focus();
           }
+          sendLTIresizemsg();
         })
         .html(icon)
     );
@@ -505,6 +506,7 @@ function initShowAnswer2() {
 		  	  .siblings("div:first-of-type")
 				.attr("aria-expanded",!curstate).attr("aria-hidden",curstate)
 				.toggleClass("hidden",curstate);
+            sendLTIresizemsg();
 		});
 	});
 }
@@ -2312,6 +2314,7 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 	}
 	var k=btn.innerHTML;
 	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
+    sendLTIresizemsg();
 }
 
 var seqgroupcollapsed = {};
@@ -2351,6 +2354,7 @@ function setupSeqPartToggles(base) {
                         $("#"+ctls).slideToggle(300);
                         var pts = ctls.substr(6).split("-");
                         seqgroupcollapsed[pts[0]][pts[1]] = state;
+                        sendLTIresizemsg();
                     }
                 }));
             }
