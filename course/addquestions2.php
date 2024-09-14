@@ -187,6 +187,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           array('grades'=>$grades)
         );
       }
+            // clear any locks
+            $stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE courseid=? and lockaid=?");
+            $stm->execute([$cid, $aid]);
 			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");

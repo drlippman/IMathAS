@@ -86,6 +86,10 @@ if ($type == 'all' && $keepver == 0) {
   );
   $stm = $DBH->prepare('DELETE FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
+  // clear any lock
+  $stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE userid=? AND courseid=? AND lockaid=?");
+  $stm->execute([$uid, $cid, $aid]);
+
   $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A' AND userid=?");
   $stm->execute(array($aid, $uid));
   $assess_record->clearLPblocks();
@@ -109,6 +113,12 @@ if ($type == 'all' && $keepver == 0) {
 }
 // recalculated totals based on removed attempts
 $assess_record->reTotalAssess();
+
+if (($assess_record->getStatus() & 1) == 0) {
+  // does not have unsubmitted; clear any locks
+  $stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE userid=? AND courseid=? AND lockaid=?");
+  $stm->execute([$uid, $cid, $aid]);
+}
 
 // get gbscore and scored_version
 $assessInfoOut = $assess_record->getGbScore();

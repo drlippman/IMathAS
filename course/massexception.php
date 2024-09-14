@@ -200,6 +200,9 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
 					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
+                    // clear any lock
+                    $stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE userid=? AND courseid=? AND lockaid=?");
+                    $stm->execute([$stu, $cid, $aid]);
 				}
 
 			}
