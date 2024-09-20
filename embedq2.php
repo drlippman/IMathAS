@@ -353,6 +353,7 @@ $placeinhead .= '<script type="text/javascript">
         MathJax.Hub.Queue(function () {
             sendresizemsg();
         });
+        MathJax.Hub.Register.MessageHook("End Process", sendresizemsg);
     } 
   } else {
       $(function() {

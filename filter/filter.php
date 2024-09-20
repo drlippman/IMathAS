@@ -161,7 +161,8 @@
                         $tag = '<div id="'.$uniqid.'wrap" class="embedwrap">';
                         $tag .= "<iframe id=\"$uniqid\" width=\"$w\" height=\"$h\" src=\"$url\" style=\"z-index:$zindex\" frameborder=\"0\">";
                         $tag .= '</iframe></div>';
-                        $str = str_replace($resval[0], $tag, $str);
+                        //$str = str_replace($resval[0], $tag, $str);
+                        $str = substr_replace($str, $tag, strpos($str, $resval[0]), strlen($resval[0]));
                         $zindex--;
                         continue;
                     }
