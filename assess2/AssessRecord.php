@@ -1918,7 +1918,13 @@ class AssessRecord
       $autosave = $this->getAutoSaves($qn);
     }
 
-    $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
+    if (isset($qver['answeights'])) {
+        $numParts = count($qver['answeights']);
+    } else if (count($qver['tries']) > 0) {
+        $numParts = max(array_keys($qver['tries'])) + 1;
+    } else {
+        $numParts = 0;
+    }
     // separate numpartautosave, since in conditional, answeights tells us 1 part, and we want to
     // continue to use that for qcolor and such
     $numPartsAutosave = $numParts;
@@ -1959,17 +1965,10 @@ class AssessRecord
           if (is_array($stuanswers[$qn+1]) || $numPartsAutosave > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
             $autosaves[$qn+1][$pn] = array($stuanswers[$qn+1][$pn] ?? '', $autosave['stuans'][$pn]);
           } else {
-            $autosaves[$qn+1] = array($stuanswers[$qn+1] ?? '', $autosave['stuans'][$pn]);
+            $autosaves[$qn+1][$pn] = array($stuanswers[$qn+1] ?? '', $autosave['stuans'][$pn]);
           }
         } else {
-          if (is_array($stuanswers[$qn+1]) || $numPartsAutosave > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
-            if (isset($autosaves[$qn+1]) && !is_array($autosaves[$qn+1])) { // isn't array yet for some reason; make it one
-                $autosaves[$qn+1] = array($autosaves[$qn+1]);
-            }
-            $autosaves[$qn+1][$pn] = $autosave['stuans'][$pn];
-          } else {
-            $autosaves[$qn+1] = $autosave['stuans'][$pn];
-          }
+          $autosaves[$qn+1][$pn] = $autosave['stuans'][$pn];
         }
         $usedAutosave[] = $pn;
       }
@@ -2036,7 +2035,7 @@ class AssessRecord
         } else {
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
-      }
+      } 
       if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$qver['scored_try'][$pn]]['wrongfmt']);
@@ -2060,6 +2059,7 @@ class AssessRecord
     if ($numParts == 0 && $this->teacherInGb) {
         $seqPartDone = true;
     }
+
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
     $questionParams = new QuestionParams();
     $questionParams

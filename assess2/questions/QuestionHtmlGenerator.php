@@ -177,17 +177,18 @@ class QuestionHtmlGenerator
                 }
             }
         }
+
         $stulastentry = null;
         if (isset($stuanswers[$thisq])) {
             $stulastentry = $stuanswers[$thisq];
         }
         if (isset($autosaves[$thisq])) {
-            if (is_array($autosaves[$thisq])) {
-              foreach ($autosaves[$thisq] as $iidx=>$kidx) {
-                $stulastentry[$iidx] = $kidx;
-              }
+            if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
+                foreach ($autosaves[$thisq] as $iidx=>$kidx) {
+                    $stulastentry[$iidx] = $kidx;
+                }
             } else {
-                $stulastentry = $autosaves[$thisq];
+                $stulastentry = $autosaves[$thisq][0];
             }
         }
 
@@ -412,12 +413,8 @@ class QuestionHtmlGenerator
             // Get the answers to all parts of this question.
             $lastAnswersAllParts = $stuanswers[$thisq] ?? [];
             if (isset($autosaves[$thisq])) {
-              if (is_array($autosaves[$thisq])) {
-                foreach ($autosaves[$thisq] as $iidx=>$kidx) {
+              foreach ($autosaves[$thisq] as $iidx=>$kidx) {
                   $lastAnswersAllParts[$iidx] = $kidx;
-                }
-              } else {
-                $lastAnswersAllParts = $autosaves[$thisq];
               }
             }
             if (!is_array($lastAnswersAllParts)) {
@@ -583,8 +580,8 @@ class QuestionHtmlGenerator
 
             $lastAnswer = $stuanswers[$thisq] ?? '';
             if (isset($autosaves[$thisq])) {
-              $lastAnswer = $autosaves[$thisq];
-            }
+              $lastAnswer = $autosaves[$thisq][0];
+            } 
 
             if (is_array($lastAnswer)) { // happens with autosaves
               //  appears to be resolved before getting here now
