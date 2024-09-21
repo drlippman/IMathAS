@@ -572,6 +572,7 @@ class QuestionHtmlGenerator
             if (!empty($GLOBALS['isquestionauthor'])) {
                 if (isset($anstypes)) {
                     $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
+                    unset($anstypes);
                 } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
                     $this->addError('It looks like you have an $answerbox with part index; did you mean for this question to be Multipart?');
                 }
