@@ -167,7 +167,7 @@ class QuestionHtmlGenerator
                 $logdata = "stuanswers is array in qid $db_qsetid: " . 
                     print_r($stuanswers[$thisq], true) . 
                     '; in script ' . $_SERVER['REQUEST_URI'] . 
-                    ' with post params ' . print_r($_POST, true);
+                    ' user ' . $GLOBALS['userid'];
                 $stm = $this->dbh->prepare("INSERT INTO imas_log (log,time) VALUES (?,?)");
                 $stm->execute([$logdata, time()]);
                 unset($stm);

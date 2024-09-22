@@ -1684,15 +1684,16 @@ class AssessRecord
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean|int $generate_html Whether to generate question HTML (def: false)  2 to grab correct ans
-   * @param int  $ver               Which version to grab data for, or 'last' for most recent, or 'scored'
+   * @param  int|string  $ver               Which version to grab data for, or 'last' for most recent, or 'scored'
+   * @param  string  $tryToShow         Which try to show, 'last' (def) or 'scored'
    * @return array  The question object
    */
-  public function getAllQuestionObjects($include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
+  public function getAllQuestionObjects($include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last', $tryToShow = 'last') {
     $out = array();
     // get data structure for current version
     $assessver = $this->getAssessVer($ver);
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
-      $out[$qn] = $this->getQuestionObject($qn, $include_scores, $include_parts, $generate_html, $ver);
+      $out[$qn] = $this->getQuestionObject($qn, $include_scores, $include_parts, $generate_html, $ver, $tryToShow);
     }
     return $out;
   }
