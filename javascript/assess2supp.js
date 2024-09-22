@@ -183,6 +183,9 @@ function disableInputs(qn, disabled) {
    }
    
    allJsParams[qn] = jsparams;
+   if (typeof sendresizemsg === 'function') {
+    sendresizemsg();
+   }
  }
 
  function addHelps(qwrap, helps) {

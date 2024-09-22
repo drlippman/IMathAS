@@ -305,7 +305,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
+$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=092224" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=021823">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css">';
 
@@ -360,6 +360,16 @@ $placeinhead .= '<script type="text/javascript">
           sendresizemsg();
       });
   }
+  rendermathnode = (function(old) {
+      return function(el,callback) {
+        old(el, function() {
+            if (typeof callback == "function") {
+                callback();
+            }
+            sendresizemsg();
+        });
+      }
+    })(rendermathnode);
   </script>
   <style>
   body { 
