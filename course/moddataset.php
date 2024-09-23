@@ -157,7 +157,9 @@
 			} else {
 				$ctx = stream_context_create(array('http'=>
 				    array(
-					'timeout' => 1
+					'timeout' => 1,
+                    'header' => "Accept-language: en\r\n" . 
+                                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 				    )
 				));
 				$t = @file_get_contents('https://www.youtube.com/watch?v='.$vidid, false, $ctx);
