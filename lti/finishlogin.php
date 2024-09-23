@@ -157,6 +157,9 @@ if ($localuserid === false) {
 }
 
 // We have a local userid, so log them in.
+if (isset($_SESSION['userid']) && $_SESSION['userid'] != $localuserid) {
+    $_SESSION = [];
+}
 $_SESSION['lti_user_id'] = $ltiuserid;
 $_SESSION['userid'] = $localuserid;
 $_SESSION['ltiver'] = '1.3';
