@@ -69,6 +69,7 @@ These are all added to the `config.php` by the install script.
 make sure you also edit your config.php and make sure the PDO connection includes a charset.  If it doesn't already, you'll want to add <code>;charset=latin1</code> to 
 the connection string (after the host= and dbname= portions) to ensure the encoding remains
 the same as the 5.x default after upgrade.  If on a new install, it's better to use <code>;charset=utf8mb4</code>.
+- `$CFG['YouTubeAPIKey']`: If the caption detection on videos attached to questions stops working, set this to your YouTube Data API v3 key, obtained from Google Cloud Platform, to use a more reliable method.
 
 ### System Defaults
 

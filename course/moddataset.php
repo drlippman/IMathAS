@@ -154,7 +154,20 @@
 			$vidid = getvideoid($_POST['helpurl']);
 			if ($vidid=='') {
 				$captioned = 0;
-			} else {
+			} else if (isset($CFG['YouTubeAPIKey'])) {
+                $captioned = 0;
+                $ctx = stream_context_create(array('http'=>array('timeout' => 1)));
+                $resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.$vidid.'&key='.$CFG['YouTubeAPIKey'], false, $ctx);
+                $capdata = json_decode($resp, true);
+                if ($capdata !== null && isset($capdata['items'])) {
+                    foreach ($capdata['items'] as $cap) {
+                        if ($cap['snippet']['trackKind'] == 'standard') {
+                            $captioned = 1;
+                            break;
+                        }
+                    }
+                }
+            } else {
 				$ctx = stream_context_create(array('http'=>
 				    array(
 					'timeout' => 1,
