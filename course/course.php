@@ -11,12 +11,18 @@ require_once "../includes/calendardisp.php";
 
 /*** pre-html data manipulation, including function code *******/
 function buildBlockLeftNav($items, $parent, &$blocklist) {
+    global $studentinfo;
 	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (!empty($item['innav'])) {
 				if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 				    ($item['SH'][0]=='S' && $item['avail']>0)) {
+                    if (!empty($studentinfo) && isset($item['grouplimit']) && count($item['grouplimit']) > 0) {
+                        if (!in_array(strtolower('s-' . $studentinfo['section']), array_map('strtolower', $item['grouplimit']))) {
+                            continue;
+                        }
+                    }
 					$blocklist[] = array($item['name'], $parent.'-'.($k+1), $item['SH'][1]);
 				}
 			}
