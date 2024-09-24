@@ -49,7 +49,10 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 $allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
-	return "//cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js";
+	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js";
+}
+function jsx_getcsslink() {
+	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.min.css";
 }
 
 function jsx_idlen() {
@@ -1690,7 +1693,12 @@ function jsxBoard($type, $ops=array()) {
 function jsx_getscript () {
 	
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
-		return '<script type="text/javascript" src="https:'.jsx_getlibrarylink().'"></script>';	
+		return '<script type="text/javascript" src="'.jsx_getlibrarylink().'"></script>' .
+            '<script type="text/javascript">
+            if ($("head").find("link[href*=jsxgraph]").length == 0) {
+                $("<link/>", {rel: "stylesheet", href: "'.jsx_getcsslink().'"}).appendTo("head");
+            }
+            </script>';	
 	} else {
 		return 
 			'<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
