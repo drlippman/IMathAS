@@ -158,7 +158,7 @@ if (!empty($_POST['regen'])) {
     $seed = rand(0, 9999) + 10000;
     $state['seeds'][$qntoregen] = $seed;
     unset($state['stuanswers'][$qntoregen+1]);
-    unset($state['stuanswersval'][$qntoregenn+1]);
+    unset($state['stuanswersval'][$qntoregen+1]);
     $state['scorenonzero'][$qntoregen+1] = -1;
     $state['scoreiscorrect'][$qntoregen+1] = -1;
     $state['partattemptn'][$qntoregen] = array();
