@@ -368,6 +368,7 @@ if ($haslogin && !$hasusername) {
     }
 
 }
+
 //has logged in already
 if ($hasusername) {
     //check validity, if desired
@@ -376,6 +377,12 @@ if ($hasusername) {
     //   caused issues so removed
     //}
     //$username = $_COOKIE['username'];
+
+    // load OWASP CSRF Protector
+    if (!empty($CFG['use_csrfp']) && (!isset($init_skip_csrfp) || (isset($init_skip_csrfp) && false == $init_skip_csrfp))) {
+        require_once __DIR__ . "/csrfp/simplecsrfp.php";
+        csrfProtector::init();
+    }
 
     $query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
     if (strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {

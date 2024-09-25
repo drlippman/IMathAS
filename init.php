@@ -139,11 +139,6 @@ $staticroot = $imasroot;
 // Load validate.php?
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {
 	require_once __DIR__ . "/validate.php";
-	// OWASP CSRF Protector
-	if (!empty($CFG['use_csrfp']) && (!isset($init_skip_csrfp) || (isset($init_skip_csrfp) && false == $init_skip_csrfp))) {
-		require_once __DIR__ . "/csrfp/simplecsrfp.php";
-		csrfProtector::init();
-	}
 } else if (!empty($init_session_start)) {
 	session_start();
 }
