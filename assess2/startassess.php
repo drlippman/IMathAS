@@ -55,8 +55,8 @@ if ($isstudent) {
 }
 
 // reject if not available
-if ($assess_info->getSetting('noprint') === 1 && !empty($_POST['in_print'])) {
-  echo '{"error": ""not_ready""}';
+if ($assess_info->getSetting('noprint') === 1 && !empty($_POST['in_print']) && !$canViewAll) {
+  echo '{"error": "not_ready"}';
   exit;
 } else if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
