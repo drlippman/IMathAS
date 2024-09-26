@@ -756,7 +756,7 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 		$answer = 'DNE';
 	}
 	$qs = $_POST["qs$qn"] ?? '';
-	if ($qs=='DNE') {
+	if (strtoupper($qs)=='DNE') {
 		$givenans = "DNE";
 	} else if ($qs=='inf') {
 		$givenans = "oo";

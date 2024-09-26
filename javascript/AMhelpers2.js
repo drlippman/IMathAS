@@ -1031,7 +1031,7 @@ function preSubmitString(name, str) {
   var params = allParams[qn];
   str = normalizemathunicode(str);
   str = str.replace(/^\s+/,'').replace(/\s+$/,'');
-  if (params.qtype == 'numfunc') {
+  if (params.qtype == 'numfunc' && name.substr(0,2) != 'qs') {
     str = AMnumfuncPrepVar(qn, str)[3];
   }
   if (str.length > 30000) {
