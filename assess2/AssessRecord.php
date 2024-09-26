@@ -3930,23 +3930,27 @@ class AssessRecord
     if ($retry_penalty > 0) {
       $triesOver = $try + 1 - $retry_penalty_after;
       if ($triesOver > 1e-10) {
-        $base *= (1 - $triesOver * $retry_penalty/100);
-        $penalties[] = array('type'=>'retry', 'pct'=>$triesOver * $retry_penalty);
+        $totalPenalty = min(100, $triesOver * $retry_penalty);
+        $base *= (1 - $totalPenalty/100);
+        $penalties[] = array('type'=>'retry', 'pct'=>$totalPenalty);
       }
     }
     if ($regen_penalty > 0) {
       $regensOver = $regen + 1 - $regen_penalty_after;
       if ($regensOver > 1e-10) {
-        $base *= (1 - $regensOver * $regen_penalty/100);
-        $penalties[] = array('type'=>'regen', 'pct'=>$regensOver * $regen_penalty);
+        $totalPenalty = min(100, $regensOver * $regen_penalty);
+        $base *= (1 - $totalPenalty/100);
+        $penalties[] = array('type'=>'regen', 'pct'=>$totalPenalty);
       }
     }
     if ($exceptionpenalty > 0 && $subtime > $duedate+10) {
       $base *= (1 - $exceptionpenalty / 100);
+      if ($base < 0) { $base = 0; }
       $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
     }
     if ($timelimitEnd > 0 && $overtimePenalty > 0 && $subtime > $timelimitEnd+10) {
       $base *= (1 - $overtimePenalty / 100);
+      if ($base < 0) { $base = 0; }
       $penalties[] = array('type'=>'overtime', 'pct'=>$overtimePenalty);
     }
     $base = round($base, 5); // cut off weird computer arithmetic issues
