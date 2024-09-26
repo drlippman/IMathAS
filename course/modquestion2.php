@@ -69,6 +69,10 @@ if (!(isset($teacherid))) {
             if (trim($_POST['fixedseeds']) == "") {$fixedseeds = null;} else { $fixedseeds = trim($_POST['fixedseeds']);}
             if ($penalty != 9999) {
                 $penalty_aftern = Sanitize::onlyInt($_POST['penalty_aftern']);
+                if ($penalty_aftern > 9) {
+                    echo "after __ tries must be less than 10";
+                    exit;
+                }
                 if ($penalty_aftern > 1 && $attempts > 1) {
                     $penalty = 'S' . $penalty_aftern . $penalty;
                 }
@@ -390,7 +394,7 @@ if (!isset($_GET['id']) || $beentaken) {
 <span class=form><?php echo _("Penalty on Tries:"); ?></span>
 <span class=formright><input type=text size=2 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']); ?>">
   <?php echo sprintf(_('%% per try after %s full-credit tries'),
-        '<input type=text size=1 name="penalty_aftern" value="' . Sanitize::encodeStringForDisplay($penalty_aftern) . '">'); ?>
+        '<input type=number min=1 max=9 size=1 name="penalty_aftern" value="' . Sanitize::encodeStringForDisplay($penalty_aftern) . '">'); ?>
    <br/><i class="grey"><?php echo _('Default:'); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['penalty']); ?></i>
 </span><BR class=form>
 <?php
