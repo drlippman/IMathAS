@@ -47,6 +47,9 @@ $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$actions[] = $row;
 	$t = substr($row[0],0,2);
+    if ($t == 'gb') {
+        $t = 'as'; // gradebook view, need to look up assess
+    }
 	$lookups[$t][] = intval($row[1]);
 	if ($t=='fo') {
 		$ip = explode(';',$row[3]);
