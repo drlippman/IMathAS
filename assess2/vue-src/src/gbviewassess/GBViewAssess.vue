@@ -312,7 +312,7 @@
               :lastq = "lastQ"
               :textlist = "textList"
             />
-            <div class = "bigquestionwrap">
+            <div class = "bigquestionwrap" v-show="showQuestion[qn]">
               <div class="headerpane">
                 <strong>
                   {{ $tc('question_n', qn+1) }}.
