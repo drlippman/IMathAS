@@ -11,7 +11,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
  "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t",
- "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson","cluster_bargraph");
+ "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson","cluster_bargraph","stem_plot");
 
 //nCr(n,r)
 //The Choose function
@@ -3292,6 +3292,198 @@ function cluster_bargraph($var1,$var2,$freq,$label,$width=450,$height=300,$optio
 	
 	return showasciisvg($outst,$width,$height);
 	
+}
+
+/* stem_plot(data,[options])
+   data : array of data.
+   options (optional): array of options:
+	options['key'] = false will remove key. For example, by default there is a key such as Key: 3|4 means 34 and will be removed if false.
+	 If $options['customkey'] is set, then options['key'] will be ignored.
+	options['customkey'] = string for a custom key.
+    options['space'] = false will remove the space between each leaf digit. By default the spacing looks like 3| 1 2 2 3 4 5, setting to false will yield 3|122345.
+    options['stemlabel'] = string for a custom label for Stem.
+    options['leaflabel'] = string for a custom label for Leaf.
+	options['split'] = true will make a split stem-and-leaf display. For example, a stem such as 3|2345789 will be split to two stems 3|234 and 3|5789.
+    The starting point for the code below was based on a Lua and Julia algorithm found on Rosetta Code.
+	Stem-and-leaf plot. (2024, July 22). Rosetta Code. Retrieved 00:26, July 31, 2024 from https://rosettacode.org/wiki/Stem-and-leaf_plot?oldid=367140.
+*/
+function stem_plot($data,$options=array()) {
+	
+	if (!is_array($data)) {
+		echo 'stem_plot expects an array of numerical data';
+		return 0;
+    } else {
+		
+		$data = array_map(function($v){return round($v,0);}, $data) ;
+	}
+	
+	if (isset($options['split'])){
+		$split = $options['split'];
+	} else {
+		$split = false;
+	}
+	
+	if(isset($options['space']) && $options['space']==false){
+		$spc = "";
+	} else {
+		$spc = " ";
+	}
+
+	if(isset($options['customkey'])) {
+		$key = "<caption style='caption-side:bottom; text-align: center;'>{$options['customkey']}</caption>";
+	} elseif(isset($options['key']) && $options['key']==false){
+		$key = "";
+	} else {
+		$keyval = randfrom($data);
+		if($keyval < 0){
+			if(intdiv($keyval,10) == 0){
+				$keytmp = "Key: -0|".(abs($keyval%10))." = ".$keyval;	
+			} else {
+				$keytmp = "Key: ".(intdiv($keyval,10))."|".(abs($keyval%10))." = ".$keyval;	
+			}
+		} else {
+			$keytmp = "Key: ".(intdiv($keyval,10))."|".(abs($keyval%10))." = ".$keyval;	
+		}
+		$key = "<caption style='caption-side:bottom; text-align: center;'>$keytmp</caption>";
+	}
+
+	if(isset($options["stemlabel"])){
+		$stemlabel = $options["stemlabel"];
+	} else {
+		$stemlabel = "Stem";
+	}
+
+	if(isset($options["leaflabel"])){
+		$leaflabel = $options['leaflabel'];
+	} else {
+		$leaflabel = "Leaf";
+	}
+
+	sort($data, SORT_NUMERIC);
+
+	$display = "<table style='align: center; border:0;'>$key";
+	$display .= "<thead><tr><th></th><th style='border-bottom: 1px solid;'>$stemlabel</th><th style='border-bottom: 1px solid; text-align: left;'>$leaflabel</th></tr></thead><tbody>";
+
+	$data_neg = array();
+	$data_pos = array();
+
+	for($i = 0; $i < count($data); $i++){
+		if($data[$i] < 0){
+			$data_neg[] = $data[$i];
+		} else {
+			$data_pos[] = $data[$i];
+		}
+	}
+	
+	if(count($data_neg) > 0){
+		$size = count($data_neg);
+		$min = $data_neg[0];
+		$max =  max($data_neg);
+		$start = intdiv($min,10); 
+		$finish = intdiv($max,10)+1;
+		$chk = 0;
+	
+		for($stem=$start; $stem < $finish; $stem++){
+			$leaf = "";
+
+			if($split == false){
+				if($stem == 0){
+					$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>-0</td>";
+				} else {
+					$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>$stem</td>";
+				}
+			
+				while($chk != $size && intdiv($data_neg[$chk],10) == $stem){
+					$tmp = abs($data_neg[$chk]%10);
+					$leaf .= $spc."$tmp";
+					$chk++;
+				}
+
+			} else {
+
+				if($stem == 0){
+					$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>-0</td>";
+				} else {
+					$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>$stem</td>";
+				}
+
+				while($chk != $size && intdiv($data_neg[$chk],10) == $stem){
+					$tmp = abs($data_neg[$chk]%10);
+					if($tmp < 5){
+						break;
+					}
+					$leaf .= $spc."$tmp";					
+					$chk++;
+				}
+
+				$display .= "<td>$leaf</td></tr>";
+				$leaf = "";
+
+				if($stem == 0){
+					$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>-0</td>";
+				} else {
+					$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>$stem</td>";
+				}
+
+				while($chk != $size && intdiv($data_neg[$chk],10) == $stem){
+					$tmp = abs($data_neg[$chk]%10);
+					$leaf .= $spc."$tmp";					
+					$chk++;
+				}
+			}
+			$display .= "<td>$leaf</td></tr>";
+		}
+	}
+	
+	if(count($data_pos)>0){
+		$min = $data_pos[0];
+		$max =  max($data_pos);
+		$size = count($data_pos);
+		$start = intdiv($min,10); 
+		$finish = intdiv($max,10)+1;
+		$chk = 0;
+
+		if($split == false){
+			for($stem=$start; $stem < $finish; $stem++){
+				$leaf = "";		
+				$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>$stem</td>";
+			
+				while($chk != $size && intdiv($data_pos[$chk],10) == $stem){
+					$tmp = abs($data_pos[$chk]%10);
+					$leaf .= $spc."$tmp";
+					$chk++;
+				}
+				$display .= "<td>$leaf</td></tr>";
+			}
+		} else {
+			for($stem=$start; $stem < $finish; $stem++){
+				$leaf = "";		
+				$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>$stem</td>";
+			
+				while($chk != $size && intdiv($data_pos[$chk],10) == $stem){
+					$tmp = abs($data_pos[$chk]%10);
+					if($tmp > 4){
+						break;
+					}
+					$leaf .= $spc."$tmp";
+					$chk++;
+				}
+				$display .= "<td>$leaf</td></tr>";
+				$display .= "<tr><td></td><td style='text-align: right; border-right: 1px solid;'>$stem</td>";
+				$leaf = "";
+
+				while($chk != $size && intdiv($data_pos[$chk],10) == $stem){
+					$tmp = abs($data_pos[$chk]%10);
+					$leaf .= $spc."$tmp";
+					$chk++;
+				}
+				$display .= "<td>$leaf</td></tr>";
+			}
+		}
+		
+	}
+	$display .= "<tr><td></td><td></td><td></td></tr></tbody></table>";
+	return $display;
 }
 
 ?>
