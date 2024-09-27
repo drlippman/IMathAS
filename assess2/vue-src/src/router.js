@@ -179,7 +179,12 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     } else {
-      return { x: 0, y: 0 };
+      // return { x: 0, y: 0 };
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve({ left: 0, top: 0 })
+        }, 50)
+      });
     }
   }
 });
