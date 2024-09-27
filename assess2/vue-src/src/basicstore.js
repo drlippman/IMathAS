@@ -1189,7 +1189,7 @@ export const actions = {
         data.questions[i].canretry = (thisq.try < thisq.tries_max);
         data.questions[i].canretry_primary = data.questions[i].canretry;
         data.questions[i].tries_remaining = thisq.tries_max - thisq.try;
-        if (thisq.hasOwnProperty('parts')) {
+        if (!data.questions[i].did_jump_to_ans && thisq.hasOwnProperty('parts')) {
           let trymin = 1e10;
           let trymax = 0;
           let canretrydet = false;
