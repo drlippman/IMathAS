@@ -19,6 +19,10 @@ function regerror($err) {
 
 // Read configuration endpoint from query string
 $configurl = $_GET['openid_configuration'];
+if (substr($configurl,0,4) !== 'http') {
+    echo "Invalid openid_configuration URL";
+    exit;
+}
 $token = $_GET['registration_token'];
 
 // Call config endpoint to get config data
