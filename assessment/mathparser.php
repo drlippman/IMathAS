@@ -373,7 +373,7 @@ class MathParser
     try {
       ob_start(); // buffer any echos so we can ditch them to keep this quiet 
       $out = $this->evaluate($variableValues);
-      ob_clean(); // ditch buffer contents 
+      ob_end_clean(); // ditch buffer contents 
       return $out;
     } catch (Throwable $t) {
       return sqrt(-1);
