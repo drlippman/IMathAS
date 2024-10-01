@@ -825,7 +825,7 @@ function togglevideoembed() {
 		$this.text(' [-]')
 			.attr('title',_("Hide video"))
 			.attr('aria-label',_("Hide embedded video"));
-		if ($this.prev().attr("data-base")) {
+		if ($this.prev().attr("data-base") && $this.prev().attr("data-def") !== 'open') {
 			var inf = $this.prev().attr('data-base').split('-');
 			recclick(inf[0], inf[1], href, $this.prev().text());
 		}
