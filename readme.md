@@ -17,6 +17,7 @@ requires PHP 7.4+, and MySQL 5.6+.  PHP has the following recommended or require
 - pdo_mysql (required)
 - gettext (required)
 - gd with freetype (recommended) for image creation
+- zip (recommended) necessary for course export packages
 - curl (recommended) necessary for LTI grade passback
 - openssl (recommended) necessary for LTI 1.3 services
 
