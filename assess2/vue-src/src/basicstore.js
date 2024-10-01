@@ -1199,10 +1199,11 @@ export const actions = {
              parseFloat(thisq.answeights[pn]) === 0) ||
               (thisq.parts[pn].hasOwnProperty('points_possible') &&
               parseFloat(thisq.parts[pn].points_possible) === 0);
-            if (remaining < trymin && !parthasnoval) {
+            // fixed for if answeights[0] = 0 on first load
+            if (remaining < trymin && (!parthasnoval || (parseInt(pn) === 0 && parseInt(thisq.try) === 0))) {
               trymin = remaining;
             }
-            if (remaining > trymax && !parthasnoval) {
+            if (remaining > trymax && (!parthasnoval || (parseInt(pn) === 0 && parseInt(thisq.try) === 0))) {
               trymax = remaining;
             }
             if (remaining > 0 &&

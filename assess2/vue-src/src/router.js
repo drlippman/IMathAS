@@ -182,8 +182,8 @@ const router = createRouter({
       // return { x: 0, y: 0 };
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          resolve({ left: 0, top: 0 })
-        }, 50)
+          resolve({ left: 0, top: 0 });
+        }, 50);
       });
     }
   }
