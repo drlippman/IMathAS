@@ -116,7 +116,11 @@ function copycourse($sourcecid, $name, $newUIver) {
     $replacebyarr[$row[0]] = $row[1];
   }
 
-  if ($outcomesarr!='') {
+  if ($outcomesarr!=='') {
+    // unserialize now so we can check for valid unserialization
+    $outcomesarr = unserialize($outcomesarr);
+  }
+  if ($outcomesarr!=='' && $outcomesarr!==false) {
     $stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
     $stm->execute(array(':courseid'=>$sourcecid));
 
@@ -145,7 +149,7 @@ function copycourse($sourcecid, $name, $newUIver) {
       }
       $arr = array_values($arr);
     }
-    $outcomesarr = unserialize($outcomesarr);
+    
     updateoutcomes($outcomesarr);
     $newoutcomearr = serialize($outcomesarr);
   } else {

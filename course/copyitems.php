@@ -233,6 +233,9 @@ if (!(isset($teacherid))) {
 					$stm->execute(array(':id'=>$cid));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					$outcomesarr = unserialize($row[0]);
+					if (!is_array($outcomesarr)) {
+						$outcomesarr = array();
+					}
 					foreach ($newoutcomes as $o) {
 						$outcomesarr[] = $o;
 					}
