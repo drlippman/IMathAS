@@ -207,11 +207,11 @@ function apportion_info($pop, $seats, $method) {
 		//seats would add $toadd+1 additional seats, so the method fails.
 		if ($toadd==0) {
 			$minq = min($tochange);
-			$outdiv = '('.$maxq.','.$minq.')';
+			$outdiv = '('.$maxq.','.$minq.']';
 		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
 			$outdiv = "fail";
 		} else {
-			$outdiv = '('.min($moddivs[$toadd-1],$moddivs[$toadd]).','.max($moddivs[$toadd-1],$moddivs[$toadd]).')';
+			$outdiv = '('.min($moddivs[$toadd-1],$moddivs[$toadd]).','.max($moddivs[$toadd-1],$moddivs[$toadd]).']';
 		}
 	} else if ($method=='huntington') {
 		foreach ($quotas as $s=>$q) {
@@ -237,7 +237,7 @@ function apportion_info($pop, $seats, $method) {
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
 				for ($i=0;$i<min(floor($q),2);$i++) {
-                    $newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-.000001); //what to get it under GM?
+                    $newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1)) - 1e-8); //what to get it under GM?
 					if ($newq>$divisor) {
 						$tochange[] = $newq; 
 					}
@@ -250,7 +250,7 @@ function apportion_info($pop, $seats, $method) {
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
 				for ($i=0;$i<min(floor($q),4);$i++) {
-					 $newq = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.000001); //what to get it over GM?
+					 $newq = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1)) + 1e-8); //what to get it over GM?
 					 if ($newq<$divisor) {
 					 	 $tochange[] = $newq;
 					 }
@@ -263,7 +263,7 @@ function apportion_info($pop, $seats, $method) {
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
 				for ($i=0;$i<min(floor($q),4);$i++) {
-					$newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-.0001); //what to get it under GM?
+					$newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-1e-8); //what to get it under GM?
 					if ($newq>$divisor) {
 						$tochange[] = $newq; 
 					}
