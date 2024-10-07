@@ -331,15 +331,19 @@ function fractionpower($f,$p) {
 	return fractionreduce($num,$denom,$fracarr);
 }
 
-//fractionroot(frac, [root])
+//fractionroot(frac, [root,rat])
 //finds the root of the fraction (defaults to square root), rationalizing
-//the denominator.  The output is a string.
-function fractionroot($f,$root=2) {
+//the denominator unless disabled.  The output is a string.
+function fractionroot($f,$root=2,$rat = true) {
 	if (!is_array($f)) {
 		$f = fractionparse($f);
 	}
 	require_once "radicals.php";
-	return reduceradicalfrac(1, $f[0]*$f[1], $f[1]);
+    if ($rat) {
+	    return reduceradicalfrac(1, $f[0]*$f[1], $f[1]);
+    } else {
+        return reduceradicalfrac3(1,$f[0],1,$f[1],false,$root,$root);
+    }
 }
 
 

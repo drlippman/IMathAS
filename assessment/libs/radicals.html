@@ -4,11 +4,12 @@
 </head><body>
 <h1>Macro Library radicals</h1>
 A collection of functions for working with radicals
-<BR>Version 3 Nov 27 2017
+<BR>Last changed 10/7/24
 <BR><ul>
 <li><a href="#reduceradical">reduceradical</a></li>
 <li><a href="#reduceradicalfrac">reduceradicalfrac</a></li>
-<li><a href="#reduceradicalfrac2">reduceradicalfrac</a></li>
+<li><a href="#reduceradicalfrac2">reduceradicalfrac2</a></li>
+<li><a href="#reduceradicalfrac3">reduceradicalfrac3</a></li>
 <li><a href="#reducequadraticform">reducequadraticform</a></li>
 </ul>
 <h3><a name="reduceradical">reduceradical</a></h3>
@@ -27,14 +28,33 @@ reduceradicalfrac(wholenum,rootnum,denom,[root,format])
 <BR>                   "disp", returns the string wrapped in backticks for display
 <BR>                   "parts", returns an array of the parts:  array(4,5,2)
 <BR><h3><a name="reduceradicalfrac2">reduceradicalfrac2</a></h3>
-reduceradicalfrac2(num,wholedenom,rootnum,[rationalize,root,format])
-<BR>given num/(wholedenom*root(rootnum)), reduces the root then the fraction
+reduceradicalfrac2(num,wholedenom,rootdenom,[rationalize,root,format])
+<BR>given num/(wholedenom*root(rootdenom)), reduces the root then the fraction
 <BR>rationalize: rationalize the denominator. Default is false.
 <BR>root: root of radical.  Default is 2 (sqrt)
 <BR>format: default is "string", which returns "2/(3sqrt(5))"
 <BR>                   "disp", returns the string wrapped in backticks for display
 <BR>                   "parts", returns an array of the parts:  array(2,3,5)
-<BR><h3><a name="reducequadraticform">reducequadraticform</a></h3>
+<BR>
+    
+<h3><a name="reduceradicalfrac3">reduceradicalfrac3</a></h3>  
+<p>reduceradicalfrac3(wholenum,rootnum, wholedenom,rootdenom, [rationalize,rootn,rootd,format])</p>
+<p>Given (wholenum*root(rootnum))/(wholedenom*root(rootdenom)), reduces the roots and fraction</p>
+<p>Optional parameters:</p>
+<ul>
+    <li>rationalize: rationalize the denominator. Default is false.</li>
+    <li>rootn: root of numerator radical.  Default is 2 (sqrt)</li>
+    <li>rootd: root of denominator radical. Default is 2 (sqrt)</li>
+    <li>format: 
+        <ul>
+            <li>default is "string", which returns something like "(2sqrt(3))/5" or "2/3 sqrt(1/2)" or "3/(2 sqrt(5))"</li>
+            <li>"disp", returns the string wrapped in backticks for display</li>
+            <li>"parts", returns an array of the reduced parts [wholenum,rootnum,wholedenom,rootdenom,root]</li>
+        </ul>
+    </li>                                    
+</ul>
+    
+<h3><a name="reducequadraticform">reducequadraticform</a></h3>
 reducequadraticform(a,b,c,d,[format])
 <BR>given (a+bsqrt(c))/d, reduces the root then the fraction
 <BR>format: default is "string", which returns "(1+4sqrt(5))/2"
