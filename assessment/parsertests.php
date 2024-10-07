@@ -139,7 +139,11 @@ $sameformtests = [
     ['(-2-3)(-4-5)','(-4-5)(-2-3)',[]],
     ['(-2-3)(-4-5)','(-5-4)(-3-2)',[]],
     ['2+3(x-4)','2-3(4-x)',['x']],
-    ['2(x+3)','2x+2*3', ['x'], 1]
+    ['2(x+3)','2x+2*3', ['x'], 1],
+    ['1/2 x', 'x/2', ['x']], // this is desirable
+    ['sqrt(3)/2', '1/2 sqrt(3)', ['x']], // this is desirable
+    ['(2 sqrt(3))/5', '2/5 sqrt(3)', ['x']], 
+    ['1/2 * 3', '3/2', ['x']] // this is questionable side effect
 ];
 $st = microtime(true);
 foreach ($sameformtests as $test) {

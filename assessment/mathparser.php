@@ -1064,7 +1064,9 @@ class MathParser
     //echo $this->toOutputString($this->normalizeNode($this->AST));
     //print_r($this->AST);
     //print_r($this->normalizeNode($this->AST));
-    return $this->toOutputString($this->normalizeNode($this->AST));
+    $normed = $this->normalizeNode($this->AST);
+    $this->walkRemoveOne($normed);
+    return $this->toOutputString($normed);
   }
 
   /**
@@ -1367,16 +1369,16 @@ class MathParser
 
   private function walkRemoveOne(&$node) {
     if ($node['symbol'] === '*') {
-      if ($node['right']['symbol'] === '1') {
+      if ($node['right']['symbol'] === 1.0) {
         $node = $node['left'];
         $this->walkRemoveOne($node);
         return;
-      } else if ($node['left']['symbol'] === '1') {
+      } else if ($node['left']['symbol'] === 1.0) {
         $node = $node['right'];
         $this->walkRemoveOne($node);
         return;
       } else if ($node['left']['symbol'] === '~' &&
-        $node['left']['left']['symbol'] === '1'
+        $node['left']['left']['symbol'] === 1.0
       ) {
         if ($node['right']['symbol'] === '~') { // both neg; remove both negs
           $node = $node['right']['left'];
@@ -1385,7 +1387,7 @@ class MathParser
           $node = $node['left'];
         }
       } else if ($node['right']['symbol'] === '~' &&
-        $node['right']['left']['symbol'] === '1'
+        $node['right']['left']['symbol'] === 1.0
       ) {
         if ($node['left']['symbol'] === '~') { // both neg; remove both negs
           $node = $node['left']['left'];
