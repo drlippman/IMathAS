@@ -1630,8 +1630,8 @@ function sign($a,$str=false) {
 		return ($a<0)?-1:1;
 	}
 }
-function sgn($a) {
-	return ($a===0)?0:(($a<0)?-1:1);
+function sgn($a, $loose=false) {
+	return ($a == 0 || ($loose && abs($a)<1e-8))?0:(($a<0)?-1:1);
 }
 
 
