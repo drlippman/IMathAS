@@ -134,7 +134,7 @@ if ($showmessagesgadget) {
 $page_studentCourseData = array();
 
 // check to see if the user is enrolled as a student
-$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.startdate,imas_courses.enddate,imas_students.hidefromcourselist,";
+$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.startdate,imas_courses.enddate,imas_students.hidefromcourselist,imas_students.locked,";
 $query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
 $query .= "FROM imas_students,imas_courses ";
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid=:userid ";
@@ -614,7 +614,11 @@ function printCourseLine($data, $type=null) {
 		echo ' <em style="color:green;">', _('Lockdown'), '</em>';
 	}
 	if ($shownewmsgnote && isset($newmsgcnt[$data['id']]) && $newmsgcnt[$data['id']]>0) {
-		echo ' <a class="noticetext" href="msgs/msglist.php?page=-1&cid='.$data['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data['id']]), '</a>';
+        if ($type == 'take' && $data['locked'] > 0) {
+		    echo ' <a class="noticetext" href="msgs/msglist.php?page=-1&cid=0&filtercid='.$data['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data['id']]), '</a>';
+        } else {
+		    echo ' <a class="noticetext" href="msgs/msglist.php?page=-1&cid='.$data['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data['id']]), '</a>';
+        }
 	}
 	if ($shownewpostnote && isset($newpostcnt[$data['id']]) && $newpostcnt[$data['id']]>0) {
 		printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data['id'],
