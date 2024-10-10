@@ -149,7 +149,7 @@
     // primes
     imathasBuiltin += " getprime getprimes isprime";
     // radicals
-    imathasBuiltin += " reduceradical reduceradicalfrac reduceradicalfrac2 reducequadraticform";
+    imathasBuiltin += " reduceradical reduceradicalfrac reduceradicalfrac2 reduceradicalfrac3 reducequadraticform";
     // shapes
     imathasBuiltin += " draw_angle draw_circle draw_circlesector draw_square draw_rectangle draw_triangle draw_polygon draw_prismcubes draw_cylinder draw_cone draw_sphere draw_pyramid draw_rectprism draw_polyomino";
     // simplex
