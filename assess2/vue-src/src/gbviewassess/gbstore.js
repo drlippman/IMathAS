@@ -28,9 +28,9 @@ export const store = reactive({
 });
 
 export const actions = {
-  loadGbAssessData (callback, keepversion) {
+  loadGbAssessData (loadtexts, callback, keepversion) {
     if (store.inTransit) {
-      window.setTimeout(() => this.loadGbAssessData(callback, keepversion), 20);
+      window.setTimeout(() => this.loadGbAssessData(loadtexts, callback, keepversion), 20);
       return;
     }
     if (store.assessInfo === null && window.gbAssessData) {
@@ -44,6 +44,7 @@ export const actions = {
       window.$.ajax({
         url: store.APIbase + 'gbloadassess.php' + store.queryString,
         dataType: 'json',
+        data: { 'loadtexts': (loadtexts ? 1 : 0) },
         xhrFields: {
           withCredentials: true
         },

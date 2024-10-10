@@ -873,6 +873,7 @@ export default {
     } else {
       store.APIbase = process.env.BASE_URL;
     }
+
     // if no assessinfo, or if cid/aid has changed, load data
     const querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
     const queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
@@ -889,19 +890,21 @@ export default {
       store.uid = queryuid;
       store.stu = querystu;
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
-      actions.loadGbAssessData();
-    }
-    const filtercookie = window.readCookie('gvaf' + store.aid);
-    if (filtercookie !== null && filtercookie.length > 0) {
-      this.showFilters = true;
-      const cookieparts = filtercookie.split(',');
-      for (const v of cookieparts) {
-        if (v === 'hidetexts') {
-          this[v] = false;
-        } else {
-          this[v] = true;
+
+      const filtercookie = window.readCookie('gvaf' + store.aid);
+      if (filtercookie !== null && filtercookie.length > 0) {
+        this.showFilters = true;
+        const cookieparts = filtercookie.split(',');
+        for (const v of cookieparts) {
+          if (v === 'hidetexts') {
+            this[v] = false;
+          } else {
+            this[v] = true;
+          }
         }
       }
+
+      actions.loadGbAssessData(this.hidetexts === false);
     }
   },
   mounted () {

@@ -168,6 +168,10 @@ $include_from_assess_info = array(
   'latepass_extendto', 'latepass_enddate', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
   'scoresingb', 'viewingb', 'latepass_status', 'help_features', 'attemptext'
 );
+if ($_REQUEST['loadtexts'] == 1) {
+    $include_from_assess_info[] = 'intro';
+    $include_from_assess_info[] = 'interquestion_text';
+}
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
 if ($isstudent && (($viewInGb == 'after_due' && $now < $assessInfoOut['enddate']) ||

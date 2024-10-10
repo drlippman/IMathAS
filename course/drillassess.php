@@ -236,7 +236,6 @@ $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 if ($courseUIver > 1) {
     $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assessment/mathtest.css" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastvueupdate.'" />';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastvueupdate.'" />';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
     $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
