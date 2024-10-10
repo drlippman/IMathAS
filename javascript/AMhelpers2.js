@@ -218,12 +218,11 @@ function init(paramarr, enableMQ, baseel) {
         div.html(html);
         $("#qn"+qn).hide().after(div);
       } else {
-        var extendsetup = null;
+        var extendsetup = {};
         if (params.nopaste) {
-            extendsetup = { 
-                'paste_preprocess': function(plugin, args) { args.content = '';}
-            };
+            extendsetup['paste_preprocess'] = function(plugin, args) { args.content = '';}
         }
+        extendsetup['valid_classes'] = 'gridded,centered,attach';
         initeditor("selector","#qn" + qn + ".mceEditor",null,false,function(ed) {
           ed.on('blur', function (e) {
             tinymce.triggerSave();
