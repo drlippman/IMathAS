@@ -15,8 +15,7 @@ filename[10]=javascript/rubric
 
 for name in ${filename[@]}; do
   echo Minifying ${name}
-  ./node_modules/.bin/uglifyjs --mangle --compress hoist_vars=true \
-    ../../${name}.js > ../../${name}_min.js
+  ./node_modules/.bin/terser ../../${name}.js --mangle --compress --output ../../${name}_min.js
 done
 
 rm ../../javascript/assess2_min.js
