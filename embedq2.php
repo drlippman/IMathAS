@@ -213,6 +213,11 @@ if (isset($QS['hidescoreval'])) {
 } else {
     $state['hidescoreval'] = 0;
 }
+if (!empty($QS['scroll'])) {
+    $state['scroll'] = ($QS['scroll'] ? 1 : 0);
+} else {
+    $state['scroll'] = 0;
+}
 
 
 if (isset($_POST['regen']) && !$issigned) {
@@ -372,7 +377,7 @@ $placeinhead .= '<script type="text/javascript">
   </script>
   <style>
   body { 
-    margin: 0; padding: 0; overflow-y: hidden;
+    margin: 0; padding: 0; ' . ($state['scroll'] ? '' : 'overflow-y: hidden;') . '
     background-color: transparent !important;
     }
   .question {
