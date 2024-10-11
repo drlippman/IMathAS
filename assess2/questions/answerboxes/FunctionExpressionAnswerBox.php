@@ -221,19 +221,15 @@ class FunctionExpressionAnswerBox implements AnswerBox
                 if (strlen($variables[$i]) > 1) {
                     $isgreek = false;
                     $varlower = strtolower($variables[$i]);
-                    for ($j = 0; $j < count($greekletters); $j++) {
-                        if ($varlower == $greekletters[$j]) {
-                            $isgreek = true;
-                            break;
-                        }
-                    }
+                    $isgreek = in_array($varlower, $greekletters);
+                    
                     if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
                         $chg = false;
-                        if (strlen($matches[1]) > 1) {
+                        if (strlen($matches[1]) > 1 && !in_array(strtolower($matches[1]), $greekletters)) {
                             $matches[1] = '"' . $matches[1] . '"';
                             $chg = true;
                         }
-                        if (strlen($matches[2]) > 1 && $matches[2][0] != '(') {
+                        if (strlen($matches[2]) > 1 && $matches[2][0] != '(' && !in_array(strtolower($matches[2]), $greekletters)) {
                             $matches[2] = '"' . $matches[2] . '"';
                             $chg = true;
                         }
