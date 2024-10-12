@@ -907,7 +907,7 @@
 		echo '<input type=hidden name=islaststu value=1 />';
 	}
 	echo "</form>";
-	echo '<p>&nbsp;</p>';
+	echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 	$placeinfooter = '<div id="ehdd" class="ehdd">
     <span id="ehddtext"></span>
     <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span>
