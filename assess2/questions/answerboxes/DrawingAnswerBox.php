@@ -120,7 +120,9 @@ class DrawingAnswerBox implements AnswerBox
             if (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false) {
                 if (strpos($settings[4], ':') !== false) {
                     $settings4pts = explode(':', $settings[4]);
-                    $settings[4] = 2 * ($settings[1] - $settings[0]) . ':' . $settings4pts[1];
+                    // rewrite xscl so no labels show
+                    $settings4pts[0] = 2 * ($settings[1] - $settings[0]); 
+                    $settings[4] = implode(':', $settings4pts);
                 } else {
                     $settings[4] = 2 * ($settings[1] - $settings[0]) . ':' . $settings[4];
                 }
