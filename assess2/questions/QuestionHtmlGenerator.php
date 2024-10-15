@@ -188,7 +188,18 @@ class QuestionHtmlGenerator
                     $stulastentry[$iidx] = $kidx;
                 }
             } else {
-                $stulastentry = $autosaves[$thisq][0];
+                if (isset($autosaves[$thisq][0])) {
+                    $stulastentry = $autosaves[$thisq][0];
+                } else {
+                    $db_qsetid = $this->questionParams->getDbQuestionSetId();
+                    $logdata = "autosave pn 0 unset for non-MP in $db_qsetid: " . 
+                        print_r($autosaves[$thisq], true) . 
+                        '; in script ' . $_SERVER['REQUEST_URI'] . 
+                        ' user ' . $GLOBALS['userid'];
+                    $stm = $this->dbh->prepare("INSERT INTO imas_log (log,time) VALUES (?,?)");
+                    $stm->execute([$logdata, time()]);
+                    unset($stm);
+                }
             }
         }
 
@@ -579,9 +590,9 @@ class QuestionHtmlGenerator
                 $this->questionParams->getLastRawScores(), 0, 1);
 
             $lastAnswer = $stuanswers[$thisq] ?? '';
-            if (isset($autosaves[$thisq])) {
+            if (isset($autosaves[$thisq][0])) {
               $lastAnswer = $autosaves[$thisq][0];
-            } 
+            }
 
             if (is_array($lastAnswer)) { // happens with autosaves
               //  appears to be resolved before getting here now
