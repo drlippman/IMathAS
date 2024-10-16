@@ -704,7 +704,7 @@ class AssessRecord
         // for by-assess, clear "accept work after" status on start
         $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
         // set lock
-        if ($this->assess_info->getSetting('lock_for_assess') && $GLOBALS['isRealStudent']) {
+        if ($this->assess_info->getSetting('lock_for_assess') && !$this->teacherPreview) {
             $stm = $this->DBH->prepare("UPDATE imas_students SET lockaid=? WHERE userid=? AND courseid=?");
             $stm->execute([$this->curAid, $this->curUid, $this->assess_info->getCourseId()]);
         }
@@ -716,7 +716,7 @@ class AssessRecord
           $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
         }
         // clear lock
-        if ($this->assess_info->getSetting('lock_for_assess') && $GLOBALS['isRealStudent']) {
+        if ($this->assess_info->getSetting('lock_for_assess') && !$this->teacherPreview) {
             $stm = $this->DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE userid=? AND courseid=?");
             $stm->execute([$this->curUid, $this->assess_info->getCourseId()]);
         } 
