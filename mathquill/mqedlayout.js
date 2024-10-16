@@ -696,7 +696,7 @@ var myMQeditor = (function($) {
             var morelink = $("<a>", {
               href: "#",
               text: _("[more..]"),
-            }).on('click', function(e) {
+            }).on('click touchstart', function(e) {
               e.preventDefault();
               $(e.target).parent().html($("#"+fulltipRef).html());
               return false;
