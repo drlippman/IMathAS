@@ -2543,8 +2543,12 @@ These macros are for working with arrays:
 <li><strong>stringtoarray(string)</strong>: Converts a text string to an array of characters</li>
 <li><strong>fillarray(value,num,[start])</strong>:  Creates an array with num entries, all of which are the same given value.  Array indexing
     starts at 0 unless specified</li>
-<li><strong>sortarray(list/array,[dir])</strong>:  Sorts an array from lowest to highest value.  To sort in reverse order, give the option
-    second parameter as "rev"</li>
+<li><strong>sortarray(list/array,[type, maxkey])</strong>:  Sorts an array from lowest to highest value.  
+    To sort in reverse order, give the option second parameter as "rev". 
+    To sort by key, give the optional second parameter as "key". 
+    To sort by key (numeric only) and fill in any missing numeric keys with empty string values, 
+    give the optional second parameter as "keyfill". In this case you can optionally provide a third 
+    argument for the max key to fill the array with.</li>
 <li><strong>jointsort(array,array,[array,...])</strong>:  Jointly reorders two or more arrays based on a lowest-to-highest sort of values in the first array</li>
 <li><strong>consecutive(min,max,[step])</strong>:  Creates an array of consecutive numbers, starting at min and ending at max, in increments of
     step.  Step is optional; it defaults to 1.</li>

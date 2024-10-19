@@ -1841,12 +1841,25 @@ function sortarray($a) {
 	if (func_num_args()>1) {
 		$dir = func_get_arg(1);
 	}
+    if (func_num_args()>2) {
+		$maxkey = func_get_arg(2);
+	}
 	if (isset($dir) && $dir=="rev") {
 		if (isset($a[0]) && is_numeric($a[0])) {
 			rsort($a, SORT_NUMERIC);
 		} else {
 			rsort($a);
 		}
+	} else if (isset($dir) && $dir=="key") {
+		ksort($a);
+	} else if (isset($dir) && $dir=="keyfill") {
+        if (empty($maxkey)) {
+            $maxkey = max(array_keys($a));
+        }
+        for ($i=0; $i<=$maxkey; $i++) {
+            if (!isset($a[$i])) { $a[$i] = ''; }
+        }
+		ksort($a);
 	} else {
 		if (isset($a[0]) && is_numeric($a[0])) {
 			sort($a, SORT_NUMERIC);
