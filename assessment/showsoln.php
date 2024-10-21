@@ -30,6 +30,25 @@ $useeditor = 0;
 $isfw = false;
 $placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastvueupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastvueupdate . '" media="print">';
+$placeinhead .= '<style type="text/css"> #writtenexample { margin-top: 0px; } div.midwrapper > div { padding:10px;} </style>';
+$placeinhead .= '<script type="text/javascript">
+function toggleinlinebtn(n,p){ 
+	var btn = document.getElementById(p);
+	var el=document.getElementById(n);
+	if (el.style.display=="none") {
+		el.style.display="";
+		el.setAttribute("aria-hidden",false);
+		btn.setAttribute("aria-expanded",true);
+	} else {
+		el.style.display="none";
+		el.setAttribute("aria-hidden",true);
+		btn.setAttribute("aria-expanded",false);
+	}
+	var k=btn.innerHTML;
+	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,"[-]"):k.replace(/\[\-\]/,"[+]");
+}
+</script>';
+
 require_once "../header.php";
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
 if ($sig != md5($id.$_SESSION['secsalt'])) {
