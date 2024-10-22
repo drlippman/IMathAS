@@ -1605,26 +1605,32 @@ function binomialpdf($N,$p,$x) {
 		echo 'invalid inputs to invtcdf';
 		return 0;
 	}
-    return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
-    /*  based on R, but doesn't seem to work right for x=1,n=30,p=.1
-    if ($N > 15) {
+    if ($N > 15 && $N != $x) {
+        // from https://www.r-project.org/doc/reports/CLoader-dbinom-2002.pdf
         $lc = stirlerr($N) - stirlerr($x) - stirlerr($N-$x) - bd0($x,$N*$p) - bd0($N-$x,$N*(1-$p));
         $lf = log(2*M_PI) + log($x) + log(1 - $x/$N);
         $alt = exp($lc - 0.5*$lf);
-        echo (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));;
         return $alt;
     }
-	*/
+    return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
 }
 
 function stirlerr($n) {
-    // from R. Only has the part for n>15
+    // from R
     $S0  = 0.083333333333333333333;
     $S1 =0.00277777777777777777778;
     $S2 =0.00079365079365079365079365;
     $S3 =0.000595238095238095238095238;
     $S4 =0.0008417508417508417508417508;
     $nn = $n*$n;
+    if ($n < 16) {
+        $sfe = [0, 0.081061466795327258219670264,0.041340695955409294093822081, 0.0276779256849983391487892927,
+                0.020790672103765093111522771, 0.0166446911898211921631948653,0.013876128823070747998745727, 
+                0.0118967099458917700950557241,0.010411265261972096497478567, 0.0092554621827127329177286366,
+                0.008330563433362871256469318, 0.0075736754879518407949720242, 0.006942840107209529865664152, 
+                0.0064089941880042070684396310, 0.005951370112758847735624416, 0.0055547335519628013710386899];
+        return $sfe[$n];
+    }
     if ($n > 500) {
         return ($S0 - $S1/$nn)/$n;
     } else if ($n > 80) {
@@ -1668,7 +1674,7 @@ function binomialcdf($N,$p,$x) {
     $z = $p;
     $a = $x+1;
     $b = $N-$x;
-    $out = round(1 - beta_cdf($z, $a, $b), 10);
+    $out = 1 - beta_cdf($z, $a, $b);
 
 	return $out;
 }
