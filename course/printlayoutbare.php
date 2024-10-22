@@ -93,6 +93,7 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Math display:</span><span class="formright"><input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</span><br class="form"/>';
 	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
 	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes ></span><br class="form"/>';
+	echo '<span class="form">Include detailed solutions?</span><span class="formright"><input type=checkbox name=detsoln ></span><br class="form"/>';
 
 	echo '<div class="submit"><input type=submit value="Continue"></div></form>';
 
@@ -245,7 +246,8 @@ if ($overwriteBody==1) {
 			echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';;
 
 		}
-
+        $sa = [];
+        $detsol = [];
 		if ($_POST['format']=='trad') {
 			for ($j=0; $j<$copies; $j++) {
 				if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';}
@@ -272,10 +274,11 @@ if ($overwriteBody==1) {
 				for ($i=0; $i<$numq; $i++) {
 					if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
                     if ($courseUIver > 1) {
-                        $sa[$j][$i] = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
+                        list($newout,$sa[$j][$i],$detsol[$j][$i])= printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
+                        echo $newout;
                     } else {
-					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
-				}
+					    $sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
+				    }
 			}
 			}
 
@@ -291,6 +294,9 @@ if ($overwriteBody==1) {
 						} else {
 						  echo Sanitize::outgoingHTML(printfilter(filter($sa[$j][$i])));
 						}
+                        if (!empty($_REQUEST['detsoln']) && !empty($detsol[$j][$i])) {
+                            echo printfilter(filter($detsol[$j][$i]));
+                        }
 						echo "</li>\n";
 					}
 					echo "</ol>\n";
@@ -320,7 +326,8 @@ if ($overwriteBody==1) {
 				for ($j=0; $j<$copies;$j++) {
 					if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
                     if ($courseUIver > 1) {
-                        $sa[] = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
+                        list($newout,$sa[],$detsol[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
+                        echo $newout;
                     } else {
 					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
@@ -337,6 +344,9 @@ if ($overwriteBody==1) {
 					} else {
 					  echo Sanitize::outgoingHTML(printfilter(filter($sa[$i])));
 					}
+                    if (!empty($_REQUEST['detsoln']) && !empty($detsol[$i])) {
+                        echo printfilter(filter($detsol[$i]));
+                    }
 					echo "</li>\n";
 				}
 				echo "</ol>\n";
@@ -381,7 +391,8 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
     
     echo $retstrout;
 
-	return $res['jsparams']['ans'];
+	//return $res['jsparams']['ans'];
+    return array($retstrout, $res['jsparams']['ans'], (($res['solnopts']&5)==5)?$res['soln']:'');
 }
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
