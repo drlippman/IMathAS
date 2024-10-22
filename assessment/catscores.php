@@ -89,10 +89,14 @@ function catscores($quests,$scores,$defptsposs,$defoutcome,$cid) {
 			} else {
 				if (isset($catscore[$oi])) {
 				  $out .= '<tr><td><span class="ind'.Sanitize::onlyInt($ind).'">'.Sanitize::encodeStringForDisplay($outcomenames[$oi]).'</span></td>';
-					$pc = round(100*$catscore[$oi]/$catposs[$oi],1);
-					$out .= "<td>" . Sanitize::onlyFloat($catscore[$oi]) . " / " . Sanitize::onlyFloat($catposs[$oi]) . " ($pc%)</td></tr>\n";
-					$totpts += $catscore[$oi];
-					$totposs += $catposs[$oi];
+                  if ($catposs[$oi] > 0) {
+                    $pc = round(100*$catscore[$oi]/$catposs[$oi],1);
+                  } else {
+                    $pc = 0;
+                  }
+                  $out .= "<td>" . Sanitize::onlyFloat($catscore[$oi]) . " / " . Sanitize::onlyFloat($catposs[$oi]) . " ($pc%)</td></tr>\n";
+                  $totpts += $catscore[$oi];
+                  $totposs += $catposs[$oi];
 				}
 			}
 		}
