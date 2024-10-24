@@ -275,7 +275,6 @@ if ($overwriteBody==1) {
 					if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
                     if ($courseUIver > 1) {
                         list($newout,$sa[$j][$i],$detsol[$j][$i])= printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
-                        echo $newout;
                     } else {
 					    $sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				    }
@@ -327,7 +326,6 @@ if ($overwriteBody==1) {
 					if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
                     if ($courseUIver > 1) {
                         list($newout,$sa[],$detsol[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
-                        echo $newout;
                     } else {
 					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
