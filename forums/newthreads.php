@@ -27,7 +27,7 @@ if (!isset($teacherid)) {
   $array[':userid2']=$userid;
 }
 $query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))";
-$query .= " LIMIT 300";
+$query .= " ORDER BY imas_forum_threads.lastposttime DESC LIMIT 300";
 $stm = $DBH->prepare($query);
 $stm->execute($array);
 $result = $stm->fetchALL(PDO::FETCH_ASSOC);
@@ -109,7 +109,7 @@ if (count($lastpost)>0) {
   echo '<table class="gb forum" id="newthreads"><thead><th></th><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
   $threadids = array_map('intval', array_keys($lastpost));
 	$ph = Sanitize::generateQueryPlaceholders($threadids);
-  $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
+  $query = "SELECT imas_forum_posts.isanon,imas_forum_posts.threadid,imas_forum_posts.subject,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
   $query .= "imas_forum_posts.threadid IN ($ph) AND imas_forum_threads.lastposttime<? AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
   $stm = $DBH->prepare($query);
