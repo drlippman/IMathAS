@@ -44,7 +44,7 @@ export const actions = {
       window.$.ajax({
         url: store.APIbase + 'gbloadassess.php' + store.queryString,
         dataType: 'json',
-        data: { 'loadtexts': (loadtexts ? 1 : 0) },
+        data: { loadtexts: (loadtexts ? 1 : 0) },
         xhrFields: {
           withCredentials: true
         },

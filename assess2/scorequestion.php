@@ -31,7 +31,9 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('lastloaded'));
+if (empty($_POST['endattempt'])) { // skip check for endattempt, as may be no questions changed
+    check_for_required('POST', array('lastloaded'));
+}
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isActualTeacher && isset($_GET['uid'])) {
