@@ -115,6 +115,7 @@ class MathParser
   private $variableValues = [];
   private $origstr = '';
   private $docomplex = false;
+  private $allowEscinot = true;
 
   /**
    * Construct the parser
@@ -138,6 +139,8 @@ class MathParser
       array_push($this->variables, 'i');
     }
     usort($this->variables, function ($a,$b) { return strlen($b) - strlen($a);});
+
+    $this->allowEscinot = !in_array('E', $this->variables);
 
     //define functions
     if (count($allowedfuncs) > 0) {
@@ -434,7 +437,12 @@ class MathParser
         continue;
       } else if (ctype_digit($c) || $c==='.') {
         // if it's a number/decimal value
-        preg_match('/^(\d*\.?\d*(E\+?-?\d+)?)/', substr($str,$n), $matches);
+        if ($this->allowEscinot) {
+            preg_match('/^(\d*\.?\d*(E[\+\-]?\d+(?!\.))?)/', substr($str,$n), $matches);
+        } else {
+            preg_match('/^(\d*\.?\d*)/', substr($str,$n), $matches);
+
+        }
         if ($matches[1] === '.') { // special case for lone period
             continue;
         }
