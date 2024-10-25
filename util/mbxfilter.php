@@ -55,15 +55,16 @@ function mbxfilter($str) {
     // wrap image in div so htmlawed will break it out of inside p
 	$str = preg_replace('|<img.*?src="(.*?)"[^>]*>(\s*</img>)?|','<p>$0</p>', $str);
 
+    //strip buttons, since they won't translate, and we'll be left with the text of the button which isn't desirable
+    $str = preg_replace('/<button[^>]*>.*?<\/button>/','',$str); 
+
 	//enforce stuff
 	$C = array('elements'=>'a,b,br,canvas,em,h1,h2,h3,h4,h5,h6,i,img,input,li,ol,option,p,pre,select,strong,sub,sup,table,tbody,td,textarea,th,thead,tr,u,ul,statement,solution,hint');
 	$str = htmLawed($str, $C);
 	$str = str_replace("\n\n","\n",$str);
 
-
 //rewrite input boxes, select, textarea, etc.
 	$str = preg_replace('/<input[^>]*Preview[^>]*>\s*/','',$str); //strip preview buttons
-    $str = preg_replace('/<button[^>]*>Preview.*?<\/button>/','',$str); //strip preview buttons
 	$str = preg_replace('/<input[^>]*hidden[^>]*>\s*/','',$str); //strip hidden fields
 
 	//assume we've bypassed any $displayformat options for choices,multans,matching
