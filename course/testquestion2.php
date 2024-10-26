@@ -1,5 +1,5 @@
 <?php
-//IMathAS:  Main admin page
+//IMathAS:  Question Preview
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
@@ -24,6 +24,11 @@ if ($myrights<20) {
 } else {
 	//data manipulation here
     $useeditor = 1;
+
+    $cid = Sanitize::courseId($_GET['cid'] ?? 0);
+
+    $isadmin = ($cid === 'admin' && $myrights == 100);
+    $isgrpadmin = ($cid === 'admin' && $myrights >= 75);
     
     if (!empty($_POST['dellibitems']) && $myrights == 100) {
         $libid = $_POST['libid'];
@@ -132,7 +137,7 @@ if ($myrights<20) {
 		$page_scoreMsg = "";
 		$_SESSION['choicemap'] = array();
 	}
-  $cid = Sanitize::courseId($_GET['cid'] ?? 0);
+  
 	$page_formAction = "testquestion2.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($qsetid);
 
 	if (isset($_POST['usecheck'])) {
@@ -163,7 +168,7 @@ if ($myrights<20) {
 	} else {
 		$eqnhelper = 4;
 	}
-	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName,imas_libraries.id,imas_users.id FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
+	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName,imas_libraries.id AS libid,imas_users.id AS uid,imas_libraries.userights,imas_users.groupid FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
 	$resultLibNames->execute(array(':qsetid'=>$qsetid));
 }
 
@@ -466,17 +471,30 @@ if ($overwriteBody==1) {
 
 	echo '<p>'._('Question is in these libraries:').'</p>';
 	echo '<ul>';
-	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
-		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
-		if ($myrights==100) {
-            printf(' (<span class="pii-full-name">%s, %s</span>)',
-                Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
-            echo ' <a class="small" href="#" onclick="if(confirm(\'Are you sure?\')){dellibitems('.Sanitize::onlyInt($row[3]).',';
-            echo Sanitize::onlyInt($row[4]).',this);} return false;">';
-            echo _('Remove all questions in this library added by this person');
-            echo '</a>';
-		}
-		echo '</li>';
+	while ($row = $resultLibNames->fetch(PDO::FETCH_ASSOC)) {
+        if ($row['userights'] > 2 ||
+            ($row['userights'] > 0 && ($row['groupid'] == $groupid || $isadmin)) ||
+            ($row['userights'] == 0 && ($row['uid'] == $userid || $isadmin || ($isgrpadmin && $row['groupid'] == $groupid)))
+        ) {
+            echo '<li>';
+            if ($row['userights'] == 0) {
+                echo '<span style="color:red">';
+            } else if ($row['userights'] < 3) {
+                echo '<span style="color:#0c0">';
+            } else {
+                echo '<span>';
+            }
+            echo Sanitize::encodeStringForDisplay($row['name']) . '</span>';
+            if ($isadmin) {
+                printf(' (<span class="pii-full-name">%s, %s</span>)',
+                    Sanitize::encodeStringForDisplay($row['LastName']), Sanitize::encodeStringForDisplay($row['FirstName']));
+                echo ' <a class="small" href="#" onclick="if(confirm(\'Are you sure?\')){dellibitems('.Sanitize::onlyInt($row['libid']).',';
+                echo Sanitize::onlyInt($row['uid']).',this);} return false;">';
+                echo _('Remove all questions in this library added by this person');
+                echo '</a>';
+            }
+            echo '</li>';
+        }
 	}
 	echo '</ul>';
 
