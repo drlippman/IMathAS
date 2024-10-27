@@ -172,12 +172,15 @@ class CalculatedAnswerBox implements AnswerBox
         }
         $preview .= "$leftb<span id=p$qn></span>$rightb ";
 
+        $nosolntype = 0;
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+            list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            if (!is_numeric($answer)) {
+            if ($nosolntype > 0) {
+                $sa = $answer;
+            } else if (!is_numeric($answer)) {
                 //$sa = '`' . $answer . '`';
                 if (in_array('allowplusminus', $ansformats)) {
                     $answer = str_replace('+-','pm',$answer);

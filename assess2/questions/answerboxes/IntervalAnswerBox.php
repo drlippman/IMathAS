@@ -129,7 +129,7 @@ class IntervalAnswerBox implements AnswerBox
         $preview .= "<span id=p$qn></span> ";
 
         if (in_array('nosoln', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, 'interval');
+            list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, 'interval');
             $answer = str_replace('"', '', $answer);
         }
         if ($answer !== '' && !is_array($answer) && !$isConditional) {

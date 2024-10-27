@@ -163,12 +163,17 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             $params['helper'] = 1;
         }
 
+        $nosolntype = 0;
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+            list($out, $answer,$nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            $sa = '`' . $answer . '`';
+            if ($nosolntype > 0) {
+                $sa = $answer;
+            } else {
+                $sa = '`' . $answer . '`';
+            }
         }
 
         // Done!

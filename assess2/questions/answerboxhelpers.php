@@ -725,14 +725,17 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	//$out .= '<span class="floatright">'.getcolormark($colorbox).'</span>';
 	$out .= '</div>';
 
+    $answertype = 0;
 	if (preg_match('/^inf/',$answer) || $answer==='oo' || $answer===$infsoln) {
-		$answer = '"'.$infsoln.'"';
+		$answer = $infsoln;
+        $answertype = 2;
 	}
 	if (preg_match('/^no\s*solution/',$answer) || $answer==='DNE' || $answer===$nosoln) {
-		$answer = '"'.$nosoln.'"';
+		$answer = $nosoln;
+        $answertype = 1;
 	}
 
-	return array($out,$answer);
+	return array($out,$answer,$answertype);
 }
 
 function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {

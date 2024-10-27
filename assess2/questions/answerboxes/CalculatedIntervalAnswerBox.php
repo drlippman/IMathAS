@@ -113,12 +113,15 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         }
         $preview .= "<span id=p$qn></span> ";
 
+        $nosolntype = 0;
         if (in_array('nosoln', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality', $ansformats) ? 'inequality' : 'interval');
+            list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality', $ansformats) ? 'inequality' : 'interval');
         }
 
         if ($answer !== '' && !$isConditional && !is_array($answer)) {
-            if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
+            if ($nosolntype > 0) {
+                $sa = $answer;
+            } else if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
                 $anspts = explode('or', $answer);
                 foreach ($anspts as $k=>$v) {
                     $anspts[$k] = '`' . intervaltoineq($v, $variables) . '`';

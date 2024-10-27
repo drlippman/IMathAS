@@ -109,7 +109,7 @@ class NTupleAnswerBox implements AnswerBox
             '" />';
         $out .= "<span id=p$qn></span>";
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+            list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
             $sa = $answer;

@@ -203,41 +203,47 @@ class FunctionExpressionAnswerBox implements AnswerBox
         }
         $preview .= "<span id=p$qn></span>\n";
 
+        $nosolntype = 0;
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+            list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            if ($GLOBALS['myrights'] > 10 && strpos($answer, '|') !== false) {
-                echo 'Warning: use abs(x) not |x| in $answer';
-            }
-            $sa = $answer;
-            if (in_array('allowplusminus', $ansformats)) {
-                $sa = str_replace('+-','pm',$sa);
-            }
-            $sa = makeprettydisp($sa);
-            $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
 
-            for ($i = 0; $i < count($variables); $i++) {
-                if (strlen($variables[$i]) > 1) {
-                    $isgreek = false;
-                    $varlower = strtolower($variables[$i]);
-                    $isgreek = in_array($varlower, $greekletters);
-                    
-                    if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
-                        $chg = false;
-                        if (strlen($matches[1]) > 1 && !in_array(strtolower($matches[1]), $greekletters)) {
-                            $matches[1] = '"' . $matches[1] . '"';
-                            $chg = true;
+        if ($answer !== '' && !is_array($answer) && !$isConditional) {
+            if ($nosolntype > 0) {
+                $sa = $answer;
+            } else {
+                if ($GLOBALS['myrights'] > 10 && strpos($answer, '|') !== false) {
+                    echo 'Warning: use abs(x) not |x| in $answer';
+                }
+                $sa = $answer;
+                if (in_array('allowplusminus', $ansformats)) {
+                    $sa = str_replace('+-','pm',$sa);
+                }
+                $sa = makeprettydisp($sa);
+                $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
+
+                for ($i = 0; $i < count($variables); $i++) {
+                    if (strlen($variables[$i]) > 1) {
+                        $isgreek = false;
+                        $varlower = strtolower($variables[$i]);
+                        $isgreek = in_array($varlower, $greekletters);
+                        
+                        if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
+                            $chg = false;
+                            if (strlen($matches[1]) > 1 && !in_array(strtolower($matches[1]), $greekletters)) {
+                                $matches[1] = '"' . $matches[1] . '"';
+                                $chg = true;
+                            }
+                            if (strlen($matches[2]) > 1 && $matches[2][0] != '(' && !in_array(strtolower($matches[2]), $greekletters)) {
+                                $matches[2] = '"' . $matches[2] . '"';
+                                $chg = true;
+                            }
+                            if ($chg) {
+                                $sa = str_replace($matches[0], $matches[1] . '_' . $matches[2], $sa);
+                            }
+                        } else if (!$isgreek) {
+                            $sa = str_replace($variables[$i], '"' . $variables[$i] . '"', $sa);
                         }
-                        if (strlen($matches[2]) > 1 && $matches[2][0] != '(' && !in_array(strtolower($matches[2]), $greekletters)) {
-                            $matches[2] = '"' . $matches[2] . '"';
-                            $chg = true;
-                        }
-                        if ($chg) {
-                            $sa = str_replace($matches[0], $matches[1] . '_' . $matches[2], $sa);
-                        }
-                    } else if (!$isgreek) {
-                        $sa = str_replace($variables[$i], '"' . $variables[$i] . '"', $sa);
                     }
                 }
             }

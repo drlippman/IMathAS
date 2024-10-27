@@ -120,15 +120,20 @@ class CalculatedComplexAnswerBox implements AnswerBox
         }
         $preview .= "<span id=p$qn></span> ";
 
+        $nosolntype = 0;
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+            list($out,$answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            if (in_array('allowplusminus', $ansformats)) {
-                $answer = str_replace('+-','pm',$answer);
+            if ($nosolntype > 0) {
+                $sa = $answer;
+            } else {
+                if (in_array('allowplusminus', $ansformats)) {
+                    $answer = str_replace('+-','pm',$answer);
+                }
+                $sa = makeprettydisp($answer);
             }
-            $sa = makeprettydisp($answer);
         }
 
         // Done!

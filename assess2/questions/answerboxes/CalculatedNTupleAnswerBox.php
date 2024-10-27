@@ -117,13 +117,18 @@ class CalculatedNTupleAnswerBox implements AnswerBox
         }
         $preview .= "<span id=p$qn></span> ";
 
+        $nosolntype = 0;
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
-            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+            list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            $sa = makeprettydisp($answer);
-            if ($displayformat == 'vector') {
-                $sa = str_replace(array('<', '>'), array('(:', ':)'), $sa);
+            if ($nosolntype > 0) {
+                $sa = $answer;
+            } else {
+                $sa = makeprettydisp($answer);
+                if ($displayformat == 'vector') {
+                    $sa = str_replace(array('<', '>'), array('(:', ':)'), $sa);
+                }
             }
         }
 
