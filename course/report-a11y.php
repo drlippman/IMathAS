@@ -2,10 +2,15 @@
 
 require_once "../init.php";
 
+$what = 'cid';
+
 if (!isset($teacherid)) {
   echo "Not for you";
   exit;
 }
+if (isset($_GET['scan']) && $_GET['scan'] === 'myqs') {
+    $what = 'myqs';
+} 
 
 $errors = [];
 $asciisvgpattern = '/^showasciisvg\(\s*((("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])+,\s*){0,2}("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])?\s*)?\)$/';
@@ -30,77 +35,110 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
 }
 function adderror($descr, $loc, $itemtype, $itemname, $link) {
     global $errors;
-    $errors[] = [sprintf('%s in %s of %s %s', $descr, $loc, $itemtype, $itemname), $link];
-}
-
-// scan assessment summary, intro (including between-question text)
-$stm = $DBH->prepare("SELECT name,summary,intro,id FROM imas_assessments WHERE courseid=?");
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    a11yscan($row['summary'], _('Summary'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
-    a11yscan($row['intro'], _('Intro or Between-question text'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
-}
-
-// scan inline text summary
-$stm = $DBH->prepare("SELECT title,text,id FROM imas_inlinetext WHERE courseid=?");
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    a11yscan($row['text'], _('Text'), _('Inline text item'), $row['title'], "course/addinlinetext.php?cid=$cid&id=" . $row['id']);
-}
-
-// scan linked text summary, text
-$stm = $DBH->prepare("SELECT title,summary,text,id FROM imas_linkedtext WHERE courseid=?");
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    a11yscan($row['summary'], _('Summary'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
-    a11yscan($row['text'], _('Text'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
-}
-
-// scan forum summary, postinstr, replyinstr
-$stm = $DBH->prepare("SELECT name,description,postinstr,replyinstr,id FROM imas_forums WHERE courseid=?");
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    a11yscan($row['description'], _('Description'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
-    a11yscan($row['postinstr'], _('Post Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
-    a11yscan($row['replyinstr'], _('Reply Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
-}
-
-// scan forum post message, for sticky forum posts with type>0
-$stm = $DBH->prepare("SELECT ifp.subject,ifp.message,ifs.name FROM imas_forums AS ifs 
-    JOIN imas_forum_posts AS ifp ON ifs.id=ifp.forumid AND ifp.posttype>0 WHERE ifs.courseid=?");
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    a11yscan($row['message'], _('Sticky post') . ' ' . $row['subject'], _('Forum'), $row['name']);
-}
-
-// scan questionset control, qtext
-$query = 'SELECT iqs.control,iqs.qtext,ia.name,iqs.id,iqs.extref FROM imas_questionset AS iqs 
-    JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
-    JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
-    WHERE ia.courseid=?';
-$stm = $DBH->prepare($query);
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
-        _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
-    if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
-        adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
-            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+    if ($itemtype !== null) {
+        $errors[] = [sprintf('%s in %s of %s %s', $descr, $loc, $itemtype, $itemname), $link];
+    } else {
+        $errors[] = [sprintf('%s in %s', $descr, $loc), $link];
     }
 }
 
-// scan qimages alttext for blank
-$query = 'SELECT iqi.alttext,iqi.var,ia.name,iqs.id FROM imas_questionset AS iqs 
+if ($what === 'cid') {
+    // scan assessment summary, intro (including between-question text)
+    $stm = $DBH->prepare("SELECT name,summary,intro,id FROM imas_assessments WHERE courseid=?");
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['summary'], _('Summary'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
+        a11yscan($row['intro'], _('Intro or Between-question text'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
+    }
+
+    // scan inline text summary
+    $stm = $DBH->prepare("SELECT title,text,id FROM imas_inlinetext WHERE courseid=?");
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['text'], _('Text'), _('Inline text item'), $row['title'], "course/addinlinetext.php?cid=$cid&id=" . $row['id']);
+    }
+
+    // scan linked text summary, text
+    $stm = $DBH->prepare("SELECT title,summary,text,id FROM imas_linkedtext WHERE courseid=?");
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['summary'], _('Summary'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
+        a11yscan($row['text'], _('Text'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
+    }
+
+    // scan forum summary, postinstr, replyinstr
+    $stm = $DBH->prepare("SELECT name,description,postinstr,replyinstr,id FROM imas_forums WHERE courseid=?");
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['description'], _('Description'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
+        a11yscan($row['postinstr'], _('Post Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
+        a11yscan($row['replyinstr'], _('Reply Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
+    }
+
+    // scan forum post message, for sticky forum posts with type>0
+    $stm = $DBH->prepare("SELECT ifp.subject,ifp.message,ifs.name FROM imas_forums AS ifs 
+        JOIN imas_forum_posts AS ifp ON ifs.id=ifp.forumid AND ifp.posttype>0 WHERE ifs.courseid=?");
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['message'], _('Sticky post') . ' ' . $row['subject'], _('Forum'), $row['name']);
+    }
+
+    // scan questionset control, qtext
+    $query = 'SELECT iqs.control,iqs.qtext,ia.name,iqs.id,iqs.extref FROM imas_questionset AS iqs 
+        JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
+        JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
+        WHERE ia.courseid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+        if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
+            adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+                _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+        }
+    }
+
+    // scan qimages alttext for blank
+    $query = 'SELECT iqi.alttext,iqi.var,ia.name,iqs.id FROM imas_questionset AS iqs 
+        JOIN imas_qimages AS iqi ON iqi.qsetid=iqs.id
+        JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
+        JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
+        WHERE ia.courseid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute([$cid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if (trim($row['alttext']) == '') {
+            adderror(_('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
+                _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+        }
+    }
+} else if ($what === 'myqs') {
+    // scan questionset control, qtext
+    $query = 'SELECT iqs.control,iqs.qtext,iqs.id,iqs.extref FROM imas_questionset AS iqs 
+    WHERE iqs.ownerid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute([$userid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+            null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+        if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
+            adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+                null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+        }
+    }
+
+    // scan qimages alttext for blank
+    $query = 'SELECT iqi.alttext,iqi.var,iqs.id FROM imas_questionset AS iqs 
     JOIN imas_qimages AS iqi ON iqi.qsetid=iqs.id
-    JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
-    JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
-    WHERE ia.courseid=?';
-$stm = $DBH->prepare($query);
-$stm->execute([$cid]);
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    if (trim($row['alttext']) == '') {
-        adderror(_('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
-            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+    WHERE iqs.ownerid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute([$userid]);
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if (trim($row['alttext']) == '') {
+            adderror(_('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
+                null, null , "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+        }
     }
 }
 
@@ -116,7 +154,11 @@ require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
-echo '<p>'._('This report scans items in your course for accessibility issues.').' ';
+if ($what === 'myqs') {
+    echo '<p>'._('This report scans questions you own for accessibility issues.').' ';
+} else {
+    echo '<p>'._('This report scans items in your course for accessibility issues.').' ';
+}
 echo _('Currently it will only identify images that are missing alt text, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
