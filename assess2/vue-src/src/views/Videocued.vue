@@ -14,6 +14,7 @@
         class="med-left"
         :qn = "qn"
         :cue = "cue"
+        :playing = "playing"
         @jumpto="jumpTo"
         @addfollowup="addShowFollowup"
       />
@@ -122,7 +123,8 @@ export default {
       timer: null,
       cue: 0,
       toshow: 'v',
-      showfolloup: []
+      showfolloup: [],
+      playing: false
     };
   },
   computed: {
@@ -272,11 +274,22 @@ export default {
           this.jumpTo(this.cue, 'q');
         }
       }
+      this.playing = (event.data === window.YT.PlayerState.PLAYING ||
+          event.data === window.YT.PlayerState.BUFFERING);
     },
     handlePlayerError (event) {
       store.errorMsg = event.data;
     },
     jumpTo (newCueNum, newToshow, failed = 0) {
+      if (newToshow === 'rv') {
+        // call is from Start Video button in VideocuedResultNav
+        // resume video if paused, otherwise treat as normal seek
+        if (this.ytplayer && this.ytplayer.getPlayerState() === 2) {
+          this.ytplayer.playVideo();
+          return;
+        }
+        newToshow = 'v';
+      }
       if (newCueNum === -1 || newToshow === 'q') {
         // if showing a question, pause the video
         this.exitFullscreen();
