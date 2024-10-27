@@ -4173,17 +4173,24 @@ function stringtopolyterms($str) {
 }
 
 /*
- abstracts some of the common numfunc processing
- @param $variables string (comma separated) 
- @param $domain   string
- return
- array of
-   $variables  array
-   $testpoints  2d array
-   $flist string (function variables, comma separated) 
+ abstracts domain and variable parsing for common numfunc stuff
+ @param $variables string (comma separated)
+ @param domain     string
+ @param $varstoadd  array variables to add to $variables if not already present
+ return 
+ array of 
+   $variables   array
+   $ofunc       array function-acting variables
+   $newdomain   multi-dim array domain parsed are normalized
+   $restrictvartoint   array
 */
-function numfuncGenerateTestpoints($variables,$domain='') {
+function numfuncParseVarsDomain($variables, $domain, $varstoadd = []) {
     $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
+    foreach ($varstoadd as $v) {
+        if (!in_array($v, $variables)) {
+            $variables[] = $v;
+        }
+    }
     $ofunc = array();
     for ($i = 0; $i < count($variables); $i++) {
         //find f() function variables
@@ -4253,12 +4260,30 @@ function numfuncGenerateTestpoints($variables,$domain='') {
         $newdomain[] = $domaingroups[$touse][1];
         $restrictvartoint[] = $domaingroups[$touse][2];
     }
-    $fromto = $newdomain;
+    
     $variables = array_values($variables);
+    if (count($ofunc)>0) {
+        usort($ofunc,'lensort');
+    }
+    return [$variables, $ofunc, $newdomain, $restrictvartoint];
+}
+
+/*
+ abstracts some of the common numfunc processing
+ @param $variables string (comma separated) 
+ @param $domain   string
+ return
+ array of
+   $variables  array
+   $testpoints  2d array
+   $flist string (function variables, comma separated) 
+*/
+function numfuncGenerateTestpoints($variables,$domain='') {
+    
+    list($variables, $ofunc, $fromto, $restrictvartoint) = numfuncParseVarsDomain($variables, $domain);
 
     $flist = '';
     if (count($ofunc)>0) {
-        usort($ofunc,'lensort');
         $flist = implode(",",$ofunc);
     }
 

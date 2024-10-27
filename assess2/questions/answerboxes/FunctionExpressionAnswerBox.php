@@ -107,61 +107,12 @@ class FunctionExpressionAnswerBox implements AnswerBox
         }
 
         if (empty($variables)) {$variables = "x";}
-        $variables = array_values(array_filter(array_map('trim', explode(",", $variables)), 'strlen'));
-        if (in_array('generalcomplex', $ansformats) && !in_array('i', $variables)) {
-            array_unshift($variables, 'i');
-        }
-        $ofunc = array();
-        for ($i = 0; $i < count($variables); $i++) {
-            $variables[$i] = trim($variables[$i]);
-            if (strpos($variables[$i], '()') !== false) {
-                $ofunc[] = substr($variables[$i], 0, strpos($variables[$i], '('));
-                $variables[$i] = substr($variables[$i], 0, strpos($variables[$i], '('));
-            }
+        $addvars = [];
+        if (in_array('generalcomplex', $ansformats)) {
+            $addvars[] = 'i';
         }
 
-        if (!empty($domain)) {
-            $fromto = array_map('trim', explode(",", $domain));
-            for ($i=0; $i < count($fromto); $i++) {
-                if ($fromto[$i] === 'integers') { continue; }
-                else if (!is_numeric($fromto[$i])) {
-                    $fromto[$i] = evalbasic($fromto[$i]);
-                }
-            }
-        } else { 
-            $fromto[0] = -10;
-            $fromto[1] = 10;
-        }
-        if (count($fromto) == 1) {$fromto[0] = -10;
-            $fromto[1] = 10;}
-        $domaingroups = array();
-        $i = 0;
-        while ($i < count($fromto)) {
-            if (isset($fromto[$i + 2]) && $fromto[$i + 2] == 'integers') {
-                $domaingroups[] = array(intval($fromto[$i]), intval($fromto[$i + 1]), true);
-                $i += 3;
-            } else if (isset($fromto[$i + 1])) {
-                $domaingroups[] = array(floatval($fromto[$i]), floatval($fromto[$i + 1]), false);
-                $i += 2;
-            } else {
-                break;
-            }
-        }
-
-        uasort($variables, 'lensort');
-        $newdomain = array();
-        $restrictvartoint = array();
-        foreach ($variables as $i => $v) {
-            if (isset($domaingroups[$i])) {
-                $touse = $i;
-            } else {
-                $touse = 0;
-            }
-            $newdomain[] = $domaingroups[$touse];
-        }
-
-        $variables = array_values($variables);
-        usort($ofunc, 'lensort');
+        list($variables, $ofunc, $newdomain, $restrictvartoint) = numfuncParseVarsDomain($variables, $domain, $addvars);
 
         $classes = ['text'];
         if ($colorbox != '') {
@@ -220,32 +171,8 @@ class FunctionExpressionAnswerBox implements AnswerBox
                     $sa = str_replace('+-','pm',$sa);
                 }
                 $sa = makeprettydisp($sa);
-                $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
-
-                for ($i = 0; $i < count($variables); $i++) {
-                    if (strlen($variables[$i]) > 1) {
-                        $isgreek = false;
-                        $varlower = strtolower($variables[$i]);
-                        $isgreek = in_array($varlower, $greekletters);
-                        
-                        if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
-                            $chg = false;
-                            if (strlen($matches[1]) > 1 && !in_array(strtolower($matches[1]), $greekletters)) {
-                                $matches[1] = '"' . $matches[1] . '"';
-                                $chg = true;
-                            }
-                            if (strlen($matches[2]) > 1 && $matches[2][0] != '(' && !in_array(strtolower($matches[2]), $greekletters)) {
-                                $matches[2] = '"' . $matches[2] . '"';
-                                $chg = true;
-                            }
-                            if ($chg) {
-                                $sa = str_replace($matches[0], $matches[1] . '_' . $matches[2], $sa);
-                            }
-                        } else if (!$isgreek) {
-                            $sa = str_replace($variables[$i], '"' . $variables[$i] . '"', $sa);
-                        }
-                    }
-                }
+                
+                $sa = numfuncPrepShowanswer($sa, $variables);
             }
         }
 

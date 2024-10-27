@@ -890,3 +890,33 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
 function rewritePlusMinus($str) {
     return preg_replace('/(.*?)\+\-(.*?)(,|$)/','$1+$2,$1-$2$3',$str);
 }
+
+function numfuncPrepShowanswer($string, $variables) {
+    $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
+
+    for ($i = 0; $i < count($variables); $i++) {
+        if (strlen($variables[$i]) > 1) {
+            $isgreek = false;
+            $varlower = strtolower($variables[$i]);
+            $isgreek = in_array($varlower, $greekletters);
+            
+            if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
+                $chg = false;
+                if (strlen($matches[1]) > 1 && !in_array(strtolower($matches[1]), $greekletters)) {
+                    $matches[1] = '"' . $matches[1] . '"';
+                    $chg = true;
+                }
+                if (strlen($matches[2]) > 1 && $matches[2][0] != '(' && !in_array(strtolower($matches[2]), $greekletters)) {
+                    $matches[2] = '"' . $matches[2] . '"';
+                    $chg = true;
+                }
+                if ($chg) {
+                    $string = str_replace($matches[0], $matches[1] . '_' . $matches[2], $string);
+                }
+            } else if (!$isgreek) {
+                $string = str_replace($variables[$i], '"' . $variables[$i] . '"', $string);
+            }
+        }
+    }
+    return $string;
+}
