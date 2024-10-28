@@ -9,7 +9,7 @@ require_once __DIR__ . '/matrix_common.php';
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
-class CalculatedMatrixScorePart implements ScorePart
+class NumMatrixScorePart implements ScorePart
 {
     private $scoreQuestionParams;
 
@@ -24,6 +24,7 @@ class CalculatedMatrixScorePart implements ScorePart
 
         $scorePartResult = new ScorePartResult();
 
+        $anstype = $this->scoreQuestionParams->getAnswerType();
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
         $qn = $this->scoreQuestionParams->getQuestionNumber();
@@ -42,9 +43,11 @@ class CalculatedMatrixScorePart implements ScorePart
         if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-        $hasNumVal = !empty($_POST["qn$qn-val"]);
-        if ($hasNumVal) {
-          $givenansval = $_POST["qn$qn-val"];
+        if ($anstype === 'calcmatrix') {
+            $hasNumVal = !empty($_POST["qn$qn-val"]);
+            if ($hasNumVal) {
+                $givenansval = $_POST["qn$qn-val"];
+            }
         }
         $givenans = normalizemathunicode($givenans);
 
@@ -63,37 +66,33 @@ class CalculatedMatrixScorePart implements ScorePart
             $sizeparts = explode(',',$answersize);
             $N = $sizeparts[0];
             $givenanslist = array();
-            if ($hasNumVal) {
+            if ($anstype === 'calcmatrix' && $hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
             } else {
                 $givenanslistvals = array();
             }
             if ($isRescore) {
               $givenanslist = explode('|', $givenans);
-              foreach ($givenanslist as $i=>$v) {
-                    $givenanslistvals[$i] = evalMathParser($v);
+              if ($anstype === 'calcmatrix') {
+                foreach ($givenanslist as $i=>$v) {
+                        $givenanslistvals[$i] = evalMathParser($v);
+                }
               }
             } else {
               for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
                   $givenanslist[$i] = $_POST["qn$qn-$i"];
-                  if (!$hasNumVal && $_POST["qn$qn-$i"] !== '') {
+                  if ($anstype === 'calcmatrix' && !$hasNumVal && $_POST["qn$qn-$i"] !== '') {
                       $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
                   }
               }
             }
             $scorePartResult->setLastAnswerAsGiven(implode('|',$givenanslist));
-            $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
+            if ($anstype === 'calcmatrix') {
+                $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
+            } 
         } else {
             list($givenanslist, $N) = parseMatrixToArray($givenans);
-            /*$givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
-            if (strlen($givenans)>1 && $givenans[1]!='(') {
-                $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,1,-1)));
-            } else {
-                $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
-            }
-            $N = substr_count($answer,'),(')+1;
-            */
-
+    
             //this may not be backwards compatible
             $scorePartResult->setLastAnswerAsGiven($givenans);
             if ($givenanslist === false) { // invalid answer
@@ -101,28 +100,21 @@ class CalculatedMatrixScorePart implements ScorePart
                 return $scorePartResult;
             }
 
-            if ($hasNumVal) {
-                $givenanslistvals = explode('|', $givenansval);
-            } else {
-                $givenanslistvals = [];
-                foreach ($givenanslist as $j=>$v) {
-                    $givenanslistvals[$j] = evalMathParser($v);
+            if ($anstype === 'calcmatrix') {
+                if ($hasNumVal) {
+                    $givenanslistvals = explode('|', $givenansval);
+                } else {
+                    $givenanslistvals = [];
+                    foreach ($givenanslist as $j=>$v) {
+                        $givenanslistvals[$j] = evalMathParser($v);
+                    }
                 }
-            }
 
-            //this may not be backwards compatible
-            $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
+                //this may not be backwards compatible
+                $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
+            }
         }
-        /*
-        $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
-        if (strlen($answer)>1 && $answer[1] != '(') {
-            $ansr = substr($answer,1,-1);
-        } else {
-            $ansr = substr($answer,2,-2);
-        }
-        $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
-        $answerlist = explode(',',$ansr);
-        */
+        
         list($answerlist, $ansN) = parseMatrixToArray($answer);
 
         //handle nosolninf case
@@ -143,50 +135,70 @@ class CalculatedMatrixScorePart implements ScorePart
         $incorrect = array();
 
         foreach ($answerlist as $k=>$v) {
-            $answerlist[$k] = evalMathParser($v);
+            $v = evalMathParser($v);
+            if (is_nan($v)) {
+                if (isset($GLOBALS['teacherid'])) {
+                    echo _('Debug info: invalid $answer');
+                }
+                $answerlist[$k] = 0;
+            } else if ($anstype === 'calcmatrix') {
+                $answerlist[$k] = $v;
+            } else { // 'matrix'
+                $answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
+            }
         }
-        if (!empty($answersize)) {
-            for ($i=0; $i<count($answerlist); $i++) {
-                if (isset($givenanslist[$i]) && !checkanswerformat($givenanslist[$i],$ansformats)) {
-                    //perhaps should just elim bad answer rather than all?
-                    if ($scoremethod == 'byelement') {
-                      $incorrect[$i] = 1;
-                    } else {
-                      $scorePartResult->setRawScore(0);
-                      return $scorePartResult;
+
+        // Check formats
+        if ($anstype === 'calcmatrix') {
+            if (!empty($answersize)) {
+                for ($i=0; $i<count($answerlist); $i++) {
+                    if (isset($givenanslist[$i]) && !checkanswerformat($givenanslist[$i],$ansformats)) {
+                        //perhaps should just elim bad answer rather than all?
+                        if ($scoremethod == 'byelement') {
+                        $incorrect[$i] = 1;
+                        } else {
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
+                        }
+                    }
+                }
+
+            } else {
+                if ($N != $ansN) {
+                    $correct = false;
+                }
+                foreach ($givenanslist as $i=>$chkme) {
+                    if (!checkanswerformat($chkme,$ansformats)) {
+                        //perhaps should just elim bad answer rather than all?
+                        if ($scoremethod == 'byelement') {
+                        $incorrect[$i] = 1;
+                        } else {
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
+                        }
                     }
                 }
             }
-
         } else {
-            if ($N != $ansN) {
-                $correct = false;
-            }
-            /*$tocheck = str_replace(' ','', $givenans);
-            $tocheck = str_replace(array('],[','),(','>,<'),',',$tocheck);
-            $tocheck = substr($tocheck,2,-2);
-            $tocheck = explode(',',$tocheck);
-            foreach($tocheck as $i=>$chkme) {
-            */
-            foreach ($givenanslist as $i=>$chkme) {
-                if (!checkanswerformat($chkme,$ansformats)) {
-                    //perhaps should just elim bad answer rather than all?
-                    if ($scoremethod == 'byelement') {
-                      $incorrect[$i] = 1;
-                    } else {
-                      $scorePartResult->setRawScore(0);
-                      return $scorePartResult;
-                    }
-                }
-            }
+            //matrix: values are already numeric
+            $givenanslistvals = $givenanslist;
         }
 
-        if (count($answerlist) != count($givenanslist)) {
+        if (count($answerlist) != count($givenanslist) || $answerlist[0]==='' || $givenanslist[0]==='') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
 
-        $fullmatrix = !in_array("",  $givenanslist, true) && !in_array("NaN",  $givenanslistvals, true);
+        if ($anstype === 'calcmatrix') {
+            $fullmatrix = !in_array("",  $givenanslist, true) && !in_array("NaN",  $givenanslistvals, true);
+        } else {
+            $fullmatrix = true;
+            foreach ($givenanslist as $j=>$v) {
+                if (!is_numeric($v)) {
+                    $fullmatrix = false;
+                }
+            }
+        }
 
         if ($fullmatrix && in_array('scalarmult',$ansformats)) {
             //scale givenanslist to the magnitude of $answerlist
