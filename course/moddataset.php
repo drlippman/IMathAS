@@ -206,6 +206,7 @@
 		$_POST['qtext'] = preg_replace('/<(\/?\w[^<>]*?)>/',"&&&L$1&&&G",$_POST['qtext']);
 		$_POST['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
 		$_POST['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
+        $_POST['solution'] = str_replace(array('<!--','-->'),array('&&&L!--','--&&&G'),$_POST['solution']);
 		$_POST['solution'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['solution']);
 		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
 		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
