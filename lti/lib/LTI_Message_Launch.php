@@ -279,8 +279,8 @@ class LTI_Message_Launch {
 
     public function get_due_date() {
       $custom = $this->get_custom();
-      if (!empty($custom['canvas_assignment_due_at'])) {
-        $duedate = strtotime($custom['canvas_assignment_due_at']);
+      if (array_key_exists('canvas_assignment_due_at', $custom)) {
+        $duedate = strtotime($custom['canvas_assignment_due_at'] ?? '');
         if ($duedate === false) {
           return 2000000000;
         } else {

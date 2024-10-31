@@ -688,8 +688,9 @@ if (isset($_GET['launch'])) {
 			$_REQUEST['custom_canvas_assignment_due_at'] = $_REQUEST['custom_assignment_due_at'];
 		}
     }
-	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
-		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at']);
+
+    if (array_key_exists('custom_canvas_assignment_due_at', $_REQUEST)) {
+		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at'] ?? '');
 		if ($duedate !== false) {
 			$_SESSION['lti_duedate'] = $duedate;
 		} else {
