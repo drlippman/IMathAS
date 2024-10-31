@@ -4226,6 +4226,8 @@ function numfuncParseVarsDomain($variables, $domain, $varstoadd = []) {
                 }
                 $fromto[$i] = -10;
             }
+        } else {
+            $fromto[$i] = floatval($fromto[$i]);
         }
         if (!is_numeric($fromto[$i+1])) {
             $fromto[$i+1] = evalbasic($fromto[$i+1], true);
@@ -4236,6 +4238,8 @@ function numfuncParseVarsDomain($variables, $domain, $varstoadd = []) {
                 }
                 $fromto[$i+1] = 10;
             }
+        } else {
+            $fromto[$i+1] = floatval($fromto[$i+1]);
         }
         if (isset($fromto[$i+2]) && ($fromto[$i+2]=='integers' || $fromto[$i+2]=='integer')) {
             $domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
@@ -4256,9 +4260,7 @@ function numfuncParseVarsDomain($variables, $domain, $varstoadd = []) {
         } else {
             $touse = 0;
         }
-        $newdomain[] = $domaingroups[$touse][0];
-        $newdomain[] = $domaingroups[$touse][1];
-        $restrictvartoint[] = $domaingroups[$touse][2];
+        $newdomain[] = $domaingroups[$touse];
     }
     
     $variables = array_values($variables);
@@ -4289,17 +4291,17 @@ function numfuncGenerateTestpoints($variables,$domain='') {
 
     $tps = [];
     for($j=0; $j < count($variables); $j++) {
-        if ($fromto[2*$j+1]==$fromto[2*$j]) {
+        if ($fromto[$j][0]==$fromto[$j][1]) {
             for ($i = 0; $i < 20; $i++) {
-                $tps[$i][$j] = $fromto[2*$j];
+                $tps[$i][$j] = $fromto[$j][0];
             } 
-        } else if ($restrictvartoint[$j]) {
-            if ($fromto[2*$j+1]-$fromto[2*$j] > 200) {
+        } else if (!empty($fromto[$j][2])) { // integers
+            if ($fromto[$j][1]-$fromto[$j][0] > 200) {
                 for ($i = 0; $i < 20; $i++) {
-                    $tps[$i][$j] = rand($fromto[2*$j],$fromto[2*$j+1]);
+                    $tps[$i][$j] = rand($fromto[$j][0],$fromto[$j][1]);
                 }
             } else {
-                $allbetween = range($fromto[2*$j],$fromto[2*$j+1]);
+                $allbetween = range($fromto[$j][0],$fromto[$j][1]);
                 shuffle($allbetween);
                 $n = count($allbetween);
                 for ($i = 0; $i < 20; $i++) {
@@ -4307,9 +4309,9 @@ function numfuncGenerateTestpoints($variables,$domain='') {
                 }
             }
         } else {
-            $dx = ($fromto[2*$j+1]-$fromto[2*$j])/20;
+            $dx = ($fromto[$j][1]-$fromto[$j][0])/20;
             for ($i = 0; $i < 20; $i++) {
-                $tps[$i][$j] = $fromto[2*$j] + $dx*$i + $dx*rand(1,499)/500.0;
+                $tps[$i][$j] = $fromto[$j][0] + $dx*$i + $dx*rand(1,499)/500.0;
             }
         }
     }
