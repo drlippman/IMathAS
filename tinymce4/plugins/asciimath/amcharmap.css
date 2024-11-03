@@ -163,3 +163,5 @@
 .veca { background-position: -52px -769px; width: 8px; height: 14px; }
 .xi { background-position: -64px -773px; width: 8px; height: 17px; }
 .zeta { background-position: -28px -777px; width: 8px; height: 17px; }
+
+.nn-cap { display: inline-block; background: url('img/nn-cap.gif') no-repeat; width: 16px; height:13px; }
