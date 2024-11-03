@@ -7,32 +7,30 @@
 Geogebra integration functions, Version 3.0, Oct 4, 2014
 <BR><ul>
 <li><a href="#addGeogebra">addGeogebra</a></li>
-<li><a href="#addGeogebraJava">addGeogebraJava</a></li>
 </ul>
 <h3><a name="addGeogebra">addGeogebra</a></h3>
-addGeogebra(url,[width,height,commands,params,callbacks,qn,part])
-<BR>place a geogebra HTML5 applet.  Either include the base64ggb (grab by pressing
-<BR>&nbsp;Ctrl+Shift+B), or include the "Material ID" after uploading to Geogebra
-<BR>, or use "graphing" or "geometry" to use a blank "App" mode.
-<br>If using a Material ID, include in the question "Other Attribution" something like 
-   "Geogebra applet created by ____" with the creator's name.
-<BR>if commands array is provided, execute these javascript commands
-<BR>&nbsp;&nbsp;(see http://wiki.geogebra.org/en/Reference:JavaScript
-<BR>&nbsp;&nbsp;for available commands)
-<BR>params should be key=>value array of parameters, like
-<BR>&nbsp;&nbsp;array('framePossible'=>'true','showToolBar'=>'true')
-<BR>&nbsp;&nbsp;(see http://wiki.geogebra.org/en/Reference:Applet_Parameters for options)
-<BR>if you want to pull values from Geogebra on submit, provide an array of
-<BR>&nbsp;&nbsp;geogebra commands to callback with and provide question number
-<BR>&nbsp;&nbsp;(1-indexed - usually use $thisq) and if multipart, part number (0-indexed)
-<BR><h3><a name="addGeogebraJava">addGeogebraJava</a></h3>
-addGeogebraJava(url,[width,height,commands,params,callbacks,qn,part])
-<BR>place a geogebra Java applet, calling .ggb file specified in URL
-<BR>if commands array is provided, execute these javascript commands
-<BR>(see http://www.geogebra.org/en/wiki/index.php/GeoGebra_JavaScript_Methods
-<BR>for available commands)
-<BR>params should be key=>value array of parameters, like array('framePossible'=>'true','showToolBar'=>'true')
-<BR>(see http://www.geogebra.org/en/wiki/index.php/GeoGebra_Applet_Parameters for options)
-<BR>if you want to pull values from Geogebra on submit, provide an array of geogebra commands to callback with
-<BR>and provide question number (1-indexed - usually use $thisq) and if multipart, part number (0-indexed)
-<BR>
+addGeogebra(applet,[width,height,commands,params,callbacks,qn,part])
+<p>place a geogebra HTML5 applet.</p>
+<p><b>applet</b> should be one of:</p>
+<ul>
+    <li>"graphing", "geometry", "3d", "spreadsheet", "classic", or "probability" for a blank applet in one of those modes</li>
+    <li>The applet ID for an app uploaded to geogebra.org.  For example, if the URL for the applet is
+        https://www.geogebra.org/m/ws7xbhyh, the applet ID is "ws7xbhyh".  You can use applets others 
+        have uploaded, or ones you upload.  To give proper attribution, include in the question 
+        "Other Attribution" something like "Geogebra applet created by ____" with the creator's name.</li>
+    <li>The base64ggb for an applet you created. In the applet editor, you grab this by pressing Ctrl+Shift+B</li>
+</ul>
+<p><b>width</b> and <b>height</b> are the dimensions in pixels for the applet. Default is 400 by 200.</p>
+<p><b>commands</b> is an optional array of javascript commands to execute on the geogebra applet to 
+  change the contents.  See <a href="https://geogebra.github.io/docs/reference/en/GeoGebra_Apps_API/">GeoGebra Apps API</a> 
+    for available commands.  For example, <code>["evalCommand('A = ($a,$b)')","evalCommand('B = ($c,$d)')"]</code>
+    would set the value of points A and B to the provided coordinates.</p>
+<p><b>params</b> is an optional key=>value array of parameters, like <code>['framePossible'=>'true','showToolBar'=>'true']</code>. 
+    See <a href="https://geogebra.github.io/docs/reference/en/GeoGebra_App_Parameters/">GeoGebra App Parameters</a> for options</p>
+<p><b>callbacks</b> is an optional array that allows you to pull values from Geogebra on submit. The values will be stored as a 
+    comma-separated list in the answerbox corresponding with <b>qn</b> and <b>part</b>. Usually you 
+    will want to use <code>$thisq</code> for qn. <b>part</b> is not required for single-part questions. For example,
+    <code>["getValue('a')","getValue('b')"]</code> would get the values of Geogebra variables a and b and
+    store them as a comma separated list</p>
+</body>
+</html>
