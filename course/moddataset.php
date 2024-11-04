@@ -1034,11 +1034,11 @@
         function selectqtype(sn) {
             // close all second-levels
             $(".dropdown-submenu").removeClass("open");
-            $("#qtypedd a").removeClass("dd-active");
+            $("#qtypedd a").removeClass("dd-active").attr("aria-expanded",false);
             var selel = $("#qtypedd a[data-sn=" + sn + "]");
             console.log("#qtypedd a[data-sn=" + sn + "]");
             selel.addClass("dd-active"); 
-            selel.closest(".dropdown-submenu").addClass("open").children("a").addClass("dd-active");
+            selel.closest(".dropdown-submenu").addClass("open").children("a").addClass("dd-active").attr("aria-expanded",true);
             var longname = selel.text();
             if (selel.attr("data-ln")) {
                 longname = selel.attr("data-ln");

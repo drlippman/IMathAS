@@ -1779,7 +1779,7 @@ function setActiveTab(el) {
 
     var $submenu = $(e.target).closest('.dropdown-submenu');
     if (isActive && e.which == 37 && $submenu.length) {
-      $submenu.removeClass("open");
+      $submenu.removeClass("open").children('a').attr("aria-expanded",false);;
       $submenu.children("a").first().focus();
     }
 
@@ -1800,8 +1800,8 @@ function setActiveTab(el) {
   }
   Dropdown.prototype.submenu = function(e) {
     if (e.type == 'keydown' && !/(13|39)/.test(e.which)) { return; }
-    $('.dropdown-submenu').removeClass('open');
-    $(this).closest('.dropdown-submenu').addClass("open");
+    $('.dropdown-submenu').removeClass('open').children('a').attr("aria-expanded",false);
+    $(this).closest('.dropdown-submenu').addClass("open").children('a').attr("aria-expanded",true);;
     if (e.type == 'keydown') {
       $(this).next(".dropdown-menu").find('a').first().focus();
     }
