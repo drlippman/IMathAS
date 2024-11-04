@@ -38,7 +38,8 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
  "array_values","array_keys","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","preg_replace","intval","comparesameform","splicearray",
- "getsigfigs","checksigfigs","prettysigfig_instring","prettyreal_instring","round_instring");
+ "getsigfigs","checksigfigs","prettysigfig_instring","prettyreal_instring","round_instring",
+ "parseNtuple");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -5331,19 +5332,6 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	}
 
 	return array($answer, $showanswer);
-}
-
-function parsesloppycomplex($v) {
-    $func = makeMathFunction($v, 'i', [], '', true);
-    if ($func===false) {
-        return false;
-    }
-    $a = $func(['i'=>0]);
-    $apb = $func(['i'=>4]);
-    if (isNaN($a) || isNaN($apb)) {
-        return false;
-    }
-    return array($a,($apb-$a)/4);
 }
 
 //scoremultiorder($stua, $answer, $swap, [$type='string', $weights])

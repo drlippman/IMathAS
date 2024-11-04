@@ -190,11 +190,16 @@ dd {
 		<li><a href="#draw">Drawing</a></li>
 		<li><a href="#ntuple">N-Tuple</a></li>
 		<li><a href="#calcntuple">Calculated N-Tuple</a></li>
+        <li><a href="#complexntuple">Complex N-Tuple</a></li>
+        <li><a href="#calccomplexntuple">Calculated Complex N-Tuple</a></li>
+        <li><a href="#algntuple">Algebraic N-Tuple</a></li>
 		<li><a href="#complex">Complex</a></li>
 		<li><a href="#calccomplex">Calculated Complex</a></li>
-
 		<li><a href="#numericalmatrix">Numerical Matrix</a></li>
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
+        <li><a href="#complexmatrix">Complex Matrix</a></li>
+		<li><a href="#calccomplexmatrix">Calculated Complex Matrix</a></li>
+        <li><a href="#algmatrix">Algebraic Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
 		<li><a href="#calcinterval">Calculated Interval</a></li>
         <li><a href="#chemeqn">Chemical Equation</a></li>
@@ -3878,9 +3883,186 @@ rather than just numbers, such as (5/3, 2/3).
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
 </dl>
-
-
 </div> <!-- h3 -->
+
+<div class=h3>
+    <h3 id="complexntuple">Complex N-Tuple</h3>
+    
+    <p>
+    Complex N-Tuple questions require the student to enter an n-tuple or list of n-tuples of complex numbers.
+    This can be used for coordinate points, vectors, or any other n-tuple of complex numbers.
+    This will require the student to enter each complex number in a+bi form.
+    </p>
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = a string containing an n-tuple or list of n-tuples of complex numbers in a+bi form.</dt>
+        <dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+        but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1,2+i)",
+        $answer = "&lt;i,3+i,4&gt;,&lt;1+i,5-i,7&gt;", $answer = "(1,2i) or (1+i,3)"</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list", "set", "setlist" </dt>
+        <dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+        entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+    <dt>$answerformat = "allowjcomplex", "nosoln", "nosolninf" </dt>
+        <dd>"allowjcomplex" allows 2+3j instead of 2+3i<br/>
+            $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+            $ansprompt = "One value, x=;No values;Many values"
+        </dd>
+    <dt>$scoremethod = "byelement" </dt>
+        <dd>By default, the whole n-tuple must be correct to receive any credit.
+        Set $scoremethod = "byelement" to give partial credit if only some elements of
+        the n-tuple are correct.</dd>
+    <dt>$partweights = ".2,.8"</dt>
+        <dd>Can be used with $scoremethod = "byelement" to change the value of each part of the ntuple</dd>
+    <dt>$reltolerance = a decimal value </dt>
+        <dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+        used by default.</dd>
+    <dt>$abstolerance = a number </dt>
+        <dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.
+        Use this to substitute a detailed answer.</dd>
+    <dt>$hidetips = true </dt>
+        <dd>Hides the question entry tips that display by default.
+    This should only be used when a question type is being used in an unintentional way,
+    or if the question type gives away critical info to the student.</dd>
+    </dl>
+    
+    
+</div> <!-- h3 -->
+<div class=h3>
+    <h3 id="calccomplexntuple">Calculated Complex N-Tuple</h3>
+    
+    <p>Calculated Complex N-Tuple questions require the student to enter an n-tuple or list of n-tuples of complex numbers.
+    This can be used for coordinate points, vectors, or any other n-tuple of complex numbers.
+    This is identical the the Complex N-tuple answer type, but allows students to enter mathematical expressions
+    rather than just numbers, such as (5/3+sqrt(2)i, 2/3+1/4i).
+    </p>
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = a string containing an n-tuple or list of n-tuples </dt>
+        <dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+        but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1/3+i,2)",
+        $answer = "&lt;2i,3,i&gt;,&lt;1+i,5,7&gt;", $answer = "(1,2i) or (i,3)". 
+        Each complex number <em>must</em> be in a+bi format unless $answerformat="sloppycomplex" or "generalcomplex" is used.</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list", "set", "setlist" </dt>
+        <dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+        entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+    <dt>$answerformat = "sloppycomplex", "generalcomplex", "allowjcomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf", "sameform" </dt>
+        <dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi 
+            (allows (4+sqrt(3)i)/5 for example). Student answer must still only contain one i. <br/>
+            Use "generalcomplex" to allow students to enter complex expressions that may involve calculations, like (e^(3i),4).<br>
+            "allowjcomplex" allows for use of j instead of i as the imaginary unit.<br/>
+        The other options require each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+        without decimals (also disallows 10^-2 and 3E-2), or
+        an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+        $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+        $ansprompt = "One value, x=;No values;Many values"
+        </dd>
+    <dt>$scoremethod = "byelement" </dt>
+        <dd>By default, the whole n-tuple must be correct to receive any credit.
+        Set $scoremethod = "byelement" to give partial credit if only some elements of
+        the n-tuple are correct.</dd>
+    <dt>$partweights = ".2,.8"</dt>
+        <dd>Can be used with $scoremethod = "byelement" to change the value of each part of the ntuple</dd>
+    <dt>$reltolerance = a decimal value </dt>
+        <dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+        used by default.</dd>
+    <dt>$abstolerance = a number </dt>
+        <dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.
+        Use this to substitute a detailed answer.</dd>
+    <dt>$hidetips = true </dt>
+        <dd>Hides the question entry tips that display by default.
+    This should only be used when a question type is being used in an unintentional way,
+    or if the question type gives away critical info to the student.</dd>
+    </dl>
+  </div> <!-- h3 -->
+  <div class=h3>
+    <h3 id="algntuple">Algebraic N-Tuple</h3>
+    
+    <p>Algebraic N-Tuple questions require the student to enter an n-tuple or list of n-tuples of algebraic expressions.
+    This can be used for parameterized points or vectors, or any other n-tuple of algebraic expressions.
+    This is similar to the other N-tuple answer types, but allows students to enter algebraic expressions
+    rather than just numbers, such as (x, x^2, 4-x).
+    </p>
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = a string containing an n-tuple or list of n-tuples </dt>
+        <dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+        but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(x,x^2)",
+        $answer = "&lt;t,4-t,2+3t&gt;,&lt;t,3t,8t&gt;", $answer = "(x,x^2) or (sqrt(x),x)". .</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list", "set", "setlist" </dt>
+        <dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+        entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+    <dt>$variables = string </dt>
+        <dd>A list of all variables in the function (including letters representing constants).  Defaults to "x".  Can use
+        "f()" to indicate a symbol represents a function.</dd>
+    <dt>$domain = "inputmin,inputmax" </dt>
+        <dd>Defines the domain on which to compare the given answer and correct answer functions.  The same domain
+        applies to all variables.  An option third list element "integers" can be given, which limits the domain to integer
+        values.  The domain defaults to real numbers from -10 to 10.  If using multiple variables, can extend domain to
+        define domain for each variable separately.  Example: $variables = "x,y"; $domain = "0,5,20,25"</dd>
+    <dt>$answerformat = "generalcomplex", "nosoln", "nosolninf", "sameform" </dt>
+        <dd>Use "generalcomplex" to allow students to enter complex functions involving i.<br>
+            "sameform" requires the student's answer be in the "same form" as the correct answer. This means exactly the same, except for commutation of addition and multiplication, multiplication by 1, implicit multiplication, and extra parentheses. (2x-3)(5-x) would be "sameform" as (-1x+5)(2*x-3), but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.<br>
+        $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+        $ansprompt = "One value, x=;No values;Many values"
+        </dd>
+    <dt>$requiretimes = a list, like "^,=3,cos,&lt;2"</dt>
+        <dd>Adds format checking to the student's answer. The list can include multiple checks, which come in pairs. The first is the symbol to look for. The second describes what is acceptable.
+            See the Function question type for more details.  Note the $requiretimes applies to the student's entire answer.
+        </dd>
+    <dt>$requiretimeslistpart = a list, in the same format as $requiretimes</dt>
+        <dd>Similar to $requiretimes, but this check is applied to each ntuple when the answer is a list of ntuples.</dd>
+    <dt>$scoremethod = "byelement" </dt>
+        <dd>By default, the whole n-tuple must be correct to receive any credit.
+        Set $scoremethod = "byelement" to give partial credit if only some elements of
+        the n-tuple are correct.</dd>
+    <dt>$partweights = ".2,.8"</dt>
+        <dd>Can be used with $scoremethod = "byelement" to change the value of each part of the ntuple</dd>
+    <dt>$reltolerance = a decimal value </dt>
+        <dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+        used by default.</dd>
+    <dt>$abstolerance = a number </dt>
+        <dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.
+        Use this to substitute a detailed answer.</dd>
+    <dt>$hidetips = true </dt>
+        <dd>Hides the question entry tips that display by default.
+    This should only be used when a question type is being used in an unintentional way,
+    or if the question type gives away critical info to the student.</dd>
+    </dl>
+  </div> <!-- h3 -->
+
 
 <div class=h3>
 <h3 id="complex">Complex</h3>
@@ -4090,7 +4272,195 @@ This should only be used when a question type is being used in an unintentional 
 or if the question type gives away critical info to the student.</dd>
 </dl>
 
+<div class=h3>
+    <h3 id="complexmatrix">Complex Numerical Matrix</h3>
+    
+    The student is asked to enter a matrix of complex numbers in a+bi form with decimal or integer coefficients.
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = string describing a matrix of complex numbers</dt>
+        <dd>Defines the answer.  Example: $answer = "[(1+i,2,3i),(8,5+i,6)]" is a 2x3 matrix with first row: 1+i,2,3i</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$answersize = "rows,cols" </dt>
+        <dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
+        entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
+        using the ASCIIMath notation, like "[(1+i,2,3i),(8,5+i,6)]" or using the equation editor palette.</dd>
+    <dt>$answerformat = "nosoln", "nosolninf"</dt>
+        <dd>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"</dd>
+    <dt>$reltolerance = a decimal value </dt>
+        <dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+        used by default.</dd>
+    <dt>$abstolerance = a number </dt>
+        <dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+    <dt>$scoremethod = "byelement" </dt>
+        <dd>By default, the whole matrix must be correct to receive any credit.
+        Set $scoremethod = "byelement" to give partial credit if only some elements of
+        the matrix are correct.</dd>
+    <dt>$displayformat = "det" or "inline" </dt>
+        <dd>When $answersize is used, by default square brackets are used around the
+            entry array. Set $displayformat = "det" to use vertical bars instead.
+        <br>
+           Normally matrices with $answersize set are displayed on their own line. Set 
+           $displayformat = "inline" to display it inline with text.</dd>
+    <dt>$ansprompt = string </dt>
+        <dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+    <dt>$answerboxsize = number </dt>
+        <dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
+        used if $answersize is not supplied.</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to $answer.
+        Use this to substitute a detailed answer.</dd>
+    <dt>$hidetips = true </dt>
+        <dd>Hides the question entry tips that display by default.
+    This should only be used when a question type is being used in an unintentional way,
+    or if the question type gives away critical info to the student.</dd>
+    </dl>
+    
+    </div> <!-- h3 -->
+<div class=h3>
+    <h3 id="calccomplexmatrix">Calculated Complex Matrix</h3>
+    
+    The student is asked to enter a matrix of complex numbers or calculations, like 2/3+1/3i or 5^2.
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = string describing a matrix of complex numbers, or calculations leading to numbers </dt>
+        <dd>Defines the answer.  Example: $answer = "[(1+i,2,3i),(3/2+i,3sqrt(2)i,6)]" is a 2x3 matrix with first row: 1+i,2,3i</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$answersize = "rows,cols" </dt>
+        <dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
+        entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
+        using the ASCIIMath notation, like "[(1+i,2,3i),(3/2+i,3sqrt(2)i,6)]" or use the equation editor palette</dd>
+    <dt>$answerformat = "sloppycomplex", "generalcomplex", "allowjcomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig", "nosoln","nosolninf" </dt>
+        <dd>
+        Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi 
+        (allows (4+sqrt(3)i)/5 for example). Student answer must still only contain one i.<br>
+        Use "generalcomplex" to allow students to enter complex expressions that may involve calculations, like e^(3i).<br>
+        "allowjcomplex" allows for use of j instead of i as the imaginary unit.<br>  
+        The other options require each of the coefficients of the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+        without decimals (also disallows 10^-2 and 3E-2), or
+        an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+        $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+    </dd>
+    <dt>$reltolerance = a decimal value </dt>
+        <dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+        used by default.</dd>
+    <dt>$abstolerance = a number </dt>
+        <dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+    <dt>$scoremethod = "byelement" </dt>
+        <dd>By default, the whole matrix must be correct to receive any credit.
+        Set $scoremethod = "byelement" to give partial credit if only some elements of
+        the matrix are correct.</dd>
+    <dt>$displayformat = "det" or "inline"</dt>
+        <dd>When $answersize is used, by default square brackets are used around the
+            entry array. Set $displayformat = "det" to use vertical bars instead.
+            <br>
+            Normally matrices with $answersize set are displayed on their own line. Set 
+            $displayformat = "inline" to display it inline with text.</dd>
+    <dt>$ansprompt = string </dt>
+        <dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+    <dt>$answerboxsize = number </dt>
+        <dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
+        used if $answersize is not supplied.</dd>
+    <dt>$hidepreview = true </dt>
+        <dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to $answer.
+        Use this to substitute a detailed answer.</dd>
+    <dt>$previewloc (In Question Text)</dt>
+        <dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+    <dt>$hidetips = true </dt>
+        <dd>Hides the question entry tips that display by default.
+    This should only be used when a question type is being used in an unintentional way,
+    or if the question type gives away critical info to the student.</dd>
+    </dl>
 </div> <!-- h3 -->
+
+<div class=h3>
+    <h3 id="algmatrix">Algebraic Matrix</h3>
+    
+    The student is asked to enter a matrix of algebraic expressions, like x^2 or 3t+1.
+    
+    <p><strong>Required Variables</strong></p>
+    <dl>
+    <dt>$answer = string describing a matrix of algebraic expressions</dt>
+        <dd>Defines the answer.  Example: $answer = "[(x,x^2,3),(4,5+x,2)]" is a 2x3 matrix with first row: x,x^2,3</dd>
+    </dl>
+    
+    <p><strong>Optional Variables</strong></p>
+    <dl>
+    <dt>$answersize = "rows,cols" </dt>
+        <dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
+        entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
+        using the ASCIIMath notation, like "[(x,x^2,3),(4,5+x,2)]" or use the equation editor palette</dd>
+    <dt>$variables = string </dt>
+        <dd>A list of all variables in the function (including letters representing constants).  Defaults to "x".  Can use
+        "f()" to indicate a symbol represents a function.</dd>
+    <dt>$domain = "inputmin,inputmax" </dt>
+        <dd>Defines the domain on which to compare the given answer and correct answer functions.  The same domain
+        applies to all variables.  An option third list element "integers" can be given, which limits the domain to integer
+        values.  The domain defaults to real numbers from -10 to 10.  If using multiple variables, can extend domain to
+        define domain for each variable separately.  Example: $variables = "x,y"; $domain = "0,5,20,25"</dd>
+    <dt>$answerformat = "generalcomplex", "nosoln", "nosolninf", "sameform" </dt>
+        <dd>Use "generalcomplex" to allow students to enter complex functions involving i.<br>
+            "sameform" requires the student's answer be in the "same form" as the correct answer. This means exactly the same, except for commutation of addition and multiplication, multiplication by 1, implicit multiplication, and extra parentheses. (2x-3)(5-x) would be "sameform" as (-1x+5)(2*x-3), but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.<br>
+        $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+        $ansprompt = "One value, x=;No values;Many values"
+        </dd>
+    <dt>$reltolerance = a decimal value </dt>
+        <dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+        used by default.</dd>
+    <dt>$abstolerance = a number </dt>
+        <dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+    <dt>$scoremethod = "byelement" </dt>
+        <dd>By default, the whole matrix must be correct to receive any credit.
+        Set $scoremethod = "byelement" to give partial credit if only some elements of
+        the matrix are correct.</dd>
+    <dt>$displayformat = "det" or "inline"</dt>
+        <dd>When $answersize is used, by default square brackets are used around the
+            entry array. Set $displayformat = "det" to use vertical bars instead.
+            <br>
+            Normally matrices with $answersize set are displayed on their own line. Set 
+            $displayformat = "inline" to display it inline with text.</dd>
+    <dt>$ansprompt = string </dt>
+        <dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+    <dt>$answerboxsize = number </dt>
+        <dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
+        used if $answersize is not supplied.</dd>
+    <dt>$hidepreview = true </dt>
+        <dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
+    <dt>$readerlabel = string</dt>
+        <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+    <dt>$answerbox (In Question Text)</dt>
+        <dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+    <dt>$showanswer </dt>
+        <dd>The answer to show to students (if option if available).  Defaults to $answer.
+        Use this to substitute a detailed answer.</dd>
+    <dt>$previewloc (In Question Text)</dt>
+        <dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+    <dt>$hidetips = true </dt>
+        <dd>Hides the question entry tips that display by default.
+    This should only be used when a question type is being used in an unintentional way,
+    or if the question type gives away critical info to the student.</dd>
+    </dl>
+
+</div> <!-- h3 -->
+
 <div class=h3>
 <h3 id="interval">Interval</h3>
 
@@ -4328,8 +4698,14 @@ This type of question can contain multiple parts, where each part is one of the 
 	<li>Drawing: "draw"</li>
 	<li>N-tuple: "ntuple"</li>
 	<li>Calculated N-tuple: "calcntuple"</li>
+    <li>Complex N-tuple: "complexntuple"</li>
+	<li>Calculated Complex N-tuple: "calccomplexntuple"</li>
+    <li>Algebraic N-tuple: "algntuple"</li>
 	<li>Matrix: "matrix"</li>
 	<li>Calculated Matrix: "calcmatrix"</li>
+    <li>Complex Matrix: "complexmatrix"</li>
+	<li>Calculated Complex Matrix: "calccomplexmatrix"</li>
+    <li>Algebraic Matrix: "algmatrix"</li>
 	<li>Complex: "complex"</li>
 	<li>Calculated Complex: "calccomplex"</li>
 	<li>Interval: "interval"</li>

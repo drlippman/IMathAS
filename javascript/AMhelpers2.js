@@ -88,7 +88,7 @@ function toMQwVars(str, elid) {
     if (qtype === 'numfunc' || (qtype === 'calcinterval' && allParams[qn].calcformat.indexOf('inequality')!=-1)) {
         str = AMnumfuncPrepVar(qn, str)[1];
     }
-    var nomatrices = !(qtype === 'matrix' || qtype === 'calcmatrix' || qtype === 'string');
+    var nomatrices = !(qtype.match(/matrix/) || qtype === 'string');
     return AMtoMQ(str, elid, nomatrices);
 }
 function fromMQwText(str, elid) {
@@ -116,7 +116,7 @@ function init(paramarr, enableMQ, baseel) {
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
 
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix|chemeqn)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix|chemeqn|complexmatrix|alg)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       if (!el && !params.matrixsize) { continue; }
       str = params.qtype;
@@ -129,6 +129,9 @@ function init(paramarr, enableMQ, baseel) {
       if (params.matrixsize) {
         str += ',matrixsized';
         $("input[id^=qn"+qn+"-]").attr("data-mq", str);
+        if (params.vars) {
+            $("input[id^=qn"+qn+"-]").attr("data-mq-vars", params.vars);
+        }
       } else {
         el.setAttribute("data-mq", str);
         if (params.vars) {
@@ -956,7 +959,7 @@ function showSyntaxCheckMQ(qn) {
   var res = processByType(qn);
   var outstr = '';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
-    if (params.qtype == 'calcmatrix' || (params.qtype == 'calcinterval' && params.calcformat.match(/inequality/))) {
+    if (params.qtype == 'calcmatrix' || params.qtype == 'calccomplexmatrix' || (params.qtype == 'calcinterval' && params.calcformat.match(/inequality/))) {
         outstr += ' &asymp; `' + htmlEntities(res.dispvalstr) + '` ';
     } else {
         outstr += ' &asymp; ' + htmlEntities(res.dispvalstr) + ' ';
@@ -1094,20 +1097,26 @@ function processByType(qn) {
         break;
       case 'ntuple':
       case 'calcntuple':
-        res = processCalcNtuple(str, params.calcformat);
+      case 'complexntuple':
+      case 'calccomplexntuple':
+      case 'algntuple':
+        res = processCalcNtuple(qn, str, params.calcformat, params.qtype);
         break;
       case 'complex':
       case 'calccomplex':
         res = processCalcComplex(str, params.calcformat);
         break;
-      case 'calcmatrix':
-        res = processCalcMatrix(str, params.calcformat);
-        break;
       case 'numfunc':
         res = processNumfunc(qn, str, params.calcformat);
         break;
       case 'matrix':
-        res = processCalcMatrix(str, 'decimal');
+      case 'complexmatrix':
+        res = processCalcMatrix(qn, str, params.calcformat, params.qtype);
+        break;
+      case 'calcmatrix':
+      case 'calccomplexmatrix':
+      case 'algmatrix':
+        res = processCalcMatrix(qn, str, params.calcformat, params.qtype);
         break;
     }
     res.str = preformat(qn, str, params.qtype, params.calcformat);
@@ -1569,7 +1578,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   }
 }
 
-function processCalcNtuple(fullstr, format) {
+function processCalcNtuple(qn, fullstr, format, qtype) {
   var outcalced = '';
   var outcalceddisp = '';
   var NCdepth = 0;
@@ -1579,6 +1588,7 @@ function processCalcNtuple(fullstr, format) {
   var res = NaN;
   var dec;
   // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
+  fullstr = normalizemathunicode(fullstr);
   fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/g, ',').replace(/(^,|,$)/g,'');
   fullstr = fullstr.replace(/<<(.*?)>>/g, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
@@ -1609,14 +1619,29 @@ function processCalcNtuple(fullstr, format) {
 
     if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
       sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
-      err += singlevalsyntaxcheck(sub, format);
-      err += syntaxcheckexpr(sub, format);
-      res = singlevaleval(sub, format);
-      err += res[1];
-      outcalced += res[0];
-      outcalceddisp += roundForDisp(res[0]);
-      outcalced += fullstr.charAt(i);
-      outcalceddisp += fullstr.charAt(i);
+      if (sub == '') {notationok = false;}
+      if (qtype.match(/complex/)) {
+        res = evalcheckcomplex(sub, format);
+        err += res.err;
+        outcalceddisp += res.outstrdisp;
+        outcalceddisp += fullstr.charAt(i);
+        if (res.outstr) {
+            outcalced += res.outstr;
+            outcalced += fullstr.charAt(i);
+        }
+      } else if (qtype === 'algntuple') {
+        res = processNumfunc(qn, sub, format);
+        err += res.err;
+      } else {
+        err += singlevalsyntaxcheck(sub, format);
+        err += syntaxcheckexpr(sub, format);
+        res = singlevaleval(sub, format);
+        err += res[1];
+        outcalced += res[0];
+        outcalceddisp += roundForDisp(res[0]);
+        outcalced += fullstr.charAt(i);
+        outcalceddisp += fullstr.charAt(i);
+      }
       lastcut = i+1;
     }
   }
@@ -1625,6 +1650,12 @@ function processCalcNtuple(fullstr, format) {
   }
   if (notationok==false) {
     err = _("Invalid notation")+". " + err;
+  }
+  if (qtype === 'algntuple') {
+    outcalceddisp = '';
+  }
+  if (format.match(/generalcomplex/)) {
+    outcalced = '';
   }
   return {
     err: err,
@@ -1644,49 +1675,19 @@ function processCalcComplex(fullstr, format) {
   var outstrdisp = '';
   var outarr = [];
   var outarrdisp = [];
-  var real, imag, imag2, prep;
+  var real, imag, imag2, prep, res;
   for (var cnt=0; cnt<arr.length; cnt++) {
-    str = arr[cnt].replace(/^\s+/,'').replace(/\s+$/,'');
-    if (format.indexOf("allowjcomplex")!=-1) {
-      str = str.replace(/j/g,'i');
-    }
-    if (format.indexOf("generalcomplex")!=-1) {
-      outarr.push(str);
-      continue; // bypass normal evaluation
-    }
-    if (format.indexOf("sloppycomplex")==-1) {
-      var cparts = parsecomplex(str);
-      if (typeof cparts == 'string') {
-        err += cparts;
-      } else {
-        err += singlevalsyntaxcheck(cparts[0], format);
-        err += singlevalsyntaxcheck(cparts[1], format);
-      }
-    } 
-    err += syntaxcheckexpr(str, format);
-    prep = prepWithMath(mathjs(str,'i'));
-    real = scopedeval('var i=0;'+prep);
-    imag = scopedeval('var i=1;'+prep);
-    imag2 = scopedeval('var i=-1;'+prep);
-    if (real=="synerr" || imag=="synerr") {
-      err += _("syntax incomplete");
-      real = NaN;
-    }
-
-    if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
-      imag -= real;
-      outstr = Math.abs(real)<1e-16?'':real;
-      outstrdisp = Math.abs(real)<1e-16?'':roundForDisp(real);
-      outstr += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+imag+'i');
-      outstrdisp += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+roundForDisp(imag)+'i');
-      outarr.push(outstr);
-      outarrdisp.push(outstrdisp);
+    res = evalcheckcomplex(arr[cnt], format);
+    err += res.err;
+    outarrdisp.push(res.outstrdisp);
+    if (res.outstr) {
+        outarr.push(res.outstr);
     }
   }
   if (format.indexOf("generalcomplex")!=-1) {
     return {
       err: err,
-      dispvalstr: outarr.join(', ')
+      dispvalstr: outarrdisp.join(', ')
     };
   } else {
     return {
@@ -1708,7 +1709,7 @@ function processSizedMatrix(qn) {
   var outcalc = [];
   var outsub = [];
   var count = 0;
-  var str;
+  var str, res;
   var err = '';
   for (var row=0; row < size[0]; row++) {
     out[row] = [];
@@ -1716,15 +1717,27 @@ function processSizedMatrix(qn) {
     for (var col=0; col<size[1]; col++) {
       str = document.getElementById('qn' + qn + '-' + count).value;
       str = normalizemathunicode(str);
-      if (str !== '') {
-        err += syntaxcheckexpr(str,format);
-        err += singlevalsyntaxcheck(str,format);
+      if (params.qtype.match(/complex/)) {
+        res = evalcheckcomplex(str, format);
+        err += res.err;
+        outcalc[row][col] = res.outstrdisp;
+        if (res.outstr) {
+            outsub.push(res.outstr);
+        }
+      } else if (params.qtype === 'algmatrix') {
+        res = processNumfunc(qn, str, format);
+        err += res.err;
+      } else {
+        if (str !== '') {
+            err += syntaxcheckexpr(str,format);
+            err += singlevalsyntaxcheck(str,format);
+        }
+        out[row][col] = str;
+        res = singlevaleval(str, format);
+        err += res[1];
+        outcalc[row][col] = res[0];
+        outsub.push(res[0]);
       }
-      out[row][col] = str;
-      res = singlevaleval(str, format);
-      err += res[1];
-      outcalc[row][col] = res[0];
-      outsub.push(res[0]);
       count++;
     }
     out[row] = '(' + out[row].join(',') + ')';
@@ -1733,12 +1746,12 @@ function processSizedMatrix(qn) {
   return {
     err: err,
     str: '[' + out.join(',') + ']',
-    dispvalstr: (params.qtype=='calcmatrix')?('[' + outcalc.join(',') + ']'):'',
+    dispvalstr: (params.qtype.match(/calc/))?('[' + outcalc.join(',') + ']'):'',
     submitstr: outsub.join('|')
   };
 }
 
-function processCalcMatrix(fullstr, format) {
+function processCalcMatrix(qn, fullstr, format, anstype) {
   var okformat = true;
   fullstr = fullstr.replace(/\[/g, '(');
   fullstr = fullstr.replace(/\]/g, ')');
@@ -1774,7 +1787,7 @@ function processCalcMatrix(fullstr, format) {
   if (MCdepth !== 0) {
     okformat = false;
   }
-  var collist, str;
+  var collist, str, res;
   var outcalc = [];
   var outsub = [];
   for (var i=0; i<rowlist.length; i++) {
@@ -1790,6 +1803,16 @@ function processCalcMatrix(fullstr, format) {
         blankerr = _('No elements of the matrix should be left blank.');
         outcalc[i][j] = '';
         outsub.push('');
+      } else if (anstype === 'algmatrix') {
+        res = processNumfunc(qn, str, format);
+        err += res.err;
+      } else if (anstype.match(/complex/)) {
+        res = evalcheckcomplex(str, format);
+        err += res.err;
+        outcalc[i][j] = res.outstrdisp;
+        if (res.outstr) {
+            outsub.push(res.outstr);
+        }
       } else {
         err += syntaxcheckexpr(str,format);
         err += singlevalsyntaxcheck(str,format);
@@ -1985,6 +2008,59 @@ function ineqtointerval(strw, intendedvar) {
     return ['', 'invalid'];
   }
   return [outstr];
+}
+
+function evalcheckcomplex(str, format) {
+    var err = '';
+    var out = '';
+    var outstr = '';
+    var outstrdisp = '';
+    str = str.replace(/^\s+/,'').replace(/\s+$/,'');
+    if (format.indexOf("allowjcomplex")!=-1) {
+        str = str.replace(/j/g,'i');
+    }
+    // general check
+    err += syntaxcheckexpr(str, format);
+    if (format.indexOf("generalcomplex")!=-1) {
+        // no eval
+        return {
+            err: err,
+            outstrdisp: str
+        }
+    } else if (format.indexOf("sloppycomplex")==-1) {
+        // regular a+bi complex; check formats
+        var cparts = parsecomplex(str);
+        if (typeof cparts == 'string') {
+            err += cparts;
+        } else {
+            err += singlevalsyntaxcheck(cparts[0], format);
+            err += singlevalsyntaxcheck(cparts[1], format);
+        }
+    }
+    
+    // evals
+    if (str !== '') {
+        var prep = prepWithMath(mathjs(str,'i'));
+        var real = scopedeval('var i=0;'+prep);
+        var imag = scopedeval('var i=1;'+prep);
+        var imag2 = scopedeval('var i=-1;'+prep);
+        if (real=="synerr" || imag=="synerr") {
+        err += _("syntax incomplete");
+        real = NaN;
+        }
+        if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
+            imag -= real;
+            outstr = Math.abs(real)<1e-16?'':real;
+            outstrdisp = Math.abs(real)<1e-16?'':roundForDisp(real);
+            outstr += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+imag+'i');
+            outstrdisp += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+roundForDisp(imag)+'i');
+        }
+    }
+    return {
+        err: err,
+        outstrdisp: outstrdisp,
+        outstr: outstr
+    };
 }
 
 function parsecomplex(v) {

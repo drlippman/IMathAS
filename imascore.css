@@ -1281,9 +1281,11 @@ a.dropdown-toggle.arrow-down:hover {
 .open > .dropdown-menu {
   display: block;
 }
+/*
 .open > a {
   outline: 0;
 }
+*/
 .dropdown-menu-right {
   right: 0;
   left: auto;
@@ -1334,6 +1336,28 @@ a.dropdown-toggle.arrow-down:hover {
   .navbar-right .dropdown-menu-left {
     right: auto;
     left: 0;
+  }
+}
+.dropdown-submenu {
+    position: relative;
+}
+@media (min-width: 768px) {
+  .dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+  }
+  .dropdown-submenu > a::after {
+    content: " \25b8";
+  }
+}
+@media (max-width: 768px) {
+  .dropdown-submenu .dropdown-menu {
+    position: relative; 
+    left: 15px;
+  }
+  .dropdown-submenu > a::after {
+    content: " \25be";
   }
 }
 

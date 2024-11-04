@@ -81,7 +81,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
                 $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
                 $shorttip = _('Enter a complex number');
             }
-            $tip .= formathint('each value',$ansformats,($reqdecimals!=='')?$reqdecimals:null,'calccomplex');
+            $tip .= formathint(_('each value'),$ansformats,($reqdecimals!=='')?$reqdecimals:null,'calccomplex');
         }
 
         $classes = ['text'];

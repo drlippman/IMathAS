@@ -53,6 +53,7 @@ class NTupleScorePart implements ScorePart
         
         $ansformats = array_map('trim',explode(',',$answerformat));
         $checkSameform = (in_array('sameform',$ansformats));
+        $isComplex = ($anstype === 'complexntuple' || $anstype === 'calccomplexntuple');
 
         $answer = str_replace(' ','',$answer);
         if (!is_array($partweights) && $partweights !== '') {
@@ -67,16 +68,22 @@ class NTupleScorePart implements ScorePart
         }
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
-        if ($anstype=='ntuple') {
-            $gaarr = $this->parseNtuple($givenans, false, false);
-        } else if ($anstype=='calcntuple') {
+
+        if ($isComplex && in_array('allowjcomplex', $ansformats)) {
+            $givenans = str_replace('j','i', $givenans);
+            $answer = str_replace('j','i', $answer);
+        }
+
+        if ($anstype=='ntuple' || $anstype=='complexntuple') {
+            $gaarr = parseNtuple($givenans, false, false, $isComplex);
+        } else if ($anstype=='calcntuple' || $anstype=='calccomplexntuple') {
             // parse and evaluate
             if ($hasNumVal) {
-                $gaarr = $this->parseNtuple($givenansval, false, false);
+                $gaarr = parseNtuple($givenansval, false, false, $isComplex, $ansformats);
                 $scorePartResult->setLastAnswerAsNumber($givenansval);
             } else {
-                $gaarr = $this->parseNtuple($givenans, false, true);
-                $scorePartResult->setLastAnswerAsNumber($this->ntupleToString($gaarr));
+                $gaarr = parseNtuple($givenans, false, true, $isComplex, $ansformats);
+                $scorePartResult->setLastAnswerAsNumber(ntupleToString($gaarr));
             }
         }
         if ($givenans == null) {
@@ -108,7 +115,7 @@ class NTupleScorePart implements ScorePart
         }
 
         // check formats for calcntuple
-        if ($anstype=='calcntuple') {
+        if ($anstype=='calcntuple' || $anstype=='calccomplexntuple') {
 
             //test for correct format, if specified
             if (checkreqtimes($givenans,$requiretimes)==0) {
@@ -117,7 +124,7 @@ class NTupleScorePart implements ScorePart
             }
 
             //parse the ntuple without evaluating
-            $tocheck = $this->parseNtuple($givenans, false, false);
+            $tocheck = parseNtuple($givenans, false, false, $isComplex, $ansformats);
             if (!is_array($tocheck)) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
@@ -130,14 +137,31 @@ class NTupleScorePart implements ScorePart
                 foreach($tocheck as $i=>$chkme) {
                     foreach ($chkme['vals'] as $k=>$chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
-                            if (!checkanswerformat($chkval,$ansformats)) {
-                                // eliminate answer
-                                unset($gaarr[$i]);
-                                continue 2;
+                            if ($isComplex) {
+                                if (in_array('generalcomplex', $ansformats)) {
+                                    // skip format checks
+                                } else if (in_array('sloppycomplex', $ansformats)) {
+                                    $chkval = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $chkval);
+                                    if (substr_count($chkval, 'i') > 1) {
+                                        unset($gaarr[$i]);
+                                        continue 2;
+                                    }
+                                    $chkval = str_replace(array('s$n', 'p$'), array('sin', 'pi'), $chkval);
+                                } else if (!is_array($chkme['cvals'][$k]) || !checkanswerformat($chkme['cvals'][$k][0],$ansformats) || !checkanswerformat($chkme['cvals'][$k][1],$ansformats)) {
+                                    // eliminate answer
+                                    unset($gaarr[$i]);
+                                    continue 2;
+                                }
+                            } else {
+                                if (!checkanswerformat($chkval,$ansformats)) {
+                                    // eliminate answer
+                                    unset($gaarr[$i]);
+                                    continue 2;
+                                }
                             }
                             // generate normalized trees for sameform check
                             if ($checkSameform) {
-                                $anfunc = parseMathQuiet($chkval);
+                                $anfunc = parseMathQuiet($chkval, $isComplex?'i':'');
                                 $normalizedGivenAnswer[$i]['vals'][$k] = $anfunc->normalizeTreeString();
                             }
                         }
@@ -158,14 +182,14 @@ class NTupleScorePart implements ScorePart
 
         $answer = makepretty($answer);
         // parse and evaluate the answer, capturing "or"s
-        $anarr = $this->parseNtuple($answer, true, true);
+        $anarr = parseNtuple($answer, true, true, $isComplex, $ansformats);
         if ($checkSameform) {
-            $normalizedAnswer = $this->parseNtuple($answer, true, false);
+            $normalizedAnswer = parseNtuple($answer, true, false, $isComplex, $ansformats);
             foreach($normalizedAnswer as $ai=>$chkme) {
                 foreach ($chkme as $ao=>$aval) {
                     foreach ($aval['vals'] as $k=>$chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
-                            $anfunc = parseMathQuiet($chkval);
+                            $anfunc = parseMathQuiet($chkval, $isComplex?'i':'');
                             $normalizedAnswer[$ai][$ao]['vals'][$k] = $anfunc->normalizeTreeString();
                         }
                     }
@@ -175,15 +199,24 @@ class NTupleScorePart implements ScorePart
 
         // ensure values are numbers
         foreach ($gaarr as $k=>$givenans) {
-            foreach ($givenans['vals'] as $v) {
-                if (!is_numeric($v)) {
-                    unset($gaarr[$k]);
-                    continue 2;
+            if ($isComplex) {
+                foreach ($givenans['cvals'] as $v) {
+                    if (!is_array($v) || !is_numeric($v[0]) || !is_numeric($v[1])) {
+                        unset($gaarr[$k]);
+                        continue 2;
+                    }
+                }
+            } else {
+                foreach ($givenans['vals'] as $v) {
+                    if (!is_numeric($v)) {
+                        unset($gaarr[$k]);
+                        continue 2;
+                    }
                 }
             }
         }
         
-        if (in_array('anyorder', $ansformats)) {
+        if (!$isComplex && in_array('anyorder', $ansformats)) {
             foreach ($anarr as $k=>$listans) {
                 foreach ($listans as $ork=>$orv) {
                     sort($anarr[$k][$ork]['vals']);
@@ -194,7 +227,8 @@ class NTupleScorePart implements ScorePart
             }
         }
 
-        if (in_array('scalarmult',$ansformats)) {
+        // TODO: extend this to work with isComplex
+        if (!$isComplex && in_array('scalarmult',$ansformats)) {
             //normalize the vectors
             foreach ($anarr as $k=>$listans) {
                 foreach ($listans as $ork=>$orv) {
@@ -255,20 +289,39 @@ class NTupleScorePart implements ScorePart
                     }
                     $matchedparts = [];
                     foreach ($answer['vals'] as $i=>$ansval) {
-                        $gansval = $givenans['vals'][$i];
-                        if (is_numeric($ansval) && is_numeric($gansval)) {
-                            if ($abstolerance !== '') {
-                                if (abs($ansval-$gansval) < $abstolerance + 1E-12) {
-                                    $matchedparts[$i] = 1;
+                        if ($isComplex) {
+                            $anscval = $answer['cvals'][$i];
+                            $ganscval = $givenans['cvals'][$i];
+                            if (is_array($ganscval) && is_numeric($anscval[0]) && is_numeric($anscval[1]) && is_numeric($ganscval[0]) && is_numeric($ganscval[1])) {
+                                if ($abstolerance !== '') {
+                                    if (abs($anscval[0]-$ganscval[0]) < $abstolerance + 1E-12 && abs($anscval[1]-$ganscval[1]) < $abstolerance + 1E-12) {
+                                        $matchedparts[$i] = 1;
+                                    }
+                                } else {
+                                    if (abs($anscval[0]-$ganscval[0])/(abs($anscval[0])+.0001) < $reltolerance+ 1E-12 && abs($anscval[1]-$ganscval[1])/(abs($anscval[1])+.0001) < $reltolerance+ 1E-12) {
+                                        $matchedparts[$i] = 1;
+                                    }
                                 }
-                            } else {
-                                if (abs($ansval-$gansval)/(abs($ansval)+.0001) < $reltolerance+ 1E-12) {
-                                    $matchedparts[$i] = 1;
-                                }
+                            } else if (($anscval==='oo' && $ganscval==='oo') || ($anscval==='-oo' && $ganscval==='-oo')) {
+                                $matchedparts[$i] = 1;
+                                //is ok
                             }
-                        } else if (($ansval==='oo' && $gansval==='oo') || ($ansval==='-oo' && $gansval==='-oo')) {
-                            $matchedparts[$i] = 1;
-                            //is ok
+                        } else {
+                            $gansval = $givenans['vals'][$i];
+                            if (is_numeric($ansval) && is_numeric($gansval)) {
+                                if ($abstolerance !== '') {
+                                    if (abs($ansval-$gansval) < $abstolerance + 1E-12) {
+                                        $matchedparts[$i] = 1;
+                                    }
+                                } else {
+                                    if (abs($ansval-$gansval)/(abs($ansval)+.0001) < $reltolerance+ 1E-12) {
+                                        $matchedparts[$i] = 1;
+                                    }
+                                }
+                            } else if (($ansval==='oo' && $gansval==='oo') || ($ansval==='-oo' && $gansval==='-oo')) {
+                                $matchedparts[$i] = 1;
+                                //is ok
+                            }
                         }
                     }
 
@@ -337,99 +390,5 @@ class NTupleScorePart implements ScorePart
         if ($score<0) { $score = 0; }
         $scorePartResult->setRawScore($score);
         return $scorePartResult;
-    }
-
-    /**
-	 * Parses a list of string ntuples
-	 * do_or: for each element in list, create an array of "or" alternatives
-	 * eval: true to eval non-numeric values
-	 */
-    private function parseNtuple($str, $do_or = false, $do_eval = true) {
-        if ($str == 'DNE' || $str == 'oo' || $str == '-oo') {
-            return $str;
-        }
-        $ntuples = [];
-        $NCdepth = 0;
-        $lastcut = 0;
-        $lastend = 0;
-        $inor = false;
-        $str = makepretty($str);
-        $matchbracket = array(
-            '(' => ')',
-            '[' => ']',
-            '<' => '>',
-            '{' => '}'
-        );
-        $closebracket = '';
-        $openbracket = '';
-        for ($i=0; $i<strlen($str); $i++) {
-            $dec = false;
-            if ($str[$i]=='(' || $str[$i]=='[' || $str[$i]=='<' || $str[$i]=='{') {
-                if ($NCdepth==0) {
-                    if ($lastend > 0) {
-                        $between = trim(substr($str, $lastend+1, $i-$lastend-1));
-                        $inor = ($do_or && $between === 'or');
-                        if ($between !== 'or' && $between !== ',' && $between !== '') {
-                            // invalid
-                            return $ntuples;
-                        }
-                    }
-                    $lastcut = $i;
-                    $closebracket = $matchbracket[$str[$i]];
-                    $openbracket = $str[$i];
-                }
-                if ($openbracket == '' || $str[$i] == $openbracket) {
-                    $NCdepth++;
-                }
-            } else if ($str[$i]==$closebracket) {
-                $NCdepth--;
-                if ($NCdepth==0) {
-                    $thisTuple = array(
-                        'lb' => $str[$lastcut],
-                        'rb' => $str[$i],
-                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
-                    );
-                    $thisTuple['vals'] = array_map("trim", $thisTuple['vals']);
-                    $lastend = $i;
-                    if ($do_eval) {
-                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
-                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
-                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
-                            }
-                        }
-                    }
-                    if ($do_or && $inor) {
-                            $ntuples[count($ntuples)-1][] = $thisTuple;
-                    } else if ($do_or) {
-                            $ntuples[] = array($thisTuple);
-                    } else {
-                            $ntuples[] = $thisTuple;
-                    }
-                    //$inor = ($do_or && substr($str, $i+1, 2)==='or');
-                    $openbracket = '';
-                    $closebracket = '';
-                }
-            }
-        }
-        return $ntuples;
-    }
-
-    private function ntupleToString($ntuples) {
-        if (!is_array($ntuples)) {
-            return $ntuples;
-        }
-        $out = array();
-        foreach ($ntuples as $ntuple) {
-            if (isset($ntuple['lb'])) {
-                $out[] = $ntuple['lb'] . implode(',', $ntuple['vals']) . $ntuple['rb'];
-            } else if (is_array($ntuple[0])) {
-                $sub = array();
-                foreach ($ntuple as $subtuple) {
-                    $sub[] = $subtuple['lb'] . implode(',', $subtuple['vals']) . $subtuple['rb'];
-                }
-                $out[] = implode(' or ', $sub);
-            }
-        }
-        return implode(',', $out);
     }
 }

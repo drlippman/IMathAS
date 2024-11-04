@@ -29,7 +29,7 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=051824";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=110324";?>" type="text/css" />
 <?php
 $isfw = false;
 if (isset($coursetheme)) {
@@ -77,7 +77,7 @@ div.breadcrumb { display:none;}
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=100924"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=110324"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //

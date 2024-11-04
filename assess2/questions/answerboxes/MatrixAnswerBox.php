@@ -55,8 +55,17 @@ class MatrixAnswerBox implements AnswerBox
             $out .= $ansprompt;
         }
         if (!empty($answersize)) {
-            $tip = _('Enter each element of the matrix as number (like 5, -3, 2.2)');
-            $shorttip = _('Enter an integer or decimal number');
+            if ($anstype === 'complexmatrix') {
+                if (in_array('allowjcomplex', $ansformats)) {
+                    $tip = _('Enter each element of the matrix as a complex number in a+bj form.  Example: -3-4j') . "<br/>";
+                } else {
+                    $tip = _('Enter each element of the matrix as a complex number in a+bi form.  Example: -3-4i') . "<br/>";
+                }
+                $shorttip = _('Enter a complex number');
+            } else {
+                $tip = _('Enter each element of the matrix as number (like 5, -3, 2.2)');
+                $shorttip = _('Enter an integer or decimal number');
+            }
             if ($reqdecimals!=='') {
                 list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
 
@@ -122,7 +131,7 @@ class MatrixAnswerBox implements AnswerBox
             $out .= "<span id=p$qn></span>";
             $out .= "</div>\n";
             $params['matrixsize'] = $answersize;
-            $params['calcformat'] = 'decimal';
+            $params['calcformat'] = $answerformat . ($answerformat == '' ? '' : ',') . 'decimal';
             $params['tip'] = $shorttip;
             $params['longtip'] = $tip;
         } else {
@@ -132,8 +141,17 @@ class MatrixAnswerBox implements AnswerBox
                 $qnref = ($multi - 1) . '-' . ($qn % 1000);
             }
             if (empty($answerboxsize)) {$answerboxsize = 20;}
-            $shorttip = _('Enter a matrix of integer or decimal numbers');
-            $tip = _('Enter your answer as a matrix filled with integer or decimal numbers, like [(2,3,4),(3,4,5)]');
+            if ($anstype === 'complexmatrix') {
+                if (in_array('allowjcomplex', $ansformats)) {
+                    $tip = _('Enter your answer as a matrix filled with complex numbers in a+bj form, like [(2,3+j),(1-j,j)]') . "<br/>";
+                } else {
+                    $tip = _('Enter your answer as a matrix filled with complex numbers in a+bi form, like [(2,3+i),(1-i,i)]') . "<br/>";
+                }
+                $shorttip = _('Enter a matrix of complex numbers');    
+            } else {
+                $shorttip = _('Enter a matrix of integer or decimal numbers');
+                $tip = _('Enter your answer as a matrix filled with integer or decimal numbers, like [(2,3,4),(3,4,5)]');
+            }
             if ($reqdecimals !== '') {
                 list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
                 $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
@@ -161,10 +179,11 @@ class MatrixAnswerBox implements AnswerBox
             'class="' . implode(' ', $classes) .
                 '" />';
 
+            $params['calcformat'] = $answerformat;
             if (empty($hidepreview)) {
                 if ($useeqnhelper) {
                     $params['helper'] = 1;
-                    $params['calcformat'] = 'decimal';
+                    $params['calcformat'] = $answerformat . ($answerformat == '' ? '' : ',') . 'decimal';
                 }
                 $params['preview'] = 1;
                 $preview .= '<button type=button class=btn id="pbtn' . $qn . '">';

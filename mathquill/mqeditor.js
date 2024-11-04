@@ -124,7 +124,7 @@ var MQeditor = (function($) {
             thisMQconfig.charsThatBreakOutOfSupSubOp = '';
             thisMQconfig.autoSubscriptNumerals = true;
         }
-        if (calcformat.match(/list/)) {
+        if (calcformat.match(/(list|ntuple)/)) {
             thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
         }
         if (calcformat.match(/allowplusminus/)) {

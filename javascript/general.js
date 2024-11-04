@@ -1760,7 +1760,7 @@ function setActiveTab(el) {
   }
 
   Dropdown.prototype.keydown = function (e) {
-    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+    if (!/(38|40|27|32|39|37)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
 
     var $this = $(this)
 
@@ -1777,11 +1777,16 @@ function setActiveTab(el) {
       return $this.trigger('click')
     }
 
-    var desc = ' li:not(.disabled):visible a'
-      var $items = $this.next('.dropdown-menu' + desc);
-      if (!$items.length) {
-        $items = $parent.find('.dropdown-menu' + desc);
-      }
+    var $submenu = $(e.target).closest('.dropdown-submenu');
+    if (isActive && e.which == 37 && $submenu.length) {
+      $submenu.removeClass("open");
+      $submenu.children("a").first().focus();
+    }
+
+    var $items = $this.next('.dropdown-menu li:not(.disabled):visible a');
+    if (!$items.length) {
+      $items = $parent.children('.dropdown-menu').children('li:not(.disabled):visible').children('a');
+    }
 
     if (!$items.length) return
 
@@ -1792,6 +1797,17 @@ function setActiveTab(el) {
     if (!~index)                                    index = 0
 
     $items.eq(index).trigger('focus')
+  }
+  Dropdown.prototype.submenu = function(e) {
+    if (e.type == 'keydown' && !/(13|39)/.test(e.which)) { return; }
+    $('.dropdown-submenu').removeClass('open');
+    $(this).closest('.dropdown-submenu').addClass("open");
+    if (e.type == 'keydown') {
+      $(this).next(".dropdown-menu").find('a').first().focus();
+    }
+    
+    e.stopPropagation();
+    e.preventDefault();
   }
 
 
@@ -1832,7 +1848,7 @@ function setActiveTab(el) {
     .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
     .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-
+    .on('click.bs.dropdown keydown.bs.dropdown', '.dropdown-submenu > a', Dropdown.prototype.submenu)
 }(jQuery);
 
 // from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js

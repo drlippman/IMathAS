@@ -42,6 +42,9 @@ class CalculatedMatrixAnswerBox implements AnswerBox
 
         $optionkeys = ['ansprompt', 'answersize', 'answerboxsize', 'hidepreview', 'answerformat',
             'answer', 'reqdecimals', 'displayformat', 'readerlabel'];
+        if ($anstype === 'algmatrix') {
+            array_push($optionkeys, 'domain', 'variables');
+        }
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -55,7 +58,12 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             $out .= $ansprompt;
         }
         if (!empty($answersize)) {
-            list($tip, $shorttip) = formathint(_('each element of the matrix'), $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calcmatrix', false, true);
+            if ($anstype === 'algmatrix') {
+                $shorttip = _('Enter an algebraic expression');
+                $tip = _('Enter each element of the matrix as an algebraic expression. Example: 3x^2, x/5, (a+b)/c');
+            } else {
+                list($tip, $shorttip) = formathint(_('each element of the matrix'), $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, $anstype, false, true);
+            }
             //$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 
             if (empty($answerboxsize)) {$answerboxsize = 3;}
@@ -125,8 +133,16 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             } else {
                 $qnref = ($multi - 1) . '-' . ($qn % 1000);
             }
-            $shorttip = _('Enter your answer as a matrix');
-            $tip = $shorttip . _(', like [(2,3,4),(1,4,5)]') . '<br/>' . formathint(_('each element of the matrix'), $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calcmatrix');
+            if ($anstype === 'calccomplexmatrix') {
+                $shorttip = _('Enter a matrix of complex numbers');
+                $tip = $shorttip . _(', like [(2+i,3,i),(2-i,4,5)]') . '<br/>' . formathint(_('each element of the matrix'), $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, $anstype);
+            } else if ($anstype === 'algmatrix') {
+                $shorttip = _('Enter a matrix of algebraic expressions');
+                $tip = $shorttip . _(', like [(x,2,x^2),(1,3x,5)]');
+            } else {
+                $shorttip = _('Enter your answer as a matrix');
+                $tip = $shorttip . _(', like [(2,3,4),(1,4,5)]') . '<br/>' . formathint(_('each element of the matrix'), $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, $anstype);
+            }
             if (empty($answerboxsize)) {$answerboxsize = 20;}
 
             $classes = ['text'];
@@ -156,11 +172,27 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             $preview .= '</button> &nbsp;';
         }
         $preview .= "<span id=p$qn></span> ";
+        if ($anstype === 'algmatrix' && in_array('generalcomplex', $ansformats)) {
+            $tip .= '<br>'._('Your answer can contain complex numbers.');
+        }
         $params['tip'] = $shorttip;
         $params['longtip'] = $tip;
         $params['calcformat'] = $answerformat;
         if ($useeqnhelper) {
             $params['helper'] = 1;
+        }
+
+        if ($anstype === 'algmatrix') {
+            if (empty($variables)) {$variables = "x";}
+            $addvars = [];
+            if (in_array('generalcomplex', $ansformats)) {
+                $addvars[] = 'i';
+            }
+            list($variables, $ofunc, $newdomain, $restrictvartoint) = numfuncParseVarsDomain($variables, $domain, $addvars);
+    
+            $params['vars'] = $variables;
+            $params['fvars'] = $ofunc;
+            $params['domain'] = $newdomain;
         }
 
         $nosolntype = 0;
