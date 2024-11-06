@@ -120,7 +120,7 @@ export default {
           incorrect++;
         }
       }
-      console.log(correct + ',' + incorrect + ',' + zeroweight);
+
       if (correct === this.qdata.parts.length - zeroweight) {
         return 'correct';
       } else if (incorrect === this.qdata.parts.length - zeroweight) {
