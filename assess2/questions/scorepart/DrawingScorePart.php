@@ -187,6 +187,22 @@ class DrawingScorePart implements ScorePart
                 foreach ($line as $j=>$pt) {
                     $line[$j] = explode(',',$pt);
                 }
+                if ($scoremethod == 'ignoreextradots') {
+                    $lastslope = null;
+                    $toelim = [];
+                    for ($j=1;$j<count($line);$j++) {
+                        $thisslope = [$line[$j][0] - $line[$j-1][0], $line[$j][1] - $line[$j-1][1]];
+                        if ($lastslope !== null && ($lastslope[1]*$thisslope[0] == $lastslope[0]*$thisslope[1])) {
+                            // same slope; eliminate middle point
+                            $toelim[] = $j-1;
+                        }
+                        $lastslope = $thisslope;
+                    }
+                    foreach ($toelim as $j) {
+                        unset($line[$j]);
+                    }
+                    $line = array_values($line);
+                }
                 if ($isclosed && ($line[0][0]-$line[count($line)-1][0])*($line[0][0]-$line[count($line)-1][0]) + ($line[0][1]-$line[count($line)-1][1])*($line[0][1]-$line[count($line)-1][1]) <=25*max(1,$reltolerance)) {
                     array_pop($line);
                     $stuclosed = true;
