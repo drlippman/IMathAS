@@ -35,7 +35,7 @@ replace3dalttext(plot, alttext)
 
 
 <h3><a name="CalcPlot3Dembed">CalcPlot3Dembed</a></h3>
-<p>CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax, showbox])</p>
+<p>CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax, showbox, scaleaxes])</p>
 <p>Embeds a dynamic figure using <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
 to draw the graph.  The dynamic figure does not show the CalcPlot3D control panel,
 so if you want that, use the CalcPlot3Dlink function instead.</p>
@@ -85,10 +85,13 @@ so if you want that, use the CalcPlot3Dlink function instead.</p>
   <li>width, height: the size for the embed. Defaults to 500 by 500</li>
   <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>
   <li>xscale, yscale, zscale: spacing for axis labels. Defaults to 1.</li>
-  <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin)</li>
+  <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin). Can set as null to use defaults.</li>
+  <li>showbox: whether to show the bounding box around the axes. Default true</li>
+  <li>scaleaxes: whether to scale (stretch) the axes so the bounds appear square. Default false.</li>
+  <li></li>
 </ul>
 <h3><a name="CalcPlot3Dlink">CalcPlot3Dlink</a></h3>
-<p>CalcPlot3Dlink(functions, linktext, [xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax, showbox])</p>
+<p>CalcPlot3Dlink(functions, linktext, [xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax, showbox, scaleaxes])</p>
 <p>Creates a custom link to <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
 to draw the graph.  This view will include the CalcPlot3D control panel for exploring the
 graph.</p>
@@ -97,6 +100,8 @@ graph.</p>
   <li>linktext: the text of the link itself</li>
   <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>
   <li>xscale, yscale, zscale: spacing for axis labels. Defaults to 1.</li>
-  <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin)</li>
+  <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin). Can set as null to use defaults.</li>
+  <li>showbox: whether to show the bounding box around the axes. Default true</li>
+  <li>scaleaxes: whether to scale (stretch) the axes so the bounds appear square. Default false.</li>
 </ul>
   
