@@ -23,6 +23,7 @@ function getfilehandlertype($filetype) {
 }
 
 function storecontenttofile($content,$key,$sec="private") {
+	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -37,7 +38,6 @@ function storecontenttofile($content,$key,$sec="private") {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
-		$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 		$dir = $base.dirname($key);
 		$fn = basename($key);
 		if (!is_dir($dir)) {
@@ -164,6 +164,7 @@ function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
 }
 
 function storeuploadedfile($id,$key,$sec="private") {
+	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -186,7 +187,6 @@ function storeuploadedfile($id,$key,$sec="private") {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			downsizeimage($_FILES[$id]);
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
-			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
@@ -205,6 +205,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 
 function storeimportfile($id) {
 	$key = uniqid();
+	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		$sec = "private";
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
@@ -221,7 +222,6 @@ function storeimportfile($id) {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
-			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			if (move_uploaded_file($_FILES[$id]['tmp_name'], $base.$key)) {
 				return $key;
 			} else {
@@ -307,6 +307,7 @@ function downsizeimage($fileinfo) {
 }
 
 function storeuploadedcoursefile($id,$key,$sec="public-read") {
+	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -333,7 +334,6 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
-			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			$keydir = dirname($key);
@@ -356,6 +356,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 	}
 }
 function storeuploadedqimage($id,$key,$sec="public-read") {
+	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -382,7 +383,6 @@ function storeuploadedqimage($id,$key,$sec="public-read") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
-			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
