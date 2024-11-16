@@ -864,8 +864,8 @@ function deletecoursefiles($files) {
 }
 
 function deleteqimage($file) {
-	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
+		$safeFilename = preg_replace('/[^\w\.]/','', $file);
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "qimages/$safeFilename";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
@@ -874,6 +874,7 @@ function deleteqimage($file) {
 			return false;
 		}
 	} else {
+		$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
 		if (@unlink($base."/$safeFilename")) {
 			return true;
