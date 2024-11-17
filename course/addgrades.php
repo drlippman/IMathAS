@@ -620,7 +620,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 				printf('<option value="%d">%s</option>', Sanitize::encodeStringForDisplay($row[0]),
                     Sanitize::encodeStringForDisplay($row[1]));
 			}
-			echo '<select><br/>';
+			echo '</select><br/>';
 			echo 'Grade type:<br/> <input type="radio" name="assesssnaptype" value="0" checked="checked">Current score ';
 			echo '<br/><input type="radio" name="assesssnaptype" value="1">Participation: give full credit if &ge; ';
 			echo '<input type="text" name="assesssnapatt" value="100" size="3">% of problems attempted and &ge; ';
