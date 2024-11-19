@@ -1601,8 +1601,8 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 //Computes the probability of x successes out of N trials
 //where each trial has probability p of success
 function binomialpdf($N,$p,$x) {
-	if (!is_nicenumber($p) || !is_nicenumber($N) || $p<0 || $p>1 || $x < 0) {
-		echo 'invalid inputs to invtcdf';
+	if (!is_nicenumber($p) || !is_nicenumber($N) || $p<0 || $p>1 || $x < 0 || $x > $N) {
+		echo 'invalid inputs to binomialpdf';
 		return 0;
 	}
     if ($N > 15 && $N != $x) {
