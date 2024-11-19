@@ -1605,7 +1605,7 @@ function binomialpdf($N,$p,$x) {
 		echo 'invalid inputs to binomialpdf';
 		return 0;
 	}
-    if ($N > 15 && $N != $x) {
+    if ($N > 15 && $N != $x && $x > 0 && $x < $N) {
         // from https://www.r-project.org/doc/reports/CLoader-dbinom-2002.pdf
         $lc = stirlerr($N) - stirlerr($x) - stirlerr($N-$x) - bd0($x,$N*$p) - bd0($N-$x,$N*(1-$p));
         $lf = log(2*M_PI) + log($x) + log(1 - $x/$N);
