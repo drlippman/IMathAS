@@ -223,7 +223,7 @@ class MathParser
           if ($this->docomplex) {
             if (!is_array($a)) { $a = [$a,0]; }
             if (!is_array($b)) { $b = [$b,0]; }
-            if ($b[1] === 0) {
+            if ($b[1] == 0) {
               $m = safepow($a[0]*$a[0]+$a[1]*$a[1], $b[0]/2);
               $t = atan2($a[1],$a[0]);
               return [$m*cos($t*$b[0]), $m*sin($t*$b[0])];
@@ -243,7 +243,7 @@ class MathParser
                 // some code replication here, but allows us to throw proper exception for invalid inputs
                 for ($j=3; $j<50; $j+=2) {
                     if (abs(round($j*$b)-($j*$b))<.000001) {
-                        if (round($j*$b)%2===0) {
+                        if (round($j*$b)%2==0) {
                             return exp($b*log(abs($a)));
                         } else {
                             return -1*exp($b*log(abs($a)));
@@ -945,7 +945,7 @@ class MathParser
             }
             break;
           case 'nthroot':
-            if ($indexval%2===0 && $insideval<0) {
+            if ($indexval%2==0 && $insideval<0) {
               throw new MathParserException("no even root of negative");
             }
             break;
@@ -1004,7 +1004,7 @@ class MathParser
    * @return boolean
    */
   private function isMultiple($a,$b) {
-    if ($b===0) {
+    if ($b==0) {
       return false;
     }
     $v = abs($a)/abs($b);
@@ -1443,15 +1443,15 @@ function factorial($x) {
 	for ($i=$x-1;$i>0;$i--) {
 		$x *= $i;
 	}
-	return ($x<0?false:($x===0?1:$x));
+	return ($x<0?false:($x==0?1:$x));
 }
 
 function nthroot($x,$n) {
-	if ($x===0) {
+	if ($x==0) {
       return 0;
-    } else if ($n%2===0 && $x<0) { //if even root and negative base
+    } else if ($n%2==0 && $x<0) { //if even root and negative base
       throw new MathParserException("Can't take even root of negative value");
-	} else if ($n===0) {
+	} else if ($n==0) {
       throw new MathParserException("Can't take 0th root");
     } else if ($x<0) { //odd root of negative base - negative result
 		return -1*exp(1/$n*log(abs($x)));
@@ -1466,8 +1466,8 @@ function funcvar ($input, $v) {
 
 // a safer power function that can handle (-8)^(1/3)
 function safepow($base,$power) {
-	if ($base===0) {
-    if($power===0) {
+	if ($base==0) {
+    if($power==0) {
       echo "0^0 is undefined";
       return NAN;
     } else {
@@ -1481,7 +1481,7 @@ function safepow($base,$power) {
 	if ($base<0 && floor($power)!=$power) {
 		for ($j=3; $j<50; $j+=2) {
 			if (abs(round($j*$power)-($j*$power))<.000001) {
-				if (round($j*$power)%2===0) {
+				if (round($j*$power)%2==0) {
 					return exp($power*log(abs($base)));
 				} else {
 					return -1*exp($power*log(abs($base)));
@@ -1651,7 +1651,7 @@ function cplx_mult($a,$b) {
 }
 function cplx_div($n,$d) {
   $ds = $d[0]*$d[0] + $d[1]*$d[1];
-  if ($ds === 0) {
+  if ($ds == 0) {
     throw new MathParserException("Cannot divide by zero in complex division");
   }
   return [($n[0]*$d[0] + $n[1]*$d[1])/$ds, ($n[1]*$d[0]-$n[0]*$d[1])/$ds];
