@@ -4621,7 +4621,7 @@ var PlusMinus = P(BinaryOperator, function(_, super_) {
       cursor[L].text = '\\pm ';
       cursor[L].htmlTemplate = '<span>&plusmn;</span>';
       cursor[L].jQ.html('&plusmn;');
-      this.bubble('reflow');
+      cursor[L].bubble('reflow');
       return;
     }
     super_.createLeftOf.apply(this, arguments);

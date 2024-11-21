@@ -364,7 +364,7 @@
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastvueupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
     if (!empty($CFG['assess2-use-vue-dev'])) {
-        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=112124" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
@@ -373,7 +373,7 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
-        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112124" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     }
     
