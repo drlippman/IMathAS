@@ -97,9 +97,9 @@ function mbxfilter($str) {
 //convert tables
 	//strip thead/tbody
 	$str = preg_replace('#</?(tbody|thead)[^>]*>#','',$str);
-	//replace <table> with <table><tabular>
-	$str = preg_replace('|<table[^>]*>|','<table><tabular>', $str);
-	$str = str_replace('</table>', '</tabular></table>', $str);
+	//replace <table> with <tabular>
+	$str = preg_replace('|<table[^>]*>|','<tabular>', $str);
+	$str = str_replace('</table>', '</tabular>', $str);
 	//replace <tr>
 	$str = preg_replace('/<tr[^>]*>/','<row>', $str);
 	$str = str_replace('</tr>', '</row>', $str);
