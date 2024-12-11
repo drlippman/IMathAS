@@ -448,13 +448,14 @@ function freqdist($a,$label,$start,$cw) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
+	$eps = $cw/1e8;
 	$out = "<table class=stats><thead><tr><th>$label</th><th>Freq</th></tr></thead>\n<tbody>\n";
-	while ($x <= $a[count($a)-1]) {
+	while ($x < $a[count($a)-1]+$eps) {
 		$out .= "<tr><td>`$x <= x < ";
 		$x += $cw;
 		$out .= "$x`</td><td>";
 		$i = $curr;
-		while (($i < count($a) && ($a[$i] < $x))) {
+		while (($i < count($a) && ($a[$i] < $x-$eps))) {
 			$i++;
 		}
 		$out .= ($i-$curr) . "</td></tr>\n";
@@ -478,10 +479,11 @@ function frequency($a,$start,$cw,$end=null) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
-	while ($x <= ($end!==null ? $end : $a[count($a)-1]+1e-10)) {
+	$eps = $cw/1e8;
+	while ($x <= ($end!==null ? $end : $a[count($a)-1]+$eps)) {
 		$x += $cw;
 		$i = $curr;
-		while (($i < count($a)) && ($a[$i] < $x)) {
+		while (($i < count($a)) && ($a[$i] < $x-$eps)) {
 			$i++;
 		}
 		$out[] = ($i-$curr);
@@ -550,6 +552,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
+	$eps = $cw/1e8;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
 	if ($upper===false) {
@@ -560,13 +563,13 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		$dxdiff = $cw-$dx;
 	}
     $st = '';
-	while ($x <= $a[count($a)-1]) {
+	while ($x < $a[count($a)-1]+$eps) {
 		$alt .= "<tr><td>$x</td>";
 		$st .= "rect([$x,0],";
 		$x += $dx;
 		$st .= "[$x,";
 		$i = $curr;
-		while (($i < count($a)) && ($a[$i] < $x)) {
+		while (($i < count($a)) && ($a[$i] < $x-$eps)) {
 			$i++;
 		}
 		if (($i-$curr)>$maxfreq) { $maxfreq = $i-$curr;}
