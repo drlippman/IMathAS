@@ -122,6 +122,11 @@ class AlgebraicNTupleScorePart implements ScorePart
             foreach ($chkme['vals'] as $k=>$chkval) {
                 if ($chkval != 'oo' && $chkval != '-oo') {
                     $gafunc = parseMathQuiet($chkval, $vlist, [], $flist, true, $isComplex);
+                    if ($gafunc === false) {
+                        $gaarr[$i]['tvals'][$k] = false;
+                        $normalizedGivenAnswer[$i]['vals'][$k] = '';
+                        continue;
+                    }
                     $gvals = [];
                     for ($c = 0; $c < 20; $c++) {
                         $varvals = array();
@@ -162,6 +167,10 @@ class AlgebraicNTupleScorePart implements ScorePart
                     if ($chkval != 'oo' && $chkval != '-oo') {
                         // generate normalized trees for sameform check
                         $anfunc = parseMathQuiet($chkval, $vlist, [], $flist, true, $isComplex);
+                        if ($anfunc === false) {
+                            $anarr[$i][$oi]['tvals'][$k] = false;
+                            $normalizedAnswer[$i][$oi]['vals'][$k] = '';
+                        }
                         $anvals = [];
                         for ($c = 0; $c < 20; $c++) {
                             $varvals = array();
@@ -211,6 +220,13 @@ class AlgebraicNTupleScorePart implements ScorePart
                         } 
                         $cntnan = 0;
                         $stunan = 0;
+                        if ($answer['tvals'][$i] === false) {
+                            continue; // invalid answer
+                        }
+                        if ($givenans['tvals'][$i] === false) {
+                            // student answer didn't parse
+                            continue;
+                        }
                         foreach ($answer['tvals'][$i] as $tvi=>$ansval) {
                             if (isNaN($ansval)) {
                                 $cntnan++; 
