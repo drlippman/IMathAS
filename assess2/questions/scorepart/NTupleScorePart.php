@@ -162,7 +162,11 @@ class NTupleScorePart implements ScorePart
                             // generate normalized trees for sameform check
                             if ($checkSameform) {
                                 $anfunc = parseMathQuiet($chkval, $isComplex?'i':'');
-                                $normalizedGivenAnswer[$i]['vals'][$k] = $anfunc->normalizeTreeString();
+                                if ($anfunc === false) { // parse error
+                                    $normalizedGivenAnswer[$i]['vals'][$k] = '';
+                                } else {
+                                    $normalizedGivenAnswer[$i]['vals'][$k] = $anfunc->normalizeTreeString();
+                                }
                             }
                         }
                     }
@@ -190,7 +194,11 @@ class NTupleScorePart implements ScorePart
                     foreach ($aval['vals'] as $k=>$chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
                             $anfunc = parseMathQuiet($chkval, $isComplex?'i':'');
-                            $normalizedAnswer[$ai][$ao]['vals'][$k] = $anfunc->normalizeTreeString();
+                            if ($anfunc === false) {
+                                $normalizedAnswer[$ai][$ao]['vals'][$k] = '';
+                            } else {
+                                $normalizedAnswer[$ai][$ao]['vals'][$k] = $anfunc->normalizeTreeString();
+                            }
                         }
                     }
                 }

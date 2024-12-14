@@ -2585,6 +2585,9 @@ function jsx_getcolorinterval($boardID, $box, $obj, $type, $param = array()) {
 	$out = 
 		"var colorInterval{$boardID}_{$box} = setInterval(function() {  
 			if ($('#qn{$box}')[0] || $('#qn{$box}')[0]) {
+				//TODO: Fix this. Needs to consider other answerboxes too.
+				//probably easiest to add ansgrn/ansred class to board, then 
+				//look to see if a class is already set on the board and incorporate that
 				if ($('#qn{$box}, #tc{$box}').is('.ansgrn')) {
 					$('#jxgboard_{$boardID}').css('border', '1px solid #0f0');
 				} else if ($('#qn{$box}, #tc{$box}').is('.ansred') || $('#qn{$box}, #tc{$box}').is('.ansyel')) {
