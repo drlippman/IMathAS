@@ -406,11 +406,21 @@ $vueData = array(
 						<option value="2"><?php echo _('After assessment');?></option>
 						<option value="3"><?php echo _('During or after assessment');?></option>
                     </select>
-                    <span v-if="showwork != 'DNC' && showwork > 1">
+					<span v-show="showwork != 'DNC'">
+                        <br>
+                        <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                        <select name="showworktype" id="showworktype" v-model="showworktype">
+                            <option value="0"><?php echo _('Essay');?></option>
+                            <option value="4"><?php echo _('File upload');?></option>
+                        </select>
+                    </span>
+                    <span v-if="showwork != 'DNC'">
                         <br>
                         <input type="checkbox" v-model="doworkcutoff" name="doworkcutoff" id="doworkcutoff" value="1"> 
                         <label for="doworkcutoff"><?php echo _('Add work cutoff') . '. ';  ?></label>
-                        <span v-if="doworkcutoff">
+						<span v-if="showwork < 2" class="small"><?php echo _('(Only applies to individual questions with "show work after" enabled)');?></span>
+						<span v-if="doworkcutoff">
+							<br/>
                             <label for="workcutoffval"><?php echo _('Work must be added within:') . ' '; ?></label>
                             <input name="workcutoffval" id="workcutoffval" v-model="workcutoffval" style="width:5.5ch" 
                                 type="number" min="0" :max="workcutofftype=='day'?45:1000"/>
@@ -421,14 +431,7 @@ $vueData = array(
                             </select>
                         </span>
                     </span>
-                    <span v-show="showwork != 'DNC'">
-                        <br>
-                        <label for="showworktype"><?php echo _('Work entry type');?>:</label>
-                        <select name="showworktype" id="showworktype" v-model="showworktype">
-                            <option value="0"><?php echo _('Essay');?></option>
-                            <option value="4"><?php echo _('File upload');?></option>
-                        </select>
-                    </span>
+                    
 				</span><br class=form />
 			</div>
 
