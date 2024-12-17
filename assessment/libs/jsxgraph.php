@@ -2589,9 +2589,27 @@ function jsx_getcolorinterval($boardID, $box, $obj, $type, $param = array()) {
 				//probably easiest to add ansgrn/ansred class to board, then 
 				//look to see if a class is already set on the board and incorporate that
 				if ($('#qn{$box}, #tc{$box}').is('.ansgrn')) {
-					$('#jxgboard_{$boardID}').css('border', '1px solid #0f0');
-				} else if ($('#qn{$box}, #tc{$box}').is('.ansred') || $('#qn{$box}, #tc{$box}').is('.ansyel')) {
-					$('#jxgboard_{$boardID}').css('border','1px solid #f00');
+					// if already red or yellow, make yellow, else make green
+					if ($('#jxgboard_{$boardID}').is('.ansred,.ansyel,.ansnoans')) {
+						$('#jxgboard_{$boardID}').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
+					} else {
+					 	$('#jxgboard_{$boardID}').addClass('ansgrn');
+					}
+				} else if ($('#qn{$box}, #tc{$box}').is('.ansred')) {
+					// if already grn or yellow, make yellow, else make red
+					if ($('#jxgboard_{$boardID}').is('.ansgrn,.ansyel')) {
+						$('#jxgboard_{$boardID}').removeClass('ansgrn').addClass('ansyel');
+					} else {
+					 	$('#jxgboard_{$boardID}').addClass('ansred');
+					}
+				} else if ($('#qn{$box}, #tc{$box}').is('.ansyel')) {
+					$('#jxgboard_{$boardID}').removeClass('ansgrn').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
+				} else {
+					if ($('#jxgboard_{$boardID}').is('.ansgrn,.ansyel')) {
+						$('#jxgboard_{$boardID}').removeClass('ansgrn').addClass('ansyel');
+					} else {
+						$('#jxgboard_{$boardID}').addClass('ansnoans');
+					}
 				}
 				/* Pull in answer from answerbox is possible */
 				if ($('#qn{$box}')[0] && $('#qn{$box}').val() !== '') {
