@@ -93,13 +93,13 @@ echo '</tr>';
 echo '</thead><tbody>';
 
 foreach ($page_assessmentList as $i=>$assess) {
-    echo '<tr><td><input type="checkbox" value="'.$assess['id'].'" ';
+    echo '<tr><td><input type="checkbox" value="'.$assess['id'].'" id="cb'.$assess['id'].'"';
     if (in_array($assess['id'], $cur)) {
         echo 'checked';
     }
     echo '></td>';
-    echo '<td><span>'.Sanitize::encodeStringForDisplay($assess['name']);
-    echo '</span><span class="sumtxt">'.Sanitize::encodeStringForDisplay($assess['summary']).'</span>';
+    echo '<td><label for="cb'.$assess['id'].'">'.Sanitize::encodeStringForDisplay($assess['name']);
+    echo '</label><span class="sumtxt">'.Sanitize::encodeStringForDisplay($assess['summary']).'</span>';
     echo '</td>';
     echo '</tr>';
 }

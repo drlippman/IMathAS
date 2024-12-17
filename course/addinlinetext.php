@@ -450,8 +450,8 @@ $(function() { chghidetitle(); });
 		<span id="titlewrap" <?php if ($hidetitle==true) {echo 'style="display:none;"';} ?>>
 		<input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>" required /><br/>
 		</span>
-		<input type="checkbox" name="hidetitle" value="1" onclick="chghidetitle()" <?php writeHtmlChecked($hidetitle,true) ?>/>
-		Hide title and icon
+		<label><input type="checkbox" name="hidetitle" value="1" onclick="chghidetitle()" <?php writeHtmlChecked($hidetitle,true) ?>/>
+		Hide title and icon</label>
 	</span><BR class=form>
 
 	Text: (shows on course page)<BR>
@@ -471,7 +471,7 @@ $(function() { chghidetitle(); });
 		<a href="<?php echo getcoursefileurl($arr['link']); ?>" target="_blank">
 		View</a>
 		<input type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
-		Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>
+		<label>Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/></label><br/>
 <?php
 		}
 	}
@@ -485,24 +485,24 @@ $(function() { chghidetitle(); });
 
 	<span class="form">List of YouTube videos</span>
 	<span class="formright">
-		<input type="checkbox" name="isplaylist" value="1" <?php writeHtmlChecked($line['isplaylist'],1);?>/> Show as embedded playlist
+		<label><input type="checkbox" name="isplaylist" value="1" <?php writeHtmlChecked($line['isplaylist'],1);?>/> Show as embedded playlist</label>
 	</span>
 	<br class="form"/>
 
 	<div>
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/>Show Always<br/>
+			<label><input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/>Hide</label><br/>
+			<label><input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/>Show by Dates</label><br/>
+			<label><input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/>Show Always</label><br/>
 		</span><br class="form"/>
 
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
-			 Always until end date<br/>
+			<label><input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			 Always until end date</label><br/>
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
@@ -512,8 +512,8 @@ $(function() { chghidetitle(); });
 
 		<span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
-			Always after start date<br/>
+			<label><input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
+			Always after start date</label><br/>
 			<input type=radio name="edatetype" value="edate" <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
@@ -523,21 +523,21 @@ $(function() { chghidetitle(); });
 
 		<span class=form>Place on Calendar?</span>
 		<span class=formright>
-			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
-			<input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)<br/>
-			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date<br/>
-			With tag: <input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
+			<label><input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No</label><br/>
+			<label><input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)</label><br/>
+			<label><input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date</label><br/>
+			<label>With tag: <input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/></label>
 		</span><br class="form" />
 		</div>
 		<div id="altcaldiv" style="display:<?php echo ($line['avail']==2)?"block":"none"; ?>">
 		<span class=form>Place on Calendar?</span>
 		<span class=formright>
-			<input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No<br/>
-			<input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on
+			<label><input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No</label><br/>
+			<label><input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on</label>
 			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> <br/>
-			With tag: <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
+			<label>With tag: <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/></label>
 		</span><BR class=form>
 		</div>
 <?php
