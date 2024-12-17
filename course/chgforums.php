@@ -166,6 +166,14 @@ if (isset($_POST['checked'])) { //form submitted
 		$sets[] = "taglist=:taglist";
 		$qarr[':taglist'] = $taglist;
 	}
+	if (isset($_POST['chgpostinstr'])) {
+		$sets[] = "postinstr=:postinstr";
+		$qarr[':postinstr'] = Sanitize::incomingHtml(Sanitize::trimEmptyPara($_POST['postinstr']));
+	}
+	if (isset($_POST['chgreplyinstr'])) {
+		$sets[] = "replyinstr=:replyinstr";
+		$qarr[':replyinstr'] = Sanitize::incomingHtml(Sanitize::trimEmptyPara($_POST['replyinstr']));
+	}
 	if (count($sets)>0 & count($checked)>0) {
 		$setslist = implode(',',$sets);
 		$stm = $DBH->prepare("UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);");
@@ -254,6 +262,7 @@ $page_allowlateonSelect['val'][2] = 3;
 $page_allowlateonSelect['label'][2] = "Replies only";
 
 //HTML output
+$useeditor = "postinstr,replyinstr";
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
 table td {
@@ -490,6 +499,24 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 		   Enter in format CategoryDescription:category,category,category<br/>
 		   <textarea rows="2" cols="60" name="taglist"></textarea>
 		 </span>
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgpostinstr" class="chgbox"/></td>
+	<td class="r">Posting Instructions: <em>Displays on Add New Thread</em></td>
+	<td>
+		<div class=editor>
+		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%"></textarea>
+		</div>
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgreplyinstr" class="chgbox"/></td>
+	<td class="r">Reply Instructions: <em>Displays on Add Reply</em></td>
+	<td>
+		<div class=editor>
+		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%"></textarea>
+		</div>
 	</td>
 </tr>
 
