@@ -715,7 +715,7 @@ if ($hasusername) {
                 $coursedefstime = $coursedeftime;
             }
             $courseenddate = $crow['enddate'];
-            $latepasshrs = $crow['latepasshrs'];
+            $latepasshrs = max(1,$crow['latepasshrs']);
             $courseUIver = $crow['UIver'];
 
             if (isset($studentid) && !$inInstrStuView && ((($crow['available']) & 1) == 1 || time() < $crow['startdate'])) {

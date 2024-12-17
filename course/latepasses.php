@@ -21,7 +21,7 @@
 			}
 		}
 		$stm = $DBH->prepare("UPDATE imas_courses SET latepasshrs=:latepasshrs WHERE id=:id");
-		$stm->execute(array(':latepasshrs'=>$_POST['hours'], ':id'=>$cid));
+		$stm->execute(array(':latepasshrs'=>max(1,intval($_POST['hours'])), ':id'=>$cid));
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
