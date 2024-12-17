@@ -499,6 +499,7 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['public'] = $item['public'] ?? 0;
                 $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
                 $newblock['grouplimit'] = $samecourse ? ($item['grouplimit'] ?? []) : [];
+                $newblock['innav'] = $item['innav'] ?? 0;
                 $newblock['items'] = array();
                 if (count($item['items']) > 0) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
