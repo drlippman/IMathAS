@@ -28,7 +28,10 @@ function standardize_role(array $roles): string {
       $currentRole = 'Instructor';
       $currentPriority = 1;
     } else if (preg_match('~http://purl.imsglobal.org/vocab/lis/v2/(membership|institution|system)(/person)?(#|/)(\w+)~', $role, $m)) {
-      if ($contextPriorities[$m[1]] > $currentPriority) {
+      if ($contextPriorities[$m[1]] == $currentPriority && in_array($m[4], $instructorRoles)) {
+        // if the LMS sent two roles at same level, use the Instructor one
+        $currentRole = 'Instructor';
+      } else if ($contextPriorities[$m[1]] > $currentPriority) {
         $currentPriority = $contextPriorities[$m[1]] ;
         if (in_array($m[4], $instructorRoles)) {
           $currentRole = 'Instructor';
