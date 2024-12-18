@@ -302,7 +302,33 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 	$safesearch = $_GET['search'];
 	$safesearch = trim(str_replace(' and ', ' ',$safesearch));
 	$searchterms = explode(" ",$safesearch);
+	$hiddenforums = [];
 	if (isset($_GET['allforums'])) {
+		if (!$canviewall) {
+			// get block-hidden forums
+			$itemsassoc = array();
+			$stm = $DBH->prepare("SELECT id,typeid FROM imas_items WHERE courseid=:courseid AND itemtype='Forum'");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$itemsassoc[$row[0]] = $row[1];
+			}
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$result = $stm->execute(array(':id'=>$cid));
+			$itemorder =  unserialize($stm->fetchColumn(0));
+			function flattenitems($items,$ishidden) {
+				global $itemsassoc,$hiddenforums;
+				foreach ($items as $item) {
+					if (is_array($item)) {
+						if (!empty($item['items'])) {
+							flattenitems($item['items'],$ishidden||($item['avail']==0));
+						}
+					} else if (isset($itemsassoc[$item]) && $ishidden) { // is a hidden forum 
+						$hiddenforums[] = $itemsassoc[$item];
+					} 
+				}
+			}
+			flattenitems($itemorder, false);
+		}
 		$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
 		$query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
 		$array = array();
@@ -333,6 +359,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if (in_array($row[0], $hiddenforums)) { continue; }
 		echo "<div class=block>";
 		echo "<b>".Sanitize::encodeStringForDisplay($row[2])."</b>";
 		if (isset($_GET['allforums'])) {
