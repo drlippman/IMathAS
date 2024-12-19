@@ -529,7 +529,7 @@ if (!$beentaken) {
 
 
 				if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-					$page_questionTable[$i]['src'] = sprintf("<a href=\"moddataset.php?id=%d&daid=%d&cid=%s&frompot=1\">Edit</a>",
+					$page_questionTable[$i]['src'] = sprintf("<a href=\"moddataset.php?id=%d&daid=%d&cid=%s\">Edit</a>",
                         Sanitize::onlyInt($line['id']), $daid, $cid);
 				} else {
 					$page_questionTable[$i]['src'] = sprintf("<a href=\"viewsource.php?id=%d&daid=%d&cid=%s\">View</a>",
@@ -765,7 +765,7 @@ if (!$beentaken) {
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
 		Exclude added</span>
 		<input type=submit value=Search>
-		<input type=button value="Add New Question" onclick="window.location='moddataset.php?cid=<?php echo $cid ?>'">
+		<input type=button value="Add New Question" onclick="window.location='moddataset.php?cid=<?php echo $cid ?>&daid=<?php echo $daid;?>'">
 
 	<br/>
 <?php

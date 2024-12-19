@@ -557,7 +557,9 @@
 			}
 		}
 
-		if (!isset($_GET['aid'])) {
+		if (isset($_GET['daid'])) {
+			$outputmsg .=  "<a href=\"adddrillassess.php?cid=$cid&daid=".Sanitize::onlyInt($_GET['daid'])."\">"._("Return to Drill Assessment")."</a>\n";
+		} else if (!isset($_GET['aid'])) {
 			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">"._("Return to Question Set Management")."</a>\n";
 		} else {
 			if ($frompot==1) {
@@ -578,7 +580,9 @@
 		} else if ($quicksave){
 			// Don't echo or die if in quicksave mode.
 		} else {
-			if ($errmsg == '' && !isset($_GET['aid'])) {
+			if ($errmsg == '' && !empty($_GET['daid'])) {
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/adddrillassess.php?cid='.$cid.'&daid='.Sanitize::onlyInt($_GET['daid']).'&r='.Sanitize::randomQueryStringParam());
+			} else if ($errmsg == '' && !isset($_GET['aid'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid.'&r='.Sanitize::randomQueryStringParam());
 			} else if ($errmsg == '' && $frompot==0) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/'.$addq.'.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
@@ -826,6 +830,7 @@
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
+		. (isset($_GET['daid']) ? "&daid=".Sanitize::encodeUrlParam($_GET['daid']) : "")
 		. (isset($_GET['aid']) ? "&aid=".Sanitize::encodeUrlParam($_GET['aid'])."&from=$from" : "")
 		. ((isset($_GET['id']) && !isset($_GET['template'])) ? "&id=".Sanitize::encodeUrlParam($_GET['id']) : "")
 		. (isset($_GET['template']) ? "&templateid=".Sanitize::encodeUrlParam($_GET['id']) : "")
