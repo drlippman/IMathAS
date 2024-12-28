@@ -1322,19 +1322,15 @@ switch($_POST['action']) {
 }
 
 session_write_close();
-if ($myrights<75 || $from=='home') {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
-} else if (empty($from)) {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
-} else if (isset($_GET['cid'])) {
-	$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']).$btf);
-} else if ($from=='admin2') {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
-} else if ($from=='userreports') {
+if ($from=='userreports') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php");
 } else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd' || $from=='unhide') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
+} else if (isset($_GET['cid'])) {
+	$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']).$btf);
+} else if ($myrights<75 || $from=='home') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 } else {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 }
