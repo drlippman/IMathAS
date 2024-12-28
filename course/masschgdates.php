@@ -353,13 +353,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			);
 		}
 
-		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf" . "&r=" . Sanitize::randomQueryStringParam());
-
+		if (!empty($_GET['quick'])) {
+			echo "saved";
+		} else {
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf" . "&r=" . Sanitize::randomQueryStringParam());
+		}
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/masschgdates.js?v=121422\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/masschgdates.js?v=122724\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }
@@ -409,6 +412,7 @@ if ($overwriteBody==1) {
 			.mcind4 {padding-left:66px;} .mcind5 {padding-left:84px;} mcind6 {padding-left:100px;}
 			.mcind0 img, .mcind1 img, .mcind2 img, .mcind3 img, .mcind4 img, .mcind5 img, .mcind6 img {float: left;}
 			.mcind0 div, .mcind1 div, .mcind2 div, .mcind3 div, .mcind4 div, .mcind5 div, .mcind6 div {margin-left: 21px;}
+			.fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
 			</style>';
 	if ($filter!='assessments') {
 		$placeinhead .= '<style type="text/css">.mca {display:none;}</style>';
@@ -969,8 +973,12 @@ if ($overwriteBody==1) {
 	echo '</form>';
 	echo "<form id=\"realform\" method=post action=\"masschgdates.php?cid=$cid\" onsubmit=\"prepforsubmit(this)\">";
 	echo "<input type=hidden id=\"chgcnt\" name=\"chgcnt\" value=\"$cnt\" />";
-	echo '<input type=submit value="Save Changes"/>';
-	echo '</form>';
+	echo '<p><input type=submit value="Save Changes"/></p>';
+	echo '</form><p>&nbsp;</p>';
+	echo '<div class="fixedbottomright">';
+	echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
+	echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
+	echo '</div>';
 	//echo "<script>var acnt = $cnt;</script>";
 }
 
