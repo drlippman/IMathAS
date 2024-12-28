@@ -316,6 +316,7 @@
     $points = $assess_info->getQuestionSetting($qid, 'points_possible');
     $rubric = $assess_info->getQuestionSetting($qid, 'rubric');
     $qsetid = $assess_info->getQuestionSetting($qid, 'questionsetid');
+	$interquestion_text = $assess_info->getSetting('interquestion_text');
 /*
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
@@ -479,6 +480,21 @@
 		writeHtmlSelect('secfiltersel', $sections, $sections, $secfilter, _('All'), '-1', 'onchange="chgsecfilter()"');
 	}
 	echo '</div>';
+
+	// convert curqloc to 0-indexed question location in original itemorder
+	$curqlocpieces = explode('-', $curqloc);
+	if (count($curqlocpieces) > 1) {
+		$qlocref = $curqlocpieces[0] + $curqlocpieces[1] - 2;
+	} else {
+		$qlocref = $curqlocpieces[0] - 1;
+	}
+	// look up and display interquestion text for this question, if set
+	foreach ($interquestion_text as $data) {
+		if ($qlocref >= $data['displayBefore'] && $qlocref <= $data['displayUntil']) {
+			echo '<div class="introtext">' . $data['text'] . '</div>';
+		}
+	}
+
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
