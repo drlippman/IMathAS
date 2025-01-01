@@ -3446,7 +3446,7 @@ A student is asked to enter a function
     You can put "ignore_spaces,true" at the beginning of the $requiretimes to ignore spaces in the answer<br/>
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "inequality" or "generalcomplex" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" or "list" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "generalcomplex" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" or "list" or "casesensitivevars" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -3470,7 +3470,9 @@ A student is asked to enter a function
     "sameform": requires the student's answer be in the "same form" as the correct answer. This means 
         exactly the same, except for commutation of addition and multiplication, multiplication by 1,
         implicit multiplication, and extra parentheses. (2x-3)(5-x) would be "sameform" as (-1x+5)(2*x-3), 
-        but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.
+        but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.<br/>
+	"casesensitivevars": By default answers with incorrect case variables (like X instead of x) will be accepted. 
+	   Add this option to not ignore case on variables.
     </dd>
 <dt>$partialcredit = array(string,score,[string,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form 

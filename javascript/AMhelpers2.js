@@ -1190,7 +1190,7 @@ function AMnumfuncPrepVar(qn,str) {
   	if (vars[i] == "E" || vars[i] == "e") {
           foundaltcap[i] = true;  // always want to treat e and E as different
 	  } else {
-	  	foundaltcap[i] = false;
+	  	foundaltcap[i] = allParams[qn].calcformat.match(/casesensitivevars/); // default false unless casesensitivevars is used
 	  	for (var j=0; j<vars.length; j++) {
 	  		if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
 	  			foundaltcap[i] = true;
@@ -2275,12 +2275,25 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-          var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
-          reglist.sort(function(x,y) { return y.length - x.length});
-	  	  reg = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
-	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
-	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
-	  	  }
+      if (format.match(/casesensitivevars/)) {
+        var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|');
+        reglist.sort(function(x,y) { return y.length - x.length});
+        let reg1 = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
+        var reglist = vl.split('|');
+        reglist.sort(function(x,y) { return y.length - x.length});
+        let reg2 = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "g");
+        if (str.replace(reg1,'').replace(reg2,'').match(/[a-zA-Z]/)) {
+          err += _(" Check your variables - you might be using an incorrect one")+". ";
+        }
+      } else {
+        var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
+        reglist.sort(function(x,y) { return y.length - x.length});
+	  	  let reg = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
+        if (str.replace(reg,'').match(/[a-zA-Z]/)) {
+          err += _(" Check your variables - you might be using an incorrect one")+". ";
+        }
+      }
+      
 	  }
 	  if ((str.match(/\|/g)||[]).length>2) {
 	  	  var regex = /\|.*?\|\s*(.|$)/g;
