@@ -46,7 +46,7 @@ if (isset($_POST['options'])) {
 		}
 	}
 
-	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
+	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.locked=0 ";
 	$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
@@ -126,7 +126,7 @@ if (isset($_POST['options'])) {
 
 	//create row headers
 	$query = "SELECT iu.id,iu.FirstName,iu.LastName,imas_students.section,iu.email FROM imas_users AS iu JOIN ";
-	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid ";
+	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid AND imas_students.locked=0 ";
 	if ($hassection) {
 		$query .= "ORDER BY imas_students.section,iu.LastName, iu.FirstName";
 	} else {
@@ -153,7 +153,7 @@ if (isset($_POST['options'])) {
     $query = "SELECT iar.* FROM imas_assessment_records AS iar
                 JOIN imas_students ON imas_students.userid = iar.userid
               WHERE iar.assessmentid = :assessmentid
-                AND imas_students.courseid = :courseid";
+                AND imas_students.courseid = :courseid AND imas_students.locked=0";
     $stm = $DBH->prepare($query);
     $stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
