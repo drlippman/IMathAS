@@ -124,10 +124,10 @@ if (!(isset($teacherid)) && $myrights<100) {
     $uploadfile = getimportfilepath($filekey);
     $handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {
-			$data = fgetcsv($handle,2096);
+			$data = fgetcsv($handle,2096, ',', '"', '');
 		}
         
-		while (($data = fgetcsv($handle,2096))!==false) {
+		while (($data = fgetcsv($handle,2096, ',', '"', ''))!==false) {
 			$arr = parsecsv($data);
 			for ($i=0;$i<count($arr);$i++) {
 				$arr[$i] = trim($arr[$i]);

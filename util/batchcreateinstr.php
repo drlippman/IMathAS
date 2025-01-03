@@ -44,7 +44,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   $now = time();
   $isoktocopy = array();
   $handle = fopen_utf8(realpath($_FILES['uploadedfile']['tmp_name']),'r');
-  while (($data = fgetcsv($handle,2096))!==false) {
+  while (($data = fgetcsv($handle,2096, ',', '"', ''))!==false) {
     if (trim($data[0])=='') {continue;}
     if (count($data)<5) {
       echo "Invalid row - skipping<br/>";

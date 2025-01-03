@@ -258,9 +258,9 @@ if ($_REQUEST['output']=='html') {
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Pragma: public');
 	$out = fopen('php://output', 'w');
-	fputcsv($out, $headerrow);
+	fputcsv($out, $headerrow, ',', '"', '');
 	foreach ($bodydata as $bodyrow) {
-		fputcsv($out,$bodyrow);
+		fputcsv($out,$bodyrow, ',', '"', '');
 	}
 	fclose($out);
 }

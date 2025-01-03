@@ -75,10 +75,10 @@ if (!(isset($teacherid))) {
 		if (count($gbitemid)>0) {
 			$handle = fopen_utf8($uploadfile,'r');
 			for ($i = 0; $i<$_POST['headerrows']; $i++) {
-				$line = fgetcsv($handle,4096);
+				$line = fgetcsv($handle,4096, ',', '"', '');
 			}
 			$sidcol = $_POST['sidcol'] - 1;
-			while ($line = fgetcsv($handle, 4096)) { //for each student
+			while ($line = fgetcsv($handle, 4096, ',', '"', '')) { //for each student
 				if ($line[$sidcol]=='' || !isset($useridarr[$line[$sidcol]])) {
 					//echo "breaking 1";
 					//print_r($line);
@@ -142,11 +142,11 @@ if (!(isset($teacherid))) {
     $uploadfile = getimportfilepath($filekey);
 		//parse out header info
 		$handle = fopen_utf8($uploadfile,'r');
-		$hrow = fgetcsv($handle,4096);
+		$hrow = fgetcsv($handle,4096, ',', '"', '');
 		$columndata = array();
 		$names = array();
 		if ($_POST['headerrows']==2) {
-			$srow = fgetcsv($handle,4096);
+			$srow = fgetcsv($handle,4096, ',', '"', '');
 		}
 		fclose($handle);
 		for ($i=0; $i<count($hrow); $i++) {

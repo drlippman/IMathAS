@@ -197,7 +197,7 @@ function outputCsv() {
         'course_count',
         'templates_copied',
 	);
-	fputcsv($stdout, $headers);
+	fputcsv($stdout, $headers, ',', '"', '');
 
 	while ($row = $GLOBALS['stm']->fetch(PDO::FETCH_ASSOC)) {
 		if ($row['name']===null) {
@@ -220,7 +220,7 @@ function outputCsv() {
 			implode('|', getTemplatesUsed($row))
         );
 
-		fputcsv($stdout, $data);
+		fputcsv($stdout, $data, ',', '"', '');
 		fflush($stdout);
 	}
 

@@ -51,12 +51,12 @@ if (!(isset($teacherid))) {
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			$handle = fopen_utf8(realpath($_FILES['userfile']['tmp_name']),'r');
 			if ($_POST['hashdr']==1) {
-				$data = fgetcsv($handle,4096,',');
+				$data = fgetcsv($handle,4096, ',', '"', '');
 			} else if ($_POST['hashdr']==2) {
-				$data = fgetcsv($handle,4096,',');
-				$data = fgetcsv($handle,4096,',');
+				$data = fgetcsv($handle,4096, ',', '"', '');
+				$data = fgetcsv($handle,4096, ',', '"', '');
 			}
-			while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
+			while (($data = fgetcsv($handle, 4096, ',', '"', '')) !== FALSE) {
 				$data = array_map('trim', $data);
 				$query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid AND ";
 				$qarr = array(':courseid'=>$cid);
