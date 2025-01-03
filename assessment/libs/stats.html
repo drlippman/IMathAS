@@ -55,6 +55,8 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#invchi2cdf">invchi2cdf</a></li>
 <li><a href="#fcdf">fcdf</a></li>
 <li><a href="#invfcdf">invfcdf</a></li>
+<li><a href="#poissonpdf">poissonpdf</a></li>
+<li><a href="#poissoncdf">poissoncdf</a></li>
 <li><a href="#gamma_cdf">gamma_cdf</a></li>
 <li><a href="#gamma_inv">gamma_inv</a></li>
 <li><a href="#beta_cdf">beta_cdf</a></li>
@@ -396,6 +398,14 @@ invfcdf(p,df1,df2)
 <BR>with degrees of freedom df1 and df2
 <BR>Algorithm is accurate to approximately 2-4 decimal places
 <BR>Less accurate for smaller p-values
+<BR><h3><a name="poissonpdf">poissonpdf</a></h3>
+poissonpdf(lambda, x)
+<BR>Computes the probability of x events
+<BR>with an expectation of lambda events
+<BR><h3><a name="poissoncdf">poissoncdf</a></h3>
+poissoncdf(lambda, x)
+<BR>Computes the probability of &lt;=x events
+<BR>with an expectation of lambda events
 <h3><a name="gamma_cdf">gamma_cdf</a></h3>
 gamma_cdf(x,shape,[scale,offset])
 <BR>Calculated the gamma cdf

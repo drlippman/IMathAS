@@ -11,7 +11,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
  "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t",
- "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson","cluster_bargraph","stem_plot");
+ "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson","cluster_bargraph",
+ "stem_plot","poissonpdf","poissoncdf","gamma_log");
 
 //nCr(n,r)
 //The Choose function
@@ -3495,4 +3496,22 @@ function stem_plot($data,$options=array()) {
 	return $display;
 }
 
+function poissonpdf($lambda,$x) {
+	if ($x < 0 || $lambda < 0 || !is_nicenumber($lambda) || !is_nicenumber($x) || floor($x) != $x) {
+		echo 'invalid input to poissonpdf';
+		return false;
+	}
+	return exp(-$lambda + $x*log($lambda) - gamma_log($x+1));
+}
+function poissoncdf($lambda,$x) {
+	if ($x < 0 || $lambda < 0 || !is_nicenumber($lambda) || !is_nicenumber($x) || floor($x) != $x) {
+		echo 'invalid input to poissoncdf';
+		return false;
+	}
+	$sum = 0;
+	for ($i=0; $i<= $x; $i++) {
+		$sum += poissonpdf($lambda, $x);
+	}
+	return $sum;
+}
 ?>
