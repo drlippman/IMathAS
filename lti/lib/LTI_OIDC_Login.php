@@ -14,7 +14,7 @@ class LTI_OIDC_Login {
      * @param Cache     $cache      Instance of the Cache interface used to loading and storing launches. If non is provided launch data will be store in $_SESSION.
      * @param Cookie    $cookie     Instance of the Cookie interface used to set and read cookies. Will default to using $_COOKIE and setcookie.
      */
-    function __construct(Database $database, Cache $cache = null, Cookie $cookie = null) {
+    function __construct(Database $database, ?Cache $cache = null, ?Cookie $cookie = null) {
         $this->db = $database;
         if ($cache === null) {
             $cache = new Cache();
@@ -30,7 +30,7 @@ class LTI_OIDC_Login {
     /**
      * Static function to allow for method chaining without having to assign to a variable first.
      */
-    public static function new(Database $database, Cache $cache = null, Cookie $cookie = null) {
+    public static function new(Database $database, ?Cache $cache = null, ?Cookie $cookie = null) {
         return new LTI_OIDC_Login($database, $cache, $cookie);
     }
 
@@ -42,7 +42,7 @@ class LTI_OIDC_Login {
      *
      * @return Redirect Returns a redirect object containing the fully formed OIDC login URL.
      */
-    public function do_oidc_login_redirect($launch_url, array $request = null) {
+    public function do_oidc_login_redirect($launch_url, ?array $request = null) {
 
         if ($request === null) {
             $request = $_REQUEST;

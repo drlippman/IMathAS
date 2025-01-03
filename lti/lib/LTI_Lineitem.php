@@ -12,7 +12,7 @@ class LTI_Lineitem {
     private $end_date_time;
     private $submission_review = null;
 
-    public function __construct(array $lineitem = null) {
+    public function __construct(?array $lineitem = null) {
         if (empty($lineitem)) {
             return;
         }

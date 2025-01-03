@@ -24,7 +24,7 @@ class LTI_Message_Launch {
      * @param Cache     $cache      Instance of the Cache interface used to loading and storing launches. If non is provided launch data will be store in $_SESSION.
      * @param Cookie    $cookie     Instance of the Cookie interface used to set and read cookies. Will default to using $_COOKIE and setcookie.
      */
-    function __construct(Database $database, Cache $cache = null, Cookie $cookie = null) {
+    function __construct(Database $database, ?Cache $cache = null, ?Cookie $cookie = null) {
         $this->db = $database;
 
         $this->launch_id = uniqid("lti1p3_launch_", true);
@@ -43,7 +43,7 @@ class LTI_Message_Launch {
     /**
      * Static function to allow for method chaining without having to assign to a variable first.
      */
-    public static function new(Database $database, Cache $cache = null, Cookie $cookie = null) {
+    public static function new(Database $database, ?Cache $cache = null, ?Cookie $cookie = null) {
         return new LTI_Message_Launch($database, $cache, $cookie);
     }
 
@@ -57,7 +57,7 @@ class LTI_Message_Launch {
      * @throws LTI_Exception        Will throw an LTI_Exception if validation fails or launch cannot be found.
      * @return LTI_Message_Launch   A populated and validated LTI_Message_Launch.
      */
-    public static function from_cache($launch_id, Database $database, Cache $cache = null) {
+    public static function from_cache($launch_id, Database $database, ?Cache $cache = null) {
         $new = new LTI_Message_Launch($database, $cache, null);
         if ($new->cache->get_launch_data($launch_id) !== false) {
             $new->launch_id = $launch_id;
@@ -76,7 +76,7 @@ class LTI_Message_Launch {
      * @throws LTI_Exception        Will throw an LTI_Exception if validation fails.
      * @return LTI_Message_Launch   Will return $this if validation is successful.
      */
-    public function validate(array $request = null) {
+    public function validate(?array $request = null) {
 
         if ($request === null) {
             $request = $_POST;
