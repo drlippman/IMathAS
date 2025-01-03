@@ -771,17 +771,18 @@ require_once "includes/sanitize.php";
 		}
 
 		$layoutstr = implode('|',$homelayout);
+		$chguserimg = '';
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
-			processImage($_FILES['stupic'],$userid,200,200);
-			processImage($_FILES['stupic'],'sm'.$userid,40,40);
-			$chguserimg = ",hasuserimg=1";
+			$savedimg = processImage($_FILES['stupic'],$userid,200,200);
+			if ($savedimg) {
+				processImage($_FILES['stupic'],'sm'.$userid,40,40);
+				$chguserimg = ",hasuserimg=1";
+			}
 		} else if (isset($_POST['removepic'])) {
 			deletecoursefile('userimg_'.$userid.'.jpg');
 			deletecoursefile('userimg_sm'.$userid.'.jpg');
 			$chguserimg = ",hasuserimg=0";
-		} else {
-			$chguserimg = '';
-		}
+		} 
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 

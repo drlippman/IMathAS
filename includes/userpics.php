@@ -8,6 +8,7 @@ require_once "$curdir/filehandler.php";
 // $image is $_FILES[ <image name> ]
 // $imageId is the id used in a database or wherever for this image
 // $thumbWidth and $thumbHeight are desired dimensions for the thumbnail
+// return true on success, false on failure
 function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
 {
     $type = $image[ 'type' ];
@@ -31,7 +32,7 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
    
     $im = @$createFunc( $image[ 'tmp_name' ] );
     if (!$im) {
-	    return;
+	    return false;
     }
     $size = getimagesize( $image[ 'tmp_name' ] );
     $w = $size[ 0 ];
@@ -86,7 +87,7 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
     }
     // save the image
    imagejpeg( $imT, $galleryPath . 'userimg_'.$imageId . '.jpg', 100 );
-   relocatecoursefileifneeded($galleryPath . 'userimg_'.$imageId . '.jpg', 'userimg_'.$imageId . '.jpg');
+   return relocatecoursefileifneeded($galleryPath . 'userimg_'.$imageId . '.jpg', 'userimg_'.$imageId . '.jpg');
 }
 
 ?>
