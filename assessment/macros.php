@@ -5510,7 +5510,7 @@ function getsigfigs($val, $targetsigfigs=0) {
     } else {
         $gadploc = strpos($val,'.');
         if ($gadploc===false) { // no decimal place
-            $sigfigs = max($targetsigfigs, strlen(rtrim($val,'0')));
+            $sigfigs = max(min(strlen($val),$targetsigfigs), strlen(rtrim($val,'0')));
         } else if (abs($val)<1) {
             $sigfigs = strlen(ltrim(substr($val,$gadploc+1),'0'));
         } else {
