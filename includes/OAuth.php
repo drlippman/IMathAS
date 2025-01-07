@@ -24,7 +24,7 @@ class OAuthConsumer {
   function __construct($key, $secret, $callback_url=NULL, $rights=0,$groupid=0) {
     $this->key = $key;
     $this->secret = $secret;
-    $this->callback_url = $callback_url;
+    // $this->callback_url = $callback_url;
     $this->rights = $rights;
     $this->groupid = $groupid;
   }
