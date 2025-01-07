@@ -218,36 +218,40 @@ function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens")
 	return $out;
 }
 
+// Recursive function to process the formula
+function chem_internal_processFormula($formula, $multiplier, &$result) {
+	// Regex to match atomic groups, elements, and parentheses
+	preg_match_all('/\(([^()]+)\)(\d*)|([A-Z][a-z]*)(\d*)/', $formula, $matches, PREG_SET_ORDER);
+
+	foreach ($matches as $match) {
+		if (!empty($match[1])) {
+			// It's a group within parentheses
+			$group = $match[1];
+			$groupMultiplier = (int)($match[2] ?: 1) * $multiplier;
+			chem_internal_processFormula($group, $groupMultiplier, $result);
+		} elseif (!empty($match[3])) {
+			// It's an individual element
+			$element = $match[3];
+			$count = (int)($match[4] ?: 1) * $multiplier;
+			if (isset($result[$element])) {
+				$result[$element] += $count;
+			} else {
+				$result[$element] = $count;
+			}
+		}
+	}
+}
+
 //chem_decomposecompound(compound)
 //breaks a compound into an array of elements and an array of atom counts
 function chem_decomposecompound($c, $assoc = false) {
-	$cout = array();
-	if (preg_match_all('/\(([^\)]*)\)_(\d+)/',$c,$matcharr, PREG_SET_ORDER)) {
-        foreach ($matcharr as $matches) {
-            $p = explode(' ',$matches[1]);
-            foreach ($p as $cb) {
-                $cbp = explode('_',$cb);
-                if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
-                if (count($cbp)==1) {
-                    $cout[$cbp[0]] += $matches[2];
-                } else {
-                    $cout[$cbp[0]] += $matches[2]*$cbp[1];
-                }
-            }
-            $c = str_replace($matches[0],'',$c);
-        }
-	}
-	$p = explode(' ',trim($c));
-	foreach ($p as $cb) {
-		if ($cb=='') {continue;}
-		$cbp = explode('_',$cb);
-		if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
-		if (count($cbp)==1) {
-			$cout[$cbp[0]] += 1;
-		} else {
-			$cout[$cbp[0]] += $cbp[1];
-		}
-	}
+	$cout = [];
+
+    $c = str_replace('_','',$c);
+
+    // Start processing the formula
+    chem_internal_processFormula($c, 1, $cout);
+
 	if ($assoc) { 
 		return $cout;
 	} else {
