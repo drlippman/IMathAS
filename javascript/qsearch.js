@@ -535,7 +535,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
        addr += '&onlychk=1';
     }
  
-    previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+    previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top='+(screen.top+20)+',left='+(.6*screen.width-20+screen.left));
     previewpop.focus();
  }
  function sethighlightrow(loc) {
