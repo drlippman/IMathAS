@@ -142,7 +142,7 @@ class MultipleAnswerScorePart implements ScorePart
         $scorePartResult->setRawScore($bestscore);
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part'])) {
-            require_once $GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part'];
+            require $GLOBALS['CFG']['hooks']['assess2/questions/scorepart/multiple_answer_score_part'];
             if (isset($onGetResult) && is_callable($onGetResult)) {
                 $onGetResult();
             }
