@@ -1541,7 +1541,10 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				// Empty notices
 				$(".quickSaveNotice").empty();
 				// Load preview page
-				var previewpop = window.open(quickSaveQuestion.testAddr, 'Testing', 'width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+				let leftpos = screen.left ?? screen.availLeft ?? 0;
+    			let toppos = screen.top ?? screen.availTop ?? 0;
+
+				var previewpop = window.open(quickSaveQuestion.testAddr, 'Testing', 'width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top='+(20+toppos)+',left='+(.6*screen.width-20+leftpos));
 				previewpop.focus();
 			},
 			error: function(res){
