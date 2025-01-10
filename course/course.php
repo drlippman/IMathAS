@@ -460,9 +460,9 @@ if ($overwriteBody==1) {
 			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
 		if (isset($_SESSION['ltiitemtype'])) {
-			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
+			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\">";
 			echo "<span id=\"myname\" class=\"pii-full-name\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
-			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a>";
+			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\""._('User Preferences')."\"/></a>";
 		} else {
 			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($userfullname).'</span>';
 		}
