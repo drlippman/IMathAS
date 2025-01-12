@@ -3244,6 +3244,13 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used,
 	where $requiretimes would be applied to the entire list of answers.  To apply different $requiretimes to each element of the $answer list, separate
 	them with semicolons, like "pi,=1;/,=1;;"</dd>
+<dt>$partialcredit = array(answer,score,[answer,score,...]) </dt>
+	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form 
+        array(answer,score,answer,score,...), where	answer is the numerical or string expression to compare to the student answer, 
+        and score is a proportion between 0 and 1 to award as partial credit.  Note this
+        currently only works for single answers; "or" answers and lists are not supported. If needed, 
+		you can make $requiretimes and/or $answerformat an array, with the first entry to be applied to the $answer, 
+	    and subsequent entries to apply to the $partialcredit answers.</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number </dt>

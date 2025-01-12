@@ -41,10 +41,18 @@ class CalculatedAnswerBox implements AnswerBox
         $preview = '';
         $params = [];
 
-        $optionkeys = ['ansprompt', 'answerboxsize', 'hidepreview', 'answerformat',
+        $optionkeys = ['ansprompt', 'answerboxsize', 'hidepreview', 
             'answer', 'reqdecimals', 'reqsigfigs', 'displayformat', 'readerlabel'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+
+        $optionkeys = ['answerformat'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 1);
+        }
+        if (is_array($answerformat)) {
+            $answerformat = $answerformat[0]; // only use first for question display
         }
 
         if (empty($answerboxsize)) {$answerboxsize = 20;}
