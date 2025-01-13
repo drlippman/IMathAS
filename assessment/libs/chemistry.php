@@ -1284,7 +1284,7 @@ $GLOBALS['chem_compounds'] = array(
 	)
 );
 
-function chem_showmolecule($data, $width=300, $height=225, $alt='') {
+function chem_showmolecule($data, $width=300, $height=225, $alt='', $format='') {
     $data = explode('~~~', $data);
     if ($_SESSION['graphdisp']==0) {
         if ($alt != '') { 
@@ -1292,10 +1292,10 @@ function chem_showmolecule($data, $width=300, $height=225, $alt='') {
         }
         return _('Molecule in SMILES format:') . $data[0];
     }
-    $out = '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/kekule.min.js?module=chemWidget,IO"></script>';
+    $out = '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/kekule.min.js?module=chemWidget,IO"></script>';
     $out .= '<script type="text/javascript">
-        if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css\']").length) {
-            $(\'<link href="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css" rel="stylesheet">\').appendTo("head");
+        if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/themes/default/kekule.min.css\']").length) {
+            $(\'<link href="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/themes/default/kekule.min.css" rel="stylesheet">\').appendTo("head");
         }
     </script>';
     $uniqid = uniqid('mol');
@@ -1304,7 +1304,11 @@ function chem_showmolecule($data, $width=300, $height=225, $alt='') {
         var chemSAViewer'.$uniqid.' = new Kekule.ChemWidget.Viewer(document.getElementById("'.$uniqid.'"), null, Kekule.Render.RendererType.R2D);
         chemSAViewer'.$uniqid.'.setPredefinedSetting("static")
         .setPadding(20)
-        .setChemObj(Kekule.IO.loadFormatData("'.Sanitize::encodeStringForJavascript($data[1]).'", "cml"));
-        </script>';
+        .setChemObj(Kekule.IO.loadFormatData("'.Sanitize::encodeStringForJavascript($data[1]).'", "cml"))';
+	if ($format == 'condensed') {
+		$out .= '.setMoleculeDisplayType(Kekule.Render.Molecule2DDisplayType.CONDENSED)';
+	}
+	$out .= ';';
+	$out .= '</script>';
     return $out;
 }

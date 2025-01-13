@@ -39,7 +39,7 @@ class MoleculeAnswerBox implements AnswerBox
         $preview = '';
         $params = [];
 
-        $optionkeys = ['answer','showanswer'];
+        $optionkeys = ['answer','showanswer','displayformat'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -81,10 +81,10 @@ class MoleculeAnswerBox implements AnswerBox
 
             $sa .= _('Answer in SMILES format:') . $ansparts[0];
         } else {
-            $out .= '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/kekule.min.js?module=chemWidget,IO"></script>';
+            $out .= '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/kekule.min.js?module=chemWidget,IO"></script>';
             $out .= '<script type="text/javascript">
-                if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css\']").length) {
-                    $(\'<link href="https://cdn.jsdelivr.net/npm/kekule@1.0.0/dist/themes/default/kekule.css" rel="stylesheet">\').appendTo("head");
+                if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/themes/default/kekule.min.css\']").length) {
+                    $(\'<link href="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/themes/default/kekule.min.css" rel="stylesheet">\').appendTo("head");
                 }
             </script>';
 
@@ -109,7 +109,7 @@ class MoleculeAnswerBox implements AnswerBox
             if ($la !== '') {
                 $params['chemla'] = html_entity_decode($laparts[1]);
             }
-
+            $params['displayformat'] = $displayformat;
 
             if (count($ansparts)<2) {
                 $sa .= _('Answer in SMILES format:') . $ansparts[0];

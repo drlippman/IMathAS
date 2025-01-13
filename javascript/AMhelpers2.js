@@ -618,6 +618,11 @@ function initMolecule(qn) {
     .setCommonToolButtons(["undo", "redo", "copy", "cut", "paste", "zoomIn", "reset", "zoomOut", ]) 
     .setChemToolButtons(["manipulate", "erase", "bond", "atomAndFormula", "ring", "charge"])
     .setStyleToolComponentNames([]);
+  if (allParams[qn].displayformat === 'condensed') {
+    var renderconfig = new Kekule.Render.Render2DConfigs();
+    renderconfig.getMoleculeDisplayConfigs().setDefMoleculeDisplayType(Kekule.Render.MoleculeDisplayType.CONDENSED);
+    allKekule[qn].setRenderConfigs(renderconfig);
+  }
   allKekule[qn].getEditor().on('editObjsUpdated', function(e) {
     processMolecule(qn);
   });
@@ -669,6 +674,9 @@ if (objBox && visualBox)
     chemSAViewer.setEnableToolbar(false)
       .setPadding(20)
       .setChemObj(Kekule.IO.loadFormatData(SAel.getAttribute('data-cmldata'), "cml"));
+    if (allParams[qn].displayformat === 'condensed') {
+      chemSAViewer.setMoleculeDisplayType(Kekule.Render.Molecule2DDisplayType.CONDENSED);
+    }
   }
 }
 

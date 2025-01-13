@@ -2,8 +2,8 @@
 <html>
 <head>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@0.9.7/dist/kekule.min.js?module=chemWidget,IO"></script>
-    <link href="https://cdn.jsdelivr.net/npm/kekule@0.9.7/dist/themes/default/kekule.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/kekule.min.js?module=chemWidget,IO"></script>
+    <link href="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/themes/default/kekule.min.css" rel="stylesheet">
     <script type="text/javascript">
         var composer;
         $(function() {
@@ -31,11 +31,26 @@
                 });
             }
         }
+        function setView(el) {
+            let view = el.value;
+            var renderconfig = new Kekule.Render.Render2DConfigs();        
+            if (view == 'condensed') {
+                renderconfig.getMoleculeDisplayConfigs().setDefMoleculeDisplayType(Kekule.Render.MoleculeDisplayType.CONDENSED);
+            } else {
+                renderconfig.getMoleculeDisplayConfigs().setDefMoleculeDisplayType(Kekule.Render.MoleculeDisplayType.SKELETAL);
+            }
+            composer.setRenderConfigs(renderconfig);
+            composer.repaint();
+        }
     </script>
 </head>
 <body>
     <p>Draw a molecule here. The Molecule question type currently only supports a single molecule.</p>
     <div id="chemdraw"></div>
+    <p>View: <select onchange="setView(this)">
+        <option value="skeletal">Skeletal (default)</option>
+        <option value="condensed">Condensed</option>
+    </select></p>
     <p><button type=button onclick="getAns(false)">Get $answer</button>
         <button type=button onclick="getAns(true)">Copy $answer to clipboard</button>
         <span id="notice" style="color:red"></span></p>
