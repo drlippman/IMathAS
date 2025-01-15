@@ -725,15 +725,26 @@ class DrawingAnswerBox implements AnswerBox
                 }
             }
             if ($answerformat[0] == "polygon") {
-                if ($dotline == 2) {
-                    $cmd = 'fill="transblue";path([[' . implode('],[', $answers) . ']]);fill="blue";';
+                if ($_SESSION['graphdisp'] == 0) {
+                    if ($dotline == 2) {
+                        $sa = _('A closed polygon connecting these points: ');
+                    } else {
+                        $sa = _('A polygon connecting these points: ');
+                    }
+                    $sa .= '('.implode('), (', $answers).')';
                 } else {
-                    $cmd = 'stroke="blue";path([[' . implode('],[', $answers) . ']]);';
+                    if ($dotline == 2) {
+                        $cmd = 'fill="transblue";path([[' . implode('],[', $answers) . ']]);fill="blue";';
+                    } else {
+                        $cmd = 'stroke="blue";path([[' . implode('],[', $answers) . ']]);';
+                    }
+                    /*
+                    for ($i = 0; $i < count($answers) - 1; $i++) {
+                        $cmd .= 'dot([' . $answers[$i] . ']);';
+                    }
+                    */
+                    $sa = adddrawcommand($sa, $cmd);
                 }
-                for ($i = 0; $i < count($answers) - 1; $i++) {
-                    $cmd .= 'dot([' . $answers[$i] . ']);';
-                }
-                $sa = adddrawcommand($sa, $cmd);
             }
         }
 
