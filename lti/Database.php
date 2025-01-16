@@ -456,11 +456,11 @@ class Imathas_LTI_Database implements LTI\Database
             // see if they're already a teacher
             $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=?');
             $stm->execute(array($userid, $localcourse->get_courseid()));
-            if (!$stm->fetchColumn(0)) {
-                // see if they're a tutor; that might be the intent
+            if ($stm->fetchColumn(0) === false) {
+                // see if they're a tutor; that might be the intent and we should just use it
                 $stm = $this->dbh->prepare('SELECT id FROM imas_tutors WHERE userid=? AND courseid=?');
                 $stm->execute(array($userid, $localcourse->get_courseid()));
-                if (!$stm->fetchColumn(0)) {
+                if ($stm->fetchColumn(0) === false) {
                     // check user's rights on imathas
                     $stm = $this->dbh->prepare('SELECT rights FROM imas_users WHERE id=?');
                     $stm->execute(array($userid));
