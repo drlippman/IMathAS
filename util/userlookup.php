@@ -27,7 +27,7 @@ if (isset($_POST['loadgroup'])) {
 		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
-    if ($_POST['format'] == 'select' && isset($_POST['name'])) {
+    if (isset($_POST['format']) && $_POST['format'] == 'select' && isset($_POST['name'])) {
         $outstr = '<select name="' . Sanitize::encodeStringForDisplay($_POST['name']).'" id="' . Sanitize::encodeStringForDisplay($_POST['name']).'">';
         foreach ($out as $user) {
             $outstr .= '<option value="' . Sanitize::encodeStringForDisplay($user['id']).'">';

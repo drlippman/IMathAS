@@ -149,8 +149,8 @@ createApp({
 			$.ajax({
 				dataType: "json",
 				type: "POST",
-				url: "<?php echo $basesiteurl;?>/util/userlookup.php",
-				data: {loadgroup: 1, cid: <?php echo $cid;?>},
+				url: "<?php echo $basesiteurl;?>/util/userlookup.php?cid=<?php echo $cid;?>",
+				data: {loadgroup: 1},
 			}).done(function(msg) {
 				self.searchResults = msg;
 			}).always(function() {

@@ -453,11 +453,28 @@ class Imathas_LTI_Database implements LTI\Database
         LTI\LTI_Localcourse $localcourse, string $section = ''
     ): void {
         if ($role == 'Instructor') {
+            // see if they're already a teacher
             $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=?');
             $stm->execute(array($userid, $localcourse->get_courseid()));
             if (!$stm->fetchColumn(0)) {
-                $stm = $this->dbh->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (?,?)');
+                // see if they're a tutor; that might be the intent
+                $stm = $this->dbh->prepare('SELECT id FROM imas_tutors WHERE userid=? AND courseid=?');
                 $stm->execute(array($userid, $localcourse->get_courseid()));
+                if (!$stm->fetchColumn(0)) {
+                    // check user's rights on imathas
+                    $stm = $this->dbh->prepare('SELECT rights FROM imas_users WHERE id=?');
+                    $stm->execute(array($userid));
+                    $userrights = $stm->fetchColumn(0);
+                    if ($userrights > 19) {
+                        // sufficient rights; add them as a teacher
+                        $stm = $this->dbh->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (?,?)');
+                        $stm->execute(array($userid, $localcourse->get_courseid()));
+                    } else {
+                        // add them as a tutor
+                        $stm = $this->dbh->prepare('INSERT INTO imas_tutors (userid,courseid) VALUES (?,?)');
+                        $stm->execute(array($userid, $localcourse->get_courseid()));
+                    }
+                }
             }
         } else {
             // check to see if they're already a teacher or tutor
