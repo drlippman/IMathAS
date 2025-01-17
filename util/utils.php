@@ -115,8 +115,22 @@ if (isset($_POST['updatecaption'])) {
 		'timeout' => 1
 	    )
 	));
-	$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
-	$captioned = (strpos($t, '<track')===false)?0:1;
+	if (isset($CFG['YouTubeAPIKey'])) {
+		$captioned = 0;
+		$resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.$vidid.'&key='.$CFG['YouTubeAPIKey'], false, $ctx);
+		$capdata = json_decode($resp, true);
+		if ($capdata !== null && isset($capdata['items'])) {
+			foreach ($capdata['items'] as $cap) {
+				if ($cap['snippet']['trackKind'] == 'standard') {
+					$captioned = 1;
+					break;
+				}
+			}
+		}
+	} else {
+		$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
+		$captioned = (strpos($t, '<track')===false)?0:1;
+	}
 	if ($captioned==1) {
 		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
