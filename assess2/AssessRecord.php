@@ -1978,7 +1978,7 @@ class AssessRecord
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
       $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
-
+      
       /* These cases should already be handled in $stuanswers grab
       else if ($tryToShow === 'scored' && $qver['scored_try'][$pn] > -1) {
         $stuanswers[$qn+1][$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['stuans'];
@@ -2044,7 +2044,7 @@ class AssessRecord
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$partattemptn[$pn] - 1]['wrongfmt']);
       }
-      if ($this->teacherInGb || $force_answers) {
+      if ($this->teacherInGb || $force_answers || (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans']))) {
         $seqPartDone[$pn] = true;
       } else if ($showscores) {
         // move on if correct or out of tries or manually graded
@@ -2057,10 +2057,10 @@ class AssessRecord
         $seqPartDone[$pn] = ($partattemptn[$pn] > 0);
       }
     }
-    if ($numParts == 0 && $this->teacherInGb) {
+    if ($numParts == 0 && ($this->teacherInGb || (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans'])))) {
         $seqPartDone = true;
     }
-
+    
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
     $questionParams = new QuestionParams();
     $questionParams
