@@ -731,7 +731,7 @@ class DrawingAnswerBox implements AnswerBox
                     } else {
                         $sa = _('A polygon connecting these points: ');
                     }
-                    $sa .= '('.implode('), (', $answers).')';
+                    $sa .= '`('.implode('), (', $answers).')`';
                 } else {
                     if ($dotline == 2) {
                         $cmd = 'fill="transblue";path([[' . implode('],[', $answers) . ']]);fill="blue";';
