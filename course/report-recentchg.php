@@ -37,15 +37,35 @@ if (isset($_POST['edatetype'])) {
 $edate = tzdate("m/d/Y",$old);
 $etime = tzdate("g:i a",$old);
 
+$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+$gbcats = array(-1 => 'All', 0 => _('Default'));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+    $gbcats[$row[0]] = $row[1];
+}
+if (isset($_POST['catfilter'])) {
+    $catfilter = Sanitize::onlyInt($_POST['catfilter']);
+} else {
+    $catfilter = -1;
+}
+
+
 $query = 'SELECT iar.assessmentid,ia.name,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score
     FROM imas_assessment_records AS iar
-    JOIN imas_assessments AS ia ON ia.id=iar.assessmentid AND ia.courseid=? 
-    JOIN imas_users AS iu ON iar.userid=iu.id
+    JOIN imas_assessments AS ia ON ia.id=iar.assessmentid AND ia.courseid=? ';
+if ($catfilter > -1) {
+    $query .= 'AND ia.gbcategory=? ';
+}
+$query .= 'JOIN imas_users AS iu ON iar.userid=iu.id
     JOIN imas_students AS istu ON istu.userid=iar.userid AND istu.courseid=?
     WHERE iar.lastchange > ?
     ORDER BY ia.name,iu.LastName';
 $stm = $DBH->prepare($query);
-$stm->execute(array($cid,$cid,$old));
+if ($catfilter > -1) {
+    $stm->execute(array($cid,$catfilter,$cid,$old));
+} else {
+    $stm->execute(array($cid,$cid,$old));
+}
 
 $pagetitle = _('Recent Submissions Report');
 $curBreadcrumb = $breadcrumbbase;
@@ -72,6 +92,13 @@ echo  _('Since:').'</label> <input type=text size=10 name=edate value="'.$edate.
     <img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a>
     at <input type=text size=10 name=etime value="'.$etime.'"></li>';
 echo '</ul>';
+echo '<p><label for=catfilter>'._('In Category').'</label>: <select id=catfilter name=catfilter>';
+foreach ($gbcats as $k=>$v) {
+    echo '<option value="'. Sanitize::onlyInt($k).'" ';
+    if ($k == $catfilter) { echo 'selected'; }
+    echo '>'.Sanitize::encodeStringForDisplay($v).'</option>';
+}
+echo '</select></p>';
 echo '<p><button type=submit>'._('Update').'</button></p>';
 
 if ($stm->rowCount()==0) {
