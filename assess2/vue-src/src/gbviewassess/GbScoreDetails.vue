@@ -445,7 +445,7 @@ export default {
         }
       }
       this.curScores = out;
-      this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
+      this.showfeedback = (this.qdata.hasOwnProperty('feedback') && this.qdata.feedback.length > 0);
     },
     showRubric (pn) {
       if (!window.imasrubrics) {

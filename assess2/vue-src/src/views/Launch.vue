@@ -123,6 +123,11 @@
       <summary-gb-score />
       <previous-attempts :caption = "$t('prev.previous_attempts')" />
     </div>
+    <div v-else-if="showGbLink" class="pane-body">
+      <p>
+        <a :href="gbUrl">{{ $t('prev.viewingb') }}</a>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -236,6 +241,20 @@ export default {
     },
     showTutorLinks () {
       return this.aInfo.hasOwnProperty('tutor_gblinks');
+    },
+    showGbLink () {
+      return (this.aInfo.is_lti &&
+        this.aInfo.viewingb === 'immediately' &&
+        this.aInfo.has_active_attempt &&
+        !store.assessInfo.can_view_all
+      );
+    },
+    gbUrl () {
+      let url = 'gbviewassess.php?';
+      url += 'cid=' + store.cid;
+      url += '&aid=' + store.aid;
+      url += '&uid=' + store.uid;
+      return url;
     }
   },
   methods: {

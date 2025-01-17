@@ -75,7 +75,9 @@ export default {
       this.$nextTick(this.renderInit);
     },
     show: function (newVal, oldVal) {
-      this.$nextTick(this.$nextTick(window.sendLTIresizemsg));
+      this.$nextTick()
+        .then(() => { return this.$nextTick(); })
+        .then(() => window.sendLTIresizemsg());
     }
   }
 };
