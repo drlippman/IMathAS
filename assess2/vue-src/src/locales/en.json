@@ -210,7 +210,11 @@
     "scorelast": "Score on last try:",
     "submitted": "Question submitted.",
     "see_details": "See Details for more.",
-    "manual_grade": "This question contains parts that must be graded by your instructor. They will show a score of 0 until they are graded."
+    "manual_grade": "This question contains parts that must be graded by your instructor. They will show a score of 0 until they are graded.",
+    "jumptoincorrect": "Jump to first changable incorrect part",
+    "jumptolast": "Jump to last submitted part",
+    "allpartscorrect": "All submitted parts correct.",
+    "onepartincorrect": "At least one scored part is incorrect."
   },
   "summary": {
     "no_total": "Your assessment has been submitted.",

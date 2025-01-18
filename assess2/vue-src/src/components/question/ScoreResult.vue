@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <div
-      :class="['scoreresult', status]"
+      :class="['scoreresult', status.general]"
       tabindex = "-1"
       v-if="expanded"
     >
@@ -19,6 +19,16 @@
       <p v-if="hasManualScore">
         <icons name="info"/>
         {{ $t('scoreresult.manual_grade') }}
+      </p>
+      <p v-if="showScores && status.general !== 'correct' && status.partcount > 1 && (status.firstincorrect > -1 || status.untried > 0)">
+        {{ partStatusMessage }}
+        <a v-if="status.firstincorrect > -1"
+          href="#" @click.prevent="jumpToIncorrect">
+          {{ $t('scoreresult.jumptoincorrect') }}.
+        </a>
+        <a v-if="status.untried > 0" href="#" @click.prevent="jumpToLastTried">
+          {{ $t('scoreresult.jumptolast') }}.
+        </a>
       </p>
       <p v-if="showRetryButtons">
         <router-link
@@ -92,42 +102,77 @@ export default {
       return (store.assessInfo.showscores === 'during');
     },
     status () {
+      let lasttried = -1;
+      let firstincorrect = -2;
+      let untried = 0;
+      const partcount = this.qdata.parts.length;
+      let statusgeneral;
       if (!this.showScores || !this.qdata.hasOwnProperty('parts') ||
         (this.qdata.parts.length === 1 && this.qdata.parts[0].req_manual)
       ) {
-        return 'neutral';
-      }
-      if (this.qdata.singlescore) {
-        if (this.qdata.rawscore > 0.99) {
-          return 'correct';
-        } else if (this.qdata.rawscore < 0.01) {
-          return 'incorrect';
-        } else {
-          return 'partial';
-        }
-      }
-      let correct = 0;
-      let incorrect = 0;
-      let zeroweight = 0;
-      for (let i = 0; i < this.qdata.parts.length; i++) {
-        if (parseFloat(this.qdata.answeights[i]) === 0) {
-          zeroweight++;
-        } else if (!this.qdata.parts[i].hasOwnProperty('rawscore')) {
-          continue; // neither correct or incorrect - untried
-        } else if (this.qdata.parts[i].rawscore > 0.99) {
-          correct++;
-        } else if (this.qdata.parts[i].rawscore < 0.01) {
-          incorrect++;
-        }
-      }
-
-      if (correct === this.qdata.parts.length - zeroweight) {
-        return 'correct';
-      } else if (incorrect === this.qdata.parts.length - zeroweight) {
-        return 'incorrect';
+        statusgeneral = 'neutral';
       } else {
-        return 'partial';
+        let correct = 0;
+        let incorrect = 0;
+        let zeroweight = 0;
+        for (let i = 0; i < this.qdata.parts.length; i++) {
+          if (parseFloat(this.qdata.answeights[i]) === 0) {
+            zeroweight++;
+          } else if (!this.qdata.parts[i].hasOwnProperty('rawscore')) {
+            untried++;
+          } else if (this.qdata.parts[i].rawscore > 0.99) {
+            lasttried = i;
+            correct++;
+          } else {
+            lasttried = i;
+            if (this.qdata.parts[i].rawscore < 0.01) {
+              incorrect++; // only count as totally incorrect if 0
+            }
+            if (firstincorrect < 0) {
+              if (this.qdata.parts[i].try < this.qdata.tries_max) {
+                firstincorrect = i;
+              } else {
+                firstincorrect = -1; // note there's an incorrect part, but don't indicate specific part
+              }
+            }
+          }
+        }
+
+        if (this.qdata.singlescore) {
+          if (this.qdata.rawscore > 0.99) {
+            statusgeneral = 'correct';
+          } else if (this.qdata.rawscore < 0.01) {
+            statusgeneral = 'incorrect';
+          } else {
+            statusgeneral = 'partial';
+          }
+        } else {
+          statusgeneral = 'partial';
+          if (correct === this.qdata.parts.length - zeroweight) {
+            statusgeneral = 'correct';
+          } else if (incorrect === this.qdata.parts.length - zeroweight) {
+            statusgeneral = 'incorrect';
+          }
+        }
       }
+      return {
+        general: statusgeneral,
+        firstincorrect: firstincorrect,
+        lasttried: lasttried,
+        untried: untried,
+        partcount: partcount
+      }
+    },
+    partStatusMessage () {
+      // if multipart and should show details;
+      if (this.status.partcount > 1 && this.status.general !== 'neutral') {
+        if (this.status.firstincorrect === -2) {
+          return this.$t('scoreresult.allpartscorrect');
+        } else {
+          return this.$t('scoreresult.onepartincorrect');
+        }
+      }
+      return '';
     },
     hasManualScore () {
       if (store.assessInfo.showscores !== 'during' ||
@@ -164,6 +209,45 @@ export default {
     },
     submitAssess () {
       actions.submitAssessment();
+    },
+    jumpToIncorrect (event) {
+      this.focusOnPart(this.status.firstincorrect, false);
+    },
+    jumpToLastTried (event) {
+      this.focusOnPart(this.status.lasttried, true);
+    },
+    getQuestionEl (pn) {
+      /*
+      look to see if there is qnwrap+qref element; give tabindex=-1 and focus.
+        this is for draw, a11ydraw, matrix, calcmatrix
+      look for $("input[id^=mqinput-qn"+qref+"]").  If found, focus first
+      Look for $('input[name^=qn' + qref + '],select[name^=qn' + qref + ']'. If found, focus first
+      */
+      const qref = (parseInt(this.qn) + 1) * 1000 + pn;
+      const containers = window.$('#qnwrap' + qref);
+      if (containers.length > 0) {
+        return [containers.attr('tabindex', '-1')[0], false];
+      }
+      const mqs = window.$('[id^=mqinput-qn' + qref + ']');
+      if (window.MQ && mqs.length > 0) {
+        return [mqs[0], true];
+      }
+      const reg = window.$('input[name^=qn' + qref + '],select[name^=qn' + qref + ']');
+      if (reg.length > 0) {
+        return [reg[0], false];
+      }
+    },
+    focusOnPart (pn, after) {
+      const tofocus = this.getQuestionEl(pn);
+      if (after) {
+        window.$(tofocus[0]).nextAll('.afterquestion').first().attr('tabindex', '-1')[0].focus();
+      } else {
+        if (tofocus[1]) { // if MQ
+          window.MQ(tofocus[0]).focus();
+        } else {
+          tofocus[0].focus();
+        }
+      }
     }
   }
 };
