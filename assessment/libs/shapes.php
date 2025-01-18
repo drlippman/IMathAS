@@ -383,6 +383,8 @@ function draw_circle() {
         $in[1] = str_replace(';',',',$in[1]);
         $centerLab = $in[1];
         $lab = "text([$xCentLab,$yCentLab],'".$centerLab."');";
+      } else if (isset($in[1])) {
+        $lab = "text([0,0],'".$in[1]."','below');";
       }
       $args = $args."dot([0,0]);".$lab;
     }
