@@ -81,6 +81,7 @@ class MoleculeAnswerBox implements AnswerBox
 
             $sa .= _('Answer in SMILES format:') . $ansparts[0];
         } else {
+            $out .= '<div id="qnwrap' . $qn . '">';
             $out .= '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/kekule.min.js?module=chemWidget,IO"></script>';
             $out .= '<script type="text/javascript">
                 if (!$("link[href=\'https://cdn.jsdelivr.net/npm/kekule@1.0.2/dist/themes/default/kekule.min.css\']").length) {
@@ -105,10 +106,10 @@ class MoleculeAnswerBox implements AnswerBox
                 Sanitize::generateAttributeString($attributes) .
                 '" />';
             $out .= '<div id="chemdraw'.$qn.'" class="' . implode(' ', $classes) .'"></div>';
-            $out .= $laparts[1];
             if ($la !== '') {
                 $params['chemla'] = html_entity_decode($laparts[1]);
             }
+            $out .= '</div>';
             $params['displayformat'] = $displayformat;
 
             if (count($ansparts)<2) {

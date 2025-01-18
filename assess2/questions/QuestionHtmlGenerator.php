@@ -537,6 +537,7 @@ class QuestionHtmlGenerator
                 }
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
+                $answerbox[$atIdx] .= '<span class="afterquestion"></span>';
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
                 $qnRef = ($this->questionParams->getDisplayQuestionNumber()+1)*1000 + $atIdx;
                 $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
