@@ -48,7 +48,7 @@ if (isset($_POST['loadgroup'])) {
 		if ($row['id']==$courseownerid) { continue; }
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
-	if ($_POST['format'] == 'select' && isset($_POST['name'])) {
+	if (isset($_POST['format']) && $_POST['format'] == 'select' && isset($_POST['name'])) {
         $outstr = '<select name="' . Sanitize::encodeStringForDisplay($_POST['name']).'" id="' . Sanitize::encodeStringForDisplay($_POST['name']).'">';
         foreach ($out as $user) {
             $outstr .= '<option value="' . Sanitize::encodeStringForDisplay($user['id']).'">';
