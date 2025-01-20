@@ -49,7 +49,7 @@ function check_for_required($method, $required) {
 }
 
 function prepDateDisp(&$out) {
-  $tochg = ['startdate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto', 'showwork_cutoff_expires'];
+  $tochg = ['startdate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto', 'showwork_cutoff_expires', 'earlybonusends'];
   foreach ($tochg as $key) {
     if (isset($out[$key])) {
       if ($out[$key] == 2000000000) {

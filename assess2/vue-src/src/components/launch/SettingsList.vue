@@ -18,6 +18,10 @@
           <icons name="alert" size="micro" />
           {{ row.alert }}
         </div>
+        <div class="small subdued" v-if="!!row.alert2">
+          <icons name="alert" size="micro" />
+          {{ row.alert2 }}
+        </div>
         <div v-if="!!row.latepass" class="small subdued">
           {{ row.latepass }}
           <button @click="redeemLatePass" class="slim secondary">
@@ -110,6 +114,9 @@ export default {
             dateobj.alert = this.$t('setlist.penalty', { p: settings.exceptionpenalty });
           }
         }
+      }
+      if (settings.hasOwnProperty('earlybonusends')) {
+        dateobj.alert2 = this.$t('setlist.earlybonus', { p: settings.earlybonus[0], date: settings.earlybonusends_disp });
       }
       if (settings.can_use_latepass > 0) {
         dateobj.latepass = this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
