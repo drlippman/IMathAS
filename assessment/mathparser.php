@@ -1143,6 +1143,9 @@ class MathParser
       $node['left'] = $this->normalizeNode($node['left']);
       $node['right'] = $this->normalizeNode($node['right']);
       return $node;
+    } else if ($node['symbol'] !== '+' && $node['symbol'] !== '-' && $node['symbol'] !== '*' && $node['symbol'] !== '/' ) {
+      // catch any weird operators that might have snuck in
+      return $node;
     } else {
       //$node['left'] = $this->normalizeNode($node['left']);
       //$node['right'] = $this->normalizeNode($node['right']);
