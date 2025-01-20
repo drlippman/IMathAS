@@ -252,7 +252,7 @@
     "viewingb": "Review work in gradebook"
   },
   "penalties": {
-    "applied": "Penalties/bonuses applied",
+    "applied": "Penalties/bonus applied",
     "retry": "Retry penalty",
     "regen": "Assessment retake penalty",
     "trysimilar": "Try Similar Question penalty",

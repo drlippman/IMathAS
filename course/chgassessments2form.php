@@ -73,6 +73,8 @@ $vueData = array(
 	'usedeffb' => 'DNC',
 	'tutoredit' => 'DNC',
 	'exceptionpenalty' => '',
+	'earlybonus' => '',
+	'earlybonushrs' => 1,
 	'defoutcome' => 'DNC',
 	'revealpw' => false
 );
@@ -753,6 +755,17 @@ $vueData = array(
 				<span class=formright>
 					<input type=text size=4 name="exceptionpenalty" id="exceptionpenalty"
 					 	v-model="exceptionpenalty">%
+				</span><br class=form />
+			</div>
+			<div :class="{highlight:earlybonus !== ''}">
+				<label for="earlybonus" class=form>
+					<?php echo _('Bonus for questions done early'); ?>:
+				</label>
+				<span class=formright>
+					<input type=text size=4 name="earlybonus" id="earlybonus"
+					 	v-model="earlybonus">% <label><?php echo _('for work done');?>
+					<input type=number size=3 name="earlybonushrs" id="earlybonushrs" min=1 max=654
+						v-model="earlybonushrs"> <?php echo _('hours before the due date'); ?></label>
 				</span><br class=form />
 			</div>
 
