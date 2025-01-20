@@ -35,6 +35,7 @@
    	2: open dot
    tptypes
 	5: line
+	5.1:  dashed line
 	5.2:  ray (no arrow)
 	5.3:  line segment
 	5.4:  vector
@@ -98,7 +99,7 @@ var didMultiTouch = false;
 var clickmightbenewcurve = false;
 var hasTouchTimer = null;
 var tpModeN = {
-	"5": 2, "5.2": 2, "5.3": 2, "5.4": 2,
+	"5": 2, "5.1": 2, "5.2": 2, "5.3": 2, "5.4": 2,
 	"6": 2, "6.1": 2, "6.2": 2, "6.3": 2, "6.5": 2, "6.6": 2,
 	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
 	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
@@ -238,6 +239,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 		},
 		"twopoint": {
 			"line": [{"mode":5, "descr":_("Line"), inN: 2, "input":_("Enter two points on the line")}],
+			"dashline": [{"mode":5.1, "descr":_("Dashed Line"), inN: 2, "input":_("Enter two points on the dashed line")}],
 			"lineseg": [{"mode":5.3, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
 			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
 			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
@@ -905,7 +907,9 @@ function drawTarget(x,y,skipencode) {
 					}
 					if (Math.abs(x2-tplines[curTarget][i][0][0])<1 || Math.abs(slope)>100) { //vert line
 						//document.getElementById("ans0-0").innerHTML = 'vert';
-						if (tptypes[curTarget][i]==5.2) {
+						if (tptypes[curTarget][i]==5.1) {
+							ctx.dashedLine(tplines[curTarget][i][0][0],0,tplines[curTarget][i][0][0],targets[curTarget].imgheight);
+						} else if (tptypes[curTarget][i]==5.2) {
 							ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
 							if (y2>tplines[curTarget][i][0][1]) {
 								ctx.lineTo(tplines[curTarget][i][0][0],targets[curTarget].imgheight);
@@ -923,7 +927,10 @@ function drawTarget(x,y,skipencode) {
 						//document.getElementById("ans0-0").innerHTML = slope;
 						var yleft = tplines[curTarget][i][0][1] - slope*tplines[curTarget][i][0][0];
 						var yright = tplines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]);
-						if (tptypes[curTarget][i]==5.2) {
+						if (tptypes[curTarget][i]==5.1) {
+							ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,yright);
+							ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,yleft);
+						} else if (tptypes[curTarget][i]==5.2) {
 							ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
 							if (x2>tplines[curTarget][i][0][0]) {
 								ctx.lineTo(targets[curTarget].imgwidth,yright);
@@ -2517,6 +2524,13 @@ function initCanvases(k) {
 		CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
 		    if (dashLen == undefined) dashLen = 10;
 
+			if (y1 < 0 && y1 != y2) {
+				x1 = x1 - y1*(x2-x1)/(y2-y1);
+				y1 = 0;
+			} else if (y1 > targets[curTarget].imgheight && y1 != y2) {
+				x1 = x1 + (targets[curTarget].imgheight - y1)*(x2-x1)/(y2-y1);
+				y1 = targets[curTarget].imgheight;
+			}
 		    this.beginPath();
 		    this.moveTo(x1, y1);
 

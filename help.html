@@ -3672,6 +3672,7 @@ drawn line from the correct line.
 	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are:
 	        	<ul>
 	        	<li>line (lines)</li>
+				<li>dashedline (dashed lines)</li>
 	        	<li>lineseg (line segment)</li>
 	        	<li>ray (rays)</li>
 	        	<li>parab (vertical parabolas)</li>
@@ -3696,7 +3697,8 @@ drawn line from the correct line.
 	        	</ul></li>
 	        <li>For lines, vertical parabolas, absolute values, square roots, cubics, cuberoots, sines, cosines, exponentials, logs, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
 	        <li>For line segments and rays, given $answers as a function with domain, like "2x+4,-oo,3", or for vertical line segments use x= and give the range, like "x=4,-2,3"</li>
-	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
+	        <li>For dashed lines, give $answers as "dashedline,function" like "dashedline,2/3x+4"</li>
+			<li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
 	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3".</li>
 	        <li>For ellipses, give $answers as "ellipse,x,y,x_radius,y_radius", like "ellipse,1,2,4,2"</li>
 	        <li>For hyperbolas of form (x-h)^2/a^2-(y-k)^2/b^2=1, give $answers as "horizhyperbola,h,k,a,b"</li>

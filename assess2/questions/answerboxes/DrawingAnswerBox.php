@@ -319,6 +319,12 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 5;}
                         $out .= ' alt="Line"/>';
                     }
+                    if (in_array('dashedline', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tplinedash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.1\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'dashedline') {$out .= 'class="sel" ';
+                            $def = 5.1;}
+                        $out .= ' alt="Dashed Line"/>';
+                    }
                     //$out .= "<img src=\"$staticroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
                     if (in_array('lineseg', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpline3.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.3\" ";
@@ -562,9 +568,14 @@ class DrawingAnswerBox implements AnswerBox
                 if ($ans == '') {continue;}
                 $function = array_map('trim', explode(',', $ans));
                 $defcolor = 'blue';
+                $dashedline = false;
                 if ($function[0] == 'optional') {
                     array_shift($function);
                     $defcolor = 'grey';
+                }
+                if ($function[0] == 'dashedline') {
+                    array_shift($function);
+                    $dashedline = true;
                 }
                 if (!empty($function[0]) && $function[0][0] === 'x') {
                     $function[0] = preg_replace('/x\s+(<|>|=)/','x$1', $function[0]);
@@ -635,6 +646,9 @@ class DrawingAnswerBox implements AnswerBox
                             $saarr[$k] = '[' . substr(str_replace('y', 't', $function[0]), 2) . ',t],' . $defcolor . ',' . $function[1] . ',' . $function[2];
                         } else {
                             $saarr[$k] = '[' . substr(str_replace('y', 't', $function[0]), 2) . ',t],' . $defcolor . ',' . ($settings[2] - 1) . ',' . ($settings[3] + 1);
+                            if ($dashedline) {
+                                $saarr[$k] .= ',,,,dash';
+                            }
                         }
                     } else { //is function
                         if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^\d\(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
@@ -669,8 +683,16 @@ class DrawingAnswerBox implements AnswerBox
                             if ($locky == 1) {
                                 $saarr[$k] .= ',3';
                             }
-                        } else if ($locky == 1) {
-                            $saarr[$k] .= ',,,,,3';
+                        } else {
+                            $saarr[$k] .= ',,,,,';
+                            if ($locky == 1 ) {
+                                $saarr[$k] .= '3,';
+                            } else {
+                                $saarr[$k] .= ',';
+                            } 
+                            if ($dashedline) {
+                                $saarr[$k] .= 'dash';
+                            }
                         }
                         //add asymptotes for rational function graphs
                         if (strpos($function[0], '/x') !== false || preg_match('|/\([^\)]*x|', $function[0])) {
