@@ -56,7 +56,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$pair = explode('=',$set);
 			$item[$itemtoadd][$pair[0]] = $pair[1];
 		}
-		$setstoadd = explode(',','name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper,caltag,calrtag,showtips,deffeedbacktext,istutorial,viddata');
+		$setstoadd = explode(',','name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,earlybonus,noprint,groupmax,endmsg,eqnhelper,caltag,calrtag,showtips,deffeedbacktext,istutorial,viddata');
 		$qarr = array();
 		$valsets = ":courseid";
 		$tosets = 'courseid';
