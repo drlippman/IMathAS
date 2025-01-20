@@ -252,11 +252,12 @@
     "viewingb": "Review work in gradebook"
   },
   "penalties": {
-    "applied": "Penalties applied",
+    "applied": "Penalties/bonuses applied",
     "retry": "Retry penalty",
     "regen": "Assessment retake penalty",
     "trysimilar": "Try Similar Question penalty",
     "late": "Late work penalty",
+    "early": "Early work bonus",
     "overtime": "Overtime penalty"
   },
   "qdetails": {

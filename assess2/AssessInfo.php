@@ -1319,6 +1319,9 @@ class AssessInfo
         $settings['reqscore'] = abs($settings['reqscore']);
     }
 
+    // parse out earlybonus parts
+    $settings['earlybonus'] = [$settings['earlybonus']%100, floor($settings['earlybonus'] / 100)]; 
+
     // get latest date latepass can extend to
     $allowlate = $settings['allowlate'];
     if ($settings['allowlate'] == 0) {

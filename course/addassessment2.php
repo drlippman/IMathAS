@@ -195,7 +195,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									'timelimit','overtime_grace','overtime_penalty','password',
 									'reqscore','reqscoretype','reqscoreaid','showhints',
 									'msgtoinstr','eqnhelper','posttoforum','extrefs','showtips',
-									'cntingb','minscore','deffeedbacktext','tutoredit','exceptionpenalty',
+									'cntingb','minscore','deffeedbacktext','tutoredit','exceptionpenalty','earlybonus',
 									'defoutcome','isgroup','groupsetid','groupmax','showwork','workcutoff');
 			$fieldlist = implode(',', $fields);
 			$stm = $DBH->prepare("SELECT $fieldlist FROM imas_assessments WHERE id=:id AND courseid=:cid");
@@ -398,6 +398,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['tutoredit'] = Sanitize::onlyInt($_POST['tutoredit']);
 			$toset['exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
 			$toset['defoutcome'] = Sanitize::onlyInt($_POST['defoutcome']);
+
+			$toset['earlybonus'] = 0;
+			if ($_POST['earlybonus'] > 0) {
+				$toset['earlybonus'] = 100 * intval($_POST['earlybonushrs']) + intval($_POST['earlybonus']);
+			}
 
 			// group assessmentid
 	    $toset['isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
