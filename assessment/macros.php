@@ -281,7 +281,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 
 			$path = 'stroke="'.$function[4].'";';
-			$path .= 'dot(['.$function[1].','.$function[2].']';
+			$path .= 'dot(['.makepretty($function[1]).','.makepretty($function[2]).']';
 			$coord = '('.$function[1].','.$function[2].')';
 			if (isset($function[3]) && $function[3]=='open') {
 				$path .= ',"open"';
