@@ -918,7 +918,7 @@ function showPreview(qn) {
   var outstr = '';
   var res = processByType(qn);
   if (res.str) {
-    outstr = '`' + htmlEntities(res.str) + '`';
+    outstr += '`' + htmlEntities(res.str) + '`';
   }
   if (res.dispvalstr && res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
     outstr += (outstr==''?'':' &asymp; ') + '`' + htmlEntities(res.dispvalstr) + '`';
@@ -967,6 +967,7 @@ function showSyntaxCheckMQ(qn) {
   var res = processByType(qn);
   var outstr = '';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
+    outstr += '`' + htmlEntities(res.str) + '`';
     if (params.qtype == 'calcmatrix' || params.qtype == 'calccomplexmatrix' || (params.qtype == 'calcinterval' && params.calcformat.match(/inequality/))) {
         outstr += ' &asymp; `' + htmlEntities(res.dispvalstr) + '` ';
     } else {
@@ -977,10 +978,7 @@ function showSyntaxCheckMQ(qn) {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
   if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
-    var previewel = document.getElementById('p'+qn).firstChild;
-    previewel.innerHTML = outstr;
-    previewel.style.visibility = '';
-    previewel.style.position = '';
+    LivePreviews[qn].RenderNow(outstr);
   } else {
     var previewel = document.getElementById('p'+qn);
     if (previewel) {
