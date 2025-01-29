@@ -459,7 +459,8 @@ function chem_randanion($group="all", $type="common", $uncommon = false) {
 	if ($group=="polyatomic") {
 		$pickfrom = range(10,36);
 	} else {
-		$pickfrom = range(0,8);
+		$pickfrom = range(0,7);
+		$pickfrom[] = 4; // avoid carbide without breaking other randomizations
 	}
 	if ($uncommon && $group != 'polyatomic') {
 		$pickfrom[] = 9;
@@ -987,7 +988,7 @@ $GLOBALS['chem_anions'] = array(
 	array('S',2,'sulfide','','s'), //common
 	array('N',3,'nitride','','s'), //common
 	array('P',3,'phosphide','','s'), //common
-	array('C',4,'carbide','','s'), //common 8
+	array('C',4,'carbide','','s'), //common 8 // NOT USED
 	array('Se',2,'selenide','','s'),
 	array('C_2 H_3 O_2',1,'acetate','','pa'), //common  10
 	array('Cl O',1,'hypochlorite','','pa'), //common
