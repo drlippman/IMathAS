@@ -92,6 +92,8 @@
   //libs
     // acct
     imathasBuiltin += " makejournal scorejournal makeaccttable makeaccttable2 makeaccttable3 makeTchart scoreTchart makestatement scorestatement makeinventory scoreinventory makeTchartsfromjournal scoreTchartsfromjournal makeledgerfromjournal maketrialbalance maketrialbalancefromjournal scoretrialbalance scoretrialbalancefromjournal totalsfromjournal prettyacct";
+    // biology
+    imathasBuiltin += " bio_getcodonname bio_randcodon bio_anticodon bio_translation bio_splitcodons";
     // calculus
     imathasBuiltin += " calculusdiffquotient calculusnumint";
     // chemistry
