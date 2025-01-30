@@ -32,6 +32,7 @@ A collection of chemistry routines
 <li><a href="#chem_getsolubility">chem_getsolubility</a></li>
 <li><a href="#chem_balancereaction">chem_balancereaction</a></li>
 <li><a href="#chem_showmolecule">chem_showmolecule</a></li>
+<li><a href="#chem_vsepr">chem_vsepr</a></li>
 </ul>
 <h3><a name="chem_disp">chem_disp</a></h3>
 chem_disp(compound) 
@@ -155,5 +156,18 @@ chem_getsolubility(cation, anion)
         <li>alttext: use to provide an accessible alternative text for the drawing.</li>
         <li>format: set to "condensed" to show atom labels on drawing</li>
     </ul>  
+
+<BR><h3><a name="chem_vsepr">chem_vsepr</a></h3>
+    <p>chem_vsepr(steric number, number of lone pairs)</p>
+    <p>Looks up molecular geometry based on VSEPR Theory</p>
+    <p> Returns an array containing:</p>
+    <ul class="nomark">
+        <li>Molecular Geometry</li>
+        <li>Electron Geometry</li>
+        <li>Bond Angle (approximate for a general case)</li> 
+        <li>Polarity (assuming equal electronegativity)</li>
+        <li>Hybridization of central atom</li>
+    </ul>
+    Example: chem_vsepr(3,2) => array('Bent', 'Trigonal Planar', '&#60;120', 'Polar', 'sp^2')
 </body>
 </html>
