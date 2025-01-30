@@ -11,7 +11,7 @@ array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp",
 "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound",
 "chem_getcompoundmolmass","chem_randanion","chem_randcation",
 "chem_makeioniccompound","chem_getsolubility","chem_balancereaction", "chem_eqndisp",
-"chem_showmolecule");
+"chem_showmolecule", "chem_vsepr");
 
 //chem_disp(compound)
 //formats a compound for display in as HTML
@@ -1310,4 +1310,43 @@ function chem_showmolecule($data, $width=300, $height=225, $alt='', $format='') 
 	$out .= ';';
 	$out .= '</script>';
     return $out;
+}
+
+
+// Information from:
+	// https://chem.libretexts.org/Courses/Bellarmine_University/BU%3A_Chem_103_(Christianson)/Phase_3%3A_Atoms_and_Molecules_-_the_Underlying_Reality/10%3A_Molecular_Structure_and_Geometry/10.3%3A_VSEPR_Geometry
+$GLOBALS['chem_vsepr_geometries'] = array(
+	// Steric Number => array( array(Molecular Geometry, Electron Geometry, Bond Angle, Polarity (assuming equal electronegativity), Hybridization) )
+	// Steric 2
+	array( 	array('Linear','Linear','180', 'Nonpolar', 'sp')),
+	// Steric 3
+	array( 	array('Trigonal Planar', 'Trigonal Planar', '120', 'Nonpolar', 'sp^2'), 
+				array('Bent', 'Trigonal Planar','<120', 'Polar', 'sp^2')),
+	// Steric 4
+	array(	array('Tetrahedral','Tetrahedral', '109.5', 'Nonpolar', 'sp^3'),
+				array('Trigonal Pyramidal', 'Tetrahedral','<109.5', 'Polar', 'sp^3'), 
+				array('Bent','Tetrahedral','<109.5', 'Polar', 'sp^3')),
+	// Steric 5
+	array(	array('Trigonal Bipyramidal', 'Trigonal Bipyramidal', '120, 90', 'Nonpolar', 'sp^3d'),
+				array('Seesaw', 'Trigonal Bipyramidal', '<120, <90', 'Polar', 'sp^3d'),
+				array('T-Shaped', 'Trigonal Bipyramidal', '<90', 'Polar', 'sp^3d'),
+				array('Linear', 'Trigonal Bipyramidal', '180', 'Nonpolar', 'sp^3d')),
+	// Steric 6
+	array(	array('Octahedral', 'Octahedral', '90', 'Nonpolar', 'sp^3d^2'),
+				array('Square Pyramidal', 'Octahedral', '<90', 'Polar', 'sp^3d^2'),
+				array('Square Planar', 'Octahedral', '90', 'Nonpolar', 'sp^3d^2')),
+);
+
+function chem_vsepr($steric_number, $lone_pairs){
+	global $chem_vsepr_geometries;
+	$steric_index = $steric_number - 2;
+	if (!isset($chem_vsepr_geometries[$steric_index])) {
+        echo "chem_vsepr: unknown steric number $steric_number";
+        return '';
+    }
+	if ($lone_pairs > $steric_index) {
+        echo "chem_vsepr: invalid number of lone pairs";
+        return '';
+    }
+	return $chem_vsepr_geometries[$steric_index][$lone_pairs];
 }
