@@ -1911,17 +1911,19 @@ function processNumfunc(qn, fullstr, format) {
       for (j=0; j < 20; j++) {
           totest = 'var DNE=1;';
           for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-          if (domain[i][2]) { //integers
-              testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-          } else { //any real between min and max
-              testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-          }
-          totest += 'var ' + remapVars[i] + '=' + testval + ';';
+            if (domain[i][2]) { //integers
+                //testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+                testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*j/20);
+            } else { //any real between min and max
+                //testval = Math.random()*(domain[i][1] - domain[i][0]) + domain[i][0];
+                testval = domain[i][0] + (domain[i][1] - domain[i][0])*j/20;
+            }
+            totest += 'var ' + remapVars[i] + '=' + testval + ';';
           }
           res = scopedeval(totest + totesteqn);
           if (res !== 'synerr') {
-          successfulEvals++;
-          break;
+            successfulEvals++;
+            break;
           }
       }
       if (successfulEvals === 0) {
@@ -2310,6 +2312,9 @@ function syntaxcheckexpr(str,format,vl) {
 	  	  	}
 	  	  }
 	  }
+    if (str.match(/\(\s*\)/)) {
+      err += _(" Empty function input or parentheses") + ". ";
+    }
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
 	  }
@@ -2355,7 +2360,12 @@ function escapeRegExp(string) {
 
 function scopedeval(c) {
 	try {
-		return eval(c);
+    let v = eval(c);
+    /*if (Number.isNaN(v)) {
+      return "synerr";
+    }
+    */
+    return v;
 	} catch(e) {
 		return "synerr";
 	}
