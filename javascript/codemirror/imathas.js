@@ -92,10 +92,12 @@
   //libs
     // acct
     imathasBuiltin += " makejournal scorejournal makeaccttable makeaccttable2 makeaccttable3 makeTchart scoreTchart makestatement scorestatement makeinventory scoreinventory makeTchartsfromjournal scoreTchartsfromjournal makeledgerfromjournal maketrialbalance maketrialbalancefromjournal scoretrialbalance scoretrialbalancefromjournal totalsfromjournal prettyacct";
+    // biology
+    imathasBuiltin += " bio_getcodonname bio_randcodon bio_anticodon bio_translation bio_splitcodons";
     // calculus
     imathasBuiltin += " calculusdiffquotient calculusnumint";
     // chemistry
-    imathasBuiltin += " chem_disp chem_mathdisp chem_isotopedisp chem_getsymbol chem_getnumber chem_getname chem_getweight chem_getmeltingpoint chem_getboilingpoint chem_getfamily chem_randelementbyfamily chem_diffrandelementsbyfamily chem_getrandcompound chem_getdiffrandcompounds chem_decomposecompound chem_getcompoundmolmass chem_randanion chem_randcation chem_makeioniccompound chem_getsolubility chem_eqndisp chem_balancereaction";
+    imathasBuiltin += " chem_disp chem_mathdisp chem_isotopedisp chem_getsymbol chem_getnumber chem_getname chem_getweight chem_getmeltingpoint chem_getboilingpoint chem_getfamily chem_randelementbyfamily chem_diffrandelementsbyfamily chem_getrandcompound chem_getdiffrandcompounds chem_decomposecompound chem_getcompoundmolmass chem_randanion chem_randcation chem_makeioniccompound chem_getsolubility chem_eqndisp chem_balancereaction chem_vsepr";
     // chgbase
     imathasBuiltin += " baseconvert asciitodec dectoascii";
     // complex
