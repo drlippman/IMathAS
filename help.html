@@ -2999,6 +2999,10 @@ have been answered, instead of checking for null.
     number on each part.</li>
 <li><strong>$requestclearla</strong>:  If you set $requestclearla=true in your code, it will request the display to clear out the student's last answer.
   This might be useful if your question branches based on attempt count.  Example: <code>$requestclearla = true if ($attemptn==2 &amp;&amp; !$scoreiscorrect[$thisq])</code></li>
+<li><strong>$graphdispmode</strong>: This will be 0 if the student has text-based alternatives 
+  for graph display enabled, and 1 or 2 if an image-based mode is enabled.</li>
+<li><strong>$drawentrymode</strong>: This will be 0 if the student has keyboard-based 
+  alternatives for drawing entry enabled, or 1 for mouse-based entry.</li>
 </ul>
 <h3>Reusing Code</h3>
 <p>You can import in the Common Control code from another question using</p>

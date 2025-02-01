@@ -1546,8 +1546,8 @@ class AssessRecord
         $score = $curq['scoreoverride'] * $out['points_possible'];
         $raw = $curq['scoreoverride'];
       }
-      $out['score'] = ($score != -1) ? round($score,2) : 0;
-      $out['rawscore'] = ($raw != -1) ? round($raw,4) : 0;
+      $out['score'] = ($score != -1) ? round($score + 1e-8,2) : 0;
+      $out['rawscore'] = ($raw != -1) ? round($raw + 1e-8,4) : 0;
     }
     // if jumped to answer, burn tries
     if (!empty($curq['jumptoans'])) {
@@ -1795,12 +1795,12 @@ class AssessRecord
         $parts[$pn] = array(
           'try' => 0,
           'score' => 0,
-          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
+          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot + 1e-8,3)
         );
         // apply by-part overrides, if set
         if (isset($overrides[$pn])) {
           $partrawscores[$pn] = $overrides[$pn];
-          $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
+          $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot + 1e-8,3);
           $parts[$pn]['rawscore'] = $partrawscores[$pn];
           $parts[$pn]['score'] = $partscores[$pn];
         }
@@ -1851,16 +1851,16 @@ class AssessRecord
       // apply by-part overrides, if set
       if (isset($overrides[$pn])) {
         $partrawscores[$pn] = $overrides[$pn];
-        $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
+        $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot + 1e-8,3);
       }
 
       $parts[$pn] = array(
         'try' => count($qver['tries'][$pn]),
-        'score' => round($partscores[$pn],3),
-        'rawscore' => round($partrawscores[$pn],4),
+        'score' => round($partscores[$pn] + 1e-8,3),
+        'rawscore' => round($partrawscores[$pn] + 1e-8,4),
         'penalties' => $partpenalty,
         'req_manual' => $partReqManual,
-        'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
+        'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot + 1e-8,3)
       );
     }
 
@@ -2586,13 +2586,13 @@ class AssessRecord
         if ($by_question) {
           $curAver['questions'][$qn]['scored_version'] = $qScoredVer;
         }
-        $curAver['questions'][$qn]['score'] = round($maxQscore,2);
-        $curAver['questions'][$qn]['rawscore'] = round($maxQrawscore,4);
+        $curAver['questions'][$qn]['score'] = round($maxQscore + 1e-8,2);
+        $curAver['questions'][$qn]['rawscore'] = round($maxQrawscore + 1e-8,4);
         $curAver['questions'][$qn]['time'] = $totalQtime;
         $aVerScore += $maxQscore;
         $verTime += $totalQtime;
       } // end loop over questions
-      $curAver['score'] = round($aVerScore, 1);
+      $curAver['score'] = round($aVerScore + 1e-8, 1);
       if ($aVerScore >= $maxAscore && ($by_question || $curAver['status'] == 1)) {
         $maxAscore = $aVerScore;
         $aScoredVer = $av;
@@ -2622,9 +2622,9 @@ class AssessRecord
       if (isset($this->data['scoreoverride'])) {
         $this->assessRecord['score'] = $this->data['scoreoverride'];
       } else if ($keepscore === 'average' && count($allAssessVerScores) > 0) {
-        $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),1);
+        $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores) + 1e-8,1);
       } else if (count($allAssessVerScores) > 0) { // best, last, or by_question
-        $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']], 1);
+        $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']] + 1e-8, 1);
       }
       $this->assessRecord['timeontask'] = $totalTime;
     }
@@ -3355,11 +3355,11 @@ class AssessRecord
       if ($ptsposs == 0) {
         $adjscore = 0;
       } else if (!isset($qdata['answeights']) || !empty($qdata['singlescore'])) {
-        $adjscore = round($score/$ptsposs, 5);
+        $adjscore = round($score/$ptsposs + 1e-8, 5);
       } else {
         $answeightTot = array_sum($qdata['answeights']);
         if ($qdata['answeights'][$pn] > 0) {
-          $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
+          $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot) + 1e-8, 5);
         } else {
           $adjscore = 0;
         }
@@ -3953,7 +3953,7 @@ class AssessRecord
       if ($base < 0) { $base = 0; }
       $penalties[] = array('type'=>'overtime', 'pct'=>$overtimePenalty);
     }
-    $base = round($base, 5); // cut off weird computer arithmetic issues
+    $base = round($base + 1e-8, 5); // cut off weird computer arithmetic issues
     if ($returnPenalties) {
       return array($base, $penalties);
     } else {

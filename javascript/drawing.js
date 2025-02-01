@@ -2447,8 +2447,10 @@ function setCursor(cursor, target) {
 	if (targets[target].cursor != cursor) {
 		if (cursor=='move') {
 			targets[target].el.style.cursor = cursor;
-		} else {
-			targets[target].el.style.cursor = 'url('+staticroot+'/img/'+cursor+'.cur), auto';
+		} else if (cursor=='pen') {
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/penup.svg) 0 0, auto';
+		} else if (cursor=='pendown') {
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/pendown.svg) 0 20, auto';
 		}
 		targets[target].cursor = cursor;
 	}

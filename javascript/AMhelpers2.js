@@ -918,7 +918,7 @@ function showPreview(qn) {
   var outstr = '';
   var res = processByType(qn);
   if (res.str) {
-    outstr = '`' + htmlEntities(res.str) + '`';
+    outstr += '`' + htmlEntities(res.str) + '`';
   }
   if (res.dispvalstr && res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
     outstr += (outstr==''?'':' &asymp; ') + '`' + htmlEntities(res.dispvalstr) + '`';
@@ -967,6 +967,7 @@ function showSyntaxCheckMQ(qn) {
   var res = processByType(qn);
   var outstr = '';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
+    outstr += '`' + htmlEntities(res.str) + '`';
     if (params.qtype == 'calcmatrix' || params.qtype == 'calccomplexmatrix' || (params.qtype == 'calcinterval' && params.calcformat.match(/inequality/))) {
         outstr += ' &asymp; `' + htmlEntities(res.dispvalstr) + '` ';
     } else {
@@ -977,10 +978,7 @@ function showSyntaxCheckMQ(qn) {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
   if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
-    var previewel = document.getElementById('p'+qn).firstChild;
-    previewel.innerHTML = outstr;
-    previewel.style.visibility = '';
-    previewel.style.position = '';
+    LivePreviews[qn].RenderNow(outstr);
   } else {
     var previewel = document.getElementById('p'+qn);
     if (previewel) {
@@ -1913,17 +1911,19 @@ function processNumfunc(qn, fullstr, format) {
       for (j=0; j < 20; j++) {
           totest = 'var DNE=1;';
           for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-          if (domain[i][2]) { //integers
-              testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-          } else { //any real between min and max
-              testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-          }
-          totest += 'var ' + remapVars[i] + '=' + testval + ';';
+            if (domain[i][2]) { //integers
+                //testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+                testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*j/20);
+            } else { //any real between min and max
+                //testval = Math.random()*(domain[i][1] - domain[i][0]) + domain[i][0];
+                testval = domain[i][0] + (domain[i][1] - domain[i][0])*j/20;
+            }
+            totest += 'var ' + remapVars[i] + '=' + testval + ';';
           }
           res = scopedeval(totest + totesteqn);
           if (res !== 'synerr') {
-          successfulEvals++;
-          break;
+            successfulEvals++;
+            break;
           }
       }
       if (successfulEvals === 0) {
@@ -2312,6 +2312,9 @@ function syntaxcheckexpr(str,format,vl) {
 	  	  	}
 	  	  }
 	  }
+    if (str.match(/\(\s*\)/)) {
+      err += _(" Empty function input or parentheses") + ". ";
+    }
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
 	  }
@@ -2357,7 +2360,12 @@ function escapeRegExp(string) {
 
 function scopedeval(c) {
 	try {
-		return eval(c);
+    let v = eval(c);
+    /*if (Number.isNaN(v)) {
+      return "synerr";
+    }
+    */
+    return v;
 	} catch(e) {
 		return "synerr";
 	}

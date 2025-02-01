@@ -138,6 +138,8 @@ class ScoreEngine
         $attemptn = $scoreQuestionParams->getAttemptNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
         $currentseed = $scoreQuestionParams->getQuestionSeed();
+        $graphdispmode = $_SESSION['userprefs']['graphdisp'];
+        $drawentrymode = $_SESSION['userprefs']['drawentry'];
         try {
           $db_qsetid = $scoreQuestionParams->getDbQuestionSetId();
           eval(interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]));
