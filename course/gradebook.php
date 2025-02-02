@@ -767,6 +767,7 @@ function gbstudisp($stu) {
 				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
 			}
 		}
+		$lpmsg = '';
 		if ($showlatepass==1) {
 			if ($latepasses==0) {
 				$lpmsg = _('No LatePasses available');
