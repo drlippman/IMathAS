@@ -786,11 +786,13 @@ function setupLivePreview(qn, skipinitial) {
                             //MathJax.typesetClear([this.buffer]);
                             MathJax.typesetPromise([this.buffer]).then(this.PreviewDone.bind(this));
                         }.bind(this));
-                      } else {
+                      } else if (parseInt(MathJax.version)===2) {
                         MathJax.Hub.Queue(
                             ["Typeset",MathJax.Hub,this.buffer],
                             ["PreviewDone",this]
                         );
+                      } else {
+                        console.log('case 3');
                       }
 			      } else if (mathRenderer=="Katex") {
 			      	  renderMathInElement(this.buffer);
@@ -821,7 +823,7 @@ function setupLivePreview(qn, skipinitial) {
                   this.mjPending = true;
                   if (this.mjPromise) {
                     this.mjPromise = this.mjPromise.then(this.CreatePreview().bind(this));
-                  } else if (MathJax.Hub) {
+                  } else if (MathJax.Hub && parseInt(MathJax.version)===2) {
                     MathJax.Hub.Queue(["CreatePreview",this]);
                   }
 			    } else {
