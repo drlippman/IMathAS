@@ -772,10 +772,10 @@ function setupLivePreview(qn, skipinitial) {
 			    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
 			  },
 
-			  RenderNow: function(text) {
+			  RenderNow: function(text, formatted) {
 				  //called by preview button
-                  this.oldtext = text;
-			      this.buffer.innerHTML = this.preformat(text);
+            this.oldtext = text;
+			      this.buffer.innerHTML = formatted ? text : this.preformat(text);
 			      this.mjRunning = true;
 			      this.RenderBuffer();
 			  },
@@ -929,7 +929,7 @@ function showPreview(qn) {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
   if (LivePreviews.hasOwnProperty(qn)) {
-    LivePreviews[qn].RenderNow(outstr);
+    LivePreviews[qn].RenderNow(outstr, true);
   } else {
     var previewel = document.getElementById('p'+qn);
     previewel.innerHTML = outstr;
@@ -980,7 +980,7 @@ function showSyntaxCheckMQ(qn) {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
   if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
-    LivePreviews[qn].RenderNow(outstr);
+    LivePreviews[qn].RenderNow(outstr, true);
   } else {
     var previewel = document.getElementById('p'+qn);
     if (previewel) {
@@ -1923,6 +1923,7 @@ function processNumfunc(qn, fullstr, format) {
             totest += 'var ' + remapVars[i] + '=' + testval + ';';
           }
           res = scopedeval(totest + totesteqn);
+          console.log(totest + totesteqn + ',res:'+res);
           if (res !== 'synerr') {
             successfulEvals++;
             break;
@@ -2362,12 +2363,12 @@ function escapeRegExp(string) {
 
 function scopedeval(c) {
 	try {
-    let v = eval(c);
-    /*if (Number.isNaN(v)) {
-      return "synerr";
-    }
+    return eval(c);
+    /* we don't check for 
+      if (Number.isNaN(v)) {
+      because we don't want to give away if values just aren't
+      in domain of student's function
     */
-    return v;
 	} catch(e) {
 		return "synerr";
 	}
