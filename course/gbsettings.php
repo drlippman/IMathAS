@@ -61,12 +61,12 @@
 			} else {
 				$chop = 0;
 			}
-			if ($_POST['droptype'][$id]==0) {
-				$drop = 0;
-			} else if ($_POST['droptype'][$id]==1){
-				$drop = $_POST['dropl'][$id];
+			if ($_POST['droptype'][$id]==1){
+				$drop = intval($_POST['dropl'][$id]);
 			} else if ($_POST['droptype'][$id]==2) {
-				$drop = -1*$_POST['droph'][$id];
+				$drop = -1*intval($_POST['droph'][$id]);
+			} else {
+				$drop = 0;
 			}
 			if ($useweights==1) {
 				$weight = $_POST['weight'][$id];
