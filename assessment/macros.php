@@ -1689,7 +1689,7 @@ function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
 		$r = range(0,$maxi);
         if ($nonzero) {
 			if ($min <= 0 && $max >= 0) {
-				array_splice($r,-1*$min/$p,1);
+				array_splice($r,-1*round($min/$p),1);
 			}
 		}
 		while ($n>count($r)) {
