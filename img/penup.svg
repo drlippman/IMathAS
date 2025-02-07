@@ -1,3 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- License: MIT. Made by joypixels: https://github.com/joypixels/emojione -->
-<svg width="20px" height="20px" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--emojione" preserveAspectRatio="xMidYMid meet" version="1.1" transform="matrix(1,0,0,-1,0,0)"><path fill="#ffce31" d="M7.934 41.132L39.828 9.246l14.918 14.922l-31.895 31.886z"></path><path d="M61.3 4.6l-1.9-1.9C55.8-.9 50-.9 46.3 2.7l-6.5 6.5l15 15l6.5-6.5c3.6-3.6 3.6-9.5 0-13.1" fill="#ed4c5c"></path><path fill="#93a2aa" d="M35.782 13.31l4.1-4.102l14.92 14.92l-4.1 4.101z"></path><path fill="#c7d3d8" d="M37.338 14.865l4.1-4.101l11.739 11.738l-4.102 4.1z"></path><path fill="#fed0ac" d="M7.9 41.1l-6.5 17l4.5 4.5l17-6.5z"></path><path d="M.3 61.1c-.9 2.4.3 3.5 2.7 2.6l8.2-3.1l-7.7-7.7l-3.2 8.2" fill="#333"></path><path fill="#ffdf85" d="M7.89 41.175l27.86-27.86l4.95 4.95l-27.86 27.86z"></path><path fill="#ff8736" d="M17.904 51.142l27.86-27.86l4.95 4.95l-27.86 27.86z"></path></svg>
+
+<svg
+   width="20px"
+   height="20px"
+   viewBox="0 0 64 64"
+   aria-hidden="true"
+   role="img"
+   class="iconify iconify--emojione"
+   preserveAspectRatio="xMidYMid meet"
+   version="1.1"
+   id="svg8"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <path
+     fill="#ffce31"
+     d="m 22.874711,7.9395247 31.886,31.8940003 -14.922,14.918 -31.8860005,-31.895 z"
+    />
+  <path
+     d="m 59.406711,61.305525 1.9,-1.9 c 3.6,-3.6 3.6,-9.4 0,-13.1 l -6.5,-6.5 -15,15 6.5,6.5 c 3.6,3.6 9.5,3.6 13.1,0"
+     fill="#ed4c5c"
+     />
+  <path
+     fill="#93a2aa"
+     d="m 50.696711,35.787525 4.102,4.1 -14.92,14.92 -4.101,-4.1 z"
+     />
+  <path
+     fill="#c7d3d8"
+     d="m 49.141711,37.343525 4.101,4.1 -11.738,11.739 -4.1,-4.102 z"
+     />
+  <path
+     fill="#fed0ac"
+     d="m 22.906711,7.9055247 -17.0000005,-6.5 -4.5,4.5 6.5,17.0000003 z"
+     />
+  <path
+     d="m 2.9067105,0.30552472 c -2.39999997,-0.9 -3.49999997,0.3 -2.59999997,2.69999998 L 3.4067105,11.205525 11.106711,3.5055247 2.9067105,0.30552472"
+     fill="#333333"
+     />
+  <path
+     fill="#ffdf85"
+     d="m 22.831711,7.8955247 27.86,27.8600003 -4.95,4.95 -27.86,-27.86 z"
+     />
+  <path
+     fill="#ff8736"
+     d="m 12.864711,17.909525 27.86,27.86 -4.95,4.95 -27.8600005,-27.86 z"
+     />
+</svg>
