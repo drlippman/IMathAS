@@ -335,7 +335,7 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
    if ($r !== null && $dirr=='left') {
       $py = $coef*exp(-$zr*$zr/2.0);
       $qpts[] = "[$zr,$py]";
-      $qpts[] = "[$zy,0]";
+      $qpts[] = "[$zr,0]";
       $qpts[] = "[$zx,0]";
    }
    if ($r !== null && $dirr=='right') {
