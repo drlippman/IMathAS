@@ -137,8 +137,8 @@ class QuestionHtmlGenerator
         $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
         $printFormat = $this->questionParams->getPrintFormat();
         $teacherInGb = $this->questionParams->getTeacherInGb();
-        $graphdispmode = $_SESSION['userprefs']['graphdisp'];
-        $drawentrymode = $_SESSION['userprefs']['drawentry'];
+        $graphdispmode = $_SESSION['userprefs']['graphdisp'] ?? 1;
+        $drawentrymode = $_SESSION['userprefs']['drawentry'] ?? 1;
 
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
 
