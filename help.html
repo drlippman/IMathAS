@@ -2666,8 +2666,14 @@ These macros are used for mathematical calculations:
   is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
 <li><strong>sgn(a)</strong>: Returns the sign of a, as -1, 0, or 1.</li>
 <li><strong>v!</strong>: Factorial, like $a = $b!</li>
-<li><strong>evalfunc(func,vars,val1,val2,..)</strong>: Evaluates a function given the variables and values for each variable.
-  for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
+<li><strong>evalfunc(func,vars,val1,val2,...,[falseonerror])</strong>: Evaluates a function given the variables and values for each variable.
+  for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3.<br/>
+  This function by default will return <code>false</code> on invalid parameters. 
+  With numerical inputs, it will return an empty string if the function is unable 
+  to be evaluated due to a syntax error. Set the optional falseonerror parameter to 
+  true to return <code>false</code> instead of an empty string in this case. 
+  For non-numerical inputs, setting the optional parameter to true will skip 
+  some additional cleanup steps that sometimes cause problems.</li>
 <li><strong>evalnumstr(expr, [complex])</strong>: Evaluates a string representation of a numerical expression, like "(2pi)/3", to a decimal.  
   Avoid using this in place of direct calculation in most cases, but it can be handy if you already have generated the string 
   for display but then need to do a calculation with it.  Set complex to true if the calculation involves complex number expressions.</li>

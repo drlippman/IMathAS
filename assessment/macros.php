@@ -3053,7 +3053,11 @@ function evalfunc($farr) {
 	if ($isnum) {
         $func = makeMathFunction($func, implode(',', $vars), [], '', true);
         if ($func === false) {
-            return '';
+			if ($skipextracleanup) {
+				return false;
+			} else {
+            	return '';
+			}
         }
 		foreach ($vars as $i=>$var) {
 			if (is_array($args[$i]) || !is_numeric($args[$i])) {
