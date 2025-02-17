@@ -1785,6 +1785,9 @@ class DrawingScorePart implements ScorePart
                     }
                     if ($overlap==-1) {
                         $newlines[] = $lines[$i];
+                    } else {
+                        // fix any gaps caused by unset
+                        $newlines = array_values($newlines);
                     }
                 }
                 $lines = $newlines;
