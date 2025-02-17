@@ -29,7 +29,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
         $GLOBALS['interpretcurarrvars'] = [];
     }
 	if ($blockname=="qtext") {
-		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
+		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/',function($m) use ($included_qs) { return getquestionqtext($m, $included_qs); }, $str);
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
@@ -51,15 +51,22 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 	}
 }
 
-function getquestionqtext($m) {
+function getquestionqtext($m, $included_qs) {
 	global $DBH;
+	if (in_array($m[2], $included_qs)) {
+		echo 'Error: circular reference in includeqtextfrom';
+		return '';
+	}
 	$stm = $DBH->prepare("SELECT qtext FROM imas_questionset WHERE id=:id");
 	$stm->execute(array(':id'=>$m[2]));
 	if ($stm->rowCount()==0) {
 		echo _('bad question id in includeqtextfrom');
 		return "";
 	} else {
-		return $stm->fetchColumn(0);
+		$str = $stm->fetchColumn(0);
+		$included_qs[] = $m[2];
+		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/',function($m) use ($included_qs) { return getquestionqtext($m, $included_qs); }, $str);
+		return $str;
 	}
 }
 //interpreter some code text.  Returns a PHP code string.
