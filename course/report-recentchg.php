@@ -50,7 +50,7 @@ if (isset($_POST['catfilter'])) {
 }
 
 
-$query = 'SELECT iar.assessmentid,ia.name,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score
+$query = 'SELECT iar.assessmentid,ia.name,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score,iar.status 
     FROM imas_assessment_records AS iar
     JOIN imas_assessments AS ia ON ia.id=iar.assessmentid AND ia.courseid=? ';
 if ($catfilter > -1) {
@@ -73,6 +73,12 @@ $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDi
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= '<script>
+    function showfb2(aid,uid,type) {
+        GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+aid+"&uid="+uid, 500, 500);
+        return false;
+    }
+</script>';
 require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
@@ -109,6 +115,7 @@ if ($stm->rowCount()==0) {
     echo '<th>'._('Student').'</th>';
     echo '<th>'._('Score').'</th>';
     echo '<th>'._('Last Changed').'</th>';
+    echo '<th>'._('Feedback').'</th>';
     echo '</tr></thead><tbody>';
 
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -118,6 +125,13 @@ if ($stm->rowCount()==0) {
         echo '<td><a href="../assess2/gbviewassess.php?'.$qs.'" target="_blank">';
         echo Sanitize::encodeStringForDisplay($row['score']).'</a></td>';
         echo '<td>'.tzdate('n/j/y g:ia', $row['lastchange']).'</td>';
+        echo '<td>';
+        if (($row['status']&8) == 8) {
+            echo '<a href="#" class="small feedbacksh pointer" ';
+            echo 'onclick="return showfb2('.Sanitize::onlyInt($row['assessmentid']).','.Sanitize::onlyInt($row['userid']).',\'A2\')">';
+            echo _('[Show Feedback]'), '</a>';
+        }
+        echo '</td>';
         echo '</tr>';
     }
 }
