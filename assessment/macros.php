@@ -281,7 +281,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 
 			$path = 'stroke="'.$function[4].'";';
-			$path .= 'dot(['.makepretty($function[1]).','.makepretty($function[2]).']';
+			$path .= 'dot(['.evalbasic($function[1],true).','.evalbasic($function[2],true).']';
 			$coord = '('.$function[1].','.$function[2].')';
 			if (isset($function[3]) && $function[3]=='open') {
 				$path .= ',"open"';
@@ -320,7 +320,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$function[6] = intval($function[6]);
 			}
 			$path = 'fontfill="'.$function[4].'";';
-			$path .= 'text(['.$function[1].','.$function[2].'],"'.$function[3].'","'.$function[5].'",'.$function[6].');';
+			$path .= 'text(['.evalbasic($function[1],true).','.evalbasic($function[2],true).'],"'.$function[3].'","'.$function[5].'",'.$function[6].');';
 			$coord = '('.$function[1].','.$function[2].')';
 			$alt .= sprintf(_('Text label, color %s, at %s reading: %s'), $function[4], $coord, $function[3]).'. ';
 			$allcolors[] = $function[4];
@@ -3332,7 +3332,7 @@ function evalbasic($str, $doextra = false, $zerofornan = false) {
 	$str = clean($str);
 	if (is_numeric($str)) {
 		return $str;
-	} else if (preg_match('/[^\d+\-\/\*\.\(\)]/',$str)) {
+	} else if ($doextra || preg_match('/[^\d+\-\/\*\.\(\)]/',$str)) {
         if ($doextra) {
             $ret = evalnumstr($str);
             if ($zerofornan && !is_nicenumber($ret)) {
