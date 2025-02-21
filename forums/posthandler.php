@@ -917,7 +917,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if ($caller=='thread') {
 			$threadid = $_GET['move'];
 		}
-		$placeinhead .= '<script type="text/javascript">function toggleforumselect(v) {
+		$placeinhead = '<script type="text/javascript">function toggleforumselect(v) {
 			if (v==0) {document.getElementById("fsel").style.display="block";document.getElementById("tsel").style.display="none";}
 			if (v==1) {document.getElementById("tsel").style.display="block";document.getElementById("fsel").style.display="none";}
 			}</script>';
