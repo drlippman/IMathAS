@@ -22,6 +22,12 @@ function ltrimzero($v,$k) {
 }
 function checkreqtimes($tocheck,$rtimes) {
 	global $mathfuncs, $myrights;
+	if (!is_string($rtimes)) {
+		if ($myrights > 10 && !empty($GLOBALS['inQuestionTesting'])) {
+			echo "Invalid requiretimes; should be a string";
+		}
+		return 1;
+	}
     if ($rtimes=='') {return 1;}
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
