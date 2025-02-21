@@ -941,6 +941,9 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 			}
 			$thisavail = ($avail && ($item['avail']==2 || ($item['avail']==1 && ($item['SH'][0]=='S' || ($item['startdate']<$now && $item['enddate']>$now)))));
 			$thisblockgrey = 0;
+			if (!isset($item['SH'])) { // should be; catch errors
+				$item['SH'] = 'HO';
+			}
 			if (strlen($item['SH'])>2) {
 				$thisblockgrey = intval($item['SH'][2]);
 			} else {
