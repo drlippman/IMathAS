@@ -213,6 +213,7 @@ function processScript($script) {
 					$this->ASsetdash($matches[2]);
 					break;
 				case 'strokewidth':
+					$maches[2] = evalifneeded($matches[2]);
 					$this->strokewidth = (int) round($matches[2] > 0.5 ? $matches[2] : 1);
 					if ($this->usegd2) {
 						imagesetthickness($this->img,$this->strokewidth);
