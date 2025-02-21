@@ -1,7 +1,7 @@
 <?php 
 
 function generateUserLookupForm($userlookupPrefix, $fieldname, $defaultresults = '') {
-    global $basesiteurl;
+    global $basesiteurl,$staticroot;
 
 echo '<p><button type=button onclick="userlookupGetgroup()">' . _('List my group members') . '</button> ';
 echo _('or lookup a teacher:') . ' <input size=30 id=userlookupName /> <button type=button onclick="userlookupByname()">' . _('Search') . '</button>';
