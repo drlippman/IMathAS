@@ -2390,6 +2390,12 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $assessver = $this->getAssessVer($ver);
     $outall = array();
+    if (empty($assessver['questions'][$qn]['question_versions'])) {
+      // version doesn't exist for some reason; maybe was deleted after student started?
+      // return error and abort
+      echo '{"error": "not_ready"}';
+      exit;
+    }
     $question_versions = $assessver['questions'][$qn]['question_versions'];
     if (!$by_question || $ver === 'last') {
       $curq = $question_versions[count($question_versions) - 1];
