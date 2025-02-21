@@ -50,6 +50,9 @@ class ChoicesAnswerBox implements AnswerBox
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
+            if ($multi) {
+                echo ' ' . sprintf(_('(part %d)'), $partnum);
+            }
             $questions = array();
         }
 
