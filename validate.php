@@ -731,6 +731,7 @@ if ($hasusername) {
                     ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'], 'assess2/') === false ||
                         strpos($_SERVER['QUERY_STRING'], '&aid=' . $lockaid) === false))
                     ) && strpos(basename($_SERVER['PHP_SELF']), 'ltiuserprefs.php') === false
+                    && strpos(basename($_SERVER['PHP_SELF']), 'rectrack.php') === false
                 ) {
                     $stm = $DBH->prepare('SELECT name,msgtoinstr,posttoforum FROM imas_assessments WHERE id=?');
                     $stm->execute([$lockaid]);
