@@ -50,7 +50,8 @@ if (isset($_POST['catfilter'])) {
 }
 
 
-$query = 'SELECT iar.assessmentid,ia.name,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score,iar.status 
+$query = 'SELECT iar.assessmentid,ia.name,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score,iar.status,
+    IF(ia.submitby="by_assessment",iar.scoreddata,"") AS scoreddata
     FROM imas_assessment_records AS iar
     JOIN imas_assessments AS ia ON ia.id=iar.assessmentid AND ia.courseid=? ';
 if ($catfilter > -1) {
@@ -114,6 +115,7 @@ if ($stm->rowCount()==0) {
     echo '<th>'._('Assessment').'</th>';
     echo '<th>'._('Student').'</th>';
     echo '<th>'._('Score').'</th>';
+    echo '<th>'._('Completed Attempts').'</th>';
     echo '<th>'._('Last Changed').'</th>';
     echo '<th>'._('Feedback').'</th>';
     echo '</tr></thead><tbody>';
@@ -123,7 +125,21 @@ if ($stm->rowCount()==0) {
         echo '<tr><td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
         echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></td>';
         echo '<td><a href="../assess2/gbviewassess.php?'.$qs.'" target="_blank">';
-        echo Sanitize::encodeStringForDisplay($row['score']).'</a></td>';
+        echo Sanitize::encodeStringForDisplay($row['score']);
+        if (($row['status']&3) == 1) { // has unsubmitted attempt or questions
+            echo ' (IP)';
+        }
+        echo '</a></td>';
+        echo '<td class=c>';
+        if ($row['scoreddata'] !== '') {
+            $data = json_decode(Sanitize::gzexpand($row['scoreddata']), true);
+            $totcnt = count($data['assess_versions']);
+            if (($row['status']&1) == 1) { // has unsubmitted attempt
+                $totcnt--;
+            }
+            echo $totcnt;
+        }
+        echo '</td>';
         echo '<td>'.tzdate('n/j/y g:ia', $row['lastchange']).'</td>';
         echo '<td>';
         if (($row['status']&8) == 8) {
@@ -134,5 +150,7 @@ if ($stm->rowCount()==0) {
         echo '</td>';
         echo '</tr>';
     }
+    echo '</tbody></table>';
+    echo '<p>&nbsp;</p><p>'._('Note: For quiz-style assessments, an IP marker here indicates either an in-progress or unsubmitted attempt.').'</p>';
 }
 require_once '../footer.php';
