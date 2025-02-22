@@ -1320,6 +1320,9 @@ class AssessInfo
     }
 
     // parse out earlybonus parts
+    if (!isset($settings['earlybonus'])) {
+      $settings['earlybonus'] = 0;
+    }
     $settings['earlybonus'] = [$settings['earlybonus']%100, floor($settings['earlybonus'] / 100)]; 
 
     // get latest date latepass can extend to
