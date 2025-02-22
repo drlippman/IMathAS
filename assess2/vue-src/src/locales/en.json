@@ -65,6 +65,7 @@
     "extension": "You were granted an extension.",
     "penalty": "A penalty of {p}% will be applied.",
     "penalty_after": "A penalty of {p}% will be applied after {date}.",
+    "earlybonus": "A bonus of {p}% will be applied until {date}.",
     "take": "You can take this assessment one time. | You can take this assessment {n} times.",
     "take_more": "You can take this assessment one more time. | You can take this assessment {n} more times.",
     "attempt_inprogress": "You have an assessment attempt in progress.",
@@ -252,11 +253,12 @@
     "viewingb": "Review work in gradebook"
   },
   "penalties": {
-    "applied": "Penalties applied",
+    "applied": "Penalties/bonus applied",
     "retry": "Retry penalty",
     "regen": "Assessment retake penalty",
     "trysimilar": "Try Similar Question penalty",
     "late": "Late work penalty",
+    "early": "Early work bonus",
     "overtime": "Overtime penalty"
   },
   "qdetails": {

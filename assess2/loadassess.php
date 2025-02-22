@@ -70,7 +70,7 @@ $include_from_assess_info = array(
   'name', 'summary', 'available', 'startdate', 'enddate', 'enddate_in',
   'original_enddate', 'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb', 'scoresingb',
-  'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
+  'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty', 'earlybonus',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
   'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue', 
   'attemptext', 'showworktype', 'latepass_enddate', 'latepass_after'
@@ -135,6 +135,14 @@ if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'
         // limit extension available
         $assessInfoOut['has_active_attempt'] = true;
     }
+}
+
+// get earlybonus end time
+if ($assessInfoOut['earlybonus'][0] > 0) {
+  $bonusbase = $assessInfoOut['original_enddate'] ?? $assessInfoOut['enddate'];
+  if ($now < $bonusbase - 3600 * $assessInfoOut['earlybonus'][1]) {
+    $assessInfoOut['earlybonusends'] = strtotime("-" . $assessInfoOut['earlybonus'][1]. ' hours', $bonusbase);
+  }
 }
 
 //get time limit expiration of current attempt, if appropriate

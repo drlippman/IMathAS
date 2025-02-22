@@ -1754,6 +1754,7 @@ class AssessRecord
 
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
     $exceptionPenalty = $this->assess_info->getSetting('exceptionpenalty');
+    $earlyBonus = $this->assess_info->getSetting('earlybonus');
     $overtimePenalty = $this->assess_info->getSetting('overtime_penalty');
 
     if (empty($qsettings['points_possible']) && $qsettings['points_possible'] !== 0) {
@@ -1828,6 +1829,7 @@ class AssessRecord
             $due_date,           // the due date
             $starttime + $submissions[$parttry['sub']], // submission time
             $exceptionPenalty,
+            $earlyBonus,
             isset($assessver['timelimit_end']) ? $assessver['timelimit_end'] : 0,
             $overtimePenalty,
             true
@@ -3922,6 +3924,7 @@ class AssessRecord
    * @param  int $regen_penalty_after
    * @param  int $duedate    Original due date timestamp
    * @param  int $exceptionpenalty
+   * @param  array $earlybonus
    * @param  int $timelimitEnd
    * @param  int $overtimePenalty
    * @param  int $subtime    Timestamp question was submitted
@@ -3930,7 +3933,7 @@ class AssessRecord
    * @return float  score after penalties if $returnPenalties = false
    *         array(score, array of penalties) if $returnPenalties = true
    */
-  private function scoreAfterPenalty($score, $points, $try, $retry_penalty, $retry_penalty_after, $regen, $regen_penalty, $regen_penalty_after, $duedate, $subtime, $exceptionpenalty, $timelimitEnd, $overtimePenalty, $returnPenalties = false) {
+  private function scoreAfterPenalty($score, $points, $try, $retry_penalty, $retry_penalty_after, $regen, $regen_penalty, $regen_penalty_after, $duedate, $subtime, $exceptionpenalty, $earlybonus, $timelimitEnd, $overtimePenalty, $returnPenalties = false) {
     $base = $score * $points;
     $penalties = array();
     if ($retry_penalty > 0) {
@@ -3953,6 +3956,10 @@ class AssessRecord
       $base *= (1 - $exceptionpenalty / 100);
       if ($base < 0) { $base = 0; }
       $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
+    }
+    if ($earlybonus[0] > 0 && $subtime < $duedate - 3600 * $earlybonus[1]) {
+      $base *= (1 + $earlybonus[0] / 100);
+      $penalties[] = array('type'=>'early', 'pct'=>$earlybonus[0]);
     }
     if ($timelimitEnd > 0 && $overtimePenalty > 0 && $subtime > $timelimitEnd+10) {
       $base *= (1 - $overtimePenalty / 100);

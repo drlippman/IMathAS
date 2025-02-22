@@ -87,6 +87,8 @@ $vueData = array(
 	'allowinstraddtutors' => (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true),
 	'tutoredit' => $line['tutoredit'],
 	'exceptionpenalty' => $line['exceptionpenalty'],
+	'earlybonus' => ($line['earlybonus'] % 100),
+	'earlybonushrs' => max(1,floor($line['earlybonus'] / 100)),
 	'defoutcome' => $line['defoutcome'],
 	'outcomeOptions' => $outcomeOptions,
 	'isgroup' => $line['isgroup'],
@@ -710,8 +712,18 @@ $vueData = array(
 				<?php echo _('Penalty for questions done while in exception/LatePass');?>:
 			</label>
 			<span class=formright>
-				<input type=text size=4 name="exceptionpenalty" id="exceptionpenalty"
+				<input type=number size=3 name="exceptionpenalty" id="exceptionpenalty" min=0 max=99
 				 	v-model="exceptionpenalty">%
+			</span><br class=form />
+
+			<label for="exceptionpenalty" class=form>
+				<?php echo _('Bonus for questions done early');?>:
+			</label>
+			<span class=formright>
+				<input type=number size=3 name="earlybonus" id="earlybonus" min=0 max=99
+				 	v-model="earlybonus">% <label><?php echo _('for work done');?>
+				<input type=number size=3 name="earlybonushrs" id="earlybonushrs" min=1 max=654
+					v-model="earlybonushrs"> <?php echo _('hours before the due date'); ?></label>
 			</span><br class=form />
 
 			<label for="defoutcome" class="form"><?php echo _('Default Outcome');?>:</label>

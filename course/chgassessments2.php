@@ -55,7 +55,7 @@ if (!(isset($teacherid))) {
         $coreOK = true;
 		if ($_POST['copyopts'] != 'DNC') {
             $copyreqscore = !empty($_POST['copyreqscore']);
-			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
+			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,earlybonus,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
@@ -395,6 +395,10 @@ if (!(isset($teacherid))) {
 			if ($_POST['exceptionpenalty'] !== '') {
 				$sets[] = "exceptionpenalty=:exceptionpenalty";
 				$qarr[':exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
+			}
+			if ($_POST['earlybonus'] !== '') {
+				$sets[] = "earlybonus=:earlybonus";
+				$qarr[':earlybonus'] = 100 * intval($_POST['earlybonushrs']) + intval($_POST['earlybonus']);
 			}
 
 			if (isset($_POST['defoutcome']) && $_POST['defoutcome'] !== 'DNC') {

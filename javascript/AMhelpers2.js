@@ -1160,6 +1160,9 @@ function preformat(qn, text, qtype, calcformat) {
     if (calcformat.indexOf('scinot')!=-1) {
       text = text.replace(/(x|X|\u00D7)/,"xx");
     }
+  } else if (qtype == 'essay') {
+    console.log('here');
+    text = encodeURIComponent(text);
   }
   text = text.replace(/[^\u0000-\u007f]/g, '?');
   return text;

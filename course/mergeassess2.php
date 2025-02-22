@@ -24,7 +24,7 @@ if (isset($_POST['mergefrom'])) {
 	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,date_by_lti,LPcutoff,';
 	$fieldstocopy .= 'timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,';
 	$fieldstocopy .= 'defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,';
-	$fieldstocopy .= 'allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,';
+	$fieldstocopy .= 'allowlate,exceptionpenalty,earlybonus,noprint,avail,groupmax,isgroup,groupsetid,endmsg,';
 	$fieldstocopy .= 'deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,';
 	$fieldstocopy .= 'istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,';
 	$fieldstocopy .= 'posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,';

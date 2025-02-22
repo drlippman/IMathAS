@@ -206,7 +206,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "REVIEWDATE\n";
 				echo $line['reviewdate'] . "\n";
 				echo "SETTINGS\n";
-				foreach (array("timelimit","displaymethod","defpoints","defattempts","deffeedback","defpenalty","shuffle","password","cntingb","minscore","showcat","showhints","isgroup","allowlate","exceptionpenalty","noprint","groupmax","endmsg","eqnhelper","caltag","calrtag","showtips","deffeedbacktext","msgtoinstr","istutorial","viddata") as $setting) {
+				foreach (array("timelimit","displaymethod","defpoints","defattempts","deffeedback","defpenalty","shuffle","password","cntingb","minscore","showcat","showhints","isgroup","allowlate","exceptionpenalty","earlybonus","noprint","groupmax","endmsg","eqnhelper","caltag","calrtag","showtips","deffeedbacktext","msgtoinstr","istutorial","viddata") as $setting) {
 					echo "$setting=".Sanitize::stripHtmlTags($line[$setting])."\n";
 				}
 				echo "QUESTIONS\n";
