@@ -182,6 +182,10 @@
 
 	 showcalendar("showcalendar");
 
+	 if (isset($studentid)) {
+		echo '<p></p><p>'._('Note: The due dates shown here are <em>your</em> due dates, reflecting any LatePasses or exceptions that have been applied.').'</p>';
+	 }
+
 	 require_once "../footer.php";
 
 
