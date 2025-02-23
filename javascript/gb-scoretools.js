@@ -346,6 +346,7 @@ function sidebysidegrading(state) {
 function sidebysidemoveels(state,base) {
     if (typeof base === 'undefined') { base = 'body'; }
     if (state) {
+		$(base).closest(".sidebyside").find(".sidepreviewtarget").empty();
         $(base).find(".question div.introtext").each(function(i,el) {
             $(el).find(".keywrap.inwrap").insertAfter($(el));
             var tgt = $(el).closest(".sidebyside").find('.sidepreview');
