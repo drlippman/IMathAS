@@ -166,6 +166,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$savetitle = _("Save Changes");
 		} else {
+			$line = [];
 			$line['name'] = "";
 			$line['description'] = "";
 			$line['avail'] = 1;

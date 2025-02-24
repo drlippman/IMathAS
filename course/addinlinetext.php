@@ -298,6 +298,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$savetitle = _("Save Changes");
 	} else {
+		$line = [];
 		//set defaults
 		$line['title'] = "";
 		$line['text'] = "";

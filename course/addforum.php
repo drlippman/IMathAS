@@ -315,6 +315,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$savetitle = _("Save Changes");
 		} else {  //ADD MODE
+			$line = [];
 			//set defaults
 			$line['name'] = "";
 			$line['description'] = "";
