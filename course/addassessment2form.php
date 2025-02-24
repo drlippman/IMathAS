@@ -716,7 +716,7 @@ $vueData = array(
 				 	v-model="exceptionpenalty">%
 			</span><br class=form />
 
-			<label for="exceptionpenalty" class=form>
+			<label for="earlybonus" class=form>
 				<?php echo _('Bonus for questions done early');?>:
 			</label>
 			<span class=formright>

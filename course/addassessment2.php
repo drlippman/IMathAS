@@ -935,6 +935,14 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 } else {
     $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
 }
+$placeinhead .= '<script>
+function showinvalid() {
+	document.getElementById("addform").reportValidity();
+	$("form :invalid").each(function(index,el) {
+		$(el).closest(".blockitems:not(:visible)").show().prev().trigger("click");
+	});
+}
+</script>';
 
  require_once "../header.php";
 
@@ -958,13 +966,13 @@ if ($overwriteBody==1) {
 	?>
 	<?php echo $page_isTakenMsg ?>
 
-	<form method=post action="<?php echo $page_formActionTag ?>">
+	<form method=post id="addform" action="<?php echo $page_formActionTag ?>">
 
 	<?php
 		require_once "addassessment2form.php";
 	?>
 
-	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
+	<div class=submit><input type=submit onclick="showinvalid()" value="<?php echo $savetitle;?>"></div>
 	</form>
 	<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 <?php
