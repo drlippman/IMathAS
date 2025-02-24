@@ -269,7 +269,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 
 		// rewrite "y,color,x,x,closed" as dot
-		if (count($function)>4 && $function[0]!='dot' && $function[0]!='text' && 
+		if (count($function)>4 && $function[0]!='dot' && $function[0]!='text' && is_numeric($function[0]) &&
 			$function[2]==$function[3] && ($function[4]=='closed' || $function[4]=='open')
 		) {
 			$function = ['dot',$function[2],$function[0],$function[4],$function[1]];
