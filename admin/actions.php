@@ -58,11 +58,13 @@ switch($_POST['action']) {
 		}
 		$stm = $DBH->prepare("SELECT rights,groupid,jsondata FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
-		list($oldrights,$oldgroupid,$oldjsondata) = $stm->fetch(PDO::FETCH_NUM);
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
 			echo _("invalid id");
 			exit;
-		} else if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
+		} 
+		list($oldrights,$oldgroupid,$oldjsondata) = $row;
+		if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
 			echo "You don't have the authority for this action";
 			exit;
 		}
