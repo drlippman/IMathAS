@@ -8,6 +8,7 @@ require_once "../includes/filehandler.php";
 function mbxfilter($str) {
 	global $basesiteurl,$imasroot;
 	$mathexp = array();  $mathexpcnt = -1;
+	$svgexp = array(); $svgexpcnt = -1;
 //$C = array('elements'=>'*-script-form');
 
 //$str = 'This is <span>the</span> text `x^2+3` and `3 &lt; 4` blah<br><br>And heres a table:<table class="stats"><thead><tr><th scope="col">x</p><p>3</th><th scope="col">y</th></tr></thead><tbody><tr><td>1</td><td>1</td></tr><tr><td>8</td><td>8</td></tr></tbody></table><br><br>Do something:';
@@ -57,6 +58,15 @@ function mbxfilter($str) {
 
     //strip buttons, since they won't translate, and we'll be left with the text of the button which isn't desirable
     $str = preg_replace('/<button[^>]*>.*?<\/button>/','',$str); 
+
+	if (!empty($_GET['preservesvg'])) {
+		$str = preg_replace_callback('|<svg[^>]*>.*?</svg>|s', function($m) {
+			global $svgexp, $svgexpcnt;
+			$svgexpcnt++;
+			$svgexp[$svgexpcnt] = $m[0];
+			return '<p>@SVGIMG'.$svgexpcnt.'</p>';
+		}, $str);
+	}
 
 	//enforce stuff
 	$C = array('elements'=>'a,b,br,canvas,em,h1,h2,h3,h4,h5,h6,i,img,input,li,ol,option,p,pre,select,strong,sub,sup,table,tbody,td,textarea,th,thead,tr,u,ul,statement,solution,hint');
@@ -225,6 +235,14 @@ function mbxfilter($str) {
 		global $mathexp;
 		return '<m>'.$mathexp[$m[1]].'</m>';
 	  }, $str);
+
+//restore svg
+	if (!empty($_GET['preservesvg'])) {
+		$str = preg_replace_callback('|<p>@SVGIMG(\d+)</p>|', function($m) {
+			global $svgexp;
+			return '<image>'.$svgexp[$m[1]].'</image>';
+		}, $str);
+	}
 
 //pretty up line spaces
 	$str = preg_replace('#<p>\s*</p>#s','',$str);
