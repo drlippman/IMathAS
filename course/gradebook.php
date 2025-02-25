@@ -797,7 +797,7 @@ function gbstudisp($stu) {
 	echo '<thead><tr>';
 	$sarr = array();
 	if ($stu>0 && $isteacher) {
-		echo '<th></th>';
+		echo '<th><span class="sr-only">'._('Select'). '</span></th>';
 	}
 	echo '<th>', _('Item'), '</th><th>', _('Percent'), '</th><th>', _('Grade'), '</th><th>', _('Possible'), '</th>';
 	if ($stu>0 && $isteacher) {
@@ -1584,7 +1584,7 @@ function gbinstrdisp() {
 
 	$sortarr = array();
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($i==1) {echo '<th><div>&nbsp;</div></th>'; $sortarr[] = 'false';} //for pics
+		if ($i==1) {echo '<th><div>&nbsp;<span class="sr-only">'. _('Select'). '</span></div></th>'; $sortarr[] = 'false';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		if ($gbt[0][0][$i]=='Section' || $gbt[0][0][$i]=='Code' || $gbt[0][0][$i]=='Last Login') {
 			echo '<th class="nocolorize"><div>';

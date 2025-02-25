@@ -837,7 +837,14 @@ function chgfilter() {
 
 	<table class=gb id="myTable">
 	<thead>
-	<tr><th></th><th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th></tr>
+	<tr><th><span class="sr-only"><?php echo _('Select'); ?></span></th>
+		<th><?php echo _('Message'); ?></th>
+		<th><?php echo _('Replied'); ?></th>
+		<th><span class="sr-only"><?php echo _('Image'); ?></span></th>
+		<th><?php echo _('Flag'); ?></th>
+		<th><?php echo _('From'); ?></th>
+		<th><?php echo _('Course'); ?></th>
+		<th><?php echo _('Sent'); ?></th></tr>
 	</thead>
 	<tbody>
 <?php
