@@ -449,6 +449,9 @@ class AssessRecord
     $lastaver = count($this->data['assess_versions'])-1;
     $this->data['assess_versions'][$lastaver]['questions'][$qn]['question_versions'][] = $newver;
 
+    // clear any autosave data
+    unset($this->data['autosaves'][$qn]);
+    
     // note that record needs to be saved
     $this->need_to_record = true;
     return $question;
