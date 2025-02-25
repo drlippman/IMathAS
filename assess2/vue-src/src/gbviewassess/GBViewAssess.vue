@@ -405,7 +405,7 @@
             :disabled = "prevVisible === -1"
             type = "button"
             class = "secondary"
-            @click = "curqn = prevVisible"
+            @click = "setCurqn(prevVisible)"
           >
             {{ $t('gradebook.prevq') }}
           </button>
@@ -444,7 +444,7 @@
             :disabled = "prevVisible === -1"
             type = "button"
             class = "secondary"
-            @click = "curqn = prevVisible"
+            @click = "setCurqn(prevVisible)"
           >
             {{ $t('gradebook.prevq') }}
           </button>
@@ -452,7 +452,7 @@
             :disabled = "nextVisible === -1"
             type = "button"
             class = "primary"
-            @click = "curqn = nextVisible"
+            @click = "setCurqn(nextVisible)"
           >
             {{ $t('gradebook.nextq') }}
           </button>
@@ -615,6 +615,9 @@ export default {
       }
     },
     curQuestions () {
+      if (store.assessInfo === null) {
+        return [];
+      }
       return this.aData.assess_versions[store.curAver].questions;
     },
     curAver () {
@@ -926,6 +929,10 @@ export default {
         window.sidebysidemoveels(true, base);
       }
       this.$nextTick(window.sendLTIresizemsg);
+    },
+    setCurqn (val) {
+      this.curqn = val;
+      this.$nextTick(() => window.document.getElementById('qwrap' + (val + 1)).scrollIntoView());
     }
   },
   created () {
