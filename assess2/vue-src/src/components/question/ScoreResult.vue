@@ -161,7 +161,7 @@ export default {
         lasttried: lasttried,
         untried: untried,
         partcount: partcount
-      }
+      };
     },
     partStatusMessage () {
       // if multipart and should show details;

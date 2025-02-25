@@ -487,7 +487,10 @@
     "floating_scoreboxes": "Floating Scoreboxes",
     "sidebyside": "Side-by-Side",
     "no_edit": "You are in the gradebook. You cannot edit answers or submit questions from here.",
-    "activitylog": "Activity Log"
+    "activitylog": "Activity Log",
+    "nextq": "Next Question",
+    "prevq": "Previous Question",
+    "oneatatime": "One at a time"
   },
   "work": {
     "add": "Add Work",

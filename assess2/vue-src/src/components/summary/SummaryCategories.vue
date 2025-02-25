@@ -1,10 +1,13 @@
 <template>
   <table class="scorelist">
     <caption class="sr-only">Category Scores</caption>
-    <tr>
-      <th>{{ $t('catlist.category') }}</th>
-      <th>{{ $t('catlist.score') }}</th>
-    </tr>
+    <thead>
+      <tr>
+        <th>{{ $t('catlist.category') }}</th>
+        <th>{{ $t('catlist.score') }}</th>
+      </tr>
+    </thead>
+    <tbody>
     <tr v-for="(cat,index) in catScores" :key="index">
       <td>
         {{ cat.name }}
@@ -16,6 +19,7 @@
         </span>
       </td>
     </tr>
+    </tbody>
   </table>
 </template>
 

@@ -1,10 +1,13 @@
 <template>
   <table class="scorelist">
     <caption class="sr-only">Scores</caption>
-    <tr>
-      <th>{{ $t('scorelist.question') }}</th>
-      <th>{{ $t('scorelist.score') }}</th>
-    </tr>
+    <thead>
+      <tr>
+        <th>{{ $t('scorelist.question') }}</th>
+        <th>{{ $t('scorelist.score') }}</th>
+      </tr>
+    </thead>
+    <tbody>
     <tr v-for="(question,index) in questions" :key="index">
       <td>
         <icons :name="question.status" />
@@ -36,6 +39,7 @@
         </click-to-show>
       </td>
     </tr>
+    </tbody>
   </table>
 </template>
 

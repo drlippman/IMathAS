@@ -278,6 +278,12 @@
                   @change = "sidebysideAction"
                 />{{ $t('gradebook.sidebyside') }}
               </label>
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="op_oneatatime"
+                />{{ $t('gradebook.oneatatime') }}
+              </label>
             </p>
           </div>
         </div>
@@ -307,12 +313,12 @@
               pos="beforeexact"
               :qn="qn"
               :key="'iqt'+qn"
-              v-show = "!hidetexts"
+              v-show = "!hidetexts && showQuestion[qn] && (!op_oneatatime || curqn === qn)"
               :active = "!hidetexts"
               :lastq = "lastQ"
               :textlist = "textList"
             />
-            <div class = "bigquestionwrap" v-show="showQuestion[qn]">
+            <div class = "bigquestionwrap" v-show="showQuestion[qn] && (!op_oneatatime || curqn === qn)">
               <div class="headerpane">
                 <strong>
                   {{ $tc('question_n', qn+1) }}.
@@ -387,13 +393,22 @@
         <gb-feedback
           qn="gen"
           :username="aData.userfullname"
-          :show="viewFull && (canEdit || assessFeedback !== '')"
+          :show="viewFull && (canEdit || assessFeedback !== '') && (!op_oneatatime || nextVisible === -1)"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
           @update = "updateFeedback"
         />
-        <div>
+        <div v-if = "!op_oneatatime || nextVisible === -1">
+          <button
+            v-if = "op_oneatatime"
+            :disabled = "prevVisible === -1"
+            type = "button"
+            class = "secondary"
+            @click = "curqn = prevVisible"
+          >
+            {{ $t('gradebook.prevq') }}
+          </button>
           <button
             v-if = "canEdit"
             type = "button"
@@ -411,6 +426,35 @@
             @click = "submitChanges(false,true)"
           >
             {{ $t('gradebook.savenext') }}
+          </button>
+          <span v-if="savedMsg !== ''" class="noticetext">
+            {{ savedMsg }}
+          </span>
+          <button
+            type = "button"
+            class = "secondary"
+            :disabled = "!canSubmit"
+            @click = "exit"
+          >
+            {{ $t('gradebook.return') }}
+          </button>
+        </div>
+        <div v-else>
+          <button
+            :disabled = "prevVisible === -1"
+            type = "button"
+            class = "secondary"
+            @click = "curqn = prevVisible"
+          >
+            {{ $t('gradebook.prevq') }}
+          </button>
+          <button
+            :disabled = "nextVisible === -1"
+            type = "button"
+            class = "primary"
+            @click = "curqn = nextVisible"
+          >
+            {{ $t('gradebook.nextq') }}
           </button>
           <span v-if="savedMsg !== ''" class="noticetext">
             {{ savedMsg }}
@@ -510,7 +554,9 @@ export default {
       op_previewFiles: false,
       op_floatingSB: false,
       op_showans: false,
-      sidebysideon: false
+      sidebysideon: false,
+      op_oneatatime: false,
+      curqn: 0
     };
   },
   computed: {
@@ -655,6 +701,22 @@ export default {
         out[i] = showit;
       }
       return out;
+    },
+    nextVisible () {
+      for (let i = this.curqn + 1; i < this.curQuestions.length; i++) {
+        if (this.showQuestion[i]) {
+          return i;
+        }
+      }
+      return -1;
+    },
+    prevVisible () {
+      for (let i = this.curqn - 1; i >= 0; i--) {
+        if (this.showQuestion[i]) {
+          return i;
+        }
+      }
+      return -1;
     },
     exceptionActionLabel () {
       if (this.aData.hasexception) {
@@ -844,7 +906,7 @@ export default {
     storeFilters () {
       const tocheck = ['hide100', 'hidePerfect', 'hideNonzero', 'hideZero', 'hideUnanswered',
         'hideFeedback', 'hideNowork', 'showEndmsg', 'showExcused', 'showAllWork',
-        'hidetexts', 'op_previewFiles', 'op_floatingSB', 'op_showans', 'sidebysideon'];
+        'hidetexts', 'op_previewFiles', 'op_floatingSB', 'op_showans', 'sidebysideon', 'op_oneatatime'];
       const out = [];
       for (const v of tocheck) {
         if ((v === 'hidetexts' && this[v] === false) || (v !== 'hidetexts' && this[v] === true)) {
@@ -919,6 +981,20 @@ export default {
   },
   updated () {
     this.$nextTick(window.sendLTIresizemsg);
+  },
+  watch: {
+    showQuestion: {
+      handler (newVal) {
+        if (this.op_oneatatime && !newVal[this.curqn]) {
+          if (newVal[this.nextVisible]) {
+            this.curqn = this.nextVisible;
+          } else if (newVal[this.prevVisible]) {
+            this.curqn = this.prevVisible;
+          }
+        }
+      },
+      deep: true
+    }
   }
 };
 </script>
