@@ -36,6 +36,7 @@ if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
     $addq = 'addquestions';
     $from = 'addq';
 }
+$origmathdisp = $_SESSION['mathdisp'];
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
 	$_SESSION['mathdisp'] = 0;
 } else {
@@ -360,6 +361,7 @@ if ($overwriteBody==1) {
 
 }
 $_SESSION['graphdisp'] = $origgraphdisp;
+$_SESSION['mathdisp'] = $origmathdisp;
 require_once "../footer.php";
 
 function printq2($qn,$qsetid,$seed,$pts,$showpts) {
