@@ -791,9 +791,7 @@ function setupLivePreview(qn, skipinitial) {
                             ["Typeset",MathJax.Hub,this.buffer],
                             ["PreviewDone",this]
                         );
-                      } else {
-                        console.log('case 3');
-                      }
+                      } 
 			      } else if (mathRenderer=="Katex") {
 			      	  renderMathInElement(this.buffer);
 				      if (typeof MathJax != "undefined" && MathJax.Hub && !MathJax.typesetPromise && $(this.buffer).children(".mj").length>0) {//has MathJax elements
@@ -1268,13 +1266,13 @@ function AMnumfuncPrepVar(qn,str) {
 		  	}
 		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
-		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
+		  	str = str.replace(new RegExp(varpts[0],"g"), " repvars"+i);
 		  	vars[i] = "repvars"+i;
 		  } else if (!isgreek && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
       if (vars[i].match(/[^\w_]/) || vars[i].match(/^(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|and with)$/)) {
-        str = str.replace(new RegExp(escapeRegExp(vars[i]),"g"), "repvars"+i);
+        str = str.replace(new RegExp(escapeRegExp(vars[i]),"g"), " repvars"+i);
 		  	vars[i] = "repvars"+i;
       }
 	  }
@@ -1923,7 +1921,6 @@ function processNumfunc(qn, fullstr, format) {
             totest += 'var ' + remapVars[i] + '=' + testval + ';';
           }
           res = scopedeval(totest + totesteqn);
-          console.log(totest + totesteqn + ',res:'+res);
           if (res !== 'synerr') {
             successfulEvals++;
             break;
@@ -2289,18 +2286,18 @@ function syntaxcheckexpr(str,format,vl) {
       if (format.match(/casesensitivevars/)) {
         var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|');
         reglist.sort(function(x,y) { return y.length - x.length});
-        let reg1 = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
+        let reg1 = new RegExp("("+reglist.join('|')+")", "ig");
         var reglist = vl.split('|');
         reglist.sort(function(x,y) { return y.length - x.length});
-        let reg2 = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "g");
-        if (str.replace(reg1,'').replace(reg2,'').match(/[a-zA-Z]/)) {
+        let reg2 = new RegExp("("+reglist.join('|')+")", "g");
+        if (str.replace(/repvars\d+/,'').replace(reg1,'').replace(reg2,'').match(/[a-zA-Z]/)) {
           err += _(" Check your variables - you might be using an incorrect one")+". ";
         }
       } else {
         var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
         reglist.sort(function(x,y) { return y.length - x.length});
-	  	  let reg = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
-        if (str.replace(reg,'').match(/[a-zA-Z]/)) {
+	  	  let reg = new RegExp("("+reglist.join('|')+")", "ig");
+        if (str.replace(/repvars\d+/,'').replace(reg,'').match(/[a-zA-Z]/)) {
           err += _(" Check your variables - you might be using an incorrect one")+". ";
         }
       }
