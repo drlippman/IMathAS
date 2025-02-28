@@ -128,8 +128,8 @@ class MatrixAnswerBox implements AnswerBox
             } else {
                 $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
             }
-            $out .= "<span id=p$qn></span>";
             $out .= "</div>\n";
+            $preview .= "<span id=p$qn></span>";
             $params['matrixsize'] = $answersize;
             $params['calcformat'] = $answerformat . ($answerformat == '' ? '' : ',') . 'decimal';
             $params['tip'] = $shorttip;
