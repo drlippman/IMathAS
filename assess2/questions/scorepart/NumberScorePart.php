@@ -179,7 +179,9 @@ class NumberScorePart implements ScorePart
             }
             $islist = true;
         } else {
-            $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
+            if (empty($GLOBALS['CFG']['nocommathousandsseparator'])) {
+                $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
+            }
             $givenans = str_replace(',','99999999',$givenans); //force wrong ans on lingering commas
             $gaarr = array($givenans);
 

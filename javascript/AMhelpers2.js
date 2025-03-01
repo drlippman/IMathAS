@@ -70,6 +70,10 @@ var scriptqueue = [];
 var processingscriptsqueue = false;
 var callbackstack = {};
 
+if (typeof commasep === 'undefined') {
+  commasep = true;
+}
+
 var imathasAssess = (function($) {
 
 var allParams = {};
@@ -1152,7 +1156,7 @@ function preformat(qn, text, qtype, calcformat) {
   } else if (qtype == 'calcntuple') {
     text = text.replace(/<+/g, '(:').replace(/>+/g, ':)');
   } else if (qtype == 'calculated') {
-    if (calcformat.indexOf('list')==-1 && calcformat.indexOf('set')==-1) {
+    if (calcformat.indexOf('list')==-1 && calcformat.indexOf('set')==-1 && commasep) {
       text = text.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
     }
     if (calcformat.indexOf('scinot')!=-1) {
@@ -1339,6 +1343,9 @@ function roundForDisp(val) {
      if (format.indexOf('list')!== -1 || format.indexOf('set') !== -1) {
          var strs = origstr.split(/\s*,\s*/);
      } else {
+        if (!commasep && origstr.match(/,/)) {
+          err += _("Invalid use of a comma.");
+        }
          var strs = [origstr.replace(/,/g,'')];
      }
      var str;
@@ -1858,6 +1865,9 @@ function processNumfunc(qn, fullstr, format) {
   if (format.match(/list/)) {
       totestarr = strprocess[0].split(/,/);
   } else {
+      if (!commasep && strprocess[0].match(/,/)) {
+        err += _("Invalid use of a comma.");
+      }
       totestarr = [strprocess[0]];
   }
   var i,j,totest,testval,res;
@@ -1956,7 +1966,9 @@ function simplifyVariable(str) {
 //Function to convert inequalities into interval notation
 function ineqtointerval(strw, intendedvar) {
   var simpvar = simplifyVariable(intendedvar);
-  strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  if (commasep) {
+    strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  }
 	if (strw.match(/all\s*real/i)) {
     return ['(-oo,oo)'];
   } else if (strw.match(/DNE/)) {
@@ -2190,7 +2202,9 @@ function parsecomplex(v) {
 var onlyAscii = /^[\u0000-\u007f]*$/;
 
 function singlevalsyntaxcheck(str,format) {
-  str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  if (commasep) {
+    str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  }
 	if (str.match(/DNE/i)) {
 		 return '';
 	} else if (str.match(/-?\+?oo$/) || str.match(/-?\+?oo\W/)) {
@@ -2327,7 +2341,9 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  if (commasep) {
+    evalstr = evalstr.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  }
   if (evalstr.match(/,/)) {
     return [NaN, _("syntax incomplete")+". "];
   }

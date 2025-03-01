@@ -3449,7 +3449,9 @@ function ineqtointerval($str, $var) {
 	}
 	$str = strtolower($str);
     $var = strtolower($var);
-    $str = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/',"$1", $str);
+	if (empty($GLOBALS['CFG']['nocommathousandsseparator'])) {
+    	$str = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/',"$1", $str);
+	}
 	if (preg_match('/all\s*real/', $str)) {
 		return '(-oo,oo)';
     }
@@ -4347,7 +4349,9 @@ function numfuncGenerateTestpoints($variables,$domain='') {
    string of rewritten expression
 */
 function numfuncPrepForEval($expr, $variables) {
-    $expr = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$expr);
+	if (empty($GLOBALS['CFG']['nocommathousandsseparator'])) {
+    	$expr = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$expr);
+	}
 
     for ($i = 0; $i < count($variables); $i++) {
         if ($variables[$i]=='lambda') { //correct lamda/lambda

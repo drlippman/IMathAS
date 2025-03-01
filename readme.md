@@ -219,6 +219,9 @@ continue using push notifications, you will need to:
 The student side of the system is pretty well set up for i18n, but the instructor side is  not yet.  Currently the only translation pack available is `de` (German).  See `/i18n/translating.md` for more information about generating translations.  To enable a translation:
 - `$CFG['locale']`: Set this to the desired language code, like `de`
 
+Also adjustable:
+- `$CFG['nocommathousandsseparator']`: set to `true` to disallow the use of comma as a thousands separator in large numbers.
+
 ### IPEDS / NCES 
 
 The system can create associations with IPEDS/NCES records. For this, you will need to manually 
