@@ -91,8 +91,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$grouplimit = array();
-	if ($_POST['grouplimit']!='none') {
-		$grouplimit[] = $_POST['grouplimit'];
+	if (!empty($_POST['grouplimit']) && is_array($_POST['grouplimit'])) {
+		$grouplimit = $_POST['grouplimit'];
 	}
 	//$_POST['title'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['title']);
 	$stm = $DBH->prepare("SELECT itemorder,blockcnt FROM imas_courses WHERE id=:id");
@@ -270,8 +270,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existBlocksLabels = array();
 	buildExistBlocksArray($items,'0');
 
-	$page_sectionlistval = array("none");
-	$page_sectionlistlabel = array("No restriction");
+	$page_sectionlistval = [];//array("none");
+	$page_sectionlistlabel = [];//array("No restriction");
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -356,7 +356,7 @@ var imgBase = '$staticroot/javascript/cpimages';
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");}</style>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/multiselect-dropdown.js\"></script>";
 /******* begin html output ********/
 require_once "../header.php";
 
@@ -377,57 +377,66 @@ if ($overwriteBody==1) {
 <?php echo $formTitle; ?>
 
 <form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder'] ?? 0); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
-	<span class=form>Title: </span>
-	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>" required></span>
+	<span class=form><label for="title"><?php echo _('Title'); ?></label>: </span>
+	<span class=formright><input type=text size=60 name=title id=title value="<?php echo str_replace('"','&quot;',$title);?>" required></span>
 	<BR class=form>
-	<span class=form>Show:</span>
-	<span class=formright>
-		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?>/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
-		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?>/>Show by Dates<br/>
-		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?>/>Show Always<br/>
+	<span class=form id="showlabel"><?php echo _('Show'); ?>:</span>
+	<span class=formright role=radiogroup aria-labelledby="showlabel">
+		<label><input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?>/><?php echo _('Hide'); ?> <span class=small>(<?php echo _('this will hide all items in the block from the gradebook'); ?>)</span></label><br/>
+		<label><input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?>/><?php echo _('Show by Dates'); ?></label><br/>
+		<label><input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?>/><?php echo _('Show Always'); ?></label>
 	</span><br class="form"/>
 
 	<div id="datediv">
-	<span class=form>Available After:</span>
-	<span class=formright>
-	<input type=radio name="sdatetype" value="0" <?php  writeHtmlChecked($startdate,0) ?>/>
-	 Always until end date<br/>
-	<input type=radio name="sdatetype" value="now"/> Now<br/>
-	<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,0,1) ?>/>
-	<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
-	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-	at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span>
+	<span class=form id="availafterlabel"><?php echo _('Available After'); ?>:</span>
+	<span class=formright role=radiogroup aria-labelledby="availafterlabel">
+		<label><input type=radio name="sdatetype" value="0" <?php  writeHtmlChecked($startdate,0) ?>/>
+		<?php echo _('Always until end date'); ?></label><br/>
+		<label><input type=radio name="sdatetype" value="now"/> <?php echo _('Now'); ?></label><br/>
+		<label><input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,0,1) ?>/>
+		<span class="sr-only"><?php echo _('the following date'); ?></label>
+		<input type=text size=10 name="sdate" value="<?php echo $sdate;?>" 
+		aria-label="<?php echo _('available after this date');?>">
+		<a href="#" onClick="displayDatePicker('sdate', this); return false">
+		<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+		at <input type=text size=10 name=stime value="<?php echo $stime;?>"
+		aria-label="<?php echo _('available after this time');?>">
+	</span>
 	<BR class=form>
 
-	<span class=form>Available Until:</span><span class=formright>
-	<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000') ?>/>
-	 Always after start date<br/>
-	<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-	<input type=text size=10 name=edate value="<?php echo $edate;?>">
-	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
+	<span class=form id="availuntillabel"><?php echo _('Available Until'); ?>:</span>
+	<span class=formright role=radiogroup aria-labelledby="availuntillabel">
+		<label><input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000') ?>/>
+		<?php echo _('Always after start date'); ?></label><br/>
+		<label><input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
+		<span class="sr-only"><?php echo _('the following date'); ?></label>
+		<input type=text size=10 name=edate value="<?php echo $edate;?>"
+		aria-label="<?php echo _('available until this date');?>">
+		<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
+		<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+		at <input type=text size=10 name=etime value="<?php echo $etime;?>"
+		aria-label="<?php echo _('available until this time');?>">
+	</span>
 	<BR class=form>
 	</div>
 	<div class="availbh">
-	<span class=form>When available:</span>
-	<span class=formright>
-	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
-	<input type=radio name=availbeh value="C" <?php writeHtmlChecked($availbeh,'C')?> />Show Collapsed<br/>
-	<input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> />Show as Folder<br/>
-	<input type=radio name=availbeh value="T" <?php writeHtmlChecked($availbeh,'T')?> />Show as TreeReader
+	<span class=form id="whenavaillabel"><?php echo _('When available'); ?>:</span>
+	<span class=formright role=radiogroup aria-labelledby="whenavaillabel">
+		<label><input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> /><?php echo _('Show Expanded'); ?></label><br/>
+		<label><input type=radio name=availbeh value="C" <?php writeHtmlChecked($availbeh,'C')?> /><?php echo _('Show Collapsed'); ?></label><br/>
+		<label><input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> /><?php echo _('Show as Folder'); ?></label><br/>
+		<label><input type=radio name=availbeh value="T" <?php writeHtmlChecked($availbeh,'T')?> /><?php echo _('Show as TreeReader'); ?></label>
 	</span><br class=form />
 	</div>
 	<div class="navail">
-	<span class=form>When not available:</span>
-	<span class=formright>
-	<input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> />Hide from Students<br/>
-	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
+	<span class=form id="whennotavaillabel"><?php echo _('When not available'); ?>:</span>
+	<span class=formright role=radiogroup aria-labelledby="whennotavaillabel">
+		<label><input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> /><?php echo _('Hide from Students'); ?></label><br/>
+		<label><input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> /><?php echo _('Show Collapsed/as folder'); ?></label>
 	</span><br class=form />
 	</div>
 	<div class="availbh">
-	<span class=form>For assignments within this block, when they are not available:</span>
+	<span class=form><label for="contentbehavior"><?php echo _('For assignments within this block, when they are not available'); ?>:</span>
 	<span class=formright>
 	<?php
 		writeHtmlSelect('contentbehavior',array(0,1,2,3),array(
@@ -439,63 +448,66 @@ if ($overwriteBody==1) {
 	?>
 	</span><br class=form />
 	<div class="expando">
-	<span class="form">If expanded, limit height to:</span>
+	<span class="form" id="heightlabel1"><?php echo _('If expanded, limit height to'); ?>:</span>
 	<span class="formright">
-	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" />pixels (blank for no limit)
+	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" aria-labelledby="heightlabel1 heightlabel2"/>
+	 <span id="heightlabel2"><?php echo _('pixels (blank for no limit)'); ?></span>
 	</span><br class="form" />
 	</div>
-	<span class="form">Restrict access to students in section:</span>
+	<span class="form"><label for="grouplimit[]"><?php echo _('Restrict access to students in section'); ?></label>:</span>
 	<span class="formright">
-	<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,$grouplimit[0] ?? 'none'); ?>
+	<?php writeHtmlSelect('grouplimit[]',$page_sectionlistval,$page_sectionlistlabel,$grouplimit,null,null,' multiple'); ?>
 	</span><br class="form" />
 
-	<span class=form>Quick Links:</span>
+	<span class=form id="quicklabel1"><?php echo _('Quick Links'); ?>:</span>
 	<span class=formright>
-	<input type=checkbox name=innav value="1" <?php writeHtmlChecked($innav,'1') ?> /> List block in student left navigation
+	<input type=checkbox name=innav value="1" <?php writeHtmlChecked($innav,'1') ?> aria-labelledby="quicklabel1 quicklabel2" /> 
+	 <span id="quicklabel2"><?php echo _('List block in student left navigation'); ?></span>
 	</span><br class=form />
 
-	<span class=form>Public:</span>
+	<span class=form id="publabel1"><?php echo _('Public'); ?>:</span>
 	<span class=formright>
-	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> /> Make items publicly accessible<sup>*</sup>
+	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> aria-labelledby="publabel1 publabel2" /> 
+	 <span id="publabel2"><?php echo _('Make items publicly accessible'); ?></span><sup>*</sup>
 	</span><br class=form />
 
 
-	<span class=form>Block colors:</span>
-	<span class=formright>
-	<input type=radio name="colors" value="def" <?php  writeHtmlChecked($usedef,1) ?> />Use defaults<br/>
-	<input type=radio name="colors" value="copy" <?php writeHtmlChecked($usedef,2) ?> />Copy colors from block:
+	<span class=form id="colorlabel"><?php echo _('Block colors'); ?>:</span>
+	<span class=formright role=radiogroup aria-labelledby="colorlabel">
+	<label><input type=radio name="colors" value="def" <?php  writeHtmlChecked($usedef,1) ?> /><?php echo _('Use defaults'); ?></label><br/>
+	<label><input type=radio name="colors" value="copy" <?php writeHtmlChecked($usedef,2) ?> /><?php echo _('Copy colors from block'); ?></label>:
 
 	<?php
-	writeHtmlSelect("copycolors",$existBlocksVals,$existBlocksLabels);
+	writeHtmlSelect("copycolors",$existBlocksVals,$existBlocksLabels,null,null,null,'aria-label="' . _('Block to copy colors from') . '"');
 	?>
 
 	<br />&nbsp;<br/>
-	<input type=radio name="colors" id="colorcustom" value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom
+	<label><input type=radio name="colors" id="colorcustom" value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> /><?php echo _('Use custom'); ?></label>
 	<table class="coloropts" role="presentation" style="display: inline; border-collapse: collapse; margin-left: 15px;">
 		<tr>
 			<td id="ex1" style="border: 1px solid #000;background-color:
 			<?php echo $titlebg;?>;color:<?php echo $titletxt;?>;">
-			Sample Title Cell</td>
+			<?php echo _('Sample Title Cell'); ?></td>
 		</tr>
 		<tr class="expando">
 			<td id="ex2" style="border: 1px solid #000;background-color:
-			<?php echo $bi;?>;">&nbsp;sample content cell</td>
+			<?php echo $bi;?>;">&nbsp;<?php echo _('sample content cell'); ?></td>
 		</tr>
 	</table>
 	<br class="coloropts"/>
 	<table class="coloropts" role="presentation" style=" margin-left: 30px;">
 		<tr>
-			<td>Title Background: </td>
+			<td><label for=titlegb><?php echo _('Title Background'); ?></label>: </td>
 			<td><input type=text id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" />
 			</td>
 		</tr>
 		<tr>
-			<td>Title Text: </td>
+			<td><label for=titletxt><?php echo _('Title Text'); ?></label>: </td>
 			<td><input type=text id="titletxt" name="titletxt" value="<?php echo $titletxt;?>" />
 			</td>
 		</tr>
 		<tr class="expando">
-			<td>Items Background: </td>
+			<td><label for=bi><?php echo _('Items Background'); ?></label>: </td>
 			<td><input type=text id="bi" name="bi" value="<?php echo $bi;?>" />
 			</td>
 		</tr>
@@ -519,6 +531,7 @@ if (isset($blockitems)) {
 echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 }
 
+echo '<script>MultiselectDropdown({style: {width: "400px"}, placeholder: "'._('No restriction').'"});</script>';
 	require_once "../footer.php";
 
 /**** end html code ******/
