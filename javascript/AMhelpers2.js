@@ -2304,14 +2304,14 @@ function syntaxcheckexpr(str,format,vl) {
         var reglist = vl.split('|');
         reglist.sort(function(x,y) { return y.length - x.length});
         let reg2 = new RegExp("("+reglist.join('|')+")", "g");
-        if (str.replace(/repvars\d+/,'').replace(reg1,'').replace(reg2,'').match(/[a-zA-Z]/)) {
+        if (str.replace(/repvars\d+/g,'').replace(reg1,'').replace(reg2,'').match(/[a-zA-Z]/)) {
           err += _(" Check your variables - you might be using an incorrect one")+". ";
         }
       } else {
         var reglist = 'degree|arc|arg|ar|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
         reglist.sort(function(x,y) { return y.length - x.length});
 	  	  let reg = new RegExp("("+reglist.join('|')+")", "ig");
-        if (str.replace(/repvars\d+/,'').replace(reg,'').match(/[a-zA-Z]/)) {
+        if (str.replace(/repvars\d+/g,'').replace(reg,'').match(/[a-zA-Z]/)) {
           err += _(" Check your variables - you might be using an incorrect one")+". ";
         }
       }
