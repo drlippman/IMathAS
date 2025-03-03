@@ -18,7 +18,7 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
             if (!isset($valList[$i]) || !isset($labelList[$i])) { continue; }
 			if (isset($selectedVal) && (
 				(is_array($selectedVal) && in_array($valList[$i], $selectedVal)) || 
-				(is_string($selectedVal) && strcmp($valList[$i], $selectedVal)==0)
+				(!is_array($selectedVal) && strcmp($valList[$i], $selectedVal)==0)
 			)) {
 				echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\" selected>".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
 			} else {
