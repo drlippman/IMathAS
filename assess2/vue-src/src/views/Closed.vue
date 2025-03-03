@@ -262,8 +262,8 @@ export default {
       );
     },
     canAddWork () {
-      return (store.assessInfo.showwork_after &&
-        (store.assessInfo.showwork_cutoff === 0 || store.assessInfo.showwork_cutoff_in > 0)
+      return (store.assessInfo.showwork_after && !store.showwork_expired &&
+        (!store.assessInfo.has_active_attempt || store.assessInfo.submitby === 'by_question')
       );
     },
     showTutorLinks () {

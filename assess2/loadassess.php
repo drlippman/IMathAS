@@ -129,9 +129,10 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'))) {
     $assessInfoOut['timelimit_ext'] = $assess_info->getSetting('timeext');
     if (!$assessInfoOut['has_active_attempt'] && ($assess_record->getStatus()&64)==64 &&
-      $assessInfoOut['timelimit_ext'] > 0
+      $assessInfoOut['timelimit_ext'] > 0 &&
+      $assessInfoOut['available'] === 'yes'
     ) {
-        // has a previously submitted attempt; mark as active since we have a time 
+        // has a previously submitted attempt; if available, mark as active since we have a time 
         // limit extension available
         $assessInfoOut['has_active_attempt'] = true;
     }
