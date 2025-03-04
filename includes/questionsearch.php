@@ -78,7 +78,7 @@ function parseSearchString($str)
  */
 function searchQuestions($search, $userid, $searchtype, $libs = array(), $options = array(), $offset = 0, $max = 200)
 {
-    global $DBH;
+    global $DBH, $groupid;
 
     $searchand = [];
     $searchvals = [];
@@ -298,23 +298,23 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = 'iq.userights=0';
             }
         } else if (!empty($options['isgroupadmin'])) {
-            $groupid = $options['isgroupadmin'];
+            $admingroupid = $options['isgroupadmin'];
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
             } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
-                $searchvals[] = $groupid;
+                $searchvals[] = $admingroupid;
             }
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
             }
             if (isset($search['id'])) {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
-                $searchvals[] = $groupid;
+                $searchvals[] = $admingroupid;
                 $searchvals[] = $search['id'];
             } else if ($searchtype != 'assess') {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
-                $searchvals[] = $groupid;
+                $searchvals[] = $admingroupid;
             }
         } else {
             if (isset($search['private']) && $search['private'] == 0) {
@@ -468,7 +468,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $row['mine'] = ($row['ownerid'] == $userid) ? 1 : 0;
         $row['canedit'] = ($row['ownerid'] == $userid || 
             !empty($options['isadmin']) ||
-            (!empty($options['isgroupadmin']) && $options['isgroupadmin'] == $row['groupid'])
+            (!empty($options['isgroupadmin']) && $options['isgroupadmin'] == $row['groupid']) ||
+            $row['userights'] == 4 ||
+            ($row['userights'] == 3 && $groupid == $row['groupid'])
         ) ? 1 : 0;
         if (!empty($options['includelastmod'])) {
             $row['lastmod'] = tzdate("m/d/y", $row['lastmoddate']);
