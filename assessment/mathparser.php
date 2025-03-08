@@ -561,7 +561,9 @@ class MathParser
               }
             } else if ($nextSymbol === 'root') {
               // found a root.  Parse the index
-              if (preg_match('/^[\(\[]*(-?\d+)[\)\]]*/', substr($str,$n+1), $sub)) {
+              if ($peek === '(') {
+                $tokens[count($tokens)-1]['symbol'] .= '(';
+              } else if (preg_match('/^[\(\[]*(-?\d+)[\)\]]*/', substr($str,$n+1), $sub)) {
                 // replace the last node with an nthroot node
                 $tokens[count($tokens)-1] = [
                   'type' => 'function',
@@ -835,6 +837,17 @@ class MathParser
             unset($this->tokens[$tokenindex+1]); // remove implicit mult
           };
           return;
+        } else if ($node['symbol'] === 'root(') {
+          if ($operand === null) {
+            throw new MathParserException("Syntax error - missing index");
+          }
+          $node['symbol'] = 'nthroot';
+          $node['index'] = $operand;
+          $this->operatorStack[] = $node;
+          if (isset($this->tokens[$tokenindex+1]) && $this->tokens[$tokenindex+1]['symbol'] === '*') {
+            unset($this->tokens[$tokenindex+1]); // remove implicit mult
+          };
+          return;
         } else {
           if ($operand === null) {
             throw new MathParserException("Syntax error - missing function input");
@@ -945,7 +958,7 @@ class MathParser
             }
             break;
           case 'nthroot':
-            if ($indexval%2==0 && $insideval<0) {
+            if (floor($indexval)==$indexval && $indexval%2==0 && $insideval<0) {
               throw new MathParserException("no even root of negative");
             }
             break;
@@ -1163,7 +1176,7 @@ class MathParser
       $this->treeWalk($node, $allSums);
 
       $invert = false;
-      usort($allSums, 'self::nodeSort');
+      usort($allSums, self::class . '::nodeSort');
       
       if ($basesym === '+' && ($allSums[0]['symbol'] === '~' ||
         ($allSums[0]['type'] === 'number' && $allSums[0]['symbol'] < 0))
@@ -1452,7 +1465,9 @@ function factorial($x) {
 function nthroot($x,$n) {
 	if ($x==0) {
       return 0;
-    } else if ($n%2==0 && $x<0) { //if even root and negative base
+  } else if (floor($n) != $n) {
+    return safepow($x, 1/$n);
+  } else if ($n%2==0 && $x<0) { //if even root and negative base
       throw new MathParserException("Can't take even root of negative value");
 	} else if ($n==0) {
       throw new MathParserException("Can't take 0th root");
