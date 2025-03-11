@@ -177,16 +177,18 @@ class CalculatedScorePart implements ScorePart
             $origanscnt = count($aarr);
             if (!empty($partialcredit) && !$isListAnswer) { // partial credit only works for non-list answers
                 if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
+                $removeReqTimesOnDup = (is_array($requiretimes) && 2*count($requiretimes) > count($partialcredit));
+                $removeAnsFmtOnDup = (is_array($answerformat) && 2*count($answerformat) > count($partialcredit));
                 for ($i=0;$i<count($partialcredit);$i+=2) {
                     if (!in_array($partialcredit[$i], $aarr) || $partialcredit[$i+1]<1) {
                         $aarr[] = $partialcredit[$i];
                         $partialpts[] = $partialcredit[$i+1];
                     } else {
                         // ignoring element; need to remove corresponding from requiretimes and answerformat
-                        if (is_array($answerformat)) {
+                        if ($removeAnsFmtOnDup) {
                             unset($answerformat[1+$i/2]);
                         }
-                        if (is_array($requiretimes)) {
+                        if ($removeReqTimesOnDup) {
                             unset($requiretimes[1+$i/2]);
                         }
                     }
