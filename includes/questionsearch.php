@@ -444,7 +444,6 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $row['extrefval'] = 0;
         if ($row['extref']!='') {
             $extref = explode('~~',$row['extref']);
-            print_r($extref);
             $hasvid = false;  $hasother = false; $hascap = false;
             foreach ($extref as $v) {
                 if (substr($v,0,5)=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
