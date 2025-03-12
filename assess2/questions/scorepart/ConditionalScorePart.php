@@ -81,6 +81,8 @@ class ConditionalScorePart implements ScorePart
                     $pt = comparenumbers($ans[1],$ans[2],$tol);
                 } else if ($ans[0]=='function') {
                     $pt = comparefunctions($ans[1],$ans[2],$variables,$tol,$domain);
+                } else {
+                    continue;
                 }
                 if ($flip) {
                     $pt = !$pt;
