@@ -175,6 +175,9 @@ function flattenitems($items,&$addto,&$itemidsection,$sec='') {
 			if (!isset($item['avail'])) { //backwards compat
 				$item['avail'] = 1;
             }
+			if (!isset($item['SH'])) { //backwards compat
+                $item['SH'] = 'HO';
+            }
             $thissec = $sec;
             $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
             if (!empty($item['grouplimit'])) {

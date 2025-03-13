@@ -255,6 +255,9 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
             if (!isset($items[$i]['id'])) { // hack fix
                 $items[$i]['id'] = 'tmpid' . $i;
             }
+            if (!isset($items[$i]['SH'])) { // hack fix
+                $items[$i]['SH'] = 'HO';
+            }
             $turnonpublic = false;
             if ($ispublic && !$inpublic) {
                 if (isset($items[$i]['public']) && $items[$i]['public'] == 1) {
