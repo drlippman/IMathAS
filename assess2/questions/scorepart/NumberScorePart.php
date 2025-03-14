@@ -71,6 +71,12 @@ class NumberScorePart implements ScorePart
             return $scorePartResult;
         }
 
+        $isListAnswer = (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats));
+        if ($isListAnswer && !empty($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+
         if (in_array('integer',$ansformats) && preg_match('/\..*[1-9]/',$givenans)) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
@@ -129,11 +135,9 @@ class NumberScorePart implements ScorePart
             $gaarr = array_map('trim', explode(',',$givenans));
             $gaarrcnt = count($gaarr);
             $anarr = explode(',',$answer);
-            $isListAnswer = true;
         } else if (in_array('orderedlist',$ansformats)) {
             $gaarr = array_map('trim', explode(',',$givenans));
             $anarr = explode(',',$answer);
-            $isListAnswer = true;
         } else if (in_array('list',$ansformats)) {
             $tmp = array();
             $gaarr = array();
@@ -165,8 +169,8 @@ class NumberScorePart implements ScorePart
                     $anarr[] = $tmp[$i];
                 }
             }
-            $isListAnswer = true;
         } else {
+            $origgivenans = array($givenans);
             if (empty($GLOBALS['CFG']['nocommathousandsseparator'])) {
                 $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
             }
@@ -187,11 +191,6 @@ class NumberScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
-        }
-
-        if ($isListAnswer && !empty($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
-            $scorePartResult->setRawScore(0);
-            return $scorePartResult;
         }
 
         if (in_array('parenneg',$ansformats)) {
@@ -311,7 +310,7 @@ class NumberScorePart implements ScorePart
                         $thisreqdecimals = '';
                         $thisreqsigfigs = '';
                     }
-                    if (!$isListAnswer && !empty($thisreqtimes) && checkreqtimes($givenans, $thisreqtimes)==0) {
+                    if (!$isListAnswer && !empty($thisreqtimes) && checkreqtimes($origgivenans[$j], $thisreqtimes)==0) {
                         // doesn't meet requiretimes
                         continue;
                     }
