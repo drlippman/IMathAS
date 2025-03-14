@@ -101,7 +101,7 @@ if ($in_practice || $canViewAll) {
 ) {
     $doCheckPassword = false;
 }
-if ($doCheckPassword && !$assess_info->checkPassword($_POST['password'])) {
+if ($doCheckPassword && !$assess_info->checkPassword($_POST['password'] ?? '')) {
   echo '{"error": "invalid_password"}';
   exit;
 } 
