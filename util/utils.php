@@ -1,6 +1,8 @@
 <?php
 
 require_once "../init.php";
+require_once '../includes/videodata.php';
+
 if (isset($_SESSION['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])) {
 	$_SESSION['userid'] = $_SESSION['emulateuseroriginaluser'];
     $userid = $_SESSION['userid'];
@@ -110,27 +112,9 @@ if (isset($_POST['updatecaption'])) {
 		exit;
 	}
     $vidid = Sanitize::simpleASCII($vidid);
-	$ctx = stream_context_create(array('http'=>
-	    array(
-		'timeout' => 1
-	    )
-	));
-	if (isset($CFG['YouTubeAPIKey'])) {
-		$captioned = 0;
-		$resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.$vidid.'&key='.$CFG['YouTubeAPIKey'], false, $ctx);
-		$capdata = json_decode($resp, true);
-		if ($capdata !== null && isset($capdata['items'])) {
-			foreach ($capdata['items'] as $cap) {
-				if ($cap['snippet']['trackKind'] == 'standard') {
-					$captioned = 1;
-					break;
-				}
-			}
-		}
-	} else {
-		$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
-		$captioned = (strpos($t, '<track')===false)?0:1;
-	}
+
+	$captioned = getCaptionDataByVidId($vidid);
+
 	if ($captioned==1) {
 		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
@@ -149,6 +133,43 @@ if (isset($_POST['updatecaption'])) {
 		}
 	}
 	echo '<p>Updated '.$chg.' records.</p><p><a href="utils.php">Utils</a></p>';
+	exit;
+}
+if (isset($_POST['updatecaptionbyqids'])) {
+	$qids = array_map('intval', explode(',', $_POST['updatecaptionbyqids']));
+	if (count($qids) == 0) {
+		echo "Must provide question IDs";
+		exit;
+	}
+	$upd = $DBH->prepare('UPDATE imas_questionset SET extref=? WHERE id=?');
+	$ph = Sanitize::generateQueryPlaceholders($qids);
+	$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE id IN ($ph)");
+	$stm->execute($qids);
+	$updatedcnt = 0;
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$changed = false;
+		$extrefs = explode('~~', $row['extref']);
+		foreach ($extrefs as $k=>$v) {
+			$parts = explode('!!', $v);
+			if ($parts[0]=="video" && $parts[2] == 0) { // video, not captioned
+				$vidid = getvideoid($parts[1]);
+				if ($vidid !== '') {
+					$captioned = getCaptionDataByVidId($vidid);
+					if ($captioned == 1) {
+						$parts[2] = 1;
+						$extrefs[$k] = implode('!!', $parts);
+						$changed = true;
+					}
+				}
+			}
+		}
+		if ($changed) {
+			$updatedcnt++;
+			$upd->execute([implode('~~', $extrefs), $row['id']]);
+		}
+	}
+	
+	echo '<p>Updated '.$updatedcnt.' records.</p><p><a href="utils.php">Utils</a></p>';
 	exit;
 }
 
@@ -257,6 +278,14 @@ if (isset($_GET['form'])) {
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo 'YouTube video ID: <input type="text" size="11" name="updatecaption"/>';
+		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
+		require_once "../footer.php";
+	} else if ($_GET['form']=='updatecaptionbyqids') {
+		require_once "../header.php";
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
+		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
+		echo 'Question IDs to rescan videos on (comma separated):<br><input type="text" size="80" name="updatecaptionbyqids"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
 		require_once "../footer.php";
@@ -419,7 +448,8 @@ if (isset($_GET['form'])) {
 	echo '<a href="getstucntdet.php">Get Detailed Student Count</a><br/>';
 	echo '<a href="utils.php?debug=true">Enable Debug Mode</a><br/>';
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';
-	echo '<a href="utils.php?form=updatecaption">Update YouTube video caption data</a><br/>';
+	echo '<a href="utils.php?form=updatecaption">Update YouTube video caption data by video ID</a><br/>';
+	echo '<a href="utils.php?form=updatecaptionbyqids">Update YouTube video caption data by Question IDs</a><br/>';
 	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
 	echo '<a href="utils.php?form=rescue">Recover lost items</a><br/>';
 	echo '<a href="utils.php?fixorphanqs=true">Fix orphaned questions</a><br/>';
