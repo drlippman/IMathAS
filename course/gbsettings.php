@@ -240,18 +240,35 @@
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = $stm->fetch(PDO::FETCH_NUM);
+
+	/*
+		defgbmode is FEDCBA where
+		F & 1 is  Show Section Column	
+		F & 2 is  Show Code Column
+		F & 4 is  Show Points (0), Percents (4)
+		E     is  Show pics: none (0), small(1), big (2)
+		D & 1 is  Total on right (0), left (1)
+		D & 2 is  Average on bottom (0), top (2)
+		D & 4 is  Last login column: hide (0), show (4)
+		C & 1 is  Links show: full (0), summary (1)
+		C & 2 is  Locked: show (0), hide (2)
+		C & 4 is  Due date column: hide (0), show (4)
+		B % 3 is  NC assignments: show (0), student visible (cntingb not 0) (1), hide all (2)
+		B & 4 is  Last change column: hide (0), show (4)
+		A     is  Show by availability: Past due (0), Past & Available (1), All (2), Past & Attempted (3), Available only (4)
+	*/
 	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
 	$showpercents = (((floor($defgbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
-	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
+	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 4 show last login column
 	$links = ((floor($defgbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 2: hide locked
 	$includeduedate = (((floor($defgbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
 	$hidenc = (floor($defgbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$includelastchange = (((floor($defgbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
-	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
+	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 avail only
 
 	$colorval = array(0);
 	$colorlabel = array("No Color");
