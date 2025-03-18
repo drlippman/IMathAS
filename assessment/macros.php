@@ -6022,7 +6022,7 @@ function comparesameform($a,$b,$vars="x") {
     return ($afunc->normalizeTreeString() === $bfunc->normalizeTreeString());
 }
 
-function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) {
+function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat = null) {
     if (!isset($stu[$qn])) {
         return false;
     }
@@ -6037,6 +6037,10 @@ function stuansready($stu, $qn, $parts, $anstypes = null, $answerformat = null) 
     if (!is_array($parts) && is_numeric($parts)) {
         $parts = [$parts];
     }
+	if (!is_array($parts)) {
+		echo "Invalid input for parts in stuansready";
+		return false;
+	}
     if ($anstypes !== null && !is_array($anstypes)) {
         $anstypes = array_map('trim', explode(',', $anstypes));
         if (count($parts)==1 && count($anstypes)==1) {
