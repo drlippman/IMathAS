@@ -328,7 +328,8 @@ function parselibs($file) {
 			$libitemid = rtrim(fgets($handle, 4096));
 		} else if ($line=="QSETIDS") {
 			if ($libitemid!=-1) {
-				$libitems[$libitemid] = rtrim(fgets($handle, 4096));
+                $readLength = $GLOBALS['CFG']['libimport']['qsetids_max_length'] ?? 4096;
+				$libitems[$libitemid] = rtrim(fgets($handle, $readLength));
 			}
 		} else if ($dopackd ==true) {
 			$packname .= rtrim($line);
