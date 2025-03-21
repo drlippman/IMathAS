@@ -44,9 +44,19 @@ class ConditionalScorePart implements ScorePart
         }
 
         if (isset($abstolerance)) {
-            $tol = '|'.$abstolerance;
+            if (is_array($abstolerance)) {
+                // this can happen if $reqdecimals[pn] was used for answertip purposes
+                // we'll just use the first value
+                $tol = '|'.$abstolerance[0];
+            } else {
+                $tol = '|'.$abstolerance;
+            }
         } else {
-            $tol = $reltolerance;
+            if (is_array($reltolerance)) {
+                $tol = $reltolerance[0];
+            } else {
+                $tol = $reltolerance;
+            }
         }
         $correct = true;
         if (!is_array($answer)) { //single boolean or decimal score
