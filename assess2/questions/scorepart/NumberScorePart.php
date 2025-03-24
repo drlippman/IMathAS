@@ -319,7 +319,7 @@ class NumberScorePart implements ScorePart
                             //check reqdecimals/sigfigs
                             if ($thisreqdecimals !== '') {
                                 $decimalsingivenans = ($p = strpos($givenans,'.'))===false ? 0 : (strlen($givenans)-$p-1);
-                                if ($exactreqdec) {
+                                if ($exactreqdec == 1) {
                                     if ($thisreqdecimals != $decimalsingivenans ) {
                                         continue;
                                     }
@@ -365,7 +365,7 @@ class NumberScorePart implements ScorePart
                                 if ($gaunitsarr[$j][1] != $anssunits[$k][1]) {
                                     continue;
                                 }
-                                if ($thisreqdecimals !== '' && $exactreqdec) {
+                                if ($thisreqdecimals !== '' && $exactreqdec == 1) {
                                     //check number of decimal places in base givenans
                                     if ($thisreqdecimals != (($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1))) {
                                         continue;
@@ -390,7 +390,7 @@ class NumberScorePart implements ScorePart
                             } else { 
                                 if ($thisreqdecimals !== '' && $exactreqdec) {
                                     //check number of decimal places in givenans
-                                    if ($thisreqdecimals != (($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1))) {
+                                    if ($exactreqdec == 1 && $thisreqdecimals != (($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1))) {
                                         continue;
                                     }
                                     $anans = round($anans, $thisreqdecimals);

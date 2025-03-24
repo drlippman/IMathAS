@@ -3091,8 +3091,12 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	will be used (even if it doesn't agree with the $reqdecimal setting).<br/><br/>
 	$reqdecimals = "=2" can be used to require exactly 2 decimal places in the answer, regardless of how the value rounds (so 3.5 would get marked
 	wrong when the answer is 3.50 if "=2" is used).  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
-	<br/>When the "=2" form is used, it overrides both $reltolerance and $abstolerance, and by default tests that the student answer exactly matches
-	the correct answer ($abstolerance=0).  To override the tolerance use +- in the setting, like this:
+	<br/>
+	$reqdecimals = "r2" can be used to require rounding to 2 decimal places in the answer, not checking for trailing zeros (so 3.5 would get marked
+	correct when the answer is 3.50 if "r2" is used).  If you use the "r2" form, it will also round your $answer if needed for the $showanswer.
+	<br/>When the "=2" or "r2" form is used, it overrides both $reltolerance and $abstolerance, and by default tests that the student answer exactly matches
+	the correct answer ($abstolerance=0). 
+	<br/>To override the tolerance use +- in the setting, like this:
 	<br/>$reqdecimals = "=2+-.01" checks for exactly 2 decimals, but allows the answer to have an absolute error of .01
 	<br/>$reqdecimals = "=2+-1%" checks for exactly 2 decimals, but allows the answer to have an relative error of 1% (equivalent to $reltolerance = .01)</dd>
 <dt>$reqsigfigs = a number </dt>

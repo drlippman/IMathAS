@@ -202,7 +202,7 @@ class ScoreEngine
             } else { 
                 list($parsedreqdec, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs((string)$reqdecimals);
                 if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
-                    if (count($reqdecscoretype)==2) {
+                    if (count($reqdecscoretype)==2) { // value set in reqdec string
                         if ($reqdecscoretype[0]=='abs') {
                             $abstolerance = $reqdecscoretype[1];
                         } else {
@@ -228,7 +228,6 @@ class ScoreEngine
                 }
             }
         }
-
         /*
          * Set RNG to a known state.
          */

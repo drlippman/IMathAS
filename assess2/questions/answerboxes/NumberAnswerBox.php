@@ -116,7 +116,10 @@ class NumberAnswerBox implements AnswerBox
         }
         if ($reqdecimals !== '') {
             list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
-            if ($exactreqdec) {
+            if ($exactreqdec == 2) {
+                $tip .= "<br/>" . sprintf(_('Your answer should be rounded to %d decimal places.'), $reqdecimals);
+                $shorttip .= sprintf(_(", rounded to %d decimal places"), $reqdecimals);
+            } else if ($exactreqdec) {
                 $exactdec = true;
                 $tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
                 $shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);

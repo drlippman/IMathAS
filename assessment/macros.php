@@ -5507,17 +5507,21 @@ function parsereqsigfigs($reqsigfigs) {
 		}
 	}
 	if ($reqsigfigs[0]=='=') {
-		$exactsigfig = true;
+		$exactsigfig = 1;
+		$reqsigfigs = substr($reqsigfigs,1);
+	} else if ($reqsigfigs[0]=='r') {
+		// for "round to __ places"
+		$exactsigfig = 2;
 		$reqsigfigs = substr($reqsigfigs,1);
 	} else if ($reqsigfigs[0]=='[') {
-		$exactsigfig = false;
+		$exactsigfig = 0;
 		$reqsigfigparts = listtoarray(substr($reqsigfigs,1,-1));
 		$reqsigfigs = $reqsigfigparts[0];
         if (isset($reqsigfigparts[1])) {
 		    $reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
         } 
 	} else {
-		$exactsigfig = false;
+		$exactsigfig = 0;
 	}
     if (!is_numeric($reqsigfigs)) {
         echo "Invalid reqsigfigs/reqdecimals string $origstr";
