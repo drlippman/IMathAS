@@ -4836,6 +4836,8 @@ function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,
 		$code = 5.2;
 	} else if ($type=='parab') {
 		$code = 6;
+	} else if ($type=='halfparab') {
+		$code = 6.2;
 	} else if ($type=='horizparab') {
 		$code = 6.1;
 	} else if ($type=='cubic') {
@@ -4930,7 +4932,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
           $outeqs[] = makexxpretty("$y = $slope $x + $int");
         }
       }
-  	} else if ($type=='parab') {
+  	} else if ($type=='parab' || $type=='halfparab') {
       foreach ($pts as $key => $pt) {
         if (abs($pt[0]-$pt[2]) > 1E-12) {
           $k = ($pt[3]-$pt[1])/pow($pt[2]-$pt[0],2);
