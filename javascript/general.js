@@ -1353,14 +1353,22 @@ function setupToggler(base) {
 			if (e.type=="click" || e.which==13) {
 				var targ = $("#"+$(this).attr("aria-controls"));
 				if ($(this).attr("aria-expanded") == "true") {
-					$(this).attr("aria-expanded", false).text(showtext);
+					$(this).attr("aria-expanded", false);
+					if (showtext != hidetext) {
+						$(this).text(showtext);
+						rendermathnode(this);
+					}
 					if (doslide) {
 						targ.slideUp(300);
 					} else {
 						targ.hide();
 					}
 				} else {
-					$(this).attr("aria-expanded", true).text(hidetext);
+					$(this).attr("aria-expanded", true);
+					if (showtext != hidetext) {
+						$(this).text(hidetext);
+						rendermathnode(this);
+					}
 					if (doslide) {
 						targ.slideDown(300);
 					} else {
