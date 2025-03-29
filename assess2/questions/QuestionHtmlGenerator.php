@@ -353,9 +353,14 @@ class QuestionHtmlGenerator
             }
 
             if ('answerformat' == $optionKey) {
-                $answerformat = str_replace(' ', '', $answerformat);
+                if (is_array($answerformat)) {
+                    array_walk_recursive($answerformat, function(&$v, $k) {
+                        $v = str_replace(' ', '', $v);
+                    });
+                } else {
+                    $answerformat = str_replace(' ', '', $answerformat);
+                }
             }
-
             $questionWriterVars[$optionKey] = ${$optionKey};
         }
 
