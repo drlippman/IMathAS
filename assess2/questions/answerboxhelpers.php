@@ -1012,3 +1012,11 @@ function numfuncPrepShowanswer($string, $variables) {
     }
     return $string;
 }
+
+function sizeToCSS($size) {
+	if (is_numeric($size)) {
+		return (1.2*$size + 1) . 'ch';
+	} else {
+		return $size;
+	}
+}

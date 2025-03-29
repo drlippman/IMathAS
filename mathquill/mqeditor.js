@@ -93,8 +93,14 @@ var MQeditor = (function($) {
         if (calcformat.match(/chem/)) {
           span.addClass("mq-chem");
         }
-        var size = (el.hasAttribute("size") ? (el.size > 3 ? el.size/1.8 : el.size) : 10);
-        span.css("min-width", size + "em");
+        if (typeof el.style.width === 'string' && el.style.width.match(/[\d\.]+\s*\w{2,3}/)) {
+          span.css("min-width", el.style.width.replace(/([\d\.]+)\s*(\w{2,3})/, function (m,n,u) {
+            return (n/1.15) + u;
+          }));
+        } else {
+          var size = (el.hasAttribute("size") ? (el.size > 3 ? el.size/1.8 : el.size) : 10);
+          span.css("min-width", size + "em");
+        } 
         span.insertAfter(el);
 
         var thisMQconfig = {
