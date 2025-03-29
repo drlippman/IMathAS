@@ -397,11 +397,22 @@ function initPicture(x_min,x_max,y_min,y_max) {
       svgpicture = qnode;
 
       if (picture.getAttribute("alt") != '' && picture.getAttribute("alt") != null) {
+        var srdiv = document.getElementById(picid+"-srlabel");
+        if (!srdiv) {
+          srdiv = document.createElement("div");
+          srdiv.id = picid+"-srlabel";
+          srdiv.classList = "sr-only";
+          svgpicture.after(srdiv);
+        }
+        srdiv.innerText = picture.getAttribute("alt");
+        svgpicture.setAttribute("aria-hidden", true);
+        /*
         var title = document.createElement("title");
         svgpicture.appendChild(title);
         title.innerText = picture.getAttribute("alt");
         title.id = picid+"-label";
         svgpicture.setAttribute("aria-labelledby", picid+"-label");
+        */
       }
 
       doc = document;
