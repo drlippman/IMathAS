@@ -839,6 +839,18 @@ class Imathas_LTI_Database implements LTI\Database
         $stm->execute(array($resource_link_id, $contextid, 'LTI13-' . $platform_id));
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row !== false) {
+            if ($row['enddate'] === null) {
+                // lti link exists but assessment doesn't exist anymore
+                // so probably deleted since link was established.
+                throw new LTI_Exception("Linked assessment appears to have been deleted. Ref: " . $row['typeid'] . '-' . $resource_link_id);
+                /* Alt approach:
+                // Delete existing lti placement, which will trigger
+                // system to try to relink to assessment
+                $stm = $this->dbh->prepare("DELETE FROM imas_lti_placements WHERE placementtype='assess' AND linkid=? AND contextid=? AND org=?");
+                $stm->execute(array($resource_link_id, $contextid, 'LTI13-' . $platform_id));
+                return null;
+                */
+            }
             return LTI\LTI_Placement::new ()
                 ->set_typeid($row['typeid'])
                 ->set_placementtype($row['placementtype'])
