@@ -56,8 +56,8 @@
 		}
 		return false;
 	}
-	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid");
-	$stm->execute(array(':typeid'=>intval($_GET['id'])));
+	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid AND courseid=:cid");
+	$stm->execute(array(':typeid'=>intval($_GET['id']), ':cid'=>$cid));
 	$itemid = $stm->fetchColumn(0);
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
