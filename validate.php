@@ -828,7 +828,7 @@ function tzdate($string, $time)
     if ($tzname != '') {
         return date($string, $time);
     } else {
-        $serveroffset = date('Z') + $tzoffset * 60;
+        $serveroffset = date('Z') + floor($tzoffset * 60);
         return date($string, $time - $serveroffset);
     }
     //return gmdate($string, $time-60*$tzoffset);

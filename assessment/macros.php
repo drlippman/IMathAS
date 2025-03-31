@@ -250,6 +250,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     $globalalt = '';
 	$allcolors = [];
 	foreach ($funcs as $function) {
+		if (is_array($function)) {
+			echo _('Input to showplot should be a single function or array of functions, with parameters added with commas after, not as an array');
+			continue;
+		}
 		if ($function=='') { continue;}
         if (substr($function,0,4) == 'alt:') {
             $globalalt = substr($function, 4);

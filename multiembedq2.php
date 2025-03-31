@@ -37,7 +37,7 @@ if (empty($QS['id'])) {
 if (!is_array($QS['id'])) {
     $QS['id'] = explode('-', $QS['id']);
 }
-$QS['id'] = array_map('trim', $QS['id']);
+$QS['id'] = array_filter(array_map('trim', $QS['id']), 'is_numeric');
 
 // set user preferences
 $prefdefaults = array(

@@ -50,7 +50,7 @@ $curmonum = tzdate('n',$today);
 $dayofmo = tzdate('j',$today);
 $curyr = tzdate('Y',$today);
 if ($tzname=='') {
-	$serveroffset = date('Z') + $tzoffset*60;
+	$serveroffset = date('Z') + floor($tzoffset*60);
 } else {
 	$serveroffset = 0; //don't need this if user's timezone has been set
 }

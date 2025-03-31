@@ -58,8 +58,8 @@ if (empty($QS['auth'])) {
     $QS['auth'] = '';
 }
 
-if (empty($QS['id'])) {
-    echo 'Need to supply an id';
+if (empty($QS['id']) || !is_numeric($QS['id'])) {
+    echo 'Need to supply a numeric id';
     exit;
 }
 
