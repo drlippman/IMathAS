@@ -16,7 +16,9 @@ use Firebase\JWT\JWT;
  *
  * This has code duplication with the other libraries
  */
-define('TOOL_HOST', $GLOBALS['basesiteurl']);
+if (!defined('TOOL_HOST')) {
+  define('TOOL_HOST', $GLOBALS['basesiteurl']);
+}
 
 class LTI_Grade_Update {
   private $dbh;
