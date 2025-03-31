@@ -83,9 +83,9 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             }
             $out .= '<table>';
             if (in_array('det', $dispformats)) {
-                $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
+                $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td style="padding:0px">';
             } else {
-                $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+                $out .= '<tr><td class="matrixleft">&nbsp;</td><td style="padding:0px">';
             }
             
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
@@ -95,10 +95,18 @@ class CalculatedMatrixAnswerBox implements AnswerBox
             $count = 0;
             $las = explode("|", $la);
             $cellcnt = $answersize[0] * $answersize[1];
+            $augcolumn = -1;
+            if (in_array('augmented', $dispformats)) {
+                $augcolumn = $answersize[1] - 1;
+            }
             for ($row = 0; $row < $answersize[0]; $row++) {
                 $out .= "<tr>";
                 for ($col = 0; $col < $answersize[1]; $col++) {
-                    $out .= '<td>';
+                    if ($col == $augcolumn) {
+                        $out .= '<td style="border-left: 1px solid #000">';
+                    } else {
+                        $out .= '<td>';
+                    }
 
                     $attributes = [
                         'type' => 'text',
