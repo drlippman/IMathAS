@@ -328,7 +328,7 @@ function parselibs($file) {
 			$libitemid = rtrim(fgets($handle, 4096));
 		} else if ($line=="QSETIDS") {
 			if ($libitemid!=-1) {
-				$libitems[$libitemid] = rtrim(fgets($handle, 4096));
+				$libitems[$libitemid] = rtrim(fgets($handle, 32768));
 			}
 		} else if ($dopackd ==true) {
 			$packname .= rtrim($line);
