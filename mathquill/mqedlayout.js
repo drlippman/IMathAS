@@ -155,10 +155,12 @@ var myMQeditor = (function($) {
         tabcontent: [
           {
             flow: 'row',
-            s: 4,
+            s: 6,
             contents: [
+              {p:'2×1', c:'w', w:'\\begin{bmatrix}\\\\\\end{bmatrix}'},
               {p:'2×2', c:'w', w:'\\begin{bmatrix}&\\\\&\\end{bmatrix}'},
               {p:'2×3', c:'w', w:'\\begin{bmatrix}&&\\\\&&\\end{bmatrix}'},
+              {p:'3×1', c:'w', w:'\\begin{bmatrix}\\\\\\\\\\end{bmatrix}'},
               {p:'3×3', c:'w', w:'\\begin{bmatrix}&&\\\\&&\\\\&&\\end{bmatrix}'},
               {p:'3×4', c:'w', w:'\\begin{bmatrix}&&&\\\\&&&\\\\&&&\\end{bmatrix}'},
               {p:'+Col', c:'m', w:'addColumn'},
@@ -354,10 +356,12 @@ var myMQeditor = (function($) {
         tabcontent: [
           {
             flow: 'row',
-            s: 4,
+            s: 6,
             contents: [
+              {p:'2×1', c:'w', w:'\\begin{bmatrix}\\\\\\end{bmatrix}'},
               {p:'2×2', c:'w', w:'\\begin{bmatrix}&\\\\&\\end{bmatrix}'},
               {p:'2×3', c:'w', w:'\\begin{bmatrix}&&\\\\&&\\end{bmatrix}'},
+              {p:'3×1', c:'w', w:'\\begin{bmatrix}\\\\\\\\\\end{bmatrix}'},
               {p:'3×3', c:'w', w:'\\begin{bmatrix}&&\\\\&&\\\\&&\\end{bmatrix}'},
               {p:'3×4', c:'w', w:'\\begin{bmatrix}&&&\\\\&&&\\\\&&&\\end{bmatrix}'},
               {p:'+Col', c:'m', w:'addColumn'},
