@@ -1,7 +1,7 @@
 <?php
 	$dbsetup = true; //to prevent database connection
 	require_once "../../init_without_validate.php";
-
+	$myrights = 5;
 	$imgdir = __DIR__ . '/imgs/'; //relative to current dir
 
 	if (isset($_GET['script']) && trim($_GET['script']!='')) {
