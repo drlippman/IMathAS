@@ -541,7 +541,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 }
 
 function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results = ['names' => '']) {
-    global $staticroot;
+    global $staticroot, $cid;
 ?>
 <div id="fullqsearchwrap">
     <div id="searcherror" class="noticetext"></div>
