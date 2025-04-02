@@ -219,22 +219,43 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		if (isset($_POST['timelimitmult'])) {
 			$msgout = '';
-			if (isset($_POST['SID'])) {
-				if (checkFormatAgainstRegex($_POST['SID'], $loginformat)) {
+			$stm = $DBH->prepare("SELECT iu.* FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=? AND istu.userid=?");
+			$stm->execute([$cid, $_GET['uid']]);
+			$olddata = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($olddata === false) {
+				echo 'Invalid userid';
+				exit;
+			}
+			$jsondata = json_decode($olddata['jsondata'], true);
+			if (!is_array($jsondata)) {
+				$jsondata = [];
+			}
+			$chglog = [];
+			if (isset($_POST['SID']) && (
+				$_POST['SID'] != $olddata['SID'] || $_POST['firstname'] != $olddata['FirstName'] || $_POST['lastname'] != $olddata['LastName'] ||
+				$_POST['email'] != $olddata['email'] || isset($_POST['doresetpw'])
+			)) {
+				if (checkFormatAgainstRegex($_POST['SID'], $loginformat) && $_POST['SID'] != $olddata['SID']) {
 					$un = $_POST['SID'];
-					$updateusername = true;
+					$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+					$stm->execute(array(':SID'=>$un));
+					if ($stm->rowCount()>0) {
+						$updateusername = false;
+					} else {
+						$updateusername = true;
+						$chglog['oldusername'] = $olddata['SID'];
+					}
 				} else {
 					$updateusername = false;
 				}
-				$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-				$stm->execute(array(':SID'=>$un));
-				if ($stm->rowCount()>0) {
-					$updateusername = false;
-				}
+				
 				if ($updateusername) {
 					$msgout .= '<p>Username changed to <span class="pii-username">'.Sanitize::encodeStringForDisplay($un).'</span></p>';
 				} else {
 					$msgout .= '<p>Username left unchanged</p>';
+				}
+				if ($_POST['firstname'] != $olddata['FirstName'] || $_POST['lastname'] != $olddata['LastName']) {
+					$chglog['oldname'] = $olddata['LastName'] . ', ' . $olddata['FirstName'];
 				}
 				$query = "UPDATE imas_users SET FirstName=:FirstName,LastName=:LastName";
 
@@ -244,9 +265,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$qarr[':SID'] = $un;
 				}
 				if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email']) ||
-				(isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($_POST['email'], $CFG['acct']['emailFormat']))) {
-				$msgout .= '<p>Invalid email address - left unchanged</p>';
-			  } else {
+					(isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($_POST['email'], $CFG['acct']['emailFormat']))) {
+					$msgout .= '<p>Invalid email address - left unchanged</p>';
+				} else {
+					if ($_POST['email'] != $olddata['email']) {
+						$chglog['oldemail'] = $olddata['email'];
+					}
 					$query .= ",email=:email";
 					$qarr[':email'] = $_POST['email'];
 				}
@@ -260,11 +284,19 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 						} else {
 							$newpw = md5($_POST['pw1']);
 						}
+						$chglog['resetpw'] = 1;
 						$query .= ",password=:password,forcepwreset=1";
 						$qarr[':password'] = $newpw;
 						$msgout .= '<p>Password updated</p>';
 					}
 				}
+				if (!empty($chglog)) {
+					$query .= ',jsondata=:jsondata';
+					$chglog['by'] = $userid;
+					$jsondata['chglog'][time()] = $chglog;
+					$qarr['jsondata'] = json_encode($jsondata);
+				}
+				
 				$query .= " WHERE id=:id AND rights<:rights";
 				$qarr[':id'] = $_GET['uid'];
 				$qarr[':rights'] = $myrights;

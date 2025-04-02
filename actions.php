@@ -366,9 +366,21 @@ require_once "includes/sanitize.php";
                     $newpw = md5($_POST['pw1']);
                 }
 
-                $query = "UPDATE imas_users SET password=:newpw WHERE id=:id LIMIT 1";
+				$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
+				$stm->execute(array(':id'=>$linkdata['uid']));
+				$jsondata = json_decode($stm->fetchColumn(0), true);
+				if (!is_array($jsondata)) {
+					$jsondata = [];
+				}
+
+				if (!isset($jsondata['chglog'])) {
+					$jsondata['chglog'] = [];
+				}
+				$jsondata['chglog'][time()] = ['chgpw' => 1];
+
+                $query = "UPDATE imas_users SET password=:newpw,jsondata=:jsondata WHERE id=:id LIMIT 1";
                 $stm = $DBH->prepare($query);
-                $stm->execute(array(':id'=>$linkdata['uid'], ':newpw'=>$newpw));
+                $stm->execute(array(':id'=>$linkdata['uid'], ':jsondata'=>json_encode($jsondata), ':newpw'=>$newpw));
                 echo _("Password Reset"),".  ";
                 echo "<a href=\"index.php\">",_("Login with your new password"),"</a>";
             } else {
@@ -530,6 +542,11 @@ require_once "includes/sanitize.php";
                 } else {
                     $jsondata = ['lastemail' => time()];
                 }
+				if (!isset($jsondata['chglog'])) {
+					$jsondata['chglog'] = [];
+				}
+				$jsondata['chglog'][time()] = ['chgpw' => 1];
+
                 $query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
                 $stm = $DBH->prepare($query);
                 $stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
@@ -840,6 +857,7 @@ require_once "includes/sanitize.php";
 			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>'', ':listperpage'=>$perpage, ':uid'=>$userid));
 
 		$pwchanged = false;
+		$acctchangelog = [];
 		if (isset($_POST['dochgpw'])) {
 			if ($_POST['pw1'] == $_POST['pw2'] && $myrights>5) {
 				if (isset($CFG['GEN']['newpasswords'])) {
@@ -850,6 +868,7 @@ require_once "includes/sanitize.php";
 				$stm = $DBH->prepare("UPDATE imas_users SET password = :newpw WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 				$pwchanged = true;
+				$acctchangelog['chgpw'] = 1;
 			} else {
 				require_once "header.php";
 				echo $pagetopper;
@@ -889,6 +908,9 @@ require_once "includes/sanitize.php";
 			$stm = $DBH->prepare("UPDATE imas_users SET mfa = '' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}
+		if ($_POST['dochgmfa'] != $lastmfatype) {
+			$acctchangelog['oldmfa'] = $lastmfatype;
+		}
 
 		require_once "includes/userprefs.php";
 		storeUserPrefs();
@@ -901,6 +923,7 @@ require_once "includes/sanitize.php";
 			$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
 			if ($old_email != $_POST['email']) {
 				$message .= sprintf(_('Your email address was changed to %s.'), Sanitize::encodeStringForDisplay($_POST['email'])).' ';
+				$acctchangelog['oldemail'] = $old_email;
 			}
 			if ($pwchanged) {
 				$message .= _('Your password was changed.');
@@ -926,9 +949,6 @@ require_once "includes/sanitize.php";
             } else {
                 $jsondata = ['lastemail' => time()];
             }
-            $query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
-            $stm = $DBH->prepare($query);
-            $stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
 
             if ($pwchanged) {
                 // record last password update time
@@ -937,6 +957,16 @@ require_once "includes/sanitize.php";
                 $stm->execute(array(':now'=>time(), ':id'=>$userid));
                 $_SESSION['started'] = time()+1;
             }
+		}
+		if (!empty($acctchangelog)) {
+			if (!isset($jsondata['chglog'])) {
+				$jsondata['chglog'] = [];
+			}
+			$jsondata['chglog'][time()] = $acctchangelog;
+
+			$query = "UPDATE imas_users SET jsondata=:jsondata WHERE id=:id";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
 		}
 
 	} else if (isset($_POST['action']) && $_POST['action'] == 'cleartrustedmfa') {
