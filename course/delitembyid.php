@@ -182,6 +182,9 @@ function delitembyid($itemid) {
         $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE typeid=:assessmentid AND placementtype='assess'");
 		$stm->execute(array(':assessmentid'=>$typeid));
 
+		$stm = $DBH->prepare("UPDATE imas_students SET lockaid=0 WHERE courseid=? and lockaid=?");
+        $stm->execute([$cid, $typeid]);
+
 	} else if ($itemtype == "Drill") {
 		$stm = $DBH->prepare("SELECT name FROM imas_drillassess WHERE id=:id");
     $stm->execute(array(':id'=>$typeid));

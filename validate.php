@@ -736,14 +736,17 @@ if ($hasusername) {
                     $stm = $DBH->prepare('SELECT name,msgtoinstr,posttoforum FROM imas_assessments WHERE id=?');
                     $stm->execute([$lockaid]);
                     $lockaiddata = $stm->fetch(PDO::FETCH_ASSOC);
-                    $lockaidname =  $lockaiddata['name'];
                     $showlockmsg = true;
-                    if ($lockaiddata['msgtoinstr'] > 0 && strpos($_SERVER['PHP_SELF'], '/msgs/') !== false) {
+                    if ($lockaiddata === false) { 
+                        // assessment deleted
+                        $showlockmsg = false;
+                    } else if ($lockaiddata['msgtoinstr'] > 0 && strpos($_SERVER['PHP_SELF'], '/msgs/') !== false) {
                         $showlockmsg = false;
                     } else if ($lockaiddata['posttoforum'] > 0 && strpos($_SERVER['PHP_SELF'], '/forums/') !== false) {
                         $showlockmsg = false;
                     } 
                     if ($showlockmsg) {
+                        $lockaidname =  $lockaiddata['name'];
                         require_once __DIR__."/header.php";
                         echo '<p>', sprintf(_('This course is currently locked for an assessment, <b>%s</b>'),
                             Sanitize::encodeStringForDisplay($lockaidname)), '</p>';
