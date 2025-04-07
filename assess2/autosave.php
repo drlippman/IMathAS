@@ -171,7 +171,7 @@ $assess_record->saveRecordIfNeeded();
 $assess_info->loadLTIMsgPosts($userid, $canViewAll);
 
 $include_from_assess_info = array(
-    'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt'
+    'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt', 'enddate'
 );
 $out = $assess_info->extractSettings($include_from_assess_info);
 
