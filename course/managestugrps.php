@@ -368,6 +368,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 }
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
+			exit;
 		} else {
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
 			$stm->execute(array(':id'=>$grpsetid));

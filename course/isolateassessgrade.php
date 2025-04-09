@@ -267,7 +267,7 @@
 			// identify as unsubmitted if past due, or time limit is expired
 			$data = json_decode(Sanitize::gzexpand($line['scoreddata']), true);
             if (abs($timelimit) > 0) {
-			    $time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+			    $time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'] ?? $now;
             }
 			if ($now > $line['thisenddate'] ||
 				(abs($timelimit) > 0 && $now > $time_exp + $overtime_grace * $line['timelimitmult'])

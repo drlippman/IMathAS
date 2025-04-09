@@ -225,25 +225,13 @@ function showresults($q,$qtype) {
 						$ql = $questions;
 					}
 					if ($type=='multans') {
-						if (is_array($answers)) {
-							$al = $answers[$i];
-						} else {
-							$al = $answers;
-						}
+						$al = $answers;
 					} else if ($type=='choices') {
-						if (is_array($answer)) {
-							$al = $answer[$i];
-						} else {
-							$al = $answer;
-						}
+						$al = $answer;
 					}
 					disp($q,$type,$i,$al,$ql);
 				} else {
-					if (is_array($answer)) {
-						$al = $answer[$i];
-					} else {
-						$al = $answer;
-					}
+					$al = $answer;
 					disp($q,$type,$i,$al);
 				}
 
@@ -265,6 +253,9 @@ function disp($q,$qtype,$part=-1,$answer='',$questions=array()) {
 	global $qdata,$qsdata,$qsids,$scorebarwidth;
 	$res = array();
 	$correct = array();
+	if (is_array($answer)) {
+		$answer = $answer[$part] ?? '';
+	}
 	$answer = explode(',',$answer);
 
 	if (array_key_exists($q, $qdata)) {

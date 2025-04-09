@@ -192,7 +192,7 @@ function flattenitems($items,&$addto,&$itemidsection,$sec='') {
 			if (!$ishidden && !empty($item['items'])) {
 				flattenitems($item['items'], $addto, $itemidsection, $thissec);
 			}
-		} else {
+		} else if ($item !== null) {
             if ($sec != '') {
                 $itemidsection[$item] = $sec;
             }
