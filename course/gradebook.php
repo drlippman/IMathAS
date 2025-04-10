@@ -191,7 +191,11 @@ if ($isteacher) {
 		require_once "lockstu.php";
 		require_once "../footer.php";
 		exit;
-	}
+	} elseif (isset($_POST['posted']) && $_POST['posted']=="Unlock") {
+		$calledfrom='gb';
+		require_once('lockstu.php');
+		exit;
+	} 
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
 		//based on a contribution by Cam Joyce
 		require_once "gbtable2.php";
@@ -581,7 +585,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo ' <li><a href="#" onclick="postGBform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
 		echo ' <li><a href="#" onclick="postGBform(\'Print Report\');return false;" title="',_("Generate printable grade reports"),'">', _('Print Report'), "</a></li>";
 		echo ' <li><a href="#" onclick="postGBform(\'Lock\');return false;" title="',_("Lock selected students out of the course"),'">', _('Lock'), "</a></li>";
+		echo ' <li><a href="#" onclick="postGBform(\'Unlock\');return false;" title="',_("Un-Lock selected students from the course"),'">', _('Un-Lock'), "</a></li>";
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+			echo '<li role="separator" class="divider"></li>';
 			echo ' <li><a href="#" onclick="postGBform(\'Unenroll\');return false;" title="',_("Unenroll the selected students"),'">', _('Unenroll'), "</a></li>";
 		}
 

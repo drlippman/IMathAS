@@ -41,6 +41,20 @@ ini_set("max_execution_time", "600");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
+	} else if (isset($_POST['posted']) && $_POST['posted']=="Unlock") { // handle unlock
+		if (!empty($_POST['checked'])) {
+			$uids = array_map('intval', $_POST['checked']);
+			$ph = Sanitize::generateQueryPlaceholders($uids);
+			$stm = $DBH->prepare("UPDATE imas_students SET locked=0 WHERE courseid=? AND userid IN ($ph)");
+			$stm->execute([$cid, ...$uids]);
+		}
+		if ($calledfrom=='lu') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+			exit;
+		} else if ($calledfrom == 'gb') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode'] ?? '') . "&r=" . Sanitize::randomQueryStringParam());
+			exit;
+		}
 	} else { //get confirm
 		if ((isset($_POST['submit']) && $_POST['submit']=="Lock") || (isset($_POST['posted']) && $_POST['posted']=="Lock")) {
 			$get_uid = 'selected';

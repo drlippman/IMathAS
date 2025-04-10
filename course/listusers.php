@@ -53,10 +53,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
-	if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
+	if (isset($_POST['posted']) && $_POST['posted']=="Unenroll") {
 		$_GET['action'] = "unenroll";
 	}
-	if (isset($_POST['submit']) && $_POST['submit']=="Lock") {
+	if (isset($_POST['posted']) && $_POST['posted']=="Lock") {
 		$_GET['action'] = "lock";
 	}
 	if (isset($_POST['lockinstead'])) {
@@ -192,7 +192,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				exit;
 			}
 		}
-	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
+	} elseif (isset($_POST['posted']) && $_POST['posted']=="Copy Emails") {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
 		if (!empty($_POST['checked'])) {
@@ -382,11 +382,11 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		}
 
-	} elseif ((isset($_POST['submit']) && ($_POST['submit']=="E-mail" || $_POST['submit']=="Message"))|| isset($_GET['masssend']))  {
+	} elseif ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "masssend.php";
-	} elseif ((isset($_POST['submit']) && $_POST['submit']=="Make Exception") || isset($_GET['massexception'])) {
+	} elseif ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "massexception.php";
@@ -404,6 +404,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
 
+	} elseif (isset($_POST['posted']) && $_POST['posted']=="Unlock") {
+		$calledfrom='lu';
+		require_once('lockstu.php');
+		exit;
 	} elseif (isset($_POST['action']) && $_POST['action']=="lockone" && is_numeric($_POST['uid'])) {
 		$now = time();
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE courseid=:courseid AND userid=:userid");
@@ -534,6 +538,16 @@ $placeinhead .= '<script type="text/javascript">$(function() {
 	  .append($("<input>", {name:"uid", value:uid, type:"hidden"}))
 	  .appendTo("body").submit();
   }
+  function postWithSelform(val) {
+	$("#qform").append($("<input>", {name:"posted", value:val, type:"hidden"})).submit();
+  }
+  function copyemails() {
+	var ids = [];
+	$("#myTable input:checkbox:checked").each(function(i) {
+		ids.push(this.value);
+	});
+	GB_show("Emails","viewemails.php?cid="+cid+"&ids="+ids.join("-"),500,500);
+  }
   </script>';
 
 require_once "../header.php";
@@ -617,7 +631,7 @@ if ($overwriteBody==1) {
 <?php
 		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform");
-	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
+	} elseif (isset($_POST['posted']) && $_POST['posted']=="Copy Emails") {
 		if (empty($_POST['checked'])) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
 		} else {
@@ -767,24 +781,29 @@ if ($overwriteBody==1) {
 	echo '</p>';
 	?>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
-		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		With Selected:
-		<?php
-		  if (!isset($CFG['GEN']['noEmailButton'])) {
-		  	  echo '<input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">';
-		  }
-		?>
-		<input type=submit name=submit value="Message" title="Send a message to the selected students">
-		<input type=submit name=submit value="Lock" title="Lock selected students out of the course">
-		<input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
-		<input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
-		<?php
-		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<input type=submit name=submit value="Unenroll" title="Unenroll the selected students">';
-		}
-		?>
-		</p>
+	<?php
+	echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true,\'locked\')">', _('Non-locked'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
+	echo '<span class="dropdown">';
+	echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	echo _('With Selected').'</a>';
+	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
+	echo ' <li><a href="#" onclick="postWithSelform(\'Message\');return false;" title="',_("Send a message to the selected students"),'">', _('Message'), "</a></li>";
+	if (!isset($CFG['GEN']['noEmailButton'])) {
+		echo ' <li><a href="#" onclick="postWithSelform(\'E-mail\');return false;" title="',_("Send e-mail to the selected students"),'">', _('E-mail'), "</a></li>";
+	}
+	echo ' <li><a href="#" onclick="copyemails();return false;" title="',_("Copy e-mail addresses of the selected students"),'">', _('Copy E-mails'), "</a></li>";
+	echo ' <li><a href="#" onclick="postWithSelform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
+	echo ' <li><a href="#" onclick="postWithSelform(\'Lock\');return false;" title="',_("Lock selected students out of the course"),'">', _('Lock'), "</a></li>";
+	echo ' <li><a href="#" onclick="postWithSelform(\'Unlock\');return false;" title="',_("Un-Lock selected students from the course"),'">', _('Un-Lock'), "</a></li>";
 
+	if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+		echo '<li role="separator" class="divider"></li>';
+		echo ' <li><a href="#" onclick="postWithSelform(\'Unenroll\');return false;" title="',_("Unenroll the selected students"),'">', _('Unenroll'), "</a></li>";
+	}
+
+	echo '</ul></span>';
+	?>
+		
 	<table class=gb id=myTable>
     <caption class="sr-only">Roster</caption>
 		<thead>
