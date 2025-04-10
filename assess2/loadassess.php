@@ -247,6 +247,8 @@ $assessInfoOut['can_viewingb'] = $assess_info->reshowQuestionsInGb() ? 1 : 0;
 // set session expiration time
 $assessInfoOut['session_life'] = $CFG['GEN']['sessionmaxlife'] ?? 432000;
 
+$assessInfoOut['summary'] = filter($assessInfoOut['summary']);
+
 //prep date display
 prepDateDisp($assessInfoOut);
 
