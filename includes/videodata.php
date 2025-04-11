@@ -7,6 +7,9 @@ function getvideoid($url) {
 	if (strpos($url,'youtube.com/watch')!==false) {
 		//youtube
 		$vidid = substr($url,strrpos($url,'v=')+2);
+        if (strpos($vidid,'?')!==false) { //bad URL form, but handle it
+			$vidid = substr($vidid,0,strpos($vidid,'?'));
+		}
 		if (strpos($vidid,'&')!==false) {
 			$vidid = substr($vidid,0,strpos($vidid,'&'));
 		}
