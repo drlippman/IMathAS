@@ -804,7 +804,6 @@ function addlabel($plot,$x,$y,$lbl) {
 	} else {
 		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\");' />",$plot);
 	}
-	echo $lbl;
 	return $plot;
 }
 function addlabelabs($plot,$x,$y,$lbl) {
