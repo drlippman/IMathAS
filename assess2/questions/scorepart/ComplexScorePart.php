@@ -86,6 +86,9 @@ class ComplexScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
+        } else if ($givenans == 'DNE' || $givenans == 'oo') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
 
         $gaarr = array_map('trim', explode(',', $givenans));
