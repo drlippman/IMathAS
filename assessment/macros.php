@@ -855,7 +855,7 @@ function mergeplots($plota) {
 	return $plota;
 }
 
-function addfractionaxislabels($plot,$step) {
+function addfractionaxislabels($plot,$step,$axis="x") {
 	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Horizontal axis labels in steps of $step.";
 	}
@@ -879,39 +879,49 @@ function addfractionaxislabels($plot,$step) {
         echo "addfractionaxislabels: input must be a plot";
         return $plot;
     }
-	$xmin = $matches[1];
-	$xmax = $matches[2];
-	$yrange = $matches[4] - $matches[3];
+	if ($axis === 'x') {
+		$min = $matches[1];
+		$max = $matches[2];
+		$crossrange = $matches[4] - $matches[3];
+	} else if ($axis === 'y') {
+		$min = $matches[3];
+		$max = $matches[4];
+		$crossrange = $matches[2] - $matches[1];
+	}
 	$stepn = $num/$den;
 	if ($ispi) { $stepn *= M_PI;}
 	if ($stepn==0) {echo "error: bad step size on pilabels"; return;}
-	$step = ceil($xmin/$stepn);
-	$totstep = ceil(($xmax-$xmin)/$stepn);
-	$tm = -.02*$yrange;
-	$tx = .02*$yrange;
+	$tm = -.02*$crossrange;
+	$tx = .02*$crossrange;
+	$step = ceil($min/$stepn);
+	$totstep = ceil(($max-$min)/$stepn);
+
 	$outst = 'fontfill="black";strokewidth=0.5;stroke="black";';
 	for ($i=0; $i<$totstep; $i++) {
-		$x = $step*$stepn;
-		if (abs($x)<.01) {$step++; continue;}
+		$av = $step*$stepn;
+		if (abs($av)<.01) {$step++; continue;}
 		$g = gcd($step*$num,$den);
 		$n = ($step*$num)/$g;  $d = $den/$g;
 		if ($ispi) {
 			if ($n==1) {
-				$xd = '&pi;';
+				$ld = '&pi;';
 			} else if ($n==-1) {
-				$xd = '-&pi;';
+				$ld = '-&pi;';
 			} else {
-				$xd = "$n&pi;";
+				$ld = "$n&pi;";
 			}
 		} else {
-			$xd = $n;
+			$ld = $n;
 		}
-		if ($d!=1) {$xd .= "/$d";}
-		$outst .= "line([$x,$tm],[$x,$tx]); text([$x,$tm],\"$xd\",\"below\");";
+		if ($d!=1) {$ld .= "/$d";}
+		if ($axis === 'x') {
+			$outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
+		} else if ($axis === 'y') {
+			$outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
+		}
 		$step++;
 	}
 	return str_replace("' />","$outst' />",$plot);
-
 }
 
 function connectthedots($xarray,$yarray,$color='black',$thick=1,$startdot='',$enddot='') {

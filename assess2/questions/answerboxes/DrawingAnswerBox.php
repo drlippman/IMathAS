@@ -82,6 +82,7 @@ class DrawingAnswerBox implements AnswerBox
             $locky = 0;
         }
         $xsclgridpts = array('');
+        $ysclgridpts = array('');
         if (!empty($grid)) {
             if (!is_array($grid)) {
                 $grid = array_map('trim', explode(',', $grid));
@@ -117,6 +118,9 @@ class DrawingAnswerBox implements AnswerBox
             if (isset($grid[4])) {
                 $xsclgridpts = explode(':', $grid[4]);
             }
+            if (isset($grid[5])) {
+                $ysclgridpts = explode(':', $grid[5]);
+            }
             if (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false) {
                 if (strpos($settings[4], ':') !== false) {
                     $settings4pts = explode(':', $settings[4]);
@@ -125,6 +129,16 @@ class DrawingAnswerBox implements AnswerBox
                     $settings[4] = implode(':', $settings4pts);
                 } else {
                     $settings[4] = 2 * ($settings[1] - $settings[0]) . ':' . $settings[4];
+                }
+            }
+            if (strpos($ysclgridpts[0], '/') !== false || strpos($ysclgridpts[0], 'pi') !== false) {
+                if (strpos($settings[5], ':') !== false) {
+                    $settings5pts = explode(':', $settings[5]);
+                    // rewrite xscl so no labels show
+                    $settings5pts[0] = 2 * ($settings[3] - $settings[2]); 
+                    $settings[5] = implode(':', $settings5pts);
+                } else {
+                    $settings[5] = 2 * ($settings[3] - $settings[2]) . ':' . $settings[5];
                 }
             }
         } else {
@@ -217,8 +231,11 @@ class DrawingAnswerBox implements AnswerBox
         } else {
             $plot = showplot($background, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
         }
-        if (!empty($grid) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
+        if (!empty($xsclgridpts) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
             $plot = addfractionaxislabels($plot, $xsclgridpts[0]);
+        }
+        if (!empty($ysclgridpts) && (strpos($ysclgridpts[0], '/') !== false || strpos($ysclgridpts[0], 'pi') !== false)) {
+            $plot = addfractionaxislabels($plot, $ysclgridpts[0], 'y');
         }
 
         if ($settings[8] != "") {
@@ -735,15 +752,21 @@ class DrawingAnswerBox implements AnswerBox
                     }
                     $saarr = array_merge($background, $saarr);
                     $sa = showplot($saarr, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
-                    if (!empty($grid) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
+                    if (!empty($xsclgridpts) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
                         $sa = addfractionaxislabels($sa, $xsclgridpts[0]);
+                    }
+                    if (!empty($ysclgridpts) && (strpos($ysclgridpts[0], '/') !== false || strpos($ysclgridpts[0], 'pi') !== false)) {
+                        $sa = addfractionaxislabels($sa, $ysclgridpts[0], 'y');
                     }
                 }
 
             } else {
                 $sa = showplot($saarr, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
-                if (!empty($grid) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
+                if (!empty($xsclgridpts) && (strpos($xsclgridpts[0], '/') !== false || strpos($xsclgridpts[0], 'pi') !== false)) {
                     $sa = addfractionaxislabels($sa, $xsclgridpts[0]);
+                }
+                if (!empty($ysclgridpts) && (strpos($ysclgridpts[0], '/') !== false || strpos($ysclgridpts[0], 'pi') !== false)) {
+                    $sa = addfractionaxislabels($sa, $ysclgridpts[0], 'y');
                 }
             }
             if ($answerformat[0] == "polygon") {
