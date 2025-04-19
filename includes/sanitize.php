@@ -570,10 +570,24 @@ class Sanitize
 	 * Note: This method currently uses htmLawed.
 	 *
 	 * @param $unsafeContent string The content to sanitize.
+	 * @param $stricter boolean Strip some attributes from the HTML that might interfere with things
+	 * @param $trim int Trim if over this many characters (0 for no trim)
 	 * @return string The sanitized content.
 	 */
-	public static function incomingHtml($unsafeContent) {
-		return myhtmLawed($unsafeContent);
+	public static function incomingHtml($unsafeContent, $stricter = false, $trim = 0) {
+		if ($stricter) {
+			$NC = [
+				'deny_attribute' => 'on*,data*,aria*,tabindex,id'
+			];
+			$str = myhtmLawed($unsafeContent, $NC);
+		} else {
+			$str = myhtmLawed($unsafeContent);
+		}
+		if ($trim > 0 && strlen($str) > $trim) {
+			$str = substr($str,0,$trim) . ' (remainder truncated due to length)';
+            $str = myhtmLawed($str, $NC); // do again to close any truncated tags
+		}
+		return $str;
 	}
 
 	/**

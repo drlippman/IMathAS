@@ -182,6 +182,10 @@ class AssessRecord
         exit;
       }
       $qarr[':scoreddata'] = gzcompress($encoded);
+      if (strlen($qarr[':scoreddata']) > 16777000) {
+        echo '{"error": "encoding_error"}';
+        exit;
+      }
     }
     if ($this->is_practice && !empty($this->data)) {
       $fields[] = 'practicedata';
@@ -191,6 +195,10 @@ class AssessRecord
         exit;
       }
       $qarr[':practicedata'] = gzcompress($encoded);
+      if (strlen($qarr[':practicedata']) > 16777000) {
+        echo '{"error": "encoding_error"}';
+        exit;
+      }
     }
 
     if ($this->hasRecord) {
@@ -2182,7 +2190,7 @@ class AssessRecord
 
     // record work, if present
     if (isset($_POST['sw' . $qn])) {
-      $data['work'] = Sanitize::incomingHtml($_POST['sw' . $qn]);
+      $data['work'] = Sanitize::incomingHtml($_POST['sw' . $qn], true, 30000);
       $this->clearAutoSave($qn, 'work');
     }
 
@@ -4140,7 +4148,7 @@ class AssessRecord
       if ($during || 
         (($this->assess_info->getQuestionSetting($curq['qid'], 'showwork') & 2) == 2 && $acceptWorkAfter)
       ) {
-        $newwork = Sanitize::incomingHtml($val);
+        $newwork = Sanitize::incomingHtml($val, true, 30000);
         if (!isset($curq['work']) || $curq['work'] != $newwork) {
             $curq['work'] = $newwork;
             $curq['worktime'] = time() - $this->assessRecord['starttime'];
