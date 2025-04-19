@@ -185,7 +185,7 @@ class DrawingScorePart implements ScorePart
                 $line = $lines[0]; //only use first line
                 $line = explode('),(',substr($line,1,strlen($line)-2));
                 foreach ($line as $j=>$pt) {
-                    $line[$j] = explode(',',$pt);
+                    $line[$j] = array_map('floatval', explode(',',$pt));
                 }
                 if ($scoremethod == 'ignoreextradots') {
                     $lastslope = null;
@@ -749,7 +749,7 @@ class DrawingScorePart implements ScorePart
             } else {
                 $tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
                 foreach ($tplines as $k=>$val) {
-                    $pts = explode(',',$val);
+                    $pts = array_map('floatval', explode(',',$val));
                     if ($pts[1]==$pts[3] && $pts[2]==$pts[4]) {
                       //the points are the same; skip it
                       unset($tplines[$k]);
@@ -935,7 +935,7 @@ class DrawingScorePart implements ScorePart
             } else {
                 $dots = explode('),(', substr($dots,1,strlen($dots)-2));
                 foreach ($dots as $k=>$pt) {
-                    $dots[$k] = explode(',',$pt);
+                    $dots[$k] = array_map('floatval', explode(',',$pt));
                 }
             }
             if ($odots=='') {
@@ -943,7 +943,7 @@ class DrawingScorePart implements ScorePart
             } else {
                 $odots = explode('),(', substr($odots,1,strlen($odots)-2));
                 foreach ($odots as $k=>$pt) {
-                    $odots[$k] = explode(',',$pt);
+                    $odots[$k] = array_map('floatval', explode(',',$pt));
                 }
             }
 
@@ -1584,7 +1584,7 @@ class DrawingScorePart implements ScorePart
             } else {
                 $ineqlines = explode('),(', substr($ineqlines,1,strlen($ineqlines)-2));
                 foreach ($ineqlines as $k=>$val) {
-                    $pts = explode(',',$val);
+                    $pts = array_map('floatval', explode(',',$val));
                     if($pts[0]<10.3){//linear
                         if ($pts[3]==$pts[1]) {
                             $slope = 10000;
@@ -1761,8 +1761,8 @@ class DrawingScorePart implements ScorePart
                 $lines = explode(';',$lines);
                 foreach ($lines as $k=>$line) {
                     $lines[$k] = explode('),(',substr($line,1,strlen($line)-2));
-                    $minp = explode(',', $lines[$k][0]);
-                    $maxp = explode(',', $lines[$k][count($lines[$k])-1]);
+                    $minp = array_map('floatval', explode(',', $lines[$k][0]));
+                    $maxp = array_map('floatval', explode(',', $lines[$k][count($lines[$k])-1]));
                     $lines[$k] = array(min($minp[0], $maxp[0]), max($minp[0], $maxp[0]));
                 }
                 $newlines = array($lines[0]);
@@ -1949,7 +1949,7 @@ class DrawingScorePart implements ScorePart
                 foreach ($lines as $k=>$line) {
                     $lines[$k] = explode('),(',substr($line,1,strlen($line)-2));
                     foreach ($lines[$k] as $j=>$pt) {
-                        $lines[$k][$j] = explode(',',$pt);
+                        $lines[$k][$j] = array_map('floatval', explode(',',$pt));
                     }
                 }
             }
@@ -1959,7 +1959,7 @@ class DrawingScorePart implements ScorePart
             } else {
                 $dots = explode('),(', substr($dots,1,strlen($dots)-2));
                 foreach ($dots as $k=>$pt) {
-                    $dots[$k] = explode(',',$pt);
+                    $dots[$k] = array_map('floatval', explode(',',$pt));
                 }
             }
             if ($odots=='') {
@@ -1967,7 +1967,7 @@ class DrawingScorePart implements ScorePart
             } else {
                 $odots = explode('),(', substr($odots,1,strlen($odots)-2));
                 foreach ($odots as $k=>$pt) {
-                    $odots[$k] = explode(',',$pt);
+                    $odots[$k] = array_map('floatval', explode(',',$pt));
                 }
             }
 
