@@ -782,28 +782,26 @@ function replacealttext($plot, $alttext) {
 	}
 }
 
-function addlabel($plot,$x,$y,$lbl) {
-	if (func_num_args()>4) {
-		$color = func_get_arg(4);
-	} else {
-		$color = "black";
-	}
+function addlabel($plot,$x,$y,$lbl,$color="black",$loc="",$angle=0,$size=0) {
 	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Label &quot;$lbl&quot; at ($x,$y). ";
     }
     $lbl = str_replace("'",'&apos;',$lbl);
     $lbl = str_replace('"','\\"',$lbl);
 
-	if (func_num_args()>6) {
-		$loc = func_get_arg(5);
-		$angle = func_get_arg(6);
-		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\",\"$loc\",\"$angle\");' />",$plot);
-	} elseif (func_num_args()>5) {
-		$loc = func_get_arg(5);
-		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\",\"$loc\");' />",$plot);
-	} else {
-		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\");' />",$plot);
+	$outstr = 'fontfill="' . $color . '";';
+	if ($size > 0) {
+		$outstr .= 'fontsize='.floatval($size).';';
 	}
+	$outstr .= "text([$x,$y],\"$lbl\"";
+	if ($loc != "" || $angle != 0) {
+		$outstr .= ",\"$loc\"";
+	}
+	if ($angle != 0) {
+		$outstr .= ",\"$angle\"";
+	}
+	$outstr .= ');';
+	$plot = str_replace("' />","$outstr' />",$plot);
 	return $plot;
 }
 function addlabelabs($plot,$x,$y,$lbl) {

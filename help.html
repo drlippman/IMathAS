@@ -2370,7 +2370,7 @@ The following macros create graphs or tables:
 <li><strong>addfractionaxislabels(plot,step,[axis])</strong>:  Adds labels along the horizontal axis in steps of step to a plot created with showplot.
       Step is a fraction like "1/4", or a pi multiple, like "pi/4" or "2pi".  When using this, make sure to set the showplot x-axis label
       spacing larger than the domain to prevent the default labels from showing.  Set axis to "y" to add fraction axis labels on the y-axis.</li>
-<li><strong>addlabel(plot,x,y,label,[color,loc,angle])</strong>: Adds a label to a plot created with showplot.
+<li><strong>addlabel(plot,x,y,label,[color,loc,angle,size])</strong>: Adds a label to a plot created with showplot.
 	<ul>
 	<li><strong>plot</strong>: The plot created with showplot</li>
 	<li><strong>x,y</strong>: The coordinates for the label</li>
@@ -2379,6 +2379,7 @@ The following macros create graphs or tables:
 	<li><strong>loc</strong>:  By default, the label is centered at the x,y coordinates.  Use "left" to display the string to the left of the
 	point, "right" to the right, "below" for below the point, "above" for above the point.</li>
 	<li><strong>angle</strong>: Angle to rotate text.</li>
+	<li><strong>size</strong>: font size for label.</li>
 	</ul>
 	</li>
 <li><strong>addlabelabs(plot,x,y,label,[color,loc,angle])</strong>: Adds a label to a plot created with showplot. Parameters are the same as with
