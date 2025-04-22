@@ -228,7 +228,7 @@ class CalculatedScorePart implements ScorePart
                             }
                         }
                     } else {
-                        $anfunc = parseMathQuiet($anans);
+                        $anfunc = parseMathQuiet(str_replace(',','',$anans));
                         if ($anfunc !== false) {
                             $aarr[$j] = $anfunc->evaluateQuiet();
                             if ($checkSameform) {
