@@ -168,23 +168,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
     require_once "../includes/parsedatetime.php";
 		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
+		if ($toset['avail'] == 1 && $dates_by_lti == 0) {
+			if ($_POST['sdatetype']=='0') {
+				$toset['startdate'] = 0;
+			} else {
+				$toset['startdate'] = parsedatetime($_POST['sdate'],$_POST['stime'],0);
+			}
+			if ($_POST['edatetype']=='2000000000') {
+				$toset['enddate'] = 2000000000;
+			} else {
+				$toset['enddate'] = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
+			}
+		} else {
+			// set some default values which won't matter to prevent undefined errors
+			$toset['startdate'] = 0;
+			$toset['enddate'] = time();
+		}
 
-    if ($_POST['sdatetype']=='0') {
-      $toset['startdate'] = 0;
-    } else {
-      $toset['startdate'] = parsedatetime($_POST['sdate'],$_POST['stime'],0);
-    }
-    if ($_POST['edatetype']=='2000000000') {
-      $toset['enddate'] = 2000000000;
-    } else {
-      $toset['enddate'] = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
-    }
-
-    if (empty($_POST['allowpractice']) || $toset['enddate'] == 2000000000) {
-      $toset['reviewdate'] = 0;
-    } else {
-      $toset['reviewdate'] = 2000000000;
-    }
+		if (empty($_POST['allowpractice']) || $toset['enddate'] == 2000000000) {
+			$toset['reviewdate'] = 0;
+		} else {
+			$toset['reviewdate'] = 2000000000;
+		}
 
 		// Core options
 		if (!empty($_POST['copyfrom'])) { // copy options from another assessment
@@ -469,7 +474,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($updategroupset == '') { // don't change group
 				unset($toset['groupsetid']);
 			}
-			if ($dates_by_lti>0) { // don't change dates
+			if ($dates_by_lti>0 || $toset['avail'] == 0) { // don't change dates
 				unset($toset['startdate']);
 				unset($toset['enddate']);
 			}
