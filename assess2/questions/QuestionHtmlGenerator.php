@@ -829,7 +829,9 @@ class QuestionHtmlGenerator
                 if (!$lastGroupDone) { // not ready for it - unset stuff
                   unset($jsParams[$qnrefnum]);
                   unset($answerbox[$pn]);
-                  unset($showanswerloc[$pn]);
+                  if (is_array($showanswerloc)) {
+                    unset($showanswerloc[$pn]);
+                  }
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
