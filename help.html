@@ -3133,6 +3133,21 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
             </li>
         </ul>
     </dd>
+<dt>$requiretimes = a list, like "E,=0" </dt>
+	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
+	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
+	the symbol "E" would be required to show up exactly 0 times.<br/>
+	Be aware that if you search for "5,=1", it will match both 5 and 15 and 2.5, since all three strings contain a 5.  When
+	searching for numbers, you can avoid this by putting a "#" before the number, like "#5,=1", which would match the 5 but not 15 or 0.5.
+	Beware this type of search ignores signs.<br/>
+	You can	use just "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
+	You can match either of two symbols by putting || between them, like ".5||1/2,>0"<br/>
+	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
+	You can put "ignore_commas,true" at the beginning of the $requiretimes to ignore commas in the answer<br/>
+	</dd>
+<dt>$requiretimeslistpart = a list, in the same format as $requiretimes </dt>
+	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used,
+	where $requiretimes would be applied to the entire list of answers. </dd>
 <dt>$partialcredit = array(number,score,[number,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
