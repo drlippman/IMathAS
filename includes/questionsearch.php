@@ -540,7 +540,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     return $out;
 }
 
-function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results = ['names' => '']) {
+function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results = ['names' => ''], $page = '') {
     global $staticroot, $cid;
 ?>
 <div id="fullqsearchwrap">
@@ -670,6 +670,11 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
 			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
                     </div></div>
                     <p><label><input type=checkbox id="search-mine"><?php echo _('Mine Only');?></label> 
+<?php
+    if ($page == 'addquestions') {
+                    echo '<label><input type=checkbox id="search-unused">' . _('Exclude Added') . '</label> ';
+    }
+?>
                         <label><input type=checkbox id="search-nopriv"><?php echo _('Exclude Private');?></label> 
                         <label><input type=checkbox id="search-nopub"><?php echo _('Exclude Public');?></label> 
                         <label><input type=checkbox id="search-newest"><?php echo _('Newest First');?></label> 

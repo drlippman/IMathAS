@@ -634,7 +634,7 @@ if ($overwriteBody==1) {
 
 <?php
 	require_once('../includes/questionsearch.php');
-	outputSearchUI($searchtype, $searchterms, $search_results);
+	outputSearchUI($searchtype, $searchterms, $search_results, 'addquestions');
 ?>
 
 <div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img alt="" src="../img/updating.gif"/></div>
