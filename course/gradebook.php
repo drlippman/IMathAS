@@ -1186,17 +1186,34 @@ function gbstudisp($stu) {
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
 		echo '<th >', _('Totals'), '</th>';
-		if (($show&1)==1) {
-			echo '<th>', _('Past Due'), '</th>';
+		$instronlynote = '<br><span class=small><i>'._('Not shown to students').'</i></span>';
+		if (($show&1)==1 || ($canviewall && $availshow == 0)) {
+			echo '<th>', _('Past Due');
+			if (($show&1)!=1) { 
+				echo $instronlynote;
+			}
+			echo '</th>';
 		}
-		if (($show&2)==2) {
-			echo '<th>', _('Past Due and Attempted'), '</th>';
+		if (($show&2)==2 || ($canviewall && $availshow == 3)) {
+			echo '<th>', _('Past Due and Attempted');
+			if (($show&2)!=2) { 
+				echo $instronlynote;
+			}
+			echo '</th>';
 		}
-		if (($show&4)==4) {
-			echo '<th>', _('Past Due and Available'), '</th>';
+		if (($show&4)==4 || ($canviewall && $availshow == 1)) {
+			echo '<th>', _('Past Due and Available');
+			if (($show&4)!=4) { 
+				echo $instronlynote;
+			}
+			echo '</th>';
 		}
-		if (($show&8)==8) {
-			echo '<th>', _('All'), '</th>';
+		if (($show&8)==8 || ($canviewall && $availshow == 2)) {
+			echo '<th>', _('All');
+			if (($show&8)!=8) { 
+				echo $instronlynote;
+			}
+			echo '</th>';
 		}
 		echo '</tr>';
 		echo '</thead><tbody>';
@@ -1224,7 +1241,7 @@ function gbstudisp($stu) {
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
 				echo '</td>';
-				if (($show&1)==1) { //past
+				if (($show&1)==1 || ($canviewall && $availshow == 0)) { //past
 					echo '<td>';
 					//show points in points-based mode
 					if ($gbt[1][2][$i][4] == 0) {
@@ -1243,7 +1260,7 @@ function gbstudisp($stu) {
 					}
 					echo '</td>';
 				}
-				if (($show&2)==2) { //past and attempted
+				if (($show&2)==2 || ($canviewall && $availshow == 3)) { //past and attempted
 					echo '<td>';
 					//show points in points-based mode
 					if ($gbt[1][2][$i][7] == 0) {
@@ -1262,7 +1279,7 @@ function gbstudisp($stu) {
 					}
 					echo '</td>';
 				}
-				if (($show&4)==4) { //past and avail
+				if (($show&4)==4 || ($canviewall && $availshow == 1)) { //past and avail
 					echo '<td>';
 					if ($gbt[1][2][$i][5] == 0) {
 						echo 'N/A';
@@ -1281,7 +1298,7 @@ function gbstudisp($stu) {
 					}
 					echo '</td>';
 				}
-				if (($show&8)==8) { //all
+				if (($show&8)==8 || ($canviewall && $availshow == 2)) { //all
 					echo '<td>';
 					if ($gbt[1][2][$i][6] == 0) {
 						echo 'N/A';
@@ -1309,36 +1326,36 @@ function gbstudisp($stu) {
 			echo '<tr class="grid">';
 			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>', _('Total'), '</td>';
-				if (($show&1)==1) {
+				if (($show&1)==1 || ($canviewall && $availshow == 0)) {
 					if ($gbt[1][3][4] > 0) {}
 					$pct = ($gbt[1][3][4] > 0) ? round(100*$gbt[1][3][0]/$gbt[1][3][4], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[1][3][4]).' ('.$pct.'%)</td>';
 				}
-				if (($show&2)==2) {
+				if (($show&2)==2 || ($canviewall && $availshow == 3)) {
 					$pct = ($gbt[1][3][7] > 0) ? round(100*$gbt[1][3][3]/$gbt[1][3][7], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][3]).'/'.Sanitize::onlyFloat($gbt[1][3][7]).' ('.$pct.'%)</td>';
 				}
-				if (($show&4)==4) {
+				if (($show&4)==4 || ($canviewall && $availshow == 1)) {
 					$pct = ($gbt[1][3][5] > 0) ? round(100*$gbt[1][3][1]/$gbt[1][3][5], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[1][3][5]).' ('.$pct.'%)</td>';
 				}
-				if (($show&8)==8) {
+				if (($show&8)==8 || ($canviewall && $availshow == 2)) {
 					$pct = ($gbt[1][3][6] > 0) ? round(100*$gbt[1][3][2]/$gbt[1][3][6], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[1][3][6]).' ('.$pct.'%)</td>';
 				}
 
 			} else {
 				echo '<td>', _('Weighted Total'), '</td>';
-				if (($show&1)==1) {
+				if (($show&1)==1 || ($canviewall && $availshow == 0)) {
 					echo '<td>'.(($gbt[1][3][4] > 0) ? round(100*$gbt[1][3][0]/$gbt[1][3][4], 1) : 0) .'%</td>';
 				}
-				if (($show&2)==2) {
+				if (($show&2)==2 || ($canviewall && $availshow == 3)) {
 					echo '<td>'.(($gbt[1][3][7] > 0) ? round(100*$gbt[1][3][3]/$gbt[1][3][7], 1) : 0) .'%</td>';
 				}
-				if (($show&4)==4) {
+				if (($show&4)==4 || ($canviewall && $availshow == 1)) {
 					echo '<td>'.(($gbt[1][3][5] > 0) ? round(100*$gbt[1][3][1]/$gbt[1][3][5], 1) : 0) .'%</td>';
 				}
-				if (($show&8)==8) {
+				if (($show&8)==8 || ($canviewall && $availshow == 2)) {
 					echo '<td>'.(($gbt[1][3][6] > 0) ? round(100*$gbt[1][3][2]/$gbt[1][3][6], 1) : 0) .'%</td>';
 				}
 			}
