@@ -3,7 +3,6 @@
 //(c) 2011 David Lippman
 
 require_once "../init.php";
-$courseUIver = 1; // Doesn't quite work right yet
 if ($courseUIver > 1) {
     require_once '../assess2/AssessStandalone.php';
     $a2 = new AssessStandalone($DBH);
@@ -51,6 +50,7 @@ $classbests = explode(',',$dadata['classbests']);
 if ($scoretype[0]=='t') {
 	$mode = 'cntdown';
 	$torecord = 'cc';   //count  correct
+	$stopattype = 'na';
 } else {
 	$mode = 'cntup';
 	$stopattype = $scoretype[1];  //a: attempted, c: correct, s: streak
@@ -77,7 +77,9 @@ if ($stm->rowCount()==0) {
 } else {
 	$sessdata = $stm->fetch(PDO::FETCH_ASSOC);
 	$curitem = $sessdata['curitem'];
-	$curitemid = $itemids[$curitem];
+	if ($curitem > -1) {
+		$curitemid = $itemids[$curitem];
+	}
 	$seed = $sessdata['seed'];
 	if ($sessdata['curscores']=='') {
 		$curscores = array();
@@ -240,7 +242,7 @@ if ($courseUIver > 1) {
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
     $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=112124" type="text/javascript"></script>';
     $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
-    $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=021823">
         <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
     $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
@@ -354,7 +356,12 @@ if ($curitem == -1) {
 		echo "		var theform = document.getElementById(\"qform\");";
 		echo "		var action = theform.getAttribute(\"action\");";
 		echo "		theform.setAttribute(\"action\",action+'&superdone=true');";
-		echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n";
+		if ($courseUIver > 1) {
+			echo " if (dopresubmit($qn,false)) { theform.submit(); } \n";
+		} else {
+			echo " if (doonsubmit(theform,true,true)) { theform.submit(); } \n";
+		}
+		
 		//setTimeout('document.getElementById(\"qform\").submit()',1000);} \n";
 		echo "		return 0;";
 		echo "    }";
@@ -379,15 +386,6 @@ if ($curitem == -1) {
 		echo "<div class=right id=timelimitholder>" . _("Time") . ": <span id=\"timer\" style=\"font-size: 120%; color: red;\" ";
 		echo ">$hours:$minutes:$seconds</span></div>\n";
 
-		?>
-		<script type="text/javascript">
-		function focusfirst() {
-            var el = document.getElementById("qn0");
-            if (el != null) {el.focus();}
-		}
-		initstack.push(focusfirst);
-		</script>
-		<?php
 		//not done with assessment.
 		$page_formAction = "drillassess.php?cid=$cid&daid=$daid";
 		if ($showans) {
@@ -421,6 +419,7 @@ if ($curitem == -1) {
             } else {
                 echo "onsubmit=\"doonsubmit(this)\">\n";
             }
+			echo '<div class="question" id="questionwrap'.$qn.'">';
 			if ($courseUIver > 1) {
                 $state = array(
                     'seeds' => array(0 => $seed),
@@ -436,6 +435,7 @@ if ($curitem == -1) {
             } else {
                 displayq(0,$curitemid,$seed,$doshowans,true,0);
             }
+			echo '</div>';
             echo '<div class="submitbtnwrap">';
 			if ($sa==3) {
 				echo "<button type=\"submit\" name=\"next\" value=\"Next Question\" class=\"primary\">" . _("New Question") . "</button>\n";
@@ -444,6 +444,22 @@ if ($curitem == -1) {
 			}
 			echo "</div></form>\n";
 		}
+		?>
+		<script type="text/javascript">
+		function focusfirst() {
+			var mqel = document.getElementById("mqinput-qn0");
+			if (mqel != null) {
+				rendermathnode(document.getElementById("questionwrap<?php echo $qn;?>"), function () {
+					MQ(mqel).focus();;
+				});
+			} else {
+            	var el = document.getElementById("qn0");
+            	if (el != null) {el.focus();}
+			}
+		}
+		initstack.push(focusfirst);
+		</script>
+		<?php
 	}
 }
 
