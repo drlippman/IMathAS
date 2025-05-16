@@ -344,7 +344,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	if ($canviewall) {
 		echo "<div class=cpmid>";
-		echo _('Category'), ': <select id="filtersel" onchange="chgfilter()">';
+		echo '<label>',_('Category'), ': <select id="filtersel" onchange="chgfilter()">';
 		echo '<option value="-1" ';
 		if ($catfilter==-1) {echo "selected=1";}
 		echo '>', _('All'), '</option>';
@@ -361,13 +361,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="-2" ';
 		if ($catfilter==-2) {echo "selected=1";}
 		echo '>', _('Category Totals'), '</option>';
-		echo '</select> | ';
-		echo _('Not Counted:'), " <select id=\"hidenc\" onchange=\"chggbfilters()\">";
+		echo '</select></label> | ';
+		echo '<label>', _('Not Counted:'), " <select id=\"hidenc\" onchange=\"chggbfilters()\">";
 		echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">", _('Show all'), "</option>";
 		echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">", _('Show stu view'), "</option>";
 		echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">", _('Hide all'), "</option>";
-		echo "</select>";
-		echo " | ", _('Show:'), " <select id=\"availshow\" onchange=\"chggbfilters()\">";
+		echo "</select></label>";
+		echo " | <label>", _('Show:'), " <select id=\"availshow\" onchange=\"chggbfilters()\">";
 		echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">", _('Past due'), "</option>";
 		echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">", _('Past &amp; Attempted'), "</option>";
 		echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">", _('Available Only'), "</option>";
@@ -375,7 +375,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select>";
 		echo " | ", _('Links:'), " <select id=\"linktoggle\" onchange=\"chglinktoggle()\">";
 		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">", _('View/Edit'), "</option>";
-		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">", _('Scores'), "</option></select>";
+		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">", _('Scores'), "</option></select></label>";
 		echo '<input type="hidden" id="toggle4" value="'.$showpics.'" />';
 		echo '<input type="hidden" id="toggle5" value="'.$hidelocked.'" />';
 		echo "</div>";
@@ -493,7 +493,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<a href="gb-export.php?cid='.$cid.'&export=true">'._('Export').'</a> &nbsp; ';
 		echo "<a href=\"gbsettings.php?cid=$cid\">", _('Settings'), "</a> &nbsp; ";
 		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">", _('Comments'), "</a> &nbsp; ";
-		echo _('Color:'), ' <select id="colorsel" onchange="updateColors(this)">';
+		echo '<label>', _('Color:'), ' <select id="colorsel" onchange="updateColors(this)">';
 		echo '<option value="0">', _('None'), '</option>';
 		for ($j=50;$j<90;$j+=($j<70?10:5)) {
 			for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
@@ -510,7 +510,7 @@ if (isset($studentid) || $stu!=0) { //show student view
         echo '<option value="-2:-2" ';
 		if ($colorize == "-2:-2") { echo 'selected="selected" ';}
 		echo '>', _('NC'), '</option>';
-		echo '</select> &nbsp; ';
+		echo '</select></label> &nbsp; ';
 		//echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
 		echo $togglehtml;
@@ -518,7 +518,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 	}
 
-	echo _('Category:'), ' <select id="filtersel" onchange="chgfilter()">';
+	echo '<label>', _('Category:'), ' <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
 	echo '>', _('All'), '</option>';
@@ -535,18 +535,18 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<option value="-2" ';
 	if ($catfilter==-2) {echo "selected=1";}
 	echo '>', ('Category Totals'), '</option>';
-	echo '</select> &nbsp; ';
-	echo _('Not Counted:'), " <select id=\"hidenc\" onchange=\"chggbfilters()\">";
+	echo '</select></label> &nbsp; ';
+	echo '<label>', _('Not Counted:'), " <select id=\"hidenc\" onchange=\"chggbfilters()\">";
 	echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">", _('Show all'), "</option>";
 	echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">", _('Show stu view'), "</option>";
 	echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">", _('Hide all'), "</option>";
-	echo "</select> &nbsp; ";
-	echo _('Show:'), " <select id=\"availshow\" onchange=\"chggbfilters()\">";
+	echo "</select></label> &nbsp; ";
+	echo '<label>', _('Show:'), " <select id=\"availshow\" onchange=\"chggbfilters()\">";
 	echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">", _('Past due'), "</option>";
 	echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">", _('Past &amp; Attempted'), "</option>";
 	echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">", _('Available Only'), "</option>";
 	echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">", _('Past &amp; Available'), "</option>";
-	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select> &nbsp; ";
+	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select></label> &nbsp; ";
 
 	if (!$isteacher) {
 		echo $togglehtml;
@@ -766,8 +766,8 @@ function gbstudisp($stu) {
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."\">";
-				echo _('Gradebook Comment').': '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
-				echo "<textarea name=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment, true) . "</textarea>";
+				echo '<label for="usrcomments">'._('Gradebook Comment').'</label>: '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
+				echo "<textarea name=\"usrcomments\" id=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment, true) . "</textarea>";
 				echo '</form>';
 			} else {
 				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
@@ -803,7 +803,7 @@ function gbstudisp($stu) {
 	echo '<thead><tr>';
 	$sarr = array();
 	if ($stu>0 && $isteacher) {
-		echo '<th><span class="sr-only">'._('Select'). '</span></th>';
+		echo '<th><span class="sr-only">'._('Pictures'). '</span></th>';
 	}
 	echo '<th>', _('Item'), '</th><th>', _('Percent'), '</th><th>', _('Grade'), '</th><th>', _('Possible'), '</th>';
 	if ($stu>0 && $isteacher) {
@@ -855,18 +855,21 @@ function gbstudisp($stu) {
 			echo '<tr class="grid">';
 			if ($stu>0 && $isteacher) {
 				if ($gbt[0][1][$i][6]==0) {
-					echo '<td><input type="checkbox" name="assesschk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+					echo '<td><input type="checkbox" name="assesschk[]" value="'.$gbt[0][1][$i][7] .'" id="chkbx'.$i.'" /></td>';
 				} else if ($gbt[0][1][$i][6]==1) {
-					echo '<td><input type="checkbox" name="offlinechk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+					echo '<td><input type="checkbox" name="offlinechk[]" value="'.$gbt[0][1][$i][7] .'" id="chkbx'.$i.'" /></td>';
 				} else if ($gbt[0][1][$i][6]==2) {
-					echo '<td><input type="checkbox" name="discusschk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+					echo '<td><input type="checkbox" name="discusschk[]" value="'.$gbt[0][1][$i][7] .'" id="chkbx'.$i.'" /></td>';
 				} else if ($gbt[0][1][$i][6]==3) {
-					echo '<td><input type="checkbox" name="exttoolchk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+					echo '<td><input type="checkbox" name="exttoolchk[]" value="'.$gbt[0][1][$i][7] .'" id="chkbx'.$i.'" /></td>';
 				} else {
 					echo '<td></td>';
 				}
 			}
 			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'" scope="row">';
+			if ($stu>0 && $isteacher && $gbt[0][1][$i][6] >= 0 && $gbt[0][1][$i][6] < 4) {
+				echo '<label for="chkbx'.$i.'">';
+			}
 
 			$showlink = false;
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
@@ -911,6 +914,9 @@ function gbstudisp($stu) {
 			echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
 			if ($showlink) {
 				echo '</a>';
+			}
+			if ($stu>0 && $isteacher && $gbt[0][1][$i][6] >= 0 && $gbt[0][1][$i][6] < 4) {
+				echo '</label>';
 			}
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
@@ -1607,7 +1613,7 @@ function gbinstrdisp() {
 
 	$sortarr = array();
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($i==1) {echo '<th><div>&nbsp;<span class="sr-only">'. _('Select'). '</span></div></th>'; $sortarr[] = 'false';} //for pics
+		if ($i==1) {echo '<th><div>&nbsp;<span class="sr-only">'. _('Pictures'). '</span></div></th>'; $sortarr[] = 'false';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		if ($gbt[0][0][$i]=='Section' || $gbt[0][0][$i]=='Code' || $gbt[0][0][$i]=='Last Login') {
 			echo '<th class="nocolorize"><div>';
@@ -1616,7 +1622,7 @@ function gbinstrdisp() {
 		}
 		echo $gbt[0][0][$i];
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
-			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
+			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\" aria-label=\"Section\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>', _('All'), '</option>';
 			$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
@@ -1633,7 +1639,7 @@ function gbinstrdisp() {
 
 		} else if ($gbt[0][0][$i]=='Name') {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span><br/>';
-			echo "<select id=\"lockedtoggle\" onchange=\"chglockedtoggle()\">";
+			echo "<select id=\"lockedtoggle\" onchange=\"chglockedtoggle()\" aria-label=\""._('Display locked students') ."\">";
 			echo "<option value=0 "; writeHtmlSelected($hidelocked,0); echo ">", _('Show Locked'), "</option>";
 			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">", _('Hide Locked'), "</option>";
 			echo "</select>";
@@ -1753,15 +1759,15 @@ function gbinstrdisp() {
 		}
 		echo '<td class="locked" scope="row"><div class="trld">';
 		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
-			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
+			echo "<input type=\"checkbox\" name='checked[]' id='chkbx$i' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
-		echo "<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
+		echo '<label for="chkbx'.$i.'">'."<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
 		if (!empty($gbt[$i][4][1]) && $gbt[$i][4][1]>0) {
 			echo '<span class="greystrike pii-full-name">'.$gbt[$i][0][0].'</span>';
 		} else {
 			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($gbt[$i][0][0]).'</span>';
 		}
-		echo '</a>';
+		echo '</a></label>';
 		if (!empty($gbt[$i][4][3]) &&  $gbt[$i][4][3]==1) {
 			echo '<sup>*</sup>';
 		}

@@ -430,7 +430,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$stm->execute(array(':courseid'=>$cid));
 		if ($stm->rowCount()>0) {
 			$hassection = true;
-			$sectionselect = "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
+			$sectionselect = "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" " ;
 			if ($secfilter==-1) {$sectionselect .= 'selected=1';}
 			$sectionselect .=  '>All</option>';
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -486,7 +486,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$haslatepasses=true;
 			}
 		}
-		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
+		$hasSectionRowHeader = ($hassection)? "<th><label for=\"secfiltersel\">Section</label>$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
 		$hasLatePassHeader = ($haslatepasses) ? "<th>LatePasses</th>" : "";
 
@@ -766,18 +766,18 @@ if ($overwriteBody==1) {
     }
     echo '<br class="clear"/>';
 	echo '</div>';
-	echo '<p>Pictures: <select id="picsize" onchange="chgpicsize()">';
+	echo '<p><label>'._('Pictures').': <select id="picsize" onchange="chgpicsize()">';
 	echo "<option value=0 selected>", _('None'), "</option>";
 	echo "<option value=1>", _('Small'), "</option>";
-	echo "<option value=2>", _('Big'), "</option></select> ";
-	echo 'Email: <select id="showemail" onchange="chgrmode()">';
+	echo "<option value=2>", _('Big'), "</option></select></label> ";
+	echo '<label>'._('Email').': <select id="showemail" onchange="chgrmode()">';
 	echo '<option value=1 '.($showemail==true?'selected':'').'>'._('Show').'</option>';
 	echo '<option value=0 '.($showemail==true?'':'selected').'>'._('Hide').'</option>';
-	echo '</select> ';
-	echo Sanitize::encodeStringForDisplay($loginprompt).': <select id="showsid" onchange="chgrmode()">';
+	echo '</select></label> ';
+	echo '<label>'.Sanitize::encodeStringForDisplay($loginprompt).': <select id="showsid" onchange="chgrmode()">';
 	echo '<option value=1 '.($showSID==true?'selected':'').'>'._('Show').'</option>';
 	echo '<option value=0 '.($showSID==true?'':'selected').'>'._('Hide').'</option>';
-	echo '</select> ';
+	echo '</select></label> ';
 	echo '</p>';
 	?>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
@@ -808,12 +808,12 @@ if ($overwriteBody==1) {
     <caption class="sr-only">Roster</caption>
 		<thead>
 		<tr>
-			<th></th>
-			<th></th>
+			<th><span class="sr-only">Checkboxes</span></th>
+			<th><span class="sr-only">Images</span></th>
 			<?php echo $hasSectionRowHeader; ?>
 			<?php echo $hasCodeRowHeader; ?>
 			<th>Name</th>
-			<th></th>
+			<th><span class="sr-only">Notes</span></th>
 			<?php
 			if ($showSID) {
 				echo '<th>'.Sanitize::encodeStringForDisplay($loginprompt).'</th>';
@@ -856,7 +856,8 @@ if ($overwriteBody==1) {
 			$hasCodeData = ($hascode) ? "<td>".Sanitize::encodeStringForDisplay($line['code'])."</td>" : "";
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
-				<td><input type=checkbox name="checked[]" value="<?php echo Sanitize::onlyInt($line['userid']); ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
+				<td><input type=checkbox name="checked[]" id="userchk<?php echo Sanitize::onlyInt($line['userid']); ?>" 
+					value="<?php echo Sanitize::onlyInt($line['userid']); ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
 				<td>
 <?php
 
@@ -876,7 +877,7 @@ if ($overwriteBody==1) {
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
 				if ($line['locked']>0) {
-					echo '<span class="greystrike pii-full-name">'.$nameline.'</span></td>';
+					echo '<label for="userchk'. Sanitize::onlyInt($line['userid']) . '" class="greystrike pii-full-name">'.$nameline.'</label></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
 						echo '<td><span class="greystrike pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
@@ -886,7 +887,7 @@ if ($overwriteBody==1) {
 					}
 					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
-					echo '<span class="pii-full-name">'.$nameline.'</span></td>';
+					echo '<label for="userchk'. Sanitize::onlyInt($line['userid']) . '" class="pii-full-name">'.$nameline.'</label></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
 						echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
