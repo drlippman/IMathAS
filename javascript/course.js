@@ -75,7 +75,6 @@ function toggleblock(event,bnum,folder) {
 	  }
           node.className = 'hidden';
           node.setAttribute('aria-hidden', true);
-          node.setAttribute('aria-expanded', false);
           $("#blockhead"+bnum+" *[aria-expanded=true]").attr("aria-expanded",false);
           //butn.value = 'Expand';
 	  if (img != null) {
@@ -91,7 +90,6 @@ function toggleblock(event,bnum,folder) {
 	  }
           node.className = 'blockitems';
           node.setAttribute('aria-hidden', false);
-          node.setAttribute('aria-expanded', true);
           $("#blockhead"+bnum+" *[aria-expanded=false]").attr("aria-expanded",true);
           //butn.value = 'Collapse';
 	  if (img != null) {

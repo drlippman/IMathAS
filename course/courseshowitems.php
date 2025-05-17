@@ -110,10 +110,10 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name)
     global $cid, $staticroot;
     $blockid = intval($blockid);
     $out = '<div class="itemhdrdd dropdown">';
-    $out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+    $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
     $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
-    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     if ($blocktype == 'T') {
         $out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _('Edit Contents') . "</a></li>";
     } else if ($blocktype == 'E') {
@@ -132,10 +132,10 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
 {
     global $cid, $staticroot;
     $out = '<div class="itemhdrdd dropdown">';
-    $out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+    $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
     $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
-    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     $out .= " <li><a href=\"addquestions2.php?aid=$typeid&cid=$cid\">" . _('Questions') . "</a></li>";
     $out .= " <li><a href=\"$thisaddassess?id=$typeid&block=$parent&cid=$cid\">" . _('Settings') . "</a></li>";
     $out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
@@ -155,10 +155,10 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name)
 {
     global $cid, $staticroot;
     $out = '<div class="itemhdrdd dropdown">';
-    $out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+    $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
     $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
-    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     $out .= " <li><a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
     $out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
     $out .= " <li><a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
@@ -173,10 +173,10 @@ function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $sho
 {
     global $cid, $staticroot;
     $out = '<div class="itemhdrdd dropdown">';
-    $out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+    $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
     $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
-    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+    $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     $out .= " <li><a href=\"add$typename.php?id=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
     $out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
     $out .= " <li><a href=\"delete$typename.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
@@ -355,9 +355,9 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     echo "<div class=title>";
 
                     if ($ispublic) {
-                        echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
+                        echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
                     } else {
-                        echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
+                        echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
                     }
                     if (isset($items[$i]['newflag']) && $items[$i]['newflag'] == 1) {
                         echo "<span class=noticetext>", _('New'), "</span>";
@@ -448,7 +448,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo "<div class=title>";
 
-                    echo "<b role=\"heading\"><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
+                    echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
                     echo 'aria-controls="block' . $items[$i]['id'] . '" aria-expanded="' . ($isopen ? "true" : "false") . '"';
                     echo "$astyle>" . Sanitize::encodeStringForDisplay($items[$i]['name']) . "</a></b> ";
                     if (isset($items[$i]['newflag']) && $items[$i]['newflag'] == 1) {
@@ -476,7 +476,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     echo "</div>\n"; //block
 
                     if ($isopen) {
-                        echo "<div aria-expanded=true class=blockitems ";
+                        echo "<div class=blockitems ";
                     } else {
                         echo "<div aria-hidden=true class=hidden ";
                     }
@@ -544,7 +544,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo "<div class=title>";
 
-                    echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">";
+                    echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
                     if ($items[$i]['SH'][0] == 'S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
                     if (isset($items[$i]['newflag']) && $items[$i]['newflag'] == 1) {
                         echo " <span class=noticetext>", _('New'), "</span>";
@@ -629,7 +629,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo "<div class=title>";
 
-                    echo "<b role=\"heading\">";
+                    echo "<b>";
                     $control = "onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
                     $control .= 'aria-controls="block' . $items[$i]['id'] . '" aria-expanded="' . ($isopen ? "true" : "false") . '"';
                     if ($items[$i]['SH'][0] == 'S') {
@@ -661,7 +661,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     echo "</div>\n"; //block
 
                     if ($isopen) {
-                        echo "<div aria-expanded=true class=blockitems ";
+                        echo "<div class=blockitems ";
                     } else {
                         echo "<div aria-hidden=true class=hidden ";
                     }
@@ -715,11 +715,11 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                 echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">", _('Manage Events'), "</a>";
                 echo '</span>';
                  */
-                echo '<div class="floatright dropdown">';
-                echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                echo '<div class="floatright dropdown">';            
+                echo '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                 echo ' <img src="' . $staticroot . '/img/gearsdd.png" alt="Options" class="mida"/>';
                 echo '</a>';
-                echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+                echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
                 echo " <li><a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">", _('Delete'), "</a></li>";
                 echo " <li><a href=\"#\" onclick=\"return moveDialog('$parent','{$items[$i]}');\">", _('Move'), '</a></li>';
                 echo " <li><a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">", _('Manage Events'), "</a></li>";
