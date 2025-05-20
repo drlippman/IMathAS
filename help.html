@@ -2428,7 +2428,7 @@ The following macros create graphs or tables:
   question and pulls out the open dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
   of the dot.</li>
 <li><strong>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getlinesdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing
-  question and pulls out the lines data, which includes polygons.  Returns an array, with an element for each line/curve draw.  Each of those
+  question using the older non-twopoint line tool or the polygon tool, and pulls out the lines data.  Returns an array, with an element for each line/curve draw.  Each of those
   elements will be an array of points on that line/curve.  Each of those points is array (x,y).</li>
 <li><strong>getineqdata(stuans, [type, xmin, xmax, ymin, ymax, drawing width, drawing height]) or getineqdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing question
   and pulls out the inequalities data for the given curve type.  Type should be one of 'linear' or 'quadratic'.
