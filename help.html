@@ -2524,8 +2524,12 @@ These macros help with working with strings:
 <li><strong>today([string])</strong>: Returns today's date, like "July 3, 2008".  Can change format using string (see https://www.php.net/manual/en/datetime.format.php for formats)</li>
 <li><strong>stringpos(needle,haystack)</strong>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
 <li><strong>stringlen(string)</strong>: returns the character count in the provided string</li>
-<li><strong>stringclean(string,mode)</strong>: mode 0: trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric characters.</li>
-<li><strong>substr(string,start,[length])</strong>: grabs the part of the string from the start index with given length.  If length is not specified, it cuts from the start index to the end of the string.</li>
+<li><strong>stringclean(string,[mode])</strong>: mode 0 (default): trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric characters.</li>
+<li><strong>substr(string,start,[length])</strong>: grabs the part of the string from the start index with given length. 
+	If start is negative, the returned string will start at the start'th character from the end of string.
+	If length is not specified, it cuts from the start index to the end of the string.
+	If length is given and is negative, then that many characters will be omitted from the end of string.
+	</li>
 <li><strong>strtoupper(string)</strong>: make all characters in the string upper case</li>
 <li><strong>ucfirst(string)</strong>: makes the first character in the string upper case</li>
 <li><strong>strtolower(string)</strong>: make all characters in the string lower case</li>
