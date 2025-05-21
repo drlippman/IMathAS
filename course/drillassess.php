@@ -6,6 +6,7 @@ require_once "../init.php";
 if ($courseUIver > 1) {
     require_once '../assess2/AssessStandalone.php';
     $a2 = new AssessStandalone($DBH);
+	$assessUIver = 2;
 } else {
     require_once "../assessment/displayq2.php";
 }
