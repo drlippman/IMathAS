@@ -62,16 +62,26 @@ export default {
     handleKey (event, index) {
       const cnt = this.tabs.length;
       const key = event.key.toLowerCase();
+      let used = false;
       if (key === 'enter' || key === ' ') {
         this.setActive(index);
+        used = true;
       } else if (key === 'arrowleft') {
         this.setFocus((index - 1 + cnt) % cnt);
+        used = true;
       } else if (key === 'arrowright') {
         this.setFocus((index + 1) % cnt);
+        used = true;
       } else if (key === 'home') {
         this.setFocus(0);
+        used = true;
       } else if (key === 'end') {
         this.setFocus(cnt - 1);
+        used = true;
+      }
+      if (used) {
+        event.preventDefault();
+        event.stopPropagation();
       }
     }
   }

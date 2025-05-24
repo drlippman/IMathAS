@@ -146,6 +146,7 @@
     "details": "Details",
     "warn_unattempted": "There appears to be unattempted questions. Are you sure you want to submit now?",
     "withdrawn": "Question withdrawn",
+    "use_mq": "Use equation editor",
     "enable_mq": "Enable equation editor",
     "disable_mq": "Disable equation editor",
     "work_save": "Save progress",

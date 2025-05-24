@@ -70,14 +70,15 @@
       </tooltip-span>
 
       <tooltip-span
-        :tip="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+        :tip="$t('header.use_mq')"
         style="display: inline-block"
       >
         <button
           @click="toggleMQuse"
+          role="switch"
           :class="{plain:true, 'switch-toggle':true}"
-          :aria-label="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
-          :aria-pressed="MQenabled"
+          :aria-label="$t('header.use_mq')"
+          :aria-checked="MQenabled"
         >
           <icons
             :name="MQenabled ? 'eqned' : 'eqnedoff'"
@@ -309,7 +310,7 @@ export default {
   background-color: #f99;
   border-radius: 4px;
 }
-.switch-toggle[aria-pressed="true"] .switch-toggle2__ui {
+.switch-toggle[aria-checked="true"] .switch-toggle2__ui {
   background-color: #9f9
 }
 .switch-toggle2__ui:after {
@@ -326,7 +327,7 @@ export default {
   line-height: 10px;
   padding: 1px 2px;
 }
-.switch-toggle[aria-pressed="true"] .switch-toggle2__ui:after {
+.switch-toggle[aria-checked="true"] .switch-toggle2__ui:after {
   content: "On";
   color: #040;
   right: 0;
@@ -387,15 +388,15 @@ export default {
 }
 
 /* change the position of the knob to indicate it has been checked*/
-.switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
+.switch-toggle[aria-checked="true"] .switch-toggle__ui:after {
   right: 0em;
 }
 
 /* update the color of the "container" to further visually indicate state */
-.switch-toggle[aria-pressed="true"] .switch-toggle__ui:before {
+.switch-toggle[aria-checked="true"] .switch-toggle__ui:before {
   background: #0c0;
 }
-.switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
+.switch-toggle[aria-checked="true"] .switch-toggle__ui:after {
   background: #090;
 }
 </style>
