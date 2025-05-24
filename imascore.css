@@ -374,7 +374,7 @@ span.left {
 ul:empty + .empty-state {
     display: block;
 }
-#skipnav:focus, #skipnav:active {
+#skipnav:focus, #skipnav:active, #pageskipnav:focus, #pageskipnav:active {
     position: static;
     width: auto;
     height: auto;

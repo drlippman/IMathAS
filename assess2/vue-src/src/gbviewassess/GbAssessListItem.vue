@@ -3,8 +3,7 @@
     <strong>{{ attemptNum }}.</strong>
     <span v-if="option.hasOwnProperty('score') && option.score !== 'N/A'">
       {{ $t('gradebook.score') }}:
-      <strong>{{ score }}</strong>. 
-    </span>
+      <strong>{{ score }}</strong>. </span>
     <span v-if="option.hasOwnProperty('status')">
       {{ verStatus }}
     </span>

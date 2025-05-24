@@ -43,6 +43,9 @@
         :class="{inactive: curqn != qn}"
         :aria-hidden = "curqn != qn"
       >
+        <h2 class="sr-only">
+          {{ $t('question_n', { n: curqn + 1 }) }}
+        </h2>
         <question
           :qn="curqn"
           :active="curqn == qn"

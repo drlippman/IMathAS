@@ -29,7 +29,7 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=110324";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=052325";?>" type="text/css" />
 <?php
 $isfw = false;
 if (isset($coursetheme)) {
@@ -78,7 +78,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 var staticroot = '<?php echo $staticroot; ?>';
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=032725"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=052325"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -298,8 +298,8 @@ if ($isfw!==false) {
 } else {
 	echo "<body class=\"notfw\">\n";
 }
-
 echo '<div class="mainbody">';
+echo '<a href="#" id="pageskipnav" class="sr-only">'._('Skip Navigation').'</a>';
 
 $insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
 if (isset($insertinheaderwrapper)) {

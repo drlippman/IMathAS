@@ -1563,6 +1563,8 @@ jQuery(document).ready(function($) {
 	if ($("#centercontent").length) {
 		$("#centercontent").attr("role","main");
 		$(".midwrapper").removeAttr("role");
+	} else if ($("div[role=main]").length > 1) {
+		$(".midwrapper").removeAttr("role");
 	}
 });
 
@@ -1917,3 +1919,15 @@ function doImageUploadResize(el, callback) {
     }
     reader.readAsDataURL(originalFile);
 }
+
+$(function() {
+	$("#pageskipnav").on('click', function (e) {
+		e.preventDefault();
+		var targ;
+		if ($("div.scrollpane[tabindex=-1]").length > 0) {
+			$("div.scrollpane[tabindex=-1]").first().focus();
+		} else if ($("div.pagetitle").length > 0) {
+			$("div.pagetitle").attr("tabindex","-1").focus();
+		}
+	});
+});

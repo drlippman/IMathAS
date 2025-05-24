@@ -867,7 +867,8 @@ class QuestionHtmlGenerator
             }
         }
 
-        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . "\">\n"
+        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . ' ' 
+            . ($this->questionParams->getDisplayQuestionNumber()+1) . "\">\n"
             . filter($evaledqtext);
 
 
