@@ -999,7 +999,13 @@ require_once "includes/sanitize.php";
 		$stm->execute(array(':uid'=>$userid, ':hidelist'=>$hidelist));
 	} 
 	if ($isgb) {
-		echo '<html><body>',_('Changes Recorded.'),'  <input type="button" onclick="parent.GB_hide()" value="',_('Done'),'" /></body></html>';
+		echo '<html><body>',_('Changes Recorded.');
+		if ($_GET['action']=="chguserinfo") {
+			echo ' ' . _('You may need to refresh the page to have new accessiblity settings applied.');
+		}
+		echo '<br/><input type="button" onclick="parent.GB_hide()" value="',_('Done'),'" />';
+		echo '<script>window.parent.$("#GB_footer button.primary").hide();</script>';
+		echo '</body></html>';
 	} else if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$_SESSION['ltiitemid']));
