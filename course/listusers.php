@@ -61,7 +61,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	}
 	if (isset($_POST['lockinstead'])) {
 		$_GET['action'] = "lock";
-		$_POST['tolock'] = $_POST['tounenroll'];
+		$_POST['tolock'] = $_POST['tounenroll'] ?? $_GET['uid'];
 	}
 
 	if (isset($_GET['assigncode'])) {
@@ -520,13 +520,19 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   $("img[data-uid]").each(function (i,el) {
   	var uid = $(el).attr("data-uid");
 	var thishtml = html + \' <li><a href="listusers.php?cid=\'+cid+\'&chgstuinfo=true&uid=\'+uid+\'">'._('Student profile and options').'</a></li>\';
-	if ($(el).siblings("span.greystrike").length) {
+	if ($(el).siblings(".greystrike").length) {
 		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'unlockone\\\');return false;">'._('Unlock').'</a></li>\';
 	} else {
 		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'lockone\\\');return false;">'._('Lock out of course').'</a></li>\';
 	}
 	thishtml += \' <li><a href="viewloginlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Login Log').'</a></li>\';
-	thishtml += \' <li><a href="viewactionlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Activity Log').'</a></li>\';
+	thishtml += \' <li><a href="viewactionlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Activity Log').'</a></li>\';';
+if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+	$placeinhead .= 'thishtml += \'<li role="separator" class="divider"></li>\';';
+	//$placeinhead .= 'thishtml += \'<li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'unenroll\\\');;return false;">'. _('Unenroll'). '</a></li>\'';
+	$placeinhead .= 'thishtml += \'<li><a href="listusers.php?cid=\'+cid+\'&action=unenroll&uid=\'+uid+\'">'. _('Unenroll'). '</a></li>\'';
+}
+$placeinhead .= '
 	thishtml += \'</ul></span> \';
 	$(el).replaceWith(thishtml);
   });

@@ -60,6 +60,10 @@ ini_set("max_execution_time", "600");
         if (empty($_POST['checked'])) {
             $_POST['checked'] = [];
         }
+		if (is_numeric($get_uid)) {
+			$_POST['checked'] = [$get_uid];
+			$get_uid = "selected";
+		}
 		if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_POST['posted']) && $_POST['posted']=="Unenroll")) {
 			/*if (isset($_POST['ca']) && $secfilter==-1) {
 				//if "check all" and not section limited, mark as all to deliver "all students" message
@@ -107,13 +111,6 @@ ini_set("max_execution_time", "600");
 					$delWikiMsg = '';
 				}
 			}
-		} else {
-			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($get_uid)));
-			$row = $stm->fetch(PDO::FETCH_NUM);
-			$unenrollConfirm =  sprintf("Are you SURE you want to unenroll <span class='pii-full-name'>%s %s</span> (<span class='pii-username'>%s</span>)?",
-                Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
-                Sanitize::encodeStringForDisplay($row[2]));
 		}
 
 		/**** confirmation page body *****/
@@ -125,11 +122,11 @@ ini_set("max_execution_time", "600");
 			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&action=unenroll&uid=".Sanitize::encodeUrlParam($get_uid)."\">";
 		}
 
+		echo '<p><b class=noticetext>Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+		If you have a student who isn\'t attending but may return, use the Lock Out of course option instead of unenrolling them.</p>';
 
 			if ($get_uid=="all") {
 ?>
-			<p><b class=noticetext>Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
-			If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
 			<p>Are you SURE you want to unenroll ALL students?</p>
 			<ul>
 <?php
@@ -174,8 +171,6 @@ ini_set("max_execution_time", "600");
 
 				} else {
 ?>
-		<p><b class=noticetext>Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
-		If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
 		<p>Are you SURE you want to unenroll the selected students?</p>
 		<ul>
 <?php
@@ -191,9 +186,7 @@ ini_set("max_execution_time", "600");
 		<input type=hidden name="tounenroll" value="<?php echo Sanitize::encodeStringForDisplay(implode(",",$_POST['checked'])); ?>">
 <?php
 				}
-			} else {
-				echo $unenrollConfirm;
-			}
+			} 
 ?>
 
 		<p>
