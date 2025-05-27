@@ -10,6 +10,7 @@ function togglecolor(threadid,tagged) {
 		$('#tr'+threadid).removeClass("tagged")
 		imgchg.src = staticroot+"/img/flagempty.gif";
 	}
+	$(imgchg).parent('button').attr("aria-checked", tagged==1);
 }
 
 function toggletagged(threadid) {
