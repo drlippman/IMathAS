@@ -3,6 +3,7 @@
 require_once "../init.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
+$errmsg = '';
 
 require '../header.php';
 
@@ -79,12 +80,23 @@ if (isset($_POST['deltype']) && is_numeric($_POST['delold']) &&
     echo '<p><a href="msglist.php?cid=' . $cid .'">' . _('Done') . '</a></p>';
     require '../footer.php';
     exit;
+} else {
+    if (!empty($_POST)) {
+        if (empty($_POST['deltype'])) {
+            $errmsg .= _('Select what kind of message to delete.').' ';
+        }
+        if (!is_numeric($_POST['delold']) || $_POST['delold'] < 0) {
+            $errmsg .= _('Enter a positive number for number of years old.').' ';
+        }
+    }
+    if ($errmsg != '') {
+        echo '<p class=red>'._('Error:').' '.$errmsg.'</p>';
+    }
 }
 
 
 
 echo '<p>' . _('This page will help you delete old messages') . '</p>';
-
 echo '<form method=post>';
 echo '<p>' . _('What kind of messages do you want to delete?');
 echo '<ul class=nomark><li><label><input type=radio name=deltype value="r"> ' . _('Messages I have received only') .'</label></li>';
@@ -92,8 +104,8 @@ echo '<li><label><input type=radio name=deltype value="s"> ' . _('Messages I hav
 echo '<li><label><input type=radio name=deltype value="rs"> ' . _('Messages I have received or sent') .'</label></li>';
 echo '</ul></p>';
 
-echo '<p>' . _('Delete messages older than:');
-echo ' <input type=text size=2 name=delold aria-label="Delete messages older than this many years old"> ' . _('years old') . '</p>';
+echo '<p><span id="yr1">' . _('Delete messages older than:');
+echo '</span> <input type=text size=2 name=delold aria-labelledby="yr1 yr2"> <span id="yr2">' . _('years old') . '</span></p>';
 
 if ($myrights > 10) {
     echo '<p><label><input type=checkbox name=onlynotenrolled value=1> ' . _('Only delete messages from or to students no longer enrolled in my classes') . '</label></p>';
