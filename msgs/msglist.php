@@ -493,7 +493,7 @@ If deleted on both ends, delete from DB
 				echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
 			} else {
 				if ($filtercid>0) {
-					echo '<select class="pii-full-name" name="to" id="to" aria-label="'._('Select an individual').'" onchange="checkTo(this)">';
+					echo '<select class="pii-full-name" name="to" id="to" aria-label="'._('Select the recipient').'" onchange="checkTo(this)">';
 					echo '<option value="0">' . _('Select a recipient...') . '</option>';
 					if ($isteacher || $msgset<2) {
 						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -582,13 +582,12 @@ If deleted on both ends, delete from DB
 			if ($replyto>0) {
 				echo '<span class="form"></span><span class="formright"><input type="checkbox" name="sendunread" id="sendunread" value="1"/> <label for="sendunread">'._('Mark original message unread').'</label></span><br class="form"/>';
 			}
-			echo '<div class="submit"><button type="submit" name="submit" value="send">'._('Send Message').'</button></div>';
-
-			echo "</span></p>\n";
 
 			if ($msgmonitor==1) {
-				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
+				echo '<span class="red form">Note:</span><span class=formright>'._('Student-to-student messages may be monitored by your instructor').'</span><br class=form>';
 			}
+			echo '<div class="submit"><button type="submit" name="submit" value="send">'._('Send Message').'</button></div>';
+
 			echo '</form>';
 			require_once "../footer.php";
 			exit;
