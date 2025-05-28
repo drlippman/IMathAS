@@ -622,4 +622,26 @@ class Sanitize
             return gzuncompress($data);
         }
     }
+
+    /**
+     * Replace "smart quotes" and related "smart" characters with their
+     * "normal" equivalents.
+     *
+     * @param string $text
+     * @return string The provided text with "smart" characters removed.
+     */
+    public static function replaceSmartQuotes(string $text): string
+    {
+        return str_replace(
+            [
+                "\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d",
+                "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"
+            ],
+            [
+                "'", "'", '"', '"',
+                '-', '--', '...'
+            ],
+            $text
+        );
+    }
 }
