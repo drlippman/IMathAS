@@ -590,21 +590,23 @@ if ($overwriteBody==1) {
 			</thead>
 			<tbody>
 <?php
+		$i = 0;
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
+			$i++;
 ?>
 			<tr>
-                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></span>
+                <td><span class="pii-full-name" id="n<?php echo $i;?>"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></span>
                     <input type="hidden" name="uid[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" />
                 </td>
-				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
-				<td><input type=text name="code[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>"/></td>
+				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>" aria-labelledby="n<?php echo $i;?>"/></td>
+				<td><input type=text name="code[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>" aria-labelledby="n<?php echo $i;?>"/></td>
 			</tr>
 <?php
 		}
 ?>
 			</tbody>
 		</table>
-		<input type=submit name=submit value="Submit"/>
+		<button type=submit name=submit value=submit>Submit</button>
 	</form>
 <?php
 	} elseif (isset($_GET['enroll']) && ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true))) {

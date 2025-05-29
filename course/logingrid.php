@@ -150,7 +150,7 @@ if ($overwriteBody==1) {
 	<input type="text" size="10" name="edate" value="<?php echo $edate;?>" aria-label="End date">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-	<button type="submit" name="daterange">Go</button></p>
+	<button type="submit" name="daterange" value="go">Go</button></p>
     </form>
 <?php
 if ($haslocked) {
