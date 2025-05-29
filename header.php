@@ -299,7 +299,9 @@ if ($isfw!==false) {
 	echo "<body class=\"notfw\">\n";
 }
 echo '<div class="mainbody">';
-echo '<a href="#" id="pageskipnav" class="sr-only">'._('Skip Navigation').'</a>';
+if (empty($noskipnavlink)) {
+	echo '<a href="#" id="pageskipnav" class="sr-only">'._('Skip Navigation').'</a>';
+}
 
 $insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
 if (isset($insertinheaderwrapper)) {

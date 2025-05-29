@@ -364,6 +364,7 @@ if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
+$noskipnavlink = true;
 require_once "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';

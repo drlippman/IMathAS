@@ -50,7 +50,7 @@
 
 	$pagetitle = "Forums";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/thread.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/thread.js?v=052825"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 
 	require_once "../header.php";
@@ -254,7 +254,7 @@ if ($searchtype == 'thread') {
 			$maxdate[$row[0]] = $row[2];
 		}
 		echo '<table class=forum><thead>';
-		echo '<tr><th>Topic</th><th>Forum</th><th>Replies</th><th>Views</th><th>Last Post Date</th></tr></thead><tbody>';
+		echo '<tr><th>Topic</th><th>Started By</th><th>Forum</th><th>Replies</th><th>Views</th><th>Last Post Date</th></tr></thead><tbody>';
 		foreach ($threaddata as $line) {
 			if (isset($postcount[$line['id']])) {
 				$posts = $postcount[$line['id']];
@@ -266,33 +266,41 @@ if ($searchtype == 'thread') {
 			echo "<tr id=\"tr" . Sanitize::onlyInt($line['id']) . "\" ";
 			if ($line['tagged']==1) {echo 'class="tagged"';}
 			echo "><td>";
-			echo "<span class=right>\n";
+			echo '<div class=flexgroup><span style="flex-grow:1">';
+			echo "<b><a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($line['forumid']) . "&thread=" . Sanitize::encodeUrlParam($line['id']) . "&page=-4\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></b></span>";
+
 			if ($line['tag']!='') { //category tags
 				echo '<span class="forumcattag">' . Sanitize::encodeStringForDisplay($line['tag']) . '</span> ';
 			}
 
+			echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');" role="switch" aria-checked="'.($line['tagged']==1?'true':'false').'" aria-labe="'._('Tag post').'">';
 			if ($line['tagged']==1) {
-				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
+				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
 			} else {
-				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Not flagged\"/>";
+				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
+			}
+			echo '</button>';
+
+			if ($isteacher) { 
+				echo '<span class="dropdown">';
+				echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.Sanitize::onlyInt($line['id']).'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+				echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
+				echo '</a>';
+				echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.Sanitize::onlyInt($line['id']).'">';
+				echo "<li><a href=\"thread.php?cid=$cid&forum=". Sanitize::onlyInt($line['forumid'])."&move=". Sanitize::onlyInt($line['id']) ."\">Move</a></li> ";
+				echo "<li><a href=\"thread.php?cid=$cid&forum=". Sanitize::onlyInt($line['forumid'])."&modify=" .Sanitize::onlyInt($line['id'])."\">Modify</a></li> ";
+				echo "<li><a href=\"thread.php?cid=$cid&forum=". Sanitize::onlyInt($line['forumid'])."&remove=".Sanitize::onlyInt($line['id'])."\">Remove</a></li>";
+				echo '</ul></span>';
 			}
 
-			if ($isteacher) {
-				echo "<a href=\"thread.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&move=" . Sanitize::onlyInt($line['id']) . "\">Move</a> ";
-			}
-			if ($isteacher) {
-				echo "<a href=\"thread.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&modify=" . Sanitize::onlyInt($line['id']) . "\">Modify</a> ";
-			}
-			if ($isteacher) {
-				echo "<a href=\"thread.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&remove=" . Sanitize::onlyInt($line['id']) . "\">Remove</a>";
-			}
-			echo "</span>\n";
+			echo "</div></td>";
+
 			if ($line['isanon']==1) {
 				$name = "Anonymous";
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<b><a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($line['forumid']) . "&thread=" . Sanitize::encodeUrlParam($line['id']) . "&page=-4\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></b>: <span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($name);
+			echo "<td><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($name);
 			echo "</span></td>\n";
 			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeStringForDisplay($line['forumid']) . "\">" . Sanitize::encodeStringForDisplay($line['name']) . "</a></td>";
 			echo "<td class=c>$posts</td><td class=c>" . Sanitize::encodeStringForDisplay($line['views']) . " </td><td class=c>$lastpost ";
@@ -507,11 +515,7 @@ if ($searchtype == 'thread') {
 				continue;
 		}
 		echo "<tr><td>";
-		if ($isteacher) {
-			echo '<span class="right">';
-			echo "<a href=\"../course/addforum.php?cid=$cid&id={$line['id']}\">Modify</a> ";
-			echo '</span>';
-        }
+		echo '<div class="flexrow"><span style="flex-grow:1">';
         if (($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) && !$forumblockhidden) {
             echo '<b>';
         } else {
@@ -526,7 +530,13 @@ if ($searchtype == 'thread') {
 		if (!empty($newcnt[$line['id']])) {
 			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}
-		echo "</td>\n";
+		echo '</span>';
+		if ($isteacher) {
+			echo '<span>';
+			echo "<a href=\"../course/addforum.php?cid=$cid&id={$line['id']}\">Modify</a> ";
+			echo '</span>';
+        }
+		echo "</div></td>\n";
 		if (isset($threadcount[$line['id']]) && $threadcount[$line['id']] > 0) {
 			$threads = $threadcount[$line['id']];
 			$posts = $postcount[$line['id']];
