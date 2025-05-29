@@ -515,18 +515,20 @@ $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	});';
 $placeinhead .= "</script>";
 $placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">INSERTNAME <img src="'.$staticroot.'/img/collapse.gif" width="10" class="mida" alt="" /></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
-  $("img[data-uid]").each(function (i,el) {
+  $("a[data-uid]").each(function (i,el) {
   	var uid = $(el).attr("data-uid");
-	var thishtml = html + \' <li><a href="listusers.php?cid=\'+cid+\'&chgstuinfo=true&uid=\'+uid+\'">'._('Student profile and options').'</a></li>\';
+	var thishtml = html.replace("INSERTNAME", el.textContent) + \' <li><a href="listusers.php?cid=\'+cid+\'&chgstuinfo=true&uid=\'+uid+\'">'._('Student profile and options').'</a></li>\';
+	thishtml += \' <li><a href="gradebook.php?cid=\'+cid+\'&stu=\'+uid+\'&from=listusers">'._('View Grades').'</a></li>\';
+	thishtml += \' <li><a href="viewloginlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Login Log').'</a></li>\';
+	thishtml += \' <li><a href="viewactionlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Activity Log').'</a></li>\';
 	if ($(el).siblings(".greystrike").length) {
 		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'unlockone\\\');return false;">'._('Unlock').'</a></li>\';
 	} else {
 		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'lockone\\\');return false;">'._('Lock out of course').'</a></li>\';
 	}
-	thishtml += \' <li><a href="viewloginlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Login Log').'</a></li>\';
-	thishtml += \' <li><a href="viewactionlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Activity Log').'</a></li>\';';
+	';
 if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 	$placeinhead .= 'thishtml += \'<li role="separator" class="divider"></li>\';';
 	//$placeinhead .= 'thishtml += \'<li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'unenroll\\\');;return false;">'. _('Unenroll'). '</a></li>\'';
@@ -790,7 +792,7 @@ if ($overwriteBody==1) {
 	<?php
 	echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true,\'locked\')">', _('Non-locked'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
 	echo '<span class="dropdown">';
-	echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	echo _('With Selected').'</a>';
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
 	echo ' <li><a href="#" onclick="postWithSelform(\'Message\');return false;" title="',_("Send a message to the selected students"),'">', _('Message'), "</a></li>";
@@ -828,8 +830,8 @@ if ($overwriteBody==1) {
 				echo '<th>'._('Email').'</th>';
 			}
 			?>
-			<th>Last Access</th>
-			<th>Grades</th>
+			<th>Last Access <span id="llt" class="sr-only">View login log</span></th>
+			<th id="gt">Grades</th>
 			<?php echo $hasLatePassHeader; ?>
 		</tr>
 		</thead>
@@ -837,7 +839,9 @@ if ($overwriteBody==1) {
 <?php
 		$alt = 0;
 		$numstu = 0;  $numunlocked = 0;
+		$ln = 0;
 		foreach ($defaultUserList as $line) {
+			$ln++;
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}
@@ -879,33 +883,30 @@ if ($overwriteBody==1) {
 				<?php
 				echo $hasSectionData;
 				echo $hasCodeData;
-				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
-				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
-				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
+		
+				$nameline = Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']);
+				//echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
+				echo '<td>';
+				
 				if ($line['locked']>0) {
-					echo '<label for="userchk'. Sanitize::onlyInt($line['userid']) . '" class="greystrike pii-full-name">'.$nameline.'</label></td>';
-					echo '<td>'.$icons.'</td>';
-					if ($showSID) {
-						echo '<td><span class="greystrike pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
-					}
-					if ($showemail) {
-						echo '<td><span class="greystrike">'.Sanitize::emailAddress($line['email']).'</span></td>';
-					}
-					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
+					$lineclass = 'greystrike ';
 				} else {
-					echo '<label for="userchk'. Sanitize::onlyInt($line['userid']) . '" class="pii-full-name">'.$nameline.'</label></td>';
-					echo '<td>'.$icons.'</td>';
-					if ($showSID) {
-						echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
-					}
-					if ($showemail) {
-						echo '<td><span class="pii-email">'.Sanitize::emailAddress($line['email']).'</span></td>';
-					}
-					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></td>';
+					$lineclass = '';
 				}
+				echo '<label for="userchk'. Sanitize::onlyInt($line['userid']) . '" class="' . $lineclass . 'pii-full-name" id="u'.$ln.'">';
+				echo '<a data-uid="'. Sanitize::onlyInt($line['userid']).'">'.$nameline.'</a></label></td>';
+				echo '<td>'.$icons.'</td>';
+				if ($showSID) {
+					echo '<td><span class="' . $lineclass . 'pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
+				}
+				if ($showemail) {
+					echo '<td><span class="' . $lineclass . '">'.Sanitize::emailAddress($line['email']).'</span></td>';
+				}
+				echo '<td><span class="' . $lineclass . '"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal" id="la'.$ln.'" aria-labelledby="la'.$ln.' llt u'.$ln.'">'.$lastaccess.'</a></span></td>';
+
 				?>
 
-				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo Sanitize::onlyInt($line['userid']); ?>&from=listusers" class="gl">Grades</a></td>
+				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo Sanitize::onlyInt($line['userid']); ?>&from=listusers" class="gl" aria-labelledby="gt u<?php echo $ln;?>">Grades</a></td>
 				<?php
 				if ($haslatepasses) {
 					echo '<td>'.Sanitize::onlyInt($line['latepass']).'</td>';
