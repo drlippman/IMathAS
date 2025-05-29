@@ -139,9 +139,9 @@ function sendtoall(type) {
 		echo 'In each assessment\'s settings, an instructor can specify whether LatePasses are allowed, ';
 		echo 'limit the number of passes allowed, limit whether they can be used after the due date, ';
 		echo 'or specify a hard date after which LatePasses are not allowed.</p>';
-		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"" . Sanitize::encodeStringForDisplay($hours) . "\"/> hours</p>";
-		echo "<p>To all students:  <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> ";
-		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
+		echo "<p><label>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"" . Sanitize::encodeStringForDisplay($hours) . "\"/> hours</label></p>";
+		echo "<p><label>To all students: <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> latepasses</label> ";
+		echo '<button type=button onClick="sendtoall(0);">Add</button> <button type=button onclick="sendtoall(1)">Replace</button><p>';
 		echo "<table id=myTable><thead><tr><th>Name</th>";
 		if ($hassection) {
 			echo '<th>Section</th>';
@@ -158,14 +158,16 @@ function sendtoall(type) {
 		}
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid));
+		$i = 0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</span></td>";
+			$i++;
+			echo "<tr><td><span class='pii-full-name' id='n$i'>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</span></td>";
 			if ($hassection) {
 				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
 
 			echo "<td><input type=text size=3 name=\"latepass[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" value=\"" . Sanitize::encodeStringForDisplay($row[4]) . "\"";
-			echo " onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td>";
+			echo " onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" aria-labelledby='n$i'/></td>";
 			echo "</tr>";
 		}
 
