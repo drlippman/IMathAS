@@ -144,13 +144,13 @@ if ($overwriteBody==1) {
 		echo '<a href="logingrid.php?cid='.$cid.'&start='.($start+7*24*60*60).'">Show following week</a>. ';
 	}
 ?>
-	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>">
+	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>" aria-label="Start date">
 	<a href="#" onClick="displayDatePicker('sdate', this); return false">
 	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> through
-	<input type="text" size="10" name="edate" value="<?php echo $edate;?>">
+	<input type="text" size="10" name="edate" value="<?php echo $edate;?>" aria-label="End date">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-	<input type="submit" name="daterange" value="Go"/></p>
+	<button type="submit" name="daterange">Go</button></p>
     </form>
 <?php
 if ($haslocked) {
@@ -169,7 +169,7 @@ if ($haslocked) {
 	<table class="gb logingrid" id="myTable">
 	<thead>
 	<tr>
-	<th>Name</th>
+	<th>Name<br><span class=small>View login log</span></th>
 <?php
 	foreach ($dates as $date) {
 		echo '<th>'.$date.'</th>';
