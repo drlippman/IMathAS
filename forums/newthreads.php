@@ -115,7 +115,9 @@ if (count($lastpost)>0) {
   $stm = $DBH->prepare($query);
 	$stm->execute(array_merge($threadids, array($now)));
   $alt = 0;
+  $ln = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $ln++;
     if ($line['isanon']==1) {
       $name = "Anonymous";
     } else {
@@ -132,21 +134,24 @@ if (count($lastpost)>0) {
             echo ' class="'.implode(' ',$classes).'"';
     }
     echo "><td>";
-    echo '<input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'"/></td>';
-    echo "<td><span class=\"right\">\n";
-    if (!empty($tags[$line['threadid']])) {
-        echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['threadid']) . ");return false;\" alt=\"Flagged\" />";
-    } else {
-        echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['threadid'])  . ");return false;\" alt=\"Not flagged\"/>";
-    }
-    echo '</span>';
-    echo "<a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
+    echo '<input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'" id="cb'.$ln.'"/></td>';
+    echo '<td><div class=flexgroup><label for="cb'.$ln.'" style="flex-grow:1">';
+    echo "<a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></label>";
+
+    echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['threadid']).');" role="switch" aria-checked="'.(!empty($tags[$line['threadid']])?'true':'false').'" aria-label="'._('Tag post').'">';
+			if (!empty($tags[$line['threadid']])) {
+				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
+			} else {
+				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
+			}
+		echo '</button>';
+    echo "</div></td>";
     printf("<td><span class='pii-full-name'>%s</span></td>", Sanitize::encodeStringForDisplay($name));
     echo "<td><a href=\"thread.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
     echo "<td>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</td></tr>";
   }
   echo '</tbody></table>';
-  echo '<script type="text/javascript">	initSortTable("newthreads",Array("S","S","S","D"),true);</script>';
+  echo '<script type="text/javascript">	initSortTable("newthreads",Array(false,"S","S","S","D"),true);</script>';
   echo '</form>';
   if (count($lastpost)==300) {
     echo '<p><i>'._('Results cut off at the 300 most recent posts').'</i></p>';

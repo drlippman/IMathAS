@@ -273,7 +273,7 @@ if ($searchtype == 'thread') {
 				echo '<span class="forumcattag">' . Sanitize::encodeStringForDisplay($line['tag']) . '</span> ';
 			}
 
-			echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');" role="switch" aria-checked="'.($line['tagged']==1?'true':'false').'" aria-labe="'._('Tag post').'">';
+			echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');" role="switch" aria-checked="'.($line['tagged']==1?'true':'false').'" aria-label="'._('Tag post').'">';
 			if ($line['tagged']==1) {
 				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
 			} else {
