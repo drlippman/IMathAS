@@ -128,7 +128,7 @@ export default {
             if (this.qdata.parts[i].rawscore < 0.01) {
               incorrect++; // only count as totally incorrect if 0
             }
-            if (firstincorrect < 0) {
+            if (firstincorrect < 0 && !this.qdata.parts[i].req_manual) {
               if (this.qdata.parts[i].try < this.qdata.tries_max) {
                 firstincorrect = i;
               } else {
@@ -232,7 +232,7 @@ export default {
       if (window.MQ && mqs.length > 0) {
         return [mqs[0], true];
       }
-      const reg = window.$('input[name^=qn' + qref + '],select[name^=qn' + qref + ']');
+      const reg = window.$('input[name^=qn' + qref + '],select[name^=qn' + qref + '],textarea[name^=qn' + qref + ']');
       if (reg.length > 0) {
         return [reg[0], false];
       }
