@@ -985,6 +985,7 @@ button.plain:hover, button.plain:active {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
+  gap: 3px;
 }
 .pane-header {
   border-bottom: 1px solid #ccc;

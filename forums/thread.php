@@ -460,7 +460,7 @@ $uniqviews = [];
 $postcount = array();
 $maxdate = array();
 $lastview = array();
-$flags = array();
+$tags = array();
 if (count($threaddata) > 0) {
    $query = "SELECT threadid,count(userid) FROM imas_forum_views ";
     $query .= "WHERE threadid IN ($shownthreadlist) GROUP BY threadid";
@@ -489,10 +489,10 @@ if (count($threaddata) > 0) {
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
         $lastview[$row[0]] = $row[1];
         if ($row[2]==1) {
-            $flags[$row[0]] = 1;
+            $tags[$row[0]] = 1;
         }
     }
-    $flaggedlist = implode(',', array_map('intval', array_keys($flags)));
+    $flaggedlist = implode(',', array_map('intval', array_keys($tags)));
 }
 
 /* start output */
@@ -564,7 +564,7 @@ foreach (array_keys($maxdate) as $tid) {
 $newpostlist = implode(',', array_map('intval', $newpost));
 /*if ($page==-1 && count($newpost)==0) {
 	$page = 1;
-} else if ($page==-2 && count($flags)==0) {
+} else if ($page==-2 && count($tags)==0) {
 	$page = 1;
 }*/
 $prevnext = '';
@@ -700,7 +700,12 @@ $toshow[] =  "<a href=\"postsbyname.php?page=". Sanitize::onlyInt($page)."&cid=$
 //}
 
 if ($page<0) {
-	$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
+	if ($page == -1) {
+		$currentshow = _('Showing New Posts.');
+	} else if ($page == -2) {
+		$currentshow = _('Showing Flagged Posts.');
+	}
+	$toshow[] =  "$currentshow <a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
 } else {
 	if (count($newpost)>0) {
 		$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=-1\">Limit to New</a>";
@@ -771,15 +776,28 @@ echo "</p>";
 				if ($line['posttype']>0) {
 					$classes[] = "sticky";
 				}
-				if (isset($flags[$line['id']])) {
+				if (isset($tags[$line['id']])) {
 					$classes[] = "tagged";
 				}
 				echo "<tr id=\"tr".Sanitize::onlyInt($line['id'])."\"";
 				if (count($classes)>0) {
 					 echo ' class="'.implode(' ',$classes).'"';
 				}
-				echo "><td>";
-				echo "<span class=\"right\">\n";
+				echo '><td><div class=flexgroup><span style="flex-grow:1">';
+				
+				if ($line['isanon']==1) {
+					$name = "Anonymous";
+				} else {
+					$name = Sanitize::encodeStringForDisplay($line['LastName']) .", ". Sanitize::encodeStringForDisplay($line['FirstName']);
+				}
+				if ($line['lastposttime']>$now) {
+					echo '<i class="grey">';
+				}
+				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . $grpqs .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a>";
+				if ($line['lastposttime']>$now) {
+					echo '</i>';
+				}
+				echo '</span>';
 				if ($line['lastposttime']>$now) {
 					echo "<img class=mida src=\"$staticroot/img/time.png\" alt=\"Scheduled\" title=\"Scheduled for later release\" /> ";
 				}
@@ -787,11 +805,14 @@ echo "</p>";
 					echo '<span class="forumcattag">'.Sanitize::encodeStringForDisplay($line['tag']).'</span> ';
 				}
 
-				if (isset($flags[$line['id']])) {
-					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
+				echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');" role="switch" aria-checked="'.(!empty($tags[$line['id']])?'true':'false').'" aria-label="'._('Tag post').'">';
+				if (!empty($tags[$line['id']])) {
+					echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
 				} else {
-					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
+					echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
 				}
+				echo '</button>';
+
 				if ($canviewall) {
 					if ($line['posttype']==2) {
 						echo "<img class=mida src=\"$staticroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
@@ -801,7 +822,7 @@ echo "</p>";
 				}
 				if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby) || ($allowdel && $line['userid']==$userid && $posts==0)) {
 					echo '<span class="dropdown">';
-					echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.Sanitize::onlyInt($line['id']).'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+					echo '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenu'.Sanitize::onlyInt($line['id']).'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 					echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
 					echo '</a>';
 					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.Sanitize::onlyInt($line['id']).'">';
@@ -817,19 +838,8 @@ echo "</p>";
 					}
 					echo '</ul></span>';
 				}
-				echo "</span>\n";
-				if ($line['isanon']==1) {
-					$name = "Anonymous";
-				} else {
-					$name = Sanitize::encodeStringForDisplay($line['LastName']) .", ". Sanitize::encodeStringForDisplay($line['FirstName']);
-				}
-				if ($line['lastposttime']>$now) {
-					echo '<i class="grey">';
-				}
-				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . $grpqs .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
-				if ($line['lastposttime']>$now) {
-					echo '</i>';
-				}
+				echo '</td>';
+
 				printf("<td><span class='pii-full-name'>%s</span></td>\n", Sanitize::encodeStringForDisplay($name));
 
 				if ($canviewall && $groupsetid>0 && !$dofilter) {
