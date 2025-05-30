@@ -20,23 +20,32 @@ function checkchgstatus(type,id) {
 }
 function toggleshow(butn) {
 	var forumgrp = $(butn).closest(".block").nextAll(".forumgrp").first();
+	var img = butn.firstChild;
+	let newopen = true;
 	if (forumgrp.hasClass("hidden")) {
 		forumgrp.removeClass("hidden");
-		butn.src = staticroot+'/img/collapse.gif';
+		img.src = staticroot+'/img/collapse.gif';
+		newopen = true;
 	} else {
 		forumgrp.addClass("hidden");
-		butn.src = staticroot+'/img/expand.gif';
+		img.src = staticroot+'/img/expand.gif';
+		newopen = false;
 	}
+	butn.setAttribute("aria-expanded", newopen);
 }
 function toggleitem(butn) {
 	var blockitems = $(butn).closest(".block").nextAll(".blockitems").first();
+	let newopen = true;
 	if (blockitems.hasClass("hidden")) {
 		blockitems.removeClass("hidden");
 		butn.value = _('Hide');
+		newopen = true;
 	} else {
 		blockitems.addClass("hidden");
 		butn.value = _('Show');
+		newopen = false;
 	}
+	butn.setAttribute("aria-expanded", newopen);
 }
 function expandall() {
 	$(".expcol").each(function(i) {
@@ -64,23 +73,25 @@ function hideall() {
 }
 
 function savelike(el) {
-	var like = (el.src.match(/gray/))?1:0;
+	var img = $(el).children("img")[0];
+	var like = (img.src.match(/gray/))?1:0;
 	var postid = el.id.substring(8);
-	$(el).parent().append('<img style="vertical-align: middle" src="'+staticroot+'/img/updating.gif" id="updating" alt="Updating"/>');
+	$(el).after('<img style="vertical-align: middle" src="'+staticroot+'/img/updating.gif" id="updating" alt="Updating"/>');
 	$.ajax({
 		url: "recordlikes.php",
 		data: {cid: cid, postid: postid, like: like},
 		dataType: "json"
 	}).done(function(msg) {
 		if (msg.aff==1) {
-			el.title = msg.msg;
+			img.title = msg.msg;
 			$('#likecnt'+postid).text(msg.cnt>0?msg.cnt:'');
-			el.className = "likeicon"+msg.classn;
+			img.className = "likeicon"+msg.classn;
 			if (like==0) {
-				el.src = el.src.replace("liked","likedgray");
+				img.src = img.src.replace("liked","likedgray");
 			} else {
-				el.src = el.src.replace("likedgray","liked");
+				img.src = img.src.replace("likedgray","liked");
 			}
+			$(el).attr("aria-checked", like==1);
 		}
 		$('#updating').remove();
 	});

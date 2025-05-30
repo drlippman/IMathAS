@@ -169,7 +169,7 @@ require_once "posthandler.php";
 
 $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=010619" type="text/css" />';
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=011517"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=053025"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
@@ -479,12 +479,15 @@ if (!$oktoshow) {
 		echo "Next";
 	}
 
-	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a> ";
+	echo " | <a class=\"abutton\" role=\"button\" href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a> ";
+
+	echo '<button type=button class="plain nopad" onclick="toggletagged('.$threadid.');" role="switch" aria-checked="'.($tagged?'true':'false').'" aria-label="'._('Tag post').'">';
 	if ($tagged) {
-		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
+		echo "<img class=\"pointer\" id=\"tag".$threadid."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
 	} else {
-		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
+		echo "<img class=\"pointer\" id=\"tag".$threadid."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
 	}
+	echo '</button>';
 
 	echo '| <button onclick="expandall()">'._('Expand All').'</button>';
 	echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
@@ -519,8 +522,8 @@ function printchildren($base,$restricttoowner=false) {
 		if ($restricttoowner && $ownerid[$child] != $userid) {
 			continue;
 		}
-		echo "<div class=block> ";
-		echo '<span class="leftbtns">';
+		echo '<div class="block flexgroup"> ';
+		echo '<span class=nowrap>';
 		if (isset($children[$child])) {
 			if ($view==1) {
 				$lbl = '+';
@@ -529,51 +532,20 @@ function printchildren($base,$restricttoowner=false) {
 				$lbl = '-';
 				$img = "collapse";
 			}
-			echo "<img class=\"pointer expcol\" src=\"$staticroot/img/$img.gif\" onClick=\"toggleshow(this)\" alt=\"Expand/Collapse\"/> ";
+			echo '<button class="plain nopad" aria-controls="childwrap'.$child.'" aria-expanded="'.($view==1?'false':'true').'" onClick="toggleshow(this)">';
+			echo "<img class=\"expcol\" src=\"$staticroot/img/$img.gif\" alt=\"Expand/Collapse\" /></button>";
 		}
 		if ($hasuserimg[$child]==1) {
+			echo '<button class="plain nopad" onclick="togglepic(this)">';
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$ownerid[$child]}.jpg\" alt=\"User picture\" />";
 			} else {
-				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" alt=\"User picture\" />";
 			}
+			echo '</button>';
 		}
 		echo '</span>';
-		echo "<span class=right>";
-
-		if ($view==2) {
-			echo "<input type=button class=\"shbtn\" value=\"Show\" onClick=\"toggleitem(this)\">\n";
-		} else {
-			echo "<input type=button class=\"shbtn\" value=\"Hide\" onClick=\"toggleitem(this)\">\n";
-		}
-		if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-			$embedstr = isset($_GET['embed'])?'&embed=true':'';
-			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child$embedstr\" onclick=\"return checkchgstatus(0,$child)\">Reply</a> ";
-		}
-		if ($isteacher || ($ownerid[$child]==$userid && $allowmod && (($base==0 && time()<$postby) || ($base>0 && time()<$replyby))) || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
-			echo '<span class="dropdown">';
-			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-			echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
-			echo '</a>';
-			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';
-
-			if ($isteacher) {
-				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a></li>\n";
-			}
-			if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
-				if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
-					echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\" onclick=\"return checkchgstatus(1,$child)\">Modify</a></li>\n";
-				}
-			}
-			if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
-				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a></li>\n";
-			}
-
-			echo '</ul></span>';
-		}
-
-		echo "</span>\n";
-		echo '<span style="float:left">';
+		echo '<span style="flex-grow:1">';
 		echo "<b>".$re[$child]. Sanitize::encodeStringForDisplay($subject[$child]) . "</b><br/>"._('Posted by').": ";
 		//if ($isteacher && $ownerid[$child]!=0) {
 		//	echo "<a href=\"mailto:{$email[$child]}\">";
@@ -587,7 +559,7 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($poster[$child]).'</span>'; // This is the user's first and last name.
 		if (($canviewall || $allowmsg) && $ownerid[$child]!=0) {
-			echo "</a>";
+			echo "<span class=\"sr-only\">send message</span></a>";
 		}
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
 			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_blank\">[GB]</a>";
@@ -617,6 +589,8 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		echo '</span>';
 
+		// right buttons
+		echo "<span class=nowrap>"; 
 		if ($allowlikes) {
 			$icon = (in_array($child,$mylikes))?'liked':'likedgray';
 			$likemsg = 'Liked by ';
@@ -653,17 +627,51 @@ function printchildren($base,$restricttoowner=false) {
 				$likemsg = 'Click to like this post. '.$likemsg;;
 			}
 
-			echo '<div class="likewrap">';
-			echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$staticroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\" alt=\"Like\">";
-			echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
-			echo '</div>';
+			//echo '<div class="likewrap">';
+			echo '<button id="likeicon'.$child.'" class="plain nopad" role="switch" aria-checked="' . ($icon=='liked'?'true':'false').'" onclick="savelike(this)">';
+			echo "<img class=\"likeicon$likeclass\" src=\"$staticroot/img/$icon.png\" title=\"$likemsg\" alt=\"Like\">";
+			echo '</button>';
+			echo "<a href=\"#\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);return false;\" aria-label=\"View likes\">".($likecnt>0?$likecnt:'').' </a> ';
+			//echo '</div>';
 		}
+		if ($view==2) {
+			echo "<input type=button class=\"shbtn\" value=\"Show\" onClick=\"toggleitem(this)\" aria-controls=\"pb$child\" aria-expanded=\"false\">\n";
+		} else {
+			echo "<input type=button class=\"shbtn\" value=\"Hide\" onClick=\"toggleitem(this)\" aria-controls=\"pb$child\" aria-expanded=\"true\">\n";
+		}
+		if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
+			$embedstr = isset($_GET['embed'])?'&embed=true':'';
+			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child$embedstr\" onclick=\"return checkchgstatus(0,$child)\">Reply</a> ";
+		}
+		if ($isteacher || ($ownerid[$child]==$userid && $allowmod && (($base==0 && time()<$postby) || ($base>0 && time()<$replyby))) || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
+			echo '<span class="dropdown">';
+			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+			echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
+			echo '</a>';
+			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';
+
+			if ($isteacher) {
+				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a></li>\n";
+			}
+			if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
+				if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
+					echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\" onclick=\"return checkchgstatus(1,$child)\">Modify</a></li>\n";
+				}
+			}
+			if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
+				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a></li>\n";
+			}
+
+			echo '</ul></span>';
+		}
+
+		echo "</span>\n";
 		echo '<div class="clear"></div>';
 		echo "</div>\n";
 		if ($view==2) {
-			echo "<div class=\"blockitems hidden\">";
+			echo "<div class=\"blockitems hidden\" id=\"pb$child\">";
 		} else {
-			echo "<div class=\"blockitems\" style=\"clear:all\">";
+			echo "<div class=\"blockitems\" style=\"clear:all\" id=\"pb$child\">";
 		}
 		if(isset($files[$child]) && $files[$child]!='') {
 			$fl = explode('@@',$files[$child]);
@@ -726,7 +734,7 @@ function printchildren($base,$restricttoowner=false) {
 
 
 		echo "<div class=\"clear\"></div></div>\n";
-		echo '<div class="forumgrp'.(($view==1)?' hidden':'').'">';
+		echo '<div class="forumgrp'.(($view==1)?' hidden':'').'" id="childwrap'.$child.'">';
 		if (isset($children[$child])) { //if has children
 			printchildren($child, ($posttype[$child]==3 && !$isteacher));
 		}
