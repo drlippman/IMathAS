@@ -21,9 +21,10 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 $stuemails = implode('; ',$stuemails);
 $flexwidth = true;
 $nologo = true;
+$noskipnavlink = true;
 require_once "../header.php";
 
-echo '<textarea id="emails" style="width:470px;height:400px;">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
+echo '<textarea id="emails" style="width:470px;height:400px;" aria-label="email list">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
 echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
 require_once "../footer.php";
 ?>

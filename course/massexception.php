@@ -411,7 +411,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 					echo "<li>" . Sanitize::encodeStringForDisplay($row['itemname']) ." <ul>";
 					$lasta = $row['itemid'];
 				}
-				printf('<li><input type=checkbox name="clears[]" value="%s" /><span class="pii-full-name">%s, %s</span> ',
+				printf('<li><label><input type=checkbox name="clears[]" value="%s" /><span class="pii-full-name">%s, %s</span> ',
 					Sanitize::encodeStringForDisplay($row['eid']), Sanitize::encodeStringForDisplay($row['LastName']),
 					Sanitize::encodeStringForDisplay($row['FirstName']));
 				if ($row['itemtype']=='A') {
@@ -441,7 +441,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 				} else if ($row['is_lti']>0) {
 					echo ' <i>('._('Set by LTI').')</i>';
 				}
-				echo "</li>";
+				echo "</label></li>";
 
 			}
 			echo "</ul></li>";
@@ -457,11 +457,11 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 					if ($lasts!=0) {
 						natsort($assessarr);
 						foreach ($assessarr as $id=>$val) {
-							echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val);
+							echo "<li><label><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val);
 							if ($notesarr[$id]!='') {
 								echo ' <em class=small>'.Sanitize::encodeStringForDisplay($notesarr[$id]).'</em>';
 							}
-							echo "</li>";
+							echo "</label></li>";
 						}
 						echo "</ul></li>";
 						$assessarr = array();
@@ -505,11 +505,11 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 			}
 			natsort($assessarr);
 			foreach ($assessarr as $id=>$val) {
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val);
+				echo "<li><label><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val);
 				if ($notesarr[$id]!='') {
 					echo ' <em class=small>'.Sanitize::encodeStringForDisplay($notesarr[$id]).'</em>';
 				}
-				echo "</li>";
+				echo "</label></li>";
 			}
 			echo "</ul></li>";
 		}
@@ -578,25 +578,25 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 		echo 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
 	}
 	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
-	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
-	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
+	echo '<p class="list"><input type="checkbox" name="eatlatepass" id="eatlatepass"> <label for="eatlatepass" id="dl">Deduct LatePass(es) from each student:</label> <input type="input" name="latepassn" size="1" value="1" aria-labelledby="dl"/>. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
+	echo '<p class="list"><label><input type="checkbox" name="sendmsg"/> Send message to these students?</label></p>';
 	echo '<p>For assessments:</p>';
 	if ($courseUIver < 2) {
-		echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
-		echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
+		echo '<p class="list"><label><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
+		echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</label></p>';
 	}
-	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear students\' attempts?  Students ';
+	echo '<p class="list"><label><input type="checkbox" name="forceclear"/> Clear students\' attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.';
 	echo '<span style="display:none" class="noticetext" id="forceclearwarn">';
-	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span>';
+	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span></label>';
 	echo '</p>';
-	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
-    echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
+	echo '<p class="list"><label><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</label></p>';
+    echo '<p class="list"><label><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.</label>  <label>Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</label></p>';
     if ($courseUIver > 1) {
-        echo '<p class="list"><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="0"> additional minutes.
+        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional time:</label> <label><input size=2 name="timelimitextmin" value="0"> additional minutes.</label>
         <span class="small" id="timelimitinfo" style="display:none"><br>Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.
         <br>To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student\'s name).</span></p>';
-        echo '<p class="list"><input type="checkbox" name="attemptext" /> Allow student <input size=2 name="attemptextnum" value="0"> additional versions.</p>';
+        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> <span id="avl">Allow student additional versions</span>:</label> <input size=2 name="attemptextnum" value="0" aria-labelledby="avl"> </p>';
     }
     echo '</fieldset>';
 
@@ -615,13 +615,13 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 		$etime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 		//$etime = tzdate("g:i a",$wk);
 		echo "<span class=form>Available After:</span><span class=formright>";
-		echo "<input type=text size=10 name=sdate value=\"$sdate\">\n";
+		echo "<input type=text size=10 name=sdate value=\"$sdate\" aria-label=\"available after date\">\n";
 		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=stime value=\"$stime\"></span><BR class=form>\n";
+		echo "at <input type=text size=10 name=stime value=\"$stime\" aria-label=\"available after time\"></span><BR class=form>\n";
 
-		echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\">\n";
+		echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\" aria-label=\"available until date\">\n";
 		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
+		echo "at <input type=text size=10 name=etime value=\"$etime\" aria-label=\"available until time\"></span><BR class=form>\n";
 
 		echo "Set Exception for assessments: ";
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',false)">None</a>. ';
@@ -630,9 +630,9 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 		natsort($assessarr);
 		foreach ($assessarr as $id=>$val) {
-			echo "<li><input type=checkbox name=\"addexc[]\" value=\"$id\" ";
+			echo "<li><label><input type=checkbox name=\"addexc[]\" value=\"$id\" ";
 			if (isset($_POST['assesschk']) && in_array($id,$_POST['assesschk'])) { echo 'checked="checked" ';}
-			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</li>";
+			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</label></li>";
 		}
 		echo '</ul>';
 		echo "<input type=submit value=\"Record Changes\" />";
@@ -652,18 +652,18 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 		$pbtime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 		$rbtime = $pbtime;
 		//$etime = tzdate("g:i a",$wk);
-		echo '<span class="form">Exception type:</span><span class="formright"><select name="forumitemtype">';
+		echo '<span class="form"><label for="forumitemtype">Exception type</label>:</span><span class="formright"><select name="forumitemtype" id="forumitemtype">';
 		echo '<option value="F" checked">Override Post By and Reply By</option>';
 		echo '<option value="P" checked">Override Post By only</option>';
 		echo '<option value="R" checked">Override Reply By only</option></select></span><br class="form"/>';
 
-		echo "<span class=form>Post By:</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\">\n";
+		echo "<span class=form>Post By:</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\" aria-label=\"post by date\">\n";
 		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=pbtime value=\"$pbtime\"></span><BR class=form>\n";
+		echo "at <input type=text size=10 name=pbtime value=\"$pbtime\" aria-label=\"post by time\"></span><BR class=form>\n";
 
-		echo "<span class=form>Reply By:</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\">\n";
+		echo "<span class=form>Reply By:</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\" aria-label=\"reply by date\">\n";
 		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=rbtime value=\"$rbtime\"></span><BR class=form>\n";
+		echo "at <input type=text size=10 name=rbtime value=\"$rbtime\" aria-label=\"reply by time\"></span><BR class=form>\n";
 
 
 
@@ -674,9 +674,9 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 		natsort($forumarr);
 		foreach ($forumarr as $id=>$val) {
-			echo "<li><input type=checkbox name=\"addfexc[]\" value=\"$id\" ";
+			echo "<li><label><input type=checkbox name=\"addfexc[]\" value=\"$id\" ";
 			if (isset($_POST['forumchk']) && in_array($id,$_POST['forumchk'])) { echo 'checked="checked" ';}
-			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</li>";
+			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</label></li>";
 		}
 		echo '</ul>';
 		echo "<input type=submit value=\"Record Changes\" />";

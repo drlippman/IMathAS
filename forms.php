@@ -27,6 +27,7 @@ if (isset($_GET['greybox'])) {
 	$gb = '&greybox=true';
 	$flexwidth = true;
 	$nologo = true;
+	$noskipnavlink = true;
 } else {
 	$gb = '';
 }
