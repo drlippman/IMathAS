@@ -101,11 +101,13 @@ ini_set("max_execution_time", "600");
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 				if (count($_POST['checked']) > floor($stm->fetchColumn(0)/2)) {
-					$delForumMsg = "<p>Also delete <b class=noticetext>ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
-					$delWikiMsg = "<p>Also delete <b class=noticetext>ALL</b> wiki revisions: ";
-					$delWikiMsg .= '<input type="radio" name="delwikirev" value="0" checked="checked" />No,  ';
-					$delWikiMsg .= '<input type="radio" name="delwikirev" value="1" />Yes, from all wikis, ';
-					$delWikiMsg .= '<input type="radio" name="delwikirev" value="2" />Yes, from group wikis only</p>';
+					$delForumMsg = "<p><label><input type=checkbox name=\"delforumposts\"/> Also delete <b class=noticetext>ALL</b> forum posts by ALL students (not just the selected ones)?</label></p>";
+					$delWikiMsg = '<p><label for="delwikirev">Also remove <b class=noticetext>ALL</b> wiki revisions:</label> 
+						<select name=delwikirev id=delwikirev>
+							<option value=0 selected>None</option>
+							<option value=1>All wikis</option>
+							<option value=2">Group wikis only</option>
+						</select></p>';
 				} else {
 					$delForumMsg = "";
 					$delWikiMsg = '';
@@ -138,21 +140,25 @@ ini_set("max_execution_time", "600");
 ?>
 		</ul>
 			<p>This will also clear all regular posts from all class forums</p>
-			<p><input type=checkbox name="removeoffline" value="1" /> Also remove all offline grade items from gradebook?
+			<p><label><input type=checkbox name="removeoffline" value="1" /> Also remove all offline grade items from gradebook?</label>
 
 			</p>
-			<p><input type=checkbox name="removewithdrawn" value="1" checked="checked"/> Also remove any withdrawn questions?
+			<p><label><input type=checkbox name="removewithdrawn" value="1" checked="checked"/> Also remove any withdrawn questions?</label>
 
 			</p>
-			<p><input type=checkbox name="usereplaceby" value="1" checked="checked"/> Also use any suggested replacements for old questions?
+			<p><label><input type=checkbox name="usereplaceby" value="1" checked="checked"/> Also use any suggested replacements for old questions?</label>
 
 			</p>
-			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis,
-				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
+			<p><label for="delwikirev">Also remove wiki revisions:</label> 
+				<select name=delwikirev id=delwikirev>
+					<option value=0 selected>None</option>
+					<option value=1>All wikis</option>
+					<option value=2">Group wikis only</option>
+				</select>
 			</p>
 			<?php if ($courseUIver == 1) { ?>
-			<p><input type=checkbox name="upgradeassessver" value="1" checked />
-				Upgrade course to use new assessment interface.
+			<p><label><input type=checkbox name="upgradeassessver" value="1" checked />
+				Upgrade course to use new assessment interface.</label>
 			</p>
 			<?php } ?>
 
