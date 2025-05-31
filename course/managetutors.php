@@ -130,8 +130,8 @@
 				$err .= '<p>Un-enroll as a student and add as a tutor:</p>';
 				$err .= '<ul class="nomark">';
 				foreach ($promoteable as $sid) {
-					$err .= '<li><input type="checkbox" name="promotetotutor[]" value="'.Sanitize::encodeStringForDisplay($stuinfo[$sid][0]).'" /> ';
-					$err .= Sanitize::encodeStringForDisplay($stuinfo[$sid][1]).'</li>';
+					$err .= '<li><label><input type="checkbox" name="promotetotutor[]" value="'.Sanitize::encodeStringForDisplay($stuinfo[$sid][0]).'" /> ';
+					$err .= Sanitize::encodeStringForDisplay($stuinfo[$sid][1]).'</label></li>';
 				}
 				$err .= '</ul>';
 				$err .= '<p><input type="submit" name="submit" value="Un-Enroll and Add as Tutor"/></p></form><p>&nbsp;</p>';
@@ -199,7 +199,7 @@
 	echo $err;
 ?>
 	<form id="curform" method=post action="managetutors.php?cid=<?php echo $cid ?>">
-	
+	<p>Check: <a href="#" onclick="return chkAllNone('curform','remove[]',true)">All</a> <a href="#" onclick="return chkAllNone('curform','remove[]',false)">None</a></p>
 	<table class="gb">
     <caption class="sr-only">Tutors</caption>
 	<thead>
@@ -207,8 +207,7 @@
 			<th>Tutor name</th>
 			<th>Limit to <?php echo Sanitize::encodeStringForDisplay($limitname); ?></th>
 
-			<th>Remove?
-			Check: <a href="#" onclick="return chkAllNone('curform','remove[]',true)">All</a> <a href="#" onclick="return chkAllNone('curform','remove[]',false)">None</a></th>
+			<th>Remove?</th>
 
 		</tr>
 	</thead>
@@ -217,12 +216,14 @@
 if (count($tutorlist)==0) {
 	echo '<tr><td colspan="3">No tutors have been designated for this course. You can add tutors below</td></tr>';
 }
+$i = 0;
 foreach ($tutorlist as $tutor) {
+	$i++;
 	echo '<tr>';
-	echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($tutor['name']).'</span></td>';
+	echo '<td><span class="pii-full-name" id="u'.$i.'">'.Sanitize::encodeStringForDisplay($tutor['name']).'</span></td>';
 	echo '<td>';
 	//section
-	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']">';
+	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']" aria-labelledby="u'.$i.'">';
 	echo '<option value="" '.getHtmlSelected($tutor['section'],"").'>All</option>';
 	foreach ($sections as $sec) {
 		echo '<option value="'.Sanitize::encodeStringForDisplay($sec).'" '.getHtmlSelected($tutor['section'],$sec).'>'.Sanitize::encodeStringForDisplay($sec).'</option>';
@@ -233,7 +234,7 @@ foreach ($tutorlist as $tutor) {
 	echo '</select>';
 	echo '</td>';
 	echo '<td>';
-	echo '<input type="checkbox" name="remove[]" value="'.Sanitize::encodeStringForDisplay($tutor['id']).'" />';
+	echo '<input type="checkbox" name="remove[]" value="'.Sanitize::encodeStringForDisplay($tutor['id']).'" aria-labelledby="u'.$i.'" />';
 	echo '</td>';
 	echo '</tr>';
 }
@@ -244,10 +245,10 @@ foreach ($tutorlist as $tutor) {
 	</table>
 	<hr/>
 	<p>
-	<b>Add new tutors.</b>  Provide a list of usernames below, separated by commas, to add as tutors.
+	<label for="newtutors"><b>Add new tutors.</b>  Provide a list of usernames, separated by commas, to add as tutors.</label>
 	</p>
 	<p>
-	<textarea name="newtutors" rows="3" cols="60"></textarea>
+	<textarea name="newtutors" id="newtutors" rows="3" cols="60"></textarea>
 	</p>
 	<input type="submit" name="submit" value="Update" />
 	</form>
