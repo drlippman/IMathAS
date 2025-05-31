@@ -1448,3 +1448,12 @@ a.dropdown-toggle.arrow-down:hover {
     margin-left: 0.025em;
     font-size: 70.7%;
 }
+
+fieldset.plain {
+	border: 0;
+	padding: .5em 0;
+	margin: 0;
+}
+fieldset.plain legend {
+	font-weight: normal;
+}

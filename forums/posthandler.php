@@ -945,7 +945,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		echo "<form method=post action=\"$returnurl&move=".Sanitize::encodeUrlParam($_GET['move'])."\">";
 		echo '<input type="hidden" name="thread" value="'.Sanitize::encodeStringForDisplay($threadid).'"/>';
-		echo "<p>What do you want to do?<br/>";
+		echo "<fieldset class=plain><legend>What do you want to do?</legend>";
 		if ($ishead) {
 			echo '<input type="radio" name="movetype" value="0" id=movetype0 checked="checked" onclick="toggleforumselect(0)"/> <label for="movetype0">Move thread to different forum</label><br/>';
 			echo '<input type="radio" name="movetype" value="1" id=movetype1 onclick="toggleforumselect(1)"/> <label for="movetype1">Move post to be a reply to a thread</label>';
@@ -953,10 +953,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo '<input type="radio" name="movetype" value="0" id=movetype0 onclick="toggleforumselect(0)"/> <label for="movetype0">Move post to be a new thread in this or another forum</label><br/>';
 			echo '<input type="radio" name="movetype" value="1" id=movetype1 checked="checked" onclick="toggleforumselect(1)"/> <label for="movetype1">Move post to be a reply to a different thread</label>';
 		}
-		echo '</p>';
-		echo '<div id="fsel" ';
+		echo '</fieldset>';
+		echo '<fieldset id="fsel" class=plain ';
 		if (!$ishead) {echo 'style="display:none;"';}
-		echo '>Move to forum:<br/>';
+		echo '><legend>Move to forum:</legend>';
 		$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -964,11 +964,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($row[0]==$forumid) {echo 'checked="checked"';}
 			echo "/> <label for=\"moveto".Sanitize::onlyInt($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
 		}
-		echo '</div>';
+		echo '</fieldset>';
 
-		echo '<div id="tsel" ';
+		echo '<fieldset id="tsel" class=plain ';
 		if ($ishead) {echo 'style="display:none;"';}
-		echo '>Move to thread:<br/>';
+		echo '><legend>Move to thread:</legend>';
 		$stm = $DBH->prepare("SELECT threadid,subject FROM imas_forum_posts WHERE forumid=:forumid AND parent=0 ORDER BY id DESC");
 		$stm->execute(array(':forumid'=>$forumid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -977,7 +977,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($row[0]==$threadid) {echo 'checked="checked"';}
 			echo "/> <label for=\"movetot".Sanitize::encodeStringForDisplay($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
 		}
-		echo '</div>';
+		echo '</fieldset>';
 
 		echo "<p><input type=submit value=\"Move\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
