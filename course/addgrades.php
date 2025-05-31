@@ -544,19 +544,27 @@
 
 ?>
 
-<span class=form>Name:</span><span class=formright><input type=text name="name" value="<?php echo Sanitize::encodeStringForDisplay($name);?>"/></span><br class="form"/>
+<label for="name" class=form>Name:</label>
+<span class=formright><input type=text name="name" id="name" value="<?php echo Sanitize::encodeStringForDisplay($name);?>"/></span>
+<br class="form"/>
 
-<span class=form>Points:</span><span class=formright><input type=text name="points" size=3 value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/></span><br class="form"/>
+<label for="points" class=form>Points:</label>
+<span class=formright><input type=text name="points" id="points" size=3 value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/></span>
+<br class="form"/>
 
-<span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
-<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo Sanitize::encodeStringForDisplay($sdate);?>">
-<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringForDisplay($stime);?>"></span><BR class=form>
+<span class=form>Show grade to students after:</span>
+<span class=formright>
+	<label><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always</label><br/>
+	<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?> aria-label="Date"/>
+		<input type=text size=10 name=sdate value="<?php echo Sanitize::encodeStringForDisplay($sdate);?>" aria-label="show after date">
+		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+		at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringForDisplay($stime);?>" aria-label="show after time"></span>
+<br class=form />
 
 <?php
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
-		echo "<span class=form>Gradebook Category:</span><span class=formright><select name=gbcat id=gbcat>\n";
+		echo "<label for=gbcat class=form>Gradebook Category:</label><span class=formright><select name=gbcat id=gbcat>\n";
 		echo "<option value=\"0\" ";
 		if ($gbcat==0) {
 			echo "selected=1 ";
@@ -574,32 +582,31 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		}
 		echo "</select></span><br class=form>\n";
 
-		echo "<span class=form>Count: </span><span class=formright>";
-		echo '<input type=radio name="cntingb" value="1" ';
-		if ($cntingb==1) { echo "checked=1";}
-		echo ' /> Count in Gradebook<br/><input type=radio name="cntingb" value="0" ';
-		if ($cntingb==0) { echo "checked=1";}
-		echo ' /> Don\'t count in grade total and hide from students<br/><input type=radio name="cntingb" value="3" ';
-		if ($cntingb==3) { echo "checked=1";}
-		echo ' /> Don\'t count in grade total<br/><input type=radio name="cntingb" value="2" ';
-		if ($cntingb==2) {echo "checked=1";}
-		echo ' /> Count as Extra Credit</span><br class=form />';
+		echo "<label for=cntingb class=form>Count: </label><span class=formright>";
+		echo '<select name=cntingb id=cntingb>';
+		echo '<option value=1 '.($cntingb==1?'selected':'').'>'._('Count in Gradebook').'</option>';
+		echo '<option value=0 '.($cntingb==0?'selected':'').'>'._('Don\'t count in grade total and hide from students').'</option>';
+		echo '<option value=3 '.($cntingb==3?'selected':'').'>'._('Don\'t count in grade total').'</option>';
+		echo '<option value=2 '.($cntingb==1?'selected':'').'>'._('Count as Extra Credit').'</option>';
+		echo '</select>';
+		echo '</span><br class=form />';
+
 		if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
 			$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 			$page_tutorSelect['val'] = array(2,0,1);
-			echo '<span class="form">Tutor Access:</span> <span class="formright">';
+			echo '<label for=tutoredit class="form">Tutor Access:</label> <span class="formright">';
 			writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
 			echo '</span><br class="form"/>';
 		}
 
-		echo '<span class=form>Use Scoring Rubric</span><span class=formright>';
+		echo '<label for=rubric class=form>Use Scoring Rubric</label><span class=formright>';
 		writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$rubric);
 		echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addg&amp;gbitem=".Sanitize::encodeUrlParam($gbItem)."\">Add new rubric</a> ";
 		echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addg&amp;gbitem=".Sanitize::encodeUrlParam($gbItem)."\">Edit rubrics</a> ";
 		echo '</span><br class="form"/>';
 
 		if (count($outcomes)>0) {
-			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
+			echo '<label for=outcomes class="form">Associate Outcomes:</label></span class="formright">';
 			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
 			echo '</span><br class="form"/>';
 		}
@@ -608,23 +615,24 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			printf("<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&del=%s\">Delete Item</a> </div><br class=form />",
                 Sanitize::encodeUrlParam($_GET['stu'] ?? ''), Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid, Sanitize::encodeUrlParam($gbItem));
 		} else {
-			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
+			echo "<span class=form>Upload</span><span class=formright>";
+			echo "<label><input type=checkbox name=\"doupload\" /> Upload grades</label> <button type=submit value=\"Submit\">Submit and Upload</button></span><br class=form />";
 		}
 		if ($gbItem=='new') {
-			echo '<span class="form">Assessment snapshot?</span><span class="formright">';
-			echo '<input type="checkbox" name="assesssnap" onclick="if(this.checked){this.nextSibling.style.display=\'\';document.getElementById(\'gradeboxes\').style.display=\'none\';}else{this.nextSibling.style.display=\'none\';document.getElementById(\'gradeboxes\').style.display=\'\';}"/>';
-			echo '<span style="display:none;"><br/>Assessment to snapshot: <select name="assesssnapaid">';
+			echo '<span class="form">Assessment snapshot</span><span class="formright">';
+			echo '<label><input type="checkbox" name="assesssnap" onclick="if(this.checked){this.parentNode.nextSibling.style.display=\'\';document.getElementById(\'gradeboxes\').style.display=\'none\';}else{this.parentNode.nextSibling.style.display=\'none\';document.getElementById(\'gradeboxes\').style.display=\'\';}"/> Take assessment snapshot</label>';
+			echo '<span style="display:none;"><br/><label>Assessment to snapshot: <select name="assesssnapaid">';
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 			$stm->execute(array(':courseid'=>$cid));
 			while($row = $stm->fetch(PDO::FETCH_NUM)) {
 				printf('<option value="%d">%s</option>', Sanitize::encodeStringForDisplay($row[0]),
                     Sanitize::encodeStringForDisplay($row[1]));
 			}
-			echo '</select><br/>';
-			echo 'Grade type:<br/> <input type="radio" name="assesssnaptype" value="0" checked="checked">Current score ';
-			echo '<br/><input type="radio" name="assesssnaptype" value="1">Participation: give full credit if &ge; ';
-			echo '<input type="text" name="assesssnapatt" value="100" size="3">% of problems attempted and &ge; ';
-			echo '<input type="text" name="assesssnappts" value="0" size="3"> points earned.';
+			echo '</select></label><br/>';
+			echo 'Grade type:<br/> <label><input type="radio" name="assesssnaptype" value="0" checked="checked">Current score</label> ';
+			echo '<br/><label><input type="radio" name="assesssnaptype" value="1">Participation</label>: <label>give full credit if &ge; ';
+			echo '<input type="text" name="assesssnapatt" value="100" size="3">% of problems attempted</label> <label>and &ge; ';
+			echo '<input type="text" name="assesssnappts" value="0" size="3"> points earned.</label>';
 			echo '<br/><input type=submit value="Submit"/></span></span><br class="form" />';
 		}
 	    } else {
@@ -650,7 +658,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 
 <?php
         if ($_GET['grades']=='all' && $gbItem!='new' && !empty($_GET['isolate']) && $hassection && empty($tutorsection)) {
-            echo '<p>'._('Section').': ';
+            echo '<p><label>'._('Section').': ';
             echo '<select id="secfiltersel" onchange="chgsecfilter(this)">';
             echo '<option value="-1"' . ($secfilter == -1 ? ' selected' : '') . '>';
             echo _('All') . '</option>';
@@ -661,7 +669,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
                 }
                 echo  '>' . Sanitize::encodeStringForDisplay($secname) . '</option>';
             }
-            echo '</select>';
+            echo '</select></label>';
             echo '<script type="text/javascript">
             function chgsecfilter(el) {
                 var sec = el.value;
@@ -685,9 +693,9 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		}
 		if ($_GET['grades']=='all') {
 			echo '<button type="button" id="useqa" onclick="togglequickadd(this)">'._("Use Quicksearch Entry").'</button>';
-			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>";
+			echo "<br/><label for=toallgrade class=form>Add/Replace to all grades:</label><span class=formright><input type=text size=3 id=\"toallgrade\" id=toallgrade onblur=\"this.value = doonblur(this.value);\"/>";
 			echo ' <input type=button value="Add" onClick="sendtoall(0,0);"/> <input type=button value="Multiply" onclick="sendtoall(0,1)"/> <input type=button value="Replace" onclick="sendtoall(0,2)"/></span><br class="form"/>';
-			echo "<span class=form>Add/Replace to all feedback:</span><span class=formright>";
+			echo "<label for=toallfeedback class=form>Add/Replace to all feedback:</label><span class=formright>";
 			if ($_SESSION['useed']==0) {
 				echo "<input type=text size=40 id=\"toallfeedback\" name=\"toallfeedback\"/>";
 			} else {
@@ -770,14 +778,16 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		}
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);
+		$i = 0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$i++;
 			if ($row[4]>0) {
 				if ($hidelocked) { continue; }
 				echo '<tr><td style="text-decoration: line-through;">';
 			} else {
 				echo '<tr><td>';
 			}
-			printf("<span class='pii-full-name'>%s, %s</span>", Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+			printf("<span class='pii-full-name' id='un$i'>%s, %s</span>", Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 			echo '</td>';
 			if ($hassection) {
 				echo "<td>".Sanitize::encodeStringForDisplay($row[3])."</td>";
@@ -797,17 +807,17 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
                 	echo 'X';
 			}
 			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" pattern=\"x|X|\d*\.?\d*\"/>";
+			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" pattern=\"x|X|\d*\.?\d*\" aria-labelledby=\"un$i\"/>";
 			if ($rubric != 0) {
 				echo printrubriclink($rubric,$points,"score". Sanitize::onlyint($row[0]),"feedback". Sanitize::onlyint($row[0]));
 			}
 			echo "</td>";
 			if ($_SESSION['useed']==0) {
-				printf('<td><textarea cols=60 rows=1 id="feedback%d" name="feedback%d">%s</textarea></td>',
+				printf('<td><textarea cols=60 rows=1 id="feedback%d" name="feedback%d" aria-labelledby="un'.$i.'">%s</textarea></td>',
 					Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]),
 					Sanitize::encodeStringForDisplay($feedback[$row[0]]));
 			} else {
-				printf('<td><div class="fbbox" id="feedback%d">%s</div></td>',
+				printf('<td><div class="fbbox" id="feedback%d" role="textbox" aria-labelledby="un'.$i.'">%s</div></td>',
 					Sanitize::encodeStringForDisplay($row[0]),
 					Sanitize::outgoingHtml($feedback[$row[0]] ?? ''));
 			}
