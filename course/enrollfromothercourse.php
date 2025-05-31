@@ -91,9 +91,9 @@ if (!empty($overwriteBody)) {
 		echo '<p>Select a course to choose students from:</p><p>';
 		$cnt = 0;
 		while ($line=$resultCourseList->fetch(PDO::FETCH_ASSOC)) {
-			echo '<input type="radio" name="sourcecourse" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ';
+			echo '<label><input type="radio" name="sourcecourse" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ';
 			if ($cnt==0) {echo 'checked="checked"';}
-			echo '/> ' . Sanitize::encodeStringForDisplay($line['name']) . '<br/>';
+			echo '/> ' . Sanitize::encodeStringForDisplay($line['name']) . '</label><br/>';
 			$cnt++;
 		}
 		echo '<input type="submit" value="Choose Students" />';
@@ -104,11 +104,11 @@ if (!empty($overwriteBody)) {
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a>';
 		echo '<p>';
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
-			echo '<input type=checkbox name="checked[]" value="' . Sanitize::encodeStringForDisplay($line['id']) . '"/>';
-			printf('<span class="pii-full-name">%s, %s</span><br/>', Sanitize::encodeStringForDisplay($line['LastName']),
+			echo '<label><input type=checkbox name="checked[]" value="' . Sanitize::encodeStringForDisplay($line['id']) . '"/>';
+			printf('<span class="pii-full-name">%s, %s</span></label><br/>', Sanitize::encodeStringForDisplay($line['LastName']),
                 Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
-		echo '</p><p>Assign to section: <input type="text" name="section" />  (optional)</p>';
+		echo '</p><p><label>Assign to section: <input type="text" name="section" />  (optional)</label></p>';
 		echo '</p><p><input type="submit" value="Enroll These Students" /></p>';
 		echo '</form>';
 	}
