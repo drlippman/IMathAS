@@ -536,7 +536,7 @@ function printchildren($base,$restricttoowner=false) {
 			echo "<img class=\"expcol\" src=\"$staticroot/img/$img.gif\" alt=\"Expand/Collapse\" /></button>";
 		}
 		if ($hasuserimg[$child]==1) {
-			echo '<button class="plain nopad" onclick="togglepic(this)">';
+			echo '<button type=button class="plain nopad" onclick="togglepic(this)">';
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$ownerid[$child]}.jpg\" alt=\"User picture\" />";
 			} else {
@@ -699,7 +699,7 @@ function printchildren($base,$restricttoowner=false) {
 		if ($haspoints) {
 			if ($caneditscore && $isstu[$child]) {
 				echo '<hr/>';
-				echo "Score: <input class=scorebox type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
+				echo "<label for=\"scorebox$child\">"._('Score')."</label>: <input class=scorebox type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
 				if ($points[$child]!==null) {
 					echo $points[$child];
 				}
@@ -707,7 +707,7 @@ function printchildren($base,$restricttoowner=false) {
 				if ($rubric != 0) {
 					echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
 				}
-				echo " Private Feedback: ";
+				echo '<label for="feedback'.$child.'">'._('Private Feedback').'</label>: ';
 				if ($_SESSION['useed']==0) {
 					echo "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback$child\" id=\"feedback$child\">";
 					if ($feedback[$child]!==null) {

@@ -69,6 +69,7 @@
 		$useeditor = "noinit";
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
+	$loadiconfont = true;
 	require_once "../header.php";
     echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
@@ -100,6 +101,7 @@
 	       node.className = 'blockitems';
 	       butn.value = '-';
 	   }
+	   butn.setAttribute("aria-expanded", butn.value == '-');
 	}
 	function toggleshowall() {
 	  for (var i=0; i<bcnt; i++) {
@@ -107,6 +109,7 @@
 	    var butn = document.getElementById('butn'+i);
 	    node.className = 'blockitems';
 	    butn.value = '-';
+		butn.setAttribute("aria-expanded", true);
 	  }
 	  document.getElementById("toggleall").value = 'Collapse All';
 	  document.getElementById("toggleall").onclick = togglecollapseall;
@@ -123,6 +126,7 @@
 	    var butn = document.getElementById('butn'+i);
 	    node.className = 'hidden';
 	    butn.value = '+';
+		butn.setAttribute("aria-expanded", false);
 	  }
 	  document.getElementById("toggleall").value = 'Expand All';
 	  document.getElementById("toggleall").onclick = toggleshowall;
@@ -252,11 +256,13 @@
 		printf("<b><pii class='pii-full-name'>%s</span></b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
 		if ($hasuserimg==1) {
+			echo '<button type=button class="plain nopad" onclick="togglepic(this)">';
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\" alt=\"User picture\" />";
 			} else {
-				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\" alt=\"User picture\" />";
 			}
+			echo '</button>';
 		}
 		echo '<div class="forumgrp">'.$content.'</div>';
 	}
@@ -274,15 +280,37 @@
 
 		if ($line['parent']!=0) {
 			if ($line['userid']!=$userid && in_array($line['threadid'], $blockreplythreads)) { continue;}
-			$content .= '<div class="reply"><div class="block">';
-			$content .= '<span style="color:green;">';
+			$content .= '<div class="reply"><div class="block flexgroup">';
 			$replycnt++;
 		} else {
-			$content .= '<div class="initialpost"><div class="block">';
+			$content .= '<div class="initialpost"><div class="block flexgroup">';
 			$postcnt++;
 		}
 
-		$content .= '<span class="right">';
+		$content .= "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" aria-controls=\"m$cnt\" aria-expanded=\"false\" />";
+		$content .= '<span style="flex-grow:1">';
+		if ($line['parent']!=0) {
+			$content .= '<span style="color:#060">';
+		}
+		if ($line['parent'] != 0) {
+			$content .= '<span class="icon-forumreply" role="img" aria-label="reply" title="Reply"></span> ';
+		} else {
+			$content .= '<span class="icon-forumpost" role="img" aria-label="post" title="Post"></span> ';
+		}
+		$content .= '<b>'.Sanitize::encodeStringForDisplay($line['subject']).'</b>';
+		if ($line['parent']!=0) {
+			$content .= '</span>';
+		}
+		$dt = tzdate("D, M j, Y, g:i a",$line['postdate']);
+		$content .= ', Posted: '.Sanitize::encodeStringForDisplay($dt);
+
+		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
+			$content .= " <span class=noticetext>New</span>\n";
+		}
+		$content .= '</span>';
+
+		// right buttons
+		$content .= '<span class="nowrap">';
 		if ($haspoints) {
 			if ($caneditscore && $line['stuid']!==null) {
 				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" value=\"";
@@ -290,12 +318,12 @@
 					$content .= Sanitize::encodeStringForDisplay($scores[$line['id']]);
 				}
 
-				$content .= "\"/> Pts ";
+				$content .= '"/> <label for="score'.Sanitize::onlyInt($line['id']).'">'._('Points').'</label> ';
 				if ($rubric != 0) {
 					$content .= printrubriclink($rubric,$pointspos,"score".Sanitize::onlyInt($line['id']), "feedback".Sanitize::onlyInt($line['id'])).' ';
 				}
 			} else if (($line['userid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
-				$content .= "<span class=red> ".Sanitize::onlyFloat($scores[$line['id']])." pts</span> ";
+				$content .= "<span class=red> ".Sanitize::onlyFloat($scores[$line['id']])." points</span> ";
 			}
 		}
 		//$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."\">Thread</a> ";
@@ -314,23 +342,13 @@
 			//$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&modify=reply&replyto=".Sanitize::onlyInt($line['id'])."\">Reply</a>";
 		}
 		$content .= '</span>';
-		$content .= "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
-		$content .= '<b>'.Sanitize::encodeStringForDisplay($line['subject']).'</b>';
-		if ($line['parent']!=0) {
-			$content .= '</span>';
-		}
-		$dt = tzdate("D, M j, Y, g:i a",$line['postdate']);
-		$content .= ', Posted: '.Sanitize::encodeStringForDisplay($dt);
 
-		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
-			$content .= " <span class=noticetext>New</span>\n";
-		}
 		$content .= '</div>';
 		$content .= "<div id=\"m$cnt\" class=\"hidden\">".Sanitize::outgoingHtml(filter($line['message']));
 		if ($haspoints) {
 			if ($caneditscore && $line['stuid']!==null) {
 				$content .= '<hr/>';
-				$content .= "Private Feedback: ";
+				$content .= '<label for="feedback'.Sanitize::onlyInt($line['id']).'">'._('Private Feedback').'</label>: ';
 				/*echo "<textarea cols=\"50\" rows=\"2\" name=\"feedback[". Sanitize::onlyInt($line['id'])."]\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
 				if ($feedback[$line['id']]!==null) {
 					$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
@@ -366,7 +384,8 @@
 		echo "</form>";
 	}
 
-	echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
+	echo '<p>Color code<br/>Black: New thread <span class="icon-forumpost" role="img" aria-label="post" title="Post"></span></br>';
+	echo '<span style="color:#060;">Green: Reply <span class="icon-forumreply" role="img" aria-label="reply" title="Reply"></span></span></p>';
 
 	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Thread List</a></p>";
 
