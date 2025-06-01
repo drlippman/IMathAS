@@ -15,7 +15,7 @@ if (isset($_GET['callength'])) {
 
 require_once "filehandler.php";
 
-function showcalendar($refpage) {
+function showcalendar($refpage, $toprightheader = '') {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
 global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver, $excused, $courseenddate;
@@ -37,6 +37,11 @@ if (!isset($_COOKIE['callength'.$cid])) {
 	$callength = 4;
 } else {
 	$callength = Sanitize::onlyInt($_COOKIE['callength'.$cid]);
+}
+if (isset($_COOKIE['calview-'.$cid])) {
+	$calview = Sanitize::onlyInt($_COOKIE['calview-'.$cid]);
+} else {
+	$calview = 0;
 }
 if (!isset($editingon)) {
 	$editingon = false;
@@ -85,25 +90,30 @@ for ($i=0;$i<7*$callength;$i++) {
 $address = $GLOBALS['basesiteurl'] . "/course/$refpage.php?cid=$cid";
 
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
-echo '<div class="floatright"><span class="calupdatenotice red"></span> Show <select id="callength" onchange="changecallength(this)" aria-label="'._('Number of weeks to display').'">';
-for ($i=2;$i<26;$i++) {
-	echo '<option value="'.$i.'" ';
-	if ($i==$callength) {echo 'selected="selected"';}
-	echo '>'.$i.'</option>';
-}
-echo '</select> weeks. ';
-echo '<a href="#" onclick="hidevisualcal();return false;" title="'._('Hide visual calendar and display events list').'" aria-controls="caleventslist">';
-echo _('Events List').'</a>';
-echo '</div>';
-echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</a> ';
-//echo $longcurmo.' ';
-
+echo '<div class=flexgroup><div class="center" style="flex-grow:1;">';
+echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</a> ';
 if ($pageshift==0 && (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid]==0)) {
 	echo "Now ";
 } else {
 	echo '<a href="'.$refpage.'.php?calpageshift=0&calstart=0&cid='.$cid.'">Now</a> ';
 }
 echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'" aria-label="'.sprintf(_('Forward %d weeks'),$callength).'">&gt; &gt;</a> ';
+echo '</div>';
+
+echo '<span class="calupdatenotice red"></span>';
+echo '<label>Show <select id="callength" onchange="changecallength(this)" aria-label="'._('Number of weeks to display').'">';
+for ($i=2;$i<26;$i++) {
+	echo '<option value="'.$i.'" ';
+	if ($i==$callength) {echo 'selected="selected"';}
+	echo '>'.$i.'</option>';
+}
+echo '</select> weeks.</label> ';
+echo '<button type=button onclick="setcalview(1);" class="sr-only showonfocus cala11y">'._('For improved accessibility, please use the Agenda view').'</button>';
+echo '<div role=group aria-label="Calendar view">';
+echo '<button type=button onclick="setcalview(0);" aria-selected="true" class="calview0">Calendar</button>';
+echo '<button type=button onclick="setcalview(1);" aria-selected="false" class="calview1">Agenda</button>';
+echo '</div>';
+echo $toprightheader;
 echo '</div> ';
 
 
@@ -859,6 +869,8 @@ foreach ($dates as $moday=>$val) {
 		$jsarr[$moday] = array("date"=>$dates[$moday]);
 	}
 }
+$firstdate = reset($dates);
+$lastdate = end($dates);
 
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
@@ -869,7 +881,7 @@ echo '$(function() {
 	 .attr("aria-controls","caleventslist");
 	 });';
 echo '</script>';
-echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
+echo "<table class=\"cal\" >";
 echo "<thead><tr><th>Sunday</th> <th>Monday</th> <th>Tuesday</th> <th>Wednesday</th> <th>Thursday</th> <th>Friday</th> <th>Saturday</th></tr></thead>";
 echo "<tbody>";
 for ($i=0;$i<count($hdrs);$i++) {
@@ -924,9 +936,11 @@ for ($i=0;$i<count($hdrs);$i++) {
 echo "</tbody></table>";
 
 echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
-echo '<span class=right id=calshowall><a href="#" onclick="showcalcontents('.(1000*($midtoday - $dayofweek*24*60*60)).'); return false;"/>'._('Show all').'</a></span>';
+echo '<p id=agendaheader style="display:none"><b>' . _("Agenda for ") . $firstdate . ' - ' . $lastdate.'</b></p>';
 echo "<div id=\"caleventslist\" aria-live=\"polite\"></div><div class=\"clear\"></div></div>";
-if ($pageshift==0) {
+if ($calview == 1) {
+	echo "<script>setcalview(1, true);</script>";
+} else if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
 }
 

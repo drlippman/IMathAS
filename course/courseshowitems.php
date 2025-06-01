@@ -709,24 +709,25 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
             if ($ispublic) {continue;}
             //echo "<div class=item>\n";
             beginitem($canedit);
+            $calmenu = '';
             if ($canedit) {
                 /*echo '<span class="instronly">';
                 echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">", _('Delete'), "</a>";
                 echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">", _('Manage Events'), "</a>";
                 echo '</span>';
                  */
-                echo '<div class="floatright dropdown">';            
-                echo '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-                echo ' <img src="' . $staticroot . '/img/gearsdd.png" alt="Options" class="mida"/>';
-                echo '</a>';
-                echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
-                echo " <li><a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">", _('Delete'), "</a></li>";
-                echo " <li><a href=\"#\" onclick=\"return moveDialog('$parent','{$items[$i]}');\">", _('Move'), '</a></li>';
-                echo " <li><a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">", _('Manage Events'), "</a></li>";
-                echo '</ul>';
-                echo '</div>';
+                $calmenu .= '<div class="dropdown">';            
+                $calmenu .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                $calmenu .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="Options" class="mida"/>';
+                $calmenu .= '</a>';
+                $calmenu .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
+                $calmenu .= " <li><a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">". _('Delete'). "</a></li>";
+                $calmenu .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','{$items[$i]}');\">". _('Move'). '</a></li>';
+                $calmenu .= " <li><a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">". _('Manage Events'). "</a></li>";
+                $calmenu .= '</ul>';
+                $calmenu .= '</div>';
             }
-            showcalendar("course");
+            showcalendar("course", $calmenu);
             enditem($canedit); // echo "</div>";
         } else if ($line['itemtype'] == "Assessment") {
             if ($ispublic) {continue;}

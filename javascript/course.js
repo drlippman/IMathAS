@@ -145,6 +145,33 @@ function hidevisualcal() {
 	jQuery("table.cal").toggle();
 }
 
+function setcalview(n, skipfocus) {
+	$("button.calview0").attr("aria-selected",n==0);
+	$("button.calview1").attr("aria-selected",n==1);
+	if (n==0) {
+		$("table.cal").show();
+		$("#agendaheader").hide();
+		$("#caleventslist").empty();
+		if ($("td.today").length > 0) {
+			showcalcontents($("td.today")[0]);
+		}
+		if (!skipfocus) {
+			$("button.calview0").focus();
+		}
+		$(".cala11y").show();
+		document.cookie = 'calview-' +cid+'=0';
+	} else if (n==1) {
+		$("table.cal").hide();
+		$("#agendaheader").show();
+		showcalcontents(1);
+		if (!skipfocus) {
+			$("button.calview1").focus();
+		}
+		$(".cala11y").hide();
+		document.cookie = 'calview-' +cid+'=1';
+	}
+}
+
 function showcalcontentsid(elid) {
 	var html = '';
 	if (caleventsarr[elid].data!=null) {
