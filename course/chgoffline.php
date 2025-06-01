@@ -177,7 +177,8 @@ Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All<
 <?php
 
 foreach($gbitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($id) . '" /> ' . Sanitize::encodeStringForDisplay($name) . ' <a class="small" href="addgrades.php?cid=' . Sanitize::encodeUrlParam($cid) . '&grades=all&gbitem=' . Sanitize::encodeUrlParam($id) . '" target="_blank">Edit</a></li>';
+	echo '<li><label><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($id) . '" /> ' . Sanitize::encodeStringForDisplay($name) . '</label> ';
+	echo '<a class="small" href="addgrades.php?cid=' . Sanitize::encodeUrlParam($cid) . '&grades=all&gbitem=' . Sanitize::encodeUrlParam($id) . '" target="_blank">Edit ' . Sanitize::encodeStringForDisplay($name) . '</a></li>';
 }
 ?>
 </ul>
@@ -191,29 +192,32 @@ foreach($gbitems as $id=>$name) {
 </thead>
 <tbody>
 <tr>
-	<td><input type="checkbox" name="chgshowafter" /></td>
-	<td class="r">Show after:</td>
-	<td>
-<input type=radio name="sdatetype" value="0" /> Always<br/>
-<input type=radio name="sdatetype" value="sdate" checked="checked"/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
-<a href="#" onClick="displayDatePicker('sdate', this); return false">
-<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+	<td><input type="checkbox" name="chgshowafter" aria-labelledby="opshowafter"/></td>
+	<td class="r"><span id="opshowafter">Show after:</span></td>
+	<td role=group aria-labelledby="opshowafter">
+		<label><input type=radio name="sdatetype" value="0"/> Always</label><br/>
+		<input type=radio name="sdatetype" value="sdate" checked="checked" aria-label="Date"/>
+		<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="show after date">
+		<a href="#" onClick="displayDatePicker('sdate', this); return false">
+		<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+		at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="show after time">
 	</td>
 </tr>
 <tr>
-	<td><input type="checkbox" name="chgcount" /></td>
-	<td class="r">Count:</td>
+	<td><input type="checkbox" name="chgcount" aria-labelledby="opcount"/></td>
+	<td class="r"><span id="opcount">Count:</label></td>
 	<td>
-	<input type="radio" name="cntingb" value="1" checked="checked" />Count in Gradebook<br/>
-	<input type="radio" name="cntingb" value="0" />Don't count in grade total and hide from students<br/>
-	<input type="radio" name="cntingb" value="3" />Don't count in grade total<br/>
-	<input type="radio" name="cntingb" value="2" />Count as Extra Credit
+	<select name=cntingb id=cntingb aria-labelledby="opcount">
+		<option value=1 selected><?php echo _('Count in Gradebook');?></option>
+		<option value=0><?php echo _('Don\'t count in grade total and hide from students');?></option>
+		<option value=3><?php echo _('Don\'t count in grade total');?></option>
+		<option value=2><?php echo _('Count as Extra Credit');?></option>
+	</select>
 	</td>
 </tr>
 <tr>
-	<td><input type="checkbox" name="chggbcat" /></td>
-	<td class="r">Gradebook category: </td>
+	<td><input type="checkbox" name="chggbcat" aria-labelledby="opgbcat"/></td>
+	<td class="r"><label for="gbcat" id="opgbcat">Gradebook category</label>: </td>
 	<td>
 <?php
 writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0," id=gbcat");
@@ -222,8 +226,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgtutoredit"/></td>
-	<td class="r">Tutor Access: </td>
+	<td><input type="checkbox" name="chgtutoredit" aria-labelledby="optutoredit"/></td>
+	<td class="r"><label for="tutoredit" id="optutoredit">Tutor Access:</label></td>
 	<td>
 <?php
 $page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");

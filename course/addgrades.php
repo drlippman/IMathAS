@@ -552,8 +552,8 @@
 <span class=formright><input type=text name="points" id="points" size=3 value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/></span>
 <br class="form"/>
 
-<span class=form>Show grade to students after:</span>
-<span class=formright>
+<span class=form id="stypelbl">Show grade to students after:</span>
+<span class=formright role=group aria-labelledby="stypelbl">
 	<label><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always</label><br/>
 	<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?> aria-label="Date"/>
 		<input type=text size=10 name=sdate value="<?php echo Sanitize::encodeStringForDisplay($sdate);?>" aria-label="show after date">
