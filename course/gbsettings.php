@@ -136,36 +136,35 @@
 		tr.id = \'newrow\'+addrowcnt;
 		tr.className = "grid";
 		var td = document.createElement("td");
-		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" value="" type="text">\';
+		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" value="" type="text" aria-label="category name">\';
 		tr.appendChild(td);
         var useweights = !!document.getElementById("usew1").checked;
 
 		var td = document.createElement("td");
-		td.innerHTML = \'<select name="hide[new\'+addrowcnt+\']"> \' +
+		td.innerHTML = \'<select name="hide[new\'+addrowcnt+\']" aria-label="category display"> \' +
 			\'<option value="1">Hidden</option>\' +
 			\'<option value="0" selected="selected">Expanded</option>\' +
 			\'<option value="2">Collapsed</option>\' +
 			\'</select>\';
-		//td.innerHTML = \'<input name="hide[new\'+addrowcnt+\']" value="1" type="checkbox">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'Scale <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text"> \' +
-		   \'(<input name="st[new\'+addrowcnt+\']" value="0" checked="1" type="radio">points \' +
-		   \'<input name="st[new\'+addrowcnt+\']" value="1" type="radio">percent)<br/>\' +
-		   \'to perfect score<br/><input name="chop[new\'+addrowcnt+\']" value="1" checked="1" type="checkbox"> \' +
-		   \'no total over <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text">%\';
+		td.innerHTML = \'Scale <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text" aria-label="score to scale to perfect"> \' +
+		   \'<select name="st[new\'+addrowcnt+\']" aria-label="scale score type"><option value="0" selected>points</option>\' +
+		   \'<option value="1">percent</option></select><br/>\' +
+		   \'to perfect score<br/><input name="chop[new\'+addrowcnt+\']" value="1" checked="1" type="checkbox" aria-label="limit max score"> \' +
+		   \'<label>no total over <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text">%</label>\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'Calc total: <select name="calctype[new\'+addrowcnt+\']" id="calctypenew\'+addrowcnt+\'">\' +
+		td.innerHTML = \'<label>Calc total: <select name="calctype[new\'+addrowcnt+\']" id="calctypenew\'+addrowcnt+\'">\' +
 			\'<option value="0" selected="selected">point total</option>\' +
-			\'<option value="1">averaged percents</option></select><br/>\' +
-			\'<input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">Keep All<br/>\' +
-			\'<input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Drop lowest \' +
-			\'<input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text"> scores<br/> \' +
-			\'<input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Keep highest \' +
-			\'<input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text"> scores\';
+			\'<option value="1">averaged percents</option></select></label><br/>\' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">Keep All</label><br/>\' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Drop lowest</label> \' +
+			\'<label><input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text"> scores</label><br/> \' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Keep highest</label> \' +
+			\'<label><input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text"> scores</label>\';
 		tr.appendChild(td);
 
         var td = document.createElement("td");
@@ -173,7 +172,7 @@
         if (useweights) {
             td.style.display = "none";
         }
-		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text">\';
+		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text" aria-label="category fixed total">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
@@ -181,7 +180,7 @@
         if (!useweights) {
             td.style.display = "none";
         }
-		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text">\';
+		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text" aria-label="category weighted total">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
@@ -189,6 +188,7 @@
 		tr.appendChild(td);
 
 		document.getElementById("cattbody").appendChild(tr);
+		$(tr).find("input").first().focus();
 	}
 	function removeexistcat(id) {
 		if (confirm("Are you SURE you want to delete this category?")) {
@@ -199,7 +199,9 @@
 			}).done(function(msg) {
 				if (msg=="OK") {
 					var torem = document.getElementById("catrow"+id);
+					var prev = $(torem).prev();
 					document.getElementById("cattbody").removeChild(torem);
+					prev.attr("tabindex",-1).focus();
 				} else {
 					alert("Error removing category");
 				}
@@ -209,14 +211,17 @@
 	}
 	function removecat(n) {
 		var torem = document.getElementById("newrow"+n);
+		var prev = $(torem).prev();
 		document.getElementById("cattbody").removeChild(torem);
+		prev.attr("tabindex",-1).focus();
 	}
 	function toggleadv(el) {
 		if ($("#viewfield").is(":hidden")) {
-			$(el).html("Hide view settings");
+			$(el).html("Hide view settings").attr("aria-expanded",true);
 			$("#viewfield").slideDown();
+
 		} else {
-			$(el).html("Edit view settings");
+			$(el).html("Edit view settings").attr("aria-expanded",false);
 			$("#viewfield").slideUp();
 		}
 	}
@@ -287,13 +292,13 @@
 ?>
 	<form id="theform" method=post action="gbsettings.php?cid=<?php echo $cid;?>" onsubmit="prepforsubmit()">
 
-	<span class=form>Calculate total using:</span>
-	<span class=formright>
+	<span class=form id="calctotlbl">Calculate total using:</span>
+	<span class=formright role=group aria-labelledby=calctotlbl>
 		<input type=radio name=useweights value="0" id="usew0" <?php writeHtmlChecked($useweights,0);?> onclick="swapweighthdr(0)"/><label for="usew0">points earned / possible</label><br/>
 		<input type=radio name=useweights value="1" id="usew1" <?php writeHtmlChecked($useweights,1);?> onclick="swapweighthdr(1)"/><label for="usew1">category weights</label>
 	</span><br class=form />
 
-	<p><a href="#" onclick="toggleadv(this);return false">Edit view settings</a></p>
+	<p><button type=button onclick="toggleadv(this);return false" aria-controls="viewfield" aria-expanded=false>Edit view settings</button></p>
 	<fieldset style="display:none;" id="viewfield"><legend>Default gradebook view:</legend>
 
 	<span class=form>Gradebook display:</span>
@@ -301,14 +306,14 @@
 		<?php
 		$orderval = array(0,4,6,8,2,10,12);
 		$orderlabel = array('by end date, old to new', 'by end date, new to old', 'by start date, old to new', 'start date, new to old', 'alphabetically', 'by course page order, offline at end', 'by course page order reversed, offline at start');
-		echo 'Order: ';
+		echo '<label for=orderby>Order</label>: ';
 		writeHtmlSelect("orderby", $orderval, $orderlabel, $orderby&~1);
 		?>
 		<br/>
 		<input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php writeHtmlChecked($orderby&1,1);?>/><label for="grouporderby">Group by category first</label>
 	</span><br class=form />
 
-	<span class=form>Default user order:</span>
+	<label for="usersort" class=form>Default user order:</label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1);
@@ -317,14 +322,14 @@
 		?>
 	</span><br class=form />
 
-	<span class=form>Show scores as: </span>
+	<label for="gbmode400000" class=form>Show scores as: </label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode400000", array(0,1), array(_('Points'), _('Percents')), $showpercents);
 		?>
 	</span><br class=form />
 	
-	<span class=form>Links show:</span>
+	<label for="gbmode100" class=form>Links show:</label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1);
@@ -337,7 +342,7 @@
 		?>
 	</span><br class=form />
 
-	<span class=form>Default show by availability: </span>
+	<label for="gbmode1" class=form>Default show by availability: </label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,3,4,1,2);
@@ -346,7 +351,7 @@
 		?>
 	</span><br class=form>
 
-	<span class=form>Not Counted (NC) items: </span>
+	<label for="gbmode10" class=form>Not Counted (NC) items: </label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1,2);
@@ -355,34 +360,34 @@
 		?>
 	</span><br class=form>
 
-	<span class=form>Locked Students:</span>
+	<label for="gbmode200" class=form>Locked Students:</label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode200", array(0,2), array(_('Show'), _('Hide')), $hidelocked);
 		?>
 	</span><br class=form />
 
-	<span class=form>Default Colorization:</span>
+	<label for="colorize" class=form>Default Colorization:</label>
 	<span class=formright>
 	<?php writeHtmlSelect("colorize",$colorval,$colorlabel,$colorize); ?>
 	</span><br class=form />
 
-	<span class=form>Totals columns show on:</span>
+	<label for="gbmode1000" class=form>Totals columns show on:</label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode1000", array(0,1), array(_('Right'), _('Left')), $totonleft);
 		?>
 	</span><br class=form />
 
-	<span class=form>Average row shows on:</span>
+	<label for="gbmode1002" class=form>Average row shows on:</label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode1002", array(0,2), array(_('Bottom'), _('Top')), $avgontop);
 		?>
 	</span><br class=form />
 
-	<span class=form>Include details:</span>
-	<span class=formright>
+	<span class=form id="detlbl">Include details:</span>
+	<span class=formright role=group aria-labelledby=detlbl>
 		<input type="checkbox" name="gbmode100000" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow">Section column (if used)</label><br/>
 		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow">Code column (if used)</label><br/>
 		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
@@ -390,8 +395,8 @@
 		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label>
 	</span><br class=form />
 
-	<span class="form">Totals to show students:</span>
-	<span class=formright>
+	<span class="form" id="totlbl">Totals to show students:</span>
+	<span class=formright role=group aria-labelledby=totlbl>
 		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/><label for="totshow1">Past Due</label><br/>
 		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/><label for="totshow2">Past Due and Attempted</label><br/>
 		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/><label for="totshow4">Past Due and Available</label><br/>
@@ -458,65 +463,58 @@
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
-			echo "<input type=text name=\"name[$id]\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\"/>";
+			echo "<input type=text name=\"name[$id]\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\" aria-label=\"category name\"/>";
 		} else {
 			echo Sanitize::encodeStringForDisplay($row['name']);
 		}
 		"</td>";
 
 		echo '<td>';
-		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row['hidden']);
+		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row['hidden'],null,null,'aria-label="category display"');
 		echo '</td>';
-		//echo "<td><input type=\"checkbox\" name=\"hide[$id]\" value=\"1\" ";
-		//writeHtmlChecked($row['hidden'],1);
-		//echo "/></td>";
+
 		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
 		if ($row['scale']>0) {
 			echo Sanitize::encodeStringForDisplay($row['scale']);
 		}
-		echo "\"/> (<input type=radio name=\"st[$id]\" value=0 ";
-		if ($row['scaletype']==0) {
-			echo "checked=1 ";
-		}
-		echo "/>points ";
-		echo "<input type=radio name=\"st[$id]\" value=1 ";
-		if ($row['scaletype']==1) {
-			echo "checked=1 ";
-		}
-		echo "/>percent)<br/>to perfect score<br/>";
+		echo "\" aria-label=\"score to scale to perfect\"/> ";
+		writeHtmlSelect("st[$id]",[0,1],['points','percent'],$row['scaletype'],null,null,'aria-label="scale score type"');
+		echo "<br/>to perfect score<br/>";
 		echo "<input type=checkbox name=\"chop[$id]\" value=1 ";
 		if ($row['chop']>0) {
 			echo "checked=1 ";
 		}
-		echo "/> no total over <input type=text size=3 name=\"chopto[$id]\" value=\"";
+		echo " aria-label=\"limit max score\"/> <label>no total over <input type=text size=3 name=\"chopto[$id]\" value=\"";
 		if ($row['chop']>0) {
 			echo round($row['chop']*100);
 		} else {
 			echo "100";
 		}
-		echo "\"/>%</td>";
+		echo "\"/>%</label></td>";
 		echo "<td>";
-		echo 'Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
+		echo '<label>Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
 		echo '><option value="0" ';
 		if ($row['calctype']==0) {echo 'selected="selected"';}
 		echo '>point total</option><option value="1" ';
 		if ($row['calctype']==1) {echo 'selected="selected"';}
-		echo '>averaged percents</option></select><br/>';
+		echo '>averaged percents</option></select></label><br/>';
 
-		echo "<input type=radio name=\"droptype[$id]\" value=0 ";
+		echo "<label><input type=radio name=\"droptype[$id]\" value=0 ";
 		if ($row['dropn']==0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep All<br/><input type=radio name=\"droptype[$id]\" value=1 ";
+		echo "/>Keep All</label><br/>";
+		echo "<label><input type=radio name=\"droptype[$id]\" value=1 ";
 		if ($row['dropn']>0) {
 			echo "checked=1 ";
 		}
 		$absr4=abs($row['dropn']);
-		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 ";
+		echo "/>Drop lowest</label> <label><input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores</label><br/>";
+		echo "<label><input type=radio name=\"droptype[$id]\" value=2 ";
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</td>";
+		echo "/>Keep highest</label> <label><input type=text size=2 name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</label></td>";
 		if ($useweights==0) {
 			echo '<td class=fixedtotcell>';
 		} else {
@@ -526,7 +524,7 @@
 		if ($useweights==0 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
-		echo '"/></td>';
+		echo '" aria-label="category fixed total"/></td>';
 		if ($useweights==1) {
 			echo '<td class=weightcell>';
 		} else {
@@ -536,7 +534,7 @@
 		if ($useweights==1 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
-		echo "\"/></td>";
+		echo "\" aria-label=\"category weighted total\"/></td>";
 		if ($id!=0) {
 			echo "<td><a href=\"#\" onclick=\"removeexistcat($id);return false;\">Remove</a></td></tr>";
 		} else {
