@@ -139,24 +139,27 @@ if ($overwriteBody==1) {
 
 	<form enctype="multipart/form-data" method=post action="uploadgrades.php?cid=<?php echo $cid ?>&gbmode=<?php echo Sanitize::encodeUrlParam($_GET['gbmode']); ?>&gbitem=<?php echo Sanitize::encodeUrlParam($_GET['gbitem']); ?>">
 		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-		<span class=form>Grade file (CSV): </span>
-		<span class=formright><input name="userfile" type="file" /></span><br class=form>
-		<span class=form>File has header row?</span>
+		<label for="userfile" class=form>Grade file (CSV): </label>
+		<span class=formright><input name="userfile" id="userfile" type="file" /></span><br class=form>
+		<label class=form for="hashdr">File has header row?</label>
 		<span class=formright>
-			<input type=radio name="hashdr" value="0" checked=1 />No header<br/>
-			<input type=radio name="hashdr" value="1" />Has 1 row header <br/>
-			<input type=radio name="hashdr" value="2" />Has 2 row header <br/>
+			<select name="hashdr" id="hashdr">
+				<option value=0 selected>No header</option>
+				<option value=1>Has 1 row header</option>
+				<option value=2>Has 2 row header</option>
+			</select>
 		</span><br class="form" />
-		<span class=form>Grade is in column:</span>
-		<span class=formright><input type=text size=4 name="gradecol" value="2"/></span><br class="form" />
-		<span class=form>Feedback is in column (0 if none):</span>
-		<span class=formright><input type=text size=4 name="feedbackcol" value="0"/></span><br class="form" />
-		<span class=form>User is identified by:</span>
-		<span class=formright>
-			<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column
-			<input type=text size=4 name="usernamecol" value="2" /><br/>
-			<input type=radio name="useridtype" value="1" />Lastname, Firstname in column
-			<input type=text size=4 name="fullnamecol" value="1" />
+		<label class=form for="gradecol">Grade is in column:</label>
+		<span class=formright><input type=text size=4 name="gradecol" id=gradecol value="2"/></span><br class="form" />
+		<label class=form for="feedbackcol">Feedback is in column (0 if none):</label>
+		<span class=formright><input type=text size=4 name="feedbackcol" id=feedbackcol value="0"/></span><br class="form" />
+		<span class=form id="idlbl">User is identified by:</span>
+		<span class=formright role=group aria-labelledby="idlbl">
+			<label><input type=radio name="useridtype" value="0" checked=1 />Username (login name)</label>
+			<label>in column <input type=text size=4 name="usernamecol" value="2" /></label>
+			<br/>
+			<label><input type=radio name="useridtype" value="1" />Lastname, Firstname</label>
+			<label>in column <input type=text size=4 name="fullnamecol" value="1" /></label>
 		</span><br class="form" />
 
 		<div class=submit><input type=submit value="Upload Grades"></div>
