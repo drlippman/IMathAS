@@ -28,7 +28,18 @@
 	}
 
 	require_once "../includes/calendardisp.php";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=011823\"></script>";
+
+	if (isset($_GET['ajax'])) {
+		$stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		$latepasshrs = $line['latepasshrs'];
+		$msgset = $line['msgset']%5;
+
+		showcalendar("showcalendar");
+		exit;
+	}
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=060225\"></script>";
 	if ($editingon) {
 		$placeinhead .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.css" integrity="sha256-Els0hoF6/l1WxcZEDh4lQsp7EqyeeYXMHCWyv6SdmX0=" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>';
@@ -63,7 +74,7 @@
 	}
 	</style>
   <script type="text/javascript">
-	$(function() {
+	function initcaldragreorder () {
 			$("span.calitem[id^=CD]").attr("title",_("Calendar Event Date"));
 			$("span.calitem[id^=AS]").attr("title",_("Assessment Available After"));
 			$("span.calitem[id^=AE]").attr("title",_("Assessment Due Date"));
@@ -138,6 +149,9 @@
 
 				}
 			});
+	}
+	$(function() {
+		initcaldragreorder();
 	});
 	</script>
 	<?php
@@ -158,6 +172,7 @@
 	 }
 	 if ($editingon) {
 		 echo '<p>'._('Drag-and-drop events to change dates. Note that time of day is not changed - use Mass Change Dates for that.').'</p>';
+		 echo '<p>'.sprintf(_('Drag-and-drop is not keyboard accessible. Use <%s>Mass Change Dates</a> instead.'),'a href="masschgdates.php?cid='.$cid.'"').'</p>';
 		 echo '<p>'._('Item Legend:').' <span class="icon-startdate"></span>'. _('Available After date');
 		 echo ', <span class="icon-enddate"></span> '. _('Available Until (Due) date');
 		 echo ', <span class="icon-eye2"></span>'. _('Assessment Review date');

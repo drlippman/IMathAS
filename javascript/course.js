@@ -172,6 +172,33 @@ function setcalview(n, skipfocus) {
 	}
 }
 
+function updatecal(pageshift, start, length) {
+	var url = calcallback; 
+	if (length !== null) {
+		url += '&callength='+length;
+		document.cookie = 'callength'+cid+'='+length;
+	} else {
+		length = document.getElementById("callength").value;
+	}
+	if (start === null && pageshift !== null) {
+		start = curcalstart + pageshift*60*60*24*7*length;
+	}
+	if (start !== null) {
+		url += '&calstart='+start;
+		document.cookie = 'calstart'+cid+'='+start;
+	}
+	url += '&ajax=true';
+	$.get(url, function (data) {
+		$("#calwrap").empty().append(data);
+		if (typeof initcaldragreorder === 'function') {
+			initcaldragreorder();
+		}
+	});
+}
+function changecallength(el) {
+	updatecal(null,null,el.value);
+}
+
 function showcalcontentsid(elid) {
 	var html = '';
 	if (caleventsarr[elid].data!=null) {
@@ -349,10 +376,6 @@ function showcalcontentsid(elid) {
 jQuery(document).ready(function($) {
 	$(".caldl").attr("title",_("Bring this day to top"));
 });
-
-function changecallength(el) {
-	window.location = calcallback + '&callength=' + el.value;
-}
 
 var playlist = [];
 var curvid = [];

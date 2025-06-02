@@ -86,18 +86,14 @@ for ($i=0;$i<7*$callength;$i++) {
 
 
 <?php
-//echo '<div class="floatleft">Jump to <a href="'.$refpage.'.php?calpageshift=0&cid='.$cid.'">Now</a></div>';
-$address = $GLOBALS['basesiteurl'] . "/course/$refpage.php?cid=$cid";
-
+$address = $GLOBALS['basesiteurl'] . "/course/showcalendar.php?cid=$cid";
+if (empty($_GET['ajax'])) {
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
 echo '<div class=flexgroup><div class="center" style="flex-grow:1;">';
-echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</a> ';
-if ($pageshift==0 && (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid]==0)) {
-	echo "Now ";
-} else {
-	echo '<a href="'.$refpage.'.php?calpageshift=0&calstart=0&cid='.$cid.'">Now</a> ';
-}
-echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'" aria-label="'.sprintf(_('Forward %d weeks'),$callength).'">&gt; &gt;</a> ';
+echo '<button type=button class="plain nopad" onclick="updatecal(-1,null,null)" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</button> ';
+echo '<button type=button class="plain nopad" onclick="updatecal(0,0,null)">Now</button> ';
+echo '<button type=button class="plain nopad" onclick="updatecal(1,null,null)" aria-label="'.sprintf(_('Forward %d weeks'),$callength).'">&gt; &gt;</button> ';
+
 echo '</div>';
 
 echo '<span class="calupdatenotice red"></span>';
@@ -115,6 +111,7 @@ echo '<button type=button onclick="setcalview(1);" aria-selected="false" class="
 echo '</div>';
 echo $toprightheader;
 echo '</div> ';
+}
 
 
 $exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr)+$serveroffset;
@@ -872,8 +869,10 @@ foreach ($dates as $moday=>$val) {
 $firstdate = reset($dates);
 $lastdate = end($dates);
 
+echo '<div id="calwrap">';
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
+echo "var curcalstart = $today;";
 echo "caleventsarr = ".json_encode($jsarr, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE).";";
 echo '$(function() {
 	$(".cal td").off("click.cal").on("click.cal", function() { showcalcontents(this); })
@@ -890,8 +889,8 @@ for ($i=0;$i<count($hdrs);$i++) {
 		if ($i==0 && $j==$dayofweek && $pageshift==0) { //onmouseover="makebig(this)"
 			echo '<td tabindex=0 id="'.$ids[$i][$j].'" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		} else {
-			$addr = $refpage.".php?cid=$cid&calstart=". ($midtoday + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60);
-			echo '<td tabindex=0 id="'.$ids[$i][$j].'"><div class="td"><span class=day><a href="'.$addr.'" class="caldl">'.$hdrs[$i][$j]."</a></span><div class=center>";
+			$daystart = $midtoday + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60;
+			echo '<td tabindex=0 id="'.$ids[$i][$j].'"><div class="td"><span class=day><a href="#" onclick="updatecal(0,'.$daystart.',null);return false;" class="caldl">'.$hdrs[$i][$j]."</a></span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
@@ -936,13 +935,14 @@ for ($i=0;$i<count($hdrs);$i++) {
 echo "</tbody></table>";
 
 echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
-echo '<p id=agendaheader style="display:none"><b>' . _("Agenda for ") . $firstdate . ' - ' . $lastdate.'</b></p>';
-echo "<div id=\"caleventslist\" aria-live=\"polite\"></div><div class=\"clear\"></div></div>";
+echo '<p id=agendaheader style="display:none" aria-live="polite"><b>' . _("Agenda for ") . $firstdate . ' - ' . $lastdate.'</b></p>';
+echo "<div id=\"caleventslist\"></div><div class=\"clear\"></div></div>";
 if ($calview == 1) {
 	echo "<script>setcalview(1, true);</script>";
 } else if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
 }
+echo '</div>';
 
 }
 function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$folder,$avail=true,$ishidden=false,$curblockgrey=0) {
