@@ -323,7 +323,7 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		
 	} else {
 		echo "Eek! parameters for a point must include the board to place it on
-			  and the coordinates as an array.<br>";
+			  and the coordinates as an array. ";
 	}
 	
 	// Append new output string to the board string
@@ -489,7 +489,7 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 		
 	} else {
 		echo "Eek! parameters for an intersection must include the board to place it on
-			  and two parameters that are either circles or lines to intersect.<br>";
+			  and two parameters that are either circles or lines to intersect. ";
 	}
 	
 	// Append new output string to the board string
