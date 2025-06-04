@@ -1,0 +1,66 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README*
+CHANGELOG*
+LICENSE*
+docs/
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js (Vue.js source - we only want built files)
+assess2/vue-src/node_modules/
+assess2/vue-src/.npm/
+assess2/vue-src/.cache/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test files
+tests/
+test/
+phpunit.xml
+codeception.yml
+
+# Build artifacts
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (don't include in image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Local config (we'll create separate config for production)
+config.php
+
+# Large directories that aren't needed for runtime
+migrations/
+util/
+vendor/codeception/

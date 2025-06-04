@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:firebase.google.com)",
+      "WebFetch(domain:cloud.google.com)"
+    ],
+    "deny": []
+  }
+}
