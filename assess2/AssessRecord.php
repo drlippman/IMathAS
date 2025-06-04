@@ -64,7 +64,7 @@ class AssessRecord
    * @param boolean $forupdate  True to use transaction with row locking
    * @return void
    */
-  public function loadRecord($userid, $forupdate = true) {  
+  public function loadRecord($userid, $forupdate = true) {   
     $this->curUid = $userid;
     $selectQuery = "SELECT * FROM imas_assessment_records WHERE userid=? AND assessmentid=?";
     if ($forupdate) {
