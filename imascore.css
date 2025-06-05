@@ -792,7 +792,7 @@ input[type=submit],input[type=button], button, a.abutton, span.fakebutton {
 	padding: 3px 12px;
 	margin: 2px 3px;
 }
-button[aria-selected=true] {
+button[aria-selected=true], button[aria-selected=true]:hover, button[aria-selected=true]:focus {
 	background-color: #ddd;
 }
 input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover,
