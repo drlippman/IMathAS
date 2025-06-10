@@ -228,7 +228,9 @@ function jsxSlider (&$board, $param, $ops=array()) {
 			}
 			
 			// Add event listener
-			$out .= ".on('up',function() { $('#qn{$box}, #tc{$box}').val(this.Value().toFixed(8));	});";
+			$out .= ';';
+			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($id.Value().toFixed(8)); });";
+			
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "slider", [$min, $max]); 
 	
 		} else {
@@ -309,10 +311,11 @@ function jsxPoint(&$board, $param, $ops=array()) {
 			} else {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
-
-			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";
 			
-			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";  
+			$out .= ';';
+			$answerfill = "'(' + $id.X().toFixed(4) + ',' + $id.Y().toFixed(4) + ')'";
+			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($answerfill); });";
+
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
 				
 		} else {
@@ -404,8 +407,9 @@ function jsxGlider (&$board, $param, $ops=array()) {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
 
-			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";		
-			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";
+			$out .= ';';
+			$answerfill = "'(' + $id.X().toFixed(4) + ',' + $id.Y().toFixed(4) + ')'";
+			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($answerfill); });";
 					
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point"); 
 				
@@ -476,9 +480,10 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
 
-			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";
-			
-			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";  
+			$out .= ';';
+			$answerfill = "'(' + $id.X().toFixed(4) + ',' + $id.Y().toFixed(4) + ')'";
+			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($answerfill); });";
+
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
 				
 		} else {
