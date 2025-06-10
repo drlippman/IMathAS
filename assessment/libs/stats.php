@@ -635,10 +635,11 @@ function fdhistogram($freq,$label,$start,$cw,$labelstart=false,$upper=false,$wid
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
     $vertlabel = 'Frequency';
+	$valuelabels = false;
     if (is_array($labelstart)) {
         $opts = $labelstart;
         $labelstart = false;
-        foreach (['labelstart','upper','width','height','showgrid','fill','stroke','vertlabel'] as $v) {
+        foreach (['labelstart','upper','width','height','showgrid','fill','stroke','vertlabel','valuelabels'] as $v) {
             if (isset($opts[$v])) {
                 ${$v} = $opts[$v];
             }
@@ -655,8 +656,15 @@ function fdhistogram($freq,$label,$start,$cw,$labelstart=false,$upper=false,$wid
 		$dxdiff = $cw-$dx;
 	}
     $st = '';
+	if ($valuelabels) {
+		$st .= "fontfill=\"$fill\";";
+	}
 	for ($curr=0; $curr<count($freq); $curr++) {
 		$alt .= "<tr><td>$x</td><td>{$freq[$curr]}</td></tr>";
+		if ($valuelabels) {
+			$hx = $x + .5*$dx;
+			$st .= "text([$hx,{$freq[$curr]}],'{$freq[$curr]}','above');";
+		}
 		$st .= "rect([$x,0],";
 		$x += $dx;
 		$st .= "[$x,{$freq[$curr]}]);";
@@ -667,11 +675,14 @@ function fdhistogram($freq,$label,$start,$cw,$labelstart=false,$upper=false,$wid
 	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
-	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
+
+	$maxfreq = $step*ceil($maxfreq/$step);
+
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,20);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>9) {$step = 2;} else {$step=1;}
 	
 	if ($showgrid===true) {
