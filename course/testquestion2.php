@@ -216,6 +216,21 @@ $placeinhead .= '<script>
           $(el).parent().slideUp();
       });
   }
+
+  $(function() {
+	if (typeof window.opener.setlib !== "undefined") {
+		$("#liblist li").each(function(i,el) {
+			let libid = el.id.substr(3);
+			$(el).find("span").first().after(
+				$("<a></a>", {href:"#", class:"small"}).text("'._('List library').'")
+				  .on("click", function() {
+				  	window.opener.setlib(libid);
+					window.opener.setlibnames(this.previousElementSibling.innerText);
+				  })
+			).after(" ");
+		});
+ 	}
+  });
   </script>';
 require_once "../header.php";
 
@@ -470,13 +485,13 @@ if ($overwriteBody==1) {
 	echo '</p>';
 
 	echo '<p>'._('Question is in these libraries:').'</p>';
-	echo '<ul>';
+	echo '<ul id="liblist">';
 	while ($row = $resultLibNames->fetch(PDO::FETCH_ASSOC)) {
         if ($row['userights'] > 2 ||
             ($row['userights'] > 0 && ($row['groupid'] == $groupid || $isadmin)) ||
             ($row['userights'] == 0 && ($row['uid'] == $userid || $isadmin || ($isgrpadmin && $row['groupid'] == $groupid)))
         ) {
-            echo '<li>';
+            echo '<li id="lib'. Sanitize::onlyInt($row['libid']) .'">';
             if ($row['userights'] == 0) {
                 echo '<span style="color:red">';
             } else if ($row['userights'] < 3) {
@@ -485,7 +500,8 @@ if ($overwriteBody==1) {
                 echo '<span>';
             }
             echo Sanitize::encodeStringForDisplay($row['name']) . '</span>';
-            if ($isadmin) {
+
+			if ($isadmin) {
                 printf(' (<span class="pii-full-name">%s, %s</span>)',
                     Sanitize::encodeStringForDisplay($row['LastName']), Sanitize::encodeStringForDisplay($row['FirstName']));
                 echo ' <a class="small" href="#" onclick="if(confirm(\'Are you sure?\')){dellibitems('.Sanitize::onlyInt($row['libid']).',';
