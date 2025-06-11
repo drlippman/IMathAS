@@ -702,10 +702,10 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
     </div>
 </div>
 <div class="selectedlibs short" <?php if ($searchtype=='all') { echo 'style="display:none;"';}?>>
-    <span id="libnames">
+    <span id="libnames" tabindex="-1">
         <?php echo Sanitize::encodeStringForDisplay(implode(', ', $search_results['names'])); ?>
     </span>
-    <button class="viewall" aria-hidden="true" onclick="this.style.display='none';this.parentNode.classList.remove('short');">
+    <button class="viewall" onclick="this.style.display='none';this.parentNode.classList.remove('short');document.getElementById('libnames').focus();">
         <?php echo _('View all');?>
     </button>
 </div>

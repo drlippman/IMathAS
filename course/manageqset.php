@@ -922,7 +922,7 @@ if (isset($searchtype)) {
 		echo '<div class=pdiv>Check: <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',false)">None</a> ';
 
         echo '<span class="dropdown">';
-		echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo ' <a role=button tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 		echo _('With Selected').'</a>';
 		echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
 		echo ' <li><a href="#" onclick="postWSform(\'transfer\');return false;" title="',_("Transfer question ownership"),'">', _('Transfer'), "</a></li>";

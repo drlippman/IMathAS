@@ -242,9 +242,8 @@ function getExistingQuestions(qlist,flattened) {
         }
     }
 }
-var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong library') + '" ' + 
-    'aria-label="' + _('Marked as in wrong library') + '">' + 
-    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18.1 12.1C19.7 9.1 19 5.3 16.4 3.2 13.8 1 10 1 7.5 3.2 4.9 5.4 4.2 9.1 5.7 12.1l6.2 10.6z M9.5 11.5 14.5 6.5 M9.5 6.5 14.5 11.5"></path></svg>' +
+var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong library') + '">' + 
+    '<svg role=img viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><title>' + _('Marked as in wrong library') + '</title><path d="M18.1 12.1C19.7 9.1 19 5.3 16.4 3.2 13.8 1 10 1 7.5 3.2 4.9 5.4 4.2 9.1 5.7 12.1l6.2 10.6z M9.5 11.5 14.5 6.5 M9.5 6.5 14.5 11.5"></path></svg>' +
     '</span> ';
 var wrongLibState = {};
 function displayQuestionList(results) {
@@ -324,18 +323,18 @@ function displayQuestionList(results) {
                 'title="'+_('Written example')+'" />';
         }
         if (q['mine'] == 1) {
-            features += '<span title="' + _('My Question') + '" aria-label="' + _('My Question') + '">' + 
-                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+            features += '<span title="' + _('My Question') + '">' + 
+                '<svg role=img viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><title>' + _('My Question') + '</title><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
                 '</span>';
         }
         if (q['userights'] == 0) {
-            features += '<span title="' + _('Private') + '" aria-label="' + _('Private') + '">' + 
-                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' +
+            features += '<span title="' + _('Private') + '">' + 
+                '<svg role=img viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><title>' + _('Private') + '</title><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' +
                 '</span>';
         }
         if (q['isrand'] == 0) {
-            features += '<span title="' + _('Not Randomized') + '" aria-label="' + _('Not Randomized') + '">' + 
-                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><line stroke="#f00" x1="5" y1="1" x2="19" y2="23"></line></svg>' +
+            features += '<span title="' + _('Not Randomized') + '">' + 
+                '<svg role=img viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><title>' + _('Not Randomized') + '</title><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><line stroke="#f00" x1="5" y1="1" x2="19" y2="23"></line></svg>' +
                 '</span>';
         }
         descrclass = '';
