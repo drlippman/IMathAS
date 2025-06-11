@@ -482,7 +482,7 @@ function anyEditorIsDirty() {
 function generateMoveSelect2(num) {
     var thisistxt = itemarray[num][0] == "text";
     num++; //adjust indexing
-    var sel = "<select id=" + num + ' onChange="moveitem2(' + num + ')">';
+    var sel = "<select id=" + num + ' onChange="moveitem2(' + num + ')" aria-label="' + _('Move question ') + num + '">';
     var qcnt = 1;
     var tcnt = 1;
     var curistxt = false;
@@ -592,7 +592,7 @@ function generateShowforSelect(num) {
         return "";
     } else {
         out =
-            _('Show for') + ' <select id="showforn' +
+            '<label>' + _('Show for') + ' <select id="showforn' +
             num +
             '" onchange="updateTextShowN(' +
             num +
@@ -606,7 +606,7 @@ function generateShowforSelect(num) {
             }
             out += ">" + j + "</option>";
         }
-        out += "</select>";
+        out += "</select></label>";
         if (itemarray[num][2] > 1) {
             out +=
                 '<br/><select id="showforntype' +
@@ -615,7 +615,7 @@ function generateShowforSelect(num) {
                 num +
                 "," +
                 itemarray[num][5] +
-                ')">';
+                ')" aria-label="' + _('Show behavior') + '">';
             out += "<option value=0";
             if (itemarray[num][5] == 0) {
                 out += " selected";
@@ -1101,7 +1101,7 @@ function generateTable() {
 
     html += "<table cellpadding=5 class='gb questions-in-assessment'><thead><tr>";
     if (!beentaken) {
-        html += "<th></th>";
+        html += "<th><span class='sr-only'>Select</span></th>";
     }
     html += "<th>" + _("Order") + "</th>";
     //return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
@@ -1117,13 +1117,13 @@ function generateTable() {
     html += "<th>" + _("Points");
     if (!beentaken) {
         html +=
-            "<br/><span class=small>" +
+            "<br/><span class=small><label>" +
             _("Default") +
             ': <input id="defpts" type=number min=0 step=1 size=2 value="' +
             defpoints +
             '" data-lastval="' +
             defpoints +
-            '"/></span>';
+            '"/><label></span>';
     }
     html += "</th>";
     html += "<th>" + _("Actions") + "</th>";
@@ -1240,7 +1240,9 @@ function generateTable() {
                             curitems[j][0] +
                             ":" +
                             curqnum +
-                            '"/></td><td>';
+                            '" ' + 
+                            (curitems[j][0]=="text" ? 'aria-label="' + _('Text segment') + '"' : 'aria-labelledby="qd'+ln+'"') +
+                            '/></td><td>';
                     } else {
                         if (itemarray[i][3] == 1) {
                             html +=
@@ -1272,6 +1274,7 @@ function generateTable() {
                             _("Group") +
                             "</b> ";
                         html +=
+                            '<label>' + 
                             _("Select") +
                             " <input type='text' size='3' id='grpn" +
                             i +
@@ -1283,9 +1286,10 @@ function generateTable() {
                             itemarray[i][0] +
                             ")'/> " +
                             _("from group of ") +
-                            curitems.length;
+                            curitems.length + 
+                            '</label>';
                         html +=
-                            " <select id='grptype" +
+                            " <label><select id='grptype" +
                             i +
                             "' onchange='updateGrpT(" +
                             i +
@@ -1299,7 +1303,7 @@ function generateTable() {
                         if (itemarray[i][1] == 1) {
                             html += "selected=1";
                         }
-                        html += ">" + _("With") + "</option></select>" + _(" replacement");
+                        html += ">" + _("With") + "</option></select>" + _(" replacement") + '</label>';
                         html += "</td>";
                         html +=
                             '<td class="nowrap c"><input size=2 type=number min=0 step=1 id="grppts-' +
@@ -1308,7 +1312,7 @@ function generateTable() {
                             curgrppoints +
                             '" data-lastval="' +
                             curgrppoints +
-                            '"/>';
+                            '" aria-label="' + _('Points for questions in group') + '"/>';
                         if (itemarray[i][0] > 1) {
                             html += "ea";
                         }
@@ -1357,7 +1361,9 @@ function generateTable() {
                         curitems[j][0] +
                         ":" +
                         (curqnum + "-" + j) +
-                        '"/></td><td>';
+                        '" ' +
+                        (curitems[j][0]=="text" ? 'aria-label="' + _('Text segment') + '"' : 'aria-labelledby="qd'+ln+'"') +
+                        '/></td><td>';
                     html +=
                         '<a href="#" onclick="return ungroupitem(\'' +
                         i +
@@ -1467,7 +1473,7 @@ function generateTable() {
                 }
                 if (curitems[j][10] == 1) {
                     descricon = '<span title="' + _('Marked as broken') + '">' + 
-                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19.7 1.3 19.6 9 16.2 6.3 13.8 11.3 10.5 8.3 7 11.7 3.6 9.2l0-7.9z" class="a"></path><path d="m19.7 22.9 0-7.8-2-1.4-3.1 4-3.3-3-3.8 3.8-4-3.9v8.4z" class="a"></path></svg>' + 
+                    '<svg role="img" viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><title>' + _('Marked as broken') + '</title><path d="M19.7 1.3 19.6 9 16.2 6.3 13.8 11.3 10.5 8.3 7 11.7 3.6 9.2l0-7.9z" class="a"></path><path d="m19.7 22.9 0-7.8-2-1.4-3.1 4-3.3-3-3.8 3.8-4-3.9v8.4z" class="a"></path></svg>' + 
                     '</span> ';
                 }
                 html += '<td';
@@ -1485,21 +1491,21 @@ function generateTable() {
                     curitems[j][1] +
                     '"/>';
                 
-                html += curitems[j][2] + "</td>"; //description
+                html += '<span id="qd'+ln+'">' + curitems[j][2] + "</span></td>"; //description
                 html += '<td class="nowrap">';
                 if ((curitems[j][7] & 32) == 32) {
-                    html += '<span title="' + _('Show Work') + '" aria-label="' + _('Show Work') + '">' + 
-                    '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+                    html += '<span title="' + _('Show Work') + '">' + 
+                    '<svg role="img" viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><title>' + _('Show Work') + '</title><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
                     + '</span>';
                 }
                 if ((curitems[j][7] & 64) == 64) {
-                    html += '<span title="' + _('Has Rubric') + '" aria-label="' + _('Has Rubric') + '">' + 
-                    '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
+                    html += '<span title="' + _('Has Rubric') + '">' + 
+                    '<svg role="img" viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><title>' + _('Has Rubric') + '</title><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
                     + '</span>';
                 }
                 if ((curitems[j][7] & 256) == 256) {
-                    html += '<span title="' + _('Not Randomized') + '" aria-label="' + _('Not Randomized') + '">' + 
-                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><line stroke="#f00" x1="5" y1="1" x2="19" y2="23"></line></svg>' +
+                    html += '<span title="' + _('Not Randomized') + '">' + 
+                    '<svg role="img" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><title>' + _('Not Randomized') + '</title><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><line stroke="#f00" x1="5" y1="1" x2="19" y2="23"></line></svg>' +
                     '</span>';
                 }
                 if ((curitems[j][7] & 1) == 1) {
@@ -1642,7 +1648,9 @@ function generateTable() {
                             curpt +
                             '" data-lastval="' +
                             curpt +
-                            '"/>' +
+                            '" ' + 
+                            'aria-labelledby="qd' + ln + '"' +
+                            '/>' +
                             (curitems[j][9] > 0 ? ECmark : '') +
                             '</td>'; //points
                     }
