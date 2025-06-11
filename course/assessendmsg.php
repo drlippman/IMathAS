@@ -100,30 +100,32 @@ if (!isset($imasroot)) {
 		echo '<input type="hidden" name="aid" value="'.Sanitize::onlyInt($_GET['aid']).'" />';
 	}
 	echo '<p>Base messages on: ';
-	echo '<input type="radio" name="type" value="0" ';
+	echo '<label><input type="radio" name="type" value="0" ';
 	if ($endmsg['type']==0) { echo 'checked="checked"';}
-	echo ' />Points <input type="radio" name="type" value="1" ';
+	echo ' />Points</label> <label><input type="radio" name="type" value="1" ';
 	if ($endmsg['type']==1) { echo 'checked="checked"';}
-	echo ' />Percents</p>';
+	echo ' />Percents</label></p>';
 
 	echo '<table class="gb"><thead><tr><th>If score is at least</th><th>Display this message</th></tr></thead><tbody>';
 	$i=1;
 	foreach($endmsg['msgs'] as $sc=>$msg) {
 		$msg = Sanitize::encodeStringForDisplay($msg);
-		echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"$sc\"/></td>";
-		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
+		echo "<tr><td><span class=\"sr-only\" id=\"label$i\">Rule $i</span>";
+		echo "<input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"$sc\" aria-labelledby=\"label$i\"/></td>";
+		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"$msg\" aria-labelledby=\"label$i\"/></td></tr>";
 		$i++;
 	}
 	for ($j=0;$j<10;$j++) {
-		echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"\"/></td>";
-		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"\" /></td></tr>";
+		echo "<tr><td><span class=\"sr-only\" id=\"label$i\">Rule $i</span>";
+		echo "<input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"\" aria-labelledby=\"label$i\"/></td>";
+		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"\" aria-labelledby=\"label$i\" /></td></tr>";
 		$i++;
 	}
 	echo "<tr><td>Otherwise, show:</td>";
 	$endmsg['def'] = Sanitize::encodeStringForDisplay($endmsg['def']);
-	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
+	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" aria-label=\"Fallback message\"/></td></tr>";
 	echo '</tbody></table>';
-	echo '<p>After the score-specific message, display this text to everyone:</p>';
+	echo '<p><label for="commonmsg">After the score-specific message, display this text to everyone</label>:</p>';
 	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" id="commonmsg" style="width: 100%">';
 	echo Sanitize::encodeStringForDisplay($endmsg['commonmsg']);
 	echo '</textarea></div>';

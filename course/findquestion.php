@@ -98,7 +98,7 @@ if ($overwriteBody==1) {
     echo '<form method="post" id="aform">';
     if (empty($qsetid)) {
         echo '<p>'._('This will find all usages of a question in this course.').'</p>';
-        echo '<p>'._('Search for Question ID').': <input name=qsetid size=10 /></p>';
+        echo '<p><label>'._('Search for Question ID').': <input name=qsetid size=10 /></label></p>';
         echo '<p><button type="submit">'._('Search').'</button>';
     } else {
         if ($didreplace) {
@@ -114,21 +114,21 @@ if ($overwriteBody==1) {
             echo '<ul class=nomark>';
             foreach ($results as $result) {
                 echo '<li>';
-                echo '<input type=checkbox name="replacein[]" value="'.$result['aid'].'" ';
+                echo '<label><input type=checkbox name="replacein[]" value="'.$result['aid'].'" ';
                 if ($result['takencnt'] > 0) {
                     echo 'disabled class="q-taken"';
                 }
                 echo '>';
                 echo '<a href="'.$addq.'.php?cid='.$cid.'&aid='.$result['aid'].'" target="_blank">';
-                echo $result['name'].'</a></li>';
+                echo $result['name'].'</a></label></li>';
             }
             echo '</ul>';
             echo '<p>' . _('Select:') . ' ';
             echo '<a href="#" onclick="return toggleaids(true);">' . _('All') . '</a>';
             echo ' <a href="#" onclick="return toggleaids(false);">' . _('None') . '</a></p>';
             echo '<input type=hidden name=qsetid value="'.$qsetid.'" />';
-            echo '<p>'. _('In selected assessments, replace with question ID');
-            echo ': <input name=replaceid size=10 /></p>';
+            echo '<p><label>'. _('In selected assessments, replace with question ID');
+            echo ': <input name=replaceid size=10 /></label></p>';
             echo '<p><button type="submit">'._('Replace').'</button>';
             echo '<p>'._('Note: assessments that students have already started are disabled, as replacing questions in those will cause problems if the questions have different types or number of parts. ');
             echo sprintf(_('If you are absolutely sure you know what you are doing, you can %s enable %s them.'),
