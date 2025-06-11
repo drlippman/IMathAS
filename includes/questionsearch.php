@@ -578,7 +578,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
     <div style="flex-grow:1" class="flexrow">
         <div id="searchwrap" <?php if ($searchterms !== '') { echo 'class="hastext"';} ?>>
             <input type=text name=search id=search  
-                value="<?php echo Sanitize::encodeStringForDisplay($searchterms); ?>">
+                value="<?php echo Sanitize::encodeStringForDisplay($searchterms); ?>" aria-label="<?php echo _('Search terms') ?>">
             <button type=button onclick="clearSearch()" 
                 id="searchclear" aria-label="Clear Search">&times;</button>
         </div>
@@ -645,27 +645,31 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>
                         </select></div>
-                    <div><label for="search-avgtime-min"><?php echo _('Avg Time');?>:</label> <div>
-                        <input size=2 id="search-avgtime-min"> to <input size=2 id="search-avgtime-max">
+                    <div><?php echo _('Avg Time');?>: <div>
+                        <input size=2 id="search-avgtime-min" aria-label="<?php echo _('Average Time Minimum');?>"> 
+                        to 
+                        <input size=2 id="search-avgtime-max" aria-label="<?php echo _('Average Time Maximum');?>">
                     </div></div>
-                    <div><label for="search-avgscore-min"><?php echo _('Avg Score');?>:</label> <div>
-                        <input size=2 id="search-avgscore-min">% to <input size=2 id="search-avgscore-max">%
+                    <div><?php echo _('Avg Score');?>:<div>
+                        <input size=2 id="search-avgscore-min" aria-label="<?php echo _('Average score Minimum');?>">% 
+                        to 
+                        <input size=2 id="search-avgscore-max" aria-label="<?php echo _('Average score Maximum');?>">%
                     </div></div>
-                    <div><label for="search-lastmod-min"><?php echo _('Last Modified');?>:</label> <div>
-                        <input size=8 id="search-lastmod-min" name="search-lastmod-min">
+                    <div><?php echo _('Last Modified');?>: <div>
+                        <input size=8 id="search-lastmod-min" name="search-lastmod-min" aria-label="<?php echo _('last modified minimum date');?>">
                         <a href="#" onClick="displayDatePicker('search-lastmod-min', this); return false">
 			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
                         to 
-                        <input size=8 id="search-lastmod-max" name="search-lastmod-max">
+                        <input size=8 id="search-lastmod-max" name="search-lastmod-max" aria-label="<?php echo _('last modified maximum date');?>">
                         <a href="#" onClick="displayDatePicker('search-lastmod-max', this); return false">
 			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
                     </div></div>
-                    <div><label for="search-created-min"><?php echo _('Created');?>:</label> <div>
-                        <input size=8 id="search-created-min" name="search-created-min">
+                    <div><?php echo _('Created');?>: <div>
+                        <input size=8 id="search-created-min" name="search-created-min" aria-label="<?php echo _('created minimum date');?>">
                         <a href="#" onClick="displayDatePicker('search-created-min', this); return false">
 			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
                         to 
-                        <input size=8 id="search-created-max" name="search-created-max">
+                        <input size=8 id="search-created-max" name="search-created-max" aria-label="<?php echo _('created maximum date');?>">
                         <a href="#" onClick="displayDatePicker('search-created-max', this); return false">
 			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
                     </div></div>

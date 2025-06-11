@@ -394,7 +394,7 @@ function displayQuestionList(results) {
         // build row
         tbody += '<tr>'
             + '<td><input type=checkbox name="nchecked[]" id="qo'+i+'" value="'+q['id']+'"></td>'
-            + '<td' + descrclass + '>' + descricon + q['description'] + '</td>'
+            + '<td' + descrclass + '><label for="qo'+i+'" id="qd'+i+'">' + descricon + q['description'] + '</label></td>'
             + '<td><div class="dropdown splitbtn nowrap"><button type="button" class="secondary" onclick="previewq(\'selq\',\'qo'+i+'\','+q['id']+',true,false)">'
             + _('Preview') + '</button>'
             + actions2

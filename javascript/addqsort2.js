@@ -1241,7 +1241,7 @@ function generateTable() {
                             ":" +
                             curqnum +
                             '" ' + 
-                            (curitems[j][0]=="text" ? 'aria-label="' + _('Text segment') + '"' : 'aria-labelledby="qd'+ln+'"') +
+                            (curitems[j][0]=="text" ? 'aria-label="' + _('Text segment') + '"' : '') +
                             '/></td><td>';
                     } else {
                         if (itemarray[i][3] == 1) {
@@ -1362,7 +1362,7 @@ function generateTable() {
                         ":" +
                         (curqnum + "-" + j) +
                         '" ' +
-                        (curitems[j][0]=="text" ? 'aria-label="' + _('Text segment') + '"' : 'aria-labelledby="qd'+ln+'"') +
+                        (curitems[j][0]=="text" ? 'aria-label="' + _('Text segment') + '"' : '') +
                         '/></td><td>';
                     html +=
                         '<a href="#" onclick="return ungroupitem(\'' +
@@ -1491,7 +1491,7 @@ function generateTable() {
                     curitems[j][1] +
                     '"/>';
                 
-                html += '<span id="qd'+ln+'">' + curitems[j][2] + "</span></td>"; //description
+                html += '<label for="qc'+ln+'">' + curitems[j][2] + "</label></td>"; //description
                 html += '<td class="nowrap">';
                 if ((curitems[j][7] & 32) == 32) {
                     html += '<span title="' + _('Show Work') + '">' + 
