@@ -110,24 +110,24 @@ $vueData = array(
 // Vue template
 ?>
 <div id="app" class="skipmathrender" v-cloak>
-	<span class=form><?php echo _('Assessment Name');?>:</span>
+	<label for=name class=form><?php echo _('Assessment Name');?>:</label>
 	<span class=formright>
-		<input type=text size=30 name=name v-model="name" required>
+		<input type=text size=30 name=name id=name v-model="name" required>
 	</span><br class=form />
 
-	<?php echo _('Summary');?>:<br/>
+	<label for=summary><?php echo _('Summary');?></label>:<br/>
 	<div class=editor>
 		<textarea cols=50 rows=15 id=summary name=summary v-model="summary" style="width: 100%"></textarea>
 	</div><br class=form />
 
-	<?php echo _('Intro/Instructions');?>:<br/>
+	<label for=intro><?php echo _('Intro/Instructions');?></label>:<br/>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;} ?>
 	<div class=editor>
 		<textarea cols=50 rows=20 id=intro name=intro v-model="intro" style="width: 100%"></textarea>
 	</div><br class=form />
 
-	<span class=form><?php echo _('Show');?>:</span>
-	<span class=formright>
+	<span class=form id=showlabel><?php echo _('Show');?>:</span>
+	<span class=formright role=radiogroup aria-labelledby=showlabel>
 		<label>
 			<input type=radio name="avail" value="0" v-model="avail" />
 			<?php echo _('Hide');?>
@@ -139,8 +139,8 @@ $vueData = array(
 	</span><br class="form"/>
 
 	<div v-show="avail==1 && datesbylti==0">
-		<span class=form><?php echo _('Available After');?>:</span>
-		<span class=formright>
+		<span class=form id=afterlabel><?php echo _('Available After');?>:</span>
+		<span class=formright role=radiogroup aria-labelledby=afterlabel>
 			<label>
 				<input type=radio name="sdatetype" value="0" v-model="sdatetype" />
 				<?php echo _('Available always until end date');?>
@@ -149,14 +149,14 @@ $vueData = array(
 				<input type=radio name="sdatetype" value="sdate" v-model="sdatetype"/>
 				<?php echo _('Available after');?>
 			</label>
-			<input type=text size=10 name="sdate" v-model="sdate">
+			<input type=text size=10 name="sdate" v-model="sdate" aria-label="<?php echo _('show after date');?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=8 name=stime v-model="stime">
+			at <input type=text size=8 name=stime v-model="stime" aria-label="<?php echo _('show after time');?>">
 		</span><br class="form"/>
 
-		<span class=form><?php echo _('Available Until');?>:</span>
-		<span class=formright>
+		<span class=form id=untillabel><?php echo _('Available Until');?>:</span>
+		<span class=formright role=radiogroup aria-labelledby=untillabel>
 			<label>
 				<input type=radio name="edatetype" value="2000000000" v-model="edatetype" />
 				<?php echo _('Available always after start date');?>
@@ -165,10 +165,10 @@ $vueData = array(
 				<input type=radio name="edatetype" value="edate" v-model="edatetype"/>
 				<?php echo _('Due');?>
 			</label>
-			<input type=text size=10 name="edate" v-model="edate">
+			<input type=text size=10 name="edate" v-model="edate" aria-label="<?php echo _('show until date');?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', '<?php echo _('Start date');?>'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
+			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime" aria-label="<?php echo _('show until time');?>">
 		</span><br class="form"/>
 	</div>
 	<div v-show="avail==1 && datesbylti>0">
@@ -205,7 +205,7 @@ $vueData = array(
 				<?php echo _('Copy Options from');?>:
 			</label>
 			<span class=formright>
-				<select name="copyfrom" v-model="copyfrom">
+				<select name="copyfrom" id="copyfrom" v-model="copyfrom">
 					<option value="0"><?php echo _('None - use settings below');?></option>
 					<option v-for="option in reqscoreOptions" :value="option.value" :key="option.value">
 						{{ option.text }}
@@ -218,18 +218,18 @@ $vueData = array(
 			</span><br class=form />
 		</div>
 		<div v-show="copyfrom > 0">
-			<span class=form>Also copy:</span>
-			<span class=formright>
-				<input type=checkbox name="copysummary" value=1 /> <?php echo _('Summary');?><br/>
-				<input type=checkbox name="copyinstr" value=1 /> <?php echo _('Intro/Instructions');?><br/>
-				<input type=checkbox name="copydates" value=1 /> <?php echo _('Dates');?> <br/>
-				<input type=checkbox name="copyendmsg" value=1 /> <?php echo _('End of Assessment Messages');?>
+			<span class=form id=alsocopylabel>Also copy:</span>
+			<span class=formright role=group aria-labelledby=alsocopylabel>
+				<label><input type=checkbox name="copysummary" value=1 /> <?php echo _('Summary');?></label><br/>
+				<label><input type=checkbox name="copyinstr" value=1 /> <?php echo _('Intro/Instructions');?></label><br/>
+				<label><input type=checkbox name="copydates" value=1 /> <?php echo _('Dates');?></label> <br/>
+				<label><input type=checkbox name="copyendmsg" value=1 /> <?php echo _('End of Assessment Messages');?></label>
 			</span><br class=form />
 		</div>
 		<div v-show="copyfrom == 0">
 			<hr v-if="reqscoreOptions.length > 0" />
 		<div>
-			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All');?></a>
+			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All');?></a>&nbsp;
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All');?></a>
 		</div>
 		<div class="block grouptoggle">
@@ -277,14 +277,14 @@ $vueData = array(
 				<span v-if="defregens > 1">
 					<br/>
 					<?php echo _('With a penalty of');?>
-					<input type=number min=0 max=100 size=3 id="defregenpenalty"
+					<label><input type=number min=0 max=100 size=3 id="defregenpenalty"
 						name="defregenpenalty" v-model.number="defregenpenalty" />%
-					<?php echo _('per version');?>
+					<?php echo _('per version');?></label>
 					<span v-show="defregenpenalty>0">
 						<?php echo _('after');?>
-						<input type=number min=1 :max="Math.min(defregens,9)" size=3 id="defregenpenaltyaftern"
+						<label><input type=number min=1 :max="Math.min(defregens,9)" size=3 id="defregenpenaltyaftern"
 							name="defregenpenaltyaftern" v-model.number="defregenpenaltyaftern" />
-						<?php echo _('full-credit versions');?>
+						<?php echo _('full-credit versions');?></label>
 					</span>
 					<br/>
 					<span v-if="subtype == 'by_assessment'">
@@ -311,14 +311,14 @@ $vueData = array(
 				<span v-if="defattempts>1">
 					<br/>
 					<?php echo _('With a penalty of');?>
-					<input type=number min=0 max=100 size=3 id="defattemptpenalty"
+					<label><input type=number min=0 max=100 size=3 id="defattemptpenalty"
 						name="defattemptpenalty" v-model.number="defattemptpenalty" />%
-					<?php echo _('per try');?>
+					<?php echo _('per try');?></label>
 					<span v-show="defattemptpenalty>0">
 						<?php echo _('after');?>
-						<input type=number min=1 :max="defattemptpenalty>0 ? Math.min(defattempts,9) : 9" size=3 id="defattemptpenaltyaftern"
+						<label><input type=number min=1 :max="defattemptpenalty>0 ? Math.min(defattempts,9) : 9" size=3 id="defattemptpenaltyaftern"
 							name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern" />
-						<?php echo _('full-credit tries');?>
+						<?php echo _('full-credit tries');?></label>
 					</span>
 				</span>
 			</span><br class=form />
@@ -547,7 +547,7 @@ $vueData = array(
 				</span>
 			</span><br class=form />
 
-			<label class=form><?php echo _('Require Password (blank for none)');?>:</label>
+			<label class=form for=assmpassword><?php echo _('Require Password (blank for none)');?>:</label>
 			<span class=formright>
 				<input :type="revealpw?'text':'password'" name="assmpassword"
 					id="assmpassword" v-model="assmpassword" autocomplete="new-password">
@@ -677,7 +677,7 @@ $vueData = array(
 			<label for="minscore" class=form><?php echo _('Minimum score to receive credit');?>:</label>
 			<span class=formright>
 				<input type=text size=4 name=minscore id=minscore v-model="minscore">
-				<select name="minscoretype" v-model="minscoretype">
+				<select name="minscoretype" v-model="minscoretype" aria-label="<?php echo _('Minimum score type');?>">
 					<option value="0"><?php echo _('Points');?></option>
 					<option value="1"><?php echo _('Percent');?></option>
 				</select>

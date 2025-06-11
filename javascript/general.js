@@ -1442,6 +1442,7 @@ jQuery(document).ready(function($) {
 		blockitem.attr("id", "bi"+id);
 
 		$(this).attr("id", id).attr("aria-controls", "bi"+id)
+			.attr("role","button")
 			.attr("aria-expanded", !initclosed)
 			.attr("tabindex", 0)
 			.css("cursor", "pointer")
