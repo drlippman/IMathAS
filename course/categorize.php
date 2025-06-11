@@ -209,11 +209,11 @@ END;
 
 	foreach($itemarr as $qid) {
         if (!isset($qsetids[$qid])) { continue; }
-		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
-		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td>';
+		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\" aria-labelledby=\"qd".Sanitize::onlyInt($qid)."\"/></td>";
+		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td id="qd'.Sanitize::onlyInt($qid).'">';
 		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td>";
 		printf("<td><input type=button value=\""._("Preview")."\" onClick=\"previewq('selform', %d, %d);\"/></td>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
-		echo "<td><select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
+		echo "<td><select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\" aria-labelledby=\"qd".Sanitize::onlyInt($qid)."\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
 		echo ">"._("Uncategorized or Default")."</option>\n";
@@ -283,13 +283,13 @@ END;
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
 
 	}
-echo "<p>"._("Select first listed")." <select id=\"label\">\n";
+echo "<p><label>"._("Select first listed")." <select id=\"label\">\n";
 echo "<option value=\""._("Libraries")."\">"._("Libraries")."</option>";
 echo "<option value=\""._("Assessments")."\">"._("Assessments")."</option>";
 echo "</select>\n";
-echo _("for all uncategorized questions").": <input type=button value=\""._("Quick Pick")."\" label=\"XXX\" onclick=\"quickpick()\"></p>\n";
+echo _("for all uncategorized questions")."</label>: <input type=button value=\""._("Quick Pick")."\" label=\"XXX\" onclick=\"quickpick()\"></p>\n";
 
-	echo "<p>"._("Add new category to lists").": <input type=text id=\"newcat\" size=40> ";
+	echo "<p><label for=newcat>"._("Add new category to lists")."</label>: <input type=text id=\"newcat\" size=40> ";
 	echo "<input type=button value=\""._("Add Category")."\" onclick=\"addcategory()\"></p>\n";
 	echo '<p><input type=submit value="'._('Record Categorizations').'"> '._('and return to the Add/Remove Questions page').'.  <input type="button" class="secondarybtn" value="'._('Reset').'" onclick="resetcat()"/></p>';
 	echo "</form>\n";
