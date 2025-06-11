@@ -251,12 +251,13 @@ if (isset($_POST['checked'])) { //modifying existing
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ($qidlist)";
 			$stm = $DBH->query($query);
+			$cnt = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['attempts']==9999) {
 					$row['attempts'] = '';
 				}
 
-				$qrows[$row['id']] = '<tr><td>'.Sanitize::onlyInt($qns[$row['id']]).'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
+				$qrows[$row['id']] = '<tr><td>'.Sanitize::onlyInt($qns[$row['id']]).'</td><td id="qd'.$cnt.'">'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
 				$qrows[$row['id']] .= '<td>';
 				if ($row['extref']!='') {
 					$extref = explode('~~',$row['extref']);
@@ -277,8 +278,8 @@ if (isset($_POST['checked'])) { //modifying existing
 				}
 				$qrows[$row['id']] .= '</td>';
 				$qrows[$row['id']] .= '<td><button type="button" onclick="previewq('.$row['qsid'].')">'._('Preview').'</button></td>';
-				$qrows[$row['id']] .= "<td><input type=text size=3 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
-				$qrows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
+				$qrows[$row['id']] .= "<td><input type=text size=3 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" aria-labelledby=\"qd$cnt\" /></td>";
+				$qrows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\" aria-labelledby=\"qd$cnt\" >";
 				$qrows[$row['id']] .= '<option value="-1" '.(($row['showhints']==-1)?'selected="selected"':'').'>'._('Use Default').'</option>';
 				$qrows[$row['id']] .= '<option value="0" '.(($row['showhints']==0)?'selected="selected"':'').'>'._('No').'</option>';
 				$qrows[$row['id']] .= '<option value="1" '.(($row['showhints']==1)?'selected="selected"':'').'>'._('Hints').'</option>';
@@ -289,16 +290,17 @@ if (isset($_POST['checked'])) { //modifying existing
                 $qrows[$row['id']] .= '<option value="6" '.(($row['showhints']==6)?'selected="selected"':'').'>'._('Videos &amp; Examples').'</option>';
                 $qrows[$row['id']] .= '<option value="7" '.(($row['showhints']==7)?'selected="selected"':'').'>'._('Hints &amp; Videos &amp; Examples').'</option>';
                 $qrows[$row['id']] .= '</select></td>';
-                $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\">";
+                $qrows[$row['id']] .= "<td><select name=\"showwork{$row['id']}\" aria-labelledby=\"qd$cnt\" >";
                 foreach ($showworkoptions as $v=>$l) {
                     $qrows[$row['id']] .= '<option value="'.Sanitize::encodeStringForDisplay($v).'" '.($row['showwork']==$v ? 'selected':'').'>';
                     $qrows[$row['id']] .= Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 $qrows[$row['id']] .= '</select></td>';
-				$qrows[$row['id']] .= "<td><input type=text size=1 name=\"copies" . Sanitize::onlyInt($row['id']) . "\" value=\"0\" /></td>";
+				$qrows[$row['id']] .= "<td><input type=text size=1 name=\"copies" . Sanitize::onlyInt($row['id']) . "\" value=\"0\" aria-labelledby=\"qd$cnt\" /></td>";
 				$qrows[$row['id']] .= '</tr>';
+				$cnt++;
 			}
-			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
+			echo "<th aria-label=\"Question number\">Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
 			echo '<th>'._('Tries').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
 			echo '<th>'._('Show Hints &amp; Videos?').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
 			echo '<th>'._('Show Work?').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['showwork']).'</i></th>';
@@ -343,6 +345,7 @@ if (isset($_POST['checked'])) { //modifying existing
 			$checked = implode(',', array_map('intval', $_POST['nchecked']));
 			$stm = $DBH->query("SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ($checked)");
 			$first = true;
+			$cnt = 0;
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]=='multipart') {
 					preg_match('/anstypes\s*=(.*)/',$row[4],$match);
@@ -350,7 +353,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				} else {
 					$n = 1;
 				}
-				echo '<tr><td>'.Sanitize::encodeStringForDisplay($row[1]).'</td>';
+				echo '<tr><td id="qd'.$cnt.'">'.Sanitize::encodeStringForDisplay($row[1]).'</td>';
 				if ($row[2]!='') {
 					$extref = explode('~~',$row[2]);
 					$hasvid = false;  $hasother = false;
@@ -371,14 +374,14 @@ if (isset($_POST['checked'])) { //modifying existing
 					echo '<td></td>';
 				}
 				echo '<td><button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($row[0]).')">'._('Preview').'</button></td>';
-				echo "<td><input class=ptscol type=text size=2 name=\"points" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"\" />";
+				echo "<td><input class=ptscol type=text size=2 name=\"points" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"\" aria-labelledby=\"qd$cnt\" />";
 				if ($first) {
 					echo '<input type=hidden name="firstqsetid" value="'.Sanitize::onlyInt($row[0]).'" />';
 					$first = false;
 				}
 				echo '<input type="hidden" name="qparts'.Sanitize::encodeStringForDisplay($row[0]).'" value="'.Sanitize::onlyInt($n).'"/></td>';
-				echo "<td><input type=text size=3 name=\"attempts" . Sanitize::encodeStringForDisplay($row[0]) ."\" value=\"\" /></td>";
-				echo "<td><select name=\"showhints" . Sanitize::encodeStringForDisplay($row[0]) . "\">";
+				echo "<td><input type=text size=3 name=\"attempts" . Sanitize::encodeStringForDisplay($row[0]) ."\" value=\"\" aria-labelledby=\"qd$cnt\"/></td>";
+				echo "<td><select name=\"showhints" . Sanitize::encodeStringForDisplay($row[0]) . "\" aria-labelledby=\"qd$cnt\">";
 				echo '<option value="-1" selected="selected">'._('Use Default').'</option>';
 				echo '<option value="0">'._('No').'</option>';
 				echo '<option value="1">'._('Hints').'</option>';
@@ -389,21 +392,22 @@ if (isset($_POST['checked'])) { //modifying existing
                 echo '<option value="6">'._('Videos &amp; Examples').'</option>';
                 echo '<option value="7">'._('Hints &amp; Videos &amp; Examples').'</option>';
                 echo '</select></td>';
-                echo "<td><select name=\"showwork" . Sanitize::encodeStringForDisplay($row[0]) . "\">";
+                echo "<td><select name=\"showwork" . Sanitize::encodeStringForDisplay($row[0]) . "\" aria-labelledby=\"qd$cnt\">";
                 foreach ($showworkoptions as $v=>$l) {
                     echo '<option value="'.$v.'" '.($v==-1 ?'selected':'').'>';
                     echo Sanitize::encodeStringForDisplay($l).'</option>';
                 }
                 echo '</select></td>';
-				echo "<td><input type=text size=1 name=\"copies" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"1\" /></td>";
+				echo "<td><input type=text size=1 name=\"copies" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"1\" aria-labelledby=\"qd$cnt\"/></td>";
 				echo '</tr>';
+				$cnt++;
 			}
 			echo '</tbody></table>';
 			echo '<input type=hidden name="qsetids" value="'.Sanitize::encodeStringForDisplay(implode(',',$_POST['nchecked'])).'" />';
 			echo '<input type=hidden name="add" value="true" />';
 
-			echo '<p><input type=checkbox name="addasgroup" value="1" onclick="chgisgrouped()"/> Add as a question group?</p>';
-			echo '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
+			echo '<p><label><input type=checkbox name="addasgroup" value="1" onclick="chgisgrouped()"/> Add as a question group?</label></p>';
+			echo '<p><label><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</label></p>';
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
