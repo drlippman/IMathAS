@@ -7,8 +7,8 @@ $(function() {
         $("#searchwrap").toggleClass("hastext", e.currentTarget.value.trim() !== '');
     });
     $("#addbar button").on('focus', function(e) {
-        if ($(this).closest("#addbar").hasClass("sr-only")) {
-            $(this).closest("#addbar").removeClass("sr-only").removeClass("footerbar");
+        if (!$(this).closest("#addbar").hasClass("nofooterbar")) {
+            $(this).closest("#addbar").removeClass("sr-only").removeClass("footerbar").addClass("nofooterbar");
         }
     });
 });
@@ -425,6 +425,9 @@ function displayQuestionList(results) {
     initSortTable('myTable', sortinit);
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
+             if (!$("#addbar").hasClass("nofooterbar")) {
+                $("#addbar").addClass("footerbar");
+             }
              $("#addbar.footerbar").toggleClass("sr-only", $("#selq input[type=checkbox]:checked").length == 0);
          });
     }

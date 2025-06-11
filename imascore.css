@@ -362,7 +362,7 @@ span.left {
 .screenreader, .sr-only {
 	position: absolute;
 	right: 0px;
-	top: 0px;
+	top: auto;
 	width: 1px;
 	height: 1px;
 	overflow: hidden;
