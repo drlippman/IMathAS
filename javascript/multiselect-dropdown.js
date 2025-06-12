@@ -153,6 +153,9 @@ function MultiselectDropdown(options){
       style:{height:config.height},
       role: "listbox"
     });
+    if ($("label[for='"+el.id+"']").length) {
+      div.setAttribute("aria-label", $("label[for='"+el.id+"']").text());
+    }
     //var search=newEl('input',{class:['multiselect-dropdown-search'].concat([config.searchInput?.class??'form-control']),style:{width:'100%',display:el.attributes['multiselect-search']?.value==='true'?'block':'none'},placeholder:config.txtSearch});
     //listWrap.appendChild(search);
     div.appendChild(listWrap);
