@@ -273,11 +273,11 @@ if ($started) {
 ?>
 
 	<form method=post action="addwiki.php<?php echo $page_formActionTag; ?>">
-		<span class=form>Wiki Name: </span>
-		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>" required /></span>
+		<label for=name class=form>Wiki Name: </label>
+		<span class=formright><input type=text size=60 name=name id=name value="<?php echo str_replace('"','&quot;',$line['name']);?>" required /></span>
 		<BR class=form>
 
-		Description: (shows on course page)<BR>
+		<label for=description>Description: (shows on course page)</label><br/>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
 		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
@@ -285,35 +285,35 @@ if ($started) {
 
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);"/>Show Always<br/>
+			<label><input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Hide</label><br/>
+			<label><input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);"/>Show by Dates</label><br/>
+			<label><input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);"/>Show Always</label><br/>
 		</span><br class="form"/>
 
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
-			Always until end date<br/>
-			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
+			<label><input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			Always until end date</label><br/>
+			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?> aria-label="show after a date"/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="show after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="show after time">
 		</span><BR class=form>
 
 		<span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
-			 Always after start date<br/>
-			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>">
+			<label><input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
+			 Always after start date</label><br/>
+			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="show until a date"/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="show until date">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="show until time">
 		</span><BR class=form>
 		</div>
-		<span class=form>Group wiki?</span><span class=formright>
+		<label for=groupsetid class=form>Group wiki?</label><span class=formright>
 <?php
 if ($started) {
 	writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
@@ -326,13 +326,13 @@ if ($started) {
 
 		<span class=form>Students can edit:</span>
 		<span class=formright>
-			<input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always<br/>
-			<input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before:
-			<input type=text size=10 name="rdate" value="<?php echo $rdate;?>">
+			<label><input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always</label><br/>
+			<label><input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/>Never</label><br/>
+			<label><input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before</label>:
+			<input type=text size=10 name="rdate" value="<?php echo $rdate;?>" aria-label="edit before date">
 			<a href="#" onClick="displayDatePicker('rdate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>">
+			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>" aria-label="edit before time">
 		</span><br class="form" />
 
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
