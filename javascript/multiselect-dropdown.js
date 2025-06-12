@@ -153,8 +153,12 @@ function MultiselectDropdown(options){
       style:{height:config.height},
       role: "listbox"
     });
-    if ($("label[for='"+el.id+"']").length) {
+    if (el.hasAttribute("aria-label")) {
+      div.setAttribute("aria-label", el.getAttribute("aria-label"));
+    } else if ($("label[for='"+el.id+"']").length) {
       div.setAttribute("aria-label", $("label[for='"+el.id+"']").text());
+    } else if ($(el).closest("label").length) {
+      div.setAttribute("aria-label", $(el).closest("label").text());
     }
     //var search=newEl('input',{class:['multiselect-dropdown-search'].concat([config.searchInput?.class??'form-control']),style:{width:'100%',display:el.attributes['multiselect-search']?.value==='true'?'block':'none'},placeholder:config.txtSearch});
     //listWrap.appendChild(search);
