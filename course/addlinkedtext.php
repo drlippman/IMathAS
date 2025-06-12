@@ -513,17 +513,17 @@ if ($overwriteBody==1) {
 	<div id="headeraddlinkedtext" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
-		<span class=form>Title: </span>
-		<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>" required />
+		<label for=title class=form>Title: </label>
+		<span class=formright><input type=text size=60 name=title id=title value="<?php echo str_replace('"','&quot;',$line['title']);?>" required />
 		</span><BR class=form>
 
-		<?php echo _("Summary: (shows on course page)"); ?><BR>
+		<label for=summary><?php echo _("Summary: (shows on course page)"); ?></label><br/>
 		<div class=editor>
 			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary'], true);?></textarea>
 		</div>
 		<br/>
 
-		<span class=form><?php echo _("Link type:"); ?> </span>
+		<label for=linktype class=form><?php echo _("Link type:"); ?> </label>
 		<span class="formright">
 		<select id="linktype" name="linktype" onchange="linktypeupdate(this)">
 			<option value="text" <?php writeHtmlSelected($type,'text');?>><?php echo _("Page of text"); ?></option>
@@ -534,20 +534,20 @@ if ($overwriteBody==1) {
 		</span><br class="form"/>
 
 		<div id="textinput" <?php if ($type != 'text') {echo 'style="display:none;"';}?> >
-			Text<BR>
+			<label for=text>Text</label><br/>
 			<div class=editor>
 				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text'], true);?></textarea>
 			</div>
 		</div>
 		<div id="webinput" <?php if ($type != 'web') {echo 'style="display:none;"';}?> >
-			<span class="form"><?php echo ("Weblink (start with http://)"); ?></span>
+			<label for=web class="form"><?php echo ("Weblink (start with https://)"); ?></label>
 			<span class="formright">
-				<input size="80" name="web" value="<?php echo Sanitize::encodeStringForDisplay($webaddr);?>" />
+				<input size="80" name="web" id="web" value="<?php echo Sanitize::encodeStringForDisplay($webaddr);?>" />
 			</span><br class="form">
 
 		</div>
 		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
-			<span class="form">File</span>
+			<label for=userfile class="form">File</label>
 			<input type="hidden" name="MAX_FILE_SIZE" value="15000000" />
 			<span class="formright">
 			<?php if ($filename != '') {
@@ -559,17 +559,17 @@ if ($overwriteBody==1) {
 				echo _('Attach ');
 			}
 			?>
-			file (Max 15MB): <input name="userfile" type="file" />
+			file (Max 15MB): <input name="userfile" id=userfile type="file" />
 			</span><br class="form">
 		</div>
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>
-			<span class="form"><?php echo _("External Tool"); ?></span>
+			<label for=tool class="form"><?php echo _("External Tool"); ?></label>
 			<span class="formright">
 			<?php
 			if (count($toolvals)>0) {
 				writeHtmlSelect('tool',$toolvals,$toollabels,$selectedtool);
-				echo '<br/>',_('Custom parameters:'),' <input type="text" name="toolcustom" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustom).'" /><br/>';
-				echo _('Custom launch URL:'),' <input type="text" name="toolcustomurl" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustomurl).'" /><br/>';
+				echo '<br/><label>',_('Custom parameters:'),' <input type="text" name="toolcustom" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustom).'" /></label><br/>';
+				echo '<label>',_('Custom launch URL:'),' <input type="text" name="toolcustomurl" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustomurl).'" /></label><br/>';
 			} else {
 				echo _('No Tools defined yet').'<br/>';
 			}
@@ -581,16 +581,16 @@ if ($overwriteBody==1) {
 			</span><br class="form"/>
 			<span class="form"><?php echo _("If this tool returns scores, do you want to record them?"); ?></span>
 			<span class="formright">
-			<input type=radio name="usegbscore" value="0" <?php if ($points==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
-			<input type=radio name="usegbscore" value="1" <?php if ($points>0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes
+			<label><input type=radio name="usegbscore" value="0" <?php if ($points==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No</label><br/>
+			<label><input type=radio name="usegbscore" value="1" <?php if ($points>0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes</label>
 			</span><br class="form"/>
 			<div id="gbdetail" <?php if ($points==0) { echo 'style="display:none;"';}?>>
-			<span class="form"><?php echo _("Points:"); ?></span>
+			<label for=points class="form"><?php echo _("Points:"); ?></label>
 			<span class="formright">
-				<input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points); ?>"/> points
+				<input type=text size=4 name="points" id=points value="<?php echo Sanitize::encodeStringForDisplay($points); ?>"/> points
 			</span><br class="form"/>
-			<span class=form><?php echo _("Gradebook Category:"); ?></span>
-				<span class=formright>
+			<label for=gbcat class=form><?php echo _("Gradebook Category:"); ?></label>
+			<span class=formright>
 
 	<?php
 		writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
@@ -598,13 +598,13 @@ if ($overwriteBody==1) {
 			</span><br class=form>
 			<span class=form>Count: </span>
 			<span class="formright">
-				<input type=radio name="cntingb" value="1" <?php writeHtmlChecked($cntingb,1,0); ?> /> <?php echo _("Count in Gradebook"); ?><br/>
-				<input type=radio name="cntingb" value="0" <?php writeHtmlChecked($cntingb,0,0); ?> /> <?php echo _("Don't count in grade total and hide from students"); ?><br/>
-				<input type=radio name="cntingb" value="3" <?php writeHtmlChecked($cntingb,3,0); ?> /> <?php echo _("Don't count in grade total"); ?><br/>
-				<input type=radio name="cntingb" value="2" <?php writeHtmlChecked($cntingb,2,0); ?> /> <?php echo _("Count as Extra Credit"); ?>
+				<label><input type=radio name="cntingb" value="1" <?php writeHtmlChecked($cntingb,1,0); ?> /> <?php echo _("Count in Gradebook"); ?></label><br/>
+				<label><input type=radio name="cntingb" value="0" <?php writeHtmlChecked($cntingb,0,0); ?> /> <?php echo _("Don't count in grade total and hide from students"); ?></label><br/>
+				<label><input type=radio name="cntingb" value="3" <?php writeHtmlChecked($cntingb,3,0); ?> /> <?php echo _("Don't count in grade total"); ?></label><br/>
+				<label><input type=radio name="cntingb" value="2" <?php writeHtmlChecked($cntingb,2,0); ?> /> <?php echo _("Count as Extra Credit"); ?></label>
 			</span><br class=form>
-			<span class="form"><?php echo _("Tutor Access:"); ?></span>
-				<span class="formright">
+			<label for=tutoredit class="form"><?php echo _("Tutor Access:"); ?></label>
+			<span class="formright">
 	<?php
 		writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
 		echo '<input type="hidden" name="gradesecret" value="'.Sanitize::encodeStringForDisplay($gradesecret).'"/>';
@@ -615,60 +615,60 @@ if ($overwriteBody==1) {
 
 		<span class="form"><?php echo _("Open page in:"); ?></span>
 		<span class="formright">
-			<input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/><?php echo _("Current window"); ?>/tab<br/>
-			<input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/><?php echo _("New window"); ?>/tab<br/>
+			<label><input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/><?php echo _("Current window"); ?>/tab</label><br/>
+			<label><input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/><?php echo _("New window"); ?>/tab</label><br/>
 		</span><br class="form"/>
 
 		<span class=form><?php echo _("Show:"); ?></span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/><?php echo _("Hide"); ?><br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/><?php echo _("Show by Dates"); ?><br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/><?php echo _("Show Always"); ?><br/>
+			<label><input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/><?php echo _("Hide"); ?></label><br/>
+			<label><input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/><?php echo _("Show by Dates"); ?></label><br/>
+			<label><input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/><?php echo _("Show Always"); ?></label><br/>
 		</span><br class="form"/>
 
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 		<span class=form><?php echo _("Available After:"); ?></span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
-			<?php echo _("Always until end date"); ?><br/>
-			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
+			<label><input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			<?php echo _("Always until end date"); ?></label><br/>
+			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?> aria-label="<?php echo _('show after a date'); ?>"/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="<?php echo _('show after date'); ?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="<?php echo _('show after time'); ?>">
 		</span><BR class=form>
 
 		<span class=form><?php echo _("Available Until:"); ?></span><span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> <?php echo _("Always after start date"); ?><br/>
-			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>">
+			<label><input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> <?php echo _("Always after start date"); ?></label><br/>
+			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="<?php echo _('show until a date'); ?>"/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="<?php echo _('show until date'); ?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="<?php echo _('show until time'); ?>">
 		</span><BR class=form>
 
 		<span class=form><?php echo _("Place on Calendar?"); ?></span>
 		<span class=formright>
-			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> <?php echo _("No"); ?><br/>
-			<input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> <?php echo _("Yes, on Available after date (will only show after that date)"); ?><br/>
-			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> <?php echo _("Yes, on Available until date"); ?><br/>
-			<?php echo _("With tag:"); ?> <input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']);?>"/>
+			<label><input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> <?php echo _("No"); ?></label><br/>
+			<label><input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> <?php echo _("Yes, on Available after date (will only show after that date)"); ?></label><br/>
+			<label><input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> <?php echo _("Yes, on Available until date"); ?></label><br/>
+			<label><?php echo _("With tag:"); ?> <input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']);?>"/></label>
 		</span><br class="form" />
 		</div>
 		<div id="altcaldiv" style="display:<?php echo ($line['avail']==2)?"block":"none"; ?>">
 		<span class=form><?php echo _("Place on Calendar?"); ?></span>
 		<span class=formright>
-			<input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No<br/>
-			<input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on
-			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>">
+			<label><input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No</label><br/>
+			<label><input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on</label>
+			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>" aria-label="Show on calendar date">
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> <br/>
-			<?php echo _("With tag:"); ?> <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']);?>"/>
+			<label><?php echo _("With tag:"); ?> <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']);?>"/>
 		</span><BR class=form>
 		</div>
 <?php
 	if (count($outcomes)>0) {
-			echo '<span class="form">',_('Associate Outcomes:'),'</span></span class="formright">';
+			echo '<label for=outcomes class="form">',_('Associate Outcomes:'),'</label></span class="formright">';
 			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,_('Select an outcome...'));
 			echo '</span><br class="form"/>';
 	}
