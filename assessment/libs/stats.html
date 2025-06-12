@@ -317,7 +317,17 @@ boxplot(array,axislabel,[options])
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nplus1: percentile method, using .25*(n+1)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TI: TI calculator method, a mix of n and nplus1 methods
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Excel: A method based on (n-1), with some linear interpolation
+<BR>&nbsp;&nbsp;&nbsp;"width" = width of the boxplot
 <BR>For backwards compatability, options can also just be an array of datalabels
+<p>Examples using options array:</p>
+<pre>
+  $opts = ['qmethod'=>'N', 'width'=>300]
+  $b = boxplot($data, "Heights", $opts)
+</pre>
+<p>or</p>
+<pre>
+  $b = boxplot([$data1,$data2],"Heights", ['datalabels'=>['Group 1','Group 2'], 'showvals'=>true])
+</pre>
 <BR><h3><a name="normalcdf">normalcdf</a></h3>
 normalcdf(z,[dec])
 <BR>calculates the area under the standard normal distribution to the left of the
