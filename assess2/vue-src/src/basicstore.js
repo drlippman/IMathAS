@@ -13,6 +13,7 @@ export const store = reactive({
   inTransit: false,
   autoSaving: false,
   errorMsg: null,
+  blankOverride: false,
   confirmObj: null,
   lastLoaded: [],
   inProgress: false,
@@ -239,6 +240,8 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        // reset blankOverride when a new question is loaded
+        store.blankOverride = false;
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -401,11 +404,47 @@ export const actions = {
         changedWork = true;
       }
     }
+    // reset override when all parts are now answered
+    for (const key of Object.keys(changedQuestions)) {
+      const qn = parseInt(key);
+      const question = store.assessInfo.questions[qn];
+      const totalParts = question.answeights ? question.answeights.length : question.parts.length;
+      const answeredParts = changedQuestions[qn].length;
+      if (answeredParts === totalParts) {
+        store.blankOverride = false;
+        store.errorMsg = null;
+        break;
+      }
+    }
+    // blank-parts warning (only once): if some but not all parts are answered
+    for (const key of Object.keys(changedQuestions)) {
+      const qn = parseInt(key);
+      const question = store.assessInfo.questions[qn];
+      const totalParts = question.answeights ? question.answeights.length : question.parts.length;
+      const answeredParts = changedQuestions[qn].length;
+      if (answeredParts > 0 && answeredParts < totalParts) {
+        // first warning: block and set override
+        if (!store.blankOverride) {
+          store.errorMsg = 'blankparts';
+          store.inTransit = false;
+          store.blankOverride = true;
+          return;
+        }
+        // override present: clear the warning and allow submission through
+        store.errorMsg = null;
+        store.inTransit = false;
+        break;
+      }
+    }
     if (Object.keys(changedQuestions).length === 0 && !changedWork && !endattempt) {
       store.errorMsg = 'nochange';
       store.inTransit = false;
       return;
     }
+    // Do not clear blankOverride here; only clear it after successful submission
+
+    // Clone changedQuestions before AJAX for later blankOverride logic
+    const submittedChangedQuestions = { ...changedQuestions };
 
     window.MQeditor.resetEditor();
     window.imathasAssess.clearTips();
@@ -510,6 +549,21 @@ export const actions = {
           return;
         } else {
           store.errorMsg = null;
+          // only reset override if submission was not partial
+          let wasPartial = false;
+          for (const key in submittedChangedQuestions) {
+            const qn = parseInt(key);
+            const question = store.assessInfo.questions[qn];
+            const totalParts = question.answeights ? question.answeights.length : question.parts.length;
+            const answeredParts = submittedChangedQuestions[qn].length;
+            if (answeredParts > 0 && answeredParts < totalParts) {
+              wasPartial = true;
+              break;
+            }
+          }
+          if (!wasPartial) {
+            store.blankOverride = false;
+          }
         }
         if (response.saved_autosaves) {
           this.markAutosavesDone();
