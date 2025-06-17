@@ -1,6 +1,7 @@
 <?php
 
 require_once "../init.php";
+require_once "../includes/videodata.php";
 
 $what = 'cid';
 
@@ -13,9 +14,11 @@ if (isset($_GET['scan']) && $_GET['scan'] === 'myqs') {
 } 
 
 $errors = [];
+$vidids = [];
+$vidlocs = [];
 $asciisvgpattern = '/^showasciisvg\(\s*((("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])+,\s*){0,2}("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])?\s*)?\)$/';
 function a11yscan($content, $field, $type, $itemname, $link='') {
-    global $asciisvgpattern;
+    global $asciisvgpattern,$vidids,$vidlocs;
     // ensure regex considers \" as well as " to account for encoding
     $content = str_replace(['\\\'','\\"', "'"], ['"','"','"'], $content);
     // look for empty text, or missing alt text.  sloppy, but works
@@ -31,6 +34,15 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
     // does not account for use of replacealttext later in the question
     if (preg_match($asciisvgpattern, $content)) {
         adderror(_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link); 
+    }
+    // look for youtube videos
+    if (preg_match_all('/((youtube\.com|youtu\.be)[^>]*?)"/', $content, $matches, PREG_SET_ORDER)) {
+        foreach ($matches as $m) {
+            if (($vidid = getvideoid($m[1])) !== '') {
+                $vidids[] = $vidid;
+                $vidlocs[$vidid] = [$field, $type, $itemname, $link];
+            }
+        }
     }
 }
 function adderror($descr, $loc, $itemtype, $itemname, $link) {
@@ -142,6 +154,43 @@ if ($what === 'cid') {
     }
 }
 
+if (count($vidids) > 0 && isset($CFG['YouTubeAPIKey'])) {
+    $vidids = array_values(array_unique($vidids));
+    $ph = Sanitize::generateQueryPlaceholders($vidids);
+    $stm = $DBH->prepare("SELECT vidid,captioned,status FROM imas_captiondata WHERE vidid IN ($ph)");
+    $stm->execute($vidids);
+    $viddata = [];
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $viddata[$row['vidid']] = [$row['captioned'], $row['status']];
+    }
+    $vidtoqueue = [];
+    foreach ($vidids as $vidid) {
+        if (!isset($viddata[$vidid]) || ($viddata[$vidid][0] == 0 && $viddata[$vidid][1] == 0)) {
+            adderror(sprintf(_('Potentially uncaptioned video (ID %s; this video will be scanned in the next few days to check for captions)'), $vidid),
+                $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
+            if (!isset($viddata[$vidid])) {
+                $vidtoqueue[] = $vidid;
+            }
+        } else if ($viddata[$vidid][1] == 3) {
+            adderror(sprintf(_('Missing/broken video (ID %s)'), $vidid),
+                $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
+        } else if ($viddata[$vidid][0] == 0 && $viddata[$vidid][1] > 0) {
+            adderror(sprintf(_('Uncaptioned video (ID %s)'), $vidid),
+                $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
+        }
+    }
+    if (count($vidtoqueue) > 0) {
+        $insarr = [];
+        $now = time();
+        foreach ($vidtoqueue as $vidid) {
+            array_push($insarr, $vidid, $now);
+        }
+        $ph = Sanitize::generateQueryPlaceholdersGrouped($insarr,2);
+        $stm = $DBH->prepare("INSERT IGNORE INTO imas_captiondata (vidid,lastchg) VALUES $ph");
+        $stm->execute($insarr);
+    }
+}
+
 
 $pagetitle = _('Accessibility Report');
 
@@ -159,7 +208,11 @@ if ($what === 'myqs') {
 } else {
     echo '<p>'._('This report scans items in your course for accessibility issues.').' ';
 }
-echo _('Currently it will only identify images that are missing alt text, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
+if (isset($CFG['YouTubeAPIKey'])) {
+    echo _('Currently it will only identify images that are missing alt text, and YouTube videos that do not have manual captions. It does not scan videos hosted elsewhere. Some YouTube videos might come back as "Potentially Uncaptioned", which just means we do not know yet; the video will be added to a queue and scanned in the next few days to check if has captions. The report will be updated once we have that information, so check back in a week or so.'). '</p>';
+} else {
+    echo _('Currently it will only identify images that are missing alt text, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
+}
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
 echo '<ul>';

@@ -70,7 +70,9 @@ These are all added to the `config.php` by the install script.
 make sure you also edit your config.php and make sure the PDO connection includes a charset.  If it doesn't already, you'll want to add <code>;charset=latin1</code> to 
 the connection string (after the host= and dbname= portions) to ensure the encoding remains
 the same as the 5.x default after upgrade.  If on a new install, it's better to use <code>;charset=utf8mb4</code>.
-- `$CFG['YouTubeAPIKey']`: If the caption detection on videos attached to questions stops working, set this to your YouTube Data API v3 key, obtained from Google Cloud Platform, to use a more reliable method.
+- `$CFG['YouTubeAPIKey']`: To get caption detection on videos attached to questions to work, set this to your YouTube Data API v3 key, obtained from Google Cloud Platform.
+    - To get accessibility reports to process queued caption lookups, the `/util/queuecaptiondata.php` script needs to be called regularly, probably once a day right before midnight Pacific time.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['video']['authcode']` and make a scheduled web call to  `/util/queuecaptiondata.php?authcode=####` using the code you define. 
+    - You can define `$CFG['video']['maxpull']` to control the max number of API calls made by queue.
 
 ### System Defaults
 

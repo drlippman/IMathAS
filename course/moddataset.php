@@ -130,6 +130,9 @@
 				$captioned = 0;
 			} else if (isset($CFG['YouTubeAPIKey'])) {
                 $captioned = getCaptionDataByVidId($vidid);
+				if ($captioned === false || $captioned === '404') {
+					$captioned = 0;
+				}
             }
             $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
 			$newextref[] = $_POST['helptype'].'!!'.trim($_POST['helpurl']).'!!'.$captioned.'!!'.$helpdescr;

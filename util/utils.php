@@ -172,6 +172,37 @@ if (isset($_POST['updatecaptionbyqids'])) {
 	echo '<p>Updated '.$updatedcnt.' records.</p><p><a href="utils.php">Utils</a></p>';
 	exit;
 }
+if (isset($_POST['exportcaptions'])) {
+	$from = intval($_POST['exportcaptions']);
+	$stm = $DBH->prepare("SELECT * FROM imas_captiondata WHERE lastchg>?");
+	$stm->execute([$from]);
+	$out = $stm->fetchAll(PDO::FETCH_ASSOC);
+	header('Content-Type: application/json'); 
+	header('Content-Disposition: attachment; filename="captiondata.json"'); 
+	echo json_encode($out);
+	exit;
+}
+
+
+if (isset($_FILES['importcaptions'])) {
+	if (is_uploaded_file($_FILES['importcaptions']['tmp_name'])) {
+		$json = json_decode(file_get_contents($_FILES['importcaptions']['tmp_name']), true);
+		$qarr = [];
+		foreach ($json as $data) {
+			array_push($qarr, $data['vidid'], $data['captioned'], $data['status'], $data['lastchg']);
+		}
+		$ph = Sanitize::generateQueryPlaceholdersGrouped($qarr, 4);
+		$query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES $ph ";
+        $query .= "ON DUPLICATE KEY UPDATE status=IF(VALUES(captioned)>captioned OR status=0,VALUES(status),status),";
+        $query .= "lastchg=IF(VALUES(captioned)>captioned OR status=0,VALUES(lastchg),lastchg),";
+        $query .= "captioned=IF(VALUES(captioned)>captioned OR status=0,VALUES(captioned),captioned)";
+		$stm = $DBH->prepare($query);
+		$stm->execute($qarr);
+		echo count($json) . ' records read. ';
+		echo $stm->rowCount() . ' rows updated.';
+	}
+	exit;
+}
 
 if (isset($_GET['fixdupgrades'])) {
 	$query = 'DELETE imas_grades FROM imas_grades JOIN ';
@@ -286,6 +317,22 @@ if (isset($_GET['form'])) {
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo 'Question IDs to rescan videos on (comma separated):<br><input type="text" size="80" name="updatecaptionbyqids"/>';
+		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
+		require_once "../footer.php";
+	} else if ($_GET['form']=='exportcaptions') {
+		require_once "../header.php";
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Export Caption Data</div>';
+		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
+		echo 'Export changes since timestamp: <input type="text" size="11" name="exportcaptions" value="0"/>';
+		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
+		require_once "../footer.php";
+	} else if ($_GET['form']=='importcaptions') {
+		require_once "../header.php";
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Import Caption Data</div>';
+		echo '<form method="post" enctype="multipart/form-data" action="'.$imasroot.'/util/utils.php">';
+		echo 'Import JSON file: <input type="file" name="importcaptions" />';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
 		require_once "../footer.php";
@@ -450,6 +497,8 @@ if (isset($_GET['form'])) {
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';
 	echo '<a href="utils.php?form=updatecaption">Update YouTube video caption data by video ID</a><br/>';
 	echo '<a href="utils.php?form=updatecaptionbyqids">Update YouTube video caption data by Question IDs</a><br/>';
+	echo '<a href="utils.php?form=exportcaptions">Export Captions database</a><br/>';
+	echo '<a href="utils.php?form=importcaptions">Import to Captions database</a><br/>';
 	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
 	echo '<a href="utils.php?form=rescue">Recover lost items</a><br/>';
 	echo '<a href="utils.php?fixorphanqs=true">Fix orphaned questions</a><br/>';

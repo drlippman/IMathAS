@@ -31,9 +31,10 @@ function getvideoid($url) {
 	return Sanitize::simpleString($vidid);
 }
 
+// temp store so we don't scan the same video twice in one script
 $youtubeCaptionDatastore = [];
 function getCaptionDataByVidId($vidid) {
-    global $CFG, $youtubeCaptionDatastore;
+    global $CFG, $DBH, $youtubeCaptionDatastore;
     
     if (isset($youtubeCaptionDatastore[$vidid])) {
         return $youtubeCaptionDatastore[$vidid];
@@ -43,6 +44,19 @@ function getCaptionDataByVidId($vidid) {
         $captioned = 0;
         $ctx = stream_context_create(array('http'=>array('timeout' => 1)));
         $resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.$vidid.'&key='.$CFG['YouTubeAPIKey'], false, $ctx);
+        if ($resp === false) {
+            $code = explode(' ', $http_response_header[0])[1];
+            if ($code == '404') {
+                $query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES (?,0,3,?) ";
+                $query .= "ON DUPLICATE KEY UPDATE status=VALUES(status),";
+                $query .= "lastchg=VALUES(lastchg),";
+                $query .= "captioned=VALUES(captioned)";
+                $novid = $DBH->prepare($query);
+                $novid->execute([$vidid, time()]);
+                return '404';
+            }
+            return false;
+        }
         $capdata = json_decode($resp, true);
         if ($capdata !== null && isset($capdata['items'])) {
             foreach ($capdata['items'] as $cap) {
@@ -52,6 +66,12 @@ function getCaptionDataByVidId($vidid) {
                 }
             }
         }
+        $query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES (?,?,2,?) ";
+        $query .= "ON DUPLICATE KEY UPDATE status=IF(VALUES(captioned)!=captioned OR status=0,VALUES(status),status),";
+        $query .= "lastchg=IF(VALUES(captioned)!=captioned OR status=0,VALUES(lastchg),lastchg),";
+        $query .= "captioned=IF(VALUES(captioned)!=captioned OR status=0,VALUES(captioned),captioned)";
+        $stm = $DBH->prepare($query);
+        $stm->execute([$vidid, $captioned, time()]);
     } else {
         $ctx = stream_context_create(array('http'=>
             array(
@@ -67,5 +87,6 @@ function getCaptionDataByVidId($vidid) {
     }
 
     $youtubeCaptionDatastore[$vidid] = $captioned;
+
     return $captioned;
 }

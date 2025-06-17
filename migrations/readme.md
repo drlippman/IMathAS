@@ -23,3 +23,11 @@ This will allow migrations to be halted on errors.
 - For database operations, `$DBH` may be used within migration scripts.
 - It is recommended to wrap the migration in a transaction
 - The boolean `$isDBsetup` can be used to determine if the migration is being run as part of the initial database install.
+
+## Special values of imas_dbscheme
+
+- 1: Very old migration tracker
+- 2: guest temp account tracker
+- 5: last time tagcoursecleanup was run
+- 6: last time sendzeros was run
+- 7: last question ID processed by captiondata scraper
