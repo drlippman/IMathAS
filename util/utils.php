@@ -193,9 +193,9 @@ if (isset($_FILES['importcaptions'])) {
 		}
 		$ph = Sanitize::generateQueryPlaceholdersGrouped($qarr, 4);
 		$query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES $ph ";
-        $query .= "ON DUPLICATE KEY UPDATE status=IF(VALUES(captioned)>captioned OR status=0,VALUES(status),status),";
-        $query .= "lastchg=IF(VALUES(captioned)>captioned OR status=0,VALUES(lastchg),lastchg),";
-        $query .= "captioned=IF(VALUES(captioned)>captioned OR status=0,VALUES(captioned),captioned)";
+        $query .= "ON DUPLICATE KEY UPDATE status=IF(VALUES(captioned)>captioned OR status=0 OR status=3,VALUES(status),status),";
+        $query .= "lastchg=IF(VALUES(captioned)>captioned OR status=0 OR status=3,VALUES(lastchg),lastchg),";
+        $query .= "captioned=IF(VALUES(captioned)>captioned OR status=0 OR status=3,VALUES(captioned),captioned)";
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);
 		echo count($json) . ' records read. ';
