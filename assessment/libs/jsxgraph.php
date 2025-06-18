@@ -229,7 +229,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 			
 			// Add event listener
 			$out .= ';';
-			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($id.Value().toFixed(8)); });";
+			$out .= "board_{$boardID}.on('update', function () { if (this.initSetupDone){ $('#qn{$box}, #tc{$box}').val($id.Value().toFixed(8)); }});";
 			
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "slider", [$min, $max]); 
 	
@@ -314,7 +314,7 @@ function jsxPoint(&$board, $param, $ops=array()) {
 			
 			$out .= ';';
 			$answerfill = "'(' + $id.X().toFixed(4) + ',' + $id.Y().toFixed(4) + ')'";
-			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($answerfill); });";
+			$out .= "board_{$boardID}.on('update', function () { if (this.initSetupDone){ $('#qn{$box}, #tc{$box}').val($answerfill); }});";
 
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
 				
@@ -409,7 +409,7 @@ function jsxGlider (&$board, $param, $ops=array()) {
 
 			$out .= ';';
 			$answerfill = "'(' + $id.X().toFixed(4) + ',' + $id.Y().toFixed(4) + ')'";
-			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($answerfill); });";
+			$out .= "board_{$boardID}.on('update', function () { if (this.initSetupDone){ $('#qn{$box}, #tc{$box}').val($answerfill); }});";
 					
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point"); 
 				
@@ -482,7 +482,7 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 
 			$out .= ';';
 			$answerfill = "'(' + $id.X().toFixed(4) + ',' + $id.Y().toFixed(4) + ')'";
-			$out .= "board_{$boardID}.on('update', function () { $('#qn{$box}, #tc{$box}').val($answerfill); });";
+			$out .= "board_{$boardID}.on('update', function () { if (this.initSetupDone){ $('#qn{$box}, #tc{$box}').val($answerfill); }});";
 
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
 				
@@ -1689,6 +1689,8 @@ function jsxBoard($type, $ops=array()) {
 	} elseif ($type == 'geometry') {
 		$board = jsx_creategeometryboard($id, $ops);
 	}
+
+	$board = str_replace("/*INSERTHERE*/", "/*INSERTHERE*/;board_$id.initSetupDone=true;", $board);
 
 	return $board;
 	
