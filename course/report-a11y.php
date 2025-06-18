@@ -102,12 +102,69 @@ if ($what === 'cid') {
         WHERE ia.courseid=?';
     $stm = $DBH->prepare($query);
     $stm->execute([$cid]);
+    $extrefissues = [];
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
             _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
         if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
+            $extrefissues[] = $row;
+            /*
             adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
                 _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+            */
+        }
+    }
+
+    // get uncaptioned videos 
+    $vidstocheck=[];
+    foreach ($extrefissues as $row) {
+        $extrefs = explode('~~', $row['extref']);
+        foreach ($extrefs as $v) {
+            $parts = explode('!!', $v);
+            if (count($parts)>2 && $parts[2] == 0) { // not captioned
+                $vidid = getvideoid($parts[1]);
+                if ($vidid !== '') {
+                    $vidstocheck[] = $vidid;
+                }
+            }
+        }
+    }
+    // pull caption data from database for those videos
+    if (count($vidstocheck)>0) {
+        $vidstocheck = array_values(array_unique($vidstocheck));
+        $ph = Sanitize::generateQueryPlaceholders($vidstocheck);
+        $stm = $DBH->prepare("SELECT vidid,captioned FROM imas_captiondata WHERE vidid IN ($ph) AND status>0 AND status<3");
+        $stm->execute($vidstocheck);
+        $captiondata = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
+        // now loop back over the extref issues and see if we have updated caption info
+        foreach ($extrefissues as $row) {
+            $gaveerrorthisquestion = false;
+            $updatedextref = false;
+            $extrefs = explode('~~', $row['extref']);
+            //loop over each extref
+            foreach ($extrefs as $k=>$v) {
+                $parts = explode('!!', $v);
+                if (count($parts)>2 && $parts[2] == 0) { // not captioned, but might not be video
+                    $vidid = getvideoid($parts[1]);
+                    if ($vidid !== '' && !empty($captiondata[$vidid])) {
+                        // it's a video, and we know it's captioned from captiondata database
+                        // update extref
+                        $parts[2] = 1;
+                        $extrefs[$k] = implode('!!', $parts);
+                        $updatedextref = true;
+                    } else if ($vidid !== '' && !$gaveerrorthisquestion) {
+                        // it's a video, don't have captions, give error once
+                        adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+                            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+                        $gaveerrorthisquestion = true;
+                    }
+                }
+            }
+            // if we updated extrefs, update database
+            if ($updatedextref) {
+                $stm = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
+                $stm->execute([implode('~~', $extrefs), $row['id']]);
+            }
         }
     }
 
