@@ -20,6 +20,6 @@ if ($res===false) {
 $DBH->query('INSERT INTO imas_dbschema (id,ver,details) VALUES (7,0,"Last qsetid scanned to captiondata")');
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>table imas_captiondata created</p>';
+echo '<p>table imas_captiondata created. If upgrading, run /util/pullcaptiondata.php several times to populate caption database from question caption data.</p>';
 
 return true;
