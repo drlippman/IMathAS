@@ -1690,7 +1690,56 @@ function jsxBoard($type, $ops=array()) {
 		$board = jsx_creategeometryboard($id, $ops);
 	}
 
-	$board = str_replace("/*INSERTHERE*/", "/*INSERTHERE*/;board_$id.initSetupDone=true;", $board);
+	$updatescript = "
+		board_$id.suspendUpdate();
+		for (let i=0; i<board_$id.colorinit.length; i++) {
+			let box = board_$id.colorinit[i][0];
+			let obj = board_$id.colorinit[i][1];
+			let type = board_$id.colorinit[i][2];
+			let param = board_$id.colorinit[i][3];
+			if ($('#qn' + box)[0]) {
+				if ($('#qn' + box + ', #tc' + box).is('.ansgrn')) {
+					// if already red or yellow, make yellow, else make green
+					if ($('#jxgboard_{$id}').is('.ansred,.ansyel,.ansnoans')) {
+						$('#jxgboard_{$id}').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
+					} else {
+					 	$('#jxgboard_{$id}').addClass('ansgrn');
+					}
+				} else if ($('#qn' + box).is('.ansred')) {
+					// if already grn or yellow, make yellow, else make red
+					if ($('#jxgboard_{$id}').is('.ansgrn,.ansyel')) {
+						$('#jxgboard_{$id}').removeClass('ansgrn').addClass('ansyel');
+					} else {
+					 	$('#jxgboard_{$id}').addClass('ansred');
+					}
+				} else if ($('#qn' + box).is('.ansyel')) {
+					$('#jxgboard_{$id}').removeClass('ansgrn').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
+				} else {
+					if ($('#jxgboard_{$id}').is('.ansgrn,.ansyel')) {
+						$('#jxgboard_{$id}').removeClass('ansgrn').addClass('ansyel');
+					} else {
+						$('#jxgboard_{$id}').addClass('ansnoans');
+					}
+				}
+				/* Pull in answer from answerbox if possible */
+				if ($('#qn' + box)[0] && $('#qn' + box).val() !== '') {
+					if (type == 'point') {
+						let coords = $('#qn'+box).val();
+						coords = coords.substring(1, coords.length - 2);
+						coords = coords.split(',');
+						window[obj].setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
+					} else if (type == 'slider') {
+						let min = param[0];
+						let max = param[1];
+						var tc = $('#qn'+box).val();
+						window[obj].setGliderPosition(((tc)-(min))/((max)-(min)));
+					}
+				}
+			} 
+		}
+		board_$id.unsuspendUpdate();";	
+
+	$board = str_replace("/*INSERTHERE*/", "board_$id.colorinit=[];/*INSERTHERE*/;$updatescript;board_$id.initSetupDone=true;", $board);
 
 	return $board;
 	
@@ -2572,65 +2621,7 @@ function jsx_setlabel($id, $label) {
 // button was pressed by the user.
 
 function jsx_getcolorinterval($boardID, $box, $obj, $type, $param = array()) {
-
-	if ($type == "point") {
-		$reposition_obj = 
-			"var coords = $('#qn{$box}').val();
-			coords = coords.substring(1, coords.length - 2);
-			coords = coords.split(',');
-			{$obj}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);";
-			
-	} else if ($type == "slider") {
-		
-		$min = $param[0];
-		$max = $param[1];
-		$reposition_obj = 
-			"var tc = $('#qn{$box}').val();
-			{$obj}.setGliderPosition(((tc)-({$min}))/(({$max})-({$min})));";
-	}
-
-	$out = 
-		"var colorInterval{$boardID}_{$box} = setInterval(function() {  
-			if ($('#qn{$box}')[0] || $('#qn{$box}')[0]) {
-				//TODO: Fix this. Needs to consider other answerboxes too.
-				//probably easiest to add ansgrn/ansred class to board, then 
-				//look to see if a class is already set on the board and incorporate that
-				if ($('#qn{$box}, #tc{$box}').is('.ansgrn')) {
-					// if already red or yellow, make yellow, else make green
-					if ($('#jxgboard_{$boardID}').is('.ansred,.ansyel,.ansnoans')) {
-						$('#jxgboard_{$boardID}').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
-					} else {
-					 	$('#jxgboard_{$boardID}').addClass('ansgrn');
-					}
-				} else if ($('#qn{$box}, #tc{$box}').is('.ansred')) {
-					// if already grn or yellow, make yellow, else make red
-					if ($('#jxgboard_{$boardID}').is('.ansgrn,.ansyel')) {
-						$('#jxgboard_{$boardID}').removeClass('ansgrn').addClass('ansyel');
-					} else {
-					 	$('#jxgboard_{$boardID}').addClass('ansred');
-					}
-				} else if ($('#qn{$box}, #tc{$box}').is('.ansyel')) {
-					$('#jxgboard_{$boardID}').removeClass('ansgrn').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
-				} else {
-					if ($('#jxgboard_{$boardID}').is('.ansgrn,.ansyel')) {
-						$('#jxgboard_{$boardID}').removeClass('ansgrn').addClass('ansyel');
-					} else {
-						$('#jxgboard_{$boardID}').addClass('ansnoans');
-					}
-				}
-				/* Pull in answer from answerbox is possible */
-				if ($('#qn{$box}')[0] && $('#qn{$box}').val() !== '') {
-					{$reposition_obj}
-					board_{$boardID}.fullUpdate();
-				} else if ($('#tc{$box}')[0] && $('#tc{$box}').val() !== '') {
-					{$reposition_obj}
-					board_{$boardID}.fullUpdate();
-				}
-				clearInterval(colorInterval{$boardID}_{$box});
-			}
-		}, 300);";
-		
+	$out = "board_{$boardID}.colorinit.push(['$box','$obj','$type',".json_encode($param)."]);";
 	return $out;
 }
-
 ?>
