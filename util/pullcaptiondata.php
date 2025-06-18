@@ -73,7 +73,7 @@ $ph = Sanitize::generateQueryPlaceholdersGrouped($qarr, 4);
 $query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES $ph ";
 $query .= "ON DUPLICATE KEY UPDATE status=IF(VALUES(captioned)>captioned,VALUES(status),status),";
 $query .= "lastchg=IF(VALUES(captioned)>captioned,VALUES(lastchg),lastchg),";
-$query .= "captioned=IF(VALUES(captioned)>captioned,VALUES(captioned),captioned)"
+$query .= "captioned=IF(VALUES(captioned)>captioned,VALUES(captioned),captioned)";
 $stm = $DBH->prepare($query);
 $stm->execute($qarr);
 
