@@ -22,20 +22,6 @@
 	// Determine if this is an AJAX quicksave call
 	$quicksave = isset($_GET['quick']) ? true : false;
 
-	function stripsmartquotes($text) {
-		$text = str_replace(
-			array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
-			array("'", "'", '"', '"', '-', '--', '...'),
-			$text);
-		// Next, replace their Windows-1252 equivalents.
-		//removed - was messing with unicode
-		/*$text = str_replace(
-			array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
-			array("'", "'", '"', '"', '-', '--', '...'),
-			$text);*/
-		return $text;
- 	}
-
  	$cid = Sanitize::courseId($_GET['cid'] ?? '0');
 	$isadmin = false;
 	$isgrpadmin = false;
@@ -82,11 +68,11 @@
 		foreach (array('qcontrol','answer','solution') as $v) {
 			if (!isset($_POST[$v])) {$_POST[$v] = '';}
 		}
-		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
-		$_POST['control'] = stripsmartquotes($_POST['control'] ?? '');
-		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol'] ?? '');
-		$_POST['answer'] = stripsmartquotes($_POST['answer'] ?? '');
-		$_POST['solution'] = stripsmartquotes($_POST['solution'] ?? '');
+		$_POST['qtext'] = Sanitize::replaceSmartQuotes($_POST['qtext']);
+		$_POST['control'] = Sanitize::replaceSmartQuotes($_POST['control'] ?? '');
+		$_POST['qcontrol'] = Sanitize::replaceSmartQuotes($_POST['qcontrol'] ?? '');
+		$_POST['answer'] = Sanitize::replaceSmartQuotes($_POST['answer'] ?? '');
+		$_POST['solution'] = Sanitize::replaceSmartQuotes($_POST['solution'] ?? '');
 		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
 		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
 
