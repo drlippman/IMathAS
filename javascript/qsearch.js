@@ -6,8 +6,11 @@ $(function() {
     }).on('input', function (e) {
         $("#searchwrap").toggleClass("hastext", e.currentTarget.value.trim() !== '');
     });
-    $("#addbar button").on('focus', function(e) {
-        if (!$(this).closest("#addbar").hasClass("nofooterbar")) {
+    var lastInputWasKeyboard = false;
+    window.addEventListener('keydown',function() { lastInputWasKeyboard = true; });
+    window.addEventListener('mousedown',function() { lastInputWasKeyboard = false; });
+    $("#addbar button").first().on('focus', function(e) {
+        if (lastInputWasKeyboard && !$(this).closest("#addbar").hasClass("nofooterbar")) {
             $(this).closest("#addbar").removeClass("sr-only").removeClass("footerbar").addClass("nofooterbar");
         }
     });
