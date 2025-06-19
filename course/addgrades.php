@@ -587,7 +587,7 @@
 		echo '<option value=1 '.($cntingb==1?'selected':'').'>'._('Count in Gradebook').'</option>';
 		echo '<option value=0 '.($cntingb==0?'selected':'').'>'._('Don\'t count in grade total and hide from students').'</option>';
 		echo '<option value=3 '.($cntingb==3?'selected':'').'>'._('Don\'t count in grade total').'</option>';
-		echo '<option value=2 '.($cntingb==1?'selected':'').'>'._('Count as Extra Credit').'</option>';
+		echo '<option value=2 '.($cntingb==2?'selected':'').'>'._('Count as Extra Credit').'</option>';
 		echo '</select>';
 		echo '</span><br class=form />';
 
