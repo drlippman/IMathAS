@@ -1843,12 +1843,15 @@ function arraytolist($a, $sp=false) {
 	}
 }
 
-function joinarray($a,$s=',') {
+function joinarray($a,$s=',',$ksort = false) {
 	if (!is_array($a)) {
 		if ($GLOBALS['myrights']>10) {
 			echo "Error: joinarray expect an array as input";
 		}
 		return $a;
+	}
+	if ($ksort) {
+		ksort($a);
 	}
 	return (implode($s,$a));
 }
