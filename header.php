@@ -162,7 +162,7 @@ if (!isset($_SESSION['mathdisp'])) {
         (($_SESSION['mathdisp']==8) ? 'sre:{speech:"shallow"},' : '')
         .'renderActions: {
             addattr: [150,
-                function (doc) {for (math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
+                function (doc) {for (const math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
                 function (math, doc) {MathJax.config.addDataAttr(math, doc)}
             ]
         }
