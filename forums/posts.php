@@ -628,7 +628,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 
 			//echo '<div class="likewrap">';
-			echo '<button id="likeicon'.$child.'" class="plain nopad" role="switch" aria-checked="' . ($icon=='liked'?'true':'false').'" onclick="savelike(this)">';
+			echo '<button type=button id="likeicon'.$child.'" class="plain nopad" role="switch" aria-checked="' . ($icon=='liked'?'true':'false').'" onclick="savelike(this)">';
 			echo "<img class=\"likeicon$likeclass\" src=\"$staticroot/img/$icon.png\" title=\"$likemsg\" alt=\"Like\">";
 			echo '</button>';
 			echo "<a href=\"#\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);return false;\" aria-label=\"View likes\">".($likecnt>0?$likecnt:'').' </a> ';
