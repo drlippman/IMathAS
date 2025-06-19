@@ -218,7 +218,7 @@ $placeinhead .= '<script>
   }
 
   $(function() {
-	if (typeof window.opener.setlib !== "undefined") {
+	if (window.opener && window.opener.setlib) {
 		$("#liblist li").each(function(i,el) {
 			let libid = el.id.substr(3);
 			$(el).find("span").first().after(
