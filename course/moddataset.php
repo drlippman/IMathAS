@@ -1077,11 +1077,11 @@ if ($viewonly) {
 ?>
 <input type="hidden" name="hasimg" value="<?php echo Sanitize::encodeStringForDisplay($line['hasimg']);?>"/>
 <p>
-Description:<BR>
-<textarea cols=60 rows=4 name=description <?php if (!$canedit) echo "disabled";?>><?php echo Sanitize::encodeStringForDisplay($line['description'], true);?></textarea>
+<label for=description><?php echo _('Description');?></label>:<br/>
+<textarea cols=60 rows=4 name=description id=description <?php if (!$canedit) echo "disabled";?>><?php echo Sanitize::encodeStringForDisplay($line['description'], true);?></textarea>
 </p>
 <p>
-Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
+<?php echo _('Author');?>: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
 </p>
 <?php
 if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $isadmin || ($isgrpadmin && $line['groupid']==$groupid)) {
@@ -1089,7 +1089,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
         echo '<p class=noticetext>'._('Note: The "make questions public by default" setting has been removed. To make a question public you must now explicitly set the use rights.').'</p>';
     }
     echo '<p>';
-	echo _('Use Rights:').' <select name="userights" id="userights">';
+	echo '<label for=userights>'._('Use Rights:').'</label> <select name="userights" id="userights">';
 	echo "<option value=\"0\" ";
 	if ($line['userights']==0) {echo "SELECTED";}
 	echo ">"._("Private")."</option>\n";
@@ -1103,7 +1103,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	if ($line['userights']==4) {echo "SELECTED";}
 	echo ">"._("Allow use by all and modifications by all")."</option>\n";
 	echo '</select><br/>';
-	echo _('License:').' <select name="license" id="license" onchange="checklicense()">';
+	echo '<label for=license>' . _('License:').'</label> <select name="license" id="license" onchange="checklicense()">';
 	echo '<option value="0" '.($line['license']==0?'selected':'').'>Copyrighted</option>';
 	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
 	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
@@ -1116,7 +1116,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	} else {
 		echo '<br/><span id="addattrspan">';
 	}
-	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.Sanitize::encodeStringForDisplay($line['otherattribution'], true).'"/>';
+	echo '<label for=addattr>'._('Additional Attribution').'</label>: <input type="text" size="80" name="addattr" id="addattr" value="'.Sanitize::encodeStringForDisplay($line['otherattribution'], true).'"/>';
 	if ($line['otherattribution']!='') {
 		echo '<br/><span class=noticetext style="font-size:80%">'._('You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution').'</span>';
 	}
@@ -1129,7 +1129,7 @@ var curlibs = '<?php echo Sanitize::encodeStringForJavascript($inlibs);?>';
 var locklibs = '<?php echo Sanitize::encodeStringForJavascript($locklibs);?>';
 function libselect() {
 	//window.open('libtree.php?libtree=popup&cid=<?php echo $cid;?>&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
-	GB_show('Library Select','libtree2.php?cid=<?php echo $cid;?>&libtree=popup&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,500,500);
+	GB_show('<?php echo _('Library Select');?>','libtree2.php?cid=<?php echo $cid;?>&libtree=popup&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,500,500);
 }
 function setlib(libs) {
 	if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
@@ -1260,7 +1260,7 @@ if ($olnames !== '') {
 }?>
 </p>
 <div id=ccbox>
-<?php echo _('Common Control'); ?>: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
+<label for=control><?php echo _('Common Control'); ?></label>: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
 <input type=button id="solveropenbutton" value="Solver">
 <button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
@@ -1272,7 +1272,7 @@ if ($olnames !== '') {
 
 
 <div id=qtbox>
-<?php echo _('Question Text'); ?>: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
+<label for=qtext><?php echo _('Question Text'); ?></label>: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
 <button type="button" onclick="toggleeditor('qtext')" ><?php echo _("Toggle Editor"); ?></button>
 <button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
@@ -1290,30 +1290,33 @@ if ($line['solution']=='') {
 	echo '<div id="solutionwrapper">';
 }
 ?>
-<?php echo _('Detailed Solution:'); ?>
+<label for="solution"><?php echo _('Detailed Solution:'); ?></label>
 <span class="noselect"><span class=pointer onclick="incqtboxsize('solution')">[+]</span><span class=pointer onclick="decqtboxsize('solution')">[-]</span></span>
 <button type="button" onclick="toggleeditor('solution')" ><?php echo _("Toggle Editor"); ?></button>
 <button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
 <button type="button" class="quickSaveButton" onclick="quickSaveQuestion()"><?php echo _('Quick Save and Preview'); ?></button>
 <br/>
-<input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
+<label><input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
-<?php echo _('Uses random variables from the question, or question is not randomized.'); ?>
+<?php echo _('Uses random variables from the question, or question is not randomized.'); ?></label>
  <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
    <i><?php echo _('Be sure to include the question you are solving in the text'); ?></i>
  </span><br/>
-<input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
-<?php echo _('Use this as a "written example" help button'); ?><br/>
-<input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
-<?php echo _('Display with the "Show Answer"'); ?><br/>
+<label><input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
+<?php echo _('Use this as a "written example" help button'); ?></label><br/>
+<label><input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
+<?php echo _('Display with the "Show Answer"'); ?></label><br/>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$canedit) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['solution'], true);?></textarea>
 </div>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
-<?php echo _('Image file:'); ?> <input type="file" name="imgfile" <?php if (!$canedit) {echo 'disabled';};?>/>
-  <?php echo _('assign to variable:'); ?> <input type="text" name="newimgvar" size="6" <?php if (!$canedit) {echo 'disabled';};?>/>
-  <?php echo _('Description:'); ?> <input type="text" size="20" name="newimgalt" value="" <?php if (!$canedit) {echo 'disabled';};?>/><br/>
+<label for=imgfile><?php echo _('Image file:'); ?></label> 
+	<input type="file" name="imgfile" id="imgfile" <?php if (!$canedit) {echo 'disabled';};?>/>
+  <label for=newimgvar><?php echo _('assign to variable:'); ?></label> 
+    <input type="text" name="newimgvar" id="newimgvar" size="6" <?php if (!$canedit) {echo 'disabled';};?>/>
+  <label for="newimgalt"><?php echo _('Description:'); ?></label> 
+    <input type="text" size="20" name="newimgalt" id="newimgalt" value="" <?php if (!$canedit) {echo 'disabled';};?>/><br/>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
 	<?php echo _('Images:'); ?>
 	<ul id='imgList'>
@@ -1328,20 +1331,21 @@ if (isset($images['vars']) && count($images['vars'])>0) {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
 		echo "<li>";
-		echo _("Variable:")." <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\" ".($canedit?'':'disabled')."/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
-		echo _("Description:")." <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\" ".($canedit?'':'disabled')."/> Delete? <input type=checkbox name=\"delimg-$id\" ".($canedit?'':'disabled')."/>";
+		echo "<label for=\"imgvar-$id\">"._("Variable:")."</label> <input type=\"text\" name=\"imgvar-$id\" id=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\" ".($canedit?'':'disabled')."/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
+		echo "<label for=\"imgalt-$id\">"._("Description:")."</label> <input type=\"text\" size=\"20\" name=\"imgalt-$id\" id=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\" ".($canedit?'':'disabled')."/> ";
+		echo "<label><input type=checkbox name=\"delimg-$id\" ".($canedit?'':'disabled')."/> Delete?</label>";
 		echo "</li>";
 	}
 }
 ?>
 	</ul>
 </div>
-<?php echo _('Help button: Type:'); ?> <select name="helptype" <?php if (!$canedit) {echo 'disabled';};?>>
+<label for=helptype><?php echo _('Help button: Type:'); ?></label> <select name="helptype" id="helptype" <?php if (!$canedit) {echo 'disabled';};?>>
  <option value="video"><?php echo _('Video'); ?></option>
  <option value="read"><?php echo _('Read'); ?></option>
  </select>
- <?php echo _('URL')?>: <input type="text" name="helpurl" size="30" <?php if (!$canedit) {echo 'disabled';};?>/>
- <?php echo _('Description')?>: <input type="text" name="helpdescr" size="30" <?php if (!$canedit) {echo 'disabled';};?>/>
+ <label for=helpurl><?php echo _('URL')?></label>: <input type="text" name="helpurl" id="helpurl" size="30" <?php if (!$canedit) {echo 'disabled';};?>/>
+ <label for=helpdescr><?php echo _('Description')?></label>: <input type="text" name="helpdescr" id="helpdescr" size="30" <?php if (!$canedit) {echo 'disabled';};?>/>
  <br/>
 <?php
 echo '<div id="helpbtnwrap" ';
@@ -1361,24 +1365,24 @@ if (count($extref)>0) {
     if (!empty($extrefpt[3])) {
         echo _('Description') . ': ' . Sanitize::encodeStringForDisplay($extrefpt[3]) . '. ';
     }
-    echo ' <label>'._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($canedit?'':'disabled')."/></label></li>";
+    echo "<label><input type=\"checkbox\" name=\"delhelp-$i\" ".($canedit?'':'disabled').'/> '._('Delete?').'</label></li>';
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
 
 if ($myrights==100) {
-	echo '<p>'._('Mark question as deprecated and suggest alternative?').' <input type="checkbox" name="doreplaceby" ';
+	echo '<p><label>'._('Mark question as deprecated and suggest alternative?').' <input type="checkbox" name="doreplaceby" ';
 	if ($line['replaceby']!=0) {
 		echo 'checked="checked"';
 	}
-	echo '/> '._('Suggested replacement ID:').' <input type="text" size="5" name="replaceby" value="';
+	echo '/></label> <label>'._('Suggested replacement ID:').' <input type="text" size="5" name="replaceby" value="';
 	if ($line['replaceby']>0) {
 		echo $line['replaceby'];
 	}
-	echo '"/>.  <i>'._('Do not use this unless you know what you\'re doing').'</i></p>';
+	echo '"/></label>.  <i>'._('Do not use this unless you know what you\'re doing').'</i></p>';
 }
 if ($line['deleted']==1 && ($myrights==100 || $line['ownerid']==$userid)) {
-	echo '<p>'._('This question is currently marked as deleted.').' <label><input type="checkbox" name="undelete"> '._('Un-delete question').'</p>';
+	echo '<p>'._('This question is currently marked as deleted.').' <label><input type="checkbox" name="undelete"> '._('Un-delete question').'</label></p>';
 }
 ?>
 </div>
@@ -1453,10 +1457,10 @@ if (FormData){ // Only allow quicksave if FormData object exists
 					for (id in images.vars){
 						imgCount++;
 						$("#imgList").append(
-							"<li> Variable: <input type='text' name='imgvar-" + id + "' value='$" + images.vars[id] + "' size='10' />" +
+							"<li><label>Variable: <input type='text' name='imgvar-" + id + "' value='$" + images.vars[id] + "' size='10' /></label>" +
 							" <a href='" + res.imgUrlBase + images.files[id] + "' target='_blank'>View</a>" +
-							" Description: <input type='text' size='20' name='imgalt-" + id + "' value='" + images.alttext[id] + "'/>" +
-							" Delete? <input type='checkbox' name='delimg-" + id + "'/>" +
+							" <label>Description: <input type='text' size='20' name='imgalt-" + id + "' value='" + images.alttext[id] + "'/></label>" +
+							" <label><input type='checkbox' name='delimg-" + id + "'/> Delete?</label>" +
 							"</li>"
 						);
 					}
@@ -1474,7 +1478,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] +
                             ", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
                             ((res.extref[i][2]) ? (_("Description")+": "+res.extref[i][2]+". "):"") +
-							_("Delete?")+" <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
+							"<label><input type=\"checkbox\" name=\"delhelp-"+i+"\"/>" + _("Delete?") + "</label></li>");
 					}
 					$("#helpbtnwrap").removeClass("hidden");
 				} else {
