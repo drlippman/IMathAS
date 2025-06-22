@@ -53,6 +53,10 @@ export default {
       return (typeof this.errormsg === 'string');
     },
     errorTitle () {
+      // show a "Warning" title for blankparts
+      if (this.errormsg === 'blankparts') {
+        return this.$t('Warning');
+      }
       return this.isError ? this.$t('error.error') : this.errormsg.title;
     },
     errorMsg () {
