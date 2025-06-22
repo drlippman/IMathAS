@@ -46,8 +46,13 @@ $stm->execute(array($cid,$cid,$uid));
 $diffs = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 sort($diffs);
 $msgRepliedCnt = count($diffs);
-$msgMedDelay = $diffs[ceil($msgRepliedCnt/2)-1];
-$msgP95Delay = $diffs[floor(.95*$msgRepliedCnt)-1];
+if (count($diffs) > 0) {
+  $msgMedDelay = $diffs[ceil($msgRepliedCnt/2)-1];
+  $msgP95Delay = $diffs[floor(.95*$msgRepliedCnt)-1];
+} else {
+  $msgMedDelay = 0;
+  $msgP95Delay = 0;
+}
 
 $t3 = microtime(true);
 
@@ -79,8 +84,13 @@ if (count($forums) > 0) {
     $diffs = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
     sort($diffs);
     $forumRepliedCnt = count($diffs);
-    $forumMedDelay = $diffs[ceil($forumRepliedCnt/2)-1];
-    $forumP95Delay = $diffs[floor(.95*$forumRepliedCnt)-1];
+    if (count($diffs) > 0) {
+      $forumMedDelay = $diffs[ceil($forumRepliedCnt/2)-1];
+      $forumP95Delay = $diffs[floor(.95*$forumRepliedCnt)-1];
+    } else {
+      $forumMedDelay = 0;
+      $forumP95Delay = 0;
+    }
 }
 $t6 = microtime(true);
 
