@@ -146,6 +146,7 @@ $placeinhead .= '<script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'
 <link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
 $pagetitle = _('Course Browser');
+$noskipnavlink = true;
 require_once "../header.php";
 
 if (!isset($_GET['embedded'])) {
@@ -167,7 +168,7 @@ if (!isset($_GET['embedded'])) {
 </div>
 <div id="filters">
 	Filter results:
-	<span v-for="propname in propsToFilter" class="dropdown-wrap">
+	<span v-for="propname in propsToFilter" class="dropdown-wrap" @focusout="handleFocusOut" @keydown.esc="handleEsc">
 		<button @click="showFilter = (showFilter==propname)?'':propname">
 			{{ courseBrowserProps[propname].name }} {{ catprops[propname].length > 0 ? '('+catprops[propname].length+')': '' }}
 			<span class="arrow-down2" :class="{rotated: showFilter==propname}"></span>
@@ -318,6 +319,18 @@ createApp({
 			} else {
 				tgt.style.right = "auto";
 				tgt.style.left = "0px";
+			}
+		},
+		handleFocusOut(event) {
+			if (!event.currentTarget.contains(event.relatedTarget)) {
+				this.showFilter = '';
+			}
+		},
+		handleEsc(event) {
+			this.showFilter = '';
+			const button = event.currentTarget.querySelector('button');
+			if (button) {
+				button.focus();
 			}
 		}
 	},
