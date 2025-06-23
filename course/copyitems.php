@@ -474,11 +474,11 @@ if ($overwriteBody==1) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 ?>
 			<td>
-			<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($calitems[$i][0]); ?>' checked="checked"/>
+			<input type=checkbox name='checked[]' aria-labelledby="<?php echo "d$i n$i";?>" value='<?php echo Sanitize::encodeStringForDisplay($calitems[$i][0]); ?>' checked="checked"/>
 			</td>
-			<td class="nowrap"><?php echo tzdate("m/d/Y",$calitems[$i][1]); ?></td>
+			<td class="nowrap" id="d<?php echo $i;?>"><?php echo tzdate("m/d/Y",$calitems[$i][1]); ?></td>
 			<td><?php echo Sanitize::encodeStringForDisplay($calitems[$i][2]); ?></td>
-			<td><?php echo Sanitize::encodeStringForDisplay($calitems[$i][3]); ?></td>
+			<td id="n<?php echo $i;?>"><?php echo Sanitize::encodeStringForDisplay($calitems[$i][3]); ?></td>
 		</tr>
 <?php
 		}
@@ -560,10 +560,12 @@ $excludeAssess = ($sourceUIver > $destUIver);
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
 			if (strpos($types[$i],'Block')!==false) {
+				$thisid = $parents[$i];
 				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' ";
 				echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				echo '/>';
 			} else {
+				$thisid = "{$parents[$i]}.{$ids[$i]}";
 				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' ";
 				echo '/>';
 			}
@@ -584,7 +586,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 				case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
 				case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
 			}
-			echo '" class="floatleft"/><div style="margin-left:21px">'.$names[$i].'</div></td>';
+			echo '" class="floatleft"/><div style="margin-left:21px"><label for="'.$thisid.'">'.$names[$i].'</label></div></td>';
 
 		?>
 			<td><?php echo $sums[$i] ?></td>
@@ -599,38 +601,90 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<p> </p>
 <div id="copyoptions" style="display:none;">
 	<fieldset><legend><?php echo _('Options'); ?></legend>
-	<table role="presentation">
-	<tbody>
-	<tr class="allon"><td class="r"><?php echo _('Copy course settings?'); ?></td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
-	<tr class="allon"><td class="r"><?php echo sprintf(_('Copy gradebook scheme and categories %s (%s will overwrite current scheme %s)?'),'<br/>','<i>','</i>'); ?> </td><td>
-		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
-	<tr><td class="r"><?php echo _('Set all copied items as hidden to students?'); ?></td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
-	<tr><td class="r"><?php echo _('Copy offline grade items?'); ?></td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
-	<tr><td class="r"><?php echo _('Remove any withdrawn questions from assessments?'); ?></td><td> <input type=checkbox name="removewithdrawn"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r"><?php echo _('Use any suggested replacements for old questions?'); ?></td><td> <input type=checkbox name="usereplaceby"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r"><?php echo _('Copy rubrics?'); ?> </td><td><input type=checkbox name="copyrubrics" value="1" checked="checked"/></td></tr>
-	<tr class="allon"><td class="r"><?php echo _('Copy outcomes?'); ?> </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
-	<tr><td class="r"><?php echo _('Select calendar items to copy?'); ?></td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
-
-	<tr><td class="r"><?php echo _('Copy "display at top" instructor forum posts?'); ?> </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
-
-	<tr class="selectonly"><td class="r"><?php echo _('Append text to titles?'); ?></td><td> <input type="text" name="append"></td></tr>
-	<tr class="selectonly"><td class="r"><?php echo _('Add to block:'); ?></td><td>
-
-<?php
+	<ul class="checklist">
+		<li class="allon">
+			<label>
+				<input type=checkbox name="copycourseopt"  value="1"/>
+				<?php echo _('Copy course settings?'); ?>
+			</label>
+		</li>
+		<li class="allon">
+			<label>
+				<input type=checkbox name="copygbsetup" value="1"/>
+				<?php echo sprintf(_('Copy gradebook scheme and categories %s (%s will overwrite current scheme %s)?'),'<br/>','<span class=noticetext>','</span>'); ?>
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type="checkbox" name="copyhidden" value="1"/>
+				<?php echo _('Set all copied items as hidden to students?'); ?>			
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type=checkbox name="copyoffline"  value="1"/>
+				<?php echo _('Copy offline grade items?'); ?>
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type=checkbox name="removewithdrawn"  value="1" checked="checked"/>
+				<?php echo _('Remove any withdrawn questions from assessments?'); ?>
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type=checkbox name="usereplaceby"  value="1" checked="checked"/>
+				<?php echo _('Use any suggested replacements for old questions?'); ?>
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type=checkbox name="copyrubrics" value="1" checked="checked"/>
+				<?php echo _('Copy rubrics?'); ?>
+			</label>
+		</li>
+		<li class="allon">
+			<label>
+				<input type=checkbox name="copyoutcomes"  value="1" />
+				<?php echo _('Copy outcomes?'); ?>
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type=checkbox name="selectcalitems"  value="1"/>
+				<?php echo _('Select calendar items to copy?'); ?>
+			</label>
+		</li>
+		<li>
+			<label>
+				<input type=checkbox name="copystickyposts"  value="1" checked="checked"/>
+				<?php echo _('Copy "display at top" instructor forum posts?'); ?>
+			</label>
+		</li>
+		<li class="selectonly">
+			<label>
+				<?php echo _('Append text to titles?'); ?>
+				<input type="text" name="append">
+			</label>
+		</li>
+		<li class="selectonly">
+			<label for=addto>
+				<?php echo _('Add to block:'); ?>
+			</label>
+			<?php
 writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$selectedVal=null,$defaultLabel=_("Main Course Page"),$defaultVal="none",$actions=null);
 ?>
+		</li>
 
-
-	</td></tr>
-	<?php
+<?php
 	if ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64) {
-		echo '<tr><td class="r">',_('Also copy students and assessment attempt data?'),'</td>';
-		echo '<td><input type=checkbox name=copystudata value=1> ',_('NOT recommended unless you know what you are doing.'),'</td></tr>';
+		echo '<li><label><input type=checkbox name=copystudata value=1> ',_('Also copy students and assessment attempt data?'),'</label><br/>';
+		echo '<span class=noticetext>',_('NOT recommended unless you know what you are doing.'),'</span>';
+		echo '</li>';
 	}
 	?>
-	</tbody>
-	</table>
+	</ul>
 	</fieldset>
 	</div>
 <?php

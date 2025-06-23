@@ -228,6 +228,14 @@ ul.qview li {
 	padding-left: 0px;
 	margin-top: 2px;
 }
+ul.checklist {
+	list-style-type: none;
+	padding-left: 30px;
+	text-indent: -30px;
+}
+ul.checklist li {
+	margin-bottom: .3em;
+}
 div#tbl-container {
 	position: relative;
 	margin-top: 10px;
