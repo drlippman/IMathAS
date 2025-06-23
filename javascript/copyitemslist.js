@@ -79,6 +79,7 @@ function lookupcid() {
 			$("#cidlookupout").hide();
 		} else {
 			$("#cidlookupctc").val(res.id);
+			res.name = '<label for="cidlookupctc">'+res.name+'</label>';
 			if (res.needkey) {
 				res.name += " &copy;";
 			} else {

@@ -149,11 +149,11 @@ function writeEkeyField() {
 ?>
 	<p id="ekeybox" style="display:none;">
 	<?php echo _('For courses marked with &copy;, you must supply the course enrollment key to show permission to copy the course.'); ?><br/>
-	<?php echo _('Enrollment key:'); ?> <input type=text name=ekey id=ekey size=30></p>
+	<label><?php echo _('Enrollment key:'); ?> <input type=text name=ekey id=ekey size=30></label></p>
 
 	<p id="termsbox" style="display:none;">
 	<?php echo sprintf(_('This course has additional %sTerms of Use %s you must agree to before copying the course.'),'<a target="_blank" href="" id="termsurl">','</a>'); ?>'<br/>
-	<input type="checkbox" name="termsagree" /> <?php echo _('I agree to the Terms of Use specified in the link above.'); ?></p>
+	<label><input type="checkbox" name="termsagree" /> <?php echo _('I agree to the Terms of Use specified in the link above.'); ?></label></p>
 <?php
 }
 
@@ -381,7 +381,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 ?>
 	</ul>
 
-	<p><?php echo _('Or, lookup using course ID:'); ?>
+	<p><?php echo _('Or, lookup using <label for=cidlookup>course ID</label>:'); ?>
 		<input type="text" size="7" id="cidlookup" />
 		<button type="button" onclick="lookupcid()"><?php echo _('Look up course'); ?></button>
 		<span id="cidlookupout" style="display:none;"><br/>
