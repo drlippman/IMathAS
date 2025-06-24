@@ -84,10 +84,10 @@ if (isset($_GET['type'])) {
 } else {
 	$type = 1;  //0 past, 1 attempted
 }
-$typesel = _('Show for scores: ').'<select id="typesel" onchange="chgtype()">';
+$typesel = '<label>'. _('Show for scores: ').'<select id="typesel" onchange="chgtype()">';
 $typesel .= '<option value="0" '.($type==0?'selected="selected"':'').'>'._('Past Due scores').'</option>';
 $typesel .= '<option value="1" '.($type==1?'selected="selected"':'').'>'._('Past Due and Attempted scores').'</option>';
-$typesel .= '</select>';
+$typesel .= '</select></label>';
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 if ($report == 'overview') {
@@ -206,8 +206,10 @@ if ($report=='overview') {
 		echo "<div id=\"tbl-container\">";
 		echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 
-		echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th><th class="cat0"><div></div></th>';
-		$sarr = '"S",false';
+		echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th>';
+		$sarr = '"S"';
+		//echo '<th class="cat0"><div></div></th>';
+		//$sarr = '"S",false';
 		list($html,$tots) = printOutcomeRow($outcomes,true,'0');
 		echo $html;
 		/*foreach ($outc as $oc) {
@@ -221,7 +223,7 @@ if ($report=='overview') {
 		for ($i=1;$i<count($ot);$i++) {
 			echo '<tr class="'.($i%2==0?'even':'odd').'">';
 			echo '<td><div class="trld"><a href="outcomereport.php?cid='.Sanitize::encodeUrlParam($cid).'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</a></div></td>';
-			echo '<td><div></div></td>';
+			//echo '<td><div></div></td>';
 			/*foreach ($outc as $oc) {
 				if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
 					echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';
