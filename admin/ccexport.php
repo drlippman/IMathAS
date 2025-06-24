@@ -129,10 +129,10 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
     }
     echo '<form id="qform" method="post" action="ccexport.php?cid=' . $cid . '&create=true" class="nolimit">';
     ?>
-	<p>Items to export: <select name="whichitems" onchange="updatewhichsel(this)">
+	<p><label>Items to export: <select name="whichitems" onchange="updatewhichsel(this)">
 		<option value="all" selected>Export entire course</option>
 		<option value="select">Select individual items to export</option>
-		</select>
+		</select></label>
 	</p>
 	<div id="itemselectwrap" style="display:none;">
 
@@ -152,11 +152,13 @@ $alt = 0;
             $alt = 0;}
         echo '<td>';
         if (strpos($types[$i], 'Block') !== false) {
-            echo '<input type=checkbox name="checked[]" id="' . Sanitize::encodeStringForDisplay($parents[$i]) . '" ';
+            $thisid = $ids[$i];
+            echo '<input type=checkbox name="checked[]" id="' . Sanitize::encodeStringForDisplay($thisid) . '" ';
             echo 'onClick="chkgrp(this.form, \'' . Sanitize::encodeStringForDisplay($ids[$i]) . '\', this.checked);" ';
             echo 'value="' . Sanitize::encodeStringForDisplay($ids[$i]) . '">';
         } else {
-            echo '<input type=checkbox name="checked[]" id="' . Sanitize::encodeStringForDisplay($parents[$i] . '.' . $ids[$i]) . '" ';
+            $thisid = $parents[$i] . '.' . $ids[$i];
+            echo '<input type=checkbox name="checked[]" id="' . Sanitize::encodeStringForDisplay($thisid) . '" ';
             echo 'value="' . Sanitize::encodeStringForDisplay($ids[$i]) . '">';
         }
         echo '</td>';
@@ -181,7 +183,7 @@ $alt = 0;
             case 'Drill':echo $CFG['CPS']['miniicons']['drill'];
                 break;
         }
-        echo '" class="floatleft"/><div style="margin-left:21px">' . Sanitize::encodeStringForDisplay($names[$i]) . '</div></td>';
+        echo '" class="floatleft"/><div style="margin-left:21px"><label for="' . Sanitize::encodeStringForDisplay($thisid) . '">' . Sanitize::encodeStringForDisplay($names[$i]) . '</label></div></td>';
 
         echo '</tr>';
     }
@@ -189,29 +191,34 @@ $alt = 0;
 		</tbody>
 		</table>
 	</div>
-	<p>Your LMS: <select name="lms" onchange="updatelms(this)">
+	<p><label>Your LMS: <select name="lms" onchange="updatelms(this)">
 		<option value="canvas" selected>Canvas</option>
 		<option value="bb">BlackBoard</option>
 		<option value="d2l">D2L Brightspace</option>
 		<option value="moodle">Moodle</option>
 		<option value="other">Other</option>
-		</select>
+		</select></label>
 	</p>
 	<div id="lmscanvas" class="lmsblock">
 		<fieldset>
 		<legend>Canvas Export Options</legend>
 		<ul class="nomark canvasoptlist">
-		<li><input type=checkbox name=includeappconfig value=1 <?php if (!$hasGroupLTI) {echo 'checked';}?> /> Include App Config? Do not include it if you have site-wide credentials,
+		<li><label><input type=checkbox name=includeappconfig value=1 <?php if (!$hasGroupLTI) {echo 'checked';}?> /> 
+            Include App Config?</label> Do not include it if you have site-wide credentials,
 			or if you are doing a second import into a course that already has a configuration.</li>
-		<li><input type=checkbox name=includegbcats value=1 checked /> Include <?php echo $installname; ?> gradebook setup and categories</li>
-		<li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname; ?> due dates for assessments</li>
-		<li><input type=checkbox name=includestartdates value=1 /> Include <?php echo $installname; ?> start dates for assessments and blocks<br/>
+		<li><label><input type=checkbox name=includegbcats value=1 checked /> 
+            Include <?php echo $installname; ?> gradebook setup and categories</label></li>
+		<li><label><input type=checkbox name=includeduedates value=1 checked /> 
+            Include <?php echo $installname; ?> due dates for assessments</label></li>
+		<li><label><input type=checkbox name=includestartdates value=1 /> 
+            Include <?php echo $installname; ?> start dates for assessments and blocks</label><br/>
 			<span class="small">Blocks will only include the start date if they are set to hide contents from students when not available</span></li>
-		<li><input type=checkbox name=newtab value=1 /> Open <?php echo $installname; ?> assignments in new window/tab</li>
-        <li><input type=checkbox name=datesbylti value=1 <?php if ($datesbylti > 0) {
+		<li><label><input type=checkbox name=newtab value=1 /> 
+            Open <?php echo $installname; ?> assignments in new window/tab</label></li>
+        <li><label><input type=checkbox name=datesbylti value=1 <?php if ($datesbylti > 0) {
         echo 'checked';
     }
-    ?> /> Allow Canvas to set <?php echo $installname; ?> due dates<br/>
+    ?> /> Allow Canvas to set <?php echo $installname; ?> due dates</label><br/>
 			<span class="small">This option can also be set on the Course Settings page.</span></li>
 		</ul>
 		</fieldset>
@@ -230,7 +237,7 @@ $alt = 0;
 		<fieldset>
 		<legend>BlackBoard Export Options</legend>
 		<ul class="nomark bboptlist">
-		  <li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname; ?> due dates for assessments</li>
+		  <li><label><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname; ?> due dates for assessments</label></li>
 		</ul>
 		</fieldset>
 		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button></p>

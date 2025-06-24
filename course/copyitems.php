@@ -560,8 +560,8 @@ $excludeAssess = ($sourceUIver > $destUIver);
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
 			if (strpos($types[$i],'Block')!==false) {
-				$thisid = $parents[$i];
-				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' ";
+				$thisid = $ids[$i];
+				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$ids[$i]}' ";
 				echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				echo '/>';
 			} else {
