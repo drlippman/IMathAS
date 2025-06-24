@@ -618,10 +618,10 @@ if ($overwriteBody==1) {
 		if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td>
-				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>' checked=checked>
+				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>' id="cb<?php echo $i;?>" checked=checked>
 				</td>
 				<td><?php echo Sanitize::encodeStringForDisplay($prespace[$i].$types[$i]); ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
+				<td><label for="cb<?php echo $i;?>"><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></label></td>
 			</tr>
 <?php
 	}
@@ -630,20 +630,20 @@ if ($overwriteBody==1) {
 		</table>
 
 	<fieldset><legend>Options</legend>
-	<table role="presentation">
-	<tbody>
-	<tr class="r"><td class="r">Export course settings?</td><td><input type=checkbox name="exportcourseopt"  value="1" checked/></td></tr>
-	<tr class="r"><td class="r">Export gradebook scheme and categories?</td><td>
-		<input type=checkbox name="exportgbsetup" value="1" checked/></td></tr>
-	<tr><td class="r">Export offline grade items?</td><td> <input type=checkbox name="exportoffline"  value="1"/></td></tr>
-	<tr><td class="r">Export calendar items?</td><td> <input type=checkbox name="exportcalitems"  value="1"/></td></tr>
-	<tr><td class="r">Export "display at top" instructor forum posts? </td><td><input type=checkbox name="exportstickyposts"  value="1" checked="checked"/></td></tr>
-    <tr><td class="r">Exclude questions? </td>
-      <td><input type=checkbox name="excludecopyright"  value="1" checked="checked"/> Exclude copywrited questions<br>
-          <input type=checkbox name="excludenc"  value="1" checked="checked"/> Exclude NC licensed questions</td></tr>
-
-    </tbody>
-	</table>
+	<ul class="checklist">
+		<li><label><input type=checkbox name="exportcourseopt"  value="1" checked/> 
+			Export course settings?</label></li>
+		<li><label><input type=checkbox name="exportgbsetup" value="1" checked/> 
+			Export gradebook scheme and categories?</label></li>
+		<li><label><input type=checkbox name="exportoffline"  value="1"/>
+			Export offline grade items?</label></li>
+		<li><label><input type=checkbox name="exportcalitems"  value="1"/>
+			Export calendar items?</label></li>
+		<li><label><input type=checkbox name="exportstickyposts"  value="1" checked="checked"/>
+			Export "display at top" instructor forum posts?</label></li>
+		<li><label><input type=checkbox name="excludecopyright"  value="1" checked="checked"/> Exclude copywrited questions</label></li>
+		<li><label><input type=checkbox name="excludenc"  value="1" checked="checked"/> Exclude NC licensed questions</label></li>
+	</ul>
 	</fieldset>
 
 		<p><input type=submit name="export" value="Export Items"></p>
