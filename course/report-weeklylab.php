@@ -317,15 +317,15 @@ if ($overwriteBody==1) {
 	echo '<p><a href="#" onclick="toggleadv(this);return false">Edit report settings</a></p>';
 	echo '<fieldset style="display:none;" id="viewfield"><legend>Report Settings</legend>';
 	echo '<form method="post" action="report-weeklylab.php?cid='.$cid.'">';
-	echo '<span class="form">Time interval to display:</span>';
+	echo '<label for=interval class="form">Time interval to display:</label>';
 	echo '<span class="formright">';
 	writeHtmlSelect('interval',array_keys($intervalarr),array_values($intervalarr),$interval,'1week');
 	echo '</span><br class="form"/>';
-	echo '<span class="form">Use &quot;minimum score to receive credit&quot; (if defined) to determine credit/no-credit:</span>';
-	echo '<span class="formright"><input type="checkbox" name="useminscore" value="1" '.getHtmlChecked($useminscore,true).'/></span>';
+	echo '<span class="form">Determine credit/no-credit:</span>';
+	echo '<span class="formright"><label><input type="checkbox" name="useminscore" value="1" '.getHtmlChecked($useminscore,true).'/> Use &quot;minimum score to receive credit&quot; (if defined)</span>';
 	echo '<br class="form"/>';
-	echo '<span class="form">Score to separate credit/no-credit:</span>';
-	echo '<span class="formright"><input type="text" size="3" name="breakpercent" value="'.$breakpercent.'"/>%</span>';
+	echo '<label for=breakpercent class="form">Score to separate credit/no-credit:</label>';
+	echo '<span class="formright"><input type="text" size="3" name="breakpercent" id=breakpercent value="'.$breakpercent.'"/>%</span>';
 	echo '<br class="form"/>';
 
 	echo '<div class="submit"><input type="submit" value="Update"/></div>';
