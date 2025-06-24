@@ -94,10 +94,10 @@ echo  _('In the last 24 hours').'</label></li>';
 echo '<li><label><input type=radio name=edatetype value="1w" '.($ttype=='1w'?'checked':'').' />';
 echo  _('In the last week').'</label></li>';
 echo '<li><label><input type=radio name=edatetype value="edate" '.($ttype=='edate'?'checked':'').' />';
-echo  _('Since:').'</label> <input type=text size=10 name=edate value="'.$edate.'">
+echo  _('Since:').'</label> <input type=text size=10 name=edate value="'.$edate.'" aria-label="start date">
     <a href="#" onClick="displayDatePicker(\'edate\', this); return false">
     <img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a>
-    at <input type=text size=10 name=etime value="'.$etime.'"></li>';
+    at <input type=text size=10 name=etime value="'.$etime.'" aria-label="start time"></li>';
 echo '</ul>';
 echo '<p><label for=catfilter>'._('In Category').'</label>: <select id=catfilter name=catfilter>';
 foreach ($gbcats as $k=>$v) {
