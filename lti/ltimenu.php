@@ -76,7 +76,7 @@ if (function_exists('lti_ltimenu_coursemenu')) {
   lti_ltimenu_coursemenu();
 }
 if (isset($line['date_by_lti']) && $line['date_by_lti']===0) {
-    echo '<li><a href="'.$imasroot.'/course/masschgdates?cid='.$cid.'">'._('Mass Change Dates').'</a></li>';
+    echo '<li><a href="'.$imasroot.'/course/masschgdates.php?cid='.$cid.'">'._('Mass Change Dates').'</a></li>';
 }
 echo '<li><a href="'.$imasroot.'/admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a></li>';
 echo '<li><a href="'.$imasroot.'/course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a></li>';
