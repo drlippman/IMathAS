@@ -474,18 +474,18 @@ if ($overwriteBody==1) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 ?>
 			<td>
-			<input type=checkbox name='checked[]' aria-labelledby="<?php echo "d$i n$i";?>" value='<?php echo Sanitize::encodeStringForDisplay($calitems[$i][0]); ?>' checked="checked"/>
+			<input type=checkbox name='checked[]' id="cb<?php echo $i;?>" value='<?php echo Sanitize::encodeStringForDisplay($calitems[$i][0]); ?>' checked="checked"/>
 			</td>
-			<td class="nowrap" id="d<?php echo $i;?>"><?php echo tzdate("m/d/Y",$calitems[$i][1]); ?></td>
+			<td class="nowrap"><?php echo tzdate("m/d/Y",$calitems[$i][1]); ?></td>
 			<td><?php echo Sanitize::encodeStringForDisplay($calitems[$i][2]); ?></td>
-			<td id="n<?php echo $i;?>"><?php echo Sanitize::encodeStringForDisplay($calitems[$i][3]); ?></td>
+			<td><label for="cb<?php echo $i;?>"><?php echo Sanitize::encodeStringForDisplay($calitems[$i][3]); ?><label></td>
 		</tr>
 <?php
 		}
 ?>
 		</tbody>
 	</table>
-	<p>Remove all existing calendar items? <input type="checkbox" name="clearexisting" value="1" /></p>
+	<p><label><input type="checkbox" name="clearexisting" value="1" /> Remove all existing calendar items?</label></p>
 	<p><input type=submit value="Copy Calendar Items"></p>
 	</form>
 
