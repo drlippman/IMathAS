@@ -157,18 +157,18 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
 echo '<p>'._('This page can help you find assignments you need to manually grade.').'</p>';
 
-echo '<p>'._('Find submitted assignments in gradebook category');
+echo '<p><label>'._('Find submitted assignments in gradebook category');
 echo ' <select id=cat>';
 echo ' <option value="all" selected>' . _('All categories') . '</option>';
 echo ' <option value="0">' . _('Default') . '</option>';
 foreach ($gbcats as $id=>$cat) {
     echo '<option value="'.intval($id).'">'.Sanitize::encodeStringForDisplay($cat).'</option>';
 }
-echo '</select><br/>' . _('with availability');
+echo '</select></label><br/><label>' . _('with availability');
 echo ' <select id=avail>';
 echo ' <option value="0" selected>' . _('Past Due') . '</option>';
 echo ' <option value="1">' . _('Past Due and Available') . '</option>';
-echo '</select><br/>';
+echo '</select><label><br/>';
 echo _('having this feature:') . '</p>';
 echo '<ul class=nomark>';
 echo ' <li><label><input type=radio name=feature value=zero checked />' . _('A score of zero') . '</label>';
