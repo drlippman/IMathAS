@@ -553,7 +553,7 @@ if ($overwriteBody==1) {
 		//add new group set
 		echo '<h3>Add new set of student groups</h3>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&addgrpset=true\">";
-		echo '<p>New group set name: <input name="grpsetname" type="text" /></p>';
+		echo '<p><label>New group set name: <input name="grpsetname" type="text" /></label></p>';
 		echo '<p><input type="submit" value="Create" />';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
@@ -591,7 +591,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['rengrpset'])) {
 		echo '<h3>Rename student group set</h3>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset=" . Sanitize::encodeUrlParam($_GET['rengrpset']) . "\">";
-		echo '<p>New group set name: <input name="grpsetname" type="text" value="'.Sanitize::encodeStringForDisplay($page_grpsetname).'"/></p>';
+		echo '<p><label>New group set name: <input name="grpsetname" type="text" value="'.Sanitize::encodeStringForDisplay($page_grpsetname).'"/></label></p>';
 		echo '<p><input type="submit" value="Rename" />';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
@@ -602,7 +602,7 @@ if ($overwriteBody==1) {
 		if (isset($stulist)) {
 			echo "<input type=\"hidden\" name=\"stutoadd\" value=\"" . Sanitize::encodeStringForDisplay($stulist) . "\" />";
 		}
-		echo '<p>New group name: <input name="grpname" type="text" /></p>';
+		echo '<p><label>New group name: <input name="grpname" type="text" /></label></p>';
 		echo '<p><input type="submit" value="Create" />';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
 		echo '</form>';
@@ -611,8 +611,9 @@ if ($overwriteBody==1) {
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&delgrp=" . Sanitize::encodeUrlParam($_GET['delgrp']) . "&confirm=true\" >";
 		echo "<p>Are you SURE you want to delete the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
 		echo "<p>Any wiki page content for this group will be deleted.</p>";
-		echo '<p><input type="radio" name="delposts" value="1" checked="checked" /> Delete group forum posts ';
-		echo '<input type="radio" name="delposts" value="0" /> Make group forum posts non-group-specific posts</p>';
+		echo "<p>With group forum posts:</p>";
+		echo '<ul class=checklist><li><label><input type="radio" name="delposts" value="1" checked="checked" /> Delete group forum posts</label></li> ';
+		echo '<li><label><input type="radio" name="delposts" value="0" /> Make group forum posts non-group-specific posts</label></li></ul>';
 		echo '<p><input type="submit" value="Yes, Delete"> ';
 		//echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "'\" /></p>";
@@ -621,7 +622,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['rengrp'])) {
 		echo '<h3>Rename student group</h3>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&rengrp=" . Sanitize::encodeUrlParam($_GET['rengrp']) . "\">";
-		echo '<p>New group name: <input name="grpname" type="text" value="'.Sanitize::encodeStringForDisplay($page_grpname).'"/></p>';
+		echo '<p><label>New group name: <input name="grpname" type="text" value="'.Sanitize::encodeStringForDisplay($page_grpname).'"/></label></p>';
 		echo '<p><input type="submit" value="Rename" />';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
 		echo '</form>';
@@ -682,15 +683,7 @@ if ($overwriteBody==1) {
 			}
 			picshow(picsize);
 		}
-		function hidelinks(el) {
-			if ($(el).text()==_('Hide Links')) {
-				$(".linkgrp").hide();
-				$(el).text(_('Show Links'));
-			} else {
-				$(".linkgrp").show();
-				$(el).text(_('Hide Links'));
-			}
-		}
+
 		function picshow(size) {
 			if (size==0) {
 				els = document.getElementById("myTable").getElementsByTagName("img");
@@ -721,8 +714,6 @@ if ($overwriteBody==1) {
 		echo "<p><button type=\"button\" onclick=\"window.location.href='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&addgrp=true'\">"._('Add New Group').'</button> ';
 		if (count($page_grps)==0) {
 			echo " <button type=\"button\" onclick=\"window.location.href='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&addrandgrps=true'\">"._('Create Random Groups').'</button> ';
-		} else {
-			echo ' <button type="button" onclick="hidelinks(this)" >'._('Hide Links').'</button>';
 		}
 		if (array_sum($hasuserimg)>0) {
 			echo ' <button type="button" onclick="rotatepics(this)" >'._('View Pictures').'</button><br/>';
@@ -733,11 +724,16 @@ if ($overwriteBody==1) {
 			echo '<p>No student groups have been created yet</p>';
 		}
 		foreach ($page_grps as $grpid=>$grpname) {
-			echo "<b>Group: " . Sanitize::encodeStringForDisplay($grpname) . "</b> <span class=linkgrp>| ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&rengrp=" . Sanitize::encodeUrlParam($grpid) . "\">Rename</a> | ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&delgrp=" . Sanitize::encodeUrlParam($grpid) . "\">Delete</a> | ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&removeall=" . Sanitize::encodeUrlParam($grpid) . "\">Remove all members</a>";
-			echo '</span><ul>';
+			echo _('Group: ') . '<span class="dropdown">';
+			echo '<a tabindex=0 class="dropdown-toggle arrow-down" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+			echo '<b>'.Sanitize::encodeStringForDisplay($grpname) .'</b></a>';
+			echo '<ul class="dropdown-menu" role="menu">';
+			echo ' <li><a href="managestugrps.php?cid='.$cid.'&grpsetid=' . Sanitize::encodeUrlParam($grpsetid) . '&rengrp=' . Sanitize::encodeUrlParam($grpid) . '">'._('Rename').'</a></li>';
+			echo ' <li><a href="managestugrps.php?cid='.$cid.'&grpsetid=' . Sanitize::encodeUrlParam($grpsetid) . '&delgrp=' . Sanitize::encodeUrlParam($grpid) . '">'._('Delete').'</a></li>';
+			echo ' <li><a href="managestugrps.php?cid='.$cid.'&grpsetid=' . Sanitize::encodeUrlParam($grpsetid) . '&removeall=' . Sanitize::encodeUrlParam($grpid) . '">'._('Remove all members').'</a></li>';
+			echo '</ul></span>';
+			echo '<ul>';
+
 			if (count($page_grpmembers[$grpid])==0) {
 				echo '<li>No group members</li>';
 			} else {
@@ -750,12 +746,16 @@ if ($overwriteBody==1) {
 							echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 						}
 					}
+					echo '<span class="dropdown">';
+					echo '<a tabindex=0 class="dropdown-toggle arrow-down" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';					
 					if ($stulocked[$uid]) {
 						echo '<span class="greystrike pii-full-name">'.$name.'</span>';
 					} else {
 						echo '<span class="pii-full-name">'.$name.'</span>';
 					}
-					echo " <span class=linkgrp>| <a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&remove=" . Sanitize::onlyInt($uid) . "&grpid=" . Sanitize::encodeUrlParam($grpid) . "\">Remove from group</a></span></li>";
+					echo '</a><ul class="dropdown-menu" role="menu">';
+					echo ' <li><a href="managestugrps.php?cid='.$cid.'&grpsetid=' . Sanitize::encodeUrlParam($grpsetid) . '&remove=' . Sanitize::onlyInt($uid) .  '&grpid=' . Sanitize::encodeUrlParam($grpid) . '">'._('Remove from group').'</a></li>';
+					echo '</ul></span>';
 				}
 			}
 			echo '</ul>';
@@ -765,13 +765,13 @@ if ($overwriteBody==1) {
 		echo '<h2>Students not in a group yet</h2>';
 		if (count($page_ungrpstu)>0) {
 			echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&addstutogrp=true\">";
-			echo 'With selected, add to group ';
+			echo '<label>With selected, add to group ';
 			echo '<select name="addtogrpid">';
 			echo "<option value=\"--new--\">New Group</option>";
 			foreach ($page_grps as $grpid=>$grpname) {
 				echo "<option value=\"" . Sanitize::encodeStringForDisplay($grpid) . "\">" . Sanitize::encodeStringForDisplay($grpname) . "</option>";
 			}
-			echo '</select>';
+			echo '</select></label>';
 			echo '<input type="submit" value="Add"/>';
 			echo '<ul class="nomark">';
 			foreach ($page_ungrpstu as $uid=>$name) {
@@ -788,7 +788,7 @@ if ($overwriteBody==1) {
 				} else {
 					echo '<span class="pii-full-name">'.$name.'</span>';
 				}
-				echo "<label></li>";
+				echo "</label></li>";
 			}
 			echo '</ul>';
 			echo '</form>';
@@ -804,7 +804,7 @@ if ($overwriteBody==1) {
 			echo '<p>No existing sets of groups</p>';
 		} else {
 			echo '<p>Select a set of groups to modify the groups in that set</p>';
-			echo '<table><tbody>';
+			echo '<table role=presentation><thead><th>'._('Group Set').'</th><th>'._('Actions').'</thead><tbody>';
 			foreach ($page_groupsets as $gs) {
                 if ($gs[1] == '##autobysection##') {
                     echo '<tr style="display:none;">';
