@@ -286,4 +286,6 @@ foreach ($errors as $error) {
 }
 echo '</ul>';
 
+echo '<p>'._('Videos marked as "Missing/broken" that seem to be available are likely unlisted videos, preventing lookup of caption data.').'</p>';
+
 require_once '../footer.php';
