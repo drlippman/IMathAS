@@ -313,7 +313,7 @@ Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All<
 <?php
 
 foreach($forumitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.Sanitize::encodeStringForDisplay($name).'</li>';
+	echo '<li><label><input type="checkbox" name="checked[]" value="'.$id.'" /> '.Sanitize::encodeStringForDisplay($name).'</label></li>';
 }
 ?>
 </ul>
@@ -327,115 +327,115 @@ foreach($forumitems as $id=>$name) {
 </thead>
 <tbody>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgavail" class="chgbox"/></td>
-	<td class="r">Show:</td>
-	<td>
-	<input type=radio name="avail" value="0" />Hide<br/>
-	<input type=radio name="avail" value="1" checked="checked"/>Show by Dates<br/>
-	<input type=radio name="avail" value="2"/>Show Always
+	<td><input type="checkbox" name="chgavail" class="chgbox" aria-labelledby="lshow"/></td>
+	<td class="r" id="lshow">Show:</td>
+	<td role=radiogroup aria-labelledby="lshow">
+	<label><input type=radio name="avail" value="0" />Hide</label><br/>
+	<label><input type=radio name="avail" value="1" checked="checked"/>Show by Dates</label><br/>
+	<label><input type=radio name="avail" value="2"/>Show Always</label>
 	</td>
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgpostby" class="chgbox" /></td>
-	<td class="r">Students can create new threads:</td>
-	<td>
-	<input type=radio name="postby" value="Always" checked="checked"/>Always<br/>
-	<input type=radio name="postby" value="Never" />Never<br/>
-	<input type=radio name="postby" value="Date" />Before:
-	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
+	<td><input type="checkbox" name="chgpostby" class="chgbox" aria-labelledby="lpostby"/></td>
+	<td class="r" id="lpostby">Students can create new threads:</td>
+	<td role=radiogroup aria-labelledby="lpostby">
+	<label><input type=radio name="postby" value="Always" checked="checked"/>Always</label><br/>
+	<label><input type=radio name="postby" value="Never" />Never</label><br/>
+	<label><input type=radio name="postby" value="Date" />Before</label>:
+	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>" aria-label="create threads by date">
 	<a href="#" onClick="displayDatePicker('postbydate', this); return false">
 	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-	at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
+	at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>" aria-label="create threads by time">
 
 	</td>
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgreplyby" class="chgbox" /></td>
-	<td class="r">Students can reply to posts:</td>
-	<td>
-	<input type=radio name="replyby" value="Always" checked="checked"/>Always<br/>
-	<input type=radio name="replyby" value="Never" />Never<br/>
-	<input type=radio name="replyby" value="Date" />Before:
-	<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
+	<td><input type="checkbox" name="chgreplyby" class="chgbox" aria-labelledby="lreplyby"/></td>
+	<td class="r" id="lreplyby">Students can reply to posts:</td>
+	<td role=radiogroup aria-labelledby="lreplyby">
+	<label><input type=radio name="replyby" value="Always" checked="checked"/>Always</label><br/>
+	<label><input type=radio name="replyby" value="Never" />Never</label><br/>
+	<label><input type=radio name="replyby" value="Date" />Before</label>:
+	<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>" aria-label="reply by date">
 	<a href="#" onClick="displayDatePicker('replybydate', this); return false">
 	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-	at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
+	at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>" aria-label="reply by time">
 
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowlate" class="chgbox" /></td>
-	<td class="r">Allow use of LatePasses?:</td>
+	<td><input type="checkbox" name="chgallowlate" class="chgbox" aria-labelledby="lallowlate"/></td>
+	<td class="r" id="lallowlate">Allow use of LatePasses?:</td>
 	<td>
 		<?php
-		writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],0);
+		writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],0,null,null,'aria-label="'._('number of latepasses').'"');
 		echo ' on ';
-		writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],0);
+		writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],0,null,null,'aria-label="'._('latepasses apply to').'"');
 		?>
 		<br/><label><input type="checkbox" name="latepassafterdue"> Allow LatePasses after due date, within 1 LatePass period</label>
 	</td>
 
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgcaltag" class="chgbox" /></td>
-	<td class="r">Calendar icon:</td>
+	<td><input type="checkbox" name="chgcaltag" class="chgbox" aria-labelledby="lcaltag"/></td>
+	<td class="r" id="lcaltag">Calendar icon:</td>
 	<td>
-	New Threads: <input name="caltagpost" type=text size=8 value="FP"/>,
-	Replies: <input name="caltagreply" type=text size=8 value="FR"/>
+	<label>New Threads: <input name="caltagpost" type=text size=8 value="FP"/></label>,
+	<label>Replies: <input name="caltagreply" type=text size=8 value="FR"/></label>
 	</td>
 </tr>
 
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowanon" class="chgbox"/></td>
-	<td class="r">Allow anonymous posts: </td>
+	<td><input type="checkbox" name="chgallowanon" class="chgbox" aria-labelledby="lallowanon"/></td>
+	<td class="r" id="lallowanon">Anonymous posts: </td>
 	<td>
-		<input type=checkbox name="allowanon" value="1"/>
+		<label><input type=checkbox name="allowanon" value="1"/> Allow anonymous posts</label>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowmod" class="chgbox"/></td>
-	<td class="r">Allow students to modify posts: </td>
+	<td><input type="checkbox" name="chgallowmod" class="chgbox" aria-labelledby="lallowmod"/></td>
+	<td class="r" id="lallowmod">Modify posts: </td>
 	<td>
-		<input type=checkbox name="allowmod" value="1" checked="checked"/>
+		<label><input type=checkbox name="allowmod" value="1" checked="checked"/>Allow students to modify posts</label>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowdel" class="chgbox"/></td>
-	<td class="r">Allow students to delete own posts (if no replies): </td>
+	<td><input type="checkbox" name="chgallowdel" class="chgbox" aria-labelledby="lallowdel"/></td>
+	<td class="r" id="lallowdel">Delete posts: </td>
 	<td>
-		<input type=checkbox name="allowdel" value="1"/>
+		<label><input type=checkbox name="allowdel" value="1"/> Allow students to delete own posts (if no replies)</label>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowlikes" class="chgbox"/></td>
-	<td class="r">Turn on "liking" posts: </td>
+	<td><input type="checkbox" name="chgallowlikes" class="chgbox" aria-labelledby="llikes"/></td>
+	<td class="r" id="llikes">"Liking" posts: </td>
 	<td>
-		<input type=checkbox name="allowlikes" value="1"/>
+		<label><input type=checkbox name="allowlikes" value="1"/>Turn on "liking" posts</label>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgviewafterpost" class="chgbox"/></td>
-	<td class="r">Viewing before posting:</td>
+	<td><input type="checkbox" name="chgviewafterpost" class="chgbox" aria-labelledby="lviewafterpost"/></td>
+	<td class="r" id="lviewafterpost">Viewing before posting:</td>
 	<td>
-		<input type=checkbox name="viewafterpost" value="1"/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
+		<label><input type=checkbox name="viewafterpost" value="1"/> Prevent students from viewing posts until they have created a thread.</label><br/><i>You will likely also want to disable modifying posts</i>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgsubscribe" class="chgbox"/></td>
-	<td class="r">Get email notify of new posts: </td>
+	<td><input type="checkbox" name="chgsubscribe" class="chgbox" aria-labelledby="lsubscribe"/></td>
+	<td class="r" id="lsubscribe">Email notification: </td>
 	<td>
-		<input type=checkbox name="subscribe" value="1"/>
+		<label><input type=checkbox name="subscribe" value="1"/>Get email notification of new posts</label>
 	</td>
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgdefdisplay" class="chgbox"/></td>
-	<td class="r">Default display: </td>
+	<td><input type="checkbox" name="chgdefdisplay" class="chgbox" aria-labelledby="ldefdisp"/></td>
+	<td class="r" id="ldefdisp">Default display: </td>
 	<td>
-	<select name="defdisplay">
+	<select name="defdisplay" aria-labelledby="ldefdisp">
 		<option value="0" selected="selected">Expanded</option>
 		<option value="1">Collapsed</option>
 		<option value="2">Condensed</option>
@@ -444,78 +444,81 @@ foreach($forumitems as $id=>$name) {
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgsortby" class="chgbox"/></td>
-	<td class="r">Sort threads by: </td>
-	<td>
-	<input type="radio" name="sortby" value="0" checked="checked"/> Thread start date<br/>
-	<input type="radio" name="sortby" value="1" /> Most recent reply date
+	<td><input type="checkbox" name="chgsortby" class="chgbox" aria-labelledby="lsortby"/></td>
+	<td class="r" id="lsortby">Sort threads by: </td>
+	<td role=radiogroup aria-labelledby="lsortby">
+	<label><input type="radio" name="sortby" value="0" checked="checked"/> Thread start date</label><br/>
+	<label><input type="radio" name="sortby" value="1" /> Most recent reply date</label>
 	</td>
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
-	<td class="r">Count: </td>
-	<td><input name="cntingb" value="0" checked="checked" type="radio"> No<br/>
-	<input name="cntingb" value="1" type="radio"> Yes<br/>
-	<input name="cntingb" value="4" type="radio"> Yes, but hide from students for now<br/>
-	<input name="cntingb" value="2" type="radio"> Yes, as extra credit<br/>
-	If yes, for: <input type=text size=4 name="points" value=""/> points (leave blank to not change)
-	</td>
-</tr>
-<tr class="coptr">
-	<td><input type="checkbox" name="chgautoscore" class="chgbox"/></td>
-	<td class="r">Autoscoring:</td>
+	<td><input type="checkbox" name="chgcntingb" class="chgbox" aria-labelledby="lcnt"/></td>
+	<td class="r" id="lcnt">Count: </td>
 	<td>
-	Auto-award <input type="text" size="2" name="autopostpts" value="0"> points
-	for the first <input type="text" size="2" name="autopostn" value="0"> posts<br/>
-	Auto-award <input type="text" size="2" name="autoreplypts" value="0"> points
-	for the first <input type="text" size="2" name="autoreplyn" value="0"> replies
+		<span role=radiogroup aria-labelledby="lcnt">
+		<label><input name="cntingb" value="0" checked="checked" type="radio"> No</label><br/>
+		<label><input name="cntingb" value="1" type="radio"> Yes</label><br/>
+		<label><input name="cntingb" value="4" type="radio"> Yes, but hide from students for now</label><br/>
+		<label><input name="cntingb" value="2" type="radio"> Yes, as extra credit</label><br/>
+		</span>
+		<label>If yes, for: <input type=text size=4 name="points" value=""/> points (leave blank to not change)</label>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
-	<td class="r">Gradebook category: </td>
+	<td><input type="checkbox" name="chgautoscore" class="chgbox" aria-labelledby="lauto"/></td>
+	<td class="r" id="lauto">Autoscoring:</td>
+	<td>
+	<label>Auto-award <input type="text" size="2" name="autopostpts" value="0"> points</label>
+	<label>for the first <input type="text" size="2" name="autopostn" value="0"> posts<br/>
+	<label>Auto-award <input type="text" size="2" name="autoreplypts" value="0"> points</label>
+	<label>for the first <input type="text" size="2" name="autoreplyn" value="0"> replies</label>
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chggbcat" class="chgbox" aria-labelledby="lgbcat"/></td>
+	<td class="r" id="lgbcat">Gradebook category: </td>
 	<td>
 <?php
-writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0," id=gbcat");
+writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0,'aria-labelledby="lgbcat"');
 ?>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgforumtype" class="chgbox"/></td>
-	<td class="r">Forum Type: </td>
-	<td>
-		<input type=radio name="forumtype" value="0" checked="checked"/>Regular forum<br/>
-		<input type=radio name="forumtype" value="1"/>File sharing forum
+	<td><input type="checkbox" name="chgforumtype" class="chgbox" aria-labelledby="lftype"/></td>
+	<td class="r" id="lftype">Forum Type: </td>
+	<td role=radiogroup aria-labelledby="lftype">
+		<label><input type=radio name="forumtype" value="0" checked="checked"/>Regular forum</label><br/>
+		<label><input type=radio name="forumtype" value="1"/>File sharing forum</label>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgtaglist" class="chgbox"/></td>
-	<td class="r">Categorize posts?: </td>
+	<td><input type="checkbox" name="chgtaglist" class="chgbox" aria-labelledby="ltaglist"/></td>
+	<td class="r" id="ltaglist">Categorize posts?: </td>
 	<td>
-		<input type=checkbox name="usetags" value="1"
-		  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
+		<label><input type=checkbox name="usetags" value="1"
+		  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" /> Enable Categorizing</label>
 		 <span id="tagholder" style="display:none">
-		   Enter in format CategoryDescription:category,category,category<br/>
-		   <textarea rows="2" cols="60" name="taglist"></textarea>
+		   <br><label for=taglist>Enter in format: CategoryDescription:category,category,category</label><br/>
+		   <textarea rows="2" cols="60" name="taglist" id="taglist"></textarea>
 		 </span>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgpostinstr" class="chgbox"/></td>
-	<td class="r">Posting Instructions: <em>Displays on Add New Thread</em></td>
+	<td><input type="checkbox" name="chgpostinstr" class="chgbox" aria-labelledby="lpostinstr"/></td>
+	<td class="r" id="lpostinstr">Posting Instructions: <em>Displays on Add New Thread</em></td>
 	<td>
 		<div class=editor>
-		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%"></textarea>
+		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%" aria-labelledby="lpostinstr"></textarea>
 		</div>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgreplyinstr" class="chgbox"/></td>
-	<td class="r">Reply Instructions: <em>Displays on Add Reply</em></td>
+	<td><input type="checkbox" name="chgreplyinstr" class="chgbox" aria-labelledby="lreplyinstr"/></td>
+	<td class="r" id="lreplyinstr">Reply Instructions: <em>Displays on Add Reply</em></td>
 	<td>
 		<div class=editor>
-		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%"></textarea>
+		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%" aria-labelledby="lreplyinstr"></textarea>
 		</div>
 	</td>
 </tr>
