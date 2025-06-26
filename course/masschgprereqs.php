@@ -121,14 +121,13 @@ foreach ($assessorder as $orderkey=>$id) {
     $row = $assessments[$id];
 
     echo '<tr class="'. (($orderkey%2==0) ? 'even' : 'odd') .'">';
-    echo '<td>' . Sanitize::encodeStringForDisplay($row['name']) . '</td>';
+    echo '<td id="n'.$orderkey.'">' . Sanitize::encodeStringForDisplay($row['name']) . '</td>';
     echo '<td>';
-    echo '<label for="reqscoredisptype['.$id.']" class="sr-only">';
-    echo _('Prerequisite type') . '</label>';
     writeHtmlSelect('reqscoredisptype['.$id.']',
         array('none','after','grey'), 
         array(_('No prerequisite'),_('Show only after'), _('Show greyed until')), 
-        $row['reqscoredisptype']);
+        $row['reqscoredisptype'],
+        null,null,'aria-labelledby="n'.$orderkey.'"');
     echo ' <span id="reqscorewrap'.$id.'" ';
     if ($row['reqscoredisptype'] == 'none') {
         echo 'style="display:none;"';
