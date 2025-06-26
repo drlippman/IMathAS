@@ -1019,6 +1019,10 @@ class AssessInfo
       $out['vidid'] = $vidid;
       $out['vidar'] = "16:9";
     }
+    if (strlen($out['vidid']) > 11) {
+      // invalid video ID; may have left query string in; strip it out
+      $out['vidid'] = substr($out['vidid'], 0, 11);
+    }
     $out['cues'] = array();
     foreach ($tmpdata as $cue=>$data) {
       $out['cues'][$cue] = array(
