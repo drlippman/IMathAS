@@ -1673,6 +1673,10 @@ function setActiveTab(el) {
 	jQuery(el).closest(".tablist").find("a[role=tab]").attr("aria-selected",false);
 	jQuery(el).attr("aria-selected",true);
 	jQuery(el).parent().addClass("active");
+	if (el.getAttribute('tabindex') == -1) {
+		jQuery(el).closest(".tablist").find("a[role=tab]").attr("tabindex", -1);
+		el.setAttribute("tabindex", 0);
+	}
 	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);
 	var tabpanelid = el.getAttribute('aria-controls');
 	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);

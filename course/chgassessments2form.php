@@ -88,40 +88,40 @@ $vueData = array(
 		<div :class="{highlight:summary != 'DNC'}">
 			<span class=form><?php echo _('Summary'); ?>:</span>
 			<span class=formright>
-				Copy from: <select name="summary" v-model="summary">
+				<label>Copy summary from: <select name="summary" v-model="summary">
 					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
-				</select>
+				</select></label>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:intro != 'DNC'}">
 			<span class=form><?php echo _('Instructions'); ?>:</span>
 			<span class=formright>
-				Copy from: <select name="intro" v-model="intro">
+				<label>Copy instructions from : <select name="intro" v-model="intro">
 					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
-				</select>
+				</select></label>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:dates != 'DNC'}">
 			<span class=form><?php echo _('Dates and Times'); ?>:</span>
 			<span class=formright>
-				Copy from: <select name="dates" v-model="dates">
+				<label>Copy dates from: <select name="dates" v-model="dates">
 					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
-				</select>
+				</select></label>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:avail != 'DNC'}">
-			<span class=form>Show:</span>
+			<label for=avail class=form>Show:</label>
 			<span class=formright>
-				<select name="avail" v-model="avail">
+				<select name="avail" id=avail v-model="avail">
 					<option value="DNC"><?php echo _('Do not change'); ?></option>
 					<option value="0"><?php echo _('Hide'); ?></option>
 					<option value="1"><?php echo _('Show By Dates'); ?></option>
@@ -129,9 +129,9 @@ $vueData = array(
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:review != 'DNC'}">
-			<span class=form><?php echo _('Practice mode'); ?>:</span>
+			<label for=review class=form><?php echo _('Practice mode'); ?>:</label>
 			<span class=formright>
-				<select name="review" v-model="review">
+				<select name="review" id=review v-model="review">
 					<option value="DNC"><?php echo _('Do not change'); ?></option>
 					<option value="0"><?php echo _('Do not keep open for un-graded practice after the due date'); ?></option>
 					<option value="1"><?php echo _('Keep open for un-graded practice after the due date'); ?></option>
@@ -141,19 +141,19 @@ $vueData = array(
 		<div :class="{highlight:copyendmsg != 'DNC'}">
 			<span class=form><?php echo _('End of Assessment Messages'); ?>:</span>
 			<span class=formright>
-				Copy from: <select name="copyendmsg" v-model="copyendmsg">
+				<label>Copy messages from: <select name="copyendmsg" id="copyendmsg" v-model="copyendmsg">
 					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
-				</select>
+				</select></label>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:chgendmsg}">
 			<span class=form><?php echo _('Define new end of assessment messages'); ?>:</span>
 			<span class=formright>
-				<input type="checkbox" name="chgendmsg" v-model="chgendmsg"/>
-				<?php echo _('You will be taken to a page to change these after you hit submit'); ?>
+				<label><input type="checkbox" name="chgendmsg" v-model="chgendmsg"/>
+				<?php echo _('You will be taken to a page to change these after you hit submit'); ?></label>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:removeperq}">
@@ -174,12 +174,12 @@ $vueData = array(
 		<div :class="{highlight:copyopts != 'DNC'}">
 			<span class=form><?php echo _('Copy assessment options'); ?>:</span>
 			<span class=formright>
-				<?php echo _('Copy from'); ?>: <select name="copyopts" v-model="copyopts">
+				<label><?php echo _('Copy options from'); ?>: <select name="copyopts" v-model="copyopts">
 					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
-				</select>
+				</select></label>
 			</span><br class=form />
 		</div>
         <div v-show="copyopts !== 'DNC'" :class="{highlight:copyreqscore != false}">
@@ -193,7 +193,7 @@ $vueData = array(
         </div>
 		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
-			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>
+			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>&nbsp;
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All'); ?></a>
 		</div>
 		<div class="block grouptoggle">
@@ -229,7 +229,7 @@ $vueData = array(
 				</p>
 				<label class="form" for="subtype"><?php echo _('Submission type'); ?>:</label>
 				<span class="formright">
-					<select name="subtype" v-model="subtype" :required="changingCore">
+					<select name="subtype" id="subtype" v-model="subtype" :required="changingCore">
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="by_question"><?php echo _('Homework-style: new versions of individual questions'); ?></option>
 						<option value="by_assessment"><?php echo _('Quiz-style: retake whole assessment with new versions'); ?></option>
@@ -243,7 +243,7 @@ $vueData = array(
 				<span class=form><?php echo _('Versions'); ?>:</span>
 				<span class=formright>
 
-					<label for="defregens" v-show="subtype == 'by_question'">
+					<label for="defregens" v-show="subtype != 'by_assessment'">
 						<?php echo _('Number of versions for each question'); ?>:
 					</label>
 					<label for="defregens" v-show="subtype == 'by_assessment'">
@@ -712,7 +712,7 @@ $vueData = array(
 				<label for="minscore" class=form><?php echo _('Minimum score to receive credit'); ?>:</label>
 				<span class=formright>
 					<input type=text size=4 name=minscore id=minscore v-model="minscore">
-					<select name="minscoretype">
+					<select name="minscoretype" aria-label="score type">
 						<option value="0" selected><?php echo _('Points'); ?></option>
 						<option value="1"><?php echo _('Percent'); ?></option>
 					</select>
@@ -720,17 +720,17 @@ $vueData = array(
 			</div>
 
 			<div :class="{highlight:usedeffb !== 'DNC'}">
-				<span class="form"><?php echo _('Default Feedback Text'); ?>:</span>
+				<label for=usedeffb class="form"><?php echo _('Default Feedback Text'); ?>:</label>
 				<span class="formright">
-					<select name="usedeffb" v-model="usedeffb">
+					<select name="usedeffb" id="usedeffb" v-model="usedeffb">
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="0"><?php echo _('Do not use default feedback text'); ?></option>
 						<option value="1"><?php echo _('Use default feedback text'); ?></option>
 					</select>
 					<span v-show="usedeffb==1">
 						<br/>
-						<?php echo _('Text'); ?>:
-						<textarea name="deffb" rows="4" cols="60"></textarea>
+						<label><?php echo _('Text'); ?>:
+						<textarea name="deffb" rows="4" cols="60"></textarea></label>
 					</span>
 				</span><br class=form />
 			</div>

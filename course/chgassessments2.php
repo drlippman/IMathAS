@@ -653,7 +653,7 @@ if (!(isset($teacherid))) {
 						$sub = getNestedList($item['items'], $parent.'-'.($k+1));
 						if ($sub !== '') {
 							$out .= '<li>';
-							$out .= '<label> <img src="'.$staticroot.'/img/folder_tiny.png"/> ';
+							$out .= '<label> <img src="'.$staticroot.'/img/folder_tiny.png" alt="folder"/> ';
 							$out .= '<input type=checkbox name="checked[]" value="0" id="'.$parent.'-'.($k+1).'" ';
 							$out .= 'onClick="chkgrp(this.form, \''.$parent.'-'.($k+1).'\', this.checked);" checked=checked /> ';
 
@@ -664,7 +664,7 @@ if (!(isset($teacherid))) {
 				} else if (isset($itemshowdata[$item]['itemtype']) && $itemshowdata[$item]['itemtype'] == 'Assessment') {
 					$aid = $itemshowdata[$item]['id'];
 					$out .= '<li>';
-					$out .= '<label><img src="'.$staticroot.'/img/assess_tiny.png"/> ';
+					$out .= '<label><img src="'.$staticroot.'/img/assess_tiny.png" alt=""/> ';
 					$out .= '<input type=checkbox name="checked[]" value="'.$aid.'" onclick="updgrp(\''.$parent.'\')" ';
 					$out .= 'id="' . $parent . "." . $item . ":" . $agbcats[$aid] . '" checked=checked /> ';
 
@@ -791,6 +791,28 @@ function tabToSettings() {
 		$(document).scrollTop(0);
 	}
 }
+$(function() {
+	$(".tablist a").on('click', function(ev) {
+		setActiveTab(this)
+		ev.preventDefault();
+	}).on('keydown', function(ev) {
+		if (ev.keyCode == 37) { // arrow left
+			let li = $(this).closest("li").prev("li");
+			if (li) {
+				let ael = li.find("a")[0];
+				setActiveTab(ael);
+				ael.focus();
+			}
+		} else if (ev.keyCode == 39) { // arrow right
+			let li = $(this).closest("li").next("li");
+			if (li) {
+				let ael = li.find("a")[0];
+				setActiveTab(ael);
+				ael.focus();
+			}
+		} 
+	});
+});
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -807,15 +829,15 @@ function tabToSettings() {
 	 taken will change the student's data.</p>
 
 	<form id="qform" method=post action="chgassessments2.php?cid=<?php echo $cid; ?>" onsubmit="return valform();" class="tabwrap">
-		<ul class="tablist" role="tablist">
-			<li class="active">
+		<ul class="tablist" role="tablist" aria-label="Mass Change Steps">
+			<li role=presentation class="active">
 				<a href="#" role="tab" id="chgassesstab_sel" aria-controls="chgassess_sel" aria-selected="true"
-					onclick="setActiveTab(this);return false;"
+					tabindex="0"
 				>1: Select Assessments</a>
 			</li>
-			<li>
+			<li role=presentation>
 				<a href="#" role="tab" id="chgassesstab_chg" aria-controls="chgassess_chg" aria-selected="true"
-					onclick="setActiveTab(this);return false;"
+					tabindex="-1"
 				>2: Change Settings</a>
 			</li>
 		</ul>
@@ -825,7 +847,7 @@ function tabToSettings() {
 		<h2>Assessments to Change</h2>
 
 		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
-		Check by gradebook category:
+		<label for=selbygbcat>Check by gradebook category</label>:
 		<?php
 		writeHtmlSelect ("selbygbcat",array_keys($gbcats),array_values($gbcats),null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
 		?>
@@ -835,9 +857,7 @@ function tabToSettings() {
 		</ul>
 
 		<p>
-			Continue to <a href="#" role="tab" id="chgassesstab_chg" aria-controls="chgassess_chg" aria-selected="true"
-				onclick="tabToSettings();return false;"
-			>Change Settings</a>.
+			Continue to <a href="#" role="button" onclick="tabToSettings();return false;">Change Settings</a>.
 		</p>
 	</div>
 	<div class="tabpanel" id="chgassess_chg" aria-labelledby="chgassesstab_chg"
