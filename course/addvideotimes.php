@@ -213,6 +213,10 @@ function validatevidform(el) {
 				alert("<?php echo _("Please provide a video ID"); ?>");
 				els[i].focus();
 				return false;
+			} else if (!els[i].value.match(/^[a-zA-Z0-9_-]{11}$/)) {
+				alert("<?php echo _("Please provide a valid 11 character video ID"); ?>");
+				els[i].focus();
+				return false;
 			}
 		} else if (els[i].name.match(/segend/)) {
 			if (els[i].value=="") {
@@ -294,6 +298,10 @@ function fixVideoId(origid) {
 	}
 	if (vidid != origid) {
 		document.getElementById("vidid").value = vidid;
+	}
+	if (!vidid.match(/^[a-zA-Z0-9_-]{11}$/)) {
+		alert("<?php echo _("Please provide a valid 11 character video ID"); ?>");
+		return '';
 	}
 	return vidid;
 }
@@ -397,10 +405,10 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 
 <form method="post" style="clear:both;" onsubmit="return validatevidform(this);">
 
-<p>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo Sanitize::encodeStringForDisplay($vidid); ?>"/>
+<p><label>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo Sanitize::encodeStringForDisplay($vidid); ?>"/></label>
 <button type="button" onclick="loadnewvideo()"><?php echo _("Load Video"); ?></button></p>
 <p>
-	<?php echo _('Video Aspect Ratio:'); ?>
+	<label for=vidar><?php echo _('Video Aspect Ratio:'); ?></label>
 	<select name="vidar" id="vidar" onchange="updateAR()">
 <?php
 	$ratios = array("16:9", "4:3", "3:2");
