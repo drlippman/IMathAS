@@ -294,7 +294,7 @@ function fixVideoId(origid) {
 			vidid = origid.split('v=')[1].split(/[#&]/)[0];
 		}
 	} else if (origid.match(/youtu\.be/)) {
-		vidid = origid.split('.be/')[1].split(/[#&]/)[0];
+		vidid = origid.split('.be/')[1].split(/[#&\?]/)[0];
 	}
 	if (vidid != origid) {
 		document.getElementById("vidid").value = vidid;
