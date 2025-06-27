@@ -201,12 +201,12 @@ Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php e
 <ul class="nomark">
 <?php
 foreach ($existblocks as $pos=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($existblockids[$pos]) . '"/>';
+	echo '<li><label><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($existblockids[$pos]) . '"/>';
 	$n = substr_count($pos,"-")-1;
 	for ($i=0;$i<$n;$i++) {
 		echo '&nbsp;&nbsp;';
 	}
-	echo Sanitize::encodeStringForDisplay($name) . '</li>';
+	echo Sanitize::encodeStringForDisplay($name) . '</label></li>';
 }
 ?>
 </ul>
@@ -217,19 +217,19 @@ foreach ($existblocks as $pos=>$name) {
 </thead>
 <tbody>
 	<tr>
-		<td><input type="checkbox" name="chgavail" class="chgbox"/></td>
-		<td class="r">Show:</td>
-		<td>
-			<input type=radio name="avail" value="0"/>Hide<br/>
-			<input type=radio name="avail" value="1"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" checked="checked"/>Show Always
+		<td><input type="checkbox" name="chgavail" class="chgbox" aria-labelledby="lavail"/></td>
+		<td class="r" id="lavail">Show:</td>
+		<td role=radiogroup aria-labelledby="lavail">
+			<label><input type=radio name="avail" value="0"/>Hide</label><br/>
+			<label><input type=radio name="avail" value="1"/>Show by Dates</label><br/>
+			<label><input type=radio name="avail" value="2" checked="checked"/>Show Always</label>
 		</td>
 	</tr>
 	<tr>
-		<td><input type="checkbox" name="chgavailbeh" class="chgbox"/></td>
-		<td class="r">When available:</td>
+		<td><input type="checkbox" name="chgavailbeh" class="chgbox" aria-labelledby="lavailbeh"/></td>
+		<td class="r" id="lavailbeh">When available:</td>
 		<td>
-			<select name="availbeh">
+			<select name="availbeh" aria-labelledby="lavailbeh">
 			<option value="O" selected="selected">Show Expanded</option>
 			<option value="C">Show Collapsed</option>
 			<option value="F">Show as Folder</option>
@@ -238,10 +238,10 @@ foreach ($existblocks as $pos=>$name) {
 		</td>
 	</tr>
 	<tr>
-		<td><input type="checkbox" name="chgshowhide" class="chgbox"/></td>
-		<td class="r">When not available:</td>
+		<td><input type="checkbox" name="chgshowhide" class="chgbox" aria-labelledby="lshowhide"/></td>
+		<td class="r" id="lshowhide">When not available:</td>
 		<td>
-			<select name="showhide">
+			<select name="showhide" aria-labelledby="lshowhide">
 			<option value="H" selected="selected">Hide from Students</option>
 			<option value="S">Show Collapsed/as folder</option>
 			</select>
@@ -249,8 +249,8 @@ foreach ($existblocks as $pos=>$name) {
 	</tr>
 
 	<tr>
-		<td><input type="checkbox" name="chggreyout" class="chgbox"/></td>
-		<td class="r">For assignments within this block,<br/>when they are not available:</td>
+		<td><input type="checkbox" name="chggreyout" class="chgbox" aria-labelledby="lgreyout"/></td>
+		<td class="r" id="lgreyout">For assignments within this block,<br/>when they are not available:</td>
 		<td>
 		<?php
 			writeHtmlSelect('contentbehavior',array(0,1,2,3),array(
@@ -258,37 +258,37 @@ foreach ($existblocks as $pos=>$name) {
 				_('Show greyed out before start date, hide after end date'),
 				_('Hide before start date, show greyed out after end date'),
 				_('Show greyed out before and after'),
-			), 0);
+			), 0,null,null,'aria-labelledby="lgreyout"');
 		?>
 		</td>
 	</tr>
 	<tr>
-		<td><input type="checkbox" name="chggrouplimit" class="chgbox"/></td>
-		<td class="r">Restrict access to students in section:</td>
+		<td><input type="checkbox" name="chggrouplimit" class="chgbox" aria-labelledby="lgrouplimit"/></td>
+		<td class="r" id="lgrouplimit">Restrict access to students in section:</td>
 		<td>
-			<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,0); ?>
+			<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,0,null,null,'aria-labelledby="lgrouplimit"'); ?>
 		</td>
 	</tr>
     <tr>
-		<td><input type="checkbox" name="chginnav" class="chgbox"/></td>
-		<td class="r">Quick Links:</td>
+		<td><input type="checkbox" name="chginnav" class="chgbox" aria-labelledby="linnav"/></td>
+		<td class="r" id="linnav">Quick Links:</td>
 		<td>
-			<input type=checkbox name=innav value=1 /> List block in student left navigation
+			<label><input type=checkbox name=innav value=1 /> List block in student left navigation</label>
 		</td>
 	</tr>
 	<tr>
-		<td><input type="checkbox" name="chgcolors" class="chgbox"/></td>
-		<td class="r">Block colors:</td>
+		<td><input type="checkbox" name="chgcolors" class="chgbox" aria-labelledby="lchgcolors"/></td>
+		<td class="r" id="lchgcolors">Block colors:</td>
 		<td>
-			<input type=radio name="colors" value="def" checked="checked"/>Use defaults<br/>
-			<input type=radio name="colors" value="copy"/>Copy colors from block:
+			<label><input type=radio name="colors" value="def" checked="checked"/>Use defaults</label><br/>
+			<label><input type=radio name="colors" value="copy"/>Copy colors from block</label>:
 
 			<?php
-			writeHtmlSelect("copycolors",$existBlocksVals,$existBlocksLabels);
+			writeHtmlSelect("copycolors",$existBlocksVals,$existBlocksLabels,null,null,null,'aria-label="block to copy colors from"');
 			?>
 
 			<br />&nbsp;<br/>
-			<input type=radio name="colors" id="colorcustom" value="custom"/>Use custom:
+			<label><input type=radio name="colors" id="colorcustom" value="custom"/>Use custom:
 			<table style="display: inline; border-collapse: collapse; margin-left: 15px;" role="presentation">
 				<tr>
 					<td id="ex1" style="border: 1px solid #000;background-color:#DDDDFF;color:#000000;">Sample Title Cell</td>
@@ -300,17 +300,17 @@ foreach ($existblocks as $pos=>$name) {
 			<br/>
 			<table style=" margin-left: 30px;" role="presentation">
 				<tr>
-					<td>Title Background: </td>
+					<td><label for="titlebg">Title Background:</label> </td>
 					<td><input type=text id="titlebg" name="titlebg" value="#DDDDFF" />
 					</td>
 				</tr>
 				<tr>
-					<td>Title Text: </td>
+					<td><label for="titletxt">Title Text:</label> </td>
 					<td><input type=text id="titletxt" name="titletxt" value="#000000" />
 					</td>
 				</tr>
 				<tr>
-					<td>Items Background: </td>
+					<td><label for="bi">Items Background:</label> </td>
 					<td><input type=text id="bi" name="bi" value="#EEEEFF" />
 					</td>
 				</tr>
