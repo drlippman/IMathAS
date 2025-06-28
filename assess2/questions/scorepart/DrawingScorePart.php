@@ -1764,7 +1764,10 @@ class DrawingScorePart implements ScorePart
                     $minp = array_map('floatval', explode(',', $lines[$k][0]));
                     $maxp = array_map('floatval', explode(',', $lines[$k][count($lines[$k])-1]));
                     $lines[$k] = array(min($minp[0], $maxp[0]), max($minp[0], $maxp[0]));
+                    if ($lines[$k][0] < 1) { $lines[$k][0] = 1; }
+                    if ($lines[$k][1] > $settings[6]-1) { $lines[$k][1] = $settings[6]-1; }
                 }
+                
                 $newlines = array($lines[0]);
                 for ($i=1;$i<count($lines);$i++) {
                     $overlap = -1;
@@ -1790,7 +1793,6 @@ class DrawingScorePart implements ScorePart
                         $newlines = array_values($newlines);
                     }
                 }
-                $lines = $newlines;
             }
             $defpttol = 5;
             if ($dots=='') {

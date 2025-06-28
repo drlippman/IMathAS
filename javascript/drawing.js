@@ -479,10 +479,16 @@ function encodea11ydraw(qn) {
 			var outpts = [];
             var outptsraw = [];
 			for (var i=1;i<input.length;i+=2) {
-				try {
-					input[i-1] = eval(prepWithMath(mathjs(input[i-1])));
-				} catch(e) {
-					input[i-1] = NaN;
+				if (input[i-1] === 'oo') {
+					input[i-1] = thistarg.imgwidth - 2*thistarg.imgborder -1;
+				} else if (input[i-1] === '-oo') {
+					input[i-1] = 1;
+				} else {
+					try {
+						input[i-1] = eval(prepWithMath(mathjs(input[i-1])));
+					} catch(e) {
+						input[i-1] = NaN;
+					}
 				}
 				try {
 					input[i] = eval(prepWithMath(mathjs(input[i])));
