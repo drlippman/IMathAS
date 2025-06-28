@@ -336,7 +336,7 @@
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
 		}
 		$lc++;
-		echo '<td><input type=checkbox name="stus[]" value="'.Sanitize::onlyInt($line['userid']).'"> ';
+		echo '<td><label><input type=checkbox name="stus[]" value="'.Sanitize::onlyInt($line['userid']).'"> ';
 		if ($line['locked']>0) {
 			echo '<span style="text-decoration: line-through;">';
 			printf("<span class='pii-full-name'>%s, %s</span></span>",
@@ -347,7 +347,7 @@
 				Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
-		echo '</td>';
+		echo '</label></td>';
 		if ($hassection && !$hidesection) {
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['section']));
 		}

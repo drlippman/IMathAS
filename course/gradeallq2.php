@@ -557,7 +557,7 @@
 	}
 	echo "<form id=\"mainform\" method=post action=\"gradeallq2.php?stu=" . Sanitize::generateQueryStringFromMap($qsmap) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
 	if ($isgroup>0 && $page == -1) {
-		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
+		echo '<p><label><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</label></p>';
 	}
 
 	
@@ -778,7 +778,8 @@
 
                     if ($canedit) {
                         $boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
-                        echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . '-'.$vernum . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\" pattern=\"N\/A|\d*\.?\d*\">";
+						$label = ($multiEntry) ? sprintf(_('Score for part %d'), $pn+1) : _('Score');
+                        echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . '-'.$vernum . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\" pattern=\"N\/A|\d*\.?\d*\" aria-label=\"$label\">";
                         echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . '-'.$vernum . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
                         if ($rubric != 0) {
                             $fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);
@@ -864,11 +865,11 @@
                     echo Sanitize::outgoingHtml($qdata['feedback']);
                     echo '</div>';
                 } else if ($_SESSION['useed']==0) {
-                    echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'. $vernum.'-'. $loc.'-'.Sanitize::onlyInt($line['userid']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
+                    echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'. $vernum.'-'. $loc.'-'.Sanitize::onlyInt($line['userid']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'" aria-label="'._('Feedback').'">';
                     echo Sanitize::encodeStringForDisplay($qdata['feedback'], true);
                     echo '</textarea>';
                 } else {
-                    echo '<div class="fbbox skipmathrender" id="fb-'. $vernum.'-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
+                    echo '<div class="fbbox skipmathrender" id="fb-'. $vernum.'-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'" role=textbox aria-label="'._('Feedback').'">';
                     echo Sanitize::outgoingHtml($qdata['feedback']);
                     echo '</div>';
                 }
