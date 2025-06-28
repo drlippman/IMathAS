@@ -146,7 +146,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
 /******* begin html output ********/
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=062825"></script>';
 $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
@@ -206,9 +206,9 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
 	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
-	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.Sanitize::encodeStringForDisplay($rubname).'"/></p>';
+	echo '<p><label>Name:  <input type="text" size="70" name="rubname" value="'.Sanitize::encodeStringForDisplay($rubname).'"/></label></p>';
 
-	echo '<p>Rubric Type: ';
+	echo '<p><label for=rubtype>Rubric Type</label>: ';
 	writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');
 	echo '</p>';
 	if ($rubtype==0 || $rubtype==1) {
@@ -228,29 +228,27 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 		total final score for the question.  Make sure one item is 100(%) or the expected point total for the question.';
 	echo '</p>';
 
-	echo '<p>Share with Group: <input type="checkbox" name="rubisgroup" '.getHtmlChecked($rubgrp,-1,1).' /></p>';
-	echo '<table><thead><tr><th>Rubric Item<br/>Shows in feedback</th><th>Instructor Note<br/>Not in feedback</th><th><span id="pointsheader" ';
-	if ($rubtype==2) {echo 'style="display:none;" ';}
-	echo '>Portion of Score</span>';
-
-	echo '</th></tr></thead><tbody>';
+	echo '<p><label><input type="checkbox" name="rubisgroup" '.getHtmlChecked($rubgrp,-1,1).' /> '._('Share with Group').'</label></p>';
+	echo '<table><thead><tr>';
+	echo '<th>Rubric Item<span class="hfeedback"><br/>Shows in feedback</span></th><th>Instructor Note<span class="hfeedback"><br/>Not in feedback</span></th>';
+	echo '<th class="rubricpoints"><span id="pointsheader">'. _('Portion of Score');
+	echo '</span></th></tr></thead><tbody>';
 	for ($i=0;$i<15; $i++) {
-		echo '<tr><td><input type="text" size="40" name="rubitem'.$i.'" value="';
-		if (isset($rubric[$i]) && isset($rubric[$i][0])) { echo str_replace('"','&quot;',$rubric[$i][0]);}
-		echo '"/></td>';
+		echo '<tr><td><span class="sr-only" id="l'.$i.'">Item '.($i+1).'</span>';
+		echo '<input type="text" size="40" name="rubitem'.$i.'" value="';
+		if (isset($rubric[$i]) && isset($rubric[$i][0])) { echo Sanitize::encodeStringForDisplay($rubric[$i][0]);}
+		echo '" aria-labelledby="l'.$i.'"/></td>';
 		echo '<td><input type="text" size="40" name="rubnote'.$i.'" value="';
-		if (isset($rubric[$i]) && isset($rubric[$i][1])) { echo str_replace('"','&quot;',$rubric[$i][1]);}
-		echo '"/></td>';
-		echo '<td><input type="text" size="4" class="rubricpoints" ';
-		if ($rubtype==2) {echo 'style="display:none;" ';}
-		echo 'name="rubscore'.$i.'" value="';
-		if (isset($rubric[$i]) && isset($rubric[$i][2])) { echo str_replace('"','&quot;',$rubric[$i][2]);} else {echo 0;}
-		echo '"/></td></tr>';
+		if (isset($rubric[$i]) && isset($rubric[$i][1])) { echo Sanitize::encodeStringForDisplay($rubric[$i][1]);}
+		echo '" aria-labelledby="l'.$i.'"/></td>';
+		echo '<td class="rubricpoints"><input type="text" size="4" name="rubscore'.$i.'" value="';
+		if (isset($rubric[$i]) && isset($rubric[$i][2])) { echo Sanitize::encodeStringForDisplay($rubric[$i][2]);} else {echo 0;}
+		echo '" aria-labelledby="l'.$i.'"/></td></tr>';
 	}
 	echo '</table>';
 	echo '<input type="submit" value="'.$savetitle.'"/>';
 	echo '</form>';
-
+	echo '<script>$(imasrubric_chgtype);</script>';
 
 }
 }

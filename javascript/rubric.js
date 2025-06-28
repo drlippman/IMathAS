@@ -243,25 +243,26 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 function imasrubric_chgtype() {
 	var val = document.getElementById("rubtype").value;
 	els = document.getElementsByTagName("input");
-	for (i in els) {
-		if (els[i].className=='rubricpoints') {
-			if (val==2) {
-				els[i].style.display = 'none';
-				document.getElementById("pointsheader").style.display = 'none';
-				$("#breakdowninstr").hide();
-				$("#scoretotalinstr").hide();
-			} else {
-				els[i].style.display = '';
-				document.getElementById("pointsheader").style.display = '';
-				if (val==0 || val==1) {
-					$("#breakdowninstr").show();
-					$("#scoretotalinstr").hide();
-				} else if (val==3||val==4) {
-					$("#breakdowninstr").hide();
-					$("#scoretotalinstr").show();
-				}
-			}
-		}
+	if (val == 2) {
+		$(".rubricpoints").hide();
+		$("#breakdowninstr").hide();
+		$("#scoretotalinstr").hide();
+	} else {
+		$(".rubricpoints").show();
+	}
+	if (val < 2) {
+		$("#pointsheader").text(_('Portion of Score'));
+		$("#breakdowninstr").show();
+		$("#scoretotalinstr").hide();
+	} else if (val > 2) {
+		$("#pointsheader").text(_('Total Score'));
+		$("#breakdowninstr").hide();
+		$("#scoretotalinstr").show();
+	}
+	if (val == 0 || val == 4) {
+		$(".hfeedback").hide();
+	} else {
+		$(".hfeedback").show();
 	}
 }
 
