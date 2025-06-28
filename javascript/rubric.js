@@ -75,30 +75,30 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
-			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
+			html += "<tr><td><span id=rr"+i+">"+imasrubrics[rubricid].data[i][0]+"</span>";
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
-			html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</td>';
+			html += '</td><td width="10%" style="white-space:nowrap;"><label><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</label></td>';
 			//if (totpts==2) {
 			//	html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
 			//}
-			html += '<td width="10%"><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</td>';
-			html += '<td width="10%" style="white-space:nowrap;"><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="number" step="0.1" min="0" max="'+totpts+'" size="3" id="rubricother'+i+'" value=""/></td></tr>';
+			html += '<td width="10%"><label><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</label></td>';
+			html += '<td width="10%" style="white-space:nowrap;"><label><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other</label>: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="number" step="0.1" min="0" max="'+totpts+'" size="3" id="rubricother'+i+'" value="" aria-label="points to assign"/></td></tr>';
 		} else if (imasrubrics[rubricid].type==2) { //just feedback
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			html += '</td><td><input type="checkbox" id="rubricchk'+i+'" value="1"/></td></tr>';
+			html += '</td><td><input type="checkbox" id="rubricchk'+i+'" value="1" aria-labelledby="rr'+i+'"/></td></tr>';
 		} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4) { //score total
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
-			html += '</td><td width="10%"><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</td></tr>';
+			html += '</td><td width="10%"><label><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</label></td></tr>';
 		}
 	}
 	html += '</tbody></table><br/><input type="button" value="Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+',false)" />';
