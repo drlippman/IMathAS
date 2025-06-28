@@ -26,6 +26,7 @@
           :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
           pattern="N\/A|\d*\.?\d*"
           v-model="curScores[i]"
+          :aria-label="$t('gradebook.score') + (partPoss.length > 1 ? ' ' + $t('gradebook.part_n', {n:i+1}) : '')"
           @input="updateScore(i, $event)"
           @keyup.enter="$emit('submitform')"
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}

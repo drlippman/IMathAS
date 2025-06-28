@@ -3,6 +3,7 @@
     :id="computedId"
     ref="inbox"
     class="fbbox skipmathrender"
+    role="textbox"
     :rows="rows"
   ></div>
 </template>

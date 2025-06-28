@@ -1,13 +1,14 @@
 <template>
   <div v-show="show">
-    {{ !username ?
+    <span :id="'fblbl'+qn">{{ !username ?
       $t('gradebook.feedback') :
       $t('gradebook.feedback_for', {name: username})
-    }}:<br/>
+    }}</span>:<br/>
     <textarea
       v-if="canedit && !useeditor"
       class="fbbox"
       :id="'fb' + qn"
+      :aria-labelledby="'fblbl'+qn"
       ref = "fbbox"
       rows="2"
       cols="60"
@@ -20,6 +21,7 @@
       :id="'fb' + qn"
       :value = "value"
       @input = "updateFeedback"
+      :aria-labelledby="'fblbl'+qn"
     ></tinymce-input>
     <div
       v-else

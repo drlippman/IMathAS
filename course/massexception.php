@@ -593,10 +593,10 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 	echo '<p class="list"><label><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</label></p>';
     echo '<p class="list"><label><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.</label>  <label>Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</label></p>';
     if ($courseUIver > 1) {
-        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional time:</label> <label><input size=2 name="timelimitextmin" value="0"> additional minutes.</label>
+        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow additional time:</label> <label><input size=2 name="timelimitextmin" value="0"> additional minutes.</label>
         <span class="small" id="timelimitinfo" style="display:none"><br>Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.
         <br>To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student\'s name).</span></p>';
-        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> <span id="avl">Allow student additional versions</span>:</label> <input size=2 name="attemptextnum" value="0" aria-labelledby="avl"> </p>';
+        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> Allow student additional versions:</label> <label><input size=2 name="attemptextnum" value="0"> Additional versions</label></p>';
     }
     echo '</fieldset>';
 
