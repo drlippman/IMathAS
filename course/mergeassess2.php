@@ -209,7 +209,7 @@ if (isset($_POST['mergefrom'])) {
 	foreach ($itemsimporder as $item) {
 		if (!isset($itemsassoc[$item])) { continue; }
 		$id = $itemsassoc[$item];
-		echo "<li><input type=\"text\" size=\"2\" name=\"mergefrom[" . Sanitize::onlyInt($id) . "]\" />" . Sanitize::encodeStringForDisplay($assess[$id]) . "</li>";
+		echo "<li><label><input type=\"text\" size=\"2\" name=\"mergefrom[" . Sanitize::onlyInt($id) . "]\" />" . Sanitize::encodeStringForDisplay($assess[$id]) . "</label></li>";
 	}
 	echo '</ul>';
 	echo '<input type="hidden" name="mergetype" value="0"/>';
