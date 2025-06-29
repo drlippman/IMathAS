@@ -3,6 +3,7 @@ function toggle(id) {
 	button = document.getElementById('b'+id);
 	if (node.className == "show") {
 		node.className = "hide";
+		$(node).find("input[type=checkbox]").prop("checked",false);
 		button.innerHTML = "+";
 	} else {
 		node.className = "show";

@@ -47,6 +47,17 @@ if ($myrights<20) {
 		$curBreadcrumb .= " &gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 
+	if (!empty($_POST['nchecked'])) {
+		$ph = Sanitize::generateQueryPlaceholders($_POST['nchecked']);
+		$stm = $DBH->prepare("SELECT name FROM imas_libraries WHERE id IN ($ph)");
+		$stm->execute($_POST['nchecked']);
+		$libchgul = '<ul>';
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$libchgul .= '<li>'.Sanitize::encodeStringForDisplay($row['name']).'</li>';
+		}
+		$libchgul .= '</ul>';
+	}
+
 	if (isset($_POST['remove'])) {
 		if (isset($_GET['confirmed'])) {
 			if ($_POST['remove']!='') {
@@ -575,6 +586,9 @@ if ($overwriteBody==1) {
 	function setlibnames(libn) {
 		document.getElementById("libnames").innerHTML = libn;
 	}
+	function postWSform(val) {
+        $('#qform').append($('<input>', {name:val, value:val, type:'hidden'})).submit();
+    }
 	</script>
 
 
@@ -597,14 +611,17 @@ if ($overwriteBody==1) {
 <?php
 	if (isset($_POST['remove'])) {
 ?>
+	<p>Impacted Libraries:</p>
+	<?php echo $libchgul; ?>
+
  	<?php echo $hasChildWarning; ?>
 	Are you SURE you want to delete these libraries?
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&confirmed=true">
 		<p>
-			<input type=radio name="delq" value="no" CHECKED>
-			Move questions in library to Unassigned<br>
-			<input type=radio name="delq" value="yes" >
-			Also delete questions in library
+			<label><input type=radio name="delq" value="no" CHECKED>
+			Yes, and move questions in library to Unassigned</label><br>
+			<label><input type=radio name="delq" value="yes" >
+			Yes, and also delete questions in library</label>
 		</p>
 		<input type=hidden name=remove value="<?php echo Sanitize::encodeStringForDisplay($rlist); ?>">
 		<p>
@@ -616,6 +633,9 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['transfer'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+		<p>Impacted Libraries:</p>
+		<?php echo $libchgul; ?>
+
 		<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 		
 		<?php //writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
@@ -632,8 +652,11 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['chgrights'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+		<p>Impacted Libraries:</p>
+		<?php echo $libchgul; ?>
+
 		<input type=hidden name=chgrights value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
-		<span class=form>Library use rights: </span>
+		<label for=newrights class=form>Library use rights: </label>
 		<span class=formright>
 			<?php writeHtmlSelect ("newrights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</span><br class=form>
@@ -654,11 +677,14 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['chgsort'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+		<p>Impacted Libraries:</p>
+		<?php echo $libchgul; ?>
+
 		<input type=hidden name=chgsort value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
-		<span class=form>Sort order: </span>
-		<span class=formright>
-			<input type="radio" name="sortorder" value="0" checked/> Creation date<br/>
-			<input type="radio" name="sortorder" value="1"/> Alphabetical
+		<span class=form id="lbl">Sort order: </span>
+		<span class=formright role=radiogroup aria-labelledby="lbl">
+			<label><input type="radio" name="sortorder" value="0" checked/> Creation date</label><br/>
+			<label><input type="radio" name="sortorder" value="1"/> Alphabetical</label>
 		</span><br class=form>
 		<p>
 			<input type=submit value="Change Sort Order">
@@ -669,6 +695,9 @@ if ($overwriteBody==1) {
 	}else if (isset($_POST['setparent'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+		<p>Impacted Libraries:</p>
+		<?php echo $libchgul; ?>
+
 		<input type=hidden name=setparent value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 		<span class=form>New Parent Library: </span>
 		<span class=formright>
@@ -686,31 +715,31 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['modify'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo Sanitize::encodeUrlParam($_GET['modify']); ?>">
-		<span class=form>Library Name:</span>
-		<span class=formright><input type=text name="name" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" size=20></span><br class=form>
+		<label for=name class=form>Library Name:</label>
+		<span class=formright><input type=text name="name" id=name value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" size=20></span><br class=form>
 		<?php
 		if (($isgrpadmin || $isadmin) && isset($ownername)) {
 			echo '<span class=form>Owner:</span><span class=formright>'.Sanitize::encodeStringForDisplay($ownername).'</span><br class=form />';
 		}
 		?>
-		<span class=form>Rights: </span>
+		<label for=rights class=form>Rights: </label>
 		<span class=formright>
 			<?php writeHtmlSelect ("rights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</span><br class=form>
 
     <?php
     if ($isadmin) {
-      echo '<span class=form>Federation: </span>
+      echo '<label for=fedlevel class=form>Federation: </label>
       <span class=formright>';
       writeHtmlSelect ("fedlevel",array(0,1,2),array('Not federated','Federated','Federated, top of list'),$fedlevel);
       echo '</span><br class=form>';
     }
 
      ?>
-		<span class=form>Sort order: </span>
-		<span class=formright>
-			<input type="radio" name="sortorder" value="0" <?php writeHtmlChecked($sortorder,0); ?> />Creation date<br/>
-			<input type="radio" name="sortorder" value="1" <?php writeHtmlChecked($sortorder,1); ?> />Alphabetical
+		<span id="sortlbl" class=form>Sort order: </span>
+		<span class=formright role=radiogroup aria-labelledby="sortlbl">
+			<label><input type="radio" name="sortorder" value="0" <?php writeHtmlChecked($sortorder,0); ?> />Creation date</label><br/>
+			<label><input type="radio" name="sortorder" value="1" <?php writeHtmlChecked($sortorder,1); ?> />Alphabetical</label>
 		</span><br class=form>
 
 		<span class=form>Parent Library:</span>
@@ -747,13 +776,19 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<div>
 			Check: <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
-			With Selected: <input type=submit name="transfer" value="Transfer" title="Transfer library ownership">
-			<input type=submit name="remove" value="Delete" title="Delete library">
-			<input type=submit name="setparent" value="Change Parent" title="Change the parent library">
-			<input type=submit name="chgrights" value="Change Rights" title="Change library use rights">
-			<input type=submit name="chgsort" value="Change Sort" title="Change library sort order">
+			<span class="dropdown">
+				<a role=button tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<?php echo _('With Selected');?>
+				</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">
+				<li><a href="#" onclick="postWSform('transfer');return false;"><?php echo _("Transfer library ownership");?></a></li>
+				<li><a href="#" onclick="postWSform('remove');return false;"><?php echo _("Delete library");?></a></li>
+				<li><a href="#" onclick="postWSform('setparent');return false;"><?php echo _("Change parent library");?></a></li>
+				<li><a href="#" onclick="postWSform('chgrights');return false;"><?php echo _("Change library use rights");?></a></li>
+				<li><a href="#" onclick="postWSform('chgsort');return false;"><?php echo _("Change library sort order");?></a></li>
+				</ul>
+			</span>
 			<?php echo $page_appliesToMsg ?>
-
 		</div>
 		<p>
 			Root
@@ -853,13 +888,16 @@ function printlist($parent) {
 				//echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
 				echo "<li class=lihdr><span class=dd>-</span><span class=\"hdr btn\" id=\"bn" . Sanitize::encodeStringForDisplay($child) . "\" onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\">+</span> ";
 				if ($child>=0) {
-					echo "<input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> ";
+					echo "<label><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> ";
 				}
 				echo "<span class=hdr onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
 				if (!empty($federated[$child])) {
 					echo ' <span class=fedico title="Federated">&lrarr;</span>';
 				}
 				echo "</span> </span>\n";
+				if ($child>=0) {
+					echo '</label>';
+				}
 				//if ($isadmin) {
 				if ($child>=0) {
 				  echo " ({$qcount[$child]}) ";
@@ -878,11 +916,11 @@ function printlist($parent) {
 
 			} else if ($child>=0) {  //no children
 
-				echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]);
+				echo "<li><span class=dd>-</span><label><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]);
 				if ($federated[$child]) {
 					echo ' <span class=fedico title="Federated">&lrarr;</span>';
 				}
-				echo "</span> ";
+				echo "</span></label> ";
 				//if ($isadmin) {
 				  echo " ({$qcount[$child]}) ";
 				//}
