@@ -4,6 +4,7 @@
 
 /*** master php includes *******/
 require_once "../init.php";
+require_once "../includes/htmlutil.php";
 require_once "../includes/TeacherAuditLog.php";
 
 /*** pre-html data manipulation, including function code *******/
@@ -362,8 +363,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/masschgdates.js?v=122724\"></script>";
-		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/masschgdates.js?v=063025\"></script>";
+		$placeinhead .= "<style>
+		.show {display:inline;} 
+		.hide {display:none;} 
+		td.dis {opacity:0.6;}
+		td.dis label { font-style: italic; }
+		.dateinp { width: 10ch;}
+		.timeinp { width: 8ch;}
+		</style>";
 	}
 }
 
@@ -403,9 +411,6 @@ if ($overwriteBody==1) {
 
 //	}
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=100319\"></script>";
-	//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
-	//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;}
-	//		td {padding: .1em .4em;}</style>';
 	$placeinhead .= '<style type="text/css">
 			td {padding: .1em 4px;}
 			.mcind1 {padding-left:20px} .mcind2 {padding-left:36px} .mcind3 {padding-left:52px;}
@@ -437,7 +442,7 @@ if ($overwriteBody==1) {
 
 	echo "var orderaddr = \"$imasroot/course/masschgdates.php?cid=$cid&filter=" . Sanitize::encodeUrlParam($filter) . "\";</script>";
 
-	echo '<p>Order by: <select id="orderby" onchange="chgorderby()">';
+	echo '<p><label>Order by: <select id="orderby" onchange="chgorderby()">';
 	echo '<option value="0" ';
 	if ($orderby==0) {echo 'selected="selected"';}
 	echo '>Start Date</option>';
@@ -450,9 +455,9 @@ if ($overwriteBody==1) {
 	echo '<option value="3" ';
 	if ($orderby==3) {echo 'selected="selected"';}
 	echo '>Course page</option>';
-	echo '</select> ';
+	echo '</select></label> ';
 
-	echo 'Filter by type: <select id="filter" onchange="filteritems()">';
+	echo '<label>Filter by type: <select id="filter" onchange="filteritems()">';
 	echo '<option value="all" ';
 	if ($filter=='all') {echo 'selected="selected"';}
 	echo '>All</option>';
@@ -474,7 +479,7 @@ if ($overwriteBody==1) {
 	echo '<option value="blocks" ';
 	if ($filter=='blocks') {echo 'selected="selected"';}
 	echo '>Blocks</option>';
-	echo '</select> ';
+	echo '</select></label> ';
 	if ($filter=='all' || $filter=='forums') {
 		echo '<button type="button" id="MCDforumtoggle" onclick="toggleMCDincforum()">';
 		if ($filter!='forums') {
@@ -495,18 +500,16 @@ if ($overwriteBody==1) {
 	}
 	echo '</p>';
 
-	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
+	echo "<p><label><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</label></p>";
 	echo "<p>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
-	echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
+	echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i> to copy the same time/date to all rows below.  ";
 	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
-	echo "Click the <img src=\"$staticroot/img/swap.gif\" alt=\"Swap\"> icon in each cell to swap from ";
-	echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
+	echo "Note that Always/Never/Hidden values cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
 	echo "<form id=\"qform\">";
 
 	echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a>. ';
 
-	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
-	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)">
+	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)" aria-label="attribute to change">
 		<option value="a" selected>Show</option>
 		<option value="s">Start Date</option>
 		<option value="e">End Date</option>
@@ -515,7 +518,7 @@ if ($overwriteBody==1) {
 		<option value="fp">Forum Post By</option>
 		<option value="fp">Forum Reply By</option>
 		</select>';
-	echo ' to <select id="swapselected">
+	echo ' to <select id="swapselected" aria-label="new attribute value">
 		<option value="0">Hidden</option>
 		<option value="1">By Dates</option>
 		<option value="2">Always/By Dates</option>
@@ -523,7 +526,7 @@ if ($overwriteBody==1) {
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
 	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 
-	echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
+	echo '<table class=gb><thead><tr><th><span class="sr-only">Select</span></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
 	$prefix = array();
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
@@ -726,6 +729,7 @@ if ($overwriteBody==1) {
 			echo '<td class="togdishid'.($avails[$i]==0?' dis':'').'">';
 		}
 		echo "<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
+		echo '<label for="cb'.$cnt.'" id="lbl'.$cnt.'">';
 		echo '<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$staticroot.'/img/';
 		switch ($types[$i]) {
 			case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
@@ -745,7 +749,7 @@ if ($overwriteBody==1) {
 		$fpdatebase = ($fpdates[$i]==0 || $fpdates[$i]==2000000000)?$defnow:$fpdates[$i];
 		$frdatebase = ($frdates[$i]==0 || $frdates[$i]==2000000000)?$defnow+7*24*60*60:$frdates[$i];
 
-		echo Sanitize::encodeStringForDisplay($names[$i])."<input type=hidden id=\"id" . Sanitize::encodeStringForDisplay($cnt) . "\" value=\"" . Sanitize::encodeStringForDisplay($ids[$i]) . "\"/></div>";
+		echo Sanitize::encodeStringForDisplay($names[$i])."</label><input type=hidden id=\"id" . Sanitize::encodeStringForDisplay($cnt) . "\" value=\"" . Sanitize::encodeStringForDisplay($ids[$i]) . "\"/></div>";
 		echo "<script> basesdates[$cnt] = ". Sanitize::onlyInt($sdatebase) . ";";
 		echo "baseedates[$cnt] = ". Sanitize::onlyInt($edatebase) . ";";
 		echo "baselpdates[$cnt] = ". Sanitize::onlyInt($lpdatebase) . ";";
@@ -755,17 +759,20 @@ if ($overwriteBody==1) {
 		echo "</script>";
 		echo "</td>";
 
-		echo '<td><span class="nowrap"><img src="'.$staticroot.'/img/swap.gif" alt="Swap" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.Sanitize::encodeStringForDisplay($cnt).'">'.Sanitize::encodeStringForDisplay($availnames[$avails[$i]]).'</span><input type="hidden" id="avail'.Sanitize::encodeStringForDisplay($cnt).'" value="'.Sanitize::encodeStringForDisplay($avails[$i]).'"/></span></td>';
-
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$staticroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('s',$cnt)\"/>";
-		if ($startdates[$i]==0) {
-			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
-		} else {
-			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"1\"/>";
+		// show
+		echo '<td>';
+		$keys = [0,1];
+		$vals = [_('Hidden'),_('By Dates')];
+		if ($types[$i] !== 'Assessment') {
+			$keys[] = 2;
+			$vals[] = _('Always');
 		}
+		writeHtmlSelect("avail$cnt", $keys, $vals, $avails[$i], null, null, 'aria-labelledby="lbl'.$cnt.'" onchange="MCDtoggle(\'a\','.$cnt.')"');
+		echo '</td>';
 
-		echo '<span id="sspan0'.$cnt.'" class="'.($startdates[$i]==0?'show':'hide').'" onclick="MCDtoggle(\'s\','.$cnt.')">';
-		echo _('Always').'</span>';
+		// start date
+		echo '<td class="togdis'.($avails[$i]!=1?' dis':'').'">';
+		writeHtmlSelect("sdatetype$cnt", [0,1], ['Always', 'Date:'], $startdates[$i]==0 ? 0 : 1, null, null, 'aria-labelledby="lbl'.$cnt.'" onchange="MCDtoggle(\'s\','.$cnt.')"');
 
 		echo '<span id="sspan1'.$cnt.'" class="'.($startdates[$i]==0?'hide':'show').'">';
 
@@ -777,23 +784,16 @@ if ($overwriteBody==1) {
 			$stime = tzdate("g:i a",$startdates[$i]);
 		}
 
-		echo "<input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
+		echo "<input type=text class=dateinp id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\" aria-label=\"Start Date\"/>(";
 		echo "<span id=\"sd$cnt\">".getshortday($sdatebase).'</span>';
-		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 		echo ") <a href=\"#\" onClick=\"displayDatePicker('sdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
 
-		echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
+		echo " at <input type=text class=timeinp id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\" aria-label=\"Start Time\">";
 		echo '</span></td>';
 
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$staticroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('e',$cnt)\"/>";
-		if ($enddates[$i]==2000000000) {
-			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
-		} else {
-			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"1\"/>";
-		}
-
-		echo '<span id="espan0'.$cnt.'" class="'.($enddates[$i]==2000000000?'show':'hide').'" onclick="MCDtoggle(\'e\','.$cnt.')">';
-		echo _('Always').'</span>';
+		// end date
+		echo '<td class="togdis'.($avails[$i]!=1?' dis':'').'">';
+		writeHtmlSelect("edatetype$cnt", [0,1], ['Always', 'Date:'], $enddates[$i]==2000000000 ? 0 : 1, null, null, 'aria-labelledby="lbl'.$cnt.'" onchange="MCDtoggle(\'e\','.$cnt.')"');
 
 		echo '<span id="espan1'.$cnt.'" class="'.($enddates[$i]==2000000000?'hide':'show').'">';
 
@@ -805,34 +805,26 @@ if ($overwriteBody==1) {
 			$etime = tzdate("g:i a",$enddates[$i]);
 		}
 
-		echo "<input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
+		echo "<input type=text class=dateinp id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\" aria-label=\"End Date\"/>(";
 		echo "<span id=\"ed$cnt\">".getshortday($edatebase).'</span>';
 		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 		echo ") <a href=\"#\" onClick=\"displayDatePicker('edate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
 
-		echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
+		echo " at <input type=text class=timeinp id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\" aria-label=\End Time\">";
 		echo '</span></td>';
 
-		echo "<td class=\"mca togdis".($avails[$i]!=1?' dis':'')."\" onclick=\"MCDtoggle('r',$cnt)\">";
+		// review
+		echo '<td class="mca togdis'.($avails[$i]!=1?' dis':'').'">';
 		if ($types[$i]=='Assessment') {
-			echo "<img src=\"$staticroot/img/swap.gif\" alt=\"Swap\"/>";
-			if ($reviewdates[$i]==0) {
-				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
-			} else {
-				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"1\"/>";
-			}
-			echo '<span id="rspan0'.$cnt.'" class="'.($reviewdates[$i]==0?'show':'hide').'">Never</span>';
-			echo '<span id="rspan1'.$cnt.'" class="'.($reviewdates[$i]>0?'show':'hide').'">After Due</span>';
+			writeHtmlSelect("rdatetype$cnt", [0,1], ['Never', 'After Due'], $reviewdates[$i]==0 ? 0 : 1, null, null, 'aria-labelledby="lbl'.$cnt.'"');
 		}
 		echo '</td>';
-		echo "<td class=\"mca togdishid".($avails[$i]==0?' dis':'')."\">";
+
+		// latepass cutoff
+		echo '<td class="mca togdis'.($avails[$i]!=1?' dis':'').'">';
 		if ($types[$i]=='Assessment') {
-			echo "<img src=\"$staticroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('lp',$cnt)\"/>";
-			if ($LPcutoffs[$i]==0) {
-				echo "<input type=hidden id=\"lpdatetype$cnt\" name=\"lpdatetype$cnt\" value=\"0\"/>";
-			} else {
-				echo "<input type=hidden id=\"lpdatetype$cnt\" name=\"lpdatetype$cnt\" value=\"1\"/>";
-			}
+			writeHtmlSelect("lpdatetype$cnt", [0,1], ['No limit', 'Date:'], $LPcutoffs[$i]==0 ? 0 : 1, null, null, 'aria-labelledby="lbl'.$cnt.'" onchange="MCDtoggle(\'lp\','.$cnt.')"');
+
 			if ($LPcutoffs[$i]==0) {
 				$lpdate = tzdate("m/d/Y", $lpdatebase);
 				$lptime = $deftime;
@@ -840,39 +832,26 @@ if ($overwriteBody==1) {
 				$lpdate = tzdate("m/d/Y",$LPcutoffs[$i]);
 				$lptime = tzdate("g:i a",$LPcutoffs[$i]);
 			}
-			echo '<span id="lpspan0'.$cnt.'" class="'.($LPcutoffs[$i]==0?'show':'hide').'" onclick="MCDtoggle(\'lp\','.$cnt.')">';
-			echo _('No limit').'</span>';
 
-			echo '<span id="lpspan1'.$cnt.'" class="'.($LPcutoffs[$i]==0?'hide':'show').'">';
-			echo "<input type=text size=10 id=\"lpdate$cnt\" name=\"lpdate$cnt\" value=\"$lpdate\" onblur=\"ob(this)\"/>(";
+			echo '<span id="lpspan1'.$cnt.'" class="'.($LPcutoffs[$i]==0?'hide':'show').'" aria-label="Latepass cutoff date">';
+			echo "<input type=text class=dateinp id=\"lpdate$cnt\" name=\"lpdate$cnt\" value=\"$lpdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"lpd$cnt\">".getshortday($lpdatebase).'</span>';
-			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('lpdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=8 id=\"lptime$cnt\" name=\"lptime$cnt\" value=\"$lptime\"></span>";
+			echo " at <input type=text class=timeinp id=\"lptime$cnt\" name=\"lptime$cnt\" value=\"$lptime\" aria-label=\"Latepass cutoff time\"></span>";
 		}
 		echo '</td>';
-		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
+
+		// forum postby
+		echo '<td class="mcf togdis'.($avails[$i]!=1?' dis':'').'">';
 		if ($types[$i]=='Forum') {
-			echo "<img src=\"$staticroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('fp',$cnt)\"/>";
-			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
-				echo "<input type=hidden id=\"fpdatetype$cnt\" name=\"fpdatetype$cnt\" value=\"0\"/>";
-			} else {
-				echo "<input type=hidden id=\"fpdatetype$cnt\" name=\"fpdatetype$cnt\" value=\"1\"/>";
-			}
-			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
-				echo "<span id=\"fpspan0$cnt\" class=\"show\">";
-			} else {
-				echo "<span id=\"fpspan0$cnt\" class=\"hide\">";
-			}
-			echo "<input type=radio name=\"fpdatean$cnt\" value=\"0\" id=\"fpdateanN$cnt\" ";
 			if ($fpdates[$i]==0) {
-				echo 'checked=1';
+				$fpdatetype = 0;
+			} else if ($fpdates[$i]==2000000000) {
+				$fpdatetype = 2;
+			} else {
+				$fpdatetype = 1;
 			}
-			echo " />Never <input type=radio name=\"fpdatean$cnt\" value=\"2000000000\"  id=\"fpdateanA$cnt\"  ";
-			if ($fpdates[$i]!=0) {
-				echo 'checked=1';
-			}
-			echo " />Always</span>";
+			writeHtmlSelect("fpdatetype$cnt", [0,1,2], ['Never', 'Date:', 'Always'], $fpdatetype, null, null, 'aria-labelledby="lbl'.$cnt.'" onchange="MCDtoggle(\'fp\','.$cnt.')"');
 
 			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
 				echo "<span id=\"fpspan1$cnt\" class=\"hide\">";
@@ -887,36 +866,26 @@ if ($overwriteBody==1) {
 				$fptime = tzdate("g:i a",$fpdates[$i]);
 			}
 
-			echo "<input type=text size=10 id=\"fpdate$cnt\" name=\"fpdate$cnt\" value=\"$fpdate\" onblur=\"ob(this)\"/>(";
+			echo "<input type=text class=dateinp id=\"fpdate$cnt\" name=\"fpdate$cnt\" value=\"$fpdate\" onblur=\"ob(this)\" aria-label=\"Forum post-by date\"/>(";
 			echo "<span id=\"fpd$cnt\">".getshortday($fpdatebase).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].fpdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].fpdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('fpdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
 
-			echo " at <input type=text size=8 id=\"fptime$cnt\" name=\"fptime$cnt\" value=\"$fptime\"></span>";
+			echo " at <input type=text class=timeinp id=\"fptime$cnt\" name=\"fptime$cnt\" value=\"$fptime\" aria-label=\"Forum post-by time\"></span>";
 		}
 		echo '</td>';
-		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
+
+		//forum replyby
+		echo '<td class="mcf togdis'.($avails[$i]!=1?' dis':'').'">';
 		if ($types[$i]=='Forum') {
-			echo "<img src=\"$staticroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('fr',$cnt)\"/>";
-			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
-				echo "<input type=hidden id=\"frdatetype$cnt\" name=\"frdatetype$cnt\" value=\"0\"/>";
-			} else {
-				echo "<input type=hidden id=\"frdatetype$cnt\" name=\"frdatetype$cnt\" value=\"1\"/>";
-			}
-			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
-				echo "<span id=\"frspan0$cnt\" class=\"show\">";
-			} else {
-				echo "<span id=\"frspan0$cnt\" class=\"hide\">";
-			}
-			echo "<input type=radio name=\"frdatean$cnt\" value=\"0\" id=\"frdateanN$cnt\" ";
 			if ($frdates[$i]==0) {
-				echo 'checked=1';
+				$frdatetype = 0;
+			} else if ($frdates[$i]==2000000000) {
+				$frdatetype = 2;
+			} else {
+				$frdatetype = 1;
 			}
-			echo " />Never <input type=radio name=\"frdatean$cnt\" value=\"2000000000\"  id=\"frdateanA$cnt\"  ";
-			if ($frdates[$i]!=0) {
-				echo 'checked=1';
-			}
-			echo " />Always</span>";
+			writeHtmlSelect("frdatetype$cnt", [0,1,2], ['Never', 'Date:', 'Always'], $frdatetype, null, null, 'aria-labelledby="lbl'.$cnt.'" onchange="MCDtoggle(\'fr\','.$cnt.')"');
 
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
 				echo "<span id=\"frspan1$cnt\" class=\"hide\">";
@@ -931,18 +900,18 @@ if ($overwriteBody==1) {
 				$frtime = tzdate("g:i a",$frdates[$i]);
 			}
 
-			echo "<input type=text size=10 id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\"/>(";
+			echo "<input type=text class=dateinp id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\" aria-label=\"Forum reply-by date\"/>(";
 			echo "<span id=\"frd$cnt\">".getshortday($frdatebase).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
 
-			echo " at <input type=text size=8 id=\"frtime$cnt\" name=\"frtime$cnt\" value=\"$frtime\"></span>";
+			echo " at <input type=text class=timeinp id=\"frtime$cnt\" name=\"frtime$cnt\" value=\"$frtime\" aria-label=\"Forum reply-by time\"></span>";
 		}
 		echo '</td>';
 
-		//echo "<td>Send Down: <a href=\"#\" <input type=button value=\"Change\" onclick=\"senddown($cnt)\"/> <input type=button value=\"Copy\" onclick=\"copydown($cnt)\"/></td>";
+		// send down
 		echo '<td class="c"><div class="dropdown">';
-		echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$cnt.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo '<a role=button tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$cnt.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 		echo ' Action <img src="'.$staticroot.'/img/collapse.gif" width="10" class="mida" alt="" />';
 		echo '</a>';
 		echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$cnt.'">';
@@ -951,21 +920,11 @@ if ($overwriteBody==1) {
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',3)">Copy down dates &amp; times</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',4)">Copy down start date &amp; time</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',5)">Copy down end date &amp; time</a></li>';
-		//echo '<li><a href="#" onclick="return senddownaction('.$cnt.',6)">Copy down review date &amp; time</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',7)">Copy down LatePass cutoff date &amp; time</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',8)">Copy down forum post-by date &amp; time</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',9)">Copy down forum reply-by date &amp; time</a></li>';
 		echo '</ul></div></td>';
 
-		/*echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
-		echo '<option value="1">Send down date &amp; time changes</option>';
-		echo '<option value="2">Copy down times only</option>';
-		echo '<option value="3">Copy down dates &amp; times</option>';
-		echo '<option value="4">Copy down start date &amp; time</option>';
-		echo '<option value="5">Copy down end date &amp; time</option>';
-		echo '<option value="6">Copy down review date &amp; time</option>';
-		echo '</select></td>';
-		*/
 		echo "</tr>";
 		$cnt++;
 	}

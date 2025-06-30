@@ -259,9 +259,6 @@ Date.prototype.getWeekDays = function(d) {
 	  if (limit == null || limit == 'e') {
 	  	  copydownsub('e',baseedates,st,usecb,type);
 	  }
-	  /*if ((limit == null || limit == 'r') && baserdates[st]!="NA") {
-		 copydownsub('r',baserdates,st,usecb,type);
-	  }*/
 	  if ((limit == null || limit == 'lp') && baselpdates[st]!="NA") {
 		 copydownsub('lp',baselpdates,st,usecb,type);
 	  }
@@ -327,9 +324,7 @@ Date.prototype.getWeekDays = function(d) {
 
 	  senddownsub('s',basesdates,st,usebusdays,usecb);
 	  senddownsub('e',baseedates,st,usebusdays,usecb);
-	 /* if (baserdates[st]!="NA") {
-		  senddownsub('r',baserdates,st,usebusdays,usecb);
-	  }*/
+
 	  if (includeassess && baselpdates[st]!="NA" && baselpdates[st]!="-1") {
 		  senddownsub('lp',baselpdates,st,usebusdays,usecb);
 	  }
@@ -375,12 +370,6 @@ Date.prototype.getWeekDays = function(d) {
   function MCDtoggle(type,cnt) {
   	if (type=='a') {
 		var curval = $('#avail'+cnt).val();
-		if (baserdates[cnt]=='NA') {
-			curval = (curval+1)%3;
-		} else {
-			curval = 1-curval;
-		}
-		$('#avail'+cnt).val(curval);
 		if (curval==1) {
 			$('#avail'+cnt).closest('tr').find('td.togdis').removeClass('dis');
 		} else {
@@ -393,15 +382,11 @@ Date.prototype.getWeekDays = function(d) {
 		}
 		$('#availname'+cnt).text(availnames[curval]);
 	} else {
-		var typeinput = document.getElementById(type+"datetype"+cnt);
-		if (typeinput.value==0) { //swap from A/N to date
-			document.getElementById(type+"span0"+cnt).className="hide";
+		var typeinput = document.getElementById(type+"datetype"+cnt).value;
+		if (typeinput==1) { 
 			document.getElementById(type+"span1"+cnt).className="show";
-			typeinput.value = 1;
-		} else { //swap from date to A/N
-			document.getElementById(type+"span0"+cnt).className="show";
+		} else { 
 			document.getElementById(type+"span1"+cnt).className="hide";
-			typeinput.value = 0;
 		}
 	}
 
@@ -431,24 +416,23 @@ Date.prototype.getWeekDays = function(d) {
 
 				} else {
 					if (to=="dates") { //swap from A/N to date
-						document.getElementById(type+"span0"+cnt).className="hide";
-						document.getElementById(type+"span1"+cnt).className="show";
+						if (document.getElementById(type+"span1"+cnt)) {
+							document.getElementById(type+"span1"+cnt).className="show";
+						}
 						document.getElementById(type+"datetype"+cnt).value = 1;
 					} else { //swap from date to A/N
-						document.getElementById(type+"span0"+cnt).className="show";
-						document.getElementById(type+"span1"+cnt).className="hide";
+						if (document.getElementById(type+"span1"+cnt)) {
+							document.getElementById(type+"span1"+cnt).className="hide";
+						}
 						document.getElementById(type+"datetype"+cnt).value = 0;
-						if (/*type=='r' ||*/ type=='fp' || type=='fr') {
+						if (type=='fp' || type=='fr') {
 							if (to=='always') {
-								document.getElementById(type+"dateanA"+cnt).checked=true;
-							} else {
-								document.getElementById(type+"dateanN"+cnt).checked=true;
+								document.getElementById(type+"datetype"+cnt).value = 2;
 							}
 						}
 					}
 				}
 			} catch (e) { };
-			//els[i].checked = false;
 		  }
 	  }
   }
@@ -518,11 +502,9 @@ Date.prototype.getWeekDays = function(d) {
   		}
   		if (includeforums && document.getElementById("fpdatetype"+i)) {
   			if (document.getElementById("fpdatetype"+i).value == 0) {
-  				if (document.getElementById("fpdateanN"+i).checked) {
-  					out.push("N");
-  				} else {
-  					out.push("A");
-  				}
+  				out.push("N");
+  			} else if (document.getElementById("fpdatetype"+i).value == 2) {
+  				out.push("A");
   			} else {
   				out.push(document.getElementById("fpdate"+i).value + "~" + document.getElementById("fptime"+i).value);
   			}
@@ -531,11 +513,9 @@ Date.prototype.getWeekDays = function(d) {
   		}
   		if (includeforums && document.getElementById("frdatetype"+i)) {
   			if (document.getElementById("frdatetype"+i).value == 0) {
-  				if (document.getElementById("frdateanN"+i).checked) {
-  					out.push("N");
-  				} else {
-  					out.push("A");
-  				}
+  				out.push("N");
+  			} else if (document.getElementById("frdatetype"+i).value == 2) {
+  				out.push("A");
   			} else {
   				out.push(document.getElementById("frdate"+i).value + "~" + document.getElementById("frtime"+i).value);
   			}
