@@ -8,6 +8,7 @@ var Nested = function(listid, newoptions) {
 	var list;
 	var haschanged;
 	var ghost;
+	var moved;
 
 	initialize(listid, newoptions);
 
@@ -39,10 +40,11 @@ var Nested = function(listid, newoptions) {
 		list = $('#'+listid);
 		options.parentTag = list[0].nodeName;
 		haschanged = false;
-		list.on('mousedown.start', start);
+		moved = false;
+		list.on('mousedown.start touchstart.start', start);
 		list.on('keydown', handleKey);
 		if (options.collapse) {
-			list.on('click.collapse', collapse);
+			list.on('click.collapse touchend.collapse', collapse);
 		}
 		if (options.initialize) options.initialize.call(this);
 	};
@@ -73,11 +75,12 @@ var Nested = function(listid, newoptions) {
 			}).appendTo(document.body);
 		}
 		el.depth = getDepth(el);
-		el.moved = false;
-		list.off('mousedown.start');
-		list.on('mousedown.end', {el:el}, end);
-		list.on('mousemove.movement', {el:el}, movement);
+		moved = false;
+		list.off('mousedown.start touchstart.start');
+		list.on('mousedown.end touchstart.end', {el:el}, end);
+		list.on('mousemove.movement touchmove.movement', {el:el}, movement);
 		$(document).on('mouseup.end', {el:el}, end);
+		list.on('touchend.end', {el:el}, end);
 		if (window.ie) { // IE fix to stop selection of text when dragging
 			$(document.body).on('drag.stop', stop).on('selectstart.stop', stop);
 		}
@@ -98,13 +101,14 @@ var Nested = function(listid, newoptions) {
 		while (el[0].nodeName != options.childTag && el[0] != list[0]) {
 			el = el.parent();
 		}
-		if (!el.moved) {
+
+		if (!moved) {
 			event.target.focus();
 		}
 		
 		if (el[0] == list[0]) return;
 
-		if (!el.moved) {
+		if (!moved) {
 			var sub = el.children(options.parentTag);
 			if (sub) {
 				if (noblockcookie) {
@@ -204,7 +208,13 @@ var Nested = function(listid, newoptions) {
 		var dest, move, prev, prevParent;
 		var abort = false;
 		var el = event.data.el;
-		if (options.ghost && el.moved) { // Position the ghost
+		if (event.originalEvent.touches) {
+			var touch = event.originalEvent.changedTouches[0] || event.originalEvent.touches[0];
+			event.pageX = touch.pageX;
+			event.pageY = touch.pageY;
+			event.target = document.elementFromPoint(touch.clientX, touch.clientY);
+		}
+		if (options.ghost && moved) { // Position the ghost
 			ghost.css({
 				'position': 'absolute',
 				'visibility': 'visible',
@@ -307,7 +317,7 @@ var Nested = function(listid, newoptions) {
 					$(el).insertBefore(dest);
 				}
 
-				el.moved = true;
+				moved = true;
 				if (prevParent.children().length==0) prevParent.remove();
 				if (!haschanged) {
 					haschanged = true;
@@ -320,8 +330,8 @@ var Nested = function(listid, newoptions) {
 	};
 
 	function detach() {
-		list.off('mousedown.start');
-		if (options.collapse) list.off('click.collapse');
+		list.off('mousedown.start touchstart.start');
+		if (options.collapse) list.off('click.collapse touchend.collapse');
 	};
 
 	function serialize(listEl) {
@@ -341,10 +351,10 @@ var Nested = function(listid, newoptions) {
 	function end(event) {
 		var el = event.data.el;
 		if (options.ghost) ghost.remove();
-		list.off('mousemove.movement');
+		list.off('mousemove.movement touchmove.movement');
 		$(document).off('mouseup.end');
-		list.off('mousedown.end');
-		list.on('mousedown.start', start);
+		list.off('mousedown.end touchstart.end touchend.end');
+		list.on('mousedown.start touchstart.start', start);
 		options.onComplete(el);
 		if (window.ie) $(document.body).off('drag.stop').off('selectstart.stop');
 	};
