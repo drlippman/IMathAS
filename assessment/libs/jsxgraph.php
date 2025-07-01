@@ -1737,7 +1737,9 @@ function jsxBoard($type, $ops=array()) {
 				}
 			} 
 		}
-		board_$id.unsuspendUpdate();";	
+		board_$id.unsuspendUpdate();
+		board_$id.fullUpdate();";	
+
 
 	$board = str_replace("/*INSERTHERE*/", "board_$id.colorinit=[];/*INSERTHERE*/;$updatescript;board_$id.initSetupDone=true;", $board);
 
