@@ -40,6 +40,7 @@ var Nested = function(listid, newoptions) {
 		options.parentTag = list[0].nodeName;
 		haschanged = false;
 		list.on('mousedown.start', start);
+		list.on('keydown', handleKey);
 		if (options.collapse) {
 			list.on('click.collapse', collapse);
 		}
@@ -87,6 +88,7 @@ var Nested = function(listid, newoptions) {
 
 	function collapse(event) {
 		var el = $(event.target);
+
 		if (options.handleClass) {
 			while (el[0].nodeName != options.childTag && !el.hasClass(options.handleClass) && el[0] != list[0]) {
 				el = el.parent();
@@ -96,6 +98,11 @@ var Nested = function(listid, newoptions) {
 		while (el[0].nodeName != options.childTag && el[0] != list[0]) {
 			el = el.parent();
 		}
+		if (!el.moved) {
+			console.log("here");
+			event.target.focus();
+		}
+		
 		if (el[0] == list[0]) return;
 
 		if (!el.moved) {
@@ -130,6 +137,50 @@ var Nested = function(listid, newoptions) {
 		event.stopPropagation();
 		event.preventDefault();
 	};
+
+	function handleKey(event) {
+		var el = $(event.target);
+		if (!el.hasClass(options.handleClass)) return;
+
+		while (el[0].nodeName != options.childTag && el[0] != list[0]) {
+			el = el.parent();
+		}
+		if (el[0].nodeName != options.childTag) return true;
+		el = $(el);
+
+		if (options.lock == 'class' && el.hasClass(options.lockClass)) return;
+		
+		let madechg = false;
+		if (event.key == 'ArrowDown') {
+			if (el.next('li')) {
+				el.insertAfter(el.next('li'));
+				madechg = true;
+			}
+		} else if (event.key == 'ArrowUp') {
+			if (el.prev('li')) {
+				el.insertBefore(el.prev('li'));
+				madechg = true;
+			}
+		} else if (event.key == 'ArrowLeft') {
+			if (el.closest('ul').closest('li')) {
+				el.insertAfter(el.closest('ul').closest('li'));
+				madechg = true;
+			}
+		} else if (event.key == 'ArrowRight') {
+			if (el.prev('li') && el.prev('li').find('ul')) {
+				if (el.prev('li').hasClass('nCollapse')) {
+					el.prev('li').removeClass('nCollapse').children('ul').show();
+				}
+				el.appendTo(el.prev('li').find('ul'));
+				madechg = true;
+			}
+		} 
+		if (madechg && !haschanged) {
+			haschanged = true;
+			options.onFirstChange(el);
+		}
+		$(event.target).focus();
+	}
 
 	function stop(event) {
 		event.stopPropagation();
@@ -417,6 +468,9 @@ function setlinksdisp(disp) {
 }
 
 function editinplace(el) {
+	if (el.tagName == 'A') {
+		el = el.previousElementSibling.getElementsByTagName('span')[0];
+	}
 	var inputh = document.getElementById('input'+el.id);
 	if (inputh==null) {
 		var inputh = document.createElement("input");

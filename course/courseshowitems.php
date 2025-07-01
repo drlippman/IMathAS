@@ -2177,9 +2177,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $qviewstyle = 'style="display:none;"';
             }
             if (!isset($CFG['CPS']['miniicons']['folder'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">B</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">B</span>';
             } else {
-                $icon = '<img alt="folder" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['folder'] . '" class="mida icon" /> ';
+                $icon = '<img alt="folder" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['folder'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li class="' . $liclass . '" id="' . "$parent-$bnum" . '" obn="' . Sanitize::encodeStringForDisplay($items[$i]['id']) . '">' . $icon;
             if ($items[$i]['avail'] == 2 || ($items[$i]['avail'] == 1 && $items[$i]['startdate'] < $now && $items[$i]['enddate'] > $now)) {
@@ -2193,8 +2193,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 echo " $show";
             }
             if ($showlinks) {
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a>';
                 echo '<span class="links">';
-                echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
+                echo " | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
                 echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=" . intval($items[$i]['id']) . "&remove=ask\">", _('Delete'), "</a>";
                 echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
                 echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
@@ -2208,9 +2209,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             echo '</li>';
         } else if ($itemtypes[$items[$i]][0] == 'Calendar') {
             if (!isset($CFG['CPS']['miniicons']['calendar'])) {
-                $icon = '<span class=icon style="background-color:#0f0;">C</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:#0f0;">C</span>';
             } else {
-                $icon = '<img alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida icon" /> ';
+                $icon = '<img alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon . 'Calendar</li>';
 
@@ -2240,9 +2241,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $color = makecolor2($line['startdate'], $line['enddate'], $now);
             }
             if (!isset($CFG['CPS']['miniicons']['assess'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">?</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">?</span>';
             } else {
-                $icon = '<img alt="assessment" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['assess'] . '" class="mida icon" /> ';
+                $icon = '<img alt="assessment" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['assess'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             if ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now) {
@@ -2273,7 +2274,8 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 echo Sanitize::encodeStringForDisplay($show);
             }
             if ($showlinks) {
-                echo '<span class="links">';
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a>';
+                echo '<span class="links"> | ';
                 if ($line['ver'] > 1) {
                     echo " <a href=\"addquestions2.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
                     echo "<a href=\"addassessment2.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
@@ -2316,9 +2318,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $color = makecolor2($line['startdate'], $line['enddate'], $now);
             }
             if (!isset($CFG['CPS']['miniicons']['inline'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">!</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">!</span>';
             } else {
-                $icon = '<img alt="text" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['inline'] . '" class="mida icon" /> ';
+                $icon = '<img alt="text" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['inline'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
@@ -2335,8 +2337,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 }
             }
             if ($showlinks) {
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a>';
                 echo '<span class="links">';
-                echo " <a href=\"addinlinetext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+                echo " | <a href=\"addinlinetext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
                 echo "<a href=\"deleteinlinetext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
                 echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
                 echo '</span>';
@@ -2363,9 +2366,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $color = makecolor2($line['startdate'], $line['enddate'], $now);
             }
             if (!isset($CFG['CPS']['miniicons']['linked'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">!</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">!</span>';
             } else {
-                $icon = '<img alt="link" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['linked'] . '" class="mida icon" /> ';
+                $icon = '<img alt="link" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['linked'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
@@ -2382,8 +2385,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 }
             }
             if ($showlinks) {
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a>';
                 echo '<span class="links">';
-                echo " <a href=\"addlinkedtext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+                echo " | <a href=\"addlinkedtext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
                 echo "<a href=\"deletelinkedtext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
                 echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
                 echo '</span>';
@@ -2410,9 +2414,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $color = makecolor2($line['startdate'], $line['enddate'], $now);
             }
             if (!isset($CFG['CPS']['miniicons']['forum'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">F</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">F</span>';
             } else {
-                $icon = '<img alt="forum" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['forum'] . '" class="mida icon" /> ';
+                $icon = '<img alt="forum" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['forum'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
@@ -2429,8 +2433,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 }
             }
             if ($showlinks) {
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a> ';
                 echo '<span class="links">';
-                echo " <a href=\"addforum.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+                echo " | <a href=\"addforum.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
                 echo "<a href=\"deleteforum.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
                 echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
                 echo '</span>';
@@ -2457,9 +2462,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $color = makecolor2($line['startdate'], $line['enddate'], $now);
             }
             if (!isset($CFG['CPS']['miniicons']['wiki'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">W</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">W</span>';
             } else {
-                $icon = '<img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['wiki'] . '" class="mida icon" /> ';
+                $icon = '<img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['wiki'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
@@ -2476,8 +2481,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 }
             }
             if ($showlinks) {
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a>';
                 echo '<span class="links">';
-                echo " <a href=\"addwiki.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+                echo " | <a href=\"addwiki.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
                 echo "<a href=\"deletewiki.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
                 echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
                 echo '</span>';
@@ -2504,9 +2510,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 $color = makecolor2($line['startdate'], $line['enddate'], $now);
             }
             if (!isset($CFG['CPS']['miniicons']['drill'])) {
-                $icon = '<span class=icon style="background-color:' . $color . '">D</span>';
+                $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">D</span>';
             } else {
-                $icon = '<img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['drill'] . '" class="mida icon" /> ';
+                $icon = '<img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['drill'] . '" class="mida icon" tabindex=0 /> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
@@ -2523,8 +2529,9 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
                 }
             }
             if ($showlinks) {
+                echo ' <a href="#" onclick="editinplace(this);return false;">Rename</a>';
                 echo ' <span class="links">';
-                echo "<a href=\"adddrillassess.php?daid=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+                echo " | <a href=\"adddrillassess.php?daid=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
                 echo "<a href=\"deletedrillassess.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
                 echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
                 echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=" . Sanitize::onlyInt($typeid) . "\">", _('Scores'), "</a>";

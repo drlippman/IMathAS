@@ -135,7 +135,7 @@ function printoutcome($arr) {
 	global $outcomeinfo,$cnt;
 	foreach ($arr as $item) {
 		if (is_array($item)) { //is outcome group
-			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
+			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f" tabindex=0>G</span> ';
 			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
 			$cnt++;
@@ -146,7 +146,7 @@ function printoutcome($arr) {
 			}
 			echo '</li>';
 		} else { //individual outcome
-			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0">O</span> ';
+			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0" tabindex=0>O</span> ';
 			echo '<input class="outcome" type="text" size="60" id="o' . Sanitize::encodeStringForDisplay($item) . '" value="' . Sanitize::encodeStringForDisplay($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
 		}
@@ -164,7 +164,7 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::e
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; </script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=063025\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;
@@ -177,8 +177,8 @@ $placeinhead .= '<script type="text/javascript">
 		}
 	}
 	function addoutcome() {
-		var html = \'<li id="new\'+ocnt+\'"><span class=icon style="background-color:#0f0">O</span> \';
-		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'" onkeyup="txtchg()"> \';
+		var html = \'<li id="new\'+ocnt+\'"><span class=icon style="background-color:#0f0" tabindex=0>O</span> \';
+		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'" onkeyup="txtchg()" value="Outcome"> \';
 		html += \'<a href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
 		$("#qviewtree").append(html);
 		$("#new"+ocnt).focus();
@@ -190,8 +190,8 @@ $placeinhead .= '<script type="text/javascript">
 		}
 	}
 	function addoutcomegrp() {
-		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f">G</span> \';
-		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
+		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f" tabindex=0>G</span> \';
+		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()" value="Outcome Group"> \';
 		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
 		$("#qviewtree").append(html);
 		$("#newgrp"+ocnt).focus();
@@ -238,11 +238,13 @@ echo '<div class="cpmid"><a href="outcomemap.php?cid='.$cid.'">'._('View Outcome
 
 echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move outcomes inside groups.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/><span id="submitnotice" class=noticetext></span></div>';
 
+echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
+echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
+
 echo '<ul id="qviewtree" class="qview">';
 printoutcome($outcomes);
 echo '</ul>';
-echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
-echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
+
 require_once "../footer.php";
 
 ?>

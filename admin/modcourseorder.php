@@ -128,7 +128,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?type=$type';</script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=063025\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;
@@ -143,7 +143,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 
 	function addcoursegrp() {
-		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f">G</span> \';
+		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f" tabindex=0>G</span> \';
 		html += \'<input class="outcome" type="text" size="40" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removecoursegrp(this);return false\">'._("Delete").'</a></li>\';
 		$("#maingrp > ul").prepend(html);
@@ -185,7 +185,7 @@ echo '<input type="button" onclick="addcoursegrp()" value="'._('Add Course Group
 function listCourse($course) {
 	$now = time();
 	echo '<li id="c'.Sanitize::onlyInt($course['id']).'">';
-	echo '<span class=icon style="background-color:#0f0">C</span> ';
+	echo '<span class=icon style="background-color:#0f0" tabindex=0>C</span> ';
 	echo Sanitize::encodeStringForDisplay($course['name']);
 	if (isset($course['available']) && (($course['available']&1)==1)) {
 		echo ' <em style="color:green;">', _('Unavailable'), '</em>';
@@ -217,7 +217,7 @@ function showCourseList($arr) {
 	global $courses,$cnt,$shownCourses;
 	foreach ($arr as $item) {
 		if (is_array($item)) { //is course group
-			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
+			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f" tabindex=0>G</span> ';
 			echo '<input class="outcome" type="text" size="40" id="g'.$cnt.'" value="'.Sanitize::encodeStringForDisplay($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removecoursegrp(this);return false">'._("Delete").'</a>';
 			$cnt++;
