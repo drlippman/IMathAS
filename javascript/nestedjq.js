@@ -99,14 +99,13 @@ var Nested = function(listid, newoptions) {
 			el = el.parent();
 		}
 		if (!el.moved) {
-			console.log("here");
 			event.target.focus();
 		}
 		
 		if (el[0] == list[0]) return;
 
 		if (!el.moved) {
-			var sub = el.find(options.parentTag);
+			var sub = el.children(options.parentTag);
 			if (sub) {
 				if (noblockcookie) {
 					if (sub.length == 0 || sub.css('display') == 'none') {
@@ -167,14 +166,17 @@ var Nested = function(listid, newoptions) {
 				madechg = true;
 			}
 		} else if (event.key == 'ArrowRight') {
-			if (el.prev('li') && el.prev('li').find('ul')) {
+			if (el.prev('li') && el.prev('li').children('ul')) {
 				if (el.prev('li').hasClass('nCollapse')) {
 					el.prev('li').removeClass('nCollapse').children('ul').show();
 				}
-				el.appendTo(el.prev('li').find('ul'));
+				el.appendTo(el.prev('li').children('ul'));
 				madechg = true;
 			}
 		} 
+		if (madechg) {
+			event.preventDefault();
+		}
 		if (madechg && !haschanged) {
 			haschanged = true;
 			options.onFirstChange(el);
@@ -216,7 +218,7 @@ var Nested = function(listid, newoptions) {
 		}
 		if (over == list[0]) return;
 		if (event[options.expandKey] && over != el && over.hasClass(options.collapseClass)) {
-			check = $(over).find(options.parentTag);
+			check = $(over).children(options.parentTag);
 			over.removeClass(options.collapseClass);
 			check.css('display', 'block');
 		}
@@ -259,10 +261,10 @@ var Nested = function(listid, newoptions) {
 		if (prev.length > 0) {
 			move = 'after';
 			dest = prev;
-			check = $(dest).find(options.parentTag).filter(':visible');
+			check = $(dest).children(options.parentTag).filter(':visible');
 			while (check.length>0 && event.pageX > check.offset().left && check.height() > 0) {
-				dest = check.find(options.childTag).last();
-				check = dest.find(options.parentTag);
+				dest = check.children(options.childTag).last();
+				check = dest.children(options.parentTag);
 			}
 			if (check.length==0 && dest[0]!=el[0] && event.pageX > dest.offset().left+options.childStep && dest[0].tagName == 'LI' && dest[0].className=="blockli") {
 				//document.getElementById("submitnotice").innerHTML = dest.parentNode.tagName + ',' + dest.parentNode.parentNode.tagName;
@@ -287,7 +289,7 @@ var Nested = function(listid, newoptions) {
 			//abort += (move=='inside' && dest.parentNode.className != "blockli");
 			abort += (dest.parent().hasClass('nochildren'));
 			abort += (dest.height() == 0);
-			sub = $(over).find(options.parentTag);
+			sub = $(over).children(options.parentTag);
 			sub = (sub.length>0) ? sub.offset().top : 0;
 			sub = (sub > 0) ? sub-$(over).offset().top : over.offsetHeight;
 			abort += (event.pageY < (sub-el.height())+$(over).offset().top);
@@ -459,16 +461,24 @@ function quickviewcollapseAll() {
 }
 
 function setlinksdisp(disp) {
-	var el = document.getElementsByTagName("span");
+	/*var el = document.getElementsByTagName("span");
 	for (var i=0; i<el.length; i++) {
 		if (el[i].className=='links') {
 			el[i].style.display = disp;
 		}
 	}
+	*/
+	if (disp == "none") {
+		$(".links").hide();
+	} else {
+		$(".links").show();
+	}
 }
 
 function editinplace(el) {
-	if (el.tagName == 'A') {
+	if (typeof el == 'string') {
+		el = document.getElementById(el);
+	} else if (el.tagName == 'A') {
 		el = el.previousElementSibling.getElementsByTagName('span')[0];
 	}
 	var inputh = document.getElementById('input'+el.id);

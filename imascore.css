@@ -219,11 +219,11 @@ ul.qview {
 	padding-left: 0px;
 	margin-bottom: 6px;
 }
-ul.qview ul {
+ul.qview > li > ul {
 	padding-left: 10px;
 	border-left: 1px dashed #ccc;
 }
-ul.qview li {
+ul.qview > li {
 	margin-left: 0px;
 	padding-left: 0px;
 	margin-top: 2px;
