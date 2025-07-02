@@ -104,6 +104,21 @@ if ($canviewall) {
 	$includelastchange = (((floor($gbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
 
+	$usefullwidth = false;
+	$headerslocked = false;
+	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+		$headerslocked = true;
+	} else {
+		if (!isset($_COOKIE["gblhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
+			$headerslocked = true;
+		} else {
+			$headerslocked = false;
+			$usefullwidth = true;
+		}
+	}
+	if (isset($_COOKIE["gbfullw-$cid"]) && $_COOKIE["gbfullw-$cid"]==1) {
+		$usefullwidth = true;
+	}
 } else {
 	$secfilter = -1;
 	$catfilter = -1;
@@ -278,6 +293,8 @@ var gbmod = {
 	"hidelocked": '.Sanitize::onlyInt($hidelocked).',
 	"links": '.Sanitize::onlyInt($links).',
 	"pts": '.Sanitize::onlyInt($showpercents).',
+	"fullwidth": '.($usefullwidth ? 1 : 0).',
+	"lockheaders": '.($headerslocked ? 1 : 0).',
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 $placeinhead .= '<style>
@@ -404,22 +421,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=052320\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
-	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+	if ($headerslocked) {
 		$placeinhead .= 'true,'.$showpics.');';
-		$headerslocked = true;
 	} else {
-		if (!isset($_COOKIE["gblhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
-			$placeinhead .= 'true,'.$showpics.');';
-			$headerslocked = true;
-		} else {
-			$placeinhead .= 'false,'.$showpics.');';
-			$headerslocked = false;
-			$usefullwidth = true;
-		}
+		$placeinhead .= 'false,'.$showpics.');';
 	}
-	if (isset($_COOKIE["gbfullw-$cid"]) && $_COOKIE["gbfullw-$cid"]==1) {
-		$usefullwidth = true;
-	}
+	
 	$showwidthtoggle = (strpos($coursetheme, '_fw')!==false);
 
 	$placeinhead .= "</script>\n";
@@ -603,12 +610,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "</div>";
 	echo '<script type="text/javascript">
 	$(function() {
-		$("a[data-hdrs='.($headerslocked?1:0).']").parent().addClass("active");
-		$("a[data-pts='.($showpercents?1:0).']").parent().addClass("active");
-		$("a[data-links='.Sanitize::onlyInt($links).']").parent().addClass("active");
-		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
-		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
-		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
+		$("input[name=hdrs][value='.($headerslocked?1:0).']").prop("checked", true);
+		$("input[name=pts][value='.($showpercents?1:0).']").prop("checked", true);
+		$("input[name=links][value='.Sanitize::onlyInt($links).']").prop("checked", true);
+		$("input[name=pics][value='.Sanitize::onlyInt($showpics).']").prop("checked", true);
+		$("input[name=newflag][value='.(($coursenewflag&1)==1?1:0).']").prop("checked", true);
+		$("input[name=pgw][value='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").prop("checked", true);
 		setupGBpercents();';
 		if ($isteacher && $colorize != '0' && $colorize != null) {
 			echo '$("#myTable").hide();';
