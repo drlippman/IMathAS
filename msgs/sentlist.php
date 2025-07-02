@@ -62,6 +62,10 @@
 	}
 
 	$pagetitle = "Messages";
+	$placeinhead = '<style type="text/css"> tr.tagged {background-color: #dff;}
+		.pagelist { display: inline-block; margin:0; padding: 0}
+		.pagelist li { display: inline-block; padding: 0 .5ch;} 
+		.pagelist li:has(a[aria-current]) { background-color: #ddd;} </style>';
 	require_once "../header.php";
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -103,7 +107,8 @@
 	}
 	$prevnext = '';
 	if ($numpages > 1) {
-		$prevnext .= "Page: ";
+		$prevnext .= '<nav aria-labelledby="pagelbl">';
+		$prevnext .= "<span id=pagelbl>Page:</span><ul class=pagelist> ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
 			$max = min($numpages-1,$page+8+$min-$page);
@@ -111,36 +116,37 @@
 			$max = min($numpages-1,$page+4);
 			$min = max(2,$page-8+$max-$page);
 		}
-		if ($page==1) {
-			$prevnext .= "<b>1</b> ";
+		if ($page>1) {
+			$prevnext .= "<li><a href=\"sentlist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a></li>";
 		} else {
-			$prevnext .= "<a href=\"sentlist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">1</a> ";
+			$prevnext .= '<li>Previous</li>';
 		}
-		if ($min!=2) { $prevnext .= " ... ";}
+		if ($page==1) {
+			$prevnext .= "<li><a href=\"sentlist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\" aria-current=\"page\"><b>1</b></a></li>";
+		} else {
+			$prevnext .= "<li><a href=\"sentlist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">1</a></li>";
+		}
+		if ($min!=2) { $prevnext .= "<li>...</li>";}
 		for ($i = $min; $i<=$max; $i++) {
 			if ($page == $i) {
-				$prevnext .= "<b>$i</b> ";
+				$prevnext .= "<li><a href=\"sentlist.php?page=$i&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\" aria-current=\"page\"><b>$i</b></a></li>";
 			} else {
-				$prevnext .= "<a href=\"sentlist.php?page=$i&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$i</a> ";
+				$prevnext .= "<li><a href=\"sentlist.php?page=$i&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$i</a></li>";
 			}
 		}
-		if ($max!=$numpages-1) {$prevnext .= " ... ";}
+		if ($max!=$numpages-1) { $prevnext .= "<li>...</li>";}
 		if ($page == $numpages) {
-			$prevnext .= "<b>$numpages</b> ";
+			$prevnext .= "<li><a href=\"sentlist.php?page=$numpages&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\" aria-current=\"page\"><b>$numpages</b></a></li>";
 		} else {
-			$prevnext .= "<a href=\"sentlist.php?page=$numpages&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$numpages</a> ";
+			$prevnext .= "<li><a href=\"sentlist.php?page=$numpages&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$numpages</a></li>";
 		}
-		$prevnext .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-		if ($page>1) {
-			$prevnext .= "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
-		} else {
-			$prevnext .= "Previous ";
-		}
+		
 		if ($page < $numpages) {
-			$prevnext .= "| <a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
+			$prevnext .= "<li><a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a></li>";
 		} else {
-			$prevnext .= "| Next ";
+			$prevnext .= '<li>Next</li>';
 		}
+		$prevnext .= '</nav>';
 		echo "<div>$prevnext</div>\n";
 	}
 	$address = $GLOBALS['basesiteurl'] . "/msgs/sentlist.php?cid=$cid&filtercid=";
