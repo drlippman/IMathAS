@@ -424,7 +424,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } div.trld {display:table-cell;vertical-align:middle;white-space: nowrap;} </style>";
-	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
+	$placeinhead .= '<style type="text/css"> .dropdown-header, .dropdown-group {  font-size: inherit;  padding: 3px 10px;}</style>';
 
 	require_once "../header.php";
     echo "<div class=breadcrumb>";
@@ -442,6 +442,53 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	echo "<div class=cpmid>";
 	$i = 0;
+
+	$togglehtml = '<span class="dropdown">';
+	$togglehtml .= ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	$togglehtml .= _('Toggles').'</a>';
+	$togglehtml .= '<div class="dropdown-menu gbtoggle" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+	
+	$togglehtml .= '<div role=radiogroup aria-labelledby=toghdrlbl>';
+	$togglehtml .= '<div id=toghdrlbl class="dropdown-header">'._('Headers').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="hdrs" value=1>'._('Locked').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="hdrs" value=0>'._('Unlocked').'</label>';
+	$togglehtml .= '</div></div>';
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=togpgwlbl id=pgwgroup>';
+	$togglehtml .= '<div id=togpgwlbl class="dropdown-header">'._('Width').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="pgw" value=0>'._('Fixed').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pgw" value=1>'._('Full').'</label>';
+	$togglehtml .= '</div></div>';
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=togptslbl>';
+	$togglehtml .= '<div id=togptslbl class="dropdown-header">'._('Scores').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="pts" value=0>'._('Points').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pts" value=1>'._('Percent').'</label>';
+	$togglehtml .= '</div></div>';
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=toglinkslbl>';
+	$togglehtml .= '<div id=toglinkslbl class="dropdown-header">'._('Links').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="links" value=0>'._('View/Edit').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="links" value=1>'._('Summary').'</label>';
+	$togglehtml .= '</div></div>';
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=togpicslbl>';
+	$togglehtml .= '<div id=togpicslbl class="dropdown-header">'._('Pictures').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="pics" value=0>'._('None').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pics" value=1>'._('Small').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pics" value=2>'._('Large').'</label>';
+	$togglehtml .= '</div></div>';
+
+	if ($isteacher) {
+		$togglehtml .= '<div role=radiogroup aria-labelledby=tognewflaglbl>';
+		$togglehtml .= '<div id=tognewflaglbl class="dropdown-header">'._('New Flag').'</div><div class="dropdown-group">';
+		$togglehtml .= '<label><input type=radio name="newflag" value=0>'._('Off').'</label><br/>';
+		$togglehtml .= '<label><input type=radio name="newflag" value=1>'._('On').'</label>';
+		$togglehtml .= '</div></div>';
+	}
+	$togglehtml .= '</div>';
+	$togglehtml .= '<script>$(function() { $(".dropdown-menu").on("click", function(ev) { ev.stopPropagation();}); });</script>';
+/*
 	$togglehtml = '<span class="dropdown">';
 	$togglehtml .= ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$togglehtml .= _('Toggles').'</a>';
@@ -478,6 +525,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$togglehtml .= '<li><a data-newflag="1">'. _('On').'</a></li>';
 	}
 	$togglehtml .= '</ul></span>';
+	*/
 	$i++;
 
 	if ($isteacher) {
