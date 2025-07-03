@@ -461,11 +461,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml .= '<label><input type=radio name="hdrs" value=0>'._('Unlocked').'</label>';
 	$togglehtml .= '</div></div>';
 
-	$togglehtml .= '<div role=radiogroup aria-labelledby=togpgwlbl id=pgwgroup>';
-	$togglehtml .= '<div id=togpgwlbl class="dropdown-header">'._('Width').'</div><div class="dropdown-group">';
-	$togglehtml .= '<label><input type=radio name="pgw" value=0>'._('Fixed').'</label><br/>';
-	$togglehtml .= '<label><input type=radio name="pgw" value=1>'._('Full').'</label>';
-	$togglehtml .= '</div></div>';
+	if ($showwidthtoggle) {
+		$togglehtml .= '<div role=radiogroup aria-labelledby=togpgwlbl id=pgwgroup>';
+		$togglehtml .= '<div id=togpgwlbl class="dropdown-header">'._('Width').'</div><div class="dropdown-group">';
+		$togglehtml .= '<label><input type=radio name="pgw" value=0>'._('Fixed').'</label><br/>';
+		$togglehtml .= '<label><input type=radio name="pgw" value=1>'._('Full').'</label>';
+		$togglehtml .= '</div></div>';
+	}
 
 	$togglehtml .= '<div role=radiogroup aria-labelledby=togptslbl>';
 	$togglehtml .= '<div id=togptslbl class="dropdown-header">'._('Scores').'</div><div class="dropdown-group">';
@@ -1828,11 +1830,13 @@ function gbinstrdisp() {
 		}
 		echo '</div></td>';
 		if ($showpics==1 && !empty($gbt[$i][4][2])) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
 		} else if ($showpics==2 && !empty($gbt[$i][4][2])) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+		} else if (!empty($gbt[$i][4][2])) {
+			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\" style=\"display:none\"/></div></td>";
 		} else {
-			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
+			echo "<td><div class=\"trld\"></div></td>";
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
             if (isset($gbt[$i][0][$j])) {

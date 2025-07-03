@@ -246,9 +246,21 @@ ierelock = function() {
 //locks the header row and column
 //adjust the winw and winh calculations to adjust sizing - currently handles
 //IE and non-IE separately
-this.lock = function() {
+this.lock = function(reset) {
 	if (!ispreinited) {
 		t.preinit(true);
+	} else if (reset === true) {
+		locktds.length = 0;
+		$(bigcont).removeAttr("style","");
+		$(bigcont).find("*").removeAttr("style","");
+		$(".locked").attr("origtop","").attr("style","");
+		requestAnimationFrame(function() {
+			requestAnimationFrame(function() {
+				ispreinited = false;
+				t.lock();
+			});
+		});
+		return;
 	}
 	toggletracker = 1;
 	if (tblbrowser == 'ie') {

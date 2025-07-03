@@ -113,11 +113,30 @@ $(function() {
 		var gbmode = gbmodebase - 10000*gbmod.showpics;
 		let val = $(this).val();
 		gbmode += 10000*val;
+		if (gbmod.lockheaders) {
+			ts.unlock();
+		}
+		if (val == 0) {
+			$(".pii-image").hide();
+		} else {
+			$(".pii-image").each(function() {
+				let cursrc = $(this).attr('src');
+				if (val == 1) {
+					$(this).attr('src', cursrc.replace(/userimg_(?!sm)/,'userimg_sm'));
+				} else if (val == 2) {
+					$(this).attr('src', cursrc.replace(/userimg_sm/,'userimg_'));				
+				}
+			});
+			$(".pii-image").show();
+		}
+		if (gbmod.lockheaders) {
+			ts.lock(true);
+		}
 		$.ajax({
 			url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
 			type: "GET"
 		}).done(function( data ) {
-			gbmod.pics = val;
+			gbmod.showpics = val;
 			gbmodebase = gbmode;
 		});
 		//TODO: actually change pics display
@@ -129,9 +148,9 @@ $(function() {
 		var val=$(this).val();
 		document.cookie = "gblhdr-"+cid+"="+val;
 		if (val==0) {
-			if ($("body").attr("class").match(/^fw/)) {
-				$("body").attr("data-fw", $("body").attr("class"));
-				$("body").removeClass("fw1000 fw1920");
+			if ($("body").attr("class").match(/fw\d+/)) {
+				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));
+				$("body").removeClass("fw1000 fw1920").addClass("notfw");
 			}
 			ts.unlock();
 			document.cookie = "skiplhdrwarn_"+cid+"=0";
@@ -145,21 +164,21 @@ $(function() {
 	$("input[name=pgw]").on("change",function(e) {
 		var val=$(this).val();
 		document.cookie = "gbfullw-"+cid+"="+val;
+		if (gbmod.lockheaders) {
+			ts.unlock();
+		}
 		if (val == 0) {
-			if (gbmod.lockheaders) {
-				ts.unlock();
-			}
-			if (!$("body").attr("class").match(/^fw/)) {
-				$("body").addClass($("body").attr("data-fw"));
-			}
-			if (gbmod.lockheaders) {
-				ts.lock();
+			if (!$("body").attr("class").match(/fw\d+/)) {
+				$("body").removeClass("notfw").addClass($("body").attr("data-fw"));
 			}
 		} else {
-			if ($("body").attr("class").match(/^fw/)) {
-				$("body").attr("data-fw", $("body").attr("class"));
-				$("body").removeClass("fw1000 fw1920");
+			if ($("body").attr("class").match(/fw\d+/)) {
+				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));
+				$("body").removeClass("fw1000 fw1920").addClass("notfw");
 			}
+		}
+		if (gbmod.lockheaders) {
+			ts.lock();
 		}
 		gbmod.fullwidth = val;
 	});

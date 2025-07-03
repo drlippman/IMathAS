@@ -291,7 +291,7 @@ if (isset($_SESSION['ltiitemtype'])) {
 }
 echo "</head>\n";
 if ($isfw!==false) {
-	if (isset($flexwidth) || isset($usefullwidth)) {
+	if (!empty($flexwidth) || !empty($usefullwidth)) {
 		echo "<body data-fw=\"fw$isfw\" class=\"notfw\">\n";
 	} else {
 		echo "<body class=\"fw$isfw\">\n";
