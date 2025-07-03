@@ -280,6 +280,34 @@ td.c, th.c, input.c {
 td.r {
 	text-align: right;
 }
+.sticky-table {
+	width: 100%;
+	height: 90vh;
+	overflow-x: auto;
+	overflow-y: auto;
+	border: 1px solid black;
+}
+.sticky-table table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0px;
+}
+.sticky-table th:first-child,
+.sticky-table td:first-child {
+	position: sticky;
+	left: 0;
+	z-index: 22;
+	border-right: 1px solid black;
+}
+.sticky-table thead tr:first-child {
+	position: sticky;
+	top: 0;
+	z-index: 23;
+}
+.sticky-table thead tr:first-child th {
+	border-bottom: 1px solid black;
+}
+
 span.form, label.form {
 	display: block;
 	width: 200px;

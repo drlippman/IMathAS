@@ -95,23 +95,7 @@ $typesel .= '</select></label>';
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 if ($report == 'overview') {
-	$placeinhead .= '<style>
-		.sticky-table {
-		width: 100%;
-		overflow-x: auto;
-		border: 1px solid black;
-	}
-	.sticky-table table {
-		width: 100%;
-	}
-	.sticky-table th:first-child,
-	.sticky-table td:first-child {
-		position: sticky;
-		left: 0;
-		z-index: 21;
-	}
-	</style>
-	<script>
+	$placeinhead .= '<script>
 	function lockcol() {
 		if ($("#tblcontmyTable").hasClass("sticky-table")) {
 			$("#tblcontmyTable").removeClass("sticky-table");

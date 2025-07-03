@@ -312,21 +312,6 @@ $placeinhead .= '<style>
  }
  ul.inlineul li::after { content: ", "; }
  ul.inlineul li:last-child::after { content: ""; }
-
- .sticky-table {
-	width: 100%;
-	overflow-x: auto;
-	border: 1px solid black;
-}
-.sticky-table table {
-	width: 100%;
-}
-.sticky-table th:first-child,
-.sticky-table td:first-child {
-	position: sticky;
-	left: 0;
-	z-index: 21;
-}
  </style>';	
 if ($canviewall) {
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
