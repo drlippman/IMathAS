@@ -312,7 +312,23 @@ $placeinhead .= '<style>
  }
  ul.inlineul li::after { content: ", "; }
  ul.inlineul li:last-child::after { content: ""; }
- </style>';
+
+ .sticky-table {
+	width: 100%;
+	overflow-x: auto;
+	border: 1px solid black;
+}
+.sticky-table table {
+	width: 100%;
+}
+.sticky-table th:first-child,
+.sticky-table td:first-child {
+	position: sticky;
+	left: 0;
+	z-index: 21;
+	box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+ </style>';	
 if ($canviewall) {
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
 }
@@ -418,18 +434,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=052320\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\">\n";
-	$placeinhead .= 'var ts = new tablescroller("myTable",';
-	if ($headerslocked) {
-		$placeinhead .= 'true,'.$showpics.');';
-	} else {
-		$placeinhead .= 'false,'.$showpics.');';
-	}
 	
 	$showwidthtoggle = (strpos($coursetheme, '_fw')!==false);
 
-	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } div.trld {display:table-cell;vertical-align:middle;white-space: nowrap;} </style>";
 	$placeinhead .= '<style type="text/css"> .dropdown-header, .dropdown-group {  font-size: inherit;  padding: 3px 10px;}</style>';
 
@@ -624,7 +631,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 			echo 'updateColors(document.getElementById("colorsel"));';
 			echo '$("#myTable").show();';
 		}
-		echo 'ts.init();
+		echo '
 	});
 	</script>';
 
@@ -1640,7 +1647,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
-	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
+	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents,$headerslocked;
 	global $assessGbUrl;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -1663,7 +1670,12 @@ function gbinstrdisp() {
 	//print_r($gbt);
 	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";
-	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+	echo '<div id="bigcontmyTable">';
+	if ($headerslocked) {
+		echo '<div id="tblcontmyTable" class="sticky-table">';
+	} else {
+		echo '<div id="tblcontmyTable">';
+	}
 
 	//echo '<div id="gbloading">'._('Loading...').'</div>';
 	echo '<table class="gb" id="myTable"><thead><tr>';

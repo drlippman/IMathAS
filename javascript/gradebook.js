@@ -113,9 +113,7 @@ $(function() {
 		var gbmode = gbmodebase - 10000*gbmod.showpics;
 		let val = $(this).val();
 		gbmode += 10000*val;
-		if (gbmod.lockheaders) {
-			ts.unlock();
-		}
+		
 		if (val == 0) {
 			$(".pii-image").hide();
 		} else {
@@ -129,9 +127,7 @@ $(function() {
 			});
 			$(".pii-image").show();
 		}
-		if (gbmod.lockheaders) {
-			ts.lock(true);
-		}
+		
 		$.ajax({
 			url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
 			type: "GET"
@@ -152,11 +148,11 @@ $(function() {
 				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));
 				$("body").removeClass("fw1000 fw1920").addClass("notfw");
 			}
-			ts.unlock();
+			$("#tblcontmyTable").removeClass("sticky-table");
 			document.cookie = "skiplhdrwarn_"+cid+"=0";
 			$("#pgwgroup").hide();
 		} else {
-			ts.lock();
+			$("#tblcontmyTable").addClass("sticky-table");
 			$("#pgwgroup").show();
 		}
 		gbmod.lockheaders = val;
@@ -164,9 +160,7 @@ $(function() {
 	$("input[name=pgw]").on("change",function(e) {
 		var val=$(this).val();
 		document.cookie = "gbfullw-"+cid+"="+val;
-		if (gbmod.lockheaders) {
-			ts.unlock();
-		}
+
 		if (val == 0) {
 			if (!$("body").attr("class").match(/fw\d+/)) {
 				$("body").removeClass("notfw").addClass($("body").attr("data-fw"));
@@ -177,9 +171,7 @@ $(function() {
 				$("body").removeClass("fw1000 fw1920").addClass("notfw");
 			}
 		}
-		if (gbmod.lockheaders) {
-			ts.lock();
-		}
+
 		gbmod.fullwidth = val;
 	});
 });
@@ -329,7 +321,7 @@ function copyemails() {
 }
 
 function lockcol() {
-	var tog = ts.toggle();
+	$("#tblcontmyTable").toggleClass("sticky-table");
 	document.cookie = 'gblhdr-'+cid+'=1';
 }
 function cancellockcol() {
