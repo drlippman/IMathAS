@@ -326,7 +326,6 @@ $placeinhead .= '<style>
 	position: sticky;
 	left: 0;
 	z-index: 21;
-	box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
  </style>';	
 if ($canviewall) {
