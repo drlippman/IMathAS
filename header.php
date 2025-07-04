@@ -383,20 +383,9 @@ require_once "$curdir/filter/filter.php";
 if (!isset($nologo) && !empty($smallheaderlogo)) {
 	echo '<div id="headerlogo" class="hideinmobile" ';
 	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
-		echo 'onclick="mopen(\'homemenu\',';
-		if (isset($cid) && is_numeric($cid)) {
-			echo $cid;
-		} else {
-			echo 0;
-		}
-		echo ')" onmouseout="mclosetime()"';
+		echo 'onclick="GB_show(\''._('My Classes').'\',\''.$imasroot.'/gethomemenu.php\',800,\'auto\',true);"';
 	}
 	echo '>'.$smallheaderlogo.'</div>';
-	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
-		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
-		echo '</div>';
-	}
-
 }
 
 

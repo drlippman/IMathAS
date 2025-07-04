@@ -1,10 +1,21 @@
 <?php
-//returns list of courses for switch-to menu
-//called via AJAX
+//switch-to menu page
 //IMathAS
 $init_skip_csrfp = true;
 require_once "init.php";
-//require_once "header.php";
+$noskipnavlink = true;
+$flexwidth = true;
+$placeinhead = '<script>
+$(function() {
+    $("a").on("click", function(ev) {
+		if (event.target.getAttribute("role") != "tab") {
+			ev.preventDefault();
+			window.parent.location.href = event.target.href;
+		}
+    });
+});
+</script>';
+require_once "header.php";
 
 $stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$userid));
