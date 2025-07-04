@@ -5,6 +5,7 @@ $init_skip_csrfp = true;
 require_once "init.php";
 $noskipnavlink = true;
 $flexwidth = true;
+$nologo = true;
 $placeinhead = '<script>
 $(function() {
     $("a").on("click", function(ev) {
