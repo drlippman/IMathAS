@@ -222,11 +222,11 @@ function showCourseList($arr) {
 			echo '<input class="outcome" type="text" size="40" id="g'.$cnt.'" value="'.Sanitize::encodeStringForDisplay($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removecoursegrp(this);return false">'._("Delete").'</a>';
 			$cnt++;
+			echo '<ul class="qview">';
 			if (count($item['courses'])>0) {
-				echo '<ul class="qview">';
 				showCourseList($item['courses']);
-				echo '</ul>';
 			}
+			echo '</ul>';
 			echo '</li>';
 		} else if (isset($courses[$item])) { //individual course
 			listCourse($courses[$item]);

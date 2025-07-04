@@ -18,6 +18,7 @@ var Nested = function(listid, newoptions) {
 			ghost: false,
 			childStep: 20, // attempts to become a child if the mouse is moved this number of pixels right
 			handleClass: 'icon',
+			expandBtnClass: 'treehandle',
 			onStart: function() {},
 			onComplete: function() {},
 			onFirstChange: function() {},
@@ -97,10 +98,17 @@ var Nested = function(listid, newoptions) {
 			while (el[0].nodeName != options.childTag && !el.hasClass(options.handleClass) && el[0] != list[0]) {
 				el = el.parent();
 			}
-			if (!el.hasClass(options.handleClass)) return true;
-			if (!moved) {
-			  el.focus();
-		    }
+			if (el.hasClass(options.handleClass)) {
+				el.focus();
+				return true;
+			} 
+		}
+		el = $(event.target);
+		if (options.expandBtnClass) {
+			while (el[0].nodeName != options.childTag && !el.hasClass(options.expandBtnClass) && el[0] != list[0]) {
+				el = el.parent();
+			}
+			if (!el.hasClass(options.expandBtnClass)) return true;
 		}
 		while (el[0].nodeName != options.childTag && el[0] != list[0]) {
 			el = el.parent();
@@ -116,10 +124,12 @@ var Nested = function(listid, newoptions) {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
 						event.target.setAttribute("aria-expanded", true);
+						el.find("."+options.expandBtnClass).text("-");
 					} else {
 						sub.css('display', 'none');
 						el.addClass(options.collapseClass);
 						event.target.setAttribute("aria-expanded", false);
+						el.find("."+options.expandBtnClass).text("+");
 					}
 				} else {
 					oblist = oblist.split(',');
@@ -129,11 +139,13 @@ var Nested = function(listid, newoptions) {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
 						event.target.setAttribute("aria-expanded", true);
+						el.find("."+options.expandBtnClass).text("-");
 						if (loc==-1) {oblist.push(obn);}
 					} else {
 						sub.css('display', 'none');
 						el.addClass(options.collapseClass);
 						event.target.setAttribute("aria-expanded", false);
+						el.find("."+options.expandBtnClass).text("+");
 						if (loc>-1) {oblist.splice(loc,1);}
 					}
 					oblist = oblist.join(',');
@@ -482,9 +494,14 @@ function submitChanges(format) {
 }
 
 function quickviewexpandAll() {
+	jQuery("#qviewtree li.blockli.nCollapse .treehandle").text("-");
+	jQuery("#qviewtree li.blockli.nCollapse .icon").attr("aria-expanded", true);
 	jQuery("#qviewtree li.blockli.nCollapse").removeClass("nCollapse").children("ul").show();
+	
 }
 function quickviewcollapseAll() {
+	jQuery("#qviewtree li.blockli:not(.nCollapse) .treehandle").text("+");
+	jQuery("#qviewtree li.blockli:not(.nCollapse) .icon").attr("aria-expanded", false);
 	jQuery("#qviewtree li.blockli:not(.nCollapse)").addClass("nCollapse").children("ul").hide();
 }
 
@@ -554,6 +571,7 @@ function addsortmarkup(baseid) {
 		if (!$(el).children("ul").attr("id")) {
 			$(el).children("ul").attr("id", "sub"+bid);
 			$(el).children(".icon").attr("aria-expanded", !$(el).hasClass("nCollapse")).attr("aria-controls", "sub"+bid);
+			$(el).children(".icon").before('<span class=treehandle>'+($(el).hasClass("nCollapse") ? '+' : '-')+'</span>');
 		}
 	});
 	base.find(".icon:not(.hashandle)").each(function(i,el) {

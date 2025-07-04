@@ -2219,7 +2219,8 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             } else {
                 $icon = '<span class=icon tabindex=0><img alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida"/></span> ';
             }
-            echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon . 'Calendar</li>';
+            echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
+            echo '<span id="cal' . Sanitize::encodeStringForDisplay($items[$i]) .'">'._('Calendar').'</span></li>';
 
         } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
             $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);

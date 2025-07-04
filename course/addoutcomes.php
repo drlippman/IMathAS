@@ -193,7 +193,7 @@ $placeinhead .= '<script type="text/javascript">
 	function addoutcomegrp() {
 		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f" tabindex=0>G</span> \';
 		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()" value="Outcome Group"> \';
-		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
+		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a><ul class=qview></ul></li>\';
 		$("#qviewtree").append(html);
 		addsortmarkup("qviewtree");
 		$("#newgrp"+ocnt).focus();
