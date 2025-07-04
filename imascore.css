@@ -376,12 +376,7 @@ span.left {
 	overflow: hidden;
 	color: transparent;
 }
-.empty-state, ul:empty {
-    display: none;
-}
-ul:empty + .empty-state {
-    display: block;
-}
+
 #skipnav:focus, #skipnav:active, #pageskipnav:focus, #pageskipnav:active, .showonfocus:focus, .showonfocus:active {
     position: static;
     width: auto;

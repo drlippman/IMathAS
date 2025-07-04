@@ -46,6 +46,7 @@ var Nested = function(listid, newoptions) {
 		if (options.collapse) {
 			list.on('click.collapse touchend.collapse', collapse);
 		}
+		addsortmarkup(listid);
 		if (options.initialize) options.initialize.call(this);
 	};
 
@@ -97,13 +98,12 @@ var Nested = function(listid, newoptions) {
 				el = el.parent();
 			}
 			if (!el.hasClass(options.handleClass)) return true;
+			if (!moved) {
+			  el.focus();
+		    }
 		}
 		while (el[0].nodeName != options.childTag && el[0] != list[0]) {
 			el = el.parent();
-		}
-
-		if (!moved) {
-			event.target.focus();
 		}
 		
 		if (el[0] == list[0]) return;
@@ -115,9 +115,11 @@ var Nested = function(listid, newoptions) {
 					if (sub.length == 0 || sub.css('display') == 'none') {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
+						event.target.setAttribute("aria-expanded", true);
 					} else {
 						sub.css('display', 'none');
 						el.addClass(options.collapseClass);
+						event.target.setAttribute("aria-expanded", false);
 					}
 				} else {
 					oblist = oblist.split(',');
@@ -126,10 +128,12 @@ var Nested = function(listid, newoptions) {
 					if (sub.length == 0 || sub.css('display') == 'none') {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
+						event.target.setAttribute("aria-expanded", true);
 						if (loc==-1) {oblist.push(obn);}
 					} else {
 						sub.css('display', 'none');
 						el.addClass(options.collapseClass);
+						event.target.setAttribute("aria-expanded", false);
 						if (loc>-1) {oblist.splice(loc,1);}
 					}
 					oblist = oblist.join(',');
@@ -155,29 +159,40 @@ var Nested = function(listid, newoptions) {
 		
 		let madechg = false;
 		if (event.key == 'ArrowDown') {
-			if (el.next('li')) {
+			if (el.next('li').length) {
 				el.insertAfter(el.next('li'));
 				madechg = true;
 			}
 		} else if (event.key == 'ArrowUp') {
-			if (el.prev('li')) {
+			if (el.prev('li').length) {
 				el.insertBefore(el.prev('li'));
 				madechg = true;
 			}
 		} else if (event.key == 'ArrowLeft') {
-			if (el.closest('ul').closest('li')) {
+			if (el.closest('ul').closest('li').length) {
 				el.insertAfter(el.closest('ul').closest('li'));
 				madechg = true;
 			}
 		} else if (event.key == 'ArrowRight') {
-			if (el.prev('li') && el.prev('li').children('ul')) {
+			if (el.prev('li').length && el.prev('li').children('ul').length) {
 				if (el.prev('li').hasClass('nCollapse')) {
 					el.prev('li').removeClass('nCollapse').children('ul').show();
 				}
 				el.appendTo(el.prev('li').children('ul'));
 				madechg = true;
 			}
-		} 
+		} else if (event.key == ' ') {
+			if (el.children('ul').length) {
+				if (el.children('ul:visible').length) {
+					el.children('ul').hide();
+					event.target.setAttribute("aria-expanded", false);
+				} else {
+					el.children('ul').show();
+					event.target.setAttribute("aria-expanded", true);
+				}
+			}
+			madechg = true;
+		}
 		if (madechg) {
 			event.preventDefault();
 		}
@@ -272,15 +287,14 @@ var Nested = function(listid, newoptions) {
 			move = 'after';
 			dest = prev;
 			check = $(dest).children(options.parentTag).filter(':visible');
-			while (check.length>0 && event.pageX > check.offset().left && check.height() > 0) {
+			while (check.length>0 && event.pageX > check.offset().left && check.height() > 0 && check.children(options.childTag).length > 0) {
 				dest = check.children(options.childTag).last();
 				check = dest.children(options.parentTag);
 			}
-			if (check.length==0 && dest[0]!=el[0] && event.pageX > dest.offset().left+options.childStep && dest[0].tagName == 'LI' && dest[0].className=="blockli") {
+			if (check.children(options.childTag).length==0 && dest[0]!=el[0] && event.pageX > dest.offset().left+options.childStep && dest[0].tagName == 'LI' && dest[0].className=="blockli") {
 				//document.getElementById("submitnotice").innerHTML = dest.parentNode.tagName + ',' + dest.parentNode.parentNode.tagName;
 				move = 'inside';
-			}
-
+			} 
 		}
 		last = dest.parent().children().last();
 
@@ -305,9 +319,13 @@ var Nested = function(listid, newoptions) {
 			abort += (event.pageY < (sub-el.height())+$(over).offset().top);
 			if (!abort) {
 				if (move == 'inside') {
-					var newsub = $(document.createElement(options.parentTag)).addClass('qview');
-					dest.append(newsub);
-					dest = newsub;
+					if ($(dest).children(options.parentTag).length > 0) {
+						dest = $(dest).children(options.parentTag);
+					} else {
+					    var newsub = $(document.createElement(options.parentTag)).addClass('qview');
+					    dest.append(newsub);
+					    dest = newsub;
+					}
 				}
 				if (move =='inside') {
 					$(dest).append(el);
@@ -318,7 +336,7 @@ var Nested = function(listid, newoptions) {
 				}
 
 				moved = true;
-				if (prevParent.children().length==0) prevParent.remove();
+				//if (prevParent.children().length==0) prevParent.remove();
 				if (!haschanged) {
 					haschanged = true;
 					options.onFirstChange(el);
@@ -528,9 +546,44 @@ function editinplaceun() {
 	this.style.display = "none";
 }
 
+function addsortmarkup(baseid) {
+	let base = $("#"+baseid);
+	base.find("li.blockli").each(function(i,el) {
+		let bid = el.id;
+		// if children ul doesn't have id, add markup
+		if (!$(el).children("ul").attr("id")) {
+			$(el).children("ul").attr("id", "sub"+bid);
+			$(el).children(".icon").attr("aria-expanded", !$(el).hasClass("nCollapse")).attr("aria-controls", "sub"+bid);
+		}
+	});
+	base.find(".icon:not(.hashandle)").each(function(i,el) {
+		let lid = $(el).closest("li").attr("id");
+		$(el).append('<span class="sr-only" id="handle'+lid+'">'+_('Handle')+'</span>');
+		$(el).addClass("hashandle");
+		let next = el.nextElementSibling;
+		let refid;
+		if ($(next).hasClass("dropdown")) {
+			refid = $(next).find("span[id]").attr("id");
+		} else {
+			refid = next.id;
+		}
+		$(el).attr("aria-labelledby", "handle"+lid+" "+refid);
+	});
+}
+
 var newblockcnt = 0;
 function addnewblock() {
     $("#qviewtree").prepend(
+		'<li id=newblock'+newblockcnt+' class=blockli>' +
+		 '<span class=icon tabindex=0>' +
+		 '<img alt="'+_('block')+'" class=mida src="'+blockiconsrc+'"/></span> ' +
+		 '<span class="dropdown">' +
+	     '<a tabindex=0 class="dropdown-toggle arrow-down" id="ddnb'+newblockcnt+'" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+		 '<b><span id="NB'+newblockcnt+'">' + _("New Block") + '</span></b>' +
+ 		 '</a><ul class="dropdown-menu" role="menu" aria-labelledby="ddnb'+newblockcnt+'">' +
+         '<li><a href="#" onclick="editinplace(\'NB'+newblockcnt+'\');return false;">Rename</a></li>'+
+		 '</ul></span><ul class=qview></ul></li>'
+               /* 
         $("<li>", {id: "newblock" + newblockcnt, class: "blockli"}).append(
             $("<img>", {
                 alt: _("block"),
@@ -546,7 +599,9 @@ function addnewblock() {
                 })
             )
         )
+		*/
     );
     newblockcnt++;
+	addsortmarkup('qviewtree');
     document.getElementById('recchg').disabled = false;
 }

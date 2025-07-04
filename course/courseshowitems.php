@@ -2179,7 +2179,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['folder'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">B</span>';
             } else {
-                $icon = '<img alt="folder" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['folder'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="folder" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['folder'] . '" class="mida"/></span> ';
             }
             echo '<li class="' . $liclass . '" id="' . "$parent-$bnum" . '" obn="' . Sanitize::encodeStringForDisplay($items[$i]['id']) . '">' . $icon;
             if ($showlinks) {
@@ -2207,18 +2207,17 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if ($showdates) {
                 echo " $show";
             }
-            
+            echo '<ul class=qview ' . $qviewstyle . '>';
             if (count($items[$i]['items']) > 0) {
-                echo '<ul class=qview ' . $qviewstyle . '>';
                 quickview($items[$i]['items'], $parent . '-' . $bnum, $showdates, $showlinks);
-                echo '</ul>';
             }
+            echo '</ul>';
             echo '</li>';
         } else if ($itemtypes[$items[$i]][0] == 'Calendar') {
             if (!isset($CFG['CPS']['miniicons']['calendar'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:#0f0;">C</span>';
             } else {
-                $icon = '<img alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon . 'Calendar</li>';
 
@@ -2250,7 +2249,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['assess'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">?</span>';
             } else {
-                $icon = '<img alt="assessment" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['assess'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="assessment" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['assess'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2336,7 +2335,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['inline'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">!</span>';
             } else {
-                $icon = '<img alt="text" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['inline'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="text" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['inline'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2393,7 +2392,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['linked'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">!</span>';
             } else {
-                $icon = '<img alt="link" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['linked'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="link" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['linked'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2451,7 +2450,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['forum'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">F</span>';
             } else {
-                $icon = '<img alt="forum" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['forum'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="forum" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['forum'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2509,7 +2508,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['wiki'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">W</span>';
             } else {
-                $icon = '<img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['wiki'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['wiki'] . '" class="mida" /></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2568,7 +2567,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['drill'])) {
                 $icon = '<span class=icon tabindex=0 style="background-color:' . $color . '">D</span>';
             } else {
-                $icon = '<img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['drill'] . '" class="mida icon" tabindex=0 /> ';
+                $icon = '<span class=icon tabindex=0><img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['drill'] . '" class="mida" /></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 

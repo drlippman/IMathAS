@@ -139,11 +139,11 @@ function printoutcome($arr) {
 			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
 			$cnt++;
+			echo '<ul class="qview">';
 			if (count($item['outcomes'])>0) {
-				echo '<ul class="qview">';
 				printoutcome($item['outcomes']);
-				echo '</ul>';
 			}
+			echo '</ul>';
 			echo '</li>';
 		} else { //individual outcome
 			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0" tabindex=0>O</span> ';
@@ -164,7 +164,7 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::e
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; </script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=063025\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=070425\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;
@@ -181,6 +181,7 @@ $placeinhead .= '<script type="text/javascript">
 		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'" onkeyup="txtchg()" value="Outcome"> \';
 		html += \'<a href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
 		$("#qviewtree").append(html);
+		addsortmarkup("qviewtree");
 		$("#new"+ocnt).focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
@@ -194,6 +195,7 @@ $placeinhead .= '<script type="text/javascript">
 		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()" value="Outcome Group"> \';
 		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
 		$("#qviewtree").append(html);
+		addsortmarkup("qviewtree");
 		$("#newgrp"+ocnt).focus();
 		ocnt++;
 		if (!sortIt.haschanged) {

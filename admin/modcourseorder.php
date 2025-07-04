@@ -145,9 +145,10 @@ $placeinhead .= '<script type="text/javascript">
 	function addcoursegrp() {
 		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f" tabindex=0>G</span> \';
 		html += \'<input class="outcome" type="text" size="40" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
-		html += \'<a href="#" onclick="removecoursegrp(this);return false\">'._("Delete").'</a></li>\';
+		html += \'<a href="#" onclick="removecoursegrp(this);return false\">'._("Delete").'</a><ul class=qview></ul></li>\';
 		$("#maingrp > ul").prepend(html);
 		$("#newgrp"+ocnt).focus();
+		addsortmarkup("qviewtree");
 		ocnt++;
 		txtchg();
 	}
@@ -186,7 +187,7 @@ function listCourse($course) {
 	$now = time();
 	echo '<li id="c'.Sanitize::onlyInt($course['id']).'">';
 	echo '<span class=icon style="background-color:#0f0" tabindex=0>C</span> ';
-	echo Sanitize::encodeStringForDisplay($course['name']);
+	echo '<span id="cn'.Sanitize::onlyInt($course['id']).'">'.Sanitize::encodeStringForDisplay($course['name']).'</span>';
 	if (isset($course['available']) && (($course['available']&1)==1)) {
 		echo ' <em style="color:green;">', _('Unavailable'), '</em>';
 	}

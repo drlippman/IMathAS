@@ -647,13 +647,13 @@ if ($overwriteBody==1) {
 
 
 	   if ($quickview=='on' && isset($teacherid)) {
-		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
+		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} span.icon { padding:0; margin:0}</style>';
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
            echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=063025\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=070425\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
