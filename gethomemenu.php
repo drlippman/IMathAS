@@ -15,6 +15,28 @@ $(function() {
 		}
     });
 });
+$(function() {
+	$(".tablist a").on("click", function(ev) {
+		setActiveTab(this)
+		ev.preventDefault();
+	}).on("keydown", function(ev) {
+		if (ev.keyCode == 37) { // arrow left
+			let li = $(this).closest("li").prev("li");
+			if (li) {
+				let ael = li.find("a")[0];
+				setActiveTab(ael);
+				ael.focus();
+			}
+		} else if (ev.keyCode == 39) { // arrow right
+			let li = $(this).closest("li").next("li");
+			if (li) {
+				let ael = li.find("a")[0];
+				setActiveTab(ael);
+				ael.focus();
+			}
+		} 
+	});
+});
 </script>';
 require_once "header.php";
 
@@ -68,12 +90,13 @@ if ($usetabs) {
 			$firsttab = $i;
 			echo '<li class="active">';
 		} else {
-			echo '<li>';
+			echo '<li tabindex>';
 		}
 		echo '<a href="#" role="tab" id="homemenutab'.$i.'" ';
 		echo 'aria-controls="homemenutabpanel'.$i.'" ';
 		echo 'aria-selected="'.(($firsttab==$i)?'true':'false').'" ';
-		echo 'onclick="setActiveTab(this);return false;">';
+		echo ($firsttab == $i ? 'tabindex=0' : 'tabindex=-1');
+		echo '>';
 		echo $typenames[$i];
 		echo '</a></li>';
 	}
