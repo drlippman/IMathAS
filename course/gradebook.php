@@ -104,6 +104,21 @@ if ($canviewall) {
 	$includelastchange = (((floor($gbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
 
+	$usefullwidth = false;
+	$headerslocked = false;
+	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+		$headerslocked = true;
+	} else {
+		if (!isset($_COOKIE["gblhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
+			$headerslocked = true;
+		} else {
+			$headerslocked = false;
+			$usefullwidth = true;
+		}
+	}
+	if (isset($_COOKIE["gbfullw-$cid"]) && $_COOKIE["gbfullw-$cid"]==1) {
+		$usefullwidth = true;
+	}
 } else {
 	$secfilter = -1;
 	$catfilter = -1;
@@ -278,6 +293,8 @@ var gbmod = {
 	"hidelocked": '.Sanitize::onlyInt($hidelocked).',
 	"links": '.Sanitize::onlyInt($links).',
 	"pts": '.Sanitize::onlyInt($showpercents).',
+	"fullwidth": '.($usefullwidth ? 1 : 0).',
+	"lockheaders": '.($headerslocked ? 1 : 0).',
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 $placeinhead .= '<style>
@@ -295,9 +312,9 @@ $placeinhead .= '<style>
  }
  ul.inlineul li::after { content: ", "; }
  ul.inlineul li:last-child::after { content: ""; }
- </style>';
+ </style>';	
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=080622"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=070425"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -401,30 +418,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=052320\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\">\n";
-	$placeinhead .= 'var ts = new tablescroller("myTable",';
-	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
-		$placeinhead .= 'true,'.$showpics.');';
-		$headerslocked = true;
-	} else {
-		if (!isset($_COOKIE["gblhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
-			$placeinhead .= 'true,'.$showpics.');';
-			$headerslocked = true;
-		} else {
-			$placeinhead .= 'false,'.$showpics.');';
-			$headerslocked = false;
-			$usefullwidth = true;
-		}
-	}
-	if (isset($_COOKIE["gbfullw-$cid"]) && $_COOKIE["gbfullw-$cid"]==1) {
-		$usefullwidth = true;
-	}
+	
 	$showwidthtoggle = (strpos($coursetheme, '_fw')!==false);
 
-	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } div.trld {display:table-cell;vertical-align:middle;white-space: nowrap;} </style>";
-	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
+	$placeinhead .= '<style type="text/css"> .dropdown-header, .dropdown-group {  font-size: inherit;  padding: 3px 10px;}</style>';
 
 	require_once "../header.php";
     echo "<div class=breadcrumb>";
@@ -442,6 +440,55 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	echo "<div class=cpmid>";
 	$i = 0;
+
+	$togglehtml = '<span class="dropdown">';
+	$togglehtml .= ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	$togglehtml .= _('Toggles').'</a>';
+	$togglehtml .= '<div class="dropdown-menu gbtoggle" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+	
+	$togglehtml .= '<div role=radiogroup aria-labelledby=toghdrlbl>';
+	$togglehtml .= '<div id=toghdrlbl class="dropdown-header">'._('Headers').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="hdrs" value=1>'._('Locked').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="hdrs" value=0>'._('Unlocked').'</label>';
+	$togglehtml .= '</div></div>';
+
+	if ($showwidthtoggle) {
+		$togglehtml .= '<div role=radiogroup aria-labelledby=togpgwlbl id=pgwgroup>';
+		$togglehtml .= '<div id=togpgwlbl class="dropdown-header">'._('Width').'</div><div class="dropdown-group">';
+		$togglehtml .= '<label><input type=radio name="pgw" value=0>'._('Fixed').'</label><br/>';
+		$togglehtml .= '<label><input type=radio name="pgw" value=1>'._('Full').'</label>';
+		$togglehtml .= '</div></div>';
+	}
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=togptslbl>';
+	$togglehtml .= '<div id=togptslbl class="dropdown-header">'._('Scores').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="pts" value=0>'._('Points').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pts" value=1>'._('Percent').'</label>';
+	$togglehtml .= '</div></div>';
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=toglinkslbl>';
+	$togglehtml .= '<div id=toglinkslbl class="dropdown-header">'._('Links').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="links" value=0>'._('View/Edit').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="links" value=1>'._('Summary').'</label>';
+	$togglehtml .= '</div></div>';
+
+	$togglehtml .= '<div role=radiogroup aria-labelledby=togpicslbl>';
+	$togglehtml .= '<div id=togpicslbl class="dropdown-header">'._('Pictures').'</div><div class="dropdown-group">';
+	$togglehtml .= '<label><input type=radio name="pics" value=0>'._('None').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pics" value=1>'._('Small').'</label><br/>';
+	$togglehtml .= '<label><input type=radio name="pics" value=2>'._('Large').'</label>';
+	$togglehtml .= '</div></div>';
+
+	if ($isteacher) {
+		$togglehtml .= '<div role=radiogroup aria-labelledby=tognewflaglbl>';
+		$togglehtml .= '<div id=tognewflaglbl class="dropdown-header">'._('New Flag').'</div><div class="dropdown-group">';
+		$togglehtml .= '<label><input type=radio name="newflag" value=0>'._('Off').'</label><br/>';
+		$togglehtml .= '<label><input type=radio name="newflag" value=1>'._('On').'</label>';
+		$togglehtml .= '</div></div>';
+	}
+	$togglehtml .= '</div>';
+	$togglehtml .= '<script>$(function() { $(".dropdown-menu").on("click", function(ev) { ev.stopPropagation();}); });</script>';
+/*
 	$togglehtml = '<span class="dropdown">';
 	$togglehtml .= ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$togglehtml .= _('Toggles').'</a>';
@@ -478,6 +525,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$togglehtml .= '<li><a data-newflag="1">'. _('On').'</a></li>';
 	}
 	$togglehtml .= '</ul></span>';
+	*/
 	$i++;
 
 	if ($isteacher) {
@@ -555,19 +603,19 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "</div>";
 	echo '<script type="text/javascript">
 	$(function() {
-		$("a[data-hdrs='.($headerslocked?1:0).']").parent().addClass("active");
-		$("a[data-pts='.($showpercents?1:0).']").parent().addClass("active");
-		$("a[data-links='.Sanitize::onlyInt($links).']").parent().addClass("active");
-		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
-		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
-		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
+		$("input[name=hdrs][value='.($headerslocked?1:0).']").prop("checked", true);
+		$("input[name=pts][value='.($showpercents?1:0).']").prop("checked", true);
+		$("input[name=links][value='.Sanitize::onlyInt($links).']").prop("checked", true);
+		$("input[name=pics][value='.Sanitize::onlyInt($showpics).']").prop("checked", true);
+		$("input[name=newflag][value='.(($coursenewflag&1)==1?1:0).']").prop("checked", true);
+		$("input[name=pgw][value='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").prop("checked", true);
 		setupGBpercents();';
 		if ($isteacher && $colorize != '0' && $colorize != null) {
 			echo '$("#myTable").hide();';
 			echo 'updateColors(document.getElementById("colorsel"));';
 			echo '$("#myTable").show();';
 		}
-		echo 'ts.init();
+		echo '
 	});
 	</script>';
 
@@ -1583,7 +1631,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
-	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
+	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents,$headerslocked;
 	global $assessGbUrl;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -1606,7 +1654,12 @@ function gbinstrdisp() {
 	//print_r($gbt);
 	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";
-	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+	echo '<div id="bigcontmyTable">';
+	if ($headerslocked) {
+		echo '<div id="tblcontmyTable" class="sticky-table">';
+	} else {
+		echo '<div id="tblcontmyTable">';
+	}
 
 	//echo '<div id="gbloading">'._('Loading...').'</div>';
 	echo '<table class="gb" id="myTable"><thead><tr>';
@@ -1773,11 +1826,13 @@ function gbinstrdisp() {
 		}
 		echo '</div></td>';
 		if ($showpics==1 && !empty($gbt[$i][4][2])) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
 		} else if ($showpics==2 && !empty($gbt[$i][4][2])) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
+		} else if (!empty($gbt[$i][4][2])) {
+			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\" style=\"display:none\"/></div></td>";
 		} else {
-			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
+			echo "<td><div class=\"trld\"></div></td>";
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
             if (isset($gbt[$i][0][$j])) {

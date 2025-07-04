@@ -13,6 +13,10 @@ require_once "outcometable.php";
 $canviewall = true;
 $catfilter = -1;
 $secfilter = -1;
+$headerslocked = false;
+if (!empty($_COOKIE['ocrhdr-'.$cid])) {
+	$headerslocked = true;
+}
 
 //load outcomes
 $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
@@ -91,32 +95,19 @@ $typesel .= '</select></label>';
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 if ($report == 'overview') {
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=012514\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\">\n";
-	$placeinhead .= 'var ts = new tablescroller("myTable",';
-	if (isset($_COOKIE["ocrhdr-$cid"]) && $_COOKIE["ocrhdr-$cid"]==1) {
-		$placeinhead .= 'true,false);';
-		$headerslocked = true;
-	} else {
-		if (!isset($_COOKIE["ocrhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
-			$placeinhead .= 'true,false);';
-			$headerslocked = true;
+	$placeinhead .= '<script>
+	function lockcol() {
+		if ($("#tblcontmyTable").hasClass("sticky-table")) {
+			$("#tblcontmyTable").removeClass("sticky-table");
+			document.cookie = "ocrhdr-'.$cid.'=0";
+			document.getElementById("lockbtn").value = "'. _('Lock headers') . '";
 		} else {
-			$placeinhead .= 'false,false);';
-			$headerslocked = false;
-			$usefullwidth = true;
+			$("#tblcontmyTable").addClass("sticky-table");
+			document.cookie = "ocrhdr-'.$cid.'=1";
+			document.getElementById("lockbtn").value = "'. _('Unlock headers') . '";
 		}
 	}
-	$placeinhead .= '$(function() {ts.init();});';
-	$placeinhead .= "\nfunction lockcol() { \n";
-	$placeinhead .= "var tog = ts.toggle(); ";
-	$placeinhead .= "document.cookie = 'ocrhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"" . _('Unlock headers') . "\"; ";
-	$placeinhead .= "if (tog==1) { "; //going to locked
-	$placeinhead .= "} else {";
-	$placeinhead .= "document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\"; ";
-	$placeinhead .= "}}\n ";
-	$placeinhead .= "function cancellockcol() {document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n";
-	$placeinhead .= '</script>';
+	</script>';
 }
 
 $address = $GLOBALS['basesiteurl'] . "/course/outcomereport.php?cid=$cid".$qs;
@@ -204,7 +195,12 @@ if ($report=='overview') {
 		echo ' <a href="outcomereport.php?cid='.$cid.'&amp;export=true&amp;type='.$type.'">Export to CSV</a> ';
 		echo '</div>';
 		echo "<div id=\"tbl-container\">";
-		echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+		echo '<div id="bigcontmyTable">';
+		if ($headerslocked) {
+			echo '<div id="tblcontmyTable" class="sticky-table">';
+		} else {
+			echo '<div id="tblcontmyTable">';
+		}
 
 		echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th>';
 		$sarr = '"S"';

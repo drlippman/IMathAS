@@ -33,9 +33,6 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
 <?php
 $isfw = false;
 if (isset($coursetheme)) {
-	if (isset($flexwidth) || isset($usefullwidth)) {
-		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$coursetheme);
-	}
 	if (strpos($coursetheme,'_fw1920')!==false) {
 		$isfw = 1920;
 		$coursetheme = str_replace('_fw1920','',$coursetheme);
@@ -294,7 +291,11 @@ if (isset($_SESSION['ltiitemtype'])) {
 }
 echo "</head>\n";
 if ($isfw!==false) {
-	echo "<body class=\"fw$isfw\">\n";
+	if (!empty($flexwidth) || !empty($usefullwidth)) {
+		echo "<body data-fw=\"fw$isfw\" class=\"notfw\">\n";
+	} else {
+		echo "<body class=\"fw$isfw\">\n";
+	}
 } else {
 	echo "<body class=\"notfw\">\n";
 }

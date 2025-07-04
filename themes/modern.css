@@ -4,6 +4,13 @@ body {
 	font-size: 90%;
 }
 
+body.fw1000 {
+	background-color:#F7F7FF;
+}
+.fw1000 .midwrapper {
+	max-width: 970px;
+}
+
 /*Link styles*/
 a:link {
 	text-decoration: none;

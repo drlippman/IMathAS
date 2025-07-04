@@ -72,20 +72,23 @@ function setupGBpercents() {
  });
 };
 $(function() {
-	$("a[data-links]").on("click",function(e) {
-		e.preventDefault();
+	$("input[name=links]").on("change",function(e) {
 		var gbmode = gbmodebase - 100*gbmod.links;
-		gbmode += 100*$(this).attr("data-links");
-		window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
+		let val = $(this).val();
+		gbmode += 100*val;
+		$.ajax({
+			url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
+			type: "GET"
+		}).done(function( data ) {
+			gbmod.links = val;
+			gbmodebase = gbmode;
+		});
 	});
-	$("a[data-pts]").on("click",function(e) {
-		e.preventDefault();
-		var val = 1*$(this).attr("data-pts");
+	$("input[name=pts]").on("change",function(e) {
+		var val = 1*$(this).val();
 		if (val != gbmod.pts) {
 			var gbmode = gbmodebase - 400000*gbmod.pts;
 			gbmode += 400000*val;
-			$("a[data-pts]").parent().removeClass("active");
-			$(this).parent().addClass("active");
 			if (val == 0) { //show points
 				$("*[data-ptv]").each(function() {
 					$(this).text($(this).attr("data-ptv"))
@@ -106,46 +109,71 @@ $(function() {
 			});
 		}
 	});
-	$("a[data-pics]").on("click",function(e) {
-		e.preventDefault();
+	$("input[name=pics]").on("change",function(e) {
 		var gbmode = gbmodebase - 10000*gbmod.showpics;
-		gbmode += 10000*$(this).attr("data-pics");
-		window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
+		let val = $(this).val();
+		gbmode += 10000*val;
+		
+		if (val == 0) {
+			$(".pii-image").hide();
+		} else {
+			$(".pii-image").each(function() {
+				let cursrc = $(this).attr('src');
+				if (val == 1) {
+					$(this).attr('src', cursrc.replace(/userimg_(?!sm)/,'userimg_sm'));
+				} else if (val == 2) {
+					$(this).attr('src', cursrc.replace(/userimg_sm/,'userimg_'));				
+				}
+			});
+			$(".pii-image").show();
+		}
+		
+		$.ajax({
+			url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
+			type: "GET"
+		}).done(function( data ) {
+			gbmod.showpics = val;
+			gbmodebase = gbmode;
+		});
+		//TODO: actually change pics display
 	});
-	$("a[data-newflag]").on("click",function(e) {
-		e.preventDefault();
+	$("input[name=newflag]").on("change",function(e) {
 		chgnewflag();
-		$("a[data-newflag]").parent().removeClass("active");
-		$(this).parent().addClass("active");
 	});
-	$("a[data-hdrs]").on("click",function(e) {
-		e.preventDefault();
-		var val=$(this).attr("data-hdrs");
+	$("input[name=hdrs]").on("change",function(e) {
+		var val=$(this).val();
 		document.cookie = "gblhdr-"+cid+"="+val;
 		if (val==0) {
-			if ($("body").attr("class").match(/^fw/)) {
-				location.reload();
-				return;
+			if ($("body").attr("class").match(/fw\d+/)) {
+				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));
+				$("body").removeClass("fw1000 fw1920").addClass("notfw");
 			}
-			ts.unlock();
+			$("#tblcontmyTable").removeClass("sticky-table");
 			document.cookie = "skiplhdrwarn_"+cid+"=0";
-			$("[data-pgw]").hide();
+			$("#pgwgroup").hide();
 		} else {
-			ts.lock();
-			$("[data-pgw]").show();
+			$("#tblcontmyTable").addClass("sticky-table");
+			$("#pgwgroup").show();
 		}
-		$("a[data-hdrs]").parent().removeClass("active");
-		$(this).parent().addClass("active");
+		gbmod.lockheaders = val;
 	});
-	$("a[data-pgw]").on("click",function(e) {
-		e.preventDefault();
-		$("a[data-pgw]").parent().removeClass("active");
-		$(this).parent().addClass("active");
-		var val=$(this).attr("data-pgw");
+	$("input[name=pgw]").on("change",function(e) {
+		var val=$(this).val();
 		document.cookie = "gbfullw-"+cid+"="+val;
-		location.reload();
+
+		if (val == 0) {
+			if (!$("body").attr("class").match(/fw\d+/)) {
+				$("body").removeClass("notfw").addClass($("body").attr("data-fw"));
+			}
+		} else {
+			if ($("body").attr("class").match(/fw\d+/)) {
+				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));
+				$("body").removeClass("fw1000 fw1920").addClass("notfw");
+			}
+		}
+
+		gbmod.fullwidth = val;
 	});
-	$(".gbtoggle a").attr("href","#");
 });
 $(function() {
 	$("th a, th select").bind("click", function(e) { e.stopPropagation(); });
@@ -293,7 +321,7 @@ function copyemails() {
 }
 
 function lockcol() {
-	var tog = ts.toggle();
+	$("#tblcontmyTable").toggleClass("sticky-table");
 	document.cookie = 'gblhdr-'+cid+'=1';
 }
 function cancellockcol() {
