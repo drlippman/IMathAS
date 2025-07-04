@@ -136,7 +136,7 @@
 		tr.id = \'newrow\'+addrowcnt;
 		tr.className = "grid";
 		var td = document.createElement("td");
-		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" value="" type="text" aria-label="category name">\';
+		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" id="namenew\'+addrowcnt+\'" value="" type="text" aria-label="category name">\';
 		tr.appendChild(td);
         var useweights = !!document.getElementById("usew1").checked;
 
@@ -184,7 +184,7 @@
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'<a href="#" onclick="removecat(\'+addrowcnt+\'); return false;">Remove</a>\';
+		td.innerHTML = \'<a href="#" onclick="removecat(\'+addrowcnt+\'); return false;" id="rn\'+addrowcnt+\'" aria-labelledby="rn\'+addrowcnt+\' namenew\'+addrowcnt+\'">Remove</a>\';
 		tr.appendChild(td);
 
 		document.getElementById("cattbody").appendChild(tr);
@@ -463,7 +463,7 @@
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
-			echo "<input type=text name=\"name[$id]\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\" aria-label=\"category name\"/>";
+			echo "<input type=text name=\"name[$id]\" id=\"name$id\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\" aria-label=\"category name\"/>";
 		} else {
 			echo Sanitize::encodeStringForDisplay($row['name']);
 		}
@@ -536,7 +536,7 @@
 		}
 		echo "\" aria-label=\"category weighted total\"/></td>";
 		if ($id!=0) {
-			echo "<td><a href=\"#\" onclick=\"removeexistcat($id);return false;\">Remove</a></td></tr>";
+			echo "<td><a href=\"#\" onclick=\"removeexistcat($id);return false;\" id=\"r$id\" aria-labelledby=\"r$id name$id\">Remove</a></td></tr>";
 		} else {
 			echo "<td></td></tr>";
 		}
