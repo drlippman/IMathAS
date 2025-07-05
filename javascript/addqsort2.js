@@ -126,6 +126,18 @@ function refreshTable() {
         toolbar: "charmap saveclose",
         setup: editorSetup
     });
+    $("textarea.textsegment,input.textsegment").on("focus", function () {
+        var i = this.id.match(/[0-9]+$/)[0];
+        var type = getTypeForSelector("#" + this.id);
+        //if the editor is collapsed, expand it
+
+        if ($(this).hasClass("collapsed") || $(this).hasClass("collapsedheader")) {
+            expandAndStyleTextSegment("#textseg" + type + i);
+        }
+    }).on("input", function () {
+        $(this).data('dirty', true);
+        $(".savebtn").prop("disabled", false);
+    });
     activateLastEditorIfBlank();
     $(".dropdown-toggle").dropdown();
     $("#curqtbl input")
@@ -300,7 +312,7 @@ function collapseAndStyleTextSegment(selector) {
     var i = getIndexForSelector(selector);
     var type = getTypeForSelector(selector);
 
-    if (i !== undefined) {
+    if (i !== undefined && useed) {
         //Deactivate the editor
         tinymce.editors["textseg" + type + i].fire("focusout");
     }
@@ -470,11 +482,15 @@ function getEditorForSelector(selector) {
 
 function anyEditorIsDirty() {
     var any_dirty = false;
-    for (index in tinymce.editors) {
-        if (tinymce.editors[index].isDirty()) {
-            any_dirty = true;
-            break;
+    if (useed) {
+        for (index in tinymce.editors) {
+            if (tinymce.editors[index].isDirty()) {
+                any_dirty = true;
+                break;
+            }
         }
+    } else {
+        any_dirty = ($(".savebtn:enabled").length > 0);
     }
     return any_dirty;
 }
@@ -941,23 +957,41 @@ function edittextseg(i) {
 
 function savetextseg(i) {
     var any_dirty = false;
-    for (index in tinymce.editors) {
-        var editor = tinymce.editors[index];
-        if (editor.isDirty()) {
-            var i = editor.id.match(/[0-9]+$/)[0];
-            var i = getIndexForSelector("#" + editor.id);
-            var type = getTypeForSelector("#" + editor.id);
-            if (type === "") {
-                itemarray[i][1] = editor.getContent();
-                any_dirty = true;
-            } else if (editor.id.match("textsegheader")) {
-                itemarray[i][4] = strip_tags(editor.getContent());
-                any_dirty = true;
+    if (useed) {
+        for (index in tinymce.editors) {
+            var editor = tinymce.editors[index];
+            if (editor.isDirty()) {
+                var i = editor.id.match(/[0-9]+$/)[0];
+                var i = getIndexForSelector("#" + editor.id);
+                var type = getTypeForSelector("#" + editor.id);
+                if (type === "") {
+                    itemarray[i][1] = editor.getContent();
+                    any_dirty = true;
+                } else if (editor.id.match("textsegheader")) {
+                    itemarray[i][4] = strip_tags(editor.getContent());
+                    any_dirty = true;
+                }
             }
         }
+    } else {
+        $("textarea.textsegment,input.textsegment").each(function(i,el) {
+            if ($(el).data('dirty') === true) {
+                var i = getIndexForSelector("#" + el.id);
+                var type = getTypeForSelector("#" + el.id);
+                if (type === "") {
+                    itemarray[i][1] = el.value;
+                    any_dirty = true;
+                } else if (el.id.match("textsegheader")) {
+                    itemarray[i][4] = strip_tags(el.value);
+                    any_dirty = true;
+                }
+            }
+        });
     }
     if (any_dirty) {
-        tinymce.activeEditor.hide();
+        if (useed) {
+            tinymce.activeEditor.hide();
+        }
         submitChanges();
     }
 }
@@ -1384,14 +1418,24 @@ function generateTable() {
                         ' id="textsegdescr' +
                         i +
                         '" class="description-cell">';
-                    if (curitems[j][3] == 1) {
+                    if (curitems[j][3] == 1) { // is page
                         var header_contents = curitems[j][4];
-                        html +=
-                            '<div style="position: relative"><h4 id="textsegheader' +
-                            i +
-                            '" class="textsegment collapsedheader">' +
-                            header_contents +
-                            "</h4>";
+                        if (useed) {
+                            html +=
+                                '<div style="position: relative"><h4 id="textsegheader' +
+                                i +
+                                '" class="textsegment collapsedheader">' +
+                                header_contents +
+                                "</h4>";
+                        } else {
+                            html +=
+                                '<div style="position: relative"><input id="textsegheader' +
+                                i +
+                                '" class="textsegment collapsedheader" value="' +
+                                header_contents +
+                                '"/>' +
+                                '<button type=button class="savebtn slim" onclick="savetextseg();" disabled=true>' + _('Save All') + '</button>';
+                        }
                         html +=
                             '<div class="text-segment-icon"><button id="edit-buttonheader' +
                             i +
@@ -1402,12 +1446,22 @@ function generateTable() {
                             '" class="icon-pencil text-segment-icon"></span></button></div></div>';
                     }
                     var contents = curitems[j][1];
-                    html +=
-                        '<div class="intro intro-like"><div id="textseg' +
-                        i +
-                        '" class="textsegment collapsed">' +
-                        contents +
-                        "</div>"; //description
+                    if (useed) {
+                        html +=
+                            '<div class="intro intro-like"><div id="textseg' +
+                            i +
+                            '" class="textsegment collapsed">' +
+                            contents +
+                            "</div>"; //description
+                    } else {
+                        html +=
+                            '<div class="intro intro-like"><textarea id="textseg' +
+                            i +
+                            '" class="textsegment collapsed">' +
+                            contents +
+                            "</textarea>" +
+                            '<button type=button class="savebtn slim" onclick="savetextseg();" disabled=true>' + _('Save All') + '</button>';
+                    }
                     html +=
                         '<div class="text-segment-icon"><button id="edit-button' +
                         i +

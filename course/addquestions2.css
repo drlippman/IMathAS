@@ -46,6 +46,14 @@ h4.textsegment {
 	max-width: 93%;
 	overflow: hidden;
 }
+textarea.textsegment.collapsed, input.textsegment.collapsedheader {
+    width: 60%;
+}
+textarea.textsegment, input.textsegment {
+    width: 90%;
+    field-sizing: content;
+    border: 1px solid black;
+}
 .intro-like {
 	position: relative;
 	background-color: #fff; /* must match .intro */

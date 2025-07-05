@@ -387,12 +387,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=061125\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=070525\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=061925\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
-    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
+    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=070523\" type=\"text/css\" />";
     $placeinhead .= '<script>
         $(function() {
             if (window.top != window.self) {
@@ -600,6 +600,7 @@ if ($overwriteBody==1) {
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
         var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
         var lastitemhash = "<?php echo md5($itemorder); ?>";
+		var useed = <?php echo Sanitize::onlyInt($_SESSION['userprefs']['useed']);?>;
 		//$(refreshTable);
 		refreshTable();
 	</script>
