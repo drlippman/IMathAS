@@ -88,16 +88,16 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 	<button @click="newRuleSet()">Add Rule Set</button>
 </div>
 <div id="ruleEditor" v-if="activeRuleSet==selectedRuleSet || activeRuleSet==ruleSets.length">
-	<p>Editing rule set <input v-model="curRuleSetName" size=20></p>
+	<p><label>Editing rule set <input v-model="curRuleSetName" size=20></label></p>
 	<div v-if="rulePhrases.length>0">
 		Current rules:
 		<transition-group name="flip-list" tag="ol" id="rulelist">
 			<li v-for="(phrase,index) in rulePhrases" :key="phrase">
 				<span class=rulebtngroup>
-				<button @click="move(index,-1)" title="Up">&uarr;</button>
-				<button @click="move(index,1)" title="Down">&darr;</button>
+				<button @click="move(index,-1)" title="Up" aria-label="Move up">&uarr;</button>
+				<button @click="move(index,1)" title="Down" aria-label="Move down">&darr;</button>
 				<button @click="edit(index)">Edit</button>
-				<button @click="remove(index)" title="Delete">X</button>
+				<button @click="remove(index)" title="Delete" aria-label="Delete">X</button>
 				</span>
 				{{ index==0?"First, ":"Of those remaining, "}} show students
 				{{phrase}}
@@ -105,29 +105,29 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 		</transition-group>
 	</div>
 	<div id="ruleDetails">
-		<p>{{currentRule.editIndex==-1?'New':'Edit'}} rule type:
+		<p><label>{{currentRule.editIndex==-1?'New':'Edit'}} rule type:
 			<select v-model="currentRule.ruleType">
 			<option v-for="(option,index) in ruleTypes" :value="index">{{option}}</option>
-			</select>
+			</select></label>
 		</p>
 		<p v-if="currentRule.ruleType!='none'">Show students who
 			<span v-if="currentRule.ruleType=='score' || currentRule.ruleType=='scores'"> had a score
-				<select v-model="currentRule.abovebelow">
+				<select v-model="currentRule.abovebelow" aria-label="score comparison type">
 					<option v-for="(option,index) in abovebelowTypes" :value="index">{{option}}</option>
 				</select>
-				<input v-model="currentRule.scorebreak" size=2>%
+				<input v-model="currentRule.scorebreak" size=2 aria-label="score value">%
 				<span v-if="currentRule.ruleType=='score'">average on assignments</span>
 				<span v-if="currentRule.ruleType=='scores'">
-					on <select v-model="currentRule.numassn">
+					on <select v-model="currentRule.numassn" aria-label="which assignments">
 						<option v-for="(option,index) in numassnTypes" :value="index">{{option}}</option>
 					</select> assignment(s)
 				</span>
 				that are
-				<select v-model="currentRule.tocnt">
+				<select v-model="currentRule.tocnt" aria-label="assignment status">
 					<option v-for="(option, index) in cntTypes" :value="index">{{option}}</option>
 				</select>
 				in category
-				<select v-model="currentRule.gbcat">
+				<select v-model="currentRule.gbcat" aria-label="gradebook category">
 					<option value="0">Default</option>
 					<option v-for="(option,index) in gbcatTypes" :value="index">{{option}}</option>
 				</select>
@@ -135,20 +135,20 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			<span v-if="currentRule.ruleType=='start' || currentRule.ruleType=='comp'">
 				<span v-if="currentRule.ruleType=='start'">started</span>
 				<span v-if="currentRule.ruleType=='comp'">completed</span>
-				<select v-model="currentRule.numassn">
+				<select v-model="currentRule.numassn" aria-label="which assignments">
 					<option v-for="(option,index) in numassnTypes" :value="index">{{option}}</option>
 				</select>
 				assignment(s) in category
-				<select v-model="currentRule.gbcat">
+				<select v-model="currentRule.gbcat" aria-label="gradebook category">
 					<option value="-1">all categories</option>
 					<option value="0">Default</option>
 					<option v-for="(option,index) in gbcatTypes" :value="index">{{option}}</option>
 				</select>
 			</span>
 			<span v-if="currentRule.ruleType=='late'"> used at least
-				<input v-model="currentRule.numLP" size=2> LatePass(es)
+				<input v-model="currentRule.numLP" size=2 aria-label="number of latepasses"> LatePass(es)
 				on assignments in category
-				<select v-model="currentRule.gbcat">
+				<select v-model="currentRule.gbcat" aria-label="gradebook category">
 					<option value="-1">all categories</option>
 					<option value="0">Default</option>
 					<option v-for="(option,index) in gbcatTypes" :value="index">{{option}}</option>
@@ -156,11 +156,11 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			</span>
 			<span v-if="currentRule.ruleType=='close'">
 				started
-				<select v-model="currentRule.numassn">
+				<select v-model="currentRule.numassn" aria-label="which assignments">
 					<option v-for="(option,index) in numassnTypes" :value="index">{{option}}</option>
 				</select>
 				assignment(s) in category
-				<select v-model="currentRule.gbcat">
+				<select v-model="currentRule.gbcat" aria-label="gradebook category">
 					<option value="-1">all categories</option>
 					<option value="0">Default</option>
 					<option v-for="(option,index) in gbcatTypes" :value="index">{{option}}</option>
@@ -168,30 +168,30 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 				within <input v-model="currentRule.closeTime" size=2> hours of the due date
 			</span>
 
-			<select v-model="currentRule.timeframe">
+			<select v-model="currentRule.timeframe" aria-label="timeframe">
 				<option v-for="(option,index) in timeframeTypes" :value="index">{{option}}</option>
 			</select>
 			<span v-if="currentRule.timeframe=='since' || currentRule.timeframe=='between'">
-				<input type=text size=10 name="sdate" id="sdate" v-model="currentRule.sdate">
+				<input type=text size=10 name="sdate" id="sdate" v-model="currentRule.sdate" aria-label="start date">
 				<a href="#" onClick="displayDatePicker('sdate', this); return false">
 				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			</span>
 			<span v-if="currentRule.timeframe=='thisweek' || currentRule.timeframe=='week'">
-				<select v-model="currentRule.dayofweek">
+				<select v-model="currentRule.dayofweek" aria-label="day of week">
 					<option v-for="(option,index) in dayofweekTypes" :value="index">{{option}}</option>
 				</select>
 			</span>
 			<span v-if="currentRule.timeframe=='inlast'">
-				<input v-model="currentRule.inlastDays" size=2> days
+				<input v-model="currentRule.inlastDays" size=2 aria-label="number of dates"> days
 			</span>
 			<span v-if="currentRule.timeframe=='between'">
 				and
-				<input type=text size=10 name="edate" id="edate" v-model="currentRule.edate">
+				<input type=text size=10 name="edate" id="edate" v-model="currentRule.edate" aria-label="end date">
 				<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			</span>
 			<span v-if="currentRule.timeframe=='due'">
-				<input v-model="currentRule.innextDays" size=2> days
+				<input v-model="currentRule.innextDays" size=2 aria-label="number of dates"> days
 			</span>
 			<br/>
 			<button @click="editRule()" v-if="currentRule.editIndex!=-1">
