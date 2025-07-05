@@ -109,7 +109,7 @@ tr.bordered  td {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 }
-tr.highlight, tr.highlight td {
+tr.highlight, tr.highlight > * {
 	background-color: #224;
 }
 tr.grid td {
