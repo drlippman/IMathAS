@@ -141,8 +141,9 @@ $(function() {
 		chgnewflag();
 	});
 	$("input[name=hdrs]").on("change",function(e) {
-		var val=$(this).val();
-		document.cookie = "gblhdr-"+cid+"="+val;
+		var gbmode = gbmodebase - 40000*gbmod.headerlockdef;
+		let val = $(this).val();
+		gbmode += 40000*(1-val); // gbmod is inverted
 		if (val==0) {
 			if ($("body").attr("class").match(/fw\d+/)) {
 				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));
@@ -155,7 +156,13 @@ $(function() {
 			$("#tblcontmyTable").addClass("sticky-table");
 			$("#pgwgroup").show();
 		}
-		gbmod.lockheaders = val;
+		$.ajax({
+			url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
+			type: "GET"
+		}).done(function( data ) {
+			gbmod.headerlockdef = 1-val;
+			gbmodebase = gbmode;
+		});
 	});
 	$("input[name=pgw]").on("change",function(e) {
 		var val=$(this).val();

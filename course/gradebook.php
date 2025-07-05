@@ -93,7 +93,8 @@ if ($canviewall) {
 	$hidesection = (((floor($gbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
 	$showpercents = (((floor($gbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
-	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
+	$showpics = ((floor($gbmode/10000)%10)&3) ; //0 none, 1 small, 2 big
+	$headerlockdef = (((floor($gbmode/10000)%10)&4)==0)?0:1 ; //0 locked, 1 unlocked (inverted from $headerslocked)
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$lastlogin = (((floor($gbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
@@ -106,15 +107,11 @@ if ($canviewall) {
 
 	$usefullwidth = false;
 	$headerslocked = false;
-	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+	if ($headerlockdef == 0) {
 		$headerslocked = true;
 	} else {
-		if (!isset($_COOKIE["gblhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
-			$headerslocked = true;
-		} else {
-			$headerslocked = false;
-			$usefullwidth = true;
-		}
+		$headerslocked = false;
+		$usefullwidth = true;
 	}
 	if (isset($_COOKIE["gbfullw-$cid"]) && $_COOKIE["gbfullw-$cid"]==1) {
 		$usefullwidth = true;
@@ -294,7 +291,7 @@ var gbmod = {
 	"links": '.Sanitize::onlyInt($links).',
 	"pts": '.Sanitize::onlyInt($showpercents).',
 	"fullwidth": '.($usefullwidth ? 1 : 0).',
-	"lockheaders": '.($headerslocked ? 1 : 0).',
+	"headerlockdef": '.Sanitize::onlyInt($headerlockdef).',
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 $placeinhead .= '<style>
@@ -314,7 +311,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';	
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=070425"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=070525"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view

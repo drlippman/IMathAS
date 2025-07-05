@@ -103,7 +103,7 @@
 				$stm->execute(array(':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop, ':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype, ':id'=>$id));
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'] + 400000*$_POST['gbmode400000'];
+		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'] + 40000*$_POST['gbmode40000'] + 400000*$_POST['gbmode400000'];
 		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
 		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
@@ -251,7 +251,8 @@
 		F & 1 is  Show Section Column	
 		F & 2 is  Show Code Column
 		F & 4 is  Show Points (0), Percents (4)
-		E     is  Show pics: none (0), small(1), big (2)
+		E & 3 is  Show pics: none (0), small(1), big (2)
+		E & 4 is  Lock headers: 0 locked, 1 unlocked
 		D & 1 is  Total on right (0), left (1)
 		D & 2 is  Average on bottom (0), top (2)
 		D & 4 is  Last login column: hide (0), show (4)
@@ -265,6 +266,7 @@
 	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
 	$showpercents = (((floor($defgbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
+	$headerlockeddef = (((floor($defgbmode/10000)%10)&4)==4)?1:0 ; //0 locked, 1 unlocked
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 4 show last login column
@@ -319,6 +321,13 @@
 		$orderval = array(0,1);
 		$orderlabel = array('Order by section (if used), then Last name','Order by Last name');
 		writeHtmlSelect("usersort", $orderval, $orderlabel, $usersort);
+		?>
+	</span><br class=form />
+
+	<label for="gbmode40000" class=form>Gradebook headers:</label>
+	<span class=formright>
+		<?php
+		writeHtmlSelect("gbmode40000", array(0,1), array(_('Lock Headers'), _('Unlock Headers')), $headerlockeddef);
 		?>
 	</span><br class=form />
 
