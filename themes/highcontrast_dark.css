@@ -99,10 +99,10 @@ table.gb thead th, table.gbl thead th, table.gbl thead th.locked {
 	border-bottom: 2px solid #00f;
 	background-color: #000;
 }
-tr.even, tr.even td {
+tr.even, tr.even > * {
 	background-color: #000;
 }
-tr.odd, tr.odd td {
+tr.odd, tr.odd > * {
 	background-color: #101;
 }
 tr.bordered  td {

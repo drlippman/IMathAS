@@ -266,6 +266,10 @@ table.gb thead th {
 	z-index: 20;
 	background-color: #fff;
 }
+table.gb tbody th {
+	text-align: left;
+	font-weight: normal;
+}
 td, th {
 	margin: 0px;
 	padding: 2px 5px 2px 5px;
