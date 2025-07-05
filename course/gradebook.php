@@ -754,7 +754,7 @@ function gbstudisp($stu) {
 				$stm->execute(array(':courseid'=>$cid));
 			}
 
-			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
+			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)" aria-label="'._('Student to display') .'">';
 			$lastsec = '';
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
@@ -914,7 +914,7 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				}
 			}
-			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'" scope="row">';
+			echo '<th class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'" scope="row">';
 			if ($stu>0 && $isteacher && $gbt[0][1][$i][6] >= 0 && $gbt[0][1][$i][6] < 4) {
 				echo '<label for="chkbx'.$i.'">';
 			}
@@ -988,7 +988,7 @@ function gbstudisp($stu) {
 				echo _('Attach Work') .']</a></span>';
 			}
 
-			echo '</td>';
+			echo '</th>';
 
 			echo '<td>';
 			if (isset($gbt[1][1][$i][0]) && is_numeric($gbt[1][1][$i][0])) {
@@ -1286,7 +1286,7 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]);
+				echo '<th scope=row class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]);
                 if ($gbt[0][2][$i][13]==1) { //averaged percents
                     echo '<sup>AP</sup>';
                 }
@@ -1294,7 +1294,7 @@ function gbstudisp($stu) {
 				if (isset($gbt[0][2][$i][11])) {  //category weight
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
-				echo '</td>';
+				echo '</th>';
 				if (($show&1)==1 || ($canviewall && $availshow == 0)) { //past
 					echo '<td>';
 					//show points in points-based mode
@@ -1420,17 +1420,17 @@ function gbstudisp($stu) {
 		echo '<dl class="inlinedl">';
 		$outcometype = 0;
 		if (($show&1)==1) {
-			echo _('<dt>Past Due:</dt> <dd>total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '</dd><br/>';
+			echo _('<dt>Past Due:</dt> <dd>total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '<br/></dd>';
 		}
 		if (($show&2)==2) {
-			echo _('<dt>Past Due and Attempted:</dt> <dd> total includes items whose due date has passed, as well as currently available items you have started working on.'), '</dd><br/>';
+			echo _('<dt>Past Due and Attempted:</dt> <dd> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/></dd>';
 			$outcometype = 1;
 		}
-		if (($show&4)==4) {
-			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t started working on them yet.'), '</dd><br/>';
+		if (($show&4)==4 || true) {
+			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t started working on them yet.'), '<br/></dd>';
 		}
 		if (($show&8)==8) {
-			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '</dd><br/>';
+			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '<br/></dd>';
 		}
 		echo '</dl>';
 		if ($hasoutcomes) {
@@ -1810,7 +1810,7 @@ function gbinstrdisp() {
 		} else {
 			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 		}
-		echo '<td class="locked" scope="row"><div class="trld">';
+		echo '<th class="locked" scope="row"><div class="trld">';
 		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
 			echo "<input type=\"checkbox\" name='checked[]' id='chkbx$i' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
@@ -1824,7 +1824,7 @@ function gbinstrdisp() {
 		if (!empty($gbt[$i][4][3]) &&  $gbt[$i][4][3]==1) {
 			echo '<sup>*</sup>';
 		}
-		echo '</div></td>';
+		echo '</div></th>';
 		if ($showpics==1 && !empty($gbt[$i][4][2])) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
 			echo "<td><div class=\"trld\"><img class=\"pii-image\" src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
 		} else if ($showpics==2 && !empty($gbt[$i][4][2])) {

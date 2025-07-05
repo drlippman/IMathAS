@@ -888,7 +888,7 @@ if ($overwriteBody==1) {
 		
 				$nameline = Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']);
 				//echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
-				echo '<td>';
+				echo '<th scope=row>';
 				
 				if ($line['locked']>0) {
 					$lineclass = 'greystrike ';
@@ -896,7 +896,7 @@ if ($overwriteBody==1) {
 					$lineclass = '';
 				}
 				echo '<label for="userchk'. Sanitize::onlyInt($line['userid']) . '" class="' . $lineclass . 'pii-full-name" id="u'.$ln.'">';
-				echo '<a data-uid="'. Sanitize::onlyInt($line['userid']).'">'.$nameline.'</a></label></td>';
+				echo '<a data-uid="'. Sanitize::onlyInt($line['userid']).'">'.$nameline.'</a></label></th>';
 				echo '<td>'.$icons.'</td>';
 				if ($showSID) {
 					echo '<td><span class="' . $lineclass . 'pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';

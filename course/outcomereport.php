@@ -218,7 +218,7 @@ if ($report=='overview') {
 
 		for ($i=1;$i<count($ot);$i++) {
 			echo '<tr class="'.($i%2==0?'even':'odd').'">';
-			echo '<td><div class="trld"><a href="outcomereport.php?cid='.Sanitize::encodeUrlParam($cid).'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</a></div></td>';
+			echo '<th scope=row><div class="trld"><a href="outcomereport.php?cid='.Sanitize::encodeUrlParam($cid).'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'"><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</span></a></div></th>';
 			//echo '<td><div></div></td>';
 			/*foreach ($outc as $oc) {
 				if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
@@ -284,7 +284,7 @@ if ($report=='overview') {
 	echo '</tr></thead><tbody>';
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
-		echo '<td>'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</td>';
+		echo '<th scope=row><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</span></th>';
 		if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$outcome])) {
 			echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';
 		} else {
@@ -349,7 +349,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				list($subhtml,$subtots) = printoutcomestu($oi['outcomes'],$ind+1);
 				//$html .= '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
-				$html .= '<tr class="'.$class.'"><td><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td>';
+				$html .= '<tr class="'.$class.'"><th scope=row><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></th>';
 				for ($i=0;$i<count($ot[0][2])+1;$i++) {
                     if (!empty($ot[0][2][$i][2])) { continue; } // hidden
 					if (count($subtots[$i])>0) {
@@ -363,7 +363,7 @@ if ($report=='overview') {
 				$tots = $tots + $subtots;
 			} else {
 				$html .= '<tr class="'.$class.'">';
-				$html .= '<td><span class="ind'.Sanitize::onlyInt($ind).'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></td>';
+				$html .= '<th><span class="ind'.Sanitize::onlyInt($ind).'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></th>';
 				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {
 					$html .= '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
 					$tots[0][] = round(100*$ot[1][3][$type][$oi],1);
