@@ -261,10 +261,12 @@ function GB_resize(e) {
 		Y = e.pageY;
 	}
 	X = Math.max(0, Math.min(X, document.documentElement.clientWidth-5));
-	Y = Math.max(0, Math.min(Y, document.documentElement.clientHeight-5));
+	Y = window.scrollY + Math.max(0, Math.min(Y-window.scrollY, document.documentElement.clientHeight-5));
+
 	var gbwin = jQuery("#GB_window");
 	var dx = (X - gbwin.data("original_mouse_x"));
 	var dy = (Y - gbwin.data("original_mouse_y"));
+
 	if (gbwin[0].hasAttribute("data-lockratio")) {
 		var ratio = gbwin.data("original_h")/gbwin.data("original_w");
 		if ((gbwin.data("original_h") + dy)/(gbwin.data("original_w") + dx) > ratio) { //too tall
@@ -399,7 +401,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 			var h = height;
 		}
     }
-
+	
 	document.getElementById("GB_window").style.display = "block";
     if (overlay !== false) {
         document.getElementById("GB_overlay").style.display = "block";
@@ -448,8 +450,13 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
         } else {
             document.getElementById("GB_window").style.width = width + "px";
         }
-        
-	document.getElementById("GB_window").style.height = h + "px";
+    
+	if (height == 'content') {
+		document.getElementById("GB_window").style.height = "auto";
+		document.getElementById("GB_frameholder").style.marginBottom = "30px";
+	} else {
+		document.getElementById("GB_window").style.height = h + "px";
+	}
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
         var capheight = $("#GB_caption").outerHeight();

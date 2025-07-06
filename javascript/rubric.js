@@ -1,7 +1,3 @@
-//var imasrubrics = new Array();
-//imasrubrics[2] = {'type':1,'data':[['Opening and Closing','',20],['Includes units','',30],['Includes values','',30],['Other considerations','Ex: public perception',20]]};
-//imasrubrics[5] = {'type':2,'data':[['Good','Includes everything'],['Good, but missing details',''],['Nice use of descriptors','']]};
-var hasTouch;
 var rubricbase, lastrubricpos;
 
 function imasrubric_getpttot(rubricid) {
@@ -17,128 +13,51 @@ function imasrubric_getpttot(rubricid) {
 	return pttot;
 }
 function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
-	hasTouch = 'ontouchstart' in document.documentElement;
-	if (GB_loaded == false) {
-		//var gb_overlay = document.createElement("div");
-		//gb_overlay.id = "GB_overlay";
-		//gb_overlay.onclick = GB_hide;
-		//document.getElementsByTagName("body")[0].appendChild(gb_overlay);
-		var gb_window = document.createElement("div");
-		gb_window.id = "GB_window";
-		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder"></div>';
-		document.getElementsByTagName("body")[0].appendChild(gb_window);
-		GB_loaded  = true;
-	}
-	document.getElementById("GB_caption").innerHTML = '<span style="float:right;"><span class="pointer clickable" onclick="GB_hide()">[X]</span></span> Rubric';
-	//document.getElementById("GB_caption").onclick = GB_hide;
-	document.getElementById("GB_caption").style.cursor = "move";
-	document.getElementById("GB_window").style.display = "block";
-	document.getElementById("GB_window").style.position = "absolute";
-	document.getElementById("GB_window").style.height = "auto";
-	document.getElementById("GB_window").style.margin = "0";
-	//document.getElementById("GB_overlay").style.display = "block";
-	document.getElementById("GB_loading").style.display = "block";
-	$('#GB_caption').on('mousedown touchstart', function(evt) {
-        if (evt.target.nodeName.toLowerCase()=='input' || evt.target.nodeName.toLowerCase()=='button'
-            || evt.target.nodeName.toLowerCase()=='a') {
-            return;
-        }
-        if (evt.type == 'touchstart') {
-            var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
-			rubricbase = {left:touch.pageX, top: touch.pageY};
-            $("body").on('touchmove.R_move', rubrictouchmove);
-            $("body").bind('touchend', function(event) {
-				var p = $('#GB_window').offset();
-				lastrubricpos.left = p.left;
-				lastrubricpos.top = p.top;
-				$("body").off('touchmove.R_move');
-				$(this).unbind(event);
-			});
-        } else {
-            rubricbase = {left:evt.pageX, top: evt.pageY};
-            $("body").on('mousemove.R_move', rubricmousemove);
-            $("body").bind('mouseup', function(event) {
-				var p = $('#GB_window').offset();
-				lastrubricpos.left = p.left;
-				lastrubricpos.top = p.top;
-				$("body").off('mousemove.R_move');
-				$(this).unbind(event);
-			});
-        }
-    });
-    
-	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><tbody>";
+	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><thead>";
 	if (imasrubrics[rubricid].type<2) {
-		html += '<tr><td></td><td colspan="3"><a href="#" onclick="imasrubric_fullcredit();return false;">'+_('Full Credit')+'</a></td></tr>';
-	}
+		html += '<tr><th>'+_('Item')+'</th><th><a href="#" onclick="imasrubric_fullcredit();return false;">'+_('Full Credit')+'</a></th>';
+		html += '<th><a href="#" onclick="imasrubric_nocredit();return false;">'+_('No Credit')+'</a></th><th>'+_('Other')+'</th></tr>';
+	} else if (imasrubrics[rubricid].type<2) {
+		html += '<tr><th>'+_('Feedback')+'</th><th>'+_('Select')+'</th></tr>';
+	} else {
+		html += '<tr><th>'+_('Feedback')+'</th><th>'+_('Points')+'</th></tr>';
+	} 
+	html += '</thead><tbody>';
 	var pttot = imasrubric_getpttot(rubricid);
 
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
-			html += "<tr><td><span id=rr"+i+">"+imasrubrics[rubricid].data[i][0]+"</span>";
+			html += "<tr scope=row role=group aria-labelledby=rr"+i+"><th><span id=rr"+i+">"+imasrubrics[rubricid].data[i][0]+"</span>";
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
-			html += '</td><td width="10%" style="white-space:nowrap;"><label><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</label></td>';
+			html += '</th><td width="10%" style="white-space:nowrap;"><label><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</label></td>';
 			//if (totpts==2) {
 			//	html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
 			//}
 			html += '<td width="10%"><label><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</label></td>';
 			html += '<td width="10%" style="white-space:nowrap;"><label><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other</label>: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="number" step="0.1" min="0" max="'+totpts+'" size="3" id="rubricother'+i+'" value="" aria-label="points to assign"/></td></tr>';
 		} else if (imasrubrics[rubricid].type==2) { //just feedback
-			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
+			html += "<tr><th scope=row><label for=rubricchk"+i+">"+imasrubrics[rubricid].data[i][0]+"</label>";
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			html += '</td><td><input type="checkbox" id="rubricchk'+i+'" value="1" aria-labelledby="rr'+i+'"/></td></tr>';
+			html += '</th><td><input type="checkbox" id="rubricchk'+i+'" value="1"/></td></tr>';
 		} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4) { //score total
-			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
+			html += "<tr><th scope=row>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
-			html += '</td><td width="10%"><label><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</label></td></tr>';
+			html += '</th><td width="10%"><label><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</label></td></tr>';
 		}
 	}
 	html += '</tbody></table><br/><input type="button" value="Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+',false)" />';
 	html += '<input type="button" value="Clear Existing and Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+',true)" /></form></div>';
 
+	GB_show(_('Rubric'), html, 800, 'content');
 
-	document.getElementById("GB_frameholder").innerHTML = html;
-	document.getElementById("GB_loading").style.display = "none";
-
-	var de = document.documentElement;
-	var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
-	var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
-	document.getElementById("GB_window").style.width = width + "px";
-	if ($("#GB_window").outerHeight() > h - 30) {
-		document.getElementById("GB_window").style.height = (h-30) + "px";
-	}
-	document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-	lastrubricpos = {
-		left: ($(window).width() - $("#GB_window").outerWidth())/2,
-		top: $(window).scrollTop() + ((window.innerHeight ? window.innerHeight : $(window).height()) - $("#GB_window").outerHeight())/2,
-		scroll: $(window).scrollTop()
-	};
-	document.getElementById("GB_window").style.top = lastrubricpos.top+"px";
-
-	//document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
-}
-
-function rubricmousemove(evt) {
-    var w = document.getElementById('GB_window');
-    w.style.left = ((evt.pageX - rubricbase.left) + lastrubricpos.left) + "px";
-    w.style.top = ((evt.pageY - rubricbase.top) + lastrubricpos.top) + "px";
-	return false;
-}
-function rubrictouchmove(evt) {
-	var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
-    var w = document.getElementById('GB_window');
-    w.style.left = ((touch.pageX - rubricbase.left) + lastrubricpos.left) + "px";
-    w.style.top = ((touch.pageY - rubricbase.top) + lastrubricpos.top) + "px";
-	evt.preventDefault();
-	return false;
 }
 
 function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexisting) {
@@ -267,7 +186,14 @@ function imasrubric_chgtype() {
 }
 
 function imasrubric_fullcredit() {
-	$("#imasrubricform tr").find("input:radio:first").attr('checked',true);
+	$("#imasrubricform tr").each(function() {
+		$(this).find("input[type=radio]").first().prop('checked',true);
+	});
+}
+function imasrubric_nocredit() {
+	$("#imasrubricform tr").each(function() {
+		$(this).find("input[type=radio]").eq(1).prop('checked',true);
+	});
 }
 function getRadioValue(theRadioGroup) {
 	var els = document.getElementsByName(theRadioGroup);

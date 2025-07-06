@@ -266,7 +266,7 @@ table.gb thead th {
 	z-index: 20;
 	background-color: #fff;
 }
-table.gb tbody th {
+tbody th {
 	text-align: left;
 	font-weight: normal;
 }
