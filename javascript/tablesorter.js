@@ -276,10 +276,18 @@
 						return false;
 					}
 				});
-			}else{
-				cells[no].style.cursor = 'default';
 			}
 		}
+		let caption = obj.querySelector("caption");
+		if (!caption) {
+			caption = document.createElement("caption");
+			caption.className = "sr-only";
+			obj.insertBefore(caption, Object.firstChild);
+		}
+		let infspan = document.createElement("span");
+		infspan.className = "sr-only";
+		infspan.textContent = _('Any focusable table header can be clicked to sort');
+		caption.append(infspan);
 
 		//for(var no2=0;no2<sortArray.length;no2++){	/* Right align numeric cells */
 		//	if(sortArray[no2] && sortArray[no2]=='N')obj.rows[0].cells[no2].style.textAlign='right';
