@@ -657,6 +657,7 @@ if ($overwriteBody==1) {
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
+		   echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: Use Tab and Shift-Tab to navigate through the tree. When on a folder icon handle, press Space to expand or collapse. When on any icon handle, use the arrow keys to rearrange the item up or down. Left to move out of a branch. Right to move into a branch when positioned below it.').'</div>';
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';

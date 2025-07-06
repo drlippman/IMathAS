@@ -189,6 +189,7 @@ span.icon {
 	border: 1px solid black;
 	text-align: center;
 	cursor: pointer;
+	user-select:none;
 }
 div.breadcrumb {
 	border: 1px solid #000;

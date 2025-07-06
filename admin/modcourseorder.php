@@ -183,6 +183,8 @@ echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and 
 
 echo '<input type="button" onclick="addcoursegrp()" value="'._('Add Course Group').'"/> ';
 
+echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: Use Tab and Shift-Tab to navigate through the tree. When on a group G handle, press Space to expand or collapse. When on any handle, use the arrow keys to rearrange the item up or down. Left to move out of a branch. Right to move into a branch when positioned below it.').'</div>';
+
 function listCourse($course) {
 	$now = time();
 	echo '<li id="c'.Sanitize::onlyInt($course['id']).'">';
