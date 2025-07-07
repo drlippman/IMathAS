@@ -191,10 +191,11 @@ $(function() {
                 name: 'newaid['+newcnt+']',
                 value: newaid
             }))
-            .append('<?php echo _('A score of').' '; ?>')
+            .append('<label for=newsc'+newcnt+'><?php echo _('A score of').' '; ?></label>')
             .append($('<input>', {
                 type: 'text',
                 name: 'newsc['+newcnt+']',
+                id: 'newsc'+newcnt,
                 value: newsc
             }).attr('size',2))
             .append('%');
@@ -267,21 +268,21 @@ foreach ($excusals as $k=>$exc) {
 echo '</ul>';
 
 echo '<h2>'._('Add New Rule').'</h2>';
-echo '<p>'._('A score of').' <input type=text id=newscore size=2 value=75 />%';
-echo '<br>'._('on').' <select id=newcat>';
+echo '<p><label>'._('A score of').' <input type=text id=newscore size=2 value=75 />%</label>';
+echo '<br><label>'._('on').' <select id=newcat>';
 echo ' <option value="whole">'._('the whole assessment').'</option>';
 foreach ($categories as $cat) {
     echo '<option value="'.Sanitize::encodeStringForDisplay($cat['cat']).'">';
     echo _('category').' '.Sanitize::encodeStringForDisplay($cat['name']);
     echo '</option>';
 }
-echo '</select>';
-echo '<br>'._('will excuse') . ' <select id=newaid>';
+echo '</select></label>';
+echo '<br><label>'._('will excuse') . ' <select id=newaid>';
 echo '<option value="">'._('Select...').'</option>';
 foreach ($allassess as $aid=>$name) {
     echo '<option value="'.$aid.'">'.Sanitize::encodeStringForDisplay($name).'</option>';
 }
-echo '</select>';
+echo '</select></label>';
 echo '</p>';
 echo '<p><button type="button" id="addnewrule">'._('Add Rule').'</button></p>';
 echo '<p class="noticetext" id="err"></p>';
