@@ -223,9 +223,10 @@ $placeinhead .= '<script>
 			let libid = el.id.substr(3);
 			$(el).find("span").first().after(
 				$("<a></a>", {href:"#", class:"small"}).text("'._('List library').'")
-				  .on("click", function() {
+				  .on("click", function(e) {
 				  	window.opener.setlib(libid);
 					window.opener.setlibnames(this.previousElementSibling.innerText);
+					e.preventDefault();
 				  })
 			).after(" ");
 		});
