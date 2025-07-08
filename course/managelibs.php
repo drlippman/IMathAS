@@ -591,7 +591,7 @@ if ($overwriteBody==1) {
 <?php
 	if (isset($_POST['remove'])) {
 ?>
-	<p>Impacted Libraries:</p>
+	<p>Potentially Impacted Libraries:</p>
 	<?php echo $libchgul; ?>
 
  	<?php echo $hasChildWarning; ?>
@@ -613,7 +613,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['transfer'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<p>Impacted Libraries:</p>
+		<p>Potentially Impacted Libraries:</p>
 		<?php echo $libchgul; ?>
 
 		<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
@@ -632,7 +632,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['chgrights'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<p>Impacted Libraries:</p>
+		<p>Potentially Impacted Libraries:</p>
 		<?php echo $libchgul; ?>
 
 		<input type=hidden name=chgrights value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
@@ -657,7 +657,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['chgsort'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<p>Impacted Libraries:</p>
+		<p>Potentially Impacted Libraries:</p>
 		<?php echo $libchgul; ?>
 
 		<input type=hidden name=chgsort value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
@@ -675,7 +675,7 @@ if ($overwriteBody==1) {
 	}else if (isset($_POST['setparent'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<p>Impacted Libraries:</p>
+		<p>Potentially Impacted Libraries:</p>
 		<?php echo $libchgul; ?>
 
 		<input type=hidden name=setparent value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
