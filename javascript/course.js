@@ -120,6 +120,7 @@ function showcalcontents(el) {
 		}
 
 	} else if (caleventsarr[el.id]!=null) {
+		html += '<button class="slim floatright plain" onclick="showcalcontents(1)">'+_('Show all')+'</button>';
 		html += '<div class="caldatebar">'+caleventsarr[el.id].date + '</div>';
 		html += showcalcontentsid(el.id);
 		var mlink = document.getElementById("mcelink");

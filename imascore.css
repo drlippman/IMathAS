@@ -421,6 +421,8 @@ span.left {
 	height: 1px;
 	overflow: hidden;
 	color: transparent;
+	border: 0;
+	padding: 0;
 }
 
 #skipnav:focus, #skipnav:active, #pageskipnav:focus, #pageskipnav:active, .showonfocus:focus, .showonfocus:active {
