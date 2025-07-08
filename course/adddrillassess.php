@@ -219,48 +219,6 @@ if (isset($_GET['record'])) {
 		}
 	}
 
-	if (isset($_POST['search'])) {
-		$safesearch = $_POST['search'];
-		$safesearch = str_replace(' and ', ' ',$safesearch);
-		$search = $safesearch;
-		$search = str_replace('"','&quot;',$search);
-		$_SESSION['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
-		if (isset($_POST['searchall'])) {
-			$searchall = 1;
-		} else {
-			$searchall = 0;
-		}
-		$_SESSION['searchall'.$cid] = $searchall;
-		if (isset($_POST['searchmine'])) {
-			$searchmine = 1;
-		} else {
-			$searchmine = 0;
-		}
-		$_SESSION['searchmine'.$cid] = $searchmine;
-		if (isset($_POST['newonly'])) {
-			$newonly = 1;
-		} else {
-			$newonly = 0;
-		}
-		$_SESSION['searchnewonly'.$cid] = $newonly;
-	}
-	if (isset($_POST['libs'])) {
-		if ($_POST['libs']=='') {
-			$_POST['libs'] = $userdeflib;
-		}
-		$searchlibs = Sanitize::encodeStringForDisplay($_POST['libs']);
-		//$_SESSION['lastsearchlibs'] = implode(",",$searchlibs);
-		$_SESSION['lastsearchlibsD'.$daid] = $searchlibs;
-	} else if (isset($_GET['listlib'])) {
-		$searchlibs = $_GET['listlib'];
-		$_SESSION['lastsearchlibsD'.$daid] = $searchlibs;
-		$searchall = 0;
-		$_SESSION['searchallD'.$daid] = $searchall;
-		$_SESSION['lastsearchD'.$daid] = '';
-		$searchlikes = '';
-		$search = '';
-		$safesearch = '';
-	}
 	$DBH->commit();
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
@@ -284,291 +242,49 @@ $useeditor = "summary";
 $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 $placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
+		var qsearchaddr = '$imasroot/course/qsearch.php?cid=$cid&did=$daid';
 		</script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js\"></script>";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?070825\"></script>";
+$placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
 require_once "../header.php";
 
 /*  Get data for question searching */
 //remember search
 
-if (isset($_SESSION['lastsearch'.$cid])) {
-	$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
-	$search = $safesearch;
-	$search = str_replace('"','&quot;',$search);
-	$searchall = $_SESSION['searchall'.$cid];
-	$searchmine = $_SESSION['searchmine'.$cid];
-	$newonly = $_SESSION['searchnewonly'.$cid];
+if (isset($_SESSION['lastsearchd'.$daid])) {
+	$searchterms = trim($_SESSION['lastsearchd'.$daid]);
 } else {
-	$search = '';
-	$searchall = 0;
-	$searchmine = 0;
-	$safesearch = '';
-	$newonly = 0;
+	$searchterms = '';
 }
-
-$searchlikevals = array();
-if (trim($safesearch)=='') {
-	$searchlikes = '';
+if (isset($_SESSION['searchtyped'.$daid])) {
+	$searchtype = $_SESSION['searchtyped'.$daid];
 } else {
-    $isIDsearch = false;
-	if (substr($safesearch,0,3)=='id=') {
-        $searchlikes = "imas_questionset.id=? AND ";
-        $searchlikevals = array(substr($safesearch,3));
-        $isIDsearch = substr($safesearch,3);
-    } else if (ctype_digit(trim($safesearch))) {
-        $searchlikes = "imas_questionset.id=? AND ";
-        $searchlikevals = [trim($safesearch)];
-        $isIDsearch = trim($safesearch);
-    } else {
-        $searchterms = explode(" ",$safesearch);
-        $searchlikes = '';
-        foreach ($searchterms as $k=>$v) {
-            if (substr($v,0,5) == 'type=') {
-                $searchlikes .= "imas_questionset.qtype=? AND ";
-                $searchlikevals[] = substr($v,5);
-                unset($searchterms[$k]);
-            }
-        }
-        $wholewords = array();
-        foreach ($searchterms as $k=>$v) {
-            if (ctype_alnum($v) && strlen($v)>2) {
-                $wholewords[] = '+'.$v.'*';
-                unset($searchterms[$k]);
-            }
-        }
-        if (count($wholewords)==0 && !$isIDsearch && $searchall===1 && $searchmine===0) {
-            echo _('Cannot search all libraries without at least one 3+ letter word in the search terms');
-            $_SESSION['searchall'.$cid] = 0;
-            exit;
-        }
-        if (count($wholewords)>0 || count($searchterms)>0) {
-                $searchlikes .= '(';
-                if (count($wholewords)>0) {
-                    $searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
-                }
-                if (count($searchterms)>0) {
-                    if (count($wholewords)>0) {
-                        $searchlikes .= 'AND ';
-                    }
-                    $searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-                    foreach ($searchterms as $t) {
-                        $searchlikevals[] = "%$t%";
-                    }
-                }
-                if (ctype_digit($safesearch)) {
-                    $searchlikes .= "OR imas_questionset.id=?) AND ";
-                    $searchlikevals[] = $safesearch;
-                    $isIDsearch = $safesearch;
-                } else {
-                    $searchlikes .= ") AND";
-                }
-        }
-    }
+	$searchtype = 'libs';
 }
-
-if (isset($_SESSION['lastsearchlibsD'.$daid])) {
-	//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
-	$searchlibs = $_SESSION['lastsearchlibsD'.$daid];
+if (isset($_SESSION['searchind'.$daid])) {
+	$searchin = $_SESSION['searchind'.$daid];
+} else if ($searchtype == 'libs') {
+	$searchin = [$userdeflib];
+	$_SESSION['searchind'.$daid] = $searchin;
+	$_SESSION['lastsearchlibsd'.$daid] = implode(',', $searchin);
 } else {
-	$searchlibs = $userdeflib;
+	$searchin = [];
 }
-$llist = implode(',',array_map('intval', explode(',',$searchlibs)));
+require_once '../includes/questionsearch.php';
+$search_parsed = parseSearchString($searchterms);
+$search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
+	'existing' => $itemids
+]);
 
 echo '<script type="text/javascript">';
-echo "var curlibs = '".Sanitize::encodeStringForJavascript($searchlibs)."';";
+echo "var curlibs = '".Sanitize::encodeStringForJavascript(implode(',', $searchin))."';";
+echo "var cursearchtype = '".Sanitize::simpleString($searchtype)."';";
+echo 'var curaid=0; var assessver=2;';
+echo 'var curcid='.$cid.';';
 echo '</script>';
-
-if (!$beentaken) {
-	//potential questions
-	$libsortorder = array();
-	if (substr($searchlibs,0,1)=="0") {
-		$lnamesarr[0] = "Unassigned";
-		$libsortorder[0] = 0;
-	}
-	$stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$lnamesarr[$row[1]] = $row[0];
-		$libsortorder[$row[1]] = $row[2];
-	}
-	$lnames = implode(", ",$lnamesarr);
-
-	$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
-
-	if (isset($search)) {
-		$qarr = $searchlikevals;
-		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.meantime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
-		$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
-		$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND $searchlikes ";
-		$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
-		$qarr[] = $userid;
-
-		if ($searchall==0) {
-			$query .= "AND imas_library_items.libid IN ($llist)"; //pre-sanitized
-		}
-		if ($searchmine==1) {
-			$query .= " AND imas_questionset.ownerid=?";
-			$qarr[] = $userid;
-		} else {
-			$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?) ";
-			$qarr[] = $userid;
-		}
-		$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
-        if ($searchall==1) {
-			$query .= " LIMIT 300";
-		}
-		$stm = $DBH->prepare($query);
-		$stm->execute($qarr);
-		if ($stm->rowCount()==0) {
-			$noSearchResults = true;
-		} else {
-            $searchlimited = ($stm->rowCount()==300);
-			$alt=0;
-			$lastlib = -1;
-            $i=0;
-            $ln = 0;
-			$page_questionTable = array();
-			$page_libstouse = array();
-			$page_libqids = array();
-			$page_useavgtimes = false;
-			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-				if ($newonly && in_array($line['id'],$itemids)) {
-					continue;
-				}
-				if (isset($page_questionTable[$line['id']])) {
-					continue;
-				}
-				if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
-					/*$page_questionTable[$i]['checkbox'] = "";
-					$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
-					$page_questionTable[$i]['preview'] = "";
-					$page_questionTable[$i]['type'] = "";
-					if ($searchall==1)
-						$page_questionTable[$i]['lib'] = "";
-					$page_questionTable[$i]['times'] = "";
-					$page_questionTable[$i]['mine'] = "";
-					$page_questionTable[$i]['add'] = "";
-					$page_questionTable[$i]['src'] = "";
-					$page_questionTable[$i]['templ'] = "";
-					$lastlib = $line['libid'];
-					$i++;
-					*/
-					$page_libstouse[] = $line['libid'];
-					$lastlib = $line['libid'];
-					$page_libqids[$line['libid']] = array();
-
-				}
-
-				if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==1) { //alpha
-					$page_libqids[$line['libid']][$line['id']] = $line['description'];
-				} else { //id
-					$page_libqids[$line['libid']][] = $line['id'];
-				}
-				$i = $line['id'];
-				$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::encodeStringForDisplay($line['id']) . "' id='qo$ln'>";
-				if (in_array($i,$itemids)) {
-					$page_questionTable[$i]['desc'] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
-				} else {
-					$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
-				}
-				$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform','qo$ln',". Sanitize::onlyInt($line['id']).",true,false)\"/>";
-				$page_questionTable[$i]['type'] = $line['qtype'];
-				if ($line['meantime']>0) {
-					$page_useavgtimes = true;
-					$page_questionTable[$i]['avgtime'] = round($line['meantime']/60,1);
-				} else {
-					$page_questionTable[$i]['avgtime'] = '';
-				}
-				if ($searchall==1) {
-					$page_questionTable[$i]['lib'] = sprintf("<a href=\"addquestions.php?cid=%s&listlib=%s\">List lib</a>",
-                        $cid, Sanitize::encodeUrlParam($line['libid']));
-				} else {
-					$page_questionTable[$i]['junkflag'] = $line['junkflag'];
-					$page_questionTable[$i]['libitemid'] = $line['libitemid'];
-				}
-				if ($line['extref']!='') {
-					$extref = explode('~~',$line['extref']);
-					$hasvid = false;  $hasother = false;
-					foreach ($extref as $v) {
-						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
-							$hasvid = true;
-						} else {
-							$hasother = true;
-						}
-					}
-					$page_questionTable[$i]['extref'] = '';
-					if ($hasvid) {
-						$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
-					}
-					if ($hasother) {
-						$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
-					}
-				} else {
-                    $page_questionTable[$i]['extref'] = '';
-                }
-
-				/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
-				$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$times = mysql_result($result2,0,0);
-				$page_questionTable[$i]['times'] = $times;
-				*/
-				$page_questionTable[$i]['times'] = 0;
-
-				if ($line['ownerid']==$userid) {
-					if ($line['userights']==0) {
-						$page_questionTable[$i]['mine'] = "Private";
-					} else {
-						$page_questionTable[$i]['mine'] = "Yes";
-					}
-				} else {
-					$page_questionTable[$i]['mine'] = "";
-				}
-
-
-
-				if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-					$page_questionTable[$i]['src'] = sprintf("<a href=\"moddataset.php?id=%d&daid=%d&cid=%s\">Edit</a>",
-                        Sanitize::onlyInt($line['id']), $daid, $cid);
-				} else {
-					$page_questionTable[$i]['src'] = sprintf("<a href=\"viewsource.php?id=%d&daid=%d&cid=%s\">View</a>",
-                        Sanitize::onlyInt($line['id']), $daid, $cid);
-				}
-
-				$page_questionTable[$i]['templ'] = sprintf("<a href=\"moddataset.php?id=%d&daid=%d&cid=%s&template=true\">Template</a>",
-                        Sanitize::onlyInt($line['id']), $daid, $cid);
-				//$i++;
-				$ln++;
-
-			} //end while
-
-			//pull question useage data
-			if (count($page_questionTable)>0) {
-				$allusedqids = array_keys($page_questionTable); //INT vals from DB
-                $allusedqids_query_placeholders = Sanitize::generateQueryPlaceholders($allusedqids);
-				$stm = $DBH->prepare("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids_query_placeholders) GROUP BY questionsetid");
-				$stm->execute($allusedqids);
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$page_questionTable[$row[0]]['times'] = $row[1];
-				}
-			}
-
-			//sort alpha sorted libraries
-			foreach ($page_libstouse as $libid) {
-				if ($libsortorder[$libid]==1) {
-					natcasesort($page_libqids[$libid]);
-					$page_libqids[$libid] = array_keys($page_libqids[$libid]);
-				}
-			}
-			if ($searchall==1) {
-				$page_libstouse = array_keys($page_libqids);
-			}
-
-		}
-	}
-
-}
 
 $hr = floor($coursedeftime/60)%12;
 $min = $coursedeftime%60;
@@ -637,46 +353,46 @@ echo "<h1>Add/Modify Drill Assessment</h1>";
 printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&daid=%d&block=%s&tb=%s&record=true\">",
     $cid, $daid, Sanitize::encodeUrlParam($block), Sanitize::encodeUrlParam($totb));
 ?>
-		<span class=form>Title: </span>
-		<span class=formright><input type=text size=60 name="title" value="<?php echo Sanitize::encodeStringForDisplay($drillname);?>" required />
+		<label for=title class=form>Title: </label>
+		<span class=formright><input type=text size=60 name="title" id=title value="<?php echo Sanitize::encodeStringForDisplay($drillname);?>" required />
 		</span><BR class=form>
 
-		Summary: (shows on course page)<BR>
+		<label for=summary>Summary: (shows on course page)</label><BR>
 		<div class=editor>
 			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($drillsummary, true);?></textarea>
 		</div>
 		<br/>
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/>Show Always<br/>
+			<label><input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/>Hide</label><br/>
+			<label><input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/>Show by Dates</label><br/>
+			<label><input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/>Show Always</label>
 		</span><br class="form"/>
 
 		<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
-			Always until end date<br/>
-			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
+			<label><input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			Always until end date</label><br/>
+			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?> aria-label="Available after a date"/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="available after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="available after time">
 		</span><BR class=form>
 
 		<span class=form>Available Until:</span><span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> Always after start date<br/>
-			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>">
+			<label><input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> Always after start date</label><br/>
+			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="Available until a date"/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="available until date">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="available until time">
 		</span><BR class=form>
 
-		<span class=form>Calendar Tag:</span>
+		<label for=caltag class=form>Calendar Tag:</label>
 		<span class=formright>
-			<input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($caltag); ?>"/>
+			<input name="caltag" id=caltag type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($caltag); ?>"/>
 		</span><BR class=form>
 		</div>
 		<span class=form></span>
@@ -693,24 +409,24 @@ if ($beentaken) {
 }
 
 echo '<p><b>Drill type</b></p>';
-echo '<p>Scoring type:';
+echo '<p><label for=scoretype>Scoring type:</label>';
 $vals = array('nat','nct','ncc','nst','nsc','t');
 $lbls = array('Do N questions then stop.  Record time.','Do N questions correct.  Record time.','Do N questions correct.  Record total attempts.','Do N questions correct in a row.  Record time','Do N questions correct in a row.  Record total attempts','Do as many correct as possible in N seconds');
 writeHtmlSelect('scoretype',$vals,$lbls,$scoretype,null,null,$beentaken?'disabled="disabled"':'');
-echo ' where N = <input type="text" size="4" name="n" value="' . Sanitize::encodeStringForDisplay($n) . '" ' . ($beentaken ? 'disabled="disabled"' : '') . '/></p>';
-echo '<p>Feedback on individual questions:';
+echo ' <label>where N = <input type="text" size="4" name="n" value="' . Sanitize::encodeStringForDisplay($n) . '" ' . ($beentaken ? 'disabled="disabled"' : '') . '/></label></p>';
+echo '<p><label for=showtype>Feedback on individual questions:</label>';
 $vals = array(0,1,4,2,3);
 $lbls = array('Show score, and display answer if wrong', 'Show score, don\'t show answers, give new question if wrong','Show score, don\'t show answers, give same question if wrong','Don\'t show score','Don\'t show score, but provide show answer buttons');
 writeHtmlSelect('showtype',$vals,$lbls,$showtype,null,null,$beentaken?'disabled="disabled"':'');
 echo '</p>';
 
 echo '<p>Show drill results to student: ';
-echo '<input type="checkbox" name="showlast" '.getHtmlChecked($showtostu&1,1).'/> Show last score. ';
-echo '<input type="checkbox" name="showpbest" '.getHtmlChecked($showtostu&2,2).'/> Show personal best score. ';
-echo '<input type="checkbox" name="showcbest" '.getHtmlChecked($showtostu&4,4).'/> Show class best score.</p>';
+echo '<label><input type="checkbox" name="showlast" '.getHtmlChecked($showtostu&1,1).'/> Show last score.</label> ';
+echo '<label><input type="checkbox" name="showpbest" '.getHtmlChecked($showtostu&2,2).'/> Show personal best score.</label> ';
+echo '<label><input type="checkbox" name="showcbest" '.getHtmlChecked($showtostu&4,4).'/> Show class best score.</label></p>';
 
 if ($beentaken) {
-	echo '<p>Reset class bests?  <input type="checkbox" name="clearbests" value="1" /></p>';
+	echo '<p><label><input type="checkbox" name="clearbests" value="1" /> Reset class bests?</label></p>';
 }
 echo '<table id="usedqtable">';
 echo '<tr>';
@@ -719,7 +435,7 @@ echo '<th>Description</th><th>Preview</th>';
 if (!$beentaken) {echo '<th>Delete?</th>';}
 echo '</tr>';
 function generateselect($cnt,$i) {
-	echo "<select name=\"order[$i]\" onchange=\"updateorder(this)\">";
+	echo "<select name=\"order[$i]\" onchange=\"updateorder(this)\" aria-label=\"select new position\">";
 	for ($j=1;$j<$cnt+1;$j++) {
 		echo "<option value=\"$j\" ";
 		if ($j==$i+1) {echo 'selected="selected" ';}
@@ -734,127 +450,39 @@ foreach ($itemids as $k=>$id) {
 		generateselect(count($itemids),$k);
 		echo '</td>';
 	}
-	echo '<td><input type="text" size="60" name="descr['.$k.']" value="' . Sanitize::encodeStringForDisplay($itemdescr[$k]) . '"/></td>';
+	echo '<td><input type="text" size="60" name="descr['.$k.']" value="' . Sanitize::encodeStringForDisplay($itemdescr[$k]) . '" aria-label="Description"/></td>';
 	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k," . Sanitize::encodeStringForJavascript($itemids[$k]) . ")\"/></td>";
 	if (!$beentaken) {
-		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';
+		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1" aria-label="Delete"/></td>';
 	}
 	echo '</tr>';
 }
-echo '<table>';
+echo '</table>';
  echo '<input type="submit" value="Update"/>';
 if (!$beentaken) {
-?>
+	echo '<h2>'._('Potential Questions').'</h2>';
 
-	<h2>Potential Questions</h2>
+	outputSearchUI($searchtype, $searchterms, $search_results, 'addquestions');
 
-		In Libraries:
-		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames) ?></span>
-		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs) ?>">
-		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree3.php?libtree=popup&libs='+curlibs,500,500)" />
-		<br>
-		Search:
-		<input type=text size=15 name=search value="<?php echo Sanitize::encodeStringForDisplay($search) ?>">
-		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
-		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
-		Search all libs</span>
-		<span tabindex="0" data-tip="List only questions I own" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
-		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
-		Mine only</span>
-		<span tabindex="0" data-tip="Exclude questions already in assessment" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
-		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
-		Exclude added</span>
-		<input type=submit value=Search>
-		<input type=button value="Add New Question" onclick="window.location='moddataset.php?cid=<?php echo $cid ?>&daid=<?php echo $daid;?>'">
+	echo '<div class=pdiv>Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
+	echo '<button type=submit>'._('Add Selected').'</button>';
+	echo '<button type="button" onclick="window.location=\'moddataset.php?cid='.$cid.'&amp;daid='.$daid.'\'">'._('Add New Question').'</button>';
+	echo '</div>';
 
-	<br/>
-<?php
-			if ($searchall==1 && trim($search)=='') {
-				echo "Must provide a search term when searching all libraries";
-			} elseif (isset($search)) {
-				if (!empty($noSearchResults)) {
-					echo "<p>No Questions matched search</p>\n";
-				} else {
-?>
-
-
-		Check: <a href="#" onclick="return chkAllNone('selform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selform','nchecked[]',false)">None</a>
-		<input name="add" type=submit value="Add Selected" />
-
-		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
-			<thead>
-				<tr><th></th><th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th>
-					<?php echo $page_libRowHeader ?>
-					<th>Times Used</th>
-					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
-					<th>Mine</th><th>Source</th><th>Use as Template</th>
-					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
-				</tr>
-			</thead>
-			<tbody>
-<?php
-				$alt=0;
-				for ($j=0; $j<count($page_libstouse); $j++) {
-
-					if ($searchall==0) {
-						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-						echo '<td></td>';
-						echo '<td>';
-						echo '<b>' . Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]) . '</b>';
-						echo '</td>';
-						for ($k=0;$k<9;$k++) {echo '<td></td>';}
-						echo '</tr>';
-					}
-
-					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
-						$qid =$page_libqids[$page_libstouse[$j]][$i];
-						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-
-?>
-					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
-					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($qid) ?></td>
-					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']) ?></td>
-<?php
-						if ($searchall==1) {
-?>
-					<td><?php echo $page_questionTable[$qid]['lib'] ?></td>
-<?php
-						}
-?>
-					<td class=c><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']) ?></td>
-					<?php if ($page_useavgtimes) {?><td class="c"><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['avgtime']) ?></td> <?php }?>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['mine']) ?></td>
-					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
-					<?php if ($searchall==0) {
-						if ($page_questionTable[$qid]['junkflag']==1) {
-							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\"/></td>";
-						} else {
-							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Not flagged\"/></td>";
-						}
-					} ?>
-				</tr>
-<?php
-					}
-                }
-                if ($searchlimited) {
-                    echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
-                }
-?>
-			</tbody>
-		</table>
-		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
-		<script type="text/javascript">
-			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
-		</script>
-
-
-<?php
-				}
-			}
+	?>
+	<table cellpadding="5" id="myTable" class="gb zebra potential-question-list" style="clear:both; position:relative;" tabindex="-1">
+    </table>
+    <p><span id="searchnums"><?php echo _('Showing');?> <span id="searchnumvals"></span></span>
+      <a href="#" id="searchprev" style="display:none"><?php echo _('Previous Results');?></a>
+      <a href="#" id="searchnext" style="display:none"><?php echo _('More Results');?></a>
+    </p>
+	<script type="text/javascript">
+		$(function() {
+			displayQuestionList(<?php echo json_encode($search_results, JSON_INVALID_UTF8_IGNORE); ?>);
+			setlibhistory();
+		});
+	</script>
+	<?php
 } else {
 	echo '<input type="hidden" name="beentaken" value="1" />';
 }

@@ -10,6 +10,9 @@ if (!isset($teacherid) && !($_GET['cid'] == 'admin' && $myrights>74)) {
 if (isset($_GET['aid'])) {
     $searchcontext = '';
     $aid = intval($_GET['aid']);
+} else if (isset($_GET['did'])) {
+    $searchcontext = 'd';
+    $aid = intval($_GET['did']);
 } else {
     $searchcontext = 'c';
     $aid = Sanitize::courseId($_GET['cid']);

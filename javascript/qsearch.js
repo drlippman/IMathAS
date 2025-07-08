@@ -255,6 +255,12 @@ function displayQuestionList(results) {
         $("#search").focus();
         return;
     }
+    let searchcontext = 'manageq';
+    if (qsearchaddr.match(/aid=/)) {
+        searchcontext = 'addq';
+    } else if (qsearchaddr.match(/did=/)) {
+        searchcontext = 'adddrill';
+    }
     var searchtype = 'libs';
     var colcnt = 9;
     var thead = '<thead><tr>'
@@ -265,11 +271,11 @@ function displayQuestionList(results) {
         + '<th>'+_('ID')+'</th>'
         + '<th>'+_('Type')+'</th>'
         + '<th>'+_('Times Used')+'</th>'
-        + (curaid > 0 ? '<th>'+_('Avg Time')+'</th>' :
-            '<th>'+_('Last Mod')+'</th>')
+        + (searchcontext == 'manageq' ? '<th>'+_('Last Mod')+'</th>' :
+            '<th>'+_('Avg Time')+'</th>')
         + (curcid == 'admin' ? '<th>'+_('Owner')+'</th>' : '')
         + '</tr></thead>';
-    var sortinit = [false,'S',false,'S','N','S','N', curaid > 0 ? 'N' : 'D'];
+    var sortinit = [false,'S',false,'S','N','S','N', searchcontext == 'manageq' ? 'D' : 'N'];
     if (curcid == 'admin') {
         sortinit.push('S');
     }
@@ -407,14 +413,14 @@ function displayQuestionList(results) {
             + '<td>' + q['qtype'] + '</td>'
             + '<td class="c">' + q['times'] + '</td>';
 
-        if (curaid > 0) {
+        if (searchcontext == 'manageq') {
+            tbody += '<td>' + q['lastmod'] + '</td>';
+        } else {
             tbody += '<td class="c">' + (q['meantimen'] > 3 ? 
                 ('<span onmouseenter="tipshow(this,\''+_('Avg score on first try: ')+q['meanscore']+'%'
                 + '<br/>'+_('Avg time on first try: ') + q['meantime'] + _(' min') + 
                 '<br/>N='+q['meantimen']+'\')" onmouseleave="tipout()">' + q['meantime'] + '</span>') :
                 '') + '</td>';
-        } else {
-            tbody += '<td>' + q['lastmod'] + '</td>';
         }
         if (curcid == 'admin') {
             tbody += '<td>' + q['ownershort'] + '</td>';
