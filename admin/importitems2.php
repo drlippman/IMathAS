@@ -127,8 +127,7 @@ if ($overwriteBody == 1) {
 
 var curlibs = '0';
 function libselect() {
-	//window.open('../course/libtree.php?libtree=popup&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
-	window.open('../course/libtree2.php?libtree=popup&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+	GB_show('<?php echo _('Library Select');?>','../course/libtree3.php?libtree=popup&selectrights=1&mode=single&libs='+curlibs,500);
 }
 function setlib(libs) {
 	if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
@@ -141,7 +140,7 @@ function setlibnames(libn) {
 	if (libn.indexOf('Unassigned')>-1 && libn.indexOf(',')>-1) {
 		libn = libn.substring(11);
 	}
-	document.getElementById("libnames").innerHTML = libn;
+	document.getElementById("libnames").textContent = libn;
 }
 function chkgrp(frm, arr, mark) {
 	  var els = frm.getElementsByTagName("input");

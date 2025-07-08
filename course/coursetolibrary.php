@@ -17,23 +17,23 @@ if (!isset($_POST['libs']) || $_POST['libs']=='') {
 
 			echo "<h2>Copy Course Questions to </h2>\n";
 			echo "<form method=post action=\"coursetolibrary.php?cid=$cid\">\n";
-
+			$libselecttitle = _('Library Select');
 			echo <<<END
 <script>
 var curlibs = '';
 function libselect() {
-	window.open('libtree2.php?cid=$cid&libtree=popup&select=child&selectrights=1&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+	GB_show("$libselecttitle","$imasroot/course/libtree3.php?libtree=popup&mode=single&selectrights=1&libs="+curlibs,500);
 }
 function setlib(libs) {
 	document.getElementById("libs").value = libs;
 	curlibs = libs;
 }
 function setlibnames(libn) {
-	document.getElementById("libnames").innerHTML = libn;
+	document.getElementById("libnames").textContent = libn;
 }
 </script>
 END;
-			echo "<span class=form>Library to place in: </span><span class=formright><span id=\"libnames\"></span><input type=hidden name=\"libs\" id=\"libs\"  value=\"$parent\">\n";
+			echo "<span class=form>Library to place in: </span><span class=formright><span id=\"libnames\"></span><input type=hidden name=\"libs\" id=\"libs\"  value=\"\">\n";
 			echo "<input type=button value=\"Select Library\" onClick=\"libselect()\"></span><br class=form> ";
 
 			echo "<p><input type=submit value=\"Copy Questions to Library\">\n";

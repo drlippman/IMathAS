@@ -598,14 +598,14 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 	var curlibs = '0';
 	function libselect() {
-		window.open('../course/libtree.php?libtree=popup&cid=<?php echo $cid ?>&selectrights=1&select=parent&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+		GB_show('<?php echo _('Library Select');?>','../course/libtree3.php?libtree=popup&selectrights=1&select=parents&mode=single&libs='+curlibs,500);
 	}
 	function setlib(libs) {
 		document.getElementById("parent").value = libs;
 		curlibs = libs;
 	}
 	function setlibnames(libn) {
-		document.getElementById("libnames").innerHTML = libn;
+		document.getElementById("libnames").textContent = libn;
 	}
 
 	function toggle(id) {

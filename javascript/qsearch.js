@@ -635,7 +635,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      if (cursearchtype == 'libs') {
          listlibs = curlibs;
      }
-     GB_show('Library Select','libtree2.php?libtree=popup&libs='+listlibs,500,500);
+     GB_show(_('Library Select'),'libtree3.php?libtree=popup&libs='+listlibs,500,500);
  }
 
  function setlib(libs) {
@@ -646,7 +646,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      doQuestionSearch();
  }
  function setlibnames(libn) {
-     document.getElementById("libnames").innerHTML = libn.replace(/\s*<span.*?<\/span.*?>/g,'').replace(/\s+/g,' ').trim();
+     document.getElementById("libnames").textContent = libn.replace(/\s*<span.*?<\/span.*?>/g,'').replace(/\s+/g,' ').trim();
      $("#libnames").parent().show();
 
     // this gets called after setlib, so we'll check for and update history here
@@ -673,7 +673,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
         recentlibs.names.splice(curloc,1);
     }
     recentlibs.ids.unshift(curlibs);
-    let curnames = document.getElementById("libnames").innerHTML.replace(/&\w+;/g,'');
+    let curnames = document.getElementById("libnames").textContent.replace(/&\w+;/g,'');
     curnames = curnames.length > 50 ? curnames.substring(0,49) + "..." : curnames;
     recentlibs.names.unshift(curnames);
     
@@ -724,7 +724,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      doQuestionSearch();
  }
  function setassessnames(aidn) {
-     document.getElementById("libnames").innerHTML = aidn.replace(/<span.*?<\/span.*?>/g,'');
+     document.getElementById("libnames").textContent = aidn.replace(/<span.*?<\/span.*?>/g,'');
      $("#libnames").parent().show();
  }
  

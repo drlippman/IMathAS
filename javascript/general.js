@@ -1746,8 +1746,12 @@ function setActiveTab(el) {
   }
 
   Dropdown.prototype.keydown = function (e) {
-    if (!/(38|40|27|32|39|37)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+    if (!/(38|40|27|32|39|37|9)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
 
+	if (e.which == 9 && $(e.target).hasClass("dropdown-toggle")) {
+		//hit tab from control button - let default happen;
+		return;
+	}
     var $this = $(this)
 
     e.preventDefault()
@@ -1778,8 +1782,8 @@ function setActiveTab(el) {
 
     var index = $items.index(e.target)
 
-    if (e.which == 38 && index > 0)                 index--         // up
-    if (e.which == 40 && index < $items.length - 1) index++         // down
+    if ((e.which == 38 || (e.which == 9 && e.shiftKey)) && index > 0)                 index--         // up
+    if ((e.which == 40 || (e.which == 9 && !e.shiftKey)) && index < $items.length - 1) index++         // down
     if (!~index)                                    index = 0
 
     $items.eq(index).trigger('focus')

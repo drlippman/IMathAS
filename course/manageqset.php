@@ -166,14 +166,10 @@ if ($myrights<20) {
 	} else if (isset($_POST['chglib'])) {
 		if (isset($_POST['qtochg'])) {
 			if ($_POST['chglib']!='') {
-				$newlibs = $_POST['libs']; //array is sanitized later
-				if ($_POST['libs']=='') {
-					$newlibs = array();
-				} else {
-					$newlibs = array_map('intval', $newlibs);
-					if ($newlibs[0]==0) { //get rid of unassigned if checked
-						array_shift($newlibs);
-					}
+				$newlibs = array_map('intval', explode(',',$_POST['libs'])); 
+				sort($newlibs); // put unassigned first if selected
+				if (count($newlibs)>0 && $newlibs[0]==0) { //get rid of unassigned if checked
+					array_shift($newlibs);
 				}
 				//Verify we have rights to add to all of newlibs
 				$newliblist = implode(',', $newlibs);
@@ -397,9 +393,8 @@ if ($myrights<20) {
 				$clist = implode(',', array_map('intval', $_POST['nchecked']));
 				$stm = $DBH->query("SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist) AND deleted=0");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$checked[] = $row[0];
+					$checkedlibs[] = $row[0];
 				}
-				$_GET['selectrights'] = 1;
 			}
 		}
 
@@ -640,7 +635,7 @@ $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=010925\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=070725\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '" . $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
@@ -656,8 +651,8 @@ $placeinhead .= "<script type=\"text/javascript\">
         }
 		</script>";
 if (!empty($_POST['chglib'])) {
-	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/accessibletree.css" type="text/css" />';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/accessibletree.js?v=031111"></script>';
 }
 $placeinhead .= '<style>
   .qisprivate {
@@ -739,23 +734,24 @@ if (isset($searchtype)) {
 ?>
 		<script type="text/javascript">
 		var chgliblaststate = 0;
+		var existinglibs = [<?php echo implode(',', array_map(function($i){return '"lib'.$i.'"';}, $checkedlibs));?>];
 		function chglibtoggle(rad) {
 			var val = rad.value;
 			var help = document.getElementById("chglibhelp");
 			if (val==0) {
 				help.innerHTML = "Select libraries to add these questions to. ";
 				if (chgliblaststate==2) {
-					initlibtree(false);
+					treeWidget.unselectAll();
 				}
 			} else if (val==1 || val==3) {
 				help.innerHTML = "Select libraries to add these questions to.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
 				if (chgliblaststate==2) {
-					initlibtree(false);
+					treeWidget.unselectAll();
 				}
 			} else if (val==2) {
 				help.innerHTML = "Unselect the libraries you want to remove questions from.  The questions will not be deleted; they will be moved to Unassigned if no other library assignments exist.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
 				if (chgliblaststate==0 || chgliblaststate==1 || chgliblaststate==3) {
-					initlibtree(true);
+					treeWidget.setSelectedItems(existinglibs);
 				}
 			}
 			chgliblaststate = val;
@@ -765,19 +761,25 @@ if (isset($searchtype)) {
 			<input type=hidden name=chglib value="true">
 			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 			What do you want to do with these questions?<br/>
-			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
-			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
+			<label><input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments</label><br/>
+			<label><input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments</label><br/>
 			<?php
 			if (isset($_SESSION['searchtypec'.$cid]) && isset($_SESSION['lastsearchlibsc'.$cid]) && $_SESSION['searchtypec'.$cid]=='libs' && $_SESSION['lastsearchlibsc'.$cid]!='0') {
-				echo '<input type=radio name="action" value="3" onclick="chglibtoggle(this)"/> Add to libraries, removing library assignment in currently listed libraries<br/>';
+				echo '<label><input type=radio name="action" value="3" onclick="chglibtoggle(this)"/> Add to libraries, removing library assignment in currently listed libraries</label><br/>';
 			}
 			?>
-			<input type=radio name="action" value="2" onclick="chglibtoggle(this)"/> Remove library assignments
+			<label><input type=radio name="action" value="2" onclick="chglibtoggle(this)"/> Remove library assignments</label>
 			<p id="chglibhelp" style="font-weight: bold;">
 			Select libraries to add these questions to.
 			</p>
 
-			<?php $libtreeshowchecks = false; require_once "libtree2.php"; ?>
+			<?php 
+			$select = 'children';
+			$mode = 'multi';
+			$_GET['selectrights'] = 1;
+			require_once "libtree3.php"; 
+			
+			?>
 
 
 			<p>
@@ -786,7 +788,7 @@ if (isset($searchtype)) {
 			</p>
 		</form>
 <?php
-	} else if (isset($_POST['template'])) {
+	} /* else if (isset($_POST['template'])) {
 ?>
 
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
@@ -808,7 +810,7 @@ if (isset($searchtype)) {
 			</p>
 		</form>
 <?php
-	} else if (isset($_POST['license'])) {
+	} */ else if (isset($_POST['license'])) {
 ?>
 
 	<form method=post action="manageqset.php?cid=<?php echo $cid ?>">

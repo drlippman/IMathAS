@@ -49,7 +49,8 @@ if (!(isset($teacherid)) && $myrights<20) {
 	}
 
 	if (isset($_POST['submit']) && $_POST['submit']=='Export') { //STEP 2 DATA MANIPULATION
-		if (count($_POST['libs'])==0) {
+		$rootlibs = array_map('intval', explode(',', $_POST['libs']));
+		if (count($rootlibs)==0) {
 			echo "No libraries selected";
 			exit;
 		}
@@ -62,11 +63,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		echo $installname;
 		echo "\n";
 
-		$rootlibs = $_POST['libs'];  //root libs
-		if (isset($_POST['rootlib'])) {
-			array_unshift($rootlibs,$_POST['rootlib']);
-		}
-		$rootlist = implode(',', array_map('intval', $rootlibs));
+		$rootlist = implode(',', $rootlibs);
 		if (trim($rootlist)=='') {
 			exit;
 		}
@@ -294,6 +291,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 }
 
 /******* begin html output ********/
+$placeinhead = '<link rel="stylesheet" href="'.$staticroot.'/javascript/accessibletree.css" type="text/css" />';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/accessibletree.js?v=031111"></script>';
+
 require_once "../header.php";
 
 if ($overwriteBody==1) {
@@ -311,19 +311,23 @@ if ($overwriteBody==1) {
 
 <?php
 	$select = "all";
-	require_once "../course/libtree.php";
+	$_GET['selectrights'] = 0;
+	require_once "../course/libtree3.php";
 ?>
-		<span class="form">Limit to non-private questions and libs?</span>
+		<span class="form">Limit</span>
 		<span class="formright">
-			<input type="checkbox" name="nonpriv" checked="checked" />
+			<label><input type="checkbox" name="nonpriv" checked="checked" />
+			Limit to non-private questions and libs
+			</label><br/>
+			<label><input type="checkbox" name="noncopyright" checked="checked" />
+			Limit to non-copyrighted questions
+			</label>
 		</span><br class="form" />
-		<span class="form">Limit to non-copyrighted questions?</span>
-		<span class="formright">
-			<input type="checkbox" name="noncopyright" checked="checked" />
+	
 		</span><br class="form" />
-		<span class=form>Package Description</span>
+		<label for=packdescription class=form>Package Description</label>
 		<span class=formright>
-			<textarea name="packdescription" rows=4 cols=60></textarea>
+			<textarea name="packdescription" id="packdescription" rows=4 cols=60></textarea>
 		</span><br class=form>
 
 		<input type=submit name="submit" value="Export"><br/>

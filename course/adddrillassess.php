@@ -751,7 +751,7 @@ if (!$beentaken) {
 		In Libraries:
 		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames) ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs) ?>">
-		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
+		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree3.php?libtree=popup&libs='+curlibs,500,500)" />
 		<br>
 		Search:
 		<input type=text size=15 name=search value="<?php echo Sanitize::encodeStringForDisplay($search) ?>">

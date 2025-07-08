@@ -328,7 +328,7 @@ if ($overwriteBody==1) {
 	<script>
 		var curlibs = '<?php echo $inlibs ?>';
 		function libselect() {
-			window.open('libtree.php?libtree=popup&type=radio&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+			GB_show('<?php echo _('Library Select');?>','libtree3.php?libtree=popup&mode=single&selectrights=1&libs='+curlibs,500,500);
 		}
 		function setlib(libs) {
 			if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
@@ -341,7 +341,7 @@ if ($overwriteBody==1) {
 			if (libn.indexOf('Unassigned')>-1 && libn.indexOf(',')>-1) {
 				libn = libn.substring(11);
 			}
-			document.getElementById("libnames").innerHTML = libn;
+			document.getElementById("libnames").textContent = libn;
 		}
 	</script>
 

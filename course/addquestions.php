@@ -1363,7 +1363,7 @@ if ($overwriteBody==1) {
 		<?php echo _('In Libraries'); ?>:
 		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames); ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>">
-		<button type="button" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" ><?php echo _("Select Libraries"); ?></button>
+		<button type="button" onClick="GB_show('Library Select','libtree3.php?libtree=popup&libs='+curlibs,500,500)" ><?php echo _("Select Libraries"); ?></button>
 		<?php echo _("or"); ?> <button type="button" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'"><?php echo _("Select From Assessments"); ?></button>
 		<br>
 		<?php echo _('Search') ?>:

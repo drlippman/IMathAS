@@ -98,14 +98,14 @@ function chkAll(frm, arr, mark) {
 }
 
 function libselect() {
-	window.open('libtree2.php?libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+	window.open('libtree3.php?libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
 function setlib(libs) {
 	document.getElementById("libs").value = libs;
 	curlibs = libs;
 }
 function setlibnames(libn) {
-	document.getElementById("libnames").innerHTML = libn;
+	document.getElementById("libnames").textContent = libn;
 }
 
 function prePageChange() {

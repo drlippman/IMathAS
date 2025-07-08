@@ -420,14 +420,14 @@ switch($_GET['action']) {
 			echo "<script type=\"text/javascript\">";
 			echo "var curlibs = '{$line['deflib']}';";
 			echo "function libselect() {";
-			echo "  window.open('$imasroot/course/libtree2.php?libtree=popup&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
-			echo " }";
+			echo ' GB_show("'. _('Library Select') .'","'.$imasroot.'/course/libtree3.php?libtree=popup&mode=single&selectrights=1&libs="+curlibs,500);';
+			echo "}";
 			echo "function setlib(libs) {";
 			echo "  document.getElementById(\"libs\").value = libs;";
 			echo "  curlibs = libs;";
 			echo "}";
 			echo "function setlibnames(libn) {";
-			echo "  document.getElementById(\"libnames\").innerHTML = libn;";
+			echo "  document.getElementById(\"libnames\").textContent = libn;";
 			echo "}";
 			echo "</script>";
 			echo "<span class=form>"._('Default question library').":</span><span class=formright> <span id=\"libnames\">".Sanitize::encodeStringForDisplay($lname)."</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"".Sanitize::encodeStringForDisplay($line['deflib'])."\">\n";

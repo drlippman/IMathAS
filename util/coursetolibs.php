@@ -184,14 +184,14 @@ require_once "../header.php";
 <script>
 var curlibs = '';
 function libselect() {
-	window.open('../course/libtree2.php?cid='+cid+'&libtree=popup&select=parent&selectrights=1&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+	GB_show("<?php echo _('Library Select');?>","../course/libtree3.php?libtree=popup&select=parents&mode=single&selectrights=1&libs="+curlibs,500);
 }
 function setlib(libs) {
 	document.getElementById("libs").value = libs;
 	curlibs = libs;
 }
 function setlibnames(libn) {
-	document.getElementById("libnames").innerHTML = libn;
+	document.getElementById("libnames").textContent = libn;
 }
 </script>
 <h1>Course to Libraries</h1>
