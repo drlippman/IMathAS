@@ -20,9 +20,12 @@ function copyitemsonsubmit() {
 	}
 }
 $(function() {
-	$("input:radio").change(function() {
+	$("input[name=ctc]").change(function() {
 		if ($(this).attr("id")!="coursebrowserctc") {
 			$("#coursebrowserout").hide();
+		}
+		if ($(this).attr("id")!="treeselected") {
+			treeWidget.unselectAll();
 		}
 		if ($(this).hasClass("copyr")) {
 			$("#ekeybox").show();
@@ -106,46 +109,7 @@ function lookupcid() {
 		$("#cidlookupout").hide();
 	});
 }
-var othersloaded = false;
-var othergroupsloaded = [];
-function loadothers() {
-	if (!othersloaded) {
-		//basicahah(ahahurl, "other");
-		$.ajax({
-			url: imasroot+"/includes/coursecopylist.php?cid="+cid+"&loadothers=true", 
-			dataType: "html"}
-		).done(function(resp) {
-			$('#other').html(resp);
-		});
-		othersloaded = true;
-	}
-}
-function loadothergroup(n) {
-	toggle("g"+n);
-	if (othergroupsloaded.indexOf(n) === -1) {
-		$.ajax({
-			url:imasroot+"/includes/coursecopylist.php?cid="+cid+"&loadothergroup="+n, 
-			dataType:"html"}
-		).done(function(resp) {
-			$('#g'+n).html(resp);
-			$("#g"+n+" input:radio").change(function() {
-				if ($(this).hasClass("copyr")) {
-					$("#ekeybox").show();
-				} else {
-					$("#ekeybox").hide();
-				}
-				if ($(this).hasClass("termsurl")) {
-					$("#termsbox").show();
-					$("#termsurl").attr("href",$(this).data("termsurl"));
-				} else {
-					$("#termsbox").hide();
-				}
-				$("#continuebutton").show().prop("disabled",false);
-			});
-		});
-		othergroupsloaded.push(n);
-	}
-}
+
 function showCopyOpts() {
 	$("#copyoptions").slideToggle();	
 }

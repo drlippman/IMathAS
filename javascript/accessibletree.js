@@ -91,6 +91,7 @@ class AccessibleTreeWidget {
 
         // Expander button
         const expander = document.createElement('button');
+        expander.type = 'button';
         expander.className = 'tree-expander';
         expander.setAttribute('aria-hidden', 'true');
         expander.tabIndex = -1;
@@ -152,7 +153,11 @@ class AccessibleTreeWidget {
 	        linkbtn += _('Actions')+'</a>';
 	        linkbtn += '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="tdd'+item.id+'">';
             for (let i=0;i<item.links.length;i++) {
-                linkbtn += '<li><a href="'+item.links[i].href+'">'+item.links[i].label+'</a></li>';
+                linkbtn += '<li><a href="'+item.links[i].href+'"';
+                if (item.links[i].newtab) {
+                    linkbtn += ' target="_blank"';
+                }
+                linkbtn += '>'+item.links[i].label+'</a></li>';
             }
             linkbtn += '</ul></span>';
             let linkspan = document.createElement("span");

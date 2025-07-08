@@ -8,6 +8,71 @@ if (isset($_GET['loadothergroup']) || isset($_GET['loadothers']) || isset($_POST
 if (!isset($myrights) || $myrights<20) {
 	exit; //cannot be called directly
 }
+/** Utility tree-building functions **/
+$grpcnt = 0;
+function getCourseTree($order, $data, &$printed, &$out, $skipcopyright=2) {
+	global $grpcnt;
+	foreach ($order as $item) {
+		if (is_array($item)) { 
+			//course grouping
+			$sub = [];
+			getCourseTree($item['courses'], $data, $printed, $sub);
+			$out[] = [
+				'id'=>'grp'.$grpcnt, 
+				'label'=>$item['name'],
+				'children'=>$sub
+			];
+			$grpcnt++;
+		} else if (isset($data[$item])) {
+			$out[] = getCourseTreeitem($data[$item], $skipcopyright);
+			$printed[] = $item;
+		} 
+	}
+}
+function getCourseTreeitem($line, $skipcopyright=2) {
+	global $imasroot; 
+
+	$item = [];
+	$item['id'] = 'c'.$line['id'];
+	$item['label'] = $line['name'];
+	
+	if ($line['copyrights']<$skipcopyright) {
+		$item['label'] .= "©";
+	} else {
+		$item['links'] =[['label'=>_('Preview'), 'href' => "$imasroot/course/course.php?cid=" . Sanitize::courseId($line['id']), 'newtab'=>true]];
+	}
+	$itemclasses = array();
+	if ($line['copyrights']<$skipcopyright) {
+		$item['copyr'] = true;
+	}
+	if ($line['termsurl']!='') {
+		$item['termsurl'] = Sanitize::url($line['termsurl']);
+	}
+	return $item;
+}
+function getGroupTree($result, $skipcopyright=2) {
+	$grouptree = [];
+	$lastteacher = 0;
+	if ($result->rowCount()>0) {
+		while ($line = $result->fetch(PDO::FETCH_ASSOC)) {
+			if ($line['userid']!=$lastteacher) {
+				if ($lastteacher!=0) {
+					$grouptree[] = $curteachertree;
+				}
+				$lastteacher = $line['userid'];
+				$curteachertree = [
+					'id'=>'gu'.$line['userid'],
+					'label'=> $line['LastName'].', '.$line['FirstName'],
+					'links'=> [['label'=>_('Email'), 'href'=>'mailto:'.Sanitize::emailAddress($line['email'])]],
+					'children'=>[]
+				];
+			}
+			$curteachertree['children'][] = getCourseTreeitem($line, $skipcopyright);
+		}
+		$grouptree[] = $curteachertree;
+	}
+	return $grouptree;
+}
 
 /** load data **/
 
@@ -29,16 +94,26 @@ if (isset($_POST['cidlookup'])) {
 	}
 	exit;
 } else if (isset($_GET['loadothers'])) {
+	$grpout = [];
 	$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 	if ($stm->rowCount()>0) {
 		$page_hasGroups=true;
-		$grpnames = array();
-		$grpnames[] = array('id'=>0,'name'=>_("Default Group"));
+		$grpout[] = [
+			'id'=>'grpid0',
+			'label'=>_("Default Group"),
+			'childrenUrl'=>"$imasroot/includes/coursecopylist.php?cid=$cid&loadothergroup=0"
+		];
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['id']==$groupid) {continue;}
-			$grpnames[] = $row;
+				$grpout[] = [
+				'id'=>'grpid'.$row['id'],
+				'label'=>$row['name'],
+				'childrenUrl'=>"$imasroot/includes/coursecopylist.php?cid=$cid&loadothergroup=".$row['id']
+			];
 		}
 	}
+	echo json_encode($grpout, JSON_INVALID_UTF8_IGNORE);
+	exit;
 
 } else if (isset($_GET['loadothergroup'])) {
 
@@ -46,6 +121,17 @@ if (isset($_POST['cidlookup'])) {
 	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 AND ic.copyrights>-1 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 	$courseGroupResults = $DBH->prepare($query);
 	$courseGroupResults->execute(array(':groupid'=>$_GET['loadothergroup'], ':userid'=>$userid));
+
+	$grptree = getGroupTree($courseGroupResults);
+	if (count($grptree)==0) {
+		$grptree[] = [
+			'id'=>'none'.$_GET['loadothergroup'],
+			'label'=>_('No Courses'),
+			'notselectable'=>true
+		];
+	}
+	echo json_encode($grptree, JSON_INVALID_UTF8_IGNORE);
+	exit;
 
 } else {
 	$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
@@ -74,75 +160,63 @@ if (isset($_POST['cidlookup'])) {
 	$query .= "iu.groupid=:groupid AND ic.istemplate > 0 AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 	$groupTemplateResults = $DBH->prepare($query);
 	$groupTemplateResults->execute(array(':groupid'=>$groupid));
-}
 
-/** define utility functions **/
-function printCourseOrder($order, $data, &$printed) {
-	foreach ($order as $item) {
-		if (is_array($item)) {
-			echo '<li class="coursegroup"><span class=dd>-</span> ';
-			echo '<b>'.Sanitize::encodeStringForDisplay($item['name']).'</b>';
-			echo '<ul class="nomark">';
-			printCourseOrder($item['courses'], $data, $printed);
-			echo '</ul></li>';
-		} else if (isset($data[$item])) {
-			printCourseLine($data[$item]);
-			$printed[] = $item;
+	// build tree data
+	$treedata = [];
+	if (!isset($skipthiscourse)) {
+		$treedata[] = getCourseTreeitem(['id'=>$cid, 'name'=>'This Course', 'copyrights'=>2, 'termsurl'=>''], -1);
+	}
+	// my courses
+	$mycoursetree = [];
+	if (isset($userjson['courseListOrder']['teach'])) {
+		$printed = [];
+		getCourseTree($userjson['courseListOrder']['teach'], $myCourses, $printed, $mycoursetree, -1);
+		$notlisted = array_diff(array_keys($myCourses), $printed);
+		foreach ($notlisted as $course) {
+			$mycoursetree[] = getCourseTreeitem($myCourses[$course], -1);
+		}
+	} else {
+		foreach ($myCoursesDefaultOrder as $course) {
+			$mycoursetree[] = getCourseTreeitem($myCourses[$course], -1);
 		}
 	}
-}
-function printCourseLine($data) {
-	echo '<li><span class=dd>-</span> ';
-	writeCourseInfo($data, -1);
-	echo '</li>';
-}
-function writeCourseInfo($line, $skipcopyright=2) {
-	global $imasroot;
-	$itemclasses = array();
-	if ($line['copyrights']<$skipcopyright) {
-		$itemclasses[] = 'copyr';
+	if (count($mycoursetree)>0) {
+		$treedata[] = [
+			'id'=>'mycourses',
+			'label'=>_('My Courses'),
+			'children'=>$mycoursetree
+		];
 	}
-	if ($line['termsurl']!='') {
-		$itemclasses[] = 'termsurl';
+	// group's courses
+	if ($courseTreeResult->rowCount()>0) {
+		$treedata[] = [
+			'id'=>'grpcourses',
+			'label'=>_('My Group\'s Courses'),
+			'children'=>getGroupTree($courseTreeResult, 1)
+		];
 	}
-	echo '<label><input type="radio" name="ctc" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ' . ((count($itemclasses)>0)?'class="' . implode(' ',$itemclasses) . '"':'');
-	if ($line['termsurl']!='') {
-		echo ' data-termsurl="'.Sanitize::url($line['termsurl']).'"';
+	// others
+	$treedata[] = [
+		'id'=>'others', 
+		'label'=>_("Other's Courses"),
+		'childrenUrl'=> "$imasroot/includes/coursecopylist.php?cid=$cid&loadothers=true"
+	];
+	// templates
+	if ($courseTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
+		$templates = [];
+		while ($line = $courseTemplateResults->fetch(PDO::FETCH_ASSOC)) {
+			$templates[] = getCourseTreeitem($line);
+		}
+		$treedata[] = ['id'=>'templatecourses','label'=>_('Template Courses'),'children'=>$templates];
 	}
-	echo '>';
-	echo Sanitize::encodeStringForDisplay($line['name']) . '</label>';
-
-	if ($line['copyrights']<$skipcopyright) {
-		echo "&copy;\n";
-	} else {
-		echo " <a href=\"$imasroot/course/course.php?cid=" . Sanitize::courseId($line['id']) . "\" target=\"_blank\" class=\"small\">"._("Preview")."</a>";
+	// grp templates
+	if ($groupTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
+		$templates = [];
+		while ($line = $groupTemplateResults->fetch(PDO::FETCH_ASSOC)) {
+			$templates[] = getCourseTreeitem($line);
+		}
+		$treedata[] = ['id'=>'grptemplatecourses','label'=>_('Group Template Courses'),'children'=>$templates];
 	}
-}
-
-function writeOtherGrpTemplates($grptemplatelist) {
-	if (count($grptemplatelist)==0) { return;}
-    $uniqid = uniqid();
-	?>
-	<li class=lihdr>
-	<span class=dd>-</span>
-	<span class=hdr onClick="toggle('OGT<?php echo $uniqid; ?>')">
-		<span class=btn id="bOGT<?php echo $uniqid; ?>">+</span>
-	</span>
-	<span class=hdr onClick="toggle('OGT<?php echo $uniqid; ?>')">
-		<span id="nOGT<?php echo $uniqid; ?>" ><?php echo _('Group Templates') . "\n" ?>
-		</span>
-	</span>
-	<ul class=hide id="OGT<?php echo $uniqid; ?>">
-	<?php
-	$showncourses = array();
-	foreach ($grptemplatelist as $gt) {
-		if (in_array($gt['courseid'], $showncourses)) {continue;}
-		echo '<li><span class=dd>-</span>';
-		writeCourseInfo($gt);
-		$showncourses[] = $gt['courseid'];
-		echo '<li>';
-	}
-	echo '</ul></li>';
 }
 
 function writeEkeyField() {
@@ -158,229 +232,45 @@ function writeEkeyField() {
 }
 
 /** HTML output **/
-if (isset($_GET['loadothers'])) { //loading others subblock
-	 if ($page_hasGroups) {
-			foreach ($grpnames as $grp) {
-				?>
-							<li class=lihdr>
-								<span class=dd>-</span>
-								<span class=hdr onClick="loadothergroup('<?php echo Sanitize::encodeStringForJavascript($grp['id']); ?>')">
-									<span class=btn id="bg<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>">+</span>
-								</span>
-								<span class=hdr onClick="loadothergroup('<?php echo Sanitize::encodeStringForJavascript($grp['id']); ?>')">
-									<span id="ng<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>" ><?php echo Sanitize::encodeStringForDisplay($grp['name']); ?></span>
-								</span>
-								<ul class=hide id="g<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>">
-									<li>Loading...</li>
-								</ul>
-							</li>
-				<?php
-			}
-	 } else {
-		 echo '<li>'. _('No other users').'</li>';
-	 }
+//display course list selection
+?>
+	<div id="treecontainer"></div>
+ 	<input class=hidden type=radio name=ctc value=0 id=treeselected>
+	<script>var treedata = <?php echo json_encode($treedata, JSON_INVALID_UTF8_IGNORE);?>;</script>
+	<script>
 
-} else if (isset($_GET['loadothergroup'])) { //loading others subblock
-	if ($courseGroupResults->rowCount()>0) {
-			$lastteacher = 0;
-			$grptemplatelist = array(); //writeOtherGrpTemplates($grptemplatelist);
-			while ($line = $courseGroupResults->fetch(PDO::FETCH_ASSOC)) {
-				if ($line['userid']!=$lastteacher) {
-					if ($lastteacher!=0) {
-						echo "				</ul>\n			</li>\n";
+	var treeWidget;
+	$(function() {
+		const container = document.getElementById("treecontainer");
+		treeWidget = new AccessibleTreeWidget(container, treedata, {
+			selectionMode: "single",
+			selectableItems: "children",
+			showCounts: false,
+			onSelectionChange: (selectedIds, selectedLabels) => {
+				let treeselected = document.getElementById("treeselected");
+				if (selectedIds.length>0) {
+					treeselected.value = selectedIds[0].replace(/c/g,"");
+					let data = treeWidget.renderedItems.get(selectedIds[0])?.data;
+					if (data.copyr) {
+						treeselected.classList.add("copyr");
+					} else {
+						treeselected.classList.remove("copyr");
 					}
-?>
-			<li class=lihdr>
-				<span class=dd>-</span>
-				<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
-					<span class=btn id="b<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">+</span>
-				</span>
-				<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
-					<span id="n<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
-					</span>
-				</span>
-                <a class="pii-email" href="mailto:<?php echo Sanitize::emailAddress($line['email']); ?>"><span class="pii-safe">Email</span></a>
-				<ul class=hide id="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">
-<?php
-					$lastteacher = $line['userid'];
+					if (data.termsurl) {
+						treeselected.classList.add("termsurl");
+						$(treeselected).data("termsurl", data.termsurl);
+					} else {
+						treeselected.classList.remove("termsurl");
+					}
+					$(treeselected).prop("checked", true).trigger("change");
 				}
-?>
-					<li>
-						<span class=dd>-</span>
-						<?php
-						//do class for has terms.  Attach data-termsurl attribute.
-						writeCourseInfo($line);
-						if (($line['istemplate']&2)==2) {
-							$grptemplatelist[] = $line;
-						}
-						?>
-					</li>
-<?php
+			},
+			onLoadError: (error, item) => {
+				alert(`Failed to load children for "${item.label}": ${error.message}`);
 			}
-?>
-
-					</ul>
-				</li>
-				<?php writeOtherGrpTemplates($grptemplatelist);?>
-
-<?php
-	 } else {
-		 echo '<li>'._('No group members with courses').'</li>';
-	 }
-
-} else {  //display course list selection
-?>
-	<ul class=base>
-<?php
-	if (!isset($skipthiscourse)) {
-?>
-		<li><span class=dd>-</span>
-			<input type=radio name=ctc value="<?php echo $cid ?>" checked=1><?php echo _('This Course'); ?></li>
-<?php
-	}
-?>
-		<li class=lihdr><span class=dd>-</span>
-			<span class=hdr onClick="toggle('mine')">
-				<span class=btn id="bmine">+</span>
-			</span>
-			<span class=hdr onClick="toggle('mine')">
-				<span id="nmine" ><?php echo _('My Courses'); ?></span>
-			</span>
-			<ul class=hide id="mine">
-<?php
-//my items
-	if (isset($userjson['courseListOrder']['teach'])) {
-		$printed = array();
-		printCourseOrder($userjson['courseListOrder']['teach'], $myCourses, $printed);
-		$notlisted = array_diff(array_keys($myCourses), $printed);
-		foreach ($notlisted as $course) {
-			printCourseLine($myCourses[$course]);
-		}
-	} else {
-		foreach ($myCoursesDefaultOrder as $course) {
-			printCourseLine($myCourses[$course]);
-		}
-	}
-?>
-			</ul>
-		</li>
-		<li class=lihdr><span class=dd>-</span>
-			<span class=hdr onClick="toggle('grp')">
-				<span class=btn id="bgrp">+</span>
-			</span>
-			<span class=hdr onClick="toggle('grp')">
-				<span id="ngrp" ><?php echo _("My Group's Courses"); ?></span>
-			</span>
-			<ul class=hide id="grp">
-
-<?php
-//group's courses
-	if ($courseTreeResult->rowCount()>0) {
-		while ($line = $courseTreeResult->fetch(PDO::FETCH_ASSOC)) {
-			if ($line['userid']!=$lastteacher) {
-				if ($lastteacher!=0) {
-					echo "				</ul>\n			</li>\n";
-				}
-?>
-				<li class=lihdr>
-					<span class=dd>-</span>
-					<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
-						<span class=btn id="b<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">+</span>
-					</span>
-					<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
-						<span id="n<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
-						</span>
-					</span>
-					<a href="mailto:<?php echo Sanitize::emailAddress($line['email']); ?>">Email</a>
-					<ul class=hide id="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">
-<?php
-				$lastteacher = $line['userid'];
-			}
-?>
-						<li>
-							<span class=dd>-</span>
-							<?php
-							writeCourseInfo($line, 1);
-							?>
-						</li>
-<?php
-		}
-		echo "						</ul>\n					</li>\n";
-		echo "				</ul>			</li>\n";
-	} else {
-		echo "				</ul>\n			</li>\n";
-	}
-?>
-		<li class=lihdr>
-			<span class=dd>-</span>
-			<span class=hdr onClick="toggle('other');loadothers();">
-				<span class=btn id="bother">+</span>
-			</span>
-			<span class=hdr onClick="toggle('other');loadothers();">
-				<span id="nother" ><?php echo _("Other's Courses"); ?></span>
-			</span>
-			<ul class=hide id="other">
-
-<?php
-//Other's courses: loaded via AHAH when clicked
-	echo "<li>Loading...</li>			</ul>\n		</li>\n";
-
-//template courses
-	if ($courseTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
-?>
-	<li class=lihdr>
-		<span class=dd>-</span>
-		<span class=hdr onClick="toggle('template')">
-			<span class=btn id="btemplate">+</span>
-		</span>
-		<span class=hdr onClick="toggle('template')">
-			<span id="ntemplate" >Template Courses</span>
-		</span>
-		<ul class=hide id="template">
-
-<?php
-		while ($line = $courseTemplateResults->fetch(PDO::FETCH_ASSOC)) {
-?>
-			<li>
-				<span class=dd>-</span>
-				<?php
-				writeCourseInfo($line);
-				?>
-			</li>
-
-<?php
-		}
-		echo "			</ul>\n		</li>\n";
-	}
-	if ($groupTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
-?>
-	<li class=lihdr>
-		<span class=dd>-</span>
-		<span class=hdr onClick="toggle('gtemplate')">
-			<span class=btn id="bgtemplate">+</span>
-		</span>
-		<span class=hdr onClick="toggle('gtemplate')">
-			<span id="ngtemplate" ><?php echo _('Group Template Courses'); ?></span>
-		</span>
-		<ul class=hide id="gtemplate">
-
-<?php
-		while ($line = $groupTemplateResults->fetch(PDO::FETCH_ASSOC)) {
-?>
-			<li>
-				<span class=dd>-</span>
-				<?php
-				writeCourseInfo($line, 1);
-				?>
-			</li>
-
-<?php
-		}
-		echo "			</ul>\n		</li>\n";
-	}
-?>
-	</ul>
-
+		});
+	});
+	</script>
 	<p><?php echo _('Or, lookup using <label for=cidlookup>course ID</label>:'); ?>
 		<input type="text" size="7" id="cidlookup" />
 		<button type="button" onclick="lookupcid()"><?php echo _('Look up course'); ?></button>
@@ -391,4 +281,4 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 		<span id="cidlookuperr"></span>
 	</p>
 <?php
-}
+
