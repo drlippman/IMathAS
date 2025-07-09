@@ -523,7 +523,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
 	thishtml += \' <li><a href="gradebook.php?cid=\'+cid+\'&stu=\'+uid+\'&from=listusers">'._('View Grades').'</a></li>\';
 	thishtml += \' <li><a href="viewloginlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Login Log').'</a></li>\';
 	thishtml += \' <li><a href="viewactionlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Activity Log').'</a></li>\';
-	if ($(el).siblings(".greystrike").length) {
+	if ($(el).parent(".greystrike").length) {
 		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'unlockone\\\');return false;">'._('Unlock').'</a></li>\';
 	} else {
 		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'lockone\\\');return false;">'._('Lock out of course').'</a></li>\';

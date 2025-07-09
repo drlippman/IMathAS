@@ -1811,12 +1811,12 @@ function gbinstrdisp() {
 		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
 			echo "<input type=\"checkbox\" name='checked[]' id='chkbx$i' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
-		echo '<label for="chkbx'.$i.'">'."<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
+		echo '<label for="chkbx'.$i.'"';
 		if (!empty($gbt[$i][4][1]) && $gbt[$i][4][1]>0) {
-			echo '<span class="greystrike pii-full-name">'.$gbt[$i][0][0].'</span>';
-		} else {
-			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($gbt[$i][0][0]).'</span>';
+			echo ' class="greystrike"';
 		}
+		echo '>'."<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
+		echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($gbt[$i][0][0]).'</span>';
 		echo '</a></label>';
 		if (!empty($gbt[$i][4][3]) &&  $gbt[$i][4][3]==1) {
 			echo '<sup>*</sup>';
