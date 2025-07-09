@@ -653,7 +653,7 @@ if ($overwriteBody==1) {
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
            echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=070425\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=070825\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
@@ -740,10 +740,10 @@ function makeTopMenu() {
 		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
 
 		if (isset($CFG['CPS']['miniicons'])) {
-			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Select Rename from the dropdown menu to edit a title in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
 
 		} else {
-			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
+			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Select Rename from the dropdown menu to edit a title in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
 		}
 		 echo '<span id="submitnotice" class=noticetext></span>';
 		 echo '<div class="clear"></div>';

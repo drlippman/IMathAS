@@ -110,49 +110,49 @@ var Nested = function(listid, newoptions) {
 			}
 			if (!el.hasClass(options.expandBtnClass)) return true;
 		}
+
 		while (el[0].nodeName != options.childTag && el[0] != list[0]) {
 			el = el.parent();
 		}
 		
 		if (el[0] == list[0]) return;
 
-		if (!moved) {
-			var sub = el.children(options.parentTag);
-			if (sub) {
-				if (noblockcookie) {
-					if (sub.length == 0 || sub.css('display') == 'none') {
-						sub.css('display', 'block');
-						el.removeClass(options.collapseClass);
-						event.target.setAttribute("aria-expanded", true);
-						el.find("."+options.expandBtnClass).text("-");
-					} else {
-						sub.css('display', 'none');
-						el.addClass(options.collapseClass);
-						event.target.setAttribute("aria-expanded", false);
-						el.find("."+options.expandBtnClass).text("+");
-					}
+		var sub = el.children(options.parentTag);
+		if (sub) {
+			if (noblockcookie) {
+				if (sub.length == 0 || sub.css('display') == 'none') {
+					sub.css('display', 'block');
+					el.removeClass(options.collapseClass);
+					event.target.setAttribute("aria-expanded", true);
+					el.find("."+options.expandBtnClass).text("-");
 				} else {
-					oblist = oblist.split(',');
-					var obn = el.attr("obn");
-					var loc = arraysearch(obn,oblist);
-					if (sub.length == 0 || sub.css('display') == 'none') {
-						sub.css('display', 'block');
-						el.removeClass(options.collapseClass);
-						event.target.setAttribute("aria-expanded", true);
-						el.find("."+options.expandBtnClass).text("-");
-						if (loc==-1) {oblist.push(obn);}
-					} else {
-						sub.css('display', 'none');
-						el.addClass(options.collapseClass);
-						event.target.setAttribute("aria-expanded", false);
-						el.find("."+options.expandBtnClass).text("+");
-						if (loc>-1) {oblist.splice(loc,1);}
-					}
-					oblist = oblist.join(',');
-					document.cookie = 'openblocks-' +cid+'='+ oblist;
+					sub.css('display', 'none');
+					el.addClass(options.collapseClass);
+					event.target.setAttribute("aria-expanded", false);
+					el.find("."+options.expandBtnClass).text("+");
 				}
+			} else {
+				oblist = oblist.split(',');
+				var obn = el.attr("obn");
+				var loc = arraysearch(obn,oblist);
+				if (sub.length == 0 || sub.css('display') == 'none') {
+					sub.css('display', 'block');
+					el.removeClass(options.collapseClass);
+					event.target.setAttribute("aria-expanded", true);
+					el.find("."+options.expandBtnClass).text("-");
+					if (loc==-1) {oblist.push(obn);}
+				} else {
+					sub.css('display', 'none');
+					el.addClass(options.collapseClass);
+					event.target.setAttribute("aria-expanded", false);
+					el.find("."+options.expandBtnClass).text("+");
+					if (loc>-1) {oblist.splice(loc,1);}
+				}
+				oblist = oblist.join(',');
+				document.cookie = 'openblocks-' +cid+'='+ oblist;
 			}
 		}
+
 		event.stopPropagation();
 		event.preventDefault();
 	};
