@@ -35,16 +35,18 @@ function chglinktoggle() {
 function setupGBpercents() {
   var colpts = [];
   $("thead th").each(function(i,el) {
+	let col = el.cellIndex;
   	if (el.className.match(/nocolorize/)) {
-  		colpts[i] = -1;
+  		colpts[col] = -1;
   	} else if (el.hasAttribute('data-pts')) {
-  		colpts[i] = 1*el.getAttribute('data-pts');
+  		colpts[col] = 1*el.getAttribute('data-pts');
   	} else {
-  		colpts[i] = 100;
+  		colpts[col] = 100;
   	}
   });
   $("tbody td").each(function(i,el) {
-    if (el.innerHTML.match(/tipshow/) || colpts[i%colpts.length]==-1) {return;}
+	let col = el.cellIndex;
+    if (el.innerHTML.match(/tipshow/) || colpts[col]==-1) {return;}
   	var a = $(el).find("a");
   	if (a.length>0) {
   	  el = a[0];
@@ -62,7 +64,7 @@ function setupGBpercents() {
 				$(el).text(pct+"%");
 			}
     } else if (p = el.textContent.match(/^\s*(\d+(\.\d*)?)\s*$/)) {
-      var pct = colpts[i%colpts.length]>0?Math.round( 1000*p[1]/colpts[i%colpts.length] )/10:0;
+      var pct = colpts[col]>0?Math.round( 1000*p[1]/colpts[col] )/10:0;
 			$(el).attr("data-ptv", p[0]).attr("data-pct", pct)
 				.attr("title", gbmod.pts==1?p[0]+"pts":pct+"%");
 			if (gbmod.pts!=0) {
