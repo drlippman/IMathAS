@@ -103,6 +103,7 @@ if (isset($_POST['tname'])) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom&r=" .Sanitize::randomQueryStringParam());
 	exit;
 } else {
+	$pagetitle = _('External Tools');
 	require_once "../header.php";
 	if ($isteacher) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -154,39 +155,39 @@ if (isset($_POST['tname'])) {
 		}
 		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$id.'">';
 ?>
-		<span class="form">Tool Name:</span>
-		<span class="formright"><input type="text" size="40" name="tname" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" /></span>
+		<label for=tname class="form">Tool Name:</label>
+		<span class="formright"><input type="text" size="40" name="tname" id="tname" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" /></span>
 		<br class="form" />
 
-		<span class="form">Launch URL:</span>
-		<span class="formright"><input type="text" size="40" name="url" value="<?php echo Sanitize::encodeStringForDisplay($url); ?>" /></span>
+		<label for=url class="form">Launch URL:</label>
+		<span class="formright"><input type="text" size="40" name="url" id="url" value="<?php echo Sanitize::encodeStringForDisplay($url); ?>" /></span>
 		<br class="form" />
 
-		<span class="form">Key:</span>
-		<span class="formright"><input type="text" size="40" name="key" value="<?php echo Sanitize::encodeStringForDisplay($key); ?>" /></span>
+		<label for=key class="form">Key:</label>
+		<span class="formright"><input type="text" size="40" name="key" id="key" value="<?php echo Sanitize::encodeStringForDisplay($key); ?>" /></span>
 		<br class="form" />
 
-		<span class="form">Secret:</span>
-		<span class="formright"><input type="password" size="40" name="secret" value="<?php echo Sanitize::encodeStringForDisplay($secret); ?>" /></span>
+		<label for=secret class="form">Secret:</label>
+		<span class="formright"><input type="password" size="40" name="secret" id="secret" value="<?php echo Sanitize::encodeStringForDisplay($secret); ?>" /></span>
 		<br class="form" />
 
-		<span class="form">Custom Parameters:</span>
+		<label for=custom class="form">Custom Parameters:</label>
 		<span class="formright">
-			<textarea rows="2" cols="30" name="custom"><?php echo Sanitize::encodeStringForDisplay($custom); ?></textarea>
+			<textarea rows="2" cols="30" name="custom" id="custom"><?php echo Sanitize::encodeStringForDisplay($custom); ?></textarea>
 		</span>
 		<br class="form" />
 
 		<span class="form">Privacy:</span>
 		<span class="formright">
-		<input type="checkbox" name="privname" value="1" <?php if (($privacy&1)==1) echo 'checked="checked"';?> /> Send name<br/>
-		<input type="checkbox" name="privemail" value="2" <?php if (($privacy&2)==2) echo 'checked="checked"';?> /> Send email
+		<label><input type="checkbox" name="privname" value="1" <?php if (($privacy&1)==1) echo 'checked="checked"';?> /> Send name</label><br/>
+		<label><input type="checkbox" name="privemail" value="2" <?php if (($privacy&2)==2) echo 'checked="checked"';?> /> Send email</label>
 		</span>
 		<br class="form" />
 <?php
 		if ($isadmin) {
 			echo '<span class="form">Scope of tool:</span><span class="formright">';
-			echo '<input type="radio" name="scope" value="0" '. (($grp==0)?'checked="checked"':'') . '> System-wide<br/>';
-			echo '<input type="radio" name="scope" value="1" '. (($grp>0)?'checked="checked"':'') . '> Group';
+			echo '<label><input type="radio" name="scope" value="0" '. (($grp==0)?'checked="checked"':'') . '> System-wide</label><br/>';
+			echo '<label><input type="radio" name="scope" value="1" '. (($grp>0)?'checked="checked"':'') . '> Group</label>';
 			echo '</span><br class="form" />';
 		}
 		echo '<div class="submit"><input type="submit" value="Save"></div>';

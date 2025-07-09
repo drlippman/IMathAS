@@ -245,6 +245,7 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 }
 if (isset($_GET['listadmins'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a>\n";
+	$pagetitle = _('Admin List');
 	require_once "../header.php";
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Admin List</div>';
 	echo '<h1>Admin List</h1>';
@@ -274,6 +275,7 @@ if (isset($_GET['form'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
 
 	if ($_GET['form']=='emu') {
+		$pagetitle = _('Emulate User');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Emulate User</div>';
 		echo '<form method="post" action="'.$imasroot.'/admin/actions.php">';
@@ -283,6 +285,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='jumptoitem') {
+		$pagetitle = _('Jump to Item');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Jump to Item</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
@@ -297,6 +300,7 @@ if (isset($_GET['form'])) {
 		require_once "../footer.php";
 
 	} else if ($_GET['form']=='rescue') {
+		$pagetitle = _('Recover Items');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Recover Items</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/rescuecourse.php">';
@@ -305,6 +309,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='updatecaption') {
+		$pagetitle = _('Update Caption Data');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
@@ -313,6 +318,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='updatecaptionbyqids') {
+		$pagetitle = _('Update Caption Data');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
@@ -321,6 +327,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='exportcaptions') {
+		$pagetitle = _('Export Caption Data');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Export Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
@@ -329,6 +336,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='importcaptions') {
+		$pagetitle = _('Import Caption Data');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Import Caption Data</div>';
 		echo '<form method="post" enctype="multipart/form-data" action="'.$imasroot.'/util/utils.php">';
@@ -337,6 +345,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='setupfcm') {
+		$pagetitle = _('Setup FCM');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Setup FCM</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
@@ -355,6 +364,7 @@ if (isset($_GET['form'])) {
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='lookup') {
+		$pagetitle = _('User Lookup');
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; User Lookup</div>';
 
@@ -478,6 +488,7 @@ if (isset($_GET['form'])) {
 
 } else {
 	//listing of utilities
+	$pagetitle = _('Admin Utilities');
 	require_once "../header.php";
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Utilities</div>';
 	echo '<h2>Admin Utilities </h2>';

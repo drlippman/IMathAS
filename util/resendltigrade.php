@@ -6,7 +6,7 @@ if ($myrights<100) {
 	echo "You are not authorized to view this page";
 	exit;
 }
-
+$pagetitle = _('Resend LTI Grade');
 require_once "../header.php";
 
 if (!isset($_POST['aid']) || !isset($_POST['uid'])) {

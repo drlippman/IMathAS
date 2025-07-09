@@ -109,6 +109,7 @@ $stm->execute(array($grp));
 $ipeds = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/ipedssearch.js"></script>';
+$pagetitle = _('Group IPEDS / NCES Associations');
 require_once '../header.php';
 echo '<div class=breadcrumb>'.$breadcrumbbase.' IPEDS/NCES Association</div>';
 echo '<form method=post action="ipedslink.php">';

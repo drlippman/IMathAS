@@ -4,7 +4,7 @@ require_once "../init.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
 $errmsg = '';
-
+$pagetitle = _('Cleanup messages');
 require '../header.php';
 
 echo "<div class=breadcrumb>$breadcrumbbase ";

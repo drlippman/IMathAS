@@ -5,6 +5,7 @@
 require_once "../init.php";
 $flexwidth = true;
 $nologo = true;
+$pagetitle = _('Detail');
 require_once "../header.php";
 
 

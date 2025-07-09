@@ -100,9 +100,10 @@ $placeinhead = '<script type="text/javascript">function highlightrow(el) { el.se
 $placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}</script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
 
+$pagetitle = _('Drill Assessment Results');
 require_once "../header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Drill Assessment Results</div>";
-echo "<h1>Drill Assessment Results</h1>";
+echo "<h1>$pagetitle</h1>";
 
 echo '<table id="myTable" class="gb">';
 echo '<thead><tr><th>Best (# tries)<br/>Last</th>';

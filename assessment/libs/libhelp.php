@@ -2,6 +2,7 @@
 	require_once "../../init.php";
 	$nologo = true;
 	$flexwidth = true;
+	$pagetitle = _('Macro Library Help');
 	require_once "../../header.php";
 	
 	echo "<h1>Installed Macro Libraries</h1>\n";

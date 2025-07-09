@@ -67,6 +67,7 @@ if (isset($_POST['aidorder'])) {
 	$agbcats = array();
 	getsubinfo($items,'0','','Assessment');
 
+	$pagetitle = _('Quick-setup conditional release');
 	require_once "../header.php";
 
 	echo '<h1>Quick-setup conditional release</h1>';

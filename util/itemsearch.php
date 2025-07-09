@@ -8,9 +8,9 @@ if ((isset($_POST['submit']) && $_POST['submit']=="Message") || isset($_GET['mas
 	require_once "../course/masssend.php";
 	exit;
 }
-
+$pagetitle = _('Search through inline and link text items')
 require_once "../header.php";
-echo '<h2>Search through inline and link text items</h2>';
+echo '<h1>Search through inline and link text items</h1>';
 echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.Sanitize::encodeStringForDisplay($_POST['search']).'"> <input type="submit" value="Search"/></p>';
 if (isset($_POST['search'])) {
 	echo '<p>';

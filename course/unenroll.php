@@ -116,8 +116,10 @@ ini_set("max_execution_time", "600");
 		}
 
 		/**** confirmation page body *****/
+		$pagetitle = _('Unenroll Confirmation');
 		require_once "../header.php";
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
+		echo '<h1>'.$pagetitle.'</h1>';
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=".Sanitize::courseId($cid)."&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($get_uid)."\">";
 		} else if ($calledfrom=='gb') {

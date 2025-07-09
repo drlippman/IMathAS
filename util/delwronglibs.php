@@ -15,6 +15,7 @@ function selgrp(n) {
 	$(".LG"+n).prop("checked",!state)
 }
 </script>';
+$pagetitle = _('Remove Questions Marked with Wrong Library');
 require_once "../header.php";
 echo '<h1>Remove Questions Marked with Wrong Library</h1>';
 

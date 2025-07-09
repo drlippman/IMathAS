@@ -19,6 +19,7 @@ if ($myrights == 100) {
 	$curBreadcrumb .= ' &gt; <a href="utils.php">Utilities</a>';
 }
 $curBreadcrumb .= ' &gt; Cross-Course Results';
+$pagetitle = _('Cross-Course Assessment Results');
 
 function reporterror($err) {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);

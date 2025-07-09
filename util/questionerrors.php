@@ -106,6 +106,7 @@ function quicksave() {
 	});
 }
 </script>';
+$pagetitle = _('Question Errors');
 require_once '../header.php';
 
 echo '<div class=breadcrumb><a href="../index.php">'._('Home').'</a> &gt; '._('Question Errors').'</div>';

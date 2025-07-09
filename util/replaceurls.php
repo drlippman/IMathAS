@@ -8,7 +8,7 @@ ini_set("max_execution_time", "1600");
 
 require_once "../init.php";
 if ($myrights<100) {exit;}
-
+$pagetitle = _('Replace URLs');
 require_once "../header.php";
 if (!empty($_POST['from']) && !empty($_POST['to'])) {
 	$from = trim($_POST['from']);

@@ -12,6 +12,7 @@ if (empty($_POST['from']) || empty($_POST['to'])) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$ops .= '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[2]).' ('.Sanitize::encodeStringForDisplay($row[3]).') '.Sanitize::encodeStringForDisplay(tzdate('n/j/y',$row[4])).'</option>';
 	}
+	$pagetitle = _('Merge Teacher Accounts');
 	require_once "../header.php";
 	echo "<h1>Merge Teacher Accounts</h1>";
 	echo '<form method="post">';

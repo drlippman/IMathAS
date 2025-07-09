@@ -96,10 +96,12 @@ messaging.onMessage(function(payload) {
 });
 
 </script>';
-
+$pagetitle = _('Notification Settings');
 require_once "../header.php";
 ?>
 <div class="breadcrumb"><a href="../index.php">Home</a> &gt; <a href="../forms.php?action=chguserinfo">User Profile</a> &gt; Notification Settings</div>
+
+<h1><?php echo $pagetitle; ?></h1>
 
 <div id="dosetup">
 	<p>If you would like to receive new message notifications from this system, even when not visiting this site,

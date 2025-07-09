@@ -17,6 +17,7 @@ function getstr($items,$str,$parent) {
 	}
 	return array();
 }
+$pagetitle = _('Block Search');
 require_once "../header.php";
 echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.Sanitize::encodeStringForDisplay($_POST['search']).'"> <input type="submit" value="Search"/></p>';
 echo '</form>';

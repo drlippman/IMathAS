@@ -5,7 +5,7 @@
 require_once "../init.php";
 
 if ($myrights < 100) { echo "You don't have the authority for this action"; exit;}
-
+$pagetitle = _('Batch Anonymize Users');
 require_once "../header.php";
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";

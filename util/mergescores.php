@@ -10,7 +10,7 @@ $cid = intval($_GET['cid']);
 if ($cid==0) {
     exit;
 }
-
+$pagetitle = _('Merge Scores');
 require_once "../header.php";
 if (isset($_POST['assess'])) {
     $dc = 0;

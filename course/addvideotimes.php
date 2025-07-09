@@ -63,6 +63,7 @@ if (isset($_POST['clearall'])) {
 
 
 //start display
+$pagetitle = _("Video Navigation and Question Cues");
 require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

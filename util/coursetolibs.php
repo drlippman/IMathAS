@@ -178,7 +178,7 @@ function buildexistblocks($items,$parent,$pre='') {
 
 $existblocks = array();
 buildexistblocks($itemorder,'0');
-
+$pagetitle = _('Course to Libraries');
 require_once "../header.php";
 ?>
 <script>

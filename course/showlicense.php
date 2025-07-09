@@ -1,8 +1,9 @@
 <?php
 
 require_once "../init_without_validate.php";
+$pagetitle = _('Question License');
 require_once "../header.php";
-echo '<h2>Question License</h2>';
+echo '<h1>'.$pagetitle.'</h1>';
 
 if (empty($_GET['id'])) {
 	echo "No IDs specified";

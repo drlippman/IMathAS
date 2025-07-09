@@ -75,8 +75,10 @@ ini_set("max_execution_time", "600");
 		}
 
 		/**** confirmation page body *****/
+		$pagetitle = _('Lock Student Confirmation');
 		require_once "../header.php";
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
+		echo "<h1>$pagetitle</h1>";
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		} else if ($calledfrom=='gb') {

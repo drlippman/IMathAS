@@ -261,6 +261,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 
   echo '</p>';
 } else {
+  $pagetitle = _('Batch Create Instructors');
   require_once "../header.php";
   if ($_GET['from']=='userreports') {
   	  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/userreports.php\">User Reports</a>\n";

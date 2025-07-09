@@ -2,6 +2,7 @@
 
 function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
     global $imasroot, $staticroot, $installname;
+    $pagetitle = _('MFA Entry');
     require_once __DIR__.'/../header.php';
     if ($error !== '') {
         echo '<p class=noticetext>'._('Invalid code - try again').'</p>';

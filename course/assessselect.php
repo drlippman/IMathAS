@@ -81,6 +81,7 @@ $placeinhead = '<script>
 </style>';
 $flexwidth = true;
 $nologo = true;
+$pagetitle = _('Select Assessment');
 require_once "../header.php";
 
 echo '<p><button type="button" onclick="uncheckall()">',_('Uncheck All'),'</button> ';

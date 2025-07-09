@@ -1,7 +1,7 @@
 <?php
 require_once "../init.php";
 if ($myrights<100) {exit;}
-
+$pagetitle = _('Replace Videos');
 require_once "../header.php";
 if (!empty($_POST['from']) && !empty($_POST['to'])) {
 	$from = trim($_POST['from']);

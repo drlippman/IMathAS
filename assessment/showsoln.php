@@ -48,7 +48,7 @@ function toggleinlinebtn(n,p){
 	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,"[-]"):k.replace(/\[\-\]/,"[+]");
 }
 </script>';
-
+$pagetitle = _('Written Example');
 require_once "../header.php";
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
 if ($sig != md5($id.$_SESSION['secsalt'])) {

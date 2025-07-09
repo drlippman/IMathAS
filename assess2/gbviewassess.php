@@ -57,6 +57,7 @@ if ($isltilimited || $inTreeReader) {
 }
 $nologo = true;
 $useeditor = 1;
+$pagetitle = _('Assessment Detail');
 require_once '../header.php';
 
 if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {

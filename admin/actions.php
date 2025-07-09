@@ -1010,7 +1010,7 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 			$stm->execute(array($groupid));
 			$hasGroupLTI = ($stm->fetchColumn() !== false);
-
+			$pagetitle = _(' Course Creation Confirmation');
 			require_once "../header.php";
 			echo '<div class="breadcrumb">'.$breadcrumbbase._(' Course Creation Confirmation').'</div>';
 			echo '<h1>',_('Your course has been created'),'!</h1>';
@@ -1307,6 +1307,7 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
 				if (isset($_POST['mfatrust'])) {
+					$pagetitle = _('MFA Confirmation');
 					require_once "../header.php";
 					echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
 					echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';

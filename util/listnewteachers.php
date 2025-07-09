@@ -108,6 +108,7 @@ function htmlHeader() {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
 
 	$placeinhead = '<script type="text/javascript" src="'.$GLOBALS['staticroot'].'/javascript/tablesorter.js"></script>';
+	$pagetitle = _('New Instructor Accounts');
 	require_once "../header.php";
 	echo '<div class=breadcrumb>';
 	echo $GLOBALS['breadcrumbbase'] .' <a href="../admin/userreports.php">'._('User Reports').'</a> &gt; ';

@@ -10,6 +10,7 @@ if (!isset($_GET['cid'])) {
 }
 $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_POST['libs']) || $_POST['libs']=='') {
+	$pagetitle = _('Course to Library');
 	require_once "../header.php";
 	if (isset($_POST['libs'])) {
 		echo "<p><b>No library selected.  Try again</b></p>";

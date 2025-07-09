@@ -67,6 +67,7 @@ $status = [
 ];
 
 $placeinhead = '<style>tbody tr:nth-child(odd) {background-color: #eee;}</style>';
+$pagetitle = _('Duplicate Pending Account Requests');
 require_once '../header.php';
 echo '<h1>'._('Duplicate Pending Account Requests').'</h1>';
 echo '<form method="POST" action="finddupacctreq.php">';
