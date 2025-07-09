@@ -139,6 +139,11 @@ export default {
     },
     uploadFile: function () {
       window.doImageUploadResize(this.$refs.fileinput, (el) => {
+        if (!el.files || el.files.length === 0) {
+          actions.handleError('file_error_cant_read');
+          this.$refs.fileinput.value = '';
+          return;
+        }
         if (el.files[0].size > 15000 * 1024) {
           actions.handleError('file_toolarge');
           this.$refs.fileinput.value = '';
