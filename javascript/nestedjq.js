@@ -531,6 +531,7 @@ function editinplace(el) {
 		inputt.id = 'inputt'+el.id;
 		inputt.type = "text";
 		inputt.size = 60;
+		inputt.onclick = function(e) { e.stopPropagation(); };
 		inputt.onblur = editinplaceun;
 		el.parentNode.insertBefore(inputt,el);
 	} else {
