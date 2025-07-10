@@ -22,6 +22,14 @@
     </timer>
 
     <div class="flexgroup">
+      <span
+        v-if = "saveStatus > 0"
+        :class = "['noticetext', saveStatus === 3 ? 'sr-only' : '']"
+        aria-live = "polite"
+        aria-atomic = "true"
+      >
+        {{ saveStatusMsg }}
+      </span>
       <button
         v-if = "saveStatus === 3"
         class = "secondary"
@@ -30,12 +38,6 @@
       >
         {{ $t('header.work_save') }}
       </button>
-      <span
-        v-if = "saveStatus === 1 || saveStatus === 2"
-        class = "noticetext"
-      >
-        {{ saveStatus === 1 ? $t('header.work_saving') : $t('header.work_saved') }}
-      </span>
       <button
         v-if = "assessSubmitLabel !== ''"
         :class="{ primary: primarySubmit, secondary: !primarySubmit }"
@@ -214,6 +216,20 @@ export default {
       // } else {
       //  return 0;
       // }
+    },
+    saveStatusMsg () {
+      if (this.saveStatus === 1) {
+        return this.$t('header.work_saving');
+      } else if (this.saveStatus === 2) {
+        return this.$t('header.work_saved');
+      } else if (this.saveStatus === 3) {
+        // Removed for now. This has the potential to be really annoying
+        // and I don't think it's technically required
+        // return this.$t('header.work_save_avail');
+        return '';
+      } else {
+        return '';
+      }
     },
     showPrint () {
       return (this.ainfo.noprint !== 1);

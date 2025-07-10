@@ -46,6 +46,7 @@ if (isset($CFG['GEN']['footerscriptinclude'])) {
 	require_once "$curdir/{$CFG['GEN']['footerscriptinclude']}";
 }
 ?>
+<span class="sr-only" id=statusmsg aria-live=polite aria-atomic=true></span>
 </body>
 </html>
 <?php

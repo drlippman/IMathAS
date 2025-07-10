@@ -358,6 +358,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	if ($canviewall) {
 		echo "<div class=cpmid>";
+		echo '<span class="sr-only">Note changing these filters will reload the page</span>';
 		echo '<label>',_('Category'), ': <select id="filtersel" onchange="chgfilter()">';
 		echo '<option value="-1" ';
 		if ($catfilter==-1) {echo "selected=1";}
@@ -562,7 +563,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "<br/>\n";
 
 	}
-
+	echo '<span class="sr-only">Note changing these filters will reload the page</span>';
 	echo '<label>', _('Category:'), ' <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
@@ -751,7 +752,7 @@ function gbstudisp($stu) {
 				$stm->execute(array(':courseid'=>$cid));
 			}
 
-			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)" aria-label="'._('Student to display') .'">';
+			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)" aria-label="'._('Student to display. Will reload the page.') .'">';
 			$lastsec = '';
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {

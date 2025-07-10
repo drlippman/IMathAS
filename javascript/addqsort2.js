@@ -1974,6 +1974,7 @@ function submitChanges() {
     var target = "submitnotice";
     check_textseg_itemarray();
     document.getElementById(target).innerHTML = _(" Saving Changes... ");
+    document.getElementById("statusmsg").textContent = _("Saving Changes");
     data = generateOutput();
     var outdata = {
         order: data[0],
@@ -1995,6 +1996,7 @@ function submitChanges() {
         .done(function (msg) {
             if (msg.match(/^error:/)) {
                 document.getElementById(target).innerHTML = msg;
+                document.getElementById("statusmsg").textContent = msg;
                 itemarray = olditemarray.slice();
                 refreshTable();
                 return;
@@ -2004,6 +2006,7 @@ function submitChanges() {
             }
             lastitemhash = msg;
             document.getElementById(target).innerHTML = "";
+            document.getElementById("statusmsg").textContent = _("Done");
             refreshTable();
             updateInAssessMarkers();
             updateSaveButtonDimming();
@@ -2023,6 +2026,7 @@ function submitChanges() {
                 req.statusText +
                 "\nError: " +
                 errorThrown;
+            document.getElementById("statusmsg").textContent = _("Error saving");
             itemarray = olditemarray.slice();
             refreshTable();
         });
@@ -2036,6 +2040,7 @@ function addusingdefaults(asgroup) {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
+    document.getElementById("statusmsg").textContent = _("Adding questions");
     $.ajax({
         type: "POST",
         url: AHAHsaveurl,
@@ -2045,11 +2050,14 @@ function addusingdefaults(asgroup) {
     }).done(function (msg) {
         if (msg.hasOwnProperty('error')) {
             document.getElementById("submitnotice").innerHTML = msg.error;
+            document.getElementById("statusmsg").textContent = _("Error adding");
         } else {
+            document.getElementById("statusmsg").textContent = _("Done adding");
             doneadding(msg);
         }
     }).fail(function () {
         alert("Error adding questions");
+        document.getElementById("statusmsg").textContent = _("Error adding");
     });
 }
 

@@ -88,7 +88,7 @@ $placeinhead = '<style type="text/css">
 <script type="text/javascript">
 function quicksave() {
     if ($("input:checked").length == 0) { return; }
-	$("#quicksavenotice").html(_("Saving...") + \' <img src="\'+staticroot+\'/img/updating.gif"/>\');
+	$("#quicksavenotice").html(_("Saving...") + \' <img src="\'+staticroot+\'/img/updating.gif" alt=\"\"/>\');
 	$.ajax({
 		url: window.location.href,
 		type: "POST",
@@ -131,13 +131,13 @@ echo '<form id=mainform method=post>';
 //echo '<p>'._('With selected:').'<button type=submit>'._('Clear error').'</button></p>';
 echo '<div class="fixedonscroll">';
 echo _('With selected:') . ' <button type="button" id="quicksavebtn" onclick="quicksave()">'._('Clear log').'</button> ';
-echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
+echo '<span class="noticetext" id="quicksavenotice" aria-live="polite" aria-atomic=true>&nbsp;</span>';
 echo '</div>';
 echo '<ul class="nomark">';
 $lastqsetid = 0;
 foreach ($qorder as $qsetid) {
-    echo '<li><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
-    echo 'Question <a target="_blank" href="../course/moddataset.php?cid='.$qcid.'&id='.$qsetid.'">#'.$qsetid.'</a>';
+    echo '<li><label><input type=checkbox name="checked[]" value="'.$qsetid.'"> ';
+    echo 'Question <a target="_blank" href="../course/moddataset.php?cid='.$qcid.'&id='.$qsetid.'">#'.$qsetid.'</a></label>';
     echo ' <span class="small grey">(Used '.($timesused[$qsetid] ?? 0).' times)</span>';
     echo '<ul>';
     foreach ($allrows[$qsetid] as $row) {

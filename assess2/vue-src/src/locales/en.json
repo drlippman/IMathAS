@@ -151,6 +151,7 @@
     "disable_mq": "Disable equation editor",
     "work_save": "Save progress",
     "work_saved": "Progress saved",
+    "work_save_avail": "Save progress button available",
     "work_saving": "Saving...",
     "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
     "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",

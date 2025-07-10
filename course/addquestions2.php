@@ -638,8 +638,6 @@ if ($overwriteBody==1) {
 	outputSearchUI($searchtype, $searchterms, $search_results, 'addquestions');
 ?>
 
-<div id="searchspinner" style="display:none;"><?php echo _('Searching');?>...<br/><img alt="" src="../img/updating.gif"/></div>
-
 <div id="addbar" class="sr-only">
     <div class="dropup inlinediv splitbtn">
         <button type="button" class="primary" onclick="addusingdefaults(false)">

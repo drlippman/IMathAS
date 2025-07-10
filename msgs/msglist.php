@@ -280,6 +280,7 @@ If deleted on both ends, delete from DB
 					var newcid = $(el).val();
 					$("#to").hide();
 					if (newcid>0) {
+						$("#statusmsg").text(_("Loading recipients"));
 						$(el).after($("<img>", {src: staticroot+"/img/updating.gif", alt: "Loading recipients..."}));
 						$.ajax({
 							url: "msglist.php?cid=0&getstulist="+newcid,
@@ -291,6 +292,7 @@ If deleted on both ends, delete from DB
 							}
 							$("#to").show();
 							$(el).siblings("img").remove();
+							$("#statusmsg").text(_("Done"));
 						});
 					} else {
 						$("#to").val(0);
@@ -309,6 +311,7 @@ If deleted on both ends, delete from DB
                     if (stu !== "") {
                         $("#stusearchresultwrap").hide();
                         $("#stusearchwrap").after($("<img>", {src: staticroot+"/img/updating.gif", alt: "Loading recipients..."}));
+						$("#statusmsg").text(_("Loading recipients"));
                         $.ajax({
 							url: "msglist.php?cid='.$cid.'",
                             type: "POST",
@@ -324,6 +327,7 @@ If deleted on both ends, delete from DB
                             }
                             $("#stusearchresultwrap").show();
                             $("#stusearchwrap").siblings("img").remove();
+							$("#statusmsg").text(_("Done"));
                         });
                     }
                 }

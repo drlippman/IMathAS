@@ -132,6 +132,7 @@ require_once "../header.php";
     function getresults() {
         $("#results").empty();
         $("#spinner").show();
+        $("#statusmsg").text(_('Searching'));
         let cat = $("#cat").val();
         let avail = $("#avail").val();
         let feature = $('input[name="feature"]:checked').val();
@@ -148,6 +149,7 @@ require_once "../header.php";
             
         }).always(function() {
             $("#spinner").hide();
+            $("#statusmsg").text(_('Done'));
         })
     }
 </script>

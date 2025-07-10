@@ -203,6 +203,7 @@ function doQuestionSearch(offset) {
         return;
     }
     $("#searchspinner").show();
+    $("#statusmsg").text(_('Searching'));
     qsearchintransit = true;
     $.ajax({
         url: qsearchaddr,
@@ -219,6 +220,7 @@ function doQuestionSearch(offset) {
         document.getElementById("myTable").focus();
         document.getElementById("fullqsearchwrap").scrollIntoView();
         $("#searchspinner").hide();
+        $("#statusmsg").text(_('Done'));
         qsearchintransit = false;
     }).fail(function() {
         $("#searcherror").show();

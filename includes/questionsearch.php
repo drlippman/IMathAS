@@ -544,7 +544,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
     global $staticroot, $cid;
 ?>
 <div id="fullqsearchwrap">
-    <div id="searcherror" class="noticetext"></div>
+    <div id="searcherror" class="noticetext" aria-live=polite aria-atomic=true></div>
 <div id="qsearchbarswrap">
 <div class="flexrow wrap dropdown searchbar">
     <div class="dropdown">
