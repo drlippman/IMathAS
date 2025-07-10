@@ -94,15 +94,6 @@ var Nested = function(listid, newoptions) {
 	function collapse(event) {
 		var el = $(event.target);
 
-		if (options.handleClass) {
-			while (el[0].nodeName != options.childTag && !el.hasClass(options.handleClass) && el[0] != list[0]) {
-				el = el.parent();
-			}
-			if (el.hasClass(options.handleClass)) {
-				el.focus();
-				return true;
-			} 
-		}
 		el = $(event.target);
 		if (options.expandBtnClass) {
 			while (el[0].nodeName != options.childTag && !el.hasClass(options.expandBtnClass) && el[0] != list[0]) {
@@ -387,6 +378,10 @@ var Nested = function(listid, newoptions) {
 		list.on('mousedown.start touchstart.start', start);
 		options.onComplete(el);
 		if (window.ie) $(document.body).off('drag.stop').off('selectstart.stop');
+		if (!moved) {
+			$(el).children('.'+options.handleClass).focus();
+		}
+		
 	};
 
 	return {

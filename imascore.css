@@ -230,6 +230,12 @@ ul.qview {
 	padding-left: 0px;
 	margin-bottom: 6px;
 }
+ul.qview *:focus, ul.qview *:focus-visible {
+	outline-style: solid;
+	outline-color: black;
+	outline-width: 2px;
+	outline-offset: 0px;
+}
 ul.qview > li > ul {
 	padding-left: 10px;
 	border-left: 1px dashed #ccc;
