@@ -217,7 +217,7 @@ function genItem($data) {
                 'href'=>'managelibs.php?cid='.$cid.'&modify='.$data['id']
             ];
         }
-        if (!empty($childlibs[$data['id']])) {
+        if (!empty($childlibs[$data['id']]) || $data['count'] === 0) {
             if (
                 $data['userights']>$allsrights || 
                 (($data['userights']%3)>$selectrights && $data['groupid']==$groupid) || 
