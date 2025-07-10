@@ -172,14 +172,14 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark">
 		<li v-for="teacher in existingTeachers" :key="teacher.id">
-            <input type=checkbox :value="teacher.id" :disabled="teacher.id==courseOwner"> <span class="pii-full-name">{{teacher.name}}</span>
+            <label><input type=checkbox :value="teacher.id" :disabled="teacher.id==courseOwner"> <span class="pii-full-name">{{teacher.name}}</span></label>
 		</li>
 	</transition-group>
 </div>
 <div id="potentialteachers">
 	<h2>Potential Teachers</h2>
 	<p><button @click="loadGroup()">List my group members</button>
-		or lookup a teacher: <input v-model="toLookup" size=30>
+		or <label>lookup a teacher: <input v-model="toLookup" size=30></label>
 		<button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
 		<span v-if="processingSearch" class="noticetext">Looking up teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
 		<span v-if="processingAdd" class="noticetext">Adding teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
@@ -190,12 +190,12 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
 		<li v-for="teacher in searchResults" :key="teacher.id">
-            <input type=checkbox :value="teacher.id"> <span class="pii-full-name">{{teacher.name}}</span>
+            <label><input type=checkbox :value="teacher.id"> <span class="pii-full-name">{{teacher.name}}</span></label>
 		</li>
 	</transition-group>
 </div>
+<div class="sr-only" id="statusbar" aria-live="polite" aria-atomic="true">{{statusmessage}}</div>
 </div>
-
 <script type="text/javascript">
 const { createApp } = Vue;
 createApp({
@@ -208,7 +208,8 @@ createApp({
             courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
             toLookup: "",
             searchResults: null,
-            lastSearchType: ''
+            lastSearchType: '',
+			statusmessage: ''
         };
 	},
 	methods: {
@@ -217,6 +218,7 @@ createApp({
 			if (toremove.length>0 && confirm("Are you SURE you want to remove these teachers?")) {
 				var self = this;
 				this.processingRemove = true;
+				this.statusmessage = 'Removing teachers';
 				$.ajax({
 					dataType: "json",
 					type: "POST",
@@ -224,6 +226,7 @@ createApp({
 					data: {remove: toremove},
 				}).done(function(msg) {
 					self.existingTeachers = msg;
+					self.statusmessage = 'Done';
 				}).always(function() {
 					self.processingRemove = false;
 					$("#currentteachers input:checked").prop("checked", false);
@@ -241,12 +244,14 @@ createApp({
 			if (toadd.length>0) {
 				var self = this;
 				this.processingAdd = true;
+				this.statusmessage = 'Adding teachers';
 				$.ajax({
 					dataType: "json",
 					type: "POST",
 					url: window.location.href,
 					data: {add: toadd},
 				}).done(function(msg) {
+					self.statusmessage = 'Done';
 					self.existingTeachers = msg;
 					var i = self.searchResults.length;
 					while (i--) {
@@ -263,6 +268,7 @@ createApp({
 		},
 		loadGroup: function() {
 			this.processingSearch = true;
+			this.statusmessage = 'Loading teachers';
 			this.lastSearchType = 'group';
 			var self = this;
 			$.ajax({
@@ -271,6 +277,7 @@ createApp({
 				url: window.location.href,
 				data: {loadgroup: 1},
 			}).done(function(msg) {
+				self.statusmessage = 'Done';
 				self.searchResults = msg;
 			}).always(function() {
 				self.processingSearch = false;
@@ -280,6 +287,7 @@ createApp({
 		searchTeacher: function() {
 			if (this.toLookup != '') {
 				this.processingSearch = true;
+				this.statusmessage = 'Searching';
 				this.lastSearchType = 'search';
 				var self = this;
 				$.ajax({
@@ -288,6 +296,7 @@ createApp({
 					url: window.location.href,
 					data: {search: this.toLookup},
 				}).done(function(msg) {
+					self.statusmessage = 'Done';
 					self.searchResults = msg;
 				}).always(function() {
 					self.processingSearch = false;
