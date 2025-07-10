@@ -64,32 +64,6 @@ if (!empty($_POST['newowner'])) {
 	exit;
 }
 
-if (!empty($CFG['GEN']['uselocaljs'])) {
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
-} else {
-    $placeinhead = '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.31/vue.global.prod.min.js" integrity="sha512-Dg9zup8nHc50WBBvFpkEyU0H8QRVZTkiJa/U1a5Pdwf9XdbJj+hZjshorMtLKIg642bh/kb0+EvznGUwq9lQqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
-}
-$placeinhead .= '<style type="text/css">
- [v-cloak] { display: none;}
- .fade-enter-active {
-  transition: all 0.2s ease-out;
-}
-.fade-leave-active {
-  transition: all 0.1s ease-out;
-}
-
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
-.fade-leave-active {
-	position: absolute;
-	z-index: 0;
-}
-.fade-move {
-	transition: transform .2s;
-}
-</style>';
-
 $pagetitle = _('Transfer Course Ownership');
 
 require_once "../header.php";
@@ -108,79 +82,20 @@ echo "$pagetitle</div>\n";
 echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDisplay($coursename).'</h1></div>';
 ?>
 <form method="post">
-<div id="app" v-cloak>
-<p>List your group member or search for a teacher to transfer your course ownership to.<br/>
-<input type=checkbox name=removeasteacher checked> Remove me as a teacher after transferring the course.</p>
-<p><button type=button @click="loadGroup()">List my group members</button>
-	or lookup a teacher: <input v-model="toLookup" size=30>
-	<button type=button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img alt="" src="<?php echo $staticroot;?>/img/updating.gif"></span>
-</p>
-<p>
-	<button type=submit :disabled="selectedTeacher == 0">Transfer</button>
-	<button type=button @click="leavePage()" class="secondarybtn">Nevermind</button>
-</p>
-<p v-if="searchResults !== null && searchResults.length==0">No teachers found</p>
-<transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
-	<li v-for="teacher in searchResults" :key="teacher.id">
-        <input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> <span class="pii-full-name">{{teacher.name}}</span>
-	</li>
-</transition-group>
-</div>
-</form>
-<script type="text/javascript">
-const { createApp } = Vue;
-createApp({
-	data: function() {
-        return {
-            processingSearch: false,
-            courseOwner: <?php echo Sanitize::onlyInt($courseownerid);?>,
-            toLookup: "",
-            searchResults: null,
-            lastSearchType: '',
-            selectedTeacher: 0
-        };
-	},
-	methods: {
-		loadGroup: function() {
-			this.processingSearch = true;
-			this.lastSearchType = 'group';
-			var self = this;
-			$.ajax({
-				dataType: "json",
-				type: "POST",
-				url: "<?php echo $basesiteurl;?>/util/userlookup.php?cid=<?php echo $cid;?>",
-				data: {loadgroup: 1},
-			}).done(function(msg) {
-				self.searchResults = msg;
-			}).always(function() {
-				self.processingSearch = false;
-			});
-			//todo: add error handling
-		},
-		searchTeacher: function() {
-			if (this.toLookup != '') {
-				this.processingSearch = true;
-				this.lastSearchType = 'search';
-				var self = this;
-				$.ajax({
-					dataType: "json",
-					type: "POST",
-					url: "<?php echo $basesiteurl;?>/util/userlookup.php",
-					data: {search: this.toLookup, cid: <?php echo $cid;?>},
-				}).done(function(msg) {
-					self.searchResults = msg;
-				}).always(function() {
-					self.processingSearch = false;
-				});
-				//todo: add error handling
-			}
-		},
-		leavePage: function() {
-			window.location.href = '<?php echo $imasroot.$backloc;?>';
-		}
-	}
-}).mount('#app');
-</script>
+
+<p>List your group members or search for a teacher to transfer your course ownership to.</p>
+<p><label><input type=checkbox name=removeasteacher checked> Remove me as a teacher after transferring the course.</label></p>
 <?php
+require_once '../includes/userlookupform.php';
+generateUserLookupForm(_('Instructor to transfer to:'), 'newowner', $defaultresults = '');
+echo '<p><button class=primary type=submit disabled=true id=transferbtn>'._('Transfer').'</button>';
+echo '<button type=button class="secondarybtn" onclick="window.location=\'../index.php\'">'._('Nevermind').'</button></p>';
+echo '<script>
+function userlookupcallback() {
+	let el = document.getElementById("newowner");
+	if (el && el.value > 0) {
+		document.getElementById("transferbtn").disabled = false;
+	}
+}
+</script>';
 require_once "../footer.php";

@@ -21,6 +21,9 @@ echo '<span id=userlookupResults>'.$defaultresults.'</span></p>';
             data: {loadgroup: 1, format: 'select', name: '<?php echo $fieldname; ?>'},
         }).done(function(msg) {
             $('#userlookupResults').html(msg);
+            if (typeof userlookupcallback == 'function') {
+                userlookupcallback();
+            }
         }).always(function() {
             $("#userlookupstatus").hide();
         });
@@ -34,6 +37,9 @@ echo '<span id=userlookupResults>'.$defaultresults.'</span></p>';
             data: {search: $("#userlookupName").val(), format: 'select', name: '<?php echo $fieldname; ?>'},
         }).done(function(msg) {
             $('#userlookupResults').html(msg);
+            if (typeof userlookupcallback == 'function') {
+                userlookupcallback();
+            }
         }).always(function() {
             $("#userlookupstatus").hide();
         });
