@@ -1141,7 +1141,9 @@ function generateTable() {
     //return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
     html += "<th>" + _("Description");
     html +=
-        "</th><th>&nbsp;</th><th>ID</th><th>" +
+        "</th><th><span class=\"sr-only\">" +
+        _("Features") +
+        "</span></th><th>ID</th><th>" +
         _("Preview") +
         "</th><th>" +
         _("Type") +
@@ -1157,7 +1159,7 @@ function generateTable() {
             defpoints +
             '" data-lastval="' +
             defpoints +
-            '"/><label></span>';
+            '"/></label></span>';
     }
     html += "</th>";
     html += "<th>" + _("Actions") + "</th>";
@@ -1545,7 +1547,7 @@ function generateTable() {
                     curitems[j][1] +
                     '"/>';
                 
-                html += '<label for="qc'+ln+'">' + curitems[j][2] + "</label></td>"; //description
+                html += '<label for="qc'+ln+'" id="qsd'+ln+'">' + curitems[j][2] + "</label></td>"; //description
                 html += '<td class="nowrap">';
                 if ((curitems[j][7] & 32) == 32) {
                     html += '<span title="' + _('Show Work') + '">' + 
@@ -1703,7 +1705,7 @@ function generateTable() {
                             '" data-lastval="' +
                             curpt +
                             '" ' + 
-                            'aria-labelledby="qd' + ln + '"' +
+                            'aria-labelledby="qsd' + ln + '"' +
                             '/>' +
                             (curitems[j][9] > 0 ? ECmark : '') +
                             '</td>'; //points

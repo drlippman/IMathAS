@@ -677,6 +677,7 @@ function addsortmarkup(baseid) {
 				class: "editname",
 				size: 50,
 				id: "input"+refel.id,
+				"aria-label": _('Item title'),
 				value: refel.innerHTML
 			}).on('focus', function(ev) {
 				let refid = this.id.substr(5);

@@ -434,6 +434,7 @@ function displayQuestionList(results) {
     rendermathnode(document.getElementById("myTable"));
 
     initSortTable('myTable', sortinit);
+    $(".dropdown-toggle").dropdown();
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
              if (!$("#addbar").hasClass("nofooterbar")) {

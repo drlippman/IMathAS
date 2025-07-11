@@ -520,10 +520,10 @@ $vueData = array(
 					</label>
 					<span v-show="dolpcutoff">
 						<?php echo _('No extensions past');?>
-						<input type=text size=10 name="lpdate" v-model="lpdate">
+						<input type=text size=10 name="lpdate" v-model="lpdate" aria-label="<?php echo _('latepass cutoff date');?>">
 						<a href="#" onClick="displayDatePicker('lpdate', this); return false">
 						<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-						at <input type=text size=8 name=lptime v-model="lptime">
+						at <input type=text size=8 name=lptime v-model="lptime" aria-label="<?php echo _('latepass cutoff time');?>">
 					</span>
 				</span>
 			</span><br class=form />
@@ -564,14 +564,14 @@ $vueData = array(
 					<option value="1"><?php echo _('Show greyed until');?></option>
 				</select>
 				<span v-show="reqscoreshowtype > -1">
-					<?php echo _('a score of');?>
-	 				<input type=text size=4 name=reqscore v-model="reqscore" />
-					<select name="reqscorecalctype" v-model="reqscorecalctype">
+					<span id="reqscorelbl1"><?php echo _('a score of');?></span>
+	 				<input type=text size=4 name=reqscore v-model="reqscore" aria-labelledby="reqscoreshowtype reqscorelbl1"/>
+					<select name="reqscorecalctype" v-model="reqscorecalctype" aria-label="<?php echo _('prerequisite score format');?>">
 						<option value="0"><?php echo _('points');?></option>
 						<option value="1"><?php echo _('percent');?></option>
 					</select>
-					<?php echo _('is obtained on');?>
-					<select name="reqscoreaid" v-model="reqscoreaid">
+					<label for=reqscoreaid><?php echo _('is obtained on');?></label>
+					<select name="reqscoreaid" id="reqscoreaid" v-model="reqscoreaid">
 						<option v-for="option in reqscoreOptions" :value="option.value" :key="option.value">
 							{{ option.text }}
 						</option>
@@ -619,7 +619,7 @@ $vueData = array(
                     </span>
 				</label>
 			 	<span v-show="doposttoforum">
-					<?php echo _('to forum');?>
+					<label for=posttoforum><?php echo _('to forum');?></label>
 					<select name="posttoforum" id="posttoforum" v-model="posttoforum">
 						<option v-for="option in forumOptions" :value="option.value" :key="option.value">
 							{{ option.text }}
@@ -691,8 +691,8 @@ $vueData = array(
 				</label>
 				<span v-show="usedeffb">
 					<br/>
-					<?php echo _('Text');?>:
-					<textarea name="deffb" v-model="deffb" rows="4" cols="60"></textarea>
+					<label for=deffb><?php echo _('Text');?></label>:
+					<textarea name="deffb" id="deffb" v-model="deffb" rows="4" cols="60"></textarea>
 				</span>
 			</span><br class="form" />
 

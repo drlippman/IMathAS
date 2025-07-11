@@ -442,7 +442,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml = '<span class="dropdown">';
 	$togglehtml .= ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$togglehtml .= _('Toggles').'</a>';
-	$togglehtml .= '<div class="dropdown-menu gbtoggle" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+	$togglehtml .= '<div class="dropdown-menu gbtoggle" aria-labelledby="dropdownMenu'.$i.'">';
 	
 	$togglehtml .= '<div role=radiogroup aria-labelledby=toghdrlbl>';
 	$togglehtml .= '<div id=toghdrlbl class="dropdown-header">'._('Headers').'</div><div class="dropdown-group">';
