@@ -1668,7 +1668,7 @@ function setActiveTab(el) {
   var backdrop = '.dropdown-backdrop'
   var toggle   = '[data-toggle="dropdown"]'
   var Dropdown = function (element) {
-    $(element).on('click.bs.dropdown', this.toggle);
+    //$(element).on('click.bs.dropdown', this.toggle);
     $(element).next('.dropdown-menu').children("li").attr("role","menuitem");
   }
 
@@ -1840,7 +1840,9 @@ function setActiveTab(el) {
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
     .on('click.bs.dropdown keydown.bs.dropdown', '.dropdown-submenu > a', Dropdown.prototype.submenu)
 }(jQuery);
-
+$(function() {
+	$(".dropdown-toggle").dropdown();
+});
 // from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js
 
 function doImageUploadResize(el, callback) {
