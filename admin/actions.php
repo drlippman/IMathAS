@@ -53,6 +53,10 @@ switch($_POST['action']) {
 			echo _("You don't have the authority for this action");
 			break;
 		}
+		if (!isset($_POST['challenge']) || $_POST['challenge'] !== $_SESSION['secchallenge']) {
+			echo _('Error');
+			exit;
+		}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -360,6 +364,10 @@ switch($_POST['action']) {
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo _("You don't have the authority for this action"); break;}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
+		}
+		if (!isset($_POST['challenge']) || $_POST['challenge'] !== $_SESSION['secchallenge']) {
+			echo _('Error');
+			exit;
 		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_POST['SID']));

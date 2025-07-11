@@ -252,22 +252,22 @@ switch($_GET['action']) {
 			}
 			</script>
 		<?php
-		echo "<span class=form>Username:</span>  <input class='form pii-username' type=text size=40 name=SID ";
+		echo "<label for=SID class=form>Username:</label>  <input class='form pii-username' type=text size=40 name=SID id=SID ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>First Name:</span> <input class='form pii-first-name' type=text size=40 name=firstname ";
+		echo "<label for=firstname class=form>First Name:</label> <input class='form pii-first-name' type=text size=40 name=firstname id=firstname ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['FirstName']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>Last Name:</span> <input class='form pii-last-name' type=text size=40 name=lastname ";
+		echo "<label for=lastname class=form>Last Name:</label> <input class='form pii-last-name' type=text size=40 name=lastname id=lastname ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['LastName']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>Email:</span> <input class='form pii-email' type=email size=40 name=email ";
+		echo "<label for=email class=form>Email:</label> <input class='form pii-email' type=email size=40 name=email id=email ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
 		}
@@ -281,42 +281,42 @@ switch($_GET['action']) {
             echo "></span><br class=form />\n";
         }
 		if ($_GET['action'] == "newadmin") {
-			echo '<span class="form">Password:</span> <input class="form pii-security" type="text" size="40" name="pw1"/><br class="form"/>';
+			echo '<label for=pw1 class="form">Password:</label> <input class="form pii-security" type="text" size="40" name="pw1" id="pw1"/><br class="form"/>';
 		} else {
-			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ';
-			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
+			echo '<span class=form>Reset password?</span><span class=formright><label><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ' . _('Yes') . '<label> ';
+			echo '<span id="newpwwrap" style="display:none"><label>Set temporary password to: <input type=text size=20 name="newpassword" /></label></span></span><br class=form />';
             if ($myrights == 100 && $_GET['id'] != $userid && $line['mfa'] != '') {
-                echo '<span class=form>Disable 2-Factor Authentication?</span><span class=formright><input type=checkbox name="clearMFA" value="1"/></span>';
+                echo '<span class=form>2-Factor Authentication</span><span class=formright><label><input type=checkbox name="clearMFA" value="1"/> Disable 2-Factor Authentication</label></span>';
                 echo '<br class=form />';
             }
 		}
 
 		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
-		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
+		echo "<span class=formright><label><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
-		echo "> Guest User <BR>\n";
-		echo "<input type=radio name=\"newrights\" value=\"10\" ";
+		echo "> Guest User</label> <BR>\n";
+		echo "<label><input type=radio name=\"newrights\" value=\"10\" ";
 		if ($oldrights == 10) {echo "CHECKED";}
-		echo "> Student <BR>\n";
+		echo "> Student</label> <BR>\n";
 		//obscelete
 		//echo "<input type=radio name=\"newrights\" value=\"15\" ";
 		//if ($oldrights == 15) {echo "CHECKED";}
 		//echo "> TA/Tutor/Proctor <BR>\n";
-		echo "<input type=radio name=\"newrights\" value=\"20\" ";
+		echo "<label><input type=radio name=\"newrights\" value=\"20\" ";
 		if ($oldrights == 20) {echo "CHECKED";}
-		echo "> Teacher <span class=small>(cannot create courses or edit course settings)</span><BR>\n";
-		echo "<input type=radio name=\"newrights\" value=\"40\" ";
+		echo "> Teacher <span class=small>(cannot create courses or edit course settings)</span></label><BR>\n";
+		echo "<label><input type=radio name=\"newrights\" value=\"40\" ";
 		if ($oldrights == 40) {echo "CHECKED";}
-		echo "> Course Creator <span class=small>(teacher who can create courses)</span><BR>\n";
+		echo "> Course Creator <span class=small>(teacher who can create courses)</span><BR></label>\n";
 		if ($myrights>=75) {
-			echo "<input type=radio name=\"newrights\" value=\"75\" ";
+			echo "<label><input type=radio name=\"newrights\" value=\"75\" ";
 			if ($oldrights == 75) {echo "CHECKED";}
-			echo "> Group Admin <BR>\n";
+			echo "> Group Admin</label> <BR>\n";
 		}
 		if ($myrights==100) {
-			echo "<input type=radio name=\"newrights\" value=\"100\" ";
+			echo "<label><input type=radio name=\"newrights\" value=\"100\" ";
 			if ($oldrights == 100) {echo "CHECKED";}
-			echo "> Full Admin";
+			echo "> Full Admin</label>";
 		}
 		echo "</span><BR class=form>\n";
 		echo '<span class="form">Task Rights:</span><span class="formright">';
@@ -391,7 +391,7 @@ switch($_GET['action']) {
             }
 			echo "<span class=form>Group: </span>";
 			echo "<span class=formright>";
-			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
+			echo '<label for="grpsearch">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
 			echo "<label for=\"group\">Assign to:</label> <select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
 			echo '<option value="-2"'.($oldgroup==-2?' selected':'').'>'._('Select a Group').'</option>';
 			echo '<option value="-1">New Group</option>';
@@ -413,8 +413,8 @@ switch($_GET['action']) {
 				}
 			}
 			echo "</select>";
-			echo '<span id="newgroup" style="display:none"><br/>New group name: ';
-			echo ' <input name=newgroupname size=20 onblur="checkgroupisnew()"/></span>';
+			echo '<span id="newgroup" style="display:none"><br/><label>New group name: ';
+			echo ' <input name=newgroupname size=20 onblur="checkgroupisnew()"/></label></span>';
 			echo "</span><br class=form />\n";
 		} else if ($myrights == 75 && $oldgroup == $groupid) {
 			$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=?");
@@ -431,6 +431,8 @@ switch($_GET['action']) {
 			echo '<span class=formright><label><input type=checkbox name=addnewcourse value=1> ';
 			echo _('Add a new course for this user').'</span><br class=form>';
 		}
+		$_SESSION['secchallenge'] = bin2hex(random_bytes(16));
+		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['secchallenge']).'"/>';
 
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {
