@@ -282,7 +282,7 @@
 		if (!caption) {
 			caption = document.createElement("caption");
 			caption.className = "sr-only";
-			obj.insertBefore(caption, Object.firstChild);
+			obj.insertBefore(caption, obj.firstChild);
 		}
 		let infspan = document.createElement("span");
 		infspan.className = "sr-only";
