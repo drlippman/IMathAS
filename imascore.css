@@ -246,19 +246,21 @@ ul.qview > li {
 	cursor: pointer;
 	user-select:none;
 }
-ul[aria-activedescendant] li[tabindex="0"] > div > .namewrap, .editname, li > div > .links  {
+ul[aria-activedescendant] li[tabindex="0"] > div > .namewrap, .editname, li .links  {
 	display: none;
 }
 li[tabindex="-1"] > div > .namewrap, ul[aria-activedescendant] li[tabindex="0"] > div > .editname, ul[aria-activedescendant] li[tabindex="0"] > div > .links {
 	display: inline;
 }
-#qviewtree li:hover:not(:has(li:hover)) > div >  .links {
+#qviewtree .tree-content:hover >  .links {
 	display: inline;
 }
 .dragactive .links {
 	display: none !important;
 }
-
+#qviewtree:not(.dragactive) .tree-content:hover {
+	background-color: #f0f0f0;
+}
 .qview .links {
 	margin-left: 5px;
 }
