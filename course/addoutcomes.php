@@ -135,9 +135,9 @@ function printoutcome($arr) {
 	global $outcomeinfo,$cnt;
 	foreach ($arr as $item) {
 		if (is_array($item)) { //is outcome group
-			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f" tabindex=0>G</span> ';
-			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
-			echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
+			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
+			echo '<span id="g'.$cnt.'">'.Sanitize::encodeStringForDisplay($item['name']).'</span> ';
+			echo '<a class="links" href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
 			$cnt++;
 			echo '<ul class="qview">';
 			if (count($item['outcomes'])>0) {
@@ -146,9 +146,9 @@ function printoutcome($arr) {
 			echo '</ul>';
 			echo '</li>';
 		} else { //individual outcome
-			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0" tabindex=0>O</span> ';
-			echo '<input class="outcome" type="text" size="60" id="o' . Sanitize::encodeStringForDisplay($item) . '" value="' . Sanitize::encodeStringForDisplay($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
-			echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
+			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0">O</span> ';
+			echo '<span id="o' . Sanitize::encodeStringForDisplay($item) . '">' .Sanitize::encodeStringForDisplay($outcomeinfo[$item]) .'</span> ';
+			echo '<a class="links" href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
 		}
 	}
 }
@@ -167,6 +167,8 @@ $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?ci
 $placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=071025\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
+	var caneditallnames = true;
+	var hidelinksonchange = false;
 	var ocnt = 0;
 	var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";
 	function txtchg() {
@@ -177,12 +179,13 @@ $placeinhead .= '<script type="text/javascript">
 		}
 	}
 	function addoutcome() {
-		var html = \'<li id="new\'+ocnt+\'"><span class=icon style="background-color:#0f0" tabindex=0>O</span> \';
-		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'" onkeyup="txtchg()" value="Outcome"> \';
-		html += \'<a href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
+		var html = \'<li id="new\'+ocnt+\'"><span class=icon style="background-color:#0f0">O</span> \';
+		html += \'<span id="newo\'+ocnt+\'">Outcome</span> \';
+		html += \'<a class=links href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
 		$("#qviewtree").append(html);
 		addsortmarkup("qviewtree");
-		$("#new"+ocnt).focus();
+		$("#qviewtree").attr("aria-activedescendant", "").find("li").attr("tabindex","-1");
+		$("#new"+ocnt).attr("tabindex","0").focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
 			sortIt.haschanged = true;
@@ -191,12 +194,13 @@ $placeinhead .= '<script type="text/javascript">
 		}
 	}
 	function addoutcomegrp() {
-		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f" tabindex=0>G</span> \';
-		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()" value="Outcome Group"> \';
-		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a><ul class=qview></ul></li>\';
+		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f">G</span> \';
+		html += \'<span id="newg\'+ocnt+\'">Outcome Group</span> \';
+		html += \'<a class=links href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a><ul class=qview></ul></li>\';
 		$("#qviewtree").append(html);
 		addsortmarkup("qviewtree");
-		$("#newgrp"+ocnt).focus();
+		$("#qviewtree").attr("aria-activedescendant", "").find("li").attr("tabindex","-1");
+		$("#newgrp"+ocnt).attr("tabindex","0").focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
 			sortIt.haschanged = true;
@@ -206,7 +210,20 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	function removeoutcome(el) {
 		if (confirm("'._("Are you sure you want to delete this outcome?").'")) {
-			$(el).parent().remove();
+			var curloc = $(el).closest("li");
+			let newfocus;
+			if (curloc.next("li")) {
+				newfocus = curloc.next("li")[0];
+			} else if (curloc.prev("li")) {
+				newfocus = curloc.prev("li")[0];
+			}
+			curloc.remove();
+			$("#qviewtree").find("li").attr("tabindex","-1");
+			if (newfocus) { 
+				$(newfocus).attr("tabindex","0").focus(); 
+			} else {
+			 	$("#qviewtree").find("li").first().attr("tabindex","0").focus();
+			}
 			if (!sortIt.haschanged) {
 				sortIt.haschanged = true;
 				sortIt.fireEvent(\'onFirstChange\', null);
@@ -216,11 +233,27 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	function removeoutcomegrp(el) {
 		if (confirm("'._("Are you sure you want to delete this outcome group?  This will not delete the included outcomes.").'")) {
-			var curloc = $(el).parent();
+			var curloc = $(el).closest("li");
+			let newfocus;
 			curloc.find("li").each(function() {
+				newfocus = this;
 				curloc.before($(this));
 			});
+			if (!newfocus) {
+				if (curloc.next("li")) {
+					newfocus = curloc.next("li")[0];
+				} else if (curloc.prev("li")) {
+					newfocus = curloc.prev("li")[0];
+				}
+			}
 			curloc.remove();
+			$("#qviewtree").find("li").attr("tabindex","-1");
+			if (newfocus) { 
+				$(newfocus).attr("tabindex","0").focus(); 
+			} else {
+			 	$("#qviewtree").find("li").first().attr("tabindex","0").focus();
+			}
+			
 			if (!sortIt.haschanged) {
 				sortIt.haschanged = true;
 				sortIt.fireEvent(\'onFirstChange\', null);
@@ -238,12 +271,12 @@ echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Course Outcomes")."<
 
 echo '<div class="cpmid"><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a> | <a href="outcomereport.php?cid='.$cid.'">'._('View Outcomes Report').'</a></div>';
 
-echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move outcomes inside groups.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/><span id="submitnotice" class=noticetext></span></div>';
+echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move outcomes inside groups. Click a title to edit in place. Hover-over or click on an element to show links.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/><span id="submitnotice" class=noticetext></span></div>';
 
 echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
 echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
 
-echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: Use Tab and Shift-Tab to navigate through the tree. When on a group G handle, press Space to expand or collapse. When on any handle, use the arrow keys to rearrange the item up or down. Left to move out of a group. Right to move into a group when positioned below it.').'</div>';
+echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: In the tree, use arrow keys to move within the tree. On an item, press Tab to edit the title and access links. To rearrange, press Space to select the item, then use the arrow keys to rearrange the item up or down, left to move out of a branch, right to move into a branch when positioned below it. Press Space again to deselect.').'</div>';
 
 echo '<ul id="qviewtree" class="qview">';
 printoutcome($outcomes);

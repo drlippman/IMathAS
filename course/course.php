@@ -647,17 +647,18 @@ if ($overwriteBody==1) {
 
 
 	   if ($quickview=='on' && isset($teacherid)) {
-		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} span.icon { padding:0; margin:0}</style>';
+		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} span.icon { padding:0;}</style>';
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
            echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
+		   echo 'var caneditallnames=true;';
 		   echo "</script>";
 		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=071025\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
-		   echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: Use Tab and Shift-Tab to navigate through the tree. When on a folder icon handle, press Space to expand or collapse. When on any icon handle, use the arrow keys to rearrange the item up or down. Left to move out of a branch. Right to move into a branch when positioned below it.').'</div>';
+		   echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: In the tree, use arrow keys to move within the tree. On an item, press Tab to edit the title and access links. To rearrange, press Space to select the item, then use the arrow keys to rearrange the item up or down, left to move out of a branch, right to move into a branch when positioned below it. Press Space again to deselect.').'</div>';
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';
@@ -740,10 +741,10 @@ function makeTopMenu() {
 		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
 
 		if (isset($CFG['CPS']['miniicons'])) {
-			echo _('Use icons to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Select Rename from the dropdown menu to edit a title in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Click a title to edit in place. Hover-over or click on an element to show links (when there are not unsaved changes).'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
 
 		} else {
-			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Select Rename from the dropdown menu to edit a title in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
+			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Click a title to edit in place. Hover-over or click on an element to show links.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
 		}
 		 echo '<span id="submitnotice" class=noticetext></span>';
 		 echo '<div class="clear"></div>';

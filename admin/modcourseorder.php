@@ -131,6 +131,7 @@ $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?
 $placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=071025\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
+	var hidelinksonchange = false;
 	var ocnt = 0;
 	var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";
 
@@ -144,21 +145,33 @@ $placeinhead .= '<script type="text/javascript">
 
 	function addcoursegrp() {
 		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f" tabindex=0>G</span> \';
-		html += \'<input class="outcome" type="text" size="40" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
+		html += \'<span class=canedit id="newg\'+ocnt+\'"">Course Group</span> \';
 		html += \'<a href="#" onclick="removecoursegrp(this);return false\">'._("Delete").'</a><ul class=qview></ul></li>\';
 		$("#maingrp > ul").prepend(html);
-		$("#newgrp"+ocnt).focus();
 		addsortmarkup("qviewtree");
+		$("#qviewtree").attr("aria-activedescendant", "").find("li").attr("tabindex","-1");
+		$("#newgrp"+ocnt).attr("tabindex","0").focus();
 		ocnt++;
 		txtchg();
 	}
 	function removecoursegrp(el) {
 		if (confirm("'._("Are you sure you want to delete this course group?  This will not delete the included courses.").'")) {
-			var curloc = $(el).parent();
+			var curloc = $(el).closest("li");
+			let newfocus;
 			curloc.find("li").each(function() {
+				newfocus = this;
 				curloc.before($(this));
 			});
+			
+			if (!newfocus) {
+				if (curloc.next("li")) {
+					newfocus = curloc.next("li")[0];
+				} else if (curloc.prev("li")) {
+					newfocus = curloc.prev("li")[0];
+				}
+			}
 			curloc.remove();
+			if (newfocus) { $(newfocus).attr("tabindex","0").focus();}
 			txtchg();
 		}
 	}
@@ -179,16 +192,16 @@ if ($type=='take') {
 }
 echo "</h1></div>\n";
 
-echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move courses inside groups.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/><span id="submitnotice" class=noticetext></span></div>';
+echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move courses inside groups. Click a title to edit in place. Hover-over or click on an element to show links.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/><span id="submitnotice" class=noticetext></span></div>';
 
 echo '<input type="button" onclick="addcoursegrp()" value="'._('Add Course Group').'"/> ';
 
-echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: Use Tab and Shift-Tab to navigate through the tree. When on a group G handle, press Space to expand or collapse. When on any handle, use the arrow keys to rearrange the item up or down. Left to move out of a branch. Right to move into a branch when positioned below it.').'</div>';
+echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboard instructions: In the tree, use arrow keys to move within the tree. On an course group item, press Tab to edit the title and access links. To rearrange, press Space to select the item, then use the arrow keys to rearrange the item up or down, left to move out of a branch, right to move into a branch when positioned below it. Press Space again to deselect.').'</div>';
 
 function listCourse($course) {
 	$now = time();
 	echo '<li id="c'.Sanitize::onlyInt($course['id']).'">';
-	echo '<span class=icon style="background-color:#0f0" tabindex=0>C</span> ';
+	echo '<span class=icon style="background-color:#0f0">C</span> ';
 	echo '<span id="cn'.Sanitize::onlyInt($course['id']).'">'.Sanitize::encodeStringForDisplay($course['name']).'</span>';
 	if (isset($course['available']) && (($course['available']&1)==1)) {
 		echo ' <em style="color:green;">', _('Unavailable'), '</em>';
@@ -220,9 +233,10 @@ function showCourseList($arr) {
 	global $courses,$cnt,$shownCourses;
 	foreach ($arr as $item) {
 		if (is_array($item)) { //is course group
-			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f" tabindex=0>G</span> ';
-			echo '<input class="outcome" type="text" size="40" id="g'.$cnt.'" value="'.Sanitize::encodeStringForDisplay($item['name']).'" onkeyup="txtchg()"> ';
-			echo '<a href="#" onclick="removecoursegrp(this);return false">'._("Delete").'</a>';
+			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
+			echo '<span id="g'.$cnt.'" class="canedit">'.Sanitize::encodeStringForDisplay($item['name']).'</span> ';
+			echo '<a class="links" href="#" onclick="removecoursegrp(this);return false">'._("Delete").'</a>';
+
 			$cnt++;
 			echo '<ul class="qview">';
 			if (count($item['courses'])>0) {
@@ -238,7 +252,7 @@ function showCourseList($arr) {
 }
 
 echo '<ul id="qviewtree" class="qview nochildren">';
-echo '<li class="blockli" id="maingrp"><b>'._('Displayed Courses').'</b>';
+echo '<li class="blockli locked" id="maingrp"><span class="icon" style="display:none;"></span><b>'._('Displayed Courses').'</b>';
 echo  '<ul class="qview">';
 //display main courses
 if (isset($courseListOrder[$type])) {
@@ -255,7 +269,7 @@ if (isset($courseListOrder[$type])) {
 }
 echo  '</ul></li>';
 if (count($hiddencourses)>0) {
-	echo '<li class="blockli" id="hiddengrp"><b>'._('Hidden Courses').'</b>';
+	echo '<li class="blockli locked" id="hiddengrp"><span class="icon" style="display:none;"></span><b>'._('Hidden Courses').'</b>';
 	echo  '<ul class="qview">';
 	//display hidden courses
 	foreach ($hiddencourses as $course) {

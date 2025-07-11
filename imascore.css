@@ -180,17 +180,7 @@ span.icon {
 	padding-right: 5px;
 	margin-right: 5px;
 }
-.treehandle {
-	display: inline-block;
-	width: 12px;
-	height: 12px;
-	margin-right: 2px;
-	font-size: 10px;
-	border: 1px solid black;
-	text-align: center;
-	cursor: pointer;
-	user-select:none;
-}
+
 div.breadcrumb {
 	border: 1px solid #000;
 	margin-bottom: 10px;
@@ -244,6 +234,43 @@ ul.qview > li {
 	margin-left: 0px;
 	padding-left: 0px;
 	margin-top: 2px;
+}
+.treehandle {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-right: 2px;
+	font-size: 10px;
+	border: 1px solid black;
+	text-align: center;
+	cursor: pointer;
+	user-select:none;
+}
+ul[aria-activedescendant] li[tabindex="0"] > div > .namewrap, .editname, li > div > .links  {
+	display: none;
+}
+li[tabindex="-1"] > div > .namewrap, ul[aria-activedescendant] li[tabindex="0"] > div > .editname, ul[aria-activedescendant] li[tabindex="0"] > div > .links {
+	display: inline;
+}
+#qviewtree li:hover:not(:has(li:hover)) > div >  .links {
+	display: inline;
+}
+.dragactive .links {
+	display: none !important;
+}
+
+.qview .links {
+	margin-left: 5px;
+}
+.qview .links a {
+	padding: 0 0.5ch;
+}
+.qview .links a:not(:last-child) {
+	border-right: 1px solid #ccc;
+}
+.editname {
+	field-sizing: content;
+	min-inline-size: 100px;
 }
 ul.checklist {
 	list-style-type: none;
