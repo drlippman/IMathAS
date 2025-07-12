@@ -218,9 +218,10 @@ function conditionalColor(table,type,low,high) {
 		var startat = 2;
 		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
 		for (var i=0;i<ths.length;i++) {
+			let idx = ths[i].cellIndex;
 			if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
-				poss[i] = parseFloat(k[1]);
-				if (poss[i]==0) {poss[i]=.0000001;}
+				poss[idx] = parseFloat(k[1]);
+				if (poss[idx]==0) {poss[idx]=.0000001;}
 			} else {
 				poss[i] = 100;
 				if(ths[i].className.match(/nocolorize/)) {
@@ -233,7 +234,9 @@ function conditionalColor(table,type,low,high) {
 		var v, perc;
 		for (var j=0;j<trs.length;j++) {
 			var tds = trs[j].getElementsByTagName("td");
-			for (var i=startat;i<tds.length;i++) {
+			for (var i=0;i<tds.length;i++) {
+				let idx = tds[i].cellIndex;
+				if (idx < startat) { continue; }
 				if (low==-1) {
 					if (tds[i].className.match("isact")) {
 						tds[i].style.backgroundColor = "#99ff99";
@@ -257,7 +260,9 @@ function conditionalColor(table,type,low,high) {
                         }
                         continue;
                     }
-					if (k = v.match(/([\d\.]+)%/)) {
+					if (tds[i].querySelector("[data-pct]")) {
+						perc = parseFloat(tds[i].querySelector("[data-pct]").getAttribute("data-pct"));
+					} else if (k = v.match(/([\d\.]+)%/)) {
 						perc = parseFloat(k[1]);
 					} else if (v.match(/\d+\/\d+\/\d+/)) {
 						continue;
@@ -270,7 +275,7 @@ function conditionalColor(table,type,low,high) {
 						if (v=="") {
 							continue;
 						} else {
-							perc = Math.round(1000*parseFloat(v)/poss[i])/10;
+							perc = Math.round(1000*parseFloat(v)/poss[idx])/10;
 						}
 					}
 
