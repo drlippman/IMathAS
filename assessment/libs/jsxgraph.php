@@ -1691,8 +1691,9 @@ function jsxBoard($type, $ops=array()) {
 	}
 
 	$updatescript = "
-		board_$id.suspendUpdate();
+		
 		for (let i=0; i<board_$id.colorinit.length; i++) {
+			board_$id.suspendUpdate();
 			let box = board_$id.colorinit[i][0];
 			let obj = board_$id.colorinit[i][1];
 			let type = board_$id.colorinit[i][2];
@@ -1736,8 +1737,8 @@ function jsxBoard($type, $ops=array()) {
 					}
 				}
 			} 
+			board_$id.unsuspendUpdate();
 		}
-		board_$id.unsuspendUpdate();
 		board_$id.fullUpdate();";	
 
 
