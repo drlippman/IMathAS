@@ -488,7 +488,7 @@ function toSimpleJSON(a) {
 	return out;
 }
 
-function submitChanges(format) {
+function submitChanges(format,which) {
 	if (format === 'json') {
 		var params = {
 			checkhash: itemorderhash,
@@ -497,7 +497,9 @@ function submitChanges(format) {
 		var url = AHAHsaveurl;
 		var els = document.getElementsByTagName("input");
 	  for (var i=0; i<els.length; i++) {
-		  if ((els[i].type=="hidden" || els[i].className=="editname") && els[i].value!="") {
+		  if ((els[i].type=="hidden" || els[i].className=="editname") && els[i].value!="" &&
+			(which === 'all' || els[i].hasAttribute('data-initial'))
+		  ) {
 		  	 params[els[i].id.substring(5)] = els[i].value;
 		  } else if (els[i].type=="text" && els[i].className=="outcome") {
 				params[els[i].id] = els[i].value;
@@ -671,7 +673,6 @@ function addsortmarkup(baseid) {
 					document.getElementById(id).focus();
 				});
 			});
-			//$(el).attr("aria-labelledby", "handle"+lid+" "+refel.id);
 			let inp = $("<input/>", {
 				type: "text",
 				class: "editname",
@@ -680,10 +681,7 @@ function addsortmarkup(baseid) {
 				"aria-label": _('Item title'),
 				value: refel.innerHTML
 			}).on('focus', function(ev) {
-				let refid = this.id.substr(5);
-				let baseval = document.getElementById(refid).innerHTML;
-				this.value = baseval;
-				this.setAttribute("data-initial", baseval);
+				this.setAttribute("data-initial", this.value);
 			}).on('blur', function(ev) {
 				let refid = this.id.substr(5);
 				if (this.value != this.getAttribute("data-initial")) {

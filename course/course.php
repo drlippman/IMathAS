@@ -654,7 +654,7 @@ if ($overwriteBody==1) {
            echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo 'var caneditallnames=true;';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=071025\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=071425\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
@@ -741,7 +741,7 @@ function makeTopMenu() {
 		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
 
 		if (isset($CFG['CPS']['miniicons'])) {
-			echo _('Use icons to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Click a title to edit in place. Hover-over or click on an element to show links (when there are not unsaved changes).'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Click a title to edit in place. Hover-over or click on an element to show links (when there are not unsaved changes).'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\',\'changed\')"/>';
 
 		} else {
 			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the [+] or [-] next to a block to expand or collapse it. Click a title to edit in place. Hover-over or click on an element to show links.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';

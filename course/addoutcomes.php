@@ -164,7 +164,7 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::e
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; </script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=071025\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=071425\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var caneditallnames = true;
@@ -271,7 +271,7 @@ echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Course Outcomes")."<
 
 echo '<div class="cpmid"><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a> | <a href="outcomereport.php?cid='.$cid.'">'._('View Outcomes Report').'</a></div>';
 
-echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move outcomes inside groups. Click a title to edit in place. Hover-over or click on an element to show links.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/><span id="submitnotice" class=noticetext></span></div>';
+echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move outcomes inside groups. Click a title to edit in place. Hover-over or click on an element to show links.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\',\'all\')"/><span id="submitnotice" class=noticetext></span></div>';
 
 echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
 echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
