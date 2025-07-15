@@ -32,7 +32,7 @@ class ErrorHandler
         error_log(sprintf('Caught error by QuestionGenerator in %s in QSID %d:%s -- %s',
             $errfile, $GLOBALS['curqsetid'], $errline, $errstr));
 
-        if (extension_loaded('newrelic')) {
+        if (!empty($GLOBALS['CFG']['newrelic_log_question_errors']) && extension_loaded('newrelic')) {
             newrelic_add_custom_parameter('cur_qsid', $GLOBALS['curqsetid']);
             newrelic_notice_error($errno, $errstr, $errfile, $errline, $errcontext);
         }
@@ -57,7 +57,7 @@ class ErrorHandler
         error_log(sprintf('Caught exception by QuestionGenerator from %s in QSID %d:%s -- %s',
             $t->getFile(), $GLOBALS['curqsetid'], $t->getLine(), $t->getMessage()));
 
-        if (extension_loaded('newrelic')) {
+        if (!empty($GLOBALS['CFG']['newrelic_log_question_errors']) && extension_loaded('newrelic')) {
             newrelic_add_custom_parameter('cur_qsid', $GLOBALS['curqsetid']);
             newrelic_notice_error($t);
         }

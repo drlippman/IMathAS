@@ -266,6 +266,10 @@ class QuestionHtmlGenerator
               . ' of '
               . $errsource
           );
+          if (!empty($GLOBALS['CFG']['newrelic_log_question_errors']) && extension_loaded('newrelic')) {
+            newrelic_add_custom_parameter('cur_qsid', $db_qsetid);
+            newrelic_notice_error($t);
+          }
 
         }
 
