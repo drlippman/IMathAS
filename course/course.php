@@ -451,7 +451,9 @@ if ($overwriteBody==1) {
 ?>
 	<div class=breadcrumb>
 		<?php
-		if (isset($CFG['GEN']['logopad'])) {
+		if (empty($smallheaderlogo)) {
+			echo '<span class="floatright hideinmobile">';
+		} else if (isset($CFG['GEN']['logopad'])) {
 			echo '<span class="padright hideinmobile" style="padding-right:'.$CFG['GEN']['logopad'].'">';
 		} else {
 			echo '<span class="padright hideinmobile">';
