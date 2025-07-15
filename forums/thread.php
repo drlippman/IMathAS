@@ -700,6 +700,7 @@ $toshow[] =  "<a href=\"postsbyname.php?page=". Sanitize::onlyInt($page)."&cid=$
 //}
 
 if ($page<0) {
+	$currentshow = '';
 	if ($page == -1) {
 		$currentshow = _('Showing New Posts.');
 	} else if ($page == -2) {
