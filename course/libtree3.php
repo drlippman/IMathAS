@@ -346,6 +346,9 @@ if (!empty($addrootnode)) {
     // add unassigned
     array_unshift($treearr, genItem(['id'=>'0','name'=>_('Unassigned'),'userights'=>0,'federationlevel'=>0, 'ownerid'=>$userid, 'groupid'=>$groupid]));
 }
+if ($mode == 'multi') {
+    echo '<div style="margin-bottom: 5px"><button type="button" onclick="treeWidget.unselectAll();">',_('Uncheck All'),'</button></div>';
+}
 echo '<div id="treecontainer"></div>';
 echo '<input type=hidden name=libs id=selected>';
 echo "<script>var treedata = ".json_encode($treearr, JSON_INVALID_UTF8_IGNORE).";</script>";
