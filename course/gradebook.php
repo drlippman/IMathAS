@@ -131,6 +131,7 @@ if ($canviewall) {
 	$includeduedate = false;
     $includelastchange = false;
     $gbmode = '';
+	$headerlockdef = true;
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
