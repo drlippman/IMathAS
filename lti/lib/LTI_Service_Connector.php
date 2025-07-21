@@ -24,10 +24,17 @@ class LTI_Service_Connector {
         if (isset($this->access_tokens[$scope_key])) {
           return $this->access_tokens[$scope_key];
         }
+        
         list($cached_token,$failures) = $this->db->get_token($this->registration->get_id(), $scope_key);
+
+        if (substr($cached_token, 0, 6) === 'failed') {
+          // failed to get token, and not time to try again yet
+          return false;
+        }
         if ($cached_token !== false) {
           return $cached_token;
         }
+        
 
         // Build up JWT to exchange for an auth token
         $client_id = $this->registration->get_client_id();
@@ -42,6 +49,7 @@ class LTI_Service_Connector {
 
         // Get tool private key from our JWKS
         $private_key = $this->db->get_tool_private_key();
+
 
         // Sign the JWT with our private key (given by the platform on registration)
         $jwt = JWT::encode($jwt_claim, $private_key['privatekey'], 'RS256', $private_key['kid']);
@@ -93,6 +101,7 @@ class LTI_Service_Connector {
 
     public function make_service_request($scopes, $method, $url, $body = null, $content_type = 'application/json', $accept = 'application/json') {
         $token = $this->get_access_token($scopes);
+
         if ($token === false) {
           return false;
         }
