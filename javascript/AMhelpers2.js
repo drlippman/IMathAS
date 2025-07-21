@@ -1195,7 +1195,7 @@ function AMnumfuncPrepVar(qn,str) {
   for (var i=0; i<vars.length; i++) {
     // handle double parens
     if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
-      str = str.replace(/\(\((.*?)\)\)/g,'($1)');
+      str = str.replace(/\(\(([^\(]*?)\)\)/g,'($1)');
     }
   	if (vars[i] == "E" || vars[i] == "e") {
           foundaltcap[i] = true;  // always want to treat e and E as different
