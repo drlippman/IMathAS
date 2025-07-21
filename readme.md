@@ -202,19 +202,20 @@ If you wish to enable users to request browser push notifications (does not work
 
 - `$CFG['FCM']['SenderId']`: Your SenderId, from the Firebase project console.
 - `$CFG['FCM']['webApiKey']`: Your web API key, from the Firebase project console.
-- `$CFG['FCM']['serverApiKey']`: Your server key, from the Firebase project console.
 - `$CFG['FCM']['icon']`: an absolute web path to an icon to show on notifications.
-
-As of June 2024, the original method for interfacing with FCM will be eliminated, so to 
-continue using push notifications, you will need to:
-
-- In your config.php, add `$CFG['FCM']['project_id']`: your Project ID, from the Firebase project console.
+- `$CFG['FCM']['project_id']`: your Project ID, from the Firebase project console.
+- `$CFG['FCM']['app_id']`: your appId, from the Firebase project console.
+- `$CFG['FCM']['vapidKey']`: this is the public key, found under 
+  Project Settings, Cloud Messaging, Web configuration, in the Key pair column.
 - Go to the Firebase console, click on your project, go to Project Settings, click on Service Accounts,
   and click Generate new private key. This will download a .json file to your computer.
 - In the Project Settings, click on Cloud Messaging, and ensure Firebase Cloud Messaging API (V1) is
   enabled (you may need to go to the Google Cloud Console to enable it)
 - In your IMathAS install, while logged in as an admin, go to Admin Page, click Utilities, then click
   Set up FCM for push notifications.  Here, paste the contents of the .json file you downloaded, and Save.
+
+If you had an older setup, pre-June 2024, using the serverApiKey, you need to update it.
+
 
 ### Internationalization
 

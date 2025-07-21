@@ -309,9 +309,16 @@ switch($_GET['action']) {
 		echo " /> ",_('Notify me by email when I receive a new message:'),"</label></span><BR class=form>\n";
 
 
-		if (isset($CFG['FCM']) && isset($CFG['FCM']['webApiKey']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
+		if (isset($CFG['FCM']) && isset($CFG['FCM']['webApiKey'])) {
+			echo '<div id=fcmwrap style="display:none">';
 			echo '<span class=form>'._('Push notifications:').'</span><span class=formright>';
 			echo '<a href="'.$imasroot.'/admin/FCMsetup.php">'.('Setup push notifications on this device').'</a></span><br class=form>';
+			echo '</div>';
+			echo '<script>$(function() {
+					if ("serviceWorker" in navigator && "PushManager" in window && "Notification" in window) {
+						$("#fcmwrap").show();
+					}
+				});</script>';
 		}
 
 		echo "<span class=form><label for=\"stupic\">",_('Picture:'),"</label></span>";

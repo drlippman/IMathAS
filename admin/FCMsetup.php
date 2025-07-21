@@ -14,33 +14,39 @@ if (isset($_POST['remove'])) {
 	exit;
 }
 
-$placeinhead = '<script src="https://www.gstatic.com/firebasejs/3.5.3/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.5.3/firebase-messaging.js"></script>
+$placeinhead = '<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 <script>
   // Initialize Firebase
   var FCMconfig = {
     apiKey: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['webApiKey']).'",
-    messagingSenderId: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['SenderId']).'"
+    messagingSenderId: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['SenderId']).'",
+	projectId: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['project_id']).'",
+	appId: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['app_id']).'"
   };
   firebase.initializeApp(FCMconfig);
+  let swRegistration = null;
 
 	const messaging = firebase.messaging();
 	if ("serviceWorker" in navigator) {
 	  navigator.serviceWorker.register(imasroot+"/firebase-messaging-sw.php").then(function(registration) {
 	    // Registration was successful
 	    console.log("ServiceWorker registration successful with scope: ", registration.scope);
-			messaging.useServiceWorker(registration);
-			if ("'.Sanitize::encodeStringForJavascript($FCMtoken).'" != "") {
-				messaging.getToken()
-				.then(function(token) {
-					if (token=="'.Sanitize::encodeStringForJavascript($FCMtoken).'") {
-						$("#havetoken").show(); $("#dosetup").hide();
-					}
-				})
-				.catch(function(err) {
-					console.log("Unable to retrieve token ", err);
-				});;
-			}
+		swRegistration = registration;
+		if ("'.Sanitize::encodeStringForJavascript($FCMtoken).'" != "") {
+			messaging.getToken({ 
+				vapidKey: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['vapidKey']).'",
+				serviceWorkerRegistration: swRegistration
+			})
+			.then(function(token) {
+				if (token=="'.Sanitize::encodeStringForJavascript($FCMtoken).'") {
+					$("#havetoken").show(); $("#dosetup").hide();
+				}
+			})
+			.catch(function(err) {
+				console.log("Unable to retrieve token ", err);
+			});;
+		}
 	  }).catch(function(err) {
 	    // registration failed :(
 	    console.log("ServiceWorker registration failed:" , err);
@@ -57,10 +63,13 @@ function removeNotifications() {
 	});
 }
 function askPermission() {
-	messaging.requestPermission()
+	Notification.requestPermission()
 	.then(function() {
 	  console.log("Notification permission granted.");
-	  return messaging.getToken();
+	  return messaging.getToken({ 
+		vapidKey: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['vapidKey']).'",
+		serviceWorkerRegistration: swRegistration
+	  });
 	})
 	.then(function(token) {
 		$("#havetoken").show(); $("#stopnotifications").show(); $("#dosetup").hide();
@@ -77,20 +86,6 @@ function askPermission() {
 	});
 }
 
-	messaging.onTokenRefresh(function() {
-	  messaging.getToken()
-	  .then(function(refreshedToken) {
-	    console.log("Token refreshed.");
-			$.ajax({
-				url: "FCMsetup.php",
-				type: "POST",
-				data: {"token": refreshedToken}
-			});
-	  })
-	  .catch(function(err) {
-	    console.log("Unable to retrieve refreshed token ", err);
-	  });
-	});
 messaging.onMessage(function(payload) {
 	console.log(payload);
 });
