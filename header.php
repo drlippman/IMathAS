@@ -42,12 +42,18 @@ if (isset($coursetheme)) {
 	}
 } 
 if (isset($CFG['GEN']['favicon'])) {
-	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
+	echo '<link rel="icon" sizes="32x32" href="'.$CFG['GEN']['favicon'].'" />';
 } else {
-	echo '<link rel="shortcut icon" href="/favicon.ico" />';
+	echo '<link rel="icon" sizes="32x32" href="/favicon.ico" />';
+}
+if (isset($CFG['GEN']['svgfavicon'])) {
+	echo '<link rel="icon" sizes="any" type="image/svg+xml" href="'.$CFG['GEN']['svgfavicon'].'" />';
 }
 if (isset($CFG['GEN']['appleicon'])) {
 	echo '<link rel="apple-touch-icon" href="'.$CFG['GEN']['appleicon'].'" />';
+}
+if (isset($CFG['GEN']['webmanifest'])) {
+	echo '<link rel="manifest" href="'.$CFG['GEN']['webmanifest'].'" />';
 }
 if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
