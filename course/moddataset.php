@@ -1315,7 +1315,7 @@ if ($line['solution']=='') {
   <label for=newimgvar><?php echo _('assign to variable:'); ?></label> 
     <input type="text" name="newimgvar" id="newimgvar" size="6" <?php if (!$canedit) {echo 'disabled';};?>/>
   <label for="newimgalt"><?php echo _('Description:'); ?></label> 
-    <input type="text" size="20" name="newimgalt" id="newimgalt" value="" <?php if (!$canedit) {echo 'disabled';};?>/><br/>
+    <textarea rows=1 cols=30 name="newimgalt" id="newimgalt" <?php if (!$canedit) {echo 'disabled';};?>></textarea><br/>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
 	<?php echo _('Images:'); ?>
 	<ul id='imgList'>
@@ -1331,7 +1331,7 @@ if (isset($images['vars']) && count($images['vars'])>0) {
 		}
 		echo "<li>";
 		echo "<label for=\"imgvar-$id\">"._("Variable:")."</label> <input type=\"text\" name=\"imgvar-$id\" id=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\" ".($canedit?'':'disabled')."/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
-		echo "<label for=\"imgalt-$id\">"._("Description:")."</label> <input type=\"text\" size=\"20\" name=\"imgalt-$id\" id=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\" ".($canedit?'':'disabled')."/> ";
+		echo "<label for=\"imgalt-$id\">"._("Description:")."</label> <textarea rows=1 cols=30 name=\"imgalt-$id\" id=\"imgalt-$id\" ".($canedit?'':'disabled').">".Sanitize::encodeStringForDisplay($images['alttext'][$id])."</textarea> ";
 		echo "<label><input type=checkbox name=\"delimg-$id\" ".($canedit?'':'disabled')."/> Delete?</label>";
 		echo "</li>";
 	}
@@ -1460,7 +1460,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 						$("#imgList").append(
 							"<li><label>Variable: <input type='text' name='imgvar-" + id + "' value='$" + images.vars[id] + "' size='10' /></label>" +
 							" <a href='" + res.imgUrlBase + images.files[id] + "' target='_blank'>View</a>" +
-							" <label>Description: <input type='text' size='20' name='imgalt-" + id + "' value='" + images.alttext[id] + "'/></label>" +
+							" <label>Description: <textarea rows=1 cols=30 name='imgalt-" + id + "'>" + images.alttext[id] + "</textarea></label>" +
 							" <label><input type='checkbox' name='delimg-" + id + "'/> Delete?</label>" +
 							"</li>"
 						);
