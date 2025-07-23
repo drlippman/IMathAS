@@ -808,12 +808,13 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\cdot/g,'*');
 	tex = tex.replace(/\\infty/g,'oo');
 	tex = tex.replace(/\\nthroot/g,'root');
+  tex = tex.replace(/\\overline/g,'bar');
   tex = tex.replace(/\\mid/g,'|');
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');
     tex = tex.replace(/degree/g,'degree '); // prevent degreesin from becoming degree in
-    
+
 	while ((i=tex.indexOf('frac{'))!=-1) { //found a fraction start
 		nested = 1;
 		curpos = i+5;

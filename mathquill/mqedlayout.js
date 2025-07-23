@@ -653,16 +653,29 @@ var myMQeditor = (function($) {
     var maxbasic = (layoutstyle=='OSK' ? 4 : 2);
     var varpts
     for (var i=0; i<vars.length; i++) {
-        varpts = vars[i].split(/_/);
-        for (var j=0; j<varpts.length; j++) {
-            varpts[j] = varpts[j].replace(/\b(alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau)\b/i,
-                '\\$&');
+      let varlen = 0;
+      varpts = vars[i].split(/_/);
+      for (var j=0; j<varpts.length; j++) {
+        varpts[j] = varpts[j].replace(/\b(alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau)\b/i,
+          '\\$&');
+        if (varpts[j].charAt(0)=='\\') {
+          varlen++;
+        } else if (varpts[j].charAt(0)=='(') {
+          varlen += varpts[j].length - 2;
+        } else if (varpts[j].match(/^(hat|bar|vec)\(([^\(]*?)\)$/)) {
+          varlen += varpts[j].length - 5;
+        } else {
+          varlen += varpts[j].length;
         }
-        vars[i] = varpts.join('_');
-      if ((vars[i].charAt(0)!='\\' || varpts.length>1) && vars[i].length > maxlen) {
-        maxlen = vars[i].length;
+      }
+      vars[i] = varpts.join('_');
+
+      if (varlen > maxlen) {
+        maxlen = varlen;
       }
       vars[i] = vars[i].replace(/_(\w{2,})/,"_{$1}");
+      vars[i] = vars[i].replace(/_\(([^\(]*?)\)/,"_{$1}");
+      vars[i] = vars[i].replace(/^(hat|bar|vec)\(([^\(]*?)\)/,"\\$1{$2}");
 
       if (vars[i].length == 1) {
         btns.push({'b':vars[i], c:'w', v:1});

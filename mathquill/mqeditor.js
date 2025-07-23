@@ -161,6 +161,9 @@ var MQeditor = (function($) {
                         }
                     }
                 }
+                if (vars[i].match(/^(hat|bar|vec)\(/)) {
+                  thisMQconfig.autoCommands += ' ' + vars[i].substring(0,3);
+                }
             }
         }
         if (el.disabled) {

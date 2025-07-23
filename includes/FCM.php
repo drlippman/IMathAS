@@ -29,6 +29,9 @@ function sendFCM2($token,$title,$body,$url='') {
 				'Authorization: Bearer ' . $access_token,
 				'Content-Type: application/json'
 		];
+		// to add icon, we'd create a 'noficiation' object under 'webpush'
+		// and add 'icon' key there. Can also add 'badge' there
+		// icon should probably be 512x512; badge 96x96
 		$message = [
 			'message' => [
 				'token' => $token,
