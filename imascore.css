@@ -43,6 +43,13 @@ h5,h6 {
 	font-size: 1em;
 }
 
+a:link, span.link {
+	color: #3333ff;
+}
+a:visited {
+	color: #7E23CD;
+}
+
 div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px 20px 0px;
 }

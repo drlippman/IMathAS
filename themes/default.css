@@ -148,7 +148,6 @@ table.gb .cat9 {
 /*Fake look of links for Javascript onclicks*/
 span.link {
 	text-decoration: underline;
-	color: #00f;
 	cursor: pointer;
 }
 
