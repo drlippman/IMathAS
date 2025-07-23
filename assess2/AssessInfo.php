@@ -919,7 +919,9 @@ class AssessInfo
    * @return void
    */
   public function overridePracticeSettings() {
-    if ($this->assessData['displaymethod'] != 'video_cued') {
+    if ($this->assessData['displaymethod'] != 'video_cued' &&
+     ($this->assessData['displaymethod'] != 'full' || empty($this->assessData['pagebreaks']))
+    ) {
       $this->assessData['displaymethod'] = 'skip';
     }
     if ($this->assessData['ansingb'] == 'never') {
