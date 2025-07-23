@@ -43,7 +43,8 @@ h5,h6 {
 	font-size: 1em;
 }
 
-a:link, span.link {
+a:link, span.link, .breadcrumb a:visited, #leftcontent a:visited, 
+.cp a:visited, .cpmid a:visited, #homelinkbox a:visited, .headerwrapper a:visited {
 	color: #3333ff;
 }
 a:visited {
@@ -88,7 +89,7 @@ input:invalid {
 	background-color: #faa;
 }
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
-	color: #db0000;
+	color: #db0000 !important;
 }
 label.error {
 	color: #db0000;
