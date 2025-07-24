@@ -120,6 +120,7 @@ if (isset($_POST['message'])) {
 	require_once "../header.php";
 
 	$iserrreport = false;
+	$qmessagetofallback = false;
 
 	if (isset($_GET['quoteq'])) {
 		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
@@ -177,6 +178,7 @@ if (isset($_POST['message'])) {
                 $_GET['to'] = $r['ownerid'];
                 if (!empty($CFG['GEN']['qerroronold']) && $r['lastaccess'] < time() - 60*60*24*$CFG['GEN']['qerroronold'][0]) {
                     $_GET['to'] = $CFG['GEN']['qerroronold'][1];
+					$qmessagetofallback = true;
                 }
 			}
 		} else if (isset($parts[3])) {  //sending to instructor
@@ -213,6 +215,9 @@ if (isset($_POST['message'])) {
 		$to = Sanitize::stripHtmlTags("$lastname, $firstname ($email)");
 	}
 
+	if ($qmessagetofallback) {
+		echo '<p><span class=noticetext>'._('Note:').'</span> '._('The owner of this question has not been active recently, so this message will be sent to someone else who can try to help.').'</p>';
+	}
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
 	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
