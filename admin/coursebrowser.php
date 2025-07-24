@@ -220,8 +220,7 @@ if (!isset($_GET['embedded'])) {
 		</tbody></table>
 		<p v-for="(propval,propname) in courseText(course)"
 		   class="pre-line"
-		>{{ courseBrowserProps[propname].name }}<br>
-		{{ propval }}</p>
+		>{{ propval }}</p>
 	</div>
 	<div class="card-footer">
 		<button @click="previewCourse(course.id)">Preview Course</button>
