@@ -23,6 +23,8 @@ linegraph(intervals,[xmin,xmax,xscl,width,height])
 linegraphbrackets(intervals,[xmin,xmax,xscl,width,height])
 <BR>Creates a line graph using brackets/parens instead of open/closed dots
 <BR>intervals:  string or array of strings in interval notation, ex: [2,5)
+<br>xscl can be a number, or "labelscl:tickscl" to have labels and tick marks 
+    at different spacing.
 <BR><h3><a name="intervalstodraw">intervalstodraw</a></h3>
 intervalstodraw(interval,xmin,xmax)
 <BR>converts an interval like (-oo,4]U(3,5] into an array of strings 
