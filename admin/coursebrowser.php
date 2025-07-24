@@ -220,7 +220,8 @@ if (!isset($_GET['embedded'])) {
 		</tbody></table>
 		<p v-for="(propval,propname) in courseText(course)"
 		   class="pre-line"
-		>{{ propval }}</p>
+		>{{ courseBrowserProps[propname].name }}<br>
+		{{ propval }}</p>
 	</div>
 	<div class="card-footer">
 		<button @click="previewCourse(course.id)">Preview Course</button>
@@ -237,13 +238,13 @@ const { createApp } = Vue;
 createApp({
 	data: function() {
         return {
-            selectedItems: [],
-            courseBrowserProps: courseBrowserProps,
-            showFilters: false,
-            showFilter: '',
-            filterLeft: 0,
-            courseTypes: courseBrowserProps.meta.courseTypes,
-            activeTab: 0,
+		selectedItems: [],
+		courseBrowserProps: courseBrowserProps,
+		showFilters: false,
+		showFilter: '',
+		filterLeft: 0,
+		courseTypes: courseBrowserProps.meta.courseTypes,
+		activeTab: 0,
         }
 	},
 	methods: {
@@ -272,7 +273,7 @@ createApp({
 						} else {
 							courseout[propname] = this.courseBrowserProps[propname].options[course[propname]];
 						}
-					} else if (courseBrowserProps[propname].type && courseBrowserProps[propname].type=='string' && propname!='name') {
+					} else if (courseBrowserProps[propname].type && (courseBrowserProps[propname].type=='string' || courseBrowserProps[propname].showinlist) && propname!='name') {
 						courseout[propname] = course[propname];
 					}
 				}
@@ -284,6 +285,7 @@ createApp({
 			for (propname in course) {
 				if (this.courseBrowserProps[propname] && 
                     this.courseBrowserProps[propname].type &&
+					!this.courseBrowserProps[propname].showinlist &&
                     this.courseBrowserProps[propname].type == 'textarea') {
 							courseout[propname] = course[propname];
 				}
