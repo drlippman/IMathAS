@@ -238,9 +238,9 @@ if ($isteacher) {
 
 	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
-			$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE userid=:userid AND courseid=:courseid");
-			$stm->execute(array(':gbcomment'=>$_POST['usrcomments'], ':userid'=>$stu, ':courseid'=>$cid));
-			//echo "<p>Comment Updated</p>";
+		$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment,gbinstrcomment=:gbinstrcomment WHERE userid=:userid AND courseid=:courseid");
+		$stm->execute(array(':gbcomment'=>$_POST['usrcomments'], ':gbinstrcomment'=>$_POST['instrnote'], ':userid'=>$stu, ':courseid'=>$cid));
+		//echo "<p>Comment Updated</p>";
 	}
 	if (isset($_POST['score']) && $stu>0) {
 		foreach ($_POST['score'] as $id=>$val) {
@@ -700,7 +700,7 @@ function gbstudisp($stu) {
 				$hasoutcomes = true;
 			}
 		}
-		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
+		$query = "SELECT imas_students.gbcomment,imas_students.gbinstrcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id=:id AND imas_students.courseid=:courseid";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$stu, ':courseid'=>$_GET['cid']));
@@ -709,7 +709,7 @@ function gbstudisp($stu) {
 			require_once "../footer.php";
 			exit;
 		}
-		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
+		list($gbcomment,$gbinstrcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 
@@ -813,8 +813,12 @@ function gbstudisp($stu) {
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."\">";
-				echo '<label for="usrcomments">'._('Gradebook Comment').'</label>: '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
+				echo '<label for="usrcomments">'._('Gradebook Comment').'</label>: '.  "<input type=submit value=\"", _('Update Comment'), "\"> ";
+				echo '<button type=button aria-controls=instrcommentwrap class=togglecontrol>'._('View Instructor Note').'</button> <br/>';
 				echo "<textarea name=\"usrcomments\" id=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment, true) . "</textarea>";
+				echo '<div id=instrcommentwrap style="display:none;"><label for=instrnote>'._('Instructor Note').'</label> <button type=submit>'. _('Update Note') .'</button><br>';
+				echo "<textarea name=\"instrnote\" id=\"instrnote\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbinstrcomment, true) . "</textarea>";
+				echo '</div>';
 				echo '</form>';
 			} else {
 				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
