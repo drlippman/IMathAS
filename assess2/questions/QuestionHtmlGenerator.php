@@ -286,6 +286,29 @@ class QuestionHtmlGenerator
                         (empty($matches[2]) ? $matches[3] : $matches[2]) . '</div></div>';
                 },$toevalqtxt);
         }
+        //                              1                 2            3       4
+        if (preg_match_all('~\[if\s+([\w_]*?)\s*(==|!=|>=|<=|>|<)\s*(\w+)\s*\](.*?)\[/if\]~ms', $toevalqtxt, $m, PREG_SET_ORDER)) {
+            foreach ($m as $match) {
+                $keep = false;
+                if (isset(${$match[1]})) {
+                    $val = ${$match[1]};
+                    if (($match[2]=='==' && $val==$match[3]) ||
+                        ($match[2]=='!=' && $val!=$match[3]) ||
+                        ($match[2]=='>=' && $val>=$match[3]) ||
+                        ($match[2]=='<=' && $val<=$match[3]) ||
+                        ($match[2]=='>' && $val>$match[3]) ||
+                        ($match[2]=='<' && $val<$match[3])
+                    ) {
+                        $keep = true;
+                    }
+                }
+                if ($keep) {
+                    $toevalqtxt = str_replace($match[0], $match[4], $toevalqtxt);
+                } else {
+                    $toevalqtxt = str_replace($match[0], '', $toevalqtxt);
+                }
+            }
+        }
         $toevalqtxt = str_replace('\\', '\\\\', $toevalqtxt);
         $toevalqtxt = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);

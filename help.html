@@ -2196,6 +2196,28 @@ if ($a==0) {
 }
 </pre>
 
+<h4>Conditionals in Question Text</h4>
+<p>Within the question text, it's possible to have a section of text display based on the value of a variable.  
+If the text is a single string, it's preferable to define the string conditionally in the question code, then 
+insert the variable for the string in the question text.  Putting a conditional direclty in the question text 
+is primarily intended for cases where there is a large block of text to control.</p>
+
+<p>To do conditional text, wrap the text in <code>[if variable==value][/if]</code>. Note that the variable name 
+should be given without the preceeding dollar sign here. You can use other simple comparisons like != or &lt;, but 
+not more complicated expressions. The value should not be in quotes, even if it is text. It is fine to have things 
+like $answerbox inside two conditionals, so long as only one will display at at time.</p>
+
+<p>Example:</p>
+<pre>
+[if graphdispmode==0]
+Given f(x)=$func, estimate f'(x) at x=$x.  $answerbox
+[/if]
+[if graphdispmode>0]
+$graph
+Given the graph above, estimate f'(x) at x=$x.  $answerbox
+[/if]
+</pre>
+
 <h3 id="loops">Loops</h3>
 <p>There are several looping macros (such as calconarray) that can meet most needs.  For more general use
 there is a "for" loop:</p>
