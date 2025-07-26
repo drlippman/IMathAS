@@ -470,7 +470,7 @@ foreach($forumitems as $id=>$name) {
 	<td class="r" id="lauto">Autoscoring:</td>
 	<td>
 	<label>Auto-award <input type="text" size="2" name="autopostpts" value="0"> points</label>
-	<label>for the first <input type="text" size="2" name="autopostn" value="0"> posts<br/>
+	<label>for the first <input type="text" size="2" name="autopostn" value="0"> posts</label><br/>
 	<label>Auto-award <input type="text" size="2" name="autoreplypts" value="0"> points</label>
 	<label>for the first <input type="text" size="2" name="autoreplyn" value="0"> replies</label>
 	</td>

@@ -510,45 +510,45 @@ if ($overwriteBody==1) {
 	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
 
 	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
-		<span class=form>Forum Name: </span>
-		<span class=formright><input type=text size=60 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']);?>" required /></span>
+		<label for=name class=form><?php echo _('Forum Name');?>: </label>
+		<span class=formright><input type=text size=60 name=name id=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']);?>" required /></span>
 		<BR class=form>
 
-		Description: (shows on course page)<BR>
+		<label for=description><?php echo _('Description: (shows on course page)');?></label><br>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
 		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
 		</div><br/>
 
 		<br class="form"/>
-		<span class=form>Show:</span>
-		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);"/>Show Always<br/>
+		<span class=form id=showlbl><?php echo _('Show');?>:</span>
+		<span class=formright role=group aria-labelledby=showlbl>
+			<label><input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Hide</label><br/>
+			<label><input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);"/>Show by Dates</label><br/>
+			<label><input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="$('#datediv').slideUp(100);"/>Show Always</label><br/>
 		</span><br class="form"/>
 
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
-			Always until end date<br/>
-			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
+			<label><input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			Always until end date</label><br/>
+			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?> aria-label="Available after a date"/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="Available after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="Available after time">
 		</span><BR class=form>
 
 		<span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
-			 Always after start date<br/>
-			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>">
+			<label><input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
+			 Always after start date</label><br/>
+			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="Available until a date"/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="Available until date">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="Available until time">
 		</span><BR class=form>
 		</div>
 
@@ -558,7 +558,7 @@ if ($overwriteBody==1) {
 			Basic Options
 		</div>
 		<div class="blockitems">
-		<span class=form>Group forum?</span><span class=formright>
+		<label for=groupsetid class=form>Group forum?</label><span class=formright>
 <?php
 	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$groupsetid,"Not group forum",0);
 	if ($groupsetid>0 && $hasgroupthreads) {
@@ -566,35 +566,40 @@ if ($overwriteBody==1) {
 	}
 ?>
 		</span><br class="form"/>
-		<span class=form>Allow anonymous posts:</span>
+		<span class=form>Anonymous posts:</span>
 		<span class=formright>
-			<input type=checkbox name="allowanon" value="1" <?php if ($allowanon) { echo "checked=1";}?>/>
+			<label><input type=checkbox name="allowanon" value="1" <?php if ($allowanon) { echo "checked=1";}?>/>
+			Allow anonymous posts</label>
 		</span><br class="form"/>
 
-		<span class=form>Allow students to modify posts:</span>
+		<span class=form>Modify posts:</span>
 		<span class=formright>
-			<input type=checkbox name="allowmod" value="1" <?php if ($allowmod) { echo "checked=1";}?>/>
+			<label><input type=checkbox name="allowmod" value="1" <?php if ($allowmod) { echo "checked=1";}?>/>
+			Allow students to modify posts</label>
 		</span><br class="form"/>
 
-		<span class=form>Allow students to delete own posts (if no replies):</span>
+		<span class=form>Delete posts:</span>
 		<span class=formright>
-			<input type=checkbox name="allowdel" value="1" <?php if ($allowdel) { echo "checked=1";}?>/>
+			<label><input type=checkbox name="allowdel" value="1" <?php if ($allowdel) { echo "checked=1";}?>/>
+			Allow students to delete own posts (if no replies)</label>
 		</span><br class="form"/>
 
-		<span class=form>Turn on "liking" posts:</span>
+		<span class=form>"Liking" posts:</span>
 		<span class=formright>
-			<input type=checkbox name="allowlikes" value="1" <?php if ($allowlikes) { echo "checked=1";}?>/>
+			<label><input type=checkbox name="allowlikes" value="1" <?php if ($allowlikes) { echo "checked=1";}?>/>
+			Turn on "liking" posts</label>
 		</span><br class="form"/>
 
 		<span class=form>Viewing before posting:</span>
 		<span class=formright>
-			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
+			<label><input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> 
+			Prevent students from viewing posts until they have created a thread.</label><br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
 
 		<span class=form>New post notification:</span>
 		<span class=formright>
-			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
-			Get email notification of new posts
+			<label><input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
+			Get email notification of new posts</label>
 		</span><br class="form" />
 
 		</div>
@@ -605,13 +610,13 @@ if ($overwriteBody==1) {
 
 		<span class="form">Calendar icon:</span>
 		<span class="formright">
-			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($posttag);?>"/>,
-			Replies: <input name="caltagreply" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($replytag);?>"/>
+			<label>New Threads: <input name="caltagpost" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($posttag);?>"/></label>,
+			<label>Replies: <input name="caltagreply" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($replytag);?>"/></label>
 		</span><br class="form" />
 
-		<span class=form>Default display:</span>
+		<label for=defdisplay class=form>Default display:</label>
 		<span class=formright>
-			<select name="defdisplay">
+			<select name="defdisplay" id="defdisplay">
 				<option value="0" <?php if ($defdisplay==0 || $defdisplay==1) {echo "selected=1";}?>>Expanded</option>
 				<option value="2" <?php if ($defdisplay==2) {echo "selected=1";}?>>Condensed</option>
 			</select>
@@ -619,23 +624,24 @@ if ($overwriteBody==1) {
 
 		<span class="form">Sort threads by: </span>
 		<span class="formright">
-			<input type="radio" name="sortby" value="0" <?php writeHtmlChecked($sortby,0);?>/> Thread start date<br/>
-			<input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date
+			<label><input type="radio" name="sortby" value="0" <?php writeHtmlChecked($sortby,0);?>/> Thread start date</label><br/>
+			<label><input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date</label>
 		</span><br class="form" />
 
 		<span class="form">File sharing:</span>
 		<span class="formright">
-			<input type=checkbox name=forumtype value=1 <?php if ($line['forumtype']==1) { echo 'checked=1';}?> />
-			Provide separate file upload option when posting
+			<label><input type=checkbox name=forumtype value=1 <?php if ($line['forumtype']==1) { echo 'checked=1';}?> />
+			Provide separate file upload option when posting</label>
 		</span><br class="form"/>
 
 		<span class="form">Categorize posts?</span>
 		<span class="formright">
-			<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
+			<label><input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
 			  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
+			Categorize posts</label>
 			  <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
-			  Enter in format CategoryDescription:category,category,category<br/>
-			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
+			  <br/><label>Enter in format CategoryDescription:category,category,category<br/>
+			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea></label>
 			  </span>
 		</span><br class="form"/>
 
@@ -645,12 +651,12 @@ if ($overwriteBody==1) {
 			Posting and Reply Instructions
 		</div>
 		<div class="blockitems">
-		Posting Instructions: <em>Displays on Add New Thread</em><br/>
+		<label for=postinstr>Posting Instructions</label>: <em>Displays on Add New Thread</em><br/>
 		<div class=editor>
 		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%">
 		<?php echo Sanitize::encodeStringForDisplay($line['postinstr']);?></textarea>
 		</div><br/>
-		Reply Instructions: <em>Displays on Add Reply</em><br/>
+		<label for=replyinstr>Reply Instructions</label>: <em>Displays on Add Reply</em><br/>
 		<div class=editor>
 		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%">
 		<?php echo Sanitize::encodeStringForDisplay($line['replyinstr']);?></textarea>
@@ -662,76 +668,77 @@ if ($overwriteBody==1) {
 		</div>
 		<div class="blockitems">
 		<span class=form>Students can create new threads:</span><span class=formright>
-			<input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always<br/>
-			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before:
-			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
+			<label><input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always</label><br/>
+			<label><input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never</label><br/>
+			<label><input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before</label>:
+			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>" aria-label="post before date">
 			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
+			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>" aria-label="post before time">
 		</span><br class="form"/>
 
 		<span class=form>Students can reply to posts:</span>
 		<span class=formright>
-			<input type=radio name="replyby" value="Always" <?php if ($replyby==2000000000) { echo "checked=1";}?>/>Always<br/>
-			<input type=radio name="replyby" value="Never" <?php if ($replyby==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before:
-			<input type=text size=10 name="replybydate" value="<?php echo Sanitize::encodeStringForDisplay($replybydate);?>">
+			<label><input type=radio name="replyby" value="Always" <?php if ($replyby==2000000000) { echo "checked=1";}?>/>Always</label><br/>
+			<label><input type=radio name="replyby" value="Never" <?php if ($replyby==0) { echo "checked=1";}?>/>Never</label><br/>
+			<label><input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before</label>:
+			<input type=text size=10 name="replybydate" value="<?php echo Sanitize::encodeStringForDisplay($replybydate);?>" aria-label="reply before date">
 			<a href="#" onClick="displayDatePicker('replybydate', this, 'sdate', 'start date'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=replybytime value="<?php echo Sanitize::encodeStringForDisplay($replybytime);?>">
+			at <input type=text size=10 name=replybytime value="<?php echo Sanitize::encodeStringForDisplay($replybytime);?>" aria-label="reply before time">
 		</span><br class="form" />
-		<span class=form>Allow use of LatePasses?: </span>
-			<span class=formright>
-				<?php
-				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
-				echo ' on ';
-				writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],floor($line['allowlate']/10)%10);
-				?>
-				<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date</label>
+		<label for=allowlate class=form>Allow use of LatePasses?: </label>
+		<span class=formright>
+			<?php
+			writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
+			echo ' <label for=allowlateon>on</label> ';
+			writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],floor($line['allowlate']/10)%10);
+			?>
+			<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date</label>
 		</span><BR class=form>
 		<span class="form">Count in gradebook?</span>
 		<span class="formright">
-			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
-			<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes<br/>
-			<input type=radio name="cntingb" value="4" <?php if ($cntingb==0 && $points>0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, but hide from students for now<br/>
-			<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, as extra credit<br/>
+			<label><input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No</label><br/>
+			<label><input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes</label><br/>
+			<label><input type=radio name="cntingb" value="4" <?php if ($cntingb==0 && $points>0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, but hide from students for now</label><br/>
+			<label><input type=radio name="cntingb" value="2" <?php if ($cntingb==2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, as extra credit</label><br/>
 		</span><br class="form"/>
 		<div id="gbdetail" <?php if ($cntingb==0 && $points==0) { echo 'style="display:none;"';}?>>
 		<span class="form">Points:</span>
 		<span class="formright">
-			<input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/> points
+			<label><input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/> points</label>
 		</span><br class="form"/>
 		<span class="form">Autoscoring:</span>
-		<span class="formright">Auto-award <input type="text" size="2" name="autopostpts" value="<?php echo Sanitize::onlyInt($autopostpts);?>"> points
-		  for each of the first <input type="text" size="2" name="autopostn" value="<?php echo Sanitize::onlyInt($autopostn);?>"> posts per student<br/>
-		  Auto-award <input type="text" size="2" name="autoreplypts" value="<?php echo Sanitize::onlyInt($autoreplypts);?>"> points
-		  for each of the first <input type="text" size="2" name="autoreplyn" value="<?php echo Sanitize::onlyInt($autoreplyn);?>"> replies per student
+		<span class="formright"><label>Auto-award <input type="text" size="2" name="autopostpts" value="<?php echo Sanitize::onlyInt($autopostpts);?>"> points</label>
+		  <label>for each of the first <input type="text" size="2" name="autopostn" value="<?php echo Sanitize::onlyInt($autopostn);?>"> posts per student</label><br/>
+		  <label>Auto-award <input type="text" size="2" name="autoreplypts" value="<?php echo Sanitize::onlyInt($autoreplypts);?>"> points</label>
+		  <label>for each of the first <input type="text" size="2" name="autoreplyn" value="<?php echo Sanitize::onlyInt($autoreplyn);?>"> replies per student</label>
 		 </span><br class=form />
-		<span class=form>Gradebook Category:</span>
+		<label for=gbcat class=form>Gradebook Category:</label>
 			<span class=formright>
 
 <?php
 	writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 ?>
 		</span><br class=form>
-		<span class="form">Tutor Access:</span>
-			<span class="formright">
+		<label for=tutoredit class="form">Tutor Access:</label>
+		<span class="formright">
 <?php
 	writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
 ?>
 		</span><br class="form" />
 
-		<span class=form>Use Scoring Rubric</span><span class=formright>
+		<label for=rubric class=form>Use Scoring Rubric</label>
+		<span class=formright>
 <?php
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
     echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'] ?? '')."\">Add new rubric</a> ";
     echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'] ?? '')."\">Edit rubrics</a> ";
 ?>
-    		</span><br class="form"/>
+    	</span><br class="form"/>
 <?php
 	if (count($outcomes)>0) {
-			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
+			echo '<label for=outcomes class="form">Associate Outcomes:</label></span class="formright">';
 			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
 			echo '</span><br class="form"/>';
 	}
