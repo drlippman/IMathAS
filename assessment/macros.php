@@ -2035,18 +2035,21 @@ function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
     if ($dblslash === 'parts') {
         return [$n,$d];
     }
+	$sign = '';
+	if ($n < 0) {
+		$sign = '-';
+		$n = abs($n);
+	}
 	if ($varinnum!==false) {
 		if ($n==1) {
 			$n = '';
-		} else if ($n==-1) {
-			$n = '-';
 		}
 	}
 	if ($d==1) {
 		if ($varinnum===false) {
-			return "$n";
+			return "$sign$n";
 		} else {
-			return "$n$varinnum";
+			return "$sign$n$varinnum";
 		}
 	} else {
 		if ($dblslash) {
@@ -2055,9 +2058,9 @@ function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 			$slash = '/';
 		}
 		if ($varinnum===false) {
-			return "$n$slash$d";
+			return "$sign$n$slash$d";
 		} else {
-			return "($n$varinnum)$slash$d";
+			return "$sign($n$varinnum)$slash$d";
 		}
 	}
 }
