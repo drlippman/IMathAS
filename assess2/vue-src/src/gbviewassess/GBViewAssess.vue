@@ -341,7 +341,7 @@
                     {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
                   </strong>
                 </span>
-
+                <span v-if="qdata[curQver[qn]].useda11yalt"> ({{ $t('gradebook.a11yalt') }})</span>
               </div>
               <div class="sidebyside" :class="{sidebysideon:sidebysideon}">
                 <div class="scrollpane">

@@ -105,7 +105,10 @@ export default {
       let lasttried = -1;
       let firstincorrect = -2;
       let untried = 0;
-      const partcount = this.qdata.parts.length;
+      let partcount = 0;
+      if (this.qdata.hasOwnProperty('parts')) {
+        partcount = this.qdata.parts.length;
+      }
       let statusgeneral;
       if (!this.showScores || !this.qdata.hasOwnProperty('parts') ||
         (this.qdata.parts.length === 1 && this.qdata.parts[0].req_manual)

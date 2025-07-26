@@ -316,6 +316,8 @@
     $points = $assess_info->getQuestionSetting($qid, 'points_possible');
     $rubric = $assess_info->getQuestionSetting($qid, 'rubric');
     $qsetid = $assess_info->getQuestionSetting($qid, 'questionsetid');
+	$qsdata = $assess_info->getQuestionSetData($qsetid);
+	$altqsetid = $qsdata['a11yalt'];
 	$interquestion_text = $assess_info->getSetting('interquestion_text');
 /*
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
@@ -874,11 +876,18 @@
                     echo '</div>';
                 }
                 echo '<br/>' . _('Question').' #'.($loc+1);
+				if (!empty($qdata['useda11yalt'])) {
+					echo ' ('._('accessible alternative').')';
+					$thisqsetid = $altqsetid;
+				} else {
+					$thisqsetid = $qsetid;
+				}
                 echo ', '._('version').' '.($qdata['ver']+1);
+				
                 echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
-                        'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
+                        'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$thisqsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
                         'to' => $line['userid'])) . "\">Use in Message</a>";
-                echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
+                echo ' <span class="subdued small">'._('Question ID ').$thisqsetid.'</span>';
                 if (!empty($qdata['timeactive']['total']) || !empty($qdata['lastchange'])) {
                     echo '<br/>';
                     if (!empty($qdata['timeactive']['total'])) {

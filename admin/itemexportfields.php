@@ -22,7 +22,7 @@ $db_fields['assessment'] = 'name,summary,intro,startdate,enddate,reviewdate,time
 $db_fields['drill'] = 'itemdescr,itemids,scoretype,showtype,n,showtostu,name,summary,startdate,enddate,avail,caltag';
 //added qimgs field if hasimg==1
 //includecodefrom(EID___) uses export ID
-$db_fields['questionset'] = 'uniqueid,adddate,lastmoddate,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,hasimg,extref,deleted,broken,replaceby,solution,solutionopts,license,ancestorauthors,otherattribution';
+$db_fields['questionset'] = 'uniqueid,adddate,lastmoddate,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,hasimg,extref,deleted,broken,replaceby,solution,solutionopts,license,ancestorauthors,otherattribution,a11yalttype,a11yalt';
 
 $db_fields['html'] = array(
 	'inlinetext'=>array('text'),

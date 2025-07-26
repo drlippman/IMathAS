@@ -99,6 +99,9 @@ if (isset($_GET['score'])) {
             'seeds' => array(0 => $seed),
             'qsid' => array(0 => $curitemid)
         );
+		if (isset($_POST['useda11yalt'])) {
+			$state['useda11yalt'] = [0 => true];
+		}
         $a2->setState($state);
         $a2->loadQuestionData();
         $res = $a2->scoreQuestion(0);
@@ -109,7 +112,11 @@ if (isset($_GET['score'])) {
     }
     $scores[0] = $score;
     $rawscores[0] = $rawscore;
-	$page_scoreMsg =  printscore($score,$curitemid,$seed);
+	if ($courseUIver > 1) {
+		$page_scoreMsg =  printscore2($res,$curitemid,$seed);
+	} else {
+		$page_scoreMsg =  printscore($score,$curitemid,$seed);
+	}
 	if (getpts($score)<.99 && $sa==0) {
 		$showans = true;
 	} else if (getpts($score)<.99 && $sa==4) {
@@ -430,6 +437,9 @@ if ($curitem == -1) {
                 $a2->loadQuestionData();
                 $disp = $a2->displayQuestion(0, ['showans'=>$doshowans]);
                 echo $disp['html'];
+				if ($disp['useda11yalt']) {
+					echo '<input type=hidden name=useda11yalt value=1 />';
+				}
                 echo '<script>$(function() {
                     initq('.$qn.','.json_encode($disp['jsparams']).');
                   });</script>';
@@ -570,6 +580,69 @@ function sandboxgetweights($code,$seed) {
 	}
 
 	return $answeights;
+}
+
+function printscore2($res,$qsetid,$seed) {
+	global $DBH,$imasroot,$staticroot;
+	$poss = 1;
+	if (count($res['scores']) == 1) {
+		$sc = str_replace('-1','N/A',$res['scores'][0]);
+		$out =  sprintf(_("%s out of %d"), $sc, $poss);
+		$pts = $sc;
+		if (!is_numeric($pts)) { $pts = 0;}
+	} else {
+		$ptposs = $res['answeights'];
+		$weightsum = array_sum($ptposs);
+		if ($weightsum>1.1) {
+			$poss = $weightsum;
+		} else {
+			$poss = count($ptposs);
+		}
+		for ($i=0; $i<count($ptposs)-1; $i++) {
+			$ptposs[$i] = round($ptposs[$i]/$weightsum*$poss,2);
+		}
+		//adjust for rounding
+		$diff = $poss - array_sum($ptposs);
+		$ptposs[count($ptposs)-1] += $diff;
+
+		$pts = getpts(implode('~',$res['scores']),$poss);
+		$scarr = $res['scores'];
+		foreach ($res['scores'] as $k=>$v) {
+			$v = str_replace('-1','N/A',$v);
+			$v = round($v * $poss, 2);
+			if ($ptposs[$k]==0) {
+				$pm = 'gchk'; $alt=_('Correct');
+			} else if (!is_numeric($v) || $v==0) {
+				$pm = 'redx'; $alt=_('Incorrect');
+			} else if (abs($v-$ptposs[$k])<.011) {
+				$pm = 'gchk'; $alt=_('Correct');
+			} else {
+				$pm = 'ychk'; $alt=_('Partially correct');
+			}
+			$bar = "<img src=\"$staticroot/img/$pm.gif\" alt=\"$alt\"/>";
+			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
+		}
+		$sc = implode(', ',$scarr);
+		$out =  sprintf(_("%s out of %d (parts: %s)"), $pts, $poss, $sc);
+	}
+
+	$bar = '<span class="scorebarholder">';
+	if ($poss==0) {
+		$w = 30;
+	} else {
+		$w = round(30*$pts/$poss);
+	}
+	if ($w==0) {$w=1;}
+	if ($w < 15) {
+	     $color = "#f".dechex(floor(16*($w)/15))."0";
+	} else if ($w==15) {
+	     $color = '#ff0';
+	} else {
+	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
+	}
+
+	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
+	return $bar . $out;
 }
 
 function printscore($sc,$qsetid,$seed) {

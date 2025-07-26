@@ -474,6 +474,12 @@ class AssessInfo
    * @return array of data for the question code
    */
   public function getQuestionSetData($qsid) {
+    // load if not pre-loaded
+    if (!isset($this->questionSetData[$qsid])) {
+      $stm = $this->DBH->prepare("SELECT * FROM imas_questionset WHERE id=?");
+      $stm->execute([$qsid]);
+      $this->questionSetData[$qsid] = $stm->fetch(PDO::FETCH_ASSOC);
+    }
     return $this->questionSetData[$qsid];
   }
 

@@ -138,6 +138,7 @@ if (isset($_POST['state'])) {
         'scoreiscorrect' => array(($qn + 1) => -1),
         'partattemptn' => array($qn => array()),
         'rawscores' => array($qn => array()),
+        'useda11yalt' => array($qn => false),
         'auth' => $QS['auth']
     );
 }
@@ -229,6 +230,7 @@ if (isset($_POST['regen']) && !$issigned) {
     $state['scoreiscorrect'][$qn+1] = -1;
     $state['partattemptn'][$qn] = array();
     $state['rawscores'][$qn] = array();
+    $state['useda11yalt'][$qn] = false;
 }
 
 $a2->setState($state);
@@ -250,6 +252,7 @@ if (isset($_POST['toscoreqn'])) {
         'errors' => $res['errors'],
         'state' => JWT::encode($a2->getState(), $statesecret)
     );
+
     if ($QS['auth'] != '') {
         $stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=?");
         $stm->execute(array($QS['auth']));
@@ -268,6 +271,12 @@ if (isset($_POST['toscoreqn'])) {
 }
 
 $disp = $a2->displayQuestion($qn, $overrides);
+
+//update useda11yalt if changed
+if ($disp['useda11yalt'] != $state['useda11yalt'][$qn]) {
+    $state['useda11yalt'][$qn] = $disp['useda11yalt'];
+    $a2->setState($state);
+}
 
 // force submitall
 if ($state['submitall']) {

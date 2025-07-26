@@ -2445,6 +2445,10 @@ function arraystodots($x,$y) {
     }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
+		if (is_array($x[$i]) || is_array($y[$i])) {
+			echo "Error: inputs to arraystodots must be arrays of numbers";
+			return [];
+		}
 		$out[] = $x[$i].','.$y[$i];
 	}
 	return $out;
@@ -2460,6 +2464,10 @@ function arraystodoteqns($x,$y,$color='blue') {
     }
 	$out = array();
 	for ($i=0;$i<count($x);$i++)  {
+		if (is_array($x[$i]) || is_array($y[$i])) {
+			echo "Error: inputs to arraystodoteqns must be arrays of numbers";
+			return [];
+		}
         if (isset($y[$i])) {
             $out[] = "dot,".$x[$i].','.$y[$i].',closed,'.$color;
         }

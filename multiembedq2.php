@@ -97,6 +97,7 @@ if (isset($_POST['state'])) {
         'stuanswersval' => array(),
         'scorenonzero' => array_fill(1, $numq, -1),
         'scoreiscorrect' => array_fill(1, $numq, -1),
+        'useda11yalt' => array_fill(0, $numq, false),
         'partattemptn' => array_fill(0, $numq, array()),
         'rawscores' => array_fill(0, $numq, array()),
     );
@@ -163,6 +164,7 @@ if (!empty($_POST['regen'])) {
     $state['scoreiscorrect'][$qntoregen+1] = -1;
     $state['partattemptn'][$qntoregen] = array();
     $state['rawscores'][$qntoregen] = array();
+    $state['useda11yalt'][$qntoregen] = false;
 }
 
 $a2->setState($state);
@@ -221,6 +223,7 @@ if (isset($_POST['toscoreqn'])) {
     $state['scoreiscorrect'][$qn+1] = -1;
     $state['partattemptn'][$qn] = array();
     $state['rawscores'][$qn] = array();
+    $state['useda11yalt'][$qn] = false;
     $a2->setState($state);
     
     // load question data
@@ -229,6 +232,10 @@ if (isset($_POST['toscoreqn'])) {
     $line = $stm->fetch(PDO::FETCH_ASSOC);
     $a2->setQuestionData($qsid, $line);
     $disp = $a2->displayQuestion($qn);
+    if ($disp['useda11yalt'] != $state['useda11yalt'][$qn]) {
+        $state['useda11yalt'][$qn] = $disp['useda11yalt'];
+        $a2->setState($state);
+    }
     $out = array(
         'state' => JWT::encode($a2->getState(), $statesecret),
         'disp' => $disp
@@ -252,6 +259,10 @@ for ($qn=0; $qn < $numq; $qn++) {
     $qsid = $QS['id'][$qn];
     $a2->setQuestionData($qsid, $qsdata[$qsid]);
     $disps[$qn] = $a2->displayQuestion($qn);
+    if ($disps[$qn]['useda11yalt'] != $state['useda11yalt'][$qn]) {
+        $state['useda11yalt'][$qn] = $disps[$qn]['useda11yalt'];
+        $a2->setState($state);
+    }
     // force submitall
     if ($state['submitall']) {
         $disps[$qn]['jsparams']['submitall'] = 1;

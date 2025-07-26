@@ -477,6 +477,18 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$dependencies[$line['id']] = array_unique(array_merge($dependencies[$line['id']], $matches[1]));
 			}
 		}
+		$query = "SELECT id,a11yalt FROM imas_questionset WHERE id IN ($ph) AND a11yalt>0";
+		$stm = $DBH->prepare($query);
+		$stm->execute($toget);
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if (!isset($dependencies[$line['id']])) {
+				$dependencies[$line['id']] = [];
+			}
+			$dependencies[$line['id']][] = $line['a11yalt'];
+			$includedqs[] = $line['a11yalt'];
+			$dependencies[$line['id']] = array_unique($dependencies[$line['id']]);
+		}
+
 		$qstoadd = array_diff(array_unique($includedqs),$toget);
 		foreach ($qstoadd as $v) {
 			$qsmap[$v] = $qscnt;
@@ -531,7 +543,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$line['qtext'] = preg_replace_callback('/includeqtextfrom\((\d+)\)/', function($matches) use ($qsmap) {
 				  return "includeqtextfrom(EID".$qsmap[$matches[1]].")";
 				}, $line['qtext']);
-
+			if ($line['a11yalt'] > 0) {
+				$line['a11yalt'] = $qsmap[$line['a11yalt']];
+			}
 			$output['questionset'][$output_qid] = $line;
 		}
 	}

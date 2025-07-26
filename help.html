@@ -176,6 +176,7 @@ dd {
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
 	<li><a href="#mathentry">Math Entry</a></li>
 	<li><a href="#solver">Solver</a></li>
+	<li><a href="#a11yalt">Accessible Alternative</a></li>
 	<li><a href="#writingcommon">Options Common to All Types</a></li>
 	<li><a href="#questiontypes">Question Types</a>
 		<ul>
@@ -2900,6 +2901,54 @@ While writing a question, it can be handy to quickly solve a formula for a varia
 		</ul>
 </div> <!-- h3 -->
 </div> <!-- h2 -->
+<div class=h2>
+<h2 id="a11yalt">Accessible Alternative</h2>
+<p>The accessible alternative option, near the bottom of the question editor, allows you to specify an 
+	alternative question ID to display if the student has accessibility settings enabled.
+</p>
+<p><b style="color:red">You most likely should not use this feature.</b> It is intended for the rare 
+    case where a question cannot be made accessible using the built-in accessibility features, like 
+    some questions using jsxgraph, Geogebra, etc. If your question uses static 
+	images, graphs generated using showplot, or is a standard Drawing type question, 
+	you <b style="color:red">DO NOT NEED</b> this feature, and will make things worse by using it.
+</p>
+<p>The system automatically generates textual alternatives for graphs generated using <code>showplot</code>, <code>histogram</code>, 
+	etc., and displays those when the student has the visual text alternatives setting enabled.  If the default 
+	text alternative is insufficient or inappropriate, use <code>replacealttext</code> to replace the 
+	default with a custom-written alternative. If using a non-interactive jsxgraph visual, you can use the 
+	<code>description></code> option in <code>jsxBoard</code> to add alternative text. 
+	To check what is generated and shown, you can test the question with 
+	different accessibility settings in the question Preview.  Note you may need to use the browser's 
+	inspector to "see" alt-text added to static images.
+</p>
+<p>Likewise, the system automatically provides a keyboard-based alternative for drawing questions when 
+	the student has the keyboard based drawing setting enabled.
+</p>
+<p>It is always preferable to make the original question accessible when possible rather than 
+	specifying an alternative. But if your question cannot be reasonably made accessible, this option allows 
+    you to specify a different question ID to show the student instead.  Your goal should be to pick a question 
+    that assesses equivalent concepts but in a different way.</p>
+<p>For the "Use accessible alternative", you can select to have the alternative displayed:</p>
+<ul>
+	<li>"visual alt": when the student has Graph Display set to text alternatives. This is the 
+		appropriate option if your question relies on visual information but does not involve any 
+		user interaction that requires a mouse (cannot be performed with a keyboard alone). 
+		In this case, rather than provide an accessible alternative, it might be better to wrap the 
+		visual in <code>&lt;div aria-hidden=true&gt;&lt;/div&gt;</code> to hide it from a screenreader, and add 
+		a <code>&lt;div class="sr-only"&gt;&lt;/div&gt;</code> after it containing a textual description 
+		of the visual element, which will be visually hidden but available to a screenreader.
+	</li>
+	<li>"mouse alt": when the student has Drawing Entry set to Keyboard and text-based. If your question has an 
+		element that requires a mouse to operate and cannot be operated with keyboard, but does not contain any 
+		visual elements that don't have alt-text, then use this option.
+	</li>
+	<li>"visual or mouse alt": if the question has both visual elements and elements that require a mouse,
+		then select this option. The alternative will be used if the student has either accessibility setting 
+		enabled.
+	</li>
+</ul>
+</div>
+
 <div class=h2>
 <h2 id="writingcommon">Common options to all types</h2>
 <p>

@@ -534,7 +534,7 @@ private function importQuestionSet() {
 	}
 
 	//resolve include___from dependencies by updating
-	$upd_qset_include = $DBH->prepare("UPDATE imas_questionset SET control=?,qtext=? WHERE id=?");
+	$upd_qset_include = $DBH->prepare("UPDATE imas_questionset SET control=?,qtext=?,a11yalt=? WHERE id=?");
 	foreach ($toresolve as $exportqid) {
 		$this->data['questionset'][$exportqid]['control'] = preg_replace_callback('/includecodefrom\(EID(\d+)\)/',
 			function($matches) {
@@ -544,7 +544,12 @@ private function importQuestionSet() {
 			function($matches) {
 				  return "includeqtextfrom(".$this->qsmap[$matches[1]].")";
 			}, $this->data['questionset'][$exportqid]['qtext']);
-		$upd_qset_include->execute(array($this->data['questionset'][$exportqid]['control'], $this->data['questionset'][$exportqid]['qtext'], $this->qsmap[$exportqid]));
+		if ($this->data['questionset'][$exportqid]['a11yalt'] > 0) {
+			$a11yalt = $this->qsmap[$this->data['questionset'][$exportqid]['a11yalt']];
+		} else {
+			$a11yalt = 0;
+		}
+		$upd_qset_include->execute(array($this->data['questionset'][$exportqid]['control'], $this->data['questionset'][$exportqid]['qtext'], $a11yalt, $this->qsmap[$exportqid]));
 	}
 }
 

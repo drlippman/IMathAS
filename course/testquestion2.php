@@ -16,6 +16,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = _("Test Question");
 $asid = 0;
+$a11ymode = 0;
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if ($myrights<20) {
@@ -30,6 +31,19 @@ if ($myrights<20) {
     $isadmin = ($cid === 'admin' && $myrights == 100);
     $isgrpadmin = ($cid === 'admin' && $myrights >= 75);
     
+	if (isset($_GET['a11ymode'])) {
+		$a11ymode = intval($_GET['a11ymode']);
+		if ($a11ymode > 0) {
+			$origa11ysettings = [$_SESSION['userprefs']['graphdisp'], $_SESSION['userprefs']['drawentry']];
+			if (($a11ymode&1) == 1) {
+				$_SESSION['userprefs']['graphdisp'] = 0;
+				$_SESSION['graphdisp'] = 0;
+			}
+			if (($a11ymode&2) == 2) {
+				$_SESSION['userprefs']['drawentry'] = 0;
+			}
+		}
+	}
     if (!empty($_POST['dellibitems']) && $myrights == 100) {
         $libid = $_POST['libid'];
         $uid = $_POST['uid'];
@@ -155,6 +169,10 @@ if ($myrights<20) {
 	if (isset($_GET['fixedseeds'])) {
 		$page_formAction .=  "&fixedseeds=1";
 	}
+	$a11yaction = $page_formAction;
+	if ($a11ymode > 0) {
+		$page_formAction .= '&a11ymode='.intval($a11ymode);
+	}
 
 	$lastmod = date("m/d/y g:i a",$line['lastmoddate']);
 
@@ -208,6 +226,9 @@ $placeinhead .= '<script>
   function showPartSteps(seed) {
     location.href = location.href.replace(/&seed=\w+/g,"").replace(/&showallparts=\w+/,"") + "&seed=" + seed;
   }
+  function changea11ymode(el) {
+	location.href = location.href.replace(/&a11ymode=\d+/g,"") + "&a11ymode="+el.value;
+  }  
   function dellibitems(libid,uid,el) {
       $.post({
           url: window.location.href,
@@ -485,6 +506,13 @@ if ($overwriteBody==1) {
 	}
 	echo '</p>';
 
+	if ($line['a11yalttype'] > 0) {
+		$a11ylabels = [_('no'),_('visual alt'),_('mouse alt'),_('visual or mouse alt')];
+		echo '<p>'.sprintf(_('Uses accessible alternative for %s'), $a11ylabels[$line['a11yalttype']]);
+		echo ': <a href="testquestion2.php?cid='.$cid.'&qsetid='.intval($line['a11yalt']).'">';
+		echo intval($line['a11yalt']).'</a></p>';
+	}
+
 	echo '<p>'._('Question is in these libraries:').'</p>';
 	echo '<ul id="liblist">';
 	while ($row = $resultLibNames->fetch(PDO::FETCH_ASSOC)) {
@@ -532,15 +560,27 @@ if ($overwriteBody==1) {
 	if ($myrights==100) {
 		echo '<p>'._('UniqueID: ').Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
 	}
-  echo '<p>'._('Testing using the new interface.');
-  echo ' <a href="testquestion.php?cid='.$cid.'&qsetid='.$qsetid.'">';
-  echo _('Test in old interface').'</a></p>';
+  echo '<p>'._('Test with accessibility settings').': ';
+  echo '<select onchange="changea11ymode(this)">';
+  echo '<option value=0'.($a11ymode==0?' selected':'').'>'._('Default').'</option>';
+  echo '<option value=2'.($a11ymode==2?' selected':'').'>'._('Mouse alt').'</option>';
+  echo '<option value=3'.($a11ymode==3?' selected':'').'>'._('Visual and mouse alt').'</option>';
+  echo '</select>';
+  echo '</p>';
+  
 }
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span id="ehddtext"></span>
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
 <div id="eh" class="eh"></div>';
+
+if ($a11ymode > 0) {
+	$_SESSION['userprefs']['graphdisp'] = $origa11ysettings[0];
+	$_SESSION['graphdisp'] = $origa11ysettings[0];
+	$_SESSION['userprefs']['drawentry'] = $origa11ysettings[1];
+}
+
 require_once "../footer.php";
 
 ?>

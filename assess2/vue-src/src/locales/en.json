@@ -492,7 +492,8 @@
     "activitylog": "Activity Log",
     "nextq": "Next Question",
     "prevq": "Previous Question",
-    "oneatatime": "One at a time"
+    "oneatatime": "One at a time",
+    "a11yalt": "Accessible alternative"
   },
   "work": {
     "add": "Add Work",

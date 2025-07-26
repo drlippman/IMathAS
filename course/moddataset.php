@@ -11,6 +11,7 @@
 
 	require_once "../init.php";
 	require_once '../includes/videodata.php';
+	require_once '../includes/htmlutil.php';
 
 	if ($myrights<20) {
 		require_once "../header.php";
@@ -151,6 +152,14 @@
 		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
 		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
 
+		if ($_POST['a11yalttype']>0 && is_numeric($_POST['a11yalt'])) {
+			$a11yalttype = intval($_POST['a11yalttype']);
+			$a11yalt = intval($_POST['a11yalt']);
+		} else {
+			$a11yalttype = 0;
+			$a11yalt = 0;
+		}
+
         $isrand = preg_match('/((shuffle|getprimes?|rand[a-zA-Z]*)\s*\(|randweights)/',$_POST['control']) ? 1 : 0;
         if (!$isrand) { // check any included code
             preg_match_all('/includecodefrom\(\s*(\d+)\s*\)/',$_POST['control'],$matches,PREG_PATTERN_ORDER);
@@ -217,7 +226,8 @@
 			if ($isok && !isset($_POST['justupdatelibs'])) {
 				$query = "UPDATE imas_questionset SET description=:description,author=:author,userights=:userights,license=:license,";
 				$query .= "otherattribution=:otherattribution,qtype=:qtype,control=:control,qcontrol=:qcontrol,solution=:solution,isrand=:isrand,";
-				$query .= "qtext=:qtext,answer=:answer,lastmoddate=:lastmoddate,extref=:extref,replaceby=:replaceby,solutionopts=:solutionopts";
+				$query .= "qtext=:qtext,answer=:answer,lastmoddate=:lastmoddate,extref=:extref,replaceby=:replaceby,solutionopts=:solutionopts,";
+				$query .= "a11yalttype=:a11yalttype,a11yalt=:a11yalt";
 				if (isset($_POST['undelete'])) {
 					$query .= ',deleted=0';
 				}
@@ -226,7 +236,9 @@
 				$stm->execute(array(':description'=>$_POST['description'], ':author'=>$_POST['author'], ':userights'=>$_POST['userights'],
 					':license'=>$_POST['license'], ':otherattribution'=>($_POST['addattr'] ?? ''), ':qtype'=>$_POST['qtype'], ':control'=>$_POST['control'],
 					':qcontrol'=>$_POST['qcontrol'], ':solution'=>$_POST['solution'], ':isrand'=>$isrand, ':qtext'=>$_POST['qtext'], ':answer'=>$_POST['answer'],
-					':lastmoddate'=>$now, ':extref'=>$extref, ':replaceby'=>$replaceby, ':solutionopts'=>$solutionopts, ':id'=>$_GET['id']));
+					':lastmoddate'=>$now, ':extref'=>$extref, ':replaceby'=>$replaceby, ':solutionopts'=>$solutionopts, ':id'=>$_GET['id'],
+					':a11yalttype'=>$a11yalttype, ':a11yalt'=>$a11yalt
+				));
 
 				if ($stm->rowCount()>0) {
 					$outputmsg .= _("Question Updated.")." ";
@@ -307,14 +319,14 @@
 					$ancestorauthors = $lastauthor;
 				}
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,license,otherattribution,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,extref,replaceby,solution,solutionopts,isrand) VALUES ";
-			$query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :license, :otherattribution, :qtype, :control, :qcontrol, :qtext, :answer, :hasimg, :ancestors, :ancestorauthors, :extref, :replaceby, :solution, :solutionopts, :isrand);";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,license,otherattribution,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,extref,replaceby,solution,solutionopts,isrand,a11yalttype,a11yalt) VALUES ";
+			$query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :license, :otherattribution, :qtype, :control, :qcontrol, :qtext, :answer, :hasimg, :ancestors, :ancestorauthors, :extref, :replaceby, :solution, :solutionopts, :isrand, :a11yalttype, :a11yalt);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':description'=>$_POST['description'], ':ownerid'=>$userid,
 				':author'=>$_POST['author'], ':userights'=>$_POST['userights'], ':license'=>$_POST['license'], ':otherattribution'=>($_POST['addattr'] ?? ''),
 				':qtype'=>$_POST['qtype'], ':control'=>$_POST['control'], ':qcontrol'=>$_POST['qcontrol'], ':qtext'=>$_POST['qtext'], ':answer'=>$_POST['answer'],
 				':hasimg'=>$_POST['hasimg'], ':ancestors'=>$ancestors, ':ancestorauthors'=>$ancestorauthors, ':extref'=>$extref, ':replaceby'=>$replaceby,
-				':solution'=>$_POST['solution'], ':solutionopts'=>$solutionopts, ':isrand'=>$isrand));
+				':solution'=>$_POST['solution'], ':solutionopts'=>$solutionopts, ':isrand'=>$isrand, ':a11yalttype'=>$a11yalttype, ':a11yalt'=>$a11yalt));
 			$qsetid = $DBH->lastInsertId();
 			$_GET['id'] = $qsetid;
 
@@ -950,7 +962,14 @@
 	   	}
 	   	$("#licensewarn").html("<br/>"+warn);
 	   }
-
+	   function changea11ytype() {
+	     let val = document.getElementById("a11yalttype").value;
+		 if (val > 0) {
+		 	$("#a11yaltwarn").show();
+		 } else {
+			$("#a11yaltwarn").hide();
+		 }
+       }
 	   function incctrlboxsize() {
 	   	$("#ccbox").find(".CodeMirror-scroll").css("min-height",0).css("max-height","none");
 	   	controlEditor.setSize("100%",$(controlEditor.getWrapperElement()).height()+28);
@@ -985,7 +1004,6 @@
             $(".dropdown-submenu").removeClass("open");
             $("#qtypedd a").removeClass("dd-active").attr("aria-expanded",false);
             var selel = $("#qtypedd a[data-sn=" + sn + "]");
-            console.log("#qtypedd a[data-sn=" + sn + "]");
             selel.addClass("dd-active"); 
             selel.closest(".dropdown-submenu").addClass("open").children("a").addClass("dd-active").attr("aria-expanded",true);
             var longname = selel.text();
@@ -1368,6 +1386,15 @@ if (count($extref)>0) {
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
+
+echo '<p><label for=a11yalttype>'._('Use accessible alternative').':</label> ';
+$allylabels = [_('no'),_('visual alt'),_('mouse alt'),_('visual or mouse alt')];
+writeHtmlSelect ('a11yalttype',[0,1,2,3],$allylabels,$line['a11yalttype'],null,null,'onchange="changea11ytype()"');
+echo ' <label>'._('Accessible alt ID').' <input type=text size=10 name=a11yalt value="'.($line['a11yalt']==0?'':Sanitize::encodeStringForDisplay($line['a11yalt'])).'"/></label>';
+echo '<span id=a11yaltwarn' . ($line['a11yalt'] > 0 ? '' : ' style="display:none"').'> ';
+echo '<span class=noticetext><br>'._('It is likely you should not be using this option. Read the help for details.').'</span></span> ';
+echo '<a href="../help.php?section=a11yalt" target="_blank">'._('Help').'</a>';
+echo '</p>';
 
 if ($myrights==100) {
 	echo '<p><label>'._('Mark question as deprecated and suggest alternative?').' <input type="checkbox" name="doreplaceby" ';
