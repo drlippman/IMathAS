@@ -132,6 +132,7 @@ if ($canviewall) {
     $includelastchange = false;
     $gbmode = '';
 	$headerlockdef = true;
+	$usefullwidth = false;
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
