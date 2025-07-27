@@ -75,11 +75,12 @@ If deleted on both ends, delete from DB
 			$isteacher = true;
 			$isauth = true;
 		} else {
-			$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=? AND courseid=? UNION SELECT id FROM imas_tutors WHERE userid=? AND courseid=?");
+			$stm = $DBH->prepare("SELECT section FROM imas_students WHERE userid=? AND courseid=? UNION SELECT section FROM imas_tutors WHERE userid=? AND courseid=?");
 			$stm->execute(array($userid, $cid, $userid, $cid));
 			if ($stm->rowCount()>0) {
 				$isauth = true;
-			}
+				$studentinfo = ['section' => $stm->fetchColumn(0)];
+			} 
 		}
 		if (!$isauth) {
 			echo '[]';
@@ -99,12 +100,12 @@ If deleted on both ends, delete from DB
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
 			$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
 			$query .= "imas_tutors.courseid=:courseid ";
-			if (!$isteacher && !$istutor && $studentinfo['section']!=null) {
+			if (!$isteacher && !empty($studentinfo['section'])) {
 			     $query .= "AND (imas_tutors.section=:section OR imas_tutors.section='') ";
 			}
 			$query .= "ORDER BY imas_users.LastName";
 			$stm = $DBH->prepare($query);
-			if (!$isteacher && !$istutor && $studentinfo['section']!=null) {
+			if (!$isteacher && !empty($studentinfo['section'])) {
 			   $stm->execute(array(':courseid'=>$cid, ':section'=>$studentinfo['section']));
 			} else {
 				$stm->execute(array(':courseid'=>$cid));
