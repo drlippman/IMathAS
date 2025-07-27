@@ -287,25 +287,25 @@ class QuestionHtmlGenerator
                 },$toevalqtxt);
         }
         //                              1                 2            3       4
-        if (preg_match_all('~\[if\s+([\w_]*?)\s*(==|!=|>=|<=|>|<)\s*(\w+)\s*\](.*?)\[/if\]~ms', $toevalqtxt, $m, PREG_SET_ORDER)) {
-            foreach ($m as $match) {
+        if (preg_match_all('~\[if\s+([\w_]*?)\s*(==|!=|>=|<=|>|<)\s*(\w+)\s*\](.*?)\[/if\]~ms', $toevalqtxt, $QHG_all_matches, PREG_SET_ORDER)) {
+            foreach ($QHG_all_matches as $QHG_match) {
                 $keep = false;
-                if (isset(${$match[1]})) {
-                    $val = ${$match[1]};
-                    if (($match[2]=='==' && $val==$match[3]) ||
-                        ($match[2]=='!=' && $val!=$match[3]) ||
-                        ($match[2]=='>=' && $val>=$match[3]) ||
-                        ($match[2]=='<=' && $val<=$match[3]) ||
-                        ($match[2]=='>' && $val>$match[3]) ||
-                        ($match[2]=='<' && $val<$match[3])
+                if (isset(${$QHG_match[1]})) {
+                    $val = ${$QHG_match[1]};
+                    if (($QHG_match[2]=='==' && $val==$QHG_match[3]) ||
+                        ($QHG_match[2]=='!=' && $val!=$QHG_match[3]) ||
+                        ($QHG_match[2]=='>=' && $val>=$QHG_match[3]) ||
+                        ($QHG_match[2]=='<=' && $val<=$QHG_match[3]) ||
+                        ($QHG_match[2]=='>' && $val>$QHG_match[3]) ||
+                        ($QHG_match[2]=='<' && $val<$QHG_match[3])
                     ) {
                         $keep = true;
                     }
                 }
                 if ($keep) {
-                    $toevalqtxt = str_replace($match[0], $match[4], $toevalqtxt);
+                    $toevalqtxt = str_replace($QHG_match[0], $QHG_match[4], $toevalqtxt);
                 } else {
-                    $toevalqtxt = str_replace($match[0], '', $toevalqtxt);
+                    $toevalqtxt = str_replace($QHG_match[0], '', $toevalqtxt);
                 }
             }
         }
