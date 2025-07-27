@@ -227,7 +227,8 @@ $placeinhead .= '<script>
     location.href = location.href.replace(/&seed=\w+/g,"").replace(/&showallparts=\w+/,"") + "&seed=" + seed;
   }
   function changea11ymode(el) {
-	location.href = location.href.replace(/&a11ymode=\d+/g,"") + "&a11ymode="+el.value;
+    let seed = document.getElementById("seed").value;
+	location.href = location.href.replace(/&a11ymode=\d+/g,"") + "&seed=" + seed + "&a11ymode="+el.value;
   }  
   function dellibitems(libid,uid,el) {
       $.post({
@@ -403,7 +404,7 @@ if ($overwriteBody==1) {
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
 	echo "<form method=post class=\"questionwrap\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"return dopresubmit($qn,false)\">\n";
-	echo "<input type=hidden name=seed value=\"$seed\">\n";
+	echo "<input type=hidden id=seed name=seed value=\"$seed\">\n";
 
   // DO DISPLAY
   echo '<hr/>';
