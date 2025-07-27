@@ -158,7 +158,7 @@ if ($report=='overview') {
 					}
 					$html .= $subhtml;
 				}
-			} else { //is outcome
+			} else if (isset($outcomeinfo[$oi])) { //is outcome
 				if ($isheader) {
 					$html .= '<th class="cat'.Sanitize::onlyInt($gcnt).'"><div>'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'<br/><a class="small" href="outcomereport.php?cid='.Sanitize::courseId($cid).'&amp;outcome='.Sanitize::encodeUrlParam($oi).'&amp;type='.Sanitize::encodeUrlParam($type).'">[Details]</a></div></th>';
 					$sarr .= ',"N"';

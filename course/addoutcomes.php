@@ -145,7 +145,7 @@ function printoutcome($arr) {
 			}
 			echo '</ul>';
 			echo '</li>';
-		} else { //individual outcome
+		} else if (isset($outcomeinfo[$item])) { //individual outcome
 			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0">O</span> ';
 			echo '<span id="o' . Sanitize::encodeStringForDisplay($item) . '">' .Sanitize::encodeStringForDisplay($outcomeinfo[$item]) .'</span> ';
 			echo '<a class="links" href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
