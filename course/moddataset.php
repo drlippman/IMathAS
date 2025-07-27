@@ -724,6 +724,8 @@
 			$line['hasimg'] = 0;
 			$line['deleted'] = 0;
 			$line['replaceby'] = 0;
+			$line['a11yalttype'] = 0;
+			$line['a11yalt'] = '';
 			if (isset($_GET['aid']) && isset($_SESSION['lastsearchlibs'.$_GET['aid']])) {
 				$inlibs = $_SESSION['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
 			} else if (isset($_SESSION['lastsearchlibs'.$cid])) {
