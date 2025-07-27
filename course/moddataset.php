@@ -1438,10 +1438,10 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		// Save codemirror and tinyMCE data
 		try {
 			if (window.tinyMCE) {
-				for (i in qEditor) { qEditor[i].save(); }
 			 	tinyMCE.triggerSave(); 
 			}
 			if (controlEditor) controlEditor.save();
+			for (i in qEditor) { qEditor[i].save(); }
 		} catch (err){
 			quickSaveQuestion.errorFunc();
 		}
