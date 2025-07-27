@@ -688,6 +688,10 @@ class QuestionHtmlGenerator
 
         if (isset($hints) && is_array($hints) && count($hints) > 0 && $showHints) {
             // Eval'd question writer code expects this to be "$hintloc".
+            if (is_array($hintlabel)) {
+                echo '$hintlabel should be a single string';
+                $hintlabel = '';
+            }
             $hintloc = $this->getHintText($hints, $hintlabel ?? '');
         }
 
