@@ -1809,7 +1809,7 @@ if (isset($_GET['launch'])) {
 	} else {
 		$tzname = '';
 	}
-	$_SESSION['tzoffset'] = $_POST['tzoffset'];
+	$_SESSION['tzoffset'] = floatval($_POST['tzoffset']);
     $_SESSION['tzname'] = $tzname;
     if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
         $_SESSION['static_ok'] = 1;

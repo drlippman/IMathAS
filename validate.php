@@ -247,7 +247,7 @@ if ($haslogin && !$hasusername) {
             require_once "$curdir/includes/userprefs.php";
             generateuserprefs($userid);
 
-            $_SESSION['tzoffset'] = $_POST['tzoffset'];
+            $_SESSION['tzoffset'] = floatval($_POST['tzoffset']);
             if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
                 $_SESSION['tzname'] = $_POST['tzname'];
             }
