@@ -41,8 +41,12 @@ function make_pwreset_link($userid, $recoverylink = false) {
 
 function verify_pwreset_link($JWT) {
     global $DBH;
-    
-    $payload = JWT::decode($JWT, null, false);
+    try {
+        $payload = JWT::decode($JWT, null, false);
+    } catch (Exception $e) {
+        echo 'Invalid reset link';
+        exit;
+    }
 
     if (!isset($payload->uid)) {
         echo 'Invalid reset link';

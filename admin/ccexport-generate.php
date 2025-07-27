@@ -35,7 +35,7 @@ function dir_is_empty($dirname) {
 }
 
 $usechecked = ($_POST['whichitems']=='select' || empty($_POST['whichitems']));
-if ($usechecked) {
+if ($usechecked && !empty($_POST['checked'])) {
 	$checked = $_POST['checked'];
 } else {
 	$checked = array();
