@@ -39,7 +39,7 @@ array_push($GLOBALS['allowedmacros'],"exp","nthlog",
  "array_values","array_keys","comparelogic","comparesetexp","stuansready","comparentuples","comparenumberswithunits",
  "isset","atan2","keepif","checkanswerformat","preg_match","preg_match_all","preg_replace","intval","floatval","comparesameform","splicearray",
  "getsigfigs","checksigfigs","prettysigfig_instring","prettyreal_instring","round_instring",
- "parseNtuple");
+ "parseNtuple","uniqid");
 
 function mergearrays() {
 	$args = func_get_args();
