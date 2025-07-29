@@ -46,6 +46,12 @@ function sendFCM2($token,$title,$body,$url='') {
                 ],
 			],
 	  	];
+		if (isset($CFG['FCM']['icon'])) {
+			$message['message']['webpush']['notification'] = ['icon'=>$CFG['FCM']['icon']];
+			if (isset($CFG['FCM']['badge'])) {
+				$message['message']['webpush']['notification']['badge'] = $CFG['FCM']['badge'];
+			}
+		}
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $apiurl);
 		curl_setopt($ch, CURLOPT_POST, true);
