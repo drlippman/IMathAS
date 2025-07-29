@@ -1123,8 +1123,11 @@ function gbtable() {
 		} else {
 			$gb[$row][1][$col][7] = round($timeused/60);
 		}
-
-		$timeontask = array_sum(explode(',',str_replace('~',',',$l['timeontask'])));
+		if ($l['timeontask'] == '') {
+			$timeontask = 0;
+		} else {
+			$timeontask = array_sum(explode(',',str_replace('~',',',$l['timeontask'])));
+		}
 		if ($timeontask==0) {
 			$gb[$row][1][$col][8] = "N/A";
 		} else {
