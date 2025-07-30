@@ -1437,11 +1437,21 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		$(".quickSaveNotice").html("Saving...");
 		// Save codemirror and tinyMCE data
 		try {
-			if (window.tinyMCE) {
-			 	tinyMCE.triggerSave(); 
-			}
 			if (controlEditor) controlEditor.save();
-			for (i in qEditor) { qEditor[i].save(); }
+			if (window.tinyMCE) {
+				if (editoron) {
+					tinyMCE.get("qtext").save();
+				} else {
+					qEditor["qtext"].save();
+				}
+				if (seditoron) {
+					tinyMCE.get("solution").save();
+				} else {
+					qEditor["solution"].save();
+				}
+			} else {
+				for (i in qEditor) { qEditor[i].save(); }
+			}
 		} catch (err){
 			quickSaveQuestion.errorFunc();
 		}
