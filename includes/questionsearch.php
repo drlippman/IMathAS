@@ -32,12 +32,11 @@ function parseSearchString($str)
             $out['isbroken'] = 1;
             unset($out['terms'][$k]);
         }
-        if (ctype_digit($v) && !isset($out['id'])) {
+        if (ctype_digit($v) && !isset($out['id']) && count($out['terms']) == 1) {
             $out['id'] = $v;
-            if (count($out['terms']) == 1) { // only id, remove as keyword
-                unset($out['terms']);
-                break;
-            }
+            // only id, remove as keyword
+            unset($out['terms']);
+            break;
         }
     }
     return $out;
@@ -87,7 +86,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype != 'all' && !is_array($libs)) {
         $libs = explode(',', $libs);
     }
-
+print_r($search);
+exit;
     if (!empty($search['type'])) {
         $types = array_map('trim', explode(',', $search['type']));
         $typesearch = [];
@@ -425,8 +425,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= ' OFFSET ' . intval($offset);
         }
     }
-    //echo $query;
-    //print_r($searchvals);
+
     $stm = $DBH->prepare($query);
     $stm->execute($searchvals);
     $res = [];
