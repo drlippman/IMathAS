@@ -3859,6 +3859,10 @@ drawn line from the correct line.
     <br>You can also set $background a string of asciisvg commands prefaced with "draw:", like "draw:line([1,1],[3,3]);".  
         Note that initPicture and axes will already have been called, so do not include them. 
     <br>You can also set $background to "none" to remove axes and the grid.
+	<br>To specify alt-text for the background, add an element to the background array, like 
+	    <code>$background = ["x^2,red","alt:a parabola"]</code>.  For a background using draw, add the alt at the 
+		end of your commands, like: <code>"draw:line([1,1],[3,3]);alt:a line segment"</code>.  Note that this 
+		provided alt will replace everything, including the basic window information.
     </dd>
 <dt>$partweights = array or list of weights </dt>
 	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
