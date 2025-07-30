@@ -86,8 +86,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype != 'all' && !is_array($libs)) {
         $libs = explode(',', $libs);
     }
-print_r($search);
-exit;
+
     if (!empty($search['type'])) {
         $types = array_map('trim', explode(',', $search['type']));
         $typesearch = [];
