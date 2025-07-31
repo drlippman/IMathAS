@@ -1454,7 +1454,7 @@ function generateTable() {
                             i +
                             '" class="textsegment collapsed">' +
                             contents +
-                            "</div>"; //description
+                            "</div>";
                     } else {
                         html +=
                             '<div class="intro intro-like"><textarea id="textseg' +
@@ -1491,12 +1491,22 @@ function generateTable() {
                         ' id="textsegdescr' +
                         i +
                         '" class="description-cell">'; //description
-                    html +=
-                        '<div class="intro intro-like"><div id="textseg' +
-                        i +
-                        '" class="textsegment collapsed">' +
-                        contents +
-                        "</div>";
+                    if (useed) {
+                        html +=
+                            '<div class="intro intro-like"><div id="textseg' +
+                            i +
+                            '" class="textsegment collapsed">' +
+                            contents +
+                            "</div>";
+                    } else {
+                        html +=
+                            '<div class="intro intro-like"><textarea id="textseg' +
+                            i +
+                            '" class="textsegment collapsed">' +
+                            contents +
+                            "</textarea>" +
+                            '<button type=button class="savebtn slim" onclick="savetextseg();" disabled=true>' + _('Save All') + '</button>';
+                    }
                     html +=
                         '<div class="text-segment-icon"><button id="edit-button' +
                         i +
@@ -1896,6 +1906,7 @@ function generateTable() {
             ".</p>";
     }
     document.getElementById("pttotal").innerHTML = pttotal;
+
     return html;
 }
 
