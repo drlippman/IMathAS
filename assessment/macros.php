@@ -5390,8 +5390,9 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 //only works if $stua and $answer are directly comparable (i.e. basic string type or exact number)
 //$swap is an array of entries of the form "1,2,3;4,5,6"  says to treat 1,2,3 as a group of questions.
 //$weights is answeights, and use function like $answer,$answeights = scoremultiorder(...) if set
+//$options allows other options, such as 'variables' for numfunc
 //comparison is made on first entry in group
-function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
+function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null, $options=[]) {
 	if ($stua == null) {
         if ($weights !== null) {
             return [$answer,$weights];
@@ -5399,6 +5400,12 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             return $answer;
         }
     }
+
+	if ($type == 'numfunc' && isset($options['variables'])) {
+		$variables = $options['variables'];
+	} else {
+		$variables = 'x';
+	}
 
     $swapindices = [];
     if (!is_array($swap)) {
@@ -5462,7 +5469,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 					$loc = $k; break;
 				} else if ($type=='calculated' && is_numeric($tofind) && abs($tofind - $newansval[$sw[$k][0]])<0.01) {
                     $loc = $k; break;
-                } else if ($type=='numfunc' && $tofind !== '' && comparefunctions($tofind, $newans[$sw[$k][0]])) {
+                } else if ($type=='numfunc' && $tofind !== '' && comparefunctions($tofind, $newans[$sw[$k][0]], $variables)) {
                     $loc = $k; break;
                 } else if (($type=='complex' || $type=='calccomplex' || $type=='ntuple' || $type == 'calcntuple') && 
                     $tofind !== false && count($tofind) == 2 && is_numeric($tofind[0]) && is_numeric($tofind[1]) && 

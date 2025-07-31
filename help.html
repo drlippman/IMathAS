@@ -2656,7 +2656,7 @@ These macros are fairly general purpose:
   provide a second argument of the number of components expected, and if the values are expected to
   be numeric, put true as the third argument.  This function will return false if the input is 
   not a valid ntuple.  This function only works for a single n-tuple, not a list of them.</li>
-<li><strong>scoremultiorder(stua, answer, swap, type, [weights])</strong>: In a multipart question, allows questions or groups 
+<li><strong>scoremultiorder(stua, answer, swap, type, [weights, options])</strong>: In a multipart question, allows questions or groups 
   of questions to be scored in any order.  Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 
   'ntuple', and 'calcntuple'.  <em>Note:</em> Use of the "list" option for individual question types is <b>strongly</b> recommended over 
   using this function if you're just asking for multiple answers.
@@ -2678,6 +2678,13 @@ These macros are fairly general purpose:
     <li>weights: optionally, you can include your answeights to have them swapped to.  In that case, use the form 
         <code>$answer,$answeights=scoremultiorder($stuanswers[$thisq],$answer,'0;1','number',$answeights)</code>
     </li>
+	<li>options: an array of other options.  To use without enabling the weights, set weights to null.
+		<ul>
+			<li>variables: to change the variables when type is numfunc. Example:
+				<code>$answer = scoremultiorder($stuanswers[$thisq],$answer,'0;1','numfunc',null,['variables'=>$variables])</code>
+			</li>
+		</ul>
+	</li>
   </ul>
   </li>
 </ul>
