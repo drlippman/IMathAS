@@ -137,7 +137,7 @@ class NumMatrixScorePart implements ScorePart
         foreach ($answerlist as $k=>$v) {
             $v = evalMathParser($v);
             if (is_nan($v)) {
-                if (isset($GLOBALS['teacherid'])) {
+                if (!empty($GLOBALS['inQuestionTesting'])) {
                     echo _('Debug info: invalid $answer');
                 }
                 $answerlist[$k] = 0;

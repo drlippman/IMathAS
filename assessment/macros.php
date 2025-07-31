@@ -4134,13 +4134,13 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	}
 	//echo "$i, $ansa, $ansb, $cntnana, $cntnanb";
 	if ($cntnana==20 || $cntnanb==20) {
-		if (isset($GLOBALS['teacherid'])) {
+		if (!empty($GLOBALS['inQuestionTesting'])) {
 			echo "<p>Debug info: one function evaled to Not-a-number at all test points.  Check \$domain</p>";
 			echo "<p>Funcs: $a and $b</p>";
 		}
 		return false;
 	} else if ($evalerr) {
-		if (isset($GLOBALS['teacherid'])) {
+		if (!empty($GLOBALS['inQuestionTesting'])) {
 			echo "<p>Debug info: one function was invalid.</p>";
 			echo "<p>Funcs: $a and $b</p>";
 		}

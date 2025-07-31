@@ -506,7 +506,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 					} else {//
 						//an unquoted string!  give a warning to instructor,
 						//but treat as a quoted string.
-						if (isset($GLOBALS['teacherid'])) {
+						if (!empty($GLOBALS['inQuestionTesting'])) {
 							echo sprintf(_('Warning... unquoted string %s.. treating as string'), Sanitize::encodeStringForDisplay($out));
 						}
 						$out = "'$out'";

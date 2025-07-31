@@ -431,7 +431,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			}
 			if ($j==$len) {
 				$i = $j;
-				if (isset($GLOBALS['teacherid'])) {
+				if (!empty($GLOBALS['inQuestionTesting'])) {
 					echo _('unmatched parens/brackets - likely will cause an error');
 				}
 			} else {

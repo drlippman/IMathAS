@@ -141,7 +141,7 @@ class CalculatedScorePart implements ScorePart
                 $aarr = explode(' or ',$ananswer);
                 foreach ($aarr as $j=>$anans) {
                     if ($anans=='') {
-                        if (isset($GLOBALS['teacherid'])) {
+                        if (!empty($GLOBALS['inQuestionTesting'])) {
                             echo '<p>', _('Debug info: empty, missing or invalid $answer'), ' </p>';
                         }
                         $scorePartResult->setRawScore(0);
@@ -202,7 +202,7 @@ class CalculatedScorePart implements ScorePart
             }
             foreach ($aarr as $j=>$anans) {
                 if ($anans=='') {
-                    if (isset($GLOBALS['teacherid'])) {
+                    if (!empty($GLOBALS['inQuestionTesting'])) {
                         echo '<p>', _('Debug info: empty, missing, or invalid $answer'), ' </p>';
                     }
                     $scorePartResult->setRawScore(0);

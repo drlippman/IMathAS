@@ -166,7 +166,7 @@ class ComplexMatrixScorePart implements ScorePart
             }
             $answerlist[$k] = parsesloppycomplex($v);
             if ($answerlist[$k] === false) {
-                if (isset($GLOBALS['teacherid'])) {
+                if (!empty($GLOBALS['inQuestionTesting'])) {
                     echo _('Debug info: invalid $answer');
                 }
             }

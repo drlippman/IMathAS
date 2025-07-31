@@ -254,7 +254,7 @@ class AlgebraicNTupleScorePart implements ScorePart
                                 }
                             }
                         }
-                        if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
+                        if ($cntnan==20 && !empty($GLOBALS['inQuestionTesting'])) {
                             echo _('Debug info: function evaled to Not-a-number at all test points.  Check $domain');
                         }
                         if ($stunan>1) { //if more than 1 student NaN response
