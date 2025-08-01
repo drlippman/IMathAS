@@ -259,7 +259,7 @@ if (isset($useeditor) && $_SESSION['useed']==1) {
 	} else {
 		echo 'var filePickerCallBackFunc = null;';
 	}
-	if ($useeditor!="noinit") {
+	if ($useeditor!="noinit" && $useeditor != "review" && $useeditor != "reviewifneeded") {
 		echo 'initeditor("exact","'.$useeditor.'");';
 	}
 	echo '</script>';

@@ -69,7 +69,7 @@ class EssayAnswerBox implements AnswerBox
         }
 
         if (!isset($GLOBALS['useeditor'])) { // should be defined, but avoid errors if not
-            $GLOBALS['useeditor'] = 1;
+            $GLOBALS['useeditor'] = "noinit";
         }
 
         if ($GLOBALS['useeditor'] == 'review' || ($GLOBALS['useeditor'] == 'reviewifneeded' && trim($la) == '')) {
@@ -97,16 +97,15 @@ class EssayAnswerBox implements AnswerBox
         } else {
             $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
                 (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '');
-            if ($displayformat == 'editor' && $GLOBALS['useeditor'] == 1) {
-                $la = str_replace('&quot;', '"', $la);
-            }
+            $la = str_replace('&quot;', '"', $la);
+
             if ($rows < 2) {
                 $out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"" . Sanitize::encodeStringForDisplay($la) . "\" ";
                 $out .= 'aria-label="' . $arialabel . '" />';
             } else {
                 if ($colorbox != '') {$out .= '<div class="' . $colorbox . '">';}
                 $out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
-                if ($displayformat == 'editor' && $GLOBALS['useeditor'] == 1) {
+                if ($displayformat == 'editor' && $_SESSION['userprefs']['useed'] == 1) {
                     $out .= "style=\"width:98%;\" class=\"mceEditor\" ";
                 } else {
                     $out .= "cols=\"$cols\" ";
@@ -115,7 +114,7 @@ class EssayAnswerBox implements AnswerBox
                 $out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la, true));
                 if ($colorbox != '') {$out .= '</div>';}
             }
-            if ($displayformat == 'editor' && $GLOBALS['useeditor'] == 1) {
+            if ($displayformat == 'editor' && $_SESSION['userprefs']['useed'] == 1) {
                 $params['usetinymce'] = 1;
                 if ($nopaste) {
                     $params['nopaste'] = 1;

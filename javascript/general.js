@@ -606,7 +606,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 	} else if (document.documentElement.clientWidth<575) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline forecolor saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";
-	}  else if (document.documentElement.clientWidth<650) {
+	}  else if (document.documentElement.clientWidth<665) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline subscript superscript forecolor snippet saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link image | asciimath asciimathcharmap asciisvg";
 	}
