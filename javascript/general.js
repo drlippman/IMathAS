@@ -649,6 +649,7 @@ function filePickerCallBack(callback, value, meta) {
 }
 const image_upload_handler = (blobInfo, progress) => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest();
+
   xhr.withCredentials = false;
   xhr.open('POST', imasroot+'/tinymce8/upload_handler.php');
 
@@ -684,9 +685,12 @@ const image_upload_handler = (blobInfo, progress) => new Promise((resolve, rejec
   };
 
   const formData = new FormData();
-  formData.append('file', blobInfo.blob(), blobInfo.filename());
-
-  xhr.send(formData);
+  let fileblob = blobInfo.blob();
+  doImageUploadResize(fileblob, function (res) {
+	formData.append('file', res, blobInfo.filename());
+  	xhr.send(formData);
+  });
+  
 });
 
 function imascleanup(type, value) {
@@ -1884,8 +1888,16 @@ $(function() {
 // from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js
 
 function doImageUploadResize(el, callback) {
-    const that = el; // input node
-    const originalFile = el.files[0];
+	let inputtype;
+	let originalFile;
+	if (el instanceof HTMLElement) {
+		const that = el; // input node
+    	originalFile = el.files[0];
+		inputtype = 'file';
+	} else if (el instanceof Blob) {
+		originalFile = el;
+		inputtype = 'blob';
+	}
 
     if (!originalFile || !originalFile.type.startsWith('image')) {
         callback(el);
@@ -1920,20 +1932,26 @@ function doImageUploadResize(el, callback) {
             ctx.drawImage(img, 0, 0, width, height);
 
             canvas.toBlob(function (blob) {
-                var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
+				if (inputtype === 'blob') {
+					if (typeof callback === 'function') {
+						callback(blob);
+					}
+				} else {
+					var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
 
-                var dataTransfer = new DataTransfer();
-                dataTransfer.items.add(resizedFile);
+					var dataTransfer = new DataTransfer();
+					dataTransfer.items.add(resizedFile);
 
-                // temporary remove event listener, change and restore
-                var currentOnChange = that.onchange;
+					// temporary remove event listener, change and restore
+					var currentOnChange = that.onchange;
 
-                that.onchange = null;
-                that.files = dataTransfer.files;
-                that.onchange = currentOnChange;
-                if (typeof callback === 'function') {
-                    callback(that);
-                }
+					that.onchange = null;
+					that.files = dataTransfer.files;
+					that.onchange = currentOnChange;
+					if (typeof callback === 'function') {
+						callback(that);
+					}
+				}
             }, 'image/jpeg', .95);
         }
     }
