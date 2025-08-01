@@ -541,7 +541,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		selector: selectorstr,
 		inline: inlinemode,
 		license_key: 'gpl',
-		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach",
+		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet",
 		menubar: false, //"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
@@ -567,7 +567,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
+		snippet_list: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
@@ -666,14 +666,14 @@ const image_upload_handler = (blobInfo, progress) => new Promise((resolve, rejec
     }
 
     if (xhr.status < 200 || xhr.status >= 300) {
-      reject('HTTP Error: ' + xhr.status);
+      reject({message:'HTTP Error: ' + xhr.status, remove: true});
       return;
     }
 
     const json = JSON.parse(xhr.responseText);
 
     if (!json || typeof json.location != 'string') {
-      reject('Invalid JSON: ' + xhr.responseText);
+      reject({message:'Invalid JSON: ' + xhr.responseText, remove: true});
       return;
     }
 
@@ -681,7 +681,7 @@ const image_upload_handler = (blobInfo, progress) => new Promise((resolve, rejec
   };
 
   xhr.onerror = () => {
-    reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+    reject({message:'Image upload failed due to a XHR Transport error. Code: ' + xhr.status, remove:true});
   };
 
   const formData = new FormData();
