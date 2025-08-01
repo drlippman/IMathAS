@@ -541,7 +541,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		selector: selectorstr,
 		inline: inlinemode,
 		license_key: 'gpl',
-		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg",
+		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach",
 		menubar: false, //"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
@@ -552,7 +552,8 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		file_picker_callback: filePickerCallBackFunc,
 		file_picker_types: 'file image',
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
-		images_upload_url: imasroot+'/tinymce8/upload_handler.php',
+		//images_upload_url: imasroot+'/tinymce8/upload_handler.php',
+		images_upload_handler: image_upload_handler,
 		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
@@ -646,6 +647,48 @@ function filePickerCallBack(callback, value, meta) {
         }
 	});
 }
+const image_upload_handler = (blobInfo, progress) => new Promise((resolve, reject) => {
+  const xhr = new XMLHttpRequest();
+  xhr.withCredentials = false;
+  xhr.open('POST', imasroot+'/tinymce8/upload_handler.php');
+
+  xhr.upload.onprogress = (e) => {
+	if (progress) {
+    	progress(e.loaded / e.total * 100);
+	}
+  };
+
+  xhr.onload = () => {
+    if (xhr.status === 403) {
+      reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+      return;
+    }
+
+    if (xhr.status < 200 || xhr.status >= 300) {
+      reject('HTTP Error: ' + xhr.status);
+      return;
+    }
+
+    const json = JSON.parse(xhr.responseText);
+
+    if (!json || typeof json.location != 'string') {
+      reject('Invalid JSON: ' + xhr.responseText);
+      return;
+    }
+
+    resolve(json.location);
+  };
+
+  xhr.onerror = () => {
+    reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+  };
+
+  const formData = new FormData();
+  formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+  xhr.send(formData);
+});
+
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
 		//value = value.replace(/[\x84\x93\x94]/g,'"');
