@@ -541,7 +541,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		selector: selectorstr,
 		inline: inlinemode,
 		license_key: 'gpl',
-		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet",
+		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons",
 		menubar: false, //"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
@@ -598,13 +598,13 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
                 }]
         }
 	if (document.documentElement.clientWidth<385) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline | saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent  | link image | asciimath asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
+		edsetup.toolbar2 = "bullist numlist outdent indent bold italic | asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<465) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline forecolor | saveclose";
+		edsetup.toolbar1 = "myEdit myInsert styles | bold italic forecolor saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent  | link unlink image | asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<575) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor | saveclose";
+		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline subscript superscript forecolor saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
 	}
 	if (setupfunction) {
