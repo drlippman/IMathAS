@@ -599,13 +599,16 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
         }
 	if (document.documentElement.clientWidth<385) {
 		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent bold italic | asciimath asciisvg";
+		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<465) {
-		edsetup.toolbar1 = "myEdit myInsert styles | bold italic forecolor saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent  | link unlink image | asciimath asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles | forecolor saveclose";
+		edsetup.toolbar2 = "bullist numlist outdent indent  | bold italic | asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<575) {
-		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline subscript superscript forecolor saveclose";
-		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline forecolor saveclose";
+		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";
+	}  else if (document.documentElement.clientWidth<650) {
+		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline subscript superscript forecolor snippet saveclose";
+		edsetup.toolbar2 = " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link image | asciimath asciimathcharmap asciisvg";
 	}
 	if (setupfunction) {
 		edsetup.setup = setupfunction;
@@ -1890,8 +1893,9 @@ $(function() {
 function doImageUploadResize(el, callback) {
 	let inputtype;
 	let originalFile;
+	let that;
 	if (el instanceof HTMLElement) {
-		const that = el; // input node
+		that = el; // input node
     	originalFile = el.files[0];
 		inputtype = 'file';
 	} else if (el instanceof Blob) {

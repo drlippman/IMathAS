@@ -56,7 +56,7 @@ if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "' . $exitUrl . '";</script>';
 }
 $nologo = true;
-$useeditor = 1;
+$useeditor = "noinit";
 $pagetitle = _('Assessment Detail');
 require_once '../header.php';
 

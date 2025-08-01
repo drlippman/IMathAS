@@ -90,7 +90,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
   header("Access-Control-Allow-Headers: Origin");
 }
 
-$useeditor = 1;
+$useeditor = "noinit";
 
 if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$_GET['cid']])) {
   $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
