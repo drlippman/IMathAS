@@ -1584,7 +1584,7 @@ function jsxParametric (&$board, $param, $ops=array()) {
         })";
 		
 		if (isset($ops['attributes'])) {
-			$out .= ".setAttribute({$ops['attributes']})";
+			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
