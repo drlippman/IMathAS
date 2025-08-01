@@ -248,8 +248,7 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 
 
 if (isset($useeditor) && $_SESSION['useed']==1) {
-    echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=021324"></script>';
-    //echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.js?v=062821"></script>';
+    echo '<script type="text/javascript" src="'.$staticroot.'/tinymce8/tinymce.min.js?v=073125" referrerpolicy="origin" crossorigin="anonymous"></script>';
 
 	echo "\n";
 	echo '<script type="text/javascript">';

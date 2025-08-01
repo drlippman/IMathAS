@@ -523,10 +523,10 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-var tinyMCEPreInit = {base: staticroot+"/tinymce4"};
+//var tinyMCEPreInit = {base: staticroot+"/tinymce8"};
 function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
-	var cssmode = css || 0;
-	var inlinemode = inline || 0;
+	var cssmode = css || false;
+	var inlinemode = inline || false;
 	var selectorstr = '';
 	if (edmode=="exact") { //list of IDs
 		selectorstr = '#'+edids.split(/,/).join(",#");
@@ -540,17 +540,10 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 	var edsetup = {
 		selector: selectorstr,
 		inline: inlinemode,
-		plugins: [
-			"lists advlist autolink attach image charmap anchor",
-			"searchreplace code link textcolor snippet",
-			"media table paste rollups colorpicker"
-		],
-        external_plugins: {
-            "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
-            "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
-        },
-		menubar: false,//"edit insert format table tools ",
-		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
+		license_key: 'gpl',
+		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg",
+		menubar: false, //"edit insert format table tools ",
+		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
         content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
@@ -559,12 +552,13 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		file_picker_callback: filePickerCallBackFunc,
 		file_picker_types: 'file image',
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
-		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
+		images_upload_url: imasroot+'/tinymce8/upload_handler.php',
 		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
 		branding: false,
+		promotion: false,
 		resize: "both",
 		width: '100%',
 		content_style: "body {background-color: " + (coursetheme.match(/_dark/) ? "#000" : "#fff") + " !important;}",
@@ -572,7 +566,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
@@ -627,7 +621,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 };
 
 function filePickerCallBack(callback, value, meta) {
-	var connector = imasroot+"/tinymce4/file_manager.php";
+	var connector = imasroot+"/tinymce8/file_manager.php";
 
 	switch (meta.filetype) {
 		case "image":
@@ -637,19 +631,20 @@ function filePickerCallBack(callback, value, meta) {
 			connector += "?type=files";
 			break;
 	}
-	tinyMCE.activeEditor.windowManager.open({
-		file : connector,
+	tinyMCE.activeEditor.windowManager.openUrl({
+		url : connector,
 		title : 'File Manager',
 		width : 350,
 		height : 450,
 		resizable : "yes",
 		inline : "yes",
-		close_previous : "no"
-	    }, {
-		oninsert: function(url, objVal) {
-			callback(url);
-		}
-	    });
+		close_previous : "no",
+		onMessage: function(api, data) {
+            if (data.data.filename) {
+				callback(data.data.filename);
+			}
+        }
+	});
 }
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
