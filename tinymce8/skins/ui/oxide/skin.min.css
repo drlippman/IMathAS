@@ -19,3 +19,6 @@
 .tox-split-button__chevron:hover {
     border-left: 1px solid #ddd;
 }
+div.tox-tinymce {
+    z-index: 30;
+}
