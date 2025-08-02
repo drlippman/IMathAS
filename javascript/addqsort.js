@@ -106,7 +106,7 @@ function handleClickTextSegmentButton(e) {
     ) {
         collapseAndStyleTextSegment(selector);
     } else {
-        expandAndStyleTextSegment(selector);
+        expandAndStyleTextSegment(selector, type === "global");
     }
 }
 
@@ -117,6 +117,7 @@ function refreshTable() {
     initeditor("selector", "div.textsegment", null, true /*inline*/, editorSetup);
     tinymce.init({
         selector: "h4.textsegment",
+        license_key: 'gpl',
         inline: true,
         menubar: false,
         statusbar: false,
@@ -145,29 +146,35 @@ function refreshTable() {
 
 //Show the editor toolbar on a newly created text segment
 function activateLastEditorIfBlank() {
-    last_editor = tinymce.editors[tinymce.editors.length - 1];
-    if (last_editor !== undefined && last_editor.getContent() == "") {
-        tinyMCE.setActive(last_editor);
-        last_editor.fire("focus");
-        last_editor.selection.setCursorLocation();
+    for (let i=0; i < itemarray.length; i++) {
+        if (itemarray[i][0] == 'text' && itemarray[i][1] == '') {
+            let to_enable = tinymce.get('textseg' + i);
+            tinyMCE.setActive(to_enable);
+            to_enable.dispatch("focus");
+        }
     }
 }
 
 //this is called by tinycme during initialization
 function editorSetup(editor) {
     var i = this.id.match(/[0-9]+$/)[0];
-    editor.addButton("saveclose", {
+    editor.ui.registry.addButton("saveclose", {
         text: "Save All",
         title: "Save All",
         icon: "save",
-        //icon: "shrink2 mce-i-addquestions-ico",
-        classes: "dim saveclose saveclose" + i, // "mce-dim" and "mce-saveclose0"
-        //disabled: true,
-        onclick: function () {
+        enabled: anyEditorDirtyVal,
+        onAction: function (api) {
             highlightSaveButton(false);
             savetextseg(); //Save all text segments
+            api.setEnabled(false);
         },
-        onPostRender: function () {
+        onSetup: function (api) {
+            function updateEnabledState() {
+                if (api.isEnabled() != anyEditorDirtyVal) {
+                    api.setEnabled(anyEditorDirtyVal);
+                }
+            }
+            editor.on('NodeChange', updateEnabledState);
             updateSaveButtonDimming();
         }
     });
@@ -204,13 +211,12 @@ function editorSetup(editor) {
 //Highlight all Save All buttons when the mouse leaves an editor
 function highlightSaveButton(leaving) {
     if (anyEditorIsDirty()) {
-        var i = tinymce.activeEditor.id.match(/[0-9]+$/)[0];
         if (leaving) {
-            $("div.mce-saveclose" + i)
+            $("button[data-mce-name='saveclose']")
                 .css("transition", "background-color 0s")
                 .addClass("highlightbackground");
         } else {
-            $("div.mce-saveclose" + i)
+            $("button[data-mce-name='saveclose']")
                 .css("transition", "background-color 1s ease-out")
                 .removeClass("highlightbackground");
         }
@@ -219,46 +225,35 @@ function highlightSaveButton(leaving) {
 
 //If any editor is dirty, undim the Save All button and
 // highlight that editor
+var anyEditorDirtyVal = false;
 function updateSaveButtonDimming(dim) {
-    var save_buttons = $("div.mce-saveclose");
     if (tinyMCE.activeEditor && tinyMCE.activeEditor.isDirty()) {
-        $("div.mce-saveclose").removeClass("mce-dim");
-        //update tinymce data structure in case other editors haven't
-        // been activated
-        for (index in tinymce.editors) {
-            var editor = tinymce.editors[index];
-            editor.buttons["saveclose"].classes = editor.buttons[
-                "saveclose"
-            ].classes.replace(/dim ?/g, "");
-            //could switch save to collapse icon
-            var editor_id = tinymce.activeEditor.id;
-            $("#" + editor_id)
-                .css("transition", "border 0s")
-                .removeClass("intro")
-                .parent()
-                .addClass("highlightborder");
-        }
+        anyEditorDirtyVal = true;
+
+        var editor_id = tinymce.activeEditor.id;
+        $("#" + editor_id)
+            .css("transition", "border 0s")
+            .removeClass("intro")
+            .parent()
+            .addClass("highlightborder");
+        $("#collapse-buttonglobal").fadeOut();
         var i = getIndexForSelector("#" + tinymce.activeEditor.id);
         var type = getTypeForSelector("#" + tinymce.activeEditor.id);
         $("#edit-button" + type + i).fadeOut();
-        //$("#edit-buttonglobal").fadeOut();
-        $("#collapse-buttonglobal").fadeOut();
     }
-    //TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
-    // re-dim the Save All button after checking all editors
 }
 
-function expandAndStyleTextSegment(selector) {
+function expandAndStyleTextSegment(selector, isglobal) {
     var i = getIndexForSelector(selector);
     var type = getTypeForSelector(selector);
 
     $(selector).each(function (index, element) {
-        expandTextSegment("#" + element.id);
+        expandTextSegment("#" + element.id, isglobal);
     });
     //$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 
     //change the exit/collapse button for the corresponding editor
-    if (i === undefined || type === "global") {
+    if (i === undefined || isglobal) {
         //expand all
         //$("#edit-buttonglobal").attr("title","Collapse All");
         //$("#edit-button-spanglobal").removeClass("icon-pencil")
@@ -288,7 +283,7 @@ function collapseAndStyleTextSegment(selector) {
 
     if (i !== undefined) {
         //Deactivate the editor
-        tinymce.editors["textseg" + type + i].fire("focusout");
+        tinymce.get("textseg" + type + i).dispatch("focusout");
     }
 
     collapseTextSegment(selector);
@@ -328,7 +323,7 @@ function collapseAndStyleTextSegment(selector) {
 }
 
 //adjust the height/width smoothly (could replace with jquery-ui)
-function expandTextSegment(selector) {
+function expandTextSegment(selector, isglobal) {
     var type = getTypeForSelector(selector);
     //copy max-height/max-width to height/width temporarily
     var max_height = $(selector).css("max-height");
@@ -375,9 +370,7 @@ function expandTextSegment(selector) {
             //If a single editor was expanded, activate the editor
             //TODO remember whether this was a global expand
             //     if available, also scroll to keep global button fixed
-            var i = getIndexForSelector(selector);
-            var type = getTypeForSelector(selector);
-            if (i !== undefined && type !== "global") {
+            if (!isglobal) {
                 $("#textseg" + type + i).focus();
             }
         });
@@ -448,7 +441,7 @@ function getEditorForSelector(selector) {
     var type = getTypeForSelector(selector);
 
     if (i !== undefined && i.length > 0) {
-        var editor = tinymce.editors["textseg" + type + i];
+        var editor = tinymce.get("textseg" + type + i);
     }
     //return undefined if the selector didn't end in a digit
     return editor;
@@ -456,8 +449,9 @@ function getEditorForSelector(selector) {
 
 function anyEditorIsDirty() {
     var any_dirty = false;
-    for (index in tinymce.editors) {
-        if (tinymce.editors[index].isDirty()) {
+    const allEditors = tinymce.get();
+    for (index in allEditors) {
+        if (allEditors[index].isDirty()) {
             any_dirty = true;
             break;
         }
@@ -912,8 +906,9 @@ function edittextseg(i) {
 
 function savetextseg(i) {
     var any_dirty = false;
-    for (index in tinymce.editors) {
-        var editor = tinymce.editors[index];
+    const allEditors = tinymce.get();
+    for (index in allEditors) {
+        var editor = allEditors[index];
         if (editor.isDirty()) {
             var i = editor.id.match(/[0-9]+$/)[0];
             var i = getIndexForSelector("#" + editor.id);
@@ -1879,6 +1874,7 @@ function submitChanges() {
             document.getElementById(target).innerHTML = "";
             refreshTable();
             updateSaveButtonDimming();
+            anyEditorDirtyVal = false;
             //scroll to top if save action puts the curqtbl out of view
             if (
                 $(window).scrollTop() >
