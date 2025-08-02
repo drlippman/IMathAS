@@ -120,17 +120,8 @@ function draw_angle() {
   [$xLabLoc,$yLabLoc] = [$labFact*cos($labAng),$labFact*sin($labAng)];
 
   $altAngleLab = $lab;
-  $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
-  $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
-  $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
   if (!empty($lab)) {
-    for ($j=0;$j<count($greekSpelled);$j++) {
-      if (preg_match($greekSpelled[$j],$lab)) {
-        $degSymbol = '';
-        $lab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$lab);
-        $altAngleLab = preg_replace($greekSpelled[$j],$altGreekSymbol[$j],$altAngleLab);
-      }
-    }  
+    list($lab, $altAngleLab, $degSymbol) = draw_markuplabel($lab, $altAngleLab, $degSymbol);
   } elseif (empty($lab)) {$degSymbol='';}
   $args = $args."text([$xLabLoc,$yLabLoc],'$lab$degSymbol');";
   
@@ -447,17 +438,8 @@ function draw_circle() {
           $hasAngleLabel = true;
           $angLab = $in[2];
           $altAngleLab = $in[2];
-          $greekSpelled = ["/\s?alpha/","/\sbeta/","/\s?gamma/","/\s?theta/","/\s?phi/","/\s?tau/","/\s?pi/","/\s?rad/"];
-          $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
-          $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
           if (!empty($angLab)) {
-            for ($j=0;$j<count($greekSpelled);$j++) {
-              if (preg_match($greekSpelled[$j],$angLab)) {
-                $degSymbol = '';
-                $angLab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$angLab);
-                $altAngleLab = preg_replace($greekSpelled[$j],$altGreekSymbol[$j],$altAngleLab);
-              }
-            }
+            list($angLab, $altAngleLab, $degSymbol) = draw_markuplabel($angLab, $altAngleLab, $degSymbol);
           }
           
           // draw angle label
@@ -905,15 +887,11 @@ function draw_circlesector() {
           $in[2] = str_replace("pi","&pi;",$in[2]);
           $degSymbol = "";
         }
-        $greekSpelled = ["alpha","beta","gamma","theta","phi","tau"];
-        $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;"];
-        foreach ($greekSpelled as $greek) {
-          if (strpos($greek,$in[2]) !== false) {
-            $degSymbol = '';
-          }
-        }
+
         $altAngleLab = $in[2];
-        $in[2] = str_replace($greekSpelled,$greekSymbol,$in[2]);
+
+        list($in[2], $altAngleLab, $degSymbol) = draw_markuplabel($in[2], $altAngleLab, $degSymbol);
+
         // Rotate the label position away from the angle line
         $angLabOffset = [-30+$angLabRad*22,30-$angLabRad*22];
         if ($minxyDisp > -0.7) {
@@ -1862,16 +1840,11 @@ function draw_triangle() {
       $degSymbol[$i] = '';
       $altDegSymbol[$i] = '';
     }
-    $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/"];
-    $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;"];
     if (!empty($angLab[$i])) {
-      for ($j=0;$j<count($greekSpelled);$j++) {
-        if (preg_match($greekSpelled[$j],$angLab[$i])) {
-          $degSymbol[$i] = '';
-          $altDegSymbol[$i] = " degrees";
-          $angLab[$i] = preg_replace($greekSpelled[$j],$greekSymbol[$j],$angLab[$i]);
-        }
-      }  
+      list($angLab[$i], $altAngleLab, $degSymbol[$i]) = draw_markuplabel($angLab[$i], $angLab[$i], $degSymbol[$i]);
+      if ($degSymbol[$i] == '') {
+        $altDegSymbol[$i] = " degrees";
+      }
     }
     $args = $args."text([{$angLabLoc[$i][0]},{$angLabLoc[$i][1]}],'".$angLab[$i]."$degSymbol[$i]');";
   }
@@ -1882,6 +1855,9 @@ function draw_triangle() {
   $sidLabLoc[2] = [$xMid[2] - $xyDiff/5*($y[2]-$yMid[2])/sqrt(pow($y[2]-$yMid[2],2)+pow($x[2] - $xMid[2],2)), $yMid[2] + $xyDiff/5*($x[2] - $xMid[2])/sqrt(pow($y[2]-$yMid[2],2)+pow($x[2] - $xMid[2],2))];
 
   for ($i=0;$i<3;$i++) {
+    if (!empty($sidLab[$i])) {
+      list($sidLab[$i]) = draw_markuplabel($sidLab[$i], '', '');
+    }
     $args = $args."text([{$sidLabLoc[$i][0]},{$sidLabLoc[$i][1]}],'".$sidLab[$i]."');";
   }
   
@@ -3904,5 +3880,19 @@ function draw_polyomino() {
     return $gr;
   }
   
+}
+/* internal utility function */
+function draw_markuplabel($lab, $altlab, $degSymbol) {
+  $greekSpelled = ["/(?<!&)alpha/","/(?<!&)beta/","/(?<!&)gamma/","/(?<!&)theta/","/(?<!&)phi/","/(?<!&)tau/","/(?<!&)pi/","/(?<!&)rho/","/rad/"];
+  $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;","&rho;",""];
+  $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi"," rho",""];
+  for ($j=0;$j<count($greekSpelled);$j++) {
+    if (preg_match($greekSpelled[$j],$lab)) {
+      $degSymbol = '';
+      $lab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$lab);
+      $altlab = preg_replace($greekSpelled[$j],$altGreekSymbol[$j],$altlab);
+    }
+  }
+  return [$lab, $altlab, $degSymbol];
 }
 ?>
