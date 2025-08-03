@@ -689,8 +689,12 @@ const image_upload_handler = (blobInfo, progress) => new Promise((resolve, rejec
 
   const formData = new FormData();
   let fileblob = blobInfo.blob();
-  doImageUploadResize(fileblob, function (res) {
-	formData.append('file', res, blobInfo.filename());
+  doImageUploadResize(fileblob, function (res, isresized) {
+	let filename = blobInfo.filename();
+	if (isresized) {
+		filename = filename.replace(/\.\w+$/,'.jpg');
+	}
+	formData.append('file', res, filename);
   	xhr.send(formData);
   });
   
@@ -1904,7 +1908,7 @@ function doImageUploadResize(el, callback) {
 	}
 
     if (!originalFile || !originalFile.type.startsWith('image')) {
-        callback(el);
+        callback(el, false);
         return;
     }
 
@@ -1938,7 +1942,7 @@ function doImageUploadResize(el, callback) {
             canvas.toBlob(function (blob) {
 				if (inputtype === 'blob') {
 					if (typeof callback === 'function') {
-						callback(blob);
+						callback(blob, true);
 					}
 				} else {
 					var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
