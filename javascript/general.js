@@ -580,12 +580,13 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			if (inIframe()) {
 				sendLTIresizemsg();
 				editor.on('OpenWindow', (e) => {
-						let ytop = editor.editorContainer.getBoundingClientRect().y;
-						let dialogel = document.querySelector(".tox-dialog");
-						dialogel.style.position = "absolute";
-						dialogel.style.top = ytop + "px";
-						dialogel.focus();
-						console.log(e);
+					let ytop = editor.editorContainer.getBoundingClientRect().y;
+					let dialogel = document.querySelector(".tox-dialog");
+					dialogel.style.position = "absolute";
+					dialogel.style.top = ytop + "px";
+					dialogel.style.width = '';
+					dialogel.focus();
+					console.log(e);
 				});
 			}
         },
