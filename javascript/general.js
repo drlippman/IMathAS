@@ -158,6 +158,13 @@ function popupwindow(id,content,width,height,scroll) {
 	}
 }
 
+var inIframe = function() {
+	try {
+		return window.self !== window.top;
+	} catch (e) {
+		return true;
+	}
+}  
 
 function findPos(obj) { //from quirksmode.org
 	var curleft = curtop = 0;
@@ -569,7 +576,19 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		style_formats_merge: true,
 		snippet_list: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
-		init_instance_callback: function(editor) {sendLTIresizemsg();},
+		init_instance_callback: function(editor) {
+			if (inIframe()) {
+				sendLTIresizemsg();
+				editor.on('OpenWindow', (e) => {
+						let ytop = editor.editorContainer.getBoundingClientRect().y;
+						let dialogel = document.querySelector(".tox-dialog");
+						dialogel.style.position = "absolute";
+						dialogel.style.top = ytop + "px";
+						dialogel.focus();
+						console.log(e);
+				});
+			}
+        },
 		style_formats: [{
 			title: "Font Family",
 			items: [
