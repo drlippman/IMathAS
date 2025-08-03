@@ -590,7 +590,6 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 					dialogel.style.top = ytop + "px";
 					dialogel.style.width = '';
 					dialogel.focus();
-					console.log(e);
 				});
 			}
         },
