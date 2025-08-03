@@ -552,6 +552,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		menubar: false, //"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
+		toolbar_mode: "sliding",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
         content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
@@ -576,6 +577,9 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		style_formats_merge: true,
 		snippet_list: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
+		mobile: {
+			toolbar_mode: 'sliding'
+		},
 		init_instance_callback: function(editor) {
 			if (inIframe()) {
 				sendLTIresizemsg();
