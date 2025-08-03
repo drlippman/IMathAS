@@ -580,8 +580,12 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			if (inIframe()) {
 				sendLTIresizemsg();
 				editor.on('OpenWindow', (e) => {
-					let ytop = editor.editorContainer.getBoundingClientRect().y;
+					let editordim = editor.editorContainer.getBoundingClientRect();
 					let dialogel = document.querySelector(".tox-dialog");
+					let dialogdim = dialogel.getBoundingClientRect();
+					let ytop = Math.min(
+						Math.max(editordim.y + .5*editordim.height - .5*dialogdim.height, 0),
+						document.documentElement.clientHeight - dialogdim.height);
 					dialogel.style.position = "absolute";
 					dialogel.style.top = ytop + "px";
 					dialogel.style.width = '';
