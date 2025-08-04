@@ -618,7 +618,7 @@
 
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
-	$cnt = 0;
+	$cnt = 100;
 	$onepergroup = array();
 	require_once "../includes/filehandler.php";
     echo '<div id="qlistwrap">';

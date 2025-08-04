@@ -140,6 +140,17 @@ class QuestionHtmlGenerator
         $graphdispmode = $_SESSION['userprefs']['graphdisp'] ?? 1;
         $drawentrymode = $_SESSION['userprefs']['drawentry'] ?? 1;
 
+        if ($thisq != $this->questionParams->getDisplayQuestionNumber() + 1) {
+            // adjust things so that $thisq is displayquestionnumber
+            $dispqn = $this->questionParams->getDisplayQuestionNumber() + 1;
+            $stuanswers = $this->reIndexArray($stuanswers, $thisq, $dispqn);
+            $stuanswersval = $this->reIndexArray($stuanswersval, $thisq, $dispqn);
+            $autosaves = $this->reIndexArray($autosaves, $thisq, $dispqn);
+            $scorenonzero = $this->reIndexArray($scorenonzero, $thisq, $dispqn);
+            $scoreiscorrect = $this->reIndexArray($scoreiscorrect, $thisq, $dispqn);
+            $thisq = $dispqn;
+        }
+
         $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
 
         $thiscourseid = (isset($GLOBALS['cid']) && is_numeric($GLOBALS['cid'])) ?
@@ -692,7 +703,7 @@ class QuestionHtmlGenerator
                 echo '$hintlabel should be a single string';
                 $hintlabel = '';
             }
-            $hintloc = $this->getHintText($hints, $hintlabel ?? '');
+            $hintloc = $this->getHintText($hints, $hintlabel ?? '', $thisq, $scoreiscorrect);
         }
 
         /*
@@ -1069,15 +1080,14 @@ class QuestionHtmlGenerator
      *
      * @param array $hints As provided by the question writer.
      * @param string $hintlabel 
+     * @param int $thisq
+     * @param array $scoreiscorrect
      * @return string|array The hint text.
      */
-    private function getHintText(array $hints, string $hintlabel)
+    private function getHintText(array $hints, string $hintlabel, int $thisq, array $scoreiscorrect)
     {
         $qdata = $this->questionParams->getQuestionData();
         $attemptn = $this->questionParams->getStudentAttemptNumber();
-        $scoreiscorrect = $this->questionParams->getScoreIsCorrect();
-
-        $thisq = $this->questionParams->getQuestionNumber() + 1;
 
         $hintloc = '';
 
@@ -1160,9 +1170,9 @@ class QuestionHtmlGenerator
                     (is_array($scoreiscorrect[$thisq]) && min($scoreiscorrect[$thisq]) == 1)
                 )) {
                     $usenum--;  // if correct, use prior hint
-                }
+                } 
             }
-            
+
             if (!empty($hints[$usenum])) {
                 if (!is_string($hints[$usenum])) { // shouldn't be, but a hack to get old bad code from throwing errors.
                     $hintloc = $hints[$usenum]; 
@@ -1515,5 +1525,18 @@ class QuestionHtmlGenerator
         return preg_replace_callback('/`(.*?)`/s', function($m) {
             return '`' . str_replace(['degrees','degree'],'^@', $m[1]).'`';
         }, $str);
+    }
+
+    /*
+     * Reindex arrays like stuanswers when the display question number is different than $thisq,
+     * so that any $thisq references to these arrays will work
+     */
+    private function reIndexArray(array $arr, int $thisq, int $dispqn) {
+        $diff = $dispqn - $thisq;
+        $out = [];
+        foreach ($arr as $k=>$v) {
+            $out[$k+$diff] = $v;
+        }
+        return $out;
     }
 }
