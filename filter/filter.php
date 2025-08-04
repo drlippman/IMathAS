@@ -108,6 +108,7 @@
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}
+		$str = str_replace('alt="decorative"', 'alt=""', $str);
 		if ($_SESSION['graphdisp']==0) {
 			if (strpos($str,'embed')!==FALSE) {
 				$str = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $str);
