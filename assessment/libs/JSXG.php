@@ -29,6 +29,7 @@ $allowedmacros[] = "JSXG_addAngle";
 $allowedmacros[] = "JSXG_addCircle";
 $allowedmacros[] = "JSXG_addPolygon";
 $allowedmacros[] = "JSXG_addGlider";
+$allowedmacros[] = "JSXG_getLabel";
 
 ####### BASIC FUNCTION THAT JUST LOADS THE JSXGRAPH SCRIPT
 function loadJSX() {
@@ -2170,5 +2171,12 @@ function JSXG_createBlankBoard($label, $ops){
 		return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 
 	}
+
+  function JSXG_getLabel($board) {
+    $labStart = strpos($board, "jxgboard_") + 9;
+		$labEnd = strpos($board, "'", $labStart);
+		$label = substr($board, $labStart, $labEnd - $labStart);
+    return $label;
+  }
 
 ?>
