@@ -958,15 +958,15 @@ class Imathas_LTI_Database implements LTI\Database
         $aid = $link->get_typeid();
         $stm = $this->dbh->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
         $stm->execute(array(':userid' => $userid, ':assessmentid' => $aid));
-        $exceptionrow = $stm->fetch(PDO::FETCH_NUM);
+        $exceptionrow = $stm->fetch(PDO::FETCH_ASSOC);
         $useexception = false;
         if ($exceptionrow != null) {
             //have exception.  Update using lti_duedate if needed
-            if ($link->get_date_by_lti() > 0 && $lms_duedate != $exceptionrow[1]) {
+            if ($link->get_date_by_lti() > 0 && $lms_duedate != $exceptionrow['enddate']) {
                 //if new due date is later, or no latepass used, then update
-                if ($exceptionrow[2] == 0 || $lms_duedate > $exceptionrow[1]) {
+                if ($exceptionrow['islatepass'] == 0 || $lms_duedate > $exceptionrow['enddate']) {
                     $stm = $this->dbh->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-                    $stm->execute(array(':startdate' => min($now, $lms_duedate, $exceptionrow[0]),
+                    $stm->execute(array(':startdate' => min($now, $lms_duedate, $exceptionrow['startdate']),
                         ':enddate' => $lms_duedate, ':userid' => $userid, ':assessmentid' => $aid));
                 }
             }

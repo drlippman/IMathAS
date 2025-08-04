@@ -84,10 +84,10 @@ if (isset($_GET['marktagged'])) {
 }
 
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
-	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
+	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 	$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
 	if ($stm->rowCount()>0) {
-		$exception = $stm->fetch(PDO::FETCH_NUM);
+		$exception = $stm->fetch(PDO::FETCH_ASSOC);
 	} else {
 		$exception = null;
 	}

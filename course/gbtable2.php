@@ -1024,9 +1024,9 @@ function gbtable() {
 	$exceptions = array();
 	$canuseexception = array();
 	$forumexceptions = array();
-	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate,imas_assessments.LPcutoff,ie.timeext FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.is_lti,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate,imas_assessments.LPcutoff,ie.timeext,ie.waivereqscore FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
-	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff,ie.timeext FROM imas_exceptions AS ie,imas_forums WHERE ";
+	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.is_lti,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff,ie.timeext,ie.waivereqscore FROM imas_exceptions AS ie,imas_forums WHERE ";
 	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
@@ -1039,7 +1039,14 @@ function gbtable() {
 			if ($r['exceptionenddate'] > $courseenddate && ($now > $courseenddate || $r['islatepass'] > 0)) { //for grading purposes, cutoff exceptions at courseenddate
 				$r['exceptionenddate'] = $courseenddate;
 			}
-			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass'],$r['timeext']);
+			$exceptions[$r['typeid']][$r['userid']] = array(
+				'startdate' => $r['exceptionstartdate'],
+				'enddate' => $r['exceptionenddate'],
+				'islatepass' => $r['islatepass'],
+				'is_lti' => $r['is_lti'],
+				'timeext' => $r['timeext'],
+				'waivereqscore' => $r['waivereqscore']
+			);
 			if ($limuser>0) {
 				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$r['typeid']][$r['userid']], $r, true);
 				if ($useexception) {
@@ -1153,11 +1160,11 @@ function gbtable() {
 
 		if ($useexception) {
 			//TODO:  Does not change due date display in individual user gradebook view when no asid
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']]['enddate'] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']]['enddate'];
 				if ($limuser>0) {  //change $avail past/cur/future
 					if ($now<$thised) {
 						$avail[$assessidx[$l['assessmentid']]] = 1;
@@ -1361,7 +1368,7 @@ function gbtable() {
 		$useexception = false; $canuselatepass = false; $hastimeext = false;
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
             list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
-            $hastimeext = ($exceptions[$l['assessmentid']][$l['userid']][3] > 0);
+            $hastimeext = ($exceptions[$l['assessmentid']][$l['userid']]['timeext'] > 0);
 		} else {
 			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
 		}
@@ -1372,11 +1379,11 @@ function gbtable() {
 
 		if ($useexception) {
 			//TODO:  Does not change due date display in individual user gradebook view when no asid
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="never") { //TODO
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']]['enddate'] && $assessmenttype[$i]=="never") { //TODO
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']]['enddate'];
 				if ($limuser>0) {  //change $avail past/cur/future
 					if ($now<$thised) {
 						$avail[$assessidx[$l['assessmentid']]] = 1;
@@ -1536,7 +1543,9 @@ function gbtable() {
 		}
 
 		if (($l['status']&128)>0 && 
-          ($workcutoff[$i] == 0 || $now < $l['lastchange'] + $workcutoff[$i])
+          ($workcutoff[$i] == 0 ||
+		  (isset($exceptions[$l['assessmentid']][$l['userid']]) && ($exceptions[$l['assessmentid']][$l['userid']]['waivereqscore']&2) == 2) ||
+		  $now < $l['lastchange'] + $workcutoff[$i])
         ) { // accepting showwork after assess and within cutoff
 			$gb[$row][1][$col][16] = 1;
 		} else {
@@ -2546,7 +2555,11 @@ function gbtable() {
 			if ($gbitem[6]==0) {
 				$k = $assessidx[$gbitem[7]];
 				$gb[1][1][$col][13] = 1;
-				if (isset($reqscores[$k]) && $reqscores[$k]['aid']>0 && isset($assesscol[$reqscores[$k]['aid']])) {
+				if (isset($reqscores[$k]) && 
+				    $reqscores[$k]['aid']>0 && 
+				    isset($assesscol[$reqscores[$k]['aid']]) && 
+					(!isset($exceptions[$gbitem[7]][$limuser]) || ($exceptions[$gbitem[7]][$limuser]['waivereqscore']&1) == 0)
+				) {
                     $colofprereq = $assesscol[$reqscores[$k]['aid']];
                     if (empty($gb[1][1][$colofprereq][14])) {
                         if (!isset($gb[1][1][$colofprereq][0]) || is_numeric($gb[1][1][$colofprereq][0]) && (

@@ -731,12 +731,12 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			'LPcutoff'=>$line['LPcutoff']
 			);
 
-		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$get_uid, ':assessmentid'=>$line['assessmentid']));
 		$useexception = false;
 		if ($stm2->rowCount()>0) {
-			$exception = $stm2->fetch(PDO::FETCH_NUM);
-			$exped = $exception[1];
+			$exception = $stm2->fetch(PDO::FETCH_ASSOC);
+			$exped = $exception['enddate'];
 			if ($exped>$saenddate) {
 				$saenddate = $exped;
 			}

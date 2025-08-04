@@ -292,7 +292,7 @@ if (!$viewall) {
 		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
+			$exceptions[$line['id']] = $line;
 		}
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
@@ -351,8 +351,8 @@ function printlist($items) {
 				 if (isset($exceptions[$item])) {
 				 	 $useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$item], $line, true);
 				 	 if ($useexception) {
-				 	 	 $line['startdate'] = $exceptions[$item][0];
-				 	 	 $line['enddate'] = $exceptions[$item][1];
+				 	 	 $line['startdate'] = $exceptions[$item]['startdate'];
+				 	 	 $line['enddate'] = $exceptions[$item]['enddate'];
 				 	 }
 				 }
 				 if ($viewall || ($line['avail']==1 && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
@@ -508,10 +508,10 @@ function upsendexceptions(&$items) {
 				if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
 			  }
 		   } else {
-			   if (isset($exceptions[$item]) && $exceptions[$item][4]=='A') {
+			   if (isset($exceptions[$item]) && $exceptions[$item]['itemtype']=='A') {
 				  // return ($exceptions[$item]);
-				   if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
-				   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
+				   if ($exceptions[$item]['startdate']<$minsdate) { $minsdate = $exceptions[$item]['startdate'];}
+				   if ($exceptions[$item]['enddate']>$maxedate) { $maxedate = $exceptions[$item]['enddate'];}
 			   }
 		   }
 	   }

@@ -121,16 +121,16 @@ $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)
 $exceptions = array();
 $forumexceptions = array();
 if (!isset($teacherid)) {
-	$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid");
+	$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,is_lti,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid");
 	$stm->execute(array(':userid'=>$userid));
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		if ($row[2] > $courseenddate && $row[3] > 0) {
-			$row[2] = $courseenddate;
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['enddate'] > $courseenddate && $row['islatepass'] > 0) {
+			$row['enddate'] = $courseenddate;
 		}
-		if ($row[5]=='A') {
-			$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
-		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
-			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],Sanitize::simpleString($row[5]));
+		if ($row['itemtype']=='A') {
+			$exceptions[$row['assessmentid']] = $row;
+		} else if ($row['itemtype']=='F' || $row['itemtype']=='P' || $row['itemtype']=='R') {
+			$forumexceptions[$row['assessmentid']] = $row;
 		}
 	}
 }
@@ -173,8 +173,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if (isset($exceptions[$row['id']])) {
 		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row);
 		if ($useexception) {
-			$row['startdate'] = $exceptions[$row['id']][0];
-			$row['enddate'] = $exceptions[$row['id']][1];
+			$row['startdate'] = $exceptions[$row['id']]['startdate'];
+			$row['enddate'] = $exceptions[$row['id']]['enddate'];
 		}
 	} else {
 		$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($row);
@@ -210,7 +210,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 	$showgrayedout = false;
     if (!isset($teacherid) && $status < 2 && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && 
-        (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0) &&
+        (!isset($exceptions[$row['id']]) || ($exceptions[$row['id']]['waivereqscore']&1)==0) &&
         empty($excused['A'.$row['reqscoreaid']])
     ) {
 		if ($bestscores_stm===null) { //only prepare once

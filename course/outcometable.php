@@ -607,15 +607,15 @@ function outcometable() {
 
 	//pull exceptions
 	$exceptions = array();
-	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.startdate,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
+	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.startdate,imas_exceptions.enddate,imas_exceptions.islatepass,imas_exceptions.is_lti FROM imas_exceptions,imas_assessments WHERE ";
 	$query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid));
-	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-		if (!isset($sturow[$r[1]])) { continue;}
-        $exceptions[$r[0]][$r[1]] = array($r[2],$r[3],$r[4]);
-        if (isset($assesscol[$r[0]]) && isset($sturow[$r[1]])) {
-            $gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][2] = 10; //will get overwritten later if assessment session exists
+	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
+		if (!isset($sturow[$r['userid']])) { continue;}
+        $exceptions[$r['assessmentid']][$r['userid']] = $r;
+        if (isset($assesscol[$r['assessmentid']]) && isset($sturow[$r['userid']])) {
+            $gb[$sturow[$r['userid']]][1][$assesscol[$r['assessmentid']]][2] = 10; //will get overwritten later if assessment session exists
         }
 	}
 
@@ -675,13 +675,13 @@ function outcometable() {
 		}
 
 		if ($useexception) {
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']]['enddate'] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']]['enddate'];
 				if ($limuser>0) {  //change $avail past/cur/future
-					if ($now<$thised && $now>$exceptions[$l['assessmentid']][$l['userid']][0]) { //inside exception window
+					if ($now<$thised && $now>$exceptions[$l['assessmentid']][$l['userid']]['startdate']) { //inside exception window
 						$gb[0][1][$col][2] = 1;
 					} else if ($now>$thised) { //past exception due date
 						$gb[0][1][$col][2] = 0;
@@ -799,13 +799,13 @@ function outcometable() {
 		}
 
 		if ($useexception) {
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $sa[$i]=="never") {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']]['enddate'] && $sa[$i]=="never") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']]['enddate'];
 				if ($limuser>0) {  //change $avail past/cur/future
-					if ($now<$thised && $now>$exceptions[$l['assessmentid']][$l['userid']][0]) { //inside exception window
+					if ($now<$thised && $now>$exceptions[$l['assessmentid']][$l['userid']]['startdate']) { //inside exception window
 						$gb[0][1][$col][2] = 1;
 					} else if ($now>$thised) { //past exception due date
 						$gb[0][1][$col][2] = 0;

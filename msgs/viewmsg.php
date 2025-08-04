@@ -149,15 +149,15 @@
 				$due = $adata['enddate'];
 
 				//list($aid,$due) = $stm->fetch(PDO::FETCH_NUM);
-				$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+				$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$adata['id']));
 				if ($stm->rowCount()>0) {
-					$exception = $stm->fetch(PDO::FETCH_NUM);
+					$exception = $stm->fetch(PDO::FETCH_ASSOC);
 					require_once "../includes/exceptionfuncs.php";
 					$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 					$useexception = $exceptionfuncs->getCanUseAssessException($exception, $adata, true);
 					if ($useexception) {
-						$due = $exception[1];
+						$due = $exception['enddate'];
 					}
 				}
 				$duedate = tzdate('D m/d/Y g:i a',$due);

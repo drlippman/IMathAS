@@ -48,13 +48,13 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 	$exceptions = array();
 	$forumexceptions = array();
 	if (isset($studentid)) {
-		$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid");
+		$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,is_lti,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$userid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if ($row[5]=='A') {
-				$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
-			} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
-				$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],$row[5]);
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['itemtype']=='A') {
+				$exceptions[$row['assessmentid']] = $row;
+			} else if ($row['itemtype']=='F' || $row['itemtype']=='P' || $row['itemtype']=='R') {
+				$forumexceptions[$row['assessmentid']] = $row;
 			}
 		}
 	}
@@ -95,8 +95,8 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			if (isset($exceptions[$row['id']])) {
 				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row, true);
 				if ($useexception) {
-					$row['startdate'] = $exceptions[$row['id']][0];
-					$row['enddate'] = $exceptions[$row['id']][1];
+					$row['startdate'] = $exceptions[$row['id']]['startdate'];
+					$row['enddate'] = $exceptions[$row['id']]['enddate'];
 				}
 			}
 			//if startdate is past now, skip
@@ -105,7 +105,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			}
 
 			$showgrayedout = false;
-			if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
+			if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || ($exceptions[$row['id']]['waivereqscore']&1)==0)) {
 				if ($bestscores_stm===null) { //only prepare once
 					$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
 					$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";

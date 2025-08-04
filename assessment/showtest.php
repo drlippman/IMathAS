@@ -82,10 +82,10 @@
 			if ($isRealStudent) {
 				$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,waivereqscore FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 				$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-				$row = $stm2->fetch(PDO::FETCH_NUM);
+				$row = $stm2->fetch(PDO::FETCH_ASSOC);
 				if ($row!=null) {
 					$useexception = $exceptionfuncs->getCanUseAssessException($row, $adata, true);
-					$waivereqscore = ($row[4]>0);
+					$waivereqscore = (($row['waivereqscore']&1)>0);
 				}
 			} else if (isset($_SESSION['lti_duedate']) && (isset($teacherid) || isset($tutorid)) && $_SESSION['lti_duedate']!=$adata['enddate']) {
 				//teacher launch with lti duedate that's different than default
@@ -701,19 +701,24 @@
 	if (!$actas) {
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
-		$exceptionrow = $stm2->fetch(PDO::FETCH_NUM);
+		$exceptionrow = $stm2->fetch(PDO::FETCH_ASSOC);
 		if ($exceptionrow != null) {
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $testsettings, true);
-			$ltiexception = ($exceptionrow[3]>0 && $exceptionrow[2]==0);
+			$ltiexception = ($exceptionrow['is_lti']>0 && $exceptionrow['islatepass']==0);
 		} else if (isset($_SESSION['lti_duedate']) && $isteacher && $_SESSION['lti_duedate']!=$testsettings['enddate']) {
 			//teacher launch with lti duedate that's different than default
 			//do a pseudo-exception
 			$useexception = true;
 			$ltiexception = true;
-			$exceptionrow = array(0, $_SESSION['lti_duedate'], 0, 1);
+			$exceptionrow = array(
+				'startdate'=>0, 
+				'enddate'=>$_SESSION['lti_duedate'],
+				'islatepass'=>0, 
+				'is_lti'=>1
+			);
 		}
 		if ($exceptionrow!=null && $useexception) {
-			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
+			if ($now<$exceptionrow['startdate'] || $exceptionrow['enddate']<$now) { //outside exception dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 					$isreview = true;
 				} else {
@@ -724,15 +729,15 @@
 					}
 				}
 			} else { //in exception
-				if ($testsettings['enddate']<$now && ($exceptionrow[3]==0 || $exceptionrow[2]>0)) { //exception is for past-due-date
+				if ($testsettings['enddate']<$now && ($exceptionrow['is_lti']==0 || $exceptionrow['islatepass']>0)) { //exception is for past-due-date
 					$inexception = true;
-					$exceptiontype = $exceptionrow[2];
-					if ($exceptionrow[4]!==null) {
-						$testsettings['exceptionpenalty'] = $exceptionrow[4];
+					$exceptiontype = $exceptionrow['islatepass'];
+					if ($exceptionrow['exceptionpenalty']!==null) {
+						$testsettings['exceptionpenalty'] = $exceptionrow['exceptionpenalty'];
 					}
 				}
 			}
-			$exceptionduedate = $exceptionrow[1];
+			$exceptionduedate = $exceptionrow['enddate'];
 		} else { //has no exception
 			if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
@@ -749,13 +754,13 @@
 	} else {
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$_SESSION['actas'], ':assessmentid'=>$line['assessmentid']));
-		$row = $stm2->fetch(PDO::FETCH_NUM);
+		$row = $stm2->fetch(PDO::FETCH_ASSOC);
 		if ($row!=null) {
 			$useexception = $exceptionfuncs->getCanUseAssessException($row, $testsettings, true);
 			if ($useexception) {
-				$exceptionduedate = $row[1];
+				$exceptionduedate = $row['enddate'];
 			}
-			$ltiexception = ($row[3]>0 && $row[2]==0);
+			$ltiexception = ($row['is_lti']>0 && $row['islatepass']==0);
 		}
 	}
 

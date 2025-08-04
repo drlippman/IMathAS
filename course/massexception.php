@@ -19,6 +19,9 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 		$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
+		if (isset($_POST['waiveworkcutoff'])) {
+			$waivereqscore += 2;
+		}
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
         $attemptext = (isset($_POST['attemptext'])) ? intval($_POST['attemptextnum']) : 0;
 
@@ -423,8 +426,11 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 				} else if ($row['itemtype']=='R') {
 					echo Sanitize::encodeStringForDisplay("(ReplyBy: $edate)");
 				}
-				if ($row['waivereqscore']==1) {
+				if (($row['waivereqscore']&1)==1) {
 					echo ' <i>('._('waives prereq').')</i>';
+                }
+				if (($row['waivereqscore']&2)==2) {
+					echo ' <i>('._('waives add work cutoff').')</i>';
                 }
                 if ($row['timeext'] != 0) {
                     echo ' <i>('.sprintf(_('%d min time extension'), abs($row['timeext']));
@@ -483,8 +489,11 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 					$assessarr[$row['eid']] .= "(ReplyBy: $edate)";
 				}
 				$notesarr[$row['eid']] = '';
-				if ($row['waivereqscore']==1) {
+				if (($row['waivereqscore']&1)==1) {
 					$notesarr[$row['eid']] .= ' ('._('waives prereq').')';
+                }
+				if (($row['waivereqscore']&2)==2) {
+					$notesarr[$row['eid']] .= ' ('._('waives add work cutoff').')';
                 }
                 if ($row['timeext'] != 0) {
                     $notesarr[$row['eid']] .= ' ('.sprintf(_('%d min time extension'), abs($row['timeext']));
@@ -591,6 +600,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span></label>';
 	echo '</p>';
 	echo '<p class="list"><label><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</label></p>';
+	echo '<p class="list"><label><input type="checkbox" name="waiveworkcutoff"/> Waive "add work cutoff", if applicable.</label></p>';
     echo '<p class="list"><label><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.</label>  <label>Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</label></p>';
     if ($courseUIver > 1) {
         echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow additional time:</label> <label><input size=2 name="timelimitextmin" value="0"> additional minutes.</label>

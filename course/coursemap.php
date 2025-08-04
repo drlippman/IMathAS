@@ -97,13 +97,13 @@ function showitemtree($items,$parent,$greyitems=0) {
 				if (!$viewall && isset($exceptions[$item])) {
 					$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$item], $line, true);
 					if ($useexception) {
-						$line['startdate'] = $exceptions[$item][0];
-						$line['enddate'] = $exceptions[$item][1];
+						$line['startdate'] = $exceptions[$item]['startdate'];
+						$line['enddate'] = $exceptions[$item]['enddate'];
 					}
 			   	}
 			   	$nothidden = true;  $showgreyedout = false;
 				if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
-				   && (!isset($exceptions[$item]) || $exceptions[$item][3]==0)) {
+				   && (!isset($exceptions[$item]) || ($exceptions[$item]['waivereqscore']&1)==0)) {
 				   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 					   $showgreyedout = true;
 				   }

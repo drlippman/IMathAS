@@ -86,12 +86,12 @@
 		require_once "../includes/exceptionfuncs.php";
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 		$ph = Sanitize::generateQueryPlaceholders($forumdata);
-		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype,assessmentid FROM imas_exceptions WHERE assessmentid in ($ph) AND userid=? AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,waivereqscore,itemtype,assessmentid FROM imas_exceptions WHERE assessmentid in ($ph) AND userid=? AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 		$stm->execute(array_merge(array_keys($forumdata), array($userid)));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-            if (!isset($forumdata[$row[5]])) { continue; } // lingering exception for nonexistant forum
-			$exceptionresult = $exceptionfuncs->getCanUseLatePassForums($row, $forumdata[$row[5]]);
-			$forumdata[$row[5]]['enddate'] = $exceptionresult[7];
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            if (!isset($forumdata[$row['assessmentid']])) { continue; } // lingering exception for nonexistant forum
+			$exceptionresult = $exceptionfuncs->getCanUseLatePassForums($row, $forumdata[$row['assessmentid']]);
+			$forumdata[$row['assessmentid']]['enddate'] = $exceptionresult[7];
 		}
 	}
 	$itemsassoc = array();

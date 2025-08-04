@@ -753,12 +753,13 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
             $duedatewords = _('Due');
             if (isset($exceptions[$items[$i]])) {
                 list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$items[$i]], $line);
+
                 if ($useexception) {
-                    $line['startdate'] = $exceptions[$items[$i]][0];
-                    $line['enddate'] = $exceptions[$items[$i]][1];
-                    if ($exceptions[$items[$i]][2] == 1) {
+                    $line['startdate'] = $exceptions[$items[$i]]['startdate'];
+                    $line['enddate'] = $exceptions[$items[$i]]['enddate'];
+                    if ($exceptions[$items[$i]]['islatepass'] == 1) {
                         $duedatewords = _('With LatePass, due');
-                    } else if (empty($exceptions[$items[$i]][3])) { //is_lti !isset or is 0
+                    } else if (empty($exceptions[$items[$i]]['is_lti'])) { //is_lti !isset or is 0
                         $duedatewords = _('With extension, due');
                     }
                 }
@@ -789,7 +790,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
             $nothidden = true;
             $showgreyedout = false;
             if (abs($line['reqscore']) > 0 && $line['reqscoreaid'] > 0 && !$viewall && $line['enddate'] > $now
-                && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3] == 0)
+                && (!isset($exceptions[$items[$i]]) || ($exceptions[$items[$i]]['waivereqscore']&1) == 0)
                 && empty($excused['A' . $line['reqscoreaid']])
             ) {
                 if ($line['reqscore'] < 0 || $line['reqscoretype'] & 1) {

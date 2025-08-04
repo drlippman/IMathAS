@@ -1484,15 +1484,15 @@ if ($linkparts[0]=='cid') {
 		}
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-		$exceptionrow = $stm->fetch(PDO::FETCH_NUM);
+		$exceptionrow = $stm->fetch(PDO::FETCH_ASSOC);
 		$useexception = false;
 		if ($exceptionrow!=null) {
 			//have exception.  Update using lti_duedate if needed
-			if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow[1]) {
+			if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow['enddate']) {
 				//if new due date is later, or no latepass used, then update
-				if ($exceptionrow[2]==0 || $_SESSION['lti_duedate']>$exceptionrow[1]) {
+				if ($exceptionrow['islatepass']==0 || $_SESSION['lti_duedate']>$exceptionrow['enddate']) {
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow[0]),
+					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow['startdate']),
 						':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
 				}
 			}
@@ -1502,24 +1502,29 @@ if ($linkparts[0]=='cid') {
 		} else if ($line['date_by_lti']==3 && isset($_SESSION['lti_duedate']) && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
 			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
-			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);
 			$stm = $DBH->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
-			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
+			$stm->execute([min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1, $userid, $aid]);
+			$exceptionrow = [
+				'startdate' => min($now,$_SESSION['lti_duedate']), 
+				'enddate' => $_SESSION['lti_duedate'], 
+				'islatepass' => 0, 
+				'is_lti' => 1
+			];
 			$useexception = true;
 		}
 		if ($exceptionrow!=null && $useexception) {
-			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
+			if ($now<$exceptionrow['startdate'] || $exceptionrow['enddate']<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
 					//reporterror("This assessment is closed");
 				}
 			} else { //inside exception dates exception
-				if ($line['enddate']<$now && ($exceptionrow[3]==0 || $exceptionrow[2]>0)) { //exception is for past-due-date
+				if ($line['enddate']<$now && ($exceptionrow['is_lti']==0 || $exceptionrow['islatepass']>0)) { //exception is for past-due-date
 					$inexception = true; //only trigger if past due date for penalty
 				}
 			}
-			$exceptionduedate = $exceptionrow[1];
+			$exceptionduedate = $exceptionrow['enddate'];
 		} else { //has no exception
 			if ($now < $line['startdate'] || $line['enddate'] < $now) { //outside normal dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
@@ -2724,14 +2729,14 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		}
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-		$exceptionrow = $stm2->fetch(PDO::FETCH_NUM);
+		$exceptionrow = $stm2->fetch(PDO::FETCH_ASSOC);
 		$useexception = false;
 		if ($exceptionrow!=null) {
-            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow[1]) {
+            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow['enddate']) {
 				//if new due date is later, or no latepass used, then update
-				if ($exceptionrow[2]==0 || $_SESSION['lti_duedate']>$exceptionrow[1]) {
+				if ($exceptionrow['islatepass']==0 || $_SESSION['lti_duedate']>$exceptionrow['enddate']) {
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow[0]),
+					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow['startdate']),
 						':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
 				}
 			}
@@ -2741,13 +2746,18 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
 			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
-			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);
 			$stm = $DBH->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
-			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
+			$stm->execute([min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1, $userid, $aid]);
+			$exceptionrow = [
+				'startdate' => min($now,$_SESSION['lti_duedate']), 
+				'enddate' => $_SESSION['lti_duedate'], 
+				'islatepass' => 0, 
+				'is_lti' => 1
+			];
 			$useexception = true;
 		}
 		if ($exceptionrow!=null && $useexception) {
-			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
+			if ($now<$exceptionrow['startdate'] || $exceptionrow['enddate']<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
@@ -2758,7 +2768,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 					$inexception = true; //only trigger if past due date for penalty
 				}
 			}
-			$exceptionduedate = $exceptionrow[1];
+			$exceptionduedate = $exceptionrow['enddate'];
 		} else { //has no exception
 			if ($now < $line['startdate'] || $line['enddate'] < $now) { //outside normal dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {

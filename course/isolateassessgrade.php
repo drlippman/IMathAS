@@ -204,11 +204,11 @@
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
 	//get exceptions
-	$stm = $DBH->prepare("SELECT userid,startdate,enddate,islatepass FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
+	$stm = $DBH->prepare("SELECT userid,startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
 	$stm->execute(array(':assessmentid'=>$aid));
 	$exceptions = array();
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$exceptions[$row['userid']] = $row;
 	}
 	if (count($exceptions)>0) {
 		require_once "../includes/exceptionfuncs.php";
@@ -255,7 +255,7 @@
 		if (isset($exceptions[$line['userid']])) {
 			$line['useexception'] = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
 			if ($line['useexception']) {
-				$line['thisenddate'] = $exceptions[$line['userid']][1];
+				$line['thisenddate'] = $exceptions[$line['userid']]['enddate'];
 			} else {
                 $line['thisenddate'] = $enddate;
             }
@@ -412,7 +412,7 @@
 				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
 			}
 			if ($line['useexception']) {
-				if ($exceptions[$line['userid']][2]>0) {
+				if ($exceptions[$line['userid']]['islatepass']>0) {
 					echo '<sup>LP</sup>';
 				} else {
 					echo '<sup>e</sup>';
@@ -474,7 +474,7 @@
 			}
 			echo '</a>';
 			if ($line['useexception']) {
-				if ($exceptions[$line['userid']][2]>0) {
+				if ($exceptions[$line['userid']]['islatepass']>0) {
 					echo '<sup>LP</sup>';
 				} else {
 					echo '<sup>e</sup>';

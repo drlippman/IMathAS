@@ -99,7 +99,7 @@ class AssessInfo
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
-      $this->setException($uid, $stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, $stm->fetch(PDO::FETCH_ASSOC), $isstu, $latepasses, $latepasshrs, $courseenddate);
     }
   }
 
@@ -107,6 +107,7 @@ class AssessInfo
    * Sets an exception
    * @param  integer  $uid   The user ID
    * @param  array|false   $exception   array of exception data, or false for none.
+   *            startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext
    * @param  boolean  $isstu      Whether the user is a student
    * @param  integer $latepasses  The number of latepasses the user has
    * @param  integer $latepasshrs How many hours latepasses extend due dates
@@ -137,18 +138,23 @@ class AssessInfo
     }
 
     // if latepass exception, and enddate is past course enddate, move back
-    if ($exception !== false && $exception[1] > $courseenddate && $exception[2] > 0) {
-        $exception[1] = $courseenddate;
+    if ($exception !== false && $exception['enddate'] > $courseenddate && $exception['islatepass'] > 0) {
+        $exception['enddate'] = $courseenddate;
     }
 
     $this->exception = $exception;
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 
-    if ($this->exception !== false && isset($this->exception[4]) && $this->exception[4] !== null) {
+    if ($this->exception !== false && isset($this->exception['exceptionpenalty']) && $this->exception['exceptionpenalty'] !== null) {
       //override default exception penalty
-      $this->assessData['exceptionpenalty'] = $this->exception[4];
+      $this->assessData['exceptionpenalty'] = $this->exception['exceptionpenalty'];
     } 
+
+    if ($this->exception !== false && isset($this->exception['waivereqscore']) && ($this->exception['waivereqscore']&2) == 2) {
+      //remove work cutoff
+      $this->assessData['workcutoff'] = 0;
+    }
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
@@ -161,11 +167,11 @@ class AssessInfo
     }
 
     // use time limit extension even if rest of exception isn't used
-    if ($this->exception !== false && !empty($this->exception[6])) {
-        $this->assessData['timeext'] = intval($this->exception[6]);
+    if ($this->exception !== false && !empty($this->exception['timeext'])) {
+        $this->assessData['timeext'] = intval($this->exception['timeext']);
     }
-    if ($this->exception !== false && !empty($this->exception[7])) {
-        $this->assessData['attemptext'] = intval($this->exception[7]);
+    if ($this->exception !== false && !empty($this->exception['attemptext'])) {
+        $this->assessData['attemptext'] = intval($this->exception['attemptext']);
         // apply additional attempts
         if ($this->assessData['submitby'] == 'by_assessment') {
             $this->assessData['allowed_attempts'] += $this->assessData['attemptext'];
@@ -181,27 +187,27 @@ class AssessInfo
 
     if ($useexception) {
       // exception format is [startdate, enddate, latepasses_used, is_lti]
-      if (empty($this->exception[3]) || $this->exception[2] > 0) {
+      if (empty($this->exception['is_lti']) || $this->exception['islatepass'] > 0) {
         //if not LTI-set, or if LP used, show orig due date
-        if (!empty($this->exception[3]) && $this->exception[2] > 0) {
+        if (!empty($this->exception['is_lti']) && $this->exception['islatepass'] > 0) {
           // lti with latepasses: subtract latepasses to get original enddate
           // since original was an lti-set exception
-          $hrstosubtract = intval($this->exception[2]) * $latepasshrs;
-          $this->assessData['original_enddate'] = strtotime("-".$hrstosubtract." hours", $this->exception[1]);
+          $hrstosubtract = intval($this->exception['islatepass']) * $latepasshrs;
+          $this->assessData['original_enddate'] = strtotime("-".$hrstosubtract." hours", $this->exception['enddate']);
         } else {
           $this->assessData['original_enddate'] = $this->assessData['enddate'];
         }
-        if ($this->exception[2] == 0) {
+        if ($this->exception['islatepass'] == 0) {
           $this->assessData['extended_with'] = array('type'=>'manual');
         } else {
           $this->assessData['extended_with'] = array(
             'type' => 'latepass',
-            'n' => intval($this->exception[2])
+            'n' => intval($this->exception['islatepass'])
           );
         }
       }
-      $this->assessData['startdate'] = intval($this->exception[0]);
-      $this->assessData['enddate'] = intval($this->exception[1]);
+      $this->assessData['startdate'] = intval($this->exception['startdate']);
+      $this->assessData['enddate'] = intval($this->exception['enddate']);
       $this->assessData['enddate_in'] = $this->assessData['enddate'] - time() - 5;
 
       $this->assessData['latepass_enddate'] = max($this->assessData['latepass_enddate'], $this->assessData['enddate']);
@@ -270,7 +276,7 @@ class AssessInfo
       if ($this->exception === null || $this->exception === false) {
         return false;
       } else {
-        return $this->exception[5];
+        return (($this->exception['waivereqscore']&1)==1);
       }
   }
 

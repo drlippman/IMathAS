@@ -82,6 +82,9 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
         $enddate = parsedatetime($_POST['edate'],$_POST['etime']);
         $waivereqscore = (isset($_POST['waivereqscore']))?1:0;
+		if (isset($_POST['waiveworkcutoff'])) {
+			$waivereqscore += 2;
+		}
         $epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
         $attemptext = (isset($_POST['attemptext'])) ? intval($_POST['attemptextnum']) : 0;
@@ -225,20 +228,20 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 		//check if exception already exists
 		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>Sanitize::onlyInt($_GET['aid'])));
-		$erow = $stm->fetch(PDO::FETCH_NUM);
+		$erow = $stm->fetch(PDO::FETCH_ASSOC);
 		$page_isExceptionMsg = "";
 		$savetitle = _('Create Exception');
 		if ($erow != null) {
 			$savetitle = _('Save Changes');
-			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($_GET['aid']) . "&uid=" . Sanitize::onlyInt($_GET['uid']) . "&clear=" . Sanitize::encodeUrlParam($erow[0]) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> or modify below.</p>';
-			$sdate = tzdate("m/d/Y",$erow[1]);
-			$edate = tzdate("m/d/Y",$erow[2]);
-			$stime = tzdate("g:i a",$erow[1]);
-			$etime = tzdate("g:i a",$erow[2]);
-			$curwaive = $erow[3];
-            $curepenalty = $erow[4];
-            $timeext = $erow[5];
-            $attemptext = $erow[6];
+			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($_GET['aid']) . "&uid=" . Sanitize::onlyInt($_GET['uid']) . "&clear=" . Sanitize::encodeUrlParam($erow['id']) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> or modify below.</p>';
+			$sdate = tzdate("m/d/Y",$erow['startdate']);
+			$edate = tzdate("m/d/Y",$erow['enddate']);
+			$stime = tzdate("g:i a",$erow['startdate']);
+			$etime = tzdate("g:i a",$erow['enddate']);
+			$curwaive = $erow['waivereqscore'];
+            $curepenalty = $erow['exceptionpenalty'];
+            $timeext = $erow['timeext'];
+            $attemptext = $erow['attemptext'];
 		} else {
             $timeext = 0;
             $attemptext = 0;
@@ -339,8 +342,10 @@ if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
 		<span class="form"><input type="checkbox" name="eatlatepass" id="eatlatepass" aria-label="deduct latepasses"/></span>
 		<span class="formright"><label for=eatlatepass>Deduct LatePass(es)</label>: <label><input type="input" name="latepassn" size="1" value="1"/> Latepass(s)</label> .
 		   Student currently has <?php echo Sanitize::onlyInt($latepasses);?> latepasses.</span><br class="form"/>
-		<span class="form"><input type="checkbox" name="waivereqscore" id="waivereqscore" <?php if ($curwaive==1) echo 'checked="checked"';?>/></span>
+		<span class="form"><input type="checkbox" name="waivereqscore" id="waivereqscore" <?php if (($curwaive&1)==1) echo 'checked="checked"';?>/></span>
 		<span class="formright"><label for=waivereqscore>Waive "show based on an another assessment" requirements, if applicable</label>.</span><br class="form"/>
+		<span class="form"><input type="checkbox" name="waiveworkcutoff" id="waiveworkcutoff" <?php if (($curwaive&2)==2) echo 'checked="checked"';?>/></span>
+		<span class="formright"><label for=waiveworkcutoff>Waive "add work cutoff", if applicable</label>.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="overridepenalty" id="overridepenalty"  <?php if ($curepenalty!==null) echo 'checked="checked"';?>/></span>
 		<span class="formright"><label for=overridepenalty>Override default exception/LatePass penalty.</label>  <label>Deduct <input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>"/>% for questions done while in exception.</label></span><br class="form"/>
 <?php

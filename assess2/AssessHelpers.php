@@ -39,9 +39,7 @@ class AssessHelpers
     $stm->execute(array($aid));
     $exceptions = [];
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        $exceptions[$row['userid']] = array($row['startdate'],$row['enddate'],
-            $row['islatepass'],$row['is_lti'],$row['exceptionpenalty'],
-            $row['waivereqscore'],$row['timeext'],$row['attemptext']);
+        $exceptions[$row['userid']] = $row;
     }
   	$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
   	$stm->execute(array($aid));
