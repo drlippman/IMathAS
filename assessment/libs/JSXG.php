@@ -84,7 +84,6 @@ function JSXG_setUpBoard($label, $width=350, $height=350, $centered=true){
 ######### JSXG_createBoard ##########
 # creates a set of axes, and a board to construct on.
 function JSXG_createAxes($label, $ops=array()){
-   $label = uniqid(); // overwrite provided value
     // Add some default values
    $width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
    $height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
@@ -602,7 +601,6 @@ function JSXG_addText($board, $ops=array()){
 ######### JSXG_createPolarAxes ##########
 # creates a set of axes, and a board to construct on.
 function JSXG_createPolarAxes($label, $ops=array()){
-  $label = uniqid(); // overwrite provided value
     // Add some default values
    $size = isset($ops['size']) ? $ops['size'] : 350;
    //set the min and max x-values if provided, else default to [-5, 5]
@@ -912,7 +910,6 @@ function JSXG_addPolar($board, $ops=array()){
 ######### JSXG_createBlankBoard ##########
 # creates a board with no axes
 function JSXG_createBlankBoard($label, $ops){
-  $label = uniqid(); // overwrite provided value
   // Add some default values
   $width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
   $height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
