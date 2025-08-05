@@ -117,16 +117,16 @@
 	$now = time();
 	$isreview = false;
 	if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
-		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
-		$row = $stm2->fetch(PDO::FETCH_NUM);
+		$row = $stm2->fetch(PDO::FETCH_ASSOC);
 		if ($row!=null) {
 			require_once "../includes/exceptionfuncs.php";
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher);
 			$useexception = $exceptionfuncs->getCanUseAssessException($row, $testsettings, true);
 		}
 		if ($row!=null && $useexception) {
-			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+			if ($now<$row['startdate'] || $row['enddate']<$now) { //outside exception dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 					$isreview = true;
 				} else {

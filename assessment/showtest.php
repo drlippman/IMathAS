@@ -91,12 +91,18 @@
 				//teacher launch with lti duedate that's different than default
 				//do a pseudo-exception
 				$useexception = true;
-				$row = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+				$row = array(
+					'startdate' => 0, 
+					'enddate' => $_SESSION['lti_duedate'], 
+					'islatepass' => 0, 
+					'is_lti' => 1, 
+					'waivereqscore' => 0
+				);
 			} else {
 				$row = null;
 			}
 			if ($row!=null && $useexception) {
-				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+				if ($now<$row['startdate'] || $row['enddate']<$now) { //outside exception dates
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
 						$isreview = true;
 					} else {
@@ -105,12 +111,12 @@
 						}
 					}
 				} else { //inside exception dates exception
-					if ($adata['enddate']<$now && ($row[3]==0 || $row[2]>0)) { //exception is for past-due-date
+					if ($adata['enddate']<$now && ($row['is_lti']==0 || $row['islatepass']>0)) { //exception is for past-due-date
 						$inexception = true; //only trigger if past due date for penalty (and not a regular lti-set exception)
 					}
 				}
-				$exceptionduedate = $row[1];
-				$activestartdate = $row[0];
+				$exceptionduedate = $row['enddate'];
+				$activestartdate = $row['startdate'];
 			} else { //has no exception
 				if ($now < $adata['startdate'] || $adata['enddate']<$now) { //outside normal dates
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
