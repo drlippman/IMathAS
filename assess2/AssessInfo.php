@@ -91,7 +91,14 @@ class AssessInfo
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
-      $this->setException($uid, array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $fakeexception = [
+        'startdate' => 0,
+        'enddate' => $_SESSION['lti_duedate'], 
+        'islatepass' => 0, 
+        'is_lti' => 1, 
+        'waivereqscore' => 0
+      ];
+      $this->setException($uid, $fakeexception, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else if (!$isstu) {
       $this->setException($uid, false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
