@@ -38,6 +38,10 @@ if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missin
 		$sub =& $items;
 		if (count($blocktree)>1) {
 			for ($i=1;$i<count($blocktree);$i++) {
+				if (!isset($sub[$blocktree[$i]-1]['items'])) {
+					echo _('Uh oh, something changed.  Please go back and try again');
+                	exit;
+				}
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}

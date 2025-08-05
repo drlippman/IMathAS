@@ -339,7 +339,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['password'] = trim(Sanitize::stripHtmlTags($_POST['assmpassword']));
 
 			$toset['reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
-			if ($_POST['reqscoreshowtype']==-1 || $toset['reqscore']==0) {
+			if ($_POST['reqscoreshowtype']==-1 || $toset['reqscore']==0 || !isset($_POST['reqscoreaid'])) {
 				$toset['reqscore'] = 0;
 				$toset['reqscoretype'] = 0;
 				$toset['reqscoreaid'] = 0;

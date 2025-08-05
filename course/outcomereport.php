@@ -362,6 +362,7 @@ if ($report=='overview') {
 				$html .= $subhtml;
 				$tots = $tots + $subtots;
 			} else {
+				if (!is_numeric($oi)) { continue; }
 				$html .= '<tr class="'.$class.'">';
 				$html .= '<th><span class="ind'.Sanitize::onlyInt($ind).'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></th>';
 				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {

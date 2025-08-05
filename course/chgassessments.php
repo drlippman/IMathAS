@@ -500,6 +500,8 @@ if (!(isset($teacherid))) {
 
 	}
 }
+$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
+
 
 /******* begin html output ********/
  require_once "../header.php";
@@ -1065,9 +1067,6 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 $page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 $page_tutorSelect['val'] = array(2,0,1);
 writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
-
-$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
-
 ?>
 				</td>
 			</tr>

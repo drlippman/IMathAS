@@ -8,7 +8,7 @@
 		exit;
 	}
 
-	if ($_GET['process']== true) {
+	if (!empty($_GET['process'])) {
 		require_once "../includes/updateptsposs.php";
 		require_once "../includes/TeacherAuditLog.php";
 		if (isset($_POST['add'])) { //adding new questions
