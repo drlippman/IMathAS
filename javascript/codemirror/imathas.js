@@ -99,7 +99,7 @@
     // chemistry
     imathasBuiltin += " chem_disp chem_mathdisp chem_isotopedisp chem_getsymbol chem_getnumber chem_getname chem_getweight chem_getmeltingpoint chem_getboilingpoint chem_getfamily chem_randelementbyfamily chem_diffrandelementsbyfamily chem_getrandcompound chem_getdiffrandcompounds chem_decomposecompound chem_getcompoundmolmass chem_randanion chem_randcation chem_makeioniccompound chem_getsolubility chem_eqndisp chem_balancereaction chem_vsepr";
     // chgbase
-    imathasBuiltin += " baseconvert asciitodec dectoascii";
+    imathasBuiltin += " baseconvert asciitodec dectoascii draw_mayan_number";
     // complex
     imathasBuiltin += " cx_add cx_arg cx_conj cx_cubicRoot cx_div cx_format2pol cx_format2std cx_matrixreduce cx_modul cx_mul cx_quadRoot cx_prettyquadRoot cx_plot cx_pow cx_polEu cx_pol2std cx_root cx_std2pol cx_sub";
     // construct2

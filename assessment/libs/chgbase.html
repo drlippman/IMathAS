@@ -5,11 +5,12 @@
     </head>
     <body>
 <h1>Macro Library chgbase</h1>
-A library of base changing functions.  Version 1.0, Nov 13, 2007
+A library of base changing functions.  Version 1.1, Aug 2025. Version 1.0, Nov 13, 2007
 <BR><ul>
 <li><a href="#baseconvert">baseconvert</a></li>
 <li><a href="#asciitodec">asciitodec</a></li>
 <li><a href="#dectoascii">dectoascii</a></li>
+<li><a href="#draw_mayan_number">draw_mayan_number</a></li>
 </ul>
 <h3><a name="baseconvert">baseconvert</a></h3>
 baseconvert(num,from,to)
@@ -24,3 +25,10 @@ asciitodec(char)
 dectoascii(num)
 <BR>returns the ASCII character for a decimal value
 <BR>
+<h3><a name="draw_mayan_number">draw_mayan_number(number, [width, mode])</a></h3>
+<p>Draws a representation of the given base-10 number as a Mayan number.</p>
+<ul>
+    <li>Number: The base-10 number to represent</li>
+    <li>Width: The width of the image (default 50). The height is auto-adjusted based on the number of positions needed.</li>
+    <li>Mode: Default "standard" for pure base-20 system. Set to "modified" for the "long count" modified vigesimal system, where the second position can only be up to 17 and the third position represents multiples of 18*20.</li>
+</ul>
