@@ -748,7 +748,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		if ($isteacher) {
 			if (isset($exped) && $exped!=$line['enddate']) {
 				$padata = array('id'=>$line['id'], 'allowlate'=>$line['allowlate'], 'enddate'=>$exped);
-				$lpnote = ($exception[2]>0)?" (LatePass)":"";
+				$lpnote = ($exception['islatepass']>0)?" (LatePass)":"";
 				if ($useexception) {
 					echo "<p>Has exception$lpnote, with due date: ".tzdate("F j, Y, g:i a",$exped);
 					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid=$get_uid&asid=$asid&from=$from&stu=$stu'\">Edit Exception</button>";

@@ -1082,7 +1082,11 @@ function gbtable() {
 			if (!isset($discusscol[$r['typeid']])) {
 				continue; //assessment is hidden
 			}
-			$forumexceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
+			$forumexceptions[$r['typeid']][$r['userid']] = array(
+				'postby' => $r['exceptionstartdate'],
+				'replyby' => $r['exceptionenddate'],
+				'islatepass' => $r['islatepass']
+			);
 			if ($limuser>0) {
 				$gb[0][1][$discusscol[$r['typeid']]][11] = max($r['exceptionstartdate'],$r['exceptionenddate']);
 			}
@@ -1639,7 +1643,7 @@ function gbtable() {
 				$col = $discusscol[$l['gradetypeid']];
 
 				if (isset($forumexceptions[$l['gradetypeid']][$l['userid']])) {
-					$thised = max($forumexceptions[$l['gradetypeid']][$l['userid']][0], $forumexceptions[$l['gradetypeid']][$l['userid']][1]);
+					$thised = max($forumexceptions[$l['gradetypeid']][$l['userid']]['postby'], $forumexceptions[$l['gradetypeid']][$l['userid']]['replyby']);
 					if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
 						if ($now<$thised) {
 							$gb[0][1][$col][3] = 1;
