@@ -93,7 +93,7 @@ if ($stm->rowCount()==0) {
 
 //score a submitted question
 $showans = false;
-if (isset($_GET['score'])) {
+if (isset($_GET['score']) && !empty($curitemid)) {
     if ($courseUIver > 1) {
         $state = array(
             'seeds' => array(0 => $seed),

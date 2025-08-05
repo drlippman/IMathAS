@@ -45,7 +45,9 @@
 		$stm = $DBH->prepare("SELECT enrollkey,deflatepass,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['cid']));
         list($enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM);
-        if (($allowunenroll&2)==2) {
+        if ($enrollkey === null) {
+            $page_newaccounterror .= _('Invalid course ID');
+		} else if (($allowunenroll&2)==2) {
             $page_newaccounterror .= _('Course is closed for self enrollment.  Contact your instructor for access.');
         } else if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= _("Please provide the enrollment key");
@@ -142,7 +144,11 @@
 			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
 			list($coursename,$enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM);
-            $keylist = array_map('trim',explode(';',$enrollkey));
+            if ($enrollkey === null) {
+				echo "Invalid course ID";
+				exit;
+			}
+			$keylist = array_map('trim',explode(';',$enrollkey));
             if (($allowunenroll&2)==2) {
                 require_once "header.php";
                 echo "<h1>" . Sanitize::encodeStringForDisplay($coursename) . "</h1>";
@@ -212,7 +218,10 @@
 		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll FROM imas_courses WHERE id=:id");
         $stm->execute(array(':id'=>$cid));
         list($enrollkey,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
-        if (($allowunenroll&2)==2) {
+        if ($enrollkey === null) {
+            echo "Invalid course ID";
+			exit;
+		} else if (($allowunenroll&2)==2) {
             echo '<p>', _('Course is closed for self enrollment.  Contact your instructor for access.'),'</p>';
             echo '<p><a href="'.$GLOBALS['basesiteurl'].'/index.php">',_('Go to home page'),'</a>. ';
             echo _('If you are already enrolled, you can log in there.'),'</p>';
