@@ -207,7 +207,7 @@ function editorSetup(editor) {
     editor.on("dirty", function () {
         updateSaveButtonDimming();
     });
-    editor.on("focus", function () {
+    editor.on("focus", function (e) {
         var i = this.id.match(/[0-9]+$/)[0];
         var type = getTypeForSelector("#" + this.id);
         var max_height = $("#" + this.id).css("max-height");
@@ -218,6 +218,18 @@ function editorSetup(editor) {
             max_height !== ""
         ) {
             expandAndStyleTextSegment("#textseg" + type + i);
+        }
+        if (document.documentElement.clientWidth<450 && e.target.contentAreaContainer) {
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(() => {
+                    $(e.target.editorContainer).css("left",0).css("width","100%");
+                    $(".tox-editor-header").css("max-width","100%");
+                    let editortop = $(e.target.contentAreaContainer).offset().top;
+                    let height = $(e.target.editorContainer).height();
+                    let pos = editortop - height;
+                    $(e.target.editorContainer).css("top", pos + "px");
+                });
+            });
         }
     });
     $(".textsegment").on("mouseleave focusout", function (e) {
