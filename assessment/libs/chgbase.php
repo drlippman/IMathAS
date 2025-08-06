@@ -4,7 +4,7 @@
 // Version 1.0, Nov 13, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"baseconvert","asciitodec","dectoascii","draw_mayan_number");
+array_push($allowedmacros,"baseconvert","asciitodec","dectoascii","draw_mayan_number","draw_babylonian_number");
 
 //baseconvert(num,from,to)
 //converts the number num from base-"from" to base-"to"
@@ -58,7 +58,7 @@ function draw_mayan_number($n, $width = 50, $mode = 'standard') {
 		$v = explode(',', baseconvert(($n-$b)/360, 10, 18));
 		$v = array_merge($v, $bc);
 	}
-	$alt = 'A mayan number.';
+	$alt = 'A Mayan number.';
 	$multi = count($v);
 	if ($multi>1) {
 		$alt .= " $multi vertical groups.";
@@ -103,6 +103,125 @@ function draw_mayan_number($n, $width = 50, $mode = 'standard') {
 		$ybase++;
 	}
 	return showasciisvg($cmd, $width, $width*$multi, $alt);
+}
+
+function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
+	$alt = 'A Bablyonian number.';
+	$v = [];
+	while ($n > 0) {
+		$v[] = ($n%60);
+		$n = floor($n/60);
+	}
+	$v = array_reverse($v);
+	$multi = count($v);
+	if ($multi > 1) {
+		$alt .= " $multi horizontal groups.";
+	}
+	$cnt = 0;
+	$xmax = $multi*9;
+	$cmd = "initPicture(-.1,$xmax.1,-1,5);fill='none';";
+	$xstart = 0;
+	foreach ($v as $k=>$val) {
+		$cnt++;
+		if ($multi > 1) {
+			$alt .= "Group $cnt from the left: ";
+		}
+		//$cmd .= "rect([$xstart,-1],[$xstart+8,5]);";
+		$ones = $val%10;
+		$tens = floor($val/10);
+		if ($val == 0) {
+			if ($zeroinmiddle && $k > 0 && $k < $multi-1) {
+				$alt .= "Two sideways wedges. ";
+				// todo: add commands
+				$x1 = $xstart+2.5;
+				$x2 = $xstart+3.5;
+				$x3 = $xstart+4.5;
+				$x4 = $xstart+5.5;
+				$cmd .= "path([[$x3,.3],[$x2,1.3],[$x1,1.3],[$x2,2.3],[$x2,1.3]]);";
+				$cmd .= "path([[$x4,1.7],[$x3,2.7],[$x2,2.7],[$x3,3.7],[$x3,2.7]]);";
+			} else {
+				$alt .= "Empty. ";
+			}
+		} else if ($ones > 0 && $tens > 0) {
+			$alt .= "$ones vertical wedges and $tens sideways chevrons. ";
+		} else if ($ones > 0) {
+			$alt .= "$ones vertical wedges. ";
+		} else if ($tens > 0) {
+			$alt .= "$tens sideways chevrons. ";
+		}
+		if ($val > 0) {
+			$onerows = ceil($ones/3);
+			$onecols = ($ones > 2 ? 3 : $ones);
+			$tenwidth = ($tens > 2 ? 3 : $tens);
+			$totwidth = $onecols + $tenwidth;
+			if ($ones > 0 && $tens > 0) {
+				$totwidth += 1;
+			}
+			
+			$firstx = $xstart + 4 - $totwidth / 2;
+
+			if ($tens > 0) {
+				if ($tens < 4) {
+					for ($i=0;$i<$tens;$i++) {
+						$cmd .= gen_babylonian_ten($firstx+$i,2,2);
+					}
+				} else {
+					$cmd .= gen_babylonian_ten($firstx,1.6,.6);
+					$cmd .= gen_babylonian_ten($firstx+1,2.4,.6);
+					$cmd .= gen_babylonian_ten($firstx+2,3.2,.6);
+					$cmd .= gen_babylonian_ten($firstx+2,1.6,.6);
+					if ($tens == 5) {
+						$cmd .= gen_babylonian_ten($firstx+1,.8,.6);
+					}
+				}
+				$firstx += $tenwidth + 1;
+			}
+			if ($ones > 0) {
+				$rh = 4/($onerows+1);
+				for ($r=0;$r<$onerows;$r++) {
+					$thiscols = 3;
+					if ($r == 0 && ($ones%3) > 0) {
+						$thiscols = $ones%3;
+					}
+					if ($onerows > 1) {
+						$rfirstx = $firstx + 1.5 - $thiscols/2;
+					} else {
+						$rfirstx = $firstx;
+					}
+					for ($c=0;$c<$thiscols;$c++) {
+						$cmd .= gen_babylonian_one($rfirstx+$c, $r > 0 ? $rh*($r+1) : $rh*$r, $rh, $r > 0);
+					}
+				}
+			}
+		}
+		$xstart += 9;
+	}
+	return showasciisvg($cmd, $height*$multi*1.4, $height, $alt);
+}
+function gen_babylonian_one($x,$y,$rh,$stubby) {
+	if ($stubby) {
+		$yt = $y+$rh;
+		$xr = $x+1;
+		$xh = $x+.5;
+		$hy = $y + .3*$rh;
+		$yb = $y;
+	} else {
+		$yt = $y+$rh*2;
+		$xr = $x+1;
+		$xh = $x+.5;
+		$hy = $y + $rh;
+		$yb = $y;
+	}
+	return "path([[$xh,$hy],[$x,$yt],[$xr,$yt],[$xh,$hy],[$xh,$yb]]);";
+}
+function gen_babylonian_ten($x,$y,$h) {
+	$yb = $y-$h;
+	$yt = $y+$h;
+	$xr = $x+1;
+	$xh = $x+.5;
+	$ybh = $y - $h/2;
+	$yth = $y + $h/2;
+	return "path([[$xr,$yt],[$x,$y],[$xr,$yb]]);line([$xh,$yth],[$xh,$ybh]);";
 }
 
 ?>
