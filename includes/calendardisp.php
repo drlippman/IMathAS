@@ -1,5 +1,8 @@
 <?php
 
+if (!isset($userid)) { // prevent direct calls
+	exit;
+}
 // Function to show calendar, used by showcalendar and courseshowitems
 $cid = Sanitize::courseId($_GET['cid']);
 

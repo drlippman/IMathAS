@@ -55,7 +55,7 @@ function showitemtree($items,$parent,$greyitems=0) {
 
 	 foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			if (isset($item['grouplimit']) && count($item['grouplimit'])>0 && !$viewall) {
+			if (isset($item['grouplimit']) && count($item['grouplimit'])>0 && !$viewall && isset($studentinfo['section'])) {
 				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
 					 continue;
 				 }

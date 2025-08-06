@@ -34,14 +34,14 @@ if (!(isset($teacherid))) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	$oktocopy = 1;
 
-	if (isset($_GET['action'])) {
+	if (isset($_GET['action']) && $ctc > 0) {
 		$query = "SELECT imas_courses.id FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid";
 		$query .= " AND imas_teachers.userid=:userid AND imas_courses.id=:id";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':userid'=>$userid, ':id'=>$_POST['ctc']));
+		$stm->execute(array(':userid'=>$userid, ':id'=>$ctc));
 		if ($stm->rowCount()==0) {
 			$stm = $DBH->prepare("SELECT enrollkey,copyrights,termsurl FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['ctc']));
+			$stm->execute(array(':id'=>$ctc));
 			list($ekey, $copyrights, $termsurl) = $stm->fetch(PDO::FETCH_NUM);
 			if ($copyrights<2) {
 				$oktocopy = 0;
@@ -49,7 +49,7 @@ if (!(isset($teacherid))) {
 					$query = "SELECT imas_users.groupid FROM imas_courses,imas_users,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 					$query .= "AND imas_teachers.userid=imas_users.id AND imas_courses.id=:id";
 					$stm2 = $DBH->prepare($query);
-					$stm2->execute(array(':id'=>$_POST['ctc']));
+					$stm2->execute(array(':id'=>$ctc));
 					while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 						if ($row[0]==$groupid) {
 							$oktocopy=1;
@@ -74,15 +74,15 @@ if (!(isset($teacherid))) {
 				$body = _("Must agree to course terms of use to copy it.")."  <a href=\"copyitems.php?cid=$cid\">"._("Try Again")."</a>";
 			} else {
 				$now = time();
-				$ctc = intval($_POST['ctc']);
+				$ctc = intval($ctc);
 				$userid = intval($userid);
 				$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES(:time, :log)");
 				$stm->execute(array(':time'=>$now, ':log'=>"User $userid agreed to terms of use on course $cid"));
 			}
 		}
-	}
+	} 
 	if ($oktocopy == 1) {
-		if (isset($_GET['action']) && $_GET['action']=="copycalitems") {
+		if (isset($_GET['action']) && $_GET['action']=="copycalitems" && $ctc > 0) {
 			if (isset($_POST['clearexisting'])) {
 				$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
@@ -91,7 +91,7 @@ if (!(isset($teacherid))) {
 				$checked = $_POST['checked'];
 				$chklist = implode(',', array_map('intval',$checked));
 				$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				$insarr = array();
 				$qarr = array();
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -106,7 +106,7 @@ if (!(isset($teacherid))) {
 			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 			exit;
-		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
+		} else if (isset($_GET['action']) && $_GET['action']=="copy" && $ctc > 0) {
 			if ($_POST['whattocopy']=='all') {
 				/*$_POST['copycourseopt'] = 1;
 				$_POST['copygbsetup'] = 1;
@@ -369,7 +369,7 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['copystudata']) && ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64)) {
 				require_once "../util/copystudata.php";
-				copyStuData($cid, $_POST['ctc']);
+				copyStuData($cid, $ctc);
 			}
 			$DBH->commit();
 			if (isset($_POST['selectcalitems'])) {
@@ -387,11 +387,11 @@ if (!(isset($teacherid))) {
 				exit;
 			}
 
-		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
+		} elseif (isset($_GET['action']) && $_GET['action']=="select" && $ctc > 0) { //DATA MANIPULATION FOR second option
 			$items = false;
 
 			$stm = $DBH->prepare("SELECT id,itemorder,name,UIver FROM imas_courses WHERE id IN (?,?)");
-			$stm->execute(array($_POST['ctc'], $cid));
+			$stm->execute(array($ctc, $cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['id']==$ctc) {
 					$items = unserialize($row['itemorder']);
