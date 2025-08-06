@@ -60,7 +60,8 @@ if ($myrights<20) {
 		$curBreadcrumb .= " &gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 
-	if (!empty($_POST['libs'])) {
+	$checkedLibraries = [];
+	if (isset($_POST['libs']) && $_POST['libs'] !== '') {
 		$checkedLibraries = array_map('intval', explode(',', $_POST['libs']));
 		$ph = Sanitize::generateQueryPlaceholders($checkedLibraries);
 		$stm = $DBH->prepare("SELECT name FROM imas_libraries WHERE id IN ($ph)");
@@ -167,7 +168,7 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Confirm Removal";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Confirm Removal ";
-			if (!isset($_POST['libs'])) {
+			if (empty($checkedLibraries)) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
@@ -214,7 +215,7 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Change Library Rights";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Change Library Rights ";
-			if (!isset($_POST['libs'])) {
+			if (empty($checkedLibraries)) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
@@ -268,7 +269,7 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Change Library Sort Order";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Change Library Sort Order ";
-			if (!isset($_POST['libs'])) {
+			if (empty($checkedLibraries)) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
@@ -306,7 +307,7 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Confirm Transfer";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Confirm Transfer ";
-			if (!isset($_POST['libs'])) {
+			if (empty($checkedLibraries)) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
@@ -355,7 +356,7 @@ if ($myrights<20) {
             $parent1 = "";
             $parent = '';
 
-			if (!isset($_POST['libs'])) {
+			if (empty($checkedLibraries)) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
