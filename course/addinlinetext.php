@@ -390,7 +390,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             if (is_array($v)) { //outcome group
                 $outcomes[] = array($v['name'], 1);
                 flattenarr($v['outcomes'], 2);
-            } else {
+            } else if ($v !== '') {
                 $outcomes[] = array($v, $deftype);
             }
         }
