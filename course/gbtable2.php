@@ -1098,7 +1098,7 @@ function gbtable() {
 		}
     }
 
-	//Get assessment scores
+	//Get old-format assessment scores
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid=:courseid ";
 	if ($limuser>0) {
@@ -1140,7 +1140,7 @@ function gbtable() {
 		if ($l['timeontask'] == '') {
 			$timeontask = 0;
 		} else {
-			$timeontask = array_sum(explode(',',str_replace('~',',',$l['timeontask'])));
+			$timeontask = array_sum(array_map('floatval', explode(',',str_replace('~',',',$l['timeontask']))));
 		}
 		if ($timeontask==0) {
 			$gb[$row][1][$col][8] = "N/A";
