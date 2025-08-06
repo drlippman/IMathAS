@@ -663,16 +663,23 @@ class QuestionHtmlGenerator
                 ->setColorboxKeyword($questionColor)
                 ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0] ?? false);
 
-            $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
-            $answerBoxGenerator->generate();
+            try {
+                $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                $answerBoxGenerator->generate();
 
-            $answerbox = $answerBoxGenerator->getAnswerBox();
-            $entryTips[0] = $answerBoxGenerator->getEntryTip();
-            $qnRef = $this->questionParams->getDisplayQuestionNumber();
-            $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
-            $jsParams[$qnRef]['qtype'] = $quesData['qtype'];
-            $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
-            $previewloc = $answerBoxGenerator->getPreviewLocation();
+                $answerbox = $answerBoxGenerator->getAnswerBox();
+                $entryTips[0] = $answerBoxGenerator->getEntryTip();
+                $qnRef = $this->questionParams->getDisplayQuestionNumber();
+                $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
+                $jsParams[$qnRef]['qtype'] = $quesData['qtype'];
+                $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
+                $previewloc = $answerBoxGenerator->getPreviewLocation();
+            } catch (\Throwable $t) {
+                $this->addError(
+                    _('Caught error while generating this question: ')
+                    . $t->getMessage());
+                $answerbox = '';
+            }
 
             if ($printFormat) {
                 $answerbox = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox);
