@@ -924,7 +924,7 @@ function gbstudisp($stu) {
 			}
 
 			$showlink = false;
-			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
+			if ($stu > 0 && $gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
 				$showlink = true;
 				if ($gbt[0][1][$i][15] > 1) {
 					echo '<a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'"';
@@ -1380,7 +1380,7 @@ function gbstudisp($stu) {
 			}
 		}
 		//Totals
-		if ($catfilter<0) {
+		if ($catfilter<0 && isset($gbt[1][3])) {
 			echo '<tr class="grid">';
 			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>', _('Total'), '</td>';
