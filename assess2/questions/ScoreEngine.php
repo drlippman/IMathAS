@@ -788,9 +788,21 @@ class ScoreEngine
             ->setAnswerType($qdata['qtype'])
             ->setIsMultiPartQuestion(false);
 
-        $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
-        $scorePartResult = $scorePart->getResult();
-        $score = $scorePartResult->getRawScore();
+        try {
+            $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+            $scorePartResult = $scorePart->getResult();
+            $score = $scorePartResult->getRawScore();
+        } catch (\Throwable $t) {
+            $this->addError(
+                _('Caught error while scoring parts in this question: ')
+                . $t->getMessage()
+                . ' on line '
+                . $t->getLine()
+                . ' of '
+                . basename($t->getFile())
+                );
+            $score = 0;
+        }
 
         if (isset($scoremethod) && $scoremethod == "allornothing") {
             if ($score < .98) {
