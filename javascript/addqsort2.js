@@ -219,7 +219,7 @@ function editorSetup(editor) {
         ) {
             expandAndStyleTextSegment("#textseg" + type + i);
         }
-        if (document.documentElement.clientWidth<450 && e.target.contentAreaContainer) {
+        /*if (document.documentElement.clientWidth<450 && e.target.contentAreaContainer) {
             window.requestAnimationFrame(() => {
                 window.requestAnimationFrame(() => {
                     $(e.target.editorContainer).css("left",0).css("width","100%");
@@ -230,7 +230,7 @@ function editorSetup(editor) {
                     $(e.target.editorContainer).css("top", pos + "px");
                 });
             });
-        }
+        }*/
     });
     $(".textsegment").on("mouseleave focusout", function (e) {
         highlightSaveButton(true);

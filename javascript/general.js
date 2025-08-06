@@ -577,7 +577,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		snippet_list: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		mobile: {
-			toolbar_mode: 'wrap'
+			toolbar_mode: 'sliding'
 		},
 		init_instance_callback: function(editor) {
 			if (inIframe()) {
@@ -624,6 +624,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
                         ]
                 }]
         }
+		
 	if (document.documentElement.clientWidth<385) {
 		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
@@ -637,6 +638,17 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline subscript superscript forecolor snippet saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link image | asciimath asciimathcharmap asciisvg";
 	}
+	if (location.href.match(/usealted/)) {
+		delete edsetup.toolbar1;
+		delete edsetup.toolbar2;
+		edsetup.menu = {
+			altinsert: { title: 'Insert', items: 'media link image attach snippet inserttable | asciimath asciimathcharmap asciisvg | charmap emoticons anchor hr' }
+		};
+		edsetup.menubar = "edit altinsert format tools table";
+		edsetup.toolbar = "alignleft aligncenter | bullist numlist outdent indent | bold italic",
+		edsetup.mobile.menubar = "edit altinsert format tools table";
+	}
+		
 	if (setupfunction) {
 		edsetup.setup = setupfunction;
 	}
