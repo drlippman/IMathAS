@@ -656,7 +656,7 @@ if ($overwriteBody==1) {
            echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo 'var caneditallnames=true;';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=071425\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=080625\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
 		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';

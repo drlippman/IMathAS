@@ -164,7 +164,7 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::e
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; </script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=071425\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=080625\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var caneditallnames = true;

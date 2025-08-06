@@ -128,7 +128,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?type=$type';</script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=071425\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=080625\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var hidelinksonchange = false;
@@ -268,7 +268,7 @@ if (isset($courseListOrder[$type])) {
 	}
 }
 echo  '</ul></li>';
-if (count($hiddencourses)>0) {
+//if (count($hiddencourses)>0) {
 	echo '<li class="blockli locked" id="hiddengrp"><span class="icon" style="display:none;"></span><b>'._('Hidden Courses').'</b>';
 	echo  '<ul class="qview">';
 	//display hidden courses
@@ -276,7 +276,7 @@ if (count($hiddencourses)>0) {
 		listCourse($course);
 	}
 	echo  '</ul></li>';
-}
+//}
 echo '</ul>';
 require_once "../footer.php";
 

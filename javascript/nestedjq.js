@@ -197,6 +197,12 @@ var Nested = function(listid, newoptions) {
 					el.attr("tabindex","-1");
 					el.next('li').attr("tabindex","0").focus();
 				}
+			} else if (indrag && el.closest('ul').parent().closest('ul').hasClass('nochildren')) {
+				// special case to provide a way to jump when can't move to parent
+				if (el.closest('ul').closest('li').next('li').find('ul').length) {
+					el.prependTo(el.closest('ul').closest('li').next('li').find('ul').first());
+					madechg = true;
+				}
 			}
 			event.preventDefault();
 		} else if (event.key == 'ArrowUp') {
@@ -208,11 +214,19 @@ var Nested = function(listid, newoptions) {
 					el.attr("tabindex","-1");
 					el.prev('li').attr("tabindex","0").focus();
 				}
+			} else if (indrag && el.closest('ul').parent().closest('ul').hasClass('nochildren')) {
+				// special case to provide a way to jump when can't move to parent
+				if (el.closest('ul').closest('li').prev('li').find('ul').length) {
+					el.appendTo(el.closest('ul').closest('li').prev('li').find('ul').first());
+					madechg = true;
+				}
 			}
 			event.preventDefault();
 		} else if (event.key == 'ArrowLeft') {
 			if (indrag) {
-				if (el.closest('ul').closest('li').length) {
+				if (el.closest('ul').closest('li').length && 
+					!el.closest('ul').parent().closest('ul').hasClass('nochildren')
+				) {
 					el.insertAfter(el.closest('ul').closest('li'));
 					madechg = true;	
 				}
@@ -357,7 +371,7 @@ var Nested = function(listid, newoptions) {
 				dest = check.children(options.childTag).last();
 				check = dest.children(options.parentTag);
 			}
-			if (check.children(options.childTag).length==0 && dest[0]!=el[0] && event.pageX > dest.offset().left+options.childStep && dest[0].tagName == 'LI' && dest[0].className=="blockli") {
+			if (check.children(options.childTag).length==0 && dest[0]!=el[0] && event.pageX > dest.offset().left+options.childStep && dest[0].tagName == 'LI' && !dest.hasClass(options.collapseClass) && dest[0].className.match(/blockli/)) {
 				//document.getElementById("submitnotice").innerHTML = dest.parentNode.tagName + ',' + dest.parentNode.parentNode.tagName;
 				move = 'inside';
 			} 
@@ -377,12 +391,14 @@ var Nested = function(listid, newoptions) {
 			abort += (options.lock == 'depth' && el.depth != getDepth(dest, (move == 'inside')));
 			abort += (options.lock == 'parent' && (move == 'inside' || dest.parent() != el.parent()));
 			//abort += (move=='inside' && dest.parentNode.className != "blockli");
-			abort += (dest.parent().hasClass('nochildren'));
+			abort += (!$.contains(list[0],dest[0]));
+			abort += (move != 'inside' && dest.parent().hasClass('nochildren'));
 			abort += (dest.height() == 0);
 			sub = $(over).children(options.parentTag);
 			sub = (sub.length>0) ? sub.offset().top : 0;
 			sub = (sub > 0) ? sub-$(over).offset().top : over.offsetHeight;
 			abort += (event.pageY < (sub-el.height())+$(over).offset().top);
+			
 			if (!abort) {
 				if (move == 'inside') {
 					if ($(dest).children(options.parentTag).length > 0) {

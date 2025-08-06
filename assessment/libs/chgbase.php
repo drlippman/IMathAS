@@ -74,7 +74,11 @@ function draw_mayan_number($n, $width = 50, $mode = 'standard') {
 		$val = $v[$i];
 		$bars = floor($val/5);
 		$dots = $val%5;
-		$nexty = $ybase + .2;
+		if ($bars == 0) {
+			$nexty = $ybase + .5;
+		} else {
+			$nexty = $ybase + .2;
+		}
 		if ($val == 0) {
 			$ymid = $ybase + .5;
 			$alt .= " A shell.";
@@ -118,8 +122,8 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 		$alt .= " $multi horizontal groups.";
 	}
 	$cnt = 0;
-	$xmax = $multi*9;
-	$cmd = "initPicture(-.1,$xmax.1,-1,5);fill='none';";
+	$xmax = 0;
+	$cmd = '';
 	$xstart = 0;
 	foreach ($v as $k=>$val) {
 		$cnt++;
@@ -129,6 +133,7 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 		//$cmd .= "rect([$xstart,-1],[$xstart+8,5]);";
 		$ones = $val%10;
 		$tens = floor($val/10);
+		$groupwidth = 9;
 		if ($val == 0) {
 			if ($zeroinmiddle && $k > 0 && $k < $multi-1) {
 				$alt .= "Two sideways wedges. ";
@@ -144,6 +149,7 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 			}
 		} else if ($ones > 0 && $tens > 0) {
 			$alt .= "$ones vertical wedges and $tens sideways chevrons. ";
+			$groupwidth = 9;
 		} else if ($ones > 0) {
 			$alt .= "$ones vertical wedges. ";
 		} else if ($tens > 0) {
@@ -158,7 +164,7 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 				$totwidth += 1;
 			}
 			
-			$firstx = $xstart + 4 - $totwidth / 2;
+			$firstx = $xstart + ($groupwidth-1)/2 - $totwidth / 2;
 
 			if ($tens > 0) {
 				if ($tens < 4) {
@@ -194,9 +200,11 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 				}
 			}
 		}
-		$xstart += 9;
+		$xstart += $groupwidth;
+		$xmax += $groupwidth;
 	}
-	return showasciisvg($cmd, $height*$multi*1.4, $height, $alt);
+	$cmd = "setBorder(0,0,5,0);initPicture(-.1,$xmax.1,-1,5);fill='none';" . $cmd;
+	return showasciisvg($cmd, $height*$multi*$xmax/10+5, $height, $alt);
 }
 function gen_babylonian_one($x,$y,$rh,$stubby) {
 	if ($stubby) {
