@@ -125,31 +125,36 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 	$xmax = 0;
 	$cmd = '';
 	$xstart = 0;
+	$groupspacing = 2;
 	foreach ($v as $k=>$val) {
+		if ($k > 0) {
+			$xstart += $groupspacing;
+			$xmax += $groupspacing;
+		}
 		$cnt++;
 		if ($multi > 1) {
 			$alt .= "Group $cnt from the left: ";
 		}
-		//$cmd .= "rect([$xstart,-1],[$xstart+8,5]);";
+
 		$ones = $val%10;
 		$tens = floor($val/10);
-		$groupwidth = 9;
 		if ($val == 0) {
 			if ($zeroinmiddle && $k > 0 && $k < $multi-1) {
 				$alt .= "Two sideways wedges. ";
 				// todo: add commands
-				$x1 = $xstart+2.5;
-				$x2 = $xstart+3.5;
-				$x3 = $xstart+4.5;
-				$x4 = $xstart+5.5;
+				$x1 = $xstart;
+				$x2 = $xstart+1;
+				$x3 = $xstart+2;
+				$x4 = $xstart+3;
 				$cmd .= "path([[$x3,.3],[$x2,1.3],[$x1,1.3],[$x2,2.3],[$x2,1.3]]);";
 				$cmd .= "path([[$x4,1.7],[$x3,2.7],[$x2,2.7],[$x3,3.7],[$x3,2.7]]);";
+				$groupwidth = 3;
 			} else {
 				$alt .= "Empty. ";
+				$groupwidth = 3;
 			}
 		} else if ($ones > 0 && $tens > 0) {
 			$alt .= "$ones vertical wedges and $tens sideways chevrons. ";
-			$groupwidth = 9;
 		} else if ($ones > 0) {
 			$alt .= "$ones vertical wedges. ";
 		} else if ($tens > 0) {
@@ -161,10 +166,11 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 			$tenwidth = ($tens > 2 ? 3 : $tens);
 			$totwidth = $onecols + $tenwidth;
 			if ($ones > 0 && $tens > 0) {
-				$totwidth += 1;
+				$totwidth += 0.3;
 			}
+			$groupwidth = $totwidth;
 			
-			$firstx = $xstart + ($groupwidth-1)/2 - $totwidth / 2;
+			$firstx = $xstart + $groupwidth / 2 - $totwidth / 2;
 
 			if ($tens > 0) {
 				if ($tens < 4) {
@@ -180,7 +186,7 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 						$cmd .= gen_babylonian_ten($firstx+1,.8,.6);
 					}
 				}
-				$firstx += $tenwidth + 1;
+				$firstx += $tenwidth + 0.3;
 			}
 			if ($ones > 0) {
 				$rh = 4/($onerows+1);
@@ -200,11 +206,12 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 				}
 			}
 		}
+		//$cmd .= "rect([$xstart,-1],[$xstart+$groupwidth,5]);";
 		$xstart += $groupwidth;
 		$xmax += $groupwidth;
 	}
-	$cmd = "setBorder(0,0,5,0);initPicture(-.1,$xmax.1,-1,5);fill='none';" . $cmd;
-	return showasciisvg($cmd, $height*$multi*$xmax/10+5, $height, $alt);
+	$cmd = "setBorder(2,0,15,0);initPicture(0,$xmax,-.5,4.5);fill='none';" . $cmd;
+	return showasciisvg($cmd, $height*$xmax/5+17, $height, $alt);
 }
 function gen_babylonian_one($x,$y,$rh,$stubby) {
 	if ($stubby) {
