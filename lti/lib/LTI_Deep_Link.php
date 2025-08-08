@@ -44,7 +44,7 @@ class LTI_Deep_Link {
     public function output_response_form($resources) {
         $jwt = $this->get_response_jwt($resources);
         ?>
-        <form id="auto_submit" action="<?= $this->deep_link_settings['deep_link_return_url']; ?>" method="POST">
+        <form id="auto_submit" action="<?= Sanitize::encodeStringForDisplay($this->deep_link_settings['deep_link_return_url']); ?>" method="POST">
             <input type="hidden" name="JWT" value="<?= $jwt ?>" />
             <input type="submit" name="Go" />
         </form>

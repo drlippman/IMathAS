@@ -789,11 +789,13 @@ class AssessRecord
   /**
    * Save relevant POST to autosaves
    * @param int  $time          Timestamp
+   * @param int  $timeactive
    * @param int  $qn            The question number
-   * @param array $pn           The part number to save
+   * @param int|string $pn           The part number to save
    * @return void
    */
   public  function setAutoSave($time, $timeactive, $qn, $pn) {
+    $qn = intval($qn);
     $this->parseData();
     $data = &$this->data['autosaves'];
     $seconds = $time - $this->assessRecord['starttime'];

@@ -159,7 +159,7 @@ if ($haspoints && $caneditscore && $rubric != 0) {
 
 
 if (isset($_GET['view'])) {
-	$view = $_GET['view'];
+	$view = Sanitize::onlyInt($_GET['view']);
 } else {
 	$view = $defdisplay;  //0: expanded, 1: collapsed, 2: condensed
 }

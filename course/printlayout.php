@@ -40,15 +40,15 @@ if ($overwriteBody==1) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (isset($_POST['vert'])) {
-		$ph = 11 - $_POST['vert'];
-		$pw = 8.5 - $_POST['horiz'];
+		$ph = 11 - Sanitize::onlyFloat($_POST['vert']);
+		$pw = 8.5 - Sanitize::onlyFloat($_POST['horiz']);
 		if ($_POST['browser']==1) {
 			$ph -= .5;
 			$pw -= .5;
 		}
 	} else if (isset ($_POST['pw'])) {
-		$ph = $_POST['ph'];
-		$pw = $_POST['pw'];
+		$ph = Sanitize::onlyFloat($_POST['ph']);
+		$pw = Sanitize::onlyFloat($_POST['pw']);
 	}
 	$isfinal = isset($_GET['final']);
 	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");

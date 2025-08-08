@@ -398,7 +398,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">-</a>';
 			} else {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -409,7 +409,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">-</a>';
 			}
 			if ($line['useexception']) {
 				if ($exceptions[$line['userid']]['islatepass']>0) {
@@ -436,7 +436,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">';
 			} else {
 				$querymap = array(
 					'gbmode' => $gbmode,

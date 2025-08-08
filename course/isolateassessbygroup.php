@@ -186,7 +186,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">-</a></td><td>-</td><td></td>';
 			} else {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -197,7 +197,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">-</a></td><td>-</td><td></td>';
 			}
 		} else {
 			if ($aver > 1) {
@@ -209,7 +209,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">';
 			} else {
 				$querymap = array(
 	                'gbmode' => $gbmode,
