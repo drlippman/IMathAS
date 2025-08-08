@@ -394,7 +394,7 @@
 	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForJavascript($deffbtext).'";';
 	$placeinhead .= 'function chgsecfilter() {
 		var sec = document.getElementById("secfiltersel").value;
-		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
+		var toopen = "'.Sanitize::encodeStringForJavascript($address).'&secfilter=" + encodeURIComponent(sec);
 		window.location = toopen;
 		}';
 	$placeinhead .= 'function toggletryblock(type,n) {
@@ -447,30 +447,30 @@
     $qsmap = ['stu'=>$stu, 'gbmode'=>$gbmode, 'cid'=>$cid, 'aid'=>$aid, 'qid'=>$qid, 'page'=>$page, 'ver'=>$ver];
 	if ($page==-1) {
         $qsmap['page'] = 0;
-		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Grade one student at a time</a> (Do not use for group assignments)";
+		echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
         $qsmap['page'] = -1;
-		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Grade all students at once</a>";
+		echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Grade all students at once</a>";
 	}
     $qsmap['page'] = $page;
     echo '<br/>';
     if ($ver=='scored') {
 		echo "<b>Showing Scored Attempts.</b>  ";
         $qsmap['ver'] = 'last';
-		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Last Attempts.</a> ";
+		echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Show Last Attempts.</a> ";
         $qsmap['ver'] = 'all';
-        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show All Attempts.</a> ";
+        echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Show All Attempts.</a> ";
 	} else if ($ver=='last') {
         $qsmap['ver'] = 'scored';
-        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Scored Attempts.</a> ";
+        echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Show Scored Attempts.</a> ";
         echo "<b>Showing Last Attempts.</b>  ";
         $qsmap['ver'] = 'all';
-        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show All Attempts.</a> ";
+        echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Show All Attempts.</a> ";
 	} else {
         $qsmap['ver'] = 'scored';
-        echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Scored Attempts.</a>  ";
+        echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Show Scored Attempts.</a>  ";
         $qsmap['ver'] = 'last';
-		echo "<a href=\"gradeallq2.php?" . Sanitize::generateQueryStringFromMap($qsmap) . "\">Show Last Attempts.</a> ";
+		echo "<a href=\"gradeallq2.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "\">Show Last Attempts.</a> ";
         echo "<b>Showing All Attempts.</b>  ";
     }
     if ($submitby == 'by_assessment') {
@@ -557,7 +557,7 @@
 		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
 		echo '</div>';
 	}
-	echo "<form id=\"mainform\" method=post action=\"gradeallq2.php?stu=" . Sanitize::generateQueryStringFromMap($qsmap) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
+	echo "<form id=\"mainform\" method=post action=\"gradeallq2.php?stu=" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($qsmap)) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
 	if ($isgroup>0 && $page == -1) {
 		echo '<p><label><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</label></p>';
 	}
@@ -884,9 +884,9 @@
 				}
                 echo ', '._('version').' '.($qdata['ver']+1);
 				
-                echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
+                echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap(array(
                         'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$thisqsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
-                        'to' => $line['userid'])) . "\">Use in Message</a>";
+                        'to' => $line['userid']))) . "\">Use in Message</a>";
                 echo ' <span class="subdued small">'._('Question ID ').$thisqsetid.'</span>';
                 if (!empty($qdata['timeactive']['total']) || !empty($qdata['lastchange'])) {
                     echo '<br/>';
