@@ -7,6 +7,7 @@ require_once "sanitize.php";
 //$labelList is an array of strings that are displayed as the select list
 //$selectVal is optional, if passed the item in $valList that matches will be output as selected
 function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
+	$name = Sanitize::encodeStringForDisplay($name);
 	echo "<select name=\"$name\" id=\"$name\" ";
 	echo (isset($actions)) ? $actions : "" ;
 	echo ">\n";
@@ -30,6 +31,7 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
 }
 
 function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$defaultLabel=null) {
+	$name = Sanitize::encodeStringForDisplay($name);
 	echo "<div class=\"multisel\"><select name=\"{$name}[]\" id=\"$name\">";
 	if (isset($defaultLabel)) {
 		echo " <option value=\"null\" selected=\"selected\">".Sanitize::encodeStringForDisplay($defaultLabel)."</option>\n";

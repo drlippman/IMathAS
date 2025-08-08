@@ -50,15 +50,18 @@ ul {
 	}
 	$skipcids = implode(',',$skipcid);
 	*/
+	$qarr = [$start];
     $query = "SELECT g.name,u.LastName,u.FirstName,c.id,c.name AS cname,COUNT(DISTINCT s.id),u.email FROM imas_students AS s JOIN imas_teachers AS t ";
-    $query .= "ON s.courseid=t.courseid AND s.lastaccess>$start ";
+    $query .= "ON s.courseid=t.courseid AND s.lastaccess>? ";
 	if ($end != $now) {
-		$query .= "AND s.lastaccess<$end ";
+		$query .= "AND s.lastaccess<? ";
+		$qarr[] = $end;
 	}
 	$query .= "JOIN imas_courses AS c ON t.courseid=c.id ";
 	$query .= "JOIN imas_users as u ";
 	$query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id,c.id ORDER BY g.name,u.LastName,u.FirstName,c.name";
-	$stm = $DBH->query($query);
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
     $lastgroup = '';  $grpcnt = 0; $grpdata = '';  $lastuser = ''; $userdata = '';
     $grpinstrcnt = 0; $lastemail = '';
 	$seencid = array();

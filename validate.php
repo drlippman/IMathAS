@@ -239,7 +239,7 @@ if ($haslogin && !$hasusername) {
                 $_POST['tzoffset'] = 0;
             }
             if (isset($_POST['tzname'])) {
-                $_SESSION['logintzname'] = $_POST['tzname'];
+                $_SESSION['logintzname'] = Sanitize::simpleASCII($_POST['tzname']);
             }
             if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
                 $_SESSION['static_ok'] = 1;
@@ -249,7 +249,7 @@ if ($haslogin && !$hasusername) {
 
             $_SESSION['tzoffset'] = floatval($_POST['tzoffset']);
             if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
-                $_SESSION['tzname'] = $_POST['tzname'];
+                $_SESSION['tzname'] = Sanitize::simpleASCII($_POST['tzname']);
             }
 
             if (isset($json_data['login_errors'])) {

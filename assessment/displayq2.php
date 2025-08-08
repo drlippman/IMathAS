@@ -7379,7 +7379,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 			if ($found) {
-				$GLOBALS['partlastanswer'] = '@FILE:'.$_POST["lf$qn"].'@';
+				$GLOBALS['partlastanswer'] = '@FILE:'.Sanitize::simpleASCII($_POST["lf$qn"]).'@';
 				if ($answerformat=='excel') {
 					$zip = new ZipArchive;
 					if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {

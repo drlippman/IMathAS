@@ -391,7 +391,7 @@ If deleted on both ends, delete from DB
 				}
 			} else if (isset($_GET['quoteq'])) {
                 $parts = explode('-',$_GET['quoteq']);
-				$GLOBALS['assessver'] = $parts[4];
+				$GLOBALS['assessver'] = Sanitize::onlyInt($parts[4]);
                 if ($courseUIver > 1) {
                     require_once '../assess2/AssessStandalone.php';
                     $a2 = new AssessStandalone($DBH);

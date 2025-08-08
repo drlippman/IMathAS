@@ -285,6 +285,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 }
 
 foreach ($qids as $i=>$qid) {
+	$i = Sanitize::onlyInt($i);
 	echo '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 	$quesout = '';
 	ob_start();

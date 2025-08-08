@@ -328,6 +328,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
 <?php
 		foreach($sel1 as $k=>$s1) {
+			$k = Sanitize::onlyInt($k);
 ?>
 			<div>
 			<p><b><?php echo Sanitize::encodeStringForDisplay($s1); ?></b>.  Deliver assessment:
@@ -355,6 +356,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 <?php
 			if (isset($sel2[$s1])) {
 				for ($i=0;$i<count($sel2[$s1]);$i++) {
+					$i = Sanitize::onlyInt($i);
 ?>
 				<tr id="trout<?php echo $k . "-" . $i ?>">
 					<td><input type=hidden id="out<?php echo $k . "-" . $i ?>" name="out<?php echo $k . "-" . $i ?>" value="<?php echo Sanitize::encodeStringForDisplay(decodeSelector($sel2[$s1][$i])); ?>">
