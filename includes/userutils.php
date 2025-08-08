@@ -21,6 +21,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
         if ($row['name']==null) {$row['name'] = _('Default');}
+        $row['priority'] = 0;
         $possible_users[] = $row;
       }
     } else if (count($words)==1) {
