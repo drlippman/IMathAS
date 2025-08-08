@@ -787,23 +787,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $skippenalty=10;
       } else
 			*/
-            if ($line['defpenalty'] === '') {
-                $line['defpenalty'] = '0';
-            }
-			if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
-				$defattemptpenalty = substr($line['defpenalty'],2);
-				$defattemptpenalty_aftern = $line['defpenalty'][1];
+	  if ($line['defpenalty'] === '') {
+		$line['defpenalty'] = '0';
+	  }
+	  if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
+		$defattemptpenalty = substr($line['defpenalty'],2);
+		$defattemptpenalty_aftern = $line['defpenalty'][1];
       } else {
         $defattemptpenalty = $line['defpenalty'];
-				$defattemptpenalty_aftern = 1;
+		$defattemptpenalty_aftern = 1;
       }
-      if ($line['defpenalty'] === '') { $line['defpenalty'] = '0'; }
-			if (is_string($line['defpenalty']) && $line['defregenpenalty'][0]==='S') {
-				$defregenpenalty = substr($line['defregenpenalty'],2);
-				$defregenpenalty_aftern = $line['defregenpenalty'][1];
+      if ($line['defregenpenalty'] === '') { 
+		$line['defregenpenalty'] = '0'; 
+	  }
+	  if (is_string($line['defregenpenalty']) && $line['defregenpenalty'][0]==='S') {
+		$defregenpenalty = substr($line['defregenpenalty'],2);
+		$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {
         $defregenpenalty = $line['defregenpenalty'];
-				$defregenpenalty_aftern = 1;
+		$defregenpenalty_aftern = 1;
       }
       if ($line['reqscoreaid']==0) {
       	$reqscoredisptype=-1;
