@@ -15,7 +15,7 @@ if (isset($_GET['secfilter'])) {
 	$secfilter = -1;
 }
 if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-    $gbmode = $_GET['gbmode'];
+    $gbmode = Sanitize::onlyInt($_GET['gbmode']);
     $_SESSION[$cid.'gbmode'] = $gbmode;
 } else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
     $gbmode =  $_SESSION[$cid.'gbmode'];

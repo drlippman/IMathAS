@@ -18,7 +18,7 @@ if (!isset($_GET['launchid'])) {
 }
 
 $db = new Imathas_LTI_Database($DBH);
-$launch = LTI\LTI_Message_Launch::from_cache($_GET['launchid'], $db);
+$launch = LTI\LTI_Message_Launch::from_cache(Sanitize::simpleASCII($_GET['launchid']), $db);
 $contextid = $launch->get_platform_context_id();
 $platform_id = $launch->get_platform_id();
 $resource_link = $launch->get_resource_link();

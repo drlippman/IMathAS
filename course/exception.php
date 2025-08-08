@@ -21,12 +21,12 @@ $uid = Sanitize::onlyInt($_GET['uid']);
 $rpq =  Sanitize::randomQueryStringParam();
 
 if (isset($_GET['stu'])) {
-	$stu = $_GET['stu'];
+	$stu = Sanitize::onlyInt($_GET['stu']);
 } else {
 	$stu=0;
 }
 if (isset($_GET['from'])) {
-	$from = $_GET['from'];
+	$from = Sanitize::simpleString($_GET['from']);
 } else {
 	$from = 'gb';
 }

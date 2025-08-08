@@ -20,7 +20,7 @@ if (!isset($_POST['launchid'])) {
   exit;
 }
 $db = new Imathas_LTI_Database($DBH);
-$launch = LTI\LTI_Message_Launch::from_cache($_POST['launchid'], $db);
+$launch = LTI\LTI_Message_Launch::from_cache(Sanitize::simpleASCII($_POST['launchid']), $db);
 
 $role = standardize_role($launch->get_roles());
 $contextid = $launch->get_platform_context_id();

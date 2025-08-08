@@ -486,7 +486,7 @@ if ($hasusername) {
         $_SESSION['useflash'] = true;
     }
     if (isset($_GET['graphdisp'])) {
-        $_SESSION['graphdisp'] = $_GET['graphdisp'];
+        $_SESSION['graphdisp'] = intval($_GET['graphdisp']);
     }
     if (!isset($_SESSION['secsalt'])) { // if it was lost somehow
         $_SESSION['secsalt'] = generaterandstring();

@@ -64,7 +64,7 @@ class Redirect {
 
         if (canAccessCookies()) {
             // We have access, continue with redirect
-            window.location = '<?php echo $this->location ?>';
+            window.location = <?php echo json_encode($this->location); ?>;
         } else {
             // We don't have access, reopen flow in a new window.
             var opened = window.open(document.getElementById('try-again').href, '_blank');

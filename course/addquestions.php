@@ -811,7 +811,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
 				$maj = count($existingq)/2;
-				$existingqlist = implode(',', $existingq);  //pulled from database, so no quotes needed
+				$existingqlist = implode(',', array_map('intval',$existingq));  //pulled from database, so no quotes needed
 				$stm = $DBH->query("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) AND deleted=0 GROUP BY libid");
 				$foundmaj = false;
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -1367,7 +1367,7 @@ if ($overwriteBody==1) {
 		<?php echo _("or"); ?> <button type="button" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'"><?php echo _("Select From Assessments"); ?></button>
 		<br>
 		<?php echo _('Search') ?>:
-		<input type=text size=15 name=search value="<?php echo $search ?>">
+		<input type=text size=15 name=search value="<?php echo Sanitize::encodeStringForDisplay($search); ?>">
 		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
 		<?php echo _('Search all libs'); ?></span>

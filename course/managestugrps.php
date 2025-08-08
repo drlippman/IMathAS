@@ -582,7 +582,7 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
-		$querystring = http_build_query(array('cid'=>$cid, 'delgrpset'=>$deleteGroupSet));
+		$querystring = Sanitize::encodeStringForDisplay(http_build_query(array('cid'=>$cid, 'delgrpset'=>$deleteGroupSet)));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Delete').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
@@ -630,7 +630,7 @@ if ($overwriteBody==1) {
 		echo '<h3>Remove ALL group members</h3>';
 		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
 
-		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'removeall'=>Sanitize::onlyInt($_GET['removeall'])));
+		$querystring = Sanitize::encodeStringForDisplay(http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'removeall'=>Sanitize::onlyInt($_GET['removeall']))));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
@@ -661,7 +661,7 @@ if ($overwriteBody==1) {
 		echo '<h3>Remove group member</h3>';
 		echo "<p>Are you SURE you want to remove <b>" . Sanitize::encodeStringForDisplay($page_stuname) . "</b> from the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
 
-		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'grpid'=>Sanitize::onlyInt($_GET['grpid']), 'remove'=>Sanitize::onlyInt($_GET['remove'])));
+		$querystring = Sanitize::encodeStringForDisplay(http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'grpid'=>Sanitize::onlyInt($_GET['grpid']), 'remove'=>Sanitize::onlyInt($_GET['remove']))));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
