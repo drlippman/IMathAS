@@ -392,6 +392,10 @@ if ($hasusername) {
     $stm = $DBH->prepare($query);
     $stm->execute(array(':id' => $userid));
     $line = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($line === false) {
+        echo "Error. Please log in again";
+        exit;
+    }
     if (!isset($_SESSION['started'])) {
         $_SESSION['started'] = time();
     }

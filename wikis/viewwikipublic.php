@@ -93,6 +93,10 @@ require_once __DIR__ . "/../includes/sanitize.php";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':wikiid'=>$id));
 	$row = $stm->fetch(PDO::FETCH_NUM);
+	if ($row === false) {
+		echo "Invalid wiki";
+		exit;
+	}
 	$text = $row[1];
 	if (strlen($text)>6 && substr($text,0,6)=='**wver') {
 		$wikiver = Sanitize::onlyInt(substr($text,6,strpos($text,'**',6)-6));
