@@ -127,7 +127,7 @@ function additems2($arr) {
         }
         $outitems[] = $block;
     } else {
-      $outitems[] = $item['id'];
+      $outitems[] = intval($item['id']);
     }
   }
   return $outitems;

@@ -1483,7 +1483,8 @@ unset($dbpassword);
 			}
 			$stm3 = $DBH->prepare("UPDATE imas_questionset SET ancestorauthors=:authors WHERE id=:id");
 			while ($row = $res->fetch(PDO::FETCH_NUM)) {
-				$stm2 = $DBH->query("SELECT author FROM imas_questionset WHERE id IN ({$row[1]})");
+				$stm2 = $DBH->prepare("SELECT author FROM imas_questionset WHERE id=?");
+				$stm2->execute([$row[1]]);
 				$thisauthor = array();
 				while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 					if ($r[0] != $row[2] && !in_array($r[0],$thisauthor)) {

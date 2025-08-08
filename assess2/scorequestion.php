@@ -358,7 +358,7 @@ if ($end_attempt) {
       }
       $qs = Sanitize::generateQueryStringFromMap(array(
         'aid' => $aid,
-        'qn' => $qn,
+        'qn' => Sanitize::onlyInt($qn),
         'user' => $uid,
         'score' => $rawscores,
         'la' => $lastAnswer,

@@ -498,7 +498,7 @@ class LTI_Message_Launch {
         if (empty($this->registration)) {
           echo "Unable to find registration with issuer ".
             Sanitize::encodeStringForDisplay($this->jwt['body']['iss']).
-            ' and client_id '.$client_id.'. ';
+            ' and client_id '.Sanitize::encodeStringForDisplay($client_id).'. ';
           echo "Ensure the LTI registration information (Client ID and such) from the LMS has been provided to the system admin.";
             throw new LTI_Exception("Registration not found.", 1);
         }

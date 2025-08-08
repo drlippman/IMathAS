@@ -232,7 +232,7 @@ if (isset($QS['showscored'])) {
 
 	echo '<script type="text/javascript">
 	$(function() {
-		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", id: '.$qsetid.', score: '.$pts.', redisplay: "'.str_replace('"','\\"',$params["redisplay"]).'", jwt: "'.Sanitize::encodeStringForJavascript($signed).'", frame_id: "' . $frameid . '"}), "*");
+		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", id: '.$qsetid.', score: '.$pts.', redisplay: "'.Sanitize::encodeStringForJavascript($params["redisplay"]).'", jwt: "'.Sanitize::encodeStringForJavascript($signed).'", frame_id: "' . $frameid . '"}), "*");
 	});
 	</script>';
 	if ($scoredonsubmit) {

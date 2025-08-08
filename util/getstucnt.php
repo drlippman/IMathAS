@@ -26,7 +26,7 @@
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$skipcid[] = $row[0];
 	}
-	$skipcids = implode(',',$skipcid);
+	$skipcids = implode(',', array_map('intval', $skipcid));
 
 	$date = $now - 60*60*24*$days;
 	echo "<p>Active enrollments in " . Sanitize::onlyInt($days) . " Days</p>";
