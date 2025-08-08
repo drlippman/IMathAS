@@ -32,7 +32,9 @@ class Rand {
 	public function rand($min=0,$max=null) {  //simple xorshift
 		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
 			if ($max===null) {
-				$max = $this->randmax;
+				//$max = $this->randmax;
+				echo "rand expects 2 arguments"; 
+				return (int)$min;
 			}
 			$min = (int)$min;
 			$max = (int)$max;
