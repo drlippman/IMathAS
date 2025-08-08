@@ -1953,6 +1953,7 @@ class AssessRecord
             'jsparams' => [],
             'answeights' => [1],
             'usedautosave' => false,
+            'useda11yalt' => false,
             'work' => '',
             'worktime' => '0',
             'errors' => _('Unable to load question data')

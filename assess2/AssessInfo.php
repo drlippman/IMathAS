@@ -462,6 +462,9 @@ class AssessInfo
    * @return mixed  the setting value
    */
   public function getQuestionSetting($id, $field) {
+    if (!isset($this->questionData[$id][$field])) {
+        return false;
+    }
     return $this->questionData[$id][$field];
   }
 
