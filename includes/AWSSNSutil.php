@@ -9,7 +9,7 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])
 	$msg = json_decode(trim(file_get_contents("php://input")), true);
 	if ($msg !== null && isset($msg['SubscribeURL'])) {
 		//call subscription URL to confirm
-		$res = file_get_contents($msg['SubscribeURL']);
+		$res = file_get_contents(Sanitize::url($msg['SubscribeURL']));
 		exit;
 	}
 }

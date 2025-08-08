@@ -612,7 +612,7 @@ if (isset($_GET['launch'])) {
 	$store->mark_nonce_used($request);
 
 	$keyparts = explode('_',$ltikey);
-	$_SESSION['ltiorigkey'] = $ltikey;
+	$_SESSION['lti_origkey'] = $ltikey;
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='LTIkey') {  //cid:org
@@ -1718,7 +1718,7 @@ if (isset($SESS['lti_launch_get'])) {
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
-$_SESSION['lti_origkey'] = $SESS['ltiorigkey'];
+$_SESSION['lti_origkey'] = $SESS['lti_origkey'];
 if (isset($SESS['lti_duedate'])) {
 	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
 }
@@ -2236,7 +2236,7 @@ if (isset($_GET['launch'])) {
 	$store->mark_nonce_used($request);
 
 	$keyparts = explode('_',$ltikey);
-	$_SESSION['ltiorigkey'] = $ltikey;
+	$_SESSION['lti_origkey'] = $ltikey;
     unset($_SESSION['place_aid']); // make sure only set if for current launch
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
@@ -2788,7 +2788,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	} else {
 		$cid = intval($keyparts[1]);
 		if ($_SESSION['lti_keytype']=='cc-vf') {
-			$usid = explode('_',$_SESSION['ltiorigkey']);
+			$usid = explode('_',$_SESSION['lti_origkey']);
 			$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
 			$query .= "imas_tutors.courseid=:courseid AND imas_users.SID=:SID";
 			$stm3 = $DBH->prepare($query);
@@ -2974,7 +2974,7 @@ if (isset($SESS['lti_launch_get'])) {
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
-$_SESSION['lti_origkey'] = $SESS['ltiorigkey'];
+$_SESSION['lti_origkey'] = $SESS['lti_origkey'];
 if (isset($SESS['lti_duedate'])) {
 	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
 }

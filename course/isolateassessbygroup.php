@@ -220,7 +220,7 @@
 					'aid' => $aid
 				);
 
-	      echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+	      echo '<td><a href="gb-viewasid.php?' . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">';
 			}
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {

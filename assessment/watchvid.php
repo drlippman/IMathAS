@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/sanitize.php';
 if (!isset($_GET['url'])) {
     exit;
 }
-$url = $_GET['url'];
+$url = Sanitize::url($_GET['url']);
 $doembed = false;
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 	 $urlmode = 'https://';
@@ -60,14 +60,14 @@ if ($isyoutube) {
 	$timestart = '?rel=0';
 	if (strpos($url,'start=')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
-		$timestart .= '&'.$m[0];
+		$timestart .= '&start='.intval($m[1]);
 	} else if (strpos($url,'t=')!==false) {
 		preg_match('/\Wt=((\d+)m)?((\d+)s?)?/',$url,$m);
 		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
 	}
 
 	if (preg_match('/end=(\d+)/',$url,$m)) {
-		$timestart .= '&'.$m[0];
+		$timestart .= '&end='.intval($m[1]);
 	}
 	$doembed = true;
 	$videoUrl = $urlmode.'www.youtube.com/embed/'.$vidid.$timestart;

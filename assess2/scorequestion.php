@@ -52,7 +52,7 @@ if (!isset($_POST['toscoreqn']) || $_POST['toscoreqn'] == -1 || $_POST['toscoreq
   $verification = array();
 } else {
   $qnstoscore = json_decode($_POST['toscoreqn'], true);
-  $qns = array_keys($qnstoscore);
+  $qns = array_map('Sanitize::onlyInt',array_keys($qnstoscore));
   $lastloaded = array_map('Sanitize::onlyInt', explode(',', $_POST['lastloaded']));
   $timeactive = array_map('Sanitize::onlyInt', explode(',', $_POST['timeactive']));
   $verification = json_decode($_POST['verification'], true);

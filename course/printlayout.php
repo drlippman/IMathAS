@@ -133,7 +133,7 @@ if ($overwriteBody==1) {
 
 <?php
 	if ($isfinal) {
-		$heights = explode(',',$_POST['heights']);
+		$heights = array_map('floatval', explode(',',$_POST['heights']));
 		for ($i=0;$i<count($heights);$i++) {
 			echo "div.trq$i {float: left; width: ".Sanitize::encodeStringForCSS($pw)."in; height: ".Sanitize::encodeStringForCSS($heights[$i])."in; padding: 0px; overflow: hidden;}\n";
 		}

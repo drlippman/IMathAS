@@ -447,7 +447,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::encodeStringForDisplay(Sanitize::generateQueryStringFromMap($querymap)) . '">';
 			}
 			if ($line['thisenddate'] > $now) {
 				echo '<i>'.Sanitize::onlyFloat($total);

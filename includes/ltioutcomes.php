@@ -349,7 +349,7 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
 
     $ctx = stream_context_create($params);
   try {
-    $fp = @fopen($endpoint, 'r', false, $ctx);
+    $fp = @fopen(Sanitize::url($endpoint), 'r', false, $ctx);
     } catch (Exception $e) {
         $fp = false;
     }
@@ -461,7 +461,7 @@ function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
 		}
 		try {
 			$ctx = stream_context_create(array('http' => $opts));
-			$fp = @fopen($url, 'rb', false, $ctx);
+			$fp = @fopen(Sanitize::url($url), 'rb', false, $ctx);
 			if ($fp) {
 				$resp = @stream_get_contents($fp);
 				$ok = $resp !== false;

@@ -4,14 +4,14 @@ if (!isset($userid)) { // prevent direct calls
 	exit;
 }
 // Function to show calendar, used by showcalendar and courseshowitems
-$cid = Sanitize::courseId($_GET['cid']);
 
-
-if (isset($_GET['calstart'])) {
+if (isset($_GET['calstart']) && isset($_GET['cid'])) {
+	$cid = Sanitize::courseId($_GET['cid']);
 	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),0,'','',false,true);
 	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
 }
-if (isset($_GET['callength'])) {
+if (isset($_GET['callength']) && isset($_GET['cid'])) {
+	$cid = Sanitize::courseId($_GET['cid']);
 	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),0,'','',false,true);
 	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }

@@ -3400,9 +3400,13 @@ function formhoverover($label,$tip) {
 
 }
 
-function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='') {
+function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='',$presanitized=false) {
 	global $urlmode;
-	$labelSanitized = Sanitize::encodeStringForDisplay($label);
+	if (!$presanitized) {
+		$labelSanitized = Sanitize::encodeStringForDisplay($label);
+	} else {
+		$labelSanitized = $label;
+	}
     if (!is_scalar($content)) { echo "invalid content in formpopup"; return ''; }
     if (!is_scalar($label)) { echo "invalid label in formpopup"; return ''; }
     if (is_array($width)) { echo "width should not be array in formpopup"; $width = 600; }

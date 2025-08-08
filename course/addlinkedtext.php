@@ -512,7 +512,7 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeraddlinkedtext" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 
-	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+	<form enctype="multipart/form-data" method=post action="<?php echo Sanitize::encodeStringForDisplay($page_formActionTag) ?>">
 		<label for=title class=form>Title: </label>
 		<span class=formright><input type=text size=60 name=title id=title value="<?php echo str_replace('"','&quot;',$line['title']);?>" required />
 		</span><BR class=form>

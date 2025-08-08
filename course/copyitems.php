@@ -454,7 +454,7 @@ if ($overwriteBody==1) {
 	<div id="headercopyitems" class="pagetitle"><h1>Copy Course Items</h1></div>
 
 <?php
-	if (isset($_GET['action']) && $_GET['action']=='selectcalitems') {
+	if (isset($_GET['action']) && $_GET['action']=='selectcalitems' && $ctc > 0) {
 //DISPLAY BLOCK FOR selecting calendar items to copy
 ?>
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
@@ -492,7 +492,7 @@ if ($overwriteBody==1) {
 
 <?php
 
-	} else if (isset($_GET['action']) && $_GET['action']=="select") {
+	} else if (isset($_GET['action']) && $_GET['action']=="select" && $ctc > 0) {
 
 //DISPLAY BLOCK FOR SECOND STEP - selecting course item
 

@@ -248,7 +248,10 @@ function deleteimport($key) {
 		$s3->deleteObject($GLOBALS['AWSbucket'],'import/'.$key);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
-		@unlink(realpath($base.$key));
+		$targetPath = realpath($base.$key);
+		if ($targetPath !== false && strpos($targetPath, $base) === 0) {
+			@unlink($targetPath);
+		}
 	}
 }
 

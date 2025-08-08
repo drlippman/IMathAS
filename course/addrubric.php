@@ -19,19 +19,31 @@ $fromstr = '';
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='modq' && !empty($_GET['qid'])) {
 	$fromstr = '&amp;' . Sanitize::encodeStringforDisplay(
-		Sanitize::generateQueryStringFromMap(array('from' => 'modq', 'aid' => $_GET['aid'],
-			'qid' => $_GET['qid'])));
-	$returnstr = 'modquestion.php?' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-			'aid' => $_GET['aid'], 'id' => $_GET['qid'])));
+		Sanitize::generateQueryStringFromMap(array(
+		'from' => 'modq', 
+		'aid' => Sanitize::onlyInt($_GET['aid']),
+		'qid' => Sanitize::onlyInt($_GET['qid']))));
+	$returnstr = 'modquestion.php?' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array(
+		'cid' => $cid,
+		'aid' => Sanitize::onlyInt($_GET['aid']), 
+		'id' => Sanitize::onlyInt($_GET['qid']))));
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Question Settings</a> ";
 } else if ($from=='addg') {
-	$fromstr = '&amp;' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array('from' => 'addg', 'gbitem' => $_GET['gbitem'])));
-	$returnstr = 'addgrades.php?'. Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-			'gbitem' => $_GET['gbitem'], 'grades' => 'all')));
+	$fromstr = '&amp;' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array(
+		'from' => 'addg', 
+		'gbitem' => Sanitize::onlyInt($_GET['gbitem']))));
+	$returnstr = 'addgrades.php?'. Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array(
+		'cid' => $cid,
+		'gbitem' => Sanitize::onlyInt($_GET['gbitem']), 
+		'grades' => 'all')));
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Offline Grades</a> ";
 } else if ($from=='addf') {
-	$fromstr = '&amp;' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array('from' => 'addf', 'fid' => $_GET['fid'])));
-	$returnstr = 'addforum.php?' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'id' => $_GET['fid'])));
+	$fromstr = '&amp;' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array(
+		'from' => 'addf', 
+		'fid' => Sanitize::onlyInt($_GET['fid']))));
+	$returnstr = 'addforum.php?' . Sanitize::encodeStringforDisplay(Sanitize::generateQueryStringFromMap(array(
+		'cid' => $cid, 
+		'id' => Sanitize::onlyInt($_GET['fid']))));
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Forum</a> ";
 }
 

@@ -130,7 +130,7 @@ if (isset($_POST['SID'])) {
 		if ($entrydig==0) {
 			$pattern .= '+';
 		} else {
-			$pattern .= '{'.$entrydig.'}';
+			$pattern .= '{'.intval($entrydig).'}';
 		}
 	}
 	$pattern .= '$/i';

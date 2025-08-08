@@ -820,7 +820,7 @@ class AssessRecord
     }
     $tosave = array();
 
-    $qref = ($qn+1)*1000 + $pn;
+    $qref = intval(($qn+1)*1000 + $pn);
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
         if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)(-\d+|-val)?/', $key, $match)) {

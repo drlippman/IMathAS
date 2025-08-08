@@ -225,14 +225,14 @@ if (isset($QS['showscored'])) {
 
 	$params = array('id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 	if (isset($_POST['auth'])) {
-		$params["auth"] = $_POST['auth'];
+		$params["auth"] = Sanitize::onlyASCII($_POST['auth']);
 	}
 
 	$signed = JWT::encode($params, $key);
 
 	echo '<script type="text/javascript">
 	$(function() {
-		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", id: '.$qsetid.', score: '.$pts.', redisplay: "'.str_replace('"','\\"',$params["redisplay"]).'", jwt: "'.$signed.'", frame_id: "' . $frameid . '"}), "*");
+		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", id: '.$qsetid.', score: '.$pts.', redisplay: "'.str_replace('"','\\"',$params["redisplay"]).'", jwt: "'.Sanitize::encodeStringForJavascript($signed).'", frame_id: "' . $frameid . '"}), "*");
 	});
 	</script>';
 	if ($scoredonsubmit) {

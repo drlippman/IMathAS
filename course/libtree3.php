@@ -100,17 +100,17 @@ else if (isset($_GET['getsubs']) && isset($_GET['cid']) && $_GET['cid']=="admin"
 
 // get settings
 if (isset($_GET['select'])) {
-    $select = $_GET['select'];
+    $select = Sanitize::simpleString($_GET['select']);
 } else if (!isset($select)) {
     $select = "children";
 }
 if (isset($_GET['mode'])) {
-    $mode = $_GET['mode'];
+    $mode = Sanitize::simpleString($_GET['mode']);
 } else {
     $mode = 'multi';
 }
 if (isset($_GET['selectrights'])) {
-    $selectrights = $_GET['selectrights'];
+    $selectrights = Sanitize::onlyInt($_GET['selectrights']);
 } else {
     $selectrights = 0;
 }

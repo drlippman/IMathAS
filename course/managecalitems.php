@@ -185,7 +185,7 @@ if (isset($_GET['addto'])) {
 } else  {
 	$date = tzdate("m/d/Y",$now);
 }
-echo '<script>$(function() { addnewevent("'.$date.'");});</script>';
+echo '<script>$(function() { addnewevent("'.Sanitize::encodeStringForDisplay($date).'");});</script>';
 /*echo '<tr>';
 //echo '<td></td>';
 echo "<td><input type=text size=10 id=\"datenew-0\" name=\"datenew-0\" value=\"$date\" oninput=\"txtchg()\"/> ";

@@ -315,7 +315,7 @@ if ($overwriteBody==1) {
 				'aid' => $_GET['aid'], 'uid' => $_GET['uid'], 'stu' => $stu, 'asid' => $asid, 'from' => $from,
             ));
 ?>
-	<form method=post action="<?php echo $exceptionUrl; ?>">
+	<form method=post action="<?php echo Sanitize::encodeStringForDisplay($exceptionUrl); ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>" aria-label="Available after date">

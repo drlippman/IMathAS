@@ -609,11 +609,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					strpos($extrefpt[1],'vimeo.com/')!==false
 				) {
 					$extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
-					echo formpopup($extrefpt[0],$extrefpt[1],$vidextrefwidth,$vidextrefheight,"button",true,"video",$qref);
+					echo formpopup(Sanitize::encodeStringForDisplay($extrefpt[0]),$extrefpt[1],$vidextrefwidth,$vidextrefheight,"button",true,"video",$qref,true);
 				} else if ($extrefpt[0]=='read') {
-					echo formpopup("Read",$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref);
+					echo formpopup("Read",$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref,true);
 				} else {
-					echo formpopup($extrefpt[0],$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref);
+					echo formpopup(Sanitize::encodeStringForDisplay($extrefpt[0]),$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref,true);
 				}
 			}
 		}

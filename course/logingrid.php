@@ -7,7 +7,7 @@ require_once "../init.php";
 
 $cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['secfilter'])) {
-	$secfilter = $_GET['secfilter'];
+	$secfilter = Sanitize::onlyASCII($_GET['secfilter']);
 	$_SESSION[$cid.'secfilter'] = $secfilter;
 } else if (isset($_SESSION[$cid.'secfilter'])) {
 	$secfilter = $_SESSION[$cid.'secfilter'];
@@ -18,7 +18,7 @@ if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
     $gbmode = Sanitize::onlyInt($_GET['gbmode']);
     $_SESSION[$cid.'gbmode'] = $gbmode;
 } else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-    $gbmode =  $_SESSION[$cid.'gbmode'];
+    $gbmode = Sanitize::onlyInt($_SESSION[$cid.'gbmode']);
 } else {
     $stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
     $stm->execute(array(':courseid'=>$cid));
