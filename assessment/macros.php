@@ -1422,6 +1422,10 @@ function rands($min,$max,$n=0,$ord='def') {
 	list($min,$max) = checkMinMax($min, $max, true, 'rands');
 	$n = floor($n);
 	if ($n<=0) { echo "rands: need n &gt; 0";}
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
+	}
     $r = [];
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = $GLOBALS['RND']->rand($min,$max);
@@ -1443,6 +1447,10 @@ function rrands($min,$max,$p=0,$n=0,$ord='def') {
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
     $n = floor($n);
 	if ($n<=0) { echo "rrands: need n &gt; 0";}
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
+	}
     $r = [];
 	$maxi = floor(($max-$min)/$p + 1e-12);
 	for ($i = 0; $i < $n; $i++) {
@@ -1570,6 +1578,10 @@ function nonzerorands($min,$max,$n=0,$ord='def') {
 	if ($min == 0 && $max == 0) { return 0; }
     $n = floor($n);
 	if ($n<=0) { echo "nonzerorands: need n &gt; 0";}
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
+	}
     $r = [];
 	for ($i = 0; $i < $n; $i++) {
 		do {
@@ -1600,6 +1612,10 @@ function nonzerorrands($min,$max,$p=0,$n=0,$ord='def') {
     $n = floor($n);
     $r = [];
 	if ($n<=0) { echo "nonzerorrands: need n &gt; 0";}
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
+	}
 	for ($i = 0; $i < $n; $i++) {
     $cnt = 0;
 		do {
@@ -1633,6 +1649,10 @@ function diffrands($min,$max,$n=0,$ord='def') {
 
 	$n = floor($n);
 	if ($n<=0) { echo "diffrands: need n &gt; 0";}
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
+	}
 	if ($n<.1*($max-$min)) {
 		$out = array();
     $cnt = 0;
@@ -1668,6 +1688,10 @@ function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
 	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	$n = floor($n);
 	list($min,$max) = checkMinMax($min, $max, false, 'diffrrands');
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
+	}
 
 	if ($p<=0) {echo "Error with diffrrands: need to set positive step size"; return array_fill(0,$n,$min);}
     $n = floor($n);
@@ -1734,6 +1758,10 @@ function nonzerodiffrands($min,$max,$n=0,$ord='def',$nowarn=false) {
 		if ($GLOBALS['myrights']>10 && !$nowarn) {
 			echo "nonzerodiffrands: min-max not far enough for n requested";
 		}
+	}
+	if ($n > 1e4) {
+		echo 'Error with diffrrands: $n too large';
+		return [];
 	}
 
 	if ($n<.1*($max-$min)) {
