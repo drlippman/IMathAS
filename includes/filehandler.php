@@ -452,14 +452,27 @@ function deleteasidfilesfromstring($str) {
 //need to exclude asid or agroupid we're deleting from
 function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 	global $DBH;
-	if ($tosearchby!='id' && $tosearchby!='agroupid') {return 0;}
-	if (is_array($val)) {
-		$keylist = implode(',', array_map('intval', $val));
-		$searchnot = "$tosearchby NOT IN ($keylist)";
+
+	if ($tosearchby == 'id') {
+		if (is_array($val)) {
+			$keylist = implode(',', array_map('intval', $val));
+			$searchnot = "id NOT IN ($keylist)";
+		} else {
+			$val = intval($val);
+			$searchnot = "id<>$val";
+		}
+	} else if ($tosearchby == 'agroupid') {
+		if (is_array($val)) {
+			$keylist = implode(',', array_map('intval', $val));
+			$searchnot = "agroupid NOT IN ($keylist)";
+		} else {
+			$val = intval($val);
+			$searchnot = "agroupid<>$val";
+		}
 	} else {
-		$val = intval($val);
-		$searchnot = "$tosearchby<>$val";
+		return 0;
 	}
+
 	if ($aid != null) {
 		if (is_array($aid)) {
 			$keylist = implode(',', array_map('intval', $aid));
@@ -600,18 +613,42 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 
 function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 	global $DBH;
-	if ($tosearchby!='id' && $tosearchby!='agroupid' && $tosearchby!='userid') {return 0;}
-	$lim = intval($lim);
 
-	if (is_array($val)) {
-		$keylist = implode(',', array_map('intval', $val));
-		$searchwhere = "$tosearchby IN ($keylist)";
-		$searchnot = "$tosearchby NOT IN ($keylist)";
+	$lim = intval($lim);
+	if ($tosearchby == 'id') {
+		if (is_array($val)) {
+			$keylist = implode(',', array_map('intval', $val));
+			$searchwhere = "id IN ($keylist)";
+			$searchnot = "id NOT IN ($keylist)";
+		} else {
+			$val = intval($val);
+			$searchwhere = "id=$val";
+			$searchnot = "id<>$val";
+		}
+	} else if ($tosearchby == 'agroupid') {
+		if (is_array($val)) {
+			$keylist = implode(',', array_map('intval', $val));
+			$searchwhere = "agroupid IN ($keylist)";
+			$searchnot = "agroupid NOT IN ($keylist)";
+		} else {
+			$val = intval($val);
+			$searchwhere = "agroupid=$val";
+			$searchnot = "agroupid<>$val";
+		}
+	} else if ($tosearchby == 'userid') {
+		if (is_array($val)) {
+			$keylist = implode(',', array_map('intval', $val));
+			$searchwhere = "userid IN ($keylist)";
+			$searchnot = "userid NOT IN ($keylist)";
+		} else {
+			$val = intval($val);
+			$searchwhere = "userid=$val";
+			$searchnot = "userid<>$val";
+		}
 	} else {
-		$val = intval($val);
-		$searchwhere = "$tosearchby=$val";
-		$searchnot = "$tosearchby<>$val";
+		return 0;
 	}
+	
 	if ($aid === null && $tosearchby!='userid') {
 		$stm = $DBH->query("SELECT assessmentid FROM imas_assessment_sessions WHERE $searchwhere");
 		$aid = $stm->fetchColumn(0);

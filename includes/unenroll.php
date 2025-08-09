@@ -26,8 +26,8 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$threads[] = $rw2[0];
 		}
 	}
-	$threadlist = implode(',',$threads);
-	$forumlist = implode(',',$forums);
+	$threadlist = implode(',', array_map('intval', $threads));
+	$forumlist = implode(',', array_map('intval', $forums));
 
 	$assesses = array();
 	$groupassess = array();
@@ -84,7 +84,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$gbitems[] = $row[0];
 		}
-		$gblist = implode(',',$gbitems);
+		$gblist = implode(',', array_map('intval', $gbitems));
 		//new
 		$grades = array();
 		if (count($assesses)>0) {

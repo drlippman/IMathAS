@@ -169,7 +169,13 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
 				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 				$query = "DELETE FROM imas_assessment_sessions";
-				$query .= " WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid"; //$qp[0] is "id" or "agroupid" from getasidquery
+				if ($qp[0] == 'id') {
+					$query .= " WHERE id=:qval AND assessmentid=:assessmentid"; //$qp[0] is "id" or "agroupid" from getasidquery
+				} else if ($qp[0] == 'agroupid') {
+					$query .= " WHERE agroupid=:qval AND assessmentid=:assessmentid"; //$qp[0] is "id" or "agroupid" from getasidquery
+				} else {
+					exit;
+				}
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
 			}

@@ -562,8 +562,8 @@ unset($dbpassword);
 				if (!isset($agroupusers[$row[2]])) {
 					$agroupusers[$row[2]] = array();
 				}
-				$agroupusers[$row[2]][] = $row[0];
-				$agroupaids[$row[2]] = $row[3];
+				$agroupusers[$row[2]][] = intval($row[0]);
+				$agroupaids[$row[2]] = intval($row[3]);
 			}
 
 			//create new student groups
@@ -595,7 +595,7 @@ unset($dbpassword);
 				$stm2->execute(array(':groupsetid'=>$assessgrpset[$row[1]], ':id'=>$row[0]));
 			}
 			if (count($forumaid)>0) {
-				$forumlist = implode(',',array_keys($forumaid));
+				$forumlist = implode(',', array_map('intval', array_keys($forumaid)));
 				$query = "SELECT forumid,threadid,userid FROM imas_forum_posts WHERE forumid IN ($forumlist) AND parent=0";
 				$stm = $DBH->query($query); //is DB INTs - safe
 				$stm2 = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id");
@@ -756,6 +756,7 @@ unset($dbpassword);
 			 	 } else {
 			 	 	 $ins .= ",";
 			 	 }
+				 $row = array_map('intval', $row);
 			 	 $ins .= "('forum',{$row[1]},{$row[0]},{$row[2]},{$row[3]})"; //is INTs - safe
 			 	 $i++;
 			 }
