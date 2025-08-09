@@ -629,8 +629,8 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<465) {
-		edsetup.toolbar1 = "myEdit myInsert styles | forecolor saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent  | bold italic | asciimath asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles forecolor saveclose";
+		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<575) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline forecolor saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";
@@ -1996,7 +1996,7 @@ function doImageUploadResize(el, callback) {
 					that.files = dataTransfer.files;
 					that.onchange = currentOnChange;
 					if (typeof callback === 'function') {
-						callback(that);
+						callback(that, true);
 					}
 				}
             }, 'image/jpeg', .95);
