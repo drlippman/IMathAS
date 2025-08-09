@@ -21,9 +21,9 @@ if ($stm->rowCount()==0) {
 }
 $peer = $stm->fetch(PDO::FETCH_ASSOC);
 if (function_exists("hash_hmac")) {
-	$computed_signature =  base64_encode(hash_hmac('sha1', $_GET['peer'], $peer['secret'], true));
+	$computed_signature =  base64_encode(hash_hmac('sha256', $_GET['peer'], $peer['secret'], true));
 } else {
-	$computed_signature = base64_encode(custom_hmac('sha1', $_GET['peer'], $peer['secret'], true));
+	$computed_signature = base64_encode(custom_hmac('sha256', $_GET['peer'], $peer['secret'], true));
 }
 if ($computed_signature != $_GET['sig']) {
 	echo '{error:"Invalid authorization"}';

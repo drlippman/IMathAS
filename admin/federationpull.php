@@ -33,9 +33,9 @@ if ($stm->rowCount()==0) {
 }
 $peerinfo = $stm->fetch(PDO::FETCH_ASSOC);
 if (function_exists("hash_hmac")) {
-	$computed_signature =  base64_encode(hash_hmac('sha1', $mypeername, $peerinfo['secret'], true));
+	$computed_signature =  base64_encode(hash_hmac('sha256', $mypeername, $peerinfo['secret'], true));
 } else {
-	$computed_signature = base64_encode(custom_hmac('sha1', $mypeername, $peerinfo['secret'], true));
+	$computed_signature = base64_encode(custom_hmac('sha256', $mypeername, $peerinfo['secret'], true));
 }
 
 //see if we have a pull to continue
