@@ -263,7 +263,7 @@ if ($tagfilter != '') {
 	$stm->execute(array(':tagfilter'=>$tagfilter));
 	$limthreads = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$limthreads[] = $row[0];
+		$limthreads[] = intval($row[0]);
 	}
 	if (count($limthreads)==0) {
 		$limthreads = '0';
@@ -451,7 +451,7 @@ $threaddata = [];
 $shownthreadids = [];
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $threaddata[] = $row;
-    $shownthreadids[] = $row['threadid'];
+    $shownthreadids[] = intval($row['threadid']);
 }
 $shownthreadlist = implode(',', $shownthreadids);
 

@@ -31,7 +31,7 @@ function deletegroup($grpid,$delposts=true) {
 		$stm = $DBH->query("SELECT id FROM imas_forum_threads WHERE stugroupid=$grpid"); //sanitized above - no need for prepared
 		$todel = array();
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$todel[] = $row[0];
+			$todel[] = intval($row[0]);
 		}
 		if (count($todel)>0) {
 			$dellist = implode(',',$todel);  //known to be safe INTs

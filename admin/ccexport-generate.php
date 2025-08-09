@@ -248,10 +248,10 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 				$ccnt++;
 
-				$fp = fopen($newdir.'/'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html','w');
+				$fp = fopen($newdir.'/'.$htmldir.'inlinetext'.intval($iteminfo[$item][1]).'.html','w');
 				fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 				fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
-				fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
+				fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].intval($iteminfo[$item][1]).'"/>');
 				if ($linktype=="canvas") {
 					fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
 					fwrite($fp,'<meta name="workflow_state" content="'.($row[3]==0?'unpublished':'active').'"/>');
@@ -287,7 +287,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 
 				if ((substr($row[1],0,4)=="http") && (strpos(trim($row[1])," ")===false)) { //is a web link
 					$alink = trim($row[1]);
-					$fp = fopen($newdir.'/weblink'.$iteminfo[$item][1].'.xml','w');
+					$fp = fopen($newdir.'/weblink'.intval($iteminfo[$item][1]).'.xml','w');
 					fwrite($fp,'<webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imswl_v1p1">');
 					fwrite($fp,' <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
 					fwrite($fp,' <url href="'.htmlentities($alink,ENT_XML1,'UTF-8',false).'" target="_blank"/>');
@@ -338,7 +338,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 					$ccnt++;
-					$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html','w');
+					$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.intval($iteminfo[$item][1]).'.html','w');
 					fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 					fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
 					fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
@@ -369,7 +369,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 				$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 				$ccnt++;
-				$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
+				$fp = fopen($newdir.'/forum'.intval($iteminfo[$item][1]).'.xml','w');
 				fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 				fwrite($fp,' <title >'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
 				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res),ENT_XML1,'UTF-8',false).'</text>');
@@ -377,7 +377,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				fclose($fp);
 
 				if ($linktype=='canvas') {
-					$fp = fopen($newdir.'/RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta.xml','w');
+					$fp = fopen($newdir.'/RESForum'.intval($iteminfo[$item][1]).'meta.xml','w');
 					fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
 						<topicMeta xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
 						  <topic_id>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</topic_id>
@@ -440,7 +440,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					}
 
 					mkdir($newdir.'/assn'.$iteminfo[$item][1]);
-					$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
+					$fp = fopen($newdir.'/assn'.intval($iteminfo[$item][1]).'/assignment_settings.xml','w');
 					fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
 					fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");
 					fwrite($fp,'<workflow_state>'.($row[6]==0?'unpublished':'published').'</workflow_state>'."\n");
@@ -463,7 +463,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					}
 					fwrite($fp,'</assignment>');
 					fclose($fp);
-					$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
+					$fp = fopen($newdir.'/assn'.intval($iteminfo[$item][1]).'/assignmenthtml'.intval($iteminfo[$item][1]).'.html','w');
 					fwrite($fp,'<html><body> </body></html>');
 					fclose($fp);
 					$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html">'."\n";
@@ -472,7 +472,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$resitem .= '</resource>';
 					$res[] = $resitem;
 				} else {
-					$fp = fopen($newdir.'/blti'.$iteminfo[$item][1].'.xml','w');
+					$fp = fopen($newdir.'/blti'.intval($iteminfo[$item][1]).'.xml','w');
 					fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 					fwrite($fp,'<blti:title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</blti:title>');
 					fwrite($fp,'<blti:description>'.htmlentities(html_entity_decode($row[1]),ENT_XML1,'UTF-8',false).'</blti:description>');
@@ -511,7 +511,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 				$ccnt++;
 
-				$fp = fopen($newdir.'/'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html','w');
+				$fp = fopen($newdir.'/'.$htmldir.'wikitext'.intval($iteminfo[$item][1]).'.html','w');
 				fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 				fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
 				fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');

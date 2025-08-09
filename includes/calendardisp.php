@@ -117,9 +117,9 @@ echo '</div> ';
 }
 
 
-$exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr)+$serveroffset;
-$lowertime = max($now,$exlowertime);
-$uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)+$serveroffset;
+$exlowertime = intval(mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr)+$serveroffset);
+$lowertime = intval(max($now,$exlowertime));
+$uppertime = intval(mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)+$serveroffset);
 
 $exceptions = array();
 $forumexceptions = array();

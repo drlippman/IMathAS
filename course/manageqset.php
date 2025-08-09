@@ -65,7 +65,7 @@ if ($myrights<20) {
 						$stm->execute(array(':ownerid'=>$userid));
 					}
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$oktorem[] = $row[0];
+						$oktorem[] = intval($row[0]);
 					}
 					$remlist = implode(',',$oktorem);
 				}

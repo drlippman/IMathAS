@@ -7,11 +7,10 @@ function catscores($quests,$scores,$defptsposs,$defoutcome,$cid) {
 	if (empty($quests)) {
 		return;
 	}
-	foreach ($quests as $i=>$q) {
-		$quests[$i] = intval($q);  //sanitize
-	}
-	$qlist = implode(',',$quests);
-	$stm = $DBH->query("SELECT id,category,points FROM imas_questions WHERE id IN ($qlist)"); //sanitized above - safe
+	$quests = array_map('intval', $quests);
+	$ph = Sanitize::generateQueryPlaceholders($quests);
+	$stm = $DBH->prepare("SELECT id,category,points FROM imas_questions WHERE id IN ($ph)");
+	$stm->execute($quests);
 	$cat = array();
 	$pospts = array();
 	$tolookup = array(intval($defoutcome));

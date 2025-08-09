@@ -322,7 +322,7 @@ function outcometable() {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$avail[$kcnt] = 0;
 
-		$grades[$kcnt] = $line['id'];
+		$grades[$kcnt] = intval($line['id']);
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
 		$enddate[$kcnt] = $line['showdate'];
@@ -350,7 +350,7 @@ function outcometable() {
         if (!isset($courseitemsassoc['Forum'.$line['id']])) {
 			continue; //forum is in hidden block - skip it
 		}
-		$discuss[$kcnt] = $line['id'];
+		$discuss[$kcnt] = intval($line['id']);
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
 		if ($line['avail']==2) {

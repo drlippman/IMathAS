@@ -38,7 +38,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$groupassess[] = $row[0];
 		}
 	}
-	$aidlist =  implode(',',$assesses);
+	$aidlist =  implode(',', array_map('intval', $assesses));
 
 	$wikis = array();
 	$grpwikis = array();
@@ -49,22 +49,22 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$grpwikis[] = $row[0];
 		}
 	}
-	$wikilist =  implode(',',$wikis);
-	$grpwikilist = implode(',',$grpwikis);
+	$wikilist =  implode(',', array_map('intval', $wikis));
+	$grpwikilist = implode(',', array_map('intval', $grpwikis));
 
 	$drills = array();
 	$stm = $DBH->query("SELECT id FROM imas_drillassess WHERE courseid=$cid");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$drills[] = $row[0];
 	}
-	$drilllist =  implode(',',$drills);
+	$drilllist =  implode(',', array_map('intval', $drills));
 
 	$exttools = array();
 	$stm = $DBH->query("SELECT id FROM imas_linkedtext WHERE courseid=$cid AND points>0");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$exttools[] = $row[0];
 	}
-	$exttoolslist =  implode(',',$exttools);
+	$exttoolslist =  implode(',', array_map('intval', $exttools));
 
 	$stugroups = array();
 	$stm = $DBH->query("SELECT imas_stugroups.id FROM imas_stugroups JOIN imas_stugroupset ON imas_stugroups.groupsetid=imas_stugroupset.id WHERE imas_stugroupset.courseid=$cid");

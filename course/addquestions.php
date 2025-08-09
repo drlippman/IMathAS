@@ -885,7 +885,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 
 				if ($search=='recommend' && count($existingq)>0) {
-					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
+					$existingqlist = implode(',', array_map('intval',$existingq));  //pulled from database, so no quotes needed
 					$stm = $DBH->prepare("SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
 						imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
 						FROM imas_questions AS a

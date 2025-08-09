@@ -6,14 +6,14 @@ if ($myrights<100 || empty($_GET['from']) || empty($_GET['to'])) {
 	exit;
 }
 
-$from = $_GET['from'];
-$to = $_GET['to'];
+$from = Sanitize::onlyInt($_GET['from']);
+$to = Sanitize::onlyInt($_GET['to']);
 
 $ids = array();
 $stm = $DBH->prepare("SELECT assessmentid FROM imas_assessment_sessions WHERE userid=:userid");
 $stm->execute(array(':userid'=>$to));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$ids[] = $row[0];
+	$ids[] = intval($row[0]);
 }
 $idlist = implode(',',$ids);
 $query = "UPDATE imas_assessment_sessions SET userid=:to WHERE userid=:from AND ";

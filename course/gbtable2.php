@@ -1578,15 +1578,15 @@ function gbtable() {
 	$exttoolidx = array_flip($exttools);
 	$gradetypeselects = array();
 	if (count($grades)>0) {
-		$gradeidlist = implode(',',$grades); //values from DB
+		$gradeidlist = implode(',', array_map('intval', $grades)); //values from DB
 		$gradetypeselects[] = "(gradetype='offline' AND gradetypeid IN ($gradeidlist))";
 	}
 	if (count($discuss)>0) {
-		$forumidlist = implode(',',$discuss); //values from DB
+		$forumidlist = implode(',', array_map('intval', $discuss)); //values from DB
 		$gradetypeselects[] = "(gradetype='forum' AND gradetypeid IN ($forumidlist))";
 	}
 	if (count($exttools)>0) {
-		$linkedlist = implode(',',$exttools); //values from DB
+		$linkedlist = implode(',', array_map('intval', $exttools)); //values from DB
 		$gradetypeselects[] = "(gradetype='exttool' AND gradetypeid IN ($linkedlist))";
 	}
 	if (count($gradetypeselects)>0) {

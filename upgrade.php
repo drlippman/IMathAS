@@ -174,8 +174,8 @@ unset($dbpassword);
 					$owners = array();
 					$dnames = array();
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$owners[$row[1]][] = $row[0];
-						$dnames[$row[0]] = $row[2];
+						$owners[$row[1]][] = intval($row[0]);
+						$dnames[$row[0]] = intval($row[2]);
 					}
 					$ow = array_keys($owners);
 					$users = array();

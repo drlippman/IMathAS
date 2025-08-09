@@ -87,7 +87,7 @@ if ($myrights<20) {
 					}
 					$oklib = array();
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$oklib[] = $row[0];
+						$oklib[] = intval($row[0]);
 					}
 					$remlist = implode(',', $oklib);
 				}
