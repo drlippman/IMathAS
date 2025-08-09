@@ -302,8 +302,6 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         if ($cid != $sourcecid) { // if same course, can keep this
             unset($row['autoexcuse']);
         }
-        $row['name'] .= $_POST['append'];
-
         $row['courseid'] = $cid;
 
         if (isset($datesbylti) && $datesbylti == true) {
@@ -321,9 +319,12 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $questionDefaults = array('defattempts' => $row['defattempts']);
         }
 
-        $fields = implode(",", array_map('Sanitize::simpleString', array_keys($row)));
+        $fields = implode(",", array_map('Sanitize::simpleString',array_keys($row)));
         //$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
         $fieldplaceholders = ':' . implode(',:', array_keys($row));
+
+        $row['name'] .= Sanitize::simpleASCII($_POST['append']);
+
         $stm = $DBH->prepare("INSERT INTO imas_assessments ($fields) VALUES ($fieldplaceholders)");
         $queryarr = array();
         foreach ($row as $k => $v) {

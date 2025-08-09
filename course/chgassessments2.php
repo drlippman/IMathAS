@@ -45,7 +45,7 @@ if (!(isset($teacherid))) {
 		$checked = array();
 		$cursubmitby = array();
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$checked[] = $row['id'];
+			$checked[] = Sanitize::onlyInt($row['id']);
 			$cursubmitby[$row['id']] = $row['submitby'];
 		}
 		$checkedlist = implode(',', $checked);

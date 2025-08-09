@@ -436,8 +436,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     } else if ($searchtype == 'libs') {
         if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
             $maj = count($existingq)/2;
-            $existingqlist = implode(',', $existingq);  //pulled from database, so no quotes needed
-            $stm = $DBH->query("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) AND deleted=0 GROUP BY libid");
+			$ph = Sanitize::generateQueryPlaceholders($existingq);
+            $stm = $DBH->prepare("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($ph) AND deleted=0 GROUP BY libid");
+			$stm->execute($existingq);
             $foundmaj = false;
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
                 if ($row[1]>=$maj) {
