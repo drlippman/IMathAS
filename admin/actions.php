@@ -103,11 +103,8 @@ switch($_POST['action']) {
 		if ((isset($_POST['specialrights64']) && $myrights==100) || $_POST['newrights']==100) {
 			$specialrights += 64;
 		}
-		if (isset($CFG['GEN']['newpasswords'])) {
-			$hashpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
-		} else {
-			$hashpw = md5($_POST['newpassword']);
-		}
+		$hashpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
+		
 		if ($_POST['newrights']>$myrights) { //checked above, but do it again
 			$_POST['newrights'] = $myrights;
 		}
@@ -269,24 +266,16 @@ switch($_POST['action']) {
 	case "resetpwd":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		if (isset($_POST['newpw'])) {
-			if (isset($CFG['GEN']['newpasswords'])) {
-				$md5pw = password_hash($_POST['newpw'], PASSWORD_DEFAULT);
-			} else {
-				$md5pw = md5($_POST['newpw']);
-			}
+			$pwhash = password_hash($_POST['newpw'], PASSWORD_DEFAULT);
 		} else {
-			if (isset($CFG['GEN']['newpasswords'])) {
-				$md5pw = password_hash("password", PASSWORD_DEFAULT);
-			} else {
-				$md5pw =md5("password");
-			}
+			$pwhash = password_hash("password", PASSWORD_DEFAULT);
 		}
 		if ($myrights < 100) {
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id AND groupid=:groupid AND rights<100");
-			$stm->execute(array(':password'=>$md5pw, ':id'=>$_GET['id'], ':groupid'=>$groupid));
+			$stm->execute(array(':password'=>$pwhash, ':id'=>$_GET['id'], ':groupid'=>$groupid));
 		} else {
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id");
-			$stm->execute(array(':password'=>$md5pw, ':id'=>$_GET['id']));
+			$stm->execute(array(':password'=>$pwhash, ':id'=>$_GET['id']));
 		}
 		break;
 	case "anonuser":
@@ -378,11 +367,8 @@ switch($_POST['action']) {
 			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">",_("Change rights for existing user"),"</a></body></html>\n";
 			exit;
 		}
-		if (isset($CFG['GEN']['newpasswords'])) {
-			$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-		} else {
-			$md5pw =md5($_POST['pw1']);
-		}
+		$pwhash= password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
 			if ($_POST['group']==-1) {
 				if (trim($_POST['newgroupname'])!='') {
@@ -441,7 +427,7 @@ switch($_POST['action']) {
         }
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights,jsondata) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights, :jsondata);");
 		$stm->execute(array(':SID'=>$_POST['SID'],
-			':password'=>$md5pw,
+			':password'=>$pwhash,
 			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 			':rights'=>$_POST['newrights'],

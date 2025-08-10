@@ -265,9 +265,8 @@ if (isset($_GET['launch'])) {
 		$allow_acctcreation = false;
 	}
 	if ($_GET['userinfo']=='set') {
-		if (isset($CFG['GEN']['newpasswords'])) {
-			require_once "includes/password.php";
-		}
+		require_once "includes/password.php";
+
 		//check input
 		$infoerr = '';
 		unset($userid);
@@ -287,8 +286,7 @@ if (isset($_GET['launch'])) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
 					list($realpw,$tmpuserid,$mfadata) = $stm->fetch(PDO::FETCH_NUM); //DB mysql_result($result,0,0);
-					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
-					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
+					if (password_verify($_POST['curPW'],$realpw)) {
                         if ($mfadata != '') {
                             $mfadata = json_decode($mfadata, true);
                             if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
@@ -324,11 +322,8 @@ if (isset($_GET['launch'])) {
 					} else {
 						$msgnot = 0;
 					}
-					if (isset($CFG['GEN']['newpasswords'])) {
-						$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-					} else {
-						$md5pw = md5($_POST['pw1']);
-					}
+					$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+					
 				}
 			}
 		}
@@ -341,7 +336,7 @@ if (isset($_GET['launch'])) {
 				if ($name_only) {
 					//make up a username/password for them
 					$_POST['SID'] = 'lti-'.$localltiuser;
-					$md5pw = 'pass'; //totally unusable since not md5'ed
+					$pwhash = 'pass'; //totally unusable since not md5'ed
 				}
 				if ($ltirole=='instructor') {
 					if (isset($CFG['LTI']['instrrights'])) {
@@ -353,7 +348,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify,:groupid)';
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash,':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 						':email'=>Sanitize::emailAddress($_POST['email']),
@@ -363,7 +358,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify)';
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash,':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 						':email'=>Sanitize::emailAddress($_POST['email']),
@@ -775,7 +770,7 @@ if (isset($_GET['launch'])) {
 			if (!isset($userid)) {
 				//make up a username/password for them
 				$_POST['SID'] = 'lti-'.$localltiuser;
-				$md5pw = 'pass'; //totally unusable since not md5'ed
+				$pwhash = 'pass'; //totally unusable since not md5'ed
 				if ($ltirole=='instructor') { //not currently used - no teachers without real usernames/passwords
 					if (isset($CFG['LTI']['instrrights'])) {
 						$rights = $CFG['LTI']['instrrights'];
@@ -786,7 +781,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0,:groupid)';
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash,':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($firstname),
 						':LastName'=>Sanitize::stripHtmlTags($lastname),
 						':email'=>Sanitize::emailAddress($email),
@@ -797,7 +792,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0)';
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash,':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($firstname),
 						':LastName'=>Sanitize::stripHtmlTags($lastname),
 						':email'=>Sanitize::emailAddress($email)));
@@ -1931,9 +1926,8 @@ if (isset($_GET['launch'])) {
 		$allow_acctcreation = false;
 	}
 	if ($_GET['userinfo']=='set') {
-		if (isset($CFG['GEN']['newpasswords'])) {
-			require_once "includes/password.php";
-		}
+		require_once "includes/password.php";
+
 		//check input
 		$infoerr = '';
 		unset($userid);
@@ -1952,8 +1946,7 @@ if (isset($_GET['launch'])) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
 					list($realpw,$queryuserid,$mfadata) = $stm->fetch(PDO::FETCH_NUM);
-					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
-					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
+					if (password_verify($_POST['curPW'],$realpw)) {
                         $userid = $queryuserid;
                         if ($mfadata != '') {
                             $mfadata = json_decode($mfadata, true);
@@ -1991,11 +1984,7 @@ if (isset($_GET['launch'])) {
 						} else {
 							$msgnot = 0;
 						}
-						if (isset($CFG['GEN']['newpasswords'])) {
-							$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-						} else {
-							$md5pw = md5($_POST['pw1']);
-						}
+						$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 					}
 				}
 			}
@@ -2009,7 +1998,7 @@ if (isset($_GET['launch'])) {
 				if ($name_only) {
 					//make up a username/password for them
 					$_POST['SID'] = 'lti-'.$localltiuser;
-					$md5pw = 'pass'; //totally unusable since not md5'ed
+					$pwhash = 'pass'; //totally unusable since not md5'ed
 				}
 				if ($ltirole=='instructor') {
 					if (isset($CFG['LTI']['instrrights'])) {
@@ -2021,7 +2010,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 						':email'=>Sanitize::emailAddress($_POST['email']),
@@ -2031,7 +2020,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 						':email'=>Sanitize::emailAddress($_POST['email']),
@@ -2420,7 +2409,7 @@ if (isset($_GET['launch'])) {
 			if (!isset($userid)) {
 				//make up a username/password for them
 				$_POST['SID'] = 'lti-'.$localltiuser;
-				$md5pw = 'pass'; //totally unusable since not md5'ed
+				$pwhash = 'pass'; //totally unusable since not md5'ed
 				if ($ltirole=='instructor') {
 					if (isset($CFG['LTI']['instrrights'])) {
 						$rights = $CFG['LTI']['instrrights'];
@@ -2431,7 +2420,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($firstname),
 						':LastName'=>Sanitize::stripHtmlTags($lastname),
 						':email'=>Sanitize::emailAddress($email),
@@ -2441,7 +2430,7 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>$rights,
 						':FirstName'=>Sanitize::stripHtmlTags($firstname),
 						':LastName'=>Sanitize::stripHtmlTags($lastname),
 						':email'=>Sanitize::emailAddress($email),

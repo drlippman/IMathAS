@@ -159,16 +159,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$overwriteBody = 1;
 				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
-				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once "../includes/password.php";
-					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-				} else {
-					$md5pw = md5($_POST['pw1']);
-				}
+				require_once "../includes/password.php";
+				$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+				
 				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, forcepwreset) ";
 				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, 1);";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>10,
+				$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>10,
 					':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 					':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 					':email'=>Sanitize::emailAddress($_POST['email']),
@@ -278,12 +275,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($_POST['pw1'], $CFG['acct']['passwordFormat'])) {
 						$msgout .= '<p>Invalid password - left unchanged</p>';
 					} else {
-						if (isset($CFG['GEN']['newpasswords'])) {
-							require_once "../includes/password.php";
-							$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-						} else {
-							$newpw = md5($_POST['pw1']);
-						}
+						require_once "../includes/password.php";
+						$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+	
 						$chglog['resetpw'] = 1;
 						$query .= ",password=:password,forcepwreset=1";
 						$qarr[':password'] = $newpw;

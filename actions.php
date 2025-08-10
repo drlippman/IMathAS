@@ -99,11 +99,8 @@ require_once "includes/sanitize.php";
 			exit;
 		}
 
-		if (isset($CFG['GEN']['newpasswords'])) {
-			$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-		} else {
-			$md5pw = md5($_POST['pw1']);
-		}
+		$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+
 		if ($emailconfirmation) {$initialrights = 0;} else {$initialrights = 10;}
 		if (isset($_POST['msgnot'])) {
 			$msgnot = 1;
@@ -162,7 +159,7 @@ require_once "includes/sanitize.php";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(
 			':SID'=>$_POST['SID'],
-			':password'=>$md5pw,
+			':password'=>$pwhash,
 			':rights'=>$initialrights,
 			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
@@ -360,12 +357,8 @@ require_once "includes/sanitize.php";
             $linkdata = verify_pwreset_link($_POST['code']);
 
 			if (isset($linkdata['uid'])) {
-                if (isset($CFG['GEN']['newpasswords'])) {
-                    $newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-                } else {
-                    $newpw = md5($_POST['pw1']);
-                }
-
+                $newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+                
 				$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$linkdata['uid']));
 				$jsondata = json_decode($stm->fetchColumn(0), true);
@@ -507,12 +500,9 @@ require_once "includes/sanitize.php";
                 exit;
             }
         }
-		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
-			if (isset($CFG['GEN']['newpasswords'])) {
-				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-			} else {
-				$newpw =md5($_POST['pw1']);
-			}
+		if (password_verify($_POST['oldpw'],$line['password']) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
+			$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+			
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 
@@ -823,7 +813,7 @@ require_once "includes/sanitize.php";
             trim($old_email) != trim($_POST['email'])
         ) {
             // these changes require security check
-            if ((md5($_POST['oldpw'])==$oldpw || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$oldpw))) && $myrights>5) {
+            if (password_verify($_POST['oldpw'],$oldpw) && $myrights>5) {
                 // pw ok
             } else {
                 require_once "header.php";
@@ -860,11 +850,8 @@ require_once "includes/sanitize.php";
 		$acctchangelog = [];
 		if (isset($_POST['dochgpw'])) {
 			if ($_POST['pw1'] == $_POST['pw2'] && $myrights>5) {
-				if (isset($CFG['GEN']['newpasswords'])) {
-					$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-				} else {
-					$newpw =md5($_POST['pw1']);
-				}
+				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+				
 				$stm = $DBH->prepare("UPDATE imas_users SET password = :newpw WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 				$pwchanged = true;

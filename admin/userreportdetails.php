@@ -59,15 +59,12 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 	if (isset($_POST['pw1'])) {
 		  $errors = checkNewUserValidation(array('pw1'));
 		  if ($errors == '') {
-			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once "../includes/password.php";
-				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-			} else {
-				$newpw = md5($_POST['pw1']);
-			}
-			$stm = $DBH->prepare("UPDATE imas_users SET password=:pw,forcepwreset=1 WHERE id=:uid");
-			$stm->execute(array(':pw'=>$newpw, ':uid'=>$uid));
-			$errors = _('Password Reset');
+        require_once "../includes/password.php";
+        $newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+
+        $stm = $DBH->prepare("UPDATE imas_users SET password=:pw,forcepwreset=1 WHERE id=:uid");
+        $stm->execute(array(':pw'=>$newpw, ':uid'=>$uid));
+        $errors = _('Password Reset');
 		  }
 	}
 

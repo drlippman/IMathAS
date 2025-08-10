@@ -62,12 +62,9 @@
 		}
 
 		if ($page_newaccounterror=='') {//no error
-			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once "includes/password.php";
-				$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-			} else {
-				$md5pw = md5($_POST['pw1']);
-			}
+			require_once "includes/password.php";
+			$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+			
 			if ($emailconfirmation) {$initialrights = 0;} else {$initialrights = 10;}
 			if (isset($_POST['msgnot'])) {
 				$msgnot = 1;
@@ -91,7 +88,7 @@
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout, jsondata) ";
 			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout, :jsondata)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights,
+			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>$initialrights,
 				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::emailAddress($_POST['email']),

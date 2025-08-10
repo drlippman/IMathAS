@@ -33,9 +33,8 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   } else {
   	  $newusergroupid = $groupid;
   }
-  if (isset($CFG['GEN']['newpasswords'])) {
-    require_once "../includes/password.php";
-  }
+  require_once "../includes/password.php";
+  
   if (isset($CFG['GEN']['homelayout'])) {
     $homelayout = $CFG['GEN']['homelayout'];
   } else {
@@ -57,11 +56,8 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
       continue;
     }
 
-    if (isset($CFG['GEN']['newpasswords'])) {
-			$hashpw = password_hash($data[1], PASSWORD_DEFAULT);
-		} else {
-			$hashpw = md5($data[1]);
-		}
+    $hashpw = password_hash($data[1], PASSWORD_DEFAULT);
+		
     echo "Importing ".Sanitize::encodeStringForDisplay($data[0])."<br/>";
     $query = 'INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,forcepwreset) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, 1)';
     $stm = $DBH->prepare($query);

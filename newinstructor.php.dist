@@ -31,20 +31,13 @@
 				$homelayout = '|0,1,2||0,1';
 			}
 
-			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("./includes/password.php");
-				$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-			} else {
-				$md5pw = md5($_POST['pw1']);
-			}
-			//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
-			//DB $query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}','$homelayout');";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $newuserid = mysql_insert_id();
+			require_once("./includes/password.php");
+			$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
 			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :homelayout);";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>12, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':homelayout'=>$homelayout));
+			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash, ':rights'=>12, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':homelayout'=>$homelayout));
 			$newuserid = $DBH->lastInsertId();
 			if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 				$valbits = array();

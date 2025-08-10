@@ -1293,9 +1293,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$stm->execute(array(':id'=>$testid));
 			$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
 			$loginfo = "$userfullname creating group. ";
-			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once "../includes/password.php";
-			}
+			require_once "../includes/password.php";
+			
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 					$stm = $DBH->prepare("SELECT password,LastName,FirstName FROM imas_users WHERE id=:id");
@@ -1304,8 +1303,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					$thisusername = $thisuser['FirstName'] . ' ' . $thisuser['LastName'];
 					if ($testsettings['isgroup']==1) {
 						$actualpw = $thisuser['password'];
-						$md5pw = md5($_POST['pw'.$i]);
-						if (!($actualpw==$md5pw || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['pw'.$i],$actualpw)))) {
+						if (password_verify($_POST['pw'.$i],$actualpw)) {
 							echo "<p>" . Sanitize::encodeStringForDisplay($thisusername) . ": ", _('password incorrect'), "</p>";
 							$errcnt++;
 							continue;

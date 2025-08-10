@@ -168,12 +168,9 @@ if ($haslogin && !$hasusername) {
         $line['groupid'] = 0;
         $line['jsondata'] = '';
         $_POST['password'] = 'temp';
-        if (isset($CFG['GEN']['newpasswords'])) {
-            require_once "includes/password.php";
-            $line['password'] = password_hash('temp', PASSWORD_DEFAULT);
-        } else {
-            $line['password'] = md5('temp');
-        }
+        require_once "includes/password.php";
+        $line['password'] = password_hash('temp', PASSWORD_DEFAULT);
+
         $_POST['usedetected'] = true;
     } else {
         $query = "SELECT id,password,rights,groupid";
@@ -192,9 +189,8 @@ if ($haslogin && !$hasusername) {
             }
         }
     }
-    if (isset($CFG['GEN']['newpasswords'])) {
-        require_once "includes/password.php";
-    }
+    require_once "includes/password.php";
+
     if (!empty($line['mfa'])) {
         require_once __DIR__.'/includes/mfa.php';
         $mfadata = json_decode($line['mfa'], true);
@@ -206,10 +202,7 @@ if ($haslogin && !$hasusername) {
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);    
     }
 
-    if (($line != false) && (
-        ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords'] != 'only') && ((md5($line['password'] . $_SESSION['challenge']) == $_POST['password']) || ($line['password'] == md5($_POST['password']))))
-        || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'], $line['password']))
-    )) {
+    if ($line != false && password_verify($_POST['password'], $line['password'])) {
         if (empty($_POST['tzname']) && (!isset($_POST['tzoffset']) || $_POST['tzoffset'] == '') && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
             echo _('Uh oh, something went wrong.  Please go back and try again');
             exit;
@@ -258,14 +251,8 @@ if ($haslogin && !$hasusername) {
                 $line['jsondata'] = json_encode($json_data);
             }
 
-            if (isset($CFG['GEN']['newpasswords']) && strlen($line['password']) == 32) { //old password - rehash it
-                $hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess,password=:password,jsondata=:jsondata WHERE id=:id");
-                $stm->execute(array(':lastaccess' => $now, ':password' => $hashpw, ':jsondata' => $line['jsondata'], ':id' => $userid));
-            } else {
-                $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess,jsondata=:jsondata WHERE id=:id");
-                $stm->execute(array(':lastaccess' => $now, ':jsondata' => $line['jsondata'], ':id' => $userid));
-            }
+            $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess,jsondata=:jsondata WHERE id=:id");
+            $stm->execute(array(':lastaccess' => $now, ':jsondata' => $line['jsondata'], ':id' => $userid));
         }
 
         // check for MFA before actual login

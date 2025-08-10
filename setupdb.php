@@ -1041,15 +1041,12 @@ $sql = 'CREATE TABLE `php_sessions` (
 $DBH->query($sql);
 echo 'php_sessions created<br/>';
 
-if (isset($CFG['GEN']['newpasswords'])) {
-	require_once "includes/password.php";
-	$md5pw = password_hash($password, PASSWORD_DEFAULT);
-} else {
-	$md5pw = md5($password);
-}
+require_once "includes/password.php";
+$pwhash = password_hash($password, PASSWORD_DEFAULT);
+
 $now = time();
 $stm = $DBH->prepare("INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES (:SID, :password, :rights, :FirstName, :LastName, :email)");
-$stm->execute(array(':SID'=>$username, ':password'=>$md5pw, ':rights'=>100, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email));
+$stm->execute(array(':SID'=>$username, ':password'=>$pwhash, ':rights'=>100, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email));
 
 echo "user " . Sanitize::encodeStringForDisplay($username) . " created<br/>";
 
