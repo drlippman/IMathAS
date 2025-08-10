@@ -189,7 +189,7 @@ if (isset($_GET['launch'])) {
 	} else if ($_SESSION['ltiitemtype']==3) {
 		$cid = $_SESSION['ltiitemid'][2];
 		$folder = $_SESSION['ltiitemid'][1];
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&folder=".$folder);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&folder=".urlencode($folder));
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
@@ -1842,7 +1842,7 @@ if (isset($_GET['launch'])) {
 	} else if ($_SESSION['ltiitemtype']==3) {
 		$cid = $_SESSION['ltiitemid'][2];
 		$folder = $_SESSION['ltiitemid'][1];
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&folder=".$folder);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&folder=".urlencode($folder));
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
