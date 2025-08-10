@@ -499,7 +499,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (count($page_grps)>0) {
 			$ph = Sanitize::generateQueryPlaceholders($page_grps);
 			$stm = $DBH->prepare("SELECT stugroupid,userid FROM imas_stugroupmembers WHERE stugroupid IN ($ph)");
-			$stm->execute($page_grps);
+			$stm->execute(array_keys($page_grps));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!isset($page_grpmembers[$row[0]])) {
 					$page_grpmembers[$row[0]] = array();
