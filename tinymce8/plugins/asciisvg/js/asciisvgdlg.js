@@ -12,8 +12,8 @@ var AsciisvgDialog = {
 		const params = new URLSearchParams(window.location.search);
 
 		// Get the selected contents as text and place it in the input
-		this.width = params.get('width');//window.parent.tinymce.activeEditor.windowManager.getParams().width;
-		this.height = params.get('height');//window.parent.tinymce.activeEditor.windowManager.getParams().height;
+		this.width = parseInt(params.get('width'));//window.parent.tinymce.activeEditor.windowManager.getParams().width;
+		this.height = parseInt(params.get('height'));//window.parent.tinymce.activeEditor.windowManager.getParams().height;
 		this.isnew = params.get('isnew');//window.parent.tinymce.activeEditor.windowManager.getParams().isnew;
 		this.sscr = params.get('sscr');//window.parent.tinymce.activeEditor.windowManager.getParams().sscr;
 		this.AScgiloc = params.get('AScgiloc');//window.parent.tinymce.activeEditor.windowManager.getParams().AScgiloc;
@@ -316,7 +316,7 @@ var AsciisvgDialog = {
 		} else {
 			document.getElementById("labels").checked = false;
 		}
-		if (typeof eval(sa[7]) == "number") {
+		if (sa[7] != "null") {
 			document.getElementById("grid").checked = true;
 		} else {
 			document.getElementById("grid").checked = false;
