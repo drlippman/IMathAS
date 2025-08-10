@@ -19,7 +19,7 @@ var AsciisvgDialog = {
 		this.AScgiloc = params.get('AScgiloc');//window.parent.tinymce.activeEditor.windowManager.getParams().AScgiloc;
 		this.alignm = params.get('alignm');//window.parent.tinymce.activeEditor.windowManager.getParams().alignm;
 		if (ASnoSVG) {
-			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " alt="Graph"/>';
+			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+parseInt(this.width)+'px; height: '+parseInt(this.height)+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " alt="Graph"/>';
 		} else {
 			document.getElementById("previewsvg").setAttribute("sscr",this.sscr);
 		}
