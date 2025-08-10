@@ -39,13 +39,16 @@ if (!(isset($teacherid))) {
         $replaceins = array_map('intval', $_POST['replacein']);
 
         $ph = Sanitize::generateQueryPlaceholders($_POST['replacein']);
-        $query = 'UPDATE imas_questions, imas_assessments SET imas_questions.questionsetid=?
-            WHERE imas_questions.assessmentid = imas_assessments.id AND
+        $query = 'UPDATE imas_questions
+            JOIN imas_assessments ON imas_questions.assessmentid = imas_assessments.id 
+            JOIN imas_teachers ON imas_assessments.courseid = imas_teachers.courseid 
+            SET imas_questions.questionsetid=?
+            WHERE 
             imas_questions.questionsetid=? AND
-            imas_assessments.courseid=? AND
+            imas_teachers.userid=? AND
             imas_assessments.id IN ('.$ph.')';
         $stm = $DBH->prepare($query);
-        $stm->execute(array_merge([$replaceid, $qsetid, $cid], $replaceins));
+        $stm->execute(array_merge([$replaceid, $qsetid, $userid], $replaceins));
         $chgcnt = $stm->rowCount();
 
         // audit logging
@@ -65,13 +68,28 @@ if (!(isset($teacherid))) {
     }
     if (isset($_POST['qsetid'])) {
         $qsetid = Sanitize::onlyInt($_POST['qsetid']);
-        $query = 'SELECT DISTINCT ia.name,ia.id AS aid,iq.id,COUNT(istu.userid) AS takencnt FROM imas_assessments AS ia 
-            JOIN imas_questions AS iq ON ia.id=iq.assessmentid
-            LEFT JOIN imas_assessment_records AS iar ON iar.assessmentid=ia.id
-            LEFT JOIN imas_students AS istu ON iar.userid=istu.userid AND istu.courseid=?
-            WHERE ia.courseid=? AND iq.questionsetid=? GROUP BY ia.id ORDER BY ia.name';
-        $stm = $DBH->prepare($query);
-        $stm->execute([$cid, $cid, $qsetid]);
+        $allcourses = !empty($_POST['allcourses']);
+        if ($allcourses) {
+            $query = 'SELECT DISTINCT ia.name,ia.id AS aid,ia.courseid,
+                COUNT(istu.userid) AS takencnt, COUNT(iq.id) AS qusecnt FROM imas_assessments AS ia 
+                JOIN imas_questions AS iq ON ia.id=iq.assessmentid 
+                JOIN imas_teachers AS it ON it.courseid=ia.courseid 
+                LEFT JOIN imas_assessment_records AS iar ON iar.assessmentid=ia.id 
+                LEFT JOIN imas_students AS istu ON iar.userid=istu.userid AND istu.courseid=ia.courseid 
+                WHERE it.userid=? AND iq.questionsetid=? GROUP BY ia.id ORDER BY ia.name;';
+            $stm = $DBH->prepare($query);
+            $stm->execute([$userid, $qsetid]);
+        } else {
+            $query = 'SELECT DISTINCT ia.name,ia.id AS aid,COUNT(istu.userid) AS takencnt, COUNT(iq.id) AS qusecnt 
+                FROM imas_assessments AS ia 
+                JOIN imas_questions AS iq ON ia.id=iq.assessmentid
+                LEFT JOIN imas_assessment_records AS iar ON iar.assessmentid=ia.id
+                LEFT JOIN imas_students AS istu ON iar.userid=istu.userid AND istu.courseid=?
+                WHERE ia.courseid=? AND iq.questionsetid=? GROUP BY ia.id ORDER BY ia.name';
+            $stm = $DBH->prepare($query);
+            $stm->execute([$cid, $cid, $qsetid]);
+        }
+        
         $results = $stm->fetchAll(PDO::FETCH_ASSOC);
     }
 }
@@ -99,11 +117,12 @@ if ($overwriteBody==1) {
     if (empty($qsetid)) {
         echo '<p>'._('This will find all usages of a question in this course.').'</p>';
         echo '<p><label>'._('Search for Question ID').': <input name=qsetid size=10 /></label></p>';
+        echo '<p><label><input type=checkbox name=allcourses> '._('Search in all my courses').'</label></p>';
         echo '<p><button type="submit">'._('Search').'</button>';
     } else {
         if ($didreplace) {
             echo '<p>'.sprintf(_('Replace changed %d questions'), $chgcnt).'<p>';
-            echo '<p><a href="findquestion?cid=' . $cid . '&aid=' . $aid . '&from=' . $from .'">';
+            echo '<p><a href="findquestion.php?cid=' . $cid . '&aid=' . $aid . '&from=' . $from .'">';
             echo _('Search Again') . '</p>';
         } else if ($results === false){ 
             echo 'error';
@@ -112,6 +131,7 @@ if ($overwriteBody==1) {
         } else {
             echo '<p>'.sprintf(_('Question ID %d was found in:'), $qsetid).'</p>';
             echo '<ul class=nomark>';
+            $thiscid = $cid;
             foreach ($results as $result) {
                 echo '<li>';
                 echo '<label><input type=checkbox name="replacein[]" value="'.$result['aid'].'" ';
@@ -119,7 +139,14 @@ if ($overwriteBody==1) {
                     echo 'disabled class="q-taken"';
                 }
                 echo '>';
-                echo '<a href="'.$addq.'.php?cid='.$cid.'&aid='.$result['aid'].'" target="_blank">';
+                if ($result['qusecnt'] > 1) {
+                    $result['name'] .= sprintf(' (uses question %d times)', $result['qusecnt']);
+                }
+                if ($allcourses) {
+                    $thiscid = intval($result['courseid']);
+                    $result['name'] .= sprintf(' (course ID %d)', $thiscid);
+                }
+                echo '<a href="'.$addq.'.php?cid='.$thiscid.'&aid='.$result['aid'].'" target="_blank">';
                 echo $result['name'].'</a></label></li>';
             }
             echo '</ul>';
