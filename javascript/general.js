@@ -558,10 +558,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
 		file_picker_types: 'file image',
-		//imagetools_cors_hosts: ['s3.amazonaws.com'],
-		//images_upload_url: imasroot+'/tinymce8/upload_handler.php',
 		images_upload_handler: image_upload_handler,
-		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
@@ -614,15 +611,16 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			    {title: 'Verdana', inline: 'span', styles: { 'font-family':'Verdana'}}
 			]
 			},
-			{title: "Font Size", items: [
-                                {title: 'x-small', inline:'span', styles: { fontSize: 'x-small', 'font-size': 'x-small' } },
-                                {title: 'small', inline:'span', styles: { fontSize: 'small', 'font-size': 'small' } },
-                                {title: 'medium', inline:'span', styles: { fontSize: 'medium', 'font-size': 'medium' } },
-                                {title: 'large', inline:'span', styles: { fontSize: 'large', 'font-size': 'large' } },
-                                {title: 'x-large', inline:'span', styles: { fontSize: 'x-large', 'font-size': 'x-large' } },
-                                {title: 'xx-large', inline:'span', styles: { fontSize: 'xx-large', 'font-size': 'xx-large' } }
-                        ]
-                }]
+			{title: "Font Size", 
+			items: [
+				{title: 'x-small', inline:'span', styles: { fontSize: 'x-small', 'font-size': 'x-small' } },
+				{title: 'small', inline:'span', styles: { fontSize: 'small', 'font-size': 'small' } },
+				{title: 'medium', inline:'span', styles: { fontSize: 'medium', 'font-size': 'medium' } },
+				{title: 'large', inline:'span', styles: { fontSize: 'large', 'font-size': 'large' } },
+				{title: 'x-large', inline:'span', styles: { fontSize: 'x-large', 'font-size': 'x-large' } },
+				{title: 'xx-large', inline:'span', styles: { fontSize: 'xx-large', 'font-size': 'xx-large' } }
+			]
+			}]
         }
 		
 	if (document.documentElement.clientWidth<385) {
