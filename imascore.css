@@ -423,7 +423,7 @@ span#leftcontenttoggle.leftcontentactive {
 		margin-bottom: 5px;
 		padding-right: 0px;
 	}
-	span.formright, span.wideformright {
+	span.formright, span.wideformright, span.form + span.left {
 		width: auto;
 		float: none;
 	}
