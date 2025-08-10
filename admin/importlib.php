@@ -495,9 +495,9 @@ if ($myrights < 100) {
 					$includedlist = implode(',', array_map('Sanitize::onlyInt', $includedqs));  //known decimal values from above
 					$stm = $DBH->query("SELECT id,uniqueid,deleted FROM imas_questionset WHERE uniqueid IN ($includedlist)");
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$includedbackref[$row[1]] = $row[0];
+						$includedbackref[$row[1]] = intval($row[0]);
 						if ($row[2]==1) {
-							$toundel[] = $row[0];
+							$toundel[] = intval($row[0]);
 						}
 					}
 				}

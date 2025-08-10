@@ -131,10 +131,6 @@ if ($myrights<20) {
                             //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
                             $stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=? WHERE id IN ($qlist_query_placeholders)");
                             $stm->execute(array_merge(array($now),$qlist));
-                                //echo "del: $qlist";
-                                /*foreach ($qidstofix as $qid) {
-                                    delqimgs($qid);
-                                }*/
                         } else {
                             //see which questions with no active lib items already have an unassigned lib item we can undeleted
                             $stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
@@ -782,36 +778,5 @@ if ($overwriteBody==1) {
 }
 
 require_once "../footer.php";
-
-function delqimgs($qsid) {
-  global $DBH;
-
-  $srch_stm = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
-  $del_stm = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
-	$stm = $DBH->prepare("SELECT id,filename,var FROM imas_qimages WHERE qsetid=:qsetid");
-	$stm->execute(array(':qsetid'=>$qsid));
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		if (substr($row[1],0,4)!='http') {
-			$srch_stm->execute(array(':filename'=>$row[1]));
-			if ($srch_stm->rowCount()==1) {
-				unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
-			}
-		}
-		$del_stm->execute(array(':id'=>$row[0]));
-	}
-}
-
-function addupchildqs($p) {
-	global $qcount,$ltlibs;
-	if (isset($ltlibs[$p])) { //if library has children
-		foreach ($ltlibs[$p] as $child) {
-            if (!isset($qcount[$p])) {
-                $qcount[$p] = 0;
-            }
-			$qcount[$p] += addupchildqs($child);
-		}
-	}
-	return $qcount[$p];
-}
 
 ?>

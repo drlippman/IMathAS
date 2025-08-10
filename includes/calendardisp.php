@@ -23,7 +23,7 @@ global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
 global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver, $excused, $courseenddate;
 
-$now= time();
+$now= intval(time());
 
 if (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid] == 0) {
 	$today = $now;

@@ -256,7 +256,6 @@
 							$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
 							$stm2->execute(array(':filename'=>$row[1]));
 							if ($stm2->rowCount()==1) {
-								//unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
 								deleteqimage($row[1]);
 							}
 						}

@@ -61,8 +61,10 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 
 		$item_upd_stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 
-		$query = "SELECT id,itemorder,defpoints FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
-		$stm = $DBH->query($query); //pre-sanitized
+		$ph = Sanitize::generateQueryPlaceholders($todoaid);
+		$query = "SELECT id,itemorder,defpoints FROM imas_assessments WHERE id IN ($ph)";
+		$stm = $DBH->prepare($query); 
+		$stm->execute($todoaid);
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$items = explode(',',$row[1]);
 			$newitems = array();

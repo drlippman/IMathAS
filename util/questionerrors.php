@@ -64,7 +64,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 $timesused = [];
 $allids = array_keys($allrows);
 if (count($allids)>0) {
-    $allqids = implode(',', array_unique($allids));
+    $allqids = implode(',', array_map('intval', array_unique($allids)));
     $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allqids) GROUP BY questionsetid");
     $timesused = [];
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {

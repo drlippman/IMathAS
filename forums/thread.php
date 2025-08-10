@@ -234,12 +234,12 @@ if ($groupsetid>0) {
 		}
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		    // This will always be a row ID (an integer). No need to sanitize.
-			$limthreads[] = $row[0];
+			$limthreads[] = intval($row[0]);
 		}
 		if (count($limthreads)==0) {
 			$limthreads = '0';
 		} else {
-			$limthreads = implode(',',$limthreads); //INT from DB - safe
+			$limthreads = implode(',', $limthreads);
 		}
 	}
 } else {

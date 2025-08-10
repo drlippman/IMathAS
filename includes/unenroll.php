@@ -159,7 +159,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		}
 
 		if (count($stugroups)>0) {
-			$stugrouplist = implode(',',$stugroups);
+			$stugrouplist = implode(',', array_map('intval', $stugroups));
 			$query = "DELETE FROM imas_stugroupmembers WHERE userid IN ($stulist) AND stugroupid IN ($stugrouplist)";
 			$DBH->query($query); //values already sanitized
 		}
@@ -224,6 +224,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 					$sets = [];
 					foreach ($row as $k=>$v) {
 						if ($k !== 'id') {
+							$k = Sanitize::simpleString($k);
 							$sets[] = "$k=:$k";
 						}
 					}
@@ -243,6 +244,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 						$sets = [];
 						foreach ($qrow as $k=>$v) {
 							if ($k !== 'id') {
+								$k = Sanitize::simpleString($k);
 								$sets[] = "$k=:$k";
 							}
 						}

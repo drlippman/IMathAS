@@ -474,7 +474,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $row['lastmod'] = tzdate("m/d/y", $row['lastmoddate']);
         }
         $res[] = $row;
-        $qsids[] = $row['id'];
+        $qsids[] = intval($row['id']);
     }
 
     // pull timesused

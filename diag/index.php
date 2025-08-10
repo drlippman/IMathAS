@@ -49,7 +49,7 @@
         exit;
     }
 	$pcid = $line['cid'];
-	$diagid = $line['id'];
+	$diagid = intval($line['id']);
 	if ($line['term']=='*mo*') {
 		$diagqtr = date("M y");
 	} else if ($line['term']=='*day*') {

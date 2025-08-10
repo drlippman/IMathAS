@@ -535,7 +535,7 @@ if ($myrights<20) {
 				$stm->execute(array(':groupid'=>$groupid));
 				$tochg = array();
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$tochg[] = $row[0];
+					$tochg[] = intval($row[0]);
 				}
 				if (count($tochg)>0) {
 					$chglist = implode(',',$tochg);
@@ -961,21 +961,4 @@ if (isset($searchtype)) {
 require_once "../footer.php";
 
 
-function delqimgs($qsid) {
-  global $DBH;
-	$del_stm = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
-	$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
-
-	$stm = $DBH->prepare("SELECT id,filename,var FROM imas_qimages WHERE qsetid=:qsetid");
-	$stm->execute(array(':qsetid'=>$qsid));
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		if (substr($row[1],0,4)!='http') {
-			$stm2->execute(array(':filename'=>$row[1]));
-			if ($stm2->rowCount()==1) {
-				unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
-			}
-		}
-		$del_stm->execute(array(':id'=>$row[0]));
-	}
-}
 ?>

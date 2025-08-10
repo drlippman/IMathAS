@@ -696,7 +696,7 @@ function printPostsGadget() {
 		echo '</div></div>';
 		return;
 	}
-	$threadlist = implode(',',$postthreads);
+	$threadlist = implode(',', array_map('intval', $postthreads));
 	$threaddata = array();
 	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
 	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";  //int vals from DB - safe

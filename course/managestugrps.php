@@ -497,7 +497,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//$page_grpmembers will be groupid=>array(  userid=>stuname )
 		$stuuseridsingroup = array();
 		if (count($page_grps)>0) {
-			$stm = $DBH->query("SELECT stugroupid,userid FROM imas_stugroupmembers WHERE stugroupid IN ($grpids)"); //known INT from DB
+			$ph = Sanitize::generateQueryPlaceholders($page_grps);
+			$stm = $DBH->prepare("SELECT stugroupid,userid FROM imas_stugroupmembers WHERE stugroupid IN ($ph)");
+			$stm->execute($page_grps);
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!isset($page_grpmembers[$row[0]])) {
 					$page_grpmembers[$row[0]] = array();

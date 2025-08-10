@@ -157,7 +157,7 @@ if ($haslogin && !$hasusername) {
             $i = 0;
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
                 if ($i > 0) {$query .= ',';}
-                $query .= "($userid,{$row[0]})"; //INT's from DB - safe
+                $query .= '('.intval($userid).','.intval($row[0]).')';
                 $i++;
             }
             $DBH->query($query);

@@ -569,7 +569,7 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		// these are the group assessments that had files.
 		// look up other assessment records for same assessment but other students
 		// Remove any tomaybedel files that are used elsewhere
-		$aidlist2 = implode(',', $tolookupaid);
+		$aidlist2 = implode(',', array_map('intval', $tolookupaid));
 		$query = "SELECT assessmentid,scoreddata,practicedata FROM imas_assessment_records ";
 		$query .= "WHERE assessmentid IN ($aidlist2) AND userid NOT IN ($userlist)";
 		$stm = $DBH->query($query);
