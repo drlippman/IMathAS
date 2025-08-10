@@ -2,6 +2,7 @@
 namespace IMSGlobal\LTI;
 
 use \Firebase\JWT\JWT;
+use Sanitize;
 
 class LTI_Deep_Link {
 
