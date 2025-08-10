@@ -217,10 +217,19 @@ class S3
 	* @param string $endpoint Amazon URI
 	* @return void
 	*/
-	public function __construct($accessKey = null, $secretKey = null, $useSSL = false, $endpoint = 's3.amazonaws.com', $region = '')
+	public function __construct($accessKey = null, $secretKey = null, $useSSL = null, $endpoint = null, $region = null)
 	{
 		if ($accessKey !== null && $secretKey !== null)
 			self::setAuth($accessKey, $secretKey);
+		if ($useSSL === null) {
+			$useSSL = $GLOBALS['CFG']['S3']['useSSL'] ?? false;
+		}
+		if ($endpoint === null) {
+			$endpoint = $GLOBALS['CFG']['S3']['endpoint'] ?? 's3.amazonaws.com';
+		}
+		if ($region === null) {
+			$region = $GLOBALS['CFG']['S3']['region'] ?? '';
+		}
 		self::$useSSL = $useSSL;
 		self::$endpoint = $endpoint;
 		self::$region = $region;
