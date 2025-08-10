@@ -158,6 +158,13 @@ function popupwindow(id,content,width,height,scroll) {
 	}
 }
 
+var inIframe = function() {
+	try {
+		return window.self !== window.top;
+	} catch (e) {
+		return true;
+	}
+}  
 
 function findPos(obj) { //from quirksmode.org
 	var curleft = curtop = 0;
@@ -523,10 +530,10 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-var tinyMCEPreInit = {base: staticroot+"/tinymce4"};
+//var tinyMCEPreInit = {base: staticroot+"/tinymce8"};
 function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
-	var cssmode = css || 0;
-	var inlinemode = inline || 0;
+	var cssmode = css || false;
+	var inlinemode = inline || false;
 	var selectorstr = '';
 	if (edmode=="exact") { //list of IDs
 		selectorstr = '#'+edids.split(/,/).join(",#");
@@ -540,17 +547,10 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 	var edsetup = {
 		selector: selectorstr,
 		inline: inlinemode,
-		plugins: [
-			"lists advlist autolink attach image charmap anchor",
-			"searchreplace code link textcolor snippet",
-			"media table paste rollups colorpicker"
-		],
-        external_plugins: {
-            "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
-            "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
-        },
-		menubar: false,//"edit insert format table tools ",
-		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
+		license_key: 'gpl',
+		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons",
+		menubar: false,
+		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
         content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
@@ -559,12 +559,14 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		file_picker_callback: filePickerCallBackFunc,
 		file_picker_types: 'file image',
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
-		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
+		//images_upload_url: imasroot+'/tinymce8/upload_handler.php',
+		images_upload_handler: image_upload_handler,
 		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
 		branding: false,
+		promotion: false,
 		resize: "both",
 		width: '100%',
 		content_style: "body {background-color: " + (coursetheme.match(/_dark/) ? "#000" : "#fff") + " !important;}",
@@ -572,8 +574,28 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+		snippet_list: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
+		mobile: {
+			toolbar_mode: 'sliding'
+		},
+		init_instance_callback: function(editor) {
+			if (inIframe()) {
+				sendLTIresizemsg();
+				editor.on('OpenWindow', (e) => {
+					let editordim = editor.editorContainer.getBoundingClientRect();
+					let dialogel = document.querySelector(".tox-dialog");
+					let dialogdim = dialogel.getBoundingClientRect();
+					let ytop = Math.min(
+						Math.max(editordim.y + .5*editordim.height - .5*dialogdim.height, 0),
+						document.documentElement.clientHeight - dialogdim.height);
+					dialogel.style.position = "absolute";
+					dialogel.style.top = ytop + "px";
+					dialogel.style.width = '';
+					dialogel.focus();
+				});
+			}
+        },
 		style_formats: [{
 			title: "Font Family",
 			items: [
@@ -602,16 +624,31 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
                         ]
                 }]
         }
+		
 	if (document.documentElement.clientWidth<385) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline | saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent  | link image | asciimath asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
+		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<465) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline forecolor | saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent  | link unlink image | asciimath asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles forecolor saveclose";
+		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<575) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor | saveclose";
-		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
+		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline forecolor saveclose";
+		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";
+	}  else if (document.documentElement.clientWidth<665) {
+		edsetup.toolbar1 = "myEdit myInsert styles bold italic underline subscript superscript forecolor snippet saveclose";
+		edsetup.toolbar2 = " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link image | asciimath asciimathcharmap asciisvg";
 	}
+	if (location.href.match(/usealted/)) {
+		delete edsetup.toolbar1;
+		delete edsetup.toolbar2;
+		edsetup.menu = {
+			altinsert: { title: 'Insert', items: 'media link image attach snippet inserttable | asciimath asciimathcharmap asciisvg | charmap emoticons anchor hr' }
+		};
+		edsetup.menubar = "edit altinsert format tools table";
+		edsetup.toolbar = "alignleft aligncenter | bullist numlist outdent indent | bold italic",
+		edsetup.mobile.menubar = "edit altinsert format tools table";
+	}
+		
 	if (setupfunction) {
 		edsetup.setup = setupfunction;
 	}
@@ -627,7 +664,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 };
 
 function filePickerCallBack(callback, value, meta) {
-	var connector = imasroot+"/tinymce4/file_manager.php";
+	var connector = imasroot+"/tinymce8/file_manager.php";
 
 	switch (meta.filetype) {
 		case "image":
@@ -637,20 +674,71 @@ function filePickerCallBack(callback, value, meta) {
 			connector += "?type=files";
 			break;
 	}
-	tinyMCE.activeEditor.windowManager.open({
-		file : connector,
+	tinyMCE.activeEditor.windowManager.openUrl({
+		url : connector,
 		title : 'File Manager',
 		width : 350,
 		height : 450,
 		resizable : "yes",
 		inline : "yes",
-		close_previous : "no"
-	    }, {
-		oninsert: function(url, objVal) {
-			callback(url);
-		}
-	    });
+		close_previous : "no",
+		onMessage: function(api, data) {
+            if (data.data.filename) {
+				callback(data.data.filename);
+			}
+        }
+	});
 }
+const image_upload_handler = (blobInfo, progress) => new Promise((resolve, reject) => {
+  const xhr = new XMLHttpRequest();
+
+  xhr.withCredentials = false;
+  xhr.open('POST', imasroot+'/tinymce8/upload_handler.php');
+
+  xhr.upload.onprogress = (e) => {
+	if (progress) {
+    	progress(e.loaded / e.total * 100);
+	}
+  };
+
+  xhr.onload = () => {
+    if (xhr.status === 403) {
+      reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+      return;
+    }
+
+    if (xhr.status < 200 || xhr.status >= 300) {
+      reject({message:'HTTP Error: ' + xhr.status, remove: true});
+      return;
+    }
+
+    const json = JSON.parse(xhr.responseText);
+
+    if (!json || typeof json.location != 'string') {
+      reject({message:'Invalid JSON: ' + xhr.responseText, remove: true});
+      return;
+    }
+
+    resolve(json.location);
+  };
+
+  xhr.onerror = () => {
+    reject({message:'Image upload failed due to a XHR Transport error. Code: ' + xhr.status, remove:true});
+  };
+
+  const formData = new FormData();
+  let fileblob = blobInfo.blob();
+  doImageUploadResize(fileblob, function (res, isresized) {
+	let filename = blobInfo.filename();
+	if (isresized) {
+		filename = filename.replace(/\.\w+$/,'.jpg');
+	}
+	formData.append('file', res, filename);
+  	xhr.send(formData);
+  });
+  
+});
+
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
 		//value = value.replace(/[\x84\x93\x94]/g,'"');
@@ -1846,11 +1934,20 @@ $(function() {
 // from https://gist.github.com/dragermrb/6d4b7fda5f183524d0ebe4b0a7d8635c#file-jquery-image-upload-resizer-js
 
 function doImageUploadResize(el, callback) {
-    const that = el; // input node
-    const originalFile = el.files[0];
+	let inputtype;
+	let originalFile;
+	let that;
+	if (el instanceof HTMLElement) {
+		that = el; // input node
+    	originalFile = el.files[0];
+		inputtype = 'file';
+	} else if (el instanceof Blob) {
+		originalFile = el;
+		inputtype = 'blob';
+	}
 
     if (!originalFile || !originalFile.type.startsWith('image')) {
-        callback(el);
+        callback(el, false);
         return;
     }
 
@@ -1882,20 +1979,26 @@ function doImageUploadResize(el, callback) {
             ctx.drawImage(img, 0, 0, width, height);
 
             canvas.toBlob(function (blob) {
-                var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
+				if (inputtype === 'blob') {
+					if (typeof callback === 'function') {
+						callback(blob, true);
+					}
+				} else {
+					var resizedFile = new File([blob], prefix+originalFile.name.replace(/\.\w+$/,'.jpg'), originalFile);
 
-                var dataTransfer = new DataTransfer();
-                dataTransfer.items.add(resizedFile);
+					var dataTransfer = new DataTransfer();
+					dataTransfer.items.add(resizedFile);
 
-                // temporary remove event listener, change and restore
-                var currentOnChange = that.onchange;
+					// temporary remove event listener, change and restore
+					var currentOnChange = that.onchange;
 
-                that.onchange = null;
-                that.files = dataTransfer.files;
-                that.onchange = currentOnChange;
-                if (typeof callback === 'function') {
-                    callback(that);
-                }
+					that.onchange = null;
+					that.files = dataTransfer.files;
+					that.onchange = currentOnChange;
+					if (typeof callback === 'function') {
+						callback(that, true);
+					}
+				}
             }, 'image/jpeg', .95);
         }
     }

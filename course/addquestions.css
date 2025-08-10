@@ -7,7 +7,7 @@ input[id^=pts],input[id^=grppts],input[id^=grpn],#defpts {
 .textsegment {
 	border: 2px solid transparent;
 }
-.highlightbackground button {
+button.highlightbackground {
 	background-color: #F8F810 !important;
 }
 .highlightborder .textsegment {

@@ -44,7 +44,7 @@ if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "'.$GLOBALS['basesiteurl'].'/course/course.php?cid='.$cid.'";</script>';
 }
 $nologo = true;
-$useeditor = 1;
+$useeditor = "noinit";
 $pagetitle = _('Assessment');
 require_once '../header.php';
 
