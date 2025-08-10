@@ -384,6 +384,12 @@ span.formright {
 	margin-bottom: 10px;
 	text-align: left;
 }
+span.form + span.left {
+	width: 650px;
+}
+span.form + span.left {
+	width: min(650px, calc(100% - 220px));
+}
 
 span.wideformright {
 	display: block;
@@ -415,7 +421,7 @@ span#leftcontenttoggle.leftcontentactive {
 	background-color: #eee;
 }
 
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 800px) {
 	span.form, label.form {
 		width: auto;
 		float: none;
