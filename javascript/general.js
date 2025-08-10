@@ -647,9 +647,15 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		edsetup.mobile.menubar = "edit altinsert format tools table";
 	}
 		
-	if (setupfunction) {
-		edsetup.setup = setupfunction;
+	edsetup.setup = function(ed) {
+		if (setupfunction) {
+			setupfunction.bind(this)(ed);
+		}
+		setTimeout(function() {
+			ed.dispatch('ResizeEditor');
+		}, 100);
 	}
+	
     if (extendsetup) {
         edsetup = Object.assign(edsetup, extendsetup);
     }

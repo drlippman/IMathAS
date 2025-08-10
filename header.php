@@ -29,7 +29,7 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=071025";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=081025";?>" type="text/css" />
 <?php
 $isfw = false;
 if (isset($coursetheme)) {
@@ -81,7 +81,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 var staticroot = '<?php echo $staticroot; ?>';
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=080425"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=080925"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //

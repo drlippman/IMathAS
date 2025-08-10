@@ -1134,7 +1134,7 @@ span.boxed {
 	padding: 2px 5px;
 }
 a.attach {
-    background: url(tinymce4/plugins/attach/ed_attach.gif) center left no-repeat;
+    background: url(tinymce8/plugins/attach/ed_attach.gif) center left no-repeat;
     padding-left: 20px;
 }
 a[target=_blank]::after {
@@ -1145,6 +1145,9 @@ a[target=_blank]::after {
     overflow: hidden;
 	display: inline-block;
 	background: url(img/extlink.png) center right no-repeat;
+}
+body.mce-content-body {
+    margin: 5px 10px;
 }
 .mce-content-body a[target=_blank]:after,
 a[target=_blank].noextlink::after {
