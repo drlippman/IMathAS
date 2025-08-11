@@ -139,6 +139,7 @@ class FileScorePart implements ScorePart
             }
 
             if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+                /*
                 if ($answerformat=='excel') {
                     $zip = new ZipArchive;
                     if ($zip->open($_FILES["qn$qn"]['tmp_name'])) {
@@ -155,7 +156,7 @@ class FileScorePart implements ScorePart
                         return $scorePartResult;
                     }
                 }
-
+                */
                 $s3object = "adata/$s3asid/$filename";
                 if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
                     $filesize = $_FILES["qn$qn"]['size'];

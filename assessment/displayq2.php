@@ -7465,6 +7465,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 
 			if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+				/*
 				if ($answerformat=='excel') {
 					$zip = new ZipArchive;
 					if ($zip->open($_FILES["qn$qn"]['tmp_name'])) {
@@ -7480,6 +7481,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						return 0;
 					}
 				}
+				*/
 
 				$s3object = "adata/$s3asid/$filename";
 				if (storeuploadedfile("qn$qn",$s3object)) {
