@@ -41,7 +41,7 @@ function ahahDone(url, target) {
 
 
     } else {
-      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText;
+      document.getElementById(target).textContent=" AHAH Error: "+ req.status + ", " +req.statusText;
     }
   }
 }

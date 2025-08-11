@@ -2442,7 +2442,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			if ($r=='success') {
 				echo '{success: true}';
 			} else {
-				echo '{error: "'.$r.'"}';
+				echo '{error: "'.Sanitize::encodeStringforDisplay($r).'"}';
 			}
 			exit;
 
@@ -2479,7 +2479,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			if ($r=='success') {
 				echo '{success: true}';
 			} else {
-				echo '{error: "'.$r.'"}';
+				echo '{error: "'.Sanitize::encodeStringforDisplay($r).'"}';
 			}
 			exit;
 

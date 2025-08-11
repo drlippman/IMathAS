@@ -1912,7 +1912,7 @@ function generateTable() {
             ) +
             ".</p>";
     }
-    document.getElementById("pttotal").innerHTML = pttotal;
+    document.getElementById("pttotal").textContent = pttotal;
 
     return html;
 }
@@ -1993,7 +1993,7 @@ function confirm_textseg_dirty() {
 function submitChanges() {
     var target = "submitnotice";
     check_textseg_itemarray();
-    document.getElementById(target).innerHTML = _(" Saving Changes... ");
+    document.getElementById(target).textContent = _(" Saving Changes... ");
     document.getElementById("statusmsg").textContent = _("Saving Changes");
     data = generateOutput();
     var outdata = {
@@ -2015,7 +2015,7 @@ function submitChanges() {
     })
         .done(function (msg) {
             if (msg.match(/^error:/)) {
-                document.getElementById(target).innerHTML = msg;
+                document.getElementById(target).textContent = msg;
                 document.getElementById("statusmsg").textContent = msg;
                 itemarray = olditemarray.slice();
                 refreshTable();
@@ -2025,7 +2025,7 @@ function submitChanges() {
                 defpoints = $("#defpts").val();
             }
             lastitemhash = msg;
-            document.getElementById(target).innerHTML = "";
+            document.getElementById(target).textContent = "";
             document.getElementById("statusmsg").textContent = _("Done");
             refreshTable();
             updateInAssessMarkers();
@@ -2040,12 +2040,12 @@ function submitChanges() {
             }
         })
         .fail(function (xhr, status, errorThrown) {
-            document.getElementById(target).innerHTML =
-                " Couldn't save changes:\n" +
+            document.getElementById(target).textContent =
+                " Couldn't save changes: " +
                 status +
-                "\n" +
+                ", " +
                 req.statusText +
-                "\nError: " +
+                ", Error: " +
                 errorThrown;
             document.getElementById("statusmsg").textContent = _("Error saving");
             itemarray = olditemarray.slice();
@@ -2070,7 +2070,7 @@ function addusingdefaults(asgroup) {
         dataType: 'json'
     }).done(function (msg) {
         if (msg.hasOwnProperty('error')) {
-            document.getElementById("submitnotice").innerHTML = msg.error;
+            document.getElementById("submitnotice").textContent = msg.error;
             document.getElementById("statusmsg").textContent = _("Error adding");
         } else {
             document.getElementById("statusmsg").textContent = _("Done adding");
@@ -2111,37 +2111,4 @@ function modsettings() {
     GB_show('Question Settings',qsettingsaddr + '&modqs=' + encodeURIComponent(checked.join(';')) + '&lih=' + lastitemhash,900,500);
 }
 
-/*
-function submitChanges() {
-  url = AHAHsaveurl + '&order='+generateOutput();
-  var target = "submitnotice";
-  document.getElementById(target).innerHTML = ' Saving Changes... ';
-  if (window.XMLHttpRequest) {
-    req = new XMLHttpRequest();
-  } else if (window.ActiveXObject) {
-    req = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  if (typeof req != 'undefined') {
-    req.onreadystatechange = function() {ahahDone(url, target);};
-    req.open("GET", url, true);
-    req.send("");
-  }
-}
 
-function ahahDone(url, target) {
-  if (req.readyState == 4) { // only if req is "loaded"
-    if (req.status == 200) { // only if "OK"
-	    if (req.responseText=='OK') {
-		    document.getElementById(target).innerHTML='';
-		    refreshTable();
-	    } else {
-		    document.getElementById(target).innerHTML=req.responseText;
-		    itemarray = olditemarray;
-	    }
-    } else {
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText;
-	    itemarray = olditemarray;
-    }
-  }
-}
-*/

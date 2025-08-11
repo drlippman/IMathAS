@@ -569,9 +569,9 @@ function submitChanges(format,which) {
 		}
 	})
 	.fail(function(xhr, status, errorThrown) {
-	  document.getElementById(target).innerHTML=" Couldn't save changes:\n"+
-			status + "\n" +req.statusText+
-			"\nError: "+errorThrown
+	  document.getElementById(target).textContent=" Couldn't save changes: "+
+			status + ", " +req.statusText+
+			", Error: "+errorThrown
 	});
 }
 

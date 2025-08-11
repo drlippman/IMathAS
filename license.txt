@@ -90,7 +90,7 @@ Documentation Guides
 WA State Distance Learning Council and the Transition Math Project
 
 S3 library 
-(c) 2007-2008, Donovan Schonknecht
+(c) 2007-2008, 2013, Donovan Schonknecht
 Attribution license - see includes/S3.php
 
 MD5 Javascript code
@@ -99,10 +99,6 @@ BSD license
 
 Nested tree drag-and-drop
 (c) 2007 CrazyDave http://www.clanccc.co.uk/moo/nested.html
-
-Mootools
-(c) 2006 Valerio Proietti
-MIT Style License
 
 excanvas
 (c) 2006 Google inc

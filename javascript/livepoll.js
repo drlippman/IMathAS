@@ -171,7 +171,7 @@ var livepoll = new function() {
 		stucnt = data.cnt;
 		teachcnt = data.teachcnt;
 		if (isteacher) {
-			$("#livepollactivestu").html(data.cnt+" " +(data.cnt==1?_('student'):_('students')));
+			$("#livepollactivestu").text(data.cnt+" " +(data.cnt==1?_('student'):_('students')));
 		} else if (data.teachcnt==0) {
 			showHandler({action: 0, qn: -1});
 		}
@@ -384,7 +384,7 @@ var livepoll = new function() {
 			}
 
 		}
-		$("#livepollrcnt").html(rescnt+" "+(rescnt==1?_("result"):_("results"))+" "+_("received."));
+		$("#livepollrcnt").text(rescnt+" "+(rescnt==1?_("result"):_("results"))+" "+_("received."));
 	}
 
 	function getSortedKeys(obj) {
@@ -419,8 +419,8 @@ var livepoll = new function() {
 			clearInterval(LPtimer);
 			$("#livepolltopright").text("");
 			$("#LPqnumber").text(_("Question") + " "+(qn+1));
-			$("#livepollqcontent").html(_("Loading..."));
-			$("#livepollrcontent").html("");
+			$("#livepollqcontent").text(_("Loading..."));
+			$("#livepollrcontent").text("");
 
 			if (typeof forceregen != 'undefined') {
 				var regenstr = '&forceregen=true';
@@ -599,11 +599,11 @@ var livepoll = new function() {
 		} else {
 			timestr += "0"+sec;
 		}
-		$("#livepolltopright").html(timestr);
+		$("#livepolltopright").text(timestr);
 	}
 
 	this.submitQuestion = function(qn) {
-		$("#livepollsubmitmsg").html(_("Saving..."));
+		$("#livepollsubmitmsg").text(_("Saving..."));
 		if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
 		doonsubmit();
 		params = {
@@ -642,9 +642,9 @@ var livepoll = new function() {
 			data: params
 		}).done(function(data) {
 			if (data.hasOwnProperty("error")) {
-				$("#livepollsubmitmsg").html(_("Error") + ": "+data.error);
+				$("#livepollsubmitmsg").text(_("Error") + ": "+data.error);
 			} else {
-				$("#livepollsubmitmsg").html(_("Saved"));
+				$("#livepollsubmitmsg").text(_("Saved"));
 			}
 		});
 

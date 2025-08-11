@@ -1,7 +1,7 @@
 
 function basicahah(url, target, def) {
   if (def==null) { def =  ' Fetching data... ';}
-  document.getElementById(target).innerHTML = def;
+  document.getElementById(target).textContent = def;
   var hasreq = false;
   if (window.XMLHttpRequest) {
     req = new XMLHttpRequest();
@@ -22,7 +22,7 @@ function basicahahDone(url, target) {
     if (req.status == 200) { // only if "OK"
       document.getElementById(target).innerHTML = req.responseText;
     } else {
-      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText;
+      document.getElementById(target).textContent=" AHAH Error: "+ req.status + ", " +req.statusText;
     }
   }
 }
