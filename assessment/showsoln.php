@@ -51,7 +51,7 @@ function toggleinlinebtn(n,p){
 $pagetitle = _('Written Example');
 require_once "../header.php";
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
-if ($sig != md5($id.$_SESSION['secsalt'])) {
+if (!hash_equals(hash_hmac('sha256', $id, $_SESSION['secsalt']), $sig)) {
 	echo "invalid signature - not authorized to view the solution for this problem";
 	exit;
 }
