@@ -42,7 +42,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
     if (!empty($_COOKIE['fromltimenu'])) {
-        setsecurecookie('fromltimenu', '', time()-3600);
+        setsecurecookie('fromltimenu', '', time()-3600, false);
     }
 	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment

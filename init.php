@@ -88,7 +88,7 @@ if ((!function_exists('isDevEnvironment') || !isDevEnvironment())
   }
 }
 if (!function_exists('setsecurecookie')) {
-function setsecurecookie($name, $value, $expires=0, $httponly=false) {
+function setsecurecookie($name, $value, $expires=0, $httponly=true) {
 	global $imasroot;
 	if ($_SERVER['HTTP_HOST'] == 'localhost' || disallowsSameSiteNone()) {
 		setcookie($name, $value, $expires, $imasroot == '' ? '/' : $imasroot, '', false, $httponly);
