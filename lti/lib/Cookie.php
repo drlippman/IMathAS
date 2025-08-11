@@ -15,7 +15,8 @@ class Cookie {
 
     public function set_cookie($name, $value, $exp = 3600, $options = []) {
         $cookie_options = [
-            'expires' => time() + $exp
+            'expires' => time() + $exp,
+            'httponly' => true
         ];
 
         // SameSite none and secure will be required for tools to work inside iframes
@@ -29,10 +30,10 @@ class Cookie {
         		// hack to add samesite
         		setcookie($name, $value,
               $cookie_options['expires'],
-              '/; samesite=none');
+              '/; samesite=none','',true,true);
           }
           // Set a second fallback cookie in the event that "SameSite" is not supported
-          setcookie("LEGACY_" . $name, $value, $cookie_options['expires']);
+          setcookie("LEGACY_" . $name, $value, $cookie_options['expires'], '', '', false, true);
         } else {
           if (!function_exists('disallowsSameSiteNone') || !disallowsSameSiteNone()) {
             setcookie($name, $value, array_merge($cookie_options, $same_site_options, $options));
