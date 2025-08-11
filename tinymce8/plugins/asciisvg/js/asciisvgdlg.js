@@ -30,6 +30,10 @@ var AsciisvgDialog = {
 		}
 		this.getsscr(this.sscr);
 		window.addEventListener('message', function (event) {
+			if (event.origin !== window.location.origin) {
+				console.warn("Blocked message from unexpected origin:", event.origin);
+    			return;
+  			}
 			if (event.data.action == 'insert') {
 				AsciisvgDialog.insert();
 			}

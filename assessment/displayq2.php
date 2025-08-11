@@ -7381,6 +7381,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($found) {
 				$GLOBALS['partlastanswer'] = '@FILE:'.Sanitize::simpleASCII($_POST["lf$qn"]).'@';
+				/*
 				if ($answerformat=='excel') {
 					$zip = new ZipArchive;
 					if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
@@ -7392,6 +7393,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						return 0;
 					}
 				}
+				*/
 				$hasfile = true;
 			} else {
 				$GLOBALS['partlastanswer'] = '';
