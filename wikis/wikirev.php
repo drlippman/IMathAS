@@ -109,13 +109,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {  // general JSON
 	$out = array('o'=>$text,'h'=>$revisionhistory,'u'=>$users);
-	if (function_exists('json_encode')) {
-		echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
-	} else {
-		require_once "../includes/JSON.php";
-		$jsonser = new Services_JSON();
-		echo $jsonser->encode($out);
-	}
+	echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
 	//echo '{"o":'.$original.',"h":'.$revisionhistory.',"u":'.$users.'}';
 }
 ?>

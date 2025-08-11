@@ -58,10 +58,10 @@ foreach($prefdefaults as $key=>$def) {
 if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
 	$_SESSION['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	$_SESSION['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
-	setcookie("embedquserprefs", json_encode(array(
+	setsecurecookie("embedquserprefs", json_encode(array(
 		'graphdisp'=>$_SESSION['userprefs']['graphdisp'],
 		'drawentry'=>$_SESSION['userprefs']['drawentry']
-		)),0,'','',false,true);
+		)),0);
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$_SESSION[$key] = $_SESSION['userprefs'][$key];

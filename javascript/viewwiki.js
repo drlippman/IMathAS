@@ -46,7 +46,7 @@ function seehistory(n) { //+ older, - newer
  		document.getElementById("first").className = "";
  	}
  	html = 'Revision '+(wikihistory.length - curversion)+'.  Edited by '+username+' on '+time;
- 	document.getElementById("revisioninfo").innerHTML = html;
+ 	document.getElementById("revisioninfo").textContent = html;
  	wikirendermath();
  	return false;
 }
@@ -165,35 +165,22 @@ function wikirendermath() {
 
 var req = null;
 function initrevisionview() {
-	document.getElementById("prevrev").innerHTML = "Loading revision history....";
+	document.getElementById("prevrev").textContent = "Loading revision history....";
 	
-	if (window.XMLHttpRequest) { 
-		req = new XMLHttpRequest(); 
-	} else if (window.ActiveXObject) { 
-		req = new ActiveXObject("Microsoft.XMLHTTP"); 
-	} 
-	if (typeof req != 'undefined') { 
-		req.onreadystatechange = function() {revloaded();}; 
-		req.open("GET", AHAHrevurl, true); 
-		req.send(""); 
-	}	
+	$.ajax({
+		url: AHAHrevurl,
+		dataType: 'json'
+	}).done(function(respobj) {
+		original = respobj.o;
+		curcontent = original.slice();
+		userinfo = respobj.u;
+		wikihistory = respobj.h;
+		contentdiv = document.getElementById("wikicontent");
+		$(contentdiv).html(original.join(' '));
+		wikirendermath();
+		document.getElementById("prevrev").textContent="";
+		document.getElementById("revcontrol").style.display = "";
+	}).fail(function(err) {
+		document.getElementById("prevrev").textContent="Load Error " + err; 
+	});
 }
-function revloaded() {
-	if (req.readyState == 4) { // only if req is "loaded" 
-		if (req.status == 200) { // only if "OK" 
-			var respobj = eval('('+req.responseText+')');
-			original = respobj.o;
-			curcontent = original.slice();
-			userinfo = respobj.u;
-			wikihistory = respobj.h;
-			contentdiv = document.getElementById("wikicontent");
-			contentdiv.innerHTML = original.join(' ');
-			wikirendermath();
-			document.getElementById("prevrev").innerHTML="";
-			document.getElementById("revcontrol").style.display = "";
-		} else { 
-			document.getElementById("prevrev").innerHTML=" Load Error:\n"+ req.status + "\n" +req.statusText; 
-		} 
-	} 
-}
-
