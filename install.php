@@ -189,8 +189,8 @@ p.imp {
 <body>
 <h1>IMathAS Install</h1>
 <?php
-if (PHP_VERSION_ID < 70200) {
-	echo '<p><b>Warning</b>:  PHP 7.2 or higher is needed for full functionality.</p>';
+if (PHP_VERSION_ID < 70400) {
+	echo '<p><b>Warning</b>:  PHP 7.4 or higher is needed for full functionality.</p>';
 }
 if (!extension_loaded("mbstring")) {
 	echo '<p><b>Warning</b>:  It appears your PHP does not have the mbstring extension installed, and it is required.</p>';
