@@ -621,7 +621,7 @@ final class SimpleEmailServiceMessage {
             $raw_message .= 'List-Unsubscribe-Post: List-Unsubscribe=One-Click' . "\n";
             preg_match('/[^<>\s]+@[^<>\s]+/',$this->to[0],$matches);
             $baseemail = $matches[0];
-            $hash = md5($baseemail . ($GLOBALS['CFG']['email']['secsalt'] ?? '123'));
+            $hash = hash_hmac('sha256', $baseemail, $GLOBALS['CFG']['email']['secsalt'] ?? '123');
             $raw_message .= 'List-Unsubscribe: <' . $GLOBALS['basesiteurl'] . '/actions.php?action=unsubscribe&email='
                 . Sanitize::encodeUrlParam($baseemail) . '&ver=' . $hash . ">\n";
         }
