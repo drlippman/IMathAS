@@ -533,7 +533,7 @@ if (isset($_GET['launch'])) {
 		if ($loc=='') {
 			reporterror(_("invalid folder identifier in folder view launch"));
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/public.php?cid=".$linkparts[0]."&folder=".$loc);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/public.php?cid=".urlencode($linkparts[0])."&folder=".urlencode($loc));
 	}
 	exit;
 
@@ -1758,7 +1758,7 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 	} else if ($linkparts[0]=='cid') { //is cid
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	} else if ($linkparts[0]=='folder') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".$linkparts[3]);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".urlencode($linkparts[3]));
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
@@ -3016,7 +3016,7 @@ if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsess
 	} else if ($keyparts[0]=='sso') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 	} else if ($keyparts[0]=='folder') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".$keyparts[3]);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".urlencode($keyparts[3]));
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
