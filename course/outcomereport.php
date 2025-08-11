@@ -99,11 +99,11 @@ if ($report == 'overview') {
 	function lockcol() {
 		if ($("#tblcontmyTable").hasClass("sticky-table")) {
 			$("#tblcontmyTable").removeClass("sticky-table");
-			document.cookie = "ocrhdr-'.$cid.'=0";
+			setCookie("ocrhdr-'.$cid.'", 0);
 			document.getElementById("lockbtn").value = "'. _('Lock headers') . '";
 		} else {
 			$("#tblcontmyTable").addClass("sticky-table");
-			document.cookie = "ocrhdr-'.$cid.'=1";
+			setCookie("ocrhdr-'.$cid.'", 1);
 			document.getElementById("lockbtn").value = "'. _('Unlock headers') . '";
 		}
 	}

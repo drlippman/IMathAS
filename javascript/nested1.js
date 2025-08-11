@@ -118,7 +118,7 @@ var Nested = new Class({
 						if (loc>-1) {oblist.splice(loc,1);}
 					}
 					oblist = oblist.join(',');
-					document.cookie = 'openblocks-' +cid+'='+ oblist;
+					setCookie('openblocks-' +cid, oblist);
 				}
 			}
 		}

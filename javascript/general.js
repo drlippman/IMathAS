@@ -776,7 +776,7 @@ function selectByDivID(el) {
 	}
 	var exdate=new Date();
 	exdate.setDate(exdate.getDate() + 365);
-	document.cookie = c+"store"+"="+escape(v) + ";expires="+exdate.toGMTString();
+	setCookie(c+"store", v, exdate.toGMTString());
 }
 function setselectbycookie() {
 	var els = document.getElementsByTagName("select");
@@ -1323,9 +1323,7 @@ jQuery(function($) {
 			}).done(function(msg) {
 				$("#ltimenudiv").html(msg);
                 btn.attr("data-loaded",1);
-                document.cookie = "fromltimenu=1;" 
-                    + 'path=' + ((imasroot=='') ? '/' : imasroot) + ';'
-                    + ((window.location.protocol=='https:') ? "secure; samesite=none" : "");
+				setCookie("fromltimenu", 1);
 				sendLTIresizemsg();
 			});
 		}
@@ -1596,7 +1594,7 @@ function setAltSelectors(group,val) {
 
 	var exdate=new Date();
 	exdate.setDate(exdate.getDate() + 365);
-	document.cookie = 'alt_store_'+group+"="+escape(val) + ";expires="+exdate.toGMTString()+ ";path=/";
+	setCookie('alt_store_'+group, val, exdate.toGMTString());
 }
 jQuery(document).ready(function($) {
 	$(".alts").on('change', function() {
@@ -1735,6 +1733,21 @@ function setActiveTab(el) {
 	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);
 	var tabpanelid = el.getAttribute('aria-controls');
 	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);
+}
+
+function setCookie(name, value, expires) {
+	expires = expires || 0;
+	let cookiestr = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+	cookiestr += ';path=' + (imasroot == '' ? '/' : imasroot);
+	if (location.protocol !== 'http:') {
+		cookiestr += '; Secure';
+		cookiestr += '; samesite=none';
+	}
+	if (expires > 0) {
+		cookiestr += '; expires=' + expires;
+	}
+	// so cookie is accessible in LTI iframes
+	document.cookie = cookiestr;
 }
 
 /* ========================================================================

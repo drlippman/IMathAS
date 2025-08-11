@@ -99,8 +99,8 @@ function toggleblock(event,bnum,folder) {
       }
       oblist = oblist.join(',');
       plblist = plblist.join(',');
-      document.cookie = 'openblocks-' +cid+'='+ oblist;
-      document.cookie = 'prevloadedblocks-'+cid+'='+plblist;
+      setCookie('openblocks-' +cid, oblist);
+      setCookie('prevloadedblocks-'+cid, plblist);
       if (event.shiftKey && node.className == 'hidden') {
           $("a[id^=blockh]").each(function(i,el) {
           	var id=$(el).attr("id").substr(6);
@@ -160,7 +160,7 @@ function setcalview(n, skipfocus) {
 			$("button.calview0").focus();
 		}
 		$(".cala11y").show();
-		document.cookie = 'calview-' +cid+'=0';
+		setCookie('calview-' +cid, 0);
 	} else if (n==1) {
 		$("table.cal").hide();
 		$("#agendaheader").show();
@@ -169,7 +169,7 @@ function setcalview(n, skipfocus) {
 			$("button.calview1").focus();
 		}
 		$(".cala11y").hide();
-		document.cookie = 'calview-' +cid+'=1';
+		setCookie('calview-' +cid, 1);
 	}
 }
 
@@ -177,7 +177,7 @@ function updatecal(pageshift, start, length) {
 	var url = calcallback; 
 	if (length !== null) {
 		url += '&callength='+length;
-		document.cookie = 'callength'+cid+'='+length;
+		setCookie('callength'+cid, length);
 	} else {
 		length = document.getElementById("callength").value;
 	}
@@ -186,7 +186,7 @@ function updatecal(pageshift, start, length) {
 	}
 	if (start !== null) {
 		url += '&calstart='+start;
-		document.cookie = 'calstart'+cid+'='+start;
+		setCookie('calstart'+cid, start);
 	}
 	url += '&ajax=true';
 	$.get(url, function (data) {

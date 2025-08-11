@@ -129,7 +129,7 @@
 
 
    if ($firstload) {
-	   echo "<script>document.cookie = 'openblocks-$cid=' + oblist;</script>\n";
+	   echo "<script>setCookie('openblocks-$cid', oblist);</script>\n";
    }
    if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	echo '<script type="text/javascript">$(".instrdates").hide();</script>';

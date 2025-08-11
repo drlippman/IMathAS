@@ -48,7 +48,7 @@ function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
             unset($mfadata['lastfail']);
             if (isset($_POST['mfatrust'])) {
                 $trusttoken = $MFA->createSecret();
-                setcookie('gatl', $trusttoken, time()+60*60*24*365*10, $imasroot.'/', '', true, true);
+                setsecurecookie('gatl', $trusttoken, time()+60*60*24*365*10, true);
                 if (!isset($mfadata['logintrusted'])) {
                     $mfadata['logintrusted'] = array();
                 }

@@ -7,12 +7,12 @@ if (!isset($userid)) { // prevent direct calls
 
 if (isset($_GET['calstart']) && isset($_GET['cid'])) {
 	$cid = Sanitize::courseId($_GET['cid']);
-	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),0,'','',false,true);
+	setsecurecookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),0,true);
 	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
 }
 if (isset($_GET['callength']) && isset($_GET['cid'])) {
 	$cid = Sanitize::courseId($_GET['cid']);
-	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),0,'','',false,true);
+	setsecurecookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),0,true);
 	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }
 

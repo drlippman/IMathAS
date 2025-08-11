@@ -1128,7 +1128,7 @@ function updateqgrpcookie() {
         }
         qcnt++;
     }
-    document.cookie = "closeqgrp-" + curaid + "=" + closegrp.join(",");
+    setCookie("closeqgrp-" + curaid, closegrp.join(","));
 }
 
 function generateTable() {

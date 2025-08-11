@@ -81,7 +81,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 var staticroot = '<?php echo $staticroot; ?>';
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=080925"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=081025"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //

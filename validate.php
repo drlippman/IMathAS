@@ -517,7 +517,7 @@ if ($hasusername) {
                     unset($_SESSION[$k]);
                 }
             }
-            setcookie('fromltimenu', '', time() - 3600);
+            setsecurecookie('fromltimenu', '', time() - 3600);
         } else if ($_SESSION['ltiitemtype'] == 0 && $_SESSION['ltirole'] == 'learner') {
             require_once __DIR__ . '/includes/userutils.php';
             user_logout();
@@ -867,7 +867,7 @@ function generaterandstring()
 function user_logout() {
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
-		setcookie(session_name(), '', time()-42000, '/', '', false, true);
+        setsecurecookie(session_name(), '', time()-42000, true);
 	}
 	session_destroy();
 }

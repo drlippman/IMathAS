@@ -916,7 +916,7 @@ export default {
           out.push(v);
         }
       }
-      window.document.cookie = 'gvaf' + store.aid + '=' + out.join(',');
+      window.setCookie('gvaf' + store.aid, out.join(','));
     },
     questionLoaded (base) {
       if (this.op_previewFiles) {

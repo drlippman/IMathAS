@@ -468,8 +468,7 @@ switch($_POST['action']) {
 	case "logout":
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
-			setcookie(session_name(), '', time()-42000, '/', '',false ,true );
-
+			setsecurecookie(session_name(), '', time()-42000, true);
 		}
 		session_destroy();
 		break;
@@ -1292,7 +1291,7 @@ switch($_POST['action']) {
 				$mfadata['laston'] = time();
 				if (isset($_POST['mfatrust'])) {
 					$trusttoken = $MFA->createSecret();
-					setcookie('gat', $trusttoken, time()+60*60*24*365*10, $imasroot.'/', '', true, true);
+					setsecurecookie('gat', $trusttoken, time()+60*60*24*365*10, true);
 					if (!isset($mfadata['trusted'])) {
 						$mfadata['trusted'] = array();
 					}

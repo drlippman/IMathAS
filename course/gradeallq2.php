@@ -419,7 +419,7 @@
                 vals.push(el.id);
             }
         });
-        document.cookie = "gaqf'.$aid.'=" + vals.join(",");
+        setCookie("gaqf'.$aid.'", vals.join(","));
     }
 	';
 	$placeinhead .= '</script>';

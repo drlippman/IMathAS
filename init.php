@@ -69,16 +69,17 @@ if ((!function_exists('isDevEnvironment') || !isDevEnvironment())
     && $hostdomain[0] != 'localhost'
     && !is_numeric($hostparts[count($hostparts)-1])
 ) {
+	$path = $imasroot == '' ? '/' : $imasroot;
 	$sess_cookie_domain = '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2));
 	if (disallowsSameSiteNone()) {
-		session_set_cookie_params(0, '/', $sess_cookie_domain, false, true);
+		session_set_cookie_params(0, $path, $sess_cookie_domain, false, true);
 	} else if (PHP_VERSION_ID < 70300) {
 		// hack to add samesite
-		session_set_cookie_params(0, '/; samesite=none', $sess_cookie_domain, true, true);
+		session_set_cookie_params(0, $path.'; samesite=none', $sess_cookie_domain, true, true);
   } else {
 		session_set_cookie_params(array(
 			'lifetime' => 0,
-			'path' => '/',
+			'path' => $path,
 			'domain' => $sess_cookie_domain,
             'secure' => true,
             'httponly' => true,
@@ -87,18 +88,19 @@ if ((!function_exists('isDevEnvironment') || !isDevEnvironment())
   }
 }
 if (!function_exists('setsecurecookie')) {
-function setsecurecookie($name, $value, $expires=0) {
+function setsecurecookie($name, $value, $expires=0, $httponly=false) {
 	global $imasroot;
 	if ($_SERVER['HTTP_HOST'] == 'localhost' || disallowsSameSiteNone()) {
-		setcookie($name, $value, $expires);
+		setcookie($name, $value, $expires, $imasroot == '' ? '/' : $imasroot, '', false, $httponly);
 	} else if (PHP_VERSION_ID < 70300) {
-		setcookie($name, $value, $expires, '/; samesite=none;', '', true);
+		setcookie($name, $value, $expires, ($imasroot == '' ? '/' : $imasroot) . '; samesite=none;', '', true, $httponly);
 	} else {
 		setcookie($name, $value, array(
 			'expires' => $expires,
 			'secure' => true,
 			'samesite'=>'None',
-			'path' => $imasroot.'/'
+			'httponly'=>$httponly,
+			'path' => ($imasroot == '' ? '/' : $imasroot)
 		));
 	}
 	$_COOKIE[$name] = $value;

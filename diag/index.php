@@ -97,7 +97,7 @@
 	if (!empty($_SESSION)) {
 	   $_SESSION = array();
 	   if (isset($_COOKIE[session_name()])) {
-		   setcookie(session_name(), '', time()-42000, '/', '', false, true);
+		   setsecurecookie(session_name(), '', time()-42000, true);
 	   }
 	   session_destroy();
 	   header('Location: ' . $GLOBALS['basesiteurl'] . "/diag/index.php?id=" . Sanitize::onlyInt($diagid));

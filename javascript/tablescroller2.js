@@ -117,7 +117,7 @@ this.preinit = function(try2) {
 					cancellockcol();
 					return;
 				} else {
-					document.cookie = "skiplhdrwarn_"+cid+"=1";
+					setCookie("skiplhdrwarn_"+cid,1);
 				}
 			}
 		}

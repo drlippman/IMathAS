@@ -42,7 +42,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
     if (!empty($_COOKIE['fromltimenu'])) {
-        setcookie('fromltimenu', '', time()-3600);
+        setsecurecookie('fromltimenu', '', time()-3600);
     }
 	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment
@@ -442,8 +442,8 @@ if ($overwriteBody==1) {
 	if (isset($CFG['GEN']['courseinclude'])) {
 		require_once $CFG['GEN']['courseinclude'];
 		if ($firstload) {
-			echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
-			echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
+			echo "<script>setCookie('openblocks-$cid', oblist);\n";
+			echo "setCookie('loadedblocks-$cid',0);</script>\n";
 		}
 		require_once "../footer.php";
 		exit;
@@ -687,8 +687,8 @@ if ($overwriteBody==1) {
    echo "</div>"; //centercontent
 
    if ($firstload) {
-		echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
-		echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
+		echo "<script>setCookie('openblocks-$cid', oblist);\n";
+		echo "setCookie('loadedblocks-$cid',0);</script>\n";
    }
 }
 

@@ -693,7 +693,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
     if (isLocalStorageAvailable()) {
         window.localStorage.setItem('recentlibs', JSON.stringify(recentlibs));
     } else {
-        document.cookie = "recentlibs=" + encodeURIComponent(JSON.stringify(recentlibs));
+        setCookie("recentlibs", JSON.stringify(recentlibs));
     }
     if (recentlibs.ids.length > 1) {
         $('#searchtypemenu').children(":nth-child(n+4)").remove();

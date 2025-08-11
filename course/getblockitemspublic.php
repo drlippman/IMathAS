@@ -73,7 +73,7 @@
 
    }
    if ($firstload) {
-	   echo "<script>document.cookie = 'openblocks-$cid=' + oblist;</script>\n";
+	   echo "<script>setCookie('openblocks-$cid', oblist);</script>\n";
    }
    function tzdate($string,$time) {
 	  global $tzoffset;
