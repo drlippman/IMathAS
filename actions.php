@@ -421,7 +421,7 @@ require_once "includes/sanitize.php";
 				} else {
 					$lastlogin = date("n/j/y g:ia",$row['lastaccess']);
 				}
-				$message .= _("Username").": <b>{$row['SID']}</b>.  "._("Last logged in").": $lastlogin<br/>";
+				$message .= _("Username").": <b>".Sanitize::encodeStringForDisplay($row['SID'])."</b>.  "._("Last logged in").": " . Sanitize::encodeStringForDisplay($lastlogin). "<br/>";
 
                 if (is_array($jsondata)) {
                     $jsondata['lastemail'] = time();
