@@ -89,7 +89,7 @@ function moveitem() {
 		if (data=="OK") {
 			window.parent.location.reload();
 		} else {
-			$("#error").append(data);
+			$("#error").text(data);
 		}
 	});
 }

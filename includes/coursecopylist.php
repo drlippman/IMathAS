@@ -87,7 +87,7 @@ if (isset($_POST['cidlookup'])) {
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		$out = array(
 			"id"=>Sanitize::onlyInt($row['id']),
-			"name"=>Sanitize::encodeStringForDisplay($row['name'] . ' ('.$row['LastName'].', '.$row['FirstName'].')'),
+			"name"=>$row['name'] . ' ('.$row['LastName'].', '.$row['FirstName'].')',
 			"termsurl"=>Sanitize::url($row['termsurl']));
 		$out['needkey'] = !($row['copyrights'] == 2 || ($row['copyrights'] == 1 && $row['groupid']==$groupid));
 		echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
@@ -276,7 +276,8 @@ function writeEkeyField() {
 		<button type="button" onclick="lookupcid()"><?php echo _('Look up course'); ?></button>
 		<span id="cidlookupout" style="display:none;"><br/>
 			<input type=radio name=ctc value=0 id=cidlookupctc />
-			<span id="cidlookupname"></span>
+			<label for=cidlookupctc id="cidlookupname"></label>
+			<a href="" id="cidlookuplink" target="_blank" class="small"><?php echo _('Preview');?></a>
 		</span>
 		<span id="cidlookuperr"></span>
 	</p>

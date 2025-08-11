@@ -82,13 +82,13 @@ function lookupcid() {
 			$("#cidlookupout").hide();
 		} else {
 			$("#cidlookupctc").val(res.id);
-			res.name = '<label for="cidlookupctc">'+res.name+'</label>';
+			$("#cidlookupname").text(res.name)
 			if (res.needkey) {
-				res.name += " &copy;";
+				$("#cidlookupname").append(" &copy;");
+				$("#cidlookuplink").hide();
 			} else {
-				res.name +=  " <a href=\""+imasroot+"/course/course.php?cid="+res.id+"\" target=\"_blank\" class=\"small\">Preview</a>";
+				$("#cidlookuplink").attr("href", imasroot+"/course/course.php?cid="+parseInt(res.id)).show();
 			}
-			$("#cidlookupname").html(res.name);
 			if (res.termsurl != "") {
 				$("#cidlookupctc").addClass("termsurl");
 				$("#cidlookupctc").attr("data-termsurl",res.termsurl);

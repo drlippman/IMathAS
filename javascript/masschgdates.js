@@ -607,10 +607,10 @@ Date.prototype.getWeekDays = function(d) {
 			$("#quicksavenotice").html(_("Saved"));
 			setTimeout(function() {$("#quicksavenotice").html("&nbsp;");}, 2000);
 		} else {
-			$("#quicksavenotice").html(msg);
+			$("#quicksavenotice").text(msg);
 		}
 	}).fail(function(jqXHR, textStatus) {
-		$("#quicksavenotice").html(textStatus);
+		$("#quicksavenotice").text(textStatus);
 	});
 }
 

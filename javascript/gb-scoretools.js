@@ -140,10 +140,10 @@ function quicksave() {
 			$("#quicksavenotice").html(_("Saved"));
 			setTimeout(function() {$("#quicksavenotice").html("&nbsp;");}, 2000);
 		} else {
-			$("#quicksavenotice").html(msg);
+			$("#quicksavenotice").text(msg);
 		}
 	}).fail(function(jqXHR, textStatus) {
-		$("#quicksavenotice").html(textStatus);
+		$("#quicksavenotice").text(textStatus);
 	});
 }
 function hidegroupdup(el) {  //el.checked = one per group

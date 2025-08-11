@@ -11,7 +11,7 @@ if ($myrights < 40) {
 }
 
 
-$placeinhead = '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
+$placeinhead = '<script src="'.$staticroot.'/javascript/copyitemslist.js?v=081125" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/accessibletree.js?v=070625"></script>';
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/accessibletree.css?v=070625" type="text/css" />';
 require_once "../header.php";

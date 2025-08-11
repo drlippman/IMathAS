@@ -1761,7 +1761,7 @@ function generateTable() {
             ) +
             ".</p>";
     }
-    document.getElementById("pttotal").innerHTML = pttotal;
+    document.getElementById("pttotal").textContent = pttotal;
     return html;
 }
 
@@ -1862,7 +1862,7 @@ function submitChanges() {
     })
         .done(function (msg) {
             if (msg.match(/^error:/)) {
-                document.getElementById(target).innerHTML = msg;
+                document.getElementById(target).textContent = msg;
                 itemarray = olditemarray.slice();
                 refreshTable();
                 return;
@@ -1884,49 +1884,15 @@ function submitChanges() {
             }
         })
         .fail(function (xhr, status, errorThrown) {
-            document.getElementById(target).innerHTML =
-                " Couldn't save changes:\n" +
+            document.getElementById(target).textContent =
+                " Couldn't save changes: " +
                 status +
-                "\n" +
+                ", " +
                 req.statusText +
-                "\nError: " +
+                ", Error: " +
                 errorThrown;
             itemarray = olditemarray.slice();;
             refreshTable();
         });
 }
 
-/*
-function submitChanges() {
-  url = AHAHsaveurl + '&order='+generateOutput();
-  var target = "submitnotice";
-  document.getElementById(target).innerHTML = ' Saving Changes... ';
-  if (window.XMLHttpRequest) {
-    req = new XMLHttpRequest();
-  } else if (window.ActiveXObject) {
-    req = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  if (typeof req != 'undefined') {
-    req.onreadystatechange = function() {ahahDone(url, target);};
-    req.open("GET", url, true);
-    req.send("");
-  }
-}
-
-function ahahDone(url, target) {
-  if (req.readyState == 4) { // only if req is "loaded"
-    if (req.status == 200) { // only if "OK"
-	    if (req.responseText=='OK') {
-		    document.getElementById(target).innerHTML='';
-		    refreshTable();
-	    } else {
-		    document.getElementById(target).innerHTML=req.responseText;
-		    itemarray = olditemarray;
-	    }
-    } else {
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText;
-	    itemarray = olditemarray;
-    }
-  }
-}
-*/
