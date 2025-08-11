@@ -319,9 +319,9 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             $questionDefaults = array('defattempts' => $row['defattempts']);
         }
 
-        $fields = implode(",", array_map('Sanitize::simpleString',array_keys($row)));
-        //$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
-        $fieldplaceholders = ':' . implode(',:', array_keys($row));
+        $fieldsarr = array_map('Sanitize::simpleString',array_keys($row));
+        $fields = implode(",", $fieldsarr);
+        $fieldplaceholders = ':' . implode(',:', $fieldsarr);
 
         $row['name'] .= Sanitize::simpleASCII($_POST['append']);
 

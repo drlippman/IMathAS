@@ -762,6 +762,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 */
 //delete all assessment files for an assessmentid
 function deleteallaidfiles($aid) {
+	$aid = intval($aid);
 	$delcnt = 0;
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -994,6 +995,7 @@ function deleteFilesFromGetBucketCall($s3,$arr) {
 }
 
 function deletealluserfiles($uid) {
+	$uid = intval($uid);
 	$delcnt = 0;
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);

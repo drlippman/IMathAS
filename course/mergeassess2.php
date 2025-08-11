@@ -38,7 +38,7 @@ if (isset($_POST['mergefrom'])) {
     if ($row['date_by_lti']>1) {
         $row['date_by_lti'] = 1;
     }
-	$fieldlist = implode(',', array_keys($row));
+	$fieldlist = implode(',', array_map('Sanitize::simpleString',array_keys($row)));
 	$placeholders = Sanitize::generateQueryPlaceholders($row);
 	$stm = $DBH->prepare("INSERT INTO imas_assessments ($fieldlist) VALUES ($placeholders)");
 	$stm->execute(array_values($row));

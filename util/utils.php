@@ -460,8 +460,10 @@ if (isset($_GET['form'])) {
 						echo '</ul></li>';
 					}
 					if (count($teachercourses)>0) {
-						$query = "SELECT org,id,courseid,contextid FROM imas_lti_courses WHERE courseid IN (".implode(",",$teachercourses).")";
-						$lti_c_stm = $DBH->query($query);
+						$ph = Sanitize::generateQueryPlaceholders($teachercourses);
+						$query = "SELECT org,id,courseid,contextid FROM imas_lti_courses WHERE courseid IN ($ph)";
+						$lti_c_stm = $DBH->prepare($query);
+						$lti_c_stm->execute($teachercourses);
 						if ($lti_c_stm->rowCount()>0) {
 							echo '<li>LTI course connections: <ul>';
 							while ($r = $lti_c_stm->fetch(PDO::FETCH_NUM)) {

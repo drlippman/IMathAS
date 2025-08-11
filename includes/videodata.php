@@ -40,10 +40,14 @@ function getCaptionDataByVidId($vidid) {
         return $youtubeCaptionDatastore[$vidid];
     }
 
+    if (!preg_match('/^[a-zA-Z0-9_-]{11}$/', $vidid)) {
+        return false;
+    }
+
     if (isset($CFG['YouTubeAPIKey'])) {
         $captioned = 0;
         $ctx = stream_context_create(array('http'=>array('timeout' => 1)));
-        $resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.$vidid.'&key='.$CFG['YouTubeAPIKey'], false, $ctx);
+        $resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.Sanitize::encodeUrlParam($vidid).'&key='.Sanitize::encodeUrlParam($CFG['YouTubeAPIKey']), false, $ctx);
         if ($resp === false) {
             $code = explode(' ', $http_response_header[0])[1];
             if ($code == '404') {
@@ -80,7 +84,7 @@ function getCaptionDataByVidId($vidid) {
                         "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
             )
         ));
-        $t = @file_get_contents('https://www.youtube.com/watch?v='.$vidid, false, $ctx);
+        $t = @file_get_contents('https://www.youtube.com/watch?v='.Sanitize::encodeUrlParam($vidid), false, $ctx);
         // auto-gen captions have vssId of "a.langcode"; manual are just ".langcode"
         // so look for vssId that starts with .; don't care about language
         $captioned = (preg_match('/"vssId":\s*"\./', $t))?1:0; 

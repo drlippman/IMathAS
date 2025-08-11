@@ -275,7 +275,14 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$bestlalist = implode('~',$lastanswers);
 				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,reattempting='',";
 				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestseeds=:bestseeds,bestlastanswers=:bestlastanswers ";
-				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid";
+				if ($qp[0] == 'id') {
+					$query .= "WHERE id=:qval AND assessmentid=:assessmentid";
+				} else if ($qp[0] == 'agroupid') {
+					$query .= "WHERE agroupid=:qval AND assessmentid=:assessmentid";
+				} else {
+					exit;
+				}
+				
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':scores'=>"$scorelist;$scorelist",
 					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist"));

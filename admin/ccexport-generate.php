@@ -439,7 +439,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 						}
 					}
 
-					mkdir($newdir.'/assn'.$iteminfo[$item][1]);
+					mkdir($newdir.'/assn'.intval($iteminfo[$item][1]));
 					$fp = fopen($newdir.'/assn'.intval($iteminfo[$item][1]).'/assignment_settings.xml','w');
 					fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
 					fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");

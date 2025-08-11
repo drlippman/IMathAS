@@ -2408,7 +2408,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				$arv = explode('##',$ar);
 				$arv = $arv[count($arv)-1];
 
-				$aid = $testsettings['id'];
+				$aid = Sanitize::onlyInt($testsettings['id']);
 				$tocheck = $aid.$qn.$userid.$rawscore.$arv;
 				$now = time();
 				if (isset($CFG['GEN']['livepollpassword'])) {
@@ -2425,7 +2425,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				exit;
 			}
 			$qn = Sanitize::onlyInt($_GET['qn']);
-			$aid = $testsettings['id'];
+			$aid = Sanitize::onlyInt($testsettings['id']);
 			$seed = Sanitize::onlyInt($_GET['seed']);
 			$startt = Sanitize::onlyInt($_GET['startt']);
 			$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=2,seed=:seed,startt=:startt WHERE assessmentid=:assessmentid");
@@ -2460,7 +2460,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				exit;
 			}
 			$qn = intval($_GET['qn']);
-			$aid = $testsettings['id'];
+			$aid = Sanitize::onlyInt($testsettings['id']);
 			if (isset($_GET['newstate'])) {
 				$newstate = $showeachscore?intval($_GET['newstate']):3;
 			} else if ($showeachscore) {

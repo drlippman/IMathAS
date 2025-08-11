@@ -79,7 +79,7 @@ class AssessUtils
     $stm = $DBH->prepare('SELECT * from imas_assessment_records WHERE userid=? AND assessmentid=?');
     $stm->execute(array($uid, $assessmentid));
     $source = $stm->fetch(PDO::FETCH_ASSOC);
-    $fields = implode(',', array_diff(array_keys($source), array('userid')));
+    $fields = implode(',', array_map('intval', array_diff(array_keys($source), array('userid'))));
 
     // this isn't super-efficient, but avoids having to send the full assessment
     // record between PHP and the DB multiple times.

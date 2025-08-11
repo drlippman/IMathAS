@@ -86,8 +86,7 @@ function copyStuData($destcid, $sourcecid = null) {
 		unset($row['id']);
 		unset($row['lti_sourcedid']);
 		if ($fieldlist == '') {
-			$fields = array_keys($row);
-			$fields = array_map('Sanitize::simpleString', $fields);
+			$fields = array_map('Sanitize::simpleString', array_keys($row));
 			$fieldlist = implode(',', $fields);
 		}
 		//remap questions
