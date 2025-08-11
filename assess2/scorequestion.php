@@ -354,7 +354,7 @@ if ($end_attempt) {
       $toSign = $aid.$qn.$uid.$rawscores.$lastAnswer;
       $now = time();
       if (isset($CFG['GEN']['livepollpassword'])) {
-        $livepollsig = base64_encode(sha1($toSign . $CFG['GEN']['livepollpassword'] . $now, true));
+        $livepollsig = base64_encode(hash('sha256',$toSign . $CFG['GEN']['livepollpassword'] . $now, true));
       }
       $qs = Sanitize::generateQueryStringFromMap(array(
         'aid' => $aid,

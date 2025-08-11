@@ -371,7 +371,7 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
     'now' => $now
   );
   if (isset($CFG['GEN']['livepollpassword'])) {
-    $livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
+    $livepollsig = base64_encode(hash('sha256',$livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
     $assessInfoOut['livepoll_data']['sig'] = $livepollsig;
   }
 }

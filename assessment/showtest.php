@@ -1174,7 +1174,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		$livepollroom = $testsettings['id'].'-'.($_SESSION['isteacher'] ? 'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
-			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
+			$livepollsig = base64_encode(hash('sha256',$livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
 		}
 		$placeinhead .= '<script type="text/javascript">
 				if (typeof io != "undefined") {livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");}
@@ -2412,7 +2412,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				$tocheck = $aid.$qn.$userid.$rawscore.$arv;
 				$now = time();
 				if (isset($CFG['GEN']['livepollpassword'])) {
-					$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now,true)));
+					$livepollsig = Sanitize::encodeUrlParam(base64_encode(hash('sha256',$tocheck . $CFG['GEN']['livepollpassword'] . $now,true)));
 				}
 
 				$r = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/qscored?aid='.$aid.'&qn='.$qn.'&user='.Sanitize::encodeUrlParam($userid).'&score='.Sanitize::encodeUrlParam($rawscore).'&now='.$now.'&la='.Sanitize::encodeUrlParam($arv).'&sig='.$livepollsig);
@@ -2432,7 +2432,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$stm->execute(array(':curquestion'=>$qn, ':seed'=>$seed, ':startt'=>$startt, ':assessmentid'=>$aid));
 
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now, true)));
+				$livepollsig = Sanitize::encodeUrlParam(base64_encode(hash('sha256',$aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now, true)));
 			}
 			$regenstr = '';
 
@@ -2469,7 +2469,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				$newstate=3;
 			}
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now,true)));
+				$livepollsig = Sanitize::encodeUrlParam(base64_encode(hash('sha256',$aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now,true)));
 			}
 			$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=:curstate WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':curquestion'=>$qn, ':curstate'=>$newstate, ':assessmentid'=>$aid));

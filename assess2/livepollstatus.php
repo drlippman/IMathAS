@@ -149,7 +149,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // call the livepoll server
   if (isset($CFG['GEN']['livepollpassword'])) {
-    $livepollsig = base64_encode(sha1($aid . $qn . $seed. $CFG['GEN']['livepollpassword'] . $now, true));
+    $livepollsig = base64_encode(hash('sha256',$aid . $qn . $seed. $CFG['GEN']['livepollpassword'] . $now, true));
   } else {
     $livepollsig = '';
   }
@@ -194,7 +194,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // call the livepoll server
   if (isset($CFG['GEN']['livepollpassword'])) {
-    $livepollsig = base64_encode(sha1($aid . $qn . $newState. $CFG['GEN']['livepollpassword'] . $now, true));
+    $livepollsig = base64_encode(hash('sha256',$aid . $qn . $newState. $CFG['GEN']['livepollpassword'] . $now, true));
   } else {
     $livepollsig = '';
   }
