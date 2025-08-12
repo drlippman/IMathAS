@@ -137,6 +137,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 	if (isset($existingid)) {  //already have id; update
+		$origSH = $sub[$existingid]['SH'];
+
 		$sub[$existingid]['name'] = htmlentities($_POST['title']);
 		$sub[$existingid]['startdate'] = $startdate;
 		$sub[$existingid]['enddate'] = $enddate;
@@ -149,6 +151,30 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['innav'] = $innav;
 		$sub[$existingid]['fixedheight'] = $fixedheight;
 		$sub[$existingid]['grouplimit'] = $grouplimit;
+
+		$now = time();
+		// if available and expand/collapse setting changed, update openblocks to reflect change
+		if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='' &&
+			$origSH != $sub[$existingid]['SH'] && 
+			$now > $startdate && $now < $enddate 
+		) {
+			$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]);
+			$blockid = $sub[$existingid]['id'];
+			$chg = false;
+			if ($_POST['availbeh'] == 'C' && in_array($blockid, $openblocks)) {
+				$openblocks = array_filter($openblocks, function ($item) use ($blockid) {
+					return ((string)$item !== (string)$blockid);
+				});
+				$chg = true;
+			} else if ($_POST['availbeh'] == 'O' && !in_array($blockid, $openblocks)) {
+				$openblocks[] = $blockid;
+				$chg = true;
+			}
+			if ($chg) {
+				setsecurecookie('openblocks-'.$cid, implode(',', $openblocks), 0, false);
+			}
+		}
+
 	} else { //add new
 		$blockitems = array();
 		$blockitems['name'] = htmlentities($_POST['title']);
