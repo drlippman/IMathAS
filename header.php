@@ -49,9 +49,13 @@ if (isset($CFG['GEN']['favicon'])) {
 if (isset($CFG['GEN']['svgfavicon'])) {
 	echo '<link rel="icon" sizes="any" type="image/svg+xml" href="'.$CFG['GEN']['svgfavicon'].'" />';
 }
+if (isset($CFG['GEN']['96icon'])) {
+	echo '<link rel="icon" sizes="96x96" href="'.$CFG['GEN']['96icon'].'" />';
+} 
 if (isset($CFG['GEN']['appleicon'])) {
 	echo '<link rel="apple-touch-icon" href="'.$CFG['GEN']['appleicon'].'" />';
 }
+
 if (isset($CFG['GEN']['webmanifest'])) {
 	echo '<link rel="manifest" href="'.$CFG['GEN']['webmanifest'].'" />';
 }
