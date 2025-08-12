@@ -611,11 +611,11 @@ if (isset($_GET['launch'])) {
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='LTIkey') {  //cid:org
-		$_SESSION['ltilookup'] = 'c';
+		$_SESSION['lti_keylookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
 		$keytype = 'gc';
 	} else {
-		$_SESSION['ltilookup'] = 'u';
+		$_SESSION['lti_keylookup'] = 'u';
 		$ltiorg = $ltikey.':'.$ltiorg;
 		$keytype = 'g';
 	}
@@ -659,22 +659,22 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
-		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
-        $_SESSION['selection_return_format'] = "Canvas";
+		$_SESSION['lti_selection_return'] = $_REQUEST['launch_presentation_return_url'];
+        $_SESSION['lti_selection_return_format'] = "Canvas";
         unset($_SESSION['place_aid']);
 	}
 	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
-		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
-		$_SESSION['selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
-		$_SESSION['selection_return_format'] = "IMSdeeplink";
+		$_SESSION['lti_selection_return'] = $_REQUEST['content_item_return_url'];
+		$_SESSION['lti_selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
+		$_SESSION['lti_selection_return_format'] = "IMSdeeplink";
 		if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='assn') {
-			$_SESSION['selection_type'] = 'assn';
+			$_SESSION['lti_selection_type'] = 'assn';
 		} else if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='link') {
-			$_SESSION['selection_type'] = 'link';
+			$_SESSION['lti_selection_type'] = 'link';
 		} else {
-			$_SESSION['selection_type'] = 'all';
+			$_SESSION['lti_selection_type'] = 'all';
 		}
-        $_SESSION['selection_data'] = @$_REQUEST['data'];
+        $_SESSION['lti_selection_data'] = @$_REQUEST['data'];
         unset($_SESSION['place_aid']);
 	}
 	unset($_SESSION['lti_duedate']);
@@ -1712,17 +1712,17 @@ if (isset($SESS['lti_launch_get'])) {
 }
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
-$_SESSION['lti_keylookup'] = $SESS['ltilookup'];
+$_SESSION['lti_keylookup'] = $SESS['lti_keylookup'];
 $_SESSION['lti_origkey'] = $SESS['lti_origkey'];
 if (isset($SESS['lti_duedate'])) {
 	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
 }
-if (isset($SESS['selection_return'])) {
-	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
-	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'] ?? '';
-	$_SESSION['lti_selection_return_format'] = $SESS['selection_return_format'];
-	$_SESSION['lti_selection_type'] = $SESS['selection_type'] ?? '';
-	$_SESSION['lti_selection_data'] = $SESS['selection_data'] ?? '';
+if (isset($SESS['lti_selection_return'])) {
+	$_SESSION['lti_selection_return'] = $SESS['lti_selection_return'];
+	$_SESSION['lti_selection_targets'] = $SESS['lti_selection_targets'] ?? '';
+	$_SESSION['lti_selection_return_format'] = $SESS['lti_selection_return_format'];
+	$_SESSION['lti_selection_type'] = $SESS['lti_selection_type'] ?? '';
+	$_SESSION['lti_selection_data'] = $SESS['lti_selection_data'] ?? '';
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {
@@ -2230,7 +2230,7 @@ if (isset($_GET['launch'])) {
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {  //cid:org
-		$_SESSION['ltilookup'] = 'c';
+		$_SESSION['lti_keylookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
 		if ($keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 			$keytype = 'gc';
@@ -2262,18 +2262,18 @@ if (isset($_GET['launch'])) {
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
 	} else if ($keyparts[0]=='aid') {   //also cid:org
-		$_SESSION['ltilookup'] = 'a';
+		$_SESSION['lti_keylookup'] = 'a';
 		$aid = intval($keyparts[1]);
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$ltiorg = $stm->fetchColumn(0) . ':' . $ltiorg;
 		$keytype = 'a';
 	} else if ($keyparts[0]=='sso') {  //ssouserid:org
-		$_SESSION['ltilookup'] = 'u';
+		$_SESSION['lti_keylookup'] = 'u';
 		$ltiorg = $keyparts[0].$keyparts[1]. ':' . $ltiorg;
 		$keytype = 's';
 	} else {
-		$_SESSION['ltilookup'] = 'u';
+		$_SESSION['lti_keylookup'] = 'u';
 		$ltiorg = $ltikey.':'.$ltiorg;
 		$keytype = 'g';
 		if (isset($_REQUEST['custom_place_aid'])) {
@@ -2329,22 +2329,22 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
-		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
-        $_SESSION['selection_return_format'] = "Canvas";
+		$_SESSION['lti_selection_return'] = $_REQUEST['launch_presentation_return_url'];
+        $_SESSION['lti_selection_return_format'] = "Canvas";
         unset($_SESSION['place_aid']);
 	}
 	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
-		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
-		$_SESSION['selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
-		$_SESSION['selection_return_format'] = "IMSdeeplink";
+		$_SESSION['lti_selection_return'] = $_REQUEST['content_item_return_url'];
+		$_SESSION['lti_selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
+		$_SESSION['lti_selection_return_format'] = "IMSdeeplink";
 		if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='assn') {
-			$_SESSION['selection_type'] = 'assn';
+			$_SESSION['lti_selection_type'] = 'assn';
 		} else if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='link') {
-			$_SESSION['selection_type'] = 'link';
+			$_SESSION['lti_selection_type'] = 'link';
 		} else {
-			$_SESSION['selection_type'] = 'all';
+			$_SESSION['lti_selection_type'] = 'all';
 		}
-        $_SESSION['selection_data'] = @$_REQUEST['data'];
+        $_SESSION['lti_selection_data'] = @$_REQUEST['data'];
         unset($_SESSION['place_aid']);
     }
     unset($_SESSION['lti_duedate']);
@@ -2962,17 +2962,17 @@ if (isset($SESS['lti_launch_get'])) {
 }
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
-$_SESSION['lti_keylookup'] = $SESS['ltilookup'];
+$_SESSION['lti_keylookup'] = $SESS['lti_keylookup'];
 $_SESSION['lti_origkey'] = $SESS['lti_origkey'];
 if (isset($SESS['lti_duedate'])) {
 	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
 }
-if (isset($SESS['selection_return'])) {
-	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
-	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'] ?? '';
-	$_SESSION['lti_selection_return_format'] = $SESS['selection_return_format'];
-	$_SESSION['lti_selection_type'] = $SESS['selection_type'] ?? '';
-	$_SESSION['lti_selection_data'] = $SESS['selection_data'] ?? '';
+if (isset($SESS['lti_selection_return'])) {
+	$_SESSION['lti_selection_return'] = $SESS['lti_selection_return'];
+	$_SESSION['lti_selection_targets'] = $SESS['lti_selection_targets'] ?? '';
+	$_SESSION['lti_selection_return_format'] = $SESS['lti_selection_return_format'];
+	$_SESSION['lti_selection_type'] = $SESS['lti_selection_type'] ?? '';
+	$_SESSION['lti_selection_data'] = $SESS['lti_selection_data'] ?? '';
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {

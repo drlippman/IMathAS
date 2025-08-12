@@ -200,7 +200,7 @@ if ($role == 'Instructor' && $localcourse === null) {
   $custom = $launch->get_custom();
   if (!empty($custom['canvas_sections']) && $role != 'Instructor') {
     $canvassections = json_decode($custom['canvas_sections'], true);
-    if (is_array($canvassections)) {
+    if (is_array($canvassections) && count($canvassections)>0) {
         if (strlen($sectionlabel) + strlen($canvassections[0]) > 37) {
             $sectionlabel = substr($sectionlabel, 0, 37 - strlen($canvassections[0]));
         }

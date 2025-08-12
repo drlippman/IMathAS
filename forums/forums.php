@@ -111,7 +111,7 @@
 		foreach ($items as $item) {
 			if (is_array($item)) {
                 if (!empty($item['items'])) {
-				    flattenitems($item['items'],$addto,$hiddenarr,$ishidden||($item['avail']==0));
+				    flattenitems($item['items'],$addto,$hiddenarr,$ishidden||(($item['avail'] ?? 1)==0));
                 }
 			} else if (isset($itemsassoc[$item])) { // is a forum 
 				$addto[] = $itemsassoc[$item];

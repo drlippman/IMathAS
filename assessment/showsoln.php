@@ -18,6 +18,9 @@ if (!isset($_GET['cid']) || $_GET['cid']==="embedq") {
 	require_once "../init.php";
 }
 
+if (!isset($_GET['id'])) {
+	exit;
+}
 $id = Sanitize::onlyInt($_GET['id']);
 $sig = $_GET['sig'] ?? '';
 //$t = Sanitize::onlyInt($_GET['t']);

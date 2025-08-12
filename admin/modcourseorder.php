@@ -55,9 +55,9 @@ if (isset($_POST['order'])) {
 					 $block = array("courses"=>additems2($it['children'], $status));
 				 }
 				 if (substr($id,0,3)=='new') {
-				 	 $name = $_POST['newg'.substr($id,6)];
+				 	 $name = $_POST['newg'.substr($id,6)] ?? '';
 				 } else if (substr($id,0,3)=='grp') {
-				 	 $name = $_POST['g'.substr($id,3)];
+				 	 $name = $_POST['g'.substr($id,3)] ?? '';
 				 } else {
                     $name = $id;
                  }
