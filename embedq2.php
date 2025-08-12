@@ -38,7 +38,7 @@ if (isset($_POST['state'])) {
         // verification using 'auth' is built-into the JWT method
         $QS = json_decode(json_encode(JWT::decode($_REQUEST['jwt'])), true);
     } catch (Exception $e) {
-        echo "JWT Error: " . $e->getMessage();
+        echo "Error decoding JWT";
         exit;
     }
     if (!empty($QS['auth'])) {

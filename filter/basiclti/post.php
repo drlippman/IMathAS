@@ -124,6 +124,6 @@ try {
 	$content = postLaunchHTML($parms, $line['url'], isset($parms['custom_debug']));
 	print($content);
 } catch (Exception $e) {
-	echo $e->getMessage();
+	echo "error";
 }
 ?>

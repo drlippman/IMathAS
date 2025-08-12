@@ -292,9 +292,6 @@ If you change any of the Vue files for the assessment player, you'll need to
 re-build the distribution files.  See `/assess2/vue-src/README.md` for more
 info, and how to configure your system for development mode testing.
 
-If tinymce is changed, or the plugins used are changed, you will need to run
-`/tinymce4/maketinymcebundle.php` to re-generate `tinymce_bundled.js`.
-
 ### Changing Mathquill
 The version of Mathquill used in this repo has it's source in the repo
 `https://github.com/drlippman/mathquill`, in the `imathas-master` branch.

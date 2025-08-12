@@ -562,6 +562,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		paste_data_images: true,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
+		contextmenu: false,
 		branding: false,
 		promotion: false,
 		resize: "both",
