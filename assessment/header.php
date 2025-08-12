@@ -98,7 +98,7 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=081125" type="text/javascript"></script>';
+echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=081225" type="text/javascript"></script>';
 
 
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
@@ -214,7 +214,7 @@ div { zoom: 1; }
 <?php
 
 if (isset($useeditor) && !empty($_SESSION['useed'])) {
-	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce8/tinymce.min.js"></script>';
+	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce8/tinymce.min.js?v=073125"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var usingTinymceEditor = true;';

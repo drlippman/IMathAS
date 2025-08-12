@@ -12,5 +12,5 @@ filename[5]=javascript/eqntips
 
 for name in ${filename[@]}; do
   echo Minifying ${name}
-  ./node_modules/.bin/terser ../../${name}.js --mangle --compress --output ../../${name}_min.js >> ../../javascript/assessment_min.js
+  ./node_modules/.bin/terser ../../${name}.js --mangle --compress >> ../../javascript/assessment_min.js
 done
