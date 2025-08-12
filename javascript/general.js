@@ -565,6 +565,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		contextmenu: false,
 		branding: false,
 		promotion: false,
+		sandbox_iframes: false,
 		resize: "both",
 		width: '100%',
 		content_style: "body {background-color: " + (coursetheme.match(/_dark/) ? "#000" : "#fff") + " !important;}",
