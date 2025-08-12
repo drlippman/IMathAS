@@ -283,7 +283,7 @@ if (function_exists('insertIntoHead')) {
     insertIntoHead();
 }
 if (isset($coursetheme)) {
-	echo '<link rel="stylesheet" href="'. $staticroot . "/themes/$coursetheme?v=042217\" type=\"text/css\" />";
+	echo '<link rel="stylesheet" href="'. $staticroot . "/themes/$coursetheme?v=081225\" type=\"text/css\" />";
 }
 echo '<link rel="stylesheet" href="'. $staticroot . '/handheld.css?v=071320" media="only screen and (max-width:480px)"/>';
 if (isset($CFG['GEN']['translatewidgetID'])) {
