@@ -67,7 +67,6 @@ function toggleblock(event,bnum,folder) {
       //var butn = document.getElementById('but'+bnum);
       var img = document.getElementById('img'+bnum);
       oblist = oblist.split(',');
-      plblist = plblist.split(',');
       var loc = arraysearch(bnum,oblist);
       if (node.className == 'blockitems') {
           if (arraysearch(bnum,loadedblocks)==-1) {
@@ -84,9 +83,7 @@ function toggleblock(event,bnum,folder) {
       } else {
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	ahah(getbiaddr+folder,'block'+bnum);
-		if (arraysearch(folder,plblist)==-1) {
-			plblist.push(folder);
-		}
+
 	  }
           node.className = 'blockitems';
           node.setAttribute('aria-hidden', false);
@@ -98,9 +95,8 @@ function toggleblock(event,bnum,folder) {
           if (loc==-1) {oblist.push(bnum);}
       }
       oblist = oblist.join(',');
-      plblist = plblist.join(',');
       setCookie('openblocks-' +cid, oblist);
-      setCookie('prevloadedblocks-'+cid, plblist);
+      
       if (event.shiftKey && node.className == 'hidden') {
           $("a[id^=blockh]").each(function(i,el) {
           	var id=$(el).attr("id").substr(6);

@@ -252,9 +252,15 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	//$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
 
 	$openblocks = Array(0);
-	$prevloadedblocks = array(0);
-	if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}
-	if (isset($_COOKIE['prevloadedblocks-'.$cid]) && $_COOKIE['prevloadedblocks-'.$cid]!='') {$prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$cid]);}
+	$prevloadedblocks = array();
+	$firstload = false;
+	if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]);} 
+	if (!empty($_SESSION['prevloadedblocks-'.$cid])) {$prevloadedblocks = $_SESSION['prevloadedblocks-'.$cid];}
+	if (!in_array($_GET['folder'], $prevloadedblocks)) {
+		$firstload = true;
+		$prevloadedblocks[] = Sanitize::simpleString($_GET['folder']);
+	} 
+
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
 
@@ -381,7 +387,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=070825\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=081325\"></script>";
 if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -442,8 +448,8 @@ if ($overwriteBody==1) {
 	if (isset($CFG['GEN']['courseinclude'])) {
 		require_once $CFG['GEN']['courseinclude'];
 		if ($firstload) {
-			echo "<script>setCookie('openblocks-$cid', oblist);\n";
-			echo "setCookie('loadedblocks-$cid',0);</script>\n";
+			echo "<script>setCookie('openblocks-$cid', oblist);</script>\n";
+			$_SESSION['prevloadedblocks-'.$cid] = $prevloadedblocks;
 		}
 		require_once "../footer.php";
 		exit;
@@ -687,8 +693,8 @@ if ($overwriteBody==1) {
    echo "</div>"; //centercontent
 
    if ($firstload) {
-		echo "<script>setCookie('openblocks-$cid', oblist);\n";
-		echo "setCookie('loadedblocks-$cid',0);</script>\n";
+		echo "<script>setCookie('openblocks-$cid', oblist);</script>\n";
+		$_SESSION['prevloadedblocks-'.$cid] = $prevloadedblocks;
    }
 }
 
