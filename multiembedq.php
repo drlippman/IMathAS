@@ -71,7 +71,7 @@ $showtips = 2;
 $useeqnhelper = 4;
 $useeditor = 1;
 $courseUIver = 1;
-$_SESSION['secsalt'] = "12345";
+$_SESSION['secsalt'] = $CFG['GEN']['embedsecret'] ?? "12345";
 $cid = "embedq";
 
 if (isset($CFG['GEN']['JWTsecret'])) {

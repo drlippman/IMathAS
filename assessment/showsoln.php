@@ -6,7 +6,7 @@ if (!isset($_GET['cid']) || $_GET['cid']==="embedq") {
 	require_once "../init_without_validate.php";
 
 	$cid = "embedq";
-	$_SESSION['secsalt'] = "12345";
+	$_SESSION['secsalt'] = $CFG['GEN']['embedsecret'] ?? "12345";
 	$_SESSION['graphdisp'] = 1;
 	$_SESSION['mathdisp'] = 1;
     $_SESSION['useed'] = 0;

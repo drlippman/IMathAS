@@ -17,7 +17,7 @@ $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
 $cid = 'embedq';
-$_SESSION['secsalt'] = "12345";
+$_SESSION['secsalt'] = $CFG['GEN']['embedsecret'] ?? "12345";
 $myrights = 5;
 
 $issigned = false;
