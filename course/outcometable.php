@@ -71,7 +71,7 @@ function getpts($sc) {
 	}
 }
 
-function flattenitems($items,&$addto,&$itemidsection,$sec='') {
+function flattenitems($items,&$addto,&$itemidsection,$sec=[]) {
 	global $canviewall,$secfilter,$studentinfo;
 	$now = time();
 	foreach ($items as $item) {
