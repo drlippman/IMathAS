@@ -79,19 +79,19 @@ function flattenitems($items,&$addto,&$itemidsection,$sec='') {
 			if (!isset($item['avail'])) { //backwards compat
 				$item['avail'] = 1;
             }
-            $thissec = $sec;
+            $thissections = $sec;
             $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
             if (!empty($item['grouplimit'])) {
-                $thissec = substr($item['grouplimit'][0],2); // trim off s-
-                if ((!$canviewall && $studentinfo['section'] != $thissec) ||
-                    ($canviewall && $secfilter != -1 && $secfilter != $thissec)
+                $thissections = array_map(function ($v) {return substr($v, 2);}, $item['grouplimit']);
+                if ((!$canviewall && !in_array($studentinfo['section'], $thissections)) ||
+                    ($canviewall && $secfilter != -1 && !in_array($secfilter, $thissections))
                 ) {
                     // if a section limited block, and not in/showing that sec, hide
                     $ishidden = true;
                 }
             } 
 			if (!$ishidden && !empty($item['items'])) {
-				flattenitems($item['items'], $addto, $itemidsection, $thissec);
+				flattenitems($item['items'], $addto, $itemidsection, $thissections);
 			}
 		} else {
             if ($sec != '') {
