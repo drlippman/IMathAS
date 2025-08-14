@@ -73,7 +73,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
         } else {
             $groupLTInote .= Sanitize::encodeStringForDisplay($ltisecret);
         }
-        $groupLTInote .= '</li></ul>';
+        $groupLTInote .= '</li>';
     }
 
     $pagetitle = "CC Export";
@@ -225,6 +225,8 @@ $alt = 0;
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=lticanvas" target="_blank">Canvas Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
+		<li>Launch URL: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?></li>
+		</ul>
         <p>&nbsp;</p>
         <p>If you don't want to embed in Canvas, but want students to know about 
            <?php echo $installname; ?> assignments in the Canvas calendar, you can 
@@ -242,13 +244,12 @@ $alt = 0;
 		</fieldset>
 		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button></p>
 		<p><a href="../help.php?section=ltibb" target="_blank">BlackBoard Setup Instructions</a></p>
-		<?php echo $groupLTInote; ?>
+		<?php echo $groupLTInote . '</ul>'; ?>
 	</div>
 	<div id="lmsmoodle" style="display:none" class="lmsblock">
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=ltimoodle" target="_blank">Moodle Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
-		<ul>
 		<li>Tool Base URL: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?> </li>
 		</ul>
 	</div>
@@ -256,7 +257,6 @@ $alt = 0;
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=ltid2l" target="_blank">Brightspace Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
-		<ul>
 		<li>Launch Point: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?> </li>
 		</ul>
 	</div>
@@ -264,7 +264,6 @@ $alt = 0;
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=ltiother" target="_blank">LMS Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
-		<ul>
 		<li>Launch URL: <?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php'; ?> </li>
 		</ul>
 

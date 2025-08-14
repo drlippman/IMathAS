@@ -578,6 +578,10 @@ if ($linktype=='canvas') {
 		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 		fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
 		fwrite($fp,'<blti:description>Math Assessment</blti:description>');
+		fwrite($fp,'<blti:launch_url>' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</blti:launch_url>');
+		if ($urlmode == 'https://') {
+			fwrite($fp,'<blti:secure_launch_url>' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</blti:secure_launch_url>');
+		}
 		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
