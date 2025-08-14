@@ -65,7 +65,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F','D'))) {
 				} else {
 					$desc = 'In-item link to '.$row['info'];
 				}
-			} else if (in_array($type,array('linkedlink','linkedviacal','wiki','assess'))) {
+			} else if (in_array($type,array('linkedlink','linkedviacal','wiki','assess','drill'))) {
 				$desc = 'Link to item';
 			} else if ($type=='forumpost') {
 				$desc = 'Forum posts';
