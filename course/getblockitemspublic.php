@@ -38,7 +38,7 @@
 			break;
         }
 		$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-		if ($items[$blocktree[$i]-1]['public']==1) {
+		if (!empty($items[$blocktree[$i]-1]['public'])) {
 			$blockispublic = true;
 		}
 		if (!isset($teacherid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {

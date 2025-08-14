@@ -12,6 +12,7 @@ $body = "";
 if (($myspecialrights&4)!=4 && $myrights < 100) {
  	$overwriteBody = 1;
 	$body = "You don't have authority to view this page.";
+  $from = '';
 }  else {
   if ($myrights<75 || (isset($_GET['show']) && $_GET['show'][0]=='u')) {  //only show own
     if ($myrights<75) {

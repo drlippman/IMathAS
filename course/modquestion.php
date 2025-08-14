@@ -282,7 +282,7 @@ if (!isset($_GET['id'])) {
 
 <span class=form><?php echo _("Penalty for missed attempts:"); ?></span>
 <span class=formright><input type=text size=4 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>">%
-   <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+   <select name="skippenalty" <?php if ($beentaken) {echo 'disabled=disabled';}?>>
      <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>><?php echo _("per missed attempt"); ?></option>
      <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 1"); ?></option>
      <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 2"); ?></option>

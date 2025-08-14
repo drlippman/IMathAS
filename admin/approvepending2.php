@@ -39,7 +39,7 @@ if (!empty($_POST['newstatus'])) {
 
 		//call hook, if defined
 		if (function_exists('getMoreInfoMessage')) {
-			$message = getMoreInfoMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+			$message = getMoreInfoMessage($row['FirstName'], $row['LastName'], $row['SID'], null);
 		} else {
 			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
 			$message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
@@ -70,7 +70,7 @@ if (!empty($_POST['newstatus'])) {
 
             //call hook, if defined
             if (function_exists('getDenyMessage')) {
-                $message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+                $message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], null);
             } else {
                 $message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
                 $message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';

@@ -151,7 +151,9 @@ if (isset($_GET['record'])) {
 
 	$n = intval($_POST['n']);
 	$scoretype = $_POST['scoretype'];
-	$showtype = intval($_POST['showtype']);
+	if (!$beentaken) {
+		$showtype = intval($_POST['showtype']);
+	}
 	$showtostu = (isset($_POST['showlast'])?1:0) + (isset($_POST['showpbest'])?2:0) + (isset($_POST['showcbest'])?4:0);
 	if (isset($_POST['clearbests'])) {
 		$classbests = array_fill(0,count($itemids),-1);
