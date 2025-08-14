@@ -18,6 +18,7 @@ ini_set("max_execution_time", "600");
 		if ($get_uid=="selected") {
 			$tounenroll = explode(",",$_POST['tounenroll']);
 		} else if ($get_uid=="all") {
+			$tounenroll = [];
 			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
