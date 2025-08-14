@@ -105,9 +105,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sets['innav'] = !empty($_POST['innav']) ? 1 : 0;
 	}
 	if (isset($_POST['chggrouplimit'])) {
-		$grouplimit = array();
-		if ($_POST['grouplimit']!='none') {
-			$grouplimit[] = $_POST['grouplimit'];
+		if (!empty($_POST['grouplimit']) && is_array($_POST['grouplimit'])) {
+			$grouplimit = $_POST['grouplimit'];
+		} else {
+			$grouplimit = array();
 		}
 		$sets['grouplimit'] = $grouplimit;
 	}
@@ -182,6 +183,7 @@ $(function() {
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");} table td {border-bottom: 1px solid #ccf;}</style>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/multiselect-dropdown.js\"></script>";
 
 /******* begin html output ********/
 require_once "../header.php";
@@ -266,7 +268,7 @@ foreach ($existblocks as $pos=>$name) {
 		<td><input type="checkbox" name="chggrouplimit" class="chgbox" aria-labelledby="lgrouplimit"/></td>
 		<td class="r" id="lgrouplimit">Restrict access to students in section:</td>
 		<td>
-			<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,0,null,null,'aria-labelledby="lgrouplimit"'); ?>
+			<?php writeHtmlSelect('grouplimit[]',$page_sectionlistval,$page_sectionlistlabel,0,null,null,'aria-labelledby="lgrouplimit" multiple'); ?>
 		</td>
 	</tr>
     <tr>
@@ -324,5 +326,7 @@ foreach ($existblocks as $pos=>$name) {
 </form>
 <?php
 }
+echo '<script>MultiselectDropdown({style: {width: "400px"}, placeholder: "'._('No restriction').'"});</script>';
+
 require_once "../footer.php";
 ?>
