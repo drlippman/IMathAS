@@ -67,7 +67,7 @@ $domain = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 $post = [
     'application_type' => 'web',
     'response_types' => ['id_token'],
-    'grant_types' => ["implict", "client_credentials"],
+    'grant_types' => ["implicit", "client_credentials"],
     "initiate_login_uri" => $basesiteurl.'/lti/login.php?u='.$uniqid,
     "redirect_uris" => [$basesiteurl.'/lti/launch.php'],
     "client_name" => $installname,
@@ -94,7 +94,7 @@ $post = [
                 "label" => sprintf(_("%s Assessment"), $installname)
             ],
             [
-                "type" => "LtiResourceLink",
+                "type" => "LtiResourceLinkRequest",
                 "target_link_uri" => $basesiteurl.'/lti/launch.php'
             ]
         ]
