@@ -65,7 +65,7 @@ function showitemtree($items,$parent,$greyitems=0) {
 			}
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 						($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
-				if ($item['SH'][1]=='T') { //just link to treereader item
+				if (($item['SH'][1]??'')=='T') { //just link to treereader item
 					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#B'.Sanitize::encodeUrlParam($item['id']).'">';
 					showicon('tree', 'treereader');
 					echo Sanitize::encodeStringForDisplay($item['name']);
