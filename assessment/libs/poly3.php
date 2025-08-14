@@ -136,8 +136,7 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 				}
 			}
 		}
-
-		return $results;
+		return poly3_trimleadingzeros($results);
 	}
 	else {
 		echo "formpoly3fromstring - the polynomial string is empty - FAIL.<br/>\r\n";
@@ -500,7 +499,8 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 //
 //
 function dividepoly3($dividend, $divisor, $IsFraction=TRUE) {
-
+	$dividend = poly3_trimleadingzeros($dividend);
+	$divisor = poly3_trimleadingzeros($divisor);
 	if($IsFraction){
 		return poly3_dividefractions($dividend, $divisor);
 	}
@@ -717,6 +717,9 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	else {
 		$MathSymbol = "";
 	}
+	$dividend = poly3_trimleadingzeros($dividend);
+	$divisor = poly3_trimleadingzeros($divisor);
+
 	$TableResults = dividepoly3($dividend, $divisor, $IsFraction);  // this does the polynomial long division
 
 	// ---------------------------------------------------------------------------------------------------------------
@@ -1005,6 +1008,24 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	return $Table;
 }
 
+/*
+ * Internal function: removes 0-coefficient terms from the lead of the poly
+*/
+function poly3_trimleadingzeros($poly) {
+	$highestpower = count($poly)-1;
+	for ($i=$highestpower; $i>=0; $i--) {
+		if ((is_array($poly[$i]) && $poly[$i][0] == 0) ||
+			(!is_array($poly[$i]) && $poly[$i] == 0)
+		) {
+			unset($poly[$i]);
+		} else {
+			break;
+		}
+	}
+	return $poly;
+}
+
+// File version : 7.6   - Added internal poly3_trimleadingzeros to fix errors on longdivisionpoly3
 // File version : 7.5   - Fixed warning in formpoly3fromstring for non-numeric value encountered on line 179 in file /var/app/current/assessment/libs/fraction.php
 //                        
 // File version : 7.4	- Fixed documentation Bug. Added formpoly3fromresults.
