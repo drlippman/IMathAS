@@ -1292,9 +1292,14 @@ other info, then click "Update"</p>
 <ul>
 <li>Name:  The name of the category</li>
 <li>Scale (optional):  Scale the category total by specifying a point value or percent value to be scaled up to 100%.
-For example, if the category point value was 80 points, and a student earned 50 points, their category total would be 50 points.
-If you specified a scale of 60 points, then the students grade would become 80*(50/60) = 66.7 points out of 80.  You can specify whether
-grades that would end up over 100% should be chopped to 100%.  You can specify no scale by leaving the Scale box blank.</li>
+For example, if the category point value was 80 points, and a student earned 50 points, 
+their category total would be 50 points (62.5%).  If you specified to scale 60 points to a perfect score, 
+then the students grade would become 80*(50/60) = 66.7 points out of 80 = 83.4%.  
+You can also base the scale on a percent value, which is usually easier: 
+If you specified to scale 80% to a perfect score,
+and a student's category total started at 70%, it would be scaled to 70*(100/80) = 87.5%.
+You can specify whether grades that would end up over 100% should be chopped to 100%.  
+You can specify no scale by leaving the Scale box blank.</li>
 <li>Drops (optional):  You can specify whether to drop the lowest N scores, or keep the highest N scores from the category.  Set the number to 0 to keep all scores.</li>
 <li>Weight/Fix Category Point Total:  If you are using a "Category Weights" grading scheme, enter the percent weights for each category
 here.  If the category percents don't add to 100%, they are all scaled equally so they do add to 100%.  If you are using a "Points earned" grading scheme, you can
