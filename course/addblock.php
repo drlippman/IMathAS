@@ -301,6 +301,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if ($row[0] === null || trim($row[0]) === '') { continue; }
 		$page_sectionlistval[] = 's-'.$row[0];
 		$page_sectionlistlabel[] = 'Section '.$row[0];
 	}

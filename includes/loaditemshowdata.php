@@ -32,7 +32,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 	 }
 			 }
 			 if (!$viewall && !empty($studentinfo) && isset($item['grouplimit']) && count($item['grouplimit'])>0) {
-				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
+                 if (!in_array(strtolower('s-' . $studentinfo['section']), array_map('strtolower', $item['grouplimit']))) {
 					 continue;
 				 }
 			 }

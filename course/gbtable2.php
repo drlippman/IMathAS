@@ -181,8 +181,8 @@ function flattenitems($items,&$addto,&$itemidsection,$sec=[]) {
             $thissections = $sec;
             $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
             if (!empty($item['grouplimit'])) {
-                $thissections = array_map(function ($v) {return substr($v, 2);}, $item['grouplimit']);
-                if ((!$canviewall && !in_array($studentinfo['section'], $thissections)) ||
+                $thissections = array_map(function ($v) {return strtolower(substr($v, 2));}, $item['grouplimit']);
+                if ((!$canviewall && !in_array(strtolower($studentinfo['section']), $thissections)) ||
                     ($canviewall && $secfilter != -1 && !in_array($secfilter, $thissections))
                 ) {
                     // if a section limited block, and not in/showing that sec, hide
@@ -994,8 +994,10 @@ function gbtable() {
 			$gb[$ln][0][] = ($line['section']==null)?'':$line['section'];
         }
         if ($line['section'] !== null) {
-            $stusection[$line['id']] = $line['section'];
-        }
+            $stusection[$line['id']] = strtolower($line['section']);
+        } else {
+			$stusection[$line['id']] = '';
+		}
 		if ($hascode) {
 			$gb[$ln][0][] = $line['code'];
 		}
@@ -1256,7 +1258,7 @@ function gbtable() {
 			$gb[$row][1][$col][3] += 10;
         }
         if (!empty($sectionlimit[$col]) && 
-            (empty($stusection[$l['userid']]) || !in_array($stusection[$l['userid']], $sectionlimit[$col]))
+            !in_array($stusection[$l['userid']], $sectionlimit[$col])
         ) {
             // assess is not in this stu's section, so we won't count it, 
             $countthisone = false;
@@ -1504,7 +1506,7 @@ function gbtable() {
 			$gb[$row][1][$col][3] += 10;
         }
         if (!empty($sectionlimit[$col]) && 
-            (empty($stusection[$l['userid']]) || !in_array($stusection[$l['userid']], $sectionlimit[$col]))
+            !in_array($stusection[$l['userid']], $sectionlimit[$col])
         ) {
             // assess is not in this stu's section, so we won't count it, 
             $countthisone = false;
@@ -1683,7 +1685,7 @@ function gbtable() {
                 $gb[$row][1][$col][3] = 0; //is counted
                 
                 if (!empty($sectionlimit[$col]) && 
-                    (empty($stusection[$l['userid']]) || !in_array($stusection[$l['userid']], $sectionlimit[$col]))
+               		!in_array($stusection[$l['userid']], $sectionlimit[$col])
                 ) {
                     // is not in this stu's section, so we won't count it, 
                     $gb[$row][1][$col][0] = ' ';
@@ -1800,7 +1802,7 @@ function gbtable() {
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) { // no score or no credit
 				if (!empty($sectionlimit[$col]) && 
-					(empty($stusection[$gb[$ln][4][0]]) || !in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col]))
+					!in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col])
 				) {
                     continue; // don't zero out section limited
                 }
@@ -1901,7 +1903,7 @@ function gbtable() {
 				unset($cattotfuture[$ln][$category[$i]][$col]);
 			} else if (!isset($gb[$ln][1][$col][0])) {
                 if (!empty($sectionlimit[$col]) && 
-					(empty($stusection[$gb[$ln][4][0]]) || !in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col]))
+					!in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col])
 				) {
                     continue; // don't zero out section limited
                 }
@@ -2099,7 +2101,7 @@ function gbtable() {
             if (!isset($assesscol[$aid])) { continue; }
             $col = $assesscol[$aid];
             if (!empty($sectionlimit[$col]) && 
-                (empty($stusection[$gb[$ln][4][0]]) || !in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col]))
+               !in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col])
             ) {
                 // assess is for diff sec; remove as avail
                 $availstu[$ln][$aid] = 4;
@@ -2190,7 +2192,7 @@ function gbtable() {
             if (!isset($discusscol[$aid])) { continue; }
             $col = $discusscol[$aid];
             if (!empty($sectionlimit[$col]) && 
-                (empty($stusection[$gb[$ln][4][0]]) || !in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col]))
+                !in_array($stusection[$gb[$ln][4][0]], $sectionlimit[$col])
             ) {
                 // assess is for diff sec; remove from poss
                 for ($j=0;$j<4;$j++) {

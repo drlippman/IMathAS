@@ -61,7 +61,7 @@ if ($_GET['folder']!='0') {
 			break;
 		}
 		if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
-			if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
+			if (!in_array(strtolower('s-' . $studentinfo['section']), array_map('strtolower', $items[$blocktree[$i]-1]['grouplimit']))) {
 				echo 'Not authorized';
 				exit;
 			}

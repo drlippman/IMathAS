@@ -972,7 +972,7 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
                 $item['avail']==0 || 
                 ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now) ||
                 (!empty($item['grouplimit']) && isset($studentinfo['section']) &&
-					!in_array('s-'.$studentinfo['section'], $item['grouplimit']))
+				    !in_array(strtolower('s-' . $studentinfo['section']), array_map('strtolower', $item['grouplimit'])))
             );
             if (!empty($item['items'])) {
 			    flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);

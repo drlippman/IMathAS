@@ -56,9 +56,9 @@ function showitemtree($items,$parent,$greyitems=0) {
 	 foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (isset($item['grouplimit']) && count($item['grouplimit'])>0 && !$viewall && isset($studentinfo['section'])) {
-				 if (!in_array('s-'.$studentinfo['section'],$item['grouplimit'])) {
+				if (!in_array(strtolower('s-' . $studentinfo['section']), array_map('strtolower', $item['grouplimit']))) {
 					 continue;
-				 }
+				}
 			}
             if (!isset($item['avail'])) { //backwards compat
 				$item['avail'] = 1;

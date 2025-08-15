@@ -82,8 +82,8 @@ function flattenitems($items,&$addto,&$itemidsection,$sec=[]) {
             $thissections = $sec;
             $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
             if (!empty($item['grouplimit'])) {
-                $thissections = array_map(function ($v) {return substr($v, 2);}, $item['grouplimit']);
-                if ((!$canviewall && !in_array($studentinfo['section'], $thissections)) ||
+                $thissections = array_map(function ($v) {return strtolower(substr($v, 2));}, $item['grouplimit']);
+                if ((!$canviewall && !in_array(strtolower($studentinfo['section']), $thissections)) ||
                     ($canviewall && $secfilter != -1 && !in_array($secfilter, $thissections))
                 ) {
                     // if a section limited block, and not in/showing that sec, hide
