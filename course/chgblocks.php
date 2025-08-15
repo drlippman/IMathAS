@@ -144,8 +144,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existBlocksLabels = array();
 	buildExistBlocksArray($items,'0');
 
-	$page_sectionlistval = array("none");
-	$page_sectionlistlabel = array(_("No restriction"));
+	$page_sectionlistval = [];//array("none");
+	$page_sectionlistlabel = [];//array("No restriction");
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
