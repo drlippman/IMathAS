@@ -1441,8 +1441,11 @@ the designated library.  Select the items to import, and click "Import Items".</
 <div class=h2>
 <h2 id="lti">LTI Integration</h2>
 
-<p>IMathAS can be used as a LTI tool using a course-level configuration or a global college-wide configuration.</p>
+<p>IMathAS can be used as a LTI tool using a course-level configuration (LTI 1.1 only) or 
+  a global college-wide configuration (LTI 1.1 or 1.3).  Use of LTI 1.3 is highly recommended.
+</p>
 
+<h3>LTI 1.1</h3>
 <p><b>Key Types</b></p>
 
 <p>For a course-level configuration, your LTI key will take the form LTKkey_###_#.  The first number, ###, is your course ID.
@@ -1475,7 +1478,27 @@ username or password, so they will only be able to access IMathAS resources thro
    with IMathAS assessments when the course is copied in the LMS, so using the Import
    process is recommened when supported by the LMS.</p>
 
-<p>IMathAS can also be an LTI consumer, using the External Tool option for Link items.</p>
+<p>IMathAS can also be an LTI 1.1 consumer, using the External Tool option for Link items.</p>
+
+<h3>LTI 1.3</h3>
+<p>LTI 1.3 must be installed by the LMS administrator.</p>
+<p>There are two general ways to set up an LTI connection:</p>
+<ul>
+	<li>Dynamic Registration: Supported by Canvas, Moodle, and D2L, amongst others. The dynamic registration 
+		URL is https://yourIMathASsite/lti/dynreg.php.  
+	</li>
+	<li>Manually: Using the platform registration page: https://yourIMathASsite/lti/admin/platforms.php</li>
+</ul>
+<p>The easiest way to set up LTI links in the LMS is to use the
+   Export feature in IMathAS to create links and import those into your LMS. To do this,
+   go to Course Items -> Export, select the items you want to export,
+   your LMS, and Download the CC Export.  Then follow the appropriate instructions below.</p>
+<p>Alternatively, you can setup individual links to assignments, using your LMS's "deep linking" feature. 
+   The specific process varies by LMS.
+</p>
+<p>Note that LTI 1.3 does not support a "whole course link" option, since that option does not allow grade 
+	passback.
+</p>
 
 
 
