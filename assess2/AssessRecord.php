@@ -1942,7 +1942,7 @@ class AssessRecord
     $work = isset($qver['work']) ? $qver['work'] : '';
     $worktime = '0';
     if (!empty($qver['worktime'])) {
-        $worktime = tzdate("n/j/y, g:i a", $qver['worktime'] + $this->assessRecord['starttime']);
+        $worktime = tzdate("n/j/y, g:i a", intval($qver['worktime']) + intval($this->assessRecord['starttime']));
     }
 
     // get the question settings
