@@ -3730,7 +3730,13 @@ function cleanbytoken($str,$funcs = array()) {
                 } else if ($out[$lastout]=='_') {
                     $out[] = 1;
                     continue;
-                }
+                } else if ($out[$lastout]=='-' && $lastout>0 && (
+					$out[$lastout-1] == '^' || $out[$lastout-1] == '/' || $out[$lastout-1] == '_'
+				)) {
+					// x^-1*5, 5/-1*6, a_-1*6, leave alone
+					$out[] = 1;
+                    continue;
+				}
             }
 
             if ($i<$grplasti) { //if not last character
