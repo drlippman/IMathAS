@@ -1109,7 +1109,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$allusedqids = array_unique($qsetid);
 					$ph = Sanitize::generateQueryPlaceholders($allusedqids);
 					$stm = $DBH->prepare("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($ph ) GROUP BY questionsetid");
-					$stm->execute($allusedqids);
+					$stm->execute(array_values($allusedqids));
 					$qsetusecnts = array();
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$qsetusecnts[$row[0]] = $row[1];
