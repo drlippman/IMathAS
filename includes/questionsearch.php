@@ -370,7 +370,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         JOIN imas_assessments AS ia ON iaq.assessmentid = ia.id ';
     } else {
         $query .= 'JOIN imas_library_items AS ili ON ' . $libquery . ' ili.qsetid=iq.id AND ili.deleted=0 ';
-        $query .= 'LEFT JOIN imas_library_items AS ili2 ON ' . $lib2query . ' ili2.qsetid=iq.id AND ili2.deleted=0 AND ili2.id < ili.id ';
+        if ($searchtype == 'all' || ($searchtype == 'libs' && count($libs) > 1)) {
+            $query .= 'LEFT JOIN imas_library_items AS ili2 ON ' . $lib2query . ' ili2.qsetid=iq.id AND ili2.deleted=0 AND ili2.id < ili.id ';
+        }
     }
     
     // begin WHERE
@@ -397,7 +399,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
     if ($searchtype == 'assess') {
         $query .= ' AND ' . $assessquery;
-    } else {
+    } else if ($searchtype == 'all' || ($searchtype == 'libs' && count($libs) > 1)) {
         $query .= ' AND ili2.id IS NULL ';
     }
 
