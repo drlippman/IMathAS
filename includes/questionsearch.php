@@ -257,10 +257,11 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 
     $libquery = '';
     $lib2query = '';
+    $assessquery = '';
     $libnames = [];
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
-        $libquery = "ili.libid IN ($llist)";
+        $libquery = "ili.libid IN ($llist) AND ";
         $lib2query = "ili2.libid IN ($llist) AND ";
         $sortorder = [];
         $stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
@@ -273,7 +274,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
-        $libquery = "ia.id IN ($llist)";
+        $assessquery = "ia.id IN ($llist)";
         $stm = $DBH->query("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($llist)");
         $aidnames = [];
         $qidmap = [];
@@ -309,7 +310,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
             }
-            if (isset($search['id'])) {
+            if ($searchtype != 'assess' && isset($search['id'])) {
                 $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
                 $searchvals[] = $admingroupid;
                 $searchvals[] = $search['id'];
@@ -327,7 +328,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
             }
-            if (isset($search['id'])) {
+            if ($searchtype != 'assess' && isset($search['id'])) {
                 $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
                 $searchvals[] = $userid;
                 $searchvals[] = $search['id'];
@@ -351,27 +352,28 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,';
-    $query .= 'ili.libid,';
     $query .= 'iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
     imas_users.LastName, imas_users.FirstName, imas_users.groupid,
-    LENGTH(iq.solution) AS hassolution,iq.solutionopts,
-    ili.junkflag, iq.broken, ili.id AS libitemid ';
+    LENGTH(iq.solution) AS hassolution,iq.solutionopts,iq.broken';
     if ($searchtype == 'assess') {
         $query .= ',iaq.id AS qid ';
+    } else {
+        $query .= ',ili.libid, ili.junkflag, ili.id AS libitemid ';
     }
     if ((!empty($search['order']) && $search['order']=='newest') || !empty($options['includelastmod'])) {
         $query .= ',iq.lastmoddate ';
     }
-    $query .= 'FROM imas_questionset AS iq JOIN imas_library_items AS ili ON
-    ili.qsetid=iq.id AND ili.deleted=0 ';
+    $query .= 'FROM imas_questionset AS iq ';
+    $query .= 'JOIN imas_users ON iq.ownerid=imas_users.id ';
     if ($searchtype == 'assess') {
         $query .= 'JOIN imas_questions AS iaq ON iaq.questionsetid=iq.id
         JOIN imas_assessments AS ia ON iaq.assessmentid = ia.id ';
+    } else {
+        $query .= 'JOIN imas_library_items AS ili ON ' . $libquery . ' ili.qsetid=iq.id AND ili.deleted=0 ';
+        $query .= 'LEFT JOIN imas_library_items AS ili2 ON ' . $lib2query . ' ili2.qsetid=iq.id AND ili2.deleted=0 AND ili2.id < ili.id ';
     }
-    $query .= 'JOIN imas_users ON iq.ownerid=imas_users.id ';
-    $query .= 'LEFT JOIN imas_library_items AS ili2 ON ' . $lib2query . ' ili2.qsetid=iq.id AND ili2.deleted=0 AND ili2.id < ili.id ';
     
-    // being WHERE
+    // begin WHERE
     $query .= 'WHERE iq.deleted=0 ';
     // TODO: Add group BY iq.id to eliminate duplicates from multiple libraries
     if (!empty($options['hidereplaceby'])) {
@@ -393,17 +395,18 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $existingq = implode(',', array_map('intval', $options['existing']));
         $query .= " AND iq.id NOT IN ($existingq)";
     }
-    $query .= ' AND ili2.id IS NULL ';
-    if ($libquery !== '') {
-        $query .= ' AND ' . $libquery;
+    if ($searchtype == 'assess') {
+        $query .= ' AND ' . $assessquery;
+    } else {
+        $query .= ' AND ili2.id IS NULL ';
     }
+
     if ($rightsquery !== '') {
         $query .= ' AND ' . $rightsquery;
     }
     
     
     if ($searchtype == 'assess') {
-        $query .= ' GROUP BY iaq.id,ili.qsetid ';
         $query .= ' ORDER BY ia.id ';
     } else {
         if (!empty($search['order']) && $search['order']=='newest') {
@@ -413,7 +416,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $query .= ' ORDER BY iq.lastmoddate DESC ';
             }
         } else if ($searchtype == 'libs' && count($libs) > 1) {
-            $query .= ' ORDER BY libid ';
+            $query .= ' ORDER BY libid '; // , iq.id
+        } else {
+            // removed so we don't have to find all records and do filesort
+            //$query .= ' ORDER BY iq.id ';
         }
     }
     if (!empty($max) && intval($max) > 0) {
@@ -424,7 +430,6 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $stm = $DBH->prepare($query);
-    
     $stm->execute($searchvals);
     $res = [];
     $qsids = [];
