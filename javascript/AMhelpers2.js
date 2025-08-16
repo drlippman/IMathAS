@@ -229,7 +229,7 @@ function init(paramarr, enableMQ, baseel) {
         if (params.nopaste) {
             extendsetup['paste_preprocess'] = function(plugin, args) { args.content = '';}
         }
-        extendsetup['valid_classes'] = 'gridded,centered,attach';
+        extendsetup['valid_classes'] = 'gridded,centered,attach,AMedit';
         initeditor("selector","#qn" + qn + ".mceEditor",null,false,function(ed) {
           ed.on('blur', function (e) {
             tinymce.triggerSave();

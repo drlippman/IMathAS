@@ -24,7 +24,7 @@ if ($myrights<20) {
 	$body = _("You need to log in as a teacher to access this page");
 } else {
 	//data manipulation here
-    $useeditor = 1;
+    $useeditor = "noinit";
 
     $cid = Sanitize::courseId($_GET['cid'] ?? 0);
 
