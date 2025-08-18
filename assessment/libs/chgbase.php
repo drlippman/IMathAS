@@ -109,12 +109,16 @@ function draw_mayan_number($n, $width = 50, $mode = 'standard') {
 	return showasciisvg($cmd, $width, $width*$multi, $alt);
 }
 
-function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
+function draw_babylonian_number($n, $height=40, $zeroinmiddle=0) {
 	$alt = 'A Bablyonian number.';
 	$v = [];
-	while ($n > 0) {
-		$v[] = ($n%60);
-		$n = floor($n/60);
+	if ($n == 0) {
+		$v = [0];
+	} else {
+		while ($n > 0) {
+			$v[] = ($n%60);
+			$n = floor($n/60);
+		}
 	}
 	$v = array_reverse($v);
 	$multi = count($v);
@@ -139,7 +143,7 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=false) {
 		$ones = $val%10;
 		$tens = floor($val/10);
 		if ($val == 0) {
-			if ($zeroinmiddle && $k > 0 && $k < $multi-1) {
+			if (($zeroinmiddle == 1 && $k > 0 && $k < $multi-1) || $zeroinmiddle == 2) {
 				$alt .= "Two sideways wedges. ";
 				// todo: add commands
 				$x1 = $xstart;
