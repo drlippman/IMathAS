@@ -752,7 +752,7 @@ if ($hasusername) {
                                     Sanitize::encodeStringForDisplay($lockaidname)), '</p>';
                                 echo '<p><form method=post action="'.$imasroot.'/assess2/endassess.php?cid='.$cid.'&aid='.Sanitize::encodeUrlParam($lockaid).'" ';
                                 echo 'onsubmit="return confirm(\''._('Are you SURE you want to submit the assessment for scoring now? If you do, you will not be able to continue working on the assessment later.').'\')">';
-                                echo '<input type=hidden name=redirect value="'.Sanitize::encodeStringForDisplay($_GET['aid']).'"/>';
+                                echo '<input type=hidden name=redirect value="'.Sanitize::encodeStringForDisplay($_GET['aid'] ?? $studentinfo['lockaid']).'"/>';
                                 echo '<button type=submit>';
                                 echo sprintf(_('Submit <em>%s</em> Now'), Sanitize::encodeStringForDisplay($lockaidname)) . '</button>';
                                 echo '</form>';

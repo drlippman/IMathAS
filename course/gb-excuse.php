@@ -12,6 +12,7 @@ if (!isset($_POST['assesschk'])) { $_POST['assesschk'] = array();}
 if (!isset($_POST['offlinechk'])) { $_POST['offlinechk'] = array();}
 if (!isset($_POST['discusschk'])) { $_POST['discusschk'] = array();}
 if (!isset($_POST['exttoolchk'])) { $_POST['exttoolchk'] = array();}
+if (!isset($_POST['stus'])) { $_POST['stus'] = array();}
 
 if ($calledfrom=='gb' && $_POST['posted']==_("Excuse Grade") && $stu>0) {
 	$vals = array();

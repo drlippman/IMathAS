@@ -899,7 +899,7 @@ function gbstudisp($stu) {
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
             }
-            if (isset($gbt[0][1][$i][17]) && !in_array(strtolower($stusection), $gbt[0][1][$i][17])) {
+            if (isset($gbt[0][1][$i][17]) && !in_array(strtolower($stusection ?? ''), $gbt[0][1][$i][17])) {
                 // is section limited, and this student isn't in the section
                 continue;
             }

@@ -91,7 +91,7 @@ if (!(isset($_GET['cid'])) || !isset($_REQUEST['bid'])) { //if the cid is missin
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
-        if (!is_array($sub[$blockid])) { echo 'Error'; exit; }
+        if (!isset($sub[$blockid]) || !is_array($sub[$blockid])) { echo 'Error'; exit; }
 		$itemname =  $sub[$blockid]['name'];
 	}
 }
