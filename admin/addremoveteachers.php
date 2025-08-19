@@ -63,9 +63,11 @@ if (isset($_POST['remove'])) {
 		$exarr[] = $uid;
 		$exarr[] = $cid;
 	}
-	$ph = Sanitize::generateQueryPlaceholdersGrouped($exarr,2);
-	$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES $ph");
-	$stm->execute($exarr);
+	if (count($exarr) > 0) {
+		$ph = Sanitize::generateQueryPlaceholdersGrouped($exarr,2);
+		$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES $ph");
+		$stm->execute($exarr);
+	}
 	
 	echo json_encode(getTeachers($cid), JSON_HEX_TAG);
 	exit;

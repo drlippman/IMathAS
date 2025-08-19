@@ -922,9 +922,9 @@ class Imathas_LTI_Database implements LTI\Database
     /**
      * Get assessment info, including name, ptsposs, submitby, and dates
      * @param  int   $aid imas_assessments.id
-     * @return array
+     * @return array|false
      */
-    public function get_assess_info(int $aid): array
+    public function get_assess_info(int $aid) //: array|false
     {
         $stm = $this->dbh->prepare('SELECT name,ptsposs,startdate,enddate,date_by_lti,submitby FROM imas_assessments WHERE id=?');
         $stm->execute(array($aid));

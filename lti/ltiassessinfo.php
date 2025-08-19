@@ -49,6 +49,10 @@ if (!empty($_POST['makelineitem'])) {
     $includeempty = !empty($_POST['resyncall']);
     $aid = $link->get_typeid();
     $iteminfo = $db->get_assess_info($aid);
+    if ($iteminfo === false) {
+        echo "Error looking up assessment for lineitem";
+        exit;
+    }
     $scores = $db->get_assess_grades(
         $localcourse->get_courseid(),
         $aid, 

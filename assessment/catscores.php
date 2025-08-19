@@ -7,7 +7,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome,$cid) {
 	if (empty($quests)) {
 		return;
 	}
-	$quests = array_map('intval', $quests);
+	$quests = array_values(array_map('intval', $quests));
 	$ph = Sanitize::generateQueryPlaceholders($quests);
 	$stm = $DBH->prepare("SELECT id,category,points FROM imas_questions WHERE id IN ($ph)");
 	$stm->execute($quests);
