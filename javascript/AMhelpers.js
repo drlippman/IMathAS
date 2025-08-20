@@ -625,7 +625,7 @@ function complexcalc(inputId, outputId, format) {
 			if (err == '') {
 				try {
 					var res = evalMathParser(prep, true);
-					if (isNaN(res)) {
+					if (!Array.isArray(res)) {
 						err += _("syntax incomplete");
 						real = NaN;
 					} else {

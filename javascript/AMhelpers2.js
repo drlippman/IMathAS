@@ -2063,7 +2063,7 @@ function evalcheckcomplex(str, format) {
     // evals
     if (str !== '') {
         var res = evalMathParser(str, true);
-        if (isNaN(res) || res === '') {
+        if (!Array.isArray(res)) {
           err += _("syntax incomplete");
           real = NaN;
         } else {
