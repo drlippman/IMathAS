@@ -121,13 +121,7 @@ function isSVGavailable() {
     	    //IE9+ can do SVG
 	    return null;
     } else {
-	    try	{
-	      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
-		return null;
-	    } catch (e) {
-
-		return 1;
-	    }
+		  return 1;
     }
   } else return 1;
 }
@@ -1090,8 +1084,9 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 
 function slopefield(fun,dx,dy) {
   var g = fun;
-  if (typeof fun=="string")
-    eval("g = function(x,y){ return "+prepWithMath(mathjs(fun,"x|y"))+" }");
+  if (typeof fun=="string") {
+    g = makeMathFunction(g.replace(/Math\./,''), 'x|y');
+  }
   var gxy,x,y,u,v,dz;
   if (dx==null) dx=1;
   if (dy==null) dy=1;
@@ -1100,7 +1095,7 @@ function slopefield(fun,dx,dy) {
   var y_min = dy*Math.ceil(ymin/dy);
   for (x = x_min; x <= xmax; x += dx)
     for (y = y_min; y <= ymax; y += dy) {
-      gxy = g(x,y);
+      gxy = g({x:x,y:y});
       if (!isNaN(gxy)) {
         if (Math.abs(gxy)=="Infinity") {u = 0; v = dz;}
         else {u = dz/Math.sqrt(1+gxy*gxy); v = gxy*u;}
@@ -1116,7 +1111,7 @@ function drawPictures() {
 
 function prepmath(str) {
     if (str === 'null') { return 'null';}
-    return prepWithMath(mathjs(str));
+    return evalMathParser(str);
 }
 
 //ShortScript format:
@@ -1323,13 +1318,15 @@ function drawPics(base) {
 //added min/max type:  0:nothing, 1:arrow, 2:open dot, 3:closed dot
 function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   var pth = [];
-  var f = function(x) { return x }, g = fun;
+  var f = function(obj) { return obj.t }, g = fun;
   var name = null;
-  if (typeof fun=="string")
-    eval("g = function(x){ return "+prepWithMath(mathjs(fun,"x"))+" }");
+  var isParam = (typeof fun=="object");
+  if (typeof fun=="string") {
+    g = makeMathFunction(fun.replace(/Math\./,''), 'x');
+  }
   else if (typeof fun=="object") {
-    eval("f = function(t){ return "+prepWithMath(mathjs(fun[0],"t"))+" }");
-    eval("g = function(t){ return "+prepWithMath(mathjs(fun[1],"t"))+" }");
+    f = makeMathFunction(fun[0].replace(/Math\./,''), 't');
+    g = makeMathFunction(fun[1].replace(/Math\./,''), 't');
   }
   if (typeof x_min=="string") { name = x_min; x_min = xmin }
   else name = id;
@@ -1340,15 +1337,15 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   var inc = max-min-0.000001*(max-min);
   inc = (points==null?inc/200:inc/points);
   var gt;
-//alert(typeof g(min))
+
   for (var t = min; t <= max; t += inc) {
-    gt = g(t);
+    gt = isParam ? g({t:t}) : g({x:t});
     if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) {
 	    if ((pth.length > 0) && (Math.abs(gt-pth[pth.length-1][1]) > (ymax-ymin))) {
 		    if (pth.length > 1)  path(pth,name);
 		    pth.length=0;
 	    } else {
-		    pth[pth.length] = [f(t), gt];
+		    pth[pth.length] = [f({t:t}), gt];
 	    }
     }
   }

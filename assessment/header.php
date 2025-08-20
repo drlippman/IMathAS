@@ -98,19 +98,18 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=081225" type="text/javascript"></script>';
+echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=081925" type="text/javascript"></script>';
 
-
-//assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
+//assessment_min.js bundles: general.js, mathparser.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 /*
 echo '<script src="' . $imasroot . '/javascript/general.js?v=042220" type="text/javascript"></script>';
-echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=20230729" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/mathparser.js?v=081925" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=060920" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/drawing.js?v=042920" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/eqntips.js?v=082616" type="text/javascript"></script>';
-
 */
+
 
 if (isset($_SESSION['ltiitemtype']) && ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3)) {
 	echo '<script type="text/x-mathjax-config">
@@ -188,7 +187,7 @@ if (!isset($_SESSION['mathdisp'])) {
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==0) {
     echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 } else {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=052520\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=082025\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 }
 ?>

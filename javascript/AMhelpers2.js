@@ -1916,25 +1916,27 @@ function processNumfunc(qn, fullstr, format) {
           totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
       }
 
-      totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+      var parser = makeMathFunction(totesteqn, remapVars.join('|'), [], '', format.match(/generalcomplex/));
       successfulEvals = 0;
-      for (j=0; j < 20; j++) {
-          totest = 'var DNE=1;';
-          for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-            if (domain[i][2]) { //integers
-                //testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-                testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*j/20);
-            } else { //any real between min and max
-                //testval = Math.random()*(domain[i][1] - domain[i][0]) + domain[i][0];
-                testval = domain[i][0] + (domain[i][1] - domain[i][0])*j/20;
+      if (parser !== false) {
+        for (j=0; j < 20; j++) {
+            totest = {'DNE': 1};
+            for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+              if (domain[i][2]) { //integers
+                  //testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+                  testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*j/20);
+              } else { //any real between min and max
+                  //testval = Math.random()*(domain[i][1] - domain[i][0]) + domain[i][0];
+                  testval = domain[i][0] + (domain[i][1] - domain[i][0])*j/20;
+              }
+              totest[remapVars[i]] = testval;
             }
-            totest += 'var ' + remapVars[i] + '=' + testval + ';';
-          }
-          res = scopedeval(totest + totesteqn);
-          if (res !== 'synerr') {
-            successfulEvals++;
-            break;
-          }
+            res = parser(totest);
+            if (res !== '' && !isNaN(res)) {
+              successfulEvals++;
+              break;
+            }
+        }
       }
       if (successfulEvals === 0) {
           err += _("syntax error") + '. ';
@@ -2060,16 +2062,13 @@ function evalcheckcomplex(str, format) {
     
     // evals
     if (str !== '') {
-        var prep = prepWithMath(mathjs(str,'i'));
-        var real = scopedeval('var i=0;'+prep);
-        var imag = scopedeval('var i=1;'+prep);
-        var imag2 = scopedeval('var i=-1;'+prep);
-        if (real=="synerr" || imag=="synerr") {
-        err += _("syntax incomplete");
-        real = NaN;
-        }
-        if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
-            imag -= real;
+        var res = evalMathParser(str, true);
+        if (isNaN(res) || res === '') {
+          err += _("syntax incomplete");
+          real = NaN;
+        } else {
+            var real = res[0];
+            var imag = res[1];
             outstr = Math.abs(real)<1e-16?'':real;
             outstrdisp = Math.abs(real)<1e-16?'':roundForDisp(real);
             outstr += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+imag+'i');
@@ -2360,8 +2359,8 @@ function singlevaleval(evalstr, format) {
       evalstr = evalstr.replace("xx","*");
   }
   try {
-    var res = scopedmatheval(evalstr);
-    if (res === '' || typeof res === 'undefined') {
+    var res = evalMathParser(evalstr);
+    if (isNaN(res) || res === '') {
       return [NaN, _("syntax incomplete")+". "];
     }
     return [res, ''];
@@ -2372,30 +2371,6 @@ function singlevaleval(evalstr, format) {
 
 function escapeRegExp(string) {
   return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
-function scopedeval(c) {
-	try {
-    return eval(c);
-    /* we don't check for 
-      if (Number.isNaN(v)) {
-      because we don't want to give away if values just aren't
-      in domain of student's function
-    */
-	} catch(e) {
-		return "synerr";
-	}
-}
-
-function scopedmatheval(c) {
-	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
-		return '';
-    }
-	try {
-		return eval(prepWithMath(mathjs(c)));
-	} catch(e) {
-		return '';
-	}
 }
 
 return {

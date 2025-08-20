@@ -561,7 +561,7 @@ function doonblur(value) {
 	if (value.match(/^\s*X\s*$/i)) {return 'X';}
 	value = value.replace(/\b0+(\d+)/g, '$1');
 	try {
-		return (eval(mathjs(value)));
+		return (evalMathParser(value));
 	} catch (e) {
 		return '';
 	}

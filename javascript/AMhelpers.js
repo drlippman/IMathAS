@@ -611,7 +611,6 @@ function complexcalc(inputId, outputId, format) {
 			if (format.indexOf('mixed') != -1) {
 				prep = prep.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g, "($1+$2/$3)");
 			}
-			var prep = mathjs(prep, 'i');
 			if (format.indexOf("sloppycomplex") == -1) {
 				var cparts = parsecomplex(arr[cnt]);
 				if (typeof cparts == 'string') {
@@ -622,11 +621,17 @@ function complexcalc(inputId, outputId, format) {
 				}
 			}
 			err += syntaxcheckexpr(arr[cnt], format);
+			var real = NaN, imag = NaN;
 			if (err == '') {
 				try {
-					var real = scopedeval('var i=0;' + prepWithMath(prep));
-					var imag = scopedeval('var i=1;' + prepWithMath(prep));
-					var imag2 = scopedeval('var i=-1;' + prepWithMath(prep));
+					var res = evalMathParser(prep, true);
+					if (isNaN(res)) {
+						err += _("syntax incomplete");
+						real = NaN;
+					} else {
+						real = res[0];
+						imag = res[1];
+					}
 				} catch (e) {
 					err += _("syntax incomplete");
 				}
@@ -635,8 +640,7 @@ function complexcalc(inputId, outputId, format) {
 				err += _("syntax incomplete");
 				real = NaN;
 			}
-			if (!isNaN(real) && real != "Infinity" && !isNaN(imag) && !isNaN(imag2) && imag != "Infinity") {
-				imag -= real;
+			if (!isNaN(real) && real != "Infinity" && !isNaN(imag)) {
 				if (cnt != 0) {
 					outcalced += ',';
 				}
@@ -904,7 +908,7 @@ function matrixcalc(inputId, outputId, rows, cols, format) {
 function mathjsformat(inputId, outputId) {
 	var str = document.getElementById(inputId).value;
 	var outnode = document.getElementById(outputId);
-	outnode.value = mathjs(str);
+	outnode.value = str;
 }
 
 function stringqpreview(inputId, outputId) {
@@ -1077,26 +1081,29 @@ function AMpreview(inputId, outputId) {
 	}
 	vars = vl.split('|');
 
-	var totesteqn = prepWithMath(mathjs(str, vl));
+	var parser = makeMathFunction(str, vl);
+	if (parser === false) {
+		err = _("syntax error");
+	} else {
+		while (tstpt < ptlist.length && (isNaN(res) || res == "Infinity")) {
+			var totest = {};
+			testvals = ptlist[tstpt].split("~");
 
-	while (tstpt < ptlist.length && (isNaN(res) || res == "Infinity")) {
-		var totest = '';
-		testvals = ptlist[tstpt].split("~");
-
-		for (var j = 0; j < vars.length; j++) {
-			totest += "var " + vars[j] + "=" + testvals[j] + ";";
+			for (var j = 0; j < vars.length; j++) {
+				totest[vars[j]] = parseFloat(testvals[j]) ?? 1;
+			}
+			err = _("syntax ok");
+			try {
+				var res = parser(totest);
+			} catch (e) {
+				console.log(e);
+				err = _("syntax error");
+			}
+			if (res == "synerr") {
+				err = _("syntax error");
+			}
+			tstpt++;
 		}
-		totest += totesteqn;
-		err = _("syntax ok");
-		try {
-			var res = scopedeval(totest);
-		} catch (e) {
-			err = _("syntax error");
-		}
-		if (res == "synerr") {
-			err = _("syntax error");
-		}
-		tstpt++;
 	}
 
 	var formaterr = syntaxcheckexpr(str, "", vl);
@@ -1458,23 +1465,23 @@ function doonsubmit(form, type2, skipconfirm) {
 		}
 		vars = varlist.split("|");
 		var nh = document.getElementById("qn" + qn);
-		nh.value = mathjs(str, varlist);
+		nh.value = str;
+		parser = makeMathFunction(str, varlist);
 		ptlist = pts[qn].split(",");
 		vals = new Array();
 		for (var fj = 0; fj < ptlist.length; fj++) { //for each set of inputs
 			inputs = ptlist[fj].split("~");
-			totest = '';
+			var totest = {DNE:1};
 			for (var fk = 0; fk < inputs.length; fk++) {
 				//totest += varlist.charAt(k) + "=" + inputs[k] + ";";
-				totest += "var " + vars[fk] + "=" + inputs[fk] + ";";
+				totest[vars[fk]] = parseFloat(inputs[fk]);
 			}
-			if (nh.value == '') {
-				totest += Math.random() + ";";
-			} else {
-				totest += prepWithMath(nh.value) + ";";
+			if (str === '' || parser === false) {
+				vals[fj] = NaN;
+				continue;
 			}
 			try {
-				vals[fj] = scopedeval(totest);
+				vals[fj] = parser(totest);
 			} catch (e) {
 				vals[fj] = NaN;
 			}
@@ -1487,20 +1494,12 @@ function doonsubmit(form, type2, skipconfirm) {
 	return true;
 }
 
-function scopedeval(c) {
-	try {
-		return eval(c);
-	} catch (e) {
-		return "synerr";
-	}
-}
-
 function scopedmatheval(c) {
 	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
 		return '';
 	}
 	try {
-		return eval(prepWithMath(mathjs(c)));
+		return evalMathParser(c);
 	} catch (e) {
 		return '';
 	}

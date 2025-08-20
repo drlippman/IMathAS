@@ -15,7 +15,6 @@ if (isset($CFG['hooks']['header'])) {
 ?>
 <head>
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
-<meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <?php
@@ -241,9 +240,9 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==0) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"none\";function rendermathnode(el,callback) {if(typeof callback=='function'){callback();}}</script>";
 }
-echo "<script src=\"$staticroot/javascript/mathjs_min.js?v=20250308\" type=\"text/javascript\"></script>\n";
+echo "<script src=\"$staticroot/javascript/mathparser_min.js?v=081925\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=032925\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=081925\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {

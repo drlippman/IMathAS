@@ -485,13 +485,13 @@ function encodea11ydraw(qn) {
 					input[i-1] = 1;
 				} else {
 					try {
-						input[i-1] = eval(prepWithMath(mathjs(input[i-1])));
+						input[i-1] = evalMathParser(input[i-1]);
 					} catch(e) {
 						input[i-1] = NaN;
 					}
 				}
 				try {
-					input[i] = eval(prepWithMath(mathjs(input[i])));
+					input[i] = evalMathParser(input[i]);
 				} catch(e) {
 					input[i] = NaN;
 				}

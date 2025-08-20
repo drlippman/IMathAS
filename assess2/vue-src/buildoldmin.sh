@@ -4,7 +4,7 @@ rm ../../javascript/assessment_min.js
 
 declare -a filename
 filename[0]=javascript/general
-filename[1]=javascript/mathjs
+filename[1]=javascript/mathparser
 filename[2]=javascript/AMhelpers
 filename[3]=javascript/confirmsubmit
 filename[4]=javascript/drawing
