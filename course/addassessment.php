@@ -288,7 +288,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 
         $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
-        $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
+        $copyFromId = Sanitize::onlyInt($_POST['copyfrom'] ?? 0);
         if (!empty($copyFromId)) {
                 $stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome,extrefs FROM imas_assessments WHERE id=:id");
                 $stm->execute(array(':id'=>$copyFromId));

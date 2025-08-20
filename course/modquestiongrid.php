@@ -237,7 +237,6 @@ if (isset($_POST['checked'])) { //modifying existing
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						$qrows[$row['id']] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
@@ -313,7 +312,6 @@ if (isset($_POST['checked'])) { //modifying existing
 							$hasother = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
 						echo "<td><img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}
