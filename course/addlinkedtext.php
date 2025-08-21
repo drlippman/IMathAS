@@ -231,7 +231,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 					} else {
 						// no file id - old file, so do it the old way
-						$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
+						$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text LIMIT 2");
 						$stm->execute(array(':text'=>$text));
 						if ($stm->rowCount()==1) {
 							//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
