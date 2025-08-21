@@ -690,7 +690,7 @@ function filePickerCallBack(callback, value, meta) {
         }
 	});
 }
-const image_upload_handler = (blobInfo, progress) => new Promise((resolve, reject) => {
+const image_upload_handler = (blobInfo, progress, isattach) => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest();
 
   xhr.withCredentials = false;
@@ -735,6 +735,9 @@ const image_upload_handler = (blobInfo, progress) => new Promise((resolve, rejec
 		filename = filename.replace(/\.\w+$/,'.jpg');
 	}
 	formData.append('file', res, filename);
+	if (isattach === true) {
+		formData.append('type', 'attach');
+	}
   	xhr.send(formData);
   });
   

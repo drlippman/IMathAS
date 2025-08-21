@@ -30,6 +30,7 @@ if (isset($_POST['remove'])) {
 
   reset ($_FILES);
   if (count($_FILES)==0) {
+    error_log('upload_handler fail: upload empty');
     header("HTTP/1.0 500 Upload failed.");
     exit;
   }
@@ -92,10 +93,12 @@ if (isset($_POST['remove'])) {
       // { location : '/your/uploaded/image/file'}
       echo json_encode(array('location' => getuserfileurl("ufiles/$userid/".$filename)));
     } else {
+      error_log('upload_handler failed to save: ' . print_r($temp, true));
       header("HTTP/1.0 500 Unable to Save");
     }
   } else {
     // Notify editor that the upload failed
+    error_log('upload_handler fail: not is_uploaded_file: ' . print_r($temp, true));
     header("HTTP/1.0 500 Server Error");
   }
 ?>

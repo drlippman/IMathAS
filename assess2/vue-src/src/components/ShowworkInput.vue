@@ -192,7 +192,7 @@ export default {
           this.updateValueFromFilelist();
           // actually delete file, if possible
           window.$.ajax({
-            url: store.APIbase + '../tinymce4/upload_handler.php',
+            url: store.APIbase + '../tinymce8/upload_handler.php',
             type: 'POST',
             dataType: 'json',
             data: { remove: todel },
