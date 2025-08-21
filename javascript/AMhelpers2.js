@@ -1909,14 +1909,7 @@ function processNumfunc(qn, fullstr, format) {
         err += _("syntax error: this is not an inequality")+ '. ';
     }
     if (!format.match(/generalcomplex/)) {
-      if (fvars.length > 0) {
-          reg = new RegExp("("+fvars.join('|')+")\\(","g");
-          totesteqn = totesteqn.replace(/\w+/g, functoindex); // avoid sqrt(3) matching t() funcvar
-          totesteqn = totesteqn.replace(reg,"$1*sin($1+");
-          totesteqn = totesteqn.replace(/@(\d+)@/g, indextofunc);
-      }
-
-      var parser = makeMathFunction(totesteqn, remapVars.join('|'), [], '', format.match(/generalcomplex/));
+      var parser = makeMathFunction(totesteqn, remapVars.join('|'), [], fvars.join('|'), format.match(/generalcomplex/));
       successfulEvals = 0;
       if (parser !== false) {
         for (j=0; j < 20; j++) {
