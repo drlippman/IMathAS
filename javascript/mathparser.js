@@ -259,6 +259,7 @@ MathParser.prototype.initializeOperators = function () {
 
 MathParser.prototype.parse = function (str) {
   this.origstr = str;
+  str = str.replace(/Math\./g,'');
   str = str.replace(/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/g, 'arc$2');
   str = str.replace(/[\\[\]`]/g, '').replace(/[\[\]]/g, '()');
   // Handle |x| as abs(x)

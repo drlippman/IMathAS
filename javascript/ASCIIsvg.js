@@ -1085,7 +1085,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 function slopefield(fun,dx,dy) {
   var g = fun;
   if (typeof fun=="string") {
-    g = makeMathFunction(g.replace(/Math\./,''), 'x|y');
+    g = makeMathFunction(g.replace(/Math\./g,''), 'x|y');
   }
   var gxy,x,y,u,v,dz;
   if (dx==null) dx=1;
@@ -1322,11 +1322,11 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   var name = null;
   var isParam = (typeof fun=="object");
   if (typeof fun=="string") {
-    g = makeMathFunction(fun.replace(/Math\./,''), 'x');
+    g = makeMathFunction(fun.replace(/Math\./g,''), 'x');
   }
   else if (typeof fun=="object") {
-    f = makeMathFunction(fun[0].replace(/Math\./,''), 't');
-    g = makeMathFunction(fun[1].replace(/Math\./,''), 't');
+    f = makeMathFunction(fun[0].replace(/Math\./g,''), 't');
+    g = makeMathFunction(fun[1].replace(/Math\./g,''), 't');
   }
   if (typeof x_min=="string") { name = x_min; x_min = xmin }
   else name = id;
