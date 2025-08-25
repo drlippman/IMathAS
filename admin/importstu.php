@@ -86,7 +86,10 @@ $isadmin = false;
 //data manipulation here
 
 	//CHECK PERMISSIONS AND SET FLAGS
-if (!(isset($teacherid)) && $myrights<100) {
+if ($myrights < 100 && empty($CFG['GEN']['allowinstraddstus'])) {
+	$overwriteBody = 1;
+	$body = "You do not have access to this page";
+} elseif (!(isset($teacherid)) && $myrights<100) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <100) {
