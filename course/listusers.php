@@ -39,7 +39,7 @@ $hasInclude = 0;
 $istutor = isset($tutorid);
 $isteacher = isset($teacherid);
 if (!isset($CFG['GEN']['allowinstraddstus'])) {
-	$CFG['GEN']['allowinstraddstus'] = true;
+	$CFG['GEN']['allowinstraddstus'] = false;
 }
 if (!isset($CFG['GEN']['allowinstraddtutors'])) {
 	$CFG['GEN']['allowinstraddtutors'] = true;
