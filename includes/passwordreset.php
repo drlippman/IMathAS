@@ -60,6 +60,10 @@ function verify_pwreset_link($JWT) {
     $stm->execute([$payload->uid]);
     list($code,$email) = $stm->fetch(PDO::FETCH_NUM);
 
+    if ($code == '') {
+        echo 'Reset link not valid';
+        exit;
+    }
     // now verify signature
     $payload = JWT::decode($JWT, $code);
 
