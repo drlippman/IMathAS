@@ -416,6 +416,44 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
+	} else if (isset($_POST['posted']) && $_POST['posted']=='maketutor' && count($_POST['checked'])> 0) {
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Add Tutors\n";
+		$pagetitle = "Add Tutors";
+
+		// get stu info
+		$stus = array_map('intval', $_POST['checked']);
+		$ph = Sanitize::generateQueryPlaceholders($stus);
+		$stm = $DBH->prepare("SELECT iu.FirstName,iu.LastName,iu.id FROM imas_users AS iu 
+							  JOIN imas_students AS istu ON istu.userid=iu.id
+							  WHERE iu.id IN ($ph) AND istu.courseid=?");
+		$stm->execute(array_merge($stus, [$cid]));
+		$stusToPromote = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+		// get section info
+		$isdiag = false;
+		$sections = array();
+		//if diagnostic, then we'll use level-2 selectors in place of sections.  level-2 selector is recorded into the
+		//imas_students.section field, so filter will act the same.
+		$stm = $DBH->prepare("SELECT sel2name,sel2list FROM imas_diags WHERE cid=:cid");
+		$stm->execute(array(':cid'=>$cid));
+		if ($stm->rowCount()>0) {
+			$isdiag = true;
+			list($limitname,$sel2list) = $stm->fetch(PDO::FETCH_NUM);
+			$sel2list = str_replace('~',';',$sel2list);
+			$sections = array_unique(explode(';',$sel2list));
+		}
+
+		//if not diagnostic, we'll work off the sections
+		if (!$isdiag) {
+			$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid AND section IS NOT NULL");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$sections[] = $row[0];
+			}
+			$limitname = "Section";
+
+		}
+		sort($sections);
 	} else { //DEFAULT DATA MANIPULATION HERE
 
 		$curBreadcrumb .= " Roster\n";
@@ -704,6 +742,44 @@ if ($overwriteBody==1) {
         );
 		require_once "../includes/newusercommon.php";
 		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
+	} else if (isset($_POST['posted']) && $_POST['posted']=='maketutor' && count($_POST['checked'])> 0) {
+		echo '<form enctype="multipart/form-data" id=pageform method=post action="managetutors.php?cid='.$cid.'">';
+
+		echo '<p class=noticetext style="font-size:150%">Warning</p>';
+		echo '<p>To promote these students to a tutor, they will have to be un-enrolled as a student, ';
+		echo '<span class="noticetext">which will DELETE ALL their student data</span>, including assessment scores. ';
+		echo 'If you are SURE you want to do this, check the boxes next to each student.</p>';
+		echo '<p>Un-enroll as a student and add as a tutor:</p>';
+
+		echo '<table class="gb">
+    		<caption class="sr-only">Potential Tutors</caption>
+			<thead>
+				<tr>
+					<th>'._('Add as tutor?').'</th>
+					<th>'._('Name').'</th>
+					<th>'._('Limit to').' '. Sanitize::encodeStringForDisplay($limitname). '</th>
+				</tr>
+			</thead>
+			<tbody>';
+
+		foreach ($stusToPromote as $k=>$u) {
+			echo '<tr>';
+			echo '<td><input type=checkbox name="promotetotutor[]" value="'.intval($u['id']).'" id="cb'.intval($k).'"></td>';
+			echo '<td class="pii-full-name"><label id="n'.intval($k).'" for="cb'.intval($k).'">';
+			echo Sanitize::encodeStringForDisplay($u['LastName'] . ', ' . $u['FirstName']);
+			echo '</label></td>';
+			echo '<td>';
+			echo '<select name="section['.Sanitize::encodeStringForDisplay($u['id']).']" aria-labelledby="n'.intval($k).'">';
+			echo '<option value="">All</option>';
+			foreach ($sections as $sec) {
+				echo '<option value="'.Sanitize::encodeStringForDisplay($sec).'">'.Sanitize::encodeStringForDisplay($sec).'</option>';
+			}
+			echo '</select></td></tr>';
+		}
+		echo '</tbody></table>';
+
+		echo '<p><button type=submit name=submit value=submit>Submit</button></p>';
+		echo '</form>';
 	} else {
 ?>
 
@@ -799,6 +875,9 @@ if ($overwriteBody==1) {
 	echo ' <li><a href="#" onclick="postWithSelform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
 	echo ' <li><a href="#" onclick="postWithSelform(\'Lock\');return false;" title="',_("Lock selected students out of the course"),'">', _('Lock'), "</a></li>";
 	echo ' <li><a href="#" onclick="postWithSelform(\'Unlock\');return false;" title="',_("Un-Lock selected students from the course"),'">', _('Un-Lock'), "</a></li>";
+	if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
+		echo ' <li><a href="#" onclick="postWithSelform(\'maketutor\');return false;" title="',_("Promote students to tutors"),'">', _('Add as Tutors'), "</a></li>";
+	}
 
 	if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 		echo '<li role="separator" class="divider"></li>';
