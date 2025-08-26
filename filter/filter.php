@@ -81,6 +81,13 @@
 		$w = preg_replace('/.*\bwidth\s*=\s*.?(\d+).*/',"$1",$arr[0]);
 		$h = preg_replace('/.*\bheight\s*=\s*.?(\d+).*/',"$1",$arr[0]);
 
+		if ($w === $arr[0]) {
+			$w = 200;
+		}
+		if ($h === $arr[0]) {
+			$h = 200;
+		}
+
 		if (strpos($arr[0],'style')!==FALSE) {
 			$sty = preg_replace('/.*style\s*=\s*(.)(.+?)\1.*/',"$2",$arr[0]);
 		} else {
