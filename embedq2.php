@@ -339,6 +339,8 @@ $placeinhead .= '<script type="text/javascript">
         element_id: "' . $frameid . '",
         frame_id: "' . $frameid . '"
       }), "*");
+   } else {
+    $("body").css("overflow-y", "auto");
    }
   }
   $(function() {
