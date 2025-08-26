@@ -14,6 +14,7 @@ function showUserPrefsForm() {
         '1'=>_('MathJax 2'),
         '7'=>_('MathJax 3'),
         '8'=>_('MathJax 3, with screenreader support pre-enabled'),
+		'9'=>_('MathJax 4'),
 		'6'=>_('Katex - faster display'),
 		'2'=>_('Image-based display'),
 		'0'=>_('Calculator-style linear display, like x^2/3'));
