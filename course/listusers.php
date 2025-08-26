@@ -228,7 +228,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$jsondata = [];
 			}
 			$chglog = [];
-			if (isset($_POST['SID']) && (
+			if ($olddata['rights'] < $myrights && isset($_POST['SID']) && (
 				$_POST['SID'] != $olddata['SID'] || $_POST['firstname'] != $olddata['FirstName'] || $_POST['lastname'] != $olddata['LastName'] ||
 				$_POST['email'] != $olddata['email'] || isset($_POST['doresetpw'])
 			)) {
