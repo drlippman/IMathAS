@@ -293,7 +293,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					fwrite($fp,' <url href="'.htmlentities($alink,ENT_XML1,'UTF-8',false).'" target="_blank"/>');
 					fwrite($fp,'</webLink>');
 					fclose($fp);
-					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" description="&lt;div&gt;'. htmlentities(str_replace("\n","",$row[2]),ENT_QUOTES|ENT_XML1,'UTF-8',false) .'&lt;/div&gt;">'."\n";
+					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
 					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
