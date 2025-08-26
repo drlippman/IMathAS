@@ -263,7 +263,18 @@ MathParser.prototype.parse = function (str) {
   str = str.replace(/(ar|arg)(sinh|cosh|tanh|sech|csch|coth)/g, 'arc$2');
   str = str.replace(/[\\[\]`]/g, '').replace(/[\[\]]/g, '()');
   // Handle |x| as abs(x)
-  str = str.replace(/(?<!\|)\|([^|]+?)\|(?!\|)/g, 'abs($1)');
+  // ES2018; not all support yet
+  // str = str.replace(/(?<!\|)\|([^|]+?)\|(?!\|)/g, 'abs($1)');
+  str = str.replace(/\|\|/g, '###DOUBLE_PIPE###');
+  str = str.replace(/\|([^\|]+?)\|/g, function(match, content) {
+    // Additional check: avoid replacing if content contains ###DOUBLE_PIPE###
+    if (content.indexOf('###DOUBLE_PIPE###') !== -1) {
+      return match; // Don't replace this one
+    }
+    return 'abs(' + content + ')';
+  });
+  // Restore || operators
+  str = str.replace(/###DOUBLE_PIPE###/g, '||');
 
   this.tokenize(str);
   this.handleImplicit();
@@ -288,7 +299,7 @@ MathParser.prototype.evaluate = function (variableValues) {
   if (this.AST.length === 0) {
     return '';
   }
-  let out = this.evalNode(this.AST);
+  var out = this.evalNode(this.AST);
   if (this.docomplex && !Array.isArray(out)) {
     out = [out, 0];
   }
@@ -307,21 +318,21 @@ MathParser.prototype.tokenize = function (str) {
   str = str.replace(this.funcregex, function (match) { return match.toLowerCase(); });
   var tokens = [];
   var len = str.length;
-  let lastTokenType = '';
+  var lastTokenType = '';
 
-  for (let n = 0; n < len; n++) {
+  for (var n = 0; n < len; n++) {
     var c = str[n];
 
     if (/\s/.test(c)) {
       continue;
     } else if (/[\d.]/.test(c)) {
-      let pattern;
+      var pattern;
       if (this.allowEscinot) {
         pattern = /^(\d*\.?\d*(E[+-]?\d+(?!\.))?)/;
       } else {
         pattern = /^(\d*\.?\d*)/;
       }
-      var matches = str.substr(n).match(pattern);
+      var matches = str.substring(n).match(pattern);
 
       if (matches[1] === '.') continue;
 
@@ -333,10 +344,10 @@ MathParser.prototype.tokenize = function (str) {
       n += matches[1].length - 1;
       continue;
     } else if (['|', '&', '#', '<', '>'].indexOf(c) !== -1 &&
-      this.operators[str.substr(n, 2)]) {
+      this.operators[str.substring(n, n+2)]) {
       tokens.push({
         type: 'operator',
-        symbol: str.substr(n, 2)
+        symbol: str.substring(n, n+2)
       });
       n++;
       lastTokenType = 'operator';
@@ -349,7 +360,7 @@ MathParser.prototype.tokenize = function (str) {
       lastTokenType = 'operator';
       continue;
     } else {
-      var matches = str.substr(n).match(this.regex);
+      var matches = str.substring(n).match(this.regex);
       if (matches) {
         var nextSymbol = matches[1];
 
@@ -412,7 +423,7 @@ MathParser.prototype.tokenize = function (str) {
           var peek = str[n + 1];
 
           if (nextSymbol === 'log' && peek === '_') {
-            var sub = str.substr(n + 2).match(this.numvarregex);
+            var sub = str.substring(n + 2).match(this.numvarregex);
             if (sub) {
               tokens[tokens.length - 1].index = {
                 type: isNaN(sub[1]) ? 'variable' : 'number',
@@ -424,7 +435,7 @@ MathParser.prototype.tokenize = function (str) {
               n += 1;
             }
           } else if (peek === '^') {
-            var sub = str.substr(n + 2).match(/^(-?\d+|\((-?\d+)\))/);
+            var sub = str.substring(n + 2).match(/^(-?\d+|\((-?\d+)\))/);
             if (sub) {
               tokens[tokens.length - 1].symbol += '^' + (sub[2] || sub[1]);
               n += sub[1].length + 1;
@@ -433,7 +444,7 @@ MathParser.prototype.tokenize = function (str) {
             if (peek === '(') {
               tokens[tokens.length - 1].symbol += '(';
             } else {
-              var sub = str.substr(n + 1).match(/^[\(\[]*(-?\d+)[\)\]]*/);
+              var sub = str.substring(n + 1).match(/^[\(\[]*(-?\d+)[\)\]]*/);
               if (sub) {
                 tokens[tokens.length - 1] = {
                   type: 'function',
@@ -463,7 +474,7 @@ MathParser.prototype.tokenize = function (str) {
 
 MathParser.prototype.handleImplicit = function () {
   var out = [];
-  let lastToken = { type: '', symbol: '' };
+  var lastToken = { type: '', symbol: '' };
 
   for (var i=0; i < this.tokens.length; i++) {
     var token = this.tokens[i];
@@ -493,9 +504,9 @@ MathParser.prototype.handleImplicit = function () {
 MathParser.prototype.buildTree = function () {
   this.operatorStack = [];
   this.operandStack = [];
-  let lastNode = null;
+  var lastNode = null;
 
-  for (let tokenindex = 0; tokenindex < this.tokens.length; tokenindex++) {
+  for (var tokenindex = 0; tokenindex < this.tokens.length; tokenindex++) {
     var token = this.tokens[tokenindex];
 
     if (token.symbol === ')') {
@@ -618,8 +629,8 @@ MathParser.prototype.handleExpression = function (node) {
 }
 
 MathParser.prototype.handleSubExpression = function (tokenindex) {
-  let clean = false;
-  let popped;
+  var clean = false;
+  var popped;
 
   while ((popped = this.operatorStack.pop())) {
     if (popped.symbol === '(') {
@@ -729,12 +740,12 @@ MathParser.prototype.evalNode = function (node) {
     }
   } else if (node.type === 'function') {
     var insideval = this.evalNode(node.input);
-    let indexval;
+    var indexval;
     if (node.index) {
       indexval = this.evalNode(node.index);
     }
 
-    let funcname = node.symbol;
+    var funcname = node.symbol;
 
     // Domain checks for real functions
     if (!this.docomplex) {
@@ -837,7 +848,7 @@ MathParser.prototype.callFunction = function (funcname) {
   }
 
   if (tocall !== null) {
-    let args = [];
+    var args = [];
     if (arguments.length > 1) {
       args = Array.prototype.slice.call(arguments, 1);
     }
@@ -858,7 +869,7 @@ MathParser.prototype.isMultiple = function (a, b) {
 function factorial(x) {
   if (x < 0) return false;
   if (x === 0) return 1;
-  for (let i = x - 1; i > 0; i--) {
+  for (var i = x - 1; i > 0; i--) {
     x *= i;
   }
   return x;
@@ -897,7 +908,7 @@ function safepow(base, power) {
     return NaN;
   }
   if (base < 0 && Math.floor(power) !== power) {
-    for (let j = 3; j < 50; j += 2) {
+    for (var j = 3; j < 50; j += 2) {
       if (Math.abs(Math.round(j * power) - (j * power)) < 0.000001) {
         if (Math.round(j * power) % 2 === 0) {
           return Math.exp(power * Math.log(Math.abs(base)));
