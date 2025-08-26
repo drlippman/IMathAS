@@ -788,6 +788,7 @@ class ScoreEngine
             ->setAnswerType($qdata['qtype'])
             ->setIsMultiPartQuestion(false);
 
+        $scorePartResults = false;
         try {
             $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
             $scorePartResult = $scorePart->getResult();
@@ -801,7 +802,6 @@ class ScoreEngine
                 . ' of '
                 . basename($t->getFile())
                 );
-            $score = 0;
         }
 
         if (isset($scoremethod) && $scoremethod == "allornothing") {
@@ -809,13 +809,18 @@ class ScoreEngine
                 $score = 0;
             }
         }
-
         $returnData = array(
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 3)),
-            'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
-            'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
-            'correctAnswerWrongFormat' => array($scorePartResult->getCorrectAnswerWrongFormat()),
+            'lastAnswerAsGiven' => array(
+                $scorePartResult !== false ? $scorePartResult->getLastAnswerAsGiven() : ''
+            ),
+            'lastAnswerAsNumber' => array(
+                $scorePartResult !== false ? $scorePartResult->getLastAnswerAsNumber() : ''
+            ),
+            'correctAnswerWrongFormat' => array(
+                $scorePartResult !== false ? $scorePartResult->getCorrectAnswerWrongFormat() : false
+            ),
             'answeights' => array(1)
         );
 
