@@ -30,14 +30,15 @@ if (isset($_POST['state'])) {
     $QS = $_GET;
 }
 
-if (empty($QS['id'])) {
-    echo 'Need to supply an id';
-    exit;
-}
 if (!is_array($QS['id'])) {
     $QS['id'] = explode('-', $QS['id']);
 }
 $QS['id'] = array_filter(array_map('trim', $QS['id']), 'is_numeric');
+
+if (empty($QS['id'])) {
+    echo 'Need to supply an id';
+    exit;
+}
 
 // set user preferences
 $prefdefaults = array(

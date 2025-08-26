@@ -291,7 +291,9 @@
 		}
 	}
 
-	printchildren(0);
+	if (!empty($children[0])) {
+		printchildren(0);
+	}
 
 	echo "<script type=\"text/javascript\">";
 	echo "var bcnt =".$bcnt."; var icnt = $icnt;\n";

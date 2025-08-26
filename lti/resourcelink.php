@@ -31,7 +31,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         // see if aid is in the current course, we just use it
         $link = $db->make_link_assoc($sourceaid,'assess',$resource_link['id'],$contextid,$platform_id);
         $iteminfo = $db->get_assess_info($sourceaid);
-        if ($iteminfo === 'false') {
+        if ($iteminfo === false) {
           echo 'Assessment this link points to no longer exists';
           exit;
         }
