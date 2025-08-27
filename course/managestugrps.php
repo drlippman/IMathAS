@@ -116,21 +116,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit();
 	} else if (isset($_GET['addstutogrp']) && !empty($_POST['stutoadd'])) {
 		//submitting list of students to add to a group
-		$stustoadd = filter_users_by_course($_POST['stutoadd'], $cid);
-		
+		$stustoadd = $_POST['stutoadd'];
+		if (!is_array($stustoadd)) {
+			$stustoadd = explode(',',$stustoadd);
+		}
+		$stustoadd = filter_users_by_course($stustoadd, $cid);
+		$stulist = implode(',', array_map('intval', $stustoadd));
+
 		if ($_POST['addtogrpid']=='--new--') {
 			//adding a new group; need to ask for group
 			$_GET['addgrp'] = true;
-			$stulist = implode(',',$stustoadd);
 		} else {
 			$grpid = Sanitize::onlyInt($_POST['addtogrpid']);
 			$loginfo = "instr adding stu to group $grpid. ";
-			if (!is_array($stustoadd)) {
-				$stustoadd = explode(',',$stustoadd);
-			}
-
+			
 			$alreadygroupedstu = array();
-			$stulist = implode(',', array_map('intval', $stustoadd));
 			$query = "SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id ";
 			$query .= "WHERE i_sg.groupsetid=:groupsetid AND i_sgm.userid IN ($stulist)";
 			$stm = $DBH->prepare($query);
