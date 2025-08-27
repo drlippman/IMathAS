@@ -83,15 +83,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "ON iq.assessmentid=ia.id JOIN imas_courses AS ic ";
 			$query .= "ON ia.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
 			$stm = $DBH->prepare($query);
-			$stm->execute($userid, $rubid);
+			$stm->execute([$userid, $rubid]);
 			$query = "UPDATE imas_gbitems AS ig JOIN imas_courses AS ic ";
 			$query .= "ON ig.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
 			$stm = $DBH->prepare($query);
-			$stm->execute($userid, $rubid);
+			$stm->execute([$userid, $rubid]);
 			$query = "UPDATE imas_forums AS if JOIN imas_courses AS ic ";
 			$query .= "ON if.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
 			$stm = $DBH->prepare($query);
-			$stm->execute($userid, $rubid);
+			$stm->execute([$userid, $rubid]);
 			// This is too inefficient to run
 			/*$stm = $DBH->prepare("UPDATE imas_questions SET rubric=0 WHERE rubric=?");
 			$stm->execute(array($rubid));
