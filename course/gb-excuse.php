@@ -2,6 +2,8 @@
 //IMathAS: Excuse Assignment
 //(c) 2018 David Lippman
 
+require_once __DIR__ . '/../includes/checkdata.php';
+
 if (!isset($imasroot)) {
 	echo "This file cannot be called directly";
 	exit;
@@ -13,6 +15,22 @@ if (!isset($_POST['offlinechk'])) { $_POST['offlinechk'] = array();}
 if (!isset($_POST['discusschk'])) { $_POST['discusschk'] = array();}
 if (!isset($_POST['exttoolchk'])) { $_POST['exttoolchk'] = array();}
 if (!isset($_POST['stus'])) { $_POST['stus'] = array();}
+
+if (!empty($_POST['assesschk'])) {
+	$_POST['assesschk'] = filter_items_by_course($_POST['assesschk'], 'imas_assessments', $cid);
+}
+if (!empty($_POST['offlinechk'])) {
+	$_POST['offlinechk'] = filter_items_by_course($_POST['offlinechk'], 'imas_gbitems', $cid);
+}
+if (!empty($_POST['discusschk'])) {
+	$_POST['discusschk'] = filter_items_by_course($_POST['discusschk'], 'imas_forums', $cid);
+}
+if (!empty($_POST['exttoolchk'])) {
+	$_POST['exttoolchk'] = filter_items_by_course($_POST['exttoolchk'], 'imas_linkedtext', $cid);
+}
+if (!empty($_POST['stus'])) {
+	$_POST['stus'] = filter_users_by_course($_POST['stus'], $cid);
+}
 
 if ($calledfrom=='gb' && $_POST['posted']==_("Excuse Grade") && $stu>0) {
 	$vals = array();

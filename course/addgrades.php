@@ -186,9 +186,12 @@
         $assesssnappts = (float) Sanitize::onlyFloat($_POST['assesssnappts']);
 
 		//doing assessment snapshot
-		$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=:assessmentid");
+		$stm = $DBH->prepare("SELECT ver,courseid FROM imas_assessments WHERE id=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$assesssnapaid));
-		$aver = $stm->fetchColumn(0);
+		list($aver,$sourcecid) = $stm->fetch(PDO::FETCH_NUM);
+		if ($sourcecid !== $cid) { 
+			exit;
+		}
 		if ($aver == 1) {
 			$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 		} else {
@@ -251,12 +254,17 @@
 		}
 	} else {
 		///regular submit
+		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
+		$stm->execute([$cid]);
+		$allstusincourse = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+
 		$submittedexcusals = array();
 		$submittedstu = array();
 		if (isset($_POST['score'])) {
 
 			foreach($_POST['score'] as $k=>$sc) {
 				if (trim($k)=='') { continue;}
+				if (!in_array($k, $allstusincourse)) { continue; }
 				$submittedstu[] = $k;
 				$sc = trim($sc);
 				if (strtolower($sc)=='x') {
@@ -284,6 +292,7 @@
 
 		if (isset($_POST['newscore'])) {
 			foreach($_POST['newscore'] as $k=>$sc) {
+				if (!in_array($k, $allstusincourse)) { continue; }
 				if (trim($k)=='') {continue;}
 				$submittedstu[] = $k;
 				$sc = trim($sc);
@@ -312,8 +321,9 @@
 			$vals = array();
 			$now = time();
 			foreach($submittedexcusals as $stu) {
+				if (!in_array($stu, $allstusincourse)) { continue; }
 				array_push($vals, $stu, $cid, 'O', $gbItem, $now);
-	}
+			}
 			if (count($vals)>0) {
 				$ph = Sanitize::generateQueryPlaceholdersGrouped($vals, 5);
 				$stm = $DBH->prepare("REPLACE INTO imas_excused (userid, courseid, type, typeid, dateset) VALUES $ph");

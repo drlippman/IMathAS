@@ -137,6 +137,14 @@ if ($canviewall) {
 
 if ($canviewall && !empty($_GET['stu'])) {
 	$stu = Sanitize::onlyInt($_GET['stu']);
+	if (!empty($_POST)) { 
+		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE userid=? AND courseid=?");
+		$stm->execute([$stu, $cid]);
+		$stu = $stm->fetchColumn(0);
+		if ($stu === false) {
+			exit;
+		}
+	}
 } else {
 	$stu = 0;
 }
@@ -243,8 +251,14 @@ if ($isteacher) {
 		$stm->execute(array(':gbcomment'=>$_POST['usrcomments'], ':gbinstrcomment'=>$_POST['instrnote'], ':userid'=>$stu, ':courseid'=>$cid));
 		//echo "<p>Comment Updated</p>";
 	}
+	if ($stu > 0 && (isset($_POST['score']) || isset($_POST['newscore']))) {
+		$stm = $DBH->prepare("SELECT id FROM imas_gbitems WHERE courseid=?");
+		$stm->execute([$cid]);
+		$allgbitems = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+	}
 	if (isset($_POST['score']) && $stu>0) {
 		foreach ($_POST['score'] as $id=>$val) {
+			if (!in_array($id, $allgbitems)) { continue; }
 			if (trim($val)=='') {
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
 				$stm->execute(array(':userid'=>$stu, ':gradetypeid'=>$id));
@@ -259,6 +273,7 @@ if ($isteacher) {
 		$toins = array();
 		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
+			if (!in_array($id, $allgbitems)) { continue; }
 			if (trim($val)=="") {continue;}
 			$toins[] = "(?,?,?,?)";
 			array_push($qarr, $id, 'offline', $stu, $val);
