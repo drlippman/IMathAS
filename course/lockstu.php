@@ -4,7 +4,9 @@
 //  The isset($teacherid) check blocks access if accessed directly
 //(c) 2013 David Lippman
 
-
+if (!isset($userid)) {
+	exit;
+}
 ini_set("max_execution_time", "600");
 
 	if (!(isset($teacherid))) {
@@ -63,15 +65,26 @@ ini_set("max_execution_time", "600");
 		if ($get_uid=="selected") {
 			if (!empty($_POST['checked'])) {
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
-				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
+				$query = "SELECT u.LastName,u.FirstName,u.SID FROM imas_users AS u JOIN
+						  imas_students AS stu ON u.id=stu.userid AND stu.courseid=?
+						  WHERE u.id IN ($ulist)";
+				$resultUserList = $DBH->prepare($query);
+				$resultUserList->execute([$cid]);
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
 		} else {
-			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$get_uid));
+			$query = "SELECT u.LastName,u.FirstName,u.SID FROM imas_users AS u JOIN
+						  imas_students AS stu ON u.id=stu.userid AND stu.courseid=?
+						  WHERE u.id=?";
+			$stm = $DBH->prepare($query);
+			$stm->execute([$cid,$get_uid]);
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$lockConfirm =  "Are you SURE you want to lock <span class='pii-full-name'>{$row[0]} {$row[1]}</span> (<span class='pii-username'>$row[2]</span>) out of the course?";
+			if ($row === false) {
+				echo "Invalid";
+				exit;
+			}
+			$lockConfirm =  "Are you SURE you want to lock <span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[0] . ' '. $row[1]). "</span> (<span class='pii-username'>" . Sanitize::encodeStringForDisplay($row[2]) . "</span>) out of the course?";
 		}
 
 		/**** confirmation page body *****/
@@ -108,7 +121,7 @@ ini_set("max_execution_time", "600");
 <?php
 				}
 			} else {
-				echo Sanitize::encodeStringForDisplay($lockConfirm);
+				echo $lockConfirm;
 			}
 ?>
 

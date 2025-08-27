@@ -7,6 +7,7 @@ require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/stugroups.php";
 require_once "../includes/filehandler.php";
+require_once "../includes/checkdata.php";
 
 /*** pre-html data manipulation, including function code *******/
 $cid = Sanitize::courseId($_GET['cid']);
@@ -115,7 +116,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit();
 	} else if (isset($_GET['addstutogrp']) && !empty($_POST['stutoadd'])) {
 		//submitting list of students to add to a group
-		$stustoadd = $_POST['stutoadd'];
+		$stustoadd = filter_users_by_course($_POST['stutoadd'], $cid);
+		
 		if ($_POST['addtogrpid']=='--new--') {
 			//adding a new group; need to ask for group
 			$_GET['addgrp'] = true;
@@ -291,9 +293,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 	} else if (isset($_GET['addgrp'])) {
-		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-		$stm->execute(array(':id'=>$grpsetid));
+		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id AND courseid=:courseid");
+		$stm->execute(array(':id'=>$grpsetid, ':courseid'=>$cid));
 		$page_grpsetname = $stm->fetchColumn(0);
+		if ($page_grpsetname === false) {
+			exit;
+		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Add Group";
 	} else if (isset($_GET['delgrp'])) {
 		//deleting groupset

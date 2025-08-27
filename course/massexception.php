@@ -2,6 +2,7 @@
 //IMathAS:  Make deadline exceptions for a multiple students; included by listusers and gradebook
 //(c) 2007 David Lippman
 require_once __DIR__."/../includes/TeacherAuditLog.php";
+require_once __DIR__."/../includes/checkdata.php";
 
 	if (!isset($imasroot)) {
 		echo "This file cannot be called directly";
@@ -38,27 +39,9 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 		if (!isset($_POST['addexc'])) { $_POST['addexc'] = array();}
 		if (!isset($_POST['addfexc'])) { $_POST['addfexc'] = array();}
-		$toarr = array_map('Sanitize::onlyInt', explode(',', $_POST['tolist']));
-		$addexcarr = array_map('Sanitize::onlyInt', $_POST['addexc']);
-		$addfexcarr = array_map('Sanitize::onlyInt', $_POST['addfexc']);
-		if (count($toarr)>0) {
-			$ph = Sanitize::generateQueryPlaceholders($toarr);
-			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE userid IN ($ph) AND courseid=?");
-			$stm->execute(array_merge($toarr, [$cid]));
-			$toarr = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
-		}
-		if (count($addexcarr)>0) {
-			$ph = Sanitize::generateQueryPlaceholders($addexcarr);
-			$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE id IN ($ph) AND courseid=?");
-			$stm->execute(array_merge($addexcarr, [$cid]));
-			$addexcarr = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
-		}
-		if (count($addfexcarr)>0) {
-			$ph = Sanitize::generateQueryPlaceholders($addfexcarr);
-			$stm = $DBH->prepare("SELECT id FROM imas_forums WHERE id IN ($ph) AND courseid=?");
-			$stm->execute(array_merge($addfexcarr, [$cid]));
-			$addfexcarr = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
-		}
+		$toarr = filter_users_by_course(explode(',', $_POST['tolist']), $cid);
+		$addexcarr = filter_items_by_course($_POST['addexc'], 'imas_assessments', $cid);
+		$addfexcarr = filter_items_by_course($_POST['addfexc'], 'imas_forums', $cid);
         $existingExceptions = array();
         $eligibleForTimeExt = array();
 		if (count($addexcarr)>0 && count($toarr)>0) {
@@ -398,6 +381,10 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
+		if ($row === false) {
+			echo "Invalid user";
+			exit;
+		}
 		echo "<h1><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]) . '</span>';
 		if ($row[2]!='') {
 			echo ' <span class="small">(Section: '.Sanitize::encodeStringForDisplay($row[2]).')</span>';

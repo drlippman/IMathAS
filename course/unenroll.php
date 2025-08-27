@@ -98,7 +98,11 @@ ini_set("max_execution_time", "600");
 		} else if ($get_uid=="selected") {
 			if (!empty($_POST['checked'])) {
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
-				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
+				$query = "SELECT u.LastName,u.FirstName,u.SID FROM imas_users AS u JOIN
+						  imas_students AS stu ON u.id=stu.userid AND stu.courseid=?
+						  WHERE u.id IN ($ulist)";
+				$resultUserList = $DBH->prepare($query);
+				$resultUserList->execute([$cid]);
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 				if (count($_POST['checked']) > floor($stm->fetchColumn(0)/2)) {

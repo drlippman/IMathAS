@@ -214,10 +214,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once "../includes/newusercommon.php";
 
+		$uidToUpdate = Sanitize::onlyInt($_GET['uid']);
+
 		if (isset($_POST['timelimitmult'])) {
 			$msgout = '';
 			$stm = $DBH->prepare("SELECT iu.* FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=? AND istu.userid=?");
-			$stm->execute([$cid, $_GET['uid']]);
+			$stm->execute([$cid, $uidToUpdate]);
 			$olddata = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($olddata === false) {
 				echo 'Invalid userid';
@@ -292,7 +294,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 				
 				$query .= " WHERE id=:id AND rights<:rights";
-				$qarr[':id'] = $_GET['uid'];
+				$qarr[':id'] = $uidToUpdate;
 				$qarr[':rights'] = $myrights;
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
@@ -327,33 +329,33 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 			if ($locked==0) {
 				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,locked=:locked,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist,latepass=:latepass WHERE userid=:userid AND courseid=:courseid");
-				$stm->execute(array(':code'=>$code, ':section'=>$section, ':locked'=>$locked, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+				$stm->execute(array(':code'=>$code, ':section'=>$section, ':locked'=>$locked, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$uidToUpdate, ':courseid'=>$cid));
 			} else {
 				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist,latepass=:latepass WHERE userid=:userid AND courseid=:courseid");
-				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$uidToUpdate, ':courseid'=>$cid));
 				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
-				$stm->execute(array(':locked'=>$locked, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+				$stm->execute(array(':locked'=>$locked, ':userid'=>$uidToUpdate, ':courseid'=>$cid));
             }
             require_once '../includes/setSectionGroups.php';
-            setSectionGroups($_GET['uid'], $cid, $section);
+            setSectionGroups($uidToUpdate, $cid, $section);
 
 			require_once '../includes/userpics.php';
 
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
-				processImage($_FILES['stupic'],Sanitize::onlyInt($_GET['uid']),200,200);
-				processImage($_FILES['stupic'],'sm'.Sanitize::onlyInt($_GET['uid']),40,40);
+				processImage($_FILES['stupic'],Sanitize::onlyInt($uidToUpdate),200,200);
+				processImage($_FILES['stupic'],'sm'.Sanitize::onlyInt($uidToUpdate),40,40);
 				$chguserimg = 1;
 			} else if (isset($_POST['removepic'])) {
-				deletecoursefile('userimg_'.Sanitize::onlyInt($_GET['uid']).'.jpg');
-				deletecoursefile('userimg_sm'.Sanitize::onlyInt($_GET['uid']).'.jpg');
+				deletecoursefile('userimg_'.Sanitize::onlyInt($uidToUpdate).'.jpg');
+				deletecoursefile('userimg_sm'.Sanitize::onlyInt($uidToUpdate).'.jpg');
 				$chguserimg = 0;
 			} else {
 				$chguserimg = -1;
 			}
 			if ($chguserimg != -1) {
 				$stm = $DBH->prepare("UPDATE imas_users SET hasuserimg=:chguserimg WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['uid'], ':chguserimg'=>$chguserimg));
+				$stm->execute(array(':id'=>$uidToUpdate, ':chguserimg'=>$chguserimg));
 			}
 
 
@@ -371,7 +373,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult,imas_students.hidefromcourselist,imas_students.latepass FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:id AND imas_students.courseid=:courseid";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':id'=>$_GET['uid'], ':courseid'=>$cid));
+			$stm->execute(array(':id'=>$uidToUpdate, ':courseid'=>$cid));
 			$lineStudent = $stm->fetch(PDO::FETCH_ASSOC);
 
 		}
@@ -397,7 +399,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
-
 	} elseif (isset($_POST['posted']) && $_POST['posted']=="Unlock") {
 		$calledfrom='lu';
 		require_once('lockstu.php');
