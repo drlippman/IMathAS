@@ -291,7 +291,7 @@ class ScoreEngine
                 $stuanswers, $quesData['qtype']);
         } else {
             $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $quesData);
-            if ($quesData['qtype'] == "conditional") {
+            if ($quesData['qtype'] == "conditional" && isset($anstypes)) {
               // Store just-build $stuanswers as lastanswer for conditional
               // in case there was no POST (like multans checkbox), null out
               // stuanswers

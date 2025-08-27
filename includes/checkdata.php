@@ -5,6 +5,9 @@
  */
 function filter_users_by_course(array $users, int $course) {    
     global $DBH;
+    if (count($users) === 0){ 
+        return [];
+    }
     $ph = Sanitize::generateQueryPlaceholders($users);
     $stm = $DBH->prepare("SELECT userid FROM imas_students WHERE userid IN ($ph) AND courseid=?");
     $stm->execute(array_merge($users, [$course]));
@@ -16,6 +19,9 @@ function filter_users_by_course(array $users, int $course) {
  */
 function filter_items_by_course(array $ids, string $table, int $course) {    
     global $DBH;
+    if (count($ids) === 0){ 
+        return [];
+    }
     $ph = Sanitize::generateQueryPlaceholders($ids);
     $table = Sanitize::simpleString($table);
     $stm = $DBH->prepare("SELECT id FROM $table WHERE id IN ($ph) AND courseid=?");
