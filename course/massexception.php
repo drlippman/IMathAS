@@ -11,9 +11,11 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 	if (isset($_POST['clears'])) {
         $clearlist = implode(',', array_map('intval', $_POST['clears']));
 		$stm = $DBH->prepare("DELETE e FROM imas_exceptions AS e
-			JOIN imas_assessments AS a ON e.assessmentid=a.id AND e.itemtype='A' 
-			WHERE e.id IN ($clearlist) AND a.courseid=?");
-		$stm->execute([$cid]);
+			LEFT JOIN imas_assessments AS a ON e.assessmentid=a.id AND e.itemtype='A' 
+			LEFT JOIN imas_forums AS f ON e.assessmentid=f.id AND (e.itemtype='F' OR e.itemtype='P' OR e.itemtype='R')
+			WHERE e.id IN ($clearlist) AND ((a.courseid=? AND e.itemtype='A') OR
+				(f.courseid=? AND (e.itemtype='F' OR e.itemtype='P' OR e.itemtype='R')))");
+		$stm->execute([$cid,$cid]);
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
         $DBH->beginTransaction();
@@ -39,6 +41,24 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 		$toarr = array_map('Sanitize::onlyInt', explode(',', $_POST['tolist']));
 		$addexcarr = array_map('Sanitize::onlyInt', $_POST['addexc']);
 		$addfexcarr = array_map('Sanitize::onlyInt', $_POST['addfexc']);
+		if (count($toarr)>0) {
+			$ph = Sanitize::generateQueryPlaceholders($toarr);
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE userid IN ($ph) AND courseid=?");
+			$stm->execute(array_merge($toarr, [$cid]));
+			$toarr = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
+		}
+		if (count($addexcarr)>0) {
+			$ph = Sanitize::generateQueryPlaceholders($addexcarr);
+			$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE id IN ($ph) AND courseid=?");
+			$stm->execute(array_merge($addexcarr, [$cid]));
+			$addexcarr = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
+		}
+		if (count($addfexcarr)>0) {
+			$ph = Sanitize::generateQueryPlaceholders($addfexcarr);
+			$stm = $DBH->prepare("SELECT id FROM imas_forums WHERE id IN ($ph) AND courseid=?");
+			$stm->execute(array_merge($addfexcarr, [$cid]));
+			$addfexcarr = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
+		}
         $existingExceptions = array();
         $eligibleForTimeExt = array();
 		if (count($addexcarr)>0 && count($toarr)>0) {

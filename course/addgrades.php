@@ -46,6 +46,13 @@
 
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
+		$stm = $DBH->prepare("SELECT name,courseid FROM imas_gbitems WHERE id=:id");
+		$stm->execute(array(':id'=>$delItem));
+		list($itemname,$itemcourseid) = $stm->fetch(PDO::FETCH_NUM);
+		if ($itemcourseid != $cid) {
+			echo "Invalid ID";
+			exit;
+		}
 		if (isset($_POST['confirm'])) {
 			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
 			$stm->execute(array(':id'=>$delItem));
@@ -79,13 +86,6 @@
 			exit;
 		} else {
 			require_once "../header.php";
-			$stm = $DBH->prepare("SELECT name,courseid FROM imas_gbitems WHERE id=:id");
-			$stm->execute(array(':id'=>$delItem));
-			list($itemname,$itemcourseid) = $stm->fetch(PDO::FETCH_NUM);
-			if ($itemcourseid != $cid) {
-				echo "Invalid ID";
-				exit;
-			}
 
 			echo "<p>Are you SURE you want to delete <strong>".Sanitize::encodeStringForDisplay($itemname);
 			echo "</strong> and all associated grades from the gradebook?</p>";
