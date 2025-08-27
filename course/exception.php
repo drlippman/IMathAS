@@ -123,15 +123,15 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
         }
 
 		//check if exception already exists
-		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
 			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty,timeext=:timeext,attemptext=:attemptext WHERE id=:id");
 			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':attemptext'=>$attemptext, ':id'=>$row[0]));
 		} else {
-			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext) VALUES ";
-			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :timeext, :attemptext)";
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext,itemtype) VALUES ";
+			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :timeext, :attemptext, 'A')";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate,
 				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':attemptext'=>$attemptext));
@@ -226,7 +226,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 		$aVer = $row[3];
 
 		//check if exception already exists
-		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>Sanitize::onlyInt($_GET['aid'])));
 		$erow = $stm->fetch(PDO::FETCH_ASSOC);
 		$page_isExceptionMsg = "";

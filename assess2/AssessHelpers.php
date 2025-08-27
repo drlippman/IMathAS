@@ -34,8 +34,8 @@ class AssessHelpers
         $timelimitmults[$row['userid']] = $row['timelimitmult'];
     }
     $stm = $DBH->prepare("SELECT imas_exceptions.* FROM imas_exceptions JOIN imas_assessment_records AS iar 
-        ON imas_exceptions.userid=iar.userid AND imas_exceptions.assessmentid=iar.assessmentid WHERE
-        iar.assessmentid=?");
+        ON imas_exceptions.userid=iar.userid AND imas_exceptions.assessmentid=iar.assessmentid 
+        AND imas_exceptions.itemtype='A' WHERE iar.assessmentid=?");
     $stm->execute(array($aid));
     $exceptions = [];
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {

@@ -10,7 +10,10 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 
 	if (isset($_POST['clears'])) {
         $clearlist = implode(',', array_map('intval', $_POST['clears']));
-		$stm = $DBH->query("DELETE FROM imas_exceptions WHERE id IN ($clearlist)");
+		$stm = $DBH->prepare("DELETE e FROM imas_exceptions AS e
+			JOIN imas_assessments AS a ON e.assessmentid=a.id AND e.itemtype='A' 
+			WHERE e.id IN ($clearlist) AND a.courseid=?");
+		$stm->execute([$cid]);
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
         $DBH->beginTransaction();

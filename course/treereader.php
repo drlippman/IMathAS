@@ -282,10 +282,10 @@ if (!$viewall) {
 	if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView) {
 		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
 		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userid AND ";
-		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid=:courseid) ";
+		$query .= "ex.assessmentid=i_a.id AND ex.itemtype='A' AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid=:courseid) ";
 		$query .= "UNION ALL SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
 		$query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid=:userid2 AND ";
-		$query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid=:courseid2) ";
+		$query .= "ex.assessmentid=i_f.id AND (ex.itemtype='F' OR ex.itemtype='R' OR ex.itemtype='P') AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid=:courseid2) ";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':userid2'=>$userid, ':courseid2'=>$cid));
 

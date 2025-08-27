@@ -761,21 +761,21 @@ switch($_POST['action']) {
 					$stm->execute(array(':cid'=>$_GET['id']));
 					//remove is_lti from exceptions with latepasses
 					$query = "UPDATE imas_exceptions JOIN imas_assessments ";
-					$query .= "ON imas_exceptions.assessmentid=imas_assessments.id ";
+					$query .= "ON imas_exceptions.assessmentid=imas_assessments.id AND imas_exceptions.itemtype='A' ";
 					$query .= "SET imas_exceptions.is_lti=0 ";
 					$query .= "WHERE imas_exceptions.is_lti>0 AND imas_exceptions.islatepass>0 AND imas_assessments.courseid=:cid";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':cid'=>$_GET['id']));
 					//delete any other is_lti exceptions
 					$query = "DELETE imas_exceptions FROM imas_exceptions JOIN imas_assessments ";
-					$query .= "ON imas_exceptions.assessmentid=imas_assessments.id ";
+					$query .= "ON imas_exceptions.assessmentid=imas_assessments.id AND imas_exceptions.itemtype='A' ";
 					$query .= "WHERE imas_exceptions.is_lti>0 AND imas_exceptions.islatepass=0 AND imas_assessments.courseid=:cid";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':cid'=>$_GET['id']));
 				}
                 // fix any latepass-based exceptions to not exceed course end date
                 $query = "UPDATE imas_exceptions JOIN imas_assessments ";
-                $query .= "ON imas_exceptions.assessmentid=imas_assessments.id ";
+                $query .= "ON imas_exceptions.assessmentid=imas_assessments.id AND imas_exceptions.itemtype='A' ";
                 $query .= "SET imas_exceptions.enddate = ? ";
                 $query .= "WHERE imas_exceptions.enddate > ? AND imas_exceptions.islatepass>0 AND imas_assessments.courseid=?";
                 $stm = $DBH->prepare($query);

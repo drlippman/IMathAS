@@ -103,7 +103,7 @@ class AssessInfo
       $this->setException($uid, false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
       $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
-      $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
+      $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=? AND itemtype='A'";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
       $this->setException($uid, $stm->fetch(PDO::FETCH_ASSOC), $isstu, $latepasses, $latepasshrs, $courseenddate);
