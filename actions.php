@@ -455,6 +455,9 @@ require_once "includes/sanitize.php";
 		if (isset($_GET['originalSID']) && $_GET['originalSID']==$_GET['SID']) {
 			echo "true";
 			exit;
+		} else if (!isset($_GET['SID'])) {
+			echo "false";
+			exit;
 		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_GET['SID']));
