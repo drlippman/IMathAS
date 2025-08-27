@@ -383,7 +383,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 	}
 	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti,ia.tutoredit FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.itemtype='A' AND ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid=:courseid AND iu.id IN ($tolist) ) ";
-	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti,2 AS tutoredit FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
+	$query .= "UNION ALL (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti,2 AS tutoredit FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
 	$query .= "WHERE (ie.itemtype='F' OR ie.itemtype='P' OR ie.itemtype='R') AND ie.assessmentid=i_f.id AND ie.userid=iu.id AND i_f.courseid=:courseid2 AND iu.id IN ($tolist) )";
 	if ($isall) {
 		$query .= "ORDER BY itemname,LastName,FirstName";

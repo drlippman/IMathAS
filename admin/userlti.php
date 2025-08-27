@@ -106,7 +106,7 @@ if ($myrights < 20) {
   }
   $query = "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ia.name FROM ";
   $query .= "imas_lti_placements AS ilp LEFT JOIN imas_assessments AS ia ON ilp.typeid=ia.id ";
-  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='assess' AND $searchstr UNION ";
+  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='assess' AND $searchstr UNION ALL ";
   $query .= "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ic.name FROM ";
   $query .= "imas_lti_placements AS ilp LEFT JOIN imas_courses AS ic ON ilp.typeid=ic.id ";
   $query .= "WHERE ilp.contextid=? AND ilp.placementtype='course' AND $searchstr";

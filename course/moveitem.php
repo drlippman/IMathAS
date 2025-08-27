@@ -133,11 +133,11 @@ makebrief($items, $briefitems);
 
 
 $itemdata = array();
-$query = "SELECT 'Assessment',id,name FROM imas_assessments WHERE courseid=:cid1 UNION ";
-$query .= "SELECT 'InlineText',id,title FROM imas_inlinetext WHERE courseid=:cid2 UNION ";
-$query .= "SELECT 'LinkedText',id,title FROM imas_linkedtext WHERE courseid=:cid3 UNION ";
-$query .= "SELECT 'Forum',id,name FROM imas_forums WHERE courseid=:cid4 UNION ";
-$query .= "SELECT 'Wiki',id,name FROM imas_wikis WHERE courseid=:cid5 UNION ";
+$query = "SELECT 'Assessment',id,name FROM imas_assessments WHERE courseid=:cid1 UNION ALL ";
+$query .= "SELECT 'InlineText',id,title FROM imas_inlinetext WHERE courseid=:cid2 UNION ALL ";
+$query .= "SELECT 'LinkedText',id,title FROM imas_linkedtext WHERE courseid=:cid3 UNION ALL ";
+$query .= "SELECT 'Forum',id,name FROM imas_forums WHERE courseid=:cid4 UNION ALL ";
+$query .= "SELECT 'Wiki',id,name FROM imas_wikis WHERE courseid=:cid5 UNION ALL ";
 $query .= "SELECT 'Drill',id,name FROM imas_drillassess WHERE courseid=:cid6";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':cid1'=>$cid, ':cid2'=>$cid, ':cid3'=>$cid, ':cid4'=>$cid, ':cid5'=>$cid, ':cid6'=>$cid));

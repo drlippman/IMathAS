@@ -1031,7 +1031,7 @@ function gbtable() {
 	$forumexceptions = array();
 	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.is_lti,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate,imas_assessments.LPcutoff,ie.timeext,ie.waivereqscore FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
-	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.is_lti,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff,ie.timeext,ie.waivereqscore FROM imas_exceptions AS ie,imas_forums WHERE ";
+	$query .= "UNION ALL SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.is_lti,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff,ie.timeext,ie.waivereqscore FROM imas_exceptions AS ie,imas_forums WHERE ";
 	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));

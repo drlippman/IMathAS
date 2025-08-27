@@ -110,7 +110,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 					$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
 					$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
 					$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
-					$query .= "UNION ";
+					$query .= "UNION ALL ";
 					$query = "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
 					$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
 					$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";

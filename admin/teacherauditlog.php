@@ -199,7 +199,7 @@ if ($overwriteBody==1) {
     }
 
     $query = '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
-    $query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?) UNION ';
+    $query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?) UNION ALL ';
     $query .= '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
     $query .= 'JOIN imas_tutors AS it ON it.userid=iu.id WHERE it.courseid=?)';
     $stm = $DBH->prepare($query);

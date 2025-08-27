@@ -75,7 +75,7 @@ If deleted on both ends, delete from DB
 			$isteacher = true;
 			$isauth = true;
 		} else {
-			$stm = $DBH->prepare("SELECT section FROM imas_students WHERE userid=? AND courseid=? UNION SELECT section FROM imas_tutors WHERE userid=? AND courseid=?");
+			$stm = $DBH->prepare("SELECT section FROM imas_students WHERE userid=? AND courseid=? UNION ALL SELECT section FROM imas_tutors WHERE userid=? AND courseid=?");
 			$stm->execute(array($userid, $cid, $userid, $cid));
 			if ($stm->rowCount()>0) {
 				$isauth = true;

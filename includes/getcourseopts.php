@@ -10,14 +10,14 @@ function getCourseOpts($send, $selected=-1) {
   if ($send) {
     $query .= "AND imas_teachers.hidefromcourselist=0 ";
   }
-  $query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole,imas_tutors.hidefromcourselist,";
+  $query .= "UNION ALL SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole,imas_tutors.hidefromcourselist,";
   $query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
   $query .= "FROM imas_courses AS i_c JOIN imas_tutors ON ";
   $query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid=:userid2 ";
   if ($send) {
     $query .= "AND imas_tutors.hidefromcourselist=0 ";
   }
-  $query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole,imas_students.hidefromcourselist,";
+  $query .= "UNION ALL SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole,imas_students.hidefromcourselist,";
   $query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
   $query .= "FROM imas_courses AS i_c JOIN imas_students ON ";
   $query .= "i_c.id=imas_students.courseid WHERE imas_students.userid=:userid3 ";
