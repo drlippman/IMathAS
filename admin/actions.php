@@ -497,7 +497,8 @@ switch($_POST['action']) {
 			}
 		}
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT * FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT ic.*,iu.groupid FROM imas_courses AS ic
+				JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$old_course_settings = $stm->fetch(PDO::FETCH_ASSOC);
 			if (isset($CFG['cleanup']['groups'][$groupid]['allowoptout'])) {
@@ -507,6 +508,12 @@ switch($_POST['action']) {
 			}
 			if ($allowoptout && isset($_POST['cleanupoptout'])) {
 				$old_course_settings['cleanupdate'] = 0;
+			}
+			if (($myrights < 75 && $old_course_settings['ownerid'] !== $userid) ||
+				($myrights < 100 && $old_course_settings['groupid'] !== $groupid)
+			) {
+				echo "Invalid ID";
+				exit;
 			}
 		} else {
 			$old_course_settings['istemplate'] = 0;
