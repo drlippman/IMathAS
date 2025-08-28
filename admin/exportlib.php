@@ -72,7 +72,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$libs = Array();
 		$parents = Array();
 		$names = Array();
-		$nonpriv = isset($_POST['nonpriv']);
+		$nonpriv = (isset($_POST['nonpriv']) || !$isadmin);
 		$noncopyright = isset($_POST['noncopyright']);
 		//$libs is systemid=>newid
 		//$parents is childnewid=>parentnewid
@@ -316,8 +316,10 @@ if ($overwriteBody==1) {
 ?>
 		<span class="form">Limit</span>
 		<span class="formright">
+<?php if ($isadmin) { ?>
 			<label><input type="checkbox" name="nonpriv" checked="checked" />
 			Limit to non-private questions and libs
+<?php } ?>
 			</label><br/>
 			<label><input type="checkbox" name="noncopyright" checked="checked" />
 			Limit to non-copyrighted questions

@@ -42,8 +42,19 @@ if (!empty($_GET['from'])) {
 }
 $curBreadcrumb .= _('Diagnostic One-time Passwords').'</div>';
 
+$stm = $DBH->prepare("SELECT d.name,d.ownerid,u.groupid FROM imas_diags AS d 
+	JOIN imas_users AS u ON d.ownerid=u.id WHERE d.id=:id");
+$stm->execute(array(':id'=>$diag));
+list($diagName, $diagOwner, $diagGroup) = $stm->fetch(PDO::FETCH_NUM);
+if ($diagName === false) {
+	echo 'Invalid id';
+	exit;
+}
 	// SECURITY CHECK DATA PROCESSING
-if ($myrights<100 && ($myspecialrights&4)!=4) {
+if (($myrights<100 && ($myspecialrights&4)!=4) ||
+	($myrights<100 && $diagGroup !== $groupid) ||
+	($myrights<75 && $diagOwner !== $userid)
+) {
 	$overwriteBody = 1;
 	$body = "You don't have authority to access this page.";
 } else if (isset($_GET['generate'])) {
@@ -127,9 +138,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 } else {
 	echo $curBreadcrumb;
 	echo '<div id="headerdiagonetime" class="pagetitle"><h1>Diagnostic One-time Passwords</h1></div>';
-	$stm = $DBH->prepare("SELECT name FROM imas_diags WHERE id=:id");
-	$stm->execute(array(':id'=>$diag));
-	echo '<h3>' . Sanitize::encodeStringForDisplay($stm->fetchColumn(0)) . '</h3>';
+	echo '<h3>' . Sanitize::encodeStringForDisplay($diagName) . '</h3>';
 	if (isset($_GET['generate'])) {
 		if (isset($_POST['n'])) {
 			echo "<b>Newly generated passwords</b> <a href=\"diagonetime.php?from=$from&id=" . Sanitize::encodeUrlParam($diag) . "&view=true\">View all</a>";

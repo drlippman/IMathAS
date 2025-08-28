@@ -46,8 +46,18 @@ function encodeSelector($sel) {
 function decodeSelector($sel) {
 	return str_replace(array('@c@','@s@','@t@'), array(',',';','~'), $sel);	
 }
+
+if (!empty($diagId)) {
+	$stm = $DBH->prepare("SELECT d.name,d.ownerid,u.groupid FROM imas_diags AS d 
+		JOIN imas_users AS u ON d.ownerid=u.id WHERE d.id=:id");
+	$stm->execute(array(':id'=>$diagId));
+	list($diagName, $diagOwner, $diagGroup) = $stm->fetch(PDO::FETCH_NUM);
+}
 	// SECURITY CHECK DATA PROCESSING
-if ($myrights<100 && ($myspecialrights&4)!=4) {
+if (($myrights<100 && ($myspecialrights&4)!=4) || 
+	(!empty($diagId) && $myrights<100 && $diagGroup !== $groupid) ||
+	(!empty($diagId) && $myrights<75 && $diagOwner !== $userid)
+) {
 	$overwriteBody = 1;
 	$body = "You don't have authority to access this page.";
 } elseif (isset($_GET['step']) && $_GET['step']==2 && isset($_POST['termtype'])) {  // STEP 2 DATA PROCESSING
@@ -173,7 +183,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	}
 	$sel2list = implode(';',$sel2);
 
-	if (isset($_POST['id']) && $_POST['id'] != 0) {
+	if (!empty($diagId)) {
 		$query = "UPDATE imas_diags SET ";
 		$query .= "name=:name,cid=:cid,term=:term,public=:public,ips=:ips,pws=:pws,idprompt=:idprompt,sel1name=:sel1name,";
 		$query .= "sel1list=:sel1list,aidlist=:aidlist,sel2name=:sel2name,sel2list=:sel2list,entryformat=:entryformat,forceregen=:forceregen,reentrytime=:reentrytime ";
@@ -183,7 +193,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'], ':sel1name'=>'!'.$_POST['sel1name'],
 			':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>'!'.$_POST['sel2name'], ':sel2list'=>$sel2list,
 			':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime'], ':id'=>$_POST['id']));
-		$id = Sanitize::onlyInt($_POST['id']);
+		$id = Sanitize::onlyInt($diagId);
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
 		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
@@ -554,7 +564,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	</table>
 
 <?php
-		if (is_array($pwss)) {
+		if (isset($pwss) && is_array($pwss)) {
 			echo "	<script> cnt['pwsout'] = ".count($pwss).";</script>";
 		} else {
 			echo "	<script> cnt['pwsout'] = 0;</script>";

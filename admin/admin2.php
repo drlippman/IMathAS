@@ -28,7 +28,7 @@ if ($myrights < 75) {
 	$body = "You don't have authority to view this page.";
 } else {
   //figure out which page we want to show, or redirect if needed
-  if ($myrights==75) {
+  if ($myrights<100) {
     //show the groupadmin page
     $page = 'groupadmin';
     $pagetitle = _("Group Administration");

@@ -21,6 +21,12 @@ if (!empty($_POST['newstatus'])) {
     list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
 	$reqdata = json_decode($reqdata, true);
 
+	if ($oldstatus > 9) {
+		// already approved or denied
+		echo "User already processed";
+		exit;
+	}
+
 	if (!isset($reqdata['actions'])) {
 		$reqdata['actions'] = array();
 	}
