@@ -67,9 +67,16 @@ if (!isset($_GET['cid'])) {
 switch($_GET['action']) {
 	case "delete":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
+		$stm = $DBH->prepare("SELECT ic.name,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
-		$name = $stm->fetchColumn(0);
+		list($name,$courseowner,$coursegroup) = $stm->fetch(PDO::FETCH_NUM);
+		if ($name === false ||
+			($myrights < 75 && $courseowner !== $userid) ||
+			($myrights < 100 && $coursegroup !== $groupid)
+		) {
+			echo 'Invalid course';
+			break;
+		}
 		echo '<div id="headerforms" class="pagetitle"><h1>'._('Delete Course').'</h1></div>';
 		echo "<p>"._("Are you sure you want to delete the course")." <b>".Sanitize::encodeStringForDisplay($name)."</b>?</p>\n";
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
@@ -110,7 +117,10 @@ switch($_GET['action']) {
         $stm = $DBH->prepare("SELECT FirstName,LastName,SID,rights,groupid FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		
+		if ($myrights < 100 && $line['groupid'] !== $groupid) {
+			echo 'Invalid user';
+			break;
+		}
         if ($myrights==100) {
 			$stm = $DBH->prepare("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE (iu.rights=100 OR iu.groupid=?) AND iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 AND iu.id<>? ORDER BY iu.LastName,iu.FirstName");
             $stm->execute(array($line['groupid'], $_GET['id']));
@@ -159,7 +169,7 @@ switch($_GET['action']) {
 	case "chgrights":
 	case "newadmin":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
-    echo "<form method=post id=userform class=limitaftervalidate action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
+    	echo "<form method=post id=userform class=limitaftervalidate action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if ($_GET['action']=="chgrights") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
         echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
@@ -447,7 +457,7 @@ switch($_GET['action']) {
 	case "modify":
 	case "addcourse":
 		if ($_GET['action']=='modify') {
-			$query = "SELECT ic.*,iu.FirstName,iu.LastName FROM imas_courses AS ic ";
+			$query = "SELECT ic.*,iu.FirstName,iu.LastName,iu.groupid FROM imas_courses AS ic ";
 			$query .= "JOIN imas_users AS iu on ic.ownerid=iu.id WHERE ic.id=:id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$_GET['id']));
@@ -559,7 +569,7 @@ switch($_GET['action']) {
 				if ($udat['groupid']==0) {
 					$udat['name'] = _('Default Group');
 				}
-				if ($myrights===75 && $udat['groupid']!=$groupid) {
+				if ($myrights<100 && $udat['groupid']!=$groupid) {
 					echo _("You don't have the authority for this action"); break;
 				}
 				if ($udat['parent']>0) {

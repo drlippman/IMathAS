@@ -12,7 +12,7 @@ require_once "../includes/htmlutil.php";
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Diagnostic Setup";
-$diagId = Sanitize::onlyInt(trim($_REQUEST['id']));
+$diagId = Sanitize::onlyInt(trim($_REQUEST['id'] ?? ''));
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase ";
 if (!empty($_GET['from'])) {
 	$from = Sanitize::simpleString($_GET['from']);
@@ -38,6 +38,7 @@ if (!empty($_GET['from'])) {
 } else {
 	$curBreadcrumb .= "<a href=\"$imasroot/admin/admin2.php\">Admin</a> &gt;";
 	$backtrack = 'admin2.php';
+	$from = '';
 }
 $curBreadcrumb .= _("Diagnostic Setup").'</div>';
 function encodeSelector($sel) {
@@ -417,7 +418,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 				<input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo Sanitize::encodeStringForDisplay($term); }?>"/></p>
 
 	<p>Linked with course:
-	<?php writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected); ?>
+	<?php writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected ?? null); ?>
 	</p>
 
 	<p>Available? (Can be taken)?
@@ -525,7 +526,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	</table>
 
 <?php
-		if (is_array($pwsb)) {
+		if (isset($pwsb) && is_array($pwsb)) {
 			echo "	<script> cnt['pwout'] = ".count($pwsb).";</script>";
 		} else {
 			echo "	<script> cnt['pwout'] = 0;</script>";
@@ -606,7 +607,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 		</table>
 
 <?php
-		if (is_array($sl)) {
+		if (isset($sl) && is_array($sl)) {
 			echo "<script> cnt['selout'] = ".count($sl).";</script>";
 		} else {
 			echo "<script> cnt['selout'] = 0;</script>";

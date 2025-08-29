@@ -813,13 +813,13 @@ class ScoreEngine
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 3)),
             'lastAnswerAsGiven' => array(
-                $scorePartResult !== false ? $scorePartResult->getLastAnswerAsGiven() : ''
+                $scorePartResult !== null ? $scorePartResult->getLastAnswerAsGiven() : ''
             ),
             'lastAnswerAsNumber' => array(
-                $scorePartResult !== false ? $scorePartResult->getLastAnswerAsNumber() : ''
+                $scorePartResult !== null ? $scorePartResult->getLastAnswerAsNumber() : ''
             ),
             'correctAnswerWrongFormat' => array(
-                $scorePartResult !== false ? $scorePartResult->getCorrectAnswerWrongFormat() : false
+                $scorePartResult !== null ? $scorePartResult->getCorrectAnswerWrongFormat() : false
             ),
             'answeights' => array(1)
         );

@@ -104,6 +104,17 @@ if ($myrights < 20) {
       $searchstr = 'ilp.org LIKE ? ';
       $sorg = $org . ':%';
   }
+  if (!$isadmin) {
+    $stm = $DBH->prepare("SELECT it.id FROM imas_lti_courses AS ilp
+        JOIN imas_teachers AS it ON ilp.courseid=it.courseid AND it.userid=?
+        WHERE ilp.contextid=? AND $searchstr");
+    $stm->execute([$userid, $contextid, $sorg]);
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($row===false) {
+        echo "ERROR";
+        exit;
+    }
+  }
   $query = "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ia.name FROM ";
   $query .= "imas_lti_placements AS ilp LEFT JOIN imas_assessments AS ia ON ilp.typeid=ia.id ";
   $query .= "WHERE ilp.contextid=? AND ilp.placementtype='assess' AND $searchstr UNION ALL ";
