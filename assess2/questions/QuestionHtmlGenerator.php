@@ -1541,10 +1541,10 @@ class QuestionHtmlGenerator
      */
     private function reIndexArray(array $arr, int $thisq, int $dispqn) {
         $diff = $dispqn - $thisq;
-        $out = [];
         foreach ($arr as $k=>$v) {
-            $out[$k+$diff] = $v;
+            // duplicate rather than replace, so any absolute references should still work
+            $arr[$k+$diff] = $v;
         }
-        return $out;
+        return $arr;
     }
 }
