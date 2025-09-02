@@ -11,9 +11,8 @@ array_push($allowedmacros,"bio_randcodon","bio_getcodonname","bio_anticodon","bi
 // fetches a random codon returns an array of (code, 3 letter abbreviation, long name)
 function bio_randcodon() {
     global $bio_codons, $RND;
-    $out = array();
     $max = count($bio_codons);
-    $out = $bio_codons[$RND->rand(0,$max-1)];
+    $out = $bio_codons[$RND->rand(1,$max)];
     return $out;
 }
 
