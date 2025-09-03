@@ -21,12 +21,8 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 $block = $_GET['block'] ?? '0';
-if (isset($_GET['daid'])) {
-    $daid = Sanitize::onlyInt($_GET['daid']);
-    $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
-    $stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
-}
-if (!isset($_GET['daid']) || $stm->rowCount()==0) {
+
+if (!isset($_GET['daid'])) {
 	//new to invalid
 	$itemdescr = array();
 	$itemids = array();
@@ -41,7 +37,16 @@ if (!isset($_GET['daid']) || $stm->rowCount()==0) {
 	$enddate = time() + 7*24*60*60;
 	$avail = 1;
     $caltag = 'D';
+	$beentaken = false;
 } else {
+	$daid = Sanitize::onlyInt($_GET['daid']);
+    $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
+    $stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
+	if ($stm->rowCount()==0) {
+		echo 'Invalid ID';
+		exit;
+	}
+
 	$dadata = $stm->fetch(PDO::FETCH_ASSOC);
 	$n = $dadata['n'];
 	$showtype = $dadata['showtype'];
@@ -64,181 +69,184 @@ if (!isset($_GET['daid']) || $stm->rowCount()==0) {
 	} else {
 		$itemdescr = explode(',',$dadata['itemdescr']);
 	}
-}
 
-if (isset($_GET['clearatt'])) {
-	$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
-	$stm->execute(array(':drillassessid'=>$daid));
-	header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
-	exit;
-}
-if (isset($_GET['record'])) {
-	$DBH->beginTransaction();
-	if ($_POST['avail']==1) {
-		if ($_POST['sdatetype']=='0') {
+	// handle POSTS
+	if (isset($_GET['clearatt'])) {
+		$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
+		$stm->execute(array(':drillassessid'=>$daid));
+		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
+		exit;
+	}
+	if (isset($_GET['record'])) {
+		$DBH->beginTransaction();
+		if ($_POST['avail']==1) {
+			if ($_POST['sdatetype']=='0') {
+				$startdate = 0;
+			} else {
+				$startdate = parsedatetime($_POST['sdate'], $_POST['stime'],0);
+			}
+			if ($_POST['edatetype']=='2000000000') {
+				$enddate = 2000000000;
+			} else {
+				$enddate = parsedatetime($_POST['edate'], $_POST['etime'],2000000000);
+			}
+		} else {
 			$startdate = 0;
+			$enddate =  2000000000;
+		}
+		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
+		$_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
+		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>' || $_POST['summary']=='<p></p>') {
+			$_POST['summary'] = '';
 		} else {
-			$startdate = parsedatetime($_POST['sdate'], $_POST['stime'],0);
+			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
 		}
-		if ($_POST['edatetype']=='2000000000') {
-			$enddate = 2000000000;
-		} else {
-			$enddate = parsedatetime($_POST['edate'], $_POST['etime'],2000000000);
+
+		if (isset($_POST['descr'])) {
+			foreach ($_POST['descr'] as $k=>$v) {
+				$itemdescr[$k] = str_replace(',','',$v);
+			}
 		}
-	} else {
-		$startdate = 0;
-		$enddate =  2000000000;
-	}
-	$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-    $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
-	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>' || $_POST['summary']=='<p></p>') {
-		$_POST['summary'] = '';
-	} else {
-		$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
-	}
 
-	if (isset($_POST['descr'])) {
-		foreach ($_POST['descr'] as $k=>$v) {
-			$itemdescr[$k] = str_replace(',','',$v);
-		}
-	}
+		$beentaken = isset($_POST['beentaken']);
 
-	$beentaken = isset($_POST['beentaken']);
-
-	if (!$beentaken) {
-		$newitemids = array();
-		$newitemdescr = array();
-		if (isset($_POST['order'])) {
-			asort($_POST['order']);
-			foreach ($_POST['order'] as $id=>$ord) {
-				if (!isset($_POST['delitem'][$id])) {
-					$newitemids[] = $itemids[$id];
-					$newitemdescr[] = $itemdescr[$id];
+		if (!$beentaken) {
+			$newitemids = array();
+			$newitemdescr = array();
+			if (isset($_POST['order'])) {
+				asort($_POST['order']);
+				foreach ($_POST['order'] as $id=>$ord) {
+					if (!isset($_POST['delitem'][$id])) {
+						$newitemids[] = $itemids[$id];
+						$newitemdescr[] = $itemdescr[$id];
+					}
 				}
 			}
+
+			$itemids = array_values($newitemids);
+			$itemdescr = array_values($newitemdescr);
+		}
+		$classbests = array();
+		$updatebests = false;
+		//if (isset($_POST['idstoadd']) && trim($_POST['idstoadd'])!='') {
+		if (isset($_POST['nchecked'])) {
+			$toadd = $_POST['nchecked'];
+			//$toadd = explode(',',$_POST['idstoadd']);
+			foreach ($toadd as $k=>$v) {
+				$toadd[$k] = Sanitize::onlyInt($v);
+				if ($toadd[$k]==0) {
+					unset($toadd[$k]);
+				}
+			}
+			$toadd_query_placeholders = Sanitize::generateQueryPlaceholders($toadd);
+			$query = "SELECT id,description FROM imas_questionset WHERE id IN ($toadd_query_placeholders)";
+			$stm = $DBH->prepare($query); //pre-sanitized INTs
+			$stm->execute(array_values($toadd));
+			$descr = array();
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$descr[$row[0]] = str_replace(',','',$row[1]);
+			}
+			foreach ($toadd as $k=>$v) {
+				$itemids[] = Sanitize::onlyInt($v);
+				$itemdescr[] = $descr[$v];
+			}
+			$classbests = array_fill(0,count($itemids),-1);
+			$updatebests = true;
 		}
 
-		$itemids = array_values($newitemids);
-		$itemdescr = array_values($newitemdescr);
-	}
-	$classbests = array();
-	$updatebests = false;
-	//if (isset($_POST['idstoadd']) && trim($_POST['idstoadd'])!='') {
-	if (isset($_POST['nchecked'])) {
-		$toadd = $_POST['nchecked'];
-		//$toadd = explode(',',$_POST['idstoadd']);
-		foreach ($toadd as $k=>$v) {
-			$toadd[$k] = Sanitize::onlyInt($v);
-			if ($toadd[$k]==0) {
-				unset($toadd[$k]);
+		$n = intval($_POST['n']);
+		$scoretype = $_POST['scoretype'];
+		if (!$beentaken) {
+			$showtype = intval($_POST['showtype']);
+		}
+		$showtostu = (isset($_POST['showlast'])?1:0) + (isset($_POST['showpbest'])?2:0) + (isset($_POST['showcbest'])?4:0);
+		if (isset($_POST['clearbests'])) {
+			$classbests = array_fill(0,count($itemids),-1);
+			$updatebests = true;
+		}
+		$itemlist = implode(',',$itemids);
+		$descrlist = implode(',',$itemdescr);
+		$bestlist = implode(',',$classbests);
+		if ($daid==0) {
+			$query = "INSERT INTO imas_drillassess (courseid,name,summary,avail,startdate,enddate,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu) VALUES ";
+			$query .= "(:courseid, :name, :summary, :avail, :startdate, :enddate, :itemdescr, :itemids, :scoretype, :showtype, :n, :classbests, :showtostu)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['title'], ':summary'=>$_POST['summary'], ':avail'=>$_POST['avail'],
+				':startdate'=>$startdate, ':enddate'=>$enddate, ':itemdescr'=>$descrlist, ':itemids'=>$itemlist, ':scoretype'=>$scoretype,
+				':showtype'=>$showtype, ':n'=>$n, ':classbests'=>$bestlist, ':showtostu'=>$showtostu));
+			$daid = $DBH->lastInsertId();
+			$stm = $DBH->prepare("INSERT INTO imas_items (courseid,itemtype,typeid) VALUES (:courseid, 'Drill', :typeid)");
+			$stm->execute(array(':courseid'=>$cid, ':typeid'=>$daid));
+			$itemid = $DBH->lastInsertId();
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			$items = unserialize($line['itemorder']);
+
+			$blocktree = explode('-',$block);
+			$sub =& $items;
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+			if ($totb=='b') {
+				$sub[] = $itemid;
+			} else if ($totb=='t') {
+				array_unshift($sub,$itemid);
+			}
+			$itemorder = serialize($items);
+			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+		} else {
+			if ($beentaken) {
+				$query = "UPDATE imas_drillassess SET itemdescr=:itemdescr,showtostu=:showtostu,";
+				$query .= "name=:name,summary=:summary,avail=:avail,caltag=:caltag,startdate=:startdate,enddate=:enddate";
+				$qarr = array(':itemdescr'=>$descrlist, ':showtostu'=>$showtostu, ':name'=>$_POST['title'], ':summary'=>$_POST['summary'],
+					':avail'=>$_POST['avail'], ':caltag'=>$_POST['caltag'], ':startdate'=>$startdate, ':enddate'=>$enddate);
+			} else {
+				$query = "UPDATE imas_drillassess SET itemdescr=:itemdescr,showtostu=:showtostu,";
+				$query .= "name=:name,summary=:summary,avail=:avail,caltag=:caltag,startdate=:startdate,enddate=:enddate,";
+				$query .= "itemids=:itemids,scoretype=:scoretype,showtype=:showtype,n=:n";
+				$qarr = array(':itemdescr'=>$descrlist, ':showtostu'=>$showtostu, ':itemids'=>$itemlist, ':scoretype'=>$scoretype,
+					':showtype'=>$showtype, ':n'=>$n, ':name'=>$_POST['title'], ':summary'=>$_POST['summary'], ':avail'=>$_POST['avail'],
+					':caltag'=>$_POST['caltag'], ':startdate'=>$startdate, ':enddate'=>$enddate);
+
+			}
+			if ($updatebests) {
+				$query .= ",classbests=:classbests";
+				$qarr[':classbests'] = $bestlist;
+			}
+			$query .= " WHERE id=:id";
+			$qarr[':id'] = $daid;
+			$stm = $DBH->prepare($query);
+			$stm->execute($qarr);
+			if (!$beentaken) {
+				//Delete any instructor attempts to account for possible changes
+				$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
+				$stm->execute(array(':drillassessid'=>$daid));
 			}
 		}
-		$toadd_query_placeholders = Sanitize::generateQueryPlaceholders($toadd);
-		$query = "SELECT id,description FROM imas_questionset WHERE id IN ($toadd_query_placeholders)";
-		$stm = $DBH->prepare($query); //pre-sanitized INTs
-		$stm->execute(array_values($toadd));
-		$descr = array();
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$descr[$row[0]] = str_replace(',','',$row[1]);
-		}
-		foreach ($toadd as $k=>$v) {
-			$itemids[] = Sanitize::onlyInt($v);
-			$itemdescr[] = $descr[$v];
-		}
-		$classbests = array_fill(0,count($itemids),-1);
-		$updatebests = true;
-	}
 
-	$n = intval($_POST['n']);
-	$scoretype = $_POST['scoretype'];
-	if (!$beentaken) {
-		$showtype = intval($_POST['showtype']);
-	}
-	$showtostu = (isset($_POST['showlast'])?1:0) + (isset($_POST['showpbest'])?2:0) + (isset($_POST['showcbest'])?4:0);
-	if (isset($_POST['clearbests'])) {
-		$classbests = array_fill(0,count($itemids),-1);
-		$updatebests = true;
-	}
-	$itemlist = implode(',',$itemids);
-	$descrlist = implode(',',$itemdescr);
-	$bestlist = implode(',',$classbests);
-	if ($daid==0) {
-		$query = "INSERT INTO imas_drillassess (courseid,name,summary,avail,startdate,enddate,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu) VALUES ";
-		$query .= "(:courseid, :name, :summary, :avail, :startdate, :enddate, :itemdescr, :itemids, :scoretype, :showtype, :n, :classbests, :showtostu)";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['title'], ':summary'=>$_POST['summary'], ':avail'=>$_POST['avail'],
-			':startdate'=>$startdate, ':enddate'=>$enddate, ':itemdescr'=>$descrlist, ':itemids'=>$itemlist, ':scoretype'=>$scoretype,
-			':showtype'=>$showtype, ':n'=>$n, ':classbests'=>$bestlist, ':showtostu'=>$showtostu));
-		$daid = $DBH->lastInsertId();
-		$stm = $DBH->prepare("INSERT INTO imas_items (courseid,itemtype,typeid) VALUES (:courseid, 'Drill', :typeid)");
-		$stm->execute(array(':courseid'=>$cid, ':typeid'=>$daid));
-		$itemid = $DBH->lastInsertId();
-		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$cid));
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		$items = unserialize($line['itemorder']);
-
-		$blocktree = explode('-',$block);
-		$sub =& $items;
-		for ($i=1;$i<count($blocktree);$i++) {
-			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-		}
-		if ($totb=='b') {
-			$sub[] = $itemid;
-		} else if ($totb=='t') {
-			array_unshift($sub,$itemid);
-		}
-		$itemorder = serialize($items);
-		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-	} else {
-		if ($beentaken) {
-			$query = "UPDATE imas_drillassess SET itemdescr=:itemdescr,showtostu=:showtostu,";
-			$query .= "name=:name,summary=:summary,avail=:avail,caltag=:caltag,startdate=:startdate,enddate=:enddate";
-			$qarr = array(':itemdescr'=>$descrlist, ':showtostu'=>$showtostu, ':name'=>$_POST['title'], ':summary'=>$_POST['summary'],
-				':avail'=>$_POST['avail'], ':caltag'=>$_POST['caltag'], ':startdate'=>$startdate, ':enddate'=>$enddate);
+		$DBH->commit();
+		if (isset($_POST['save']) && $_POST['save']=='Save') {
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, Sanitize::randomQueryStringParam()));
 		} else {
-			$query = "UPDATE imas_drillassess SET itemdescr=:itemdescr,showtostu=:showtostu,";
-			$query .= "name=:name,summary=:summary,avail=:avail,caltag=:caltag,startdate=:startdate,enddate=:enddate,";
-			$query .= "itemids=:itemids,scoretype=:scoretype,showtype=:showtype,n=:n";
-			$qarr = array(':itemdescr'=>$descrlist, ':showtostu'=>$showtostu, ':itemids'=>$itemlist, ':scoretype'=>$scoretype,
-				':showtype'=>$showtype, ':n'=>$n, ':name'=>$_POST['title'], ':summary'=>$_POST['summary'], ':avail'=>$_POST['avail'],
-				':caltag'=>$_POST['caltag'], ':startdate'=>$startdate, ':enddate'=>$enddate);
-
+			header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
 		}
-		if ($updatebests) {
-			$query .= ",classbests=:classbests";
-			$qarr[':classbests'] = $bestlist;
-		}
-		$query .= " WHERE id=:id";
-		$qarr[':id'] = $daid;
-		$stm = $DBH->prepare($query);
-		$stm->execute($qarr);
-		if (!$beentaken) {
-			//Delete any instructor attempts to account for possible changes
-			$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
-			$stm->execute(array(':drillassessid'=>$daid));
-		}
+		exit;
 	}
 
-	$DBH->commit();
-	if (isset($_POST['save']) && $_POST['save']=='Save') {
-		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
-		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, Sanitize::randomQueryStringParam()));
+	$query = "SELECT ias.id FROM imas_drillassess_sessions AS ias,imas_students WHERE ";
+	$query .= "ias.drillassessid=:drillassessid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':drillassessid'=>$daid, ':courseid'=>$cid));
+	if ($stm->rowCount()>0) {
+		$beentaken = true;
 	} else {
-		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
+		$beentaken = false;
 	}
-	exit;
 }
-$query = "SELECT ias.id FROM imas_drillassess_sessions AS ias,imas_students WHERE ";
-$query .= "ias.drillassessid=:drillassessid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
-$stm = $DBH->prepare($query);
-$stm->execute(array(':drillassessid'=>$daid, ':courseid'=>$cid));
-if ($stm->rowCount()>0) {
-	$beentaken = true;
-} else {
-	$beentaken = false;
-}
+
 
 $useeditor = "summary";
 $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
