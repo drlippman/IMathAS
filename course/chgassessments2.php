@@ -56,8 +56,8 @@ if (!(isset($teacherid))) {
 		if ($_POST['copyopts'] != 'DNC') {
             $copyreqscore = !empty($_POST['copyreqscore']);
 			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,earlybonus,defoutcome';
-			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
+			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts']), ':courseid'=>$cid));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
@@ -432,14 +432,14 @@ if (!(isset($teacherid))) {
 		}
 
 		if ($_POST['summary'] !== 'DNC') {
-			$stm = $DBH->prepare("SELECT summary FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['summary'])));
+			$stm = $DBH->prepare("SELECT summary FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['summary']), ':courseid'=>$cid));
 			$sets[] = "summary=:summary";
 			$qarr[':summary'] = $stm->fetchColumn(0);
 		}
 		if ($_POST['dates'] !== 'DNC') {
-			$stm = $DBH->prepare("SELECT startdate,enddate,reviewdate,LPcutoff FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['dates'])));
+			$stm = $DBH->prepare("SELECT startdate,enddate,reviewdate,LPcutoff FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['dates']), ':courseid'=>$cid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$sets[] = "startdate=:startdate";
 			$qarr[':startdate'] = $row[0];
@@ -453,8 +453,8 @@ if (!(isset($teacherid))) {
 			$qarr[':LPcutoff'] = $row[3];
 		}
 		if ($_POST['copyendmsg'] !== 'DNC') {
-			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg'])));
+			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg']), ':courseid'=>$cid));
 			$sets[] = "endmsg=:endmsg";
 			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
@@ -487,8 +487,8 @@ if (!(isset($teacherid))) {
             }
         }
 		if ($_POST['intro'] !== 'DNC') {
-			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['intro'])));
+			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['intro']), ':courseid'=>$cid));
 			$cpintro = $stm->fetchColumn(0);
 			if (($introjson=json_decode($cpintro))!==null) { //is json intro
 				$newintro = $introjson[0];

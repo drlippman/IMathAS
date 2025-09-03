@@ -117,6 +117,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$rubricstring = serialize($rubric);
 		if ($_GET['id']!='new') { //MODIFY
+			$stm = $DBH->prepare("SELECT groupid,ownerid FROM imas_rubrics WHERE id=:id");
+			$stm->execute(array(':id'=>intval($_GET['id'])));
+			list($origgroupid,$origownerid) = $stm->fetch(PDO::FETCH_NUM);
+			if ($origownerid !== $userid && $origgroupid !== $groupid) {
+				echo 'No rights';
+				exit;
+			} else if ($origownerid !== $userid) {
+				$rubgrp = $origgroupid; // don't allow changing by group members
+			}
 			$stm = $DBH->prepare("UPDATE imas_rubrics SET name=:name,rubrictype=:rubrictype,groupid=:groupid,rubric=:rubric WHERE id=:id");
 			$stm->execute(array(':name'=>$_POST['rubname'], ':rubrictype'=>$_POST['rubtype'], ':groupid'=>$rubgrp, ':rubric'=>$rubricstring, ':id'=>$_GET['id']));
 		} else {
@@ -132,9 +141,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) { //MODIFY
 			if ($_GET['id']=='new') {//NEW
 				if (isset($_GET['copy'])) {
-					$stm = $DBH->prepare("SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,groupid,rubrictype,rubric,ownerid FROM imas_rubrics WHERE id=:id");
 					$stm->execute(array(':id'=>intval($_GET['copy'])));
-					list($rubname,$rubgrp,$rubtype,$rubric) = $stm->fetch(PDO::FETCH_NUM);
+					list($rubname,$rubgrp,$rubtype,$rubric,$origownerid) = $stm->fetch(PDO::FETCH_NUM);
+					if ($origownerid !== $userid && $rubgrp !== $groupid) {
+						echo 'No rights';
+						exit;
+					}
 					$rubric = unserialize($rubric);
 					$rubname = 'Copy of: '.$rubname;
 				} else {
@@ -146,9 +159,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$savetitle = _('Create Rubric');
 			} else {
 				$rubid = Sanitize::onlyInt($_GET['id']);
-				$stm = $DBH->prepare("SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=:id");
+				$stm = $DBH->prepare("SELECT name,groupid,rubrictype,rubric,ownerid FROM imas_rubrics WHERE id=:id");
 				$stm->execute(array(':id'=>$rubid));
-				list($rubname,$rubgrp,$rubtype,$rubric) = $stm->fetch(PDO::FETCH_NUM);
+				list($rubname,$rubgrp,$rubtype,$rubric,$ownerid) = $stm->fetch(PDO::FETCH_NUM);
+				if ($ownerid !== $userid && $rubgrp !== $groupid) {
+					echo 'No rights';
+					exit;
+				}
 				$rubric = unserialize($rubric);
 				$savetitle = _('Save Changes');
 			}

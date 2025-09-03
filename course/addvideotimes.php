@@ -54,8 +54,8 @@ if (isset($_POST['clearall'])) {
 	}
 
 	$data = serialize($data);
-	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
-	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
+	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id AND courseid=:courseid");
+	$stm->execute(array(':viddata'=>$data, ':id'=>$aid, ':courseid'=>$cid));
 
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addqpage?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 	exit;
@@ -68,9 +68,13 @@ require_once "../header.php";
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"$addqpage?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
-$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+$stm = $DBH->prepare("SELECT itemorder,viddata,courseid FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 $row = $stm->fetch(PDO::FETCH_NUM);
+if ($row[2] !== $cid) {
+	echo "Invalid ID";
+	exit;
+}
 $qorder = explode(',',$row[0]);
 $viddata = $row[1];
 $qidbynum = array();

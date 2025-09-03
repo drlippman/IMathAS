@@ -14,6 +14,13 @@
         $addq = 'addquestions';
         $from = 'from=addq';
     }
+	$stm = $DBH->prepare("SELECT itemorder,courseid FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($assessitemorder, $sourcecid) = $stm->fetch(PDO::FETCH_NUM);
+	if ($sourcecid !== $cid) {
+		echo "Invalid aid";
+		exit;
+	}
 
 	if (isset($_GET['record'])) {
 
@@ -182,10 +189,8 @@ END;
 			$extracats[] = $line['category'];
 		}
 	}
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	$row = $stm->fetch(PDO::FETCH_NUM);
-	$itemarrinit = explode(',',$row[0]);
+	
+	$itemarrinit = explode(',',$assessitemorder);
 	$itemarr = array();
 	$itemnum = array();
 	foreach ($itemarrinit as $k=>$v) {

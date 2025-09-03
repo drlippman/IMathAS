@@ -5,10 +5,10 @@
 
 if (!isset($imasroot)) {
 	require_once "../init.php";
-	if (!(isset($teacherid))) { // loaded by a NON-teacher
-		echo "You must be a teacher to access this page";
-		exit;
-	}
+}
+if (!(isset($teacherid))) { // loaded by a NON-teacher
+	echo "You must be a teacher to access this page";
+	exit;
 }
 
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -38,12 +38,12 @@ if (!isset($imasroot)) {
 		$endmsg['commonmsg'] = Sanitize::incomingHtml($_POST['commonmsg']);
 		$msgstr = serialize($endmsg);
 		if (isset($_POST['aid'])) {
-			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id=:id");
-			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>Sanitize::onlyInt($_POST['aid'])));
+			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>Sanitize::onlyInt($_POST['aid']), ':courseid'=>$cid));
 		} else if (isset($_POST['aidlist'])) {
 			$aidlist = implode(',', array_map('intval', explode(',',$_POST['aidlist'])));
-			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id IN ($aidlist)");
-			$stm->execute(array(':endmsg'=>$msgstr));
+			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id IN ($aidlist) AND courseid=:courseid");
+			$stm->execute(array(':endmsg'=>$msgstr, ':courseid'=>$cid));
 
 		}
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
@@ -66,9 +66,13 @@ if (!isset($imasroot)) {
 		echo "<a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
 	}
 	if (!isset($_POST['checked'])) {
-		$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT endmsg,courseid FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
-		$endmsg = $stm->fetchColumn(0);
+		list($endmsg,$sourcecid) = $stm->fetch(PDO::FETCH_NUM);
+		if ($sourcecid !== $cid) {
+			echo 'Invalid aid';
+			exit;
+		}
 	} else {
 		$endmsg = '';
 		if (empty($_POST['checked'])) {
