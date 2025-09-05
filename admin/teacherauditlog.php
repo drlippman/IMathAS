@@ -51,6 +51,7 @@ function getAllNames($allactions) {
     global $stunames, $offlinenames, $DBH;
     $uids = [];
     foreach ($allactions as $action) {
+        $uids[] = $action['userid'];
         if ($action['action'] == 'Delete Item' || $action['action'] == 'Clear Attempts') {
             $data = json_decode($action['metadata'], true);
             if (isset($data['grades'])) {
@@ -198,6 +199,7 @@ if ($overwriteBody==1) {
         exit;
     }
 
+/*
     $query = '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
     $query .= 'JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=?) UNION ALL ';
     $query .= '(SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
@@ -208,7 +210,7 @@ if ($overwriteBody==1) {
     while($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $teacherNames[$row['id']] = $row['LastName'].', '.$row['FirstName'];
     }
-
+*/
     echo '<div class=breadcrumb>', $curBreadcrumb, '</div>';
     echo '<div id="headeruserdetail" class="pagetitle"><h1>' . _('Teacher Audit Log') . ': ';
     echo Sanitize::encodeStringForDisplay($coursename);
@@ -232,7 +234,7 @@ if ($overwriteBody==1) {
             echo '<tr>';
             echo '<td>' . formatdate($action['created_at']) . '</td>';
             echo "<td><span class='pii-full-name'>";
-						echo Sanitize::encodeStringForDisplay($teacherNames[$action['userid']]);
+						echo Sanitize::encodeStringForDisplay($stunames[$action['userid']]);
 						echo " (" . Sanitize::onlyInt($action['userid']) . ')</span></td>';
             echo '<td>' . Sanitize::encodeStringForDisplay($action['action']) . '</td>';
             echo '<td>' . Sanitize::onlyInt($action['itemid']) . '</td>';

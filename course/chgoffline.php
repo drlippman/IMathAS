@@ -19,6 +19,11 @@ if (isset($_POST['checked'])) { //form submitted
 	}
 	$checked = array_map('Sanitize::onlyInt', $_POST['checked']);
 	$ph = Sanitize::generateQueryPlaceholders($checked);
+	// verify in course
+	$stm = $DBH->prepare("SELECT id FROM imas_gbitems WHERE id IN ($ph) AND courseid=?");
+	$stm->execute(array_merge($checked, [$cid]));
+	$checked = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+	$ph = Sanitize::generateQueryPlaceholders($checked);
 	if ($_POST['submit']=="Delete") {
 		if (isset($_POST['confirm'])) {
 			$gbitems = array();

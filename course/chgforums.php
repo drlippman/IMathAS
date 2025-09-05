@@ -13,9 +13,14 @@ if (!isset($teacherid)) {
 $cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_POST['checked'])) { //form submitted
-	$checked = $_POST['checked'];
 	require_once "../includes/parsedatetime.php";
+	$checked = $_POST['checked'];
 	$checkedlist = implode(',', array_map('intval', $checked));
+	$stm = $DBH->prepare("SELECT id FROM imas_forums WHERE id IN ($checkedlist) AND courseid=?");
+	$stm->execute([$cid]);
+	$checked = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+	$checkedlist = implode(',', array_map('intval', $checked));
+	
 	$sets = array();
 	$qarr = array();
 	if (isset($_POST['chgavail'])) {

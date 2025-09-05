@@ -1007,6 +1007,16 @@ switch($_POST['action']) {
 			*/
 			$DBH->commit();
 
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Course Settings Change",
+				null,
+				[
+					'action' => 'Course Created',
+					'via' => 'Home'
+				]
+			);
+
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 			$stm->execute(array($groupid));
 			$hasGroupLTI = ($stm->fetchColumn() !== false);

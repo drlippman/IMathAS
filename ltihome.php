@@ -171,6 +171,19 @@ if (!empty($createcourse)) {
 		if (function_exists('onAddCourse')) {
 			onAddCourse($cid, $userid);
 		}
+
+		require_once 'includes/TeacherAuditLog.php';
+		TeacherAuditLog::addTracking(
+			$destcid,
+			"Course Settings Change",
+			$destcid,
+			[
+				'action'=>'Establish LTI course connection',
+				'type'=>'ltihome',
+				'contextid'=>$_SESSION['lti_context_id'],
+				'copycourse'=>$createcourse
+			]
+		);
     }
     
     $shortorg = explode(':', $_SESSION['ltiorg'])[0];

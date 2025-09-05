@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__."/copyiteminc.php";
+require_once __DIR__."/TeacherAuditLog.php";
 
 // TODO: Revamp this total hack job.
 // Rewrite the item and course copying as a class
@@ -175,6 +176,16 @@ function copycourse($sourcecid, $name, $newUIver) {
   copyrubrics();
   $DBH->commit();
 
+  TeacherAuditLog::addTracking(
+    $destcid,
+    "Course Settings Change",
+    null,
+    [
+      'action' => 'Course Created',
+      'via' => 'coursecopy',
+      'copy' => $sourcecid
+    ]
+  );
   return $destcid;
 }
 

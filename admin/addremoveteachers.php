@@ -3,6 +3,7 @@
 // IMathAS (c) 2018 David Lippman
 
 require_once "../init.php";
+require_once "../includes/TeacherAuditLog.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -48,8 +49,17 @@ if (isset($_POST['remove'])) {
 	$toremove = array_diff($_POST['remove'], array($courseownerid));
 	$ph = Sanitize::generateQueryPlaceholders($toremove);
 	$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE userid IN ($ph) AND courseid=?");
-	$toremove[] = $cid;
-	$stm->execute($toremove);
+	$stm->execute(array_merge($toremove, [$cid]));
+
+	TeacherAuditLog::addTracking(
+		$cid,
+		"Course Settings Change",
+		null,
+		[
+			'action' => 'Remove Teachers',
+			'removed' => $toremove
+		]
+	);
 	
 	echo json_encode(getTeachers($cid), JSON_HEX_TAG);
 	exit;
@@ -67,6 +77,16 @@ if (isset($_POST['remove'])) {
 		$ph = Sanitize::generateQueryPlaceholdersGrouped($exarr,2);
 		$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES $ph");
 		$stm->execute($exarr);
+
+		TeacherAuditLog::addTracking(
+		$cid,
+		"Course Settings Change",
+		null,
+		[
+			'action' => 'Add Teachers',
+			'added' => $toadd
+		]
+	);
 	}
 	
 	echo json_encode(getTeachers($cid), JSON_HEX_TAG);

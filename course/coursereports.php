@@ -14,9 +14,9 @@ $body = "";
 $pagetitle = "Course Reports";
 $cid = Sanitize::courseId($_GET['cid']);
 
-if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
+if (!isset($teacherid) && !isset($tutorid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
-	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
+	$body = _("You are not authorized to view this page");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
 }

@@ -3,6 +3,7 @@
 // IMathAS (c) 2018 David Lippman
 
 require_once "../init.php";
+require_once "../includes/TeacherAuditLog.php";
 
 if ($myrights<40) {
 	echo "Not authorized to view this page";
@@ -60,6 +61,16 @@ if (!empty($_POST['newowner'])) {
 			$stm->execute(array(':courseid'=>$cid, ':userid'=>$courseownerid));
 		}
 	}
+	TeacherAuditLog::addTracking(
+		$cid,
+		"Course Settings Change",
+		null,
+		[
+			'action' => 'Transfer Owner',
+			'from' => $courseownerid,
+			'to' => $ownerid
+		]
+	);
 	header('Location: ' . $GLOBALS['basesiteurl'] . $backloc );
 	exit;
 }
