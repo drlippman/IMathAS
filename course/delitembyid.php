@@ -9,9 +9,13 @@ if (isset($CFG['hooks']['delete'])) {
 
 function delitembyid($itemid) {
 	global $DBH, $cid;
-	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
-	$stm->execute(array(':id'=>$itemid));
+	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id AND courseid=:courseid");
+	$stm->execute(array(':id'=>$itemid, ':courseid'=>$cid));
 	list($itemtype,$typeid) = $stm->fetch(PDO::FETCH_NUM);
+	if (empty($itemtype)) {
+		echo 'Invalid ID';
+		exit;
+	}
 	$typeid = Sanitize::simpleString($typeid);
 
 	if ($itemtype == "InlineText") {

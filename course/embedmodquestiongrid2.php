@@ -11,6 +11,17 @@
     }
     $aid = intval($_GET['aid']);
 
+	//get defaults
+	$query = "SELECT defpoints,defattempts,showhints,showwork,ver FROM imas_assessments ";
+	$query .= "WHERE id=:id AND courseid=:cid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
+	$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($defaults === false) {
+		echo 'Invalid ID';
+		exit;
+	}
+
 	if (isset($_POST['action'])) {
 		require_once "../includes/updateptsposs.php";
 		if ($_POST['action'] == 'add') { //adding new questions
@@ -116,23 +127,18 @@
             }
 			$jsonintro = json_decode($intro,true);
 
-			//what qsetids do we need for adding copies?
-			$lookupid = array();
-			foreach(explode(',',$_POST['qids']) as $qid) {
-				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
-					$lookupid[] = intval($qid);
-				}
-			}
+			
 			//lookup qsetids
 			$qidtoqsetid = array();
-			if (count($lookupid)>0) {
-				$stm = $DBH->query("SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")"); //sanitized above
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$qidtoqsetid[$row[0]] = $row[1];
-				}
+			$stm = $DBH->prepare("SELECT id,questionsetid FROM imas_questions WHERE assessmentid=?");
+			$stm->execute([$aid]);
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$qidtoqsetid[$row[0]] = $row[1];
 			}
+			
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
+				if (!isset($qidtoqsetid[$qid])) { continue; } // invalid qid
 				$attempts = trim($_POST['attempts'.$qid]);
                 $showhints = !empty($_POST['showhintsusedef'.$qid]) ? -1 : (
                     (empty($_POST['showhints1'.$qid]) ? 0 : 1) +
@@ -204,13 +210,7 @@
         exit;
 
 	} else {
-		//get defaults
-		$query = "SELECT defpoints,defattempts,showhints,showwork,ver FROM imas_assessments ";
-		$query .= "WHERE id=:id";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$aid));
-        $defaults = $stm->fetch(PDO::FETCH_ASSOC);
-        
+	
         if ($defaults['ver'] > 1) {
             $query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
             $query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
@@ -323,8 +323,9 @@
 			$qidlist = implode(',', array_map('intval', $qids));
 			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questions.showwork,imas_questionset.extref,imas_questionset.id AS qsid ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
-			$query .= "imas_questions.id IN ($qidlist)";
-			$stm = $DBH->query($query);
+			$query .= "imas_questions.id IN ($qidlist) AND imas_questions.assessmentid=?";
+			$stm = $DBH->prepare($query);
+			$stm->execute([$aid]);
 			$cnt = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['attempts']==9999) {
@@ -420,11 +421,11 @@
 			$first = true;
 			$cnt = 0;
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$n = 1;
 				if ($row[3]=='multipart') {
-					preg_match('/anstypes\s*=(.*)/',$row[4],$match);
-					$n = substr_count($match[1],',')+1;
-				} else {
-					$n = 1;
+					if (preg_match('/anstypes\s*=(.*)/',$row[4],$match)) {
+						$n = substr_count($match[1],',')+1;
+					}
 				}
 				echo '<tr><td id="qd'.$cnt.'">'.Sanitize::encodeStringForDisplay($row[1]).'</td>';
 				if ($row[2]!='') {

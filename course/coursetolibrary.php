@@ -2,7 +2,7 @@
 //Utility function for copying questions used in an assessment into a seperate library
 //not integrated into user interface
 require_once "../init.php";
-if (!isset($teacherid)) {exit;}
+if ($myrights < 100) {exit;}
 
 if (!isset($_GET['cid'])) {
 	echo "No course identified";
