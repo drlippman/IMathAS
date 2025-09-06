@@ -75,8 +75,24 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 } elseif (!(isset($_GET['cid'])) || !(isset($_GET['aid']))) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
+} elseif (empty($aid) || empty($uid)) {
+	$overwriteBody=1;
+	$body = "Invalid values";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = Sanitize::courseId($_GET['cid']);
+	// check valid values
+	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm->execute([$aid]);
+	if ($stm->fetchColumn(0) !== $cid) {
+		echo 'Invalid aid';
+		exit;
+	}
+
+	$stm = $DBH->prepare("SELECT id FROM imas_students WHERE courseid=? AND userid=?");
+	$stm->execute([$cid, $uid]);
+	if ($stm->fetchColumn(0) === false) {
+		echo 'Invalid uid';
+		exit;
+	}
 
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
@@ -124,7 +140,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 
 		//check if exception already exists
 		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid));
+		$stm->execute(array(':userid'=>$uid, ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
 			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty,timeext=:timeext,attemptext=:attemptext WHERE id=:id");
@@ -133,26 +149,24 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext,itemtype) VALUES ";
 			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :timeext, :attemptext, 'A')";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate,
+			$stm->execute(array(':userid'=>$uid, ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate,
 				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':attemptext'=>$attemptext));
 		}
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid=:userid AND courseid=:courseid");
-			$stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
+			$stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 		}
 
 		//force regen?
 		if (isset($_POST['forceregen'])) {
 			//this is not group-safe
-			$stu = $_GET['uid'];
-			$aid = Sanitize::onlyInt($_GET['aid']);
 			$stm = $DBH->prepare("SELECT shuffle FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			list($shuffle) = $stm->fetch(PDO::FETCH_NUM);
 			$allqsameseed = (($shuffle&2)==2);
 			$stm = $DBH->prepare("SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
-			$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
+			$stm->execute(array(':userid'=>$uid, ':assessmentid'=>$aid));
 			if ($stm->rowCount()>0) {
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if (strpos($row[1],';')===false) {
@@ -207,8 +221,8 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 		header('Location: ' . $backurl);
         exit;
 	} else if (isset($_GET['clear'])) {
-		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['clear']));
+		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:uid AND assessmentid=:aid");
+		$stm->execute(array(':uid'=>$uid, ':aid'=>$aid));
 		header('Location: ' . $backurl);
         exit;
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
@@ -216,7 +230,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 		$stm->execute(array(':id'=>$uid));
 		$stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
 		$stm = $DBH->prepare("SELECT startdate,enddate,date_by_lti,ver FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
+		$stm->execute(array(':id'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$sdate = tzdate("m/d/Y",$row[0]);
 		$edate = tzdate("m/d/Y",$row[1]);
@@ -227,13 +241,13 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 
 		//check if exception already exists
 		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>Sanitize::onlyInt($_GET['aid'])));
+		$stm->execute(array(':userid'=>$uid, ':assessmentid'=>$aid));
 		$erow = $stm->fetch(PDO::FETCH_ASSOC);
 		$page_isExceptionMsg = "";
 		$savetitle = _('Create Exception');
 		if ($erow != null) {
 			$savetitle = _('Save Changes');
-			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($_GET['aid']) . "&uid=" . Sanitize::onlyInt($_GET['uid']) . "&clear=" . Sanitize::encodeUrlParam($erow['id']) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> or modify below.</p>';
+			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&uid=" . Sanitize::onlyInt($uid) . "&clear=" . Sanitize::encodeUrlParam($erow['id']) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> or modify below.</p>';
 			$sdate = tzdate("m/d/Y",$erow['startdate']);
 			$edate = tzdate("m/d/Y",$erow['enddate']);
 			$stime = tzdate("g:i a",$erow['startdate']);
@@ -256,7 +270,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 	} 
 	//DEFAULT LOAD DATA MANIPULATION
 	$address = $GLOBALS['basesiteurl'] . "/course/exception.php?" . Sanitize::generateQueryStringFromMap(array(
-			'cid' => $_GET['cid'], 'uid' => $_GET['uid'], 'asid' => $asid, 'stu' => $stu, 'from' => $from));
+			'cid' => $_GET['cid'], 'uid' => $uid, 'asid' => $asid, 'stu' => $stu, 'from' => $from));
 	$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$page_courseSelect = array();
@@ -269,7 +283,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 
 }
 $stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
-$stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
+$stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 $latepasses = $stm->fetchColumn(0);
 
 /******* begin html output ********/
@@ -307,12 +321,12 @@ if ($overwriteBody==1) {
 	echo '<h2><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($stuname).'</span></h2>';
 	echo $page_isExceptionMsg;
 	echo '<p><label for=aidselect class="form">Assessment:</label><span class="formright">';
-	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($_GET['aid']),"Select an assessment","", " onchange='nextpage()'");
+	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($aid),"Select an assessment","", " onchange='nextpage()'");
 	echo '</span><br class="form"/></p>';
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
 		$exceptionUrl = "exception.php?" . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-				'aid' => $_GET['aid'], 'uid' => $_GET['uid'], 'stu' => $stu, 'asid' => $asid, 'from' => $from,
+				'aid' => $aid, 'uid' => $uid, 'stu' => $stu, 'asid' => $asid, 'from' => $from,
             ));
 ?>
 	<form method=post action="<?php echo Sanitize::encodeStringForDisplay($exceptionUrl); ?>">

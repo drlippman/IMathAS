@@ -87,9 +87,13 @@ if (isset($_POST['options'])) {
 	if (isset($_POST['la'])) { $dola = true; $outcol++;}
 
 	//get assessment info
-	$stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,courseid FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($defpoints, $assessname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($defpoints, $assessname, $itemorder, $sourcecid) = $stm->fetch(PDO::FETCH_NUM);
+	if ($sourcecid !== $cid) {
+		echo 'Invalid ID';
+		exit;
+	}
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
