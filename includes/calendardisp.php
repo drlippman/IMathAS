@@ -248,7 +248,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					 require_once "../includes/updateptsposs.php";
 					 $reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
 				 }
-				 if (round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
+				 if ($reqscoreptsposs > 0 && round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
 					 if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 						 $showgrayedout = true;
 					 } else {
