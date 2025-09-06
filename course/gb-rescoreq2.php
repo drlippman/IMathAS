@@ -6,9 +6,9 @@ require_once "../init.php";
 require_once "../assess2/AssessInfo.php";
 require_once "../assess2/AssessRecord.php";
 
-if (!isset($teacherid) && !isset($tutorid)) {
+if (!isset($teacherid)) {
 	require_once "../header.php";
-	echo "You need to log in as a teacher or tutor to access this page";
+	echo "You need to log in as a teacher to access this page";
 	require_once "../footer.php";
 	exit;
 }
