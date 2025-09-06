@@ -46,7 +46,7 @@ $stm = $DBH->prepare("SELECT d.name,d.ownerid,u.groupid FROM imas_diags AS d
 	JOIN imas_users AS u ON d.ownerid=u.id WHERE d.id=:id");
 $stm->execute(array(':id'=>$diag));
 list($diagName, $diagOwner, $diagGroup) = $stm->fetch(PDO::FETCH_NUM);
-if ($diagName === false) {
+if (empty($diagOwner)) {
 	echo 'Invalid id';
 	exit;
 }

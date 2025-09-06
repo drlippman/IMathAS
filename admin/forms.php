@@ -70,7 +70,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT ic.name,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($name,$courseowner,$coursegroup) = $stm->fetch(PDO::FETCH_NUM);
-		if ($name === false ||
+		if (empty($courseowner) ||
 			($myrights < 75 && $courseowner !== $userid) ||
 			($myrights < 100 && $coursegroup !== $groupid)
 		) {
