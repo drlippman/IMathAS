@@ -96,4 +96,24 @@ function removegroupmember($grpid, $uid) {
 	}
 }
 
+function checkGroupSetIDinCourse($grpsetid,$cid) {
+	global $DBH;
+	$stm = $DBH->prepare("SELECT courseid FROM imas_stugroupset WHERE id=?");
+	$stm->execute([$grpsetid]);
+	if ($stm->fetchColumn(0) !== $cid) {
+		echo 'Invalid grpsetid';
+		exit;
+	}
+}
+function checkGroupIDinCourse($grpid,$cid) {
+	global $DBH;
+	$stm = $DBH->prepare("SELECT gset.courseid FROM imas_stugroupset AS gset JOIN
+		imas_stugroups AS grp ON grp.groupsetid=gset.id WHERE grp.id=?");
+	$stm->execute([$grpid]);
+	if ($stm->fetchColumn(0) !== $cid) {
+		echo 'Invalid grpid';
+		exit;
+	}
+}
+
 ?>

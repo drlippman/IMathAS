@@ -33,9 +33,9 @@ if (isset($_POST['submit'])) {
 			$date = $_POST['date'.$id];
 			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 			$date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-			$stm = $DBH->prepare("UPDATE imas_calitems SET date=:date,tag=:tag,title=:title WHERE id=:id");
+			$stm = $DBH->prepare("UPDATE imas_calitems SET date=:date,tag=:tag,title=:title WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':date'=>$date, ':tag'=>Sanitize::stripHtmlTags($tag),
-				':title'=>Sanitize::stripHtmlTags($_POST['txt'][$id]), ':id'=>$id));
+				':title'=>Sanitize::stripHtmlTags($_POST['txt'][$id]), ':id'=>$id, ':courseid'=>$cid));
 		}
 	}
 
