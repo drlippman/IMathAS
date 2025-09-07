@@ -22,7 +22,7 @@ if (isset($CFG['hooks']['init'])) {
 	require_once $CFG['hooks']['init'];
 }
 
-$lastvueupdate = '20250820';
+$lastvueupdate = '20250907';
 
 // setup session stuff
 if (!function_exists('disallowsSameSiteNone')) {

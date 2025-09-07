@@ -404,14 +404,17 @@ export default {
     },
     allFull () {
       for (let i = 0; i < this.answeights.length; i++) {
-        this.curScores[i] = this.partPoss[i];
-        actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+        if (this.curScores[i] < this.partPoss[i]) {
+          this.curScores[i] = this.partPoss[i];
+          actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+        }
       }
     },
     manualFull () {
       for (let i = 0; i < this.answeights.length; i++) {
         if (this.qdata.parts[i] && this.qdata.parts[i].hasOwnProperty('req_manual') &&
-          this.qdata.parts[i].req_manual === true
+          this.qdata.parts[i].req_manual === true &&
+          this.curScores[i] < this.partPoss[i]
         ) {
           this.curScores[i] = this.partPoss[i];
           actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);

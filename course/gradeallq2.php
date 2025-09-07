@@ -361,7 +361,7 @@
 
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=022223"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=090725"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060724"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastvueupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastvueupdate.'" />';
@@ -512,7 +512,7 @@
         echo '<li><label><input type=checkbox id="filter-zero" onchange="updatefilters()">'._('Score = 0').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100% (before penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-perfect" onchange="updatefilters()">'._('Score = 100% (before penalties)').'</label></li>';
-        echo '<li><label><input type=checkbox id="filter-100" onchange="updatefilters()">'._('Score = 100% (after penalties)').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-100" onchange="updatefilters()">'._('Score ≥ 100% (after penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-work" onchange="updatefilters()">'._('Questions with Work').'</label></li>';
@@ -680,7 +680,7 @@
                         $classes = 'qfilter-zero';
                     }
                 }
-                if (abs($qdata['score'] - $qdata['points_possible']) < .002) {
+                if ($qdata['score'] > $qdata['points_possible'] - .002) {
                     $classes .= ' qfilter-100';
                 }
                 if (trim($qdata['feedback']) !== '') {

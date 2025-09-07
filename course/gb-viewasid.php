@@ -576,7 +576,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$_SESSION['coursetheme'] = $coursetheme;
 		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=090725"></script>';
 			require_once "../includes/rubric.php";
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060724"></script>';
 			if ($_SESSION['useed']!=0) {
