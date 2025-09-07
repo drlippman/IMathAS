@@ -80,9 +80,10 @@ if (!empty($search['unused']) && $searchcontext!='c') {
     // populate existing if unused is set
     $query = 'SELECT iqs.id FROM imas_questionset AS iqs
         JOIN imas_questions AS iq ON iq.questionsetid=iqs.id
-        WHERE iq.assessmentid=?';
+        JOIN imas_assessments AS ia ON iq.assessmentid=ia.id
+        WHERE iq.assessmentid=? AND ia.courseid=?';
     $stm = $DBH->prepare($query);
-    $stm->execute(array($aid));
+    $stm->execute(array($aid, $cid));
     $options['existing'] = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 }
 if ($searchcontext=='c') {

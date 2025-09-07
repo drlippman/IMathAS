@@ -182,10 +182,10 @@
 				$query .= "WHERE iq.id=:id AND iq.ownerid=imas_users.id AND (imas_users.groupid=:groupid OR iq.userights>2)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
-				if ($stm->rowCount()==0) {
+				$row = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($row === false) {
 					$isok = false;
 				} else {
-					$row = $stm->fetch(PDO::FETCH_ASSOC);
 					if ($row['userights'] > 3 && $row['groupid'] != $groupid) {
 						// is a "allow mod by all" and not in group; cannot change userights or license or attrib
 						$_POST['userights'] = $row['userights'];
@@ -193,20 +193,16 @@
 						$_POST['addattr'] = $row['otherattribution'];
 					}
 				}
-				//$query = "UPDATE imas_questionset AS iq,imas_users SET iq.description='{$_POST['description']}',iq.author='{$_POST['author']}',iq.userights='{$_POST['userights']}',";
-				//$query .= "iq.qtype='{$_POST['qtype']}',iq.control='{$_POST['control']}',iq.qcontrol='{$_POST['qcontrol']}',";
-				//$query .= "iq.qtext='{$_POST['qtext']}',iq.answer='{$_POST['answer']}',iq.lastmoddate=$now ";
-				//$query .= "WHERE iq.id='{$_GET['id']}' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>2)";
 			}
 			if (!$isadmin && !$isgrpadmin) {  //check is owner or is allowed to modify
 				$query = "SELECT iq.id,iq.ownerid,iq.userights,iq.license,iq.otherattribution,imas_users.groupid FROM imas_questionset AS iq,imas_users ";
 				$query .= "WHERE iq.id=:id AND iq.ownerid=imas_users.id AND (iq.ownerid=:ownerid OR (iq.userights=3 AND imas_users.groupid=:groupid) OR iq.userights>3)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['id'], ':ownerid'=>$userid, ':groupid'=>$groupid));
-				if ($stm->rowCount()==0) {
+				$row = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($row === false) {
 					$isok = false;
 				} else {
-					$row = $stm->fetch(PDO::FETCH_ASSOC);
 					if ($row['ownerid'] != $userid &&
 						($row['userights'] != 3 || $row['groupid'] != $groupid)
 					) {

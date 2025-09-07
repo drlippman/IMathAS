@@ -2,6 +2,8 @@
 //IMathAS:  Mass send email or message to students; called from List Users or Gradebook
 //(c) 2006 David Lippman
 
+require_once '../includes/checkdata.php';
+
 	if (!isset($DBH)) {
 		require_once "../init.php";
 		if (isset($_GET['embed'])) {
@@ -24,9 +26,13 @@
 		if (intval($_POST['aidselect'])!=0) {
 			$limitaid = $_POST['aidselect'];
 			$limittype = $_POST['limittype'];
-			$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=?");
-			$stm->execute(array($limitaid));
+			$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=? AND courseid=?");
+			$stm->execute(array($limitaid,$cid));
 			$aver = $stm->fetchColumn(0);
+			if ($aver === false) {
+				echo 'Invalid assessement';
+				exit;
+			}
 
 			if ($limittype=='comp') {
 				if ($aver > 1) {
@@ -65,25 +71,28 @@
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
-			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email,FCMtoken FROM imas_users WHERE id IN ($tolist)");
+			$stm = $DBH->prepare("SELECT iu.FirstName,iu.LastName,iu.id,iu.msgnotify,iu.email,iu.FCMtoken 
+				FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id 
+				WHERE iu.id IN ($tolist) AND courseid=?");
+			$stm->execute([$cid]);
 			$emailaddys = array();
 			$FCMtokens = array();
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				if (!in_array($row[2],$toignore)) {
-					$fullnames[$row[2]] = strip_tags($row[1]. ', '.$row[0]);
-					$firstnames[$row[2]] = strip_tags($row[0]);
-					$lastnames[$row[2]] = strip_tags($row[1]);
+			$toarr = [];
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (!in_array($row['id'],$toignore)) {
+					$fullnames[$row['id']] = strip_tags($row['LastName']. ', '.$row['FirstName']);
+					$firstnames[$row['id']] = strip_tags($row['FirstName']);
+					$lastnames[$row['id']] = strip_tags($row['LastName']);
 
-					if ($row[3]==1 && $row[4]!='' && $row[4]!='none@none.com') {
-						$emailaddys[$row[2]] = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[4]) .'>';
+					if ($row['msgnotify']==1 && $row['email']!='' && $row['email']!='none@none.com') {
+						$emailaddys[$row['id']] = Sanitize::simpleASCII("{$row['FirstName']} {$row['LastName']}"). ' <'. Sanitize::emailAddress($row['email']) .'>';
 					}
-					if ($row[5]!='') {
-						$FCMtokens[$row[2]] = $row[5];
+					if ($row['FCMtoken']!='') {
+						$FCMtokens[$row['id']] = $row['FCMtoken'];
 					}
+					$toarr[] = $row['id'];
 				}
 			}
-
-			$tolist = explode(',',$_POST['tolist']);
 
 			if (isset($_POST['savesent'])) {
 				$deleted = 0;
@@ -97,7 +106,7 @@
 			require_once "../includes/email.php";
 			require_once "../includes/FCM.php";
 
-			foreach ($tolist as $msgto) {
+			foreach ($toarr as $msgto) {
 				if (!in_array($msgto,$toignore)) {
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]), $messagePost);
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,deleted,courseid) VALUES ";
@@ -151,15 +160,18 @@
 			//$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 			//$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id";
 			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
-			$stm = $DBH->query("SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)");
+			$stm = $DBH->prepare("SELECT iu.FirstName,iu.LastName,iu.id,iu.email
+				FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id 
+				WHERE iu.id IN ($tolist) AND courseid=?");
+			$stm->execute([$cid]);
 			$emailaddys = array();
 			$fullnames = array();
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				if (!in_array($row[3],$toignore) && $row[2]!='' && $row[2]!='none@none.com') {
-					$emailaddys[] = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[2]) .'>';
-					$firstnames[] = $row[0];
-					$lastnames[] = $row[1];
-					$fullnames[] = $row[1].', '.$row[0];
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (!in_array($row['id'],$toignore) && $row['email']!='' && $row['email']!='none@none.com') {
+					$emailaddys[] = Sanitize::simpleASCII("{$row['FirstName']} {$row['LastName']}"). ' <'. Sanitize::emailAddress($row['email']) .'>';
+					$firstnames[] = $row['FirstName'];
+					$lastnames[] = $row['LastName'];
+					$fullnames[] = $row['LastName'].', '.$row['FirstName'];
 				}
 			}
 
@@ -341,7 +353,10 @@
 		echo "<div class=submit><input type=submit value=\"Send ".Sanitize::encodeStringForDisplay($sendtype)."\"></div>\n";
 		echo "</form>\n";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));
-		$stm = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
+		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu
+			JOIN imas_students AS istu ON istu.userid=iu.id 
+			WHERE iu.id IN ($tolist) AND istu.courseid=? ORDER BY LastName,FirstName");
+		$stm->execute([$cid]);
 		if (isset($_GET['nolimit'])) {
 			echo '<p>Message will be sent to:<ul>';
 		} else {

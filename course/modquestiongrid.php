@@ -12,10 +12,13 @@
 		require_once "../includes/updateptsposs.php";
 		require_once "../includes/TeacherAuditLog.php";
 		if (isset($_POST['add'])) { //adding new questions
-			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$aid));
+			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
+			$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 			list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
-
+			if ($itemorder === null || $itemorder === false) {
+				echo 'Invalid aid';
+				exit;
+			}
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
 				$newitemorder = '1|0';
@@ -91,10 +94,13 @@
 			updatePointsPossible($aid, $itemorder, $defpoints);
 
 		} else if (isset($_POST['mod'])) { //modifying existing
-			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$aid));
+			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
+			$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
-
+			if ($itemorder === null || $itemorder === false) {
+				echo 'Invalid aid';
+				exit;
+			}
 			// get old settings
 			$stm = $DBH->prepare("SELECT * FROM imas_questions WHERE assessmentid=?");
 			$stm->execute(array($aid));
@@ -106,18 +112,20 @@
 			$changes = array();
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
+				if (!isset($old_settings[$qid])) {
+					continue; // invalid qid
+				}
 				$attempts = trim($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
-				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
 				$settings = array(':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid);
 				$stm = $DBH->prepare("UPDATE imas_questions SET attempts=:attempts,showhints=:showhints WHERE id=:id");
 				$stm->execute($settings);
 				foreach ($old_settings[$qid] as $k=>$v) {
-	        if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
-	          $changes[$qid][$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
-	        }
-	      }
+					if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
+						$changes[$qid][$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
+					}
+				}
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
 					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
 						$qsetid = $old_settings[$qid]['questionsetid'];
@@ -141,13 +149,13 @@
 			// we only get to modquestiongrid if assessment is untaken,
 			// and we're not logging course building changes for now
 			if (false && count($changes)>0) {
-        TeacherAuditLog::addTracking(
-          $cid,
-          "Question Settings Change",
-          $_GET['id'],
-          $changes
-        );
-      }
+				TeacherAuditLog::addTracking(
+					$cid,
+					"Question Settings Change",
+					$_GET['id'],
+					$changes
+				);
+			}
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
 
@@ -157,10 +165,14 @@
 	} else {
 		//get defaults
 		$query = "SELECT defpoints,defattempts,showhints FROM imas_assessments ";
-		$query .= "WHERE id=:id";
+		$query .= "WHERE id=:id AND courseid=:cid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$aid));
+		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($defaults === false) {
+			echo 'Invalid aid';
+			exit;
+		}
 		$defaults['showhints'] = ($defaults['showhints']==1)?_('Yes'):_('No');
 
 		$pagetitle = "Question Settings";

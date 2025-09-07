@@ -12,12 +12,17 @@
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
-		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+		echo 'Only true students can redeem latepasses';
+		exit;
 	}
 
-	$stm = $DBH->prepare("SELECT allowlate,postby,replyby,enddate FROM imas_forums WHERE id=:id");
-	$stm->execute(array(':id'=>$fid));
+	$stm = $DBH->prepare("SELECT allowlate,postby,replyby,enddate FROM imas_forums WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$fid, ':cid'=>$cid));
 	$fdata = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($fdata === false) { 
+		echo 'Invalid forum';
+		exit;
+	}
 	$allowlate = $fdata['allowlate'];
 	$postby = $fdata['postby'];
 	$replyby = $fdata['replyby'];
@@ -197,7 +202,6 @@
 		}
 
 	} else {
-		//TO HERE - TODO keep going
 		require_once "../header.php";
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {

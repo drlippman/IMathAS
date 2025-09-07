@@ -25,8 +25,8 @@ if (isset($studentid) && !$inInstrStuView) {
 		$typeid = intval($_POST['unloadinglinked']);
 		$stm = $DBH->prepare("SELECT id FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='linkedlink' AND typeid=:typeid ORDER BY viewtime DESC LIMIT 1");
 		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid, ':typeid'=>$typeid));
-		if ($stm->rowCount()>0) {
-			$row = $stm->fetch(PDO::FETCH_NUM);
+		$row = $stm->fetch(PDO::FETCH_NUM);
+		if ($row !== false) {
 			$stm = $DBH->prepare("UPDATE imas_content_track SET info=CONCAT(info,:info) WHERE id=:id");
 			$stm->execute(array(':info'=>"::$now", ':id'=>$row[0]));
 		}

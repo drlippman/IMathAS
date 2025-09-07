@@ -23,9 +23,13 @@ if (isset($_POST['mergefrom'])) {
 	$fieldstocopy .= 'istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,';
 	$fieldstocopy .= 'posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,';
 	$fieldstocopy .= 'ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty';
-	$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$seta[0]));
+	$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$seta[0], ':cid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === false) {
+		echo 'Invalid id';
+		exit;
+	}
 	$defpoints = $row['defpoints'];
 	$row['name'] .= ' - merge result';
 	$row['courseid'] = $cid;
@@ -45,9 +49,13 @@ if (isset($_POST['mergefrom'])) {
 	}
 
 	for ($i=0;$i<count($seta);$i++) {
-		$stm = $DBH->prepare("SELECT itemorder,intro,name FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$seta[$i]));
+		$stm = $DBH->prepare("SELECT itemorder,intro,name FROM imas_assessments WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$seta[$i], ':cid'=>$cid));
 		list($itemorder, $curintro, $thisname) = $stm->fetch(PDO::FETCH_NUM);
+		if (empty($itemorder)) {
+			continue;
+		}
+			
 		$thisintro = '';
 		if (isset($_POST['addpages'])) {
 			$thisintro .= "<p>[PAGE $thisname]</p>";
