@@ -28,3 +28,15 @@ function filter_items_by_course(array $ids, string $table, int $course) {
     $stm->execute(array_merge($ids, [$course]));
     return array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
 }
+
+/*
+ * Checks user has some role in course
+ */
+function check_user_in_course($uid, $course) {
+    global $DBH;
+    $stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=? AND courseid=?
+        UNION ALL SELECT id FROM imas_tutors WHERE userid=? AND courseid=?
+        UNION ALL SELECT id FROM imas_teachers WHERE userid=? AND courseid=?");
+    $stm->execute([$uid,$course,$uid,$course,$uid,$course]);
+    return ($stm->fetchColumn(0) !== false);
+}

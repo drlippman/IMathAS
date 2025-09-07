@@ -73,11 +73,12 @@ if ($itemtype == 'B') {
 }
 $stm = $DBH->prepare("SELECT $field FROM $table WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':id'=>$itemid, ':courseid'=>$cid));
-if ($stm->rowCount()==0) {
+$row = $stm->fetch(PDO::FETCH_NUM);
+if ($row === false) {
 	echo '{"res":"error", "error":"invalid item id"}';
 	exit;
 }
-$row = $stm->fetch(PDO::FETCH_NUM);
+
 $newdate = adjustDate($row[0],$year,$month,$day);
 $stm = $DBH->prepare("UPDATE $table set $field=:field WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':field'=>$newdate, ':id'=>$itemid, ':courseid'=>$cid));

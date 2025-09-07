@@ -13,9 +13,15 @@ $now = time();
 
 if (isset($_REQUEST['libitemid'])) {
     $libitemids = [$_REQUEST['libitemid']];
+    if (!isset($_REQUEST['flag'])) {
+        exit;
+    }
     $flags = [$_REQUEST['flag']];
 } else {
     $libitemids = explode(',', $_REQUEST['libitemids']);
+    if (!isset($_REQUEST['flags'])) {
+        exit;
+    }
     $flags = explode(',', $_REQUEST['flags']);
 }
 

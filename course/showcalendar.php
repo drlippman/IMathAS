@@ -10,10 +10,10 @@
 	}
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	if (isset($_GET['editing'])) {
+	if (isset($_GET['editing']) && isset($teacherid)) {
 		$editingon = $_GET['editing']=='on';
 		$_SESSION[$cid.'caledit'] = $editingon;
-	} else if (isset($_SESSION[$cid.'caledit'])) {
+	} else if (isset($_SESSION[$cid.'caledit']) && isset($teacherid)) {
 		$editingon = $_SESSION[$cid.'caledit'];
 	} else {
 		$editingon = false;

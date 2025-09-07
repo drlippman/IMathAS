@@ -22,11 +22,11 @@
 		
 	$stm = $DBH->prepare("SELECT text,title,fileorder FROM imas_inlinetext WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$inlinetextid, ':cid'=>$cid));
-	if ($stm->rowCount()==0) {
+	list($text,$title,$fileorder) = $stm->fetch(PDO::FETCH_NUM);
+	if ($text === null || $text === false) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($text,$title,$fileorder) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
 
