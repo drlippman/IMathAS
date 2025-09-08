@@ -1237,9 +1237,12 @@ switch($_GET['action']) {
 			}
 			if (empty($browser['owner'])) {
 				if (!isset($udat)) {
-					$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
+					$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
 					$stm->execute(array(':id'=>$userid));
 					$udat = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($udat['groupid']==0) {
+						$udat['name'] = _('Default Group');
+					}
 				}
 				$browser['owner'] = $udat['FirstName'].' '.$udat['LastName'].' ('.$udat['name'].')';
 			}
