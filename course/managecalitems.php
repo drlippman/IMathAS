@@ -26,16 +26,19 @@ if (isset($_POST['submit'])) {
 			$stm->execute(array(':id'=>$id, ':courseid'=>$cid));
 		}
 	}
-
+	$err = '';
 	//update the rest
 	if (isset($_POST['tag']) && count($_POST['tag'])>0) {
 		foreach ($_POST['tag'] as $id=>$tag) {
 			$date = $_POST['date'.$id];
-			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-			$date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-			$stm = $DBH->prepare("UPDATE imas_calitems SET date=:date,tag=:tag,title=:title WHERE id=:id AND courseid=:courseid");
-			$stm->execute(array(':date'=>$date, ':tag'=>Sanitize::stripHtmlTags($tag),
-				':title'=>Sanitize::stripHtmlTags($_POST['txt'][$id]), ':id'=>$id, ':courseid'=>$cid));
+			if (preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches)) {
+				$date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+				$stm = $DBH->prepare("UPDATE imas_calitems SET date=:date,tag=:tag,title=:title WHERE id=:id AND courseid=:courseid");
+				$stm->execute(array(':date'=>$date, ':tag'=>Sanitize::stripHtmlTags($tag),
+					':title'=>Sanitize::stripHtmlTags($_POST['txt'][$id]), ':id'=>$id, ':courseid'=>$cid));
+			} else {
+				$err .= sprintf(_('Error parsing date "%s"; no change made. '), Sanitize::encodeStringForDisplay($date));
+			}
 		}
 	}
 
@@ -44,27 +47,36 @@ if (isset($_POST['submit'])) {
 	while (isset($_POST['datenew-'.$newcnt])) {
 		if (trim($_POST['tagnew-'.$newcnt])!='' && (trim($_POST['txtnew-'.$newcnt])!='' || $_POST['tagnew-'.$newcnt] != '!')) {
 			$date = $_POST['datenew-'.$newcnt];
-			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-            $datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-            $dayofweek = date('w', $datenew);
-            $tag = Sanitize::stripHtmlTags($_POST['tagnew-'.$newcnt]);
-            $title = Sanitize::stripHtmlTags($_POST['txtnew-'.$newcnt]);
-            $qarr = [$cid, $datenew, $tag, $title];
-            if (!empty($_POST['repeat'.$newcnt])) {
-                foreach ($_POST['repeat'.$newcnt] as $daytorepeat) {
-                    $dayoffset = ($daytorepeat - $dayofweek + 7)%7;
-                    for ($i=($dayoffset==0)?1:0;$i<$_POST['repeatN'.$newcnt];$i++) {
-                        $date = strtotime("+$dayoffset days +$i weeks", $datenew);
-                        array_push($qarr, $cid, $date, $tag, $title);
-                    }
-                }
-            }
-            $ph = Sanitize::generateQueryPlaceholdersGrouped($qarr, 4);
-            $stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES $ph");
-            $stm->execute($qarr);
-
+			if (preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches)) {
+				$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+				$dayofweek = date('w', $datenew);
+				$tag = Sanitize::stripHtmlTags($_POST['tagnew-'.$newcnt]);
+				$title = Sanitize::stripHtmlTags($_POST['txtnew-'.$newcnt]);
+				$qarr = [$cid, $datenew, $tag, $title];
+				if (!empty($_POST['repeat'.$newcnt])) {
+					foreach ($_POST['repeat'.$newcnt] as $daytorepeat) {
+						$dayoffset = ($daytorepeat - $dayofweek + 7)%7;
+						for ($i=($dayoffset==0)?1:0;$i<$_POST['repeatN'.$newcnt];$i++) {
+							$date = strtotime("+$dayoffset days +$i weeks", $datenew);
+							array_push($qarr, $cid, $date, $tag, $title);
+						}
+					}
+				}
+				$ph = Sanitize::generateQueryPlaceholdersGrouped($qarr, 4);
+				$stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES $ph");
+				$stm->execute($qarr);
+			}  else {
+				$err .= sprintf(_('Error parsing date "%s"; new item skipped. '), Sanitize::encodeStringForDisplay($date));
+			}
 		}
 		$newcnt++;
+	}
+	if ($err !== '') {
+		require_once '../header.php';
+		echo '<p>'.$err.'</p>';
+		echo '<p><a href="managecalitems.php?cid='.$cid.'">Back</a></p>';
+		require_once '../footer.php';
+		exit;
 	}
 	if ($_POST['submit']=='Save') {
 		if ($from=='cp') {
