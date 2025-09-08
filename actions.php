@@ -470,7 +470,7 @@ require_once "includes/sanitize.php";
 	} else if (isset($_GET['action']) && $_GET['action']=='unsubscribe') {
         require_once "init_without_validate.php";
         if (!empty($_GET['email']) && !empty($_GET['ver']) && 
-			hash_compare(hash_hmac('sha256', $_GET['email'], $GLOBALS['CFG']['email']['secsalt'] ?? '123'), $_GET['ver'])
+			hash_equals(hash_hmac('sha256', $_GET['email'], $GLOBALS['CFG']['email']['secsalt'] ?? '123'), $_GET['ver'])
 		) {
             $stm = $DBH->prepare("UPDATE imas_users SET msgnotify=0 WHERE email=?");
             $stm->execute([$_GET['email']]);
