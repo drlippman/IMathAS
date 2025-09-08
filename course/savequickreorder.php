@@ -19,6 +19,10 @@
  list($itemorder,$blockcnt) = $stm->fetch(PDO::FETCH_NUM);
  $items = unserialize($itemorder);
 
+ $stm = $DBH->prepare("SELECT id FROM imas_items WHERE courseid=?");
+ $stm->execute([$cid]);
+ $allCourseItems = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+
  $order = json_decode($_POST['order'], true);
  $newblocks = [];
  $newitems = additems2($order);
@@ -77,7 +81,7 @@
  }
 
 function additems2($arr) {
-  global $items, $blockcnt, $newblocks;
+  global $items, $blockcnt, $newblocks, $allCourseItems;
   $outitems = array();
   foreach ($arr as $id=>$item) {
     if (strpos($item['id'],'-')!==false) { //is block
@@ -127,12 +131,14 @@ function additems2($arr) {
         }
         $outitems[] = $block;
     } else {
-      $outitems[] = intval($item['id']);
+		if (in_array($item['id'], $allCourseItems)) {
+      		$outitems[] = intval($item['id']);
+		}
     }
   }
   return $outitems;
 }
-
+/*
  function additems($list) {
 	 global $items;
 	 $outarr = array();
@@ -181,6 +187,7 @@ function additems2($arr) {
 	 }
 	 return $outarr;
  }
+*/
  echo '1,'.md5($itemlist).':';
 
  require_once "courseshowitems.php";

@@ -6,10 +6,12 @@ require_once "../init.php";
 
 
 $cid = intval($_GET['cid']);
-if (!isset($teacherid) && !isset($tutorid)) {
+if (isset($studentid)) {
 	$uid = $userid;
-} else {
+} else if (isset($teacherid) || isset($tutorid)) {
 	$uid = intval($_GET['uid']);
+} else {
+	exit;
 }
 
 $curBreadcrumb = $breadcrumbbase;

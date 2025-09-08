@@ -6,10 +6,12 @@ require_once "../init.php";
 
 
 $cid = intval($_GET['cid']);
-if (!isset($teacherid) && !isset($tutorid)) {
+if (isset($studentid)) {
 	$uid = $userid;
-} else {
+} else if (isset($teacherid) || isset($tutorid)) {
 	$uid = intval($_GET['uid']);
+} else {
+	exit;
 }
 
 $curBreadcrumb = $breadcrumbbase;
@@ -35,9 +37,14 @@ echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 
 echo '<div id="headerloginlog" class="pagetitle"><h1>'.$pagetitle. '</h1></div>';
 echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.$from.'">View Activity Log</a></div>';
-$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
-$stm->execute(array(':id'=>$uid));
+$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName FROM imas_users AS iu
+	JOIN imas_students AS istu ON istu.userid=iu.id WHERE iu.id=:id AND istu.courseid=:cid");
+$stm->execute(array(':id'=>$uid, ':cid'=>$cid));
 $row = $stm->fetch(PDO::FETCH_NUM);
+if ($row === false) {
+	echo 'Invalid uid';
+	exit;
+}
 printf('<h2>Login Log for <span class="pii-full-name">%s, %s</span></h2>',
 	Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 echo '<ul class="nomark">';
