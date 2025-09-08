@@ -5218,6 +5218,13 @@ function getineqdata($str,$type='linear',$xmin=null,$xmax=null,$ymin=null,$ymax=
 function getdotsdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
+    } else {
+        if ($xmin === null) { $xmin = -5;}
+        if ($xmax === null) { $xmax = 5;}
+        if ($ymin === null) { $ymin = -5;}
+        if ($ymax === null) { $ymax = 5;}
+        if ($w === null) { $w = 300;}
+        if ($h === null) { $h = 300;}
     }
     if (trim($str)=='' || $xmax==$xmin || $ymax==$ymin) { return []; } // invalid
 	$imgborder = 5;
@@ -5237,6 +5244,13 @@ function getdotsdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h
 function getopendotsdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
+    } else {
+        if ($xmin === null) { $xmin = -5;}
+        if ($xmax === null) { $xmax = 5;}
+        if ($ymin === null) { $ymin = -5;}
+        if ($ymax === null) { $ymax = 5;}
+        if ($w === null) { $w = 300;}
+        if ($h === null) { $h = 300;}
     }
     if (trim($str)=='' || $xmax==$xmin || $ymax==$ymin) { return []; } // invalid
 	$imgborder = 5;
@@ -5256,6 +5270,13 @@ function getopendotsdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=nul
 function getlinesdata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
     if (is_string($xmin) && strpos($xmin,',')!==false) {
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin,$xmax);
+    } else {
+        if ($xmin === null) { $xmin = -5;}
+        if ($xmax === null) { $xmax = 5;}
+        if ($ymin === null) { $ymin = -5;}
+        if ($ymax === null) { $ymax = 5;}
+        if ($w === null) { $w = 300;}
+        if ($h === null) { $h = 300;}
     }
     if (trim($str)=='' || $xmax==$xmin || $ymax==$ymin) { return []; } // invalid
 	$imgborder = 5;
