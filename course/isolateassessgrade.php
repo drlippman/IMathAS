@@ -384,7 +384,7 @@
 				$total += getpts($scores[$i]);
 			}
 			$timeused = $line['endtime']-$line['starttime'];
-			$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
+			$timeontask = round(array_sum(array_map('floatval', explode(',',str_replace('~',',',$line['timeontask']))))/60,1);
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 			$UA = 0;
 		}
