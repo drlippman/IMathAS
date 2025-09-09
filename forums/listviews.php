@@ -17,7 +17,7 @@ $query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_threads ON imas
 $query .= "WHERE imas_forum_threads.id=:id AND imas_forums.courseid=:courseid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$thread, ':courseid'=>$cid));
-if ($stm->rowCount()==0) {
+if ($stm->fetchColumn(0) === false) {
 	echo 'Invalid thread';
 	exit;
 }

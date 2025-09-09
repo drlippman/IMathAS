@@ -4,6 +4,9 @@
 
 require_once "../init.php";
 
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	exit;
+}
 if (!isset($_GET['post'])) {
 	echo "No post specified";
 	exit;
@@ -13,7 +16,7 @@ $query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_posts ON imas_f
 $query .= " WHERE imas_forum_posts.id=:id AND imas_forums.courseid=:courseid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$postid, ':courseid'=>$cid));
-if ($stm->rowCount()==0) {
+if ($stm->fetchColumn(0) === false) {
 	echo 'Invalid post';
 	exit;
 }

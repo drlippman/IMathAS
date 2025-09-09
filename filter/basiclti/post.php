@@ -5,10 +5,18 @@ if (empty($_GET['linkid'])) {
 	echo "no link id provided";
 	exit;
 }
+if (!isset($teacher) && !isset($tutorid) && !isset($studentid)) {
+	echo 'Invalid link';
+	exit;
+}
 $linkid = Sanitize::onlyInt($_GET['linkid']);
-$stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id");
-$stm->execute(array(':id'=>$linkid));
+$stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
+$stm->execute(array(':id'=>$linkid, ':cid'=>$cid));
 list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM);
+if ($text === null) {
+	echo 'Invalid linkid';
+	exit;
+}
 $toolparts = explode('~~',substr($text,8));
 $tool = $toolparts[0];
 $linkcustom = $toolparts[1];
