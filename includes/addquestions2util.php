@@ -7,9 +7,13 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
     global $DBH, $userid, $groupid, $adminasteacher, $aver;
 
     if ($data === null) {
-        $stm = $DBH->prepare("SELECT itemorder,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
-        $stm->execute(array(':id' => $aid));
+        $stm = $DBH->prepare("SELECT itemorder,showhints,showwork,intro FROM imas_assessments WHERE id=:id AND courseid=:cid");
+        $stm->execute(array(':id' => $aid, ':cid'=>$cid));
         $data = $stm->fetch(PDO::FETCH_ASSOC);
+        if ($data === false) {
+            echo 'Invalid aid';
+            exit;
+        }
         $data['showwork'] = ($data['showwork'] & 3);
     }
     $ln = 1;

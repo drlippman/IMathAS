@@ -76,6 +76,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	if ($withwithdrawn=='remove' || $usereplaceby) {
 		require_once "$curdir/updateassess.php";
 	}
+	// validate tounenroll
+	if (!empty($tounenroll) && count($tounenroll)>0) {
+        $stulist = implode(',', array_map('intval', $tounenroll));
+		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE userid IN ($stulist) AND courseid=?");
+		$stm->execute([$cid]);
+		$tounenroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+	}
 	if (!empty($tounenroll) && count($tounenroll)>0) {
         $stulist = implode(',', array_map('intval', $tounenroll));
 

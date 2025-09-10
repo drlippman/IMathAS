@@ -68,24 +68,12 @@ function diffsparsejson($old, $new) {
 	if (count($out)==0) {
 		return '';
 	} else {
-		if (function_exists('json_encode')) {
-			return json_encode($out, JSON_INVALID_UTF8_IGNORE);
-		} else {
-			require_once "JSON.php";
-			$jsonser = new Services_JSON();
-			return $jsonser->encode($out);
-		}
+		return json_encode($out, JSON_INVALID_UTF8_IGNORE);
 	}
 }
 
 function diffapplydiff($base,$diff) {
-	if (function_exists('json_encode')) {
-		$diffs = json_decode($diff);
-	} else {
-		require_once "JSON.php";
-		$jsonser = new Services_JSON();
-		return $jsonser->decode($diff);
-	}
+	$diffs = json_decode($diff);
 	for ($i = count($diffs)-1; $i>=0; $i--) {
 		if ($diffs[$i][0]==2) { //replace
 			array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);

@@ -67,17 +67,7 @@ if ($cid==0) {
 			$i = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$revisionusers[$row['userid']] =  $row['LastName'].', '.$row['FirstName'];
-				//$row[1] = filter(str_replace('"','@^@^@',$row[1]));
-				//$row[1] = str_replace('"','\\"',$row[1]);
-				//$row[1] = str_replace('@^@^@','"',$row[1]);
-				//$revisionhistory .= ',{u:'.$row[5].',c:'.$row[1].',t:"'.tzdate("F j, Y, g:i a",$row[2]).'",id:'.$row[0].'}';
-				if (function_exists('json_encode')) {
-					$row['revision']=  json_decode($row['revision']);
-				} else {
-					require_once "../includes/JSON.php";
-					$jsonser = new Services_JSON();
-					$row['revision'] = $jsonser->decode($row['revision']);
-				}
+				$row['revision']=  json_decode($row['revision']);
 				$revisionhistory[] = array('u'=>$row['userid'],'c'=>$row['revision'],'t'=>tzdate("F j, Y, g:i a",$row['time']),'id'=>$row['id']);
 				$i++;
 			}
