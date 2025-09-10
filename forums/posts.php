@@ -45,14 +45,14 @@ if ($page==-4) {
 	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=$cid&forum=$forumid&page=$page";
 }
 $query = "SELECT ifs.settings,ifs.replyby,ifs.defdisplay,ifs.name,ifs.points,ifs.groupsetid,igs.name AS igsname,ifs.postby,ifs.rubric,ifs.tutoredit,ifs.enddate,ifs.avail,ifs.allowlate,ifs.autoscore,ifs.courseid,ift.forumid ";
-$query .= "FROM imas_forums AS ifs JOIN imas_forum_threads AS ift ON ifs.id=ift.forumid LEFT JOIN imas_stugroupset AS igs ON igs.id=ifs.groupsetid WHERE ifs.id=:id AND ift.id=:threadid";
+$query .= "FROM imas_forums AS ifs JOIN imas_forum_threads AS ift ON ifs.id=ift.forumid LEFT JOIN imas_stugroupset AS igs ON igs.id=ifs.groupsetid WHERE ifs.id=:id AND ift.id=:threadid AND ifs.courseid=:cid";
 $stm = $DBH->prepare($query);
-$stm->execute(array(':id'=>$forumid, ':threadid'=>$threadid));
-if ($stm->rowCount()==0) {
+$stm->execute(array(':id'=>$forumid, ':threadid'=>$threadid, ':cid'=>$cid));
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $groupsetname, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
+if ($forumsettings === null) {
 	echo "Invalid forum ID or thread ID";
 	exit;
 }
-list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $groupsetname, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
 	exit;

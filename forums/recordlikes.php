@@ -19,6 +19,15 @@ $cid = intval($_GET['cid']);
 $postid = intval($_GET['postid']);
 $like = intval($_GET['like']);
 
+$stm = $DBH->prepare("SELECT ifp.threadid FROM imas_forum_posts AS ifp JOIN
+	imas_forums AS ifs ON ifp.forumid=ifs.id WHERE ifp.id=:id AND ifs.courseid=:cid");
+$stm->execute(array(':id'=>$postid, ':cid'=>$cid));
+$threadid = $stm->fetchColumn(0);
+if ($threadid === false) {
+	echo "fail";
+	exit;
+}
+
 if ($like==0) {
 	$stm = $DBH->prepare("DELETE FROM imas_forum_likes WHERE postid=:postid AND userid=:userid");
 	$stm->execute(array(':postid'=>$postid, ':userid'=>$userid));
@@ -29,10 +38,6 @@ if ($like==0) {
 	if ($stm->rowCount()>0) {
 		$aff = 0;
 	} else {
-		$stm = $DBH->prepare("SELECT threadid FROM imas_forum_posts WHERE id=:id");
-		$stm->execute(array(':id'=>$postid));
-		if ($stm->rowCount()==0) {echo "fail";exit;}
-		$threadid = $stm->fetchColumn(0);
 		$query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
 		$query .= "(:userid, :threadid, :postid, :type)";
 		$stm = $DBH->prepare($query);

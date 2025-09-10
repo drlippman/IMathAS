@@ -129,10 +129,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$_GET['modify'] = $threadid;
 			$files = array();
 		} else if ($_GET['modify']=="reply") { //new reply post
-			$stm = $DBH->prepare("SELECT userid FROM imas_forum_posts WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['replyto']));
-			if ($stm->rowCount()==0) {
-
+			$stm = $DBH->prepare("SELECT userid,threadid FROM imas_forum_posts WHERE id=:id AND forumid=:fid");
+			$stm->execute(array(':id'=>$_GET['replyto'], ':fid'=>$forumid));
+			$postdata = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($postdata === false || $postdata['threadid'] !== $threadid) {
 				$sendemail = false;
 				require_once "../header.php";
 				echo '<h1>Error:</h1><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
@@ -145,7 +145,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				require_once "../footer.php";
 				exit;
 			} else {
-				$uid = $stm->fetchColumn(0);
+				$uid = $postdata['userid'];
 				$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
 				$query .= "(:forumid, :threadid, :subject, :message, :userid, :postdate, :parent, :posttype, :isanon)";
 				$stm = $DBH->prepare($query);
@@ -208,12 +208,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		} else {
 			$query = "UPDATE imas_forum_posts SET subject=:subject,message=:message,isanon=:isanon,tag=:tag,posttype=:posttype,replyby=:replyby";
-			$arr = array(':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':isanon'=>$isanon, ':tag'=>$tag, ':posttype'=>$type, ':replyby'=>$replyby, ':id'=>$_GET['modify']);
+			$arr = array(':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':isanon'=>$isanon, ':tag'=>$tag, ':posttype'=>$type, ':replyby'=>$replyby, ':id'=>$_GET['modify'], ':fid'=>$forumid);
 			if ($isteacher && isset($_POST['releaseon']) && $_POST['releaseon'] != 'nochange') {
 					$query .= ",postdate=:postdate";
 					$arr[':postdate'] = $thisposttime;
 			}
-			$query .= " WHERE id=:id";
+			$query .= " WHERE id=:id AND forumid=:fid";
 			if (!$isteacher) {
 				$query .= " AND userid=:userid";
 				$stm = $DBH->prepare($query);
@@ -226,14 +226,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			// mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($caller=='thread' || $_GET['thread']==$_GET['modify']) {
 				if ($groupsetid>0 && $isteacher && isset($_POST['stugroup'])) {
-					$groupid = $_POST['stugroup'];
-					$stm = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id");
-					$stm->execute(array(':stugroupid'=>$groupid, ':id'=>$_GET['modify']));
+					$groupid = intval($_POST['stugroup']);
+					if ($groupid > 0) {
+						require_once '../includes/stugroups.php';
+						checkGroupIDinCourse($groupid,$cid);
+					}
+					$stm = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id AND forumid=:fid");
+					$stm->execute(array(':stugroupid'=>$groupid, ':id'=>$_GET['modify'], ':fid'=>$forumid));
 
 				}
 				if ($isteacher && isset($_POST['releaseon']) && $_POST['releaseon'] != 'nochange') {
-					$stm = $DBH->prepare("UPDATE imas_forum_threads SET lastposttime=:newtime WHERE id=:id");
-					$stm->execute(array(':newtime'=>$thisposttime, ':id'=>$_GET['modify']));
+					$stm = $DBH->prepare("UPDATE imas_forum_threads SET lastposttime=:newtime WHERE id=:id AND forumid=:fid");
+					$stm->execute(array(':newtime'=>$thisposttime, ':id'=>$_GET['modify'], ':fid'=>$forumid));
 				}
 			}
 
@@ -246,11 +250,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 
 			$sendemail = false;
-			$stm = $DBH->prepare("SELECT files FROM imas_forum_posts WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['modify']));
+			$stm = $DBH->prepare("SELECT files FROM imas_forum_posts WHERE id=:id AND forumid=:fid");
+			$stm->execute(array(':id'=>$_GET['modify'], ':fid'=>$forumid));
 			$files = $stm->fetchColumn(0);
 
-			if ($files=='') {
+			if ($files === false) {
+				echo 'Invalid id';
+				exit;
+			} else if ($files=='') {
 				$files = array();
 			} else {
 				$files = explode('@@',$files);
@@ -311,8 +318,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		$files = implode('@@',$files);
-		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
-		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
+		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id AND forumid=:fid");
+		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify'], ':fid'=>$forumid));
 		if (!empty($_GET['embed'])) {
 			$returnurl = "embeddone.php?embed=true";
 		}
@@ -351,13 +358,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$notice = '';
 		if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
-			$stm = $DBH->prepare("SELECT * from imas_forum_posts WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['modify']));
+			// modifying post
+			$stm = $DBH->prepare("SELECT * from imas_forum_posts WHERE id=:id AND forumid=:fid");
+			$stm->execute(array(':id'=>$_GET['modify'], ':fid'=>$forumid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$replyby = $line['replyby'];
+			if (!$isteacher && $line['userid'] !== $userid) {
+				echo 'Not your post';
+				exit;
+			}
 			if (!empty($groupsetid) && $isteacher && $line['parent']==0) {
-				$stm = $DBH->prepare("SELECT stugroupid FROM imas_forum_threads WHERE id=:id");
-				$stm->execute(array(':id'=>$line['threadid']));
+				$stm = $DBH->prepare("SELECT stugroupid FROM imas_forum_threads WHERE id=:id AND forumid=:fid");
+				$stm->execute(array(':id'=>$line['threadid'], ':fid'=>$forumid));
 				$curstugroupid = $stm->fetchColumn(0);
 			}
 			echo '<div id="headerposthandler" class="pagetitle"><h1>Modify Post</h1></div>';
@@ -370,14 +382,15 @@ if (isset($_GET['modify'])) { //adding or modifying post
             $line['isanon'] = 0;
             $replyby = null;
 			if ($_GET['modify']=='reply') {
-
-					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 				$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
-				$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id=:id";
+				$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id=:id AND ifp.forumid=:fid";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':id'=>$_GET['replyto']));
+				$stm->execute(array(':id'=>$_GET['replyto'], ':fid'=>$forumid));
 				list($sub,$points) = $stm->fetch(PDO::FETCH_NUM);
-
+				if ($sub === null) {
+					echo 'Invalid reply id';
+					exit;
+				}
 				$sub = str_replace('"','&quot;',$sub);
 				$line['subject'] = "Re: $sub";
 				
@@ -437,8 +450,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 					$line['message'] = '<p> </p><br/><hr/>'.$message;
 					if (isset($parts[3])) {
-						$stm = $DBH->prepare("SELECT name,itemorder FROM imas_assessments WHERE id=:id");
-						$stm->execute(array(':id'=>$parts[3]));
+						$stm = $DBH->prepare("SELECT name,itemorder FROM imas_assessments WHERE id=:id AND courseid=:cid");
+						$stm->execute(array(':id'=>$parts[3], ':cid'=>$cid));
 						list($aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
 						// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;', $aname);
@@ -611,8 +624,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$thread_lastposttime = 0;
 
 				if ($_GET['modify']!='new' && $line['parent']==0) {
-					$stm = $DBH->prepare("SELECT lastposttime FROM imas_forum_threads WHERE id=:id");
-					$stm->execute(array(':id'=>$line['id']));
+					$stm = $DBH->prepare("SELECT lastposttime FROM imas_forum_threads WHERE id=:id AND forumid=:fid");
+					$stm->execute(array(':id'=>$line['id'], ':fid'=>$forumid));
 					$thread_lastposttime = $stm->fetchColumn(0);
 					$releasebydate = tzdate("m/d/Y",$thread_lastposttime);
 					$releasebytime = tzdate("g:i a",$thread_lastposttime);
@@ -701,9 +714,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($_GET['modify']=='reply') {
 				echo "<p>Replying to:</p>";
 				$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName from imas_forum_posts,imas_users ";
-				$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid)";
+				$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) AND imas_forum_posts.forumid=:fid";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':id'=>$threadid, ':threadid'=>$threadid));
+				$stm->execute(array(':id'=>$threadid, ':threadid'=>$threadid, ':fid'=>$forumid));
 				while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 					$parent[$line['id']] = $line['parent'];
 					$date[$line['id']] = $line['postdate'];
@@ -744,24 +757,30 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		exit;
 	}
 } else if (isset($_GET['remove']) && $allowdel) {// $isteacher) { //removing post
+	$toremove = Sanitize::onlyInt($_GET['remove']);
 	if (isset($_POST['confirm'])) {
 		$go = true;
 		if (!$isteacher) {
+			// if not teacher, do not allow deletion of post with replies
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
-			$stm->execute(array(':parent'=>$_GET['remove']));
+			$stm->execute(array(':parent'=>$toremove));
 			if ($stm->rowCount()>0) {
 				$go = false;
 			}
 		}
 		if ($go) {
 			require_once "../includes/filehandler.php";
-			$stm = $DBH->prepare("SELECT parent,files FROM imas_forum_posts WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['remove']));
-			list($parent,$files) = $stm->fetch(PDO::FETCH_NUM);
+			$stm = $DBH->prepare("SELECT parent,files,userid FROM imas_forum_posts WHERE id=:id AND forumid=:fid");
+			$stm->execute(array(':id'=>$toremove, ':fid'=>$forumid));
+			list($parent,$files,$postowner) = $stm->fetch(PDO::FETCH_NUM);
+			if ($parent === null || (!$isteacher && $postowner !== $userid)) {
+				echo 'Invalid post';
+				exit;
+			}
 
 			if ($parent==0) {
-				$stm = $DBH->prepare("SELECT id,files FROM imas_forum_posts WHERE threadid=:threadid");
-				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$stm = $DBH->prepare("SELECT id,files FROM imas_forum_posts WHERE threadid=:threadid AND forumid=:fid");
+				$stm->execute(array(':threadid'=>$toremove, ':fid'=>$forumid));
 				$children = array();
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$children[] = $row[0];
@@ -775,26 +794,26 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$stm->execute($children);
 				}
 				$stm = $DBH->prepare("DELETE FROM imas_forum_posts WHERE threadid=:threadid");
-				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$stm->execute(array(':threadid'=>$toremove));
 				$stm = $DBH->prepare("DELETE FROM imas_forum_threads WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['remove']));
+				$stm->execute(array(':id'=>$toremove));
 				$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE threadid=:threadid");
-				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$stm->execute(array(':threadid'=>$toremove));
 				$lastpost = true;
 
 			} else {
 				$stm = $DBH->prepare("DELETE FROM imas_forum_posts WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['remove']));
+				$stm->execute(array(':id'=>$toremove));
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET parent=:parent WHERE parent=:parent2");
-				$stm->execute(array(':parent'=>$parent, ':parent2'=>$_GET['remove']));
+				$stm->execute(array(':parent'=>$parent, ':parent2'=>$toremove));
 				$lastpost = false;
 
 				if ($files!= '') {
-					deleteallpostfiles(Sanitize::onlyInt($_GET['remove']));
+					deleteallpostfiles($toremove);
 				}
 			}
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='forum' AND refid=:refid");
-			$stm->execute(array(':refid'=>$_GET['remove']));
+			$stm->execute(array(':refid'=>$toremove));
 
 		}
 		if ($caller == "posts" && $lastpost) {
@@ -805,14 +824,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		exit;
 	} else {
 		$pagetitle = "Remove Post";
-		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['remove']));
+		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id AND forumid=:fid");
+		$stm->execute(array(':id'=>$toremove, ':fid'=>$forumid));
 		$parent = $stm->fetchColumn(0);
 
 		require_once "../header.php";
 		if (!$isteacher) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
-			$stm->execute(array(':parent'=>$_GET['remove']));
+			$stm->execute(array(':parent'=>$toremove));
 			if ($stm->rowCount()>0) {
 			echo "Someone has replied to this post, so you cannot remove it.  <a href=\"$returnurl\">Back</a>";
 				require_once "../footer.php";
@@ -843,11 +862,21 @@ if (isset($_GET['modify'])) { //adding or modifying post
 	}
 } else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum   NEW ONE
 	if (isset($_POST['movetype'])) {
+		$tomove = Sanitize::onlyInt($_GET['move']);
 		$threadid = intval($_POST['thread']);
-		$stm = $DBH->prepare("SELECT * FROM imas_forum_posts WHERE threadid=:threadid");
-		$stm->execute(array(':threadid'=>$threadid));
+		$stm = $DBH->prepare("SELECT * FROM imas_forum_posts WHERE threadid=:threadid AND forumid=:fid");
+		$stm->execute(array(':threadid'=>$threadid, ':fid'=>$forumid));
+		$children = [];
+		$found = false;
 		while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 			$children[$line['parent']][] = $line['id'];
+			if ($line['id'] == $tomove) {
+				$found = true;
+			}
+		}
+		if (!$found) { // check post in forum; also checks threadid in forum
+			echo 'Invalid post';
+			exit;
 		}
 		$tochange = array();
 
@@ -861,17 +890,23 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 			}
 		}
-		addchildren($_GET['move'],$tochange,$children);
-		$tochange[] = $_GET['move'];
+		addchildren($tomove,$tochange,$children);
+		$tochange[] = $tomove;
 		$list = implode(',', array_map('intval', $tochange));
 
 		if ($_POST['movetype']==0) { //move to different forum
-			if ($children[0][0] == $_GET['move']) { //is post head of thread?
+			$stm = $DBH->prepare('SELECT id FROM imas_forums WHERE id=? AND courseid=?');
+			$stm->execute([$_POST['movetof'], $cid]);
+			if ($stm->fetchColumn(0) === false) {
+				echo 'Invalid dest forum';
+				exit;
+			}
+			if ($children[0][0] == $tomove) { //is post head of thread?
 				//if head of thread, then :
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET forumid=:forumid WHERE threadid=:threadid");
-				$stm->execute(array(':forumid'=>$_POST['movetof'], ':threadid'=>$_GET['move']));
+				$stm->execute(array(':forumid'=>$_POST['movetof'], ':threadid'=>$tomove));
 				$stm = $DBH->prepare("UPDATE imas_forum_threads SET forumid=:forumid WHERE id=:id");
-				$stm->execute(array(':forumid'=>$_POST['movetof'], ':id'=>$_GET['move']));
+				$stm->execute(array(':forumid'=>$_POST['movetof'], ':id'=>$tomove));
 			} else {
 				//if not head of thread, need to create new thread, move items to new thread, then move forum
 				$stm = $DBH->prepare("SELECT lastposttime,lastpostuser FROM imas_forum_threads WHERE id=:id");
@@ -879,13 +914,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				//set all lower posts to new threadid and forumid
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET threadid=:threadid,forumid=:forumid WHERE id IN ($list)");
-				$stm->execute(array(':threadid'=>$_GET['move'], ':forumid'=>$_POST['movetof']));
+				$stm->execute(array(':threadid'=>$tomove, ':forumid'=>$_POST['movetof']));
 				//set post to head of thread
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET parent=0 WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['move']));
+				$stm->execute(array(':id'=>$tomove));
 				//create new threads listing
 				$stm = $DBH->prepare("INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES (:id, :forumid, :lastposttime, :lastpostuser)");
-				$stm->execute(array(':id'=>$_GET['move'], ':forumid'=>$_POST['movetof'], ':lastposttime'=>$row[0], ':lastpostuser'=>$row[1]));
+				$stm->execute(array(':id'=>$tomove, ':forumid'=>$_POST['movetof'], ':lastposttime'=>$row[0], ':lastpostuser'=>$row[1]));
 			}
 			//update grade records
 			$stm = $DBH->prepare("UPDATE imas_grades SET gradetypeid=:gradetypeid WHERE gradetype='forum' AND refid IN ($list)");
@@ -895,17 +930,21 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
 			if ($_POST['movetot'] != $threadid) {
-	   		$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE threadid=:threadid AND parent=0");
-		  	$stm->execute(array(':threadid'=>$_POST['movetot']));
+	   			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE threadid=:threadid AND parent=0 AND forumid=:fid");
+		  		$stm->execute(array(':threadid'=>$_POST['movetot'], ':fid'=>$forumid));
 				$base = $stm->fetchColumn(0);
+				if ($base === false) {
+					echo 'Invalid dest thread';
+					exit;
+				}
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET threadid=:threadid WHERE id IN ($list)");
 				$stm->execute(array(':threadid'=>$_POST['movetot']));
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET parent=:parent WHERE id=:id");
-				$stm->execute(array(':parent'=>$base, ':id'=>$_GET['move']));
-				if ($base != $_GET['move'] ) {//if not moving back to self,
+				$stm->execute(array(':parent'=>$base, ':id'=>$tomove));
+				if ($base != $tomove) {//if not moving back to self,
 					//delete thread.  One will only exist if moved post was head of thread
 					$stm = $DBH->prepare("DELETE FROM imas_forum_threads WHERE id=:id");
-					$stm->execute(array(':id'=>$_GET['move']));
+					$stm->execute(array(':id'=>$tomove));
 				}
 			}
 
@@ -933,9 +972,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo "<a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
 		}
 
-		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['move']));
-		if ($stm->fetchColumn(0)==0) {
+		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id AND forumid=:fid");
+		$stm->execute(array(':id'=>$_GET['move'], ':fid'=>$forumid));
+		$moveparent = $stm->fetchColumn(0);
+		if ($moveparent === false) {
+			echo 'Invalid thread';
+			exit;
+		} else if ($moveparent==0) {
 			$ishead = true;
 			echo "<h2>Move Thread</h2>\n";
 		} else {
