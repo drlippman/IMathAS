@@ -30,6 +30,9 @@ if (isset($_GET['framed'])) {
 if ($cid==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a course id";
+} else if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	$overwriteBody=1;
+	$body = "You must be enrolled in the course";
 } else if ($id==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a wiki id";
@@ -38,9 +41,13 @@ if ($cid==0) {
     $grpback = !empty($_GET['grp']) ? '&grp='.intval($_GET['grp']) : '';
 	$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	$curBreadcrumb .= "<a href=\"$imasroot/wikis/viewwiki.php?cid=$cid&id=$id$grpback\">View Wiki</a> &gt; Edit Wiki";
-	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
-	$stm->execute(array(':id'=>$id));
+	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$id, ':cid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === false) {
+		echo 'Invalid wiki id';
+		exit;
+	}
 	$wikiname = $row['name'];
 	$now = time();
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])) || $now>$row['editbydate'])) {
@@ -50,9 +57,13 @@ if ($cid==0) {
 		if ($row['groupsetid']>0) {
 			if (isset($teacherid)) {
 				$groupid = intval($_GET['grp']);
-				$stm = $DBH->prepare("SELECT ig.name,igs.name AS igsname FROM imas_stugroups AS ig JOIN imas_stugroupset AS igs ON ig.groupsetid=igs.id WHERE ig.id=:id");
-				$stm->execute(array(':id'=>$groupid));
+				$stm = $DBH->prepare("SELECT ig.name,igs.name AS igsname FROM imas_stugroups AS ig JOIN imas_stugroupset AS igs ON ig.groupsetid=igs.id WHERE ig.id=:id AND igs.courseid=:cid");
+				$stm->execute(array(':id'=>$groupid, ':cid'=>$cid));
                 list($groupname, $groupsetname) = $stm->fetch(PDO::FETCH_NUM);
+				if ($groupname === null) {
+					echo 'Invalid group id';
+					exit;
+				}
 			} else {
 				$groupsetid = $row['groupsetid'];
 				$query = 'SELECT i_sg.id,i_sg.name,igs.name AS igsname FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';

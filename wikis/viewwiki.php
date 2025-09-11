@@ -33,15 +33,22 @@ if (isset($_GET['framed'])) {
 if ($cid==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a course id";
+} else if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	$overwriteBody=1;
+	$body = "You must be enrolled in the course";
 } else if ($id==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
     $query = "SELECT w.name,w.startdate,w.enddate,w.editbydate,w.avail,w.groupsetid,gs.name AS igsname 
-        FROM imas_wikis AS w LEFT JOIN imas_stugroupset AS gs ON w.groupsetid=gs.id WHERE w.id=:id";
+        FROM imas_wikis AS w LEFT JOIN imas_stugroupset AS gs ON w.groupsetid=gs.id WHERE w.id=:id AND w.courseid=:cid";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':id'=>$id));
+	$stm->execute(array(':id'=>$id, ':cid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === false) {
+		echo 'Invalid wiki id';
+		exit;
+	}
 	$wikiname = $row['name'];
 	$pagetitle = $wikiname;
 	$now = time();
@@ -63,8 +70,8 @@ if ($cid==0) {
 		if (isset($_POST['delrev']) && $_POST['delrev']=='true') {
 			$stm = $DBH->prepare("SELECT id FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid ORDER BY id DESC LIMIT 1");
 			$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
-			if ($stm->rowCount()>0) {
-				$curid = $stm->fetchColumn(0);
+			$curid = $stm->fetchColumn(0);
+			if ($curid !== false) {
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id<:curid");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':curid'=>$curid));
 			}
@@ -122,12 +129,11 @@ if ($cid==0) {
 			$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$groupsetid));
-			if ($stm->rowCount()==0) {
+			list($groupid, $curgroupname) = $stm->fetch(PDO::FETCH_NUM);
+			if ($groupid === null) {
 				$overwriteBody=1;
 				$body = "You need to be a member of a group before you can view or edit this wiki";
 				$isgroup = false;
-			} else {
-				list($groupid, $curgroupname) = $stm->fetch(PDO::FETCH_NUM);
 			}
 		} else if ($row['groupsetid']>0 && isset($teacherid)) {
 			$isgroup = true;
@@ -152,11 +158,13 @@ if ($cid==0) {
 			$i = 0;
 			$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY name");
 			$stm->execute(array(':groupsetid'=>$groupsetid));
+			$foundgrp = false;
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$stugroup_ids[$i] = $row[0];
 				$stugroup_names[$i] = $row[1] . ((isset($hasnew[$row[0]]))?' (New Revisions)':'');
 				if ($row[0]==$groupid) {
 					$curgroupname = $row[1];
+					$foundgrp = true;
 				}
 				$i++;
 			}
@@ -169,6 +177,9 @@ if ($cid==0) {
 					$groupid = $stugroup_ids[0];
 					$curgroupname = $stugroup_names[0];
 				}
+			} else if (!$foundgrp) {
+				echo 'Invalid groupid';
+				exit;
 			}
 		} else {
             $isgroup = false;

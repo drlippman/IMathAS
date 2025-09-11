@@ -39,11 +39,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = $_GET['block'];
+	$block = $_GET['block'] ?? '';
 
 	if (isset($_REQUEST['clearattempts'])) {
+		$id = Sanitize::onlyInt($_GET['id']);
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="true") {
-			$id = Sanitize::onlyInt($_GET['id']);
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
 			$stm->execute(array(':wikiid'=>$id));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addwiki.php?cid=$cid&id=$id&r=" .Sanitize::randomQueryStringParam());
