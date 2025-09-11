@@ -42,8 +42,8 @@ if ($type == 'assess') {
     $stm->execute(array($aid));
     $assessinfo = $stm->fetch(PDO::FETCH_ASSOC);
     if ($assessinfo['courseid'] != $localcourse->get_courseid()) {
-    echo 'Invalid assessment';
-    exit;
+        echo 'Invalid assessment';
+        exit;
     }
     $itemtype = 0; //assessment
 
@@ -52,10 +52,10 @@ if ($type == 'assess') {
         ->set_score_maximum($assessinfo['ptsposs'])
         ->set_label($assessinfo['name']);
     if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
-    $lineitem->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
+        $lineitem->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
     }
     if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
-    $lineitem->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
+        $lineitem->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
     }
     $submission_review = LTI\LTI_Grade_Submission_Review::new ()
         ->set_reviewable_status(["Submitted"]);
@@ -67,10 +67,10 @@ if ($type == 'assess') {
         ->set_lineitem($lineitem);
 
     if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
-    $resource->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
+        $resource->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
     }
     if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
-    $resource->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
+        $resource->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
     }
 } else if ($type == 'course') {
     $resource = LTI\LTI_Deep_Link_Resource::new()

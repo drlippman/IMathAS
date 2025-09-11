@@ -50,6 +50,26 @@ if ($_POST['linktype'] == 'assoc') {
   // TODO: do we want to use the context.title instead of label here? Or both?
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
   $tocopycourse = intval($_POST['copyselect']);
+
+  //verify course
+  $target = parse_target_link($launch->get_target_link(), $db);
+  $sourcecid = $target['refcid'];
+  $last_copied_cid = $target['refcid'];
+
+  // Get most recently copied course in LMS if available
+  $context_history = $launch->get_platform_context_history();
+  if (count($context_history)>0) {
+      $cidlookup = $db->get_local_course($context_history[0], $launch);
+      if ($cidlookup !== null) {
+        $last_copied_cid = $cidlookup->get_courseid();
+      }
+  }
+  list($copycourses,$assoccourses,$sourceUIver) =
+        $db->get_potential_courses($target,$last_copied_cid,$userid);
+  if (!isset($copycourses[$tocopycourse])) {
+    echo 'Invalid course to copy';
+    exit;
+  }
   $destcid = copycourse($tocopycourse, $contexttitle, $newUIver);
 
   //call hook, if defined

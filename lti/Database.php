@@ -190,7 +190,7 @@ class Imathas_LTI_Database implements LTI\Database
     {
         $stm = $this->dbh->prepare('SELECT * FROM imas_lti_deployments WHERE platform=? AND deployment=?');
         $stm->execute(array($platform_id, $deployment_id));
-        if ($stm->rowCount() === 0) {
+        if ($stm->fetchColumn(0) === false) {
             // no existing deployment record, create one
             $stm = $this->dbh->prepare('INSERT INTO imas_lti_deployments (platform,deployment) VALUES (?,?)');
             $stm->execute(array($platform_id, $deployment_id));
