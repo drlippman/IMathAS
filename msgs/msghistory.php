@@ -48,19 +48,21 @@
 	$query = "SELECT baseid,courseid,msgto,msgfrom FROM imas_msgs WHERE id=:id";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= " AND (msgto=:msgto OR msgfrom=:msgfrom)";
+	} else {
+		$query .= " AND courseid=:cid";
 	}
 	$stm = $DBH->prepare($query);
 	if ($type!='allstu' || !$isteacher) {
 		$stm->execute(array(':id'=>$msgid, ':msgto'=>$userid, ':msgfrom'=>$userid));
 	} else {
-		$stm->execute(array(':id'=>$msgid));
+		$stm->execute(array(':id'=>$msgid, ':cid'=>$cid));
 	}
-	if ($stm->rowCount()==0) {
+    $line =  $stm->fetch(PDO::FETCH_ASSOC);
+	if ($line === false) {
 		echo "Message not found";
 		require_once "../footer.php";
 		exit;
 	}
-    $line =  $stm->fetch(PDO::FETCH_ASSOC);
 	$baseid = $line['baseid'];
 	if ($baseid==0) {
 		$baseid=$msgid;

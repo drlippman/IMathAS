@@ -41,12 +41,9 @@
 		}
 		$checklist = implode(',', $goodmsgs);
 		//TODO: check courseid on these msgs against teacher courses
-		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
-		$DBH->query($query);
-	}
-	if (isset($_GET['removeid'])) {
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['removeid']));
+		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND courseid=?";
+		$stm = $DBH->prepare($query);
+		$stm->execute([$cid]);
 	}
 
 	$pagetitle = "Student Messages";
