@@ -1,6 +1,6 @@
 <html>
 <head>
-<link rel="stylesheet" href="imas.css" type="text/css">
+<link rel="stylesheet" href="imascore.css" type="text/css">
 </head>
 <body>
 <?php

@@ -67,7 +67,7 @@ require_once "includes/sanitize.php";
                 $stm->execute(array(':cid'=>$_POST['courseid']));
                 $line = $stm->fetch(PDO::FETCH_ASSOC);
 
-                if ($line==null) {
+                if ($line==false) {
                     $error = _('Course not found');
                 } else if (($line['allowunenroll']&2)==2) {
                     $error = _('Course is closed for self enrollment');
@@ -287,8 +287,8 @@ require_once "includes/sanitize.php";
 			$query = "SELECT id,email,rights,jsondata FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':sid'=>$_POST['username']));
-			if ($stm->rowCount()>0) {
-				list($id,$email,$rights,$jsondata) = $stm->fetch(PDO::FETCH_NUM);
+			list($id,$email,$rights,$jsondata) = $stm->fetch(PDO::FETCH_NUM);
+			if ($id !== null) {
                 $jsondata = json_decode($jsondata,true);
 				if (isset($jsondata['lastemail']) && time() - $jsondata['lastemail'] < 60) {
 					echo 'Please wait and try again';
@@ -403,13 +403,14 @@ require_once "includes/sanitize.php";
 		$query = "SELECT id,SID,lastaccess,jsondata FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':email'=>$_POST['email']));
-		if ($stm->rowCount() > 0) {
-			$cnt = $stm->rowCount();
+		$allrows = $stm->fetchAll(PDO::FETCH_ASSOC);
+		if (count($allrows)>0) {
+			$cnt = count($allrows);
 			$message  = "<h3>".sprintf(_("This is an automated message from %s. Do not respond to this email"),$installname)."</h3>\r\n";
 			$message .= "<p>".sprintf(_("Your email was entered in the Username Lookup page on %s.  If you did not do this, you may ignore and delete this message."),$installname)."  ";
 			$message .= _("All usernames using this email address are listed below")."</p><p>";
 			$ids = array();
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			foreach ($allrows as $row) {
                 $jsondata = json_decode($row['jsondata'],true);
 				if (isset($jsondata['lastemail']) && time() - $jsondata['lastemail'] < 60) {
 					echo 'Please wait and try again';
@@ -443,7 +444,7 @@ require_once "includes/sanitize.php";
 			$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID LIKE 'lti-%'";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':email'=>$_POST['email']));
-			if ($stm->rowCount() > 0) {
+			if ($stm->fetchColumn(0) !== false) {
 				echo _("Your account can only be accessed through your school's learning management system.")," <a href=\"index.php\">",_("Return to login page"),"</a>";
 			} else {
 				echo _("No usernames match this email address, or the email address provided is invalid.")," <a href=\"index.php\">",_("Return to login page"),"</a>";
@@ -461,7 +462,7 @@ require_once "includes/sanitize.php";
 		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_GET['SID']));
-		if ($stm->rowCount()>0) {
+		if ($stm->fetchColumn(0) !== false) {
 			echo "false";
 		} else {
 			echo "true";
@@ -604,7 +605,7 @@ require_once "includes/sanitize.php";
 		}  else {
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid, ':cid'=>$_POST['cid']));
-			if ($stm->rowCount() > 0) {
+			if ($stm->fetchColumn(0) !== false) {
 				require_once "header.php";
 				echo $pagetopper;
 				echo _("You are a teacher for this course, and can't enroll as a student.  Use Student View to see the class from a student's perspective, or create a dummy student account.  ");
@@ -614,7 +615,7 @@ require_once "includes/sanitize.php";
 			}
 			$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid, ':cid'=>$_POST['cid']));
-			if ($stm->rowCount() > 0) {
+			if ($stm->fetchColumn(0) !== false) {
 				require_once "header.php";
 				echo $pagetopper;
 				echo _("You are a tutor for this course, and can't enroll as a student. ");
@@ -624,7 +625,7 @@ require_once "includes/sanitize.php";
 			}
 			$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid, ':cid'=>$_POST['cid']));
-			if ($stm->rowCount() > 0) {
+			if ($stm->fetchColumn(0) !== false) {
 				require_once "header.php";
 				echo $pagetopper;
 				echo _("You are already enrolled in the course.  Click on the course name on the <a href=\"index.php\">main page</a> to access the course"),"\n";
@@ -687,7 +688,7 @@ require_once "includes/sanitize.php";
 		$cid = Sanitize::courseId($_GET['cid']);
 		$stm = $DBH->prepare("SELECT allowunenroll FROM imas_courses WHERE id=:cid");
 		$stm->execute(array(':cid'=>$cid));
-		if ($stm->fetchColumn()==1) {
+		if (($stm->fetchColumn()&1)==1) {
 			$stm = $DBH->prepare("DELETE FROM imas_students WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
 			/*
@@ -795,8 +796,6 @@ require_once "includes/sanitize.php";
 			deletecoursefile('userimg_sm'.$userid.'.jpg');
 			$chguserimg = ",hasuserimg=0";
 		} 
-
-		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
 		$stm = $DBH->prepare("SELECT email,jsondata,mfa,password FROM imas_users WHERE id=?");
 		$stm->execute(array($userid));

@@ -19,6 +19,6 @@ coverage:
         - katex/*
         - migrations/*
         - tests/*
-        - tinymce4/*
+        - tinymce8/*
         - vendor/*
 
