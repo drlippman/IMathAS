@@ -3,10 +3,6 @@
 //login / new student page specific for course
 //(c) 2007 David Lippman
 
-	$curdir = rtrim(dirname(__FILE__), '/\\');
-	 if (!file_exists("$curdir/config.php")) {
-		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
-	 }
 	$init_session_start = true;
  	require_once __DIR__ . "/init_without_validate.php";
 	require_once __DIR__ ."/includes/newusercommon.php";
@@ -29,14 +25,14 @@
 	 $page_newaccounterror = '';
 	 if (isset($_POST['submit']) && $_POST['submit']=="Sign Up") {
         if (!isset($_SESSION['challenge']) || $_POST['challenge'] !== $_SESSION['challenge'] ||
-        !empty($_POST['hval']) ||
-        !isset($_SESSION['newuserstart']) || (time() - $_SESSION['newuserstart']) < 5
-     ) {
-        echo "Invalid submission";
-        exit;
-     }
-     $_SESSION['challenge'] = '';
-     unset($_SESSION['newuserstart']);
+			!empty($_POST['hval']) ||
+			!isset($_SESSION['newuserstart']) || (time() - $_SESSION['newuserstart']) < 5
+		) {
+			echo "Invalid submission";
+			exit;
+		}
+		$_SESSION['challenge'] = '';
+		unset($_SESSION['newuserstart']);
 
 		unset($_POST['username']);
 		unset($_POST['password']);

@@ -769,11 +769,11 @@ if ($hasusername) {
                 }
             }
             unset($lockaid);
-            if ($myrights == 75 && !isset($teacherid) && !isset($studentid) && $crow['groupid'] == $groupid) {
+            if ($myrights == 75 && !isset($teacherid) && !isset($tutorid) && !isset($studentid) && $crow['groupid'] == $groupid) {
                 //group admin access
                 $teacherid = $userid;
                 $adminasteacher = true;
-            } else if ($myrights > 19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && !$inInstrStuView) {
+            } else if ($myrights > 19 && !isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($tutorid) && !$inInstrStuView) {
                 if ($crow['copyrights'] == 2) {
                     $instrPreviewId = $userid;
                 } else if ($crow['copyrights'] == 1 && $crow['groupid'] == $groupid) {
