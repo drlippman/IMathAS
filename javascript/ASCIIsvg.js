@@ -975,24 +975,24 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   ticklength = fontsize/4;
   if (xgrid!=null) gdx = xgrid;
   if (ygrid!=null) gdy = ygrid;
-  if (gdx!=null && gdx>0) {
+  if (true) {
     if (smallticks!=null && smallticks==1) {
-    	  var gridymin = origin[1] + .7*ticklength;
-	  var gridymax = origin[1] - .7*ticklength;
-	  var gridxmin = origin[0] - .7*ticklength;
-	  var gridxmax = origin[0] + .7*ticklength;
+      var gridymin = origin[1] + .7*ticklength;
+      var gridymax = origin[1] - .7*ticklength;
+      var gridxmin = origin[0] - .7*ticklength;
+      var gridxmax = origin[0] + .7*ticklength;
     } else {
-	  var gridymin = winymin;
-	  var gridymax = winymax;
-	  var gridxmin = winxmin;
-	  var gridxmax = winxmax;
+      var gridymin = winymin;
+      var gridymax = winymax;
+      var gridxmin = winxmin;
+      var gridxmax = winxmax;
     }
 
     gdx = (typeof gdx=="string"?dx:gdx*xunitlength);
-    gdy = (gdy==null?dy:gdy*yunitlength);
+    gdy = (typeof gdy=="string"?dy:gdy*yunitlength);
     pnode = myCreateElementSVG("path");
     st="";
-    if (dox && gdx>0) {
+    if (dox && gdx !== null && gdx>0) {
 	    for (x = origin[0]; x<=winxmax; x = x+gdx)
 	      if (x>=winxmin) st += " M"+x+","+gridymin+" "+x+","+(fqonlyy?height-origin[1]:gridymax);
 	    if (!fqonlyx) {
@@ -1001,7 +1001,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	    }
     }
 
-    if (doy && gdy>0) {
+    if (doy && gdy !== null && gdy>0) {
 	    if (!fqonlyy) {
 	      for (y = height-origin[1]; y<=winymax; y = y+gdy)
 	        if (y>=winymin) st += " M"+(fqonlyx?origin[0]:gridxmin)+","+y+" "+gridxmax+","+y;
