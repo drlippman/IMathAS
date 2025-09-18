@@ -22,7 +22,7 @@ if (isset($CFG['hooks']['init'])) {
 	require_once $CFG['hooks']['init'];
 }
 
-$lastvueupdate = '20250820';
+$lastvueupdate = '20250907';
 
 // setup session stuff
 if (!function_exists('disallowsSameSiteNone')) {
@@ -114,17 +114,6 @@ if (!isset($use_local_sessions)) {
 			. 'prefix='.preg_replace('/\W/','',$installname);
   	ini_set('session.save_handler', 'redis');
   	ini_set('session.save_path', $redispath);
-	} else if (!empty($CFG['dynamodb'])) {
-  	require_once __DIR__ . "/includes/dynamodb/DynamoDbSessionHandler.php";
-  	(new Idealstack\DynamoDbSessionsDependencyFree\DynamoDbSessionHandler([
-  		'region' => $CFG['dynamodb']['region'],
-  		'table_name' => $CFG['dynamodb']['table'],
-  		'credentials' => [
-  			'key' => $CFG['dynamodb']['key'],
-  			'secret' => $CFG['dynamodb']['secret']
-  		],
-  		'base64' => false
-  	]))->register();
   } else {
 	require_once __DIR__ . "/includes/session.php";
 	session_set_save_handler(new SessionDBHandler(), true);

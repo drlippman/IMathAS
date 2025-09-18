@@ -291,7 +291,19 @@ function addcolor(&$origcolor) {
 		$r = hexdec(substr($color,1,2));
 		$g = hexdec(substr($color,3,2));
 		$b = hexdec(substr($color,5,2));
+		if (strlen($color)==9) {
+			$alpha = 127 - floor(hexdec(substr($color,7,2))/2);
+		}
 		$this->colors[$origcolor] = imagecolorallocatealpha($this->img, $r, $g, $b, $alpha);
+	} else if (preg_match('/^rgba?\((.*?)\)$/', $color, $m)) {
+		$parts = array_map('floatval', array_map('trim', explode(',', $m[1])));
+		if (count($parts) === 3) {
+			$this->colors[$origcolor] = imagecolorallocatealpha($this->img, $parts[0], $parts[1], $parts[2], 0);
+		} else if (count($parts) === 4) {
+			$this->colors[$origcolor] = imagecolorallocatealpha($this->img, $parts[0], $parts[1], $parts[2], 127*(1-$parts[3]));
+		} else {
+			$origcolor = 'black';
+		}
 	} else if (isset($this->extendedcolors[strtolower($color)])) {
         $cd = $this->extendedcolors[strtolower($color)];
         $this->colors[$origcolor] = imagecolorallocatealpha($this->img, $cd[0], $cd[1], $cd[2], $alpha);

@@ -7,6 +7,7 @@
 require_once "../init.php";
 require_once "../includes/htmlutil.php";
 require_once "../includes/diff.php";
+require_once '../includes/stugroups.php';
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -22,13 +23,20 @@ $groupid = intval($_GET['grp'] ?? 0);
 if ($cid==0) {
 	$overwriteBody=1;
 	$body = "Error - need course id";
+} else if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	$overwriteBody=1;
+	$body = "You must be enrolled in the course";
 } else if ($id==0) {
 	$overwriteBody=1;
 	$body = "Error - need wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id=:id");
-	$stm->execute(array(':id'=>$id));
+	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$id, ':cid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === false) {
+		echo 'Invalid wiki id';
+		exit;
+	}
 	$wikiname = $row['name'];
 	$now = time();
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])))) {
@@ -41,6 +49,20 @@ if ($cid==0) {
 			$canedit = true;
 		} else {
 			$canedit = false;
+		}
+		if ($row['groupsetid']>0) {
+			if (isset($teacherid)) {
+				checkGroupIDinCourse($groupid,$cid);
+			} else {
+				$stm = $DBH->prepare("SELECT id FROM imas_stugroupmembers WHERE stugroupid=? AND userid=?");
+				$stm->execute([$groupid, $userid]);
+				if ($stm->fetchColumn(0)===false) {
+					echo 'Invalid groupid';
+					exit;
+				}
+			}
+		} else {
+			$groupid = 0;
 		}
 		$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id AS userid FROM ";
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
@@ -67,17 +89,7 @@ if ($cid==0) {
 			$i = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$revisionusers[$row['userid']] =  $row['LastName'].', '.$row['FirstName'];
-				//$row[1] = filter(str_replace('"','@^@^@',$row[1]));
-				//$row[1] = str_replace('"','\\"',$row[1]);
-				//$row[1] = str_replace('@^@^@','"',$row[1]);
-				//$revisionhistory .= ',{u:'.$row[5].',c:'.$row[1].',t:"'.tzdate("F j, Y, g:i a",$row[2]).'",id:'.$row[0].'}';
-				if (function_exists('json_encode')) {
-					$row['revision']=  json_decode($row['revision']);
-				} else {
-					require_once "../includes/JSON.php";
-					$jsonser = new Services_JSON();
-					$row['revision'] = $jsonser->decode($row['revision']);
-				}
+				$row['revision']=  json_decode($row['revision']);
 				$revisionhistory[] = array('u'=>$row['userid'],'c'=>$row['revision'],'t'=>tzdate("F j, Y, g:i a",$row['time']),'id'=>$row['id']);
 				$i++;
 			}

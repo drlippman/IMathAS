@@ -54,12 +54,6 @@
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND msgfrom=?");
 		$stm->execute(array($userid));
 	}
-	if (isset($_GET['removeid'])) {
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND deleted=2 AND msgfrom=:msgfrom");
-		$stm->execute(array(':id'=>$_GET['removeid'], ':msgfrom'=>$userid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE id=:id AND msgfrom=:msgfrom");
-		$stm->execute(array(':id'=>$_GET['removeid'], ':msgfrom'=>$userid));
-	}
 
 	$pagetitle = "Messages";
 	$placeinhead = '<style type="text/css"> tr.tagged {background-color: #dff;}

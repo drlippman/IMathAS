@@ -686,7 +686,7 @@ export default {
       for (let i = 0; i < this.curQuestions.length; i++) {
         const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hide100 && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
+        if (this.hide100 && qdata.score > qdata.points_possible - 0.002) {
           showit = false;
         } else if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;

@@ -6,7 +6,7 @@ require_once "../init.php";
 require_once "../assessment/displayq2.php";
 require_once "../includes/ltioutcomes.php";
 
-if (!isset($teacherid) && !isset($tutorid)) {
+if (!isset($teacherid)) {
 	require_once "../header.php";
 	echo "You need to log in as a teacher or tutor to access this page";
 	require_once "../footer.php";
@@ -22,6 +22,13 @@ $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']); //imas_assessments id
 $qid = Sanitize::onlyInt($_GET['qid']);
 $qsid = Sanitize::onlyInt($_GET['qsid']);
+
+$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+$stm->execute([$aid]);
+if ($stm->fetchColumn(0) !== $cid) {
+	echo 'Invalid aid';
+	exit;
+}
 
 function overwriteval($list, $loc, $val, $delim=',', $delim2='') {
 	if ($delim2 != '') {

@@ -77,7 +77,7 @@ function parseSearchString($str)
  */
 function searchQuestions($search, $userid, $searchtype, $libs = array(), $options = array(), $offset = 0, $max = 200)
 {
-    global $DBH, $groupid;
+    global $DBH, $groupid, $cid;
 
     $searchand = [];
     $searchvals = [];
@@ -261,21 +261,24 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     $libnames = [];
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
-        $libquery = "ili.libid IN ($llist) AND ";
-        $lib2query = "ili2.libid IN ($llist) AND ";
         $sortorder = [];
-        $stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
+        $stm = $DBH->prepare("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)
+             AND ((ownerid=? OR userights>2) OR (userights>0 AND groupid=?))");
+        $stm->execute([$userid, $groupid]);
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];
         }
+        $llist = implode(',', array_map('intval', array_keys($libnames)));
+        $libquery = "ili.libid IN ($llist) AND ";
+        $lib2query = "ili2.libid IN ($llist) AND ";
         if (in_array(0, $libs)) {
             $libnames[0] = _('Unassigned');
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
-        $assessquery = "ia.id IN ($llist)";
-        $stm = $DBH->query("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($llist)");
+        $stm = $DBH->prepare("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($llist) AND courseid=?");
+        $stm->execute([$cid]);
         $aidnames = [];
         $qidmap = [];
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -285,6 +288,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $qidmap[$v] = array($row[0], $k);
             }
         }
+        $llist = implode(',', array_map('intval', array_keys($aidnames)));
+        $assessquery = "ia.id IN ($llist)";
     }
 
     $rightsand = [];

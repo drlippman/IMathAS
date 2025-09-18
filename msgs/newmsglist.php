@@ -38,12 +38,6 @@
 		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=2 WHERE id IN ($checklist) AND msgto=?");
 		$stm->execute(array($userid));
 	}
-	if (isset($_GET['removeid'])) {
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND deleted=1 AND msgto=:msgto");
-		$stm->execute(array(':id'=>$_GET['removeid'], ':msgto'=>$userid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=2 WHERE id=:id AND msgto=:msgto");
-		$stm->execute(array(':id'=>$_GET['removeid'], ':msgto'=>$userid));
-	}
 
 	$pagetitle = "New Messages";
 	require_once "../header.php";

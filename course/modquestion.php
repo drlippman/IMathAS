@@ -61,42 +61,48 @@ if (!(isset($teacherid))) {
 			$showhints = intval($_POST['showhints']);
 		}
 		if (isset($_GET['id'])) { //already have id - updating
-      $stm = $DBH->prepare("SELECT * FROM imas_questions WHERE id=?");
-      $stm->execute(array($_GET['id']));
-      $old_settings = $stm->fetch(PDO::FETCH_ASSOC);
+			$stm = $DBH->prepare("SELECT iq.* FROM imas_questions AS iq
+				JOIN imas_assessments AS ia ON iq.assessmentid=ia.id
+				WHERE iq.id=? AND ia.courseid=?");
+			$stm->execute(array($_GET['id'], $cid));
+			$old_settings = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($old_settings === false) {
+				echo 'Invalid id';
+				exit;
+			}
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
-        $settings = array(':points'=>$points, ':attempts'=>$attempts,
-          ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
-          ':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
-          ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']);
+				$settings = array(':points'=>$points, ':attempts'=>$attempts,
+					':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
+					':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
+					':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']);
 				$stm->execute($settings);
 			} else {
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
-        $settings = array(':points'=>$points, ':attempts'=>$attempts,
-          ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
-          ':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
-          ':id'=>$_GET['id']);
+				$settings = array(':points'=>$points, ':attempts'=>$attempts,
+					':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
+					':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
+					':id'=>$_GET['id']);
 				$stm->execute($settings);
 			}
-      $changes = array();
-      foreach ($old_settings as $k=>$v) {
-        if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
-          $changes[$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
-        }
-      }
-      if ($stm->rowCount()>0 && $beentaken && count($changes)>0) {
-        TeacherAuditLog::addTracking(
-          $cid,
-          "Question Settings Change",
-          $_GET['id'],
-          $changes
-        );
-      }
+			$changes = array();
+			foreach ($old_settings as $k=>$v) {
+				if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
+				$changes[$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
+				}
+			}
+			if ($stm->rowCount()>0 && $beentaken && count($changes)>0) {
+				TeacherAuditLog::addTracking(
+				$cid,
+				"Question Settings Change",
+				$_GET['id'],
+				$changes
+				);
+			}
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$stm = $DBH->prepare("SELECT questionsetid FROM imas_questions WHERE id=:id");
 				$stm->execute(array(':id'=>$_GET['id']));
@@ -105,9 +111,13 @@ if (!(isset($teacherid))) {
 		}
 		require_once "../includes/updateptsposs.php";
 		if (isset($_GET['qsetid'])) { //new - adding
-			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$aid));
+			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
+			$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 			list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
+			if ($itemorder === null || $itemorder === false) {
+				echo 'Invalid aid';
+				exit;
+			}
 			for ($i=0;$i<$_POST['copies'];$i++) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints,fixedseeds) ";
 				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :questionsetid, :rubric, :showhints, :fixedseeds)";
@@ -143,9 +153,15 @@ if (!(isset($teacherid))) {
 	} else { //DEFAULT DATA MANIPULATION
 
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm = $DBH->prepare("SELECT iq.* FROM imas_questions AS iq
+				JOIN imas_assessments AS ia ON iq.assessmentid=ia.id
+				WHERE iq.id=? AND ia.courseid=?");
+			$stm->execute(array($_GET['id'], $cid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($line === false) {
+				echo 'Invalid id';
+				exit;
+			}
 			if ($line['penalty'][0]==='L') {
 				$line['penalty'] = substr($line['penalty'],1);
 				$skippenalty = 10;
@@ -199,10 +215,14 @@ if (!(isset($teacherid))) {
 
 		//get defaults
 		$query = "SELECT defpoints,defattempts,defpenalty,deffeedback,showhints,shuffle FROM imas_assessments ";
-		$query .= "WHERE id=:id";
+		$query .= "WHERE id=:id AND courseid=:cid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$aid));
+		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($defaults === false) {
+			echo 'Invalid aid';
+			exit;
+		}
 		list($deffeedback,$defshowans) = explode('-',$defaults['deffeedback']);
 		if ($defaults['defpenalty'][0]==='L') {
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],1);

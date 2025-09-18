@@ -106,7 +106,9 @@ function draw_mayan_number($n, $width = 50, $mode = 'standard') {
 		}
 		$ybase++;
 	}
-	return showasciisvg($cmd, $width, $width*$multi, $alt);
+	$g = showasciisvg($cmd, $width, $width*$multi, $alt);
+	$g = str_replace('<embed','<embed data-nomag=1', $g);
+	return $g;
 }
 
 function draw_babylonian_number($n, $height=40, $zeroinmiddle=0) {
@@ -214,8 +216,10 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=0) {
 		$xstart += $groupwidth;
 		$xmax += $groupwidth;
 	}
-	$cmd = "setBorder(2,0,15,0);initPicture(0,$xmax,-.5,4.5);fill='none';" . $cmd;
-	return showasciisvg($cmd, $height*$xmax/5+17, $height, $alt);
+	$cmd = "setBorder(2,0,2,0);initPicture(0,$xmax,-.5,4.5);fill='none';" . $cmd;
+	$g = showasciisvg($cmd, $height*$xmax/5+4, $height, $alt);
+	$g = str_replace('<embed','<embed data-nomag=1', $g);
+	return $g;
 }
 function gen_babylonian_one($x,$y,$rh,$stubby) {
 	if ($stubby) {

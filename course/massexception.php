@@ -708,7 +708,11 @@ require_once __DIR__."/../includes/checkdata.php";
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo '<fieldset><legend>'._("Students Selected").'</legend>';
 		//echo "<h3>Students Selected</h3>";
-		$stm = $DBH->query("SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
+		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName FROM imas_users AS iu 
+			JOIN imas_students AS istu ON istu.userid=iu.id 
+			WHERE iu.id IN ($tolist) AND istu.courseid=?
+			ORDER BY LastName,FirstName");
+		$stm->execute([$cid]);
 		echo "<ul>";
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf("<li><span class='pii-full-name'>%s, %s</span></li>",

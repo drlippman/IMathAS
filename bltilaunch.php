@@ -772,21 +772,7 @@ if (isset($_GET['launch'])) {
 				$_POST['SID'] = 'lti-'.$localltiuser;
 				$pwhash = 'pass'; //totally unusable since not md5'ed
 				if ($ltirole=='instructor') { //not currently used - no teachers without real usernames/passwords
-					if (isset($CFG['LTI']['instrrights'])) {
-						$rights = $CFG['LTI']['instrrights'];
-					} else {
-						$rights = 40;
-					}
-					$newgroupid = intval($_SESSION['lti_keygroupid']);
-					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
-					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0,:groupid)';
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$pwhash,':rights'=>$rights,
-						':FirstName'=>Sanitize::stripHtmlTags($firstname),
-						':LastName'=>Sanitize::stripHtmlTags($lastname),
-						':email'=>Sanitize::emailAddress($email),
-						':groupid'=>$newgroupid));
-
+					reporterror('Teachers must log in');
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";

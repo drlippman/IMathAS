@@ -25,11 +25,11 @@
 	$istutor = isset($tutorid);
 	$stm = $DBH->prepare("SELECT text,title,target FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$linkedtextid, ':cid'=>$cid));
-	if ($stm->rowCount()==0) {
+	list($text,$title,$target) = $stm->fetch(PDO::FETCH_NUM);
+	if ($text === null) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($text,$title,$target) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
 	if (substr($text,0,8)=='exttool:') {

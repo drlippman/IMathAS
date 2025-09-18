@@ -18,16 +18,16 @@
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}*/
 	if (isset($_POST['remove'])) {  //via ajax post
-		$stm = $DBH->prepare("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory=:gbcategory");
-		$stm->execute(array(':gbcategory'=>$_POST['remove']));
-		$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
-		$stm->execute(array(':gbcategory'=>$_POST['remove']));
-        $oldgbref = '~~'.intval($_POST['remove']).'~~'; // a bit hacky, but OK
-        $stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text, '$oldgbref', '~~0~~') WHERE courseid=:courseid AND text LIKE 'exttool:%'");
-        $stm->execute(array(':courseid'=>$cid));
-		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['remove']));
+		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$_POST['remove'], ':cid'=>$cid));
 		if ($stm->rowCount()>0) {
+			$stm = $DBH->prepare("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory=:gbcategory");
+			$stm->execute(array(':gbcategory'=>$_POST['remove']));
+			$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
+			$stm->execute(array(':gbcategory'=>$_POST['remove']));
+			$oldgbref = '~~'.intval($_POST['remove']).'~~'; // a bit hacky, but OK
+			$stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text, '$oldgbref', '~~0~~') WHERE courseid=:courseid AND text LIKE 'exttool:%'");
+			$stm->execute(array(':courseid'=>$cid));
 			echo "OK";
 		} else {
 			echo "ERROR";
@@ -99,8 +99,8 @@
 			} else if ($id=='0') {
 				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide,$calctype";
 			} else {
-				$stm = $DBH->prepare("UPDATE imas_gbcats SET name=:name,scale=:scale,scaletype=:scaletype,chop=:chop,dropn=:dropn,weight=:weight,hidden=:hidden,calctype=:calctype WHERE id=:id");
-				$stm->execute(array(':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop, ':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype, ':id'=>$id));
+				$stm = $DBH->prepare("UPDATE imas_gbcats SET name=:name,scale=:scale,scaletype=:scaletype,chop=:chop,dropn=:dropn,weight=:weight,hidden=:hidden,calctype=:calctype WHERE id=:id AND courseid=:cid");
+				$stm->execute(array(':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop, ':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype, ':id'=>$id, ':cid'=>$cid));
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'] + 40000*$_POST['gbmode40000'] + 400000*$_POST['gbmode400000'];

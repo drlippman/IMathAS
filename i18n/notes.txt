@@ -10,6 +10,6 @@ directory.  This files does not need to be compiled.
 
 I have not yet automated the process for generating the messages.js
 file using xgettext or other utilizies.  I have included a
-getjsmessages.php script which extracts the javascript messages, but
+extractjsfrompo script which extracts the javascript messages from the po file, but
 it doesn't not currently merge in existing translated messages.  
 Additional work needs to be done on this.

@@ -172,9 +172,9 @@ if ($myrights<20) {
 					array_shift($newlibs);
 				}
 				//Verify we have rights to add to all of newlibs
-				$newliblist = implode(',', $newlibs);
 				if (!$isadmin && count($newlibs)>0) {
 					$oktoaddto = array();
+					$newliblist = implode(',', $newlibs);
 					$stm = $DBH->query("SELECT id,ownerid,userights,groupid FROM imas_libraries WHERE id IN ($newliblist)");
 					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						if ($isgrpadmin) {

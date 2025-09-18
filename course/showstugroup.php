@@ -4,6 +4,7 @@
 
 /*** master php includes *******/
 require_once "../init.php";
+require_once '../includes/stugroups.php';
 
 /*** pre-html data manipulation, including function code *******/
 $cid = intval($_GET['cid']);
@@ -12,6 +13,7 @@ $sgid = intval($_GET['gid']);
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	exit;
 }
+checkGroupIDinCourse($sgid,$cid);
 
 $out = '<ul>';
 $userfound = false;

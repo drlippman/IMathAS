@@ -1,6 +1,6 @@
 <?php
 	require_once "../init.php";
-	if ($myrights<100 && ($myspecialrights&(32+64))==0) {
+	if ($myrights<100 && ($myspecialrights&32)==0) {
 		exit;
 	}
 	$now = time();

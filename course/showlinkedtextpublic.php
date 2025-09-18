@@ -59,6 +59,7 @@
 	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid AND courseid=:cid");
 	$stm->execute(array(':typeid'=>intval($_GET['id']), ':cid'=>$cid));
 	$itemid = $stm->fetchColumn(0);
+	if ($itemid === false) { exit; }
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);

@@ -18,21 +18,28 @@
 
 	if ($isteacher || $istutor) {
 		$uid = intval($_GET['uid']);
-	} else {
+	} else if (isset($studentid)) {
 		$uid = $userid;
+	} else {
+		exit;
 	}
 	$forumid = intval($_GET['fid']);
 	
 	$embedded = !empty($_GET['embed']);
 
+	$query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit,i_f.enddate FROM imas_users AS iu, imas_forums as i_f, imas_students AS istu ";
+	$query .= "WHERE istu.userid=iu.id AND iu.id=:uid AND istu.courseid=:cid2 AND i_f.id=:fid AND i_f.courseid=:cid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':uid'=>$uid, ':fid'=>$forumid, ':cid'=>$cid, ':cid2'=>$cid));
+	$forumsettings = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($forumsettings === false) {
+		echo 'Invalid forum';
+		exit;
+	}
+
 	if (($isteacher || $istutor) && (isset($_POST['score']) || isset($_POST['newscore']))) {
-		if ($istutor) {
-			$stm = $DBH->prepare("SELECT tutoredit FROM imas_forums WHERE id=:id");
-			$stm->execute(array(':id'=>$forumid));
-			$row = $stm->fetch(PDO::FETCH_NUM);
-			if ($row[0]!=1) {
-				exit; //not auth for score change
-			}
+		if ($istutor && $forumsettings['tutoredit'] != 1) {
+			exit; //not auth for score change
 		}
 		//check for grades marked as newscore that aren't really new
 		//shouldn't happen, but could happen if two browser windows open
@@ -91,15 +98,10 @@
 		exit;
 	}
 	
-	$query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit,i_f.enddate FROM imas_users AS iu, imas_forums as i_f ";
-	$query .= "WHERE iu.id=:uid AND i_f.id=:fid";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':uid'=>$uid, ':fid'=>$forumid));
-	$row = $stm->fetch(PDO::FETCH_NUM);
-	$possiblepoints = $row[3];
-	$tutoredit = $row[4];
+	$possiblepoints = $forumsettings['points'];
+	$tutoredit = $forumsettings['tutoredit'];
 	$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
-	$showlink = ($caneditscore || time()<$row[5]);
+	$showlink = ($caneditscore || time()<$forumsettings['enddate']);
 
 	$pagetitle = "View Forum Grade";
 	if ($caneditscore && $_SESSION['useed']!=0) {
@@ -132,7 +134,7 @@
 	}
 
 	echo '<div id="headerviewforumgrade" class="pagetitle"><h1>View Forum Grade</h1></div>';
-	echo "<p>Grades on forum <b>".Sanitize::encodeStringForDisplay($row[2])."</b> for <b>".Sanitize::encodeStringForDisplay($row[1])." ".Sanitize::encodeStringForDisplay($row[0])."</b></p>";
+	echo "<p>Grades on forum <b>".Sanitize::encodeStringForDisplay($forumsettings['name'])."</b> for <b>".Sanitize::encodeStringForDisplay($forumsettings['FirstName'])." ".Sanitize::encodeStringForDisplay($forumsettings['LastName'])."</b></p>";
 
 	if ($istutor && $tutoredit==2) {
 		echo '<p>No access to scores for this forum</p>';

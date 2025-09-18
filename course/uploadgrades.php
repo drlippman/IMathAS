@@ -29,10 +29,17 @@ if (!(isset($teacherid))) {
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
+		$gbitemid = Sanitize::onlyInt($_GET['gbitem']);
+		$stm = $DBH->prepare('SELECT courseid FROM imas_gbitems WHERE id=?');
+		$stm->execute([$gbitemid]);
+		if ($stm->fetchColumn(0) !== $cid) {
+			echo 'Invalid gbitem';
+			exit;
+		}
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
 			$curscores = array();
 			$stm = $DBH->prepare("SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
-			$stm->execute(array(':gradetypeid'=>$_GET['gbitem']));
+			$stm->execute(array(':gradetypeid'=>$gbitemid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$curscores[$row[0]] = $row[1];
 			}
@@ -88,13 +95,13 @@ if (!(isset($teacherid))) {
 					$cuserid=$stm->fetchColumn(0);
 					if (isset($curscores[$cuserid])) {
 						$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetype='offline' AND gradetypeid=:gradetypeid");
-						$stm->execute(array(':score'=>$score, ':feedback'=>$feedback, ':userid'=>$cuserid, ':gradetypeid'=>$_GET['gbitem']));
+						$stm->execute(array(':score'=>$score, ':feedback'=>$feedback, ':userid'=>$cuserid, ':gradetypeid'=>$gbitemid));
 						$successes++;
 					} else {
 						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 						$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':gradetype'=>'offline', ':gradetypeid'=>$_GET['gbitem'], ':userid'=>$cuserid, ':score'=>$score, ':feedback'=>$feedback));
+						$stm->execute(array(':gradetype'=>'offline', ':gradetypeid'=>$gbitemid, ':userid'=>$cuserid, ':score'=>$score, ':feedback'=>$feedback));
 						$successes++;
 					}
 				} else {

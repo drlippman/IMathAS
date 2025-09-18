@@ -207,16 +207,24 @@ function getRadioValue(theRadioGroup) {
 function quickgrade(qn,type,prefix,todo,vals) {
 	if (type==0) { //all
 		for (var i=0;i<todo;i++) {
-			document.getElementById(prefix+qn+"-"+i).value = vals[i];
+			var el = document.getElementById(prefix+qn+"-"+i);
+			if (el.value < vals[i]) {
+				el.value = vals[i];
+			}
 		}
 	} else {  //select
 		for (var i=0;i<todo.length;i++) {
-			document.getElementById(prefix+qn+"-"+todo[i]).value = vals[todo[i]];
+			var el = document.getElementById(prefix+qn+"-"+todo[i]);
+			if (el.value < vals[todo[i]]) {
+				el.value = vals[todo[i]];
+			}	
 		}
 	}
 }
 function quicksetscore(el,score,clickel) {
-	document.getElementById(el).value = score;
+	if (document.getElementById(el).value < score) {
+		document.getElementById(el).value = score;
+	}
 	if (clickel != null) {
 		var html = " | "+_('Quick feedback: ');
 		html += '<a href="#" onclick="return quicksetfb(this)">'+_('Good!')+'</a> | ';

@@ -11,7 +11,8 @@
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
-		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+		echo 'Only true students can redeem latepasses';
+		exit;
 	}
 
 	if (isset($_REQUEST['from'])) {
@@ -39,10 +40,10 @@
 		echo "Un-use LatePass</div>";
 		$stm = $DBH->prepare("SELECT enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-		if ($stm->rowCount()==0) {
+		$row = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($row === false) {
 			echo '<p>Invalid</p>';
 		} else {
-			$row = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($row['islatepass']==0) {
 				echo '<p>Invalid</p>';
 			} else {
@@ -94,9 +95,13 @@
 
 	} else if (isset($_POST['confirm'])) {
 		//$addtime = $latepasshrs*60*60;
-		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,LPcutoff FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$aid));
+		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,LPcutoff FROM imas_assessments WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 		list($allowlate,$enddate,$startdate,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
+		if ($enddate === null || $enddate === false) {
+			echo 'Invalid aid';
+			exit;
+		}
 		if ($LPcutoff<$enddate) {
 			$LPcutoff = 0;  //ignore nonsensical values
 		}
@@ -176,9 +181,13 @@
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		//$curBreadcrumb .= " Redeem LatePass\n";
 		//echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
-		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff,ver FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$aid));
+		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff,$aVer) =$stm->fetch(PDO::FETCH_NUM);
+		if ($enddate === null || $enddate === false) {
+			echo 'Invalid aid';
+			exit;
+		}
 		if ($LPcutoff<$enddate) {
 			$LPcutoff = 0;  //ignore nonsensical values
 		}

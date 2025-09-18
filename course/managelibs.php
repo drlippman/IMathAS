@@ -282,8 +282,8 @@ if ($myrights<20) {
 				$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$_POST['newowner']));
 				$newgpid = $stm->fetchColumn(0);
-				$query = "UPDATE imas_libraries SET ownerid=:ownerid,groupid=:groupid WHERE imas_libraries.id IN ($translist)";
-				$qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid);
+				$query = "UPDATE imas_libraries SET ownerid=:newownerid,groupid=:newgroupid WHERE imas_libraries.id IN ($translist)";
+				$qarr = array(':newownerid'=>$_POST['newowner'], ':newgroupid'=>$newgpid);
 
 				if (!$isadmin) {
 				  $query .= " AND groupid=:groupid";
@@ -370,8 +370,8 @@ if ($myrights<20) {
 			//$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
 			//$query .= ",imas_libraries.groupid=imas_users.groupid WHERE imas_libraries.ownerid=imas_users.id AND ";
 			//$query .= "imas_libraries.id='{$_GET['transfer']}'";
-			$query = "UPDATE imas_libraries SET ownerid=:ownerid,groupid=:groupid WHERE imas_libraries.id=:id";
-			$qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid, ':id'=>$_GET['transfer']);
+			$query = "UPDATE imas_libraries SET ownerid=:newownerid,groupid=:newgroupid WHERE imas_libraries.id=:id";
+			$qarr = array(':newownerid'=>$_POST['newowner'], ':newgroupid'=>$newgpid, ':id'=>$_GET['transfer']);
 		      if ($isgrpadmin) {
 			$query .= " AND groupid=:groupid";
 			$qarr[':groupid']=$groupid;

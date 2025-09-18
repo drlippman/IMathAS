@@ -40,8 +40,8 @@
 
 	if (isset($_GET['markunread'])) {
 		$msg = Sanitize::onlyInt($_GET['msgid']);
-		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=0 WHERE id=:id and viewed>0");
-		$stm->execute(array(':id'=>$msg));
+		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=0 WHERE id=:id and viewed>0 AND msgto=:msgto");
+		$stm->execute(array(':id'=>$msg, ':msgto'=>$userid));
 		if ($type=='new') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
 		} else {
@@ -91,20 +91,23 @@
 	$query .= "WHERE imas_msgs.id=:id ";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto=:msgto OR imas_msgs.msgfrom=:msgfrom)";
+	} else {
+		$query .= "AND imas_msgs.courseid=:cid";
 	}
 
 	$stm = $DBH->prepare($query);
 	if ($type!='allstu' || !$isteacher) {
 		$stm->execute(array(':courseid'=>$cid, ':id'=>$msgid, ':msgto'=>$userid, ':msgfrom'=>$userid));
 	} else {
-		$stm->execute(array(':courseid'=>$cid, ':id'=>$msgid));
+		$stm->execute(array(':courseid'=>$cid, ':cid'=>$cid, ':id'=>$msgid));
 	}
-	if ($stm->rowCount()==0) {
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($line === false) {
 		echo "Message not found";
 		require_once "../footer.php";
 		exit;
 	}
-	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	
 
 	$isteacher = isset($teacherof[$line['courseid']]);
 
@@ -264,8 +267,8 @@
 
 	}
 	if ($type!='sent' && $type!='allstu' && $line['viewed']==0) {
-		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id=:id");
-		$stm->execute(array(':id'=>$msgid));
+		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id=:id AND msgto=:msgto");
+		$stm->execute(array(':id'=>$msgid, ':msgto'=>$userid));
 	}
 	echo '<p>&nbsp;</p>';
 	require_once "../footer.php";

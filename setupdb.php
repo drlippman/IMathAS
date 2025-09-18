@@ -1,6 +1,11 @@
-<html>
+<?php
+$dbsetup = true;
+$use_local_sessions = true;
+$init_session_start = true;
+require_once "init_without_validate.php";
+?><html>
 <head>
-<link rel="stylesheet" href="imas.css" type="text/css">
+<link rel="stylesheet" href="imascore.css" type="text/css">
 </head>
 <body>
 <?php
@@ -15,12 +20,10 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 
 ***************/
 
-$dbsetup = true;
-$use_local_sessions = true;
-$init_session_start = true;
-require_once "init_without_validate.php";
+
 $stm = $DBH->query("SHOW TABLES LIKE 'imas_dbschema'");
-if ($stm->rowCount()>0) {
+$row = $stm->fetch();
+if ($row !== false) {
 	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
 	echo "rerun the setup, clear out your database";
 	echo "</body></html>";

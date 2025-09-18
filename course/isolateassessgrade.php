@@ -19,11 +19,12 @@
     
     $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-	if ($stm->rowCount()==0) {
+	$res = $stm->fetch(PDO::FETCH_NUM);
+	if ($res === false) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible) = $res;
     if ($istutor && $tutoredit == 2) {  // tutor, no access to view grades
         echo 'No access';
         exit;
@@ -383,7 +384,7 @@
 				$total += getpts($scores[$i]);
 			}
 			$timeused = $line['endtime']-$line['starttime'];
-			$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
+			$timeontask = round(array_sum(array_map('floatval', explode(',',str_replace('~',',',$line['timeontask']))))/60,1);
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 			$UA = 0;
 		}

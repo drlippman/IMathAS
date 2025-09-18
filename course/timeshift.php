@@ -42,9 +42,13 @@ if (!(isset($teacherid))) {
 
 	if (isset($_POST['sdate'])) {
 
-		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['aid'])));
+		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['aid']), ':cid'=>$cid));
 		$basedate = $stm->fetchColumn(intval($_POST['base']));
+		if ($basedate === false) {
+			echo 'Invalid aid';
+			exit;
+		}
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$_POST['sdate'],$dmatches);
 		$newstamp = mktime(date('G',$basedate),date('i',$basedate),0,$dmatches[1],$dmatches[2],$dmatches[3]);
 		$shift = $newstamp-$basedate;

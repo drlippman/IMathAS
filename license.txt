@@ -1,6 +1,6 @@
 *********************************************************
 **   Internet Mathematics Assessment System (IMathAS)  ** 
-**   (c) David Lippman, 2006-2014		       **
+**   (c) David Lippman, 2006-2025		               **
 *********************************************************
 
 See readme.html for installation information.
@@ -24,7 +24,7 @@ Questions written using the IMathAS language and macro libraries are
 NOT derivative works of this software, and therefore are not required 
 to be be licensed under the GPL.  If you wish to distribute question 
 libraries or macro libraries using a license other than public-domain, 
-specify the license in the library description.  Libraries distributed 
+specify the license in the question editor.  Libraries distributed 
 without a license statement will be assumed to be public-domain.  
 
 It is my interpretation of the GPL (in the spirit of free software) that 
@@ -37,8 +37,8 @@ ASCIIMathML and ASCIIsvg
 GPL License
 
 TinyMCE
-(c) 2003-2008 Moxiecode Systems AB
-LGPL License
+(c) 2024, Ephox Corporation DBA Tiny Technologies, Inc
+GPL2 License
 
 AsciiMath and AsciiSvg Plugins for TinyMCE
 (c) David Lippman
@@ -130,6 +130,10 @@ MIT License
 
 LTI Utilities
 (c) IMS Global, written by Dr Chuck
+Apache 2.0 license
+
+LTI 1.3 Library
+Copyright 2018 Turnitin, LLC
 Apache 2.0 license
 
 Thumbs-up icon remixed from work (c) Bersam at

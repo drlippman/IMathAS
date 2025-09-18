@@ -13,13 +13,26 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
+	if (!$isteacher && !$istutor && !isset($studentid)) {
+		echo 'No access';
+		exit;
+	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['asid'])) {
 		echo '<html>Error - invalid assessment session ID</html>';
-	} else if ($_GET['asid']=='new') {
+	} else if ($_GET['asid']=='new' && $isteacher) {
 		$asid = 'new';
 	} else {
 		$asid = Sanitize::onlyInt($_GET['asid']);
+		$stm = $DBH->prepare("SELECT ias.id FROM imas_assessment_sessions AS ias
+			JOIN imas_assessments AS ia ON ia.id=ias.assessmentid
+			JOIN imas_students AS istu ON istu.userid=ias.userid
+			WHERE ia.courseid=? AND istu.courseid=?");
+		$stm->execute([$cid,$cid]);
+		if ($stm->fetchColumn(0) === false) {
+			echo 'Invalid asid';
+			exit;
+		}
 	}
 
 	if (!isset($_GET['uid']) || (!$isteacher && !$istutor)) {
@@ -563,7 +576,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$_SESSION['coursetheme'] = $coursetheme;
 		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=011823"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=090725"></script>';
 			require_once "../includes/rubric.php";
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060724"></script>';
 			if ($_SESSION['useed']!=0) {

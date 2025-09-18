@@ -70,7 +70,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT ic.name,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($name,$courseowner,$coursegroup) = $stm->fetch(PDO::FETCH_NUM);
-		if ($name === false ||
+		if (empty($courseowner) ||
 			($myrights < 75 && $courseowner !== $userid) ||
 			($myrights < 100 && $coursegroup !== $groupid)
 		) {
@@ -1237,9 +1237,12 @@ switch($_GET['action']) {
 			}
 			if (empty($browser['owner'])) {
 				if (!isset($udat)) {
-					$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
+					$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
 					$stm->execute(array(':id'=>$userid));
 					$udat = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($udat['groupid']==0) {
+						$udat['name'] = _('Default Group');
+					}
 				}
 				$browser['owner'] = $udat['FirstName'].' '.$udat['LastName'].' ('.$udat['name'].')';
 			}

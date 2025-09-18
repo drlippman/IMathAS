@@ -3,6 +3,8 @@
 //(c) 2006 David Lippman
 
 require_once "../init.php";
+require_once '../includes/checkdata.php';
+
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	require_once "../header.php";
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -56,7 +58,8 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 	}
 	$postuserids = array();
 	$refids = implode(',', array_map('intval', array_keys($_POST['score'])));
-	$stm = $DBH->query("SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)");
+	$stm = $DBH->prepare("SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids) AND forumid=?");
+	$stm->execute([$forumid]);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$postuserids[$row[0]] = $row[1];
 	}
@@ -70,7 +73,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 			if (isset($existingscores[$k])) {
 				$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE id=:id");
 				$stm->execute(array(':score'=>$v, ':feedback'=>$feedback, ':id'=>$existingscores[$k]));
-			} else {
+			} else if (isset($postuserids[$k])) {
 				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score,feedback) VALUES ";
 				$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score, :feedback)";
 				$stm = $DBH->prepare($query);
@@ -259,8 +262,9 @@ if ($tagfilter != '') {
 	if ($dofilter) {
 		$query .= " AND threadid IN ($limthreads)";
 	}
+	$query .= " AND forumid=:fid"
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':tagfilter'=>$tagfilter));
+	$stm->execute(array(':tagfilter'=>$tagfilter, ':fid'=>$forumid));
 	$limthreads = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$limthreads[] = intval($row[0]);

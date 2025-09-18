@@ -39,9 +39,13 @@ if (!(isset($teacherid))) {
     $curBreadcrumb .= _("Modify Question Settings");
 
     if (!empty($_GET['process'])) {
-        $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id");
-        $stm->execute(array(':id' => $aid));
+        $stm = $DBH->prepare("SELECT itemorder,defpoints,intro FROM imas_assessments WHERE id=:id AND courseid=:cid");
+        $stm->execute(array(':id' => $aid, ':cid'=>$cid));
         list($itemorder, $defpoints, $intro) = $stm->fetch(PDO::FETCH_NUM);
+        if ($itemorder === null || $itemorder === false) {
+            echo 'Invalid aid';
+            exit;
+        }
         if (isset($_GET['usedef'])) {
             $points = 9999;
             $attempts = 9999;
@@ -98,9 +102,15 @@ if (!(isset($teacherid))) {
             }
         }
         if (isset($_GET['id'])) { //already have id - updating
-            $stm = $DBH->prepare("SELECT * FROM imas_questions WHERE id=?");
-            $stm->execute(array($_GET['id']));
+            $stm = $DBH->prepare("SELECT iq.* FROM imas_questions AS iq
+				JOIN imas_assessments AS ia ON iq.assessmentid=ia.id
+				WHERE iq.id=? AND ia.courseid=?");
+			$stm->execute(array($_GET['id'], $cid));
             $old_settings = $stm->fetch(PDO::FETCH_ASSOC);
+            if ($old_settings === false) {
+				echo 'Invalid id';
+				exit;
+			}
             if (isset($_POST['replacementid']) && $_POST['replacementid'] != '' && intval($_POST['replacementid']) != 0) {
                 $query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,showwork=:showwork,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
                 $query .= ',questionsetid=:questionsetid,extracredit=:extracredit WHERE id=:id';
@@ -226,9 +236,15 @@ if (!(isset($teacherid))) {
     } else { //DEFAULT DATA MANIPULATION
 
         if (isset($_GET['id'])) {
-            $stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,showwork,rubric,showhints,questionsetid,fixedseeds,extracredit FROM imas_questions WHERE id=:id");
-            $stm->execute(array(':id' => $_GET['id']));
-            $line = $stm->fetch(PDO::FETCH_ASSOC);
+            $stm = $DBH->prepare("SELECT iq.* FROM imas_questions AS iq
+				JOIN imas_assessments AS ia ON iq.assessmentid=ia.id
+				WHERE iq.id=? AND ia.courseid=?");
+			$stm->execute(array($_GET['id'], $cid));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($line === false) {
+				echo 'Invalid id';
+				exit;
+			}
             if ($line['penalty'][0] === 'S') {
                 $penalty_aftern = $line['penalty'][1];
                 $line['penalty'] = substr($line['penalty'], 2);
@@ -286,10 +302,15 @@ if (!(isset($teacherid))) {
         //get defaults
         $query = "SELECT defpoints,defattempts,defpenalty,defregens,";
         $query .= "showans,showwork,submitby,showhints,shuffle FROM imas_assessments ";
-        $query .= "WHERE id=:id";
+        $query .= "WHERE id=:id AND courseid=:cid";
         $stm = $DBH->prepare($query);
-        $stm->execute(array(':id' => $aid));
+        $stm->execute(array(':id' => $aid, ':cid'=>$cid));
         $defaults = $stm->fetch(PDO::FETCH_ASSOC);
+        if ($defaults === false) {
+			echo 'Invalid aid';
+			exit;
+		}
+
         $defaults['showwork'] = ($defaults['showwork'] & 3);
 
         if ($defaults['defpenalty'] === '') { $defaults['defpenalty'] = '0'; }

@@ -38,7 +38,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stm->execute([$userid]);
 			$todo = [];
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$todo[] = intval($stu);
+				$todo[] = intval($row[0]);
 			}
 			if (count($todo)==0) {
 				echo 'No valid students';

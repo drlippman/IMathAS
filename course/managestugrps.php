@@ -26,6 +26,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } else {
 	if (isset($_GET['addgrp']) && isset($_POST['grpname']) && isset($_GET['grpsetid'])) {
+		checkGroupSetIDinCourse($grpsetid, $cid);
 		//adding a group.  Could be a "add new group" only, or adding a new group while assigning students
 		if (trim($_POST['grpname'])=='') {
 			$_POST['grpname'] = 'Unnamed group';
@@ -58,6 +59,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//deleting groupset
 		if (isset($_POST['confirm'])) {
 			//if name is set
+			checkGroupSetIDinCourse($deleteGroupSet, $cid);
 			deletegroupset($deleteGroupSet);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
@@ -72,6 +74,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$renameGrpSet = sanitize::onlyInt($_GET['rengrpset']);
 		//renaming groupset
 		if (isset($_POST['grpsetname'])) {
+			checkGroupSetIDinCourse($renameGrpSet, $cid);
 			//if name is set
 			$stm = $DBH->prepare("UPDATE imas_stugroupset SET name=:name WHERE id=:id");
 			$stm->execute(array(':name'=>Sanitize::stripHtmlTags($_POST['grpsetname']), ':id'=>$renameGrpSet)); //formerly ':id'=>$_GET['rengrpset']
@@ -86,9 +89,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else if (isset($_GET['copygrpset'])) {
 		//copying groupset
 		$copygrpset = Sanitize::onlyInt($_GET['copygrpset']);
-		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-		$stm->execute(array(':id'=>$copygrpset));
-		$grpsetname = $stm->fetchColumn(0) . ' (copy)';
+		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$copygrpset, ':cid'=>$cid));
+		$sourcename = $stm->fetchColumn(0);
+		if ($sourcename === false) {
+			echo 'Invalid groupsetid to copy';
+			exit;
+		}
+		$grpsetname = $sourcename . ' (copy)';
 		$stm = $DBH->prepare("INSERT INTO imas_stugroupset (name,courseid) VALUES (:name, :courseid)");
 		$stm->execute(array(':name'=>$grpsetname, ':courseid'=>$cid));
 		$newgrpset = $DBH->lastInsertId();
@@ -128,6 +136,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_GET['addgrp'] = true;
 		} else {
 			$grpid = Sanitize::onlyInt($_POST['addtogrpid']);
+			checkGroupIDinCourse($grpid, $cid);
 			$loginfo = "instr adding stu to group $grpid. ";
 			
 			$alreadygroupedstu = array();
@@ -301,24 +310,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Add Group";
 	} else if (isset($_GET['delgrp'])) {
-		//deleting groupset
+		//deleting group
 		$delgrp = sanitize::onlyInt($_GET['delgrp']);
+		checkGroupIDinCourse($delgrp, $cid);
 		if (isset($_GET['confirm']) && isset($_POST['delposts'])) {
 			//if name is set
 			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
+			$stm = $DBH->prepare("SELECT grp.name AS grpname, gset.name AS grpsetname 
+				FROM imas_stugroups AS grp 
+				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
+				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$delgrp));
-			$page_grpname = $stm->fetchColumn(0);
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-			$stm->execute(array(':id'=>$grpsetid));
-			$page_grpsetname = $stm->fetchColumn(0);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
 		}
-
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Delete Group";
 	} else if (isset($_GET['addrandgrps'])) {
+		checkGroupSetIDinCourse($grpsetid, $cid);
 		if (isset($_POST['grpsize']) && intval($_POST['grpsize'])>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_stugroups WHERE groupsetid=?");
 			$stm->execute(array($grpsetid));
@@ -389,42 +399,45 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else if (isset($_GET['rengrp'])) {
 		//renaming groupset
 		$renGrp = sanitize::onlyInt($_GET['rengrp']);
+		checkGroupIDinCourse($renGrp, $cid);
 		if (isset($_POST['grpname'])) {
 			//if name is set
 			$stm = $DBH->prepare("UPDATE imas_stugroups SET name=:name WHERE id=:id");
-			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$_GET['rengrp']));
+			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$renGrp));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
+			$stm = $DBH->prepare("SELECT grp.name AS grpname, gset.name AS grpsetname 
+				FROM imas_stugroups AS grp 
+				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
+				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$renGrp));
-			$page_grpname = $stm->fetchColumn(0);
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-			$stm->execute(array(':id'=>$grpsetid));
-			$page_grpsetname = $stm->fetchColumn(0);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Rename Group";
 	} else if (isset($_GET['removeall'])) {
 		//removing all group members
 		$removeall = sanitize::onlyInt($_GET['removeall']);
+		checkGroupIDinCourse($removeall, $cid);
 		if (isset($_POST['confirm'])) {
 			//if name is set
 			removeallgroupmembers($removeall);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
+			$stm = $DBH->prepare("SELECT grp.name AS grpname, gset.name AS grpsetname 
+				FROM imas_stugroups AS grp 
+				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
+				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$removeall));
-			$page_grpname = $stm->fetchColumn(0);
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-			$stm->execute(array(':id'=>$grpsetid));
-			$page_grpsetname = $stm->fetchColumn(0);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove all group members";
 
 	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
 		//removing one group member
 		$removegrpid = sanitize::onlyInt($_GET['grpid']);
+		checkGroupIDinCourse($removegrpid, $cid);
 		$remove = sanitize::onlyInt($_GET['remove']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
@@ -432,24 +445,29 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
-			$stm = $DBH->prepare("SELECT LastName, FirstName FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$remove));
+			$stm = $DBH->prepare("SELECT iu.LastName, iu.FirstName FROM imas_users AS iu
+				JOIN imas_students AS istu ON istu.userid=iu.id WHERE iu.id=:id AND istu.courseid=:cid");
+			$stm->execute(array(':id'=>$remove, ':cid' => $cid));
 			$page_stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
-			$stm->execute(array(':id'=>$removegrpid));
-			$page_grpname = $stm->fetchColumn(0);
-			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-			$stm->execute(array(':id'=>$grpsetid));
-			$page_grpsetname = $stm->fetchColumn(0);
+			$stm = $DBH->prepare("SELECT grp.name AS grpname, gset.name AS grpsetname 
+				FROM imas_stugroups AS grp 
+				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
+				WHERE grp.id=:id");
+			$stm->execute(array(':id'=>$remove));
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove group member";
 
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected, show groups
 		$grpsetid = Sanitize::onlyInt($_GET['grpsetid']);
-		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-		$stm->execute(array(':id'=>$grpsetid));
+		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$grpsetid, ':cid'=>$cid));
 		$page_grpsetname = $stm->fetchColumn(0);
+		if ($page_grpsetname === false) {
+			echo 'Invalid groupsetid';
+			exit;
+		}
 
 		//$page_grps will be an array, groupid=>name
 		$page_grps = array();

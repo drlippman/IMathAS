@@ -12,7 +12,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
   $contextid = $launch->get_platform_context_id();
   $platform_id = $launch->get_platform_id();
   $resource_link = $launch->get_resource_link();
-  $target = parse_target_link($launch->get_target_link(), $db);
+  //$target = parse_target_link($launch->get_target_link(), $db);
   $targetltiuserid = $launch->get_submission_review_user_id();
   if (empty($targetltiuserid)) {
       echo _('No target user id provided');
@@ -23,11 +23,13 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
       $target = ['type'=>'ext'];
     }
   }
+  /*
   if (empty($target)) {
     echo "Error parsing requested resource";
     exit;
   }
-
+  */
+  
   // look to see if we already know where this link should point
   $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
   if ($link === null) {

@@ -33,9 +33,13 @@ if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
     $addq = 'addquestions';
     $from = 'addq';
 }
-$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
-$stm->execute(array(':id'=>$aid));
+$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id AND courseid=:cid");
+$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 $line = $stm->fetch(PDO::FETCH_ASSOC);
+if ($line === false) {
+	echo 'Invalid aid';
+	exit;
+}
 
 
 if ($overwriteBody==1) {

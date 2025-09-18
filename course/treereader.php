@@ -330,8 +330,8 @@ function printlist($items) {
 				$out .=  '</ul></li>';
 			}
 		} else {
-			$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
-			$stm->execute(array(':id'=>$item));
+			$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id AND courseid=:cid");
+			$stm->execute(array(':id'=>$item, ':cid'=>$cid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$typeid = Sanitize::onlyInt($line['typeid']);
 			$itemtype = Sanitize::simpleString($line['itemtype']);
@@ -345,8 +345,8 @@ function printlist($items) {
 			if ($line['itemtype']=='Assessment') {
 				//TODO check availability, timelimit, etc.
 				//TODO: reqscoreaid, latepasses
-				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,displaymethod,ver FROM imas_assessments WHERE id=:id");
-				 $stm->execute(array(':id'=>$typeid));
+				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,displaymethod,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
+				 $stm->execute(array(':id'=>$typeid, ':cid'=>$cid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if (isset($exceptions[$item])) {
 				 	 $useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$item], $line, true);
@@ -431,8 +431,8 @@ function printlist($items) {
 				 }
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
-				 $stm = $DBH->prepare("SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id=:id");
-				 $stm->execute(array(':id'=>$typeid));
+				 $stm = $DBH->prepare("SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
+				 $stm->execute(array(':id'=>$typeid, ':cid'=>$cid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 					 if ($openitem=='' && $foundfirstitem=='') {
@@ -445,8 +445,8 @@ function printlist($items) {
 				 }
 			} else if ($line['itemtype']=='InlineText') {
 				//TODO check availability, etc.
-				 $stm = $DBH->prepare("SELECT title,text,startdate,enddate,avail FROM imas_inlinetext WHERE id=:id");
-				 $stm->execute(array(':id'=>$typeid));
+				 $stm = $DBH->prepare("SELECT title,text,startdate,enddate,avail FROM imas_inlinetext WHERE id=:id AND courseid=:cid");
+				 $stm->execute(array(':id'=>$typeid, ':cid'=>$cid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 					 if ($openitem=='' && $foundfirstitem=='') {
@@ -471,8 +471,8 @@ function printlist($items) {
 				 $out .=  '<li><img src="'.$imasroot.'/img/forum_tiny.png" alt="Forum"> <a href="'.$imasroot.'/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid.'" onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 			} */else if ($line['itemtype']=='Wiki') {
 				//TODO check availability, etc.
-				 $stm = $DBH->prepare("SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id=:id");
-				 $stm->execute(array(':id'=>$typeid));
+				 $stm = $DBH->prepare("SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id=:id AND courseid=:cid");
+				 $stm->execute(array(':id'=>$typeid, ':cid'=>$cid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 					 if ($openitem=='' && $foundfirstitem=='') {

@@ -1,2 +1,6 @@
 .gitattributes export-ignore
 .gitignore export-ignore
+codeception.yml export-ignore
+composer.json export-ignore
+composer.lock export-ignore
+phpunit.xml export-ignore

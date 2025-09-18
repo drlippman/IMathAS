@@ -28,6 +28,10 @@ if ($type=='A') {
 	$stm->execute($qarr);
 
 	list($aname, $origfeedback) = $stm->fetch(PDO::FETCH_NUM);
+	if ($aname === false || $aname === null) {
+		echo 'Invalid aid';
+		exit;
+	}
 
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
 	$feedback = json_decode($origfeedback, true);
@@ -61,6 +65,10 @@ if ($type=='A') {
 	$stm->execute(array($id, $uid, $cid));
 
 	list($aname, $submitby, $deffb, $scoreddata) = $stm->fetch(PDO::FETCH_NUM);
+	if ($aname === false || $aname === null) {
+		echo 'Invalid aid';
+		exit;
+	}
 	$scoreddata = json_decode(Sanitize::gzexpand($scoreddata), true);
 	$by_question = ($submitby == 'by_question');
 
@@ -120,6 +128,10 @@ if ($type=='A') {
 	$stm->execute($qarr);
 
 	list($aname, $feedback) = $stm->fetch(PDO::FETCH_NUM);
+	if ($aname === false || $aname === null) {
+		echo 'Invalid aid';
+		exit;
+	}
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
 	echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback).'</div>';
 }

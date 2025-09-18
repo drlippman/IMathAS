@@ -321,7 +321,7 @@ if ($isActualTeacher || $istutor) {
     $stm->execute($qarr);
     $stuarr = $stm->fetchAll(PDO::FETCH_COLUMN,0);
     $loc = array_search($uid, $stuarr);
-    if ($loc < count($stuarr) - 1) {
+    if ($loc !== false && $loc < count($stuarr) - 1) {
         $assessInfoOut['nextstu'] = $stuarr[$loc+1];
     }
 }
