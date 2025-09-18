@@ -750,8 +750,8 @@ class DrawingScorePart implements ScorePart
                 $tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
                 foreach ($tplines as $k=>$val) {
                     $pts = array_map('floatval', explode(',',$val));
-                    if ($pts[1]==$pts[3] && $pts[2]==$pts[4]) {
-                      //the points are the same; skip it
+                    if ($pts[1]==$pts[3] && $pts[2]==$pts[4] && $pts[0]!==5.4) {
+                      //the points are the same; skip it except for vectors
                       unset($tplines[$k]);
                       continue;
                     }
