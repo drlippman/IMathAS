@@ -172,16 +172,25 @@ function refreshTable() {
 }
 
 //Show the editor toolbar on a newly created text segment
+var lastedifblankcnt = 0;
 function activateLastEditorIfBlank() {
     for (let i=0; i < itemarray.length; i++) {
         if (itemarray[i][0] == 'text' && itemarray[i][1] == '') {
-            let to_enable = tinymce.get('textseg' + i);
-            if (!to_enable) {
-                window.setTimeout(activateLastEditorIfBlank, 100);
-                return;
+            if (useed) {
+                let to_enable = tinymce.get('textseg' + i);
+                if (!to_enable) {
+                    lastedifblankcnt++;
+                    if (lastedifblankcnt < 20) {
+                        window.setTimeout(activateLastEditorIfBlank, 100);
+                    }
+                    return;
+                }
+                lastedifblankcnt = 0;
+                tinyMCE.setActive(to_enable);
+                to_enable.dispatch("focus");
+            } else {
+                document.getElementById('textseg' + i).focus();
             }
-            tinyMCE.setActive(to_enable);
-            to_enable.dispatch("focus");
         }
     }
 }
@@ -309,7 +318,7 @@ function expandAndStyleTextSegment(selector, isglobal) {
         );
     } else {
         var editor = getEditorForSelector(selector);
-        if (editor !== undefined && editor.isDirty()) {
+        if (editor !== undefined && editor !== null && editor.isDirty()) {
             $("#edit-button" + type + i).fadeOut();
         }
         $("#edit-button" + type + i).attr("title", "Collapse");
