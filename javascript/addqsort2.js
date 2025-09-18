@@ -139,7 +139,8 @@ function refreshTable() {
         $(this).data('dirty', true);
         $(".savebtn").prop("disabled", false);
     });
-    activateLastEditorIfBlank();
+    // only do on new seg 
+    // activateLastEditorIfBlank();
     $(".dropdown-toggle").dropdown();
     $("#curqtbl input")
         .off("keydown.doblur")
@@ -175,6 +176,10 @@ function activateLastEditorIfBlank() {
     for (let i=0; i < itemarray.length; i++) {
         if (itemarray[i][0] == 'text' && itemarray[i][1] == '') {
             let to_enable = tinymce.get('textseg' + i);
+            if (!to_enable) {
+                window.setTimeout(activateLastEditorIfBlank, 100);
+                return;
+            }
             tinyMCE.setActive(to_enable);
             to_enable.dispatch("focus");
         }
@@ -1925,6 +1930,7 @@ function addtextsegment(n) {
             itemarray.push(["text", "", 1, 0, "", 1]);
         }
         refreshTable();
+        activateLastEditorIfBlank();
     }
 }
 
