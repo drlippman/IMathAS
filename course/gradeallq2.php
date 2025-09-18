@@ -639,7 +639,7 @@
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($exceptionarr[$line['userid']])) {
-			$assess_info->setException($line['userid'], $line, true);
+			$assess_info->setException($line['userid'], $exceptionarr[$line['userid']], true);
 		} else {
 			$assess_info->setException($line['userid'], false, true);
 		}
