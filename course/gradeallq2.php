@@ -596,6 +596,21 @@
         echo '</p>';
 	}
 
+	// load exceptions. loads more than needed, but ok.
+	$query = "SELECT ie.* FROM imas_exceptions AS ie
+		JOIN imas_students AS istu ON istu.userid=ie.userid 
+		WHERE istu.courseid=:courseid AND ie.assessmentid=:assessmentid";
+	if ($hidelocked) {
+		$query .= "AND imas_students.locked=0 ";
+	}
+	$exceptionarr = [];
+	$stm = $DBH->prepare($query);
+	$stm->execute([':courseid'=>$cid, ':assessmentid'=>$aid]);
+	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		$exceptionarr[$line['userid']] = $line;
+	}
+
+	// load assessment data
 	$qarr = array(':courseid'=>$cid, ':assessmentid'=>$aid);
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_records.* FROM imas_users,imas_assessment_records,imas_students ";
 	$query .= "WHERE imas_assessment_records.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_records.assessmentid=:assessmentid ";
@@ -623,6 +638,11 @@
     echo '<div id="qlistwrap">';
 	if ($stm->rowCount()>0) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		if (isset($exceptionarr[$line['userid']])) {
+			$assess_info->setException($line['userid'], $exceptionarr[$line['userid']], true);
+		} else {
+			$assess_info->setException($line['userid'], false, true);
+		}
 		$assess_record = new AssessRecord($DBH, $assess_info, false);
 		$assess_record->setRecord($line);
 		$assess_record->setTeacherInGb(true);
