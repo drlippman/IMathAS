@@ -833,8 +833,7 @@
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
-	  var editoron = 0; var seditoron = 0;
-	  var coursetheme = "'.$coursetheme.'";';
+	  var editoron = 0; var seditoron = 0;';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		$placeinhead .= 'var filePickerCallBackFunc = filePickerCallBack;';
 	} else {
