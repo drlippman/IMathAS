@@ -262,7 +262,7 @@ if ($tagfilter != '') {
 	if ($dofilter) {
 		$query .= " AND threadid IN ($limthreads)";
 	}
-	$query .= " AND forumid=:fid"
+	$query .= " AND forumid=:fid";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':tagfilter'=>$tagfilter, ':fid'=>$forumid));
 	$limthreads = array();
