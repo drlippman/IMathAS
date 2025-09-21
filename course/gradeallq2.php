@@ -599,7 +599,7 @@
 	// load exceptions. loads more than needed, but ok.
 	$query = "SELECT ie.* FROM imas_exceptions AS ie
 		JOIN imas_students AS istu ON istu.userid=ie.userid 
-		WHERE istu.courseid=:courseid AND ie.assessmentid=:assessmentid";
+		WHERE istu.courseid=:courseid AND ie.assessmentid=:assessmentid ";
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
 	}
