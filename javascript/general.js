@@ -1206,6 +1206,10 @@ function rotateimg(el) {
 }
 
 function sendLTIresizemsg() {
+	if (typeof sendresizemsg === 'function') {
+    	sendresizemsg();
+		return;
+   	}
 	var default_height = Math.max(
 		document.body.scrollHeight, document.body.offsetHeight)+100;
 		//document.documentElement.clientHeight, document.documentElement.scrollHeight,
