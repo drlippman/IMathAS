@@ -260,9 +260,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     $assessquery = '';
     $libnames = [];
     if ($searchtype == 'libs' && count($libs) > 0) {
-        $libs = array_map('intval', $libs);
-        $llist = implode(',', $libs);
-        $hasUnassigned = in_array(0, $libs);
+        $llist = implode(',', array_map('intval', $libs));
         $sortorder = [];
         $stm = $DBH->prepare("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)
              AND ((ownerid=? OR userights>2) OR (userights>0 AND groupid=?))");
@@ -271,16 +269,13 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];
         }
-        // rebuild libs 
-        $libs = array_keys($libnames);
-        if ($hasUnassigned) {
-            $libs[] = 0;
-        }
-        $llist = implode(',', array_map('intval', $libs));
-        $libquery = "ili.libid IN ($llist) AND ";
-        $lib2query = "ili2.libid IN ($llist) AND ";
         if (in_array(0, $libs)) {
             $libnames[0] = _('Unassigned');
+        }
+        $llist = implode(',', array_map('intval', array_keys($libnames)));
+        if ($llist != '') {
+            $libquery = "ili.libid IN ($llist) AND ";
+            $lib2query = "ili2.libid IN ($llist) AND ";
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
