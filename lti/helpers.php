@@ -77,7 +77,7 @@ function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): arr
 
   if (!empty($param['refaid'])) {
     $sourcecid = $db->get_course_from_aid($param['refaid']);
-    if ($sourcecid != $param['refaid']) {
+    if ($sourcecid != $param['refcid']) {
       echo 'Invalid resource link; inconsistent refcid';
       exit;
     }
