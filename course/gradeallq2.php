@@ -601,7 +601,7 @@
 		JOIN imas_students AS istu ON istu.userid=ie.userid 
 		WHERE istu.courseid=:courseid AND ie.assessmentid=:assessmentid ";
 	if ($hidelocked) {
-		$query .= "AND imas_students.locked=0 ";
+		$query .= "AND istu.locked=0 ";
 	}
 	$exceptionarr = [];
 	$stm = $DBH->prepare($query);
