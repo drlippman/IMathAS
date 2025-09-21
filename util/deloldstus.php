@@ -39,7 +39,7 @@ if (isset($CFG['cleanup']['oldstu'])) {
     $olddays = 365;
 }
 // select students who aren't enrolled in any courses, and haven't logged in within $olddays days
-$query = "EXPLAIN SELECT iu.id 
+$query = "SELECT iu.id 
     FROM imas_users AS iu 
     WHERE iu.rights < 11 
     AND iu.lastaccess < ?
