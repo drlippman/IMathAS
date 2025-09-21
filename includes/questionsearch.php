@@ -276,6 +276,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if ($llist != '') {
             $libquery = "ili.libid IN ($llist) AND ";
             $lib2query = "ili2.libid IN ($llist) AND ";
+        } else {
+            return 'No accessible libraries selected';
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));

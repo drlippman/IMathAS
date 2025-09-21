@@ -18,7 +18,7 @@ function regerror($err) {
 }
 
 // Read configuration endpoint from query string
-$configurl = Sanitize::url($_GET['openid_configuration']);
+$configurl = Sanitize::url($_GET['openid_configuration'] ?? '');
 if (substr($configurl,0,4) !== 'http') {
     echo "Invalid openid_configuration URL";
     exit;
