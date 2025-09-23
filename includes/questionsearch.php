@@ -294,6 +294,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         }
         $llist = implode(',', array_map('intval', array_keys($aidnames)));
         $assessquery = "ia.id IN ($llist)";
+        if ($llist=='') {
+            return 'No assessments selected';
+        }
     }
 
     $rightsand = [];
