@@ -78,8 +78,11 @@ function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): arr
   if (!empty($param['refaid'])) {
     $sourcecid = $db->get_course_from_aid($param['refaid']);
     if ($sourcecid != $param['refcid']) {
-      echo 'Invalid resource link; inconsistent refcid';
-      exit;
+      // triggering when shouldn't; log for now to investigate
+      $stm = $GLOBALS['DBH']->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+      $stm->execute([time(), "Inconsistent refcid on $targetlink"]);
+      //echo 'Invalid resource link; inconsistent refcid';
+      //exit;
     }
     $out = ['type'=>'aid', 'refaid'=>$param['refaid'], 'refcid'=>$param['refcid']];
   } else if (!empty($param['refblock'])) {
