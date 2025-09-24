@@ -10,7 +10,11 @@ require_once __DIR__ . '/Database.php';
 
 use \IMSGlobal\LTI;
 
-LTI\LTI_OIDC_Login::new(new Imathas_LTI_Database($DBH))
+try {
+  LTI\LTI_OIDC_Login::new(new Imathas_LTI_Database($DBH))
     ->do_oidc_login_redirect($GLOBALS['basesiteurl']. "/lti/launch.php")
     ->do_hybrid_redirect();
+} catch (OIDC_Exception $e) {
+    echo _('Error: ') . $e->getMessage();
+}
 ?>
