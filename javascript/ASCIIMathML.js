@@ -24,8 +24,7 @@ var noMathRender = false;
 var AMisIE = (navigator.appName.slice(0,9)=="Microsoft");// document.createElementNS==null;
 
 if (document.getElementById==null) 
-  alert("This webpage requires a recent browser such as\
-\nMozilla/Netscape 7+ or Internet Explorer 6+MathPlayer")
+  alert("This webpage requires a recent browser.")
 
 // all further global variables start with "AM"
 
@@ -914,8 +913,7 @@ function AMprocessNodeR(n, linebreaks) {
           AMnoMathML = nd != null;
           if (AMnoMathML && notifyIfNoMathML) 
             if (alertIfNoMathML)
-              alert("To view the ASCIIMathML notation use Internet Explorer 6 +\nMathPlayer (free from www.dessci.com)\n\
-                or Firefox/Mozilla/Netscape");
+              alert("To view the ASCIIMathML notation use a modern browser.");
             else AMbody.insertBefore(nd,AMbody.childNodes[0]);
         }
         if (!AMnoMathML) {
@@ -969,8 +967,7 @@ function translate(spanclassAM) {
 AMinitSymbols();
 
 if (AMisIE) { // avoid adding MathPlayer info explicitly to each webpage
-  document.write("<object id=\"mathplayer\"\
-  classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
+  document.write("<object id=\"mathplayer\" classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
   document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
 }
 
