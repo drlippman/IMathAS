@@ -167,6 +167,7 @@
   },
   "error": {
     "error": "Error",
+    "warning": "Warning",
     "invalid_password": "The password you entered was invalid",
     "invalid_aid": "Invalid assessment ID",
     "no_access": "You must be a student, teacher, or tutor to access this assessment",
@@ -188,6 +189,7 @@
     "lti_no_session": "Your session expired. Please go back to your LMS and open the assignment again.",
     "fast_regen": "Hey, how about slowing down and trying the problem before hitting Get a Similar Question?  Wait 5 seconds before trying again.",
     "nochange": "Your answers have not changed since your last submission.",
+    "blankparts": "Some parts are unanswered; submitting again will bypass this warning.",
     "noserver": "The site is not responding",
     "parseerror": "Server sent an invalid response",
     "livepoll_wrongquestion": "Submitted question is not the current question.",
