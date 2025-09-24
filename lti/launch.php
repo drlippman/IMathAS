@@ -13,8 +13,16 @@ require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
 use \IMSGlobal\LTI;
-$launch = LTI\LTI_Message_Launch::new(new Imathas_LTI_Database($DBH))
+try {
+  $launch = LTI\LTI_Message_Launch::new(new Imathas_LTI_Database($DBH))
     ->validate();
+} catch (LTI_Exception $e) {
+  echo _('Error: ') . $e->getMessage();
+  if ($e->getMessage() === "State not found") {
+    echo '. ' . _('Go back and open from the LMS again. If you continue to get this issue, ensure you have 3rd party cookies enabled. If it is an option, try opening in a new tab/window.');
+  }
+  exit;
+}
 
 // Get LMS user ID
 $lti_user_id = $launch->get_platform_user_id();

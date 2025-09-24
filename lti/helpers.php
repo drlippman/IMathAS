@@ -77,7 +77,10 @@ function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): arr
 
   if (!empty($param['refaid'])) {
     $sourcecid = $db->get_course_from_aid($param['refaid']);
-    if ($sourcecid != $param['refcid']) {
+    // if sourcecid is null, then original assess was deleted;
+    // we'll try to work around it.  If sourcecid is defined but
+    // doesn't match, then link is invalid
+    if ($sourcecid !== null && $sourcecid != $param['refcid']) {
       // triggering when shouldn't; log for now to investigate
       $stm = $GLOBALS['DBH']->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
       $stm->execute([time(), "Inconsistent refcid on $targetlink"]);
