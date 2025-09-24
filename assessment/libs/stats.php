@@ -3512,6 +3512,9 @@ function poissonpdf($lambda,$x) {
 		echo 'invalid input to poissonpdf';
 		return false;
 	}
+	if ($x==0) {
+		return exp(-$lambda);
+	}
 	return exp(-$lambda + $x*log($lambda) - gamma_log($x+1));
 }
 function poissoncdf($lambda,$x) {
@@ -3521,7 +3524,7 @@ function poissoncdf($lambda,$x) {
 	}
 	$sum = 0;
 	for ($i=0; $i<= $x; $i++) {
-		$sum += poissonpdf($lambda, $x);
+		$sum += poissonpdf($lambda, $i);
 	}
 	return $sum;
 }
