@@ -862,16 +862,21 @@
 	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>");
 
 			initeditor("exact",el,1);
-	     } else {
+			if (el=="qtext") {
+				editoron = 1;
+			} else if (el=="solution") {
+				seditoron = 1;
+			}
+	     } else if ((el=="qtext" && editoron==1) || (el=="solution" && seditoron==1)) {
 	     	tinymce.remove("#"+el);
 	     	qtextbox.rows -= 3;
 	     	qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	     	setupQtextEditor(el);
-	     }
-	     if (el=="qtext") {
-	     	editoron = 1 - editoron;
-	     } else if (el=="solution") {
-	     	seditoron = 1 - seditoron;
+			if (el=="qtext") {
+				editoron = 0;
+			} else if (el=="solution") {
+				seditoron = 0;
+			}
 	     }
 	   }
 	   function initsolneditor() {
@@ -885,6 +890,14 @@
 	   }
 
 	   addLoadEvent(function(){setupQtextEditor("qtext");setupQtextEditor("solution");});
+	   $(function() {
+		$("#mainform").on("submit", function(e) {
+			e.preventDefault();
+			if (saveEditors()) {
+				e.target.submit();
+			}
+		});
+	   });
 	   /*
 	   if (document.cookie.match(/qeditoron=1/)) {
 	   	var val = document.getElementById("qtext").value;
@@ -1066,7 +1079,7 @@
 		echo "<p class=noticetext>"._("This view will not allow you to modify the code.  You can only view the code and make additional library assignments")."</p>";
     } 
 ?>
-<form enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
+<form id=mainform enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
 <?php
 if ($viewonly) {
     echo '<input type=hidden name=viewonly value=1 />';
@@ -1408,30 +1421,40 @@ $("input[name=imgfile]").on("change", function(event) {
 	}
 });
 
+function saveEditors() {
+	try {
+		if (controlEditor) controlEditor.save();
+		if (window.tinymce) {
+			if (editoron) {
+				tinymce.get("qtext").save();
+			} else {
+				qEditor["qtext"].save();
+			}
+			if (seditoron) {
+				tinymce.get("solution").save();
+			} else {
+				qEditor["solution"].save();
+			}
+		} else {
+			for (i in qEditor) { qEditor[i].save(); }
+		}
+		return true;
+	} catch (err){
+		quickSaveQuestion.errorFunc();
+		return false;
+		
+	}
+}
 if (FormData){ // Only allow quicksave if FormData object exists
 	var quickSaveQuestion = function(){
 		// Add text to notice areas
 		$(".quickSaveNotice").html("Saving...");
-		// Save codemirror and tinyMCE data
-		try {
-			if (controlEditor) controlEditor.save();
-			if (window.tinyMCE) {
-				if (editoron) {
-					tinyMCE.get("qtext").save();
-				} else {
-					qEditor["qtext"].save();
-				}
-				if (seditoron) {
-					tinyMCE.get("solution").save();
-				} else {
-					qEditor["solution"].save();
-				}
-			} else {
-				for (i in qEditor) { qEditor[i].save(); }
-			}
-		} catch (err){
-			quickSaveQuestion.errorFunc();
+
+		// Save codemirror and tinymce data
+		if (!saveEditors()) {
+			return;
 		}
+
 		// Get form data
 		var data = new FormData($("form")[0]);
 
@@ -1535,7 +1558,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 	}
 	// Bind key event
 	$(document).on("keydown", quickSaveQuestion.keyBind);
-	// A little trickier for tinyMCE due to race conditions
+	// A little trickier for tinymce due to race conditions
 	var mceTry = setInterval(function(){
 		try {
 			tinymce.get('qtext').on('keydown', quickSaveQuestion.keyBind);
