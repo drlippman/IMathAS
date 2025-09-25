@@ -861,26 +861,17 @@
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
 	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>");
 
-	        var toinit = [];
-	        if ((el=="qtext" && editoron==0) || (el!="qtext" && editoron==1)) {
-	        	toinit.push("qtext");
-	        }
-	        if ((el=="solution" && seditoron==0) || (el!="solution" && seditoron==1)) {
-	        	toinit.push("solution");
-	        }
-	        initeditor("exact",toinit.join(","),1);
+			initeditor("exact",el,1);
 	     } else {
 	     	tinymce.remove("#"+el);
 	     	qtextbox.rows -= 3;
 	     	qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	     	setupQtextEditor(el);
 	     }
-	     if (el.match(/qtext/)) {
+	     if (el=="qtext") {
 	     	editoron = 1 - editoron;
-	     	//document.cookie = "qeditoron="+editoron;
-	     } else if (el.match(/solution/)) {
+	     } else if (el=="solution") {
 	     	seditoron = 1 - seditoron;
-	     	//document.cookie = "seditoron="+seditoron;
 	     }
 	   }
 	   function initsolneditor() {
