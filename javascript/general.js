@@ -735,6 +735,11 @@ const image_upload_handler = (blobInfo, progress, isattach) => new Promise((reso
 	if (isresized) {
 		filename = filename.replace(/\.\w+$/,'.jpg');
 	}
+	var maxFileSize = 15000*1024; // 15MB
+	if (res.size > maxFileSize) {
+		reject({message:'This file is too large - maximum size is 15MB', remove:true});
+		return;
+	}
 	formData.append('file', res, filename);
 	if (isattach === true) {
 		formData.append('type', 'attach');
@@ -1541,9 +1546,9 @@ function initFileAlt(el) {
                 var fileName = '';
                 fileName = el.value.split(/(\\|\/)/g).pop();
                 if (fileName) {
-                    var maxFileSize = 10000*1024; // 10MB
+                    var maxFileSize = 15000*1024; // 15MB
                     if (el.files[0].size > maxFileSize) {
-                        alert(_('This file is too large - maximum size is 10MB'));
+                        alert(_('This file is too large - maximum size is 15MB'));
                         $(el).val('');
                         label.html('');
                     } else {
