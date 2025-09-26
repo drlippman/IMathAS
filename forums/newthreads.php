@@ -54,12 +54,14 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && !empty($_POST['check
   // ensure checked are new threads
   $checked = array_intersect($checked, array_keys($lastpost));
 	$toupdate = array();
-	$threadids_query_placeholders = Sanitize::generateQueryPlaceholders($checked);
-	$stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=? AND threadid IN ($threadids_query_placeholders)");
-	$stm->execute(array_merge(array($userid), $checked));
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$toupdate[] = $row[0];
-	}
+  if (count($checked)>0) {
+    $threadids_query_placeholders = Sanitize::generateQueryPlaceholders($checked);
+    $stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=? AND threadid IN ($threadids_query_placeholders)");
+    $stm->execute(array_merge(array($userid), $checked));
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+      $toupdate[] = $row[0];
+    }
+  }
 
 	if (count($toupdate)>0) {
 		$toupdatelistSanitize = array_map('Sanitize::onlyInt', $toupdate);
