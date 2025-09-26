@@ -540,6 +540,8 @@ var myMQeditor = (function($) {
       baselayout.tabs[3].enabled = true;
       baselayout.tabs[3].tabcontent[0].contents.splice(5,3);
       baselayout.tabs[3].tabcontent[0].s = 5;
+    } else if (qtype=='string' && calcformat.match(/inequality/)) {
+      baselayout.tabs[3].enabled = true;
     }
     if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic|setexp|chemeqn)/)) {
       baselayout.tabs[1].enabled = true;
