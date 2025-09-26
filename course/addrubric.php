@@ -81,15 +81,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			// but that's better than nothing
 			$query = "UPDATE imas_questions AS iq JOIN imas_assessments AS ia ";
 			$query .= "ON iq.assessmentid=ia.id JOIN imas_courses AS ic ";
-			$query .= "ON ia.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
+			$query .= "ON ia.courseid=ic.id AND ic.ownerid=? SET iq.rubric=0 WHERE iq.rubric=?";
 			$stm = $DBH->prepare($query);
 			$stm->execute([$userid, $rubid]);
 			$query = "UPDATE imas_gbitems AS ig JOIN imas_courses AS ic ";
-			$query .= "ON ig.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
+			$query .= "ON ig.courseid=ic.id AND ic.ownerid=? SET ig.rubric=0 WHERE ig.rubric=?";
 			$stm = $DBH->prepare($query);
 			$stm->execute([$userid, $rubid]);
-			$query = "UPDATE imas_forums AS if JOIN imas_courses AS ic ";
-			$query .= "ON if.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
+			$query = "UPDATE imas_forums AS ifs JOIN imas_courses AS ic ";
+			$query .= "ON ifs.courseid=ic.id AND ic.ownerid=? SET ifs.rubric=0 WHERE ifs.rubric=?";
 			$stm = $DBH->prepare($query);
 			$stm->execute([$userid, $rubid]);
 			// This is too inefficient to run
