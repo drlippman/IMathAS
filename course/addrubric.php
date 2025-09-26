@@ -77,21 +77,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("DELETE FROM imas_rubrics WHERE id=? and ownerid=?");
 		$stm->execute(array($rubid, $userid));
 		if ($stm->rowCount() > 0) {
-			// this doesn't clear rubric usage outside of directly owned courses,
-			// but that's better than nothing
+			// this clears rubric usage in group, which should be all usage
 			$query = "UPDATE imas_questions AS iq JOIN imas_assessments AS ia ";
 			$query .= "ON iq.assessmentid=ia.id JOIN imas_courses AS ic ";
-			$query .= "ON ia.courseid=ic.id AND ic.ownerid=? SET iq.rubric=0 WHERE iq.rubric=?";
+			$query .= "ON ia.courseid=ic.id ";
+			$query .= "JOIN imas_users AS iu ON iu.id=ic.ownerid ";
+			$query .= "SET iq.rubric=0 WHERE iu.groupid=? AND iq.rubric=?";
 			$stm = $DBH->prepare($query);
-			$stm->execute([$userid, $rubid]);
+			$stm->execute([$groupid, $rubid]);
 			$query = "UPDATE imas_gbitems AS ig JOIN imas_courses AS ic ";
-			$query .= "ON ig.courseid=ic.id AND ic.ownerid=? SET ig.rubric=0 WHERE ig.rubric=?";
+			$query .= "ON ig.courseid=ic.id ";
+			$query .= "JOIN imas_users AS iu ON iu.id=ic.ownerid ";
+			$query .= "SET ig.rubric=0 WHERE iu.groupid=? AND ig.rubric=?";
 			$stm = $DBH->prepare($query);
-			$stm->execute([$userid, $rubid]);
+			$stm->execute([$groupid, $rubid]);
 			$query = "UPDATE imas_forums AS ifs JOIN imas_courses AS ic ";
-			$query .= "ON ifs.courseid=ic.id AND ic.ownerid=? SET ifs.rubric=0 WHERE ifs.rubric=?";
+			$query .= "ON ifs.courseid=ic.id ";
+			$query .= "JOIN imas_users AS iu ON iu.id=ic.ownerid ";
+			$query .= "SET ifs.rubric=0 WHERE iu.groupid=? AND ifs.rubric=?";
 			$stm = $DBH->prepare($query);
-			$stm->execute([$userid, $rubid]);
+			$stm->execute([$groupid, $rubid]);
 			// This is too inefficient to run
 			/*$stm = $DBH->prepare("UPDATE imas_questions SET rubric=0 WHERE rubric=?");
 			$stm->execute(array($rubid));
