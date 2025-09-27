@@ -339,6 +339,7 @@ require_once "includes/sanitize.php";
 				if (function_exists('getInstructorSupport')) {
 					getInstructorSupport($rights);
 				}
+
 				require_once "footer.php";
 				exit;
 			} else {
@@ -359,9 +360,10 @@ require_once "includes/sanitize.php";
 			if (isset($linkdata['uid'])) {
                 $newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
                 
-				$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
+				$stm = $DBH->prepare("SELECT jsondata,email FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$linkdata['uid']));
-				$jsondata = json_decode($stm->fetchColumn(0), true);
+				list($jsondata,$oldemail) = $stm->fetch(PDO::FETCH_NUM);
+				json_decode($jsondata, true);
 				if (!is_array($jsondata)) {
 					$jsondata = [];
 				}
@@ -369,11 +371,26 @@ require_once "includes/sanitize.php";
 				if (!isset($jsondata['chglog'])) {
 					$jsondata['chglog'] = [];
 				}
-				$jsondata['chglog'][time()] = ['chgpw' => 1];
+				$now = time();
+				$jsondata['chglog'][$now] = ['chgpw' => 1];
 
-                $query = "UPDATE imas_users SET password=:newpw,jsondata=:jsondata WHERE id=:id LIMIT 1";
-                $stm = $DBH->prepare($query);
-                $stm->execute(array(':id'=>$linkdata['uid'], ':jsondata'=>json_encode($jsondata), ':newpw'=>$newpw));
+				$qarr = array(':id'=>$linkdata['uid'], ':jsondata'=>json_encode($jsondata), 
+					':now'=>time(), ':newpw'=>$newpw);
+				$query = "UPDATE imas_users SET password=:newpw,jsondata=:jsondata,lastemail=:now WHERE id=:id LIMIT 1";
+                
+				if ($linkdata['recoverylink'] && !empty($_POST['email'])) {
+					$newemail = Sanitize::emailAddress(trim($_POST['email']));
+					if ($newemail !== '' && $newemail != $oldemail) {
+						$query = "UPDATE imas_users SET password=:newpw,jsondata=:jsondata,lastemail=:now,email=:email WHERE id=:id LIMIT 1";
+						$qarr[':email'] = $newemail;
+						$jsondata['chglog'][$now]['oldemail'] = $oldemail;
+						$jsondata['chglog'][$now]['newemail'] = $newemail;
+					}
+				} 
+
+	          	$stm = $DBH->prepare($query);
+                $stm->execute($qarr);
+
                 echo _("Password Reset"),".  ";
                 echo "<a href=\"index.php\">",_("Login with your new password"),"</a>";
             } else {
