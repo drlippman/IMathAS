@@ -1689,7 +1689,7 @@ $_SESSION['ltirole'] = $SESS['ltirole'];
 $_SESSION['lti_context_id']  = $SESS['lti_context_id'];
 $_SESSION['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
 if ($linkparts[0]=='aid') {
-	$_SESSION['lti_lis_result_sourcedid'.$aid]  = $SESS['lti_lis_result_sourcedid'];
+	$_SESSION['lti_lis_result_sourcedid'.$aid]  = $SESS['lti_lis_result_sourcedid'] ?? '';
 }
 $_SESSION['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $_SESSION['lti_context_label'] = $SESS['lti_context_label'];
@@ -2939,7 +2939,7 @@ $_SESSION['lti_context_id']  = $SESS['lti_context_id'];
 $_SESSION['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
 // record it with aid for safety
 if ($keyparts[0]=='aid') {
-	$_SESSION['lti_lis_result_sourcedid'.$aid]  = $SESS['lti_lis_result_sourcedid'];
+	$_SESSION['lti_lis_result_sourcedid'.$aid]  = $SESS['lti_lis_result_sourcedid'] ?? '';
 }
 $_SESSION['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $_SESSION['lti_context_label'] = $SESS['lti_context_label'];

@@ -62,7 +62,9 @@ function catscores($quests,$scores,$defptsposs,$defoutcome,$cid) {
             $catscore[$cat[$qid]] = 0;
             $catposs[$cat[$qid]] = 0;
         }
-		$catscore[$cat[$qid]] += $pts;
+		if (is_numeric($pts)) {
+			$catscore[$cat[$qid]] += $pts;
+		}
 		$catposs[$cat[$qid]] += $pospts[$qid];
 	}
 	echo "<h3>", _('Categorized Score Breakdown'), "</h3>\n";

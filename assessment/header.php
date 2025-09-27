@@ -295,7 +295,7 @@ if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAll
 	require_once "$curdir/../{$CFG['GEN']['headerinclude']}";
 }
 
-if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !$isdiag && (!isset($_SESSION['intreereader']) || $_SESSION['intreereader']==false)) {
+if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && empty($isdiag) && (!isset($_SESSION['intreereader']) || $_SESSION['intreereader']==false)) {
 	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 

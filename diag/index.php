@@ -60,12 +60,12 @@
 	$sel1 = array_map('decodeSelector', explode(',',$line['sel1list']));
 	$entryformat = $line['entryformat'];
 
-	if ($line['sel1name'][0]=='!') {
+	if (strlen($line['sel1name']) > 0 && $line['sel1name'][0]=='!') {
 		$line['sel1name'] = substr($line['sel1name'], 1);
 	} else {
 		$line['sel1name'] = sprintf(_('Select your %s'), $line['sel1name']);
 	}
-	if ($line['sel2name'][0]=='!') {
+	if (strlen($line['sel2name']) > 0 && $line['sel2name'][0]=='!') {
 		$line['sel2name'] = substr($line['sel2name'], 1);
 	} else {
 		$line['sel2name'] = sprintf(_('Select your %s'), $line['sel2name']);
