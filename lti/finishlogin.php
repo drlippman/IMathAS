@@ -22,7 +22,7 @@ if (!isset($_POST['launchid'])) {
 $db = new Imathas_LTI_Database($DBH);
 try {
   $launch = LTI\LTI_Message_Launch::from_cache(Sanitize::simpleASCII($_POST['launchid']), $db);
-} catch (LTI_Exception $e) {
+} catch (\IMSGlobal\LTI\LTI_Exception $e) {
   echo _('Error opening link.') . ' ';
   echo _('Go back and open from the LMS again. If you continue to get this error, ensure you have 3rd party cookies enabled. If it is an option, try opening in a new tab/window.');
 }
