@@ -260,6 +260,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     $assessquery = '';
     $libnames = [];
     $libsIncludesUnassigned = false;
+    $numNumberedLibs = 0;
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $sortorder = [];
@@ -270,6 +271,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];
         }
+        $numNumberedLibs = count($libnames);
         $llist = implode(',', array_map('intval', array_keys($libnames)));
         if (in_array(0, $libs)) {
             $libnames[0] = _('Unassigned');
@@ -367,6 +369,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 
     $query = '(';
     $piecesUsed = 0;
+    // library and unassigned searches are separated for efficiency;
+    // the self-join used for libraries is very inefficient for unassigned, and
+    // unassigned is never in another library
     if ($searchtype == 'assess' || $searchtype == 'all' || ($searchtype == 'libs' && $libquery != '')) {
         $query .= 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,';
         $query .= 'iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
@@ -387,7 +392,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             JOIN imas_assessments AS ia ON iaq.assessmentid = ia.id ';
         } else {
             $query .= 'JOIN imas_library_items AS ili ON ' . $libquery . ' ili.qsetid=iq.id AND ili.deleted=0 ';
-            if ($searchtype == 'all' || ($searchtype == 'libs' && count($libs) > 1)) {
+            if ($searchtype == 'all' || ($searchtype == 'libs' && $numNumberedLibs > 1)) {
                 $query .= 'LEFT JOIN imas_library_items AS ili2 ON ' . $lib2query . ' ili2.qsetid=iq.id AND ili2.deleted=0 AND ili2.id < ili.id ';
             }
         }
@@ -416,7 +421,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         }
         if ($searchtype == 'assess') {
             $query .= ' AND ' . $assessquery;
-        } else if ($searchtype == 'all' || ($searchtype == 'libs' && count($libs) > 1)) {
+        } else if ($searchtype == 'all' || ($searchtype == 'libs' && $numNumberedLibs > 1)) {
             $query .= ' AND ili2.id IS NULL ';
         }
 
