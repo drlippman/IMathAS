@@ -24,12 +24,16 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$asid = 'new';
 	} else {
 		$asid = Sanitize::onlyInt($_GET['asid']);
-		$stm = $DBH->prepare("SELECT ias.id FROM imas_assessment_sessions AS ias
+		$stm = $DBH->prepare("SELECT ias.userid,ia.courseid 
+			FROM imas_assessment_sessions AS ias
 			JOIN imas_assessments AS ia ON ia.id=ias.assessmentid
-			JOIN imas_students AS istu ON istu.userid=ias.userid
-			WHERE ia.courseid=? AND istu.courseid=?");
-		$stm->execute([$cid,$cid]);
-		if ($stm->fetchColumn(0) === false) {
+			WHERE ias.id=?");
+		$stm->execute([$asid]);
+		$testdata = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($testdata === false ||
+			(isset($studentid) && $testdata['userid'] != $userid) ||
+			(!isset($studentid) && $testdata['courseid'] != $cid)
+		) {
 			echo 'Invalid asid';
 			exit;
 		}
@@ -1258,7 +1262,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		if ($isdiag) {
 			$selparts = explode('~',$row[2]);
 			$ID = $selparts[0];
-			$term = $selparts[1];
+			$term = $selparts[1] ?? '';
 			echo "<h1>Score Report</h1>\n";
 			echo "<h2><span class='pii-full-name'>{$row[1]}, {$row[0]}</span><br/>(<span class='pii-username'>$ID</span>)</h2>\n";
 		} else {
@@ -1362,7 +1366,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
 				echo '<td>'.($i+1).'</td>';
 				echo '<td>';
-				if ($row['withdrawn']==1) {
+				if ($qdata[$qid]['withdrawn']==1) {
 					echo '<span class="noticetext">'._('Withdrawn') . '</span> ';
 				}
 				echo Sanitize::encodeStringForDisplay($qdata[$qid]['description']);

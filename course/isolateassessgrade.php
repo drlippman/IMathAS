@@ -375,7 +375,7 @@
             }
 			//$IP = ($line['status']&3)>0;
 			//$UA = ($line['status']&1)>0;
-		} else {
+		} else if ($line['starttime']!==null) {
 			$total = 0;
 			$sp = explode(';',$line['bestscores']);
 			$scores = explode(",",$sp[0]);
