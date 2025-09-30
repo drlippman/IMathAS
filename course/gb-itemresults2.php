@@ -44,9 +44,14 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 //tally results, grouping by result
 //output results.  For numeric/function, sort by frequency
 
-$query = "SELECT scoreddata,ver FROM imas_assessment_records WHERE assessmentid = :assessmentid";
+//$query = "SELECT scoreddata,ver FROM imas_assessment_records WHERE assessmentid = :assessmentid";
+$query = "SELECT iar.scoreddata,iar.ver FROM imas_assessment_records AS iar
+			JOIN imas_students ON imas_students.userid = iar.userid
+			WHERE iar.assessmentid = :assessmentid
+			AND imas_students.courseid = :courseid
+			AND imas_students.locked = 0";
 $stm = $DBH->prepare($query);
-$stm->execute(array(':assessmentid' => $aid));
+$stm->execute(array(':assessmentid' => $aid, ':courseid' => $cid));
 
 $sessionCount = 0;
 $qdata = array();

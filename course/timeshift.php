@@ -40,7 +40,7 @@ if (!(isset($teacherid))) {
 
 	$cid = Sanitize::courseId($_GET['cid']);
 
-	if (isset($_POST['sdate'])) {
+	if (isset($_POST['sdate']) && !empty($_POST['aid'])) {
 
 		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id AND courseid=:cid");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['aid']), ':cid'=>$cid));
