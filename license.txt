@@ -120,10 +120,6 @@ AutoSuggest
 (C) 2005 Joe Kepley, The Sling & Rock Design Group, Inc.
 LGPL
 
-JSON Library (PEAR)
-(c) 2005 Michal Migurski
-BSD license
-
 OAuth Library
 (c) 2007 Andy Smith
 MIT License
@@ -135,6 +131,11 @@ Apache 2.0 license
 LTI 1.3 Library
 Copyright 2018 Turnitin, LLC
 Apache 2.0 license
+
+svg sanitizer
+Copyright Daryll Doyle
+GPL 2
+https://github.com/darylldoyle/svg-sanitizer
 
 Thumbs-up icon remixed from work (c) Bersam at
 http://commons.wikimedia.org/wiki/File:Thumbs-up-icon.svg

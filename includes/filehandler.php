@@ -181,6 +181,10 @@ function storeuploadedfile($id,$key,$sec="private") {
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			downsizeimage($_FILES[$id]);
+			if (strpos($_FILES[$id]['name'], '.svg') !== -1) {
+				require_once __DIR__ . '/svg-sanitizer/svgcleaner.php';
+				sanitizeSvg($_FILES[$id]);
+			}
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if ($s3->putObjectFile(realpath($_FILES[$id]['tmp_name']),$GLOBALS['AWSbucket'],$key,$sec)) {
@@ -194,6 +198,10 @@ function storeuploadedfile($id,$key,$sec="private") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			downsizeimage($_FILES[$id]);
+			if (strpos($_FILES[$id]['name'], '.svg') !== -1) {
+				require_once __DIR__ . '/svg-sanitizer/svgcleaner.php';
+				sanitizeSvg($_FILES[$id]);
+			}
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 			$dir = $base.dirname($key);
 			$fn = basename($key);
