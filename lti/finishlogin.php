@@ -25,6 +25,7 @@ try {
 } catch (\IMSGlobal\LTI\LTI_Exception $e) {
   echo _('Error opening link.') . ' ';
   echo _('Go back and open from the LMS again. If you continue to get this error, ensure you have 3rd party cookies enabled. If it is an option, try opening in a new tab/window.');
+  exit;
 }
 
 $role = standardize_role($launch->get_roles());
