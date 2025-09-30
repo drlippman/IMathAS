@@ -181,7 +181,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			downsizeimage($_FILES[$id]);
-			if (strpos($_FILES[$id]['name'], '.svg') !== -1) {
+			if (strpos($_FILES[$id]['name'], '.svg') !== false) {
 				require_once __DIR__ . '/svg-sanitizer/svgcleaner.php';
 				sanitizeSvg($_FILES[$id]);
 			}
@@ -198,7 +198,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			downsizeimage($_FILES[$id]);
-			if (strpos($_FILES[$id]['name'], '.svg') !== -1) {
+			if (strpos($_FILES[$id]['name'], '.svg') !== false) {
 				require_once __DIR__ . '/svg-sanitizer/svgcleaner.php';
 				sanitizeSvg($_FILES[$id]);
 			}
