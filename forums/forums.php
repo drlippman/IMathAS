@@ -243,7 +243,7 @@ if ($searchtype == 'thread') {
 		echo 'No results';
 	} else {
 		$limthreads = implode(',', array_map('intval', $threadids));
-    $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+    	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 		$query .= "WHERE threadid IN ($limthreads) GROUP BY threadid";
 		$stm = $DBH->query($query);
 
@@ -427,11 +427,11 @@ if ($searchtype == 'thread') {
 ?>
 	<table class=forum>
 	<thead>
-	<tr><th>Forum Name</th><th>Threads</th><th>Posts</th><th>Last Post Date</th></tr>
+	<tr><th>Forum Name</th><th>Threads</th><th>Last Post Date</th></tr>
 	</thead>
 	<tbody>
 <?php
-	$query = "SELECT imas_forums.id,COUNT(imas_forum_threads.id) FROM imas_forums LEFT JOIN imas_forum_threads ON ";
+	$query = "SELECT imas_forums.id,COUNT(imas_forum_threads.id),MAX(imas_forum_threads.lastposttime) FROM imas_forums LEFT JOIN imas_forum_threads ON ";
 	$query .= "imas_forums.id=imas_forum_threads.forumid AND imas_forum_threads.lastposttime<:now ";
 	$query .= "WHERE imas_forums.courseid=:courseid ";
 	$qarr = array(':now'=>$now, ':courseid'=>$cid);
@@ -445,17 +445,12 @@ if ($searchtype == 'thread') {
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
 	foreach ($result as $row) {
 		$threadcount[$row[0]] = $row[1];
+		$maxdate[$row[0]] = $row[2];
 	}
 
-	// $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate) AS maxdate FROM imas_forums LEFT JOIN imas_forum_posts ON ";
-	// $query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
-	//
-	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	// var_dump($result);
-	// while ($row = mysql_fetch_row($result)) {
-	// 	$postcount[$row[0]] = $row[1];
-	// 	$maxdate[$row[0]] = $row[2];
-	//NOT WORKING
+	/*
+	// This query was very slow, and we don't really need to report the number of posts
+
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate) AS maxdate FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	$query .= "imas_forums.id=imas_forum_posts.forumid ";
 	if ($anyforumsgroup && !isset($teacherid)) {
@@ -477,17 +472,8 @@ if ($searchtype == 'thread') {
 		$postcount[$row[0]] = $row[1];
 		$maxdate[$row[0]] = $row[2];
 	}
-/*
-	$query = "SELECT imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
-	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
-	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))";
-*/
-	/*$query = "SELECT imas_forums.id,count(imas_forum_threads.id) as pcount FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) GROUP BY imas_forums.id";
 	*/
+
 	$query = "SELECT imas_forums.id, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
@@ -501,7 +487,6 @@ if ($searchtype == 'thread') {
 	$stm = $DBH->prepare($query);
 	$stm->execute($array);
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
-	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	foreach($result as $row) {
 		$newcnt[$row[0]] = $row[1];
 	}
@@ -539,14 +524,14 @@ if ($searchtype == 'thread') {
 		echo "</div></td>\n";
 		if (isset($threadcount[$line['id']]) && $threadcount[$line['id']] > 0) {
 			$threads = $threadcount[$line['id']];
-			$posts = $postcount[$line['id']];
+			//$posts = $postcount[$line['id']];
 			$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
 		} else {
 			$threads = 0;
-			$posts = 0;
+			//$posts = 0;
 			$lastpost = '';
 		}
-		echo "<td class=c>" . Sanitize::onlyInt($threads) . "</td><td class=c>" . Sanitize::onlyInt($posts) . "</td><td class=c>" . Sanitize::encodeStringForDisplay($lastpost) . "</td></tr>\n";
+		echo "<td class=c>" . Sanitize::onlyInt($threads) . "</td><td class=c>" . Sanitize::encodeStringForDisplay($lastpost) . "</td></tr>\n";
 	}
 ?>
 	</tbody>
