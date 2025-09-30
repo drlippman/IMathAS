@@ -1698,6 +1698,7 @@ if (isset($SESS['lti_launch_get'])) {
 }
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
+$_SESSION['lti_keyrights'] = $SESS['lti_keyrights'];
 $_SESSION['lti_keylookup'] = $SESS['lti_keylookup'];
 $_SESSION['lti_origkey'] = $SESS['lti_origkey'];
 if (isset($SESS['lti_duedate'])) {
@@ -2948,6 +2949,7 @@ if (isset($SESS['lti_launch_get'])) {
 }
 $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
+$_SESSION['lti_keyrights'] = $SESS['lti_keyrights'];
 $_SESSION['lti_keylookup'] = $SESS['lti_keylookup'];
 $_SESSION['lti_origkey'] = $SESS['lti_origkey'];
 if (isset($SESS['lti_duedate'])) {

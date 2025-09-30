@@ -435,11 +435,11 @@ if ($searchtype == 'thread') {
 	$query .= "imas_forums.id=imas_forum_threads.forumid AND imas_forum_threads.lastposttime<:now ";
 	$query .= "WHERE imas_forums.courseid=:courseid ";
 	$qarr = array(':now'=>$now, ':courseid'=>$cid);
-	if (!isset($teacherid)) {
+	if ($anyforumsgroup && !isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$qarr[':userid']=$userid;
 	}
-	$query .= "GROUP BY imas_forum_threads.forumid";
+	$query .= "GROUP BY imas_forums.id";
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
@@ -458,16 +458,16 @@ if ($searchtype == 'thread') {
 	//NOT WORKING
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate) AS maxdate FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	$query .= "imas_forums.id=imas_forum_posts.forumid ";
-	if (!isset($teacherid)) {
-		$query .= "JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id ";
+	if ($anyforumsgroup && !isset($teacherid)) {
+		$query .= "LEFT JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id ";
 	}
 	$query .= "WHERE imas_forums.courseid=:courseid ";
 	$qarr = array(':courseid'=> $cid);
-	if (!isset($teacherid)) {
+	if ($anyforumsgroup && !isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$qarr[':userid']=$userid;
 	}
-	$query .= "GROUP BY imas_forum_posts.forumid";
+	$query .= "GROUP BY imas_forums.id";
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 
@@ -488,16 +488,16 @@ if ($searchtype == 'thread') {
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) GROUP BY imas_forums.id";
 	*/
-	$query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query = "SELECT imas_forums.id, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE imas_forum_threads.lastposttime<:now  AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	$array = array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid);
-	if (!isset($teacherid)) {
+	if ($anyforumsgroup && !isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$array[':userid']=$userid;
 	}
-	$query .= "GROUP BY imas_forum_threads.forumid";
+	$query .= "GROUP BY imas_forums.id";
 	$stm = $DBH->prepare($query);
 	$stm->execute($array);
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
