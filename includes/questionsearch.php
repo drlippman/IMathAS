@@ -303,54 +303,83 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         }
     }
 
-    $rightsand = [];
+    $rightsand = []; // for libid>0
+    $rightsand2 = []; // for libid=0
+    $searchvals2 = $searchvals;
     if (!empty($search['mine'])) {
         $rightsand[] = '(iq.ownerid=?)';
         $searchvals[] = $userid;
+        $rightsand2[] = '(iq.ownerid=?)';
+        $searchvals2[] = $userid;
     } else {
         if (!empty($options['isadmin'])) {
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
+                $rightsand2[] = 'iq.userights>0';
             }
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
+                $rightsand2[] = 'iq.userights=0';
             }
         } else if (!empty($options['isgroupadmin'])) {
             $admingroupid = $options['isgroupadmin'];
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
+                $rightsand2[] = 'iq.userights>0';
             } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $admingroupid;
+                // don't need, since we'll limit to groupid=? below
+                //$rightsand2[] = '(imas_users.groupid=? OR iq.userights>0)';
+                //$searchvals2[] = $admingroupid;
             }
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
+                $rightsand2[] = 'iq.userights=0';
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
-                $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
-                $searchvals[] = $admingroupid;
-                $searchvals[] = $search['id'];
+                // not needed since libid>0
+                //$rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
+                //$searchvals[] = $admingroupid;
+                //$searchvals[] = $search['id'];
+                $rightsand2[] = '(imas_users.groupid=? OR iq.id=?)';
+                $searchvals2[] = $admingroupid;
+                $searchvals2[] = $search['id'];
             } else if ($searchtype != 'assess') {
-                $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
-                $searchvals[] = $admingroupid;
+                // not needed since libid>0
+                //$rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
+                //$searchvals[] = $admingroupid;
+                $rightsand2[] = '(imas_users.groupid=?)';
+                $searchvals2[] = $admingroupid;
             }
         } else {
             if (isset($search['private']) && $search['private'] == 0) {
                 $rightsand[] = 'iq.userights>0';
+                $rightsand2[] = 'iq.userights>0';
             } else if ($searchtype != 'assess') {
                 $rightsand[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals[] = $userid;
+                $rightsand2[] = '(iq.ownerid=? OR iq.userights>0)';
+                $searchvals2[] = $userid;
             }
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
+                $rightsand2[] = 'iq.userights=0';
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
-                $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
-                $searchvals[] = $userid;
-                $searchvals[] = $search['id'];
+                // not needed since libid>0
+                //$rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
+                //$searchvals[] = $userid;
+                //$searchvals[] = $search['id'];
+                $rightsand2[] = '(iq.ownerid=? OR iq.id=?)';
+                $searchvals2[] = $userid;
+                $searchvals2[] = $search['id'];
             } else if ($searchtype != 'assess') {
-                $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
-                $searchvals[] = $userid;
+                // not needed since libid>0
+                //$rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
+                //$searchvals[] = $userid;
+                $rightsand2[] = '(iq.ownerid=?)';
+                $searchvals2[] = $userid;
             }
         }
     }
@@ -358,6 +387,11 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $rightsquery = '(' . implode(' AND ', $rightsand) . ')';
     } else {
         $rightsquery = '';
+    }
+    if (count($rightsand2) > 0) {
+        $rightsquery2 = '(' . implode(' AND ', $rightsand2) . ')';
+    } else {
+        $rightsquery2 = '';
     }
 
     if ($searchtype == 'all' && empty($wholewords) && !empty($search['terms'])) {
@@ -431,7 +465,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if ($libsIncludesUnassigned) {
             $query .= ' UNION ALL ';
         }
-        $piecesUsed++;
+        $piecesUsed += 1;
     }
     if ($libsIncludesUnassigned) {
         // libs search - search separately for unassigned
@@ -465,10 +499,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= " AND iq.id NOT IN ($existingq)";
         }
   
-        if ($rightsquery !== '') {
-            $query .= ' AND ' . $rightsquery;
+        if ($rightsquery2 !== '') {
+            $query .= ' AND ' . $rightsquery2;
         }
-        $piecesUsed++;
+        $piecesUsed += 2;
     }
     $query .= ')';
     
@@ -497,8 +531,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $stm = $DBH->prepare($query);
-    if ($piecesUsed == 2) {
-        $stm->execute(array_merge($searchvals, $searchvals));
+    if ($piecesUsed == 3) {
+        $stm->execute(array_merge($searchvals, $searchvals2));
+    } else if ($piecesUsed == 2) {
+        $stm->execute($searchvals2);
     } else {
         $stm->execute($searchvals);
     }
