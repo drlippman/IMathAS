@@ -57,7 +57,8 @@ class MoleculeAnswerBox implements AnswerBox
             $laparts = ['',''];
         }
  
-        $ansparts = explode('~~~', $answer);
+        $ansarr = explode(' or ', $answer);
+        $ansparts = explode('~~~', $ansarr[0]);
 
         if ($_SESSION['userprefs']['drawentry'] == 0 || $forcea11y) { //accessible entry
             $classes = ['text'];

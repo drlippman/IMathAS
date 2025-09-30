@@ -41,14 +41,17 @@ class MoleculeScorePart implements ScorePart
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
-        // format is SMILES~~~CML.  We only score on the SMILES
-        $ansparts = explode('~~~', $answer);
-        $gaparts = explode('~~~', $givenans);
+        $anarr = explode(' or ', $answer);
+        $score = 0;
+        foreach ($anarr as $ans) {
+            // format is SMILES~~~CML.  We only score on the SMILES
+            $ansparts = explode('~~~', $ans);
+            $gaparts = explode('~~~', $givenans);
 
-        if ($ansparts[0] == $gaparts[0]) {
-            $score = 1;
-        } else {
-            $score = 0;
+            if ($ansparts[0] == $gaparts[0]) {
+                $score = 1;
+                break;
+            }
         }
 
         $scorePartResult->setRawScore($score);
