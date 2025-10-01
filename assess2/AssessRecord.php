@@ -3966,7 +3966,7 @@ class AssessRecord
           $pts = explode('|',$parttrydata[$tn]['stuans'] ?? '');
           $outstr = '';
           foreach ($pts as $ptval) {
-            $outstr .= ($ptval=="") ? "" : $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
+            $outstr .= ($ptval=="") ? "" : ($GLOBALS['choicesdata'][$partref][$ptval] ?? $ptval).'<br/>';
           }
           $out[$pn][] = $outstr;
         } else if ($qtype == 'matching') {

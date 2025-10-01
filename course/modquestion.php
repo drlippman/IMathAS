@@ -27,6 +27,7 @@ if (!(isset($teacherid))) {
   $stm = $DBH->prepare($query);
   $stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
   $beentaken = ($stm->rowCount() > 0);
+  $page_beenTakenMsg = '';
 
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";

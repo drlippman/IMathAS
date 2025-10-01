@@ -148,7 +148,9 @@
 
 		if (isset($_POST['onepergroup']) && $_POST['onepergroup']==1) {
 			foreach ($_POST['groupuid'] as $grp=>$uid) {
-				$grpscores[$grp] = $allscores[$uid];
+				if (isset($allscores[$uid])) {  // may not be set if score didn't change
+					$grpscores[$grp] = $allscores[$uid];
+				}
 				$grpfeedbacks[$grp] = $allfeedbacks[$uid];
 			}
 			$onepergroup = true;

@@ -141,7 +141,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr&r=" .Sanitize::randomQueryStringParam());
-
+		exit;
 	} else { //INITIAL LOAD DATA PROCESS
 		if (isset($_GET['id'])) { //MODIFY
 			if ($_GET['id']=='new') {//NEW
