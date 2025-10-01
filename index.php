@@ -708,6 +708,10 @@ function printPostsGadget() {
 	echo '<table class="gb" id="newpostlist"><thead><tr><th>', _('Thread'), '</th><th>', _('Started By'), '</th><th>', _('Course'), '</th><th>', _('Last Post'), '</th></tr></thead>';
 	echo '<tbody>';
 	foreach ($page_newpostlist as $line) {
+		if (!isset($threaddata[$line['threadid']])) { 
+			// might happen if user was deleted?
+			continue; 
+		}
 		echo '<tr>';
 		$subject = $threaddata[$line['threadid']]['subject'];
 		if (trim($subject)=='') {
