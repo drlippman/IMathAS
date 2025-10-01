@@ -18,7 +18,6 @@
 
 
 require_once "../init.php";
-$cid = Sanitize::courseId($_GET['cid']);
 $isteacher = isset($teacherid);
 $istutor = isset($tutorid);
 
