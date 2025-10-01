@@ -155,55 +155,9 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
     }
-    // for autoload of a11y extension, add "a11y/semantic-enrich" to load, and put in options enrichSpeech: "shallow",
-    echo '<script>
-    window.MathJax = {
-      loader: {
-        load: ["input/asciimath", "output/chtml", "ui/menu"'.
-            (($_SESSION['mathdisp']==8) ? ',"a11y/semantic-enrich"' : '')
-        .']
-      },
-      options: {
-        ignoreHtmlClass: "skipmathrender",'.
-        (($_SESSION['mathdisp']==8) ? 'sre:{speech:"shallow"},' : '')
-        .'renderActions: {
-            addattr: [150,
-                function (doc) {for (const math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
-                function (math, doc) {MathJax.config.addDataAttr(math, doc)}
-            ]
-        }
-      },
-      addDataAttr: function (math, doc) {
-        math.typesetRoot.setAttribute("data-asciimath", math.math);
-      },
-      startup: {
-          ready: function() {
-            var AM = MathJax.InputJax.AsciiMath.AM;
-            AM.newsymbol({input: "o-", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
-            AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
-            AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
-            AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
-            ["arcsec","arccsc","arccot"].forEach(function(v) {
-                AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
-            });
-            MathJax.startup.defaultReady();
-          }
-       }
-    };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>';
-    echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
-		function rendermathnode(node,callback) {
-			if (window.MathJax && window.MathJax.typesetPromise) {
-                if (typeof callback != "function") {
-					callback = function () {};
-				}
-                MathJax.typesetClear([node]);
-                MathJax.typesetPromise([node]).then(sendLTIresizemsg).then(callback);
-			} else {
-				setTimeout(function() {rendermathnode(node, callback);}, 100);
-			}
-        }</script>';
+	echo '<script>var mathjaxdisp = ' . intval($_SESSION['mathdisp']).';</script>';
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=093025\" type=\"text/javascript\"></script>\n";
+    echo '<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>';
     if (isset($_SESSION['ltiitemtype'])) {
         echo '<script type="text/javascript">
             MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
@@ -215,53 +169,10 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
     }
-    // for autoload of a11y extension, add "a11y/semantic-enrich" to load, and put in options enrichSpeech: "shallow",
-    echo '<script>
-    window.MathJax = {
-      loader: {
-        load: ["input/asciimath", "output/chtml", "ui/menu"]
-      },
-      options: {
-        ignoreHtmlClass: "skipmathrender",
-		renderActions: {
-            addattr: [150,
-                function (doc) {for (const math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
-                function (math, doc) {MathJax.config.addDataAttr(math, doc)}
-            ]
-        }
-      },
-      addDataAttr: function (math, doc) {
-        math.typesetRoot.setAttribute("data-asciimath", math.math);
-      },
-      startup: {
-          ready: function() {
-            var AM = MathJax.InputJax.AsciiMath.AM;
-            AM.newsymbol({input: "o-", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
-            AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
-            AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
-            AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
-            ["arcsec","arccsc","arccot"].forEach(function(v) {
-                AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
-            });
-            MathJax.startup.defaultReady();
-          }
-       }
-    };
-    </script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
-	<script nomodule src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script-fb"></script>';
-    echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
-		function rendermathnode(node,callback) {
-			if (window.MathJax && window.MathJax.typesetPromise) {
-                if (typeof callback != "function") {
-					callback = function () {};
-				}
-                MathJax.typesetClear([node]);
-                MathJax.typesetPromise([node]).then(sendLTIresizemsg).then(callback);
-			} else {
-				setTimeout(function() {rendermathnode(node, callback);}, 100);
-			}
-        }</script>';
+	echo '<script>var mathjaxdisp = ' . intval($_SESSION['mathdisp']).';</script>';
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=093025\" type=\"text/javascript\"></script>\n";
+    echo '<script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
+		<script nomodule src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script-fb"></script>';
     if (isset($_SESSION['ltiitemtype'])) {
         echo '<script type="text/javascript">
             MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
