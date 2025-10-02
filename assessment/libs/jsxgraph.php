@@ -104,7 +104,7 @@ function jsxObject (&$board, $param, $ops=array()) {
 			$out .= ";";
 		}
 		
-		$out .= jsx_setlabel($id, $label);
+		//$out .= jsx_setlabel($id, $label);
 		
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);

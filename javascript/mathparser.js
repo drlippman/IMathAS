@@ -1226,6 +1226,19 @@ function cplx_funcvar(input, v) {
 var pi = Math.PI, ln = Math.log, e = Math.E;
 var arcsin = Math.asin, arccos = Math.acos, arctan = Math.atan;
 
+// mathjs, for jsxgraph
+var logten = function(x) { return (Math.LOG10E*Math.log(x)) };
+function nthlogten(n,v) {
+	return ((Math.log(v))/(Math.log(n)));
+}
+var sinn = function(n,x) {return Math.pow(Math.sin(x),n)};
+var cosn = function(n,x) {return Math.pow(Math.cos(x),n)};
+var tann = function(n,x) {return Math.pow(Math.tan(x),n)};
+var cscn = function(n,x) {return 1/Math.pow(Math.sin(x),n)};
+var secn = function(n,x) {return 1/Math.pow(Math.cos(x),n)};
+var cotn = function(n,x) {return 1/Math.pow(Math.tan(x),n)};
+var lnn = function(n,x) {return Math.pow(Math.log(x),n)};
+
 var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|argsinh|argcosh|argtanh|argsech|argcsch|argcoth|arsinh|arcosh|artanh|arsech|arcsch|arcoth|pi".split("|");
 function functoindex(match) {
 	for (var i=0;i<funcstoindexarr.length;i++) {
