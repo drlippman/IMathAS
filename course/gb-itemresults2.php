@@ -112,7 +112,9 @@ $placeinhead = ' <style type="text/css">
 	position:relative;
 	left:0px;
 	top:0px;
-
+}
+div.question {
+	padding: 10px;
 }
 </style>';
 $stm = $DBH->prepare("SELECT defpoints,name,itemorder,tutoredit,courseid FROM imas_assessments WHERE id=:id");
@@ -124,7 +126,8 @@ if ($assesscid !== $cid) {
 	exit;
 }
 $useeqnhelper = 0;
-require_once "../assessment/header.php";
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastvueupdate.'" />';
+require_once "../header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
@@ -154,6 +157,7 @@ foreach (explode(',',$itemorder) as $k=>$itel) {
 }
 echo '<p style="color:#f00;">Warning: Results are not accurate or meaningful for randomized questions</p>';
 
+$capturechoiceslivepoll = true;
 require_once '../assess2/AssessStandalone.php';
 $a2 = new AssessStandalone($DBH);
 foreach ($qsdata as $k=>$v) {
@@ -162,100 +166,52 @@ foreach ($qsdata as $k=>$v) {
 
 $questions = array_keys($qdata);
 foreach ($itemarr as $k=>$q) {
-	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
-	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]]['description']).'</b></p>';
-	echo '<br class="clear"/>';
-	echo '<div style="float:left;width:35%;">';
-	showresults($q,$qsdata[$qsids[$q]]['qtype']);
-	echo '</div>';
-	echo '<div style="float:left;width:60%;margin-left:10px;">';
-    $state = array(
+	$state = array(
 		'seeds' => array($k => 0),
 		'qsid' => array($k => $qsids[$q])
 	);
 	$a2->setState($state);
-    $res = $a2->displayQuestion($k, ['showhints'=>false]);
+    $res = $a2->displayQuestion($k, ['showhints'=>false, 'includeans'=>true]);
+
+	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
+	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]]['description']).'</b></p>';
+	echo '<div class="flexrow" style="gap: 10px">';
+	echo '<div>';
+	showresults2($q, $qsdata[$qsids[$q]]['qtype'], $k, $res);
+	echo '</div>';
+	echo '<div style="flex:1; max-width:700px; margin:0;">';
     echo $res['html'];
 	echo '</div>';
-	echo '<br class="clear"/>';
+	echo '</div>';
 	echo '</div>';
 }
 require_once "../footer.php";
 
-function sandboxeval($control, $qtype) {
-	try {
-		eval(interpret('control', $qtype, $control));
-	} catch (Throwable $t) {
-		if ($GLOBALS['myrights']>10) {
-			echo '<p>Caught error in evaluating a function in a question: ';
-			echo Sanitize::encodeStringForDisplay($t->getMessage());
-			echo '</p>';
-		}
-	}
-	if ($qtype=='multipart' && !is_array($anstypes)) {
-		$anstypes = explode(',',$anstypes);
-	}
-	if ($qtype=='multipart' && count($anstypes)==1) {
-		//if it's multipart but only one part, treat like it was
-		//just a singlepart question of that type
-		//matches handling of stuanswers.
-		$qtype = $anstypes[0];
-		if (isset($answer) && is_array($answer)) {
-			$answer = $answer[0];
-		}
-		if (isset($answers) && is_array($answers)) {
-			$answers = $answers[0];
-		}
-	}
-	if ($qtype=='choices' || $qtype=='multans' || $qtype=='multipart') {
-		if (isset($choices) && !isset($questions)) {
-			$questions =& $choices;
-		}
-	}
-	return array(
-		isset($anstypes)?$anstypes:array(),
-		isset($questions)?$questions:array(),
-		isset($answer)?$answer:"",
-		isset($answers)?$answers:""
-	);
-}
-
-function showresults($q,$qtype) {
+function showresults2($q,$qtype,$qn,$res) {
 	global $qdata,$qsids,$qsdata;
-	//eval(interpret('control',$qtype,$qsdata[$qsids[$q]][1]));
-	list($anstypes, $questions, $answer, $answers) = sandboxeval($qsdata[$qsids[$q]]['control'], $qtype);
 
 	if ($qtype=='choices' || $qtype=='multans' || $qtype=='multipart') {
 		if ($qtype=='multipart') {
-			foreach ($anstypes as $i=>$type) {
+			$cnt = count($res['jsparams']['ans']);
+			for ($pn = 0; $pn < $cnt; $pn++) {
+				$qnref = ($qn+1)*1000 + $pn;
+				$type = $res['jsparams'][$qnref]['qtype'];
 				if ($type=='choices' || $type=='multans') {
-					if (isset($questions[$i]) && is_array($questions[$i])) {
-						$ql = $questions[$i];
-					} else {
-						$ql = $questions;
-					}
-					if ($type=='multans') {
-						$al = $answers;
-					} else if ($type=='choices') {
-						$al = $answer;
-					}
-					disp($q,$type,$i,$al,$ql);
+					$ql = $res['jsparams'][$qnref]['livepoll_choices'];
+					$al = $res['jsparams'][$qnref]['livepoll_ans'];
+					disp($q,$type,$pn,$al,$ql);
 				} else {
-					$al = $answer;
-					disp($q,$type,$i,$al);
+					$al = $res['jsparams']['ans'][$pn];
+					disp($q,$type,$pn,$al);
 				}
 
 			}
 		} else {
-			if ($qtype=='multans') {
-				$al = $answers;
-			} else if ($qtype=='choices') {
-				$al = $answer;
-			}
-			disp($q,$qtype,-1,$al,$questions);
+			$al = $res['jsparams'][$qn]['livepoll_ans'];
+			disp($q,$qtype,-1,$al,$res['jsparams'][$qn]['livepoll_choices']);
 		}
 	} else {
-		disp($q,$qtype,-1,$answer);
+		disp($q,$qtype,-1,$res['jsparams']['ans'][0]);
 	}
 }
 
