@@ -34,7 +34,8 @@ if (mathjaxdisp == 8) {
     window.MathJax.options['sre'] = {speech:"shallow"};
 }
 
-var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
+var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; 
+var MathJaxCompatible = true; var mathRenderer="MathJax";
 
 function rendermathnode(node,callback) {
     if (window.MathJax && window.MathJax.typesetPromise) {
