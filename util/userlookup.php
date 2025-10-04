@@ -19,11 +19,14 @@ if (!empty($_GET['cid'])) {
     $coursegroupid = $groupid;
 }
 
+$excludeself = $_POST['excludeself'] ?? 1;
+
 if (isset($_POST['loadgroup'])) {
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName,rights FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
-	$stm->execute(array($courseownerid, $coursegroupid));
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName,rights FROM imas_users WHERE groupid=? AND rights>11 ORDER BY LastName,FirstName");
+	$stm->execute(array($coursegroupid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if ($excludeself && $row['id'] == $courseownerid) { continue; }
 		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
@@ -45,7 +48,7 @@ if (isset($_POST['loadgroup'])) {
 	$possible_teachers = searchForUser($search, true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
-		if ($row['id']==$courseownerid) { continue; }
+		if ($excludeself && $row['id']==$courseownerid) { continue; }
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
 	if (isset($_POST['format']) && $_POST['format'] == 'select' && isset($_POST['name'])) {

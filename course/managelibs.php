@@ -617,7 +617,7 @@ if ($overwriteBody==1) {
 		
 		<?php //writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
         <?php require_once '../includes/userlookupform.php'; 
-            generateUserLookupForm(_('Transfer library ownership to:'), 'newowner');
+            generateUserLookupForm(_('Transfer library ownership to:'), 'newowner', '', false);
         ?>
 
 		<p>

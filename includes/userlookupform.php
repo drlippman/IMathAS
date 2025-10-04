@@ -1,6 +1,6 @@
 <?php 
 
-function generateUserLookupForm($userlookupPrefix, $fieldname, $defaultresults = '') {
+function generateUserLookupForm($userlookupPrefix, $fieldname, $defaultresults = '', $excludeself = true) {
     global $basesiteurl,$staticroot;
 
 echo '<p><button type=button onclick="userlookupGetgroup()">' . _('List my group members') . '</button> ';
@@ -20,7 +20,7 @@ echo '<span id=statusmsg class="sr-only" aria-live="polite" aria-atomic="true"><
             dataType: "html",
             type: "POST",
             url: "<?php echo $basesiteurl;?>/util/userlookup.php",
-            data: {loadgroup: 1, format: 'select', name: '<?php echo $fieldname; ?>'},
+            data: {loadgroup: 1, format: 'select', name: '<?php echo $fieldname; ?>', excludeself: <?php echo $excludeself?1:0;?>},
         }).done(function(msg) {
             $('#userlookupResults').html(msg);
             $("#statusmsg").text(_('Done'));
@@ -38,7 +38,7 @@ echo '<span id=statusmsg class="sr-only" aria-live="polite" aria-atomic="true"><
             dataType: "html",
             type: "POST",
             url: "<?php echo $basesiteurl;?>/util/userlookup.php",
-            data: {search: $("#userlookupName").val(), format: 'select', name: '<?php echo $fieldname; ?>'},
+            data: {search: $("#userlookupName").val(), format: 'select', name: '<?php echo $fieldname; ?>', excludeself: <?php echo $excludeself?1:0;?>},
         }).done(function(msg) {
             $('#userlookupResults').html(msg);
             $("#statusmsg").text(_('Done'));

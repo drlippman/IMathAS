@@ -635,7 +635,7 @@ $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=071125\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=100325\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '" . $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
@@ -721,7 +721,7 @@ if (isset($searchtype)) {
 
 			<?php //writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
             <?php require_once '../includes/userlookupform.php'; 
-                generateUserLookupForm(_('Transfer question ownership to:'), 'newowner');
+                generateUserLookupForm(_('Transfer question ownership to:'), 'newowner', '', false);
             ?>
 
 			<p>
@@ -902,7 +902,7 @@ if (isset($searchtype)) {
 			
 			<?php //writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
             <?php require_once '../includes/userlookupform.php'; 
-                generateUserLookupForm(_('Transfer question ownership to:'), 'newowner');
+                generateUserLookupForm(_('Transfer question ownership to:'), 'newowner', '', false);
             ?>
 			<p>
 				<input type=submit value="Transfer">
