@@ -264,9 +264,23 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $sortorder = [];
-        $stm = $DBH->prepare("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)
-             AND ((ownerid=? OR userights>2) OR (userights>0 AND groupid=?))");
-        $stm->execute([$userid, $groupid]);
+        $query = "SELECT il.name,il.id,il.sortorder FROM imas_libraries AS il ";
+        if (!empty($options['isgroupadmin'])) {
+            $query .= "JOIN imas_users ON imas_users.id=il.ownerid ";
+        }
+        $query .= "WHERE il.id IN ($llist) ";
+        $libqarr = [];
+        if (!empty($options['isadmin'])) {
+            // no additional conditions needed
+        } else if (!empty($options['isgroupadmin'])) {
+            $query .= "AND (imas_users.groupid=? OR il.userights>2 OR il.groupid=?)";
+            $libqarr = [$groupid,$groupid];
+        } else {
+            $query .= "AND ((ownerid=? OR userights>2) OR (userights>0 AND groupid=?))";
+            $libqarr = [$userid, $groupid];
+        }
+        $stm = $DBH->prepare($query);
+        $stm->execute($libqarr);
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];

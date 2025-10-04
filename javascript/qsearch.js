@@ -644,7 +644,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
      if (cursearchtype == 'libs') {
          listlibs = curlibs;
      }
-     GB_show(_('Library Select'),'libtree3.php?libtree=popup&libs='+listlibs,500,500);
+     GB_show(_('Library Select'),'libtree3.php?cid='+curcid+'&libtree=popup&libs='+listlibs,500,500);
  }
 
  function setlib(libs) {
@@ -696,7 +696,11 @@ function previewq(formn,loc,qn,docheck,onlychk) {
         setCookie("recentlibs", JSON.stringify(recentlibs));
     }
     if (recentlibs.ids.length > 1) {
-        $('#searchtypemenu').children(":nth-child(n+4)").remove();
+        if (curcid === 'admin') {
+            $('#searchtypemenu').children(":nth-child(n+3)").remove();
+        } else {
+            $('#searchtypemenu').children(":nth-child(n+4)").remove();
+        }
         $('#searchtypemenu').append($("<li>", {
             text: _("Recent Libraries"),
             class: "dropdown-header"
