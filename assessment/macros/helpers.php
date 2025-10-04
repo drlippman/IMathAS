@@ -1028,7 +1028,8 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
-		$tocheck = preg_replace('/\s/','',$tocheck);
+		$tocheck = preg_replace('/([0-9])\s+([0-9])/','$1*$2',$tocheck);
+        $tocheck = preg_replace('/\s/','',$tocheck);
 		if (!preg_match('/^\(?\-?\s*\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\s*\d*?\.\d*?\s*$/',$tocheck))) {
 			return false;
 		} else {
