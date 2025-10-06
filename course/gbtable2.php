@@ -2421,8 +2421,12 @@ function gbtable() {
 					) {
 						$avgs[] = $gb[$i][1][$j][0];
 						if ($limuser==-1 && $gb[0][1][$j][6]==0) { //for online, if showning avgs
-							$avgtime[] = $gb[$i][1][$j][7];
-							$avgtimedisp[] = $gb[$i][1][$j][8];
+							if ($gb[$i][1][$j][7] >= 0) {
+								$avgtime[] = $gb[$i][1][$j][7];
+							}
+							if (is_numeric($gb[$i][1][$j][8])) {
+								$avgtimedisp[] = $gb[$i][1][$j][8];
+							}
 						}
 					}
 				}
@@ -2444,7 +2448,9 @@ function gbtable() {
 				}
 				if ($limuser==-1 && count($avgtime)>0) {
 					$gb[$ln][1][$j][7] = round(array_sum($avgtime)/count($avgtime),1);
-					$gb[$ln][1][$j][8] = round(array_sum($avgtimedisp)/count($avgtimedisp),1);
+					if (count($avgtimedisp)>0) {
+						$gb[$ln][1][$j][8] = round(array_sum($avgtimedisp)/count($avgtimedisp),1);
+					}
 				}
 				$gb[$ln][1][$j][0] = round(array_sum($avgs)/count($avgs),1);
 				$gb[$ln][1][$j][4] = 'average';

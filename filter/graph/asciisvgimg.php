@@ -546,7 +546,11 @@ function ASinitPicture($arg=array()) {
 		$this->ymax = -$this->ymin;
 	} else {
 		if (isset($arg[3])) {  // do have ymax too
-			$this->yunitlength = ($this->height - $this->border[1] - $this->border[3])/($this->ymax - $this->ymin);
+			if ($this->ymax == $this->ymin) {
+				$this->yunitlength = 1;
+			} else {
+				$this->yunitlength = ($this->height - $this->border[1] - $this->border[3])/($this->ymax - $this->ymin);
+			}
 			if ($this->yunitlength<=0) {
 				$this->yunitlength = 1;
 			}

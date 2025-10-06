@@ -65,6 +65,7 @@ function flattenout($arr,$level) {
 }
 flattenout($outcomes,'0');
 
+$qs = '';
 if (isset($studentid)) {
 	$stu = intval($userid);
 	$report = 'onestu';
@@ -81,7 +82,6 @@ if (isset($studentid)) {
 	$report = 'export';
 } else {
 	$report = 'overview';
-	$qs = '';
 }
 if (isset($_GET['type'])) {
 	$type = intval($_GET['type']);
