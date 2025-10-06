@@ -262,7 +262,7 @@ $placeinhead = "<script type=\"text/javascript\">
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js\"></script>";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?071125\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?100325\"></script>";
 $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
 require_once "../header.php";
 
