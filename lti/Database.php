@@ -842,7 +842,7 @@ class Imathas_LTI_Database implements LTI\Database
             if ($row['enddate'] === null) {
                 // lti link exists but assessment doesn't exist anymore
                 // so probably deleted since link was established.
-                throw new LTI_Exception("Linked assessment appears to have been deleted. Ref: " . $row['typeid'] . '-' . $resource_link_id);
+                throw new LTI\LTI_Exception("Linked assessment appears to have been deleted. Ref: " . $row['typeid'] . '-' . $resource_link_id);
                 /* Alt approach:
                 // Delete existing lti placement, which will trigger
                 // system to try to relink to assessment
