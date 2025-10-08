@@ -529,6 +529,23 @@ function chkAllNone(frmid, arr, mark, skip) {
   }
   return false;
 }
+var allowedImgDomains = [
+	'.amazonaws.com',
+	window.location.hostname
+];
+function isAllowedImgSrc(src) {
+	try {
+		var parser = document.createElement('a');
+		parser.href = src;
+		var hostname = parser.hostname;
+		for (var i=0; i < allowedImgDomains.length; i++) {
+			if (hostname.indexOf(allowedImgDomains[i]) !== -1) {
+				return true;
+			}
+		}
+	} catch (e) {}
+	return false;
+}
 
 //var tinyMCEPreInit = {base: staticroot+"/tinymce8"};
 function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
@@ -561,6 +578,17 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		file_picker_types: 'file image',
 		images_upload_handler: image_upload_handler,
 		paste_data_images: true,
+		paste_block_drop: true,
+		paste_postprocess: function (editor, args) {
+			const images = args.node.querySelectorAll('img');
+			for (var i = 0; i < images.length; i++) {
+				var img = images[i];
+				if (!isAllowedImgSrc(img.getAttribute('src'))) {
+					var text = document.createTextNode('[External image removed - upload the image instead]');
+          			img.parentNode.replaceChild(text, img);
+				}
+			}
+		},
 		default_link_target: "_blank",
 		browser_spellcheck: true,
 		contextmenu: false,

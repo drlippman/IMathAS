@@ -160,6 +160,10 @@ course list from the course browser options, so you must also have `$CFG['course
 - `$CFG['CPS']['leftnavtools']`:  Set to `"limited"` to remove from the course left navigation tools that are also in the top navigation.  Set to false to remove the entire Tools block from the course left navigation.
 - `$CFG['GEN']['deflicense']`:  The default license for new questions.  See `/course/moddataset.php` for valid values.  Defaults to 1 (IMathAS community license).
 - `$CFG['GEN']['defGroupType']`: Set to change the default group type for newly created groups (def: 0)
+- `$CFG['GEN']['allowedImgDomains']`: In the text editor, which domains pasted images
+  are allowed to point to. Defaults to host domain and amazonaws.com.  Set as stringified
+  javascript array like <code>'["site1.com","site2.com"]'</code>
+
 
 ### LTI
 
