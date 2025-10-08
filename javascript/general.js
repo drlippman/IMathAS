@@ -578,12 +578,14 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		file_picker_types: 'file image',
 		images_upload_handler: image_upload_handler,
 		paste_data_images: true,
-		paste_block_drop: true,
 		paste_postprocess: function (editor, args) {
 			const images = args.node.querySelectorAll('img');
 			for (var i = 0; i < images.length; i++) {
 				var img = images[i];
-				if (!isAllowedImgSrc(img.getAttribute('src'))) {
+				var src = img.getAttribute('src');
+				if (src.indexOf('data:')===-1 && src.indexOf('blob:')===-1 &&
+					!isAllowedImgSrc(img.getAttribute('src'))
+				) {
 					var text = document.createTextNode('[External image removed - upload the image instead]');
           			img.parentNode.replaceChild(text, img);
 				}
@@ -677,9 +679,16 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		edsetup.toolbar = "alignleft aligncenter | bullist numlist outdent indent | bold italic",
 		edsetup.mobile.menubar = "edit altinsert format tools table";
 	}
-		
-	if (setupfunction) {
-		edsetup.setup = setupfunction;
+	edsetup.setup = function(editor) {
+		editor.on('drop', function(e) {
+			var html = e.dataTransfer.getData('text/html');
+			if (html && !e.dataTransfer.files.length) {
+				e.preventDefault();
+			}
+		});
+		if (setupfunction) {
+			setupfunction(editor);
+		}
 	}
 	
     if (extendsetup) {
