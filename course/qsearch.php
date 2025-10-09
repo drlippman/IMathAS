@@ -2,15 +2,15 @@
 
 require_once '../init.php';
 
-if (!isset($teacherid) && !($_GET['cid'] == 'admin' && $myrights>74)) {
+if ($myrights < 20) {
     echo 'You do not have access to this page';
     exit;
 }
 
-if (isset($_GET['aid'])) {
+if (isset($_GET['aid']) && isset($teacherid)) {
     $searchcontext = '';
     $aid = intval($_GET['aid']);
-} else if (isset($_GET['did'])) {
+} else if (isset($_GET['did']) && isset($teacherid)) {
     $searchcontext = 'd';
     $aid = intval($_GET['did']);
 } else {
@@ -31,7 +31,7 @@ if ($_POST['searchtype'] == 'libs') {
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (isset($_GET['getassess'])) {
+if (isset($_GET['getassess']) && $cid > 0) {
     // get assessment list 
     $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
     $stm->execute(array(':id'=>$cid));
@@ -89,7 +89,7 @@ if (!empty($search['unused']) && $searchcontext!='c') {
 if ($searchcontext=='c') {
     $options['includelastmod'] = 1;
 }
-if ($_GET['cid'] == 'admin') {
+if ($_GET['cid'] === 'admin') {
     $options['includeowner'] = 1;
     if ($myrights == 100) {
         $options['isadmin'] = true;
@@ -97,7 +97,6 @@ if ($_GET['cid'] == 'admin') {
         $options['isgroupadmin'] = $groupid;
     }
 }
-
 $res = searchQuestions($search, $userid, $_POST['searchtype'], $libs, $options, $offset);
 
 echo json_encode($res, JSON_INVALID_UTF8_IGNORE);

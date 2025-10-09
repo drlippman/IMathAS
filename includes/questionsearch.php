@@ -690,7 +690,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
                 <?php echo _('Select Libraries...'); ?>
             </a></li>
             <?php 
-            if ($cid != 'admin') {
+            if ($cid != 'admin' && $cid > 0) {
                 echo '<li><a href="#" role="button" onclick="assessselect(); return false;">';
                 echo _('Select Assessments...');
                 echo '</a></li>';

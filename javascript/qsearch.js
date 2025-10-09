@@ -696,7 +696,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
         setCookie("recentlibs", JSON.stringify(recentlibs));
     }
     if (recentlibs.ids.length > 1) {
-        if (curcid === 'admin') {
+        if (curcid === 'admin' || curcid == 0) {
             $('#searchtypemenu').children(":nth-child(n+3)").remove();
         } else {
             $('#searchtypemenu').children(":nth-child(n+4)").remove();
