@@ -6,19 +6,14 @@ window.addEventListener("message", function(e) {
             var frame = document.getElementById(edata["frame_id"]);
             if (frame) {
                 found = true;
-                frame.style.height = edata.height + "px";
-            }
-            
-            var frameWrap = document.getElementById(edata["frame_id"] + "wrap");
-            if (frameWrap && ("wrapheight" in edata)) {
-                frameWrap.style.height = edata.wrapheight + "px";
+                setEmbedqHeight(frame, edata);
             }
         }
         if (!found && "iframe_resize_id" in edata) {
             var frame = document.getElementById(edata["iframe_resize_id"]);
             if (frame) {
                 found = true;
-                frame.style.height = edata.height + "px";
+                setEmbedqHeight(frame, edata);
             }
         } 
         if (!found) {
@@ -27,10 +22,27 @@ window.addEventListener("message", function(e) {
                 if (frames[i].contentWindow === e.source &&
                         !frames[i].hasAttribute('data-noresize')
                 ) {
-                    frames[i].style.height = edata.height + "px"; 
+                    setEmbedqHeight(frames[i], edata);
                     break;
                 }
             }
         }
     }
 });
+
+function setEmbedqHeight(frame, edata) {
+    var parent = frame.parentNode;
+    if (frame.style.position === 'absolute' && parent.style.overflow === 'visible') {
+        parent.style.height = edata.wrapheight + "px";
+    } else {
+        var wrapdiv = document.createElement('div');
+        wrapdiv.style.overflow = 'visible';
+        wrapdiv.style.position = 'relative';
+        wrapdiv.style.height = edata.wrapheight + "px";
+        parent.insertBefore(wrapdiv, frame);
+        wrapdiv.appendChild(frame);
+        frame.style.position = 'absolute';
+        frame.style.zIndex = 1;
+    }
+    frame.style.height = edata.height + "px";
+}
