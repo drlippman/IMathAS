@@ -693,7 +693,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			}
 		});
 		if (setupfunction) {
-			setupfunction(editor);
+			setupfunction.call(this, editor);
 		}
 	}
 	
