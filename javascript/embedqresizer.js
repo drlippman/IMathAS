@@ -22,7 +22,7 @@ window.addEventListener("message", function(e) {
                 if (frames[i].contentWindow === e.source &&
                         !frames[i].hasAttribute('data-noresize')
                 ) {
-                    setEmbedqHeight(frames[i], edata);
+                    setEmbedqHeight(frames[i], edata, i, frames.length);
                     break;
                 }
             }
@@ -30,7 +30,17 @@ window.addEventListener("message", function(e) {
     }
 });
 
-function setEmbedqHeight(frame, edata) {
+function setEmbedqHeight(frame, edata, loc, cnt) {
+    if (cnt === undefined) {
+        var frames = document.getElementsByTagName('iframe');
+        cnt = frames.length;
+        for (var i = 0; i < frames.length; i++) {
+            if (frames[i] === frame) {
+                loc = i;
+                break;
+            }
+        }
+    }
     var parent = frame.parentNode;
     if (frame.style.position === 'absolute' && parent.style.overflow === 'visible') {
         parent.style.height = edata.wrapheight + "px";
@@ -42,7 +52,7 @@ function setEmbedqHeight(frame, edata) {
         parent.insertBefore(wrapdiv, frame);
         wrapdiv.appendChild(frame);
         frame.style.position = 'absolute';
-        frame.style.zIndex = 1;
+        frame.style.zIndex = cnt - loc;
     }
     frame.style.height = edata.height + "px";
 }
