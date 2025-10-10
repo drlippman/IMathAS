@@ -49,7 +49,11 @@ class EssayAnswerBox implements AnswerBox
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
         if (empty($answerboxsize)) {
-            $rows = 5;
+            if ($displayformat == 'editor') {
+                $rows = 8;
+            } else {
+                $rows = 5;
+            }
             $cols = 50;
         } else if (strpos($answerboxsize, ',') > 0) {
             list($rows, $cols) = explode(',', $answerboxsize);

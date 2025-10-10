@@ -605,6 +605,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		sandbox_iframes: false,
 		resize: "both",
 		width: '100%',
+		height: 150,
 		content_style: "body {background-color: " + (coursetheme.match(/_dark/) ? "#000" : "#fff") + " !important;}",
 		table_class_list: [{title: "None", value:''},
 			{title:"Gridded", value:"gridded"},
@@ -630,6 +631,15 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 					dialogel.style.width = '';
 					dialogel.focus();
 				});
+			}
+			if (!inline) {
+				var baseel = editor.getElement();
+				var textareaHeight = baseel.rows ? (baseel.rows-5)*16+108 : 400;
+				var desiredMinHeight = 150;
+				
+				if (textareaHeight > desiredMinHeight && editor.editorContainer) {
+					editor.editorContainer.style.height = textareaHeight + 'px';
+				}
 			}
         },
 		style_formats: [{
