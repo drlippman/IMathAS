@@ -208,14 +208,14 @@ function quickgrade(qn,type,prefix,todo,vals) {
 	if (type==0) { //all
 		for (var i=0;i<todo;i++) {
 			var el = document.getElementById(prefix+qn+"-"+i);
-			if (el.value < vals[i]) {
+			if (el.value === 'N/A' || el.value < vals[i]) {
 				el.value = vals[i];
 			}
 		}
 	} else {  //select
 		for (var i=0;i<todo.length;i++) {
 			var el = document.getElementById(prefix+qn+"-"+todo[i]);
-			if (el.value < vals[todo[i]]) {
+			if (el.value === 'N/A' || el.value < vals[todo[i]]) {
 				el.value = vals[todo[i]];
 			}	
 		}

@@ -154,7 +154,7 @@ if ($groupsetid>0) {
 }
 $placeinhead = '';
 if ($haspoints && $caneditscore && $rubric != 0) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=090725"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=101025"></script>';
 	require_once "../includes/rubric.php";
 }
 
