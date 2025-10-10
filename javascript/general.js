@@ -597,7 +597,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 				}
 			}
 		},
-		default_link_target: "_blank",
+		link_default_target: "_blank",
 		browser_spellcheck: true,
 		contextmenu: false,
 		branding: false,
