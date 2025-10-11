@@ -1039,6 +1039,7 @@ class Imathas_LTI_Database implements LTI\Database
         $stm->execute(array($destcid));
         $ancestors = explode(',', $stm->fetchColumn(0));
         $ciddepth = array_search($aidsourcecid, $ancestors); //so if we're looking for 23, "20,24,23,26" would give 2 here.
+        // if aidsource is in ancestry, use that to help find the right assessment
         if ($ciddepth !== false) {
             // first approach: look for aidsourcecid:sourcecid in ancestry of current course
             // then we'll walk back through the ancestors and make sure the course
@@ -1092,40 +1093,41 @@ class Imathas_LTI_Database implements LTI\Database
             if ($foundsubaid) { // tracked it back all the way
                 return $aidtolookfor;
             }
+        }
 
-            // ok, still didn't work, so assessment wasn't copied through the whole
-            // history.  So let's see if we have a copy in our course with the assessment
-            // anywhere in the ancestry.
-            $anregex = MYSQL_LEFT_WRDBND . $sourceaid . MYSQL_RIGHT_WRDBND;
-            $stm = $this->dbh->prepare("SELECT id,name,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
-            $stm->execute(array(':ancestors' => $anregex, ':destcid' => $destcid));
-            $res = $stm->fetchAll(PDO::FETCH_ASSOC);
-            if (count($res) == 1) { //only one result - we found it
-                return $res[0]['id'];
-            }
-            $stm = $this->dbh->prepare("SELECT name FROM imas_assessments WHERE id=?");
-            $stm->execute(array($sourceaid));
-            $aidsourcename = $stm->fetchColumn(0);
-            if (count($res) > 1) { //multiple results - look for the identical name
-                foreach ($res as $k => $row) {
-                    $res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
-                    if ($row['name'] == $aidsourcename) {
-                        return $row['id'];
-                    }
+        // ok, still didn't work, so assessment wasn't copied through the whole
+        // history.  So let's see if we have a copy in our course with the assessment
+        // anywhere in the ancestry.
+        $anregex = MYSQL_LEFT_WRDBND . $sourceaid . MYSQL_RIGHT_WRDBND;
+        $stm = $this->dbh->prepare("SELECT id,name,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
+        $stm->execute(array(':ancestors' => $anregex, ':destcid' => $destcid));
+        $res = $stm->fetchAll(PDO::FETCH_ASSOC);
+        if (count($res) == 1) { //only one result - we found it
+            return $res[0]['id'];
+        }
+        $stm = $this->dbh->prepare("SELECT name FROM imas_assessments WHERE id=?");
+        $stm->execute(array($sourceaid));
+        $aidsourcename = $stm->fetchColumn(0);
+        if (count($res) > 1) { //multiple results - look for the identical name
+            foreach ($res as $k => $row) {
+                $res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
+                if ($row['name'] == $aidsourcename) {
+                    return $row['id'];
                 }
-                //no name match. pick the one with the assessment closest to the start
-                usort($res, function ($a, $b) {return $a['loc'] - $b['loc'];});
-                return $res[0]['id'];
             }
+            //no name match. pick the one with the assessment closest to the start
+            usort($res, function ($a, $b) {return $a['loc'] - $b['loc'];});
+            return $res[0]['id'];
+        }
 
-            // still haven't found it, so nothing in our current course has the
-            // desired assessment as an ancestor.  Try finding something just with
-            // the right name maybe?
-            $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE name=:name AND courseid=:courseid");
-            $stm->execute(array(':name' => $aidsourcename, ':courseid' => $destcid));
-            if ($stm->rowCount() > 0) {
-                return $stm->fetchColumn(0);
-            }
+        // still haven't found it, so nothing in our current course has the
+        // desired assessment as an ancestor.  Try finding something just with
+        // the right name maybe?
+        $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE name=:name AND courseid=:courseid");
+        $stm->execute(array(':name' => $aidsourcename, ':courseid' => $destcid));
+        $resid = $stm->fetchColumn(0);
+        if ($resid !== false) {
+            return $resid;
         }
         return false;
     }
