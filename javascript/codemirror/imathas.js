@@ -173,7 +173,7 @@
     // diffeq 
     imathasBuiltin += " diffeq_slopefield";
 
-  var imathasSpecialVars = keywords("$abstolerance $ansprompt $anstypes $answeights $answer $answerbox $answerboxsize $answerformat $answers $answersize $answertitle $background $displayformat $domain $formatfeedbackon $grid $hidepreview $hidetips $matchlist $noshuffle $partialcredit $partweights $previewloc $questions $questiontitle $reltolerance $reqdecimals $reqsigfigs $requiretimes $requiretimeslistpart $scoremethod $showanswer $showanswerloc $snaptogrid $strflags $variables");
+  var imathasSpecialVars = keywords("$abstolerance $ansprompt $anstypes $answeights $answer $answerbox $answerboxsize $answerformat $answers $answersize $answertitle $background $displayformat $domain $formatfeedbackon $grid $hidepreview $hidetips $matchlist $noshuffle $partialcredit $partweights $previewloc $questions $questiontitle $reltolerance $reqdecimals $reqsigfigs $requiretimes $requiretimeslistpart $scoremethod $showanswer $showanswerloc $snaptogrid $strflags $variables $defaults");
   var imathasDisallowedVars = keywords("$link $qidx $qnidx $seed $qdata $toevalqtxt $la $laarr $shanspt $GLOBALS $laparts $anstype $kidx $iidx $tips $optionsPack $partla $partnum $score $disallowedvar $allowedmacros $wherecount $countcnt $myrights $myspecialrights");
   CodeMirror.registerHelper("hintWords", "php", [imathasKeywords, imathasAtoms, imathasBuiltin].join(" ").split(" "));
   CodeMirror.registerHelper("wordChars", "php", /[\w$]/);

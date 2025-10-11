@@ -59,7 +59,8 @@ class QuestionHtmlGenerator
         'snaptogrid',
         'strflags',
         'variables',
-        'readerlabel'
+        'readerlabel',
+        'defaults'
     );
 
     // Variables that need to be packed up and passed to the answerbox generator.
@@ -377,6 +378,24 @@ class QuestionHtmlGenerator
                 }
             }
             unset($answersize);
+        }
+
+        /*
+         * Apply defaults, if set
+         */
+        if (isset($defaults)) {
+            foreach ($defaults as $kidx => $atIdx) {
+                if (!in_array($kidx, self::ALLOWED_QUESTION_WRITER_VARS)) { continue; }
+                if ($quesData['qtype'] == "multipart" && is_array($anstypes)) {
+                    for ($_pnidx=0; $_pnidx < count($anstypes); $_pnidx++) {
+                        if (!isset(${$kidx}[$_pnidx])) {
+                            ${$kidx}[$_pnidx] = $atIdx;
+                        }
+                    }
+                } else if (!isset(${$kidx})) {
+                    ${$kidx} = $atIdx;
+                }
+            }
         }
 
         /*

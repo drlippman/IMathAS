@@ -4901,7 +4901,9 @@ This type of question can contain multiple parts, where each part is one of the 
 	<dd>For each question part, you will need to define the variables (like $answer, $questions, etc.) you would normally
 	need to define.  However, you will need to suffix the variable with a part designator.  For example, based on $anstypes
 	above, the first answer is a number.  Instead of $answer = 5, enter $answer[0] = 5.  This designates that this answer belongs
-	to the first element of $anstypes.  Likewise, to set the variables for the "numfunc" type, you'd set $variables[5] = "x".</dd>
+	to the first element of $anstypes.  Likewise, to set the variables for the "numfunc" type, you'd set $variables[5] = "x".
+	Note that if you do not index the variable, it will apply to all parts. See $defaults below for more info and other 
+	options.</dd>
 <dt>$answerbox[partnum] (In Question Text)</dt>
 	<dd>The array $answerbox will contain the entry boxes for each answer type.  In the question text, you will need to position
 	these boxes within the question.  For example:  "Enter a number: $answerbox[0].  Now a function: $answerbox[1]".  Alternatively, you
@@ -4922,6 +4924,18 @@ This type of question can contain multiple parts, where each part is one of the 
     $scoremethod['whole'] instead.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
+<dt>$defaults</dt>
+	<dd>To set an optional variable to the same value for every question part, you can simply specify 
+		it without index, like <code>$reqdecimals=1</code>, and it will apply to all parts.
+		But if you do this, you can't set an indexed value for one one/some parts.
+		If you want to change the default value for most parts but have a different value for some, set
+		<code>$defaults['variable'] = value</code>, like <code>$defaults['answerboxsize'] = 5</code>,
+		and that will change the default value for that variable, and you can still override that 
+		default for specific parts, like <code>$answerboxsize[2]=3</code>.  Be aware that using
+		$defaults will apply the variable for ALL parts, which may cause some unexpected behavior. 
+		In particular, you probably shouldn't use <code>$defaults['abstolerance']</code> or
+		<code>$defaults['reltolerance']</code> if your question has drawing parts, since tolerances have 
+		special meaning for that type.</dd>
 <dt>$showanswer </dt>
 	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one
 	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>

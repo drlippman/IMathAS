@@ -52,7 +52,8 @@ class ScoreEngine
         'strflags',
         'questions',
         'variables',
-        'formatfeedbackon'
+        'formatfeedbackon',
+        'defaults'
     );
 
     const ADDITIONAL_VARS_FOR_SCORING = array(
@@ -179,6 +180,28 @@ class ScoreEngine
             }
             $anstypes = array_map('trim', $anstypes);
         }
+
+        /*
+         * Apply defaults, if set
+         */
+        if (isset($defaults)) {
+            foreach ($defaults as $kidx => $atIdx) {
+                if (!in_array($kidx, self::VARS_FOR_SCOREPART_EVALS)) { continue; }
+                if ($quesData['qtype'] == "multipart" && is_array($anstypes)) {
+                    for ($_pnidx=0; $_pnidx < count($anstypes); $_pnidx++) {
+                        if (!isset(${$kidx}[$_pnidx])) {
+                            ${$kidx}[$_pnidx] = $atIdx;
+                        }
+                    }
+                } else if (!isset(${$kidx})) {
+                    ${$kidx} = $atIdx;
+                }
+            }
+        }
+
+        /*
+		 * Massage some more data.
+		 */
 
         if (isset($reqdecimals) && $reqdecimals !== '') {
             $hasGlobalAbstol = false;
