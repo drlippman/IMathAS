@@ -189,11 +189,15 @@ class ScoreEngine
                 if (!in_array($kidx, self::VARS_FOR_SCOREPART_EVALS)) { continue; }
                 if ($quesData['qtype'] == "multipart" && is_array($anstypes)) {
                     for ($_pnidx=0; $_pnidx < count($anstypes); $_pnidx++) {
-                        if (!isset(${$kidx}[$_pnidx])) {
+                        if (!isset(${$kidx}[$_pnidx]) && 
+                            ($anstypes[$_pnidx] !== 'draw' || ($kidx !== 'abstolerance' && $kidx !== 'reltolerance'))
+                        ) {
                             ${$kidx}[$_pnidx] = $atIdx;
                         }
                     }
-                } else if (!isset(${$kidx})) {
+                } else if (!isset(${$kidx}) && 
+                    ($quesData['qtype'] !== 'draw' || ($kidx !== 'abstolerance' && $kidx !== 'reltolerance'))
+                ) {
                     ${$kidx} = $atIdx;
                 }
             }

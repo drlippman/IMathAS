@@ -4932,10 +4932,9 @@ This type of question can contain multiple parts, where each part is one of the 
 		<code>$defaults['variable'] = value</code>, like <code>$defaults['answerboxsize'] = 5</code>,
 		and that will change the default value for that variable, and you can still override that 
 		default for specific parts, like <code>$answerboxsize[2]=3</code>.  Be aware that using
-		$defaults will apply the variable for ALL parts, which may cause some unexpected behavior. 
-		In particular, you probably shouldn't use <code>$defaults['abstolerance']</code> or
-		<code>$defaults['reltolerance']</code> if your question has drawing parts, since tolerances have 
-		special meaning for that type.</dd>
+		$defaults will generally apply the variable for ALL parts, which may cause some unexpected behavior. 
+		Note that defaults for abstolerance or reltolerance will not be applied to Drawing question parts, since 
+		those variables have special meaning in that context.</dd>
 <dt>$showanswer </dt>
 	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one
 	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>
