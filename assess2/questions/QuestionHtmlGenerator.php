@@ -788,7 +788,6 @@ class QuestionHtmlGenerator
           $evaledqtext = '';
           $evaledsoln = '';
         }
-        $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
 
         /*
          * Possibly adjust the showanswer if it doesn't look right
@@ -877,6 +876,19 @@ class QuestionHtmlGenerator
                 $toevalqtxt .= '$showanswerloc';
             }
         }
+
+        if (strpos($evaledsoln, '[SAB') !== false) {
+            if (is_array($showanswerloc)) {
+                foreach ($displayedAnswersForParts as $iidx => $sa) {
+                    if (strpos($evaledsoln, '[SAB' . $iidx . ']') !== false) {
+                        $evaledsoln = str_replace('[SAB' . $iidx . ']', $sa, $evaledsoln);
+                    }
+                }
+            } else {
+                $evaledsoln = str_replace('[SAB]', $displayedAnswersForParts[0], $evaledsoln);
+            }
+        }
+        $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
 
         /*
          *  Handle sequenial multipart, now that all answerboxes have been inserted
