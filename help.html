@@ -2606,7 +2606,14 @@ These macros are for working with arrays:
     along the way.</li>
 <li><strong>stringtoarray(string)</strong>: Converts a text string to an array of characters</li>
 <li><strong>fillarray(value,num,[start])</strong>:  Creates an array with num entries, all of which are the same given value.  Array indexing
-    starts at 0 unless specified</li>
+    starts at 0 unless specified. Alternatively, num can be an array of indices, in which case the array will
+	only be defined to the value at those indices.</li>
+<li><strong>arraysetvalues(array,keyarray,value/valuearray)</strong>:
+	Sets values on an existing array, at the keys specified in the keyarray. If value is a single value,
+	that value is set at all the keys. This is similar to fillarray with an array for num, but this function 
+	modifies an existing array rather than creating a new one. If an array of values is provided, the corresponding value is set 
+	for each key in the keyarray.  Returns the array with new values.  
+	</li>
 <li><strong>sortarray(list/array,[type, maxkey])</strong>:  Sorts an array from lowest to highest value.  
     To sort in reverse order, give the option second parameter as "rev". 
     To sort by key, give the optional second parameter as "key". 

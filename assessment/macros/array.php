@@ -26,6 +26,7 @@ array_push(
     'unionarrays',
     'subarray',
     'fillarray',
+    'arraysetvalues',
     'ABarray',
     'arrayhasduplicates'
 );
@@ -402,7 +403,29 @@ function ABarray($s, $n) {
 }
 
 function fillarray($v, $n, $s = 0) {
-    return array_fill($s, $n, $v);
+    if (is_array($n)) {
+        return array_fill_keys($n, $v);
+    } else {
+        return array_fill($s, $n, $v);
+    }
+}
+
+function arraysetvalues($arr,$keys,$values) {
+    if ($arr === null) {
+        $arr = [];
+    }
+    if (is_array($values) && count($keys)!=count($values)) {
+        echo 'When providing an array of values for arraysetvalues, the number needs to match the number of keys';
+        return $arr;
+    }
+    foreach ($keys as $i=>$k) {
+        if (is_array($values)) {
+            $arr[$k] = $values[$i];
+        } else {
+            $arr[$k] = $values;
+        }
+    }
+    return $arr;
 }
 
 function arrayhasduplicates($arr) {
