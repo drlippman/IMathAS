@@ -298,18 +298,19 @@ class QuestionHtmlGenerator
                         (empty($matches[2]) ? $matches[3] : $matches[2]) . '</div></div>';
                 },$toevalqtxt);
         }
-        //                              1                 2            3       4
-        if (preg_match_all('~\[if\s+([\w_]*?)\s*(==|!=|>=|<=|>|<)\s*(\w+)\s*\](.*?)\[/if\]~ms', $toevalqtxt, $QHG_all_matches, PREG_SET_ORDER)) {
+        //                              1                 2                                 3            4
+        if (preg_match_all('~\[if\s+([\w_]*?)\s*(==|!=|>=|&gt;=|<=|&lt;=|>|&gt;|<|&lt;)\s*(\w+)\s*\]\s*(.*?)\[/if\]\n?~ms', $toevalqtxt, $QHG_all_matches, PREG_SET_ORDER)) {
             foreach ($QHG_all_matches as $QHG_match) {
                 $keep = false;
                 if (isset(${$QHG_match[1]})) {
+                    if (in_array($QHG_match[1], $GLOBALS['disallowedvar'])) { continue; }
                     $val = ${$QHG_match[1]};
                     if (($QHG_match[2]=='==' && $val==$QHG_match[3]) ||
                         ($QHG_match[2]=='!=' && $val!=$QHG_match[3]) ||
-                        ($QHG_match[2]=='>=' && $val>=$QHG_match[3]) ||
-                        ($QHG_match[2]=='<=' && $val<=$QHG_match[3]) ||
-                        ($QHG_match[2]=='>' && $val>$QHG_match[3]) ||
-                        ($QHG_match[2]=='<' && $val<$QHG_match[3])
+                        (($QHG_match[2]=='>=' || $QHG_match[2]=='&gt;=') && $val>=$QHG_match[3]) ||
+                        (($QHG_match[2]=='<=' || $QHG_match[2]=='&lt;=') && $val<=$QHG_match[3]) ||
+                        (($QHG_match[2]=='>' || $QHG_match[2]=='&gt;') && $val>$QHG_match[3]) ||
+                        (($QHG_match[2]=='<' || $QHG_match[2]=='&lt;') && $val<$QHG_match[3])
                     ) {
                         $keep = true;
                     }
@@ -317,10 +318,11 @@ class QuestionHtmlGenerator
                 if ($keep) {
                     $toevalqtxt = str_replace($QHG_match[0], $QHG_match[4], $toevalqtxt);
                 } else {
-                    $toevalqtxt = str_replace($QHG_match[0], '', $toevalqtxt);
+                    $toevalqtxt = str_replace($QHG_match[0], '', $toevalqtxt);    
                 }
             }
         }
+        
         $toevalqtxt = str_replace('\\', '\\\\', $toevalqtxt);
         $toevalqtxt = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
