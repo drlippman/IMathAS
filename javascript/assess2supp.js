@@ -167,9 +167,9 @@ function disableInputs(qn, disabled) {
    var qwrap = document.getElementById('questionwrap'+qn);
 
    setTimeout(window.drawPics, 100);
-   window.rendermathnode(qwrap);
    window.initSageCell(qwrap);
    window.initlinkmarkup(qwrap);
+   window.rendermathnode(qwrap);
    window.setInitValues(qwrap, jsparams);
 
    if (jsparams.disabled) {
