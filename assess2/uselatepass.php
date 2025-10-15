@@ -22,8 +22,6 @@ require_once "./AssessInfo.php";
 require_once "./AssessRecord.php";
 require_once './AssessUtils.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
 check_for_required('GET', array('aid', 'cid'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);

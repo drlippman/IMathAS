@@ -215,7 +215,7 @@ export const actions = {
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
-      dataType: 'json',
+      dataType: 'text',
       data: data,
       processData: false,
       contentType: false,
@@ -225,22 +225,31 @@ export const actions = {
       crossDomain: true
     })
       .done(response => {
-        if (response.hasOwnProperty('error')) {
-          this.handleError(response.error);
-          return;
+        try {
+          var data = JSON.parse(response.trim().replace(/^\uFEFF/, ''));
+          if (data.hasOwnProperty('error')) {
+            this.handleError(data.error);
+            return;
+          }
+          if (data.saved_autosaves) {
+            this.markAutosavesDone();
+          }
+          delete data.saved_autosaves;
+          if (regen && store.assessInfo.questions[qn].jsparams) {
+            // clear out before overwriting
+            window.imathasAssess.clearparams(store.assessInfo.questions[qn].jsparams);
+          }
+          data = this.processSettings(data);
+          this.copySettings(data);
+        } catch (e) {
+          console.log('Response text:', response);
+          this.handleError('parseerror');
         }
-        if (response.saved_autosaves) {
-          this.markAutosavesDone();
-        }
-        delete response.saved_autosaves;
-        if (regen && store.assessInfo.questions[qn].jsparams) {
-          // clear out before overwriting
-          window.imathasAssess.clearparams(store.assessInfo.questions[qn].jsparams);
-        }
-        response = this.processSettings(response);
-        this.copySettings(response);
       })
       .fail((xhr, textStatus, errorThrown) => {
+        if (textStatus === 'parsererror') {
+          console.log('Response text:', xhr.responseText);
+        }
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {

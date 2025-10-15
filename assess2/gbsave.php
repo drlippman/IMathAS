@@ -25,8 +25,6 @@ require_once "./AssessRecord.php";
 require_once './AssessUtils.php';
 require_once '../includes/TeacherAuditLog.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
 if (!$isActualTeacher && !$istutor) {
   echo '{"error": "no_access"}';
   exit;

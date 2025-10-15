@@ -88,6 +88,12 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
   header("Access-Control-Allow-Credentials: true");
   header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
   header("Access-Control-Allow-Headers: Origin");
+} 
+if (empty($_POST['redirect'])) {
+  header('Content-Type: application/json; charset=utf-8');
+  // server already likely delivers this, but no harm in being explicit
+  header('Cache-Control: no-store, no-cache, must-revalidate');
+  header('X-Content-Type-Options: nosniff');
 }
 
 $useeditor = "noinit";

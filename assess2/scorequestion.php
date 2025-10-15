@@ -25,10 +25,6 @@ require_once "./AssessInfo.php";
 require_once "./AssessRecord.php";
 require_once './AssessUtils.php';
 
-//error_reporting(E_ALL);
-
-header('Content-Type: application/json; charset=utf-8');
-
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
 if (empty($_POST['endattempt'])) { // skip check for endattempt, as may be no questions changed
