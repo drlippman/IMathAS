@@ -3517,8 +3517,8 @@ class AssessRecord
       if ($scores['gen'] === '') {
         if (isset($this->data['scoreoverride'])) {
           $changes['gen'] = ['old'=>$this->data['scoreoverride'], 'new'=>''];
+          unset($this->data['scoreoverride']);
         }
-        unset($this->data['scoreoverride']);
         $doRetotal = true;
       } else {
         $changes['gen'] = ['old'=> ($this->data['scoreoverride'] ?? ''), 'new'=>$scores['gen']];
@@ -3552,8 +3552,8 @@ class AssessRecord
         if ($score === '') {
           if (isset($qdata['scoreoverride'])) {
             $changes[$chgkey] = ['old'=>$qdata['scoreoverride'], 'new'=>''];
+            unset($qdata['scoreoverride']);
           }
-          unset($qdata['scoreoverride']);
         } else {
           if (!isset($qdata['scoreoverride']) || floatval($score) != $qdata['scoreoverride']) {
             $changes[$chgkey] = ['old'=>$qdata['scoreoverride'] ?? '', 'new'=>$score];
@@ -3575,8 +3575,8 @@ class AssessRecord
         if ($score === '') {
           if (isset($qdata['scoreoverride'][$pn])) {
             $changes[$chgkey] = ['old'=>$qdata['scoreoverride'][$pn], 'new'=>''];
-          }
-          unset($qdata['scoreoverride'][$pn]);
+            unset($qdata['scoreoverride'][$pn]);
+          } 
         } else {
           if (!isset($qdata['scoreoverride'][$pn]) || floatval($score) != $qdata['scoreoverride'][$pn]) {
             $changes[$chgkey] = ['old'=>$qdata['scoreoverride'][$pn] ?? '', 'new'=>$score];

@@ -1110,7 +1110,7 @@ class Imathas_LTI_Database implements LTI\Database
         $aidsourcename = $stm->fetchColumn(0);
         if (count($res) > 1) { //multiple results - look for the identical name
             foreach ($res as $k => $row) {
-                $res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
+                $res[$k]['loc'] = strpos($row['ancestors'], (string) $sourceaid);
                 if ($row['name'] == $aidsourcename) {
                     return $row['id'];
                 }
