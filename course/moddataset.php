@@ -858,7 +858,16 @@
 	     	}
 	        qtextbox.rows += 3;
 	        qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
-	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
+	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g, function(match,p1,offset,string) {
+				let before = string.substring(0, offset);
+				let lastOpenTag = before.lastIndexOf("<");
+				let lastCloseTag = before.lastIndexOf(">");
+				if (lastOpenTag > lastCloseTag) {
+					return match; // in tag; do not replace
+				} else {
+					return "<span class=\"AM\" title=\"" + p1 + "\">`" + p1 + "`</span>";
+				}
+			});
 	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>");
 
 			initeditor("exact",el,1);
@@ -870,7 +879,7 @@
 	     } else if ((el=="qtext" && editoron==1) || (el=="solution" && seditoron==1)) {
 	     	tinymce.remove("#"+el);
 	     	qtextbox.rows -= 3;
-	     	qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
+	     	qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1").replace(/&#96;/g,"`");
 	     	setupQtextEditor(el);
 			if (el=="qtext") {
 				editoron = 0;
