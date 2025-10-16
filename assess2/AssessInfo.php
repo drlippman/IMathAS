@@ -568,9 +568,20 @@ class AssessInfo
    * normalization, so those aren't checked here.
    */
   public function checkPassword($pw) {
-    return ($this->assessData['password'] == '' ||
-        $this->assessData['password'] == trim($pw)
-    );
+    $pw = trim($pw);
+    if ($this->assessData['password'] == '' ||
+        $this->assessData['password'] == $pw) {
+          return true;
+    }
+    if ($this->assessData['password'] != '') {
+      $pwpts = array_map('trim', explode(';', $this->assessData['password']));
+      foreach ($pwpts as $apw) {
+        if ($apw !== '' && $apw == $pw) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /*
