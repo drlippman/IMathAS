@@ -4,7 +4,7 @@
 // $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 // and
 
-function showUserPrefsForm() {
+function showUserPrefsForm($limited = false) {
 	global $CFG, $tzname;
 
 	require_once dirname(__FILE__)."/htmlutil.php";
@@ -57,15 +57,25 @@ function showUserPrefsForm() {
 		'tztype'=>0,
 		'usertheme'=>0,
 		'livepreview'=>1);
-	$prefdescript = array(
-		'mathdisp'=>_('Math Display'),
-		'graphdisp'=>_('Graph Display'),
-		'drawentry'=>_('Drawing Entry'),
-		'useed'=>_('Text Editor'),
-		'useeqed'=>_('Math Entry'),
-		'usertheme'=>_('Course styling and contrast'),
-		'livepreview'=>_('Live preview'),
-		'tztype'=>_('Time Zone'));
+	if (!$limited) {
+		$prefdescript = array(
+			'mathdisp'=>_('Math Display'),
+			'graphdisp'=>_('Graph Display'),
+			'drawentry'=>_('Drawing Entry'),
+			'useed'=>_('Text Editor'),
+			'useeqed'=>_('Math Entry'),
+			'usertheme'=>_('Course styling and contrast'),
+			'livepreview'=>_('Live preview'),
+			'tztype'=>_('Time Zone'));
+	} else {
+		$prefdescript = array(
+			'mathdisp'=>_('Math Display'),
+			'graphdisp'=>_('Graph Display'),
+			'drawentry'=>_('Drawing Entry'),
+			'useed'=>_('Text Editor'),
+			'useeqed'=>_('Math Entry'),
+			'livepreview'=>_('Live preview'));
+	}
 
 	foreach($prefdefaults as $k=>$v) {
 		if (isset($CFG['UP'][$k])) {

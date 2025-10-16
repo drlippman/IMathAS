@@ -377,6 +377,7 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
 $noskipnavlink = true;
 require_once "./header.php";
+echo '<a href="embedq2prefs.php" target="_blank" class="sr-only">'._('Edit display preferences').'</a>';
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 for ($qn=0; $qn < $numq; $qn++) {
@@ -406,7 +407,10 @@ for ($qn=0; $qn < $numq; $qn++) {
 echo '<input type=hidden name=toscoreqn id=toscoreqn value=""/>';
 echo '<input type=hidden name=state id=state value="'.Sanitize::encodeStringForDisplay(JWT::encode($a2->getState(), $statesecret)).'" />';
 
-echo '<div class="mce-content-body" style="text-align:right;font-size:70%;margin-right:5px;"><a style="color:#666" target="_blank" href="course/showlicense.php?id='.Sanitize::encodeUrlParam(implode('-', $QS['id'])).'">'._('License').'</a></div>';
+echo '<div class="mce-content-body" style="text-align:right;font-size:70%;margin-right:5px;">';
+echo '<a style="color:#666" href="embedq2prefs.php" target="_blank">'._('Prefs').'</a> ';
+echo '<a style="color:#666" target="_blank" href="course/showlicense.php?id='.Sanitize::encodeUrlParam(implode('-', $QS['id'])).'">'._('License').'</a>';
+echo '</div>';
 
 
 if ($state['jssubmit']) {
