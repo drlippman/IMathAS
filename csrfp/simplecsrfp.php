@@ -47,7 +47,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 				self::$config['failedAuthAction'] = 'log';
 			}
 
-			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js?v=071322";
+			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js?v=101525";
 
 			// Authorise the incoming request
 			if (isset($_SESSION[CSRFP_TOKEN])) {
@@ -145,6 +145,9 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			} else {
 				if (isset($GLOBALS['CFG']['csrfp_error_message'])) {
 					exit($GLOBALS['CFG']['csrfp_error_message']);
+				} else if (isset($GLOBALS['no_session_handler']) && $GLOBALS['no_session_handler']=='json_error') {
+					echo '{"error":"no_csrfp"}';
+					exit;
 				} else {
 					$err = 'Your submission has been blocked because we were unable to verify it came from a valid source. ';
 					$err .= 'This can happen if you have two browser windows open and logged in within one while the other was open, ';

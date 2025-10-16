@@ -111,6 +111,9 @@ var CSRFP = {
 
 			return result;
 		};
+	},
+	addCsrfpHeader: function(xhr) {
+		xhr.setRequestHeader(CSRFP.CSRFP_TOKEN, CSRFP._getAuthKey());
 	}
 };
 
@@ -190,68 +193,19 @@ function csrfprotector_init() {
 		}
 	}
 
-
-	//==================================================================
-	// Wrapper for XMLHttpRequest & ActiveXObject (for IE 6 & below)
-	// Set X-No-CSRF to true before sending if request method is
-	//==================================================================
-
-	/**
-	 * Wrapper to XHR open method
-	 * Add a property method to XMLHttpRequst class
-	 * @param: all parameters to XHR open method
-	 * @return: object returned by default, XHR open method
-	 */
-	function new_open(method, url, async, username, password) {
-		this.method = method;
-        this.url = url;
-        async = (typeof async === 'undefined') ? true : async;
-        username = (typeof username === 'undefined') ? null : username;
-        password = (typeof password === 'undefined') ? null : password;
-
-		var isAbsolute = (url.indexOf("./") === -1) ? true : false;
-		if (!isAbsolute) {
-			var base = location.protocol +'//' +location.host
-							+ location.pathname;
-			url = CSRFP._getAbsolutePath(base, url);
-		}
-		return this.old_open(method, url, async, username, password);
-	}
-
-	/**
-	 * Wrapper to XHR send method
-	 * Add query paramter to XHR object,
-	 *
-	 * @param: all parameters to XHR send method
-	 *
-	 * @return: object returned by default, XHR send method
-	 */
-	function new_send(data) {
-        // only attach to posts to the same domain
-		if (this.method.toLowerCase() === 'post' && 
-            CSRFP._getDomain(this.url).indexOf(document.domain) !== -1
-        ) {
-			// attach the token in request header
-			this.setRequestHeader(CSRFP.CSRFP_TOKEN, CSRFP._getAuthKey());
-		} 
-
-		return this.old_send(data);
-	}
-
-	if (window.XMLHttpRequest) {
-		// Wrapping
-		XMLHttpRequest.prototype.old_send = XMLHttpRequest.prototype.send;
-		XMLHttpRequest.prototype.old_open = XMLHttpRequest.prototype.open;
-		XMLHttpRequest.prototype.open = new_open;
-		XMLHttpRequest.prototype.send = new_send;
-	}
-	if (typeof ActiveXObject !== 'undefined') {
-		ActiveXObject.prototype.old_send = ActiveXObject.prototype.send;
-		ActiveXObject.prototype.old_open = ActiveXObject.prototype.open;
-		ActiveXObject.prototype.open = new_open;
-		ActiveXObject.prototype.send = new_send;
-	}
+	// Removed XHR wrapper, since most requests use jQuery
+	// manual xhr posts will need to call CSRFP.addCsrfpHeader(xhr);
 }
+
+jQuery.ajaxSetup({
+    beforeSend: function(jqXHR, settings) {
+        if (settings.url && settings.type && settings.type.toUpperCase() === 'POST' &&
+			CSRFP._getDomain(settings.url).indexOf(document.domain) !== -1
+		) {
+			jqXHR.setRequestHeader(CSRFP.CSRFP_TOKEN, CSRFP._getAuthKey());
+        }
+    }
+});
 
 jQuery(function() {
 	csrfprotector_init();

@@ -749,7 +749,9 @@ const image_upload_handler = (blobInfo, progress, isattach) => new Promise((reso
 
   xhr.withCredentials = false;
   xhr.open('POST', imasroot+'/tinymce8/upload_handler.php');
-
+  if (typeof CSRFP !== 'undefined') {
+	CSRFP.addCsrfpHeader(xhr);
+  }
   xhr.upload.onprogress = (e) => {
 	if (progress) {
     	progress(e.loaded / e.total * 100);
