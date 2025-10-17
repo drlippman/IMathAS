@@ -267,7 +267,7 @@ if ($isRealStudent) {
   $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid,
     ':type'=>$in_practice?'assessreview':'assess',
     ':typeid'=>$aid, ':viewtime'=>time(), 
-    ':info'=>substr(base64_encode(hex2bin(md5($userIP))),0,-2)
+    ':info'=>substr(base64_encode(hex2bin(md5($userIP))),-8,6)
   ));
 }
 

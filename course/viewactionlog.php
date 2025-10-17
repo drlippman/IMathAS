@@ -189,7 +189,7 @@ foreach ($actions as $r) {
 	case 'assess':
 		$actionmsg =  'Started/resumed assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
 		if ($r[3] !== '') {
-			$actionmsg .= ' <span class=small>(from ' . substr($r[3],-6) .')</span>';
+			$actionmsg .= ' <span class=small>(from ' . Sanitize::encodeStringForDisplay($r[3]) .')</span>';
 		}
 		break;
     case 'assessreview':
