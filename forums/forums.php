@@ -253,9 +253,11 @@ if ($searchtype == 'thread') {
 			$postcount[$row[0]] = $row[1] - 1;
 			$maxdate[$row[0]] = $row[2];
 		}
+		arsort($maxdate);
 		echo '<table class=forum><thead>';
 		echo '<tr><th>Topic</th><th>Started By</th><th>Forum</th><th>Replies</th><th>Views</th><th>Last Post Date</th></tr></thead><tbody>';
-		foreach ($threaddata as $line) {
+		foreach ($maxdate as $tid=>$date) {
+			$line = $threaddata[$tid];
 			if (isset($postcount[$line['id']])) {
 				$posts = $postcount[$line['id']];
 				$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
