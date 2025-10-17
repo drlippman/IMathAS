@@ -750,6 +750,7 @@ return function(str,elid,nomatrices) {
 	  return "";
   }
   var out = AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
+  out = out.replace(/{(\d+)}(?={\d+})/g, '{$1}\\ ');
   return out;
 }
 }();
