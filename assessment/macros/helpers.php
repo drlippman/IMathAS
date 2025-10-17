@@ -1026,6 +1026,9 @@ function checkanswerformat($tocheck,$ansformats) {
 		$num = str_replace(' ','',$mnmatches[1])*$mnmatches[4] + $mnmatches[3]*1;
 		$tocheck = $num.'/'.$mnmatches[4];
 	}
+    if (!in_array("allowmixed",$ansformats) && preg_match('/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/',$tocheck,$mnmatches)) {
+		return false;
+	}
 
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		$tocheck = preg_replace('/([0-9])\s+([0-9])/','$1*$2',$tocheck);
