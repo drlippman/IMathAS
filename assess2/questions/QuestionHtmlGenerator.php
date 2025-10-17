@@ -299,12 +299,13 @@ class QuestionHtmlGenerator
                 },$toevalqtxt);
         }
         //                              1                 2                                 3            4
-        if (preg_match_all('~\[if\s+([\w_]*?)\s*(==|!=|>=|&gt;=|<=|&lt;=|>|&gt;|<|&lt;)\s*(\w+)\s*\]\s*(.*?)\[/if\]\n?~ms', $toevalqtxt, $QHG_all_matches, PREG_SET_ORDER)) {
+        if (preg_match_all('~\[if\s+\$?([\w_]*?)\s*(==|!=|>=|&gt;=|<=|&lt;=|>|&gt;|<|&lt;)\s*(\w+)\s*\]\s*(.*?)\[/if\]\n?~ms', $toevalqtxt, $QHG_all_matches, PREG_SET_ORDER)) {
             foreach ($QHG_all_matches as $QHG_match) {
                 $keep = false;
                 if (isset(${$QHG_match[1]})) {
                     if (in_array($QHG_match[1], $GLOBALS['disallowedvar'])) { continue; }
                     $val = ${$QHG_match[1]};
+
                     if (($QHG_match[2]=='==' && $val==$QHG_match[3]) ||
                         ($QHG_match[2]=='!=' && $val!=$QHG_match[3]) ||
                         (($QHG_match[2]=='>=' || $QHG_match[2]=='&gt;=') && $val>=$QHG_match[3]) ||
