@@ -310,6 +310,8 @@ function numfuncGenerateTestpoints($variables, $domain = '') {
         $flist = implode(",", $ofunc);
     }
 
+    $primes = [3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+
     $tps = [];
     for ($j = 0; $j < count($variables); $j++) {
         if ($fromto[$j][0] == $fromto[$j][1]) {
@@ -330,13 +332,14 @@ function numfuncGenerateTestpoints($variables, $domain = '') {
                 }
             }
         } else {
-            $dx = ($fromto[$j][1] - $fromto[$j][0]) / 20;
+            $w = ($fromto[$j][1] - $fromto[$j][0]);
+            $mult = $primes[$j%(count($primes))];
             for ($i = 0; $i < 20; $i++) {
-                $tps[$i][$j] = $fromto[$j][0] + $dx * $i + $dx * rand(1, 499) / 500.0;
+                $loc = (($i*$mult)%20)/20;
+                $tps[$i][$j] = $fromto[$j][0] + $w*$loc + $w * rand(1, 499) / 10000.0;
             }
         }
     }
-
     return [$variables, $tps, $flist];
 }
 

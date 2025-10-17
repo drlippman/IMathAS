@@ -1857,6 +1857,7 @@ function processNumfunc(qn, fullstr, format) {
   var iseqn = format.match(/equation/);
   var isineq = format.match(/inequality/);
   var err = '';
+  var primes = [3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
@@ -1911,16 +1912,19 @@ function processNumfunc(qn, fullstr, format) {
     if (!format.match(/generalcomplex/)) {
       var parser = makeMathFunction(totesteqn, remapVars.join('|'), [], fvars.join('|'), format.match(/generalcomplex/));
       successfulEvals = 0;
+      var mult, loc;
       if (parser !== false) {
         for (j=0; j < 20; j++) {
             totest = {'DNE': 1};
             for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+              mult = primes[i%(primes.length)];
+              loc = ((j*mult)%20)/20; 
               if (domain[i][2]) { //integers
                   //testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-                  testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*j/20);
+                  testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*loc);
               } else { //any real between min and max
                   //testval = Math.random()*(domain[i][1] - domain[i][0]) + domain[i][0];
-                  testval = domain[i][0] + (domain[i][1] - domain[i][0])*j/20;
+                  testval = domain[i][0] + (domain[i][1] - domain[i][0])*loc;
               }
               totest[remapVars[i]] = testval;
             }
