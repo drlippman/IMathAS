@@ -256,12 +256,19 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
 
 // log access
 if ($isRealStudent) {
-  $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
-  $query .= "(:userid, :courseid, :type, :typeid, :viewtime)";
+  $userIP = $_SERVER['HTTP_CF_CONNECTING_IP']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? $_SERVER['HTTP_CLIENT_IP']
+        ?? '';
+  $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+  $query .= "(:userid, :courseid, :type, :typeid, :viewtime, :info)";
   $stm = $DBH->prepare($query);
   $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid,
     ':type'=>$in_practice?'assessreview':'assess',
-    ':typeid'=>$aid, ':viewtime'=>time()));
+    ':typeid'=>$aid, ':viewtime'=>time(), 
+    ':info'=>substr(base64_encode(hex2bin(md5($userIP))),0,-2)
+  ));
 }
 
 // update lti_sourcedid if needed

@@ -141,7 +141,7 @@ if (count($lookups['dr'])>0) {
 
 echo '<table><thead><tr><th>Date</th><th>Action</th></tr></thead><tbody>';
 foreach ($actions as $r) {
-	if (isset($r[3])) {
+	if (isset($r[3]) && $r[0] !== 'assess') {
 		$r3pts = explode('::',$r[3]);
 		if (count($r3pts)==2) {
 			$thelink = '<a href="'.Sanitize::url($r3pts[0]).'" target="_blank">'.Sanitize::encodeStringForDisplay($r3pts[1]).'</a>';
@@ -187,7 +187,10 @@ foreach ($actions as $r) {
 		$actionmsg =  'In assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)').' summary, clicked link to '.$thelink;
 		break;
 	case 'assess':
-		$actionmsg =  'Opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
+		$actionmsg =  'Started/resumed assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
+		if ($r[3] !== '') {
+			$actionmsg .= ' <span class=small>(from ' . substr($r[3],-6) .')</span>';
+		}
 		break;
     case 'assessreview':
     case 'assessreviewub':

@@ -124,8 +124,10 @@ class AssessUtils
    */
   public static function isIPinRange($userip, $range) {
     $ips = array_map('trim', explode(',', $range));
-    $userip = explode('.', $userip);
-	$isoneIPok = false;
+    // might be multiple userips listed; use first
+    $userips = array_map('trim', explode(',', $userip));
+    $userip = explode('.', $userips[0]);
+	  $isoneIPok = false;
     foreach ($ips as $ip) {
       $ip = explode('.', $ip);
       $thisIPok = true;

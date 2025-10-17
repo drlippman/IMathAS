@@ -1333,7 +1333,8 @@ class AssessInfo
     }
 
     //handle IP-form passwords
-    $userIP = $_SERVER['HTTP_X_FORWARDED_FOR']
+    $userIP = $_SERVER['HTTP_CF_CONNECTING_IP']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
         ?? $_SERVER['REMOTE_ADDR']
         ?? $_SERVER['HTTP_CLIENT_IP']
         ?? '';
