@@ -49,10 +49,10 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 $allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
-	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js";
+	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.11.1/distrib/jsxgraphcore.js";
 }
 function jsx_getcsslink() {
-	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.min.css";
+	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.11.1/distrib/jsxgraph.min.css";
 }
 
 function jsx_idlen() {
@@ -212,7 +212,8 @@ function jsxSlider (&$board, $param, $ops=array()) {
 				highline: { highlight: false, strokeColor: '{$color}' },
 				strokeColor: '{$color}',
 				name: '{$name}',
-				label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
+				label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
+				tabindex: 0
 			})";
 			
 		// Set any remaining paramenters specified by user
@@ -272,7 +273,8 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		$snapSizeX = isset($ops['xsnapsize']) ? $ops['xsnapsize'] : 1;
 		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
 		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
-		
+		$tabindex = ($fixed === 'false') ? 0 : -1;
+
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
@@ -297,7 +299,8 @@ function jsxPoint(&$board, $param, $ops=array()) {
 			visible: {$visible},
 			snapSizeX: {$snapSizeX},
 			snapSizeY: {$snapSizeY},
-			snapToGrid: {$snapToGrid}
+			snapToGrid: {$snapToGrid},
+			tabindex: {$tabindex}
 		})";
 		
 		// Set any remaining paramenters specified by user
@@ -365,7 +368,8 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		$snapSizeX = isset($ops['xsnapsize']) ? $ops['xsnapsize'] : 1;
 		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
 		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
-		
+		$tabindex = ($fixed === 'false') ? 0 : -1;
+
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
@@ -391,7 +395,8 @@ function jsxGlider (&$board, $param, $ops=array()) {
             label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
 			snapSizeX: {$snapSizeX},
 			snapSizeY: {$snapSizeY},
-			snapToGrid: {$snapToGrid}
+			snapToGrid: {$snapToGrid},
+			tabindex: {$tabindex}
         })";
 		
 		if (isset($ops['attributes'])) { 
