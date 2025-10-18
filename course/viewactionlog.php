@@ -242,6 +242,7 @@ foreach ($actions as $r) {
 }
 echo '</tbody></table>';
 
+echo '<p></p><p class="small">'._('Note: On "started/resumed assessment" records, the "(from ___)" is an identifier based on the IP address of the student\'s computer. Note that this can change if the student switches from a phone to a laptop, from one computer to another, or even if their wifi connection resets, so don\'t put too much weight on this value changing.').'</p>';
 require_once "../footer.php";
 
 ?>
