@@ -4921,6 +4921,11 @@ var SupSub = P(MathCommand, function(_, super_) {
         }
       }
       if (cursor[L] && !cursor[R] && !cursor.selection && !nobreaksubsup
+          && (this.parent[L] instanceof Bracket)
+          && cursor.options.charsThatBreakOutOfSupSubOp.indexOf(ch) > -1) {
+        cursor.insRightOf(this.parent);
+      }
+      if (cursor[L] && !cursor[R] && !cursor.selection && !nobreaksubsup
           && this.parent[L] instanceof Variable
       ) {
           if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e' 
