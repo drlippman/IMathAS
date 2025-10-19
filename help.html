@@ -2599,12 +2599,14 @@ These macros help with working with strings:
 <h2 id="arraymacros">Array Macros</h2>
 These macros are for working with arrays:
 <ul>
-<li><strong>listtoarray(list)</strong>:  Converts a list, like "1,2,3,4" or "cat,dog,rabbit" to an array</li>
+<li><strong>listtoarray(list, [tonum])</strong>:  Converts a list, like "1,2,3,4" or "cat,dog,rabbit" to an array. 
+	If the list is decimal or integer numbers, set tonum to true to ensure they're treated like numbers.</li>
 <li><strong>explode(symbol, string)</strong>:  Converts a string to an array, breaking it apart on the given symbol.</li>
 <li><strong>arraytolist(array)</strong>:  Converts an array to a list</li>
 <li><strong>calclisttoarray(list)</strong>:  Converts a list of calculations, like "2^2,3^5,7/2" to an array, evaluating the calculations
     along the way.</li>
-<li><strong>stringtoarray(string)</strong>: Converts a text string to an array of characters</li>
+<li><strong>stringtoarray(string, [tonum])</strong>: Converts a text string to an array of characters. 
+	If the characters are all numbers, set tonum to true to ensure they're treated as numbers.</li>
 <li><strong>fillarray(value,num,[start])</strong>:  Creates an array with num entries, all of which are the same given value.  Array indexing
     starts at 0 unless specified. Alternatively, num can be an array of indices, in which case the array will
 	only be defined to the value at those indices.</li>

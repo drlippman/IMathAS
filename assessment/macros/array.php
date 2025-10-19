@@ -46,11 +46,15 @@ function arrayfindindex($n, $h) {
 function arrayfindindices($n, $h) {
     return array_keys($h, $n);
 }
-function stringtoarray($str) {
+function stringtoarray($str,$tonum=false) {
     $str_array = array();
     $len = strlen($str);
     for ($i = 0; $i < $len; $i++) {
-        $str_array[] = $str[$i];
+        if ($tonum) {
+            $str_array[] = floatval($str[$i]);
+        } else {
+            $str_array[] = $str[$i];
+        }
     }
     return $str_array;
 }
@@ -79,7 +83,7 @@ function jointsort() {
     return $out;
 }
 
-function listtoarray($l) {
+function listtoarray($l, $tonum=false) {
     if (func_num_args() > 1) {
         echo "Warning:  listtoarray expects one argument, more than one provided";
     }
@@ -87,9 +91,16 @@ function listtoarray($l) {
         return [];
     }
     if (is_array($l)) {
+        if ($tonum) {
+            return array_map('floatval', $l);
+        }
         return $l;
     }
-    return array_map('trim', explode(',', $l));
+    if ($tonum) {
+        return array_map('floatval', array_map('trim', explode(',', $l)));
+    } else {
+        return array_map('trim', explode(',', $l));
+    }
 }
 
 
@@ -122,8 +133,22 @@ function joinarray($a, $s = ',', $ksort = false) {
 
 function calclisttoarray($l) {
     $l = listtoarray($l);
+    $parser = null;
     foreach ($l as $k => $tocalc) {
-        $l[$k] = evalMathParser($tocalc, null);
+        if (is_numeric($tocalc)) {
+            $l[$k] = floatval($tocalc);
+        } else {
+            if ($parser === null) {
+                $parser = new MathParser('',[],'',false);
+            }
+            try {
+                $parser->parse($tocalc);
+                $l[$k] = $parser->evaluate();
+            } catch (Throwable $t) {
+                $l[$k] = sqrt(-1);
+            }
+            //$l[$k] = evalMathParser($tocalc, null);
+        }
     }
     return $l;
 }
