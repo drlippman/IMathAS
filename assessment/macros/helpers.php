@@ -1042,7 +1042,12 @@ function checkanswerformat($tocheck,$ansformats) {
 		$num = str_replace(' ','',$mnmatches[1])*$mnmatches[4] + $mnmatches[3]*1;
 		$tocheck = $num.'/'.$mnmatches[4];
 	}
-    if (!in_array("allowmixed",$ansformats) && preg_match('/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/',$tocheck,$mnmatches)) {
+    if (!in_array("allowmixed",$ansformats) &&
+        !in_array("mixednumber",$ansformats) &&
+        !in_array("sloppymixednumber",$ansformats) &&
+        !in_array("mixednumberorimproper",$ansformats)
+        && preg_match('/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/',$tocheck,$mnmatches)
+    ) {
 		return false;
 	}
 
