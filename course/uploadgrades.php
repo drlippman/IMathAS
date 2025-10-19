@@ -68,11 +68,11 @@ if (!(isset($teacherid))) {
 				$query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid AND ";
 				$qarr = array(':courseid'=>$cid);
 				if ($_POST['useridtype']==0) {
-					if ($data[$usercol]=='') {continue;}
+					if (!isset($data[$usercol]) || $data[$usercol]=='') {continue;}
 					$query .= "imas_users.SID=:SID";
 					$qarr[':SID'] = Sanitize::stripHtmlTags($data[$usercol]);
 				} else if ($_POST['useridtype']==1) {
-					if (strpos($data[$usercol],',')===false) { continue;}
+					if (!isset($data[$usercol]) || strpos($data[$usercol],',')===false) { continue;}
 					list($last,$first) = explode(',',$data[$usercol]);
 					$first = trim($first);
 					$last = trim($last);
@@ -88,9 +88,9 @@ if (!(isset($teacherid))) {
 				if ($feedbackcol==-1) {
 					$feedback = '';
 				} else {
-					$feedback = Sanitize::incomingHtml($data[$feedbackcol]);
+					$feedback = Sanitize::incomingHtml($data[$feedbackcol] ?? '');
 				}
-				$score = Sanitize::onlyFloat($data[$scorecol]);
+				$score = Sanitize::onlyFloat($data[$scorecol] ?? 0);
 				if ($stm->rowCount()>0) {
 					$cuserid=$stm->fetchColumn(0);
 					if (isset($curscores[$cuserid])) {
