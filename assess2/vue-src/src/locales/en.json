@@ -493,7 +493,9 @@
     "nextq": "Next Question",
     "prevq": "Previous Question",
     "oneatatime": "One at a time",
-    "a11yalt": "Accessible alternative"
+    "a11yalt": "Accessible alternative",
+    "set_as_last": "Move to Last",
+    "setaslast_warn": "This will move this attempt to be the last attempt, making it the scored attempt"
   },
   "work": {
     "add": "Add Work",

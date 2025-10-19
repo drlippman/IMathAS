@@ -153,6 +153,13 @@
             >
               {{ $t('gradebook.clear_attempt') }}
             </button>
+            <button
+              v-if = "!isByQuestion && canEdit && aData.keepscore === 'last' && curAver < aData.assess_versions.length - 1"
+              type="button"
+              @click="setVerAsLast"
+            >
+              {{ $t('gradebook.set_as_last') }}
+            </button>
           </div>
           <div v-if="isUnsubmitted">
             {{ $t('gradebook.unsubmitted') }}
@@ -858,6 +865,12 @@ export default {
     clearAttempts (type) {
       store.clearAttempts.type = type;
       store.clearAttempts.show = true;
+    },
+    setVerAsLast () {
+      store.confirmObj = {
+        body: 'gradebook.setaslast_warn',
+        action: () => actions.setVerAsLast()
+      };
     },
     clearLPblock () {
       actions.clearLPblock();

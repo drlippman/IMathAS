@@ -364,7 +364,7 @@ class ScoreQuestionParams
      * Set all of the student's answers to ALL questions. (as entered)
      *
      * @param array $allQuestionAnswers
-     * @return QuestionParams
+     * @return ScoreQuestionParams
      */
     public function setAllQuestionAnswers(?array $allQuestionAnswers): ScoreQuestionParams
     {
@@ -386,7 +386,7 @@ class ScoreQuestionParams
      * Set all of the student's answers to ALL questions. (as floats)
      *
      * @param array $allQuestionAnswersAsNum
-     * @return QuestionParams
+     * @return ScoreQuestionParams
      */
     public function setAllQuestionAnswersAsNum(?array $allQuestionAnswersAsNum): ScoreQuestionParams
     {

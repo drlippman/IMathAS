@@ -384,6 +384,42 @@ export const actions = {
     store.clearAttempts.type = 'practiceview';
     this.clearAttempt(true);
   },
+  setVerAsLast () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.setVerAsLast(), 20);
+      return;
+    }
+    window.$.ajax({
+      url: store.APIbase + 'gbsetlast.php' + store.queryString,
+      type: 'POST',
+      dataType: 'json',
+      data: { aver: store.curAver },
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        // move attempt in local store
+        const vertomove = store.assessInfo.assess_versions[store.curAver];
+        store.assessInfo.assess_versions.splice(store.curAver, 1);
+        store.assessInfo.assess_versions.push(vertomove);
+        store.curAver = store.assessInfo.assess_versions.length - 1;
+        // update score details
+        store.assessInfo.gbscore = response.gbscore;
+        store.assessInfo.scored_version = response.scored_version;
+      })
+      .fail(response => {
+        this.handleError('send_fail');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
   clearAttempt (keepver) {
     const data = {
       type: store.clearAttempts.type,

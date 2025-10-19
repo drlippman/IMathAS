@@ -570,6 +570,18 @@ class AssessRecord
   }
 
   /**
+   * Swap assess version to last
+   */
+  public function setAssessVerAsLast($aver) {
+    $this->parseData();
+    $vertomove = $this->data['assess_versions'][$aver];
+    array_splice($this->data['assess_versions'], $aver, 1);
+    array_push($this->data['assess_versions'], $vertomove);
+    // recalculate score; don't need to rescore individual questions
+    $this->reTotalAssess([]);
+  }
+
+  /**
    * Determine if there is an active assessment attempt
    * @return boolean true if there is an active assessment attempt
    */
