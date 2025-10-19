@@ -126,6 +126,8 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
         $code = 6.2;
     } else if ($type == 'horizparab') {
         $code = 6.1;
+    } else if ($type == '3pointparab') {
+        $code = 6.7;
     } else if ($type == 'cubic') {
         $code = 6.3;
     } else if ($type == 'sqrt') {
@@ -186,6 +188,10 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
                 $pts[6] = ($h - $pts[6] - $imgborder) / $pixelspery + $ymin;
                 // Last value is the asymptote: y val for genexp, x val for genlog
                 $outpt = ($type == 'genexp') ? array($pts[3], $pts[4], $pts[5], $pts[6], $pts[2]) : array($pts[3], $pts[4], $pts[5], $pts[6], $pts[1]);
+            } else if ($type == '3pointparab') {
+                $pts[5] = ($pts[5] - $imgborder) / $pixelsperx + $xmin;
+                $pts[6] = ($h - $pts[6] - $imgborder) / $pixelspery + $ymin;
+                $outpt = array($pts[1], $pts[2], $pts[3], $pts[4], $pts[5], $pts[6]);
             }
             $outpts[] = $outpt;
         }
@@ -238,6 +244,16 @@ function gettwopointformulas($str, $type, $xmin = null, $xmax = null, $ymin = nu
                     $coef2 = pow($pt[1], 2) * $k + $pt[0];
                     $outexps[] = makexxpretty("$k $y^2 + $coef1 $y + $coef2");
                     $outeqs[] = makexxpretty("$x = $k $y^2 + $coef1 $y + $coef2");
+                }
+            }
+        } else if ($type == '3pointparab') {
+            foreach ($pts as $key => $pt) {
+                if (abs($pt[0] - $pt[2]) > 1E-12 && abs($pt[4] - $pt[2]) > 1E-12  && abs($pt[4] - $pt[0]) > 1E-12) {
+                    $a = ($pt[0]*($pt[5]-$pt[3]) + $pt[2]*($pt[1]-$pt[5]) + $pt[4]*($pt[3]-$pt[1]))/(($pt[0]-$pt[2])*($pt[0]-$pt[4])*($pt[2]-$pt[4]));
+                    $b = ($pt[3]-$pt[1])/($pt[2]-$pt[0]) - $a*($pt[0]+$pt[2]);
+                    $c = $pt[1] - $a*$pt[0]*$pt[0] - $b*$pt[0];
+                    $outexps[] = makexxpretty("$a $x^2 + $b $x + $c");
+                    $outeqs[] = makexxpretty("$y = $a $x^2 + $b $x + $c");
                 }
             }
         } else if ($type == 'cubic') {
