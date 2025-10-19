@@ -803,6 +803,20 @@ class DrawingScorePart implements ScorePart
                             $y = $pts[2]+sign($a)*sqrt(abs(20/$a));
                             $hparabs[] = array($pts[1],$pts[2],$y,$x);
                         }
+                    } else if ($pts[0]==6.7) {
+                        $leftrightdir = '';
+                        if ($pts[4]==$pts[2] && $pts[4]==$pts[6]) {
+                            $lines[] = array('y',0,$pts[4], false);
+                        } else if ($pts[3]!=$pts[1] && $pts[3]!=$pts[5] && $pts[1]!=$pts[5]) {
+                            $a = ($pts[1]*($pts[6]-$pts[4]) + $pts[3]*($pts[2]-$pts[6]) + $pts[5]*($pts[4]-$pts[2]))/(($pts[1]-$pts[3])*($pts[1]-$pts[5])*($pts[3]-$pts[5]));
+                            $b = ($pts[4]-$pts[2])/($pts[3]-$pts[1]) - $a*($pts[1]+$pts[3]);
+                            $c = $pts[2] - $a*$pts[1]*$pts[1] - $b*$pts[1];
+                            $h = -$b/(2*$a);
+                            $k  = (4*$a*$c - $b*$b)/(4*$a);
+                            $y = $k+$a*400;
+                            $x = $h+sign($a)*sqrt(abs(20/$a));
+                            $parabs[] = array($h,$k,$y,$x,$leftrightdir);
+                        }
                     } else if ($pts[0]==6.5) {//sqrt
                         $flip = ($pts[3] < $pts[1])?-1:1;
                         if ($pts[3]!=$pts[1]) {

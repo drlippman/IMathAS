@@ -377,6 +377,12 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 6;}
                         $out .= ' alt="Parabola"/>';
                     }
+                    if (in_array('3pointparab', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tp3pparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.7\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == '3pointparab') {$out .= 'class="sel" ';
+                            $def = 6.7;}
+                        $out .= ' alt="3 Point Parabola"/>';
+                    }
                     if (in_array('horizparab', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tphorizparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.1\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'horizparab') {$out .= 'class="sel" ';
