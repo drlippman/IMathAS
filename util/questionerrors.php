@@ -133,6 +133,7 @@ echo '<div class="fixedonscroll">';
 echo _('With selected:') . ' <button type="button" id="quicksavebtn" onclick="quicksave()">'._('Clear log').'</button> ';
 echo '<span class="noticetext" id="quicksavenotice" aria-live="polite" aria-atomic=true>&nbsp;</span>';
 echo '</div>';
+echo '<div class="fixedonscrollpad"></div>';
 echo '<ul class="nomark">';
 $lastqsetid = 0;
 foreach ($qorder as $qsetid) {

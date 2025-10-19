@@ -75,7 +75,17 @@ span.leftbtns img {
 .fixedonscroll[data-fixed=true] {
 	z-index: 100;
 	margin-top: -5px;
-	padding: 5px 0px;;
+	padding: 5px 0px;
 	background-color: #fff;
 	width: 100%;
+}
+.fixedonscroll {
+	padding: 5px 0px;
+}
+.newglow {
+	border-radius: 4px 4px 0 0;
+	box-shadow: 0 0 4px 0px rgba(255,0,0,0.75);
+}
+.newglow.curactive {
+	box-shadow: 0 0 6px 0px #F00;
 }

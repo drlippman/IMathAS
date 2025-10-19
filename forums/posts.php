@@ -169,8 +169,8 @@ $caller = "posts";
 require_once "posthandler.php";
 
 $pagetitle = "Posts";
-$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=010619" type="text/css" />';
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=053025"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=011825" type="text/css" />';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=101825"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
@@ -494,7 +494,9 @@ if (!$oktoshow) {
 	echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
 	echo '<button onclick="showall()">'._('Show All').'</button>';
 	echo '<button onclick="hideall()">'._('Hide All').'</button>';
+	echo '<span id="nextnew" style="display:none"> | <button onclick="shownextnew()">'._('Next New').'</button></span>';
 	echo '</div>';
+	echo '<div class="fixedonscrollpad"></div>';
 
 	/*if ($view==2) {
 	echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=0\">View Expanded</a>";
@@ -523,7 +525,12 @@ function printchildren($base,$restricttoowner=false) {
 		if ($restricttoowner && $ownerid[$child] != $userid) {
 			continue;
 		}
-		echo '<div class="block flexgroup"> ';
+		echo '<div class="postwrap';
+		if ($date[$child]>$lastview) {
+			echo ' newglow';
+		}
+		echo '" tabindex=-1>';
+		echo '<div class="block flexgroup">';
 		echo '<span class=nowrap>';
 		if (isset($children[$child])) {
 			if ($view==1) {
@@ -734,7 +741,7 @@ function printchildren($base,$restricttoowner=false) {
 		}
 
 
-		echo "<div class=\"clear\"></div></div>\n";
+		echo "<div class=\"clear\"></div></div></div>\n";
 		echo '<div class="forumgrp'.(($view==1)?' hidden':'').'" id="childwrap'.$child.'">';
 		if (isset($children[$child])) { //if has children
 			printchildren($child, ($posttype[$child]==3 && !$isteacher));

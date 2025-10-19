@@ -1428,8 +1428,10 @@ jQuery(document).ready(function($) {
 			var winscrolltop = $(window).scrollTop();
 			for (var i=0;i<fixedonscrollel.length;i++) {
 				if (winscrolltop > initialtop[i] && initialtop[i]>0) {
+					$(fixedonscrollel[i]).next(".fixedonscrollpad").height($(fixedonscrollel[i]).height() + 5);
 					$(fixedonscrollel[i]).css('position','fixed').css('top','5px').attr("data-fixed",true);
 				} else {
+					$(fixedonscrollel[i]).next(".fixedonscrollpad").height(0);
 					$(fixedonscrollel[i]).css('position','static').attr("data-fixed",false);
 				}
 			}

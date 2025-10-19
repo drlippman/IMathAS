@@ -105,3 +105,18 @@ function toggletagged(id) {
 	   	else {$("#tag"+id).attr("src",cursrc.replace(/empty/,"filled"));}
 	   }});
 }
+
+var newposts = [];
+var lastnew = -1;
+$(function() {
+	newposts = $(".newglow");
+	if (newposts.length > 0) {
+		$("#nextnew").show();
+	}
+});
+function shownextnew() {
+	$(".curactive").removeClass("curactive");
+	var nextnew = (lastnew + 1)%newposts.length;
+	$(newposts[nextnew]).focus().addClass("curactive");
+	lastnew = nextnew;
+}
