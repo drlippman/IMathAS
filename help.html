@@ -3223,7 +3223,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	<br/>$reqdecimals = "=2+-1%" checks for exactly 2 decimals, but allows the answer to have an relative error of 1% (equivalent to $reltolerance = .01)</dd>
 <dt>$reqsigfigs = a number </dt>
 	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
-	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
+	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,4]" to require between 2 to 4 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
 	<br/>This setting overrides both $reltolerance and $abstolerance, and by default tests that the student answer rounded to the specified sigfigs matches
 	the correct answer.  To override the tolerance use +- in the setting, like this:
@@ -3370,7 +3370,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 <dt>$reqsigfigs = a number </dt>
 	<dd>Defines the significant figure accuracy required.  Only valid for "decimal", "scinot", and "scinotordec" $answerformat options.
 	Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
-	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
+	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,4]" to require 2 to 4 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
 	<br/>This setting overrides both $reltolerance and $abstolerance, and by default tests that the student answer rounded to the specified sigfigs matches
 	the correct answer.  To override the tolerance use +- in the setting, like this:

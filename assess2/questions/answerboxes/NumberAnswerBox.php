@@ -123,6 +123,9 @@ class NumberAnswerBox implements AnswerBox
                 $exactdec = true;
                 $tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
                 $shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
+            } else if ($reqdecoffset > 0) {
+                $tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d decimal places.'), $reqdecimals, $reqdecimals + $reqdecoffset);
+                $shorttip .= sprintf(_(', with %d - %d decimal places'), $reqdecimals, $reqdecimals + $reqdecoffset);
             } else {
                 $tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least %d decimal places.'), $reqdecimals);
                 $shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);

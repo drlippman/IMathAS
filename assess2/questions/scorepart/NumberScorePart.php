@@ -370,7 +370,12 @@ class NumberScorePart implements ScorePart
                                     if ($thisreqdecimals != (($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1))) {
                                         continue;
                                     }
-                                } 
+                                } else if ($thisreqdecimals !== '' && $reqdecoffset > 0) {
+                                    $gadec = ($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1);
+                                    if ($gadec - $thisreqdecimals > $reqdecoffset) {
+                                        continue;
+                                    }
+                                }
                                 if ($thisreqsigfigs !== '') {
                                     if (checkunitssigfigs($gaunitsarr[$j], $anssunits[$k], $thisreqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
                                         $correct += $partialpts[$k]; $foundloc = $j; break 2;
@@ -394,6 +399,11 @@ class NumberScorePart implements ScorePart
                                         continue;
                                     }
                                     $anans = round($anans, $thisreqdecimals);
+                                } else if ($thisreqdecimals !== '' && $reqdecoffset > 0) {
+                                    $gadec = ($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1);
+                                    if ($gadec - $thisreqdecimals > $reqdecoffset) {
+                                        continue;
+                                    }
                                 }
                                 if ($thisreqsigfigs !== '') {
                                     if (checksigfigs($givenans, $anans, $thisreqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
