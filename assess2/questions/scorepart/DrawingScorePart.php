@@ -291,6 +291,7 @@ class DrawingScorePart implements ScorePart
             $ansexps = array();
             $anslogs = array();
             $anscoss = array();
+            $anstans = array();
             $ansvecs = array();
             $ansrats = array();
             $ansellipses = array();
@@ -596,6 +597,30 @@ class DrawingScorePart implements ScorePart
                                 $anscoss[$key] = array($secxp,$xintp,$secyp,$yintp);
                             }
                         }
+                    } else if (($p = strpos($function[0],'tan('))!==false) { //is tan
+                        $nested = 1;
+                        for ($i=$p+4;$i<strlen($function[0]);$i++) {
+                            if ($function[0][$i]=='(') {$nested++;}
+                            else if ($function[0][$i]==')') {$nested--;}
+                            if ($nested==0) {break;}
+                        }
+                        if ($nested==0) {
+                            $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
+                            $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
+                            $y0 = $infunc(['x'=>0]);
+                            $y1 = $infunc(['x'=>1]);
+                            $period = M_PI/abs($y1-$y0); //slope of inside function
+                            $xint = -$y0/($y1-$y0);
+                            $secx = $xint + $period/4;
+                            $xintp = ($xint - $settings[0])*$pixelsperx + $imgborder;
+                            $secxp = ($secx - $settings[0])*$pixelsperx + $imgborder;
+                            $yint = $func(['x'=>$xint]);
+                            $yintp = $settings[7] - ($yint-$settings[2])*$pixelspery - $imgborder;
+                            $secy = $func(['x'=>$secx]);
+                            $secyp = $settings[7] - ($secy-$settings[2])*$pixelspery - $imgborder;
+                            $anstans[$key] = array($xintp,$yintp,$secxp,$secyp);
+                        }
                     } else if (strpos($function[0],'^3')!==false) { //cubic
                         $y4p = $ytopix($func(['x'=>$x4]));
                         $a1 = safepow($x3p,3)-2*safepow($x2p,3)+safepow($x1p,3);
@@ -736,6 +761,7 @@ class DrawingScorePart implements ScorePart
             $abs = array();
             $sqrts = array();
             $coss = array();
+            $tans = array();
             $exps = array();
             $logs = array();
             $vecs = array();
@@ -940,6 +966,15 @@ class DrawingScorePart implements ScorePart
                             $coss[] = array($pts[3],$pts[1],$pts[4],$pts[2]);
                         } else {
                             $coss[] = array($pts[1],$pts[3],$pts[2],$pts[4]);
+                        }
+                    } else if ($pts[0]==9.2) {
+                        // second point is x,y at 1/4 period, where tan==1
+                        if ($pts[3] != $pts[1]) {
+                            $b = M_PI/(2*abs($pts[3] - $pts[1]));
+                            $amp = ($pts[6]-$pts[2])/tan($b*($pts[5]-$pts[1]));
+                            $xt = $pts[1] + 0.5*abs($pts[3] - $pts[1]);
+                            $yt = $pts[2] + $amp;
+                            $tans[] = array($pts[1], $pts[2], $xt, $yt);
                         }
                     }
                 }
@@ -1474,6 +1509,35 @@ class DrawingScorePart implements ScorePart
                     }
                     $scores[$scoretype[$key]][$key] = 1;
                     $usedcos[$i] = 1;
+                    break;
+                }
+            }
+            $usedtan = [];
+            foreach ($anstans as $key=>$atan) {
+                $period = 4*($atan[2]-$atan[0]);
+                $scores[$scoretype[$key]][$key] = 0;
+                for ($i=0; $i<count($tans); $i++) {
+                    if (!empty($usedtan[$i])) { continue; }
+                    // need to check if atan[0] = tans[i][0] + k*period
+                    $pk = round(($atan[0]-$tans[$i][0])/$period);
+                    $shiftedxb = $tans[$i][0] + $period*$pk;
+                    if (abs($atan[0]-$shiftedxb)>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    if (abs($atan[1]-$tans[$i][1])>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    // need to check if atan[2] = tans[i][2] + k*period
+                    $pk = round(($atan[2]-$tans[$i][2])/$period);
+                    $shiftedx2 = $tans[$i][2] + $period*$pk;
+                    if (abs($atan[2]-$shiftedx2)>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    if (abs($atan[3]-$tans[$i][3])>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    $scores[$scoretype[$key]][$key] = 1;
+                    $usedtan[$i] = 1;
                     break;
                 }
             }

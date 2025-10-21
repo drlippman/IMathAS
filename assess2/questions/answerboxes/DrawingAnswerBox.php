@@ -477,6 +477,12 @@ class DrawingAnswerBox implements AnswerBox
                         $out .= ' alt="Cosine"/>';
                         $out .= "<img src=\"$staticroot/img/tpsvg/tpsin.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9.1\" alt=\"Sine\"/>";
                     }
+                    if (in_array('tan', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tpsvg/tptan.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9.2\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'tan') {$out .= 'class="sel" ';
+                            $def = 9.2;}
+                        $out .= ' alt="Tangent"/>';
+                    }
                     if (count($answerformat) == 1 || in_array('dot', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpsvg/tpdot.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'dot') {$out .= 'class="sel" ';
@@ -684,7 +690,7 @@ class DrawingAnswerBox implements AnswerBox
                             }
                         }
                     } else { //is function
-                        if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^\d\(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
+                        if (preg_match('/(sin[^\(]|cos[^\(]|tan[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^\d\(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
                             echo "Invalid notation on " . Sanitize::encodeStringForDisplay($function[0]) . ": missing function parens";
                             continue;
                         }

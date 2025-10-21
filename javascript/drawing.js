@@ -58,6 +58,7 @@
 	8.6: log (shifted)
 	9: cosine
 	9.1: sine
+	9.2: tangent
    ineqtypes
    	10: linear >= or <=
    	10.2: linear < or >
@@ -104,7 +105,7 @@ var tpModeN = {
 	"6": 2, "6.1": 2, "6.2": 2, "6.3": 2, "6.5": 2, "6.6": 2, "6.7": 3,
 	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
 	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
-	"9": 2, "9.1": 2,
+	"9": 2, "9.1": 2, "9.2": 3,
 	"10": 3, "10.2": 3, "10.3": 3, "10.4": 3};
 var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
 
@@ -244,7 +245,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 			"lineseg": [{"mode":5.3, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
 			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
 			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
-			"3pointparab": [{"mode":6.7, "descr":_("Parabola"), inN: 2, "input":_("Enter three points on the parabola")}],
+			"3pointparab": [{"mode":6.7, "descr":_("Parabola"), inN: 3, "input":_("Enter three points on the parabola")}],
 			"horizparab": [{"mode":6.1, "descr":_("Parabola opening right or left"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
 			"halfparab": [{"mode":6.2, "descr":_("Half Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the half parabola")}],
 			"cubic": [{"mode":6.3, "descr":_("Cubic"), inN: 2, "input":_("Enter the inflection point, then another point on the cubic")}],
@@ -268,6 +269,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 				{"mode":9, "descr":_("Cosine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point half a phase further")},
 				{"mode":9.1, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
 			],
+			"tan": [{"mode":9.2, "descr":_("Tangent"), inN: 3, "input":_("Enter the inflection point of the tangent, then a point on a vertical asymptote, then a point on the graph")}],
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
 		},
 		"basic": {
@@ -1629,6 +1631,86 @@ function drawTarget(x,y,skipencode) {
 							ctx.moveTo(curx,cury);
 						} else {
 							ctx.lineTo(curx,cury);
+						}
+					}
+				}
+			}
+		} else if (tptypes[curTarget][i]==9.2) {//if a tp tangent
+			var y2 = null;
+			var x2 = null;
+			var y3 = null;
+			var x3 = null;
+			if (tplines[curTarget][i].length==3) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+				x3 = tplines[curTarget][i][2][0];
+				y3 = tplines[curTarget][i][2][1];
+			} else if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+				x3 = x;
+				y3 = y;
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			var x1 = tplines[curTarget][i][0][0];
+			var y1 = tplines[curTarget][i][0][1];
+			var asymp = [];
+			if (x2 != null && Math.abs(x2-x1)>2) {
+				// draw asymptotes
+				// y = atan(b(x-h))+k    b=pi/period
+				ctx.strokeStyle = asymcolor;
+				var mid = y1;
+				var horizs = x1;
+				var period = 2*Math.round(Math.abs(x2-x1));
+				var n=0;
+				while (x2 + period*n < targets[curTarget].imgwidth) {
+					// draw asymptote
+					ctx.dashedLine(x2 + period*n,0,x2 + period*n,targets[curTarget].imgheight);
+					asymp.push(x2 + period*n);
+					n++;
+				}
+				n=-1;
+				while (x2 + period*n > 0) {
+					// draw asymptote
+					ctx.dashedLine(x2 + period*n,0,x2 + period*n,targets[curTarget].imgheight);
+					asymp.push(x2 + period*n);
+					n--;
+				}
+				ctx.beginPath();
+				ctx.strokeStyle = "rgb(0,0,255)";
+				if (x3 != null && x3!=x2 && x3!=x1 && y3!=y1 && (Math.round(Math.abs(2*(x3-x1)))%period) != 0) {
+					// draw curve
+					// y = atan(b(x-h))+k    b=pi/period
+					var stretch = Math.PI/period;
+					var amp = (y3-y1)/Math.tan(stretch*(x3-x1));
+					
+					asymp.push(targets[curTarget].imgwidth+1);
+					asymp.sort(function(a,b) { return a - b; });
+
+					var leftstart=0, rightend, cury;
+					for (var cursec=0;cursec<asymp.length;cursec++) {
+						rightend = asymp[cursec];
+						if (cursec > 0) {
+							leftstart = asymp[cursec - 1] + 1;
+						}
+						for (var curx=leftstart;curx < rightend;curx += 1) {
+							cury = amp*Math.tan(stretch*(curx - horizs)) + mid;
+							if ((cursec > 0 && curx == leftstart) || 
+								(cursec < asymp.length - 1 && rightend-curx <= 1)
+							) {
+								if (cury > y1 && cury < targets[curTarget].imgheight) {
+									cury = targets[curTarget].imgheight;
+								} else if (cury < y1 && cury > 0) {
+									cury = 0;
+								}
+							}
+							if (curx==leftstart) {
+								ctx.moveTo(curx,cury);
+							} else {
+								ctx.lineTo(curx,cury);
+							}
 						}
 					}
 				}
