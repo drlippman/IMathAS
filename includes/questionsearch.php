@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|uid|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[3]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|uid|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -192,6 +192,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.lastmoddate < ?';
             $searchvals[] = strtotime($lastmodparts[1]);
         }
+    }
+    if (!empty($search['uid'])) {
+        $searchand[] = 'iq.uniqueid = ?';
+        $searchvals[] = str_replace(['UID','uid'],'', $search['uid']);
     }
     if (!empty($search['created'])) {
         $createdparts = explode(',', $search['created']);
