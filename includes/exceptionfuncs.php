@@ -167,6 +167,14 @@ class ExceptionFuncs {
 			//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
 			//presumption: exception was made to extend due date, not start assignment early
 			$useexception = false;
+		} else if ($useexception && 
+			$exception['islatepass']==0 && 
+			$exception['startdate']==$exception['enddate']
+		) {
+			//if manual exception and start of exception is equal to the exception enddate
+			//then teacher didn't intend for this to really extend the due date
+			//and they just wanted to use other exception features
+			$useexception = false;
 		}
 		if (!$limit) {
 			if ($useexception && 
