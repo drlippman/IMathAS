@@ -2506,6 +2506,8 @@ The following macros help with formatting values for display:
 <li><strong>makexxpretty and makexxprettydisp</strong>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, x^1, x^0, etc.  Can occasionally cause strange output, so
    be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.
    This function cannot handle |x| notation; use abs(x) instead.</li>
+<li><strong>makepretynegative(string)</strong>: Puts parens around negatives is certain cases.
+	Changes 3--4 to 3-(-4) and  3+-4 to 3+(-4), but note it will change 3-+4 to 3-4.</li>
 <li><strong>numtowords(number,[addth, numwithTh, addcommas)</strong>:  Creates a string containing number written out in words.<br/>
    numtowords(1203) returns "one thousand two hundred three"<br/>
    numtowords(1203,true) returns "one thousand two hundred third"<br/>
