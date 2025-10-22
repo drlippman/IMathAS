@@ -968,9 +968,19 @@ if ($overwriteBody==1) {
 
 	<?php
 	if (isset($_GET['id'])) {
-		printf('<div class="cp"><a href="addquestions2.php?aid=%d&amp;cid=%s" onclick="return confirm(\''
+		echo '<div class="cp"><span class="column">';
+		printf('<a href="addquestions2.php?aid=%d&amp;cid=%s" onclick="return confirm(\''
             . _('This will discard any changes you have made on this page').'\');">'
-            . _('Add/Remove Questions').'</a></div>', Sanitize::onlyInt($_GET['id']), $cid);
+            . _('Add/Remove Questions').'</a>', Sanitize::onlyInt($_GET['id']), $cid);
+		echo '</span>';
+		if ($line['password'] !== '') {
+			echo '<span class="column">';
+			printf('<a href="assessonetime.php?aid=%d&amp;cid=%s" onclick="return confirm(\''
+				. _('This will discard any changes you have made on this page').'\');">'
+				. _('One-time Passwords').'</a>', Sanitize::onlyInt($_GET['id']), $cid);
+			echo '</span>';
+		}
+		echo '<br class=clear /></div>';
 	}
 	?>
 	<?php echo $page_isTakenMsg ?>

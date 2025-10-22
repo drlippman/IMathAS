@@ -580,6 +580,12 @@ class AssessInfo
           return true;
         }
       }
+      // see if it's a one-time password. Try deleting it; if successful, was valid
+      $stm = $this->DBH->prepare("DELETE FROM imas_onetime_pw WHERE assessmentid=? AND code=?");
+      $stm->execute([$this->curAid, $pw]);
+      if ($stm->rowCount() > 0) {
+        return true;
+      }
     }
     return false;
   }
