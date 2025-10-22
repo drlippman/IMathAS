@@ -145,8 +145,14 @@
 					$enddate = min($enddate, $LPcutoff);
 				}
 				if ($hasexception) { //already have exception
-					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-					$stm->execute(array(':lps'=>$LPneeded, ':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
+					if ($r['startdate'] == $r['enddate']) {
+						// since date-ignored type exception, need to set startdate too
+						$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+						$stm->execute(array(':lps'=>$LPneeded, ':userid'=>$userid, ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate));
+					} else {
+						$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+						$stm->execute(array(':lps'=>$LPneeded, ':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
+					}
 				} else {
 					$stm = $DBH->prepare("INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES (:userid, :assessmentid, :startdate, :enddate, :islatepass, :itemtype)");
 					$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate, ':islatepass'=>$LPneeded, ':itemtype'=>'A'));

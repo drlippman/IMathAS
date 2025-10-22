@@ -428,7 +428,11 @@ require_once __DIR__."/../includes/checkdata.php";
 					Sanitize::encodeStringForDisplay($row['eid']), Sanitize::encodeStringForDisplay($row['LastName']),
 					Sanitize::encodeStringForDisplay($row['FirstName']));
 				if ($row['itemtype']=='A') {
-					echo Sanitize::encodeStringForDisplay("($sdate - $edate)");
+					if ($row['startdate'] == $row['enddate']) {
+						echo _('(no date override)');
+					} else {
+						echo Sanitize::encodeStringForDisplay("($sdate - $edate)");
+					}
 				} else if ($row['itemtype']=='F') {
 					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate, ReplyBy: $edate)");
 				} else if ($row['itemtype']=='P') {
@@ -493,7 +497,11 @@ require_once __DIR__."/../includes/checkdata.php";
 				}
 				$assessarr[$row['eid']] = "{$row['itemname']} ";
 				if ($row['itemtype']=='A') {
-					$assessarr[$row['eid']] .= "($sdate - $edate)";
+					if ($row['startdate'] == $row['enddate']) {
+						$assessarr[$row['eid']] .= _('(no date override)');
+					} else {
+						$assessarr[$row['eid']] .= "($sdate - $edate)";
+					}
 				} else if ($row['itemtype']=='F') {
 					$assessarr[$row['eid']] .= "(PostBy: $sdate, ReplyBy: $edate)";
 				} else if ($row['itemtype']=='P') {
