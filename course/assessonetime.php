@@ -79,6 +79,7 @@ require_once "../header.php";
 <div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 <div class="pagetitle">
     <h1><?php echo $pagetitle; ?></h1>
+    <h2><?php echo Sanitize::encodeStringForDisplay($adata['name'])?></h2>
 </div>
 <?php
 // show message if just added
