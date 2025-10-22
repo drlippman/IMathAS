@@ -45,7 +45,7 @@ if (isset($_POST['genn'])) {
         $max = strlen($chars)-1;
         for ($i=0; $i < $n; $i++) {
             $code = '';
-            for ($j=0;$j<8;$j++) {
+            for ($j=0;$j<6;$j++) {
                 $code .= $chars[rand(0,$max)];
             }
             array_push($inserts, $aid, $code, $now);
