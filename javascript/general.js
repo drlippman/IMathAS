@@ -565,7 +565,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		selector: selectorstr,
 		inline: inlinemode,
 		license_key: 'gpl',
-		cache_suffix: '?v=100825',
+		cache_suffix: '?v=102225',
 		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons accordion",
 		menubar: false,
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
@@ -579,11 +579,6 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		file_picker_types: 'file image',
 		images_upload_handler: image_upload_handler,
 		paste_data_images: true,
-		paste_preprocess: function (editor, args) {
-			// hacky workaround for paste stripping embeds
-			// change tag here, convert back in asciisvg plugin
-			args.content = args.content.replace(/<embed/gi, '<asvg');
-		},
 		paste_postprocess: function (editor, args) {
 			const images = args.node.querySelectorAll('img');
 			for (var i = 0; i < images.length; i++) {
