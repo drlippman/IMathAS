@@ -5,7 +5,7 @@ $DBH->beginTransaction();
 
 $query = 'CREATE TABLE `imas_onetime_pw` (
   `assessmentid` INT(10) UNSIGNED NOT NULL,
-  `code` CHAR(6) NOT NULL,
+  `code` CHAR(6) NOT NULL COLLATE utf8_bin,
   `createdon` INT(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`assessmentid`,`code`),
   INDEX (`createdon`)
