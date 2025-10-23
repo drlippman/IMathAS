@@ -597,7 +597,8 @@ class DrawingScorePart implements ScorePart
                                 $anscoss[$key] = array($secxp,$xintp,$secyp,$yintp);
                             }
                         }
-                    } else if (($p = strpos($function[0],'tan('))!==false) { //is tan
+                    } else if (($p = strpos($function[0],'tan('))!==false || ($q = strpos($function[0],'cot('))!==false) { //is tan
+                        if ($p===false) { $p = $q;}
                         $nested = 1;
                         for ($i=$p+4;$i<strlen($function[0]);$i++) {
                             if ($function[0][$i]=='(') {$nested++;}
@@ -612,6 +613,9 @@ class DrawingScorePart implements ScorePart
                             $y1 = $infunc(['x'=>1]);
                             $period = M_PI/abs($y1-$y0); //slope of inside function
                             $xint = -$y0/($y1-$y0);
+                            if (strpos($function[0],'cot')!==false) {
+                                $xint += $period/2;
+                            }
                             $secx = $xint + $period/4;
                             $xintp = ($xint - $settings[0])*$pixelsperx + $imgborder;
                             $secxp = ($secx - $settings[0])*$pixelsperx + $imgborder;
