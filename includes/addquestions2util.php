@@ -60,6 +60,7 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
     $query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
     $query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
     $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
+    $query .= "iq.attempts,iq.penalty,iq.regen,iq.showans,";
     $query .= "iqs.meantimen,iq.extracredit,iqs.broken,iqs.isrand FROM imas_questions AS iq ";
     $query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
     $query .= "WHERE iq.assessmentid=:aid";
@@ -136,6 +137,27 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
         $timeout[2] = round($line['meantime'] / 60, 1);
         $timeout[3] = intval($line['meantimen']);
 
+        $notdefault = '';
+        if ($line['attempts'] != 9999) {
+            $notdefault .= sprintf('%d tries', $line['attempts']) . '. ';
+        }
+        if ($line['penalty'] != '9999') {
+            if ($line['penalty'][0] == 'L') {
+                $notdefault .= sprintf(_('%d%% penalty after last try'), substr($line['penalty'],1)) . '. ';
+            } else if ($line['penalty'][0] == 'S') {
+                $n = $line['penalty'][1];
+                $notdefault .= sprintf(_('%d%% penalty after %d full-credit tries'), substr($line['penalty'],2), $n) . '. ';
+            } else {
+                $notdefault .= sprintf(_('%d%% penalty'), $line['penalty']) . '. ';
+            }
+        }
+        if ($line['regen'] == 1) {
+            $notdefault .= _('No try similar') . '. ';
+        }
+        if ($line['showans'] == 'N') {
+            $notdefault .= _('No show answers') . '. ';
+        }
+
         $questionjsarr[$line['id']] = array((int) $line['id'],
             (int) $line['questionsetid'],
             Sanitize::encodeStringForDisplay($line['description']),
@@ -146,7 +168,8 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
             (int) $extrefval,
             $timeout,
             (int)Sanitize::onlyInt($line['extracredit']),
-            (int)Sanitize::onlyInt($line['broken'])
+            (int)Sanitize::onlyInt($line['broken']),
+            $notdefault
         );
 
     }

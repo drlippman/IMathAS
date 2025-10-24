@@ -1260,7 +1260,7 @@ function generateTable() {
                         }
                         html += (curitems[0][9] > 0 ? ECmark : '');
                         html +=
-                            '</td><td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                            '</td><td><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                         html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
                         html += '<li><a href="#" onclick="return togglegroupEC(' + i + ');">' +
                             _("Toggle Extra Credit") +
@@ -1376,7 +1376,7 @@ function generateTable() {
                         html += (curitems[0][9] > 0 ? ECmark : '');
 
                         html +=
-                            '</td><td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                            '</td><td><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                         html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
 
                         html +=
@@ -1744,7 +1744,7 @@ function generateTable() {
                 }
 
                 html +=
-                    '<td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    '<td><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                 html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
                 html +=
                     ' <li><a href="modquestion' +
@@ -1872,7 +1872,11 @@ function generateTable() {
                 if (j == 0) {
                     html += '<li><a href="#" onclick="addtextsegment(' + i + '); return false;">' + _('Add Text Before') + '</a></li>';
                 }
-                html += '</ul></div>';
+                html += '</ul>';
+                if (curitems[j][11] != '') {
+                    html += ' <span style="width:1em" onmouseover="tipshow(this,\'' + _('Settings override: ') + curitems[j][11] + '\')" onmouseout="tipout()" aria-label="has settings override">*</span>';
+                } 
+                html += '</div>';
             }
             html += "</tr>";
             ln++;
