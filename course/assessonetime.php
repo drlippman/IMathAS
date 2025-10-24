@@ -62,7 +62,14 @@ if (isset($_POST['genn'])) {
     }
     echo 'Invalid n';
     exit;
+} else if (isset($_POST['clearpws'])) {
+    $stm = $DBH->prepare("DELETE FROM imas_onetime_pw WHERE assessmentid=?");
+    $stm->execute([$aid]);
+    header(sprintf('Location: %s/course/assessonetime.php?cid=%s&aid=%d&r=' . Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+           $cid, $aid));
+    exit;
 }
+
 
 $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
@@ -95,7 +102,12 @@ if (count($allcodes) > 0) {
         echo '<li>' . Sanitize::encodeStringForDisplay($code) . '</li>';
     }
     echo '</ul>';
+    echo '<form method=post>';
+    echo '<p><button name=clearpws value=1 onclick="return confirm(\''._('Are you SURE you want to remove and invalidate all these codes?').'\')">';
+    echo _('Remove Existing Codes').'</button></p>';
+    echo '</form>';
     echo '</div>';
+    
 } else {
     echo '<p>' . _('There are no unused one-time codes for this assessment');
 }
