@@ -1,4 +1,7 @@
-<FilesMatch "\.(php|phtml|pl|cgi|py|asp|jsp|sh)$">
+<FilesMatch "\.(php|phtml|pl|cgi|py|asp|jsp|sh|js|html|htm|xml|xhtml)$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>
