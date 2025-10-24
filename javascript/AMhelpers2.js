@@ -1857,7 +1857,7 @@ function processNumfunc(qn, fullstr, format) {
   var iseqn = format.match(/equation/);
   var isineq = format.match(/inequality/);
   var err = '';
-  var primes = [3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+  var primes = [2, 3, 5, 7, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
@@ -1918,7 +1918,11 @@ function processNumfunc(qn, fullstr, format) {
             totest = {'DNE': 1};
             for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
               mult = primes[i%(primes.length)];
-              loc = ((j*mult)%20)/20; 
+              if (j==0 || j==19) {
+                loc = j/19;
+              } else {
+                loc = ((j*mult)%19)/20; 
+              }
               if (domain[i][2]) { //integers
                   //testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
                   testval = Math.floor(domain[i][0] + (domain[i][1] - domain[i][0])*loc);
