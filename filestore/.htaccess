@@ -1,7 +1,14 @@
-<FilesMatch "\.(php|phtml|pl|cgi|py|asp|jsp|sh|js|html|htm|xml|xhtml)$">
+<FilesMatch "\.(php[s0-9]?|phtml|pl|cgi|py|asp|jsp|sh|js|html|htm|xml|xhtml)$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
 </IfModule>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+Options -ExecCGI -Includes -Indexes
+<FilesMatch ".*">
+    SetHandler default-handler
+</FilesMatch>
