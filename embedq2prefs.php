@@ -55,7 +55,7 @@ require_once "includes/userprefs.php";
 
 showUserPrefsForm(true);
 
-echo '<p>'._('After saving preferences, close this page and go back and reload the page you were viewing for the new prefences to be utilized.').'</p>';
+echo '<p>'._('After saving preferences, close this page and go back and reload the page you were viewing for the new preferences to be utilized.').'</p>';
 
 echo '<button type=button onclick="savepref()">'._('Save Preferences').'</button>';
 echo '<div id="savenote" aria-live="polite"></div>';
