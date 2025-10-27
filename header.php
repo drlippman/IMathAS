@@ -106,7 +106,7 @@ if (isset($ispublic) && $ispublic && !isset($_SESSION['mathdisp'])) {
 
 if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
-} else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+} else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) { // MathJax 2
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $_SESSION['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
@@ -183,8 +183,7 @@ if (!isset($_SESSION['mathdisp'])) {
             </script>';
     }
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
-} else if ($_SESSION['mathdisp']==6) {
-	//Katex experimental
+} else if ($_SESSION['mathdisp']==6) { // Katex
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
 
@@ -193,15 +192,15 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<link rel="stylesheet" href="'.$staticroot.'/katex/katex.min.css" />';
 		//echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.css" integrity="sha256-tVkQ3/3zHAr/iep04F8LJwgzNzJ2NzX8oHqg71BvzYU=" crossorigin="anonymous">';
-		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha256-6xggdIcWFnTnFwh8MX2xSsGmLa2uzMuAJJnOFzv+tzk=" crossorigin="anonymous"></script>';
+		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">';
+		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>';
 		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=073119"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
-} else if ($_SESSION['mathdisp']==2 && isset($useeditor) && $_SESSION['useed']==1) {
+} else if ($_SESSION['mathdisp']==2 && isset($useeditor) && $_SESSION['useed']==1) { // image based
 	//these scripts are used by the editor to make image-based math work in the editor
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
@@ -210,7 +209,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\"; function rendermathnode(el,callback) {AMprocessNode(el); if(typeof callback=='function'){callback();}}</script>";
 } else if ($_SESSION['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el,callback) {AMprocessNode(el);} if(typeof callback=='function'){callback();}</script>";
-} else if ($_SESSION['mathdisp']==0) {
+} else if ($_SESSION['mathdisp']==0) { // none
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"none\";function rendermathnode(el,callback) {if(typeof callback=='function'){callback();}}</script>";
 }
 echo "<script src=\"$staticroot/javascript/mathparser_min.js?v=100125\" type=\"text/javascript\"></script>\n";
