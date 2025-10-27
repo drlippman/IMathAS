@@ -193,8 +193,8 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<link rel="stylesheet" href="'.$staticroot.'/katex/katex.min.css" />';
 		//echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.css" integrity="sha256-tVkQ3/3zHAr/iep04F8LJwgzNzJ2NzX8oHqg71BvzYU=" crossorigin="anonymous">';
-		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha256-6xggdIcWFnTnFwh8MX2xSsGmLa2uzMuAJJnOFzv+tzk=" crossorigin="anonymous"></script>';
+		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.css" integrity="sha256-tVkQ3/3zHAr/iep04F8LJwgzNzJ2NzX8oHqg71BvzYU=" crossorigin="anonymous">';
+		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha256-6xggdIcWFnTnFwh8MX2xSsGmLa2uzMuAJJnOFzv+tzk=" crossorigin="anonymous"></script>';
 		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=073119"></script>';
