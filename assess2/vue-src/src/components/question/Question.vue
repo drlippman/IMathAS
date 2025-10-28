@@ -299,7 +299,9 @@ export default {
           let changed = false;
           if (this.type === 'radio' || this.type === 'checkbox') {
             changed = true;
-          } else if (val !== window.$(this).attr('data-lastval') && val !== '') {
+          } else if (val !== window.$(this).attr('data-lastval') &&
+            (val !== '' || window.$(this).attr('data-lastval').trim() !== '')
+          ) {
             changed = true;
           }
           if (changed) {
