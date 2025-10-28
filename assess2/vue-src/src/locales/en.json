@@ -463,6 +463,7 @@
     "no_versions": "No assessment attempts available to view yet",
     "minutes": "minutes",
     "avail_never": "Grade is currently hidden by the teacher.",
+    "avail_manual": "Grade is currently hidden by the teacher.",
     "avail_after_take": "Will show after you submit an assessment attempt.",
     "avail_after_due": "Will show after the due date.",
     "avail_after_lp": "Will show after the LatePass period.",

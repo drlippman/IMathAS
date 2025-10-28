@@ -84,19 +84,19 @@ export default {
       if (this.ainfo.viewingb === 'never') {
         return 'never';
       } else if (this.ainfo.viewingb === 'after_due') {
-        if (this.ainfo.scoresingb === 'never') {
+        if (this.ainfo.scoresingb === 'never' || this.ainfo.scoresingb === 'manual') {
           return 'work_after';
         } else {
           return 'after_due';
         }
       } else if (this.ainfo.viewingb === 'after_lp') {
-        if (this.ainfo.scoresingb === 'never') {
+        if (this.ainfo.scoresingb === 'never' || this.ainfo.scoresingb === 'manual') {
           return 'work_after_lp';
         } else {
           return 'after_lp';
         }
       } else { // after_take or immediately
-        if (this.ainfo.scoresingb === 'never') {
+        if (this.ainfo.scoresingb === 'never' || this.ainfo.scoresingb === 'manual') {
           return 'work';
         } else if (this.ainfo.scoresingb === 'after_due') {
           return 'work_scores_after';

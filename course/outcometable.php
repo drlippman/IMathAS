@@ -754,7 +754,7 @@ function outcometable() {
 	}
 
 	//Get assessment2 scores
-	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid,iar.scoreddata FROM imas_assessment_records AS iar ";
+	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.status2,iar.userid,iar.scoreddata FROM imas_assessment_records AS iar ";
 	$query .= "JOIN imas_assessments AS ia ON ia.id=iar.assessmentid WHERE ia.courseid=:courseid ";
 	if ($limuser>0) {
 		$query .= " AND iar.userid=:userid ";
@@ -835,7 +835,8 @@ function outcometable() {
 			($sa[$i]=="never") ||
 		 	($sa[$i]=='after_due' && $now < $thised) ||
             ($sa[$i]=='after_lp' && $now < max($thised,$LPenddate[$i])) ||
-			($sa[$i]=='after_take' && !$hasSubmittedTake)
+			($sa[$i]=='after_take' && !$hasSubmittedTake) ||
+			($sa[$i]=='manual' && ($l['status2']&1)==0)
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][2] = 0;  //no other info
