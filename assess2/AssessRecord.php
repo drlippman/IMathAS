@@ -967,30 +967,34 @@ class AssessRecord
    * Score any autosave data.  Records it as a single submission with a date
    * based on the last autosave time
    *
+   * @param  int|bool  $submission      Submission number, to use an existing one
    * @return void
    */
-  public function scoreAutosaves() {
+  public function scoreAutosaves($submission=false) {
     $this->parseData();
 
     $autosaves = $this->data['autosaves'];
     if (count($autosaves) === 0) {
       return; // nothing to do
     }
-    $maxtime = 0;
-    foreach ($autosaves as $qn=>$qdata) {
-      if ($qdata['time'] > $maxtime) {
-        $maxtime = $qdata['time'];
+    if ($submission === false) {
+      $maxtime = 0;
+      foreach ($autosaves as $qn=>$qdata) {
+        if ($qdata['time'] > $maxtime) {
+          $maxtime = $qdata['time'];
+        }
       }
+      $submission_time = $maxtime + $this->assessRecord['starttime'];
+      // add a submission
+      $submission = $this->addSubmission($submission_time);
     }
-    $submission_time = $maxtime + $this->assessRecord['starttime'];
 
     // Load the question code
     $qns = array_keys($autosaves);
     list($qids, $toloadqids) = $this->getQuestionIds($qns);
     $this->assess_info->loadQuestionSettings($toloadqids, true, false);
 
-    // add a submission
-    $submission = $this->addSubmission($submission_time);
+    
 
     // score the questions
     foreach ($autosaves as $qn=>$qdata) {

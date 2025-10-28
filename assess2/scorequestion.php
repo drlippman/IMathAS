@@ -287,7 +287,7 @@ if (!empty($_POST['autosave-tosaveqn'])) {
 
 
 if ($end_attempt) {
-  $assess_record->scoreAutosaves();
+  $assess_record->scoreAutosaves($submission);
   // sets assessment attempt as submitted and updates status
   $assess_record->setStatus(false, true);
   // Recalculate scores based on submitted assessment.
