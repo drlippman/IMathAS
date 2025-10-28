@@ -785,6 +785,20 @@ class AssessRecord
     $this->need_to_record = true;
   }
 
+  /** 
+   * Update the manually released flag
+   * @param bool $release  Boolean whether to release
+   */
+  public function setManuallyReleased($release) {
+    $this->parseData();
+    if ($release) {
+      $this->assessRecord['status2'] |= 1;
+    } else {
+      $this->assessRecord['status2'] &= ~1;
+    }
+    $this->need_to_record = true;
+  }
+
   /**
    * Updates the lastchange for the current assessment version
    * @param int $time   Timestamp to set as last change
@@ -3170,8 +3184,9 @@ class AssessRecord
 
     if (!$this->teacherInGb && (
       $scoresInGb == 'never' ||
-      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb =='after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')))
+      ($scoresInGb == 'after_due' && time() < $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb == 'after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 0))
     ) {
       // don't show overall score;
       $out['gbscore'] = "N/A";
@@ -3215,8 +3230,9 @@ class AssessRecord
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     if (!$this->teacherInGb && (
       $scoresInGb == 'never' ||
-      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb =='after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')))
+      ($scoresInGb == 'after_due' && time() < $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb == 'after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 0))
     ) {
       $scored_aver = 0;
     }
@@ -3260,7 +3276,8 @@ class AssessRecord
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate'))
+      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 1)
     ) {
       $out['score'] = $aver['score'];
       $showScores = true;
@@ -3380,7 +3397,8 @@ class AssessRecord
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $this->data['assess_versions'][$aver]['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate'))
+      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 0)
     ) {
       $showScores = true;
     } else {
