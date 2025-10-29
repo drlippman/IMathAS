@@ -107,6 +107,16 @@
           {{ $t('gradebook.' + (showExcused ? 'hide' : 'show') + '_excused') }}
         </button>
       </div>
+      <div v-if="aData.scoresingb === 'manual'">
+        {{ $t('gradebook.manualstatus' + aData.manual_released) }}
+        <button
+          type="button"
+          class="slim"
+          @click="setManualRelease"
+        >
+          {{ $t('gradebook.manualbutton' + aData.manual_released) }}
+        </button>
+      </div>
 
       <div v-if="showExcused" class="introtext">
         {{ $t('gradebook.excused_list') }}
@@ -121,7 +131,7 @@
         <a v-if="showViewAsStu" :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a>
-        <span v-if="showViewAsStu">|</span>
+        <span v-if="showViewAsStu"> | </span>
         <a :href="viewAsStuUrl + '#/print'">
           {{ $t('gradebook.print') }}
         </a> |
@@ -407,6 +417,12 @@
           @update = "updateFeedback"
         />
         <div v-if = "!op_oneatatime || nextVisible === -1">
+          <p v-if = "aData.scoresingb === 'manual' && aData.manual_released == 0">
+            <label>
+              <input type="checkbox" v-model="releaseOnSave" />
+              {{ $t('gradebook.release_on_save') }}
+            </label>
+          </p>
           <button
             v-if = "op_oneatatime"
             :disabled = "prevVisible === -1"
@@ -563,6 +579,7 @@ export default {
       op_showans: false,
       sidebysideon: false,
       op_oneatatime: false,
+      releaseOnSave: false,
       curqn: 0
     };
   },
@@ -854,7 +871,7 @@ export default {
       }
       var doexit = (exit === true);
       var donextstu = (nextstu === true);
-      actions.saveChanges(doexit, donextstu);
+      actions.saveChanges(doexit, donextstu, this.releaseOnSave);
     },
     submitForm () {
       this.submitChanges(true);
@@ -871,6 +888,11 @@ export default {
         body: 'gradebook.setaslast_warn',
         action: () => actions.setVerAsLast()
       };
+    },
+    setManualRelease () {
+      // toggle value
+      this.releaseOnSave = false;
+      actions.setManualRelease(1 - this.aData.manual_released);
     },
     clearLPblock () {
       actions.clearLPblock();

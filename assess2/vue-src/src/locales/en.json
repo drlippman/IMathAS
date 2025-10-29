@@ -496,7 +496,12 @@
     "oneatatime": "One at a time",
     "a11yalt": "Accessible alternative",
     "set_as_last": "Move to Last",
-    "setaslast_warn": "This will move this attempt to be the last attempt, making it the scored attempt"
+    "setaslast_warn": "This will move this attempt to be the last attempt, making it the scored attempt",
+    "manualstatus0": "Grade has not been released to the student",
+    "manualbutton0": "Release grade",
+    "manualstatus1": "Grade has been released to the student",
+    "manualbutton1": "Un-Release grade",
+    "release_on_save": "Release grade to student on Save"
   },
   "work": {
     "add": "Add Work",

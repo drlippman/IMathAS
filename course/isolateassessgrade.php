@@ -17,14 +17,14 @@
 	$aid = Sanitize::onlyInt($_GET['aid']);
     $now = time();
     
-    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs FROM imas_assessments WHERE id=:id AND courseid=:cid");
+    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs,scoresingb FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	$res = $stm->fetch(PDO::FETCH_NUM);
 	if ($res === false) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible) = $res;
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible,$scoresingb) = $res;
     if ($istutor && $tutoredit == 2) {  // tutor, no access to view grades
         echo 'No access';
         exit;
@@ -46,6 +46,27 @@
 				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
 			exit;
         }
+		if (isset($_POST['posted']) && $_POST['posted']=="manualrelease") {
+			$stus = $_POST['stus'] ?? [];
+			if (count($stus)>0) {
+				$ph = Sanitize::generateQueryPlaceholders($stus);
+				$stm = $DBH->prepare("UPDATE imas_assessment_records SET status2=status2|1 WHERE userid IN ($ph) AND assessmentid=?");
+				$stm->execute([...$stus, $aid]);
+			}
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
+		} else if (isset($_POST['posted']) && $_POST['posted']=="manualunrelease") {
+			$stus = $_POST['stus'] ?? [];
+			if (count($stus)>0) {
+				$ph = Sanitize::generateQueryPlaceholders($stus);
+				$stm = $DBH->prepare("UPDATE imas_assessment_records SET status2=status2&~1 WHERE userid IN ($ph) AND assessmentid=?");
+				$stm->execute([...$stus, $aid]);
+			}
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
+		}
     }
     if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
@@ -225,7 +246,7 @@
 	if ($aver>1) {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
 		$query .= "IF((iar.status&1)=1,iar.scoreddata,'') AS scoreddata,";
-		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.timelimitexp,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.status2,iar.timelimitexp,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_assessment_records AS iar ON iu.id=iar.userid AND iar.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
 	} else {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
@@ -299,6 +320,10 @@
         if ($isteacher || ($istutor && $tutoredit == 3)) {
             echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
         }
+		if ($scoresingb === 'manual') {
+			echo ' <button type=submit value="manualrelease" name="posted">',_('Release Grades'),'</button>';
+			echo ' <button type=submit value="manualunrelease" name="posted">',_('Un-Release Grades'),'</button>';
+		}
         echo '</p>';
     }
 
@@ -373,6 +398,7 @@
             ) {
                 $IP=1;
             }
+			$manuallyreleased = (($line['status2']&1)==1);
 			//$IP = ($line['status']&3)>0;
 			//$UA = ($line['status']&1)>0;
 		} else if ($line['starttime']!==null) {
@@ -387,6 +413,7 @@
 			$timeontask = round(array_sum(array_map('floatval', explode(',',str_replace('~',',',$line['timeontask']))))/60,1);
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 			$UA = 0;
+			$manuallyreleased = false;
 		}
 
 		if ($line['starttime']===null) {
@@ -469,6 +496,9 @@
 			} else {
 				$tot += $total;
 				$n++;
+			}
+			if ($scoresingb == 'manual' && !$manuallyreleased) {
+				echo ' (NR)';
 			}
 			if ($line['thisenddate'] > $now) {
 				echo '</i>';
@@ -593,7 +623,7 @@
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	}
-	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
+	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NR-not manually released<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
 	echo '</form>';
 	require_once "../footer.php";

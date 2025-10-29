@@ -170,7 +170,7 @@ class AssessRecord
 
     $qarr = array();
     $fields = array('lti_sourcedid', 'timeontask', 'starttime', 'lastchange',
-                    'score', 'status', 'timelimitexp');
+                    'score', 'status', 'status2', 'timelimitexp');
     foreach ($fields as $field) {
       $qarr[':'.$field] = $this->assessRecord[$field];
     }
@@ -299,6 +299,7 @@ class AssessRecord
       'lastchange' => 0,
       'score' => 0,
       'status' => 0,  // overridden later
+      'status2' => 0,
       'scoreddata' => '',
       'practicedata' => ''
     );
@@ -343,12 +344,13 @@ class AssessRecord
         $recordStart ? $this->now : 0,
         2,
         $this->assessRecord['status'],
+        $this->assessRecord['status2'],
         $scoredtosave,
         $practicetosave
       );
     }
     $query = 'INSERT INTO imas_assessment_records (userid, assessmentid,
-      agroupid, lti_sourcedid, starttime, ver, status, scoreddata, practicedata)
+      agroupid, lti_sourcedid, starttime, ver, status, status2, scoreddata, practicedata)
       VALUES '.implode(',', $vals);
     $stm = $this->DBH->prepare($query);
     $stm->execute($qarr);
@@ -3210,6 +3212,9 @@ class AssessRecord
           $stm = $this->DBH->prepare($query);
           $stm->execute(array_values($this->data['excused']));
           $out['excused'] = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+      }
+      if ($scoresInGb == 'manual') {
+        $out['manual_released'] = (($this->assessRecord['status2']&1) === 1) ? 1 : 0;
       }
     }
     return $out;
