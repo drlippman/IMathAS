@@ -7,6 +7,7 @@
 require_once __DIR__."/../includes/ltioutcomes.php";
 require_once __DIR__.'/AssessInfo.php';
 require_once __DIR__.'/AssessRecord.php';
+require_once __DIR__.'/../includes/TeacherAuditLog.php';
 
 class AssessHelpers
 {
@@ -233,6 +234,7 @@ class AssessHelpers
     }
 
     $cnt = 0;
+    $changes = [];
     while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
       $GLOBALS['assessver'] = $line['ver'];
 
@@ -245,13 +247,23 @@ class AssessHelpers
       if ($alreadyreleased !== $release) { // if changing status
         $assess_record->setManuallyReleased($release);
         $assess_record->saveRecord();
-
+        $changes[] = $line['userid'];
         // update LTI grade
         $assess_record->updateLTIscore(true, false);
         $cnt++;
       }
     }
     $DBH->commit();
+    if (!empty($changes)) {
+      TeacherAuditLog::addTracking(
+        $cid,
+        "Change Grades",
+        $aid,
+        array(
+          'mass_manual_release'=>['to'=>$release?1:0, 'stus'=>$changes]
+        )
+      );
+    }
     return $cnt;
   }
 

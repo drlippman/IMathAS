@@ -77,8 +77,9 @@ if (!$assess_record->hasRecord()) {
 $changes = $assess_record->setGbScoreOverrides($scores);
 $assess_record->setGbFeedbacks($feedbacks);
 if (isset($_POST['releasescore'])) {
-  $assess_record->setManuallyReleased($_POST['releasescore']==1);
-  $changes['manually_released'] = ($_POST['releasescore']==1)?1:0;
+  if ($assess_record->setManuallyReleased($_POST['releasescore']==1)) {
+    $changes['manually_released'] = ($_POST['releasescore']==1)?1:0;
+  }
 }
 $assess_record->saveRecord();
 

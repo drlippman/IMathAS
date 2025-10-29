@@ -798,15 +798,21 @@ class AssessRecord
   /** 
    * Update the manually released flag
    * @param bool $release  Boolean whether to release
+   * @return bool changed
    */
   public function setManuallyReleased($release) {
     $this->parseData();
-    if ($release) {
-      $this->assessRecord['status2'] |= 1;
-    } else {
-      $this->assessRecord['status2'] &= ~1;
+    // only update if it's actually a change
+    if ((($this->assessRecord['status2']&1)==1) !== $release) {
+      if ($release) {
+        $this->assessRecord['status2'] |= 1;
+      } else {
+        $this->assessRecord['status2'] &= ~1;
+      }
+      $this->need_to_record = true;
+      return true;
     }
-    $this->need_to_record = true;
+    return false;
   }
 
   /**
