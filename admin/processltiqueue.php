@@ -111,7 +111,10 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if (substr($row['sourcedid'],0,6)=='LTI1.3') {
 		// LTI 1.3 update
 		list($ltiver,$ltiuserid,$score_url,$platformid) = explode(':|:', $row['sourcedid']);
-		if (!is_numeric($platformid)) { continue; }
+		if (!is_numeric($platformid) || strlen($score_url)===0 || strlen($ltiuserid)===0) { 
+			deleteInvalid($row['hash']);
+			continue; 
+		}
 		if ($updater1p3->have_token($platformid)) {
 			if ($updater1p3->token_valid($platformid)) {
 				debuglog('queing request with token for '.$row['hash']);
@@ -190,8 +193,12 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
                         'lasttry' => ($row['failures']>=6)
                     )
                 );
-            }
-        }
+            } else {
+				deleteInvalid($row['hash']);
+			}
+        } else {
+			deleteInvalid($row['hash']);
+		}
 	}
 }
 
@@ -413,4 +420,10 @@ function LTIDeleteQueue() {
     $delfromqueue = $DBH->prepare("DELETE FROM imas_ltiqueue WHERE (hash,sendon) IN ($ph)");
     $delfromqueue->execute($deletequeue);
     $deletequeue = [];
+}
+
+function deleteInvalid($hash) {
+	global $DBH;
+	$delfromqueue = $DBH->prepare("DELETE FROM imas_ltiqueue WHERE hash=?");
+    $delfromqueue->execute([$hash]);
 }
