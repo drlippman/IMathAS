@@ -63,18 +63,6 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 }
 ?>
 
-<!--[if lte IE 6]>
-<style>
-div { zoom: 1; }
-.clearlooks2, .clearlooks2 div { zoom: normal;}
-.clear { line-height: 0;}
-#GB_overlay, #GB_window {
- position: absolute;
- top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
- left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');}
-}
-</style>
-<![endif]-->
 <style type="text/css" media="print">
 div.breadcrumb { display:none;}
 #headerlogo { display:none;}
@@ -239,9 +227,8 @@ if (isset($useeditor) && $_SESSION['useed']==1) {
 	}
 	echo '</script>';
 }
-if ((isset($useeditor) && $_SESSION['useed']==1) || isset($loadiconfont)) {
+if (isset($loadiconfont)) {
 	echo '<link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
-	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
 if (isset($placeinhead)) {
 	echo $placeinhead;

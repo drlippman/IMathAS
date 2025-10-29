@@ -190,27 +190,6 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==0) {
 	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=082025\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 }
-?>
-<!--[if lte IE 6]>
-<style type="text/css">
-div { zoom: 1; }
-.clear { line-height: 0;}
-#mqarea { height: 2em;}
-#GB_overlay, #GB_window {
- position: absolute;
- top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
- left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');}
-}
-</style>
-<![endif]-->
-<!--[if lt IE 9]>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/excanvas_min.js?v=120811"></script>
-<![endif]-->
-
-
-
-<?php
 
 if (isset($useeditor) && !empty($_SESSION['useed'])) {
 	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce8/tinymce.min.js?v=073125"></script>';
@@ -229,9 +208,8 @@ if (isset($useeditor) && !empty($_SESSION['useed'])) {
 } else {
 	echo '<script type="text/javascript">var usingTinymceEditor = false;</script>';
 }
-if ((isset($useeditor) && $_SESSION['useed']==1) || isset($loadiconfont)) {
+if (isset($loadiconfont)) {
 	echo '<link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
-	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
 if (!isset($useeqnhelper)) { $useeqnhelper = 0; }
 
@@ -242,15 +220,6 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 
 } else if ($useeqnhelper==3 || $useeqnhelper==4) {
 	echo "<link rel=\"stylesheet\" href=\"$staticroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
-	if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
-		echo '<!--[if lte IE 7]><style style="text/css">
-			.mathquill-editable.empty { width: 0.5em; }
-			.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25e  m;}
-			.mathquill-rendered-math sup { line-height: .8em; }
-			.mathquill-rendered-math .numerator {float: left; padding: 0;}
-			.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
-			</style><![endif]-->';
-	}
 	//This bundles mathquill.js, mathquilled.js, and AMtoMQ.js
 	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/MQbundle_min.js?v=021920\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
