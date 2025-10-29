@@ -202,6 +202,60 @@ class AssessHelpers
   }
 
   /**
+   * Manually Release all grades
+   * @param  int $cid   The course ID
+   * @param  int $aid   The assessment ID
+   * @param  array|string $stus  array of userids to update, or 'all' for all
+   * @param  bool $release  true to release, false to un-release
+   * @return int      The number of assessments changed
+   */
+  public static function manuallyReleaseAll($cid, $aid, $stus, $release) {
+    global $DBH;
+    // load settings
+    $assess_info = new AssessInfo($DBH, $aid, $cid, false);
+
+    // this only makes sense for manual scoresingb
+    if ($assess_info->getSetting('scoresingb') !== 'manual') {
+      return 0;
+    }
+    if (is_array($stus) && count($stus) === 0) {
+      return 0;
+    }
+
+    $DBH->beginTransaction();
+    if ($stus === 'all') {
+      $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
+      $stm->execute(array($aid));
+    } else {
+      $ph = Sanitize::generateQueryPlaceholders($stus);
+      $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE userid IN ($ph) AND assessmentid=? FOR UPDATE");
+      $stm->execute([...$stus, $aid]);
+    }
+
+    $cnt = 0;
+    while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+      $GLOBALS['assessver'] = $line['ver'];
+
+      $assess_record = new AssessRecord($DBH, $assess_info, false);
+      $assess_record->setRecord($line);
+      $assess_record->parseData();
+
+      $alreadyreleased = (($assess_record->getstatus2()&1)==1);
+
+      if ($alreadyreleased !== $release) { // if changing status
+        $assess_record->setManuallyReleased($release);
+        $assess_record->saveRecord();
+
+        // update LTI grade
+        $assess_record->updateLTIscore(true, false);
+        $cnt++;
+      }
+    }
+    $DBH->commit();
+    return $cnt;
+  }
+
+  /**
    * Updates the "Show work after" flag on assessment records
    * @param  int $aid   The assessment ID
    * @param  int $newshowwork  The new value for imas_assessments.showwork

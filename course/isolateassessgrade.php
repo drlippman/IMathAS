@@ -48,21 +48,15 @@
         }
 		if (isset($_POST['posted']) && $_POST['posted']=="manualrelease") {
 			$stus = $_POST['stus'] ?? [];
-			if (count($stus)>0) {
-				$ph = Sanitize::generateQueryPlaceholders($stus);
-				$stm = $DBH->prepare("UPDATE imas_assessment_records SET status2=status2|1 WHERE userid IN ($ph) AND assessmentid=?");
-				$stm->execute([...$stus, $aid]);
-			}
+			require_once '../assess2/AssessHelpers.php';
+			AssessHelpers::manuallyReleaseAll($cid, $aid, $stus, true);
 			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
 				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
 			exit;
 		} else if (isset($_POST['posted']) && $_POST['posted']=="manualunrelease") {
 			$stus = $_POST['stus'] ?? [];
-			if (count($stus)>0) {
-				$ph = Sanitize::generateQueryPlaceholders($stus);
-				$stm = $DBH->prepare("UPDATE imas_assessment_records SET status2=status2&~1 WHERE userid IN ($ph) AND assessmentid=?");
-				$stm->execute([...$stus, $aid]);
-			}
+			require_once '../assess2/AssessHelpers.php';
+			AssessHelpers::manuallyReleaseAll($cid, $aid, $stus, false);
 			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
 				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
 			exit;

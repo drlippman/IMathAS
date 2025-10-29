@@ -509,6 +509,14 @@ class AssessRecord
   }
 
   /**
+   * Gets the assessment status
+   * @return [type] [description]
+   */
+  public function getStatus2() {
+    return $this->assessRecord['status2'];
+  }
+
+  /**
    * Get whether previous/cur attempt accepts work after
    * @return boolean
    */
