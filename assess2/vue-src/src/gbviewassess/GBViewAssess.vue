@@ -107,7 +107,7 @@
           {{ $t('gradebook.' + (showExcused ? 'hide' : 'show') + '_excused') }}
         </button>
       </div>
-      <div v-if="aData.scoresingb === 'manual'">
+      <div v-if="canEdit && aData.scoresingb === 'manual'">
         {{ $t('gradebook.manualstatus' + aData.manual_released) }}
         <button
           type="button"
@@ -417,7 +417,7 @@
           @update = "updateFeedback"
         />
         <div v-if = "!op_oneatatime || nextVisible === -1">
-          <p v-if = "aData.scoresingb === 'manual' && aData.manual_released == 0">
+          <p v-if = "canEdit && aData.scoresingb === 'manual' && aData.manual_released == 0">
             <label>
               <input type="checkbox" v-model="releaseOnSave" />
               {{ $t('gradebook.release_on_save') }}
@@ -454,6 +454,7 @@
             {{ savedMsg }}
           </span>
           <button
+            v-if="hasExit"
             type = "button"
             class = "secondary"
             :disabled = "!canSubmit"
@@ -483,6 +484,7 @@
             {{ savedMsg }}
           </span>
           <button
+            v-if="hasExit"
             type = "button"
             class = "secondary"
             :disabled = "!canSubmit"
@@ -797,6 +799,9 @@ export default {
       } else {
         return store.assessInfo.interquestion_text;
       }
+    },
+    hasExit () {
+      return (window.exiturl && window.exiturl !== '');
     }
   },
   methods: {

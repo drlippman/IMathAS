@@ -3423,7 +3423,7 @@ class AssessRecord
       ($scoresInGb == 'after_take' && $this->data['assess_versions'][$aver]['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
       ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate')) ||
-      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 0)
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 1)
     ) {
       $showScores = true;
     } else {
