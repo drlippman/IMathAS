@@ -112,6 +112,7 @@
         <button
           type="button"
           class="slim"
+          :disabled = "!canSubmit"
           @click="setManualRelease"
         >
           {{ $t('gradebook.manualbutton' + aData.manual_released) }}
