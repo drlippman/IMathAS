@@ -243,6 +243,12 @@ class AssessRecord
    * @param  boolean $isstu     true if student initiated
    */
   public function updateLTIscore($sendnow = true, $isstu = true) {
+    if ($this->assess_info->getSetting('scoresingb') === 'manual' &&
+      ($this->assessRecord['status2']&1) == 0
+    ) {
+      // manual release, not released yet - don't sent LTI update
+      return;
+    }
     $lti_sourcedid = $this->getLTIsourcedId();
     if (strlen($lti_sourcedid) > 1) {
         require_once __DIR__ . '/../includes/ltioutcomes.php';
