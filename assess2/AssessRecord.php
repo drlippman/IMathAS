@@ -335,7 +335,7 @@ class AssessRecord
     $qarr = array();
     $vals = array();
     foreach ($users as $uid) {
-      $vals[] = '(?,?,?,?,?,?,?,?,?)';
+      $vals[] = '(?,?,?,?,?,?,?,?,?,?)';
       $this_lti_sourcedid = '';
       if (isset($lti_sourcedidarr[$uid])) {
         $this_lti_sourcedid = $lti_sourcedidarr[$uid];
