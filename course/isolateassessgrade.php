@@ -118,6 +118,9 @@
                 $(this).closest("tr").find(".pii-full-name").attr("data-gtu", uid);
             });
         });
+		function postWithSelform(val) {
+			$("#sform").append($("<input>", {name:"posted", value:val, type:"hidden"})).submit();
+		}
 		</script>';
 	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -306,19 +309,23 @@
     
     
     if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {
-        echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
+        echo '<div>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
         echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
-        echo _('With selected:');
-        echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
-        echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
-        if ($isteacher || ($istutor && $tutoredit == 3)) {
-            echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
-        }
-		if ($scoresingb === 'manual') {
-			echo ' <button type=submit value="manualrelease" name="posted">',_('Release Grades'),'</button>';
-			echo ' <button type=submit value="manualunrelease" name="posted">',_('Un-Release Grades'),'</button>';
+        echo '<span class="dropdown">';
+		echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo _('With Selected').'</a>';
+		echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
+		echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to excuse these grades?\')) { postWithSelform(\'Excuse Grade\'); } return false;">', _('Excuse Grade'), "</a></li>";
+		echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to un-excuse these grades?\')) { postWithSelform(\'Un-excuse Grade\'); } return false;">', _('Un-excuse Grade'), "</a></li>";
+		if ($isteacher || ($istutor && $tutoredit == 3)) {
+			echo ' <li><a href="#" onclick="postWithSelform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
 		}
-        echo '</p>';
+		if ($scoresingb === 'manual') {
+			echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to release these grades?\')) { postWithSelform(\'manualrelease\'); } return false;">',_('Release Grades to Students'), "</a></li>";
+			echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to un-release these grades?\')) { postWithSelform(\'manualunrelease\'); } return false;">',_('Un-Release Grades to Students'), "</a></li>";
+		}
+		echo '</ul></span>';
+        echo '</div>';
     }
 
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";

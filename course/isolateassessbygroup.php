@@ -23,13 +23,13 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid,ver,deffeedbacktext,scoresingb FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid,$aver,$deffeedbacktext,$scoresingb) = $stm->fetch(PDO::FETCH_NUM);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
@@ -92,7 +92,7 @@
 
 	$scoredata = array();
 	if ($aver>1) {
-		$query = "SELECT iar.agroupid,iar.userid,iar.starttime,iar.lastchange,iar.score,iar.status,iar.timeontask FROM ";
+		$query = "SELECT iar.agroupid,iar.userid,iar.starttime,iar.lastchange,iar.score,iar.status,iar.status2,iar.timeontask FROM ";
 		$query .= "imas_assessment_records AS iar WHERE iar.assessmentid=:assessmentid GROUP BY iar.agroupid";
 	} else {
 		$query = "SELECT ias.agroupid,ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM ";
@@ -164,6 +164,7 @@
 			$isOvertime = ($line['status']&4) == 4;
 			$IP = ($line['status']&3)>0;
 			$UA = ($line['status']&1)>0;
+			$manuallyreleased = (($line['status2']&1)==1);
 		} else {
 			$sp = explode(';',$line['bestscores']);
 			$scores = explode(",",$sp[0]);
@@ -174,6 +175,7 @@
 			}
 			$timeused = $line['endtime']-$line['starttime'];
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
+			$manuallyreleased = false;
 		}
 
 		if ($line['starttime']==null) {
@@ -238,7 +240,9 @@
 				$tot += $total;
 				$n++;
 			}
-
+			if ($scoresingb == 'manual' && !$manuallyreleased) {
+				echo ' (NR)';
+			}
 			echo "</a></td>";
 			if ($totalpossible>0) {
 				echo '<td>'.round(100*($total)/$totalpossible,1).'%</td>';
