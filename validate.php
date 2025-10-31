@@ -615,20 +615,7 @@ if ($hasusername) {
                 echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
                 require_once __DIR__ . '/footer.php';
                 exit;
-            } else {
-                $now = time();
-                if (!isset($_SESSION['lastaccess' . $cid]) || $now - $_SESSION['lastaccess' . $cid] > 24 * 3600) {
-                    $stm = $DBH->prepare("UPDATE imas_students SET lastaccess=:lastaccess WHERE id=:id");
-                    $stm->execute(array(':lastaccess' => $now, ':id' => $studentid));
-                    $_SESSION['lastaccess' . $cid] = $now;
-                    $stm = $DBH->prepare("INSERT INTO imas_login_log (userid,courseid,logintime) VALUES (:userid, :courseid, :logintime)");
-                    $stm->execute(array(':userid' => $userid, ':courseid' => $cid, ':logintime' => $now));
-                    $_SESSION['loginlog' . $cid] = $DBH->lastInsertId();
-                } else if (isset($CFG['GEN']['keeplastactionlog'])) {
-                    $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
-                    $stm->execute(array(':lastaction' => $now, ':id' => $_SESSION['loginlog' . $cid]));
-                }
-            }
+            } 
         } else {
             $stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
             $stm->execute(array(':userid' => $userid, ':courseid' => $cid));
@@ -709,9 +696,25 @@ if ($hasusername) {
             $latepasshrs = max(1,$crow['latepasshrs']);
             $courseUIver = $crow['UIver'];
 
-            if (isset($studentid) && !$inInstrStuView && ((($crow['available']) & 1) == 1 || time() < $crow['startdate'])) {
-                echo _("This course is not available at this time");
-                exit;
+            if (isset($studentid) && !$inInstrStuView) {
+                if ((($crow['available']) & 1) == 1 || time() < $crow['startdate']) {
+                    echo _("This course is not available at this time");
+                    exit;
+                } else {
+                    // log access
+                    $now = time();
+                    if (!isset($_SESSION['lastaccess' . $cid]) || $now - $_SESSION['lastaccess' . $cid] > 24 * 3600) {
+                        $stm = $DBH->prepare("UPDATE imas_students SET lastaccess=:lastaccess WHERE id=:id");
+                        $stm->execute(array(':lastaccess' => $now, ':id' => $studentid));
+                        $_SESSION['lastaccess' . $cid] = $now;
+                        $stm = $DBH->prepare("INSERT INTO imas_login_log (userid,courseid,logintime) VALUES (:userid, :courseid, :logintime)");
+                        $stm->execute(array(':userid' => $userid, ':courseid' => $cid, ':logintime' => $now));
+                        $_SESSION['loginlog' . $cid] = $DBH->lastInsertId();
+                    } else if (isset($CFG['GEN']['keeplastactionlog'])) {
+                        $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
+                        $stm->execute(array(':lastaction' => $now, ':id' => $_SESSION['loginlog' . $cid]));
+                    }
+                }
             }
             $lockaid = $crow['lockaid']; 
             if (!empty($studentinfo['lockaid'])) {
