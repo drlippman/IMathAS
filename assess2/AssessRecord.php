@@ -1013,6 +1013,7 @@ class AssessRecord
     if (count($autosaves) === 0) {
       return; // nothing to do
     }
+    $submission_time = 0;
     if ($submission === false) {
       $maxtime = 0;
       foreach ($autosaves as $qn=>$qdata) {

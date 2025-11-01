@@ -167,6 +167,8 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_gracein'] = max($assess_record->getTimeLimitGrace() - $now, 0);
 }
 
+$submission = false;
+
 if (count($qns) > 0) {
   // get current question version ids
   list($qids, $toloadqids) = $assess_record->getQuestionIds($qns);
