@@ -992,6 +992,10 @@ createApp({
                     'text': '<?php echo _('After Latepass period');?>'
                 },
 				{
+                    'value': 'manual',
+                    'text': '<?php echo _('After manually released');?>'
+                },
+				{
 					'value': 'never',
 					'text': '<?php echo _('Never'); ?>'
 				}
@@ -1048,6 +1052,12 @@ createApp({
  						'text': '<?php echo _('Never'); ?>'
  					}
                 ];
+				if (this.scoresingb === 'manual') {
+					out.splice(1,0,{
+ 						'value': 'manual',
+ 						'text': '<?php echo _('After scores manually released');?>'
+ 					});
+				}
                 if (this.viewingb !== 'after_lp' && this.scoresingb !== 'after_lp') {
                     out.unshift({
  						'value': 'after_due',

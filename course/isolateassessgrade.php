@@ -17,14 +17,14 @@
 	$aid = Sanitize::onlyInt($_GET['aid']);
     $now = time();
     
-    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs FROM imas_assessments WHERE id=:id AND courseid=:cid");
+    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs,scoresingb FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	$res = $stm->fetch(PDO::FETCH_NUM);
 	if ($res === false) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible) = $res;
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible,$scoresingb) = $res;
     if ($istutor && $tutoredit == 2) {  // tutor, no access to view grades
         echo 'No access';
         exit;
@@ -46,6 +46,21 @@
 				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
 			exit;
         }
+		if (isset($_POST['posted']) && $_POST['posted']=="manualrelease") {
+			$stus = $_POST['stus'] ?? [];
+			require_once '../assess2/AssessHelpers.php';
+			AssessHelpers::manuallyReleaseAll($cid, $aid, $stus, true);
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
+		} else if (isset($_POST['posted']) && $_POST['posted']=="manualunrelease") {
+			$stus = $_POST['stus'] ?? [];
+			require_once '../assess2/AssessHelpers.php';
+			AssessHelpers::manuallyReleaseAll($cid, $aid, $stus, false);
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
+		}
     }
     if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
@@ -103,6 +118,9 @@
                 $(this).closest("tr").find(".pii-full-name").attr("data-gtu", uid);
             });
         });
+		function postWithSelform(val) {
+			$("#sform").append($("<input>", {name:"posted", value:val, type:"hidden"})).submit();
+		}
 		</script>';
 	require_once "../header.php";
     echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -225,7 +243,7 @@
 	if ($aver>1) {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
 		$query .= "IF((iar.status&1)=1,iar.scoreddata,'') AS scoreddata,";
-		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.timelimitexp,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.status2,iar.timelimitexp,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_assessment_records AS iar ON iu.id=iar.userid AND iar.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
 	} else {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
@@ -291,15 +309,23 @@
     
     
     if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {
-        echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
+        echo '<div>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
         echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
-        echo _('With selected:');
-        echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
-        echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
-        if ($isteacher || ($istutor && $tutoredit == 3)) {
-            echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
-        }
-        echo '</p>';
+        echo '<span class="dropdown">';
+		echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo _('With Selected').'</a>';
+		echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
+		echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to excuse these grades?\')) { postWithSelform(\'Excuse Grade\'); } return false;">', _('Excuse Grade'), "</a></li>";
+		echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to un-excuse these grades?\')) { postWithSelform(\'Un-excuse Grade\'); } return false;">', _('Un-excuse Grade'), "</a></li>";
+		if ($isteacher || ($istutor && $tutoredit == 3)) {
+			echo ' <li><a href="#" onclick="postWithSelform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
+		}
+		if ($scoresingb === 'manual') {
+			echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to release these grades?\')) { postWithSelform(\'manualrelease\'); } return false;">',_('Release Grades to Students'), "</a></li>";
+			echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to un-release these grades?\')) { postWithSelform(\'manualunrelease\'); } return false;">',_('Un-Release Grades to Students'), "</a></li>";
+		}
+		echo '</ul></span>';
+        echo '</div>';
     }
 
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
@@ -373,6 +399,7 @@
             ) {
                 $IP=1;
             }
+			$manuallyreleased = (($line['status2']&1)==1);
 			//$IP = ($line['status']&3)>0;
 			//$UA = ($line['status']&1)>0;
 		} else if ($line['starttime']!==null) {
@@ -387,6 +414,7 @@
 			$timeontask = round(array_sum(array_map('floatval', explode(',',str_replace('~',',',$line['timeontask']))))/60,1);
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 			$UA = 0;
+			$manuallyreleased = false;
 		}
 
 		if ($line['starttime']===null) {
@@ -469,6 +497,9 @@
 			} else {
 				$tot += $total;
 				$n++;
+			}
+			if ($scoresingb == 'manual' && !$manuallyreleased) {
+				echo ' (NR)';
 			}
 			if ($line['thisenddate'] > $now) {
 				echo '</i>';
@@ -593,7 +624,7 @@
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	}
-	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
+	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NR-not manually released<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
 	echo '</form>';
 	require_once "../footer.php";

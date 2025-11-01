@@ -114,7 +114,8 @@ row[1][1][0] first score - assessment
 row[1][1][0][0] = score
 row[1][1][0][1] = 0 no comment, 1 has comment - is comment in includecomments
 row[1][1][0][2] = show gbviewasid link: 0 no, 1 yes,
-row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT, 5 UA, 6 No submission  + 10 if still active
+row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT, 5 UA, 
+					6 No submission, 7 not manually released + 10 if still active
 row[1][1][0][4] = asid, or 'new' (or userid for assess2)
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
 row[1][1][0][6] = 1 if had exception, = 2 if was latepass
@@ -1327,7 +1328,7 @@ function gbtable() {
 	}
 
 	//Get assessment2 scores,
-	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid,iar.timelimitexp";
+	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.status2,iar.userid,iar.timelimitexp";
 	if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 		$query .= ',iar.scoreddata';
 	}
@@ -1450,7 +1451,8 @@ function gbtable() {
 			($sa[$i]=="never") ||
 		 	($sa[$i]=='after_due' && $now < $thised) ||
             ($sa[$i]=='after_lp' && $now < max($thised,$LPenddate[$i])) ||
-			($sa[$i]=='after_take' && !$hasSubmittedTake && ($l['status']&1) == 1) // does not have a submitted attempt, but does have an unsubmitted attempt
+			($sa[$i]=='after_take' && !$hasSubmittedTake && ($l['status']&1) == 1) || // does not have a submitted attempt, but does have an unsubmitted attempt
+			($sa[$i]=='manual' && ($l['status2']&1)==0) // not manually released yet
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][3] = 0;  //no other info
@@ -1478,7 +1480,11 @@ function gbtable() {
 			$countthisone =true;
 		} elseif ($l['lastchange'] == 0) { // no submissions
             $gb[$row][1][$col][0] = $pts; //the score
-			$gb[$row][1][$col][3] = 6;  //no other info
+			$gb[$row][1][$col][3] = 6;  //no submission
+			$countthisone =true;
+        } elseif ($sa[$i]=='manual' && ($l['status2']&1)==0) { // manual release
+            $gb[$row][1][$col][0] = $pts; //the score
+			$gb[$row][1][$col][3] = 7;  //not manually released
 			$countthisone =true;
         } else { //regular score available to students
 			$gb[$row][1][$col][0] = $pts; //the score

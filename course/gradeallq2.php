@@ -57,9 +57,9 @@
     $userprefUseMQ = (!isset($_SESSION['userprefs']['useeqed']) ||
         $_SESSION['userprefs']['useeqed'] == 1);
 
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver,itemorder FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit,submitby,ver,itemorder,scoresingb FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit,$submitby,$aver,$itemorder,$scoresingb) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -227,8 +227,16 @@
 				$adjustedFeedbacks = $assess_record->convertGbFeedbacks($feedbackToSet);
 				$changes = $assess_record->setGbScoreOverrides($adjustedScores);
 				$assess_record->setGbFeedbacks($adjustedFeedbacks);
+				if (!empty($_POST['domanualrelease'])) {
+					if ($assess_record->setManuallyReleased(true)) {
+						$changes['manually_released'] = 1;
+					}
+				}
 
-				if (count($adjustedScores) > 0 || count($adjustedFeedbacks) > 0) {
+				if (count($adjustedScores) > 0 || 
+					count($adjustedFeedbacks) > 0 || 
+					!empty($changes['manually_released'])
+				) {
 					$assess_record->saveRecord();
 				}
 
@@ -636,6 +644,8 @@
 	$stm->execute($qarr);
 	$cnt = 500;
 	$onepergroup = array();
+	$hasunreleased = false;
+
 	require_once "../includes/filehandler.php";
     echo '<div id="qlistwrap">';
 	if ($stm->rowCount()>0) {
@@ -650,6 +660,7 @@
 		$assess_record->setTeacherInGb(true);
 
 		$GLOBALS['assessver'] = $line['ver'];
+		$hasunreleased |= (($line['status2']&1)==0);
 
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="' . Sanitize::onlyInt($line['userid']) . '"/>';
@@ -930,6 +941,18 @@
     echo '</div>'; //qlistwrap
 	if ($canedit) {
         echo '<p>'.sprintf(_('Grading Question %s in %s'), $curqloc, Sanitize::encodeStringForDisplay($aname)).'</p>';
+
+		if ($scoresingb === 'manual' && $hasunreleased) {
+			echo '<p><label><input type=checkbox name=domanualrelease value=1 />';
+			if ($page == -1) {
+				echo _('Manually release assessment scores to all students, visible or not.');
+			} else {
+				echo _('Manually release assessment score to this student.');
+			}
+			echo '<label> ';
+			echo _('This will release the score for the whole assessment, not just this question.');
+			echo '</p>';
+		}
 
 		echo '<button type="submit">';
         if ($page == -1 || $page == count($stulist)-1) {

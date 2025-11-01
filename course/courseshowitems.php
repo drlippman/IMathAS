@@ -873,7 +873,8 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     }
                     if (($line['scoresingb'] == 'after_due' && $now < $line['enddate']) ||
                         ($line['scoresingb'] == 'after_lp' && $now < max($line['enddate'], $LPenddate)) ||
-                        $line['scoresingb'] == 'never'
+                        $line['scoresingb'] == 'never' ||
+                        ($line['scoresingb'] == 'manual' && empty($line['manualreleased']))
                     ) {
                         $showScoreInIcon = false;
                     }

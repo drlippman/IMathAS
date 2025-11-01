@@ -170,7 +170,7 @@ class AssessRecord
 
     $qarr = array();
     $fields = array('lti_sourcedid', 'timeontask', 'starttime', 'lastchange',
-                    'score', 'status', 'timelimitexp');
+                    'score', 'status', 'status2', 'timelimitexp');
     foreach ($fields as $field) {
       $qarr[':'.$field] = $this->assessRecord[$field];
     }
@@ -243,6 +243,12 @@ class AssessRecord
    * @param  boolean $isstu     true if student initiated
    */
   public function updateLTIscore($sendnow = true, $isstu = true) {
+    if ($this->assess_info->getSetting('scoresingb') === 'manual' &&
+      ($this->assessRecord['status2']&1) == 0
+    ) {
+      // manual release, not released yet - don't sent LTI update
+      return;
+    }
     $lti_sourcedid = $this->getLTIsourcedId();
     if (strlen($lti_sourcedid) > 1) {
         require_once __DIR__ . '/../includes/ltioutcomes.php';
@@ -299,6 +305,7 @@ class AssessRecord
       'lastchange' => 0,
       'score' => 0,
       'status' => 0,  // overridden later
+      'status2' => 0,
       'scoreddata' => '',
       'practicedata' => ''
     );
@@ -328,7 +335,7 @@ class AssessRecord
     $qarr = array();
     $vals = array();
     foreach ($users as $uid) {
-      $vals[] = '(?,?,?,?,?,?,?,?,?)';
+      $vals[] = '(?,?,?,?,?,?,?,?,?,?)';
       $this_lti_sourcedid = '';
       if (isset($lti_sourcedidarr[$uid])) {
         $this_lti_sourcedid = $lti_sourcedidarr[$uid];
@@ -343,12 +350,13 @@ class AssessRecord
         $recordStart ? $this->now : 0,
         2,
         $this->assessRecord['status'],
+        $this->assessRecord['status2'],
         $scoredtosave,
         $practicetosave
       );
     }
     $query = 'INSERT INTO imas_assessment_records (userid, assessmentid,
-      agroupid, lti_sourcedid, starttime, ver, status, scoreddata, practicedata)
+      agroupid, lti_sourcedid, starttime, ver, status, status2, scoreddata, practicedata)
       VALUES '.implode(',', $vals);
     $stm = $this->DBH->prepare($query);
     $stm->execute($qarr);
@@ -504,6 +512,14 @@ class AssessRecord
    */
   public function getStatus() {
     return $this->assessRecord['status'];
+  }
+
+  /**
+   * Gets the assessment status
+   * @return [type] [description]
+   */
+  public function getStatus2() {
+    return $this->assessRecord['status2'];
   }
 
   /**
@@ -783,6 +799,26 @@ class AssessRecord
       }
     }
     $this->need_to_record = true;
+  }
+
+  /** 
+   * Update the manually released flag
+   * @param bool $release  Boolean whether to release
+   * @return bool changed
+   */
+  public function setManuallyReleased($release) {
+    $this->parseData();
+    // only update if it's actually a change
+    if ((($this->assessRecord['status2']&1)==1) !== $release) {
+      if ($release) {
+        $this->assessRecord['status2'] |= 1;
+      } else {
+        $this->assessRecord['status2'] &= ~1;
+      }
+      $this->need_to_record = true;
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -3170,8 +3206,9 @@ class AssessRecord
 
     if (!$this->teacherInGb && (
       $scoresInGb == 'never' ||
-      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb =='after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')))
+      ($scoresInGb == 'after_due' && time() < $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb == 'after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 0))
     ) {
       // don't show overall score;
       $out['gbscore'] = "N/A";
@@ -3196,6 +3233,9 @@ class AssessRecord
           $stm->execute(array_values($this->data['excused']));
           $out['excused'] = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
       }
+      if ($scoresInGb == 'manual') {
+        $out['manual_released'] = (($this->assessRecord['status2']&1) === 1) ? 1 : 0;
+      }
     }
     return $out;
   }
@@ -3215,8 +3255,9 @@ class AssessRecord
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     if (!$this->teacherInGb && (
       $scoresInGb == 'never' ||
-      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb =='after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')))
+      ($scoresInGb == 'after_due' && time() < $this->assess_info->getSetting('enddate')) ||
+      ($scoresInGb == 'after_lp' && time() < $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 0))
     ) {
       $scored_aver = 0;
     }
@@ -3260,7 +3301,8 @@ class AssessRecord
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate'))
+      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 1)
     ) {
       $out['score'] = $aver['score'];
       $showScores = true;
@@ -3380,7 +3422,8 @@ class AssessRecord
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $this->data['assess_versions'][$aver]['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate')) ||
-      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate'))
+      ($scoresInGb == 'after_lp' && time() > $this->assess_info->getSetting('latepass_enddate')) ||
+      ($scoresInGb == 'manual' && ($this->assessRecord['status2']&1) === 1)
     ) {
       $showScores = true;
     } else {

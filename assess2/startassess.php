@@ -181,7 +181,7 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
     if ($assess_record->hasRecord() && count($available_new_members) > 0) {
         $sourcedids = AssessUtils::formLTIsourcedId($available_new_members, $aid, true);
         // get current record
-        $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
+        $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,status2,scoreddata,practicedata,ver';
         $query = "SELECT $fieldstocopy FROM ";
         $query .= "imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid";
         $stm = $DBH->prepare($query);

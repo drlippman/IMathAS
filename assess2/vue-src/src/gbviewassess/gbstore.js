@@ -235,9 +235,9 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  saveChanges (exit, nextstu) {
+  saveChanges (exit, nextstu, releaseonsave) {
     if (store.inTransit) {
-      window.setTimeout(() => this.saveChanges(exit), 20);
+      window.setTimeout(() => this.saveChanges(exit, nextstu, releaseonsave), 20);
       return;
     }
     let nextstuurl = '';
@@ -248,7 +248,8 @@ export const actions = {
       }
     }
     if (Object.keys(store.scoreOverrides).length === 0 &&
-      Object.keys(store.feedbacks).length === 0
+      Object.keys(store.feedbacks).length === 0 &&
+      !releaseonsave
     ) {
       store.saving = 'saved';
       if (exit) {
@@ -266,6 +267,9 @@ export const actions = {
     data.append('scores', JSON.stringify(store.scoreOverrides));
     data.append('feedback', JSON.stringify(store.feedbacks));
     data.append('practice', store.ispractice ? 1 : 0);
+    if (releaseonsave) {
+      data.append('releasescore', 1);
+    }
     window.$.ajax({
       url: store.APIbase + 'gbsave.php' + qs,
       type: 'POST',
@@ -372,6 +376,9 @@ export const actions = {
         // Update assessment scores
         store.scoreOverrides = {};
         store.feedbacks = {};
+        if (releaseonsave) {
+          store.assessInfo.manual_released = 1;
+        }
       })
       .fail(response => {
         store.saving = 'save_fail';
@@ -383,6 +390,47 @@ export const actions = {
   clearLPblock () {
     store.clearAttempts.type = 'practiceview';
     this.clearAttempt(true);
+  },
+  setManualRelease (val) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.setManualRelease(val), 20);
+      return;
+    }
+    const qs = store.queryString;
+    store.inTransit = true;
+    store.saving = 'saving';
+    store.errorMsg = null;
+    const data = new FormData();
+    data.append('scores', '{}');
+    data.append('feedback', '{}');
+    data.append('practice', 0);
+    data.append('releasescore', val);
+    window.$.ajax({
+      url: store.APIbase + 'gbsave.php' + qs,
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      processData: false,
+      contentType: false,
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        store.saving = 'saved';
+        store.assessInfo.manual_released = val;
+      })
+      .fail(response => {
+        this.handleError('send_fail');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
   },
   setVerAsLast () {
     if (store.inTransit) {

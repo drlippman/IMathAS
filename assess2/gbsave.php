@@ -76,6 +76,11 @@ if (!$assess_record->hasRecord()) {
 
 $changes = $assess_record->setGbScoreOverrides($scores);
 $assess_record->setGbFeedbacks($feedbacks);
+if (isset($_POST['releasescore'])) {
+  if ($assess_record->setManuallyReleased($_POST['releasescore']==1)) {
+    $changes['manually_released'] = ($_POST['releasescore']==1)?1:0;
+  }
+}
 $assess_record->saveRecord();
 
 $out = $assess_record->getGbScore();
@@ -96,8 +101,5 @@ if (!empty($changes)) {
 
 // update LTI grade
 $assess_record->updateLTIscore(true, false);
-
-//prep date display
-prepDateDisp($assessInfoOut);
 
 echo json_encode($out, JSON_INVALID_UTF8_IGNORE);

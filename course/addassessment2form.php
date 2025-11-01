@@ -951,6 +951,7 @@ createApp({
 			‘after_take’: After an assessment version is done
 			‘after_due’: After the due date
 			‘never’: Never
+			'manual': After manual release by instructor
 			 */
 
 			/*
@@ -971,6 +972,10 @@ createApp({
                 {
                     'value': 'after_lp',
                     'text': '<?php echo _('After Latepass period');?>'
+                },
+				{
+                    'value': 'manual',
+                    'text': '<?php echo _('After manually released');?>'
                 },
 				{
 					'value': 'never',
@@ -1025,6 +1030,12 @@ createApp({
  						'text': '<?php echo _('Never');?>'
  					}
  				];
+				if (this.scoresingb === 'manual') {
+					out.splice(1,0,{
+ 						'value': 'manual',
+ 						'text': '<?php echo _('After scores manually released');?>'
+ 					});
+				}
                 if (this.viewingb !== 'after_lp' && this.scoresingb !== 'after_lp') {
                     out.unshift({
  						'value': 'after_due',

@@ -420,6 +420,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<li>'._('EC-extra credit').'</li>';
 	echo '<li>'._('NC-no credit').'</li>';
     echo '<li>'._('NS-no submission').'</li>';
+	if ($canviewall) {
+		echo '<li>'._('NR-not manually released to student').'</li>';
+	}
     echo '<li>'._('N/A-Not Available').'</li>';
 	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
 	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
@@ -673,7 +676,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NS-no submission<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NS-no submission, NR-not manually released<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require_once "../footer.php";
 
 	/*if ($isteacher) {
@@ -1155,6 +1158,8 @@ function gbstudisp($stu) {
                         echo ' (PT)';
                     } else if ($gbt[1][1][$i][3]==6) {
                         echo ' (NS)';
+                    } else if ($gbt[1][1][$i][3]==7) {
+                        echo ' (NR)';
                     }
                 }
 			} else {
@@ -1941,6 +1946,8 @@ function gbinstrdisp() {
                                 echo ' (PT)';
                             } else if ($gbt[$i][1][$j][3]==6) {
                                 echo ' (NS)';
+                            } else if ($gbt[$i][1][$j][3]==7) {
+                                echo ' (NR)';
                             }
                         }
 
