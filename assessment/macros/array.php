@@ -28,7 +28,8 @@ array_push(
     'fillarray',
     'arraysetvalues',
     'ABarray',
-    'arrayhasduplicates'
+    'arrayhasduplicates',
+    'are_numeric'
 );
 
 function mergearrays() {
@@ -459,6 +460,18 @@ function arrayhasduplicates($arr) {
     } else {
         return true;
     }
+}
+
+function are_numeric(...$vals) {
+    if (count($vals)==1 && is_array($vals[0])) {
+        $vals = $vals[0];
+    }
+    foreach ($vals as $v) {
+        if (!is_numeric($v)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /** not public **/
