@@ -462,7 +462,7 @@ class DrawingScorePart implements ScorePart
                                         }
                                     }
                                     $inlogfunc = makeMathFunction(makepretty($loginside), 'x');
-                                    if ($func === false) { continue; }
+                                    if ($inlogfunc === false) { continue; }
                                     //We're going to assume inside is linear
                                     //Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
                                     //solve for when this is =0
@@ -608,7 +608,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
                             $infunc = makeMathFunction($infunc, 'x');
-                            if ($func === false) { continue; }
+                            if ($infunc === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $period = M_PI/abs($y1-$y0); //slope of inside function

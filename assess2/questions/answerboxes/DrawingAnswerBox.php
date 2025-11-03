@@ -755,6 +755,105 @@ class DrawingAnswerBox implements AnswerBox
                             $saarr[$k] = "$ha,green,,,,,,dash";
                             $k++;
                             $saarr[$k] = "[$va,t],green,,,,,,dash";
+                        } else if (preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
+                            $x1 = 1 / 4 * $settings[1] + 3 / 4 * $settings[0];
+                            $x2 = 1 / 2 * $settings[1] + 1 / 2 * $settings[0];
+                            $x3 = 3 / 4 * $settings[1] + 1 / 4 * $settings[0];
+
+                            $func = makeMathFunction(makepretty($function[0]), 'x');
+                            $y1 = $func(['x' => $x1]);
+                            $y2 = $func(['x' => $x2]);
+                            $y3 = $func(['x' => $x3]);
+
+                            $base = safepow(($y3-$y2)/($y2-$y1), 1/($x3-$x2));
+                            $str = ($y1 - $y2)/(safepow($base, $x2) - safepow($base, $x1));
+                            $asy = $y1 + $str*safepow($base, $x1);
+                            $k++;
+                            if ($asy != 0) {
+                                $saarr[$k] = "$asy,green,,,,,,dash";
+                            }
+                        } else if (($logloc = strpos($function[0],'log'))!==false ||
+                            ($lnloc = strpos($function[0],'ln'))!==false) { //is log
+
+                            $nestd = 0; $vertasy = 0; $openright = true;
+                            $startloc = strpos($function[0],'(',$logloc!==false?$logloc:$lnloc);
+                            if ($function[0][$startloc-1] == '_') {
+                                // is parens for base; skip to next paren
+                                $startloc = strpos($function[0],'(',$startloc+1);
+                            }
+                            for ($i = $startloc; $i<strlen($function[0]); $i++) {
+                                if ($function[0][$i]=='(') {
+                                    $nestd++;
+                                } else if ($function[0][$i]==')') {
+                                    $nestd--;
+                                    if ($nestd == 0 && $i>$startloc) {
+                                        $loginside = substr($function[0], $startloc, $i-$startloc+1);
+                                        if (strpos($loginside,'x')===false) { //found a log w/o variable
+                                            //look for another one
+                                            if (($logloc = strpos($function[0],'log', $i))!==false ||
+                                                ($lnloc = strpos($function[0],'ln', $i))!==false) { //is another log
+                                                $startloc = ($logloc!==false)?($logloc+3):($lnloc+2);
+                                                continue;
+                                            }
+                                        }
+                                        $inlogfunc = makeMathFunction(makepretty($loginside), 'x');
+                                        if ($inlogfunc === false) { continue; }
+                                        //We're going to assume inside is linear
+                                        //Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
+                                        //solve for when this is =0
+                                        // x = -y0/(y1-y0)
+                                        $inlogy0 = $inlogfunc(['x'=>0]);
+                                        $inlogy1 = $inlogfunc(['x'=>1]);
+                                        $vertasy = -$inlogy0/($inlogy1 - $inlogy0);
+                                        $opensright = ($inlogy1 > $inlogy0);
+                                        break;
+                                    }
+                                } else if ($nestd == 0) {
+                                    $startloc = $i+1; //reset start to handle log_2(x-5) and such
+                                }
+                            }
+                            // adjust starting domain
+                            $sapts = explode(',', $saarr[$k]);
+                            if ($opensright) {
+                                $sapts[2] = $vertasy + .0000001;
+                            } else {
+                                $sapts[3] = $vertasy - .0000001;
+                            }
+                            $saarr[$k] = implode(',', $sapts);
+                            $k++;
+                            if ($vertasy != 0) {
+                                $saarr[$k] = "[$vertasy,t],green,,,,,,dash";
+                            }
+                        } else if (($p = strpos($function[0],'tan('))!==false || ($q = strpos($function[0],'cot('))!==false) { //is tan
+                            if ($p===false) { $p = $q;}
+                            $nested = 1;
+                            for ($i=$p+4;$i<strlen($function[0]);$i++) {
+                                if ($function[0][$i]=='(') {$nested++;}
+                                else if ($function[0][$i]==')') {$nested--;}
+                                if ($nested==0) {break;}
+                            }
+                            if ($nested==0) {
+                                $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
+                                $infunc = makeMathFunction($infunc, 'x');
+                                if ($infunc === false) { continue; }
+                                $y0 = $infunc(['x'=>0]);
+                                $y1 = $infunc(['x'=>1]);
+                                $period = M_PI/abs($y1-$y0); //slope of inside function
+                                $xint = -$y0/($y1-$y0);
+                                if (strpos($function[0],'cot')!==false) {
+                                    $xint += $period/2;
+                                }
+                                if ($period > ($settings[1] - $settings[0])/10) {
+                                    for ($x=$xint+$period/2; $x < $settings[1]+1; $x += $period) {
+                                        $k++;
+                                        $saarr[$k] = "[$x,t],green,,,,,,dash";
+                                    }
+                                    for ($x=$xint-$period/2; $x > $settings[0]; $x -= $period) {
+                                        $k++;
+                                        $saarr[$k] = "[$x,t],green,,,,,,dash";
+                                    }
+                                }
+                            }
                         }
                     }
                 }
