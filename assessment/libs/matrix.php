@@ -67,10 +67,10 @@ function matrixformat($m, $bracket='[', $asfraction=false) {
 			if ($j!=0) {
 				$out .= ',';
             }
-            if ($asfraction) {
+            if ($asfraction && $m[$i][$j]!=0) {
                 $out .= decimaltofraction($m[$i][$j]);
             } else {
-                $out.= $m[$i][$j];
+                $out .= ($m[$i][$j]==0) ? 0 : $m[$i][$j];
             }
 		}
 		$out .= ')';
