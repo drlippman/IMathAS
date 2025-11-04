@@ -1741,7 +1741,7 @@ function jsxBoard($type, $ops=array()) {
 				if ($('#qn' + box)[0] && $('#qn' + box).val() !== '') {
 					if (type == 'point') {
 						let coords = $('#qn'+box).val();
-						coords = coords.substring(1, coords.length - 2);
+						coords = coords.substring(1, coords.length - 1);
 						coords = coords.split(',');
 						window[obj].setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
 					} else if (type == 'slider') {
