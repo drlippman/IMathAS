@@ -279,13 +279,12 @@ function jsxPoint(&$board, $param, $ops=array()) {
 
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
-			$fixedx = jsx_getdecimalplaces($snapSizeX);
-			$fixedy = jsx_getdecimalplaces($snapSizeY);
 		} else {
 			$snapToGrid = 'false';
-			$fixedx = 4;
-			$fixedy = 4;
 		}
+
+		$fixedx = isset($ops['xsnapsize']) ? jsx_getdecimalplaces($snapSizeX) : 4;
+		$fixedy = isset($ops['ysnapsize']) ? jsx_getdecimalplaces($snapSizeY) : 4;
 			
 		// Start making the point
 		$out = "window.{$id} = board_{$boardID}.create('point', ".jsx_pointToJS($param).",";
@@ -378,13 +377,12 @@ function jsxGlider (&$board, $param, $ops=array()) {
 
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
-			$fixedx = jsx_getdecimalplaces($snapSizeX);
-			$fixedy = jsx_getdecimalplaces($snapSizeY);
 		} else {
 			$snapToGrid = 'false';
-			$fixedx = 4;
-			$fixedy = 4;
 		}
+
+		$fixedx = isset($ops['xsnapsize']) ? jsx_getdecimalplaces($snapSizeX) : 4;
+		$fixedy = isset($ops['ysnapsize']) ? jsx_getdecimalplaces($snapSizeY) : 4;
 
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('glider', [";
