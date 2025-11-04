@@ -870,7 +870,7 @@
 			});
 	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>");
 
-			initeditor("exact",el,1);
+			initeditor("exact",el);
 			if (el=="qtext") {
 				editoron = 1;
 			} else if (el=="solution") {
