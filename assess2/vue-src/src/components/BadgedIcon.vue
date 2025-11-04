@@ -2,6 +2,7 @@
   <tooltip-span
     :tip="$tc(label, cnt)"
     style="display: inline-block"
+    :hasbutton="true"
   >
     <a
       :href="link"

@@ -83,8 +83,7 @@ var MQeditor = (function($) {
         var span = $("<span/>", {
           id: "mqinput-"+textId,
           class: "mathquill-math-field",
-          text: initval,
-          "aria-label": el.getAttribute("aria-label")
+          text: initval 
         });
         var m;
         if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
@@ -120,6 +119,7 @@ var MQeditor = (function($) {
           thisMQconfig.substituteTextarea = function () {
             var s = document.createElement('span');
             s.setAttribute('tabindex', 0);
+            s.setAttribute('role', 'textbox');
             return s;
           };
           thisMQconfig.keyboardPassthrough = true;
@@ -171,6 +171,10 @@ var MQeditor = (function($) {
           span.addClass("disabled");
         } else {
           mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
+          $(span).find(".mq-textarea > *").attr('aria-label', el.getAttribute("aria-label"));
+          if (el.hasAttribute('aria-describedby')) {
+            $(span).find(".mq-textarea > *").attr('aria-describedby', el.getAttribute("aria-describedby"));
+          }
           attachEditor(span);
           // if original input has input changed programmatically and change
           // event triggered, update mathquill.

@@ -7,23 +7,25 @@
     @focusin = "handleFocus"
     @focusout = "handleBlur"
   >
-    <button
-      :id = "id"
-      ref = "button"
-      :tabindex = "open?-1:0"
-      :class = "{'nobutton': !!nobutton, 'flex-nowrap-center': true}"
-      aria-haspopup = "true"
-      :aria-controls = "id + '_wrap'"
-      :aria-expanded = "open?'true':'false'"
-      @click = "toggleOpen"
-      @keydown.space.prevent = "toggleOpen"
-    >
-      <slot v-if="!hasButton" :option="options[selected]" :selected="true"></slot>
-      <tooltip-span :show="!open" :tip="header">
+    <tooltip-span :show="!open" :tip="header" :tipid="'mbtip' + id">
+      <button
+        :id = "id"
+        ref = "button"
+        :tabindex = "open?-1:0"
+        :class = "{'nobutton': !!nobutton, 'flex-nowrap-center': true}"
+        aria-haspopup = "true"
+        :aria-controls = "id + '_wrap'"
+        :aria-expanded = "open?'true':'false'"
+        :aria-describedby = "header === '' ? undefined : 'mbtip' + id"
+        @click = "toggleOpen"
+        @keydown.space.prevent = "toggleOpen"
+      >
+        <slot v-if="!hasButton" :option="options[selected]" :selected="true"></slot>
         <slot v-if="hasButton" name=button></slot>
-      </tooltip-span>
-      <icons class="mb_downarrow" v-if="!noarrow" name="downarrow" size="micro"/>
-    </button>
+
+        <icons class="mb_downarrow" v-if="!noarrow" name="downarrow" size="micro"/>
+      </button>
+    </tooltip-span>
     <transition name="fade">
       <ul
         v-if="open"

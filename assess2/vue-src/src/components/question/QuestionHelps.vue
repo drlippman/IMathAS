@@ -6,15 +6,14 @@
     </span>
     <ul class="helplist" :aria-labelledby="'qhelp' + qn">
       <li v-for="(qHelp,idx) in qHelps" :key="idx">
-        <tooltip-span :tip="qHelp.descr">
-          <a href="#" @click.prevent="loadHelp(qHelp)">
+        <tooltip-span :tip="qHelp.descr" :tipid="'qhtip' + qn + '-' + idx">
+          <a href="#" @click.prevent="loadHelp(qHelp)"
+            :aria-describedby="qHelp.descr ? 'qhtip' + qn + '-' + idx : undefined"
+          >
             <icons :name="qHelp.icon" alt=""/>
             {{ qHelp.title }}
             <span :class="{'sr-only': !showCnts}">
               {{ qHelp.cnt }}
-            </span>
-            <span v-if="qHelp.descr" class="sr-only">
-              {{qHelp.descr}}
             </span>
           </a>
         </tooltip-span>

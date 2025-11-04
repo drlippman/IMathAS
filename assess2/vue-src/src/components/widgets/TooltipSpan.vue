@@ -7,14 +7,17 @@
     @touchstart = "triggerOpen"
     @focusin = "triggerOpen($event,true)"
     @focusout = "triggerOpen($event,false)"
-    tabindex = "-1"
+    :aria-describedby = "showDescribedBy ? uid : undefined"
+    :tabindex = "tabindex ? tabindex : undefined"
   >
     <slot></slot>
     <transition name="fade">
       <div
         class = "dropdown-pane tooltip-pane"
         ref = "pane"
+        :id = "tipid ? tipid : uid"
         v-if = "open"
+        role = "tooltip"
       >
         {{ tip }}
       </div>
@@ -25,11 +28,17 @@
 <script>
 export default {
   name: 'TooltipSpan',
-  props: ['tip', 'show'],
+  props: ['tip', 'show', 'tabindex', 'tipid'],
   data: function () {
     return {
-      open: false
+      open: false,
+      uid: 'tooltip-' + Math.random().toString(36).substring(2, 11)
     };
+  },
+  computed: {
+    showDescribedBy () {
+      return ((this.tabindex === 0 || this.tabindex === '0') && this.tip !== '');
+    }
   },
   methods: {
     triggerOpen (event, val) {

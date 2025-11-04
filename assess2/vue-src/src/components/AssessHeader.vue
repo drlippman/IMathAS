@@ -60,7 +60,7 @@
         <resource-pane />
       </dropdown>
 
-      <tooltip-span v-if = "showPrint" :tip="$t('print.print_version')">
+      <tooltip-span v-if = "showPrint" :tip="$t('print.print_version')" :hasbutton="true">
         <a
           :href="printLink"
           class = "noextlink"
@@ -74,6 +74,7 @@
       <tooltip-span
         :tip="$t('header.use_mq')"
         style="display: inline-block"
+        :hasbutton="true"
       >
         <button
           @click="toggleMQuse"
@@ -104,7 +105,7 @@
         label = "lti.forum"
         :cnt = "ainfo.lti_forumcnt"
       />
-      <lti-menu v-if="ainfo.is_lti || ainfo.is_diag" />
+      <lti-menu />
     </div>
 
   </div>

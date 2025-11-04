@@ -307,6 +307,7 @@ function setupTips(id, tip, longtip) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
   }
   el.setAttribute('aria-describedby', 'tips'+ref);
+  $("#mqinput-" + id).find(".mq-textarea > *").attr('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
   });

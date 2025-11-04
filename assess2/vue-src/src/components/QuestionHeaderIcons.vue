@@ -3,19 +3,24 @@
     <tooltip-span
       v-if="scoreDisplay !== ''"
       :tip="scoreTip"
+      tabindex="0"
     >
-      <icons name="square-check" />
+      <icons name="square-check" alt="qdetails.gbscore"/>
       {{ scoreDisplay }}
     </tooltip-span>
     <tooltip-span
       v-if="qn >= 0 && curQData.canretry && showretry !== false"
-      :tip="retryInfo.msg">
+      :tip="retryInfo.msg"
+      tabindex="0"
+    >
       <icons name="retry"/>
       {{ retryInfo.cnt }}
     </tooltip-span>
     <tooltip-span
       v-if="qn >= 0 && curQData.canregen && showretry !== false"
-      :tip="$tc('qinfo.regens_remaining', curQData.regens_remaining)">
+      :tip="$tc('qinfo.regens_remaining', curQData.regens_remaining)"
+      tabindex="0"
+    >
       <icons name="retake"/>
       {{ curQData.regens_remaining }}
     </tooltip-span>
@@ -23,7 +28,6 @@
       :id="'qd-dd-'+qn"
       class="question-details"
       v-if="showDetails"
-      :tip = "$t('qdetails.question_details')"
     >
       <template v-slot:button>
         <icons name="info" size="medium"/>
