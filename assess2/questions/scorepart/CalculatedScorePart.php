@@ -364,6 +364,7 @@ class CalculatedScorePart implements ScorePart
         $correctanyformat = 0;
         foreach($anarr as $i=>$anss) {
             $foundloc = -1;
+            $thiscorrectanyformat = false;
             if (in_array('orderedlist',$ansformats)) {
                 $gaarr = array($gamasterarr[$i]);
             }
@@ -413,15 +414,19 @@ class CalculatedScorePart implements ScorePart
                         if (is_array($anans)) {
                             if (($anans[1]=="(" && $numericans>$anans[2]) || ($anans[1]=="[" && $numericans>=$anans[2])) {
                                 if (($anans[4]==")" && $numericans<$anans[3]) || ($anans[4]=="]" && $numericans<=$anans[3])) {
-                                    if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                                    $thiscorrectanyformat = true; $foundloc = $j;
+                                    if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                                 }
                             }
                         } else if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
-                            if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                            $thiscorrectanyformat = true; $foundloc = $j;
+                            if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                         } else if (($anans=="+oo" || $anans=="oo") && ($givenans=="+oo" || $givenans=="oo")) {
-                            if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                            $thiscorrectanyformat = true; $foundloc = $j;
+                            if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                         } else if ($anans=="-oo" && $givenans=="-oo") {
-                            if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                            $thiscorrectanyformat = true; $foundloc = $j;
+                            if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                         }
                     } else if (is_numeric($numericans)) {
                         //echo "{$ganorm[$j]} vs {$ansnorm[$i][$k]}";
@@ -433,10 +438,12 @@ class CalculatedScorePart implements ScorePart
                                 } else if ($thischecksameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                     $formatok = "nopart";  $partformatok = false;
                                 }
-                                if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                                $thiscorrectanyformat = true; $foundloc = $j;
+                                if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                             } else if ($exactsigfig && checksigfigs($tocheck, $anans, $reqsigfigs, false, $reqsigfigoffset, $sigfigscoretype)) {
                                 //see if it'd be right aside from exact sigfigs
-                                $formatok = "nopart";  $partformatok = false; $correctanyformat++; $foundloc = $j; break 2;
+                                $thiscorrectanyformat = true; $foundloc = $j;
+                                $formatok = "nopart";  $partformatok = false;
                             } 
                         } else if ($abstolerance !== '') {
                             if (abs($anans-$numericans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
@@ -445,7 +452,8 @@ class CalculatedScorePart implements ScorePart
                                 } else if ($thischecksameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                     $formatok = "nopart";  $partformatok = false;
                                 }
-                                if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                                $thiscorrectanyformat = true; $foundloc = $j;
+                                if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                             }
                         } else {
                             if ($anans==0) {
@@ -455,7 +463,8 @@ class CalculatedScorePart implements ScorePart
                                     } else if ($thischecksameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                         $formatok = "nopart";  $partformatok = false;
                                     }
-                                    if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                                    $thiscorrectanyformat = true; $foundloc = $j;
+                                    if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                                 }
                             } else {
                                 if (abs($anans - $numericans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {
@@ -464,7 +473,8 @@ class CalculatedScorePart implements ScorePart
                                     } else if ($thischecksameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                         $formatok = "nopart";  $partformatok = false;
                                     }
-                                    if ($partformatok) {$correct += $partialpts[$k] ?? 1;}; $correctanyformat++; $foundloc = $j; break 2;
+                                    $thiscorrectanyformat = true; $foundloc = $j;
+                                    if ($partformatok) {$correct += $partialpts[$k] ?? 1; break 2;}
                                 }
                             }
                         }
@@ -472,6 +482,9 @@ class CalculatedScorePart implements ScorePart
                 }
             }
             if ($foundloc>-1) {
+                if ($thiscorrectanyformat) {
+                    $correctanyformat++;
+                }
                 array_splice($gaarr,$foundloc,1); //remove from list
                 if ($thischecksameform) {
                   array_splice($ganorm,$foundloc,1);
