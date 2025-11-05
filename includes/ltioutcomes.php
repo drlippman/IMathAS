@@ -312,6 +312,7 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
 
     $header = $acc_req->to_header();
     $header = $header . "\r\nContent-Type: " . $content_type . "\r\n";
+	$header = $header . "User-Agent: " . Sanitize::simpleASCII($GLOBALS['installname'] ?? 'IMathAS') . "\r\n";
 
     if ($checkResponse) { //use a send that waits for response
     	return newXMLoverPost($endpoint, $body, $header, $method);

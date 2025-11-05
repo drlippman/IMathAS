@@ -207,6 +207,9 @@ Class RollingCurlX {
             $options[CURLOPT_HTTPHEADER] = $headers;
         }
 
+        // set user agent
+        $options[CURLOPT_USERAGENT] = Sanitize::simpleASCII($GLOBALS['installname'] ?? 'IMathAS');
+
         // enable POST method and set POST parameters
         if($post_data !== null) {
         	$options[CURLOPT_POST] = 1;
