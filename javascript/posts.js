@@ -19,7 +19,7 @@ function checkchgstatus(type,id) {
 	}
 }
 function toggleshow(butn) {
-	var forumgrp = $(butn).closest(".block").nextAll(".forumgrp").first();
+	var forumgrp = $(butn).closest(".postwrap").nextAll(".forumgrp").first();
 	var img = butn.firstChild;
 	let newopen = true;
 	if (forumgrp.hasClass("hidden")) {
@@ -49,13 +49,13 @@ function toggleitem(butn) {
 }
 function expandall() {
 	$(".expcol").each(function(i) {
-		var forumgrp = $(this).closest(".block").nextAll(".forumgrp").first().removeClass("hidden");
+		var forumgrp = $(this).closest(".postwrap").nextAll(".forumgrp").first().removeClass("hidden");
 		this.src = staticroot+'/img/collapse.gif';
 	});
 }
 function collapseall() {
 	$(".expcol").each(function(i) {
-		var forumgrp = $(this).closest(".block").nextAll(".forumgrp").first().addClass("hidden");
+		var forumgrp = $(this).closest(".postwrap").nextAll(".forumgrp").first().addClass("hidden");
 		this.src = staticroot+'/img/expand.gif';
 	});
 }

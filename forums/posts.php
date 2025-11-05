@@ -170,7 +170,7 @@ require_once "posthandler.php";
 
 $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=011825" type="text/css" />';
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=101825"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=110425"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
