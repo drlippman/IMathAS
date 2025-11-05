@@ -104,6 +104,7 @@ $post = [
 $ch = curl_init($regurl);
 $authorization = "Authorization: Bearer ".$token; // Prepare the authorisation token
 curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization, 'Content-Type: application/json')); // Inject the token into the header
+curl_setopt($ch, CURLOPT_USERAGENT, Sanitize::simpleASCII($GLOBALS['installname'] ?? 'IMathAS'));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, 1); // Specify the request method as POST
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post)); // Set the posted fields
