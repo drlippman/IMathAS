@@ -2743,7 +2743,7 @@ class AssessRecord
         $curAver['questions'][$qn]['score'] = round($maxQscore + 1e-8,2);
         $curAver['questions'][$qn]['rawscore'] = round($maxQrawscore + 1e-8,4);
         $curAver['questions'][$qn]['time'] = $totalQtime;
-        $aVerScore += $maxQscore;
+        $aVerScore += $curAver['questions'][$qn]['score'];
         $verTime += $totalQtime;
       } // end loop over questions
       $curAver['score'] = round($aVerScore + 1e-8, 1);
