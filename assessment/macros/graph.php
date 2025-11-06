@@ -1044,7 +1044,13 @@ function textonimage() {
         $left = array_shift($args);
         $top = array_shift($args);
         $hidden = (strpos($text, '[AB') === false) ? 'aria-hidden=true' : '';
-        $out .= "<div $hidden style=\"position:absolute;top:{$top}px;left:{$left}px;\">$text</div>";
+        if ($_SESSION['graphdisp'] == 0) {
+            if ($hidden == '') {
+                $out .= "<span>$text</span>";
+            }
+        } else {
+            $out .= "<div $hidden style=\"position:absolute;top:{$top}px;left:{$left}px;\">$text</div>";
+        }
     }
     $out .= '</div>';
     return $out;
