@@ -3,6 +3,9 @@
 require_once "../init.php";
 require_once "../includes/JWT.php";
 
+if (empty($cid) || (!isset($teacherid) && !isset($tutorid) && !isset($studentid))) {
+	exit;
+}
 //grab user's hashed password to sign request with
 $stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
 $stm->execute(array(':uid'=>$userid));
