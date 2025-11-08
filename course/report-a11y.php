@@ -101,7 +101,7 @@ if ($what === 'cid') {
     }
 
     // scan questionset control, qtext
-    $query = 'SELECT iqs.control,iqs.qtext,ia.name,ia.id AS aid,iqs.id,iqs.extref FROM imas_questionset AS iqs 
+    $query = 'SELECT iqs.control,iqs.qtext,ia.name,ia.id AS aid,iqs.id,iqs.extref,ia.showhints AS hintsdef,iq.showhints FROM imas_questionset AS iqs 
         JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
         JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
         WHERE ia.courseid=?';
@@ -111,12 +111,11 @@ if ($what === 'cid') {
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
             _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
-        if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
+        if (preg_match('/youtu[^!]*!!0/', $row['extref']) &&
+            (($row['showhints'] > -1 && ($row['showhints']&2)==2) || 
+             ($row['showhints'] == -1 && ($row['hintsdef']&2)==2))
+        ) {
             $extrefissues[] = $row;
-            /*
-            adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
-                _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
-            */
         }
     }
 
