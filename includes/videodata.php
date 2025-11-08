@@ -1,6 +1,10 @@
 <?php
 
 // Functions for getting data about videos
+/*
+* Note on imas_captiondata:
+*  status: 0 no info, 1 got info from old moddataset scan, 2 got info from API scan, 3 got 404 error on scan
+*/
 
 function getvideoid($url) {
 	$vidid = '';
@@ -52,9 +56,9 @@ function getCaptionDataByVidId($vidid) {
             $code = explode(' ', $http_response_header[0])[1];
             if ($code == '404') {
                 $query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES (?,0,3,?) ";
-                $query .= "ON DUPLICATE KEY UPDATE status=VALUES(status),";
-                $query .= "lastchg=VALUES(lastchg),";
-                $query .= "captioned=VALUES(captioned)";
+                $query .= "ON DUPLICATE KEY UPDATE status=IF(status=0 OR status=3,VALUES(status),status),";
+                $query .= "lastchg=IF(status=0 OR status=3,VALUES(lastchg),lastchg),";
+                $query .= "captioned=IF(status=0 OR status=3,VALUES(captioned),captioned)";
                 $novid = $DBH->prepare($query);
                 $novid->execute([$vidid, time()]);
                 return '404';
