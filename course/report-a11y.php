@@ -45,10 +45,15 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
         }
     }
 }
-function adderror($descr, $loc, $itemtype, $itemname, $link) {
+function adderror($descr, $loc, $itemtype, $itemname, $link, $link2 = null) {
     global $errors;
     if ($itemtype !== null) {
-        $errors[] = [sprintf('%s in %s of %s %s', $descr, $loc, $itemtype, $itemname), $link];
+        if ($link2 !== null) {
+            $errors[] = [sprintf('%s in %s', $descr, $loc), $link, 
+                sprintf('of %s %s', $itemtype, $itemname), $link2];
+        } else {
+            $errors[] = [sprintf('%s in %s of %s %s', $descr, $loc, $itemtype, $itemname), $link];
+        }
     } else {
         $errors[] = [sprintf('%s in %s', $descr, $loc), $link];
     }
@@ -96,7 +101,7 @@ if ($what === 'cid') {
     }
 
     // scan questionset control, qtext
-    $query = 'SELECT iqs.control,iqs.qtext,ia.name,iqs.id,iqs.extref FROM imas_questionset AS iqs 
+    $query = 'SELECT iqs.control,iqs.qtext,ia.name,ia.id AS aid,iqs.id,iqs.extref FROM imas_questionset AS iqs 
         JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
         JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
         WHERE ia.courseid=?';
@@ -155,7 +160,8 @@ if ($what === 'cid') {
                     } else if ($vidid !== '' && !$gaveerrorthisquestion) {
                         // it's a video, don't have captions, give error once
                         adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
-                            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+                            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
+                            "course/addquestions2.php?cid=$cid&aid=" . $row['aid']);
                         $gaveerrorthisquestion = true;
                     }
                 }
@@ -281,6 +287,11 @@ foreach ($errors as $error) {
     echo Sanitize::encodeStringForDisplay($error[0]);
     if (!empty($error[1])) {
         echo '</a>';
+    }
+    if (!empty($error[3])) {
+       echo ' <a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[3]) . '" target="_blank">';
+       echo Sanitize::encodeStringForDisplay($error[2]);
+       echo '</a>';
     }
     echo '</li>';
 }
