@@ -14,7 +14,8 @@ array_push(
     'cases',
     'decimaltofraction',
     'is_nicenumber',
-    'getnumbervalue'
+    'getnumbervalue',
+    'normalizefunc'
 );
 
 
@@ -355,6 +356,26 @@ function mod($p, $n) {
     return (($p % $n) + $n) % $n;
 }
 
+function normalizefunc($a, $vars = "x") {
+    $variables = array_values(array_filter(array_map('trim', explode(",", $vars)), 'strlen'));
+    $ofunc = array();
+    for ($i = 0; $i < count($variables); $i++) {
+        //find f() function variables
+        if (strpos($variables[$i], '()') !== false) {
+            $ofunc[] = substr($variables[$i], 0, strpos($variables[$i], '('));
+            $variables[$i] = substr($variables[$i], 0, strpos($variables[$i], '('));
+        }
+    }
+    $vlist = implode(',', $variables);
+    $flist = implode(',', $ofunc);
+    $afunc = parseMathQuiet($a, $vlist, [], $flist);
+    if ($afunc === false) {
+        return false;
+    }
+
+    return $afunc->normalizeTreeString();
+}
+
 /** not public **/
 function evalMathPHP($str, $vl) {
     return evalReturnValue('return (' . mathphp($str, $vl) . ');', $str);
@@ -456,4 +477,5 @@ function evalbasic($str, $doextra = false, $zerofornan = false) {
         return $ret;
     }
 }
+
 
