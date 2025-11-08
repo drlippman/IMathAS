@@ -112,8 +112,17 @@ if (isset($_POST['updatecaption'])) {
 		exit;
 	}
     $vidid = Sanitize::simpleASCII($vidid);
-
-	$captioned = getCaptionDataByVidId($vidid);
+	if (!empty($_POST['forcecaptioned'])) {
+		$captioned = 1;
+		$query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES (?,1,2,?) ";
+        $query .= "ON DUPLICATE KEY UPDATE status=IF(VALUES(captioned)!=captioned OR status=0 OR status=3,VALUES(status),status),";
+        $query .= "lastchg=IF(VALUES(captioned)!=captioned OR status=0 OR status=3,VALUES(lastchg),lastchg),";
+        $query .= "captioned=IF(VALUES(captioned)!=captioned OR status=0 OR status=3,VALUES(captioned),captioned)";
+        $stm = $DBH->prepare($query);
+        $stm->execute([$vidid, time()]);
+	} else {
+		$captioned = getCaptionDataByVidId($vidid);
+	}
 	$chg = 0;
 	if ($captioned==1) {
 		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
@@ -313,8 +322,9 @@ if (isset($_GET['form'])) {
 		require_once "../header.php";
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
-		echo 'YouTube video ID: <input type="text" size="11" name="updatecaption"/>';
-		echo '<input type="submit" value="Go"/>';
+		echo '<label>YouTube video ID: <input type="text" size="11" name="updatecaption"/></label>';
+		echo '<br/><label><input type=checkbox name="forcecaptioned" value="1"> Skip scan and mark as captioned (manually verified)</label>';
+		echo '<br/><input type="submit" value="Go"/>';
 		echo '</form>';
 		require_once "../footer.php";
 	} else if ($_GET['form']=='updatecaptionbyqids') {
