@@ -577,6 +577,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
 		file_picker_types: 'file image',
+		a11y_advanced_options: true,
 		images_upload_handler: image_upload_handler,
 		paste_data_images: true,
 		paste_postprocess: function (editor, args) {

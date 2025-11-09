@@ -24,8 +24,8 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
     // look for empty text, or missing alt text.  sloppy, but works
     if (preg_match('/(<img[^>]*?alt="(.*?)"[^>]*?>|<img[^>]*>)/', $content, $matches)) {
         if (!isset($matches[2])) { // used second pattern; missing alt text
-            adderror(_('Missing alt text'), $field, $type, $itemname, $link); 
-        } else if (trim($matches[2]) == '') {
+            adderror(_('Missing alt text'), $field, $type, $itemname, $link);
+        } else if (trim($matches[2]) == '' && strpos($matches[0], 'role="presentation"') === false) {
             adderror(_('Blank alt text'), $field, $type, $itemname, $link); 
         }
     }
