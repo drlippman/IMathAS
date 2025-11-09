@@ -94,6 +94,12 @@ function mbxfilter($str) {
 		//return '<var name="qn'.$varcnt.'" width="'.$m[1].'" />';
 		return '<fillin characters="'.$m[1].'" />';
 	  },$str);
+	$str = preg_replace_callback('#<input[^>]*width:(\d+)[^>]*>#',function($m) {
+		global $varcnt;
+		$varcnt++;
+		//return '<var name="qn'.$varcnt.'" width="'.$m[1].'" />';
+		return '<fillin characters="'.ceil(($m[1] - 1)/1.2).'" />';
+	  },$str);
 
 	//replace any textareas
 	$str = preg_replace_callback('#<textarea*cols="?(\d+)[^>]*>.*?</textarea>#',function($m) {
