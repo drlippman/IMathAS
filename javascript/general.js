@@ -565,8 +565,8 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		selector: selectorstr,
 		inline: inlinemode,
 		license_key: 'gpl',
-		cache_suffix: '?v=102225',
-		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons accordion",
+		cache_suffix: '?v=111125',
+		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons accordion ableplayer",
 		menubar: false,
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
@@ -926,7 +926,7 @@ function togglevideoembed() {
         var viframe = jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
-			height: 400,
+			height: href.match(/ableplayer/)?530:400,
 			src: href,
 			frameborder: 0,
 			allowfullscreen: 1
@@ -1325,6 +1325,7 @@ function initlinkmarkup(base) {
 	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
+	$(base).find('a[href*="ableplayer.php"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
     $(base).find('a[href*="loom.com/share"],a[href*="loom.com/embed"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setIframeSpinner(base);
@@ -1625,7 +1626,8 @@ jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
         "iframe[src*='player.vimeo.com']",
         "iframe[src*='youtube.com']",
         "iframe[src*='youtube-nocookie.com']",
-        "iframe[src*='loom.com']"
+        "iframe[src*='loom.com']",
+		"iframe[src*='ableplayer.php'"
       ];
 
       var $allVideos = $(this).find(selectors.join(','));

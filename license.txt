@@ -141,6 +141,10 @@ Thumbs-up icon remixed from work (c) Bersam at
 http://commons.wikimedia.org/wiki/File:Thumbs-up-icon.svg
 CC-BY
 
+AblePlayer
+Copyright (c) 2014-2025 The Able Player Contributors
+MIT License
+
 
 
 
