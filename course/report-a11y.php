@@ -2,6 +2,7 @@
 
 require_once "../init.php";
 require_once "../includes/videodata.php";
+require_once "../includes/colorcontrast.php";
 
 $what = 'cid';
 
@@ -45,6 +46,28 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
         }
     }
 }
+function scancolors($items, $parent) {
+    global $errors,$cid;
+    foreach ($items as $k=>$item) {
+        if (is_array($item)) {
+            $bnum = $k+1;
+            if (!empty($item['colors'])) {
+                list($titlebg,$titletext,$blockbg) = explode(',', $item['colors']);
+                if (calculateLuminosityRatio($titletext,$titlebg) < 4.5) {
+                    adderror(_('Insufficient color contrast'), 
+                        _('title text and background'), 
+                        _('Block'),
+                        $item['name'],
+                        "course/addblock.php?cid=$cid&id=" . $parent.'-'.$bnum);
+                }
+            }
+            if (!empty($item['items'])) {
+                scancolors($item['items'], $parent.'-'.$bnum);
+            }
+        }
+    }
+}
+
 function adderror($descr, $loc, $itemtype, $itemname, $link, $link2 = null) {
     global $errors;
     if ($itemtype !== null) {
@@ -60,6 +83,11 @@ function adderror($descr, $loc, $itemtype, $itemname, $link, $link2 = null) {
 }
 
 if ($what === 'cid') {
+    $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=?");
+    $stm->execute([$cid]);
+    $itemorder = $stm->fetchColumn(0);
+    scancolors(unserialize($itemorder), '0');
+
     // scan assessment summary, intro (including between-question text)
     $stm = $DBH->prepare("SELECT name,summary,intro,id FROM imas_assessments WHERE courseid=?");
     $stm->execute([$cid]);
