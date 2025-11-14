@@ -999,6 +999,9 @@ function rewriteVideoUrl(href) {
 		return loc_protocol+'//'+vidsrc+vidid+timeref;
 }
 function setupvideoembeds(i,el) {
+	if (el.href.match(/youtu/) && !el.href.match(/[a-zA-Z0-9_-]{11}/)) {
+		return;
+	}
 
 	jQuery('<span/>', {
 		text: " [+]",
