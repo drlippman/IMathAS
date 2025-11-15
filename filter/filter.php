@@ -211,6 +211,37 @@
 			}
 		}
 
+		if (($p=strpos($str,'[DOENETML]'))!==false) {
+			$q = strpos($str, '[/DOENETML]', $p);
+			$srcdoc = '<!doctype html><html>
+				<script
+					type="module"
+					src="https://cdn.jsdelivr.net/npm/@doenet/standalone@latest/doenet-standalone.js"
+				></script>
+				<link
+					rel="stylesheet"
+					href="https://cdn.jsdelivr.net/npm/@doenet/standalone@latest/style.css"
+				/>
+				<script>
+					document.addEventListener("DOMContentLoaded", () => {
+						document
+							.querySelectorAll(".doenetml-viewer")
+							.forEach((container) => {
+								renderDoenetViewerToContainer(container);
+							});
+					});
+				</script>
+				<body>
+					<div style="display: flex; justify-content: center;"> 
+						<div class="doenetml-viewer" style="width: 850px">
+							<script type="text/doenetml">'.
+							substr($str,$p+10,$q-$p-10).
+							'</script></div></div></body></html>';
+			$str = substr($str,0,$p) . 
+				'<iframe srcdoc="'.htmlspecialchars($srcdoc).'"></iframe>'
+				. substr($str,$q+11);
+		}
+
 		if (strpos($str,'[CDF')!==false) {
 			$search = '/\[CDF:\s*([^,]+),([^,]+),([^,\]]+)\]/';
 
