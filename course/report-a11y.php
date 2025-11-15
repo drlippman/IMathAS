@@ -45,7 +45,14 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
     if (preg_match('/textonimage\([^\)]*\[AB/', $content) &&
         strpos($content,'readerlabel') === false
     ) {
+        //textonimage with AB without readerlabel
         adderror(_('Potential issue: [AB] in textonimage used without readerlabel'), $field, $type, $itemname, $link); 
+    }
+    if (strpos($content,'jsxgraph') !== false) {
+        adderror(_('Potential issue: question may use jsxgraph; check for accessible alt'), $field, $type, $itemname, $link); 
+    }
+    if (strpos($content,'geogebra') !== false) {
+        adderror(_('Potential issue: question may use geogebra; check for accessible alt'), $field, $type, $itemname, $link); 
     }
     // look for youtube videos
     if (preg_match_all('/((youtube\.com|youtu\.be)[^>]*?)"/', $content, $matches, PREG_SET_ORDER)) {
@@ -310,9 +317,9 @@ if ($what === 'myqs') {
     echo '<p>'._('This report scans items in your course for accessibility issues.').' ';
 }
 if (isset($CFG['YouTubeAPIKey'])) {
-    echo _('Currently it will only identify images that are missing alt text, and YouTube videos that do not have manual captions. It does not scan videos hosted elsewhere. Some YouTube videos might come back as "Potentially Uncaptioned", which just means we do not know yet; the video will be added to a queue and scanned in the next few days to check if has captions. The report will be updated once we have that information, so check back in a week or so.'). '</p>';
+    echo _('Currently it will only identify images that are missing alt text, some potential question issues that need manual review, and YouTube videos that do not have manual captions. It does not scan videos hosted elsewhere. Some YouTube videos might come back as "Potentially Uncaptioned", which just means we do not know yet; the video will be added to a queue and scanned in the next few days to check if has captions. The report will be updated once we have that information, so check back in a week or so.'). '</p>';
 } else {
-    echo _('Currently it will only identify images that are missing alt text, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
+    echo _('Currently it will only identify images that are missing alt text, some potential question issues that need manual review, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
 }
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
