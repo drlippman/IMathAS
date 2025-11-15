@@ -211,7 +211,12 @@
 			}
 		}
 
-		if (($p=strpos($str,'[DOENETML]'))!==false) {
+		if (($p=strpos($str,'[DOENETML'))!==false) {
+			$ebp = strpos($str,']',$p);
+			$size = array_map('intval',explode(',', substr($str,$p+9,$ebp-$p-9)));
+			if (count($size)!=2) {
+				$size = [500,500];
+			}
 			$q = strpos($str, '[/DOENETML]', $p);
 			$srcdoc = '<!doctype html><html>
 				<script
@@ -235,10 +240,10 @@
 					<div style="display: flex; justify-content: center;"> 
 						<div class="doenetml-viewer" style="width: 850px">
 							<script type="text/doenetml">'.
-							substr($str,$p+10,$q-$p-10).
+							substr($str,$ebp+1,$q-$ebp-1).
 							'</script></div></div></body></html>';
 			$str = substr($str,0,$p) . 
-				'<iframe srcdoc="'.htmlspecialchars($srcdoc).'"></iframe>'
+				'<iframe width="'.$size[0].'" height="'.$size[1].'" srcdoc="'.htmlspecialchars($srcdoc).'"></iframe>'
 				. substr($str,$q+11);
 		}
 
