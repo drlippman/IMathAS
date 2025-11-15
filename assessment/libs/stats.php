@@ -54,8 +54,8 @@ function nPr($n,$r){
 //mean(array)
 //Finds the mean of an array of numbers
 function mean($a,$w=null) {
-	if (!is_array($a)) {
-		echo 'mean expects an array';
+	if (!is_array($a) || count($a)==0) {
+		echo 'mean expects a nonempty array';
 		return false;
 	}
   if (is_array($w)) {
