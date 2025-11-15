@@ -410,7 +410,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         }
 
         if ($_SESSION['graphdisp'] == 0) {
-            if ($xmax - $xmin > 2 || $xmax == $xmin) {
+            if (($xmax - $xmin > 2 && $xmax==(int)$xmax && $xmin==(int)$xmin) || $xmax == $xmin) {
                 $dx = 1;
                 $stopat = ($xmax - $xmin) + 1;
             } else {
@@ -687,7 +687,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             $alt .= "Open dot at ($x,$y). ";
         } else if (isset($function[5]) && $function[5] == 'closed') {
             $path .= "dot([$x,$y],\"closed\");";
-            $alt .= "Closed dot at ($x,$y).). ";
+            $alt .= "Closed dot at ($x,$y). ";
         } else if (isset($function[5]) && $function[5] == 'arrow' && isset($fx[$stopat - 2])) {
             $path .= "arrowhead([{$fx[$stopat - 2]},{$fy[$stopat - 2]}],[$x,$y]);";
             $alt .= "Arrow at ($x,$y). ";
