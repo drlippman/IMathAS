@@ -18,7 +18,7 @@ $errors = [];
 $vidids = [];
 $vidlocs = [];
 $asciisvgpattern = '/^showasciisvg\(\s*((("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])+,\s*){0,2}("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])?\s*)?\)$/';
-function a11yscan($content, $field, $type, $itemname, $link='') {
+function a11yscan($content, $field, $type, $itemname, $link='',$hasa11yalt=false) {
     global $asciisvgpattern,$vidids,$vidlocs;
     // ensure regex considers \" as well as " to account for encoding
     $content = str_replace(['\\\'','\\"', "'"], ['"','"','"'], $content);
@@ -33,25 +33,25 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
     // look for asciisvg call with undefined alt text.
     // we'll assume if alt text is defined but blank that it was intentional
     // does not account for use of replacealttext later in the question
-    if (preg_match($asciisvgpattern, $content)) {
+    if (!$hasa11yalt && preg_match($asciisvgpattern, $content)) {
         adderror(_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link); 
     }
-    if (strpos($content,'textonimage(') !== false && 
+    if (!$hasa11yalt && strpos($content,'textonimage(') !== false && 
         strpos($content,'replacealttext(') === false
     ) {
         // textonimage without replacealttext probably 
         adderror(_('Potential issue: textonimage used without replacealttext'), $field, $type, $itemname, $link); 
     }
-    if (preg_match('/textonimage\([^\)]*\[AB/', $content) &&
+    if (!$hasa11yalt && preg_match('/textonimage\([^\)]*\[AB/', $content) &&
         strpos($content,'readerlabel') === false
     ) {
         //textonimage with AB without readerlabel
         adderror(_('Potential issue: [AB] in textonimage used without readerlabel'), $field, $type, $itemname, $link); 
     }
-    if (strpos($content,'jsxgraph') !== false) {
+    if (!$hasa11yalt && strpos($content,'jsxgraph') !== false) {
         adderror(_('Potential issue: question may use jsxgraph; check for accessible alt'), $field, $type, $itemname, $link); 
     }
-    if (strpos($content,'geogebra') !== false) {
+    if (!$hasa11yalt && strpos($content,'geogebra') !== false) {
         adderror(_('Potential issue: question may use geogebra; check for accessible alt'), $field, $type, $itemname, $link); 
     }
     // look for youtube videos
@@ -147,7 +147,7 @@ if ($what === 'cid') {
     }
 
     // scan questionset control, qtext
-    $query = 'SELECT iqs.control,iqs.qtext,ia.name,ia.id AS aid,iqs.id,iqs.extref,ia.showhints AS hintsdef,iq.showhints FROM imas_questionset AS iqs 
+    $query = 'SELECT iqs.control,iqs.qtext,iqs.a11yalt,ia.name,ia.id AS aid,iqs.id,iqs.extref,ia.showhints AS hintsdef,iq.showhints FROM imas_questionset AS iqs 
         JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
         JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
         WHERE ia.courseid=?';
@@ -156,7 +156,7 @@ if ($what === 'cid') {
     $extrefissues = [];
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
-            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'], $row['a11yalt']!=0);
         if (preg_match('/youtu[^!]*!!0/', $row['extref']) &&
             (($row['showhints'] > -1 && ($row['showhints']&2)==2) || 
              ($row['showhints'] == -1 && ($row['hintsdef']&2)==2))
