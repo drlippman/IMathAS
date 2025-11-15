@@ -36,6 +36,17 @@ function a11yscan($content, $field, $type, $itemname, $link='') {
     if (preg_match($asciisvgpattern, $content)) {
         adderror(_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link); 
     }
+    if (strpos($content,'textonimage(') !== false && 
+        strpos($content,'replacealttext(') === false
+    ) {
+        // textonimage without replacealttext probably 
+        adderror(_('Potential issue: textonimage used without replacealttext'), $field, $type, $itemname, $link); 
+    }
+    if (preg_match('/textonimage\([^\)]*\[AB/', $content) &&
+        strpos($content,'readerlabel') === false
+    ) {
+        adderror(_('Potential issue: [AB] in textonimage used without readerlabel'), $field, $type, $itemname, $link); 
+    }
     // look for youtube videos
     if (preg_match_all('/((youtube\.com|youtu\.be)[^>]*?)"/', $content, $matches, PREG_SET_ORDER)) {
         foreach ($matches as $m) {
