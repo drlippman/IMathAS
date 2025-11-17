@@ -114,7 +114,12 @@
 		if (isset($_POST['helpurl']) && $_POST['helpurl']!='') {
 			$vidid = getvideoid($_POST['helpurl']);
 			if ($vidid=='') {
-				$captioned = 0;
+				if (strpos($_POST['helpurl'],'ableplayer.php')!==false &&
+					strpos($_POST['helpurl'],'vtt')!==false) {
+						$captioned = 1;
+				} else {
+					$captioned = 0;
+				}
 			} else if (isset($CFG['YouTubeAPIKey'])) {
                 $captioned = getCaptionDataByVidId($vidid);
 				if ($captioned === false || $captioned === '404') {
