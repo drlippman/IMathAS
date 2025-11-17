@@ -239,7 +239,7 @@ class AccessibleTreeWidget {
             case 'children':
                 return !hasChildren;
             case 'parents':
-                return hasChildren;
+                return (hasChildren || item.count == 0);
             case 'all':
             default:
                 return true;

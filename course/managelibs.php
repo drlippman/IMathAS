@@ -554,7 +554,7 @@ if ($overwriteBody==1) {
 	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1 ?? ''); ?>';
 	// used for selecting parents
 	function libselect() {
-		GB_show('<?php echo _('Library Select');?>','libtree3.php?libtree=popup&select=parents&addroot=true&selectrights=1&mode=single&libs='+curlibs,500);
+		GB_show('<?php echo _('Library Select');?>','libtree3.php?libtree=popup&select=parents&addroot=true&selectrights=1&mode=single&cid=<?php echo $cid;?>&libs='+curlibs,500);
 	}
 	function setlib(libs) {
 		document.getElementById("parentlib").value = libs;

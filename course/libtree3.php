@@ -32,7 +32,7 @@ if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
     } else if ($myrights<20) {
         exit;
     }
-    $placeinhead = '<script src="'.$staticroot.'/javascript/accessibletree.js?v=070625"></script>';
+    $placeinhead = '<script src="'.$staticroot.'/javascript/accessibletree.js?v=111725"></script>';
     $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/accessibletree.css?v=070625" type="text/css" />';
     $noskipnavlink = true;
     $hideAllHeaderNav = true;
@@ -206,9 +206,8 @@ function genItem($data) {
     }
     $item['userights'] = $rights;
     $item['federated'] = ($data['federationlevel']>0);
-    if ($includecounts) {
-        $item['count'] = $data['count'];
-    }
+    $item['count'] = $data['count'] ?? 0;
+
     if (!empty($showmanagelibslinks) && $data['id']>0) {
         $links = [];
         if ($data['ownerid']==$userid || ($isgrpadmin && $data['groupid']==$groupid) || $isadmin) {
