@@ -18,41 +18,41 @@ $errors = [];
 $vidids = [];
 $vidlocs = [];
 $asciisvgpattern = '/^showasciisvg\(\s*((("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])+,\s*){0,2}("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])?\s*)?\)$/';
-function a11yscan($content, $field, $type, $itemname, $link='',$hasa11yalt=false) {
+function a11yscan($content, $field, $type, $itemname, $link='',$hasa11yalt=false,$link2=null) {
     global $asciisvgpattern,$vidids,$vidlocs;
     // ensure regex considers \" as well as " to account for encoding
     $content = str_replace(['\\\'','\\"', "'"], ['"','"','"'], $content);
     // look for empty text, or missing alt text.  sloppy, but works
     if (preg_match('/(<img[^>]*?alt="(.*?)"[^>]*?>|<img[^>]*>)/', $content, $matches)) {
         if (!isset($matches[2])) { // used second pattern; missing alt text
-            adderror(_('Missing alt text'), $field, $type, $itemname, $link);
+            adderror(_('Missing alt text'), $field, $type, $itemname, $link, $link2);
         } else if (trim($matches[2]) == '' && strpos($matches[0], 'role="presentation"') === false) {
-            adderror(_('Blank alt text'), $field, $type, $itemname, $link); 
+            adderror(_('Blank alt text'), $field, $type, $itemname, $link, $link2); 
         }
     }
     // look for asciisvg call with undefined alt text.
     // we'll assume if alt text is defined but blank that it was intentional
     // does not account for use of replacealttext later in the question
     if (!$hasa11yalt && preg_match($asciisvgpattern, $content)) {
-        adderror(_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link); 
+        adderror(_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link, $link2); 
     }
     if (!$hasa11yalt && strpos($content,'textonimage(') !== false && 
         strpos($content,'replacealttext(') === false
     ) {
         // textonimage without replacealttext probably 
-        adderror(_('Potential issue: textonimage used without replacealttext'), $field, $type, $itemname, $link); 
+        adderror(_('Potential issue: textonimage used without replacealttext'), $field, $type, $itemname, $link, $link2); 
     }
     if (!$hasa11yalt && preg_match('/textonimage\([^\)]*\[AB/', $content) &&
         strpos($content,'readerlabel') === false
     ) {
         //textonimage with AB without readerlabel
-        adderror(_('Potential issue: [AB] in textonimage used without readerlabel'), $field, $type, $itemname, $link); 
+        adderror(_('Potential issue: [AB] in textonimage used without readerlabel'), $field, $type, $itemname, $link, $link2); 
     }
     if (!$hasa11yalt && strpos($content,'jsxgraph') !== false) {
-        adderror(_('Potential issue: question may use jsxgraph; check for accessible alt'), $field, $type, $itemname, $link); 
+        adderror(_('Potential issue: question may use jsxgraph; check for accessible alt'), $field, $type, $itemname, $link, $link2); 
     }
     if (!$hasa11yalt && strpos($content,'geogebra') !== false) {
-        adderror(_('Potential issue: question may use geogebra; check for accessible alt'), $field, $type, $itemname, $link); 
+        adderror(_('Potential issue: question may use geogebra; check for accessible alt'), $field, $type, $itemname, $link, $link2); 
     }
     // look for youtube videos
     if (preg_match_all('/((youtube\.com|youtu\.be)[^>]*?)"/', $content, $matches, PREG_SET_ORDER)) {
@@ -88,7 +88,7 @@ function scancolors($items, $parent) {
 
 function adderror($descr, $loc, $itemtype, $itemname, $link, $link2 = null) {
     global $errors;
-    if ($itemtype !== null) {
+    /*if ($itemtype !== null) {
         if ($link2 !== null) {
             $errors[] = [sprintf('%s in %s', $descr, $loc), $link, 
                 sprintf('of %s %s', $itemtype, $itemname), $link2];
@@ -97,7 +97,8 @@ function adderror($descr, $loc, $itemtype, $itemname, $link, $link2 = null) {
         }
     } else {
         $errors[] = [sprintf('%s in %s', $descr, $loc), $link];
-    }
+    }*/
+    $errors[] = [$descr, $loc, $itemtype, $itemname, $link2, $link];
 }
 
 if ($what === 'cid') {
@@ -156,7 +157,8 @@ if ($what === 'cid') {
     $extrefissues = [];
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
-            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'], $row['a11yalt']!=0);
+            _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'], 
+            $row['a11yalt']!=0,"course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
         if (preg_match('/youtu[^!]*!!0/', $row['extref']) &&
             (($row['showhints'] > -1 && ($row['showhints']&2)==2) || 
              ($row['showhints'] == -1 && ($row['hintsdef']&2)==2))
@@ -205,8 +207,8 @@ if ($what === 'cid') {
                     } else if ($vidid !== '' && !$gaveerrorthisquestion) {
                         // it's a video, don't have captions, give error once
                         adderror(_('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
-                            _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
-                            "course/addquestions2.php?cid=$cid&aid=" . $row['aid']);
+                            _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
+                            "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
                         $gaveerrorthisquestion = true;
                     }
                 }
@@ -220,7 +222,7 @@ if ($what === 'cid') {
     }
 
     // scan qimages alttext for blank
-    $query = 'SELECT iqi.alttext,iqi.var,ia.name,iqs.id FROM imas_questionset AS iqs 
+    $query = 'SELECT iqi.alttext,iqi.var,ia.name,ia.id AS aid,iqs.id FROM imas_questionset AS iqs 
         JOIN imas_qimages AS iqi ON iqi.qsetid=iqs.id
         JOIN imas_questions AS iq ON iqs.id=iq.questionsetid
         JOIN imas_assessments AS ia ON ia.id=iq.assessmentid
@@ -230,7 +232,9 @@ if ($what === 'cid') {
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if (trim($row['alttext']) == '') {
             adderror(_('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
-                _('Assessment'), $row['name'], "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+                _('Assessment'), $row['name'],
+                "course/addquestions2.php?cid=$cid&aid=" . $row['aid'], 
+                "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
         }
     }
 } else if ($what === 'myqs') {
@@ -305,7 +309,8 @@ $pagetitle = _('Accessibility Report');
 $curBreadcrumb = $breadcrumbbase;
 $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">" . _('Course Reports') . "</a> ";
-
+$placeinhead = '<style>tbody tr:hover, tbody tr:hover > * {background-color:#c1f5ff !important;}</style>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
 
 require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
@@ -323,25 +328,52 @@ if (isset($CFG['YouTubeAPIKey'])) {
 }
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
-echo '<ul>';
+//echo '<ul>';
+echo '<table class=gb id=errortable><thead><tr>';
+echo '<th>'._('Issue').'</th>';
+echo '<th>'._('Location').'</th>';
+if ($what !== 'myqs') {
+    echo '<th>'._('Item Type').'</th>';
+    echo '<th>'._('Item').'</th>';
+}
+echo '</tr><thead><tbody>';
+$alt = 0;
 foreach ($errors as $error) {
-    echo '<li>';
-    if (!empty($error[1])) {
-        echo '<a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[1]) . '" target="_blank">';
+    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+    //[$descr, $loc, $itemtype,$itemname, $link, $link2];
+    echo '<td>'.Sanitize::encodeStringForDisplay($error[0]).'</td>';
+    echo '<td>';
+    if (!empty($error[4])) {
+        echo '<a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[4]) . '" target="_blank">';
     }
-    echo Sanitize::encodeStringForDisplay($error[0]);
-    if (!empty($error[1])) {
+    echo Sanitize::encodeStringForDisplay($error[1]);
+    if (!empty($error[4])) {
         echo '</a>';
     }
-    if (!empty($error[3])) {
-       echo ' <a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[3]) . '" target="_blank">';
-       echo Sanitize::encodeStringForDisplay($error[2]);
-       echo '</a>';
+    echo '</td>';
+    if ($what !== 'myqs') {
+        echo '<td>';
+        echo Sanitize::encodeStringForDisplay($error[2]);
+        echo '</td><td>';
+        if (!empty($error[5])) {
+            echo ' <a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[5]) . '" target="_blank">';
+        }
+        echo Sanitize::encodeStringForDisplay($error[3]);
+        if (!empty($error[5])) {
+            echo '</a>';
+        }
     }
-    echo '</li>';
+    echo '</tr>';
 }
-echo '</ul>';
+echo '</tbody></table>';
 
 echo '<p>'._('Videos marked as "Missing/broken" that seem to be available are likely unlisted videos, preventing lookup of caption data.').'</p>';
 
+$sortstr = '"S","S"';
+if ($what !== 'myqs') {
+    $sortstr .= ',"S","S"';
+}
+echo '<script type="text/javascript">
+			initSortTable("errortable",Array('.$sortstr.'),true);
+		</script>';
 require_once '../footer.php';
