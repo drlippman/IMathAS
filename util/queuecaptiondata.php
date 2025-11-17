@@ -33,9 +33,14 @@ $now = time();
 
 $stm = $DBH->query("SELECT vidid FROM imas_captiondata WHERE status=0 ORDER BY lastchg LIMIT $maxtopull");
 $novid = $DBH->prepare("UPDATE imas_captiondata SET status=3,lastchg=? WHERE vidid=?");
+$delvid = $DBH->prepare("DELETE FROM imas_captiondata WHERE vidid=?");
 
 $cnt = 0;
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if (!preg_match('/^[a-zA-Z0-9_-]{11}$/', $row['vidid'])) {
+        $delvid->execute([$row['vidid']]);
+        continue;
+    }
     // updates database after check
     $captioned = getCaptionDataByVidId($row['vidid']);
     if ($captioned === '404') {
