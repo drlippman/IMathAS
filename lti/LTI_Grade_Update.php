@@ -259,6 +259,7 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $request_post);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, \Sanitize::simpleASCII($GLOBALS['installname'] ?? 'IMathAS'));
 
     if (!empty($GLOBALS['CFG']['LTI']['skipsslverify'])) {
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);

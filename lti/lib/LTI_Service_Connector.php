@@ -112,6 +112,7 @@ class LTI_Service_Connector {
             'Accept:' . $accept,
         ];
         curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_USERAGENT, \Sanitize::simpleASCII($GLOBALS['installname'] ?? 'IMathAS'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
