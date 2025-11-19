@@ -172,6 +172,7 @@ function init() {
 	attachColorPicker(inp2);
 	var inp3 = document.getElementById(\"bi\");
 	attachColorPicker(inp3);
+	$('#titlebg,#titletxt,#bi').on('input', updateColors);
 }
 var imgBase = '$staticroot/javascript/cpimages';
 $(document).ready(init);
@@ -179,10 +180,54 @@ $(function() {
 	$('.chgbox').change(function() {
 			$(this).parents('tr').toggleClass('odd');
 	});
-})
+});
+function updateColors(e) {
+	var id = e.target.id;
+	var haserr = false;
+	if (!e.target.value.match(/#[A-Fa-f0-9]{6}/)) {
+		e.target.setAttribute('aria-invalid', true);
+		e.target.setAttribute('aria-describedby', e.target.id + 'err');
+		document.getElementById(e.target.id + 'err').textContent = 'Invalid format';
+		haserr = true;
+	} else {
+		if (id=='titlebg' || id=='titletxt') {
+			if (!checkContrast(document.getElementById('titletxt').value, document.getElementById('titlebg').value)) {
+				document.getElementById('titletxt').setAttribute('aria-invalid', true);
+				document.getElementById('titletxt').setAttribute('aria-describedby', 'titlecolorerr');
+				document.getElementById('titlebg').setAttribute('aria-invalid', true);
+				document.getElementById('titlebg').setAttribute('aria-describedby', 'titlecolorerr');
+				document.getElementById('titlecolorerr').textContent = 'Insufficient contrast';
+				haserr = true;
+			} else {
+				document.getElementById('titlebg').removeAttribute('aria-describedby');
+				document.getElementById('titletxt').removeAttribute('aria-describedby');
+				document.getElementById('titletxt').setAttribute('aria-invalid', false);
+				document.getElementById('titlebg').setAttribute('aria-invalid', false);
+				document.getElementById('titlecolorerr').textContent = '';
+			}
+		}
+	}
+		
+	if (!haserr) {
+		e.target.setAttribute('aria-invalid', false);
+		e.target.removeAttribute('aria-describedby');
+		document.getElementById(e.target.id + 'err').textContent = '';
+	}
+	if (id=='titlebg') {
+		document.getElementById('ex1').style.backgroundColor = e.target.value;
+	}
+	if (id=='titletxt') {
+		document.getElementById('ex1').style.color = e.target.value;
+	}
+	if (id=='bi') {
+		document.getElementById('ex2').style.backgroundColor = e.target.value;
+	}
+	document.getElementById('colorcustom').checked = true;
+}
 </script>";
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");} table td {border-bottom: 1px solid #ccf;}</style>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js?v=111825\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/contrastcheck.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/multiselect-dropdown.js\"></script>";
 
@@ -305,16 +350,19 @@ foreach ($existblocks as $pos=>$name) {
 				<tr>
 					<td><label for="titlebg">Title Background:</label> </td>
 					<td><input type=text id="titlebg" name="titlebg" value="#DDDDFF" />
+					<span id=titlebgerr class=noticetext></span>
 					</td>
 				</tr>
 				<tr>
 					<td><label for="titletxt">Title Text:</label> </td>
 					<td><input type=text id="titletxt" name="titletxt" value="#000000" />
+					<span id=titletxterr class=noticetext></span> <span id=titlecolorerr class=noticetext></span>
 					</td>
 				</tr>
 				<tr>
 					<td><label for="bi">Items Background:</label> </td>
 					<td><input type=text id="bi" name="bi" value="#EEEEFF" />
+					<span id=bierr class=noticetext></span>
 					</td>
 				</tr>
 			</table>
