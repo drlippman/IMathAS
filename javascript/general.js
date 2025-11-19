@@ -953,6 +953,9 @@ function togglevideoembed() {
 }
 function rewriteVideoUrl(href) {
 	var qsconn = '?';
+		if (href.match(/ableplayer/)) {
+			return href;
+		}
 		href = href.replace(/%3F/g,'?').replace(/%3D/g,'=');
 		if (href.match(/youtube\.com/)) {
 			if (href.indexOf('playlist?list=')>-1) {
