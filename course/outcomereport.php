@@ -40,6 +40,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 
 if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 	$gbmode = $_GET['gbmode'];
+	$_SESSION[$cid.'gbmode'] = $gbmode;
 } else if (isset($_SESSION[$cid.'gbmode'])) {
 	$gbmode =  $_SESSION[$cid.'gbmode'];
 } else {
@@ -91,9 +92,14 @@ if (isset($_GET['type'])) {
 $typesel = '<label>'. _('Show for scores: ').'<select id="typesel" onchange="chgtype()">';
 $typesel .= '<option value="0" '.($type==0?'selected="selected"':'').'>'._('Past Due scores').'</option>';
 $typesel .= '<option value="1" '.($type==1?'selected="selected"':'').'>'._('Past Due and Attempted scores').'</option>';
-$typesel .= '</select></label>';
+$typesel .= '</select></label> ';
+$typesel .= '<label>'._('Locked students:').' <select id="lockedtoggle" onchange="chglockedtoggle()">';
+$typesel .= "<option value=0 ".($hidelocked==0?'selected':'').">". _('Show Locked'). "</option>";
+$typesel .= "<option value=2 ".($hidelocked==2?'selected':'').">". _('Hide Locked'). "</option>";
+$typesel .= "</select></label>";
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+
 if ($report == 'overview') {
 	$placeinhead .= '<script>
 	function lockcol() {
@@ -116,6 +122,13 @@ $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 	function chgtype() {
 		var type = document.getElementById("typesel").value;
 		window.location = selfaddr+"&type="+type;
+	}
+	function chglockedtoggle() {
+		var newval = document.getElementById("lockedtoggle").value;
+		if (newval != '.$hidelocked.') {
+			var newgbmode = '.Sanitize::onlyInt($gbmode).' - 100*'.$hidelocked.' + 100*newval;
+			window.location = selfaddr+"&gbmode="+newgbmode;
+		}
 	}
 	</script>';
 
@@ -218,7 +231,8 @@ if ($report=='overview') {
 
 		for ($i=1;$i<count($ot);$i++) {
 			echo '<tr class="'.($i%2==0?'even':'odd').'">';
-			echo '<th scope=row><div class="trld"><a href="outcomereport.php?cid='.Sanitize::encodeUrlParam($cid).'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'"><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</span></a></div></th>';
+			$addclass = ($ot[$i][0][2])?' greystrike':'';
+			echo '<th scope=row><div class="trld"><a href="outcomereport.php?cid='.Sanitize::encodeUrlParam($cid).'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'"><span class="pii-full-name'.$addclass.'">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</span></a></div></th>';
 			//echo '<td><div></div></td>';
 			/*foreach ($outc as $oc) {
 				if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
@@ -284,7 +298,8 @@ if ($report=='overview') {
 	echo '</tr></thead><tbody>';
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
-		echo '<th scope=row><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</span></th>';
+		$addclass = ($ot[$i][0][2])?' greystrike':'';
+		echo '<th scope=row><span class="pii-full-name'.$addclass.'">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</span></th>';
 		if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$outcome])) {
 			echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';
 		} else {
