@@ -1,5 +1,6 @@
 <?php
 require '../includes/sanitize.php';
+require '../includes/videodata.php';
 require '../config.php';
 ?>
 <!DOCTYPE html>
@@ -11,6 +12,38 @@ require '../config.php';
 if (!isset($_GET['video'])) {
     echo 'Need video';
     exit;
+}
+$video = $_GET['video'];
+if (strlen($video)==11 || strpos($video, 'youtube.com')!==false || strpos($video, 'youtu.be')!==false) {
+    if (strlen($video)> 11) {
+        $video = getvideoid($video);
+    }
+    if (!preg_match('/^[a-zA-Z0-9_-]{11}$/', $video)) {
+        echo 'Invalid youtube video';
+        exit;
+    }
+    $vidload = 'data-youtube-nocookie="true" data-youtube-id="'.Sanitize::encodeStringForDisplay($video).'"';
+} else if (strpos($video, 'vimeo')!==false) {
+    if (preg_match('%^https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)(?:[?]?.*)$%im', $video, $regs)) {
+        $video = $regs[3];
+    } else {
+        echo 'Invalid vimeo video';
+        exit; 
+    }
+    $vidload = 'data-vimeo-id="'.Sanitize::encodeStringForDisplay($video).'"';
+} else if (strpos($video, 'https://')==0) {
+    $video = Sanitize::url($video);
+    if (strpos($video, '.webm')!==false) {
+        $format = 'webm';
+    } else if (strpos($video, '.mp4')!==false) {
+        $format = 'mp4';
+    } else {
+        echo 'Invalid video format - only webm and mp4 supported.';
+        exit;
+    }
+    $vidload = '<source type="video/'.$format.'" src="'.$video.'" />';
+} else {
+    echo 'Invalid video';
 }
 ?>
 <head>
@@ -48,9 +81,8 @@ $(function() {
 <body>
 <video id="video1" 
     data-able-player
-    data-youtube-nocookie="true" 
-    data-youtube-id="<?php echo Sanitize::encodeStringForDisplay($_GET['video']);?>">
 <?php
+echo $vidload;
 if (isset($_GET['captions'])) {
     echo '<track kind="captions" src="' . Sanitize::url($_GET['captions']) . '" />';
 }
