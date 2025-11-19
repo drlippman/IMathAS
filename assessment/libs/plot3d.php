@@ -298,7 +298,7 @@ function CalcPlot3Dembed($funcs, $width=500, $height=500, $xmin=-2, $xmax=2, $ym
 	$out = '<div class="video-wrapper-wrapper" style="max-width: '.Sanitize::onlyInt($width).'px">';
 	$aspectRatio = round(100*$height/$width,2);
 	$out .= '<div class="fluid-width-video-wrapper" style="padding-top:'.$aspectRatio.'%">';
-	$out .= '<iframe frameborder=0 scrolling="no" ';
+	$out .= '<iframe frameborder=0 scrolling="no" aria-label="3D graph" ';
 	//$querystring is sanitized as it's constructed
 	$out .= 'src="https://c3d.libretexts.org/CalcPlot3D/dynamicFigure/index.html?'.$querystring.'"></iframe>';
 	$out .= '</div></div>';
