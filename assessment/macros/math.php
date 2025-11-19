@@ -420,6 +420,11 @@ function evalReturnValue($str, $errordispstr = '', $vars = array()) {
     return $res;
 }
 
+function cleanround($n,$d) {
+    $n = round($n,$d);
+    return ($n==0)?0:$n;
+}
+
 function getRoundNumber($val) {
     $str = (string) $val;
     $str = str_replace('e', 'E', $str);

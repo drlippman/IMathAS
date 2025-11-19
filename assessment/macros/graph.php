@@ -447,8 +447,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         $nextavoid = null;
         $fx = array();
         $fy = array();
-        $yyaltmin = $yymin - .5 * ($yymax - $yymin);
-        $yyaltmax = $yymax + .5 * ($yymax - $yymin);
+        $yyaltmin = -1e10;//$yymin - .5 * ($yymax - $yymin);
+        $yyaltmax = 1e10; //$yymax + .5 * ($yymax - $yymin);
         if (count($avoid) > 0) {
             $nextavoid = array_shift($avoid);
         }
@@ -463,8 +463,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 if (isNaN($x) || isNaN($yorig)) {
                     continue;
                 }
-                $x = round($x, $xrnd); //round(eval("return ($xfunc);"),3);
-                $y = round($yorig, $yrnd); //round(eval("return ($yfunc);"),3);
+                $x = cleanround($x, $xrnd); //round(eval("return ($xfunc);"),3);
+                $y = cleanround($yorig, $yrnd); //round(eval("return ($yfunc);"),3);
                 if ($xmax != $xmin && $y > $yyaltmin && $y < $yyaltmax) {
                     $alt .= "<tr><td>$x</td><td>$y</td></tr>";
                 }
@@ -488,8 +488,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     }
                     continue;
                 }
-                $y = round($yorig, $yrnd); //round(eval("return ($func);"),3);
-                $x = round($x, $xrnd);
+                $y = cleanround($yorig, $yrnd); //round(eval("return ($func);"),3);
+                $x = cleanround($x, $xrnd);
                 if ($xmax != $xmin && $y > $yyaltmin && $y < $yyaltmax) {
                     $alt .= "<tr><td>$x</td><td>$y</td></tr>";
                 }
