@@ -366,6 +366,49 @@ function updateSlides(init) {
 		$('.expando').slideUp(init?0:100);
 	}
 }
+function updateColors(e) {
+	var id = e.target.id;
+	var haserr = false;
+	if (!e.target.value.match(/#[A-Fa-f0-9]{6}/)) {
+		e.target.setAttribute('aria-invalid', true);
+		e.target.setAttribute('aria-describedby', e.target.id + 'err');
+		document.getElementById(e.target.id + 'err').textContent = 'Invalid format';
+		haserr = true;
+	} else {
+		if (id=='titlebg' || id=='titletxt') {
+			if (!checkContrast(document.getElementById('titletxt').value, document.getElementById('titlebg').value)) {
+				document.getElementById('titletxt').setAttribute('aria-invalid', true);
+				document.getElementById('titletxt').setAttribute('aria-describedby', 'titlecolorerr');
+				document.getElementById('titlebg').setAttribute('aria-invalid', true);
+				document.getElementById('titlebg').setAttribute('aria-describedby', 'titlecolorerr');
+				document.getElementById('titlecolorerr').textContent = 'Insufficient contrast';
+				haserr = true;
+			} else {
+				document.getElementById('titlebg').removeAttribute('aria-describedby');
+				document.getElementById('titletxt').removeAttribute('aria-describedby');
+				document.getElementById('titletxt').setAttribute('aria-invalid', false);
+				document.getElementById('titlebg').setAttribute('aria-invalid', false);
+				document.getElementById('titlecolorerr').textContent = '';
+			}
+		}
+	}
+		
+	if (!haserr) {
+		e.target.setAttribute('aria-invalid', false);
+		e.target.removeAttribute('aria-describedby');
+		document.getElementById(e.target.id + 'err').textContent = '';
+	}
+	if (id=='titlebg') {
+		document.getElementById('ex1').style.backgroundColor = e.target.value;
+	}
+	if (id=='titletxt') {
+		document.getElementById('ex1').style.color = e.target.value;
+	}
+	if (id=='bi') {
+		document.getElementById('ex2').style.backgroundColor = e.target.value;
+	}
+	document.getElementById('colorcustom').checked = true;
+}
 $(function() {
 	var inp1 = document.getElementById(\"titlebg\");
 	attachColorPicker(inp1);
@@ -377,11 +420,13 @@ $(function() {
 	$('input[name=colors]').on('click', updateSlides);
 	$('input[name=avail]').on('click', updateSlides);
 	$('input[name=availbeh]').on('click', updateSlides);
+	$('#titlebg,#titletxt,#bi').on('input', updateColors);
 });
 var imgBase = '$staticroot/javascript/cpimages';
 </script>";
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");}</style>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js?v=111825\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/contrastcheck.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/multiselect-dropdown.js\"></script>";
 /******* begin html output ********/
@@ -524,18 +569,18 @@ if ($overwriteBody==1) {
 	<br class="coloropts"/>
 	<table class="coloropts" role="presentation" style=" margin-left: 30px;">
 		<tr>
-			<td><label for=titlegb><?php echo _('Title Background'); ?></label>: </td>
-			<td><input type=text id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" />
+			<td><label for=titlebg><?php echo _('Title Background'); ?></label>: </td>
+			<td><input type=text id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" /> <span id=titlebgerr class=noticetext></span>
 			</td>
 		</tr>
 		<tr>
 			<td><label for=titletxt><?php echo _('Title Text'); ?></label>: </td>
-			<td><input type=text id="titletxt" name="titletxt" value="<?php echo $titletxt;?>" />
+			<td><input type=text id="titletxt" name="titletxt" value="<?php echo $titletxt;?>" /> <span id=titletxterr class=noticetext></span> <span id=titlecolorerr class=noticetext></span>
 			</td>
 		</tr>
 		<tr class="expando">
 			<td><label for=bi><?php echo _('Items Background'); ?></label>: </td>
-			<td><input type=text id="bi" name="bi" value="<?php echo $bi;?>" />
+			<td><input type=text id="bi" name="bi" value="<?php echo $bi;?>" /> <span id=bierr class=noticetext></span>
 			</td>
 		</tr>
 	</table>

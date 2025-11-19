@@ -237,16 +237,7 @@
 	function hColorPickerMouseDown(){
 		if(cp.cpColor.r || (cp.cpColor.r===0)) cp.cpColor = '#'+hex(cp.cpColor.r)+hex(cp.cpColor.g)+hex(cp.cpColor.b);
 		cp.cpInput.value = cp.cpColor;
-		if (cp.cpInput.id=="titlebg") {
-			document.getElementById("ex1").style.backgroundColor = cp.cpColor;
-		}
-		if (cp.cpInput.id=="titletxt") {
-			document.getElementById("ex1").style.color = cp.cpColor;
-		}
-		if (cp.cpInput.id=="bi") {
-			document.getElementById("ex2").style.backgroundColor = cp.cpColor;
-		}
-		document.getElementById("colorcustom").checked = true;
+		cp.cpInput.dispatchEvent(new Event('input'));
 		hideColorPicker();
 	}
 
