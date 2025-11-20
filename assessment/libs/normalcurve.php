@@ -25,11 +25,11 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
    if ($_SESSION['graphdisp'] == 0) {
       $alt = sprintf(_('A bell-shaped curve. '), $mu);
       if ($axislabel != '') {
-         $alt .= sprintf(_('The axis is labeled %s. '), $axislabel);
+         $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
       }
       $bn = ceil(($a - $mu)/$sigma - 1e-8);
       $tn = floor(($b - $mu)/$sigma + 1e-8);
-      $alt .= _('The axis has tickmarks at ');
+      $alt .= _('The horizontal axis has tick mark at ');
       $tm = [];
       for ($i=$bn;$i<=$tn;$i++) {
          $tm[] = $mu + $i*$sigma;
@@ -37,7 +37,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
       $tm[count($tm)-1] = _('and').' '.$tm[count($tm)-1];
       $alt .= implode(', ', $tm) . '. ';
 
-      $alt .= sprintf(_('The curve is centered at %d. '), $mu);
+      $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
       
       if ($dirx == 'right' && $diry == 'left') {
          $alt .= sprintf(_('The area from %d to %d is shaded.'), $x, $y);
