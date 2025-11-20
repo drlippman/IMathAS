@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|uid|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|uid|id|regex|used|avgtime|mine|intext|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[3]);
         }
-        $str = preg_replace('/(author|type|uid|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|uid|id|regex|used|avgtime|mine|intext|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -57,6 +57,7 @@ function parseSearchString($str)
  *    isrand:   1 to exclude non-rand
  *    isbroken: 1 to limit to broken questions
  *    wronglib: 1 to limit to questions marked as in wrong library
+ *    intext:   1 to search in qtext/control instead of description (only allowed on mine=1)
  *    res:      resources
  *    lastmod:  lastmod date range: "lower,upper"
  *    created:  created date range: "lower,upper"
@@ -115,9 +116,23 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             }
         }
     }
+    $searchintext = false;
+    if (!empty($search['intext']) && 
+        (!empty($search['mine']) || 
+            (!empty($search['author']) && ctype_digit($search['author']))
+        )
+    ) {
+        $searchintext = true;
+    }
     if (!empty($search['regex'])) {
-        $searchand[] = 'iq.description REGEXP ?';
-        $searchvals[] = $search['regex'];
+        if ($searchintext) {
+            $searchand[] = '(iq.control REGEXP ? OR iq.qtext REGEXP ?)';
+            $searchvals[] = $search['regex'];
+            $searchvals[] = $search['regex'];
+        } else {
+            $searchand[] = 'iq.description REGEXP ?';
+            $searchvals[] = $search['regex'];
+        }
     }
     if (!empty($search['terms'])) {
         $wholewords = array();
@@ -128,7 +143,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 break;
             }
         }
-        if ($haspos) {
+        if ($haspos && !$searchintext) {
             foreach ($search['terms'] as $k => $v) {
                 $sgn = '+';
                 if ($v[0] == '!') {
@@ -149,11 +164,22 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             foreach ($search['terms'] as $k => $v) {
                 if ($v[0] == '!') {
                     $v = substr($v, 1);
-                    $searchand[] = 'iq.description NOT LIKE ?';
+                    if ($searchintext) {
+                        $searchand[] = '(iq.qtext NOT LIKE ? AND iq.control NOT LIKE ?)';
+                    } else {
+                        $searchand[] = 'iq.description NOT LIKE ?';
+                    }
                 } else {
-                    $searchand[] = 'iq.description LIKE ?';
+                    if ($searchintext) {
+                        $searchand[] = '(iq.qtext LIKE ? OR iq.control LIKE ?)';
+                    } else {
+                        $searchand[] = 'iq.description LIKE ?';
+                    }
                 }
                 $searchvals[] = '%' . str_replace('%', '\\%', $v) . '%';
+                if ($searchintext) {
+                    $searchvals[] = '%' . str_replace('%', '\\%', $v) . '%';
+                }
             }
         }
     }
@@ -412,7 +438,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $rightsquery2 = '';
     }
 
-    if ($searchtype == 'all' && empty($wholewords) && !empty($search['terms'])) {
+    if ($searchtype == 'all' && empty($wholewords) && !$searchintext && !empty($search['terms'])) {
         return _('Cannot search all libraries without at least one 3+ letter word in the search terms');
     }
     if ($searchtype == 'all' && $searchquery === '') {
@@ -800,7 +826,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
                         <a href="#" onClick="displayDatePicker('search-created-max', this); return false">
 			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
                     </div></div>
-                    <p><label><input type=checkbox id="search-mine"><?php echo _('Mine Only');?></label> 
+                    <p><label><input type=checkbox id="search-mine" onclick="$('#search-intext-wrap').toggle(this.checked)"><?php echo _('Mine Only');?></label> 
 <?php
     if ($page == 'addquestions') {
                     echo '<label><input type=checkbox id="search-unused">' . _('Exclude Added') . '</label> ';
@@ -810,6 +836,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
                         <label><input type=checkbox id="search-nopub"><?php echo _('Exclude Public');?></label> 
                         <label><input type=checkbox id="search-newest"><?php echo _('Newest First');?></label> 
                         <label><input type=checkbox id="search-nounrand"><?php echo _('Exclude non-randomized');?></label> 
+                        <label id="search-intext-wrap" style="display:none;"><input type=checkbox id="search-intext"><?php echo _('Search question code');?></label>
                     </p>
                     <p><?php echo _('Helps');?>: 
                         <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 

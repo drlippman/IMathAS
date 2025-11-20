@@ -34,7 +34,8 @@ $(function() {
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/g)) {
+    $("#search-intext-wrap").hide();
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|intext|unused|private|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
             pts = matches[i].split(/(:|=)/);
@@ -63,6 +64,9 @@ function parseAdvSearch() {
                 $("#search-created-max").val(avgt[1]);
             } else if (pts[0] == 'mine') {
                 $("#search-mine").prop('checked', pts[2] == 1)
+                if (pts[2] == 1) {
+                    $("#search-intext-wrap").show();
+                }
             } else if (pts[0] == 'unused') {
                 $("#search-unused").prop('checked', pts[2] == 1)
             } else if (pts[0] == 'private') {
@@ -82,10 +86,12 @@ function parseAdvSearch() {
                 $("#search-broken").prop('checked', pts[2] == 1);
             } else if (pts[0] == 'wronglib') {
                 $("#search-wronglib").prop('checked', pts[2] == 1);
+            } else if (pts[0] == 'intext') {
+                $("#search-intext").prop('checked', pts[2] == 1);
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|intext|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -148,6 +154,9 @@ function doAdvSearch() {
     }
     if ($("#search-mine").is(':checked')) {
         outstr += 'mine:1 ';
+    }
+    if ($("#search-intext").is(':checked') && $("#search-mine").is(':checked')) {
+        outstr += 'intext:1 ';
     }
     if ($("#search-unused").is(':checked')) {
         outstr += 'unused:1 ';
