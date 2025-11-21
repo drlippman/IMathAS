@@ -8,11 +8,11 @@
   It should be called once a day.
 
   Config options (in config.php):
-  To enable using LTI queue:
+  To enable using email queue:
      $CFG['email']['usequeue'] = true;
 
   Authcode to pass in query string if calling as scheduled web service;
-  Call processltiqueue.php?authcode=thiscode
+  Call processemailqueue.php?authcode=thiscode
      $CFG['email']['authcode'] = "thecode";
 */
 
