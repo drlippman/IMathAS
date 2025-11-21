@@ -25,11 +25,13 @@ priority: (optional) priority of the email from 1 (low) to 10 (high)
 		  Password resets / new acct notices: priority 10
 		  Emails sent as user: 5
 		  Quickdrill results: 8
-		  
+includeUnsub: (optional) include unsubscribe headers
+usequeue: (optional) set to 2 to push to emailqueue instead of sending now. Note all queued emails 
+			will be sent with includeUnsub enabled
 */
 
-function send_email($email, $from, $subject, $message, $replyto=array(), $bccList=array(), $priority=10, $includeUnsub = false) {
-	global $CFG;
+function send_email($email, $from, $subject, $message, $replyto=array(), $bccList=array(), $priority=10, $includeUnsub = false, $usequeue=1) {
+	global $CFG,$DBH;
 	if (!is_array($email)) {
 		$email = array($email);
 	}
@@ -66,6 +68,13 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 	if (!isset($CFG['email']['handlerpriority'])) {
 		$CFG['email']['handlerpriority'] = 0;
 	}
+	if (!empty($CFG['email']['usequeue']) && $usequeue == 2) {
+		$stm = $DBH->prepare("INSERT IGNORE INTO imas_emailqueue (email,emailfrom,subject,message,priority,sendafter) VALUES (?,?,?,?,?,?)");
+		foreach ($email as $emailto) {
+			$stm->execute([$emailto, $from, $subject, $message, $priority, time()]);
+		}
+		return;
+	}
 	if (isset($CFG['email']['handler']) && $priority>$CFG['email']['handlerpriority']) {
 		list($handlerscript, $sendfunc) = $CFG['email']['handler'];
 		require_once __DIR__ . '/' . $handlerscript;
@@ -75,6 +84,7 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 		send_SESemail($email, $from, $subject, $message, $replyto, $bccList, $includeUnsub);
 	} else {
 		$tostr = implode(',', $email);
+
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 		$headers .= "From: $from\r\n";
