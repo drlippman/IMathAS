@@ -7,47 +7,7 @@
 <html>
 <head>
 <title><?php echo $installname;?> Help</title>
-<style type="text/css">
-table td {
-	padding: 1px 10px;
-}
-table thead td {
-	font-weight: bold;
-}
-ul li {
-	margin-top: .3em;
-}
-span.icon {
-	padding-left: 5px;
-	padding-right: 5px;
-	background-color: #ff0;
-	color:#00d;	
-	border: 1px solid #00f;
-	font-weight: bolder;
-}
-h1,h2,h3 {
-	margin-top: 1.5em;
-	margin-bottom: .5em;
-}
-h1 {
-	color: #00f;
-}
-h2,h3,h4,h5,h6 {
-	color: #00c;
-}
-div.h2 {
-	margin-left: 5px;
-}
-div.h3 {
-	margin-left: 10px;
-}
-div.h4 {
-	margin-left: 15px;
-}
-dd {
-	margin-bottom: .4em;
-}
-</style>
+<link rel="stylesheet" href="<?php echo $staticroot;?>/assessment/libs/help.css?v=112325" type="text/css" />
 <link rel="stylesheet" href="<?php echo $staticroot;?>/iconfonts/style.css?v=081316" type="text/css" />
 <link rel="stylesheet" href="<?php echo $staticroot;?>/tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
 <?php
