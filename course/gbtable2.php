@@ -305,7 +305,7 @@ function gbtable() {
 
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti,ver,viewingb,scoresingb,deffeedbacktext";
+	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,isgroup,allowlate,date_by_lti,ver,viewingb,scoresingb,deffeedbacktext";
 	if ($limuser>0) {
 		$query .= ',reqscoreaid,reqscore,reqscoretype,workcutoff';
 	}
@@ -400,7 +400,7 @@ function gbtable() {
 			$avail[$kcnt] = 0;
 		}
 		$category[$kcnt] = $line['gbcategory'];
-		$isgroup[$kcnt] = ($line['groupsetid']!=0);
+		$isgroup[$kcnt] = ($line['groupsetid']!=0 && $line['isgroup']>0);
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
 		if (isset($deffeedback[0]) && $deffeedback[0]=='Practice') { //set practice as no count in gb
