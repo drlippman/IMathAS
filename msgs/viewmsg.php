@@ -120,7 +120,7 @@
 			echo " <img style=\"float:left;\" class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 		}
 	}
-	echo "<table class=gb ><tbody>";
+	echo "<table class=gb role=presentation><tbody>";
 	if ($type=='sent') {
 		echo '<tr><td><b>'._('To').':</b></td>';
 	} else {
