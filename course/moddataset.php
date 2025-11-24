@@ -365,7 +365,7 @@
 
 		if ($isok) {
 			//upload image files if attached
-			if ($_FILES['imgfile']['name']!='') {
+			if (!empty($_FILES['imgfile']['name'])) {
 				$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
 				$_POST['newimgvar'] = preg_replace('/[^\w\[\]]/','', $_POST['newimgvar']);
 				if (!is_uploaded_file($_FILES['imgfile']['tmp_name'])) {
