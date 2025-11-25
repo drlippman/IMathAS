@@ -128,7 +128,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?type=$type';</script>";
-$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=080625\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=112525\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var hidelinksonchange = false;
@@ -201,8 +201,8 @@ echo '<div class="sr-only" tabindex=0 onfocus="this.className=\'\'">'._('Keyboar
 function listCourse($course) {
 	$now = time();
 	echo '<li id="c'.Sanitize::onlyInt($course['id']).'">';
-	echo '<span class=icon style="background-color:#0f0">C</span> ';
-	echo '<span id="cn'.Sanitize::onlyInt($course['id']).'">'.Sanitize::encodeStringForDisplay($course['name']).'</span>';
+	echo '<span class=icon style="background-color:#0f0" aria-hidden="true">C</span> ';
+	echo '<span id="cn'.Sanitize::onlyInt($course['id']).'" class="namewrapnoedit">'.Sanitize::encodeStringForDisplay($course['name']).'</span>';
 	if (isset($course['available']) && (($course['available']&1)==1)) {
 		echo ' <em style="color:green;">', _('Unavailable'), '</em>';
 	}

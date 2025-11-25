@@ -192,6 +192,7 @@ var Nested = function(listid, newoptions) {
 			if (el.next('li').length) {
 				if (indrag) {
 					el.insertAfter(el.next('li'));
+					$("#statusmsg").text(_('Item moved to position ') + (el.index()+1));
 					madechg = true;
 				} else {
 					el.attr("tabindex","-1");
@@ -209,6 +210,7 @@ var Nested = function(listid, newoptions) {
 			if (el.prev('li').length) {
 				if (indrag) {
 					el.insertBefore(el.prev('li'));
+					$("#statusmsg").text(_('Item moved to position ') + (el.index()+1));
 					madechg = true;
 				} else {
 					el.attr("tabindex","-1");
@@ -228,6 +230,7 @@ var Nested = function(listid, newoptions) {
 					!el.closest('ul').parent().closest('ul').hasClass('nochildren')
 				) {
 					el.insertAfter(el.closest('ul').closest('li'));
+					$("#statusmsg").text(_('Item moved to parent list position ') + (el.index()+1));
 					madechg = true;	
 				}
 			} else {
@@ -247,6 +250,7 @@ var Nested = function(listid, newoptions) {
 						toggleCollapse(el.prev('li'));
 						//el.prev('li').removeClass('nCollapse').children('ul').show();
 					}
+					$("#statusmsg").text(_('Item moved into child list position') + (el.index()+1));
 					el.appendTo(el.prev('li').children('ul'));
 					madechg = true;
 				} 
@@ -264,7 +268,13 @@ var Nested = function(listid, newoptions) {
 			if (!(options.lock == 'class' && el.hasClass(options.lockClass))) {
 				el.toggleClass('drag');
 				list.toggleClass('dragactive');
-				el.attr("aria-selected", !el.attr("aria-selected"));
+				var newstate = (el.attr("aria-selected") !== 'true');
+				el.attr("aria-selected", newstate);
+				if (newstate == true) {
+					$("#statusmsg").text(_('Item Selected') + ' ' + $(el).find(".namewrap,.namewrapnoedit").text());
+				} else {
+					$("#statusmsg").text(_('Item Dropped'));
+				}
 				event.preventDefault();
 			}
 		} else if (event.key == 'Tab') {
