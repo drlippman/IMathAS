@@ -2278,7 +2278,7 @@ function gbtable() {
 							$cattotstu[$stype][$cat] = 0;
 						}
 						if (isset($cattotstuec[$stype][$cat])) {
-							$cattotstuec[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstuec[$stype][$cat])/$tokeep;
+							$cattotstuec[$stype][$cat] = ($tokeep>0)?(array_sum($catpossstu[$stype][$cat])*array_sum($cattotstuec[$stype][$cat])/$tokeep):0;
 						}
 					} else {
 						if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotstu[$stype][$cat])) { //if drop is set and have enough items
