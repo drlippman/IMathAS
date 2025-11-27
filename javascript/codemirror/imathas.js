@@ -147,7 +147,7 @@
     // polys2
     imathasBuiltin += " formpoly2 writepoly2 addpolys2 subtpolys2 multpolys2 scalepoly2 getcoef2 polypower2";
     // polys
-    imathasBuiltin += " formpoly formpolyfromroots writepoly addpolys subtpolys multpolys scalepoly roundpoly quadroot getcoef polypower checkpolypowerorder derivepoly polys_getdegree";
+    imathasBuiltin += " formpoly formpolyfromroots writepoly addpolys subtpolys multpolys scalepoly roundpoly quadroot getcoef polypower checkpolypowerorder derivepoly polys_getdegree describepoly describerational";
     // primes
     imathasBuiltin += " getprime getprimes isprime";
     // radicals
