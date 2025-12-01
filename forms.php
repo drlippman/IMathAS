@@ -478,7 +478,7 @@ switch($_GET['action']) {
             }
         }
 		if ($doselfenroll) {
-			echo '<p>',_('Select the course you\'d like to enroll in'),'</p>';
+			echo '<p><label for="courseselect">',_('Select the course you\'d like to enroll in'),'</label></p>';
 			echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 			echo '<option value="0" selected="selected">',_('My teacher gave me a course ID (enter below)').'</option>';
 			echo '<optgroup label="Self-study courses">';

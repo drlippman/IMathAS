@@ -1741,7 +1741,7 @@ switch($_GET['action']) {
 		echo '<p>Enter the 2-factor authentication code from your device. This code can be found in the Google Authenticator compatible app, like Authy, that you set up when you enabled 2-factor authentication.</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'">';
 		echo '<input type=hidden name=action value="entermfa" />';
-		echo '<p>Code: <input size=8 name=mfatoken /></p>';
+		echo '<p><label>Code: <input size=8 name=mfatoken /></label></p>';
 		echo '<p><label><input type=checkbox name=mfatrust /> Do not ask again on this device</label></p>';
 		echo '<p><input type=submit value="Verify Code" /></p>';
 		echo '</form>';
@@ -1750,8 +1750,8 @@ switch($_GET['action']) {
 		if ($myrights < 20) { echo _("You don't have the authority for this action"); break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Find Student'),'</h1></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
-		echo '<p>',_('Enter all or part of the name, email, or username:'),' ';
-		echo '<input type=text class="pii-mixed" size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo'] ?? '').'"/></p>';
+		echo '<p><label>',_('Enter all or part of the name, email, or username:'),' ';
+		echo '<input type=text class="pii-mixed" size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo'] ?? '').'"/></label></p>';
 		echo '<input type="submit">';
 		echo '</form>';
 		if (!empty($_POST['userinfo'])) {
