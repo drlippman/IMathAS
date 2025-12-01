@@ -326,16 +326,16 @@ require_once '../includes/checkdata.php';
 		echo '</span><br class=form>';
 		if ($sendtype=='Message') {
 			echo '<span class="form"><label for="savesent">Save in sent messages?</label></span>';
-			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';
+			echo '<span class="formright"><input type="checkbox" name="savesent" id="savesent" checked="checked" /></span><br class="form" />';
 		}
 
 		if (!isset($_GET['nolimit'])) {
-			echo "<span class=form><label for=\"limit\">Limit send: </label></span>";
+			echo "<span class=form>Limit send:</span>";
 			echo "<span class=formright>";
-			echo 'Only send to students who haven\'t <select name="limittype">';
+			echo '<label>Only send to students who haven\'t <select name="limittype">';
 			echo ' <option value="start" selected>started</option>';
 			echo ' <option value="comp">tried every problem in</option>';
-			echo '</select> this assessment: ';
+			echo '</select></label> <label>this assessment: ';
 			echo "<select name=\"aidselect\" id=\"aidselect\">\n";
 			echo "<option value=\"0\">Don't limit - send to all</option>\n";
 			$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
@@ -345,7 +345,7 @@ require_once '../includes/checkdata.php';
 				if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
 				echo ">".Sanitize::encodeStringForDisplay($line['name'])."</option>\n";
 			}
-			echo "</select>\n";
+			echo "</select></label>\n";
 		}
 		echo "<input type=hidden name=\"tolist\" value=\""
 	. Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";

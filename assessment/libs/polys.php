@@ -8,7 +8,7 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree","describepoly","describerational");
 
 
 //formpoly(coefficients,powers or degree)
@@ -307,5 +307,145 @@ function derivepoly($p) {
     }
 	return $out;
 }
+/*
+*   $eqn: string equation
+*	$xints: array of x-intercepts
+*	$vas: array of vertical asymptotes; empty array for none
+* 	$ha: horizontal asymptote. value, or null if none
+* 	$invar: input variable, default x
+* 	$outvar: output variable, default y
+* 	$other: array of other features, each of form [xval, 'description'] or 'description'
+* 		ex: [[3, 'local minimum'], 'slant asysmptote of y=3x+1']
+*		if xval is given, it will calculate the y and generate "description at (xval,yval)"
+*/
+function describerational($eqn, $xints, $vas, $ha, $invar="x", $outvar="y", $other=[]) {
+	if (!is_array($xints)) {
+		echo "describerations: xints must be array";
+		return '';
+	}
+	if (!is_array($vas)) {
+		echo "describerations: vas must be array";
+		return '';
+	}
+	if (!is_string($invar)) { 
+		echo "input var must be string";
+		return '';
+	}
+	if (!is_string($outvar)) { 
+		echo "output var must be string";
+		return '';
+	}
+	$func = makeMathFunction($eqn, $invar, [], '', true);
+    if ($func === false) {
+		return 'invalid function';
+		return '';
+	}
+	$critical = [];
+	$final = [];
+	foreach ($xints as $xi) {
+		$critical[] = [$xi, 'xint'];
+	}
+	foreach ($vas as $va) {
+		$critical[] = [$va, 'va'];
+	}
+	foreach ($other as $ot) {
+		if (is_array($ot)) {
+			$critical[] = [$ot[0], 'other', $ot[1]];
+		} else {
+			$final[] = $ot;
+		}
+	}
+	if (!in_array(0, $xints) && !in_array(0, $vas) && !in_array(0, $other)) {
+		$critical[] = [0, 'yint'];
+	}
+	usort($critical, function($a,$b) { return $a[0] <=> $b[0];});
+	if (count($vas)==0) {
+		$alt = _('Polynomial function. ');
+	} else {
+		$alt = _('Rational function. ');
+	}
+	$left = null;
+	$cnt = count($critical);
+	$donepoint = false;
+	for ($i=0;$i<$cnt;$i++) {
+		if ($left === null) {
+			$left = round($func([$invar=> $critical[$i][0] - 1]),4);
+			if ($ha===null) {
+				$dir = ($left>0)?_('infinity'):_('negative infinity');
+			} else {
+				$dir = $ha;
+			}
+			$alt .= sprintf(_('As %s approaches negative infinity, %s approaches %s. '),
+				$invar, $outvar, $dir);
+		}
+		if ($critical[$i][1]=='yint') {
+			$right = round($func([$invar=>0]),4);
+			$alt .= sprintf(_('%s-intercept at %s. '),
+				$outvar, $right);
+			$donepoint = true;
+		} else if ($critical[$i][1]=='other') {
+			$right = $func([$invar=>$critical[$i][0]]);
+			$alt .= sprintf(_('%s at (%s,%s). '),
+				$critical[$i][2], $critical[$i][0], $right);
+		} else {
+			$rightx = $critical[$i][0]+1;
+			if (isset($critical[$i+1])) {
+				$rightx = min($rightx, ($critical[$i][0]+$critical[$i+1][0])/2);
+			}
+			$right = round($func([$invar=>$rightx]),4);
+			if ($rightx >= 0 && !$donepoint) {
+				$alt .= sprintf(_('Graph passes through the point (%s,%s). '),
+					$rightx, $right);
+				$donepoint = true;
+			}
+			if ($critical[$i][1]=='xint') {
+				if (sign($left)==sign($right)) {
+					$alt .= sprintf(_('%s-intercept at %s where the graph touches the axis and changes direction. '),
+						$invar, $critical[$i][0]);
+				} else {
+					$alt .= sprintf(_('%s-intercept at %s where the graph passes through the axis. '),
+						$invar, $critical[$i][0]);
+				}
+			} else if ($critical[$i][1]=='va') {
+				if (sign($left)==sign($right)) {
+					$alt .= sprintf(_('As %s approaches %s from both sides, %s approaches %s. '),
+						$invar, $critical[$i][0], $outvar,
+						($left>0)?_('infinity'):_('negative infinity')
+					);
+				} else {
+					$alt .= sprintf(_('As %s approaches %s from the left, %s approaches %s. '),
+						$invar, $critical[$i][0], $outvar,
+						($left>0)?_('infinity'):_('negative infinity')
+					);
+					$alt .= sprintf(_('As %s approaches %s from the right, %s approaches %s. '),
+						$invar, $critical[$i][0], $outvar,
+						($right>0)?_('infinity'):_('negative infinity')
+					);
+				}
+			}
+		}
+		if ($i==$cnt-1) {
+			if ($ha===null) {
+				$dir = ($right>0)?_('infinity'):_('negative infinity');
+			} else {
+				$dir = $ha;
+			}
+			$alt .= sprintf(_('As %s approaches infinity, %s approaches %s.'),
+				$invar, $outvar, $dir);
+		}
+		$left = $right;
+	}
+	foreach ($final as $f) {
+		$alt .= ' '.$f.'.';
+	}
+	return $alt;
+}
 
+function describepoly($eqn, $xints, $invar="x", $outvar="y", $other=[]) {
+	if (!is_array($xints)) {
+		echo "describepoly: xints must be array";
+		return '';
+	}
+	return describerational($eqn, $xints, [], null, $invar, $outvar, $other);
+}
 ?>

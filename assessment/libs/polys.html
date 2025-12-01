@@ -18,6 +18,8 @@ Polynomial functions.  Version 1.1, Nov 11, 2007
 <li><a href="#quadroot">quadroot</a></li>
 <li><a href="#getcoef">getcoef</a></li>
 <li><a href="#polys_getdegree">polys_getdegree</a></li>
+<li><a href="#describepoly">describepoly</a></li>
+<li><a href="#describerational">describerational</a></li>
 </ul>
 <h3><a name="formpoly">formpoly</a></h3>
 formpoly(coefficients,powers or degree)
@@ -72,5 +74,45 @@ getcoef(poly,degree)
 <BR>poly: polynomial object, created with formpoly
 <BR>degree: degree of term to get coefficient of
 <BR>
+<BR><h3><a name="polys_getdegree">polys_getdegree</a></h3>
 polys_getdegree(poly)
 <br>Returns the degree of the polynomial
+<h3><a name="describepoly">describepoly</a></h3>
+<p><b>describepoly(eqn, xints, [invar, outvar, other])</b></p>
+<p>Generates a text description of a polynomial that you can use as 
+    an input to replacealttext when the auto-generated table of values
+    isn't sufficient for accessibility.  Note the function only describes 
+    behavior at roots for multiplicity 1 and 2 behaviors.
+</p>
+<ul>
+    <li><b>eqn</b>: string equation, like "3(x-2)(x-3)"</li>
+    <li><b>xints</b>: array of x-intercepts, like  [2,3]</li>
+    <li><b>invar</b>: (optional) input variable (default "x")</li>
+    <li><b>outvar</b>: (optional) output variable (default "y")</li>
+    <li><b>other</b>: (optional) array of other features you want to note
+        each of form 
+        [xval, 'description'] or 'description'
+ 		ex: [[3, 'local minimum'], 'graph is concave up'].
+        if xval is given, it will calculate the y and generate "description at (xval,yval)"</li>
+</ul>
+
+<h3><a name="describerational">describerational</a></h3>
+<p><b>describerational(eqn, xints, vas, ha, [invar, outvar, other])</b></p>
+<p>Generates a text description of a rational function that you can use as 
+    an input to replacealttext when the auto-generated table of values
+    isn't sufficient for accessibility. Note the function only describes 
+    behavior at roots and asymptotes for multiplicity 1 and 2 behaviors.
+</p>
+<ul>
+    <li><b>eqn</b>: string equation, like "2((x-3)(x-2))/((x-4)(x+1))"</li>
+    <li><b>xints</b>: array of x-intercepts, like [2,3]</li>
+    <li><b>vas</b>: array of x-coordinates of vertical asymptotes, like [-1,4]</li>
+    <li><b>ha</b>: horizontal asymptote value, null if none, ex: 2</li>
+    <li><b>invar</b>: (optional) input variable (default "x")</li>
+    <li><b>outvar</b>: (optional) output variable (default "y")</li>
+    <li><b>other</b>: (optional) array of other features you want to note
+        each of form 
+        [xval, 'description'] or 'description'
+ 		ex: [[3, 'local minimum'], 'slant asymptote of y=x+1'].
+        if xval is given, it will calculate the y and generate "description at (xval,yval)"</li>
+</ul>
