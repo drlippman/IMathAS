@@ -2322,10 +2322,14 @@ The following macros create graphs or tables:
     Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
     or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
     and $opts["caption"] to add a caption to the table.</li>
-<li><strong>horizshowarrays(string,array,[string,array]...)</strong>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
-    as row labels.  Does not text wrap, so only use for small data sets.</li>
-<li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[format])</strong>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.
-    The rowlabels and columnlabels are arrays of labels. format = "c", "r", or "l" to center, left-align, or right align data.</li>
+<li><strong>horizshowarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
+    as row labels.  Does not text wrap, so only use for small data sets. Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
+	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
+      and $opts["caption"] to add a caption to the table</li>
+<li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[options])</strong>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.
+    The rowlabels and columnlabels are arrays of labels. Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
+	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
+      and $opts["caption"] to add a caption to the table.</li>
 <li><strong>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</strong>
 	<ul>
 	<li><strong>funcstrings</strong> is a single string or an array of strings each having at least the first of the following list:<BR>

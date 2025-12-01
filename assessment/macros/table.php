@@ -51,10 +51,8 @@ function showarrays() {
         $out .= ' style="margin:0 auto;"';
     }
     $out .= '>';
-    if ($caption != '') {
-        $out .= '<caption>' . Sanitize::encodeStringForDisplay($caption) . '</caption>';
-    }
     $hashdr = false;
+    $hdrtexts = [];
     $maxlength = 0;
     for ($i = 0; $i < $ncol; $i++) {
         if (!is_scalar($alist[2 * $i])) {
@@ -62,6 +60,7 @@ function showarrays() {
             $alist[2 * $i] = '';
         }
         if ($alist[2 * $i] != '') {
+            $hdrtexts[] = $alist[2 * $i];
             $hashdr = true;
         }
         if (!is_array($alist[2 * $i + 1])) {
@@ -70,6 +69,13 @@ function showarrays() {
         if (count($alist[2 * $i + 1]) > $maxlength) {
             $maxlength = count($alist[2 * $i + 1]);
         }
+    }
+    if ($caption != '') {
+        $out .= '<caption>' . Sanitize::encodeStringForDisplay($caption) . '</caption>';
+    } else if ($hashdr) {
+        $out .= '<caption class="sr-only">' . _('Data Table for ') .Sanitize::encodeStringForDisplay(implode(', ', $hdrtexts)). '</caption>';
+    } else {
+        $out .= '<caption class="sr-only">' . _('Data Table') . '</caption>';
     }
     if ($hashdr) {
         $out .= '<thead><tr>';
@@ -105,11 +111,37 @@ function showarrays() {
     return $out;
 }
 
-function showrecttable($m, $clabel, $rlabel, $format = '') {
+function showrecttable($m, $clabel, $rlabel, $opts = '') {
     if (count($m) != count($rlabel) || count($m[0]) != count($clabel)) {
         return 'Error - label counts don\'t match dimensions of the data';
     }
-    $out = '<table class=stats><thead><tr><th></th>';
+    $format = "default";
+    $caption = "";
+    $tablealign = '';
+    if (is_array($opts)) {
+        if (isset($opts['caption'])) {
+            $caption = $opts['caption'];
+        }
+        if (isset($opts['format'])) {
+            $format = $opts['align'];
+        }
+        if (isset($opts['tablealign'])) {
+                $tablealign = $opts['tablealign'];
+            }
+    } else {
+        $format = $opts;
+    }
+    $out = '<table class=stats';
+    if ($tablealign == 'center') {
+        $out .= ' style="margin:0 auto;"';
+    }
+    $out .= '>';
+    if ($caption != '') {
+        $out .= '<caption>'.Sanitize::encodeStringForDisplay($caption).'</caption>';
+    } else {
+        $out .= '<caption class="sr-only">'._('Data table').'</caption>';
+    }
+    $out .= '<thead><tr><th></th>';
     for ($i = 0; $i < count($clabel); $i++) {
         $out .= "<th scope=\"col\">{$clabel[$i]}</th>";
     }
@@ -136,12 +168,37 @@ function showrecttable($m, $clabel, $rlabel, $format = '') {
 
 function horizshowarrays() {
     $alist = func_get_args();
+    $format = "default";
+    $caption = "";
+    $tablealign = '';
     if (count($alist) < 2) {
         return false;
     }
-
+    if (count($alist) % 2 == 1) {
+        if (is_array($alist[count($alist) - 1])) {
+            $opts = $alist[count($alist) - 1];
+            if (isset($opts['align'])) {
+                $format = $opts['align'];
+            }
+            if (isset($opts['caption'])) {
+                $caption = $opts['caption'];
+            }
+            if (isset($opts['tablealign'])) {
+                $tablealign = $opts['tablealign'];
+            }
+        } else if (is_string($alist[count($alist) - 1])) {
+            $format = $alist[count($alist) - 1];
+        }
+        array_pop($alist);
+    }
     $maxlength = 0;
+    $hashdr = false;
+    $hdrtexts = [];
     for ($i = 0; $i < count($alist) / 2; $i++) {
+        if ($alist[2 * $i] != '') {
+            $hdrtexts[] = $alist[2 * $i];
+            $hashdr = true;
+        }
         if (!isset($alist[2 * $i + 1])) {
             $alist[2 * $i + 1] = [];
         } else if (!is_array($alist[2 * $i + 1])) {
@@ -151,11 +208,31 @@ function horizshowarrays() {
             $maxlength = count($alist[2 * $i + 1]);
         }
     }
-    $out = '<table class=stats>';
+    $out = '<table class=stats';
+    if ($tablealign == 'center') {
+        $out .= ' style="margin:0 auto;"';
+    }
+    $out .= '>';
+    if ($caption != '') {
+        $out .= '<caption>' . Sanitize::encodeStringForDisplay($caption) . '</caption>';
+    } else if ($hashdr) {
+        $out .= '<caption class="sr-only">' . _('Data Table for ') .Sanitize::encodeStringForDisplay(implode(', ', $hdrtexts)). '</caption>';
+    } else {
+        $out .= '<caption class="sr-only">' . _('Data Table') . '</caption>';
+    }
+    $class = '';
+    if ($format == 'c' || $format == 'C') {
+        $class = ' class="c"';
+    } else if ($format == 'r' || $format == 'R') {
+        $class = ' class="r"';
+    } else if ($format == 'l' || $format == 'L') {
+        $class = ' class="l"';
+    }
+    $out .= '<tbody>';
     for ($i = 0; $i < count($alist) / 2; $i++) {
-        $out .= "<tr><th scope=\"row\"><b>{$alist[2 *$i]}</b></th>";
+        $out .= "<tr><th scope=\"row\"$class><b>{$alist[2 *$i]}</b></th>";
         if (count($alist[2 * $i + 1]) > 0) {
-            $out .= "<td>" . implode("</td><td>", $alist[2 * $i + 1]) . "</td>";
+            $out .= "<td$class>" . implode("</td><td$class>", $alist[2 * $i + 1]) . "</td>";
         }
         if (count($alist[2 * $i + 1]) < $maxlength) {
             $out .= str_repeat('<td></td>', $maxlength - count($alist[2 * $i + 1]));
@@ -226,6 +303,8 @@ function showdataarray($a, $n = 1, $opts = null) {
         $out .= '>';
         if ($caption != '') {
             $out .= '<caption>' . Sanitize::encodeStringForDisplay($caption) . '</caption>';
+        } else {
+            $out .= '<caption class="sr-only">'._('Data').'</caption>';
         }
         $out .= '<tbody>';
         $cnt = 0;
