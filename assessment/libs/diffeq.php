@@ -35,6 +35,7 @@ function diffeq_slopefield($func,$options=[]) {
     $color = $options['color'] ?? 'blue';
     $len = floatval($options['length'] ?? 0.75);
     $norm = boolval($options['norm'] ?? true);
+    $caption = $options['caption'] ?? '';
     
 
     $vs = array_map('trim', explode(',',$vars));
@@ -59,14 +60,17 @@ function diffeq_slopefield($func,$options=[]) {
     }
 
     if ($doalt) {
-        if ($format == 'vectorfield') {
-            $alt = '<table class=gridded><caption>'._('Graph of a vectorfield. The table lists the vector at various points.').'</caption>';
+        $alt = '<table class=gridded><caption>';
+        if (!empty($caption)) {
+            $alt .= $caption;
+        } else if ($format == 'vectorfield') {
+            $alt .= _('Vector field. Each cell lists the vector at that point.');
         } else {
-            $alt = '<table class=gridded><caption>'._('Graph of a slopefield. The table lists the slope at various points.').'</caption>';
+            $alt .= _('Slope field. Each cell lists the slope at that point.');
         }
-        $alt .= '<thead><tr><th></th>';
-        for ($y = $xmin; $y < $ymax + $dy/2; $y += $dy) {
-            $alt .= '<th>'.$vs[1].'='.round($y,$yrnd).'</th>';
+        $alt .= '</caption><thead><tr><th></th>';
+        for ($x = $xmin; $x < $xmax + $dx/2; $x += $dx) {
+            $alt .= '<th>'.$vs[0].'='.round($x,$xrnd).'</th>';
         }
         $alt .= '</tr></thead><tbody>';
     }
@@ -103,11 +107,11 @@ function diffeq_slopefield($func,$options=[]) {
             }
         }
     }
-    for ($x = $xmin; $x < $xmax + $dx/2; $x += $dx) {
+    for ($y = $ymin; $y < $ymax + $dy/2; $y += $dy) {
         if ($doalt) {
-            $alt .= '<tr><th scope=row>'.$vs[0].'='.round($x,$xrnd).'</th>';
+            $alt .= '<tr><th scope=row>'.$vs[1].'='.round($y,$yrnd).'</th>';
         }
-        for ($y = $ymin; $y < $ymax + $dy/2; $y += $dy) {
+        for ($x = $xmin; $x < $xmax + $dx/2; $x += $dx) {
             if (empty($data[$x][$y])) {
                 if ($doalt) {
                     $alt .= '<td>-</td>';
