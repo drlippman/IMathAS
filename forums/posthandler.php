@@ -512,11 +512,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$replybytime = tzdate("g:i a",time()+7*24*60*60);
 		}
 		if ($forumsettings['postinstr'] != '' && $_GET['modify']=="new") {
-			echo '<h3>'._('Posting Instructions').'</h3>';
+			echo '<h2>'._('Posting Instructions').'</h2>';
 			// $forumsettings['postinstr'] contains HTML.
 			echo '<div class="intro">'.Sanitize::outgoingHtml($forumsettings['postinstr']).'</div><br/>';
 		} else if ($forumsettings['replyinstr'] != '' && $_GET['modify']=="reply") {
-			echo '<h3>'._('Reply Instructions').'</h3>';
+			echo '<h2>'._('Reply Instructions').'</h2>';
 			// $forumsettings['replyinstr'] contains HTML.
 			echo '<div class="intro">'.Sanitize::outgoingHtml($forumsettings['replyinstr']).'</div><br/>';
 		}

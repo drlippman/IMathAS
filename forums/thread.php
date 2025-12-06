@@ -855,7 +855,7 @@ echo "</p>";
 
 				echo '<td class="c">';
 				if ($isteacher) {
-					echo '<a href="#" aria-haspopup="dialog" role="button" onclick="GB_show(\''._('Thread Views').'\',\'listviews.php?cid='.$cid.'&amp;thread='.Sanitize::onlyInt($line['id']).'\',500,500);">';
+					echo '<a href="#" aria-haspopup="dialog" role="button" onclick="GB_show(\''._('Thread Views').'\',\'listviews.php?cid='.$cid.'&amp;thread='.Sanitize::onlyInt($line['id']).'\',500,500);return false;">';
 				} 
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']] ?? 0).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
 				if ($isteacher) {
