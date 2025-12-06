@@ -448,31 +448,7 @@
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
-			echo '<span class="dropdown">';
-			echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dd'.$i.'" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-			echo Sanitize::encodeStringForDisplay($descrips[$qid]).'</a>';
-			echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dd'.$i.'">';
-			echo sprintf("<li><a href=\"#\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\">%s</a></li>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), _('Score Details'));
-			if ($submitby == 'by_question') {
-				echo sprintf("<li><a href=\"#\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s</a></li>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), _('Tries Details'));
-			} else {
-				echo sprintf("<li><a href=\"#\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</a></li>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), _('Tries Details'));
-			}
-			echo sprintf("<li><a href=\"#\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s</a></li>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), _('Incomplete Details'));
-			echo sprintf("<li><a href=\"#\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</a></li>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), _('Time Details'));
-			if ($showhints) {
-				if ($showextref[$qid] && isset($qcnt[$qid]) && $qcnt[$qid]!=$qincomplete[$qid]) {
-					echo sprintf("<li><a href=\"#\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%s</a></li>",
-                        $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), _('Help Details'));
-				}
-			}
-
-			echo '</ul></span>';
+			echo Sanitize::encodeStringForDisplay($descrips[$qid]);
             echo "</td>";
 			echo "<td><a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&asid=average&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "\" ";
 			if (isset($needmanualgrade[$qid])) {
@@ -484,32 +460,31 @@
                   '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>';
             }
             echo "</td>";
-			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b>",
+			echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></a>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
             if ($extracredit[$qid] == 1) {
                 echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
             }
             echo '</td>';
 			if ($submitby == 'by_question') {
-				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</td>",
+				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
 			} else {
-				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</td>",
+				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt));
 			}
-			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</td>",
+			echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($pi));
 			if ($submitby == 'by_question') {
-				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</td>",
+				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
 			} else {
-				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</td>",
+				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
 			if ($showhints) {
 				if ($showextref[$qid] && isset($qcnt[$qid]) && $qcnt[$qid]!=$qincomplete[$qid]) {
-					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
+					echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</a></td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
 					echo '<td class="c">N/A</td>';

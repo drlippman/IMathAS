@@ -853,12 +853,14 @@ echo "</p>";
 
 				echo "<td class=c>".Sanitize::encodeStringForDisplay($posts)."</td>";
 
+				echo '<td class="c">';
 				if ($isteacher) {
-					echo '<td class="pointer c" onclick="GB_show(\''._('Thread Views').'\',\'listviews.php?cid='.$cid.'&amp;thread='.Sanitize::onlyInt($line['id']).'\',500,500);">';
-				} else {
-					echo '<td class="c">';
-				}
+					echo '<a href="#" aria-haspopup="dialog" role="button" onclick="GB_show(\''._('Thread Views').'\',\'listviews.php?cid='.$cid.'&amp;thread='.Sanitize::onlyInt($line['id']).'\',500,500);">';
+				} 
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']] ?? 0).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
+				if ($isteacher) {
+					echo '</a>';
+				}
 				if ($lastpost=='' || !isset($lastview[$line['id']]) || !isset($maxdate[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
 					echo " <span class=\"noticetext\">New</span>";
 				}

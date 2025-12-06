@@ -312,6 +312,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 		document.getElementsByTagName("body")[0].appendChild(gb_overlay);
 		var gb_window = document.createElement("div");
 		gb_window.setAttribute("role","dialog");
+		gb_window.setAttribute("aria-modal","true");
 		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
