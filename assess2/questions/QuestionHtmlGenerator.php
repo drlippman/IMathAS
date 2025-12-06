@@ -325,15 +325,16 @@ class QuestionHtmlGenerator
         }
         
         $toevalqtxt = str_replace('\\', '\\\\', $toevalqtxt);
-        $toevalqtxt = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
-            array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
+        
+        $toevalqtxt = str_replace(array('\\\\"', '\\\\$', '\\\\{', '\\\\}'),
+            array('\\"', '\\$', '\\{', '\\}'), $toevalqtxt);
 
         $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
         $solnvars = array_merge($GLOBALS['interpretcurvars'], $GLOBALS['interpretcurarrvars']);
 
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
-        $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
-            array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
+        $toevalsoln = str_replace(array('\\\\"', '\\\\$', '\\\\{', '\\\\}'),
+            array('\\"', '\\$', '\\{', '\\}'), $toevalsoln);
         $toevalsoln = preg_replace('/\$answerbox(\[.*?\])?/', '', $toevalsoln);
         
         // Reset the RNG to a known state after the question code has been eval'd.
@@ -791,6 +792,10 @@ class QuestionHtmlGenerator
           $evaledqtext = '';
           $evaledsoln = '';
         }
+
+        // fix php 8.3 breaking change: \{$a} doesn't consume \ starting in 8.3, so let's eat it
+        $evaledqtext = str_replace(['\\{','\\}'], ['{','}'], $evaledqtext);
+        $evaledsoln = str_replace(['\\{','\\}'], ['{','}'], $evaledsoln);
 
         /*
          * Possibly adjust the showanswer if it doesn't look right
