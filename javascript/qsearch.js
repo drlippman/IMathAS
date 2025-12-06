@@ -259,6 +259,12 @@ function getExistingQuestions(qlist,flattened) {
 var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong library') + '">' + 
     '<svg role=img viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><title>' + _('Marked as in wrong library') + '</title><path d="M18.1 12.1C19.7 9.1 19 5.3 16.4 3.2 13.8 1 10 1 7.5 3.2 4.9 5.4 4.2 9.1 5.7 12.1l6.2 10.6z M9.5 11.5 14.5 6.5 M9.5 6.5 14.5 11.5"></path></svg>' +
     '</span> ';
+var a11yissueicon = '<span class="a11yissueicon" title="' + _('Potentialy accessibility issue') + '">' + 
+    '<svg role=img viewBox="0 0 16 16" stroke-width="1" fill="none" stroke-linecap="round"><title>'+_('Potentialy accessibility issue')+'</title><circle stroke="black" cx="8" cy="8" r="7"/><circle fill="black" cx="8" cy="4" r="1"/><path stroke="black" d="M4 5 L8 6 L12 5 M7.5 6 L7.75 8.5 L6.5 13 M8.5 6 L8.25 8.5 L9.5 13"/><path fill="orange" d="M12 8 L8 16 L16 16 z"/><path stroke="black" d="M12 10.5v3 M12 15v.1"/></svg>' +
+    '</span> ';
+var a11ygoodicon = '<span class="a11ygoodicon" title="' + _('Positive accessibility reviews') + '">' + 
+    '<svg role=img viewBox="0 0 16 16" stroke-width="1" fill="none" stroke-linecap="round"><title>'+ _('Positive accessibility reviews')+'</title><circle stroke="black" cx="8" cy="8" r="7"/><circle fill="black" cx="8" cy="4" r="1"/><path stroke="black" d="M4 5 L8 6 L12 5 M7.5 6 L7.75 8.5 L6.5 13 M8.5 6 L8.25 8.5 L9.5 13"/></svg>' +
+    '</span> ';
 var wrongLibState = {};
 function displayQuestionList(results) {
     if (typeof results === 'string') {  // error message

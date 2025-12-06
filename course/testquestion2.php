@@ -44,6 +44,32 @@ if ($myrights<20) {
 			}
 		}
 	}
+  if (isset($_POST['a11yreview'])) {
+    if ($_POST['a11yreview'] === 'remove') {
+      $query = 'DELETE FROM imas_a11yreviews WHERE qsetid=? AND userid=?';
+      $stm = $DBH->prepare($query);
+      $stm->execute([intval($_GET['qsetid']), $userid]);
+    } else {
+      $query = 'INSERT INTO imas_a11yreviews (qsetid,userid,review) VALUES (?,?,?)
+        ON DUPLICATE KEY UPDATE review=VALUES(review)';
+      $stm = $DBH->prepare($query);
+      $stm->execute([intval($_GET['qsetid']), $userid, intval($_POST['a11yreview'])]);
+    }
+	$query = 'SELECT 
+		SUM(CASE WHEN review=1 THEN 1 ELSE 0 END) AS positive_reviews,
+		SUM(CASE WHEN review=0 THEN 1 ELSE 0 END) AS negative_reviews 
+		FROM imas_a11yreviews WHERE qsetid=?';
+	$stm = $DBH->prepare($query);
+	$stm->execute([intval($_GET['qsetid'])]);
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	$stm = $DBH->prepare('UPDATE imas_questionset SET a11ystatus=? WHERE id=?');
+	$stm->execute([
+		($line['positive_reviews']>0?1:0) + ($line['negative_reviews']>0?2:0)
+		, intval($_GET['qsetid'])
+	]);
+    echo 'DONE';
+    exit;
+  }
     if (!empty($_POST['dellibitems']) && $myrights == 100) {
         $libid = $_POST['libid'];
         $uid = $_POST['uid'];
@@ -89,16 +115,26 @@ if ($myrights<20) {
 		}
 	}
 
-  $query = "SELECT imas_users.email,imas_questionset.* ";
-	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id=:id";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':id'=>$qsetid));
-	$line = $stm->fetch(PDO::FETCH_ASSOC);
-    if ($line === false) {
-        echo _('Invalid question ID');
-        exit;
-    }
-    $isquestionauthor = ($line['ownerid'] == $userid);
+  $query = "SELECT imas_users.email,imas_questionset.*, ";
+  $query .= 'COUNT(CASE WHEN imas_a11yreviews.review=1 THEN 1 END) AS positive_reviews,';
+  $query .= 'COUNT(CASE WHEN imas_a11yreviews.review=0 THEN 1 END) AS negative_reviews ';
+  $query .= "FROM imas_questionset JOIN imas_users ON imas_users.id=imas_questionset.ownerid ";
+  $query .= "LEFT JOIN imas_a11yreviews ON imas_questionset.id=imas_a11yreviews.qsetid ";
+  $query .= "WHERE imas_questionset.id=:id GROUP BY imas_questionset.id";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':id'=>$qsetid));
+  $line = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($line === false) {
+    echo _('Invalid question ID');
+    exit;
+  }
+  $isquestionauthor = ($line['ownerid'] == $userid);
+  $mya11yreview = false;
+  if ($line['positive_reviews']>0 || $line['negative_reviews']>0) {
+    $stm = $DBH->prepare('SELECT review FROM imas_a11yreviews WHERE qsetid=? AND userid=?');
+    $stm->execute([$qsetid, $userid]);
+    $mya11yreview = $stm->fetchColumn(0);
+  }
 
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
@@ -236,6 +272,20 @@ $placeinhead .= '<script>
       }).done(function(msg) {
           $(el).parent().slideUp();
       });
+  }
+  function makea11yreview() {
+    GB_show("'._('Accessibility Review').'","a11yreview.php", 500, "auto", true);
+  }
+  function removea11yreview() {
+    senda11yreview("remove");
+  }
+  function senda11yreview(val) {
+    $.post({
+      url: window.location.href,
+      data: {a11yreview:val}
+    }).done(function(msg) {
+      window.location.reload();
+    });
   }
 
   $(function() {
@@ -512,6 +562,18 @@ if ($overwriteBody==1) {
 		echo ': <a href="testquestion2.php?cid='.$cid.'&qsetid='.intval($line['a11yalt']).'">';
 		echo intval($line['a11yalt']).'</a></p>';
 	}
+
+	echo '<p>'._('Accessibility Reviews: ');
+	echo sprintf(_('%d positive, %d negative. '),
+	  $line['positive_reviews'], $line['negative_reviews']);
+	if ($mya11yreview !== false) {
+		echo _('Your review: ');
+		echo ($mya11yreview==1?_('Positive'):_('Negative'));
+		echo '<button onclick="removea11yreview()" class="slim">'._('Remove Review').'</button>';
+	} else {
+    echo '<button onclick="makea11yreview()" class="slim">'._('Review').'</button>';
+  }
+	echo '</p>';
 
 	echo '<p>'._('Question is in these libraries:').'</p>';
 	echo '<ul id="liblist">';

@@ -247,6 +247,15 @@
 					$outputmsg .= _("Library Assignments Updated.")." ";
 				}
 
+				if (!empty($_POST['cleara11yreviews'])) {
+					// delete reviews
+					$stm = $DBH->prepare("DELETE FROM imas_a11yreviews WHERE qsetid=?");
+					$stm->execute([$_GET['id']]);
+					// disable bad review flag in a11ystatus
+					$stm = $DBH->prepare("UPDATE imas_questionset SET a11ystatus=a11ystatus&~2 WHERE id=?");
+					$stm->execute([$_GET['id']]);
+				}
+
 				$stm = $DBH->prepare("SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm->execute(array(':qsetid'=>$_GET['id']));
 				$imgcnt = $stm->rowCount();
@@ -703,6 +712,10 @@
 			}
 
 			$line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
+
+			$stm = $DBH->prepare("SELECT count(userid) FROM imas_a11yreviews WHERE qsetid=? AND review=0");
+			$stm->execute([$_GET['id']]);
+			$bada11yreviews = $stm->fetchColumn(0);
 	} else {
 			$myq = true;
             $line = array();
@@ -738,6 +751,7 @@
 			$images = array();
 			$extref = array();
 			$author = $myname;
+			$bada11yreviews = 0;
 			$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
 			if (!isset($_GET['id']) || isset($_GET['template'])) {
 				$oklibs = array();
@@ -1092,6 +1106,9 @@
 	} else if ($viewonly) {
 		echo "<p class=noticetext>"._("This view will not allow you to modify the code.  You can only view the code and make additional library assignments")."</p>";
     } 
+	if ($canedit && $bada11yreviews>0) {
+		echo '<p class="noticetext a11ynegrev">'.sprintf(_('This question has received %d negative accessibility reviews.'), $bada11yreviews).'</p>';
+	}
 ?>
 <form id=mainform enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
 <?php
@@ -1402,6 +1419,12 @@ echo '<span class=noticetext><br>'._('It is likely you should not be using this 
 echo '<a href="../help.php?section=a11yalt" target="_blank">'._('Help').'</a>';
 echo '</p>';
 
+if ($canedit && $bada11yreviews>0) {	
+	echo '<p class="a11ynegrev">'.sprintf(_('This question has received %d negative accessibility reviews.'), $bada11yreviews).' ';
+	echo _('If you have fixed the issues, you can clear the accessibility reviews.');
+	echo '<br/><label><input type=checkbox name=cleara11yreviews value=1 /> '._('Clear all accessiblity reviews').'</label></p>';
+}
+
 if ($myrights==100) {
 	echo '<p><label>'._('Mark question as deprecated and suggest alternative?').' <input type="checkbox" name="doreplaceby" ';
 	if ($line['replaceby']!=0) {
@@ -1542,6 +1565,9 @@ if (FormData){ // Only allow quicksave if FormData object exists
 
 				// Empty notices
 				$(".quickSaveNotice").empty();
+				if (data.get('cleara11yreviews') == 1) {
+					$(".a11ynegrev").hide();
+				}
 				// Load preview page
 				let leftpos = screen.left ?? screen.availLeft ?? 0;
     			let toppos = screen.top ?? screen.availTop ?? 0;
