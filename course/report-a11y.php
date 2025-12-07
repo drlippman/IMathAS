@@ -365,7 +365,7 @@ if (isset($CFG['YouTubeAPIKey'])) {
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
 if (count($errors[2])>0) {
-    echo '<h2>'._('The questions in these issues have negative accessibility reviews, suggesting they are likely legitimate issues.').'</h2>';
+    echo '<h2>'._('The questions in these issues have accessibility reviews indicating they may "need work", suggesting they are likely legitimate issues.').'</h2>';
     outputerrortable(2);
 }
 if (count($errors[1])>0) {
@@ -373,7 +373,7 @@ if (count($errors[1])>0) {
     outputerrortable(1);
 }
 if (count($errors[0])>0) {
-    echo '<h2>'._('These are potential issues in questions with positive accessibilty reviews, so these questions may be fine.').'</h2>';
+    echo '<h2>'._('These are potential issues in questions with "looks good" accessibilty reviews, so these questions may be fine.').'</h2>';
     outputerrortable(0);
 }
 

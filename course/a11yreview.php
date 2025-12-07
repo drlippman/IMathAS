@@ -26,11 +26,11 @@ echo '<li>'._('Ensure tables are not used for layout without a role=presentation
 echo '<li>'._('Any videos embedded in the question should have manually-edited captions. Please do not leave a negative review for attached "help" videos without captions, since those can be disabled by the person using the question.').'</li>';
 echo '</ul>';
 
-echo '<p>'._('If the question appears to be accessible, to the best of your understanding, leave a positive review.').'</p>';
-echo '<p><button onclick="doreview(1)">'._('Leave Positive Review').'</button></p>';
+echo '<p>'._('If the question appears to be accessible, to the best of your understanding, leave review indiciting it "looks good".').'</p>';
+echo '<p><button onclick="doreview(1)">'._('Leave "Looks Good" Review').'</button></p>';
 
-echo '<p>'._('If the question does not appear to be accessible, leave a negative review, then use the "Message Owner" option to send a message to the owner letting them know what you found so they can work on fixing it.').'</p>';
-echo '<p><button onclick="doreview(0)">'._('Leave Negative Review').'</button></p>';
+echo '<p>'._('If the question does not appear to be accessible, leave a review indicating it "needs work", then use the "Message Owner" option to send a message to the owner letting them know what you found so they can work on fixing it.').'</p>';
+echo '<p><button onclick="doreview(0)">'._('Leave "Needs Work" Review').'</button></p>';
 
 echo '<p>'._('If you are not sure, you can close this window without leaving a review.').'</p>';
 require_once "../footer.php";

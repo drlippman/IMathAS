@@ -1107,7 +1107,7 @@
 		echo "<p class=noticetext>"._("This view will not allow you to modify the code.  You can only view the code and make additional library assignments")."</p>";
     } 
 	if ($canedit && $bada11yreviews>0) {
-		echo '<p class="noticetext a11ynegrev">'.sprintf(_('This question has received %d negative accessibility reviews.'), $bada11yreviews).'</p>';
+		echo '<p class="noticetext a11ynegrev">'.sprintf(_('This question has received %d "needs work" accessibility reviews.'), $bada11yreviews).'</p>';
 	}
 ?>
 <form id=mainform enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
@@ -1420,7 +1420,7 @@ echo '<a href="../help.php?section=a11yalt" target="_blank">'._('Help').'</a>';
 echo '</p>';
 
 if ($canedit && $bada11yreviews>0) {	
-	echo '<p class="a11ynegrev">'.sprintf(_('This question has received %d negative accessibility reviews.'), $bada11yreviews).' ';
+	echo '<p class="a11ynegrev">'.sprintf(_('This question has received %d "needs work" accessibility reviews.'), $bada11yreviews).' ';
 	echo _('If you have fixed the issues, you can clear the accessibility reviews.');
 	echo '<br/><label><input type=checkbox name=cleara11yreviews value=1 /> '._('Clear all accessiblity reviews').'</label></p>';
 }

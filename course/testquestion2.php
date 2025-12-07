@@ -564,11 +564,11 @@ if ($overwriteBody==1) {
 	}
 
 	echo '<p>'._('Accessibility Reviews: ');
-	echo sprintf(_('%d positive, %d negative. '),
+	echo sprintf(_('%d "looks good", %d "needs work". '),
 	  $line['positive_reviews'], $line['negative_reviews']);
 	if ($mya11yreview !== false) {
 		echo _('Your review: ');
-		echo ($mya11yreview==1?_('Positive'):_('Negative'));
+		echo ($mya11yreview==1?_('Looks good'):_('Needs work'));
 		echo '<button onclick="removea11yreview()" class="slim">'._('Remove Review').'</button>';
 	} else {
     echo '<button onclick="makea11yreview()" class="slim">'._('Review').'</button>';
