@@ -2624,7 +2624,8 @@ These macros are for working with arrays:
 <li><strong>arrayfindindex(needle,haystack)</strong>: Returns the index in the array haystack of the value needle.  If there are multiple matches, it only returns the first.</li>
 <li><strong>arrayfindindices(needle,haystack)</strong>: Returns an array of indices in the array haystack of the value needle.</li>
 <li><strong>array_flip(array)</strong>:  Reverses a one-to-one array, so indexes become values and values become indexes</li>
-
+<li><strong>print_r(array, [return])</strong>: Outputs an array for debugging purposes. Add second argument true to return the output as a string you
+	can store to a variable and include in your question text for nicer debugging.</li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
@@ -2704,6 +2705,8 @@ These macros are used for mathematical calculations:
 <li><strong>sign(a,[option])</strong>:  Returns the sign of a, as 1 or -1.  If option is set to true, returns a string "+" or "-" instead. If option
   is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
 <li><strong>sgn(a)</strong>: Returns the sign of a, as -1, 0, or 1.</li>
+<li><strong>hexdec(a)</strong>: converts a hexidecimal string to a decimal number</li>
+<li><strong>dechex(a)</strong>: converts a decimal number to a hexidecimal string</li>
 <li><strong>v!</strong>: Factorial, like $a = $b!</li>
 <li><strong>evalfunc(func,vars,val1,val2,...,[falseonerror])</strong>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3.<br/>
