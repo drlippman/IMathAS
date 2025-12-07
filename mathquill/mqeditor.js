@@ -291,7 +291,7 @@ var MQeditor = (function($) {
       rebuild = true;
       // trigger change on last field
       if (curMQfield !== null) {
-        $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
+        $("#"+curMQfield.el().id.substring(8)).trigger('change', true).triggerHandler('blur');
       }
 
       // new field; need to build the panel
@@ -349,7 +349,7 @@ var MQeditor = (function($) {
         } else {
         $("#mqeditor").hide();
         }
-        $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
+        $("#"+curMQfield.el().id.substring(8)).trigger('change', true).triggerHandler('blur');
         curMQfield = null;
     }
   }
