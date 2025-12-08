@@ -147,8 +147,8 @@ $body = "";
 $pagetitle = "Teacher Audit Log";
 $cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['userid'])) {
-    $userid = Sanitize::onlyInt($_GET['userid']);
-    $curBreadcrumb = "$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; <a href=\"userdetails.php?id=$userid\">User Details</a> &gt; ";
+    $uid = Sanitize::onlyInt($_GET['userid']);
+    $curBreadcrumb = "$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; <a href=\"userdetails.php?id=$uid\">User Details</a> &gt; ";
 } else {
     $curBreadcrumb = "$breadcrumbbase ";
 }
@@ -215,6 +215,8 @@ if ($overwriteBody==1) {
     echo '<div id="headeruserdetail" class="pagetitle"><h1>' . _('Teacher Audit Log') . ': ';
     echo Sanitize::encodeStringForDisplay($coursename);
     echo '</h1></div>';
+
+    echo '<p class="noticetext">'._('Warning: A lot of things in this record are not very human-readable, as they use reference IDs rather than item names.').'</p>';
 
     $teacher_actions = TeacherAuditLog::findActionsByCourse($cid);
     if (empty($teacher_actions)) {

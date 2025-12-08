@@ -71,6 +71,7 @@ if ($myrights>15) {
   		thishtml += \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');return false;">'._('Hide from course list').'</a></li>\';
   		thishtml += \' <li><a href="admin/addremoveteachers.php?from=home&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
   		thishtml += \' <li><a href="admin/transfercourse.php?from=home&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
+  		thishtml += \' <li><a href="admin/teacherauditlog.php?from=home&cid=\'+cid+\'">'._('Teacher Activity Log').'</a></li>\';		
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
   		thishtml += \'</ul></div>\';
   		$(el).append(thishtml);
