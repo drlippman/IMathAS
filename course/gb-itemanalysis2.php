@@ -467,19 +467,19 @@
             }
             echo '</td>';
 			if ($submitby == 'by_question') {
-				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</a></td>",
+				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
 			} else {
-				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</a></td>",
+				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt));
 			}
 			echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($pi));
 			if ($submitby == 'by_question') {
-				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</a></td>",
+				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
 			} else {
-				echo sprintf("<td><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</a></td>",
+				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</a></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
 			if ($showhints) {
