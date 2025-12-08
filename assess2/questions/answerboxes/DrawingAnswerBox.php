@@ -605,6 +605,10 @@ class DrawingAnswerBox implements AnswerBox
             foreach ($answers as $ans) {
                 if (is_array($ans)) {continue;} //shouldn't happen, unless user forgot to set question to multipart
                 if ($ans == '') {continue;}
+                if (substr($ans,0,4)=='alt:') {
+                    $saarr[] = $ans;
+                    continue;
+                }
                 $function = array_map('trim', explode(',', $ans));
                 $defcolor = 'blue';
                 $dashedline = false;

@@ -151,6 +151,11 @@ class DrawingScorePart implements ScorePart
             settype($answers,"array");
         }
         $answers = array_map('clean', $answers);
+        foreach ($answers as $key=>$function) {
+            if (substr($function,0,4)=='alt:') {
+                unset($answers[$key]);
+            }
+        }
 
         if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
             foreach ($answers as $key=>$function) {
