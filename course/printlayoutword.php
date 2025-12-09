@@ -242,7 +242,7 @@ if ($overwriteBody==1) {
 			$out .= "<div class=hdrm>\n";
 
 			$out .= "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-			$out .= "<div id=intro>{$line['intro']}</div>\n";
+			$out .= "<div id=intro>".printfilter($line['intro'])."</div>\n";
 			$out .= "</div>\n";
 			$out .= "</div>\n";
 
@@ -262,9 +262,19 @@ if ($overwriteBody==1) {
 				if ($courseUIver > 1) {
 					list($newout,$sa[$j][$i],$detsol[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				} else {
-				list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
+			}
+			if (!empty($_REQUEST['showtexts'])) {
+				foreach ($texts as $k=>$v) {
+					if ($v['displayBefore'] >= $numq) {
+						if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
+							$out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
+						}
+						$out .= '<div>'.printfilter(filter($v['text'])).'</div>';
+					}
+				}
 			}
 
 		}
@@ -304,7 +314,7 @@ if ($overwriteBody==1) {
 		$out .= "<div class=hdrm>\n";
 
 		$out .= "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-		$out .= "<div id=intro>{$line['intro']}</div>\n";
+		$out .= "<div id=intro>".printfilter($line['intro'])."</div>\n";
 		$out .= "</div>\n";
 		$out .= "</div>\n";
 		for ($i=0; $i<$numq; $i++) {
@@ -327,6 +337,16 @@ if ($overwriteBody==1) {
 				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
+			}
+		}
+		if (!empty($_REQUEST['showtexts'])) {
+			foreach ($texts as $k=>$v) {
+				if ($v['displayBefore'] >= $numq) {
+					if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
+						$out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
+					}
+					$out .= '<div>'.printfilter(filter($v['text'])).'</div>';
+				}
 			}
 		}
 		if ($_REQUEST['keys']>0) { //print answer keys
