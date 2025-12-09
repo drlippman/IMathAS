@@ -227,6 +227,7 @@ if ($searchtype == 'thread') {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=?)) ";
 		$arr[] = $userid;
 	}
+	$query .= ' ORDER BY imas_forum_threads.lastposttime DESC LIMIT 200';
 
 	$stm = $DBH->prepare($query);
 	$stm->execute($arr);
