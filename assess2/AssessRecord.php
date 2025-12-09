@@ -4036,7 +4036,7 @@ class AssessRecord
           $qrefarr = array_flip($GLOBALS['choicesdata'][$partref][0]);
           $outptarr = array();
           foreach ($pts as $k=>$ptval) {
-            $outptarr[$qrefarr[$k]] = ($ptval=="") ? "" : $GLOBALS['choicesdata'][$partref][1][$ptval];
+            $outptarr[$qrefarr[$k]] = ($ptval=="") ? "" : ($GLOBALS['choicesdata'][$partref][1][$ptval] ?? $ptval);
           }
           ksort($outptarr);
           $out[$pn][] = implode('<br/>',$outptarr);
