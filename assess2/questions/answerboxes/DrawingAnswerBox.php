@@ -917,7 +917,7 @@ class DrawingAnswerBox implements AnswerBox
                     }
                     $sa .= ' '._('Answer drawings: ');
                     $ansalt = showplot($saarr, $origxmin, $settings[1], $origymin, $settings[3], $sclinglbl, $sclinggrid, $settings[6], $settings[7]);
-                    $sgloc = strpos($ansalt, 'Start Graph');
+                    $sgloc = strpos($ansalt, '&nbsp;');
                     if ($sgloc !== false) {
                         $ansalt = substr($ansalt, $sgloc);
                     }

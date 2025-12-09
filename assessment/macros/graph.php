@@ -715,9 +715,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     if ($hasaxislabels) {
         $alt = "Graphing window shows horizontal axis" .
             ($xvar == '' ? '' : " labeled $xvar") . ": {$winxmin} to {$winxmax}, vertical axis" .
-            ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}. " . $alt;
+            ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}.&nbsp;" . $alt;
     } else {
-        $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}. " . $alt;
+        $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}.&nbsp;" . $alt;
     }
 
     if ($_SESSION['graphdisp'] == 0) {
