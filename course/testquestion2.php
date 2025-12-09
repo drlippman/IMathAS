@@ -304,6 +304,39 @@ $placeinhead .= '<script>
  	}
   });
   </script>';
+if (($a11ymode&1)==1) {
+	$placeinhead .= '<script>
+	$(function() {
+		$(".questionpane > .question > .question img").each(function() {
+			if (!$(this).attr("alt")) {
+				$(this).after("<span class=\"small noticetext\"><br/>Accessibility preview note: this image has no alt text</span>");
+			} else if ($(this).attr("alt")=="") {
+				$(this).after("<span class=\"small noticetext\"><br/>Accessibility preview note: this image has blank alt text</span>");
+			} else {
+				var $span = $("<span class=\"small noticetext\"><br/>Accessibility preview note: this image has alt text: </span>");
+				$span.append(document.createTextNode($(this).attr("alt")));
+				$(this).after($span);
+			}
+		});
+		$(".questionpane > .question > .question .sr-only").each(function() {
+			$(this).removeClass("sr-only").addClass("sr-only-highlight");
+		});
+	});
+	</script>
+	<style>
+	.sr-only-highlight {
+		border: 1px solid #ccc;
+		padding: 5px;
+		color: #666;
+	}
+	.sr-only-highlight::before {
+		display: block;
+		color: #f33;
+		content: "Accessibility preview note: This text is only visible to screenreaders";
+	}
+	</style>
+	';
+}
 require_once "../header.php";
 
 if ($overwriteBody==1) {
