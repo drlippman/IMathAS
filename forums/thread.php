@@ -421,16 +421,16 @@ if (isset($_GET['markallread'])) {
 $qarr = [':forumid'=>$forumid, ':now'=>$canviewall?2000000000:$now];
 $query = "SELECT ifp.id,ifp.threadid,ifp.posttype,ifp.tag,ifp.userid,ifp.forumid,ifp.isanon,ifp.subject,";
 $query .= "imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid,imas_forum_threads.lastposttime ";
-$query .= "FROM imas_forum_posts AS ifp JOIN imas_users ON ifp.userid=imas_users.id ";
-$query .= "JOIN imas_forum_threads ON ifp.threadid=imas_forum_threads.id ";
+$query .= "FROM imas_forum_threads JOIN imas_forum_posts AS ifp ON ifp.threadid=imas_forum_threads.id AND ifp.parent=0 ";
+$query .= "JOIN imas_users ON ifp.userid=imas_users.id ";
 if ($page < 0) {
     $query .= 'LEFT JOIN imas_forum_views ON imas_forum_views.threadid=imas_forum_threads.id AND imas_forum_views.userid=:userid ';
     $qarr[':userid'] = $userid;
 }
-$query .= "WHERE ifp.parent=0 AND ifp.forumid=:forumid ";
+$query .= "WHERE imas_forum_threads.forumid=:forumid ";
 $query .= "AND imas_forum_threads.lastposttime<:now ";
 if ($dofilter) {
-    $query .= "AND ifp.threadid IN ($limthreads) ";
+    $query .= "AND imas_forum_threads.id IN ($limthreads) ";
 }
 if ($page==-1) {
     //$query .= "AND ifp.threadid IN ($newpostlist) ";
