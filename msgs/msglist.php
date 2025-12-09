@@ -168,14 +168,14 @@ If deleted on both ends, delete from DB
 			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cidP));
 			$msgset = ($stm->fetchColumn(0))%5;
-			$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
-			$stm->execute(array($cidP));
+			$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=? AND userid IN (?,?)");
+			$stm->execute(array($cidP, $userid, $msgToPost));
 			$teacherList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-			$stm = $DBH->prepare("SELECT userid FROM imas_tutors WHERE courseid=?");
-			$stm->execute(array($cidP));
+			$stm = $DBH->prepare("SELECT userid FROM imas_tutors WHERE courseid=? AND userid IN (?,?)");
+			$stm->execute(array($cidP, $userid, $msgToPost));
 			$tutorList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
-			$stm->execute(array($cidP));
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=? AND userid IN (?,?)");
+			$stm->execute(array($cidP, $userid, $msgToPost));
 			$studentList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
 			$isvalid = false;
