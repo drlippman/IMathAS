@@ -178,7 +178,7 @@ function activateLastEditorIfBlank() {
         if (itemarray[i][0] == 'text' && itemarray[i][1] == '') {
             if (useed) {
                 let to_enable = tinymce.get('textseg' + i);
-                if (!to_enable) {
+                if (!to_enable || !to_enable.initialized) {
                     lastedifblankcnt++;
                     if (lastedifblankcnt < 20) {
                         window.setTimeout(activateLastEditorIfBlank, 100);
@@ -187,7 +187,7 @@ function activateLastEditorIfBlank() {
                 }
                 lastedifblankcnt = 0;
                 tinyMCE.setActive(to_enable);
-                to_enable.dispatch("focus");
+                to_enable.focus(); //dispatch("focus");
             } else {
                 document.getElementById('textseg' + i).focus();
             }
