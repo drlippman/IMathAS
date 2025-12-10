@@ -39,15 +39,25 @@ if (isset($CFG['cleanup']['oldstu'])) {
     $olddays = 365;
 }
 // select students who aren't enrolled in any courses, and haven't logged in within $olddays days
-$query = "SELECT iu.id 
+/*$query = "SELECT iu.id 
     FROM imas_users AS iu 
     WHERE iu.rights < 11 
     AND iu.lastaccess < ?
     AND NOT EXISTS (SELECT 1 FROM imas_students WHERE userid = iu.id)
-    AND NOT EXISTS (SELECT 1 FROM imas_tutors WHERE userid = iu.id);";
+    AND NOT EXISTS (SELECT 1 FROM imas_tutors WHERE userid = iu.id) ";
+    */
+// return to left join approach; seems a bit more efficient than the not exists query
+$query = 'SELECT iu.id 
+    FROM imas_users AS iu
+    LEFT JOIN imas_students AS s ON s.userid = iu.id
+    LEFT JOIN imas_tutors AS t ON t.userid = iu.id
+    WHERE iu.rights < 11 
+    AND iu.lastaccess < ?
+    AND s.userid IS NULL
+    AND t.userid IS NULL ';
 $query .= "LIMIT $batchsize ";
 $stm = $DBH->prepare($query);
-$stm->execute(array(time()-$olddays*24*60*60)); //a week old
+$stm->execute(array(time()-$olddays*24*60*60));
 $stus = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
 if (count($stus) > 0) {
