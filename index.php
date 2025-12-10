@@ -245,10 +245,6 @@ if ($stm->rowCount()==0) {
 $postcidlist = implode(',',$postcheckcids);
 $postthreads = array();
 if ($showpostsgadget && count($postcheckcids)>0) {
-	/*$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";*/
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";  //is int's from DB - safe
@@ -270,25 +266,15 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 		}
 	}
 } else if (count($postcheckcids)>0) {
-	/*$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "($postcidlist) AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";*/
-
 	$now = time();
 	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";    //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
-	//this is not consistent with above...
-	//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
-	$query .= "GROUP BY imas_forums.courseid";
+	$query .= "AND imas_forum_threads.lastposttime>:old GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
-	$stm2->execute(array(':userid'=>$userid, ':now'=>$now));
+	$stm2->execute(array(':userid'=>$userid, ':now'=>$now, ':old'=>$now - 365*24*60*60));
 	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -296,10 +282,6 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 //check for new posts in courses being taken
 $poststucidlist = implode(',',$postcheckstucids);
 if ($showpostsgadget && count($postcheckstucids)>0) {
-	/*$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";*/
 	$now = time();
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
@@ -325,24 +307,17 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	}
 } else if (count($postcheckstucids)>0) {
 	$now = time();
-	/*
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "($postcidlist) AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";*/
 	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "AND imas_forum_threads.lastposttime<:now AND imas_forum_threads.lastposttime>:old ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
-	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now));
+	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now, ':old'=>$now - 365*24*60*60));
 	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
