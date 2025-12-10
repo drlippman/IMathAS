@@ -22,7 +22,7 @@ if (strlen($video)==11 || strpos($video, 'youtube.com')!==false || strpos($video
         echo 'Invalid youtube video';
         exit;
     }
-    $vidload = 'data-youtube-nocookie="true" data-youtube-id="'.Sanitize::encodeStringForDisplay($video).'"';
+    $vidload = 'data-youtube-nocookie="true" data-youtube-id="'.Sanitize::encodeStringForDisplay($video).'"'.'>';
 } else if (strpos($video, 'vimeo')!==false) {
     if (preg_match('%^https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)(?:[?]?.*)$%im', $video, $regs)) {
         $video = $regs[3];
@@ -30,7 +30,7 @@ if (strlen($video)==11 || strpos($video, 'youtube.com')!==false || strpos($video
         echo 'Invalid vimeo video';
         exit; 
     }
-    $vidload = 'data-vimeo-id="'.Sanitize::encodeStringForDisplay($video).'"';
+    $vidload = 'data-vimeo-id="'.Sanitize::encodeStringForDisplay($video).'"'.'>';
 } else if (strpos($video, 'https://')==0) {
     $video = Sanitize::url($video);
     if (strpos($video, '.webm')!==false) {
@@ -41,7 +41,7 @@ if (strlen($video)==11 || strpos($video, 'youtube.com')!==false || strpos($video
         echo 'Invalid video format - only webm and mp4 supported.';
         exit;
     }
-    $vidload = '<source type="video/'.$format.'" src="'.$video.'" />';
+    $vidload = '>'.'<source type="video/'.$format.'" src="'.$video.'" />';
 } else {
     echo 'Invalid video';
 }
