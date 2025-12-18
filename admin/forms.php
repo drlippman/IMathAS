@@ -824,7 +824,7 @@ switch($_GET['action']) {
 			}
 		}
 
-		if ($_GET['action']=="modify" && $line['cleanupdate']>0) {
+		if ($_GET['action']=="modify" && $line['cleanupdate']>1) {
 			$courseid = Sanitize::courseId($_GET['id']);
 			echo '<p>'._('This class has been scheduled for data cleanup, on ');
 			echo tzdate('F j, Y', $line['cleanupdate']).'. ';
