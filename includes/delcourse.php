@@ -130,7 +130,7 @@ function deleteCourse($cid) {
 				$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
 				$stm->execute(array($fileid));
 			}
-		} else if (strpos($row[0], 'file:'.$cid.'/') === 0) { // if file is from this course
+		} else if (strpos($row[0], 'file:'.$cid.'/') === 0 && empty($CFG['GEN']['skip_old_linked_delete'])) { // if file is from this course
 			$stm2 = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 			$stm2->execute(array(':text'=>$row[0]));
 			if ($stm2->rowCount()==1) {

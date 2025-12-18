@@ -73,7 +73,7 @@ function delitembyid($itemid) {
 				$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
 				$stm->execute(array($fileid));
 			}
-		} else if (strpos($text, 'file:'.$cid.'/') === 0) { //delete file if not used
+		} else if (strpos($text, 'file:'.$cid.'/') === 0 && empty($CFG['GEN']['skip_old_linked_delete'])) { //delete file if not used
 			$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 			$stm->execute(array(':text'=>$text));
 			if ($stm->rowCount()==1) {
