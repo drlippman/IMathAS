@@ -182,22 +182,25 @@ function mbxproc($qn,$qsetid,$seed) {
     $res = $a2->displayQuestion(0, ['includeans'=>true, 'printformat'=>true, 'showallparts'=>true, 'hideans'=>true]);
     $statement = mbxfilter($res['html']);
     if (is_array($res['jsparams']['ans'])) {
-        $soln = mbxfilter('<ul><li>'.implode('</li><li>',$res['jsparams']['ans']).'</li></ul>');
+        $ans = mbxfilter('<ul><li>'.implode('</li><li>',$res['jsparams']['ans']).'</li></ul>');
     } else {
-        $soln = mbxfilter('<p>'.$res['jsparams']['ans'].'</p>');
+        $ans = mbxfilter('<p>'.$res['jsparams']['ans'].'</p>');
     }
     if (($res['solnopts']&5)==5) {
-        $soln .= mbxfilter('<p>'.$res['soln'].'</p>');
-    }
+        $soln = '<solution>'.mbxfilter('<p>'.$res['soln'].'</p>').'</solution>';
+    } else {
+		$soln = '';
+	}
 
 
 echo "<myopenmath id=\"" . Sanitize::onlyInt($qsetid) . "\">
 <statement>
 $statement
 </statement>
-<solution>
+<answer>
+$ans
+</answer>
 $soln
-</solution>
 </myopenmath>
 
 ";
