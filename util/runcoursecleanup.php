@@ -194,6 +194,9 @@ if (!$skip) {
         $stm = $DBH->prepare("DELETE iar FROM imas_assessment_records AS iar JOIN imas_assessments AS ia ON iar.assessmentid=ia.id WHERE ia.courseid=?");
 	    $stm->execute(array($cidtoclean));
 		$DBH->commit();
+
+		$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+		$stm->execute([$now, "Course cleanup complete on $cidtoclean"]);
 	}
 } else {
 	$updcrs->execute(array(0, $cidtoclean));
