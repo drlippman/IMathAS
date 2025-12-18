@@ -126,7 +126,7 @@ if (isset($_POST['updatecaption'])) {
 			$captioned = getCaptionDataByVidId($vidid);
 		}
 		
-		if ($captioned==1) {
+		if ($captioned==1 && empty($_POST['skipquestionupdate'])) {
 			$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
 			$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
 			$stm->execute(array(MYSQL_LEFT_WRDBND.$vidid.MYSQL_RIGHT_WRDBND));
@@ -144,7 +144,7 @@ if (isset($_POST['updatecaption'])) {
 			}
 		}
 	}
-	echo '<p>Updated '.$chg.' records.</p><p><a href="utils.php">Utils</a></p>';
+	echo '<p>Updated '.$chg.' question records.</p><p><a href="utils.php">Utils</a></p>';
 	exit;
 }
 if (isset($_POST['updatecaptionbyqids'])) {
@@ -327,6 +327,7 @@ if (isset($_GET['form'])) {
 		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
 		echo '<label>YouTube video ID: <input type="text" size="11" name="updatecaption"/></label>';
 		echo '<br/><label><input type=checkbox name="forcecaptioned" value="1"> Skip scan and mark as captioned (manually verified)</label>';
+		echo '<br/><label><input type=checkbox name="skipquestionupdate" value="1"> Skip question updating</label>';
 		echo '<br/><input type="submit" value="Go"/>';
 		echo '</form>';
 		require_once "../footer.php";
