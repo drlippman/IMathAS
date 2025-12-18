@@ -107,6 +107,9 @@ if (!defined('JSON_INVALID_UTF8_IGNORE')) {
 	define('JSON_INVALID_UTF8_IGNORE', 0);
 }
 
+// set default user agent for file_get_contents
+ini_set('user_agent', Sanitize::simpleASCII($GLOBALS['installname'] ?? 'IMathAS'));
+
 // Store PHP sessions in the database.
 if (!isset($use_local_sessions)) {
   if (!empty($CFG['redis'])) {
