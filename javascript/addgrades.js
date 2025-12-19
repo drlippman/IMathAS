@@ -634,3 +634,42 @@ function togglequickadd(el) {
 		quickaddshowing = false;
 	}
 }
+
+$(function() {
+	$("[id^=score],[id^=feedback]").each(function(i,el) {
+		if (el.tagName == 'DIV') {
+			$(el).attr("data-init", el.innerHTML);
+		} else {
+			$(el).attr("data-init", el.value);
+		}
+	});
+	$(window).on('beforeunload', unloadcheck);
+});
+
+function unloadcheck (e) {
+	if (!$('form').hasClass("submitted")) {
+		var dirty = false;
+		var els = $("[id^=score],[id^=feedback]");
+		for (var i=0;i<els.length;i++) {
+			var el = els[i];
+			if (el.id.match(/score/) && doonblur($(el).attr("data-init")) != doonblur(el.value)) {
+				dirty = true; break;
+			} else if (el.tagName === 'TEXTAREA' && $(el).attr("data-init") != el.value) {
+				dirty = true; break;
+			} 
+		}
+		if (tinymce) {
+			var allEditors = tinymce.get();
+			for (index in allEditors) {
+				if (allEditors[index].isDirty()) {
+					dirty = true; break;
+					break;
+				}
+			}
+		}
+		if (dirty) {
+			e.preventDefault();
+			return _("You have unrecorded changes.  Are you sure you want to abandon your changes?");
+		}
+	}
+}

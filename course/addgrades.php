@@ -401,7 +401,7 @@
     }
 
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=012722\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=121925\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
@@ -806,18 +806,19 @@
 				if ($row[5]==null) {$row[5] = '';}
 				echo "<td>".Sanitize::encodeStringForDisplay($row[5])."</td>";
 			}
+			if (isset($excused[$row[0]])) {
+				$score[$row[0]] = 'X';
+			}
 			if (isset($score[$row[0]])) {
-				printf('<td><input type="text" size="3" autocomplete="off" name="score[%d]" id="score%d" value="%s',
+				printf('<td><input type="text" size="3" autocomplete="off" name="score[%d]" id="score%d" value="%s"',
                     Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]),
+					Sanitize::encodeStringForDisplay($score[$row[0]]),
                     Sanitize::encodeStringForDisplay($score[$row[0]]));
 			} else {
-				printf('<td><input type="text" size="3" autocomplete="off" name="newscore[%d]" id="score%d" value="',
+				printf('<td><input type="text" size="3" autocomplete="off" name="newscore[%d]" id="score%d" value=""',
                     Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]));
-                if (isset($excused[$row[0]])) {
-                	echo 'X';
 			}
-			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" pattern=\"x|X|\d*\.?\d*\" aria-labelledby=\"un$i\"/>";
+			echo " onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" pattern=\"x|X|\d*\.?\d*\" aria-labelledby=\"un$i\"/>";
 			if ($rubric != 0) {
 				echo printrubriclink($rubric,$points,"score". Sanitize::onlyint($row[0]),"feedback". Sanitize::onlyint($row[0]));
 			}
