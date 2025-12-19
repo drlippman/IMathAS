@@ -350,16 +350,19 @@ class ScoreEngine
             (time() - $quesData['lastmoddate']) > 10000
         ) {
             // only log if hasn't been edited in a few hours
-            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
-                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
+            $errortolog = implode('; ', $this->errors);
+            
+            $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error)
+                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
             $stm = $this->dbh->prepare($query);
             $stm->execute([
                 $scoreQuestionParams->getDbQuestionSetId(),
                 $scoreQuestionParams->getQuestionSeed(),
-                1,
                 time(),
-                implode('; ', $this->errors)
+                md5($errortolog),
+                $errortolog
             ]);
+            
         }
 
         return $scoreResult;

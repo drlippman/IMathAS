@@ -343,7 +343,7 @@ if ($myrights==100) {
 	}
 }
 if (!empty($CFG['logquestionerrors']) && $myrights >= 20) {
-    $stm = $DBH->prepare('SELECT count(DISTINCT iqe.qsetid) FROM imas_questionerrors AS iqe JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id WHERE iqs.ownerid=?');
+    $stm = $DBH->prepare('SELECT count(DISTINCT iqe.qsetid) FROM imas_questionerrorlog AS iqe JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id WHERE iqs.ownerid=?');
     $stm->execute([$userid]);
     $qerrcnt = $stm->fetchColumn(0);
 }

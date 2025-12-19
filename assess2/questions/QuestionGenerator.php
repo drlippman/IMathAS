@@ -102,17 +102,19 @@ class QuestionGenerator
             (time() - $question->getQuestionLastMod()) > 10000
         ) {
             // only log if hasn't been edited in a few hours
-            $query = 'INSERT INTO imas_questionerrors (qsetid, seed, scored, etime, error)
-                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime),error=VALUES(error)';
+            $errortolog = implode('; ', $question->getErrors()) . 
+                    ((count($question->getErrors())>0 && count($this->silenterrors)>0) ? '; ' : '') . 
+                    implode('; ', $this->silenterrors);
+            
+            $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error)
+                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
             $stm = $this->dbh->prepare($query);
             $stm->execute([
                 $this->questionParams->getDbQuestionSetId(),
                 $this->questionParams->getQuestionSeed(),
-                0,
                 time(),
-                implode('; ', $question->getErrors()) . 
-                    ((count($question->getErrors())>0 && count($this->silenterrors)>0) ? '; ' : '') . 
-                    implode('; ', $this->silenterrors)
+                md5($errortolog),
+                $errortolog
             ]);
         }
 
