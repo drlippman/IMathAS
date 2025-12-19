@@ -180,8 +180,7 @@ if (!$skip) {
 	}
 	// not including in transaction to prevent cleanup from stalling on a
 	// weird course
-	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
-	$stm->execute(array($cidtoclean));
+	$updcrs->execute(array(0, $cidtoclean));
 
 	if (count($stus)>0) {
 		$DBH->beginTransaction();
@@ -200,8 +199,6 @@ if (!$skip) {
 	}
 } else {
 	$updcrs->execute(array(0, $cidtoclean));
-	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
-	$stm->execute(array($cidtoclean));
 }
 
 //clear out any old pw

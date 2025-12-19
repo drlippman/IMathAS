@@ -715,7 +715,7 @@ export default {
         let showit = true;
         if (this.hide100 && qdata.score > qdata.points_possible - 0.002) {
           showit = false;
-        } else if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
+        } else if (this.hidePerfect && Math.abs(qdata.rawscore) > 0.998) {
           showit = false;
         } else if (this.hideUnanswered && qdata.parts.reduce((a, c) => Math.max(a, c.try), 0) === 0) {
           showit = false;

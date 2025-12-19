@@ -692,7 +692,7 @@
                 $qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
                 
                 $classes = '';
-                if ($qdata['gbrawscore']==1) {
+                if ($qdata['gbrawscore']>=1) {
                     $classes = 'qfilter-perfect';
                 } else if ($qdata['gbscore']>0) {
                     $classes = 'qfilter-nonzero';
