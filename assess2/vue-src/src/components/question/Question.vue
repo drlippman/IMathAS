@@ -56,6 +56,7 @@
       <div v-show="getwork === 2 || showWorkInput">
         <showwork-input
           :id="'sw' + qn"
+          :qn="qn"
           :value = "questionData.work"
           rows = "3"
           :active = "getwork === 2 || showWorkInput"

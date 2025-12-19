@@ -39,6 +39,7 @@
         <div v-else>
           <showwork-input
             :id="'sw' + curqn"
+            :qn="curqn"
             :value = "question.work"
             rows = "3"
             @input = "(val) => workChanged(curqn, val)"

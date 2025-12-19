@@ -7,6 +7,7 @@
         ref="inbox"
         class="fbbox swbox"
         :rows="rows"
+        :aria-label="$t('question.showwork_n', {n: qn+1})"
       ></textarea>
     </div>
     <div v-else class="feedbackwrap">
@@ -44,6 +45,7 @@ export default {
   name: 'ShowworkInput',
   props: {
     id: { default: null },
+    qn: { default: null },
     value: { default: '' },
     rows: { default: 2 },
     active: { default: true }

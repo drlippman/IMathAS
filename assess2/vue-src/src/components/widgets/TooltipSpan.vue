@@ -16,7 +16,7 @@
         class = "dropdown-pane tooltip-pane"
         ref = "pane"
         :id = "tipid ? tipid : uid"
-        v-if = "open"
+        v-show = "open"
         role = "tooltip"
       >
         {{ tip }}
