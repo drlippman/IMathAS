@@ -34,10 +34,12 @@ function parseSearchString($str)
         }
         if (ctype_digit($v) && !isset($out['id']) && count($out['terms']) == 1) {
             $out['id'] = $v;
-            // only id, remove as keyword
-            unset($out['terms']);
             break;
         }
+    }
+    // if searching id, don't need terms
+    if (isset($out['id'])) {
+        unset($out['terms']);
     }
     return $out;
 }
@@ -113,6 +115,17 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $searchand[] = '(iq.author LIKE ? OR iq.author LIKE ?)';
                 $searchvals[] = $names[0] . ',' . $names[2] . '%';
                 $searchvals[] = $names[2] . ',' . $names[0] . '%';
+            }
+            $authorbool = [];
+            if (isset($names[0]) && strlen($names[0])>2 && !in_array($names[0], $stopwords)) {
+                $authorbool[] = '+'.$names[0];
+            }
+            if (isset($names[2]) && strlen($names[2])>2 && !in_array($names[2], $stopwords)) {
+                $authorbool[] = '+'.$names[2];
+            }
+            if (count($authorbool)>0) {
+                $searchand[] = 'MATCH(iq.author) AGAINST(? IN BOOLEAN MODE)';
+                $searchvals[] = implode(' ', $authorbool);
             }
         }
     }

@@ -44,7 +44,7 @@ echo '<h2>Activity Log for <span class="pii-full-name">'.Sanitize::encodeStringF
 
 $actions = array();
 $lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array(), 'dr'=>array(),);
-$stm = $DBH->prepare("SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid=:userid AND courseid=:courseid ORDER BY viewtime DESC");
+$stm = $DBH->prepare("SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid=:userid AND courseid=:courseid");
 $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$actions[] = $row;
@@ -58,6 +58,10 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$lookups['forums'][] = $ip[0];
 	}
 }
+//sort by viewtime desc
+usort($actions, function ($a,$b) { 
+	return $b[2] <=> $a[2];
+});
 $asnames = array();
 if (count($lookups['as'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['as']));
