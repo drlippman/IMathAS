@@ -508,7 +508,7 @@ function line(p,q,id) { // segment connecting points p,q (coordinates in units)
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
     node = myCreateElementSVG("path");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
   node.setAttribute("d","M"+(p[0]*xunitlength+origin[0])+","+
@@ -529,7 +529,7 @@ function path(plist,id,c) {
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
     node = myCreateElementSVG("path");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
   if (typeof plist == "string") st = plist;
@@ -560,7 +560,7 @@ function circle(center,radius,id) { // coordinates in units
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
     node = myCreateElementSVG("circle");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
 
@@ -585,7 +585,7 @@ function sector(center,radius,startang,endang,id) {
 	if (id!=null) node = doc.getElementById(id);
 	if (node==null) {
 		node = myCreateElementSVG("path");
-		node.setAttribute("id", id);
+		if (id!=null) node.setAttribute("id", id);
 		svgpicture.appendChild(node);
 	}
 	var arctype = 0;
@@ -628,7 +628,7 @@ function arc(start,end,radius,id) { // coordinates in units
   }
   if (node==null) {
     node = myCreateElementSVG("path");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
   node.setAttribute("d","M"+(start[0]*xunitlength+origin[0])+","+
@@ -656,7 +656,7 @@ function ellipse(center,rx,ry,id) { // coordinates in units
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
     node = myCreateElementSVG("ellipse");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
   node.setAttribute("cx",center[0]*xunitlength+origin[0]);
@@ -672,7 +672,7 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
     node = myCreateElementSVG("rect");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
   node.setAttribute("x",Math.min(p[0],q[0])*xunitlength+origin[0]);
@@ -748,7 +748,7 @@ function textabs(p,st,pos,angle,id,fontsty) {
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
     node = myCreateElementSVG("text");
-    node.setAttribute("id", id);
+    if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
     node.appendChild(doc.createTextNode(st));
   }
@@ -811,7 +811,7 @@ function dot(center, typ, label, pos, id) {
   if (typ=="+" || typ=="-" || typ=="|") {
     if (node==null) {
       node = myCreateElementSVG("path");
-      node.setAttribute("id", id);
+      if (id!=null) node.setAttribute("id", id);
       svgpicture.appendChild(node);
     }
     if (typ=="+") {
@@ -831,7 +831,7 @@ function dot(center, typ, label, pos, id) {
   } else {
     if (node==null) {
       node = myCreateElementSVG("circle");
-      node.setAttribute("id", id);
+      if (id!=null) node.setAttribute("id", id);
       svgpicture.appendChild(node);
     }
     node.setAttribute("cx",cx);
