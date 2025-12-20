@@ -1078,13 +1078,14 @@ function boxplot($arr,$label="",$options = array()) {
 		return $alt;
 	}
 	$dw = $bigmax-$bigmin;
-
-	if ($dw>100) {$step = 20;} else if ($dw > 50) { $step = 10; } else if ($dw > 20) { $step = 5;} else {$step=1;}
+	$dosmallticks = 1;
+	$smallt = 1;
+	if ($dw>100) {$step = 20;$smallt=5;} else if ($dw > 50) { $step = 10;$smallt=5; } else if ($dw > 20) { $step = 5;} else {$step=1;$dosmallticks=0;$smallt='null';}
 	$bigmin = floor($bigmin/$step)*$step;
 	$bigmax = ceil($bigmax/$step)*$step;
 
 	$outst = "setBorder(15); initPicture($bigmin,$bigmax,-3,".($ycnt).");";
-	$outst .= "axes($step,100,1,null,null,1,'off');";
+	$outst .= "axes($step,100,1,$smallt,null,1,'off',$dosmallticks);";
 	$outst .= "text([". ($bigmin+.5*$dw) . ",-3],\"$label\");";
 	if (isset($dlbls)) {
 		$ybase = 0;

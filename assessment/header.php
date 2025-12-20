@@ -187,7 +187,7 @@ if (!isset($_SESSION['mathdisp'])) {
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==0) {
     echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 } else {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=082025\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=122025\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 }
 

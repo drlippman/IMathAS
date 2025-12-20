@@ -977,8 +977,8 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (ygrid!=null) gdy = ygrid;
   
   if (smallticks!=null && smallticks==1) {
-    var gridymin = origin[1] + .7*ticklength;
-    var gridymax = origin[1] - .7*ticklength;
+    var gridymin = height - origin[1] + .7*ticklength;
+    var gridymax = height - origin[1] - .7*ticklength;
     var gridxmin = origin[0] - .7*ticklength;
     var gridxmax = origin[0] + .7*ticklength;
   } else {
