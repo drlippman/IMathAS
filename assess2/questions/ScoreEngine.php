@@ -352,15 +352,16 @@ class ScoreEngine
             // only log if hasn't been edited in a few hours
             $errortolog = implode('; ', $this->errors);
             
-            $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error)
-                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
+            $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error, ownerid)
+                VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
             $stm = $this->dbh->prepare($query);
             $stm->execute([
                 $scoreQuestionParams->getDbQuestionSetId(),
                 $scoreQuestionParams->getQuestionSeed(),
                 time(),
                 md5($errortolog),
-                $errortolog
+                $errortolog,
+                $quesData['ownerid']
             ]);
             
         }

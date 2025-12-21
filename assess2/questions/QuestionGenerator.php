@@ -106,15 +106,18 @@ class QuestionGenerator
                     ((count($question->getErrors())>0 && count($this->silenterrors)>0) ? '; ' : '') . 
                     implode('; ', $this->silenterrors);
             
-            $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error)
-                VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
+            $qdata = $this->questionParams->getQuestionData();
+
+            $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error, ownerid)
+                VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
             $stm = $this->dbh->prepare($query);
             $stm->execute([
                 $this->questionParams->getDbQuestionSetId(),
                 $this->questionParams->getQuestionSeed(),
                 time(),
                 md5($errortolog),
-                $errortolog
+                $errortolog,
+                $qdata['ownerid']
             ]);
         }
 

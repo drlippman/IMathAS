@@ -10,12 +10,10 @@ if (!empty($_POST['checked'])) {
     $data = array_map('intval', $_POST['checked']);
     $ph = Sanitize::generateQueryPlaceholders($data);
     
-    $query = "DELETE imas_questionerrorlog FROM imas_questionerrorlog
-        JOIN imas_questionset ON imas_questionerrorlog.qsetid=imas_questionset.id
-        WHERE imas_questionerrorlog.qsetid IN ($ph)";
+    $query = "DELETE FROM imas_questionerrorlog WHERE qsetid IN ($ph)";
     if (!$isadmin) {
         $data[] = $userid;
-        $query .= " AND imas_questionset.ownerid=?";
+        $query .= " AND ownerid=?";
     }
     $stm = $DBH->prepare($query);
     $stm->execute($data);
@@ -45,9 +43,7 @@ if ($isadmin) {
 
     $stm = $DBH->query($query);
 } else {
-    $query = 'SELECT iqe.* FROM imas_questionerrorlog AS iqe
-        JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
-        WHERE iqs.ownerid=? ORDER BY iqe.qsetid';
+    $query = 'SELECT * FROM imas_questionerrorlog WHERE ownerid=? ORDER BY qsetid';
 
     $stm = $DBH->prepare($query);
     $stm->execute([$userid]);
