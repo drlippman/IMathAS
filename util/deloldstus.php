@@ -62,7 +62,7 @@ $stus = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
 if (count($stus) > 0) {
     $ph = Sanitize::generateQueryPlaceholders($stus);
-    $toDelTable = array('user_prefs', 'bookmarks', 'content_track', 'ltiusers');
+    $toDelTable = array('user_prefs', 'bookmarks', 'ltiusers');
     foreach ($toDelTable as $table) {
         $stm = $DBH->prepare("DELETE FROM imas_$table WHERE userid IN ($ph)");
         $stm->execute($stus);
