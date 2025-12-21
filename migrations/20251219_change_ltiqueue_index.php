@@ -30,6 +30,6 @@ $res = $DBH->query($query);
  }
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>change index on ltiqueue, adjust some other indexes</p>';
+echo '<p style="color: green;">✓ change index on ltiqueue, adjust some other indexes</p>';
 
 return true;

@@ -26,6 +26,6 @@ $res = $DBH->query($query);
  }
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>add table imas_a11yreviews, column a11ystatus</p>';
+echo '<p style="color: green;">✓ add table imas_a11yreviews, column a11ystatus</p>';
 
 return true;

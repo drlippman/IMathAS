@@ -21,6 +21,6 @@ if ($res===false) {
 }
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>table imas_emailqueue.</p>';
+echo '<p style="color: green;">✓ table imas_emailqueue.</p>';
 
 return true;

@@ -41,6 +41,6 @@ $res = $DBH->query('INSERT INTO imas_questionerrorlog (qsetid,seed,etime,ehash,e
  }*/
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>revamp imas_questionerrors to imas_questionerrorlog</p>';
+echo '<p style="color: green;">✓ revamp imas_questionerrors to imas_questionerrorlog</p>';
 
 return true;

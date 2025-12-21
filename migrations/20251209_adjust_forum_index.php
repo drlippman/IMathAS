@@ -12,6 +12,6 @@ $res = $DBH->query($query);
  }
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>adjust index on imas_forum_threads</p>';
+echo '<p style="color: green;">✓ adjust index on imas_forum_threads</p>';
 
 return true;

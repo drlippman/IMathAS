@@ -131,6 +131,6 @@ $res = $DBH->query($query);
  }
 
 if ($DBH->inTransaction()) { $DBH->commit(); }
-echo '<p>delete unused indexes</p>';
+echo '<p style="color: green;">✓ delete unused indexes</p>';
 
 return true;
