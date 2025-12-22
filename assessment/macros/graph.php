@@ -651,36 +651,45 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 
         if ($isineq) {
             // combine multiple paths together
+            if ($domainlimited) {
+                $thisxxmin = $xmin;
+                $thisxxmax = $xmax;
+            } else {
+                $thisxxmin = $xxmin;
+                $thisxxmax = $xxmax;
+            }
             $pathstr = str_replace(']);path([', ',', $pathstr);
             $pathstr = substr($pathstr, 0, -3);
             preg_match('/^path\(\[\[(-?[\d\.]+),(-?[\d\.]+).*(-?[\d\.]+),(-?[\d\.]+)\]$/', $pathstr, $matches);
-            $sig = ($xxmax - $xxmin) / 100;
-            $ymid = ($yymax + $yymin) / 2;
-            if ($ineqtype[0] == '<') {
-                if (abs($matches[3] - $xxmax) > $sig && $matches[4] > $ymid) {
-                    $pathstr .= ",[$xxmax,$yymax]"; //need to add upper right corner
+            if (isset($matches[4])) {
+                $sig = ($thisxxmax - $thisxxmin) / 100;
+                $ymid = ($yymax + $yymin) / 2;
+                if ($ineqtype[0] == '<') {
+                    if (abs($matches[3] - $thisxxmax) > $sig && $matches[4] > $ymid) {
+                        $pathstr .= ",[$thisxxmax,$yymax]"; //need to add upper right corner
+                    }
+                    $pathstr .= ",[$thisxxmax,$yymin],[$thisxxmin,$yymin]";
+                    if (abs($matches[1] - $thisxxmin) > $sig  && $matches[2] > $ymid) {
+                        $pathstr .= ",[$thisxxmin,$yymax]"; //need to add upper left corner
+                    }
+                    $pathstr .= ']);';
+                } else {
+                    if (abs($matches[3] - $thisxxmax) > $sig && $matches[4] < $ymid) {
+                        $pathstr .= ",[$thisxxmax,$yymin]"; //need to add lower right corner
+                    }
+                    $pathstr .= ",[$thisxxmax,$yymax],[$thisxxmin,$yymax]";
+                    if (abs($matches[1] - $thisxxmin) > $sig  && $matches[2] < $ymid) {
+                        $pathstr .= ",[$thisxxmin,$yymin]"; //need to add lower left corner
+                    }
+                    $pathstr .= ']);';
                 }
-                $pathstr .= ",[$xxmax,$yymin],[$xxmin,$yymin]";
-                if (abs($matches[1] - $xxmin) > $sig  && $matches[2] > $ymid) {
-                    $pathstr .= ",[$xxmin,$yymax]"; //need to add upper left corner
+                if (isset($function[1])) {
+                    $path .= "fill=\"trans{$function[1]}\";";
+                } else {
+                    $path .= "fill=\"transblue\";";
                 }
-                $pathstr .= ']);';
-            } else {
-                if (abs($matches[3] - $xxmax) > $sig && $matches[4] < $ymid) {
-                    $pathstr .= ",[$xxmax,$yymin]"; //need to add lower right corner
-                }
-                $pathstr .= ",[$xxmax,$yymax],[$xxmin,$yymax]";
-                if (abs($matches[1] - $xxmin) > $sig  && $matches[2] < $ymid) {
-                    $pathstr .= ",[$xxmin,$yymin]"; //need to add lower left corner
-                }
-                $pathstr .= ']);';
+                $path .= "stroke=\"none\";strokedasharray=\"none\";$pathstr";
             }
-            if (isset($function[1])) {
-                $path .= "fill=\"trans{$function[1]}\";";
-            } else {
-                $path .= "fill=\"transblue\";";
-            }
-            $path .= "stroke=\"none\";strokedasharray=\"none\";$pathstr";
         }
         if (isset($function[5]) && $function[5] == 'open') {
             $path .= "dot([$x,$y],\"open\");";

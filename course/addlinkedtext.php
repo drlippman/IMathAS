@@ -229,7 +229,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
 							$stm->execute(array($oldfileid));
 						}
-					} else {
+					} else if (empty($CFG['GEN']['skip_old_linked_delete'])) {
 						// no file id - old file, so do it the old way
 						$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text LIMIT 2");
 						$stm->execute(array(':text'=>$text));
