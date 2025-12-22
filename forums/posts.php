@@ -327,66 +327,114 @@ if ($oktoshow) {
 	//get next/prev before marked as read
 	$prevth = '';
 	$nextth = '';
-	if ($page==-3 || $page==-5) { //came from new threads or flagged threads
-		if ($page==-3) {
-			$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
-			$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
-			$array = array(':now'=>$now);
+	if ($page==-3 || $page==-5 || 
+		($CFG['MySQL_ver']>=8 && ($page==-2 || $page==-1))
+	) { //came from new threads or flagged threads
+		if ($CFG['MySQL_ver']>=8) {
+			$query = 'SELECT threadid, prev_threadid, prev_forumid, next_threadid, next_forumid
+				FROM (
+				SELECT 
+					imas_forum_threads.id as threadid,
+					LAG(imas_forum_threads.id) OVER (ORDER BY imas_forum_threads.lastposttime DESC) as prev_threadid,
+					LAG(imas_forum_threads.forumid) OVER (ORDER BY imas_forum_threads.lastposttime DESC) as prev_forumid,
+					LEAD(imas_forum_threads.id) OVER (ORDER BY imas_forum_threads.lastposttime DESC) as next_threadid,
+					LEAD(imas_forum_threads.forumid) OVER (ORDER BY imas_forum_threads.lastposttime DESC) as next_forumid
+				FROM imas_forum_threads 
+				JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<'.$now;
 			if (!isset($teacherid)) {
-			  $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+				$query .= ' AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<'.$now.' AND imas_forums.enddate>'.$now.'))';
 			}
-			$query .= "LEFT JOIN imas_forum_views AS mfv ";
-			$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
-			$array[':userid']=  $userid;
-			$array[':courseid']=$cid;
+			$query .= ' LEFT JOIN imas_forum_views AS mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid
+				WHERE imas_forums.courseid=:courseid ';
 			if (!isset($teacherid)) {
-			  $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
-			  $array[':userid2']=$userid;
+				$query .= ' AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid)) ';
 			}
-			$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";
+			if ($page==-3 || $page==-1) {	
+				$query .= ' AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))';
+			} else if ($page == -5 || $page==-2) {
+				$query .= ' AND mfv.tagged=1';
+			}
+			$qarr = [':userid'=>$userid, ':courseid'=>$cid, ':curthread'=>$threadid];
+			if ($page==-1 || $page==-2) {
+				$query .= ' AND imas_forums.id=:forumid';
+				$qarr[':forumid'] = $forumid;
+			}
+			$query .= ') AS threads_with_neighbors
+				WHERE threadid = :curthread';
+			$stm = $DBH->prepare($query);
+			$stm->execute($qarr);
+			$row = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($row !== false) {
+				if ($row['prev_threadid'] !== null) {
+					$prevth = $row['prev_threadid'];
+					$prevthforum = $row['prev_forumid'];
+				}
+				if ($row['next_threadid'] !== null) {
+					$nextth = $row['next_threadid'];
+					$nextthforum = $row['next_forumid'];
+				}
+			}
 		} else {
-			$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
-			$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
-			$array = array(':now'=>$now);
-			if (!isset($teacherid)) {
-			  $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
-			}
-			$query .= "LEFT JOIN imas_forum_views AS mfv ";
-			$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
-			$array[':userid']=  $userid;
-			$array[':courseid']=$cid;
-			if (!isset($teacherid)) {
-			  $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
-			  $array[':userid2']=$userid;
-			}
-			$query .= "AND (mfv.tagged=1) ORDER BY imas_forum_threads.lastposttime DESC";
-		}
-		$stm = $DBH->prepare($query);
-		$stm->execute($array);
-		$lastrow = array();
-		$atcur = false;
-		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if ($atcur) {
-				$nextth = $row['threadid'];
-				$nextthforum = $row['id'];
-				break;
-			}
-			if ($row['id']==$forumid && $row['threadid']==$threadid) { //found current
-				if (count($lastrow)>1) {
-					$prevth = $lastrow['threadid'];
-					$prevthforum = $lastrow['id'];
+			if ($page==-3) {
+				$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
+				$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+				$array = array(':now'=>$now);
+				if (!isset($teacherid)) {
+				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 				}
-				$atcur = true;
-			} else if (isset($_GET['olpt']) && $_GET['olpt']>$row['lastposttime']) {
-				if (count($lastrow)>1) {
-					$prevth = $lastrow['threadid'];
-					$prevthforum = $lastrow['id'];
+				$query .= "LEFT JOIN imas_forum_views AS mfv ";
+				$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
+				$array[':userid']=  $userid;
+				$array[':courseid']=$cid;
+				if (!isset($teacherid)) {
+				$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
+				$array[':userid2']=$userid;
 				}
-				$nextth = $row['threadid'];
-				$nextthforum = $row['id'];
-				break;
+				$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";
+			} else {
+				$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
+				$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+				$array = array(':now'=>$now);
+				if (!isset($teacherid)) {
+				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+				}
+				$query .= "LEFT JOIN imas_forum_views AS mfv ";
+				$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
+				$array[':userid']=  $userid;
+				$array[':courseid']=$cid;
+				if (!isset($teacherid)) {
+				$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
+				$array[':userid2']=$userid;
+				}
+				$query .= "AND (mfv.tagged=1) ORDER BY imas_forum_threads.lastposttime DESC";
 			}
-			$lastrow = $row;
+			$stm = $DBH->prepare($query);
+			$stm->execute($array);
+			$lastrow = array();
+			$atcur = false;
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($atcur) {
+					$nextth = $row['threadid'];
+					$nextthforum = $row['id'];
+					break;
+				}
+				if ($row['id']==$forumid && $row['threadid']==$threadid) { //found current
+					if (count($lastrow)>1) {
+						$prevth = $lastrow['threadid'];
+						$prevthforum = $lastrow['id'];
+					}
+					$atcur = true;
+				} else if (isset($_GET['olpt']) && $_GET['olpt']>$row['lastposttime']) {
+					if (count($lastrow)>1) {
+						$prevth = $lastrow['threadid'];
+						$prevthforum = $lastrow['id'];
+					}
+					$nextth = $row['threadid'];
+					$nextthforum = $row['id'];
+					break;
+				}
+				$lastrow = $row;
+			}
 		}
 	} else {
 		$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
