@@ -689,6 +689,18 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     $path .= "fill=\"transblue\";";
                 }
                 $path .= "stroke=\"none\";strokedasharray=\"none\";$pathstr";
+            } else {
+                if (($ineqtype[0] == '<' && $y>$ymax) || 
+                    ($ineqtype[0] == '>' && $y<$ymin)
+                ) {
+                    $path .= 'stroke="none";';
+                    if (isset($function[1])) {
+                        $path .= "fill=\"trans{$function[1]}\";";
+                    } else {
+                        $path .= "fill=\"transblue\";";
+                    }
+                    $path .= "rect([$thisxxmin,$yymin],[$thisxxmax,$yymax]);";
+                }
             }
         }
         if (isset($function[5]) && $function[5] == 'open') {
