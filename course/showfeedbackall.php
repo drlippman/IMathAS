@@ -70,6 +70,10 @@ require_once "gbtable2.php";
 $includecomments = true;
 
 $gbt = gbtable($stu);
+if (!isset($gbt[1][0][0])) {
+	echo 'Invalid student';
+	exit;
+}
 
 $flexwidth = true;
 $nologo = true;
