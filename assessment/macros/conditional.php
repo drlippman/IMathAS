@@ -48,7 +48,12 @@ function comparefunctions($a, $b, $vars = 'x', $tol = '.001', $domain = '-10,10'
         $abstolerance = floatval(substr($tol, 1));
     }
     $type = "expression";
-    if (strpos($a, '=') !== false && strpos($b, '=') !== false) {
+    
+    if ((strpos($a, '>') !== false || strpos($a, '<') !== false || strpos($a, '!=') !== false) && 
+        (strpos($b, '>') !== false || strpos($b, '<') !== false || strpos($b, '!=') !== false)
+    ) {
+        $type = "inequality";
+    } else if (strpos($a, '=') !== false && strpos($b, '=') !== false) {
         $type = "equation";
     }
 
@@ -67,6 +72,21 @@ function comparefunctions($a, $b, $vars = 'x', $tol = '.001', $domain = '-10,10'
             return false;
         }
         $b = preg_replace('/(.*)=(.*)/', '$1-($2)', $b);
+    } else if ($type == 'inequality') {
+        preg_match('/(.*?)(<=|>=|<|>|!=|=)(.*)/', $a, $matches);
+        if (!empty($matches)) {
+            $a = $matches[3] . '-(' . $matches[1] . ')';
+            $aInequality = $matches[2];
+        } else {
+            return false;
+        }
+        preg_match('/(.*?)(<=|>=|<|>|!=|=)(.*)/', $b, $matches);
+        if (!empty($matches)) {
+            $b = $matches[3] . '-(' . $matches[1] . ')';
+            $bInequality = $matches[2];
+        } else {
+            return false;
+        }
     }
 
     $afunc = makeMathFunction($a, $vlist, [], $flist, true);
@@ -114,7 +134,7 @@ function comparefunctions($a, $b, $vars = 'x', $tol = '.001', $domain = '-10,10'
             continue;
         }
 
-        if ($type == 'equation') {
+        if ($type == 'equation' || $type == 'inequality') {
             if (abs($ansa) > .000001 && is_numeric($ansb)) {
                 $ratios[] = $ansb / $ansa;
                 if (abs($ansb) <= .00000001 && $ansa != 0) {
@@ -157,7 +177,7 @@ function comparefunctions($a, $b, $vars = 'x', $tol = '.001', $domain = '-10,10'
     if ($diffnan > 1) {
         return false;
     }
-    if ($type == "equation") {
+    if ($type == "equation" || $type == 'inequality') {
         if ($cntbothzero > 18) {
             $correct = true;
         } else if (count($ratios) > 0) {
@@ -165,6 +185,18 @@ function comparefunctions($a, $b, $vars = 'x', $tol = '.001', $domain = '-10,10'
                 $correct = false;
             } else {
                 $meanratio = array_sum($ratios) / count($ratios);
+                if ($type == 'inequality') {
+                    if ($meanratio > 0) {
+                        if ($aInequality != $bInequality) {
+                            $correct = false; 
+                        }
+                    } else {
+                        $flippedIneq = strtr($bInequality, ['<'=>'>', '>'=>'<']);
+                        if ($aInequality != $flippedIneq) {
+                            $correct = false; 
+                        }
+                    }     
+                }
                 for ($i = 0; $i < count($ratios); $i++) {
                     if (isset($abstolerance)) {
                         if (abs($ratios[$i] - $meanratio) > $abstolerance - 1E-12) {
