@@ -120,6 +120,8 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
         $code = 5.3;
     } else if ($type == 'ray') {
         $code = 5.2;
+    } else if ($type == 'dashedline') {
+        $code = 5.1;
     } else if ($type == 'parab') {
         $code = 6;
     } else if ($type == 'halfparab') {
@@ -154,6 +156,8 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
         $code = 9.1;
     } else if ($type == 'cos') {
         $code = 9;
+    } else if ($type == 'tan') {
+        $code = 9.2;
     } else if ($type == 'vector') {
         $code = 5.4;
     } else {
@@ -188,7 +192,7 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
                 $pts[6] = ($h - $pts[6] - $imgborder) / $pixelspery + $ymin;
                 // Last value is the asymptote: y val for genexp, x val for genlog
                 $outpt = ($type == 'genexp') ? array($pts[3], $pts[4], $pts[5], $pts[6], $pts[2]) : array($pts[3], $pts[4], $pts[5], $pts[6], $pts[1]);
-            } else if ($type == '3pointparab') {
+            } else if ($type == '3pointparab' || $type == 'tan') {
                 $pts[5] = ($pts[5] - $imgborder) / $pixelsperx + $xmin;
                 $pts[6] = ($h - $pts[6] - $imgborder) / $pixelspery + $ymin;
                 $outpt = array($pts[1], $pts[2], $pts[3], $pts[4], $pts[5], $pts[6]);
@@ -217,7 +221,7 @@ function gettwopointformulas($str, $type, $xmin = null, $xmax = null, $ymin = nu
     $outexps = [];
     $outeqs = [];
     if (!empty($pts)) {
-        if ($type == 'line' || $type == 'lineseg' || $type == 'ray') {
+        if ($type == 'line' || $type == 'lineseg' || $type == 'ray'  || $type == 'dashedline') {
             foreach ($pts as $key => $pt) {
                 if (abs($pt[0] - $pt[2]) > 1E-12) {
                     $slope = ($pt[3] - $pt[1]) / ($pt[2] - $pt[0]);

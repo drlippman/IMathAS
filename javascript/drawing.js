@@ -241,7 +241,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 		},
 		"twopoint": {
 			"line": [{"mode":5, "descr":_("Line"), inN: 2, "input":_("Enter two points on the line")}],
-			"dashline": [{"mode":5.1, "descr":_("Dashed Line"), inN: 2, "input":_("Enter two points on the dashed line")}],
+			"dashedline": [{"mode":5.1, "descr":_("Dashed Line"), inN: 2, "input":_("Enter two points on the dashed line")}],
 			"lineseg": [{"mode":5.3, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
 			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
 			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
