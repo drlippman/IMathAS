@@ -74,6 +74,12 @@ if (!isset($gbt[1][0][0])) {
 	echo 'Invalid student';
 	exit;
 }
+if (isset($studentid)) {
+	$query = "INSERT INTO imas_content_track (userid,courseid,type,viewtime) VALUES ";
+	$query .= "(:userid, :courseid, :type, :viewtime)";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'viewallfb', ':viewtime'=>$now));
+}
 
 $flexwidth = true;
 $nologo = true;

@@ -36,6 +36,12 @@
 		echo 'Invalid forum';
 		exit;
 	}
+	if (isset($studentid)) {
+		$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+		$query .= "(:userid, :courseid, :type, :typeid, :viewtime)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'foviewfb', ':typeid'=>$forumid, ':viewtime'=>$now));
+	}
 
 	if (($isteacher || $istutor) && (isset($_POST['score']) || isset($_POST['newscore']))) {
 		if ($istutor && $forumsettings['tutoredit'] != 1) {

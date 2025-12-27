@@ -43,7 +43,7 @@ echo '<h2>Activity Log for <span class="pii-full-name">'.Sanitize::encodeStringF
 
 
 $actions = array();
-$lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array(), 'dr'=>array(),);
+$lookups = array('as'=>[], 'in'=>[], 'li'=>[], 'ex'=>[], 'wi'=>[], 'fo'=>[], 'forums'=>[], 'dr'=>array(), 'og'=>[]);
 $stm = $DBH->prepare("SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid=:userid AND courseid=:courseid");
 $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -142,6 +142,16 @@ if (count($lookups['dr'])>0) {
 		$drnames[$row[0]] = $row[1];
 	}
 }
+$ognames = array();
+if (count($lookups['og'])>0) {
+	$lookuplist = array_map('intval', array_unique($lookups['og']));
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE id IN ($query_placeholders)");
+	$stm->execute(array_values($lookuplist));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$ognames[$row[0]] = $row[1];
+	}
+}
 
 echo '<table><thead><tr><th>Date</th><th>Action</th></tr></thead><tbody>';
 foreach ($actions as $r) {
@@ -199,6 +209,21 @@ foreach ($actions as $r) {
     case 'assessreview':
     case 'assessreviewub':
 		$actionmsg =  'Opened in review mode assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
+		break;
+	case 'viewallfb':
+		$actionmsg =  'Viewed feedback for all items via gradebook';
+		break;
+	case 'gbviewfb':
+		$actionmsg =  'Viewed feedback for assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]] ?? '(deleted)');
+		break;
+	case 'liviewfb':
+		$actionmsg =  'Viewed feedback for external assignment '.Sanitize::encodeStringForDisplay($linames[$r[1]] ?? '(deleted)');
+		break;
+	case 'ogviewfb':
+		$actionmsg =  'Viewed feedback for offline grade '.Sanitize::encodeStringForDisplay($ognames[$r[1]] ?? '(deleted)');
+		break;
+	case 'foviewfb':
+		$actionmsg =  'Viewed feedback via gradebook for forum posts in '.Sanitize::encodeStringForDisplay($ognames[$r[1]] ?? '(deleted)');	
 		break;
 	case 'gbviewassess':
 	case 'gbviewsafe':
