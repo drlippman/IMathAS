@@ -1,4 +1,4 @@
-<FilesMatch "\.(php[s0-9]?|phtml|pl|cgi|py|asp|jsp|sh|js|html|htm|xml|xhtml)$">
+<FilesMatch "\.(php[s0-9]?|phar|phtml|pl|cgi|py|asp|jsp|sh|js|html|htm|xml|xhtml)$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>

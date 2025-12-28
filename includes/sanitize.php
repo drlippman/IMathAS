@@ -8,6 +8,7 @@ class Sanitize
 	private static $blacklistedFilenames = array(
 		'/^\./',
 		'/\.php\d?$/',
+		'/\.phar$/',
 		'/\.bat$/',
 		'/\.com$/',
 		'/\.exe$/',
