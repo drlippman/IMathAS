@@ -39,7 +39,7 @@ function linegraph($intvs) {
 	$xsclpts = explode(':',$settings[2]);
 
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},-.5,.5);";
-	$alt = "Line Graph, x {$settings[0]} to {$settings[1]}.";
+	$alt = "Line Graph from {$settings[0]} to {$settings[1]}. ";
 	$commands .= 'axes('.$xsclpts[0].',1,1,';
 	if (count($xsclpts)>1) {
 		$commands .= $xsclpts[1];
@@ -97,10 +97,11 @@ function linegraph($intvs) {
 				$alt .= ", closed dot at $max";
 			} else {
 				$commands .= '"open"';
-				$alt .= ", open dot at $min";
+				$alt .= ", open dot at $max";
 			}
 			$commands .= ');';
 		}
+		$alt .= '. ';
 	}
 	if ($_SESSION['graphdisp']==0) {
 		return $alt;
@@ -123,7 +124,7 @@ function linegraphbrackets($intvs) {
 	}
 
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},-.5,.5);";
-	$alt = "Line Graph, x {$settings[0]} to {$settings[1]}.";
+	$alt = "Line Graph from {$settings[0]} to {$settings[1]}. ";
 	$commands .= 'axes('.$settings[2].',1,1,0,0,1,"off"); stroke="blue"; strokewidth=2;';
 	foreach ($intvs as $intv) {
 		$commands .= 'line([';
@@ -176,6 +177,7 @@ function linegraphbrackets($intvs) {
 				$alt .= ", right parenthesis at $max";
 			}
 		}
+		$alt .= '. ';
 	}
 	if ($_SESSION['graphdisp']==0) {
 		return $alt;
