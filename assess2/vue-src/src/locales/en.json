@@ -525,5 +525,16 @@
   "links": {
       "settings": "Settings",
       "questions": "Questions"
+  },
+  "latepass": {
+    "reason0": "LatePasses are not enabled.",
+    "reason2": "LatePasses cannot be used because it is past the LatePass cutoff time.",
+    "reason3": "LatePasses cannot be used because it is past the course end date.",
+    "reason4": "LatePasses cannot be used because it is past assessment end date, and LatePasses must be used before that.",
+    "reason5": "LatePasses cannot be used because it is too far past the due date for the allowed number to LatePasses to reopen it.",
+    "reason6": "LatePasses cannot be used because you do not have enough LatePasses to reopen this assesssment.",
+    "reason7": "LatePasses cannot be used because you have opened this assessment in Practice Mode, and that blocks use of LatePasses.",
+    "reason8": "LatePasses cannot be used because you have reviewed this assessment in the Gradebook, and that blocks use of LatePasses.",
+    "reason9": "LatePasses cannot be used because you are out of attempts."
   }
 }

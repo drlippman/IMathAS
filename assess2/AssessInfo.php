@@ -165,13 +165,9 @@ class AssessInfo
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
-    if ($latepasses > 0) {
-      list($useexception, $canundolatepass, $canuselatepass) =
-        $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
-    } else {
-      $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
-      $canuselatepass = false;
-    }
+    list($useexception, $latepassreason) =
+        $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, false, true);
+    $canuselatepass = ($latepassreason == 1);
 
     // use time limit extension even if rest of exception isn't used
     if ($this->exception !== false && !empty($this->exception['timeext'])) {
@@ -221,6 +217,8 @@ class AssessInfo
       $this->setAvailable();
     }
 
+    $this->assessData['latepasses_avail'] = $latepasses;
+    $this->assessData['latepass_reason'] = $latepassreason;
     //determine if latepasses can be used, and how many are needed
     if ($canuselatepass) {
       if (time() > $this->assessData['enddate']) {
@@ -232,7 +230,6 @@ class AssessInfo
 
       $this->assessData['can_use_latepass'] = $LPneeded;
       $this->assessData['latepass_after'] = ($this->assessData['allowlate']>10);
-      $this->assessData['latepasses_avail'] = $latepasses;
 
       $LPcutoff = $this->assessData['LPcutoff'];
       if ($LPcutoff<$this->assessData['enddate']) {
@@ -247,7 +244,6 @@ class AssessInfo
       } else {
         $this->assessData['latepass_extendto'] = strtotime("+".($latepasshrs*$LPneeded)." hours", $this->assessData['enddate']);
       }
-
     } else {
       $this->assessData['can_use_latepass'] = 0;
     }

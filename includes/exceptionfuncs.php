@@ -236,7 +236,7 @@ class ExceptionFuncs {
 	// Also called internally from getCanUseAssessException using second param
 	// latepasscnt is number of latepasses already used
 	public function getCanUseAssessLatePass($adata, $latepasscnt = 0, $getreason=false) {
-		if ($this->latepasses == 0) { // no latepasses to use; no need to check further
+		if ($this->latepasses == 0 && !$getreason) { // no latepasses to use; no need to check further
 			return false;
 		}
 		$now = time();

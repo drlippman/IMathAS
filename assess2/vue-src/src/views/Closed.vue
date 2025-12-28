@@ -38,6 +38,12 @@
         <br/>
         {{ latepassExtendMsg }}
       </p>
+      <p v-if="settings.can_use_latepass == 0 && settings.latepass_reason > 1 && showLatePassOffer">
+        {{  $t('latepass.reason' + settings.latepass_reason) }}
+        <span v-if = "settings.latepass_reason == 6">
+          {{ $tc('closed.latepassn', settings.latepasses_avail) }}
+        </span>
+      </p>
 
       <p v-if="settings.available === 'practice' && settings.can_use_latepass === 0">
         {{ $t('closed.practice_no_latepass') }}
