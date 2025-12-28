@@ -165,7 +165,23 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     $absymax = -1E10;
     $globalalt = '';
     $allcolors = [];
-    foreach ($funcs as $function) {
+    $labelassoc = [];
+    if ($_SESSION['graphdisp'] == 0) {
+        foreach ($funcs as $k=>$function) {
+            if (is_array($function) || $function == '') {
+                continue;
+            }
+            if (substr($function,0,5) == 'text,') {
+                $function = str_replace('\\,', '&x44;', $function);
+                $function = listtoarray($function);
+                if (isset($function[7])) {
+                    $labelassoc[$function[7]] = $function[3];
+                    $funcs[$k] = '';
+                }
+            }
+        }
+    }
+    foreach ($funcs as $k=>$function) {
         if (is_array($function)) {
             echo _('Input to showplot should be a single function or array of functions, with parameters added with commas after, not as an array');
             continue;
@@ -238,10 +254,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             if (!isset($function[4]) || $function[4] == '') {
                 $function[4] = 'black';
             }
-            if (!isset($function[5])) {
+            if (!isset($function[5]) || $function[5] == '') {
                 $function[5] = 'centered';
             }
-            if (!isset($function[6])) {
+            if (!isset($function[6]) || $function[6] == '') {
                 $function[6] = 0;
             } else {
                 $function[6] = intval($function[6]);
@@ -322,6 +338,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             $path .= "stroke=\"black\";";
             $alt .= ", color black";
             $allcolors[] = 'black';
+        }
+        if (isset($labelassoc[$k])) {
+            $alt .= ', labeled ' . $labelassoc[$k];
         }
         if (isset($function[6]) && $function[6] != '') {
             $path .= "strokewidth=\"{$function[6]}\";";

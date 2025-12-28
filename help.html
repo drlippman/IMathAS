@@ -2357,7 +2357,7 @@ The following macros create graphs or tables:
 		</ul>
 			</li>
 			<li><strong>text</strong>: For placing text labels. A string containing at least the
-				first four of: "text,x,y,label,color,location,angle"
+				first four of: "text,x,y,label,color,location,angle,graphassoc"
 				<ul>
 					<li>text: the literal word text</li>
 					<li>x,y: the coordinates of the label</li>
@@ -2365,6 +2365,8 @@ The following macros create graphs or tables:
 					<li>color: a color designator: black,red,orange,yellow,green,blue,purple</li>
 					<li>location: label location: above, left, right, below, aboveleft, etc.</li>
 					<li>angle: a rotation angle in degrees for the label (0,90,180,270)</li>
+					<li>graphassoc: If this text is a label for a graph, the index in funcstrings 
+						for the graph it labels. This is used by the accessible alt text.</li>
 					<li><strong>Examples:</strong>: "text,2,4,Cars", "text,4,0,Hours,below"</li>
 				</ul>
 			</li>
