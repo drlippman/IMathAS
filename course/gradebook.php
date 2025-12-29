@@ -150,7 +150,7 @@ if ($canviewall && !empty($_GET['stu'])) {
 
 if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessGbUrl = sprintf("%s/gbviewassess.html", $CFG['assess2-use-vue-dev-address']);
-	$assessUrl = $CFG['assess2-use-vue-dev-address'] . '/';
+	$assessUrl = $CFG['assess2-use-vue-dev-address'] . '/index.html';
 } else {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 	$assessUrl = "../assess2/";
