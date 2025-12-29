@@ -97,6 +97,9 @@ class FunctionExpressionAnswerBox implements AnswerBox
             } else if (in_array('inequality', $ansformats)) {
                 $shorttip = _('Enter an algebraic inequality');
                 $tip = _('Enter your answer as an inequality.  Example: y<3x^2+1, 2+x+y>=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+            } else if (in_array('doubleinequality', $ansformats)) {
+                $shorttip = _('Enter a compound algebraic inequality');
+                $tip = _('Enter your answer as a compound inequality.  Example: 5<2x+1<3') . "\n<br/>" . _('Be sure your variables match those in the question');
             } else {
                 $shorttip = _('Enter an algebraic expression');
                 $tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');

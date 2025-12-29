@@ -87,12 +87,13 @@ class FunctionExpressionScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        if (!in_array('inequality',$ansformats) &&
+        if (!in_array('inequality',$ansformats) && !in_array('doubleinequality', $ansformats) &&
             (strpos($answer,'<')!==false || strpos($answer,'>')!==false || strpos($answer,'!=')!==false)
          ) {
             echo 'Your $answer contains an inequality sign, but you do not have $answerformat="inequality" set. This question probably will not work right.';
         } else if (!in_array('equation',$ansformats) &&
           !in_array('inequality',$ansformats) &&
+          !in_array('doubleinequality', $ansformats) &&
           strpos($answer,'=')!==false
         ) {
             echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
@@ -107,6 +108,23 @@ class FunctionExpressionScorePart implements ScorePart
             }
             $answer = rewritePlusMinus($answer);
             $givenans = rewritePlusMinus($givenans);
+        }
+        if (in_array('doubleinequality', $ansformats)) {
+            if (!$isListAnswer) {
+                $ansformats[] = 'list';
+                $isListAnswer = true;
+            }
+            if (!in_array('inequality', $ansformats)) {
+                $ansformats[] = 'inequality';
+            }
+            $answer = preg_replace('/(.*?)(<=|>=|<|>)(.*?)(<=|>=|<|>)(.*?)/', '$1$2$3,$3$4$5', $answer);
+            $givenans = preg_replace_callback('/(.*?)(<=|>=|<|>)(.*?)(<=|>=|<|>)(.*?)/', function($m) {
+                if ($m[2][0] != $m[4][0]) { // non-matching directions: reject
+                    return '';
+                } else {
+                    return $m[1].$m[2].$m[3].','.$m[3].$m[4].$m[5];
+                }
+            }, $givenans);
         }
 
         if ($isListAnswer) {

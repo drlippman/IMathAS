@@ -1856,6 +1856,7 @@ function processNumfunc(qn, fullstr, format) {
   var fvars = params.fvars;
   var domain = params.domain;
   var iseqn = format.match(/equation/);
+  var isdoubleineq = format.match(/doubleinequality/);
   var isineq = format.match(/inequality/);
   var err = '';
   var primes = [2, 3, 5, 7, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
@@ -1886,8 +1887,10 @@ function processNumfunc(qn, fullstr, format) {
             } else {
                 err += _("syntax error: you gave an inequality, not an expression")+ '. ';
             }
-        } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length>1) {
+        } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length>1 && !isdoubleineq) {
             err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
+        } else if (totesteqn.match(/(<=|>=|<|>|!=)/g).length!=2 && isdoubleineq) {
+            err += _("syntax error: your inequality should contain two inequality symbols")+ '. ';
         } else if (totesteqn.match(/(^(<|>|!))|(=|>|<)$/)) {
             err += _("syntax error: your inequality should have expressions on both sides")+ '. ';
         }
