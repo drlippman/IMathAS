@@ -32,7 +32,7 @@ module.exports = {
         filename: 'js/[name]' + legacy + '.js',
         chunkFilename: 'js/[name]' + legacy + '.js?v=[chunkhash]'
       }
-    }
+    };
   },
   // in dev server mode, proxy all requests to localhost
   devServer: {

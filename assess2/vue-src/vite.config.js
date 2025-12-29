@@ -1,12 +1,13 @@
-import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import path from 'path'
-import fs from 'fs'
-import { fileURLToPath } from 'url'
-import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
+import { defineConfig, loadEnv } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
 import legacy from "@vitejs/plugin-legacy";
+import eslintPlugin from 'vite-plugin-eslint';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function updatePhpFiles() {
   return {
@@ -47,12 +48,13 @@ function updatePhpFiles() {
 }
 
 export default defineConfig(({ mode }) => {
-  const isProduction = mode === 'production'
-  const env = loadEnv(mode, process.cwd(), '')
+  const isProduction = mode === 'production';
+  const env = loadEnv(mode, process.cwd(), '');
 
   return {
     envPrefix: "VUE_APP_",
     plugins: [
+      eslintPlugin(),
       vue(),
       // i18n plugin
       VueI18nPlugin({
@@ -108,11 +110,11 @@ export default defineConfig(({ mode }) => {
       port: 8080,
       hmr: true,
       proxy: env.VUE_APP_PROXY ? {
-        '^/(?!src|node_modules|@vite|@fs|@id|__|index\.html|gbviewassess\.html).*': {
+        '^/(?!src|node_modules|@vite|@fs|@id|__|index.html|gbviewassess.html).*': {
           target: env.VUE_APP_PROXY,
           changeOrigin: true
         }
       } : undefined
     },
-  }
-})
+  };
+});
