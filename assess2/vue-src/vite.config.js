@@ -1,11 +1,50 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import fs from 'fs'
 import { fileURLToPath } from 'url'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import legacy from "@vitejs/plugin-legacy";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+function updatePhpFiles() {
+  return {
+    name: 'update-php-files',
+    closeBundle(options, bundle) {
+      const manifest = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, '../vue/.vite/manifest.json'), 'utf-8')
+      );
+
+      // index
+      let jsFile = manifest['index.html'].file;
+      let legacyJsFile = manifest['index-legacy.html'].file;
+      let cssFile = manifest['style.css'].file;
+
+      // Update your PHP file
+      let phpPath = path.resolve(__dirname, '../index.php');
+      let phpContent = fs.readFileSync(phpPath, 'utf-8');
+      phpContent = phpContent.replace(/js\/index-\w+\.js/g, jsFile)
+                            .replace(/js\/index-legacy-\w+\.js/g, legacyJsFile)
+                            .replace(/css\/style-\w+\.css/g, cssFile);
+      fs.writeFileSync(phpPath, phpContent);
+
+      // gbviewassess
+      jsFile = manifest['gbviewassess.html'].file;
+      legacyJsFile = manifest['gbviewassess-legacy.html'].file;
+      cssFile = manifest['style.css'].file;
+
+      // Update your PHP file
+      phpPath = path.resolve(__dirname, '../gbviewassess.php');
+      phpContent = fs.readFileSync(phpPath, 'utf-8');
+      phpContent = phpContent.replace(/js\/gbviewassess-\w+\.js/g, jsFile)
+                            .replace(/js\/gbviewassess-legacy-\w+\.js/g, legacyJsFile)
+                            .replace(/css\/style-\w+\.css/g, cssFile);
+      fs.writeFileSync(phpPath, phpContent);
+      console.log('✓ PHP files updated with new asset hashes');
+    }
+  };
+}
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production'
@@ -24,7 +63,8 @@ export default defineConfig(({ mode }) => {
       }),
       legacy({
         targets: ["defaults", "not IE 11"],
-      })
+      }),
+      updatePhpFiles()
     ],
     
     resolve: {
@@ -39,6 +79,7 @@ export default defineConfig(({ mode }) => {
       outDir: path.resolve(__dirname, '../vue'),
       emptyOutDir: true,
       cssCodeSplit: false,
+      manifest: true,
       rollupOptions: {
         input: {
             index: path.resolve(__dirname, 'index.html'),
