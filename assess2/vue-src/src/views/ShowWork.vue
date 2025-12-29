@@ -17,7 +17,7 @@
     </div>
     <div v-if="readyToShow">
       <p v-if="ainfo.showwork_cutoff > 0">
-        {{ $tc('work.duein', {date: ainfo.showwork_cutoff_expires_disp}) }}
+        {{ $t('work.duein', {date: ainfo.showwork_cutoff_expires_disp}) }}
       </p>
       <p v-if="questions.length === 0">
         {{ $t('work.noquestions') }}

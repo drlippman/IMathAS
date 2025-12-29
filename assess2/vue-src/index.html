@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="%VUE_APP_I18N_LOCALE%">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script src="%VUE_APP_IMASROOT%/javascript/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/mathparser_min.js?v=122025" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/ASCIIsvg_min.js?v=122025" type="text/javascript"></script>
+    <script type="text/javascript">
+      var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true;
+      var MathJaxCompatible = true; var mathRenderer="MathJax";
+      function rendermathnode(node,callback) {
+  			if (window.MathJax) {
+  				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+  				if (typeof callback == "function") {
+  					MathJax.Hub.Queue(callback);
+  				}
+  			} else {
+  				setTimeout(function() {rendermathnode(node, callback);}, 100);
+  			}
+      }
+      var imasroot = '%VUE_APP_IMASROOT%';
+      var staticroot = '%VUE_APP_IMASROOT%';
+      var APIbase = '%VUE_APP_IMASROOT%/assess2/';
+      var coursetheme = "%VUE_APP_IMASROOT%/themes/modern.css?v=110918";
+      var AMTcgiloc = 'https://www.myopenmath.com/cgi-bin/mimetex.cgi';
+      var filePickerCallBackFunc = null;
+      var tinymceUseSnippets = false;
+      var exiturl = '%VUE_APP_IMASROOT%';
+    </script>
+    <script src="%VUE_APP_IMASROOT%/javascript/general.js?ver=090819" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/drawing.js" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/AMhelpers2.js?v=110119" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/eqntips.js" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/mathparser.js" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/mathquill/AMtoMQ.js" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/mathquill/mathquill.min.js" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/mathquill/mqeditor.js?v=071320" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/mathquill/mqedlayout.js?v=110119b" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/javascript/ASCIIMathTeXImg_min.js" type="text/javascript"></script>
+    <script src="%VUE_APP_IMASROOT%/tinymce4/tinymce_bundled.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="%VUE_APP_IMASROOT%/mathquill/mathquill-basic.css">
+    <link rel="stylesheet" type="text/css" href="%VUE_APP_IMASROOT%/mathquill/mqeditor.css?v=071320">
+    <link rel="stylesheet" type="text/css" href="%VUE_APP_IMASROOT%/imascore.css?v=110918">
+    <link rel="stylesheet" type="text/css" href="%VUE_APP_IMASROOT%/themes/modern.css?v=110918">
+    <link rel="stylesheet" type="text/css" href="%VUE_APP_IMASROOT%/assess2/print.css?v=110918" media="print">
+    <title>vue-demo</title>
+  </head>
+  <body class="fw1000">
+  <div class="headerwrapper">
+    <div id="navlistcont" role="navigation" aria-label="Course Navigation" style="font-family: &quot;Open Sans&quot;, &quot;Trebuchet MS&quot;, Arial, Helvetica, sans-serif; font-size: 14px;">
+      <ul id="navlist">
+        <li><a href="/course/course.php?cid=31867">Course</a></li>
+        <li><a href="/msgs/msglist.php?cid=31867">Messages</a></li>
+        <li><a href="/forums/forums.php?cid=31867">Forums</a></li>
+        <li><a href="/course/listusers.php?cid=31867">Roster</a></li>
+        <li><a href="/course/showcalendar.php?cid=31867">Calendar</a></li>
+        <li><a href="/course/gradebook.php?cid=31867">Gradebook</a></li>
+      </ul>
+      <div class="clear"></div>
+    </div>
+  </div>
+  <div class=midwrapper>
+    <div class="breadcrumb">
+      Home &gt; Assessment
+    </div>
+    <noscript>
+      <strong>We're sorry but vue-demo doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <script type="module" src="src/main.js"></script>
+  </div>
+  <div id="ehdd" class="ehdd">
+    <span id="ehddtext"></span>
+    <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span>
+  </div>
+	<div id="eh" class="eh"></div>
+  </body>
+</html>

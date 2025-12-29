@@ -1,5 +1,5 @@
 {
-  "nth": "| first | second | third | fourth | {n}th",
+  "nth": "none | first | second | third | fourth | {n}th",
   "seconds": "1 second | {n} seconds",
   "minutes": "1 minute | {n} minutes",
   "hours": "1 hour | {n} hours",

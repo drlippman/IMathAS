@@ -102,7 +102,7 @@ export default {
         var origduedate = settings.original_enddate_disp;
         dateobj.sub = this.$t('setlist.originally_due', { date: origduedate });
         if (settings.extended_with.type === 'latepass') {
-          dateobj.sub += ' ' + this.$tc('setlist.latepass_used', settings.extended_with.n);
+          dateobj.sub += ' ' + this.$t('setlist.latepass_used', settings.extended_with.n);
         } else {
           dateobj.sub += ' ' + this.$t('setlist.extension');
         }
@@ -119,11 +119,11 @@ export default {
         dateobj.alert = this.$t('setlist.earlybonus', { p: settings.earlybonus[0], date: settings.earlybonusends_disp });
       }
       if (settings.can_use_latepass > 0) {
-        dateobj.latepass = this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
+        dateobj.latepass = this.$t('setlist.latepass_needed', settings.can_use_latepass, {
           n: settings.can_use_latepass,
           date: settings.latepass_extendto_disp
         });
-        dateobj.latepass_label = this.$tc('closed.use_latepass', settings.can_use_latepass);
+        dateobj.latepass_label = this.$t('closed.use_latepass', settings.can_use_latepass);
       }
       return dateobj;
     },
@@ -135,17 +135,17 @@ export default {
       let altstr = '';
       if (settings.hasOwnProperty('attemptext')) {
         if (settings.prev_attempts.length === 0) {
-          altstr = this.$tc('setlist.take', attemptsLeft);
+          altstr = this.$t('setlist.take', attemptsLeft);
         } else {
-          altstr = this.$tc('setlist.take_more', attemptsLeft);
+          altstr = this.$t('setlist.take_more', attemptsLeft);
         }
         attemptsLeft = Math.max(0, attemptsLeft - settings.attemptext);
       }
 
       if (settings.prev_attempts.length === 0) {
-        attemptsLeftStr = this.$tc('setlist.take', attemptsLeft);
+        attemptsLeftStr = this.$t('setlist.take', attemptsLeft);
       } else {
-        attemptsLeftStr = this.$tc('setlist.take_more', attemptsLeft);
+        attemptsLeftStr = this.$t('setlist.take_more', attemptsLeft);
       }
 
       if (settings.has_active_attempt) {
@@ -256,27 +256,27 @@ export default {
       const sec = time - 60 * min - 3600 * hrs;
       let out = '';
       if (hrs > 0) {
-        out += this.$tc('hours', hrs);
+        out += this.$t('hours', hrs);
       }
       if (min > 0) {
         if (out !== '') { out += ' '; }
-        out += this.$tc('minutes', min);
+        out += this.$t('minutes', min);
       }
       if (sec > 0) {
         if (out !== '') { out += ' '; }
-        out += this.$tc('seconds', sec);
+        out += this.$t('seconds', sec);
       }
       return out;
     },
     redeemLatePass () {
       var settings = store.assessInfo;
       store.confirmObj = {
-        body: this.$tc('closed.latepassn', settings.latepasses_avail) + ' ' +
-          this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
+        body: this.$t('closed.latepassn', settings.latepasses_avail) + ' ' +
+          this.$t('setlist.latepass_needed', settings.can_use_latepass, {
             n: settings.can_use_latepass,
             date: settings.latepass_extendto_disp
           }),
-        ok: this.$tc('closed.use_latepass', settings.can_use_latepass),
+        ok: this.$t('closed.use_latepass', settings.can_use_latepass),
         action: () => actions.redeemLatePass()
       };
     }

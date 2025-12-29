@@ -22,12 +22,12 @@
             {{ $t('duedialog.nowdue') }}
           </p>
           <p v-if="settings.can_use_latepass > 0 && settings.latepass_after">
-            {{ $tc('closed.latepassn', settings.latepasses_avail) }}
+            {{ $t('closed.latepassn', settings.latepasses_avail) }}
             <br/>
             {{ latepassExtendMsg }}
             <br/>
             <button @click="useLatepass" class="primary">
-              {{ $tc('closed.use_latepass', this.settings.can_use_latepass) }}
+              {{ $t('closed.use_latepass', this.settings.can_use_latepass) }}
             </button>
           </p>
           <p v-if="hasUnsubmitted">
@@ -71,7 +71,7 @@ export default {
       return store.assessInfo;
     },
     latepassExtendMsg () {
-      return this.$tc('closed.latepass_needed', this.settings.can_use_latepass, {
+      return this.$t('closed.latepass_needed', this.settings.can_use_latepass, {
         n: this.settings.can_use_latepass,
         date: this.settings.latepass_extendto_disp
       });

@@ -20,8 +20,5 @@ module.exports = {
     'no-var': 'off',
     'object-shorthand': 'off',
     'dot-notation': 'off'
-  },
-  parserOptions: {
-    parser: '@babel/eslint-parser'
   }
 };

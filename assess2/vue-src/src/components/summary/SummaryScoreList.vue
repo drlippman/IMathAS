@@ -20,7 +20,7 @@
         {{ $t('scorelist.unattempted') }}
       </td>
       <td v-else>
-        {{ $tc('scorelist.pts', question.points_possible,
+        {{ $t('scorelist.pts', question.points_possible,
               {pts: question.gbscore, poss: question.points_possible}) }}
         &nbsp;&nbsp;
         <click-to-show

@@ -79,8 +79,8 @@ export default {
         this.timeString += (this.minutes < 10 ? '0' : '') + this.minutes + ':';
         this.timeString += (this.seconds < 10 ? '0' : '') + this.seconds;
       } else {
-        this.timeString += this.hours > 0 ? this.hours + this.$tc('timer.hrs', this.hours) : '';
-        this.timeString += this.minutes > 0 ? this.minutes + this.$tc('timer.min', this.minutes) : '';
+        this.timeString += this.hours > 0 ? this.hours + this.$t('timer.hrs', this.hours) : '';
+        this.timeString += this.minutes > 0 ? this.minutes + this.$t('timer.min', this.minutes) : '';
       }
     },
     toggleShow: function () {

@@ -1,12 +1,13 @@
 // import Vue from 'vue';
 import { createI18n } from 'vue-i18n';
 import { dateTimeFormats } from './dateTimeFormats';
-import messages from './locales/en.json';
+import messages from '@intlify/unplugin-vue-i18n/messages';
 
 export const i18n = createI18n({
+  legacy: true,
   locale: 'en',
   fallbackLocale: 'en',
-  messages: { en: messages },
+  messages: {en: messages.en},
   dateTimeFormats
 });
 
@@ -30,7 +31,7 @@ function loadLanguageAsync (lang) {
   }
 
   // If the language hasn't been loaded yet
-  return import(/* webpackChunkName: "lang-[request]" */ '@/locales/' + lang + '.json').then(
+  return import(`./locales/${lang}.json`).then(
     messages => {
       i18n.global.setLocaleMessage(lang, messages.default);
       loadedLanguages.push(lang);

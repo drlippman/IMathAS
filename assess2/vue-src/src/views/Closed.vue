@@ -34,14 +34,14 @@
       </p>
 
       <p v-if="settings.can_use_latepass > 0 && showLatePassOffer">
-        {{ $tc('closed.latepassn', settings.latepasses_avail) }}
+        {{ $t('closed.latepassn', settings.latepasses_avail) }}
         <br/>
         {{ latepassExtendMsg }}
       </p>
       <p v-if="settings.can_use_latepass == 0 && settings.latepass_reason > 1 && showLatePassOffer">
         {{  $t('latepass.reason' + settings.latepass_reason) }}
         <span v-if = "settings.latepass_reason == 6">
-          {{ $tc('closed.latepassn', settings.latepasses_avail) }}
+          {{ $t('closed.latepassn', settings.latepasses_avail) }}
         </span>
       </p>
 
@@ -196,7 +196,7 @@ export default {
         !this.settings.hasOwnProperty('pasttime'));
     },
     latepassExtendMsg () {
-      return this.$tc('closed.latepass_needed', this.settings.can_use_latepass, {
+      return this.$t('closed.latepass_needed', this.settings.can_use_latepass, {
         n: this.settings.can_use_latepass,
         date: this.settings.latepass_extendto_disp
       });
@@ -214,7 +214,7 @@ export default {
     },
     primaryButton () {
       if (this.primaryAction === 'latepass') {
-        return this.$tc('closed.use_latepass', this.settings.can_use_latepass);
+        return this.$t('closed.use_latepass', this.settings.can_use_latepass);
       } else if (this.primaryAction === 'practice') {
         return this.$t('closed.do_practice');
       } else if (this.primaryAction === 'exit') {

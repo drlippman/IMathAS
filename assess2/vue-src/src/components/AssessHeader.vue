@@ -175,7 +175,7 @@ export default {
       } else if (this.ainfo.show_scores_during) {
         return this.$t('header.score', { pts: pointsEarned, poss: pointsPossible });
       } else {
-        return this.$tc('header.possible', pointsPossible);
+        return this.$t('header.possible', pointsPossible);
       }
     },
     qAttempted () {

@@ -161,11 +161,11 @@
 
 <script>
 import { store, actions } from './gbstore';
-import GbAllTries from '@/gbviewassess/GbAllTries';
-import GbPenalties from '@/gbviewassess/GbPenalties';
-import Icons from '@/components/widgets/Icons';
-import MenuButton from '@/components/widgets/MenuButton';
-import GbFeedback from '@/gbviewassess/GbFeedback';
+import GbAllTries from '@/gbviewassess/GbAllTries.vue';
+import GbPenalties from '@/gbviewassess/GbPenalties.vue';
+import Icons from '@/components/widgets/Icons.vue';
+import MenuButton from '@/components/widgets/MenuButton.vue';
+import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 
 export default {
   name: 'GbScoreDetails',

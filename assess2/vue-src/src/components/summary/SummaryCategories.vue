@@ -15,7 +15,7 @@
       <td>
         {{ cat.pct }}%
         <span class="subdued med-left">
-          {{ $tc('catlist.pts', cat.poss, {pts: cat.tot, poss: cat.poss}) }}
+          {{ $t('catlist.pts', cat.poss, {pts: cat.tot, poss: cat.poss}) }}
         </span>
       </td>
     </tr>

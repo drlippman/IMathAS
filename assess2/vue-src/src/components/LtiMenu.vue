@@ -58,7 +58,7 @@ export default {
       Moved to separate msgs icon
       if (store.assessInfo['lti_showmsg']) {
         out.push({
-          label: this.$tc('lti.msgs', store.assessInfo['lti_msgcnt']),
+          label: this.$t('lti.msgs', store.assessInfo['lti_msgcnt']),
           link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid,
           target: '_self'
         });

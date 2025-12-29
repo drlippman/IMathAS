@@ -452,10 +452,12 @@ https://github.com/edenspiekermann/a11y-dialog
 
     return siblings;
   }
-
+  
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = A11yDialog;
   } else if (typeof global === 'object') {
     global.A11yDialog = A11yDialog;
   }
 })(typeof global !== 'undefined' ? global : window);
+
+export default A11yDialog;

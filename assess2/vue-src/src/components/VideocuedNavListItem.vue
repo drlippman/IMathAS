@@ -67,7 +67,7 @@ export default {
           str += qdata.canretry ? ')' : ']';
           return str;
         } else {
-          return this.$tc('header.pts', qdata.points_possible);
+          return this.$t('header.pts', qdata.points_possible);
         }
       }
     },

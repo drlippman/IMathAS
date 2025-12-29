@@ -103,7 +103,7 @@ export default {
       return store.assessInfo.livepoll_status.curstate;
     },
     studentCount () {
-      return this.$tc('livepoll.stucnt', store.livepollStuCnt);
+      return this.$t('livepoll.stucnt', store.livepollStuCnt);
     }
   },
   methods: {

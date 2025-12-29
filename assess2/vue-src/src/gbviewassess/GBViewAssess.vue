@@ -13,7 +13,7 @@
         {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}
         <span v-if="aData.timeontask > 0">
           <br/>
-          {{ $tc('gradebook.time_onscreen', attemptCount) }}:
+          {{ $t('gradebook.time_onscreen', attemptCount) }}:
           {{ totalTimeOnTask }}
         </span>
         <span v-if="aData.hasOwnProperty('timelimit_ext')">
@@ -339,7 +339,7 @@
             <div class = "bigquestionwrap" v-show="showQuestion[qn] && (!op_oneatatime || curqn === qn)">
               <div class="headerpane">
                 <strong>
-                  {{ $tc('question_n', qn+1) }}.
+                  {{ $t('question_n', qn+1) }}.
                 </strong>
                 <em v-if="qdata[curQver[qn]].extracredit" class="small subdued">
                   {{ $t('extracredit') }}
@@ -636,7 +636,7 @@ export default {
     },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {
-        return this.$tc('setlist.latepass_used', this.aData.extended_with.n);
+        return this.$t('setlist.latepass_used', this.aData.extended_with.n);
       } else {
         return this.$t('setlist.extension');
       }
@@ -684,7 +684,7 @@ export default {
       } else if (this.aData.keepscore === 'best') {
         let out = this.$t('gradebook.keep_best');
         if (typeof this.aData.gbscore === 'number') {
-          out += ' (' + this.$tc('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
+          out += ' (' + this.$t('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
         }
         return out;
       } else if (this.aData.keepscore === 'average') {

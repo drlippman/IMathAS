@@ -23,7 +23,7 @@ export default {
       } else if (this.submitby === 'by_question') {
         return this.$t('gradebook.scored_attempt');
       } else {
-        return this.$tc('gradebook.attempt_n', this.option.ver + 1);
+        return this.$t('gradebook.attempt_n', this.option.ver + 1);
       }
     },
     verStatus () {
