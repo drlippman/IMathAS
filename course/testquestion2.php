@@ -308,8 +308,11 @@ if (($a11ymode&1)==1) {
 	$placeinhead .= '<script>
 	$(function() {
 		$(".questionpane > .question > .question img").each(function() {
-			if (!$(this).attr("alt")) {
+		console.log(this);
+			if (!this.hasAttribute("alt")) {
 				$(this).after("<span class=\"small noticetext\"><br/>Accessibility preview note: this image has no alt text</span>");
+			} else if ($(this).attr("role")=="presentation") {
+				$(this).after("<span class=\"small noticetext\"><br/>Accessibility preview note: this image has been marked as decorative</span>");
 			} else if ($(this).attr("alt")=="") {
 				$(this).after("<span class=\"small noticetext\"><br/>Accessibility preview note: this image has blank alt text</span>");
 			} else {
