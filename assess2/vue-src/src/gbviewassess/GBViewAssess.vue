@@ -564,7 +564,7 @@ export default {
   data: function () {
     return {
       showOverride: false,
-      assessOverride: false,
+      assessOverride: '',
       hide100: false,
       hidePerfect: false,
       hideNonzero: false,
