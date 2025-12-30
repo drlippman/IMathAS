@@ -196,7 +196,8 @@ export default {
         !this.settings.hasOwnProperty('pasttime'));
     },
     latepassExtendMsg () {
-      return this.$t('closed.latepass_needed', this.settings.can_use_latepass, {
+      return this.$t('closed.latepass_needed', {
+        count: this.settings.can_use_latepass,
         n: this.settings.can_use_latepass,
         date: this.settings.latepass_extendto_disp
       });

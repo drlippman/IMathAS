@@ -119,7 +119,8 @@ export default {
         dateobj.alert = this.$t('setlist.earlybonus', { p: settings.earlybonus[0], date: settings.earlybonusends_disp });
       }
       if (settings.can_use_latepass > 0) {
-        dateobj.latepass = this.$t('setlist.latepass_needed', settings.can_use_latepass, {
+        dateobj.latepass = this.$t('setlist.latepass_needed', {
+          count: settings.can_use_latepass,
           n: settings.can_use_latepass,
           date: settings.latepass_extendto_disp
         });
@@ -272,7 +273,8 @@ export default {
       var settings = store.assessInfo;
       store.confirmObj = {
         body: this.$t('closed.latepassn', settings.latepasses_avail) + ' ' +
-          this.$t('setlist.latepass_needed', settings.can_use_latepass, {
+          this.$t('setlist.latepass_needed', {
+            count: settings.can_use_latepass,
             n: settings.can_use_latepass,
             date: settings.latepass_extendto_disp
           }),

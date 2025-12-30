@@ -122,9 +122,11 @@ export default {
 <style>
 .subheader {
   display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.subheader.pagenav {
   flex-flow: row nowrap;
   align-items: stretch;
-  border-bottom: 1px solid #ccc;
 }
 .subheader > * {
   margin: 4px 0;

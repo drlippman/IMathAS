@@ -20,8 +20,10 @@
         {{ $t('scorelist.unattempted') }}
       </td>
       <td v-else>
-        {{ $t('scorelist.pts', question.points_possible,
-              {pts: question.gbscore, poss: question.points_possible}) }}
+        {{ $t('scorelist.pts', {
+          count: question.points_possible,
+          pts: question.gbscore, 
+          poss: question.points_possible}) }}
         &nbsp;&nbsp;
         <click-to-show
           v-if = "question.has_details"

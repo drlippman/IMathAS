@@ -11,15 +11,15 @@
       <p v-if="showGBScore">
         {{ gbScoreString }}:
         <span class="nowrap">
-          {{ $t('scoreresult.scorepts', qinfo.points_possible,
-            {pts: qinfo.gbscore, poss: qinfo.points_possible}) }}
+          {{ $t('scoreresult.scorepts',
+            {count: qinfo.points_possible, pts: qinfo.gbscore, poss: qinfo.points_possible}) }}
         </span>
       </p>
       <p v-if="showScore">
         {{ $t('qdetails.lastscore') }}:
         <span class="nowrap">
-          {{ $t('scoreresult.scorepts', qinfo.points_possible,
-            {pts: qinfo.score, poss: qinfo.points_possible}) }}
+          {{ $t('scoreresult.scorepts',
+            {count: qinfo.points_possible, pts: qinfo.score, poss: qinfo.points_possible}) }}
         </span>
       </p>
 

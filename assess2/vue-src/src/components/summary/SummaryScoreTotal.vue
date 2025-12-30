@@ -6,7 +6,8 @@
         {{ scoreTotalPercent }}%
       </strong>
       <br/>
-      {{ $t("summary.scorepts", ainfo.points_possible, {pts: scoreTotal, poss: ainfo.points_possible}) }}
+      {{ $t("summary.scorepts", 
+        {count: ainfo.points_possible, pts: scoreTotal, poss: ainfo.points_possible}) }}
       <span v-if="retakePenalty > 0">
         <br/>
         {{ $t("summary.retake_penalty", {n: retakePenalty}) }}
