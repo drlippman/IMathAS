@@ -10,8 +10,6 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore"
   },
   "dependencies": {
-    "@rushstack/eslint-patch": "^1.6.1",
-    "@vue/eslint-config-standard": "^8.0.1",
     "vue": "^3.5.26",
     "vue-i18n": "^10.0.8",
     "vue-router": "^4.2.5"
@@ -20,6 +18,8 @@
     "@intlify/unplugin-vue-i18n": "^11.0.3",
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-vue": "^6.0.3",
+    "@rushstack/eslint-patch": "^1.6.1",
+    "@vue/eslint-config-standard": "^8.0.1",
     "autoprefixer": "^10.4.23",
     "eslint": "^8.0.1",
     "terser": "^5.44.1",
