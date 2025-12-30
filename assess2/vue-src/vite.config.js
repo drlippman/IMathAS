@@ -5,7 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
 import legacy from "@vitejs/plugin-legacy";
-import eslintPlugin from 'vite-plugin-eslint';
+import checker from 'vite-plugin-checker'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -54,8 +54,12 @@ export default defineConfig(({ mode }) => {
   return {
     envPrefix: "VUE_APP_",
     plugins: [
-      eslintPlugin(),
       vue(),
+      checker({
+        eslint: {
+          lintCommand: 'eslint "./src/**/*.{js,vue}"'
+        }
+      }),
       // i18n plugin
       VueI18nPlugin({
         include: [path.resolve(__dirname, './src/locales/en.json')],
