@@ -77,6 +77,13 @@ function updatePhpFiles() {
                             .replace(/js\/gbviewassess-legacy\.js\?v=\w+/g, legacyJsFile)
                             .replace(/css\/style\.js\?v=\w+/g, cssFile);
       fs.writeFileSync(phpPath, phpContent);
+
+      // Delete the .html files copied into /vue/
+      let html1 = path.resolve(__dirname, '../vue/index.html');
+      fs.unlinkSync(html1);
+      let html2 = path.resolve(__dirname, '../vue/gbviewassess.html');
+      fs.unlinkSync(html2);
+
       console.log('✓ PHP files updated with new asset hashes');
     }
   };
@@ -101,8 +108,6 @@ export default defineConfig(({ mode }) => {
       VueI18nPlugin({
         include: [path.resolve(__dirname, './src/locales/en.json')],
         compositionOnly: false,
-        runtimeOnly: false, 
-        fullInstall: true,
       }),
       legacy({
         // builds the legacy version
@@ -127,8 +132,10 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       // put all the css in one file; it's not that much
       cssCodeSplit: false,
+      // needed for plugin above
       manifest: true,
       rollupOptions: {
+        // our two entry points
         input: {
             index: path.resolve(__dirname, 'index.html'),
             gbviewassess: path.resolve(__dirname, 'gbviewassess.html')
@@ -145,7 +152,7 @@ export default defineConfig(({ mode }) => {
     // Base path. Seems to work without separate Production value
     base: './',
     // Vite processes the .html entry files no matter what, so this doesn't seem useful
-    //publicDir: isProduction ? false : 'public',
+    // publicDir: isProduction ? false : 'public',
 
     // Dev server proxy
     server: {
