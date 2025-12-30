@@ -210,7 +210,7 @@
     "next": "Next question",
     "retryq": "You can retry this question below",
     "trysimilar": "Get a similar question",
-    "scorepts": "{pts} of {poss} pts | {pts} of {poss} pts",
+    "scorepts": "{pts} of {poss} pt | {pts} of {poss} pts",
     "scorelast": "Score on last try:",
     "submitted": "Question submitted.",
     "see_details": "See Details for more.",
