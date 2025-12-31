@@ -351,7 +351,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             $path .= "strokedasharray=\"5\";";
             $alt .= ", Dashed";
         } else if (isset($function[7]) && $function[7] != '') {
-            if ($function[7] == "dash") {
+            if (is_numeric($function[7]) && $function[7] > 0) {
+                $path .= "strokedasharray=\"{$function[7]}\";";
+                $alt .= ", Dashed";
+            } else if ($function[7] == "dash") {
                 $path .= "strokedasharray=\"5\";";
                 $alt .= ", Dashed";
             } else {
