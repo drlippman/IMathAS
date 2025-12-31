@@ -670,18 +670,18 @@ class DrawingAnswerBox implements AnswerBox
                         $k++;
                         $saarr[$k] = "-sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
                         $k++;
-                        $saarr[$k] = "[$function[1]+$function[4]*t,$function[2]+$function[3]*t],green,,,,,,dash";
+                        $saarr[$k] = "[$function[1]+$function[4]*t,$function[2]+$function[3]*t],#00C800,,,,,2,dash";
                         $k++;
-                        $saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],green,,,,,,dash";
+                        $saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],#00C800,,,,,2,dash";
                     } else if ($function[0] == 'horizhyperbola') {
                         //(x-xc)^2/a^2 - (y-yc)^2/b^2 = 1
                         $saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],$defcolor,$settings[2],$settings[3]";
                         $k++;
                         $saarr[$k] = "[-sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],$defcolor,$settings[2],$settings[3]";
                         $k++;
-                        $saarr[$k] = "[$function[1]+$function[3]*t,$function[2]+$function[4]*t],green,,,,,,dash";
+                        $saarr[$k] = "[$function[1]+$function[3]*t,$function[2]+$function[4]*t],#00C800,,,,,2,dash";
                         $k++;
-                        $saarr[$k] = "[$function[1]+$function[3]*t,$function[2]-$function[4]*t],green,,,,,,dash";
+                        $saarr[$k] = "[$function[1]+$function[3]*t,$function[2]-$function[4]*t],#00C800,,,,,2,dash";
                     } else if (substr($function[0], 0, 2) == 'x=') {
                         if (count($function) == 3) {
                             if ($function[1] == '-oo') {$function[1] = $settings[2] - .1 * ($settings[3] - $settings[2]);}
@@ -690,7 +690,7 @@ class DrawingAnswerBox implements AnswerBox
                         } else {
                             $saarr[$k] = '[' . substr(str_replace('y', 't', $function[0]), 2) . ',t],' . $defcolor . ',' . ($settings[2] - 1) . ',' . ($settings[3] + 1);
                             if ($dashedline) {
-                                $saarr[$k] .= ',,,,dash';
+                                $saarr[$k] .= ',,,2,dash';
                             }
                         }
                     } else { //is function
@@ -731,7 +731,7 @@ class DrawingAnswerBox implements AnswerBox
                             if ($locky == 1 ) {
                                 $saarr[$k] .= '3,';
                             } else {
-                                $saarr[$k] .= ',';
+                                $saarr[$k] .= '2,';
                             } 
                             if ($dashedline) {
                                 $saarr[$k] .= 'dash';
@@ -756,9 +756,9 @@ class DrawingAnswerBox implements AnswerBox
                             $ha = (($x1 * $y1 - $x2 * $y2) - $va * ($y1 - $y2)) / ($x1 - $x2);
 
                             $k++;
-                            $saarr[$k] = "$ha,green,,,,,,dash";
+                            $saarr[$k] = "$ha,#00C800,,,,,2,dash";
                             $k++;
-                            $saarr[$k] = "[$va,t],green,,,,,,dash";
+                            $saarr[$k] = "[$va,t],#00C800,,,,,2,dash";
                         } else if (preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
                             $x1 = 1 / 4 * $settings[1] + 3 / 4 * $settings[0];
                             $x2 = 1 / 2 * $settings[1] + 1 / 2 * $settings[0];
@@ -774,7 +774,7 @@ class DrawingAnswerBox implements AnswerBox
                             $asy = $y1 + $str*safepow($base, $x1);
                             $k++;
                             if ($asy != 0) {
-                                $saarr[$k] = "$asy,green,,,,,,dash";
+                                $saarr[$k] = "$asy,#00C800,,,,,2,dash";
                             }
                         } else if (($logloc = strpos($function[0],'log'))!==false ||
                             ($lnloc = strpos($function[0],'ln'))!==false) { //is log
@@ -826,7 +826,7 @@ class DrawingAnswerBox implements AnswerBox
                             $saarr[$k] = implode(',', $sapts);
                             $k++;
                             if ($vertasy != 0) {
-                                $saarr[$k] = "[$vertasy,t],green,,,,,,dash";
+                                $saarr[$k] = "[$vertasy,t],#00C800,,,,,2,dash";
                             }
                         } else if (($p = strpos($function[0],'tan('))!==false || ($q = strpos($function[0],'cot('))!==false) { //is tan
                             if ($p===false) { $p = $q;}
@@ -850,11 +850,11 @@ class DrawingAnswerBox implements AnswerBox
                                 if ($period > ($settings[1] - $settings[0])/10) {
                                     for ($x=$xint+$period/2; $x < $settings[1]+1; $x += $period) {
                                         $k++;
-                                        $saarr[$k] = "[$x,t],green,,,,,,dash";
+                                        $saarr[$k] = "[$x,t],#00C800,,,,,2,dash";
                                     }
                                     for ($x=$xint-$period/2; $x > $settings[0]; $x -= $period) {
                                         $k++;
-                                        $saarr[$k] = "[$x,t],green,,,,,,dash";
+                                        $saarr[$k] = "[$x,t],#00C800,,,,,2,dash";
                                     }
                                 }
                             }
