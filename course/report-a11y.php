@@ -14,6 +14,30 @@ if (isset($_GET['scan']) && $_GET['scan'] === 'myqs') {
     $what = 'myqs';
 } 
 
+if (isset($_POST['qidtodisable']) && isset($teacherid)) {
+    $qids = array_map('intval', explode(',', $_POST['qidtodisable']));
+    $ph = Sanitize::generateQueryPlaceholders($qids);
+    $query = "SELECT iq.id,iq.showhints AS qshowhints,ia.showhints AS ashowhints 
+        FROM imas_questions AS iq 
+        JOIN imas_assessments AS ia ON iq.assessmentid=ia.id 
+        WHERE iq.id IN ($ph) AND ia.courseid=?";
+    $stm = $DBH->prepare($query);
+    $params = $qids;
+    $params[] = $cid;
+    $stm->execute($params);
+    $upstm = $DBH->prepare("UPDATE imas_questions SET showhints=? WHERE id=?");
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $newshowhints = $row['qshowhints'];
+        if ($row['qshowhints'] == -1) {
+            $newshowhints = $row['ashowhints'];
+        }
+        $newshowhints = $newshowhints & (~2); // turn off bit 2 (show video)
+        $upstm->execute([$newshowhints, $row['id']]);
+    }
+    header('Location: report-a11y.php?cid=' . $cid);
+    exit;
+}
+
 $errors = [[],[],[]];
 $vidids = [];
 $vidlocs = [];
@@ -159,7 +183,7 @@ if ($what === 'cid') {
     }
 
     // scan questionset control, qtext
-    $query = 'SELECT iqs.control,iqs.qtext,iqs.a11yalt,ia.name,ia.id AS aid,iqs.id,iqs.extref,ia.showhints AS hintsdef,iq.showhints,
+    $query = 'SELECT iqs.control,iqs.qtext,iqs.a11yalt,ia.name,ia.id AS aid,iqs.id,iqs.extref,ia.showhints AS hintsdef,iq.showhints,iq.id AS qid,
         COUNT(CASE WHEN iar.review=1 THEN 1 END) AS positive_reviews,
         COUNT(CASE WHEN iar.review=0 THEN 1 END) AS negative_reviews
         FROM imas_questionset AS iqs 
@@ -205,6 +229,7 @@ if ($what === 'cid') {
             }
         }
     }
+    $qidswithuncaptioned = [];
     // pull caption data from database for those videos
     if (count($vidstocheck)>0) {
         $vidstocheck = array_values(array_unique($vidstocheck));
@@ -228,12 +253,15 @@ if ($what === 'cid') {
                         $parts[2] = 1;
                         $extrefs[$k] = implode('!!', $parts);
                         $updatedextref = true;
-                    } else if ($vidid !== '' && !$gaveerrorthisquestion) {
-                        // it's a video, don't have captions, give error once
-                        adderror(1, _('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
-                            _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
-                            "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
-                        $gaveerrorthisquestion = true;
+                    } else if ($vidid !== '') {
+                        if (!$gaveerrorthisquestion) {
+                            // it's a video, don't have captions, give error once
+                            adderror(1, _('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+                                _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
+                                "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+                            $gaveerrorthisquestion = true;
+                        }
+                        $qidswithuncaptioned[] = $row['qid'];
                     }
                 }
             }
@@ -363,6 +391,16 @@ if (isset($CFG['YouTubeAPIKey'])) {
     echo _('Currently it will only identify images that are missing alt text, some potential question issues that need manual review, and YouTube videos added as helps to questions that do not have manual captions. YouTube links elsewhere are not scanned.'). '</p>';
 }
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
+
+if (count($qidswithuncaptioned)>0) {
+    $qidswithuncaptioned = array_values(array_unique($qidswithuncaptioned));
+    echo '<form method=post>';
+    echo '<input type=hidden name=qidtodisable value="'.implode(',', $qidswithuncaptioned).'">';
+    echo '<p>';
+    echo sprintf(_('%d questions were found using uncaptioned videos. As a quick fix, you can disable showing videos on those questions.'), count($qidswithuncaptioned));
+    echo '<button type=submit>'. _('Disable videos on these questions') .'</button></p>';
+    echo '</form>';
+}
 
 if (count($errors[2])>0) {
     echo '<h2>'._('The questions in these issues have accessibility reviews indicating they may "need work", suggesting they are likely legitimate issues.').'</h2>';

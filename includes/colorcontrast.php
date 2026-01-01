@@ -1,4 +1,3 @@
-
 <?php
 
 // From https://github.com/gdkraus/wcag2-color-contrast
