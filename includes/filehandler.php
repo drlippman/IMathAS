@@ -1145,6 +1145,9 @@ function getcoursefileurl($key,$abs=false) {
 }
 function getqimageurl($key,$abs=false) {
 	global $urlmode,$imasroot;
+	if (substr($key,0,4)=='http') {
+		return $key;
+	}
 	$key = Sanitize::rawurlencodePath($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		return getS3endpoint() . "/qimages/$key";
