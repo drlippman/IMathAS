@@ -386,6 +386,12 @@ If deleted on both ends, delete from DB
 			}
 
 			$courseid=($cid==0)?$filtercid:$cid;
+			if ($cid == 0 && $courseopts == '') {
+				echo '<p>'. _('No courses available to send messages through.').'</p>';
+				require_once "../footer.php";
+				exit;
+			}
+
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 				$stm = $DBH->prepare("SELECT title,message,courseid FROM imas_msgs WHERE id=:id AND msgto=:msgto");
 				$stm->execute(array(':id'=>$replyto, ':msgto'=>$userid));
