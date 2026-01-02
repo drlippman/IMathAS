@@ -83,24 +83,39 @@ class Sanitize
 	 */
 	public static function isFilenameBlacklisted($filenameToCheck)
 	{
-		$filenameToCheck = strtolower($filenameToCheck);
-		foreach (self::$blacklistedFilenames as $blacklistedFilename) {
-			if (preg_match($blacklistedFilename, $filenameToCheck)) {
+		if (isset($GLOBALS['CFG']['GEN']['filewhitelist'])) {
+			$filenameToCheck = strtolower($filenameToCheck);
+			$pos = strrpos($filenameToCheck, '.');
+			if ($pos === false) {
+				$ext = ''; // no extension
+			} else {
+				$ext = substr($filenameToCheck, $pos);
+			}
+			if (in_array($ext, $GLOBALS['CFG']['GEN']['filewhitelist'])) {
+				return false;
+			} else {
 				return true;
 			}
-		}
-		// not using S3 for coursefiles, check local blacklist
-		// even though file might get uploaded to S3 if not coursefile
-		// this is easier than trying to keep track of what kind of upload it is
-		if (empty($GLOBALS['CFG']['GEN']['AWSforcoursefiles'])) {
-			foreach (self::$localBlacklistedFilenames as $blacklistedFilename) {
+		} else {
+			$filenameToCheck = strtolower($filenameToCheck);
+			foreach (self::$blacklistedFilenames as $blacklistedFilename) {
 				if (preg_match($blacklistedFilename, $filenameToCheck)) {
 					return true;
 				}
 			}
-		}
+			// not using S3 for coursefiles, check local blacklist
+			// even though file might get uploaded to S3 if not coursefile
+			// this is easier than trying to keep track of what kind of upload it is
+			if (empty($GLOBALS['CFG']['GEN']['AWSforcoursefiles'])) {
+				foreach (self::$localBlacklistedFilenames as $blacklistedFilename) {
+					if (preg_match($blacklistedFilename, $filenameToCheck)) {
+						return true;
+					}
+				}
+			}
 
-		return false;
+			return false;
+		}
 	}
 
 	/**

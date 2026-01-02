@@ -756,13 +756,14 @@ const image_upload_handler = (blobInfo, progress, isattach) => new Promise((reso
   };
 
   xhr.onload = () => {
+	console.log(xhr);
     if (xhr.status === 403) {
-      reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+      reject({ message: 'HTTP Error: ' + xhr.statusText, remove: true });
       return;
     }
 
     if (xhr.status < 200 || xhr.status >= 300) {
-      reject({message:'HTTP Error: ' + xhr.status, remove: true});
+      reject({message:'HTTP Error: ' + xhr.statusText, remove: true});
       return;
     }
 

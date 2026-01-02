@@ -37,7 +37,7 @@ if (isset($_POST['remove'])) {
   $tempkey = key($_FILES);
   $temp = current($_FILES);
   if (Sanitize::isFilenameBlacklisted(str_replace(' ','_',$temp['name']))) {
-    header("HTTP/1.0 500 Invalid file name.");
+    header("HTTP/1.0 500 Invalid file type.");
     exit;
   }
   $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
