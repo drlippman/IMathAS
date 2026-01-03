@@ -7,6 +7,7 @@ require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use DOMDocument;
 use ZipArchive;
+use Sanitize;
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -95,10 +96,8 @@ class FileScorePart implements ScorePart
             }
         }
         if (!$hasfile) {
-            $extension = strtolower(strrchr($filename,"."));
-            $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
             $scorePartResult->addScoreMessage(sprintf(_('Upload of %s: '), $filename));
-            if (in_array($extension,$badextensions)) {
+            if (Sanitize::isFilenameBlacklisted($filename)) {
                 $scorePartResult->setLastAnswerAsGiven(_('Error - Invalid file type'));
                 $scorePartResult->addScoreMessage(_('Error - Invalid file type'));
                 $scorePartResult->setRawScore(0);

@@ -145,6 +145,7 @@ if (!$assess_record->checkVerification($verification)) {
 }
 
 // autosave the requested parts
+$err = '';
 foreach ($qns as $qn=>$parts) {
   if (!isset($timeactive[$qn])) {
     $timeactive[$qn] = 0;
@@ -152,11 +153,11 @@ foreach ($qns as $qn=>$parts) {
   $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
   foreach ($parts as $part) {
     if ($ok_to_save === true || !empty($ok_to_save[$part])) {
-      $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
+      $err .= $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
     }
   }
   if (isset($_POST['sw' . $qn])) {  //autosaving work
-    $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
+    $err .= $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
   }
 }
 
@@ -170,6 +171,11 @@ $include_from_assess_info = array(
     'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt', 'enddate'
 );
 $out = $assess_info->extractSettings($include_from_assess_info);
+
+// if error above, include it
+if ($err !== '') {
+  $out['error'] = "error";
+}
 
 //output JSON object
 $out['autosave'] = 'done';
