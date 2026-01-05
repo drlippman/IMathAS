@@ -201,7 +201,7 @@ if ($myrights < 100 && empty($CFG['GEN']['allowinstraddstus'])) {
 		$body .= "</a></p>\n";
 
 	} elseif (isset($_FILES['userfile'])) {  //STEP 2 DATA MANIPULATION
-    if ($filekey = storeimportfile('userfile')) {
+    if ($filekey = storeimportfile('userfile', '.csv')) {
       $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
     } else {
       echo "<p>Error uploading file!</p>\n";

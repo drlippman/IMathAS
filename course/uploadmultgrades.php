@@ -132,7 +132,7 @@ if (!(isset($teacherid))) {
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		//upload file
-    if ($filekey = storeimportfile('userfile')) {
+    if ($filekey = storeimportfile('userfile', '.csv')) {
       $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
     } else {
       echo "<p>Error uploading file!</p>\n";

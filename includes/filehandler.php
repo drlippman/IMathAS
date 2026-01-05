@@ -219,8 +219,8 @@ function storeuploadedfile($id,$key,$sec="private") {
 	}
 }
 
-function storeimportfile($id) {
-	$key = uniqid();
+function storeimportfile($id, $ext = '.imas') {
+	$key = uniqid() . $ext;
 	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		$sec = "private";
