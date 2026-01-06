@@ -196,7 +196,8 @@
     "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again.",
     "ytnotready": "YouTube is not ready yet. Please be patient for a few seconds.",
     "file_upload_error": "Error uploading file",
-    "file_toolarge": "Error uploading file - too large. Must be under 15MB"
+    "file_toolarge": "Error uploading file - too large. Must be under 15MB",
+    "file_invalidtype": "Error uploading file - invalid file type"
   },
   "confirm": {
     "ok": "OK",

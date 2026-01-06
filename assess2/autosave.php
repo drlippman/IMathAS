@@ -153,11 +153,17 @@ foreach ($qns as $qn=>$parts) {
   $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
   foreach ($parts as $part) {
     if ($ok_to_save === true || !empty($ok_to_save[$part])) {
-      $err .= $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
+      $res = $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
+      if ($res !== '') {
+        $err = $res;  
+      }
     }
   }
   if (isset($_POST['sw' . $qn])) {  //autosaving work
-    $err .= $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
+    $res = $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
+    if ($res !== '') {
+      $err = $res;  
+    }
   }
 }
 
@@ -174,7 +180,7 @@ $out = $assess_info->extractSettings($include_from_assess_info);
 
 // if error above, include it
 if ($err !== '') {
-  $out['error'] = "error";
+  $out['warning'] = $err;
 }
 
 //output JSON object

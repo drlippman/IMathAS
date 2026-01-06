@@ -230,6 +230,8 @@ export const actions = {
           if (data.hasOwnProperty('error')) {
             this.handleError(data.error);
             return;
+          } else if (data.hasOwnProperty('warning')) {
+            this.handleError(data.warning);
           }
           if (data.saved_autosaves) {
             this.markAutosavesDone();
@@ -773,6 +775,8 @@ export const actions = {
             this.copySettings(response);
           }
           return;
+        } else if (response.hasOwnProperty('warning')) {
+          this.handleError(response.warning);
         }
         if (response.autosave === 'done') {
           this.markAutosavesDone();

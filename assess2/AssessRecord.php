@@ -930,15 +930,17 @@ class AssessRecord
     }
     $filestr = '';
     if (isset($_FILES["qn$qref"])) {
-      $filestr = $this->autosaveFile($qref);
-      if ($filestr === '') {
-        $err = _('Error with file');
+      list($success, $filestr) = $this->autosaveFile($qref);
+      if (!$success) {
+        $err = $filestr;
+        $filestr = '';
       }
       $data[$qn]['post']["qn$qref"] = $filestr;
     } else if ($pn == 0 && isset($_FILES["qn$qn"])) {
-      $filestr = $this->autosaveFile($qn);
-      if ($filestr === '') {
-        $err = _('Error with file');
+      list($success, $filestr) = $this->autosaveFile($qn);
+      if (!$success) {
+        $err = $filestr;
+        $filestr = '';
       }
       $data[$qn]['post']["qn$qn"] = $filestr;
     }
@@ -953,7 +955,7 @@ class AssessRecord
   /**
    * Save a file upload as part of autosaving
    * @param  int $qref   The file input reference: $_FILES['"qn$qnref"']
-   * @return string  saved file identifier, or empty string on failure
+   * @return array  [success:boolean, message:error string or file ref] 
    */
   private function autosaveFile($qref) {
     $randstr = '';
@@ -979,15 +981,15 @@ class AssessRecord
       $filename = basename(str_replace('\\','/',$_FILES["qn$qref"]['name']));
       $filename = preg_replace('/[^\w\.]/','',$filename);
       if (Sanitize::isFilenameBlacklisted($filename)) {
-        return '';
+        return [false, 'file_invalidtype'];
       }
       $s3object = "adata/$s3asid/$filename";
       require_once __DIR__."/../includes/filehandler.php";
       if (storeuploadedfile("qn$qref",$s3object)) {
-        return "@FILE:$s3asid/$filename@";
+        return [true, "@FILE:$s3asid/$filename@"];
       }
     }
-    return '';
+    return [false, 'file_upload_error'];
   }
 
   /**
