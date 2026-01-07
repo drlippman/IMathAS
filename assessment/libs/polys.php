@@ -8,7 +8,7 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree","describepoly","describerational");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","divpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree","describepoly","describerational");
 
 
 //formpoly(coefficients,powers or degree)
@@ -77,12 +77,16 @@ function formpolyfromroots($a,$roots,$mult=1) {
 	return $outpoly;
 }
 
+function writepolyfrac($poly,$var="x",$sz=false) {
+	return writepoly($poly,$var,$sz,true);
+}
+
 //writepoly(poly,[var,showzeros])
 //Creates a display form for polynomial object
 //poly: polynomial object, created with formpoly
 //var: input variable.  Defaults to x
 //showzeros:  optional, defaults to false.  If true, shows zero coefficients
-function writepoly($poly,$var="x",$sz=false) {
+function writepoly($poly,$var="x",$sz=false,$tofrac=false) {
 	$po = '';
     $first = true;
     foreach ($poly as $p) {
@@ -99,7 +103,11 @@ function writepoly($poly,$var="x",$sz=false) {
 			}
 		}
 		if (abs($p[0])!=1 || $p[1]==0) {
-			$po .= abs($p[0]);
+			if ($tofrac) {
+				$po .= decimaltofraction(abs($p[0]));
+			} else {
+				$po .= abs($p[0]);
+			}
 		}
 		if ($p[1]>1) {
 			$po .= " $var^". $p[1];
@@ -196,6 +204,68 @@ function multpolys($p1,$p2) {
 		$i++;
 	}
 	return $po;
+}
+
+//divpolys(poly1,poly2)
+//Divides polynomials: poly1/poly2
+//Returns an array with two elements: quotient and remainder
+function divpolys($p1,$p2) {
+    // Convert input polys to associative arrays keyed by degree => coef
+    $r = array();
+    for ($i=0;$i<count($p1);$i++) {
+        $r[$p1[$i][1]] = $p1[$i][0]*1;
+    }
+    $d = array();
+    for ($i=0;$i<count($p2);$i++) {
+		$d[$p2[$i][1]] = $p2[$i][0]*1;
+    }
+
+    // remove tiny near-zero coefficients
+    foreach ($r as $deg=>$coef) {
+        if (abs($coef) < 1e-12) { unset($r[$deg]); }
+    }
+    foreach ($d as $deg=>$coef) {
+        if (abs($coef) < 1e-12) { unset($d[$deg]); }
+    }
+
+    // division by zero: return empty quotient and original as remainder
+    if (count($d) == 0) {
+        return array(array(), $p1);
+    }
+
+    krsort($r); krsort($d);
+
+    $quot = array();
+    $maxdeg_d = max(array_keys($d));
+    $lead_d = $d[$maxdeg_d];
+
+    while (count($r)>0) {
+        $maxdeg_r = max(array_keys($r));
+        if ($maxdeg_r < $maxdeg_d) { break; }
+        $lead_r = $r[$maxdeg_r];
+        $qcoef = $lead_r / $lead_d;
+        $qdeg = $maxdeg_r - $maxdeg_d;
+        if (isset($quot[$qdeg])) { $quot[$qdeg] += $qcoef; } else { $quot[$qdeg] = $qcoef; }
+
+        // subtract qcoef * x^qdeg * d from r
+        foreach ($d as $deg=>$coef) {
+            $td = $deg + $qdeg;
+            if (isset($r[$td])) { $r[$td] -= $qcoef * $coef; }
+            else { $r[$td] = -1 * $qcoef * $coef; }
+            if (abs($r[$td]) < 1e-12) { unset($r[$td]); }
+        }
+    }
+
+    // format quotient and remainder into polynomial objects (arrays of [coef,deg])
+    krsort($quot);
+    $qarr = array(); $i = 0;
+    foreach ($quot as $deg=>$coef) { $qarr[$i][0] = $coef; $qarr[$i][1] = $deg; $i++; }
+
+    krsort($r);
+    $rarr = array(); $i = 0;
+    foreach ($r as $deg=>$coef) { $rarr[$i][0] = $coef; $rarr[$i][1] = $deg; $i++; }
+
+    return array($qarr,$rarr);
 }
 
 //scalepoly(poly,c)

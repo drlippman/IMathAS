@@ -9,9 +9,11 @@ Polynomial functions.  Version 1.1, Nov 11, 2007
 <li><a href="#formpoly">formpoly</a></li>
 <li><a href="#formpolyfromroots">formpolyfromroots</a></li>
 <li><a href="#writepoly">writepoly</a></li>
+<li><a href="#writepolyfrac">writepolyfrac</a></li>
 <li><a href="#addpolys">addpolys</a></li>
 <li><a href="#subtpolys">subtpolys</a></li>
 <li><a href="#multpolys">multpolys</a></li>
+<li><a href="#divpolys">divpolys</a></li>
 <li><a href="#scalepoly">scalepoly</a></li>
 <li><a href="#derivepoly">derivepoly</a></li>
 <li><a href="#polypower">polypower</a></li>
@@ -44,6 +46,14 @@ writepoly(poly,[var,showzeros])
 <BR>poly: polynomial object, created with formpoly
 <BR>var: input variable.  Defaults to x
 <BR>showzeros:  optional, defaults to false.  If true, shows zero coefficients
+
+<BR><h3><a name="writepolyfrac">writepolyfrac</a></h3>
+writepolyfrac(poly,[var,showzeros])
+<BR>Creates a display form for polynomial object, converting decimal coefficients to fractions where possible
+<BR>poly: polynomial object, created with formpoly
+<BR>var: input variable.  Defaults to x
+<BR>showzeros:  optional, defaults to false.  If true, shows zero coefficients
+
 <BR><h3><a name="addpolys">addpolys</a></h3>
 addpolys(poly1,poly2)
 <BR>Adds polynomials, arranging terms from highest to lowest powers
@@ -53,6 +63,12 @@ subtpolys(poly1,poly2)
 <BR><h3><a name="multpolys">multpolys</a></h3>
 multpolys(poly1,poly2)
 <BR>Multiplies polynomials
+    
+<BR><h3><a name="divpolys">divpolys</a></h3>
+divpolys(poly1,poly2)
+<BR>Divides polynomials: poly1/poly2
+<BR>Returns an array with two elements, quotient and remainder, each a polynomial object
+
 <BR><h3><a name="scalepoly">scalepoly</a></h3>
 scalepoly(poly,c)
 <BR>Multiplies each term of poly by constant c
