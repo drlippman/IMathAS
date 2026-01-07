@@ -250,12 +250,13 @@ function storeimportfile($id, $ext = '.imas') {
 }
 
 function getimportfilepath($key) {
+	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],'import/'.$key,7200);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
-		return $base . Sanitize::sanitizeFilePathAndCheckBlacklist($key);
+		return $base . $key;
 	}
 }
 function deleteimport($key) {

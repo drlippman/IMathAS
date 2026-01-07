@@ -358,7 +358,7 @@ if ($myrights < 100) {
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
-		$filekey = Sanitize::simplestring($_POST['filekey']);
+		$filekey = Sanitize::simpleASCII($_POST['filekey']);
 		$uploadfile = getimportfilepath($filekey);
 
         $libstoadd = array_map('intval',$_POST['libs']);

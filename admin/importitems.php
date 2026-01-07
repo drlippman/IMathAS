@@ -629,7 +629,7 @@ if (!(isset($teacherid))) {
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		//$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
-		$filename = getimportfilepath(Sanitize::simplestring($_POST['filekey']));
+		$filename = getimportfilepath(Sanitize::simpleASCII($_POST['filekey']));
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 		deleteimport(Sanitize::simplestring($_POST['filekey']));
 

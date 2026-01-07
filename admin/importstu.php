@@ -121,7 +121,7 @@ if ($myrights < 100 && empty($CFG['GEN']['allowinstraddstus'])) {
 		$stm->execute(array(':cid'=>$ncid));
 		$deflatepass = $stm->fetchColumn(0);
 
-    $filekey = Sanitize::simplestring($_POST['filekey']);
+    $filekey = Sanitize::simpleASCII($_POST['filekey']);
     $uploadfile = getimportfilepath($filekey);
     $handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {

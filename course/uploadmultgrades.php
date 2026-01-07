@@ -28,7 +28,7 @@ if (!(isset($teacherid))) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_POST['filekey'])) {
 		//already uploaded file, ready for official upload
-    $filekey = Sanitize::simplestring($_POST['filekey']);
+    $filekey = Sanitize::simpleASCII($_POST['filekey']);
     $uploadfile = getimportfilepath($filekey);
 
 		$stm = $DBH->prepare("SELECT imas_users.id,imas_users.SID FROM imas_users JOIN imas_students ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid");

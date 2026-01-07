@@ -33,7 +33,7 @@ if (!(isset($teacherid))) {
 } else if (isset($_POST['process'])) {
     //FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION - do import
 
-    $filekey = Sanitize::simplestring($_POST['filekey']);
+    $filekey = Sanitize::simpleASCII($_POST['filekey']);
     $uploadfile = getimportfilepath($filekey);
 
     $data = json_decode(file_get_contents($uploadfile), true);
