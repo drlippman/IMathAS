@@ -228,10 +228,18 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             $coord = '(' . $function[1] . ',' . $function[2] . ')';
             if (isset($function[3]) && $function[3] == 'open') {
                 $path .= ',"open"';
-                $alt .= sprintf(_('Open dot at %s'), $coord);
+                if ($noyaxis) {
+                    $alt .= sprintf(_('Open dot at %s'), $function[1]);
+                } else {
+                    $alt .= sprintf(_('Open dot at %s'), $coord);
+                }
             } else {
                 $path .= ',"closed"';
-                $alt .= sprintf(_('Dot at %s'), $coord);
+                if ($noyaxis) {
+                    $alt .= sprintf(_('Solid dot at %s'), $function[1]);
+                } else {
+                    $alt .= sprintf(_('Dot at %s'), $coord);
+                }
             }
             $alt .= ', color ' . $function[4];
             $allcolors[] = $function[4];
@@ -432,7 +440,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         }
 
         if ($_SESSION['graphdisp'] == 0) {
-            if (($xmax - $xmin > 2 && $xmax==(int)$xmax && $xmin==(int)$xmin) || $xmax == $xmin) {
+            if (is_numeric($function[0]) && $noyaxis) {
+                // TODO!  Not sure this is right. Maybe oversimplifies the graph in some cases
+                if ($xmin < $winxmin) {
+                    $xmin = 'negative infinity';
+                }
+                if ($xmax > $winxmax) {
+                    $xmax = 'infinity';
+                }
+                $alt .= ". Line segment from $xmin to $xmax. ";
+                continue;
+            } else if (($xmax - $xmin > 2 && $xmax==(int)$xmax && $xmin==(int)$xmin) || $xmax == $xmin) {
                 $dx = 1;
                 $stopat = ($xmax - $xmin) + 1;
             } else {
@@ -757,10 +775,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     $commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});" . $commands;
     if ($hasaxislabels) {
         $alt = "Graphing window shows horizontal axis" .
-            ($xvar == '' ? '' : " labeled $xvar") . ": {$winxmin} to {$winxmax}, vertical axis" .
-            ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}.&nbsp;" . $alt;
+            ($xvar == '' ? '' : " labeled $xvar") . ": {$winxmin} to {$winxmax}" .
+            ($noyaxis? "" : ", vertical axis" .
+                ($yvar == '' ? '' : " labeled $yvar") . ": {$ymin} to {$ymax}") . '.&nbsp;' . $alt;
     } else {
-        $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}, vertical axis: {$ymin} to {$ymax}.&nbsp;" . $alt;
+        $alt = "Graphing window shows horizontal axis: {$winxmin} to {$winxmax}" . 
+            ($noyaxis?"":", vertical axis: {$ymin} to {$ymax}.") . '.&nbsp;' . $alt;
     }
 
     if ($_SESSION['graphdisp'] == 0) {

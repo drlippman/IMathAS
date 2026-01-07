@@ -204,6 +204,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
 	var afgroup;
+	targets[tarnum].isnumberline = (ansformats[0]=="numberline");
 	//massae ansformats array to account for default behaviors
 	if (ansformats[0]=="inequality") {
 		afgroup = ansformats.shift();
@@ -218,11 +219,12 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 			ansformats = ["line","parab","abs","circle","dot"];
 		}
 	} else if (ansformats[0]=="numberline") {
-		afgroup = "basic";
+		afgroup = "numberline";
 		ansformats.shift();
 	} else {
 		afgroup = "basic";
 	}
+
 	targets[tarnum].afgroup = afgroup;
 	var types = {
 		"inequality": {
@@ -280,6 +282,15 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"polygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter a list of points for dots to connect with lines"), "dotline":1}],
 			"closedpolygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter a list of points for dots to connect with lines"), "dotline":2}],
+		},
+		"numberline": {
+			"lineseg": [
+				{"mode":0.5, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending values of the line segment, separated by a comma")},
+				{"mode":0.8, "descr":_("Ray to the left"), inN: 1, "input":_("Enter the value the ray goes left from")},
+				{"mode":0.9, "descr":_("Ray to the right"), inN: 1, "input":_("Enter the value the ray goes right from")},
+			],
+			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the value of the solid dot")}],
+			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the value of the open dot")}],
 		}
 	};
 
@@ -392,27 +403,33 @@ function changea11ydraw(tarel, tarnum) {
 	encodea11ydraw();
 }
 function updatea11ydraw(el) {
+	var qn = parseInt($(el).closest('.a11ydraw').attr("id").substring(8));
     var err = 0;
     var elval = el.value.trim();
-    if (elval.charAt(0) != '(' || elval.slice(-1) != ')') {
-        err |= 1;
-    }
-    var pts = elval.slice(1,-1).split(/\)\s*,\s*\(/);
-    var inN = el.getAttribute('data-n');
-    if (inN.match(/\d/) && pts.length != parseInt(inN)) {
-        err |= 2;
-    }
-    for (var i=0; i<pts.length;i++) {
-        var subpts = pts[i].split(/,/);
-        if (subpts.length != 2) {
-            err |= 1;
-        }
-        for (var j=0; j<subpts.length; j++) {
-            if (subpts[j].trim().length == 0) {
-                err |= 1;
-            }
-        }
-    }
+	var pts;
+	if (targets[qn].isnumberline) {
+		pts = elval.split(/\s*,\s*/);
+	} else {
+		if (elval.charAt(0) != '(' || elval.slice(-1) != ')') {
+			err |= 1;
+		}
+		pts = elval.slice(1,-1).split(/\)\s*,\s*\(/);
+		for (var i=0; i<pts.length;i++) {
+			var subpts = pts[i].split(/,/);
+			if (subpts.length != 2) {
+				err |= 1;
+			}
+			for (var j=0; j<subpts.length; j++) {
+				if (subpts[j].trim().length == 0) {
+					err |= 1;
+				}
+			}
+		}
+	}
+	var inN = el.getAttribute('data-n');
+	if (inN.match(/\d/) && pts.length != parseInt(inN)) {
+		err |= 2;
+	}
     if (el.parentNode.parentNode.lastChild.className == 'noticetext') {
         el.parentNode.parentNode.removeChild(el.parentNode.parentNode.lastChild);
     }
@@ -435,7 +452,7 @@ function updatea11ydraw(el) {
         el.removeAttribute('aria-describedby');
         setariastatus("");
     }
-    var qn = parseInt($(el).closest('.a11ydraw').attr("id").substring(8));
+    
 	encodea11ydraw(qn);
 }
 function pixcoordstopointlist(vals,tarnum) {
@@ -478,31 +495,66 @@ function encodea11ydraw(qn) {
             var input = $(el).find("input").val();
             var mode = el.getAttribute('data-mode');
             var expectedn = $(el).find("input").attr('data-n');
+			if (mode == 0.8 || mode == 0.9) {
+				expectedn++; // adjust because we add a second point
+			}
 			saveinput.push("["+mode+',"'+input+'"]');
-			input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
 			var outpts = [];
-            var outptsraw = [];
-			for (var i=1;i<input.length;i+=2) {
-				if (input[i-1] === 'oo') {
-					input[i-1] = thistarg.imgwidth - 2*thistarg.imgborder -1;
-				} else if (input[i-1] === '-oo') {
-					input[i-1] = 1;
-				} else {
-					try {
-						input[i-1] = evalMathParser(input[i-1]);
-					} catch(e) {
-						input[i-1] = NaN;
+			var outptsraw = [];
+			if (targets[tarnum].isnumberline && !input.match(/\(/)) {
+				// numberline list of values
+				var yorig = thistarg.imgheight - (0 - thistarg.ymin)*thistarg.pixpery - thistarg.imgborder;
+				input = input.split(/\s*,\s*/);
+				for (var i=0;i<input.length;i+=1) {
+					if (input[i] === 'oo') {
+						input[i] = thistarg.xmax;
+					} else if (input[i] === '-oo') {
+						input[i] = thistarg.xmin;
+					} else {
+						try {
+							input[i] = evalMathParser(input[i]);
+						} catch(e) {
+							input[i] = NaN;
+						}
+					}
+					input[i] = (input[i] - thistarg.xmin)*thistarg.pixperx + thistarg.imgborder;
+					if (mode == 0.8 && input.length == 1) { // ray left
+						var leftx = 0;
+						outpts.push(Math.round(leftx)+',' + Math.round(yorig));
+						outptsraw.push([leftx, yorig]);
+					}
+					outpts.push(Math.round(input[i])+',' + Math.round(yorig));
+					outptsraw.push([input[i], yorig]);
+					if (mode == 0.9 && input.length == 1) { // ray right
+						var rightx = thistarg.imgwidth;
+						outpts.push(Math.round(rightx)+',' + Math.round(yorig));
+						outptsraw.push([rightx, yorig]);
 					}
 				}
-				try {
-					input[i] = evalMathParser(input[i]);
-				} catch(e) {
-					input[i] = NaN;
+			} else {
+				input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
+				for (var i=1;i<input.length;i+=2) {
+					if (input[i-1] === 'oo') {
+						input[i-1] = thistarg.xmax;
+					} else if (input[i-1] === '-oo') {
+						input[i-1] = thistarg.xmin;
+					} else {
+						try {
+							input[i-1] = evalMathParser(input[i-1]);
+						} catch(e) {
+							input[i-1] = NaN;
+						}
+					}
+					try {
+						input[i] = evalMathParser(input[i]);
+					} catch(e) {
+						input[i] = NaN;
+					}
+					input[i-1] = (input[i-1] - thistarg.xmin)*thistarg.pixperx + thistarg.imgborder;
+					input[i] = thistarg.imgheight - (input[i] - thistarg.ymin)*thistarg.pixpery - thistarg.imgborder;
+					outpts.push(Math.round(input[i-1])+','+Math.round(input[i]));
+					outptsraw.push([input[i-1], input[i]]);
 				}
-				input[i-1] = (input[i-1] - thistarg.xmin)*thistarg.pixperx + thistarg.imgborder;
-				input[i] = thistarg.imgheight - (input[i] - thistarg.ymin)*thistarg.pixpery - thistarg.imgborder;
-				outpts.push(Math.round(input[i-1])+','+Math.round(input[i]));
-                outptsraw.push([input[i-1], input[i]]);
 			}
             if (expectedn !== 'list' && expectedn != outpts.length) {
                 return;
