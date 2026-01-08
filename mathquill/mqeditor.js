@@ -45,12 +45,6 @@ var MQeditor = (function($) {
     }
   }
 
-  /*
-    MQconfig holds the config used when creating MQ editable fields
-   */
-  function setMQconfig(newconfig) {
-    MQconfig = newconfig;
-  }
   function inIframe () {
     try {
         return window.self !== window.top;
@@ -103,6 +97,13 @@ var MQeditor = (function($) {
         span.insertAfter(el);
 
         var thisMQconfig = {
+          spaceBehavesLikeTab: true,
+          leftRightIntoCmdGoes: 'up',
+          supSubsRequireOperand: true,
+          charsThatBreakOutOfSupSub: '=<>',
+          charsThatBreakOutOfSupSubVar: "+-(",
+          charsThatBreakOutOfSupSubOp: "+-(",
+          restrictMismatchedBrackets: true,
           handlers: {
             edit: onMQedit,
             enter: onMQenter
@@ -117,24 +118,31 @@ var MQeditor = (function($) {
         }
         if (config.curlayoutstyle == 'OSK') {
           thisMQconfig.substituteTextarea = function () {
-            var s = document.createElement('span');
-            s.setAttribute('tabindex', 0);
-            s.setAttribute('role', 'textbox');
+            if (isOldiOS()) { 
+              var s = document.createElement('span');
+              s.setAttribute('tabindex', 0);
+              s.setAttribute('role', 'textbox')
+            } else {
+              var s = document.createElement('textarea');
+              s.setAttribute('tabindex', 0);
+              s.setAttribute('inputmode', 'none');
+            }
             return s;
           };
-          thisMQconfig.keyboardPassthrough = true;
+          //thisMQconfig.keyboardPassthrough = true;
         }
         
         if (calcformat.match(/chem/)) {
             thisMQconfig.charsThatBreakOutOfSupSubVar = '';
             thisMQconfig.charsThatBreakOutOfSupSubOp = '';
             thisMQconfig.autoSubscriptNumerals = true;
+            thisMQconfig.autoSubscriptBrackets = true;
         }
         if (calcformat.match(/(list|ntuple)/)) {
             thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
         }
         if (calcformat.match(/allowplusminus/)) {
-            thisMQconfig.quickplusminus = true;
+            thisMQconfig.quickPlusMinus = true;
         }
 
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
@@ -170,12 +178,25 @@ var MQeditor = (function($) {
           mqfield = MQ.StaticMath(span[0]);
           span.addClass("disabled");
         } else {
-          mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
-          $(span).find(".mq-textarea > *").attr('aria-label', el.getAttribute("aria-label"));
+          mqfield = MQ.MathField(span[0], thisMQconfig);
+          mqfield.setAriaLabel(el.getAttribute("aria-label"));
           if (el.hasAttribute('aria-describedby')) {
-            $(span).find(".mq-textarea > *").attr('aria-describedby', el.getAttribute("aria-describedby"));
+            $(span).find(".mq-textarea > [tabindex=0]").attr('aria-describedby', el.getAttribute("aria-describedby"));
           }
           attachEditor(span);
+          $(span).find(".mq-textarea > [tabindex=0]").on('keydown.mqed', function(e) {
+            if (e.ctrlKey && e.key === "z") {
+              e.preventDefault();
+              onMQundo(mqfield);
+            } else if (e.ctrlKey && e.key === "y") {
+              e.preventDefault();
+              onMQredo(mqfield);
+            }
+          });
+          // history: array with index pointer. _suppressHistory prevents recording while performing undo/redo
+          mqfield.data.history = [initval];
+          mqfield.data.historyIndex = 0;
+          mqfield.data._suppressHistory = false;
           // if original input has input changed programmatically and change
           // event triggered, update mathquill.
           $(el).on('change.mqed', function(e, fromblur) {
@@ -192,6 +213,9 @@ var MQeditor = (function($) {
       } else { // has existing MQ input
         mqfield.show();
   			mqfield = MQ(mqfield[0]).latex(initval);
+        mqfield.data.history = [initval];
+        mqfield.data.historyIndex = 0;
+        mqfield.data._suppressHistory = false;
       }
       if (nofocus !== true) {
         mqfield.focus();
@@ -227,6 +251,11 @@ var MQeditor = (function($) {
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function() {
         blurTimer = setTimeout(hideEditor, 100);
+        var mf = MQ.MathField(mqel[0]);
+        if (mf && mf.data.history) {
+          mf.data.history = [mf.data.history[mf.data.historyIndex]];
+          mf.data.historyIndex = 0;
+        }
         if (config.hasOwnProperty('onBlur')) {
             config.onBlur();
         }
@@ -399,6 +428,20 @@ var MQeditor = (function($) {
     }
   	if (el.id.match(/mqinput/)) {
       var latex = mf.latex();
+      if (!mf.data._suppressHistory) {
+        // truncate forward history if user edits after an undo
+        if (mf.data.historyIndex < mf.data.history.length - 1) {
+          mf.data.history.splice(mf.data.historyIndex + 1);
+        }
+        if (mf.data.history.length == 0 || (latex != '' && mf.data.history[mf.data.history.length-1] != latex)) {
+          mf.data.history.push(latex);
+          // enforce max history length
+          if (mf.data.history.length > 10) {
+            mf.data.history.shift();
+          }
+          mf.data.historyIndex = mf.data.history.length - 1;
+        }
+      }
       if (config.hasOwnProperty('fromMQ')) {
         //convert to input format
         latex = config.fromMQ(latex, el.id);
@@ -409,11 +452,33 @@ var MQeditor = (function($) {
       if (latex != '') {
         $("#"+el.id.substring(8)).siblings("input[id^=qs][value=spec]").prop("checked",true);
       }
-
+      if (curMQfield) {
+        curMQfield.setAriaPostLabel('');
+      }
       if (config.hasOwnProperty('onEdit')) {
         config.onEdit(el.id, latex);
       }
   	}
+  }
+
+  function onMQundo(mf) {
+    if (mf.data.history && mf.data.historyIndex > 0) {
+      mf.data.historyIndex--;
+      var latex = mf.data.history[mf.data.historyIndex];
+      mf.data._suppressHistory = true;
+      mf.latex(latex);
+      mf.data._suppressHistory = false;
+    }
+  }
+
+  function onMQredo(mf) {
+    if (mf.data.history && mf.data.historyIndex < mf.data.history.length - 1) {
+      mf.data.historyIndex++;
+      var latex = mf.data.history[mf.data.historyIndex];
+      mf.data._suppressHistory = true;
+      mf.latex(latex);
+      mf.data._suppressHistory = false;
+    }
   }
 
   /*
@@ -701,9 +766,10 @@ var MQeditor = (function($) {
       curMQfield.matrixCmd(cmdval);
     } else if (cmdtype=='f') {
       // function; if there's a selection, wrap it in parens and apply function
-  		var sel = curMQfield.getSelection();
-  		if (sel) {
-  			curMQfield.write(cmdval+'\\left('+sel+'\\right)');
+  		var sel = curMQfield.selection();
+  		if (sel && sel.startIndex != sel.endIndex) {
+        let latex = sel.latex.substring(sel.startIndex, sel.endIndex);
+  			curMQfield.write(cmdval+'\\left('+latex+'\\right)');
         curMQfield.keystroke('Left');
   		} else if (cmdval.match(/{}$/)) {
         curMQfield.typedText(cmdval.replace(/{}$/,''));
@@ -712,27 +778,29 @@ var MQeditor = (function($) {
   		}
     } else if (cmdtype=='sf') {
       // simple function, that doesn't need parens.
-  		var sel = curMQfield.getSelection();
-  		if (sel) {
-  			curMQfield.write(cmdval+'{'+sel+'}');
+  		var sel = curMQfield.selection();
+  		if (sel && sel.startIndex != sel.endIndex) {
+        let latex = sel.latex.substring(sel.startIndex, sel.endIndex);
+  			curMQfield.write(cmdval+'{'+latex+'}');
   		} else {
   		  curMQfield.cmd(cmdval);
   		}
   		curMQfield.keystroke('Left');
     } else if (cmdtype=='i') {
       // interval: if there's a selection, wrap it
-  		var sel = curMQfield.getSelection();
-      if (!sel) {
-        sel = '';
+  		var sel = curMQfield.selection();
+      var latex = '';
+      if (sel && sel.startIndex != sel.endIndex) {
+        latex = sel.latex.substring(sel.startIndex, sel.endIndex);
       }
       if (typeof cmdval === 'string') {
         var leftsym = cmdval.charAt(0);
         var rightsym = cmdval.charAt(1);
-    		curMQfield.write('\\left'+leftsym+sel+'\\right'+rightsym);
+    		curMQfield.write('\\left'+leftsym+latex+'\\right'+rightsym);
       } else {
-        curMQfield.write(cmdval[0]+sel+cmdval[1]);
+        curMQfield.write(cmdval[0]+latex+cmdval[1]);
       }
-      if (sel=='') {
+      if (latex=='') {
         curMQfield.keystroke('Left');
       }
     } else if (cmdtype=='showtabpanel') {
@@ -772,7 +840,6 @@ var MQeditor = (function($) {
   }
   return {
     setConfig: setConfig,
-    setMQconfig: setMQconfig,
     toggleMQ: toggleMQ,
     toggleMQAll: toggleMQAll,
     attachEditor: attachEditor,
@@ -780,3 +847,14 @@ var MQeditor = (function($) {
     resetEditor: resetEditor
   }
 })(jQuery);
+
+function isOldiOS() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  // Match iOS version from user agent
+  const match = ua.match(/OS (\d+)_\d+/i);
+  if (match && match.length > 1) {
+    const majorVersion = parseInt(match[1], 10);
+    return majorVersion <= 13;
+  }
+  return false; // Not iOS or version not detectable
+}

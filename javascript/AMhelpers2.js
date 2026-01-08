@@ -307,7 +307,7 @@ function setupTips(id, tip, longtip) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
   }
   el.setAttribute('aria-describedby', 'tips'+ref);
-  $("#mqinput-" + id).find(".mq-textarea > *").attr('aria-describedby', 'tips'+ref);
+  $("#mqinput-" + id).find(".mq-textarea > [tabindex=0]").attr('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
   });
@@ -950,7 +950,7 @@ function a11ypreview(str) {
     // replace mathjax spans with aria-label
     $(el).find("[aria-label]").each(function(i,e) {
       $(e).html($(e).attr("aria-label"));
-    })
+    });
     arialiveel.appendChild(el);
   });
 }
@@ -971,6 +971,7 @@ function showSyntaxCheckMQ(qn) {
   var params = allParams[qn];
   var res = processByType(qn);
   var outstr = '';
+  var outerr = ' ';
   if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
     outstr += '`' + htmlEntities(res.str) + '`';
     if (params.qtype == 'calcmatrix' || params.qtype == 'calccomplexmatrix' || (params.qtype == 'calcinterval' && params.calcformat.match(/inequality/))) {
@@ -981,6 +982,7 @@ function showSyntaxCheckMQ(qn) {
   }
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
+    outerr += res.err;
   }
   if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
     LivePreviews[qn].RenderNow(outstr, true);
@@ -992,7 +994,9 @@ function showSyntaxCheckMQ(qn) {
     }
   }
   if (document.getElementById("qn"+qn)) {
-    a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
+    var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
+    var mf = MQ.MathField(document.getElementById("mqinput-qn"+qn));
+    mf.setAriaPostLabel(outerr, 5);
   } else {
     a11ypreview(outstr);
   }

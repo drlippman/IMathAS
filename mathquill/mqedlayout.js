@@ -17,9 +17,9 @@ var myMQeditor = (function($) {
               {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
               {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
               {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
-              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
+              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf mq-sqrt-container"><span class="mq-scaled mq-sqrt-prefix"><svg preserveAspectRatio="none" viewBox="0 0 32 54"><path d="M0 33 L7 27 L12.5 47 L13 47 L30 0 L32 0 L13 54 L11 54 L4.5 31 L0 33"></path></svg></span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
               {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
-              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
+              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<span class="mq-nthroot-container mq-non-leaf"><sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled mq-sqrt-container"><span class="mq-sqrt-prefix mq-scaled"><svg preserveAspectRatio="none" viewBox="0 0 32 54"><path d="M0 33 L7 27 L12.5 47 L13 47 L30 0 L32 0 L13 54 L11 54 L4.5 31 L0 33"></path></svg></span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span></span>'},
               {p:'DNE', 'sm':2},
               {l:'\\left|\\right|', c:'i', w:'||'},
             ]
@@ -243,8 +243,8 @@ var myMQeditor = (function($) {
               {l:'\\frac{}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
               {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
               {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
-              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
-              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
+              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf mq-sqrt-container"><span class="mq-scaled mq-sqrt-prefix"><svg preserveAspectRatio="none" viewBox="0 0 32 54"><path d="M0 33 L7 27 L12.5 47 L13 47 L30 0 L32 0 L13 54 L11 54 L4.5 31 L0 33"></path></svg></span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
+              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<span class="mq-nthroot-container mq-non-leaf"><sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled mq-sqrt-container"><span class="mq-sqrt-prefix mq-scaled"><svg preserveAspectRatio="none" viewBox="0 0 32 54"><path d="M0 33 L7 27 L12.5 47 L13 47 L30 0 L32 0 L13 54 L11 54 L4.5 31 L0 33"></path></svg></span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span></span>'},
               {l:'\\left(\\right)', c:'i', w:'()'},
               {l:'\\left|\\right|', c:'i', w:'||'},
               {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
@@ -391,8 +391,8 @@ var myMQeditor = (function($) {
           {l:'\\frac{}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
           {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
           {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
-          {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
-          {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
+          {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf mq-sqrt-container"><span class="mq-scaled mq-sqrt-prefix"><svg preserveAspectRatio="none" viewBox="0 0 32 54"><path d="M0 33 L7 27 L12.5 47 L13 47 L30 0 L32 0 L13 54 L11 54 L4.5 31 L0 33"></path></svg></span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
+          {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<span class="mq-nthroot-container mq-non-leaf"><sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled mq-sqrt-container"><span class="mq-sqrt-prefix mq-scaled"><svg preserveAspectRatio="none" viewBox="0 0 32 54"><path d="M0 33 L7 27 L12.5 47 L13 47 L30 0 L32 0 L13 54 L11 54 L4.5 31 L0 33"></path></svg></span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span></span>'},
           {l:'\\left(\\right)', c:'t', w:'('},
           {l:'\\left|\\right|', c:'t', w:'|', nb:1},
           {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
@@ -600,7 +600,7 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
           {l:'\\cap',pr:'<span class="mq-binary-operator">∩</span>'},
-          {l:'\\^c',c:"w",pr:'<span class="mq-non-leaf mq-empty"></span><sup class="mq-binary-operator">c</sup>'},
+          {l:'\\^c',c:"w",pr:'<span class="mq-non-leaf mq-empty mq-empty-box"></span><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sub"><var>c</var></span></span>'},
           {l:'\\ominus',pr:'<span class="mq-binary-operator">⊖</span>'},
           {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'}
       ];

@@ -12,7 +12,6 @@ filename[7]=javascript/ASCIIMathML
 filename[8]=javascript/ASCIIsvg
 filename[9]=javascript/ASCIIMathTeXImg
 filename[10]=javascript/rubric
-filename[11]=mathquill/mathquill
 
 for name in ${filename[@]}; do
   echo Minifying ${name}

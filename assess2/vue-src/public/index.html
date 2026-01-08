@@ -4,23 +4,13 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script type="text/javascript">var mathjaxdisp = 9; // MJ 4</script>
     <script src="<%= process.env.VUE_APP_IMASROOT %>/javascript/jquery.min.js" type="text/javascript"></script>
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>
+    <script src="<%= process.env.VUE_APP_IMASROOT %>/javascript/mathjaxconfig.js" type="text/javascript"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
     <script src="<%= process.env.VUE_APP_IMASROOT %>/javascript/mathparser_min.js?v=122025" type="text/javascript"></script>
     <script src="<%= process.env.VUE_APP_IMASROOT %>/javascript/ASCIIsvg_min.js?v=122025" type="text/javascript"></script>
     <script type="text/javascript">
-      var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true;
-      var MathJaxCompatible = true; var mathRenderer="MathJax";
-      function rendermathnode(node,callback) {
-  			if (window.MathJax) {
-  				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
-  				if (typeof callback == "function") {
-  					MathJax.Hub.Queue(callback);
-  				}
-  			} else {
-  				setTimeout(function() {rendermathnode(node, callback);}, 100);
-  			}
-      }
       var imasroot = '<%= process.env.VUE_APP_IMASROOT %>';
       var staticroot = '<%= process.env.VUE_APP_IMASROOT %>';
       var APIbase = '<%= process.env.VUE_APP_IMASROOT %>/assess2/';
