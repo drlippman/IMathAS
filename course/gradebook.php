@@ -832,7 +832,13 @@ function gbstudisp($stu) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."\">";
 				echo '<label for="usrcomments">'._('Gradebook Comment').'</label>: '.  "<input type=submit value=\"", _('Update Comment'), "\"> ";
-				echo '<button type=button aria-controls=instrcommentwrap class=togglecontrol>'._('View Instructor Note').'</button> <br/>';
+				echo '<button type=button aria-controls=instrcommentwrap class=togglecontrol>';
+				if ($gbinstrcomment=='') {
+					echo _('Add Instructor Note');
+				} else {
+					echo _('View Instructor Note');
+				}
+				echo '</button> <br/>';
 				echo "<textarea name=\"usrcomments\" id=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment, true) . "</textarea>";
 				echo '<div id=instrcommentwrap style="display:none;"><label for=instrnote>'._('Instructor Note').'</label> <button type=submit>'. _('Update Note') .'</button><br>';
 				echo "<textarea name=\"instrnote\" id=\"instrnote\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbinstrcomment, true) . "</textarea>";
