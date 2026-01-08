@@ -247,7 +247,7 @@ var MQeditor = (function($) {
    */
   function attachEditor(mqel) {
     // set up editor to display on focus
-    $(mqel).find(".mq-textarea > *")
+    $(mqel).find(".mq-textarea > [tabindex=0]")
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function() {
         blurTimer = setTimeout(hideEditor, 100);
