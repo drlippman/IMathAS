@@ -860,7 +860,7 @@ function addlabelabs($plot, $x, $y, $lbl) {
 
 function adddrawcommand($plot, $cmd) {
     $cmd = str_replace("'", '"', $cmd);
-    return str_replace("' />", $cmd . "' />", $plot);
+    return preg_replace("/'(\s+alt=\"[^\"]*\")?\s*\/>/", "$cmd'\\1 />", $plot);
 }
 
 function mergeplots($plota) {
