@@ -59,6 +59,7 @@ These are all added to the `config.php` by the install script.
 -   `$sendfrom`: An email address to send confirmation and notification emails from.
 -   `$imasroot`: The web root of the imathas install.  An empty string if installed at the web root, or something like `'/imathas'` if installed in a directory.
 -   `$mathimgurl`: An absolute path or full url to a [Mimetex](http://www.forkosh.com/mimetex.html) installation, for math image fallback
+-   `$CFG['GEN']['mathcgisvg']`: Set to true if you change $mathimgurl to something that returns svgs instead of images, like [this option](https://github.com/drlippman/IMathAS-Extras/tree/master/mathsvg)
 -   `$colorshift`: Whether icons should change colors as due date approaches. I thought this was cute, but others might find it annoying.
 -   `$smallheaderlogo`: Text or an HTML image tag for a small (120 x 80) logo to display at the top right of course pages.
 -   `$allownongrouplibs`: Whether non-admins should be allowed to create non-group libraries. On a single-school install, set to true; for larger installs that plan to use the Groups features, set to false.

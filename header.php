@@ -72,7 +72,7 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 var staticroot = '<?php echo $staticroot; ?>';
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=010626"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=010826"></script>
 <?php
 // override allowedImgDomains if set in config
 if (isset($CFG['GEN']['allowedImgDomains'])) {
@@ -92,14 +92,24 @@ if (isset($ispublic) && $ispublic && !isset($_SESSION['mathdisp'])) {
 	$_SESSION['graphdisp'] = 1;
 }
 
+if ((isset($useeditor) && $_SESSION['useed']==1) || // using editor
+	(isset($_SESSION['mathdisp']) && $_SESSION['mathdisp']==6) // katex
+) {
+	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
+	if (!empty($CFG['GEN']['mathcgisvg'])) {
+		echo 'var AMTcgilocUseSVG = true;';
+	}
+	if (isset($_SESSION['mathdisp']) && $_SESSION['mathdisp']==2 && $mathdarkbg) {
+		echo 'var mathbg = "dark";';
+	}
+	echo '</script>';
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
+}
 if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
 } else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) { // MathJax 2
 	//merged, eliminating original AsciiMath display; MathJax only now
-	if (isset($useeditor) && $_SESSION['useed']==1) {
-		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
-    }
+	
     if (isset($_SESSION['ltiitemtype'])) {
         echo '<script type="text/x-mathjax-config">
             MathJax.Hub.Queue(function () {
@@ -143,10 +153,6 @@ if (!isset($_SESSION['mathdisp'])) {
 
     echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
 } else if ($_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) { // mathjax 3
-    if (isset($useeditor) && $_SESSION['useed']==1) {
-		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
-    }
 	echo '<script>var mathjaxdisp = ' . intval($_SESSION['mathdisp']).';</script>';
     echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=093025\" type=\"text/javascript\"></script>\n";
     echo '<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>';
@@ -157,10 +163,6 @@ if (!isset($_SESSION['mathdisp'])) {
     }
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==9) { // mathjax 4
-    if (isset($useeditor) && $_SESSION['useed']==1) {
-		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
-    }
 	echo '<script>var mathjaxdisp = ' . intval($_SESSION['mathdisp']).';</script>';
     echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=093025\" type=\"text/javascript\"></script>\n";
     echo '<script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
@@ -172,22 +174,12 @@ if (!isset($_SESSION['mathdisp'])) {
     }
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==6) { // Katex
-	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
-
 	echo '<script src="'.$staticroot.'/katex/katex.min.js"></script>';
 	echo '<link rel="stylesheet" href="'.$staticroot.'/katex/katex.min.css" />';
 	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=111025"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
-} else if ($_SESSION['mathdisp']==2 && isset($useeditor) && $_SESSION['useed']==1) { // image based
-	//these scripts are used by the editor to make image-based math work in the editor
-	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
-	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
-	echo '</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\"; function rendermathnode(el,callback) {AMprocessNode(el); if(typeof callback=='function'){callback();}}</script>";
 } else if ($_SESSION['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el,callback) {AMprocessNode(el);} if(typeof callback=='function'){callback();}</script>";
 } else if ($_SESSION['mathdisp']==0) { // none
