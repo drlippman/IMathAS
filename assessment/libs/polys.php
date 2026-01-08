@@ -8,7 +8,7 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","divpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree","describepoly","describerational");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","writepolyfrac","addpolys","subtpolys","multpolys","divpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly","polys_getdegree","describepoly","describerational");
 
 
 //formpoly(coefficients,powers or degree)
