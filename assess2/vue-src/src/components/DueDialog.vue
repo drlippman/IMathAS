@@ -14,27 +14,27 @@
         <div class="pane-header flexrow" id="duedialog_hdr">
           <div style="flex-grow: 1">
             <icons name="alert" />
-            {{ $t('duedialog.due') }}
+            {{ $t('duedialog-due') }}
           </div>
         </div>
         <div class="pane-body" id="duedialog_body">
           <p>
-            {{ $t('duedialog.nowdue') }}
+            {{ $t('duedialog-nowdue') }}
           </p>
           <p v-if="settings.can_use_latepass > 0 && settings.latepass_after">
-            {{ $tc('closed.latepassn', settings.latepasses_avail) }}
+            {{ $t('closed-latepassn', {n: settings.latepasses_avail}) }}
             <br/>
             {{ latepassExtendMsg }}
             <br/>
             <button @click="useLatepass" class="primary">
-              {{ $tc('closed.use_latepass', this.settings.can_use_latepass) }}
+              {{ $t('closed-use_latepass', {n: this.settings.can_use_latepass}) }}
             </button>
           </p>
           <p v-if="hasUnsubmitted">
             {{ unsubmittedMessage }}
             <br/>
             <button @click="submitNow" class="primary">
-              {{ $t('duedialog.submitnow') }}
+              {{ $t('duedialog-submitnow') }}
             </button>
           </p>
           <p>
@@ -42,7 +42,7 @@
               :class="{primary: exitPrimary, secondary: !exitPrimary}"
               @click="exit"
             >
-              {{ $t('closed.exit') }}
+              {{ $t('closed-exit') }}
             </button>
           </p>
         </div>
@@ -71,7 +71,7 @@ export default {
       return store.assessInfo;
     },
     latepassExtendMsg () {
-      return this.$tc('closed.latepass_needed', this.settings.can_use_latepass, {
+      return this.$t('closed-latepass_needed', {
         n: this.settings.can_use_latepass,
         date: this.settings.latepass_extendto_disp
       });
@@ -82,9 +82,9 @@ export default {
     },
     unsubmittedMessage () {
       if (this.settings.submitby === 'by_question') {
-        return this.$t('duedialog.byq_unsubmitted');
+        return this.$t('duedialog-byq_unsubmitted');
       } else {
-        return this.$t('duedialog.bya_unsubmitted');
+        return this.$t('duedialog-bya_unsubmitted');
       }
     },
     exitPrimary () {

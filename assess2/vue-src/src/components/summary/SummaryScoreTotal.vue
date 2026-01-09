@@ -2,23 +2,24 @@
   <div>
     <p v-if="showTotal">
       <strong class="larger">
-        {{ $t("summary.score") }}:
+        {{ $t("summary-score") }}:
         {{ scoreTotalPercent }}%
       </strong>
       <br/>
-      {{ $tc("summary.scorepts", ainfo.points_possible, {pts: scoreTotal, poss: ainfo.points_possible}) }}
+      {{ $t("summary-scorepts", 
+        {pts: scoreTotal, poss: ainfo.points_possible}) }}
       <span v-if="retakePenalty > 0">
         <br/>
-        {{ $t("summary.retake_penalty", {n: retakePenalty}) }}
+        {{ $t("summary-retake_penalty", {n: retakePenalty}) }}
       </span>
       <span v-if="latePenalty > 0">
         <br/>
-        {{ $t("summary.late_penalty", {n: latePenalty}) }}
+        {{ $t("summary-late_penalty", {n: latePenalty}) }}
       </span>
     </p>
     <p v-else>
-      {{ $t("summary.no_total") }}
-      {{ $t("summary.viewwork_" + viewWorkType) }}
+      {{ $t("summary-no_total") }}
+      {{ $t("summary-viewwork_" + viewWorkType) }}
     </p>
   </div>
 </template>

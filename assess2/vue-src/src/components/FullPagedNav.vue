@@ -1,5 +1,5 @@
 <template>
-  <div class="subheader pagenav" role="navigation" :aria-label="$t('regions.pagenav')">
+  <div class="subheader pagenav" role="navigation" :aria-label="$t('regions-pagenav')">
     <menu-button id="qnav"
       :options = "navOptions"
       :selected = "disppage"
@@ -122,9 +122,11 @@ export default {
 <style>
 .subheader {
   display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.subheader.pagenav {
   flex-flow: row nowrap;
   align-items: stretch;
-  border-bottom: 1px solid #ccc;
 }
 .subheader > * {
   margin: 4px 0;

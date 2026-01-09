@@ -3,9 +3,9 @@ The MIT License (MIT)
 Copyright (c) 2017 Edenspiekermann
 https://github.com/edenspiekermann/a11y-dialog
  */
-/* global NodeList, Element, Event */
+// global NodeList, Element, Event 
 
-(function (global) {
+
   'use strict';
 
   var FOCUSABLE_ELEMENTS = [
@@ -452,10 +452,6 @@ https://github.com/edenspiekermann/a11y-dialog
 
     return siblings;
   }
+  
+export default A11yDialog;
 
-  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = A11yDialog;
-  } else if (typeof global === 'object') {
-    global.A11yDialog = A11yDialog;
-  }
-})(typeof global !== 'undefined' ? global : window);

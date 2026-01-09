@@ -4,7 +4,7 @@
       <span class="pii-full-name">{{ diagUserName }}</span>
     </p>
     <p>
-      {{ $d(new Date(), 'long') }}
+      {{ $t('longdate', { date: new Date() }) }}
     </p>
   </div>
 </template>

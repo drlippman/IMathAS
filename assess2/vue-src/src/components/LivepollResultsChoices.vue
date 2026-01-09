@@ -3,8 +3,8 @@
     <caption class="sr-only">Results</caption>
     <thead>
       <tr>
-        <th>{{ $t('livepoll.answer') }}</th>
-        <th style="min-width:10em">{{ $t('livepoll.frequency') }}</th>
+        <th>{{ $t('livepoll-answer') }}</th>
+        <th style="min-width:10em">{{ $t('livepoll-frequency') }}</th>
       </tr>
     </thead>
     <tbody>

@@ -8,7 +8,7 @@
       class="dialog pane-body"
       role="alertdialog"
       aria-modal="true"
-      :aria-label="$t('gradebook.clear_hdr')"
+      :aria-label="$t('gradebook-clear_hdr')"
       aria-describedby="clearoptions"
       tabindex="-1"
     >
@@ -16,13 +16,13 @@
         <p>
           <label>
             <input type="radio" value="0" v-model="type">
-            {{ $t('gradebook.clear_completely_msg') }}
+            {{ $t('gradebook-clear_completely_msg') }}
           </label>
         </p>
         <p v-if="isByQuestion">
           <label>
             <input type="radio" value="1" v-model="type">
-            {{ $t('gradebook.clear_all_work_msg') }}
+            {{ $t('gradebook-clear_all_work_msg') }}
           </label>
         </p>
       </div>
@@ -30,13 +30,13 @@
         <p>
           <label>
             <input type="radio" value="0" v-model="type">
-            {{ $t('gradebook.clear_attempt_regen_msg') }}
+            {{ $t('gradebook-clear_attempt_regen_msg') }}
           </label>
         </p>
         <p v-if="isLastAttempt">
           <label>
             <input type="radio" value="1" v-model="type">
-            {{ $t('gradebook.clear_attempt_msg') }}
+            {{ $t('gradebook-clear_attempt_msg') }}
           </label>
         </p>
       </div>
@@ -44,24 +44,24 @@
         <p v-if="isByQuestion">
           <label>
             <input type="radio" value="0" v-model="type">
-            {{ $t('gradebook.clear_qver_regen_msg') }}
+            {{ $t('gradebook-clear_qver_regen_msg') }}
           </label>
         </p>
         <p v-else>
           <label>
             <input type="radio" value="0" v-model="type">
-            {{ $t('gradebook.clear_qver_regen_msg2') }}
+            {{ $t('gradebook-clear_qver_regen_msg2') }}
           </label>
         </p>
         <p v-if="isLastQAttempt">
           <label>
             <input type="radio" value="1" v-model="type">
-            {{ $t('gradebook.clear_qver_msg') }}
+            {{ $t('gradebook-clear_qver_msg') }}
           </label>
         </p>
       </div>
       <p class="noticetext">
-        {{ $t('gradebook.clear_warning') }}
+        {{ $t('gradebook-clear_warning') }}
       </p>
       <div class="flexrow" style="justify-content: space-between;">
         <button class="primary" @click="close">

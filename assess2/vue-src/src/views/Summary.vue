@@ -16,7 +16,7 @@
         <div
           v-if="ainfo.hasOwnProperty('newexcused') && Object.keys(ainfo.newexcused).length > 0"
         >
-          <p>{{ $t('summary.new_excused') }}</p>
+          <p>{{ $t('summary-new_excused') }}</p>
           <ul id="excusedlist">
             <li v-for="(name,index) in ainfo.newexcused" :key="index">
               {{ name }}
@@ -26,7 +26,7 @@
 
         <div v-if = "showScores">
           <vue-tabs id="scoretabs">
-            <vue-tab :name="$t('summary.scorelist')">
+            <vue-tab :name="$t('summary-scorelist')">
               <summary-score-list />
               <p>&nbsp;</p>
               <summary-categories
@@ -35,7 +35,7 @@
               />
             </vue-tab>
             <vue-tab
-              :name="$t('summary.reshowquestions')"
+              :name="$t('summary-reshowquestions')"
               v-if="showReviewQ"
             >
               <template v-slot = "{ active }">
@@ -48,7 +48,7 @@
       </div>
       <div v-if="ainfo.hasOwnProperty('prev_attempts') && ainfo.prev_attempts.length > 0">
         <summary-gb-score />
-        <previous-attempts :caption = "$t('prev.all_attempts')" />
+        <previous-attempts :caption = "$t('prev-all_attempts')" />
       </div>
     </div>
   </div>

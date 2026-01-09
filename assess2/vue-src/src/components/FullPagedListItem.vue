@@ -40,7 +40,7 @@ export default {
       if (this.option.disppage === 0 || this.option.numquestions === 0) {
         return '';
       } else {
-        return this.$t('header.answered', {
+        return this.$t('header-answered', {
           n: this.option.numattempted,
           tot: this.option.numquestions
         });

@@ -14,8 +14,8 @@
         <button
           @click="popout(curResource)"
           class = "min1000"
-          :title = "$t('resource.sidebar')"
-          :aria-label = "$t('resource.sidebar') + ' ' + curResource.label"
+          :title = "$t('resource-sidebar')"
+          :aria-label = "$t('resource-sidebar') + ' ' + curResource.label"
         >
           <icons name="sidebar" alt="" />
         </button>
@@ -24,8 +24,8 @@
           class="abutton"
           :href="curResource.link"
           :target="'res' + index"
-          :title = "$t('resource.newtab')"
-          :aria-label = "$t('resource.newtab') + ' ' + curResource.label"
+          :title = "$t('resource-newtab')"
+          :aria-label = "$t('resource-newtab') + ' ' + curResource.label"
         >
           <icons name="extlink" alt="" />
         </a>

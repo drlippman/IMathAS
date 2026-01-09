@@ -1,7 +1,7 @@
 <template>
   <ul class="listpane">
     <li v-for="(penalty, index) in penalties" :key="index">
-      {{ penalty.pct }}% {{ $t("penalties." + penalty.type) }}
+      {{ penalty.pct }}% {{ $t("penalties-" + penalty.type) }}
     </li>
   </ul>
 </template>

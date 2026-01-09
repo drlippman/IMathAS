@@ -1,37 +1,37 @@
 <template>
   <div>
     <div class="pane-header nowrap">
-      {{ $t('qdetails.question_details') }}
+      {{ $t('qdetails-question_details') }}
     </div>
     <div class="pane-body">
       <p v-if="qinfo.extracredit === 1">
-        {{ $t('qdetails.extracredit') }}
+        {{ $t('qdetails-extracredit') }}
       </p>
 
       <p v-if="showGBScore">
         {{ gbScoreString }}:
         <span class="nowrap">
-          {{ $tc('scoreresult.scorepts', qinfo.points_possible,
+          {{ $t('scoreresult-scorepts',
             {pts: qinfo.gbscore, poss: qinfo.points_possible}) }}
         </span>
       </p>
       <p v-if="showScore">
-        {{ $t('qdetails.lastscore') }}:
+        {{ $t('qdetails-lastscore') }}:
         <span class="nowrap">
-          {{ $tc('scoreresult.scorepts', qinfo.points_possible,
+          {{ $t('scoreresult-scorepts',
             {pts: qinfo.score, poss: qinfo.points_possible}) }}
         </span>
       </p>
 
       <question-details-table
         v-if="hasParts"
-        :caption = "$t('qdetails.lasttry')"
+        :caption = "$t('qdetails-lasttry')"
         :qinfo="qinfo"
         :submitby="submitby"
       />
 
       <div v-if = "hasOnePartPenalties">
-        <p>{{ $t('penalties.applied') }}:</p>
+        <p>{{ $t('penalties-applied') }}:</p>
         <penalties-applied
           class = "med-left"
           :part="qinfo.parts[0]"
@@ -40,12 +40,12 @@
       </div>
 
       <p v-if="hasCategory">
-        <strong>{{ $t('qdetails.category') }}:</strong>
+        <strong>{{ $t('qdetails-category') }}:</strong>
         {{ qinfo.category }}
       </p>
       <p class="small subdued" style="text-align:right">
         <a target="license" :href="licenseUrl">
-          {{ $t('qdetails.license') }}
+          {{ $t('qdetails-license') }}
         </a>
       </p>
     </div>
@@ -91,9 +91,9 @@ export default {
     },
     gbScoreString () {
       if (store.assessInfo.in_practice) {
-        return this.$t('qdetails.bestpractice');
+        return this.$t('qdetails-bestpractice');
       } else {
-        return this.$t('qdetails.gbscore');
+        return this.$t('qdetails-gbscore');
       }
     },
     hasCategory () {

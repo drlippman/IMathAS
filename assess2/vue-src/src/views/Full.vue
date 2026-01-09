@@ -5,13 +5,13 @@
     </a>
     <assess-header></assess-header>
     <p v-if="isPreviewAll" class="headerpane noticetext">
-      {{ $t("header.preview_all") }}
+      {{ $t("header-preview_all") }}
       <button
         type="button"
         class = "secondary"
         @click="showAllAns"
       >
-        {{ $t("gradebook.show_all_ans") }}
+        {{ $t("gradebook-show_all_ans") }}
       </button>
       <button
         type="button"
@@ -20,15 +20,15 @@
       >
         {{ textToggleLabel }}
       </button>
-      <a :href="settingsLink">{{ $t("links.settings") }}</a>&nbsp;
-      <a :href="questionsLink">{{ $t("links.questions") }}</a>
+      <a :href="settingsLink">{{ $t("links-settings") }}</a>&nbsp;
+      <a :href="questionsLink">{{ $t("links-questions") }}</a>
     </p>
     <div
       class="scrollpane fulldisp"
       role="region"
       ref="scrollpane"
       tabindex="-1"
-      :aria-label="$t('regions.questions')"
+      :aria-label="$t('regions-questions')"
     >
       <intro-text
         v-if = "hasIntro"
@@ -71,7 +71,7 @@
         class = "primary"
         @click = "submitAssess"
       >
-        {{ $t('header.assess_submit') }}
+        {{ $t('header-assess_submit') }}
       </button>
     </p>
   </div>
@@ -123,7 +123,7 @@ export default {
       return (store.assessInfo.submitby === 'by_assessment');
     },
     textToggleLabel () {
-      return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');
+      return this.showTexts ? this.$t('print-hide_text') : this.$t('print-show_text');
     },
     textList () {
       if (!store.assessInfo.hasOwnProperty('interquestion_text')) {

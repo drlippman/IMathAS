@@ -6,7 +6,7 @@
     noarrow = "true"
     searchby = "label"
     id="ltimenubutton"
-    :header = "$t('lti.more')"
+    :header = "$t('lti-more')"
   >
     <template v-slot:button>
       <icons name="more" size="medium"/>
@@ -44,10 +44,10 @@ export default {
     LtiOptions () {
       const out = [];
       out.push({
-        label: this.$t('lti.userprefs'),
+        label: this.$t('lti-userprefs'),
         onclick: () => {
           window.GB_show(
-            this.$t('lti.userprefs'),
+            this.$t('lti-userprefs'),
             store.APIbase + '../admin/ltiuserprefs.php?cid=' + store.cid + '&greybox=true',
             800, 'auto', true, 0, 0,
             { label: 'Update Info', func: 'doSubmit' }
@@ -58,7 +58,7 @@ export default {
       Moved to separate msgs icon
       if (store.assessInfo['lti_showmsg']) {
         out.push({
-          label: this.$tc('lti.msgs', store.assessInfo['lti_msgcnt']),
+          label: this.$t('lti-msgs', {n: store.assessInfo}['lti_msgcnt']),
           link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid,
           target: '_self'
         });
@@ -68,14 +68,14 @@ export default {
           store.assessInfo.prev_attempts.length > 0
       ) {
         out.push({
-          label: this.$t('closed.view_scored'),
+          label: this.$t('closed-view_scored'),
           link: store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid,
           target: '_self'
         });
       }
       if (store.assessInfo.can_use_latepass) {
         out.push({
-          label: this.$t('lti.use_latepass'),
+          label: this.$t('lti-use_latepass'),
           link: store.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid,
           target: '_self'
         });

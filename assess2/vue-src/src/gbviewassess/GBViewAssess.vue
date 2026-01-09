@@ -4,27 +4,27 @@
       {{ $t('loading') }}
     </div>
     <div v-else class="gbmainview">
-      <h1>{{ $t('gradebook.detail_title')}}</h1>
+      <h1>{{ $t('gradebook-detail_title')}}</h1>
       <h2><span class="pii-full-name">{{ aData.userfullname }}</span></h2>
       <h3>{{ aData.name }}</h3>
 
       <div>
-        {{ $t('gradebook.started') }}: {{ startedString }}<br/>
-        {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}
+        {{ $t('gradebook-started') }}: {{ startedString }}<br/>
+        {{ $t('gradebook-lastchange') }}: {{ lastchangeString }}
         <span v-if="aData.timeontask > 0">
           <br/>
-          {{ $tc('gradebook.time_onscreen', attemptCount) }}:
+          {{ $t('gradebook-time_onscreen', {n: attemptCount}) }}:
           {{ totalTimeOnTask }}
         </span>
         <span v-if="aData.hasOwnProperty('timelimit_ext')">
           <br/>
-          {{ $t('gradebook.'+ (aData.timelimit_ext > 0 ? 'has_timeext' : 'used_timeext'),
+          {{ $t('gradebook-'+ (aData.timelimit_ext > 0 ? 'has_timeext' : 'used_timeext'),
             {n: Math.abs(aData.timelimit_ext)}) }}
         </span>
       </div>
 
       <div>
-        {{ $t('gradebook.due')}}: {{ aData.enddate_disp }}
+        {{ $t('gradebook-due')}}: {{ aData.enddate_disp }}
           <button
             v-if = "canEdit && aData.can_make_exception"
             type="button"
@@ -35,13 +35,13 @@
           </button>
         <span v-if="aData.hasOwnProperty('original_enddate')">
           <br/>
-          {{ $t('gradebook.originally_due') }}:
+          {{ $t('gradebook-originally_due') }}:
             {{ aData.original_enddate_disp }}.
           {{ extensionString }}
         </span>
         <span v-if="aData.hasOwnProperty('attemptext')">
           <br/>
-          {{ $t('gradebook.attemptext', {n: aData.attemptext}) }}
+          {{ $t('gradebook-attemptext', {n: aData.attemptext}) }}
         </span>
       </div>
 
@@ -52,12 +52,12 @@
           type="button"
           @click="clearLPblock"
         >
-          {{ $t('gradebook.clear_latepass_block' )}}
+          {{ $t('gradebook-clear_latepass_block' )}}
         </button>
       </div>
       <div>
         <strong>
-          {{ $t('gradebook.gb_score') }}:
+          {{ $t('gradebook-gb_score') }}:
           <span v-if="aData.hasOwnProperty('scoreoverride') && canEdit">
             <input id="assessoverride" size=4
               :value = "aData.scoreoverride"
@@ -67,7 +67,7 @@
           </span>
           <span v-else>
             <span v-if="!canEdit && aData.gbscore === 'N/A'">
-              {{ $t('gradebook.avail_' + aData.scoresingb) }}
+              {{ $t('gradebook-avail_' + aData.scoresingb) }}
             </span>
             <span v-else>
               {{ aData.gbscore }}/{{ aData.points_possible }}
@@ -75,7 +75,7 @@
           </span>
         </strong>
         <span v-if="aData.hasOwnProperty('scoreoverride')">
-          ({{ $t('gradebook.overridden') }})
+          ({{ $t('gradebook-overridden') }})
         </span>
         <span v-else-if="canEdit">
           <button
@@ -83,10 +83,10 @@
             type="button"
             @click="showOverride = !showOverride"
           >
-            {{ $t('gradebook.override') }}
+            {{ $t('gradebook-override') }}
           </button>
           <span v-if="showOverride">
-            <label for="assessoverride">{{ $t('gradebook.override') }}</label>:
+            <label for="assessoverride">{{ $t('gradebook-override') }}</label>:
             <input id="assessoverride" size=4 v-model="assessOverride" @keyup.enter="submitForm" />
           </span>
         </span>
@@ -96,7 +96,7 @@
           class="slim"
           @click="clearAttempts('all')"
         >
-          {{ $t('gradebook.clear_all') }}
+          {{ $t('gradebook-clear_all') }}
         </button>
         <button
           v-if="aData.hasOwnProperty('excused')"
@@ -104,23 +104,23 @@
           class="slim"
           @click="showExcused = !showExcused"
         >
-          {{ $t('gradebook.' + (showExcused ? 'hide' : 'show') + '_excused') }}
+          {{ $t('gradebook-' + (showExcused ? 'hide' : 'show') + '_excused') }}
         </button>
       </div>
       <div v-if="canEdit && aData.scoresingb === 'manual'">
-        {{ $t('gradebook.manualstatus' + aData.manual_released) }}
+        {{ $t('gradebook-manualstatus' + aData.manual_released) }}
         <button
           type="button"
           class="slim"
           :disabled = "!canSubmit"
           @click="setManualRelease"
         >
-          {{ $t('gradebook.manualbutton' + aData.manual_released) }}
+          {{ $t('gradebook-manualbutton' + aData.manual_released) }}
         </button>
       </div>
 
       <div v-if="showExcused" class="introtext">
-        {{ $t('gradebook.excused_list') }}
+        {{ $t('gradebook-excused_list') }}
         <ul>
           <li v-for="name in aData.excused" :key="name">
             {{ name }}
@@ -130,19 +130,19 @@
 
       <div v-if="canEdit">
         <a v-if="showViewAsStu" :href="viewAsStuUrl">
-          {{ $t('gradebook.view_as_stu') }}
+          {{ $t('gradebook-view_as_stu') }}
         </a>
         <span v-if="showViewAsStu"> | </span>
         <a :href="viewAsStuUrl + '#/print'">
-          {{ $t('gradebook.print') }}
+          {{ $t('gradebook-print') }}
         </a> |
         <a :href="activityLogUrl" target="_blank">
-          {{ $t('gradebook.activitylog') }}
+          {{ $t('gradebook-activitylog') }}
         </a>
       </div>
 
       <div v-if="aData.assess_versions.length == 0">
-        {{ $t('gradebook.no_versions') }}
+        {{ $t('gradebook-no_versions') }}
       </div>
       <div v-else class="gbmainview">
         <div>
@@ -162,30 +162,30 @@
               type="button"
               @click="clearAttempts('attempt')"
             >
-              {{ $t('gradebook.clear_attempt') }}
+              {{ $t('gradebook-clear_attempt') }}
             </button>
             <button
               v-if = "!isByQuestion && canEdit && aData.keepscore === 'last' && curAver < aData.assess_versions.length - 1"
               type="button"
               @click="setVerAsLast"
             >
-              {{ $t('gradebook.set_as_last') }}
+              {{ $t('gradebook-set_as_last') }}
             </button>
           </div>
           <div v-if="isUnsubmitted">
-            {{ $t('gradebook.unsubmitted') }}
+            {{ $t('gradebook-unsubmitted') }}
             <button
               type="button"
               @click="submitVersion"
             >
-              {{ $t('closed.submit_now') }}
+              {{ $t('closed-submit_now') }}
             </button>
             <button
               v-if="!canEdit && aData.can_use_latepass"
               type = "button"
               @click = "redeemLatePass"
             >
-              {{ $t('lti.use_latepass') }}
+              {{ $t('lti-use_latepass') }}
             </button>
           </div>
         </div>
@@ -196,7 +196,7 @@
             type="button"
             @click = "showEndmsg = !showEndmsg"
           >
-            {{ $t('gradebook.' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
+            {{ $t('gradebook-' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
           </button>
           <div
             class="introtext"
@@ -207,57 +207,57 @@
 
         <div v-if="canEdit && viewFull">
           <button @click = "showFilters = !showFilters">
-            {{ $t('gradebook.filters') }}
+            {{ $t('gradebook-filters') }}
           </button>
           <div v-if = "showFilters" class="tabpanel" @change="storeFilters">
-            <p>{{ $t('gradebook.hide') }}:</p>
+            <p>{{ $t('gradebook-hide') }}:</p>
             <ul style="list-style-type: none; margin:0; padding-left: 15px;">
               <li>
                 <label>
                   <input type=checkbox v-model="hideUnanswered">
-                  {{ $t('gradebook.hide_unans') }}
+                  {{ $t('gradebook-hide_unans') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hideZero">
-                  {{ $t('gradebook.hide_zero') }}
+                  {{ $t('gradebook-hide_zero') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hideNonzero">
-                  {{ $t('gradebook.hide_nonzero') }}
+                  {{ $t('gradebook-hide_nonzero') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hidePerfect">
-                  {{ $t('gradebook.hide_perfect') }}
+                  {{ $t('gradebook-hide_perfect') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hide100">
-                  {{ $t('gradebook.hide_100') }}
+                  {{ $t('gradebook-hide_100') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hideFeedback">
-                  {{ $t('gradebook.hide_fb') }}
+                  {{ $t('gradebook-hide_fb') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hideNowork">
-                  {{ $t('gradebook.hide_nowork') }}
+                  {{ $t('gradebook-hide_nowork') }}
                 </label>
               </li>
               <li>
                 <label>
                   <input type=checkbox v-model="hidetexts" @change="loadTexts">
-                  {{ $t('gradebook.introtexts') }}
+                  {{ $t('gradebook-introtexts') }}
                 </label>
               </li>
             </ul>
@@ -267,50 +267,50 @@
                   type="checkbox"
                   v-model="op_showans"
                   @change = "showAllAns"
-                />{{ $t('gradebook.show_all_ans') }}
+                />{{ $t('gradebook-show_all_ans') }}
               </label>
               <label>
                 <input
                   type="checkbox"
                   v-model="showAllWork"
-                />{{ $t('gradebook.show_all_work') }}
+                />{{ $t('gradebook-show_all_work') }}
               </label>
               <label>
                 <input
                   type="checkbox"
                   v-model="op_previewFiles"
                   @change = "previewFiles"
-                />{{ $t('gradebook.preview_files') }}
+                />{{ $t('gradebook-preview_files') }}
               </label>
               <label>
                 <input
                   type="checkbox"
                   v-model="op_floatingSB"
                   @change = "toggleFloatingScoreboxes"
-                />{{ $t('gradebook.floating_scoreboxes') }}
+                />{{ $t('gradebook-floating_scoreboxes') }}
               </label>
               <label>
                 <input
                   type="checkbox"
                   v-model="sidebysideon"
                   @change = "sidebysideAction"
-                />{{ $t('gradebook.sidebyside') }}
+                />{{ $t('gradebook-sidebyside') }}
               </label>
               <label>
                 <input
                   type="checkbox"
                   v-model="op_oneatatime"
-                />{{ $t('gradebook.oneatatime') }}
+                />{{ $t('gradebook-oneatatime') }}
               </label>
             </p>
           </div>
         </div>
         <div v-else-if="viewFull">
           <button @click="hidetexts = !hidetexts; loadTexts()">
-            {{ $t(hidetexts ? 'print.show_text' : 'print.hide_text') }}
+            {{ $t(hidetexts ? 'print-show_text' : 'print-hide_text') }}
           </button>
           <p class="noticetext">
-            {{ $t('gradebook.no_edit') }}
+            {{ $t('gradebook-no_edit') }}
           </p>
         </div>
 
@@ -339,7 +339,7 @@
             <div class = "bigquestionwrap" v-show="showQuestion[qn] && (!op_oneatatime || curqn === qn)">
               <div class="headerpane">
                 <strong>
-                  {{ $tc('question_n', qn+1) }}.
+                  {{ $t('question_n', {n: qn+1}) }}.
                 </strong>
                 <em v-if="qdata[curQver[qn]].extracredit" class="small subdued">
                   {{ $t('extracredit') }}
@@ -354,12 +354,12 @@
                   class = "med-left"
                 />
                 <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
-                  {{ $t('gradebook.score') }}:
+                  {{ $t('gradebook-score') }}:
                   <strong>
                     {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
                   </strong>
                 </span>
-                <span v-if="qdata[curQver[qn]].useda11yalt"> ({{ $t('gradebook.a11yalt') }})</span>
+                <span v-if="qdata[curQver[qn]].useda11yalt"> ({{ $t('gradebook-a11yalt') }})</span>
               </div>
               <div class="sidebyside" :class="{sidebysideon:sidebysideon}">
                 <div class="scrollpane">
@@ -421,7 +421,7 @@
           <p v-if = "canEdit && aData.scoresingb === 'manual' && aData.manual_released == 0">
             <label>
               <input type="checkbox" v-model="releaseOnSave" />
-              {{ $t('gradebook.release_on_save') }}
+              {{ $t('gradebook-release_on_save') }}
             </label>
           </p>
           <button
@@ -431,7 +431,7 @@
             class = "secondary"
             @click = "setCurqn(prevVisible)"
           >
-            {{ $t('gradebook.prevq') }}
+            {{ $t('gradebook-prevq') }}
           </button>
           <button
             v-if = "canEdit"
@@ -440,7 +440,7 @@
             class = "primary"
             @click = "submitChanges(true)"
           >
-            {{ $t('gradebook.save') }}
+            {{ $t('gradebook-save') }}
           </button>
           <button
             v-if = "canEdit && aData.nextstu"
@@ -449,7 +449,7 @@
             class = "primary"
             @click = "submitChanges(false,true)"
           >
-            {{ $t('gradebook.savenext') }}
+            {{ $t('gradebook-savenext') }}
           </button>
           <span v-if="savedMsg !== ''" class="noticetext">
             {{ savedMsg }}
@@ -461,7 +461,7 @@
             :disabled = "!canSubmit"
             @click = "exit"
           >
-            {{ $t('gradebook.return') }}
+            {{ $t('gradebook-return') }}
           </button>
         </div>
         <div v-else>
@@ -471,7 +471,7 @@
             class = "secondary"
             @click = "setCurqn(prevVisible)"
           >
-            {{ $t('gradebook.prevq') }}
+            {{ $t('gradebook-prevq') }}
           </button>
           <button
             :disabled = "nextVisible === -1"
@@ -479,7 +479,7 @@
             class = "primary"
             @click = "setCurqn(nextVisible)"
           >
-            {{ $t('gradebook.nextq') }}
+            {{ $t('gradebook-nextq') }}
           </button>
           <span v-if="savedMsg !== ''" class="noticetext">
             {{ savedMsg }}
@@ -491,7 +491,7 @@
             :disabled = "!canSubmit"
             @click = "exit"
           >
-            {{ $t('gradebook.return') }}
+            {{ $t('gradebook-return') }}
           </button>
         </div>
         <div class="floatrightbutton">
@@ -505,7 +505,7 @@
             class = "primary"
             @click = "submitChanges"
           >
-            {{ $t('gradebook.save') }}
+            {{ $t('gradebook-save') }}
           </button>
         </div>
         <summary-categories
@@ -564,7 +564,7 @@ export default {
   data: function () {
     return {
       showOverride: false,
-      assessOverride: false,
+      assessOverride: '',
       hide100: false,
       hidePerfect: false,
       hideNonzero: false,
@@ -610,20 +610,20 @@ export default {
     },
     startedString () {
       if (this.aData.starttime === 0) {
-        return this.$t('gradebook.not_started');
+        return this.$t('gradebook-not_started');
       } else {
         return this.aData.starttime_disp;
       }
     },
     lastchangeString () {
       if (this.aData.lastchange === 0) {
-        return this.$t('gradebook.not_submitted');
+        return this.$t('gradebook-not_submitted');
       } else {
         return this.aData.lastchange_disp;
       }
     },
     totalTimeOnTask () {
-      return Math.round(10 * this.aData.timeontask / 60) / 10 + ' ' + this.$t('gradebook.minutes');
+      return Math.round(10 * this.aData.timeontask / 60) / 10 + ' ' + this.$t('gradebook-minutes');
     },
     attemptCount () {
       let cnt = 0;
@@ -636,9 +636,9 @@ export default {
     },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {
-        return this.$tc('setlist.latepass_used', this.aData.extended_with.n);
+        return this.$t('setlist-latepass_used', {n: this.aData.extended_with.n});
       } else {
-        return this.$t('setlist.extension');
+        return this.$t('setlist-extension');
       }
     },
     curQuestions () {
@@ -680,17 +680,17 @@ export default {
     },
     scoreCalc () {
       if (this.aData.submitby === 'by_question') {
-        return this.$t('gradebook.best_on_question');
+        return this.$t('gradebook-best_on_question');
       } else if (this.aData.keepscore === 'best') {
-        let out = this.$t('gradebook.keep_best');
+        let out = this.$t('gradebook-keep_best');
         if (typeof this.aData.gbscore === 'number') {
-          out += ' (' + this.$tc('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
+          out += ' (' + this.$t('gradebook-attempt_n', {n: this.aData.scored_version + 1}) + ')';
         }
         return out;
       } else if (this.aData.keepscore === 'average') {
-        return this.$t('gradebook.keep_avg');
+        return this.$t('gradebook-keep_avg');
       } else if (this.aData.keepscore === 'last') {
-        return this.$t('gradebook.keep_last');
+        return this.$t('gradebook-keep_last');
       } else {
         return '';
       }
@@ -750,9 +750,9 @@ export default {
     },
     exceptionActionLabel () {
       if (this.aData.hasexception) {
-        return this.$t('gradebook.edit_exception');
+        return this.$t('gradebook-edit_exception');
       } else {
-        return this.$t('gradebook.make_exception');
+        return this.$t('gradebook-make_exception');
       }
     },
     assessFeedback () {
@@ -762,7 +762,7 @@ export default {
       if (store.saving === '') {
         return '';
       } else {
-        return this.$t('gradebook.' + store.saving);
+        return this.$t('gradebook-' + store.saving);
       }
     },
     latepassBlockMsg () {
@@ -776,7 +776,7 @@ export default {
         case 5: m = 'toolate'; break;
         case 6: m = 'toofew'; break;
       }
-      return this.$t('gradebook.latepass_blocked_' + m);
+      return this.$t('gradebook-latepass_blocked_' + m);
     },
     isUnsubmitted () {
       return (this.aData.submitby === 'by_assessment' &&
@@ -814,7 +814,7 @@ export default {
         Object.keys(store.feedbacks).length > 0
       ) {
         store.confirmObj = {
-          body: 'gradebook.unsaved_warn',
+          body: 'gradebook-unsaved_warn',
           action: () => this.doChangeAssessVersion(val)
         };
       } else {
@@ -850,7 +850,7 @@ export default {
       }
       if (hasUnsaved) {
         store.confirmObj = {
-          body: 'gradebook.unsaved_warn',
+          body: 'gradebook-unsaved_warn',
           action: () => actions.loadGbQuestionVersion(qn, val)
         };
       } else {
@@ -891,7 +891,7 @@ export default {
     },
     setVerAsLast () {
       store.confirmObj = {
-        body: 'gradebook.setaslast_warn',
+        body: 'gradebook-setaslast_warn',
         action: () => actions.setVerAsLast()
       };
     },

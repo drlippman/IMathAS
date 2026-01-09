@@ -7,14 +7,14 @@
       @click = "startVid"
       class = "primary"
     >
-      {{ $t('videocued.start') }}
+      {{ $t('videocued-start') }}
     </button>
     <button
       v-if = "qn > -1 && hasNextVid"
       @click = "nextVidLink"
       :class="{'primary': status !== 'correct' || !showSkip}"
     >
-      {{ $t('videocued.continue', {'title': nextVidTitle}) }}
+      {{ $t('videocued-continue', {'title': nextVidTitle}) }}
     </button>
 
     <button
@@ -22,7 +22,7 @@
       @click = "skipLink"
       class="primary"
     >
-      {{ $t('videocued.skipto', {'title': skipTitle}) }}
+      {{ $t('videocued-skipto', {'title': skipTitle}) }}
     </button>
   </div>
 </template>

@@ -10,14 +10,14 @@
     </div>
     <p class="hideonprint headerpane">
       <strong>
-        {{ $t('print.print_version') }}
+        {{ $t('print-print_version') }}
       </strong>
       <button
         type = "button"
         class = "primary"
         @click = "doPrint"
       >
-        {{ $t('print.print') }}
+        {{ $t('print-print') }}
       </button>
       <button
         type = "button"
@@ -118,10 +118,10 @@ export default {
       return store.assessInfo.questions.length - 1;
     },
     textToggleLabel () {
-      return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');
+      return this.showTexts ? this.$t('print-hide_text') : this.$t('print-show_text');
     },
     qToggleLabel () {
-      return this.showQs ? this.$t('print.hide_qs') : this.$t('print.show_qs');
+      return this.showQs ? this.$t('print-hide_qs') : this.$t('print-show_qs');
     },
     textList () {
       if (!store.assessInfo.hasOwnProperty('interquestion_text')) {

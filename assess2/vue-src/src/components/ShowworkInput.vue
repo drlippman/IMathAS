@@ -1,28 +1,28 @@
 <template>
   <div class="showworkwrap">
     <div v-if="worktype === 0">
-      {{ $t("question.showwork") }}
+      {{ $t("question-showwork") }}
       <textarea
         :id="computedId"
         ref="inbox"
         class="fbbox swbox"
         :rows="rows"
-        :aria-label="$t('question.showwork_n', {n: qn+1})"
+        :aria-label="$t('question-showwork_n', {n: qn+1})"
       ></textarea>
     </div>
     <div v-else class="feedbackwrap">
-      {{ $t("question.uploadwork") }}
+      {{ $t("question-uploadwork") }}
       <ul class="nomark">
         <li v-for="(file,index) in filelist" :key="index">
           <a :href="file" class="attach" target="_blank">{{ file.split('/').pop() }}</a>
           <button @click="removeFile(index)">
-            {{ $t('group.remove') }}
+            {{ $t('group-remove') }}
           </button>
         </li>
         <li>
           <input type="file" ref="fileinput" @change="uploadFile" />
           <span class="noticetext" v-if="uploading">
-            {{ $t('question.uploading') }}
+            {{ $t('question-uploading') }}
           </span>
         </li>
       </ul>
@@ -187,7 +187,7 @@ export default {
     },
     removeFile: function (index) {
       store.confirmObj = {
-        body: 'work.remove',
+        body: 'work-remove',
         action: () => {
           const todel = this.filelist[index];
           this.filelist.splice(index, 1);

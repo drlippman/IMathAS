@@ -1,6 +1,6 @@
 <template>
   <tooltip-span
-    :tip="$tc(label, cnt)"
+    :tip="$t(label, {n: cnt})"
     style="display: inline-block"
     :hasbutton="true"
   >
@@ -8,7 +8,7 @@
       :href="link"
       class = "noextlink badgewrap"
       target = "_blank"
-      :aria-label = "$tc(label, cnt)"
+      :aria-label = "$t(label, {n: cnt})"
     >
       <icons :name="icon" size="medium"/>
       <div class="badgeicon" v-if="cnt > 0">

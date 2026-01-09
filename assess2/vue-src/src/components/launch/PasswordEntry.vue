@@ -1,7 +1,7 @@
 <template>
   <div>
     <label for="password">
-      {{ $t('password.label') }}
+      {{ $t('password-label') }}
     </label>
     <input
       :value="modelValue"

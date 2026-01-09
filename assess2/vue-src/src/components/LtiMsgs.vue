@@ -3,7 +3,7 @@
     :href="msglink"
     class = "noextlink badgewrap"
     target = "_blank"
-    :aria-label = "$tc('lti.msgs', msgcnt)"
+    :aria-label = "$t('lti-msgs', {n: msgcnt})"
   >
     <icons name="message" size="medium"/>
     <div class="badgeicon" v-if="msgcnt > 0">

@@ -480,7 +480,7 @@ export const actions = {
         data.append('sw' + qn, store.work[qn]);
       }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
-    };
+    }
     data.append('toscoreqn', JSON.stringify(changedQuestions));
     data.append('timeactive', timeactive.join(','));
     data.append('lastloaded', lastLoaded.join(','));
@@ -696,7 +696,7 @@ export const actions = {
         }
       });
       lastLoaded[qn] = store.lastLoaded[qn].getTime();
-    };
+    }
     data.append('autosave-tosaveqn', JSON.stringify(tosaveqn));
     data.append('autosave-lastloaded', JSON.stringify(lastLoaded));
     data.append('autosave-verification', JSON.stringify(this.getVerificationData(tosaveqn)));
@@ -1159,7 +1159,9 @@ export const actions = {
     }
     try {
       top.updateTRunans(store.aid, status);
-    } catch (e) {}
+    } catch (e) {
+      // empty
+    }
   },
   enableMQ () {
     store.enableMQ = true;

@@ -2,26 +2,28 @@
   "name": "imathas-assess2",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite --host",
+    "build": "vite build",
+    "serve": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore"
   },
   "dependencies": {
-    "@rushstack/eslint-patch": "^1.6.1",
-    "@vue/eslint-config-standard": "^8.0.1",
-    "core-js": "^3.34.0",
-    "vue": "^3.2.37",
-    "vue-i18n": "^9.8.0",
+    "@fluent/bundle": "^0.19.1",
+    "fluent-vue": "^3.8.1",
+    "vue": "^3.5.26",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "^5.0.8",
-    "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-service": "^5.0.8",
+    "@rushstack/eslint-patch": "^1.6.1",
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/eslint-config-standard": "^8.0.1",
+    "autoprefixer": "^10.4.23",
     "eslint": "^8.0.1",
-    "vue-i18n-loader2": "^0.1.3"
+    "terser": "^5.44.1",
+    "vite": "^7.3.0",
+    "vite-plugin-checker": "^0.8.0"
   }
 }

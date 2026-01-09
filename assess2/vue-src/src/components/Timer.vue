@@ -9,7 +9,7 @@
     </span>
     <icons v-if="open" name="close" size="small" color="subdued" />
     <span v-else class="sronly">
-      {{ $t('timer.show') }}
+      {{ $t('timer-show') }}
     </span>
   </button>
 </template>
@@ -65,7 +65,7 @@ export default {
       let remaining = Math.max(0, this.end - now);
       if (remaining === 0 && this.grace > 0) {
         remaining = Math.max(0, this.grace - now);
-        this.timeString += this.$t('timer.overtime') + ' ';
+        this.timeString += this.$t('timer-overtime') + ' ';
       }
       if (!this.gaveWarning && remaining < this.warningTime * 1000) {
         this.open = true;
@@ -79,8 +79,8 @@ export default {
         this.timeString += (this.minutes < 10 ? '0' : '') + this.minutes + ':';
         this.timeString += (this.seconds < 10 ? '0' : '') + this.seconds;
       } else {
-        this.timeString += this.hours > 0 ? this.hours + this.$tc('timer.hrs', this.hours) : '';
-        this.timeString += this.minutes > 0 ? this.minutes + this.$tc('timer.min', this.minutes) : '';
+        this.timeString += this.hours > 0 ? this.hours + this.$t('timer-hrs', {n: this.hours}) : '';
+        this.timeString += this.minutes > 0 ? this.minutes + this.$t('timer-min', {n: this.minutes}) : '';
       }
     },
     toggleShow: function () {

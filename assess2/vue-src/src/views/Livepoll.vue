@@ -16,11 +16,11 @@
       <div v-if = "isTeacher" id="livepoll_qsettings" style="flex-grow:1">
         <label>
           <input type="checkbox" v-model="showQuestion" />
-          {{ $t('livepoll.show_question') }}
+          {{ $t('livepoll-show_question') }}
         </label>
         <label>
           <input type="checkbox" v-model="showResults" />
-          {{ $t('livepoll.show_results') }}
+          {{ $t('livepoll-show_results') }}
         </label>
         <label>
           <input type="checkbox" v-model="showAnswers" @change="updateShowAnswers"/>
@@ -42,7 +42,7 @@
         {{ $t('question_n', { n: curqn+1 }) }}
       </h2>
     </div>
-    <div class="scrollpane" :aria-label="$t('regions.questions')">
+    <div class="scrollpane" :aria-label="$t('regions-questions')">
       <livepoll-settings
         class = "questionpane"
         v-if = "isTeacher && (curstate === 0 || curqn === -1)"
@@ -51,7 +51,7 @@
         class = "questionpane"
         v-if = "!isTeacher && curstate < 2"
       >
-        {{ $t('livepoll.waiting') }}
+        {{ $t('livepoll-waiting') }}
       </div>
       <question
         v-if = "curqn >= 0 && ((isTeacher && curstate>0) || (!isTeacher && curstate>1))"
@@ -135,9 +135,9 @@ export default {
     },
     showAnswersLabel () {
       if (this.curstate < 3) {
-        return this.$t('livepoll.show_answers_after');
+        return this.$t('livepoll-show_answers_after');
       } else {
-        return this.$t('livepoll.show_answers');
+        return this.$t('livepoll-show_answers');
       }
     }
   },

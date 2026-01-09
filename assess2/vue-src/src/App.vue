@@ -86,7 +86,7 @@ export default {
       } else if (!store.inProgress && Object.keys(store.work).length > 0 && !this.prewarned) {
         evt.preventDefault();
         this.prewarned = false;
-        return this.$t('unload.unsubmitted_work');
+        return this.$t('unload-unsubmitted_work');
       } else if (!store.inProgress) {
         // do nothing
       } else if (Object.keys(actions.getChangedQuestions()).length > 0 &&
@@ -94,16 +94,16 @@ export default {
       ) {
         evt.preventDefault();
         this.prewarned = false;
-        return this.$t('unload.unsubmitted_questions');
+        return this.$t('unload-unsubmitted_questions');
       } else if (store.assessInfo.submitby === 'by_assessment' &&
         store.assessInfo.has_active_attempt &&
         !this.prewarned
       ) {
         evt.preventDefault();
         if (!unanswered) {
-          return this.$t('unload.unsubmitted_done_assessment');
+          return this.$t('unload-unsubmitted_done_assessment');
         } else {
-          return this.$t('unload.unsubmitted_assessment');
+          return this.$t('unload-unsubmitted_assessment');
         }
       }
       this.prewarned = false;
@@ -133,7 +133,7 @@ export default {
       if (store.assessInfo.submitby === 'by_assessment' && store.assessInfo.has_active_attempt) {
         e.preventDefault();
         store.confirmObj = {
-          body: 'unload.unsubmitted_assessment',
+          body: 'unload-unsubmitted_assessment',
           action: () => {
             self.prewarned = true;
             window.location = e.currentTarget.href;
@@ -143,7 +143,7 @@ export default {
       } else if (!store.inProgress && Object.keys(store.work).length > 0) {
         e.preventDefault();
         store.confirmObj = {
-          body: 'unload.unsubmitted_work',
+          body: 'unload-unsubmitted_work',
           action: () => {
             self.prewarned = true;
             window.location = e.currentTarget.href;

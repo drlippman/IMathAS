@@ -1,6 +1,6 @@
 <template>
   <div id="assess-header" :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
-    role="region" :aria-label="$t('regions.aheader')"
+    role="region" :aria-label="$t('regions-aheader')"
   >
     <div style="flex-grow: 1">
       <h1>{{ ainfo.name }}</h1>
@@ -36,7 +36,7 @@
         @click = "handleSaveWork"
         :disabled = "!canSubmit"
       >
-        {{ $t('header.work_save') }}
+        {{ $t('header-work_save') }}
       </button>
       <button
         v-if = "assessSubmitLabel !== ''"
@@ -52,7 +52,7 @@
       <dropdown
         v-if="ainfo.resources.length > 0"
         id="resource-dropdown"
-        :tip = "$t('header.resources_header')"
+        :tip = "$t('header-resources_header')"
       >
         <template v-slot:button>
           <icons name="file" size="medium"/>
@@ -60,19 +60,19 @@
         <resource-pane />
       </dropdown>
 
-      <tooltip-span v-if = "showPrint" :tip="$t('print.print_version')" :hasbutton="true">
+      <tooltip-span v-if = "showPrint" :tip="$t('print-print_version')" :hasbutton="true">
         <a
           :href="printLink"
           class = "noextlink"
           target = "_blank"
-          :aria-label = "$t('print.print_version')"
+          :aria-label = "$t('print-print_version')"
         >
           <icons name="print" size="medium"/>
         </a>
       </tooltip-span>
 
       <tooltip-span
-        :tip="$t('header.use_mq')"
+        :tip="$t('header-use_mq')"
         style="display: inline-block"
         :hasbutton="true"
       >
@@ -80,7 +80,7 @@
           @click="toggleMQuse"
           role="switch"
           :class="{plain:true, 'switch-toggle':true}"
-          :aria-label="$t('header.use_mq')"
+          :aria-label="$t('header-use_mq')"
           :aria-checked="MQenabled"
         >
           <icons
@@ -95,14 +95,14 @@
         v-if="ainfo.is_lti && ainfo.lti_showmsg"
         :link="msglink"
         icon = "message"
-        label = "lti.msgs"
+        label = "lti-msgs"
         :cnt = "ainfo.lti_msgcnt"
       />
       <badged-icon
         v-if="ainfo.is_lti && ainfo.help_features.forum > 0"
         :link="forumlink"
         icon = "forum"
-        label = "lti.forum"
+        label = "lti-forum"
         :cnt = "ainfo.lti_forumcnt"
       />
       <lti-menu />
@@ -171,11 +171,11 @@ export default {
       }
       pointsEarned = Math.round(pointsEarned * 1000) / 1000;
       if (this.ainfo.in_practice) {
-        return this.$t('header.practicescore', { pts: pointsEarned, poss: pointsPossible });
+        return this.$t('header-practicescore', { pts: pointsEarned, poss: pointsPossible });
       } else if (this.ainfo.show_scores_during) {
-        return this.$t('header.score', { pts: pointsEarned, poss: pointsPossible });
+        return this.$t('header-score', { pts: pointsEarned, poss: pointsPossible });
       } else {
-        return this.$tc('header.possible', pointsPossible);
+        return this.$t('header-possible', {n: pointsPossible});
       }
     },
     qAttempted () {
@@ -189,15 +189,15 @@ export default {
     },
     curAnswered () {
       const nQuestions = this.ainfo.questions.length;
-      return this.$t('header.answered', { n: this.qAttempted, tot: nQuestions });
+      return this.$t('header-answered', { n: this.qAttempted, tot: nQuestions });
     },
     assessSubmitLabel () {
       if (this.ainfo.submitby === 'by_assessment') {
-        return this.$t('header.assess_submit');
+        return this.$t('header-assess_submit');
       } else if (this.hasShowWorkAfter && !this.ainfo.in_practice) {
-        return this.$t('work.add');
+        return this.$t('work-add');
       } else if (this.ainfo.showscores === 'during') {
-        return this.$t('header.done');
+        return this.$t('header-done');
       } else {
         return '';
       }
@@ -220,13 +220,13 @@ export default {
     },
     saveStatusMsg () {
       if (this.saveStatus === 1) {
-        return this.$t('header.work_saving');
+        return this.$t('header-work_saving');
       } else if (this.saveStatus === 2) {
-        return this.$t('header.work_saved');
+        return this.$t('header-work_saved');
       } else if (this.saveStatus === 3) {
         // Removed for now. This has the potential to be really annoying
         // and I don't think it's technically required
-        // return this.$t('header.work_save_avail');
+        // return this.$t('header-work_save_avail');
         return '';
       } else {
         return '';

@@ -1,7 +1,7 @@
 <template>
   <div>
     <span :id="'qhelp' + qn">
-      {{ $t('helps.help') }}<span class="sr-only">
+      {{ $t('helps-help') }}<span class="sr-only">
       {{ $t('question_n', {n: qn+1}) }}</span>:
     </span>
     <ul class="helplist" :aria-labelledby="'qhelp' + qn">
@@ -21,13 +21,13 @@
       <li v-if="showMessage">
         <a :href="messageHref" target="help">
           <icons name="message" />
-          {{ $t('helps.message_instructor') }}
+          {{ $t('helps-message_instructor') }}
         </a>
       </li>
       <li v-if="postToForum > 0">
         <a :href="forumHref" target="help">
           <icons name="forum" />
-          {{ $t('helps.post_to_forum') }}
+          {{ $t('helps-post_to_forum') }}
         </a>
       </li>
     </ul>
@@ -69,13 +69,13 @@ export default {
           }
           if (helps[i].label === 'video') {
             helps[i].icon = 'video';
-            helps[i].title = this.$t('helps.video');
+            helps[i].title = this.$t('helps-video');
           } else if (helps[i].label === 'read') {
             helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.read');
+            helps[i].title = this.$t('helps-read');
           } else if (helps[i].label === 'ex') {
             helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.written_example');
+            helps[i].title = this.$t('helps-written_example');
           } else {
             helps[i].icon = 'file';
             helps[i].title = helps[i].label;

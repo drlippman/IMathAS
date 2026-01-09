@@ -7,7 +7,7 @@
         {{ btnLabel }}
       </button>
       <span class="small" v-if="show && worktime !== '0'">
-        {{ $t('gradebook.lastchange')}} {{ worktime }}
+        {{ $t('gradebook-lastchange')}} {{ worktime }}
       </span>
     </div>
     <transition name="fade">
@@ -28,7 +28,7 @@ export default {
   },
   computed: {
     btnLabel () {
-      return this.$t(this.show ? 'gradebook.hidework' : 'gradebook.showwork');
+      return this.$t(this.show ? 'gradebook-hidework' : 'gradebook-showwork');
     }
   },
   methods: {

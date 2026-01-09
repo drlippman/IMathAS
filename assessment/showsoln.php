@@ -31,7 +31,7 @@ $isdiag = false;
 $useeqnhelper = false;
 $useeditor = 0;
 $isfw = false;
-$placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/index.css?v=' . $lastvueupdate . '" />';
+$placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/style.css?v=' . $lastvueupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastvueupdate . '" media="print">';
 $placeinhead .= '<style type="text/css"> #writtenexample { margin-top: 0px; } div.midwrapper > div { padding:10px;} </style>';
 $placeinhead .= '<script type="text/javascript">

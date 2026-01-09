@@ -1,8 +1,8 @@
 <template>
   <div v-show="show">
     <span :id="'fblbl'+qn">{{ !username ?
-      $t('gradebook.feedback') :
-      $t('gradebook.feedback_for', {name: username})
+      $t('gradebook-feedback') :
+      $t('gradebook-feedback_for', {name: username})
     }}</span>:<br/>
     <textarea
       v-if="canedit && !useeditor"

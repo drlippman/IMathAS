@@ -5,10 +5,10 @@
       <thead>
         <tr>
           <th>
-            {{ $t('prev.date') }}
+            {{ $t('prev-date') }}
           </th>
           <th v-if="prevAttempts[0].hasOwnProperty('score')">
-            {{ $t('prev.score') }}
+            {{ $t('prev-score') }}
           </th>
         </tr>
       </thead>
@@ -27,7 +27,7 @@
       </tbody>
     </table>
     <p v-if="showGbLink">
-      <a :href="gbUrl">{{ $t('prev.viewingb') }}</a>
+      <a :href="gbUrl">{{ $t('prev-viewingb') }}</a>
     </p>
   </div>
 </template>

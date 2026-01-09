@@ -3,8 +3,8 @@
     <caption class="sr-only">Penalties Applied</caption>
     <thead>
       <tr>
-        <th>{{ $t('qdetails.part') }}</th>
-        <th>{{ $t('penalties.applied') }}</th>
+        <th>{{ $t('qdetails-part') }}</th>
+        <th>{{ $t('penalties-applied') }}</th>
       </tr>
     </thead>
     <tbody>

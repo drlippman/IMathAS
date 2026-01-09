@@ -1,42 +1,24 @@
 // import Vue from 'vue';
-import { createI18n } from 'vue-i18n';
-import { dateTimeFormats } from './dateTimeFormats';
-import messages from './locales/en.json';
+import { FluentBundle, FluentResource } from '@fluent/bundle';
+import { createFluentVue } from 'fluent-vue';
 
-export const i18n = createI18n({
-  locale: 'en',
-  fallbackLocale: 'en',
-  messages: { en: messages },
-  dateTimeFormats
+import enMessages from './locales/en.ftl?raw';
+const enBundle = new FluentBundle('en');
+enBundle.addResource(new FluentResource(enMessages));
+export const fluent = createFluentVue({
+  bundles: [enBundle]
 });
 
-const loadedLanguages = ['en']; // our default language that is preloaded
-
-function setI18nLanguage (lang) {
-  i18n.global.locale = lang;
-  document.querySelector('html').setAttribute('lang', lang);
-  return lang;
-}
-
-function loadLanguageAsync (lang) {
-  // If the same language
-  if (i18n.locale === lang) {
-    return Promise.resolve(setI18nLanguage(lang));
-  }
-
-  // If the language was already loaded
-  if (loadedLanguages.includes(lang)) {
-    return Promise.resolve(setI18nLanguage(lang));
-  }
-
-  // If the language hasn't been loaded yet
-  return import(/* webpackChunkName: "lang-[request]" */ '@/locales/' + lang + '.json').then(
-    messages => {
-      i18n.global.setLocaleMessage(lang, messages.default);
-      loadedLanguages.push(lang);
-      return setI18nLanguage(lang);
-    }
-  );
+async function loadLanguageAsync (locale) {
+  // Dynamic import: Vite will create a separate JS chunk for each .ftl file
+  // We use '?raw' to tell Vite to import the file content as a string
+  const messages = await import(`./locales/${locale}.ftl?raw`);
+  
+  const newBundle = new FluentBundle(locale);
+  newBundle.addResource(new FluentResource(messages.default));
+  
+  // 3. Swap the bundles to trigger a global re-render
+  fluent.bundles = [newBundle, enBundle];
 }
 
 var docLang = document.getElementsByTagName('html')[0].getAttribute('lang').substring(0, 2);

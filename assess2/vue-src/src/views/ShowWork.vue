@@ -2,7 +2,7 @@
   <div class="home">
     <div class="assess-header headerpane">
       <div style="flex-grow: 1">
-        <h1>{{ $t('work.add') }}: {{ ainfo.name }}</h1>
+        <h1>{{ $t('work-add') }}: {{ ainfo.name }}</h1>
       </div>
       <timer v-if="ainfo.showwork_cutoff > 0"
         :total="ainfo.showwork_cutoff * 60"
@@ -17,10 +17,10 @@
     </div>
     <div v-if="readyToShow">
       <p v-if="ainfo.showwork_cutoff > 0">
-        {{ $tc('work.duein', {date: ainfo.showwork_cutoff_expires_disp}) }}
+        {{ $t('work-duein', {date: ainfo.showwork_cutoff_expires_disp}) }}
       </p>
       <p v-if="questions.length === 0">
-        {{ $t('work.noquestions') }}
+        {{ $t('work-noquestions') }}
       </p>
       <div v-for="(question,curqn) in questions" :key="curqn">
         <full-question-header
@@ -101,7 +101,7 @@ export default {
       return out;
     },
     saveLabel () {
-      return store.inAssess ? this.$t('work.save_continue') : this.$t('work.save');
+      return store.inAssess ? this.$t('work-save_continue') : this.$t('work-save');
     }
   },
   methods: {

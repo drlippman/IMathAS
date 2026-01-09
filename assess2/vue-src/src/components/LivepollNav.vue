@@ -1,7 +1,7 @@
 <template>
   <div class="subheader">
     <div class="flexrow" style="flex-grow:1"
-      role="navigation" :aria-label="$t('regions.qnav')"
+      role="navigation" :aria-label="$t('regions-qnav')"
     >
       <menu-button id="qnav"
         :options = "navOptions"
@@ -39,14 +39,14 @@
         v-if = "curstate === 2 && dispqn > 0"
         @click = "closeQuestion"
       >
-        {{ $t('livepoll.close_input') }}
+        {{ $t('livepoll-close_input') }}
       </button>
       <button
         class = "primary"
         v-else-if = "curstate > 0 && dispqn > 0"
         @click = "openQuestion"
       >
-        {{ $t('livepoll.open_input') }}
+        {{ $t('livepoll-open_input') }}
       </button>
       <button
         class = "secondary"
@@ -54,7 +54,7 @@
         @click = "newVersion"
       >
         <icons name="retake" />
-        {{ $t('livepoll.new_version') }}
+        {{ $t('livepoll-new_version') }}
       </button>
     </div>
     <div>
@@ -80,7 +80,7 @@ export default {
       var out = [];
       out.push({
         onclick: () => this.$emit('selectq', 0),
-        title: this.$t('livepoll.settings'),
+        title: this.$t('livepoll-settings'),
         dispqn: 0
       });
       for (const qn in store.assessInfo.questions) {
@@ -103,7 +103,7 @@ export default {
       return store.assessInfo.livepoll_status.curstate;
     },
     studentCount () {
-      return this.$tc('livepoll.stucnt', store.livepollStuCnt);
+      return this.$t('livepoll-stucnt', {n: store.livepollStuCnt});
     }
   },
   methods: {

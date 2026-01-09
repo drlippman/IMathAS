@@ -65,7 +65,7 @@ export default {
     },
     nameHover () {
       if (this.curQData.withdrawn !== 0) {
-        return this.$t('header.withdrawn');
+        return this.$t('header-withdrawn');
       } else {
         return '';
       }

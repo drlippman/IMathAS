@@ -2,7 +2,7 @@
   <div id="skip-question-header">
     <div class="flexrow wrap" style="flex-grow: 1">
       <div id="skip-question-select"
-        role="navigation" :aria-label="$t('regions.qnav')"
+        role="navigation" :aria-label="$t('regions-qnav')"
       >
           <menu-button id="qnav"
             :options = "navOptions"

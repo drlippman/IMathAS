@@ -1,15 +1,15 @@
 <template>
   <div>
     <div>
-      {{ $t('group.isgroup') }}
+      {{ $t('group-isgroup') }}
     </div>
     <div v-if = "canViewAll">
       {{ teacherNote }}
     </div>
     <div v-else-if = "groupMembers.length > 0">
-      {{ $t('group.members') }}
+      {{ $t('group-members') }}
         <span v-if = "showMax">
-          ({{ $t('group.max', {n: groupMax}) }})
+          ({{ $t('group-max', {n: groupMax}) }})
         </span>
 
       <ul class="no-margin-top">
@@ -21,20 +21,20 @@
             v-if = "member.new"
             @click = "removeMember(member.index)"
           >
-            {{ $t('group.remove') }}
+            {{ $t('group-remove') }}
           </button>
         </li>
       </ul>
     </div>
     <div v-else-if = "isPresetGroups">
-      {{ $t('group.needpreset') }}
+      {{ $t('group-needpreset') }}
     </div>
     <div v-if = "canAddMembers">
       <label for="addtogroup">
-        {{ $t('group.add') }}
+        {{ $t('group-add') }}
       </label>
       <select v-model = "newMember" id="addtogroup">
-        <option value="0">{{ $t('group.select') }}</option>
+        <option value="0">{{ $t('group-select') }}</option>
         <option
           v-for = "user in availableUsers"
           :value = "user.id"
@@ -47,7 +47,7 @@
         class="slim"
         @click = "addMember"
       >
-        {{ $t('group.addbutton') }}
+        {{ $t('group-addbutton') }}
       </button>
     </div>
   </div>
@@ -117,9 +117,9 @@ export default {
     },
     teacherNote () {
       if (this.isPresetGroups) {
-        return this.$t('group.teacher_preset');
+        return this.$t('group-teacher_preset');
       } else {
-        return this.$t('group.teacher_auto', { n: store.assessInfo.groupmax });
+        return this.$t('group-teacher_auto', { n: store.assessInfo.groupmax });
       }
     }
   },

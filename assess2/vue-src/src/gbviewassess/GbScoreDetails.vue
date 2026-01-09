@@ -14,7 +14,7 @@
       </template>
     </menu-button>
     <div v-if="canedit || (qdata.hasOwnProperty('score') && qdata.score !== 'N/A')">
-      {{ $t('gradebook.score') }}:
+      {{ $t('gradebook-score') }}:
       <span
         v-for="(poss,i) in partPoss"
         :key="i"
@@ -26,7 +26,7 @@
           :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
           pattern="N\/A|\d*\.?\d*"
           v-model="curScores[i]"
-          :aria-label="$t('gradebook.score') + (partPoss.length > 1 ? ' ' + $t('gradebook.part_n', {n:i+1}) : '')"
+          :aria-label="$t('gradebook-score') + (partPoss.length > 1 ? ' ' + $t('gradebook-part_n', {n:i+1}) : '')"
           @input="updateScore(i, $event)"
           @keyup.enter="$emit('submitform')"
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
@@ -35,7 +35,7 @@
           class="plain nopad"
           @click="showRubric(i)"
         >
-          <icons name="clipboard" alt="icons.rubric" size="small" />
+          <icons name="clipboard" alt="icons-rubric" size="small" />
         </button>
         <button
           v-if="canedit && !isPractice && qdata.rubric > 0"
@@ -44,7 +44,7 @@
           @click="showRubric(i)"
           :id="'rublink-scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
         >
-          <icons name="clipboard" alt="icons.rubric" size="small" />
+          <icons name="clipboard" alt="icons-rubric" size="small" />
         </button>
       </span>
       <button
@@ -61,7 +61,7 @@
         @click="manualFull"
         class="slim"
       >
-        {{ $t('gradebook.full_manual_parts') }}
+        {{ $t('gradebook-full_manual_parts') }}
       </button>
       <button
         v-if="canedit && !isPractice && showfeedback === false"
@@ -69,7 +69,7 @@
         class="slim"
         @click="revealFeedback"
       >
-        {{ $t('gradebook.add_feedback') }}
+        {{ $t('gradebook-add_feedback') }}
       </button>
     </div>
     <gb-feedback
@@ -84,11 +84,11 @@
 
     <div v-if="showfull">
       <span v-if="qdata.timeactive.total > 0">
-        {{ $t('gradebook.time_on_version') }}:
+        {{ $t('gradebook-time_on_version') }}:
         {{ timeSpent }}.
       </span>
       <span v-if="qdata.lastchange">
-        {{ $t('gradebook.lastchange') }}
+        {{ $t('gradebook-lastchange') }}
         {{ qdata.lastchange }}.
       </span>
       <button
@@ -97,7 +97,7 @@
         class="slim"
         @click="showAllTries = !showAllTries"
       >
-        {{ $t('gradebook.show_tries') }}
+        {{ $t('gradebook-show_tries') }}
       </button>
       <button
         v-if="hasPenalties"
@@ -105,7 +105,7 @@
         class="slim"
         @click="showPenalties = !showPenalties"
       >
-        {{ $t('gradebook.show_penalties') }}
+        {{ $t('gradebook-show_penalties') }}
       </button>
       <button
         v-if="hasAutoSaves"
@@ -113,7 +113,7 @@
         class="slim"
         @click="showAutosaves = !showAutosaves"
       >
-        {{ $t('gradebook.show_autosaves') }}
+        {{ $t('gradebook-show_autosaves') }}
       </button>
     </div>
     <gb-all-tries
@@ -135,7 +135,7 @@
       :qn="qn"
     />
     <div v-if="showfull && qHelps.length > 0">
-      {{ $t('gradebook.had_help') }}:
+      {{ $t('gradebook-had_help') }}:
       <a v-for="(help,idx) in qHelps"
         :key="idx"
         :href="help.url"
@@ -143,17 +143,17 @@
       >{{ help.title }}</a>
     </div>
     <div v-if="qdata.category">
-      {{ $t('qdetails.category') }}:
+      {{ $t('qdetails-category') }}:
       {{ qdata.category }}
     </div>
     <div>
       <a :href="messageHref" target="help" v-if="showMessage">
         <icons name="message" />
-        {{ $t('helps.message_instructor') }}
+        {{ $t('helps-message_instructor') }}
       </a>
       <a :href="forumHref" target="help" v-if="postToForum > 0">
         <icons name="forum" />
-        {{ $t('helps.post_to_forum') }}
+        {{ $t('helps-post_to_forum') }}
       </a>
     </div>
   </div>
@@ -161,11 +161,11 @@
 
 <script>
 import { store, actions } from './gbstore';
-import GbAllTries from '@/gbviewassess/GbAllTries';
-import GbPenalties from '@/gbviewassess/GbPenalties';
-import Icons from '@/components/widgets/Icons';
-import MenuButton from '@/components/widgets/MenuButton';
-import GbFeedback from '@/gbviewassess/GbFeedback';
+import GbAllTries from '@/gbviewassess/GbAllTries.vue';
+import GbPenalties from '@/gbviewassess/GbPenalties.vue';
+import Icons from '@/components/widgets/Icons.vue';
+import MenuButton from '@/components/widgets/MenuButton.vue';
+import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 
 export default {
   name: 'GbScoreDetails',
@@ -208,13 +208,13 @@ export default {
     },
     fullCreditLabel () {
       if (this.answeights.length > 1) {
-        return this.$t('gradebook.full_credit_parts');
+        return this.$t('gradebook-full_credit_parts');
       } else {
-        return this.$t('gradebook.full_credit');
+        return this.$t('gradebook-full_credit');
       }
     },
     timeSpent () {
-      const out = Math.round(10 * this.qdata.timeactive.total / 60) / 10 + ' ' + this.$t('gradebook.minutes');
+      const out = Math.round(10 * this.qdata.timeactive.total / 60) / 10 + ' ' + this.$t('gradebook-minutes');
       // TODO: Add per-try average?
       return out;
     },
@@ -268,29 +268,29 @@ export default {
         '&quoteq=' + quoteq + '&to=' + store.uid;
       return store.APIbase + '../msgs/msglist.php?' + qs;
       // TODO: get GB to work for this.
-      // window.GB_show(this.$t('gradebook.send_msg'),
+      // window.GB_show(this.$t('gradebook-send_msg'),
       //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
     },
     moreOptions () {
       const out = [
         {
-          label: this.$t('gradebook.use_in_msg'),
+          label: this.$t('gradebook-use_in_msg'),
           link: this.useInMsg
         },
         {
-          label: this.$t('gradebook.view_edit') + ' ID ' + this.qdata.qsetid + ' Seed ' + this.qdata.seed,
+          label: this.$t('gradebook-view_edit') + ' ID ' + this.qdata.qsetid + ' Seed ' + this.qdata.seed,
           link: this.questionEditUrl
         },
         {
           label: (store.assessInfo.hasOwnProperty('qerrortitle')
             ? store.assessInfo.qerrortitle
-            : this.$t('gradebook.msg_owner')),
+            : this.$t('gradebook-msg_owner')),
           link: this.questionErrorUrl
         }
       ];
       if (!this.isPractice && this.isLastVersion) {
         out.push({
-          label: this.$t('gradebook.clear_qwork'),
+          label: this.$t('gradebook-clear_qwork'),
           onclick: () => this.clearWork()
         });
       }
@@ -331,13 +331,13 @@ export default {
         for (const i in helps) {
           if (helps[i].label === 'video') {
             helps[i].icon = 'video';
-            helps[i].title = this.$t('helps.video');
+            helps[i].title = this.$t('helps-video');
           } else if (helps[i].label === 'read') {
             helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.read');
+            helps[i].title = this.$t('helps-read');
           } else if (helps[i].label === 'ex') {
             helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.written_example');
+            helps[i].title = this.$t('helps-written_example');
           } else {
             helps[i].icon = 'file';
             helps[i].title = helps[i].label;

@@ -5,10 +5,10 @@
     </caption>
     <thead>
       <tr>
-        <th>{{ $t('qdetails.part') }}</th>
-        <th v-if="showScore">{{ $t('qdetails.score') }}</th>
-        <th v-if="doShowTries">{{ $t('qdetails.try') }}</th>
-        <th v-if="hasPenalty">{{ $t('qdetails.penalties') }}</th>
+        <th>{{ $t('qdetails-part') }}</th>
+        <th v-if="showScore">{{ $t('qdetails-score') }}</th>
+        <th v-if="doShowTries">{{ $t('qdetails-try') }}</th>
+        <th v-if="hasPenalty">{{ $t('qdetails-penalties') }}</th>
       </tr>
     </thead>
     <tbody>

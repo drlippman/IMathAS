@@ -49,10 +49,10 @@ export default {
       return this.$t(this.data.body);
     },
     okMessage () {
-      return this.$t(this.data.ok ? this.data.ok : 'confirm.ok');
+      return this.$t(this.data.ok ? this.data.ok : 'confirm-ok');
     },
     cancelMessage () {
-      return this.$t(this.data.cancel ? this.data.cancel : 'confirm.cancel');
+      return this.$t(this.data.cancel ? this.data.cancel : 'confirm-cancel');
     }
   },
   methods: {

@@ -1,6 +1,6 @@
 <template>
   <div v-if="showGBScore" class="pane-header">
-    <strong>{{ $t('summary.recordedscore') }}: {{ gbScore }}%</strong>
+    <strong>{{ $t('summary-recordedscore') }}: {{ gbScore }}%</strong>
     <br/>
     <span class="small subdued">
       {{ scoreUsed }}
@@ -19,19 +19,19 @@ export default {
     },
     scoreUsed () {
       if (this.ainfo.scored_attempt.kept === 'override') {
-        return this.$t('summary.use_override');
+        return this.$t('summary-use_override');
       } else if (this.ainfo.keepscore === 'best' &&
           this.ainfo.submitby === 'by_assessment'
       ) {
-        return this.$t('setlist.keep_highest');
+        return this.$t('setlist-keep_highest');
       } else if (this.ainfo.keepscore === 'best' &&
           this.ainfo.submitby === 'by_question'
       ) {
-        return this.$t('setlist.keep_highest_q');
+        return this.$t('setlist-keep_highest_q');
       } else if (this.ainfo.keepscore === 'average') {
-        return this.$t('setlist.keep_average');
+        return this.$t('setlist-keep_average');
       } else if (this.ainfo.keepscore === 'last') {
-        return this.$t('setlist.keep_last');
+        return this.$t('setlist-keep_last');
       } else {
         return '';
       }

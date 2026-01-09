@@ -97,7 +97,7 @@ ul.vuetablist li {
   display: inline-block;
   margin-bottom: -1px;
   background-color: #ddd;
-  color: #666;
+  color: #555;
   padding: 4px 8px;
   border: 1px solid #ccc;
   cursor: default;

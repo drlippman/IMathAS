@@ -10,7 +10,7 @@
       role="region"
       ref="scrollpane"
       tabindex="-1"
-      :aria-label="$t('regions.questions')"
+      :aria-label="$t('regions-questions')"
     >
       <intro-text
         :active = "qn == -1"
@@ -30,7 +30,7 @@
           role="link"
         >
           <icons name="right" alt=""/>
-          {{ $t('question.firstq') }}
+          {{ $t('question-firstq') }}
         </button>
       </router-link>
       <inter-question-text-skiplist

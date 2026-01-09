@@ -3,8 +3,8 @@
     <caption class="sr-only">Category Scores</caption>
     <thead>
       <tr>
-        <th>{{ $t('catlist.category') }}</th>
-        <th>{{ $t('catlist.score') }}</th>
+        <th>{{ $t('catlist-category') }}</th>
+        <th>{{ $t('catlist-score') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -15,7 +15,7 @@
       <td>
         {{ cat.pct }}%
         <span class="subdued med-left">
-          {{ $tc('catlist.pts', cat.poss, {pts: cat.tot, poss: cat.poss}) }}
+          {{ $t('catlist-pts', {pts: cat.tot, poss: cat.poss}) }}
         </span>
       </td>
     </tr>

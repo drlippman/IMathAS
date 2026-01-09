@@ -6,28 +6,28 @@
       v-if="expanded"
     >
       <p v-if="showScores">
-        {{ $t('scoreresult.scorelast') }}
+        {{ $t('scoreresult-scorelast') }}
         <strong>
-          {{ $tc('scoreresult.scorepts', qdata.points_possible, {
-            pts: qdata.score, poss: qdata.points_possible }) }}.
+          {{ $t('scoreresult-scorepts',
+            {pts: qdata.score, poss: qdata.points_possible }) }}.
         </strong>
-        {{ $t('scoreresult.see_details') }}
+        {{ $t('scoreresult-see_details') }}
       </p>
       <p v-else>
-        {{ $t('scoreresult.submitted') }}
+        {{ $t('scoreresult-submitted') }}
       </p>
       <p v-if="hasManualScore">
         <icons name="info"/>
-        {{ $t('scoreresult.manual_grade') }}
+        {{ $t('scoreresult-manual_grade') }}
       </p>
       <p v-if="showScores && status.general !== 'correct' && status.partcount > 1 && (status.firstincorrect > -1 || status.untried > 0)">
         {{ partStatusMessage }}
         <a v-if="status.firstincorrect > -1"
           href="#" @click.prevent="jumpToIncorrect">
-          {{ $t('scoreresult.jumptoincorrect') }}.
+          {{ $t('scoreresult-jumptoincorrect') }}.
         </a>
         <a v-if="status.untried > 0" href="#" @click.prevent="jumpToLastTried">
-          {{ $t('scoreresult.jumptolast') }}.
+          {{ $t('scoreresult-jumptolast') }}.
         </a>
       </p>
       <p v-if="showRetryButtons">
@@ -44,7 +44,7 @@
             role="link"
           >
             <icons name="right" alt="" />
-            {{ $t('scoreresult.next') }}
+            {{ $t('scoreresult-next') }}
           </button>
         </router-link>
         <button
@@ -53,7 +53,7 @@
           class = "primary"
           @click = "submitAssess"
         >
-          {{ $t('header.assess_submit') }}
+          {{ $t('header-assess_submit') }}
         </button>
         <button
           v-if = "qdata.canregen"
@@ -61,10 +61,10 @@
           @click = "trySimilar"
         >
           <icons name="retake" alt="" />
-          {{ $t('scoreresult.trysimilar') }}
+          {{ $t('scoreresult-trysimilar') }}
         </button>
         <span v-if = "qdata.canretry_primary">
-          {{ $t('scoreresult.retryq') }}
+          {{ $t('scoreresult-retryq') }}
         </span>
       </p>
     </div>
@@ -170,9 +170,9 @@ export default {
       // if multipart and should show details;
       if (this.status.partcount > 1 && this.status.general !== 'neutral') {
         if (this.status.firstincorrect === -2) {
-          return this.$t('scoreresult.allpartscorrect');
+          return this.$t('scoreresult-allpartscorrect');
         } else {
-          return this.$t('scoreresult.onepartincorrect');
+          return this.$t('scoreresult-onepartincorrect');
         }
       }
       return '';

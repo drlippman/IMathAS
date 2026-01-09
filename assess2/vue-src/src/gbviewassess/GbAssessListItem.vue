@@ -2,7 +2,7 @@
   <span>
     <strong>{{ attemptNum }}. </strong>
     <span v-if="option.hasOwnProperty('score') && option.score !== 'N/A'">
-      {{ $t('gradebook.score') }}:
+      {{ $t('gradebook-score') }}:
       <strong>{{ score }}</strong>. </span>
     <span v-if="option.hasOwnProperty('status')">
       {{ verStatus }}
@@ -19,24 +19,24 @@ export default {
   computed: {
     attemptNum () {
       if (this.option.status === 3) {
-        return this.$t('gradebook.practice_attempt');
+        return this.$t('gradebook-practice_attempt');
       } else if (this.submitby === 'by_question') {
-        return this.$t('gradebook.scored_attempt');
+        return this.$t('gradebook-scored_attempt');
       } else {
-        return this.$tc('gradebook.attempt_n', this.option.ver + 1);
+        return this.$t('gradebook-attempt_n', {n: this.option.ver + 1});
       }
     },
     verStatus () {
       if (this.option.status === -1) {
-        return this.$t('gradebook.not_started');
+        return this.$t('gradebook-not_started');
       } else if (this.option.status === 0 && this.submitby === 'by_assessment') {
-        return this.$t('gradebook.not_submitted');
+        return this.$t('gradebook-not_submitted');
       } else if (this.option.status === 1 || this.option.status === 2) {
         let out = '';
         if (this.submitby === 'by_question') {
-          out += this.$t('gradebook.lastchange');
+          out += this.$t('gradebook-lastchange');
         } else {
-          out += this.$t('gradebook.submitted');
+          out += this.$t('gradebook-submitted');
         }
         out += ' ' + this.option.lastchange_disp;
         return out;

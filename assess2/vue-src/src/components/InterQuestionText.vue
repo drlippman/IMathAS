@@ -10,12 +10,12 @@
   <button
     type = "button"
     :class = "{plain: true, floatright: expanded, togglebtn: true}"
-    :aria-label = "expanded ? $t('text.hide') : $t('text.show')"
+    :aria-label = "expanded ? $t('text-hide') : $t('text-show')"
     :aria-expanded = "expanded ? 'true' : 'false'"
     @click = "expanded = !expanded"
   >
     <icons v-if="expanded" name="close" />
-    <span v-else>{{ $t('text.show') }}</span>
+    <span v-else>{{ $t('text-show') }}</span>
   </button>
 
 </div>

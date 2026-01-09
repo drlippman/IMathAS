@@ -17,7 +17,7 @@
         @click = "trySimilar"
       >
         <icons name="retake" alt="" />
-        {{ $t('scoreresult.trysimilar') }}
+        {{ $t('scoreresult-trysimilar') }}
       </button>
     </div>
     <p
@@ -25,7 +25,7 @@
       class="noticetext"
     >
       <icons name="alert" color="warn" size="medium" />
-      {{ $t('question.withdrawn') }}
+      {{ $t('question-withdrawn') }}
     </p>
     <div v-if = "errorsToShow.length > 0" class="small">
       <ul>
@@ -51,7 +51,7 @@
         v-if = "getwork !== 2"
         @click = "showWorkInput = !showWorkInput"
       >
-        {{ showWorkInput ? $t('work.hide') : $t('work.add') }}
+        {{ showWorkInput ? $t('work-hide') : $t('work-add') }}
       </button>
       <div v-show="getwork === 2 || showWorkInput">
         <showwork-input
@@ -85,7 +85,7 @@
         class = "secondary"
         :disabled = "!canSubmit"
       >
-        {{ $t('question.jump_to_answer') }}
+        {{ $t('question-jump_to_answer') }}
       </button>
     </div>
     <div v-else-if="showNext"  class="submitbtnwrap">
@@ -103,7 +103,7 @@
           :disabled = "!canSubmit"
         >
           <icons name="right" />
-          {{ $t('question.next') }}
+          {{ $t('question-next') }}
         </button>
       </router-link>
     </div>
@@ -203,7 +203,7 @@ export default {
       return store.assessInfo.show_results;
     },
     submitLabel () {
-      let label = 'question.';
+      let label = 'question-';
       if (store.assessInfo.submitby === 'by_question') {
         // by question submission
         label += 'submit';
@@ -268,7 +268,7 @@ export default {
     },
     jumpToAnswer () {
       store.confirmObj = {
-        body: 'question.jump_warn',
+        body: 'question-jump_warn',
         action: () => actions.loadQuestion(this.qn, false, true)
       };
     },
@@ -378,7 +378,7 @@ export default {
             el.disabled = true;
           }
         });
-      };
+      }
 
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ, this.$refs.thisqwrap);
       setTimeout(window.sendLTIresizemsg, 100);

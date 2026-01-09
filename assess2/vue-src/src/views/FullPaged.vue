@@ -10,7 +10,7 @@
       role="region"
       ref="scrollpane"
       tabindex="-1"
-      :aria-label="$t('regions.questions')"
+      :aria-label="$t('regions-questions')"
     >
       <intro-text
         :active = "page === -1 && hasIntro"
@@ -72,7 +72,7 @@
           <router-link
             :to="'/full/page/'+ (page+2)"
           >
-            {{ $t('pages.next') }}
+            {{ $t('pages-next') }}
           </router-link>
         </p>
       </div>
@@ -82,7 +82,7 @@
           class = "primary"
           @click = "submitAssess"
         >
-          {{ $t('header.assess_submit') }}
+          {{ $t('header-assess_submit') }}
         </button>
       </p>
     </div>

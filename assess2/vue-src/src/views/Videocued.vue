@@ -24,7 +24,7 @@
       role="region"
       ref="scrollpane"
       tabindex="-1"
-      :aria-label="$t('regions.q_and_vid')"
+      :aria-label="$t('regions-q_and_vid')"
     >
       <intro-text
         :active = "cue == -1"

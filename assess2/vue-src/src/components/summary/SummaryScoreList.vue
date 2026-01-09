@@ -3,8 +3,8 @@
     <caption class="sr-only">Scores</caption>
     <thead>
       <tr>
-        <th>{{ $t('scorelist.question') }}</th>
-        <th>{{ $t('scorelist.score') }}</th>
+        <th>{{ $t('scorelist-question') }}</th>
+        <th>{{ $t('scorelist-score') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -17,11 +17,12 @@
         </em>
       </td>
       <td v-if="noTries[index]">
-        {{ $t('scorelist.unattempted') }}
+        {{ $t('scorelist-unattempted') }}
       </td>
       <td v-else>
-        {{ $tc('scorelist.pts', question.points_possible,
-              {pts: question.gbscore, poss: question.points_possible}) }}
+        {{ $t('scorelist-pts', {
+          pts: question.gbscore, 
+          poss: question.points_possible}) }}
         &nbsp;&nbsp;
         <click-to-show
           v-if = "question.has_details"
@@ -30,7 +31,7 @@
         >
           <template v-slot:button>
             <icons name="info" size="small"/>
-            {{ $t('header.details') }}
+            {{ $t('header-details') }}
           </template>
           <question-details-table
             :qinfo="question"
