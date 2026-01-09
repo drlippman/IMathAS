@@ -256,7 +256,7 @@ if ($what === 'cid') {
                     } else if ($vidid !== '') {
                         if (!$gaveerrorthisquestion) {
                             // it's a video, don't have captions, give error once
-                            adderror(1, _('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+                            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
                                 _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
                                 "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
                             $gaveerrorthisquestion = true;
@@ -311,7 +311,7 @@ if ($what === 'cid') {
             null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $row['a11yalt']!=0, null, $thiserrorlevel);
         if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
-            adderror(1, _('Uncaptioned video'), sprintf(_('Question ID %d'), $row['id']), 
+            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
                 null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
         }
     }
