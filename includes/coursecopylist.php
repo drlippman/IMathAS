@@ -98,11 +98,6 @@ if (isset($_POST['cidlookup'])) {
 	$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 	if ($stm->rowCount()>0) {
 		$page_hasGroups=true;
-		$grpout[] = [
-			'id'=>'grpid0',
-			'label'=>_("Default Group"),
-			'childrenUrl'=>"$imasroot/includes/coursecopylist.php?cid=$cid&loadothergroup=0"
-		];
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['id']==$groupid) {continue;}
 				$grpout[] = [
@@ -111,6 +106,11 @@ if (isset($_POST['cidlookup'])) {
 				'childrenUrl'=>"$imasroot/includes/coursecopylist.php?cid=$cid&loadothergroup=".$row['id']
 			];
 		}
+		$grpout[] = [
+			'id'=>'grpid0',
+			'label'=>_("Default Group"),
+			'childrenUrl'=>"$imasroot/includes/coursecopylist.php?cid=$cid&loadothergroup=0"
+		];
 	}
 	echo json_encode($grpout, JSON_INVALID_UTF8_IGNORE);
 	exit;
@@ -118,7 +118,12 @@ if (isset($_POST['cidlookup'])) {
 } else if (isset($_GET['loadothergroup'])) {
 
 	$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu  WHERE ";
-	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 AND ic.copyrights>-1 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
+	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 AND ic.copyrights>-1 ";
+	if ($_GET['loadothergroup'] == 0) {
+		// add extra filter to bypass students in group 0
+		$query .= "AND iu.rights>19 ";
+	}
+	$query .= "ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 	$courseGroupResults = $DBH->prepare($query);
 	$courseGroupResults->execute(array(':groupid'=>$_GET['loadothergroup'], ':userid'=>$userid));
 
