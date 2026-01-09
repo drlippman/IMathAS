@@ -156,7 +156,7 @@
 	}
     $(function () {
         $("input[type=text][id^=score]").on('keyup', function() {
-            var visel = $("input[type=text][id^=score]:visible");
+            var visel = $(".forumgrp > div:not(.pseudohidden) input[type=text][id^=score]:visible");
             var idx = visel.index(this);
             if (idx != -1) {
                 if (event.which == 38 && idx > 0) { 
@@ -165,6 +165,7 @@
                     idx++;
                 }
                 visel[idx].focus();
+				$(visel[idx]).closest('.initialpost,.reply')[0].scrollIntoView();
             }
         }).on('keypress', function() {
             if (event.which == 13) { event.preventDefault(); }
