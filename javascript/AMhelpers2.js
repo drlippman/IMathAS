@@ -995,8 +995,11 @@ function showSyntaxCheckMQ(qn) {
   }
   if (document.getElementById("qn"+qn)) {
     var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
-    var mf = MQ.MathField(document.getElementById("mqinput-qn"+qn));
-    mf.setAriaPostLabel(outerr, 5);
+    var mqel = document.getElementById("mqinput-qn"+qn);
+    if (mqel.className.indexOf('disabled') == -1) {
+      var mf = MQ.MathField(mqel);
+      mf.setAriaPostLabel(outerr, 5);
+    }
   } else {
     a11ypreview(outstr);
   }
