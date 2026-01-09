@@ -1876,6 +1876,7 @@ function setCookie(name, value, expires) {
       if (!$parent.hasClass('open')) return
 
       if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+	  if (e && e.type == 'click' && e.target.tagName != 'A' && $(e.target).closest('.dropdown-menu').length) return
 
       $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
 

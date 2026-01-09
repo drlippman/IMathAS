@@ -756,7 +756,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
             </button>
 
             <div class="dropdown-menu dropdown-menu-right advsearch">
-                <form class="mform" id="advsearchform">
+                <div class="mform" id="advsearchform">
                     <div><label for="search-words"><?php echo _('Has words');?>:</label>
                         <input id="search-words"/></div>
                     <div><label for="search-exclude"><?php echo _('Doesn\'t have');?>:</label> 
@@ -867,7 +867,7 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
                             <?php echo _('Search');?>
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
