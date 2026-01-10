@@ -392,7 +392,7 @@ if (isset($CFG['YouTubeAPIKey'])) {
 }
 echo '<p>'._('Note: Blank alt text can be valid, but should only be used to indicate a decorative image, one that does not add information to the page. For example, if the same information in the image is also included in adjacent text.').'</p>';
 
-if (count($qidswithuncaptioned)>0) {
+if (isset($qidswithuncaptioned) && count($qidswithuncaptioned)>0) {
     $qidswithuncaptioned = array_values(array_unique($qidswithuncaptioned));
     echo '<form method=post>';
     echo '<input type=hidden name=qidtodisable value="'.implode(',', $qidswithuncaptioned).'">';
@@ -431,16 +431,26 @@ function outputerrortable($errorlevel) {
         if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
         //[$descr, $loc, $itemtype,$itemname, $link, $link2];
         echo '<td>'.Sanitize::encodeStringForDisplay($error[0]).'</td>';
-        echo '<td>';
-        if (!empty($error[4])) {
-            echo '<a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[4]) . '" target="_blank">';
-        }
-        echo Sanitize::encodeStringForDisplay($error[1]);
-        if (!empty($error[4])) {
-            echo '</a>';
-        }
-        echo '</td>';
-        if ($what !== 'myqs') {
+        if ($what == 'myqs') {
+             echo '<td>';
+            if (!empty($error[5])) {
+                echo '<a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[5]) . '" target="_blank">';
+            }
+            echo Sanitize::encodeStringForDisplay($error[1]);
+            if (!empty($error[5])) {
+                echo '</a>';
+            }
+            echo '</td>';
+        } else {
+            echo '<td>';
+            if (!empty($error[4])) {
+                echo '<a href="' . Sanitize::encodeStringForDisplay($basesiteurl . '/' . $error[4]) . '" target="_blank">';
+            }
+            echo Sanitize::encodeStringForDisplay($error[1]);
+            if (!empty($error[4])) {
+                echo '</a>';
+            }
+            echo '</td>';
             echo '<td>';
             echo Sanitize::encodeStringForDisplay($error[2]);
             echo '</td><td>';
