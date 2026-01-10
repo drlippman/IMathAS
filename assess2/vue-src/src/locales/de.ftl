@@ -559,6 +559,8 @@ gradebook-hide_nonzero = 0 < Punktzahl < 100 % (vor Abzügen)
 gradebook-hide_zero = Punktzahl = 0
 gradebook-hide_fb = Fragen mit Feedback
 gradebook-hide_nowork = Fragen ohne Arbeit
+# checkme
+gradebook-hide_unans = Unbeantwortete Fragen
 gradebook-show_unans = Unbeantwortete Fragen einblenden
 gradebook-quick_grade = Schnell-Bewertung
 gradebook-saving = Speichere...
