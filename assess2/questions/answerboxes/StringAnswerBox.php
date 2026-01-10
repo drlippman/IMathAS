@@ -105,7 +105,7 @@ class StringAnswerBox implements AnswerBox
             }
             $attributes = [
                 'type' => 'text',
-                'size' => $answerboxsize,
+                'style' => 'width:'.sizeToCSS($answerboxsize),
                 'name' => "qn$qn",
                 'id' => "qn$qn",
                 'value' => $la,
