@@ -136,6 +136,7 @@ function adderror($errorlevel,$descr, $loc, $itemtype, $itemname, $link, $link2 
     $errors[$errorlevel][] = [$descr, $loc, $itemtype, $itemname, $link2, $link];
 }
 
+$extrefissues = [];
 if ($what === 'cid') {
     $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=?");
     $stm->execute([$cid]);
@@ -194,7 +195,7 @@ if ($what === 'cid') {
         GROUP BY iqs.id,ia.id';
     $stm = $DBH->prepare($query);
     $stm->execute([$cid]);
-    $extrefissues = [];
+    
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if ($row['negative_reviews']>0) {
             $thiserrorlevel = 2;
@@ -212,64 +213,6 @@ if ($what === 'cid') {
              ($row['showhints'] == -1 && ($row['hintsdef']&2)==2))
         ) {
             $extrefissues[] = $row;
-        }
-    }
-
-    // get uncaptioned videos 
-    $vidstocheck=[];
-    foreach ($extrefissues as $row) {
-        $extrefs = explode('~~', $row['extref']);
-        foreach ($extrefs as $v) {
-            $parts = explode('!!', $v);
-            if (count($parts)>2 && $parts[2] == 0) { // not captioned
-                $vidid = getvideoid($parts[1]);
-                if ($vidid !== '') {
-                    $vidstocheck[] = $vidid;
-                }
-            }
-        }
-    }
-    $qidswithuncaptioned = [];
-    // pull caption data from database for those videos
-    if (count($vidstocheck)>0) {
-        $vidstocheck = array_values(array_unique($vidstocheck));
-        $ph = Sanitize::generateQueryPlaceholders($vidstocheck);
-        $stm = $DBH->prepare("SELECT vidid,captioned FROM imas_captiondata WHERE vidid IN ($ph) AND status>0 AND status<3");
-        $stm->execute($vidstocheck);
-        $captiondata = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
-        // now loop back over the extref issues and see if we have updated caption info
-        foreach ($extrefissues as $row) {
-            $gaveerrorthisquestion = false;
-            $updatedextref = false;
-            $extrefs = explode('~~', $row['extref']);
-            //loop over each extref
-            foreach ($extrefs as $k=>$v) {
-                $parts = explode('!!', $v);
-                if (count($parts)>2 && $parts[2] == 0) { // not captioned, but might not be video
-                    $vidid = getvideoid($parts[1]);
-                    if ($vidid !== '' && !empty($captiondata[$vidid])) {
-                        // it's a video, and we know it's captioned from captiondata database
-                        // update extref
-                        $parts[2] = 1;
-                        $extrefs[$k] = implode('!!', $parts);
-                        $updatedextref = true;
-                    } else if ($vidid !== '') {
-                        if (!$gaveerrorthisquestion) {
-                            // it's a video, don't have captions, give error once
-                            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
-                                _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
-                                "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
-                            $gaveerrorthisquestion = true;
-                        }
-                        $qidswithuncaptioned[] = $row['qid'];
-                    }
-                }
-            }
-            // if we updated extrefs, update database
-            if ($updatedextref) {
-                $stm = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
-                $stm->execute([implode('~~', $extrefs), $row['id']]);
-            }
         }
     }
 
@@ -311,8 +254,7 @@ if ($what === 'cid') {
             null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $row['a11yalt']!=0, null, $thiserrorlevel);
         if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
-            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
-                null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+            $extrefissues[] = $row;
         }
     }
 
@@ -326,6 +268,73 @@ if ($what === 'cid') {
         if (trim($row['alttext']) == '') {
             adderror(1, _('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
                 null, null , "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+        }
+    }
+}
+
+// get uncaptioned videos 
+$vidstocheck=[];
+foreach ($extrefissues as $row) {
+    $extrefs = explode('~~', $row['extref']);
+    foreach ($extrefs as $v) {
+        $parts = explode('!!', $v);
+        if (count($parts)>2 && $parts[2] == 0) { // not captioned
+            $vidid = getvideoid($parts[1]);
+            if ($vidid !== '') {
+                $vidstocheck[] = $vidid;
+            }
+        }
+    }
+}
+
+$qidswithuncaptioned = [];
+// pull caption data from database for the videos flagged as uncaptioned in extref
+if (count($vidstocheck)>0) {
+    $vidstocheck = array_values(array_unique($vidstocheck));
+    $ph = Sanitize::generateQueryPlaceholders($vidstocheck);
+    $stm = $DBH->prepare("SELECT vidid,captioned FROM imas_captiondata WHERE vidid IN ($ph) AND status>0 AND status<3");
+    $stm->execute($vidstocheck);
+    $captiondata = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
+    // now loop back over the extref issues and see if we have updated caption info
+    foreach ($extrefissues as $row) {
+        $gaveerrorthisquestion = false;
+        $updatedextref = false;
+        $extrefs = explode('~~', $row['extref']);
+        //loop over each extref
+        foreach ($extrefs as $k=>$v) {
+            $parts = explode('!!', $v);
+            if (count($parts)>2 && $parts[2] == 0) { // not captioned, but might not be video
+                $vidid = getvideoid($parts[1]);
+                if ($vidid !== '' && !empty($captiondata[$vidid])) {
+                    // it's a video, and we know it's captioned from captiondata database
+                    // update extref
+                    $parts[2] = 1;
+                    $extrefs[$k] = implode('!!', $parts);
+                    $updatedextref = true;
+                } else if ($vidid !== '') {
+                    if (!$gaveerrorthisquestion) {
+                        // it's a video, don't have captions, give error once
+                        if ($what === 'myqs') {
+                            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
+                                null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+
+                        } else {
+                            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
+                                _('Assessment'), $row['name'], 
+                                "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
+                                "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
+                            $qidswithuncaptioned[] = $row['qid'];
+                        }
+                        // since we're listing IDs now, go ahead and list them all
+                        // $gaveerrorthisquestion = true;
+                    }
+                }
+            }
+        }
+        // if we updated extrefs, update database
+        if ($updatedextref) {
+            $stm = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
+            $stm->execute([implode('~~', $extrefs), $row['id']]);
         }
     }
 }
@@ -417,6 +426,12 @@ if (count($errors[0])>0) {
 
 function outputerrortable($errorlevel) {
     global $what, $errors, $basesiteurl;
+
+    if ($what === 'myqs') {
+        usort($errors[$errorlevel], function($a, $b) {
+            return strnatcmp($a[1], $b[1]);
+        });
+    } 
     //echo '<ul>';
     echo '<table class=gb id=errortable'.$errorlevel.'><thead><tr>';
     echo '<th>'._('Issue').'</th>';
