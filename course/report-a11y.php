@@ -239,7 +239,7 @@ if ($what === 'cid') {
     COUNT(CASE WHEN iar.review=0 THEN 1 END) AS negative_reviews
     FROM imas_questionset AS iqs 
     LEFT JOIN imas_a11yreviews AS iar ON iar.qsetid=iqs.id
-    WHERE iqs.ownerid=? GROUP BY iqs.id';
+    WHERE iqs.ownerid=? AND iqs.deleted=0 GROUP BY iqs.id';
     $stm = $DBH->prepare($query);
     $stm->execute([$userid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
