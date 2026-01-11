@@ -27,6 +27,8 @@ VUE_APP_PROXY=http://localhost
 If you have an `imasroot` set in your config.php other than the root directory,
 append it to the address (no trailing slash) for VUE_APP_IMASROOT only.
 
+You should set these .env.local variables, even if you're just building for production.
+
 Note you will also have to disable `$CFG['use_csrfp']` when using the above
 option.
 
@@ -49,15 +51,10 @@ npm run dev
 npm run build
 ```
 If you modify any of the external javascript, be sure to also run this to
-rebuild minified javascript files.  You may want to edit index.php to change
-the v= date to force reload.
+rebuild minified javascript files.  You should also edit init.php to change
+the <code>$lastvueupdate</code> string to force reload.
 ```
 ./buildmin.sh
-```
-
-### Run your tests
-```
-npm run test
 ```
 
 ### Lints and fixes files
@@ -65,5 +62,3 @@ npm run test
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
