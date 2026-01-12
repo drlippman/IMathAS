@@ -204,7 +204,7 @@ if ($what === 'cid') {
         } else {
             $thiserrorlevel = 1;
         }
-        $res = a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+        $res = a11yscan($row['control'] . ';;' . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
             _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'], 
             $row['a11yalt']!=0,"course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $thiserrorlevel);
@@ -251,7 +251,7 @@ if ($what === 'cid') {
         } else {
             $thiserrorlevel = 1;
         }
-        $res = a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+        $res = a11yscan($row['control'] . ';;' . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
             $row['id'], null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $row['a11yalt']!=0, null, $thiserrorlevel);
         if ($res) {

@@ -32,6 +32,9 @@ function getvideoid($url) {
 		}
 		$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 	}
+    if (strlen($vidid) != 11) {
+        return '';
+    }
 	return Sanitize::simpleString($vidid);
 }
 
