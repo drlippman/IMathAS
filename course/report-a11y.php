@@ -233,6 +233,7 @@ if ($what === 'cid') {
         }
     }
 } else if ($what === 'myqs') {
+    $qsreported = [];
     // scan questionset control, qtext
     $query = 'SELECT iqs.control,iqs.qtext,iqs.id,iqs.extref,iqs.a11yalt,
     COUNT(CASE WHEN iar.review=1 THEN 1 END) AS positive_reviews,
@@ -250,9 +251,12 @@ if ($what === 'cid') {
         } else {
             $thiserrorlevel = 1;
         }
-        a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
-            null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
+        $res = a11yscan($row['control'] . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+            $row['id'], null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $row['a11yalt']!=0, null, $thiserrorlevel);
+        if ($res) {
+            $qsreported[] = $row['id'];
+        }
         if (preg_match('/youtu[^!]*!!0/', $row['extref'])) {
             $extrefissues[] = $row;
         }
@@ -267,7 +271,7 @@ if ($what === 'cid') {
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if (trim($row['alttext']) == '') {
             adderror(1, _('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
-                null, null , "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+                $row['id'], null , "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
         }
     }
 }
@@ -316,8 +320,8 @@ if (count($vidstocheck)>0) {
                         // it's a video, don't have captions, give error once
                         if ($what === 'myqs') {
                             adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
-                                null, null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
-
+                                $row['id'], null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
+                            $qsreported[] = $row['id'];
                         } else {
                             adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
                                 _('Assessment'), $row['name'], 
@@ -337,6 +341,13 @@ if (count($vidstocheck)>0) {
             $stm->execute([implode('~~', $extrefs), $row['id']]);
         }
     }
+}
+
+if ($what === 'myqs') {
+    $ph = Sanitize::generateQueryPlaceholders($qsreported);
+    $stm = $DBH->prepare("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($ph) GROUP BY questionsetid");
+    $stm->execute($qsreported);
+    $qscounts = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
 }
 
 if (count($vidids) > 0 && isset($CFG['YouTubeAPIKey'])) {
@@ -425,7 +436,7 @@ if (count($errors[0])>0) {
 }
 
 function outputerrortable($errorlevel) {
-    global $what, $errors, $basesiteurl;
+    global $what, $errors, $basesiteurl, $qscounts;
 
     if ($what === 'myqs') {
         usort($errors[$errorlevel], function($a, $b) {
@@ -439,6 +450,8 @@ function outputerrortable($errorlevel) {
     if ($what !== 'myqs') {
         echo '<th>'._('Item Type').'</th>';
         echo '<th>'._('Item').'</th>';
+    } else {
+        echo '<th>'._('Times Used').'</th>';
     }
     echo '</tr><thead><tbody>';
     $alt = 0;
@@ -455,6 +468,9 @@ function outputerrortable($errorlevel) {
             if (!empty($error[5])) {
                 echo '</a>';
             }
+            echo '</td>';
+            echo '<td>';
+            echo Sanitize::encodeStringForDisplay($qscounts[$error[2]] ?? '0');
             echo '</td>';
         } else {
             echo '<td>';
@@ -483,6 +499,8 @@ function outputerrortable($errorlevel) {
     $sortstr = '"S","S"';
     if ($what !== 'myqs') {
         $sortstr .= ',"S","S"';
+    } else {
+        $sortstr .= ',"N"';
     }
     echo '<script type="text/javascript">
                 initSortTable("errortable'.$errorlevel.'",Array('.$sortstr.'),true);
