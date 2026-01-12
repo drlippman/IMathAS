@@ -85,7 +85,7 @@ function a11yscan($content, $field, $type, $itemname, $link='',$hasa11yalt=false
         $addederror = true;
     }
     // look for youtube videos
-    if (preg_match_all('/((youtube\.com|youtu\.be)[^>]*?)"/', $content, $matches, PREG_SET_ORDER)) {
+    if (preg_match_all('/((youtube\.com|youtu\.be)[^>\s]*?)"/', $content, $matches, PREG_SET_ORDER)) {
         foreach ($matches as $m) {
             if (($vidid = getvideoid($m[1])) !== '') {
                 $vidids[] = $vidid;
