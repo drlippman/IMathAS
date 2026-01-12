@@ -265,7 +265,7 @@ if ($what === 'cid') {
     // scan qimages alttext for blank
     $query = 'SELECT iqi.alttext,iqi.var,iqs.id FROM imas_questionset AS iqs 
     JOIN imas_qimages AS iqi ON iqi.qsetid=iqs.id
-    WHERE iqs.ownerid=?';
+    WHERE iqs.ownerid=? AND iqs.deleted=0';
     $stm = $DBH->prepare($query);
     $stm->execute([$userid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
