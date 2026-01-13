@@ -163,7 +163,9 @@
                     idx--; 
                 } else if ((event.which == 40 || event.which == 13) && idx < visel.length-1) {
                     idx++;
-                }
+                } else {
+					return;
+				}
                 visel[idx].focus();
 				$(visel[idx]).closest('.initialpost,.reply')[0].scrollIntoView();
             }
