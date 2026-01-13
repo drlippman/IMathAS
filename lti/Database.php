@@ -326,7 +326,7 @@ class Imathas_LTI_Database implements LTI\Database
         $ltiuserid = $launch->get_platform_user_id();
         $platform_id = $launch->get_platform_id();
 
-        $query = 'SELECT lti.userid FROM imas_ltiusers AS lti 
+        $query = 'SELECT lti.userid,iu.LastName,lti.id FROM imas_ltiusers AS lti 
             JOIN imas_users AS iu ON lti.userid=iu.id 
             WHERE lti.ltiuserid=? AND lti.org=?';
         if ($role == 'Instructor') {
@@ -336,10 +336,23 @@ class Imathas_LTI_Database implements LTI\Database
 
         $stm = $this->dbh->prepare($query);
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
-        $userid = $stm->fetchColumn(0);
+        list($userid,$lastname,$refid) = $stm->fetch(PDO::FETCH_NUM);
+
         if ($userid === false) {
             $contextid = $launch->get_platform_context_id();
             $migration_claim = $launch->get_migration_claim();
+        } else if (substr($lastname,0,5) == 'anon_') {
+            // if anonymized user, restore name from launch if possible
+            $name = parse_name_from_launch($launch->get_launch_data());
+            if (!empty($name) && 
+                (!empty($name['first']) || !empty($name['last']))
+            ) {
+                $deffirst = $name['first'] ?? '';
+                $deflast = $name['last'] ?? '';
+                $newsid = 'lti-' . $refid;
+                $stm = $this->dbh->prepare('UPDATE imas_users SET SID=?, FirstName=?, LastName=? WHERE id=?');
+                $stm->execute(array($newsid, $deffirst, $deflast, $userid));
+            }
         }
 
         if ($userid === false && 
