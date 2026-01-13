@@ -752,8 +752,8 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 			$sa .= '<td>'.$rows[$j][$i].'</td>';
 		}
 		for ($j=0;$j<count($ansarray);$j++) {
-			$out .= '<td class="r">'.($ansarray[$j][$i][0]=='$'?'$':'').'[AB'.$sn.']</td>';
-			$sa .= '<td class="r">'.($ansarray[$j][$i][0]=='$'?'$':'');
+			$out .= '<td class="r">'.(substr($ansarray[$j][$i],0,1)=='$'?'$':'').'[AB'.$sn.']</td>';
+			$sa .= '<td class="r">'.(substr($ansarray[$j][$i],0,1)=='$'?'$':'');
 			$ansarray[$j][$i] = str_replace(array('$',','),'',$ansarray[$j][$i]) * 1;
 			$answer[$sn] = $ansarray[$j][$i];
 			if ($hasdecimals) {

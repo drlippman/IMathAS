@@ -69,7 +69,7 @@ function rands($min, $max, $n = 0, $ord = 'def') {
         echo "rands: need n &gt; 0";
     }
     if ($n > 1e4) {
-        echo 'Error with diffrrands: $n too large';
+        echo 'Error with rands: $n too large';
         return [];
     }
     $r = [];
@@ -102,7 +102,7 @@ function rrands($min, $max, $p = 0, $n = 0, $ord = 'def') {
         echo "rrands: need n &gt; 0";
     }
     if ($n > 1e4) {
-        echo 'Error with diffrrands: $n too large';
+        echo 'Error with rrands: $n too large';
         return [];
     }
     $r = [];
@@ -273,7 +273,7 @@ function nonzerorands($min, $max, $n = 0, $ord = 'def') {
         echo "nonzerorands: need n &gt; 0";
     }
     if ($n > 1e4) {
-        echo 'Error with diffrrands: $n too large';
+        echo 'Error with nonzerorands: $n too large';
         return [];
     }
     $r = [];
@@ -315,7 +315,7 @@ function nonzerorrands($min, $max, $p = 0, $n = 0, $ord = 'def') {
         echo "nonzerorrands: need n &gt; 0";
     }
     if ($n > 1e4) {
-        echo 'Error with diffrrands: $n too large';
+        echo 'Error with nonzerorrands: $n too large';
         return [];
     }
     for ($i = 0; $i < $n; $i++) {
@@ -362,7 +362,7 @@ function diffrands($min, $max, $n = 0, $ord = 'def') {
         echo "diffrands: need n &gt; 0";
     }
     if ($n > 1e4) {
-        echo 'Error with diffrrands: $n too large';
+        echo 'Error with diffrands: $n too large';
         return [];
     }
     if ($n < .1 * ($max - $min)) {
@@ -493,7 +493,7 @@ function nonzerodiffrands($min, $max, $n = 0, $ord = 'def', $nowarn = false) {
         }
     }
     if ($n > 1e4) {
-        echo 'Error with diffrrands: $n too large';
+        echo 'Error with nonzerodiffrands: $n too large';
         return [];
     }
 
