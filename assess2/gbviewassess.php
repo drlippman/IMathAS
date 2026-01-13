@@ -94,8 +94,8 @@ if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$i
 </noscript>
 <div id="app"></div>
 
-<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess.js?v=CP8DN2j3"></script>
-<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess-legacy.js?v=DKWFWC1C"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess.js?v=1-kqQ7Oz"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/gbviewassess-legacy.js?v=CkwqnewL"></script>
 
 <?php
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">

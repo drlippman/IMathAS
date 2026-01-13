@@ -60,6 +60,7 @@
  }
  .keywrap [id^=ans] {
    padding: 2px 8px;
+   display: inline-block;
  }
  .keybtn {
    height: 28px;
