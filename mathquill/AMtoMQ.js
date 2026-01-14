@@ -839,8 +839,8 @@ function MQtoAM(tex,display) {
     tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
     tex = tex.replace(/(\^|_)([+\-])([^\^])/g, '$1$2 $3');  
 	tex = tex.replace(/\^(\w)(\w)/g, '^$1 $2');
-	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
-	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');
+	tex = tex.replace(/_{([\d\.]+)}(\w)/g,'_$1 $2');
+  tex = tex.replace(/_{([\d\.]+)}([^\w])/g,'_$1$2');
 	tex = tex.replace(/_{([\d\.]+)}$/g,'_$1');
   tex = tex.replace(/_{(\w+)}$/g,'_($1)');
 	tex = tex.replace(/{/g,'(').replace(/}/g,')');
