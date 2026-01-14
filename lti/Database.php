@@ -338,6 +338,10 @@ class Imathas_LTI_Database implements LTI\Database
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
         list($userid,$lastname,$refid) = $stm->fetch(PDO::FETCH_NUM);
 
+        if ($userid === null) {
+            $userid = false;
+        }
+
         if ($userid === false) {
             $contextid = $launch->get_platform_context_id();
             $migration_claim = $launch->get_migration_claim();
