@@ -833,11 +833,12 @@ function MQtoAM(tex,display) {
 		} else {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
-    }
+   }
 
-    //separate un-braced subscripts using latex rules
-    tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
-    tex = tex.replace(/(\^|_)([+\-])([^\^])/g, '$1$2 $3');  
+  //separate un-braced subscripts using latex rules
+  tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
+  tex = tex.replace(/(\^|_){([+\-])}/g, '$1$2');  // restore previous behavior
+  tex = tex.replace(/(\^|_)([+\-])([^\^])/g, '$1$2 $3');  
 	tex = tex.replace(/\^(\w)(\w)/g, '^$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}(\w)/g,'_$1 $2');
   tex = tex.replace(/_{([\d\.]+)}([^\w])/g,'_$1$2');
