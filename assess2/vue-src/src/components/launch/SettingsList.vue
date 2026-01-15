@@ -194,7 +194,7 @@ export default {
         var mytime = settings.timelimit * settings.timelimit_multiplier;
         if (settings.overtime_grace > 0) {
           timeobj.str = this.$t(
-            settings.overtime_penalty > 0 ? 'setlist.timelimit_wgrace_penalty' : 'setlist.timelimit_wgrace',
+            settings.overtime_penalty > 0 ? 'setlist-timelimit_wgrace_penalty' : 'setlist-timelimit_wgrace',
             {
               time: this.formatTimeLimit(mytime),
               grace: this.formatTimeLimit(settings.overtime_grace * settings.timelimit_multiplier),
@@ -210,7 +210,7 @@ export default {
           });
         } else if (store.timelimit_restricted === 2) { // grace restricted
           timeobj.altstr = this.$t(
-            settings.overtime_penalty > 0 ? 'setlist.timelimit_wgrace_restricted_penalty' : 'setlist.timelimit_wgrace_restricted',
+            settings.overtime_penalty > 0 ? 'setlist-timelimit_wgrace_restricted_penalty' : 'setlist-timelimit_wgrace_restricted',
             {
               time: this.formatTimeLimit(mytime),
               due: settings.enddate_disp,
