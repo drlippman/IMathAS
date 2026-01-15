@@ -33,6 +33,8 @@ if (mathjaxdisp == 8) {
     window.MathJax.loader.load.push("a11y/semantic-enrich");
     window.MathJax.options['sre'] = {speech:"shallow"};
 }
+/*
+// use MJ3 fonts for mathquill to better match mathjax rendering
 if (mathjaxdisp == 7 || mathjaxdisp == 8) {
     const style = document.createElement('style');
     style.textContent = `
@@ -54,6 +56,7 @@ if (mathjaxdisp == 7 || mathjaxdisp == 8) {
     }`;
     document.head.appendChild(style);
 }
+*/
 
 var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; 
 var MathJaxCompatible = true; var mathRenderer="MathJax";

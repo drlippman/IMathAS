@@ -198,7 +198,11 @@
 }
 
 /* override fonts for mathquill, to try to match math render. 
-   Doesn't include MJ4 because it uses different font mechanism */
+   Doesn't include MJ4 because it uses different font mechanism 
+   MJ3 handled in mathjaxconfig due to double-slanting issue
+   disabled since MJ2 still has issue. Seems better to just use default font   
+*/
+/*
 .mq-math-mode .mq-font,
 .mq-math-mode .mq-text-mode,
 .mq-math-mode .mq-operator-name {
@@ -213,6 +217,7 @@
 .mq-math-mode i.mq-font {
   font-family: KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
 }
+  */
 .mq-chem var {
     font-style: normal;
     font-family: "Times New Roman", Symbola, serif;
