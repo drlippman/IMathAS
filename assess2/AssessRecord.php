@@ -1658,6 +1658,10 @@ class AssessRecord
           && !$this->is_practice
           && time() > $this->assess_info->getSetting('latepass_enddate')
         ) ||
+        ($ansInGb == 'manual'
+          && !$this->is_practice
+          && $include_scores
+        ) ||
         $this->teacherInGb;
       $out['info'] = $generate_html;
       $out += $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html === 2);
