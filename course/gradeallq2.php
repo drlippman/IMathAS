@@ -389,7 +389,7 @@
     }
     
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=010726">
-	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=010726">';
+	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=011426">';
 
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';

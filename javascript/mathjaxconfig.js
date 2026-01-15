@@ -33,6 +33,27 @@ if (mathjaxdisp == 8) {
     window.MathJax.loader.load.push("a11y/semantic-enrich");
     window.MathJax.options['sre'] = {speech:"shallow"};
 }
+if (mathjaxdisp == 7 || mathjaxdisp == 8) {
+    const style = document.createElement('style');
+    style.textContent = `
+    .mq-math-mode .mq-font,
+    .mq-math-mode .mq-text-mode,
+    .mq-math-mode .mq-operator-name {
+    font-family: MJXZERO, MJXTEX, "Times New Roman", Symbola, serif !important;
+    }
+
+    .mq-math-mode .mq-nonSymbola {
+    font-family: MJXZERO, MJXTEX-I, "Times New Roman", Symbola, serif !important;
+    font-style: normal !important;
+    }
+    .mq-math-mode var,
+    .mq-math-mode i,
+    .mq-math-mode i.mq-font {
+    font-family: MJXZERO, MJXTEX-I, "Times New Roman", Symbola, serif !important;
+    font-style: normal !important;
+    }`;
+    document.head.appendChild(style);
+}
 
 var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; 
 var MathJaxCompatible = true; var mathRenderer="MathJax";

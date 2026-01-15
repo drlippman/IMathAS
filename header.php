@@ -154,7 +154,7 @@ if (!isset($_SESSION['mathdisp'])) {
     echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
 } else if ($_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) { // mathjax 3
 	echo '<script>var mathjaxdisp = ' . intval($_SESSION['mathdisp']).';</script>';
-    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=093025\" type=\"text/javascript\"></script>\n";
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=011426\" type=\"text/javascript\"></script>\n";
     echo '<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>';
     if (isset($_SESSION['ltiitemtype'])) {
         echo '<script type="text/javascript">
@@ -164,7 +164,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==9) { // mathjax 4
 	echo '<script>var mathjaxdisp = ' . intval($_SESSION['mathdisp']).';</script>';
-    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=093025\" type=\"text/javascript\"></script>\n";
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=011426\" type=\"text/javascript\"></script>\n";
     echo '<script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
 		<script nomodule src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script-fb"></script>';
     if (isset($_SESSION['ltiitemtype'])) {
