@@ -197,27 +197,45 @@
   color: #fff;
 }
 
-/* override fonts for mathquill, to try to match math render. 
-   Doesn't include MJ4 because it uses different font mechanism 
-   MJ3 handled in mathjaxconfig due to double-slanting issue
-   disabled since MJ2 still has issue. Seems better to just use default font   
+@font-face {
+  font-family: "KaTeX_Main";
+  src: url(../katex/fonts/KaTeX_Main-Italic.woff2) format("woff2"), url(../katex/fonts/KaTeX_Main-Italic.woff) format("woff"), url(../katex/fonts/KaTeX_Main-Italic.ttf) format("truetype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: "KaTeX_Main";
+  src: url(../katex/fonts/KaTeX_Main-Regular.woff2) format("woff2"), url(../katex/fonts/KaTeX_Main-Regular.woff) format("woff"), url(../katex/fonts/KaTeX_Main-Regular.ttf) format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "KaTeX_Math";
+  src: url(../katex/fonts/KaTeX_Math-Italic.woff2) format("woff2"), url(../katex/fonts/KaTeX_Math-Italic.woff) format("woff"), url(../katex/fonts/KaTeX_Math-Italic.ttf) format("truetype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: block;
+}
+/* 
+override fonts for mathquill, using katex for computer modern. 
 */
-/*
 .mq-math-mode .mq-font,
 .mq-math-mode .mq-text-mode,
 .mq-math-mode .mq-operator-name {
-  font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;
+  font-family: KaTeX_Main, "Times New Roman", Symbola, serif;
 }
 
 .mq-math-mode .mq-nonSymbola {
-  font-family: KaTeX_Main, KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
+  font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", Symbola, serif;
 }
 .mq-math-mode var,
 .mq-math-mode i,
 .mq-math-mode i.mq-font {
-  font-family: KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
+  font-family: KaTeX_Math, "Times New Roman", Symbola, serif;
 }
-  */
+
 .mq-chem var {
     font-style: normal;
     font-family: "Times New Roman", Symbola, serif;
