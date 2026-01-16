@@ -11,9 +11,6 @@ function showUserPrefsForm($limited = false) {
 
 	$prefs = array();
 	$prefs['mathdisp'] = array(
-        '1'=>_('MathJax 2'),
-        '7'=>_('MathJax 3'),
-        '8'=>_('MathJax 3, with screenreader support pre-enabled'),
 		'9'=>_('MathJax 4'),
 		'6'=>_('Katex - faster display'),
 		'2'=>_('Image-based display'),
@@ -49,7 +46,7 @@ function showUserPrefsForm($limited = false) {
 		'1'=>_('Show live preview of answer entry as I type'),
 		'0'=>_('Only show a preview when I click the Preview button'));
 	$prefdefaults = array(
-		'mathdisp'=>1,
+		'mathdisp'=>9,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
@@ -78,7 +75,7 @@ function showUserPrefsForm($limited = false) {
 	}
 
 	foreach($prefdefaults as $k=>$v) {
-		if (isset($CFG['UP'][$k])) {
+		if (isset($CFG['UP'][$k]) && isset($prefs[$k][$CFG['UP'][$k]])) {
 			$prefdefaults[$k] = $CFG['UP'][$k];
 		}
 		//mark default etnry with *
@@ -133,7 +130,7 @@ function storeUserPrefs() {
 		$currentuserprefs[$row[0]] = array($row[1],$row[2]);
 	}
 	$prefdefaults = array(
-		'mathdisp'=>1,
+		'mathdisp'=>9,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
@@ -200,7 +197,7 @@ function generateuserprefs($uid) {
 
 	$_SESSION['userprefs'] = array();
 	$prefdefaults = array(
-		'mathdisp'=>1,
+		'mathdisp'=>9,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
@@ -225,12 +222,20 @@ function generateuserprefs($uid) {
 				$_SESSION['userprefs'][$key] = $prefdefaults[$key];
 			}
 		}
+		// adjust old MJ mathdisp options
+		if ($_SESSION['userprefs']['mathdisp'] == 1 || 
+			$_SESSION['userprefs']['mathdisp'] == 3 || 
+			$_SESSION['userprefs']['mathdisp'] == 7 || 
+			$_SESSION['userprefs']['mathdisp'] == 8
+		) {
+			$_SESSION['userprefs']['mathdisp'] = 9;
+		}
 		foreach(array('graphdisp','mathdisp','useed') as $key) {
 			if (isset($_SESSION['userprefs'][$key])) {
 				$_SESSION[$key] = $_SESSION['userprefs'][$key];
 			}
 		}
-	 }
+	}
 }
 
 ?>
