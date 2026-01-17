@@ -463,6 +463,14 @@
           >
             {{ $t('gradebook-return') }}
           </button>
+          <a 
+            v-if="canEdit && aData?.can_message"
+            href="#"
+            @click.prevent="msgStu"
+            target="_blank"
+          >
+            {{  $t('gradebook-msg_student') }}
+          </a>
         </div>
         <div v-else>
           <button
@@ -974,6 +982,12 @@ export default {
     setCurqn (val) {
       this.curqn = val;
       this.$nextTick(() => window.document.getElementById('qwrap' + (val + 1)).scrollIntoView());
+    },
+    msgStu () {
+      let url = store.APIbase + '../course/sendmsgmodal.php?add=new&sendtype=msg';
+      url += '&cid=' + store.cid + '&to=' + store.uid;
+      url += '&title=' + encodeURIComponent(this.aData.name);
+      window.GB_show(this.$t('gradebook-msg_student'), url, 600, 'auto', false);
     }
   },
   created () {

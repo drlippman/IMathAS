@@ -532,6 +532,8 @@ gradebook-feedback = Rückmeldung
 gradebook-feedback_for = Rückmeldung für {$name}
 gradebook-general_feedback = Allgemeine Rückmeldung
 gradebook-use_in_msg = Verwendung in Nachricht
+#checkme
+gradebook-msg_student = Nachricht an den Schüler senden
 gradebook-clear_hdr = Bestätigung löschen
 gradebook-clear_all = Alle Versuche löschen
 gradebook-clear_attempt = Diesen Versuch löschen

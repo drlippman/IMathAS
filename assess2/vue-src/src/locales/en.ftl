@@ -529,6 +529,7 @@ gradebook-feedback = Feedback
 gradebook-feedback_for = Feedback for {$name}
 gradebook-general_feedback = General feedback
 gradebook-use_in_msg = Use in Message
+gradebook-msg_student = Message Student
 gradebook-clear_hdr = Delete confirmation
 gradebook-clear_all = Delete all attempts
 gradebook-clear_attempt = Delete this attempt

@@ -147,7 +147,7 @@ export default {
     linkClick (event, option) {
       if (option.link && option.popup) {
         event.preventDefault();
-        window.GB_show(option.label, option.link, 400, 400, false);
+        window.GB_show(option.label, option.link, option?.popupwidth ?? 400, option?.popupheight ?? 400, false);
         this.toggleOpen(false, true);
       }
       if (option.onclick) {

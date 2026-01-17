@@ -231,6 +231,7 @@ if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
       'data' => unserialize($row['rubric'])
     );
   }
+  $assessInfoOut['can_message'] = ($coursemsgset < 4);
 } else {
   $assessInfoOut['can_edit_scores'] = false;
 }

@@ -251,32 +251,24 @@ export default {
       if (store.assessInfo.qerror_cid) {
         const quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
           '-reperr-' + store.assessInfo.ver;
-        const qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+        const qs = 'add=new&sendtype=msg&cid=' + store.assessInfo.qerror_cid +
           '&quoteq=' + quoteq + '&to=' + this.qdata.qowner +
           '&title=Problem%20with%20question%20id%20' +
           this.qdata.qsetid;
-        return store.APIbase + '../msgs/msglist.php?' + qs;
+        return store.APIbase + '../course/sendmsgmodal.php?' + qs;
       } else {
         return '';
       }
     },
     useInMsg () {
-      // TODO
       const quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
         '-' + store.aid + '-' + store.assessInfo.ver;
-      const qs = 'add=new&cid=' + store.cid +
+      const qs = 'add=new&sendtype=msg&cid=' + store.cid +
         '&quoteq=' + quoteq + '&to=' + store.uid;
-      return store.APIbase + '../msgs/msglist.php?' + qs;
-      // TODO: get GB to work for this.
-      // window.GB_show(this.$t('gradebook-send_msg'),
-      //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
+      return store.APIbase + '../course/sendmsgmodal.php?' + qs;
     },
     moreOptions () {
       const out = [
-        {
-          label: this.$t('gradebook-use_in_msg'),
-          link: this.useInMsg
-        },
         {
           label: this.$t('gradebook-view_edit') + ' ID ' + this.qdata.qsetid + ' Seed ' + this.qdata.seed,
           link: this.questionEditUrl
@@ -285,9 +277,21 @@ export default {
           label: (store.assessInfo.hasOwnProperty('qerrortitle')
             ? store.assessInfo.qerrortitle
             : this.$t('gradebook-msg_owner')),
-          link: this.questionErrorUrl
+          link: this.questionErrorUrl,
+          popup: true,
+          popupwidth: 600,
+          popupheight: 'auto'
         }
       ];
+      if (store.assessInfo?.can_message) {
+        out.unshift({
+          label: this.$t('gradebook-use_in_msg'),
+          link: this.useInMsg,
+          popup: true,
+          popupwidth: 600,
+          popupheight: 'auto'
+        });
+      }
       if (!this.isPractice && this.isLastVersion) {
         out.push({
           label: this.$t('gradebook-clear_qwork'),
