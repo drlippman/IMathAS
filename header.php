@@ -119,7 +119,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp'] > 0) { // mathjax
 	echo '<script>var mathjaxdisp = 9;</script>'; // default MJ 4
 	echo '<script nomodule>mathjaxdisp = 8;</script>'; // fallback to MJ 3 for old browsers
-    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=011426\" type=\"text/javascript\"></script>\n";
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=011726\" type=\"text/javascript\"></script>\n";
     echo '<script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
 		<script nomodule src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script-fb"></script>';
     if (isset($_SESSION['ltiitemtype'])) {
