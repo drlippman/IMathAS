@@ -77,8 +77,8 @@ function showarrays() {
         $out .= '<caption class="sr-only">' . _('Data Table for ') .Sanitize::encodeStringForDisplay($cleanhdr). '</caption>';
     } else {
         $out .= '<caption class="sr-only">' . _('Data Table') . '</caption>';
-        }
-        if ($hashdr) {
+    }
+    if ($hashdr) {
         $out .= '<thead><tr>';
         for ($i = 0; $i < floor(count($alist) / 2); $i++) {
             $out .= "<th scope=\"col\">{$alist[2 *$i]}</th>";
