@@ -822,6 +822,7 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
             $anstypes[$parts[0]] = $anstypes[0];
         }
     }
+
     foreach ($parts as $part) {
         $ors = array_map('trim', explode(' or ', $part));
         $partok = false;
@@ -845,9 +846,28 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
                     if (!is_numeric($stu[$qn][$v])) {
                         continue;
                     }
-                } else if ($thisaf !== '') {
-                    if ($anstypes[$v] == 'calculated' && !checkanswerformat($stu[$qn][$v], $thisaf)) {
+                } else if ($anstypes[$v] == 'calculated' && $thisaf !== '') {
+                    if (!checkanswerformat($stu[$qn][$v], $thisaf)) {
                         continue;
+                    }
+                } else if ($anstypes[$v] == 'ntuple' || $anstypes[$v] == 'calcntuple') {
+                    $ntuples = parseNtuple($stu[$qn][$v], false, false);
+                    if (!is_array($ntuples) || !isset($ntuples[0])) {
+                        continue;
+                    }
+                    $checknumeric = (strpos($thisaf, 'checknumeric') !== false);
+                    foreach ($ntuples[0]['vals'] as $pv) {
+                        if ($pv === '') {
+                            continue 2;
+                        } else if ($checknumeric) {
+                            if (!is_numeric($pv)) {
+                                continue 2;
+                            }
+                        } else if ($thisaf !== '') {
+                            if (!checkanswerformat($pv, $thisaf)) {
+                                continue 2;
+                            }
+                        }
                     }
                 }
             }
