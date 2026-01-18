@@ -250,8 +250,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             } else {
                 $msgtoinstr = 0;
             }
-            $defpenalty = Sanitize::onlyFloat($_POST['defpenalty']);
-            $skippenalty_post = Sanitize::onlyInt($_POST['skippenalty']);
+            $defpenalty = Sanitize::onlyFloat($_POST['defpenalty'] ?? 0);
+            $skippenalty_post = Sanitize::onlyInt($_POST['skippenalty'] ?? 0);
             if ($skippenalty_post==10) {
                 $defpenalty = 'L'.$defpenalty;
             } else if ($skippenalty_post>0) {
@@ -406,7 +406,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $query .= ",groupsetid=:groupsetid";
                     $qarr[':groupsetid'] = $updategroupset;
                 }
-                if (isset($_POST['defpenalty'])) {
+                if (isset($_POST['defpenalty']) && isset($_POST['skippenalty'])) {
                     $query .= ",defpenalty=:defpenalty";
                     $qarr[':defpenalty'] = $defpenalty;
                 }
