@@ -872,15 +872,18 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
                 }
             }
             //echo $stu[$qn][$v];
-            if (
-                $anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
-                isset($stu[$qn][$v]) && ($stu[$qn][$v] === '' || strpos($stu[$qn][$v], '||') !== false ||
-                    $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v]) - 1] === '|' ||
-                    strpos($stu[$qn][$v], 'NaN') !== false ||
-                    ($anstypes[$v] === 'matrix' && strpos($stu[$qn][$v], '|') !== false && preg_match('/[^\d\.\-\+E\s\|]/', $stu[$qn][$v])))
-            ) {
-                // empty looking matrix entry
-                continue;
+            if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix')) {
+                if ($stu[$qn][$v] === '') { continue; }
+                $matparts = explode('|', $stu[$qn][$v]);
+                if (in_array('', $matparts)) { continue; }
+                if (in_array('NaN', $matparts)) { continue; }
+                if ($anstypes[$v] === 'matrix') {
+                    foreach ($matparts as $mpart) {
+                        if (!is_numeric($mpart)) {
+                            continue 2;
+                        }
+                    }
+                }
             }
             if ($anstypes !== null && $anstypes[$v] === 'choices' && !$blankok && $stu[$qn][$v] === 'NA') {
                 continue;

@@ -2748,7 +2748,8 @@ These macros are used to test various conditions.  They typically return true or
     and it will check that "number", "calculated", "ntuple", and "calcntuple" answers are numeric 
 	(must use $stuanswersval for calculated and calcntuplein this case).
     Note this won't work for list answers, only single numbers, and that it won't recognize answers 
-    with commas like "2,345" as numeric.</li>
+    with commas like "2,345" as numeric. For calcmatrix, it's best to pass $stuanswersval, as that will 
+	allow stuansready to confirm all elements evaluate to a value.</li>
 <li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparenumberswithunits(a,b,[tol])</strong>:  Compares numbers-with-units a and b to see if they are equivalent to the specified tolerance. Set tol to 
