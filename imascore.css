@@ -1564,3 +1564,13 @@ fieldset.plain {
 fieldset.plain legend {
 	font-weight: normal;
 }
+/* override MathJax dark mode colors */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--mjx-fg-black: #000 !important;
+		--mjx-fg-white: #fff !important;
+		--mjx-bg-black: #000 !important;
+		--mjx-bg-white: #fff !important;
+		--mjx-gb-blue: #00F !important;
+	}
+}
