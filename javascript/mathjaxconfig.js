@@ -11,6 +11,11 @@ window.MathJax = {
             ]
         }
     },
+    output: {
+        linebreaks: {
+            inline: false
+        }
+    },
     addDataAttr: function (math, doc) {
         math.typesetRoot.setAttribute("data-asciimath", math.math);
     },
