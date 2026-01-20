@@ -32,26 +32,18 @@ window.MathJax = {
         if (mathjaxdisp > 8) { // MJ4
             const {SpeechExplorer} = MathJax._.a11y.explorer.KeyExplorer;
             Object.assign(SpeechExplorer.prototype, {
-                _AddEvents_: SpeechExplorer.prototype.AddEvents,
-                AddEvents() {
-                    if (!this.eventsAttached) {
-                        this.node.addEventListener('click', function(e) {
-                            if (e.target.tagName !== 'MJX-HELP') {
-                                e.stopImmediatePropagation();
-                                if (e.target.parentNode) {
-                                    e.target.parentNode.dispatchEvent(
-                                        new MouseEvent('click', {
-                                            bubbles:true, 
-                                            cancelable:true, 
-                                            view:window
-                                        })
-                                    );
-                                }
-                            }
-                        });
-                    }
-                    this._AddEvents_();
+                MouseDown(event) {
+                    this.clicked = true;
+                    if (this.document.infoIcon.contains(event.target)) this.stopEvent(event);
                 },
+                DblClick() {},
+                Click(event) {
+                    this.clicked = null;
+                    if (this.document.infoIcon.contains(event.target)) {
+                        this.stopEvent(event);
+                        this.help();
+                    }
+                }
             });
         }
         MathJax.startup.defaultReady();
