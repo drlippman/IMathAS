@@ -231,7 +231,7 @@ $_SESSION['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
 
-$useeqnhelper = $eqnhelper;
+$useeqnhelper = $eqnhelper ?? 0;
 $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/style.css?v='.$lastvueupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {

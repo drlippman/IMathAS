@@ -1093,6 +1093,17 @@ class QuestionHtmlGenerator
         $stm->execute(array(':qsetid' => $this->questionParams->getDbQuestionSetId()));
 
         $imagesAsHtml = array();
+        if (!empty($GLOBALS['CFG']['GEN']['AWSforcoursefiles'])) {
+            if (isset($GLOBALS['CFG']['S3']['altendpoint'])) {
+                $endpoint = 'https://'.$GLOBALS['CFG']['S3']['altendpoint'];
+            } else {
+                $endpoint = 'https://'.$GLOBALS['AWSbucket'].'.s3';
+                if (isset($GLOBALS['CFG']['S3']['region'])) {
+                    $endpoint .= '.' . $GLOBALS['CFG']['S3']['region'];
+                }
+                $endpoint .= '.amazonaws.com';
+            }
+        }
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $imageName = $row[0];
             $filename = $row[1]; // This can be a complete URL or a filename.
@@ -1105,10 +1116,10 @@ class QuestionHtmlGenerator
                 $imagesAsHtml[$imageName] =
                     sprintf('<img src="%s" alt="%s" />',
                         $filename, htmlentities($altText, ENT_QUOTES));
-            } else if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+            } else if (!empty($GLOBALS['CFG']['GEN']['AWSforcoursefiles'])) {
                 $imagesAsHtml[$imageName] =
-                    sprintf('<img src="https://%s.s3.amazonaws.com/qimages/%s" alt="%s" />',
-                        $GLOBALS['AWSbucket'], $filename,
+                    sprintf('<img src="%s/qimages/%s" alt="%s" />',
+                        $endpoint, $filename,
                         htmlentities($altText, ENT_QUOTES));
             } else {
                 $imagesAsHtml[$imageName] =
