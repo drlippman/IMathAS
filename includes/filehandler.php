@@ -91,6 +91,9 @@ function relocatefileifneeded($file, $key, $sec="public") {
 }
 
 function getS3endpoint() {
+	if (isset($GLOBALS['CFG']['S3']['altendpoint'])) {
+		return 'https://'.$GLOBALS['CFG']['S3']['altendpoint'];
+	}
 	$endpoint = 'https://'.$GLOBALS['AWSbucket'].'.s3';
 	if (isset($GLOBALS['CFG']['S3']['region'])) {
 		$endpoint .= '.' . $GLOBALS['CFG']['S3']['region'];
