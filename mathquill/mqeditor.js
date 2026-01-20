@@ -104,6 +104,7 @@ var MQeditor = (function($) {
           charsThatBreakOutOfSupSubVar: "+-(",
           charsThatBreakOutOfSupSubOp: "+-(",
           restrictMismatchedBrackets: true,
+          interpretTildeAsSim: true,
           handlers: {
             edit: onMQedit,
             enter: onMQenter
