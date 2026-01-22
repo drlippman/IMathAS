@@ -6,6 +6,8 @@ if ($myrights<20) {exit;}
 $isadmin = (isset($_GET['cid']) && $_GET['cid']=='admin' && $myrights==100);
 $qcid = ($isadmin ? 'admin' : 0);
 
+$sort = $_GET['sort'] ?? 'timesused';
+
 if (!empty($_POST['checked'])) {
     $data = array_map('intval', $_POST['checked']);
     $ph = Sanitize::generateQueryPlaceholders($data);
@@ -57,6 +59,11 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     }
     $allrows[$row['qsetid']][] = $row;
 }
+foreach ($allrows as $k=>$v) {
+    usort($allrows[$k], function($a,$b) {
+        return $b['etime'] <=> $a['etime'];
+    });
+}
 $timesused = [];
 $allids = array_keys($allrows);
 if (count($allids)>0) {
@@ -67,9 +74,16 @@ if (count($allids)>0) {
         $timesused[$row[0]] = $row[1];
     }
 }
-arsort($timesused);
-$qorder = array_keys($timesused);
-$qorder = array_merge($qorder, array_diff($allids,$qorder));
+if ($sort === 'recent') {
+    $qorder = array_keys($allrows);
+    usort($qorder, function($a,$b) use ($allrows) {
+        return $allrows[$b][0]['etime'] <=> $allrows[$a][0]['etime'];
+    });
+} else {
+    arsort($timesused);
+    $qorder = array_keys($timesused);
+    $qorder = array_merge($qorder, array_diff($allids,$qorder));
+}
 
 $placeinhead = '<style type="text/css"> 
 .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
@@ -112,6 +126,13 @@ echo '<p>'._('The questions listed below have logged an error. Some error may oc
 echo _('Click the Seed to test that particular version of the question. Click the question number to edit the question. ');
 echo _('Once you have fixed the issue or determined it does not need fixing, clear the log entry. ');
 echo '</p>';
+echo '<p>'._('Sort by: ');
+if ($sort === 'recent') {
+    echo ' <strong>'._('Most Recent Error').'</strong> | <a href="questionerrors.php?cid='.$qcid.'&sort=timesused">'._('Most Used Questions').'</a>';
+} else {
+    echo ' <a href="questionerrors.php?cid='.$qcid.'&sort=recent">'._('Most Recent Error').'</a> | <strong>'._('Most Used Questions').'</strong>';
+}
+echo '</p>';
 if (isset($CFG['hooks']['util/questionerrors'])) {
 	require_once $CFG['hooks']['util/questionerrors'];
 }
@@ -139,7 +160,7 @@ foreach ($qorder as $qsetid) {
     echo '<ul>';
     foreach ($allrows[$qsetid] as $row) {
         echo '<li><a target="_blank" href="../course/testquestion2.php?cid=0&qsetid='.$qsetid.'&seed='.intval($row['seed']).'">';
-        echo 'Seed '.intval($row['seed']).'</a>';
+        echo 'Seed '.intval($row['seed']).' <span class=small>('.date('n/j/Y', $row['etime']).')</span></a>';
         echo ': ' . Sanitize::encodeStringForDisplay($row['error']).'</li>';
     }
     echo '</ul></li>';
