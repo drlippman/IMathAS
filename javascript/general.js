@@ -668,20 +668,23 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			]
 			}]
         }
-		
-	if (document.documentElement.clientWidth<385) {
+	
+	if (document.documentElement.clientWidth<350) {
 		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<465) {
 		edsetup.toolbar1 = "myEdit myInsert styles forecolor saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
-	} else if (document.documentElement.clientWidth<575) {
+	} /* 
+	// handle these in CSS for better responsiveness
+	else if (document.documentElement.clientWidth<575) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic forecolor backcolor saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";
-	}  else if (document.documentElement.clientWidth<665) {
+	} else if (document.documentElement.clientWidth<665) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic subscript superscript forecolor backcolor snippet saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link image | asciimath asciimathcharmap asciisvg";
 	}
+	*/
 	if (location.href.match(/usealted/)) {
 		delete edsetup.toolbar1;
 		delete edsetup.toolbar2;

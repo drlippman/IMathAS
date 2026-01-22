@@ -1574,3 +1574,46 @@ fieldset.plain legend {
 		--mjx-gb-blue: #00F !important;
 	}
 }
+
+@media (max-width: 665px) {
+	.tox-tbtn[data-mce-name="underline"],
+	.tox-tbtn[data-mce-name="unlink"],
+	.tox-tbtn[data-mce-name="table"],
+	.tox-tbtn[data-mce-name="code"] {
+		display: none !important;
+	}
+	.tox-toolbar__group {
+		padding: 0 0px !important;
+		border-right: 0px !important;
+	}
+}
+@media (max-width: 575px) {
+	.tox-tbtn[data-mce-name="subscript"],
+	.tox-tbtn[data-mce-name="superscript"],
+	.tox-tbtn[data-mce-name="snippet"],
+	.tox-tbtn[data-mce-name="attach"],
+	.tox-tbtn[data-mce-name="alignright"] {
+		display: none !important;
+	}
+}
+/* Handle below in init for alt positioning */
+/*
+@media (max-width: 465px) {
+	.tox-tbtn[data-mce-name="bold"],
+	.tox-tbtn[data-mce-name="italic"],
+	.tox-tbtn[data-mce-name="backcolor"],
+	.tox-tbtn[data-mce-name="backcolor-chevron"],
+	.tox-tbtn[data-mce-name="aligncenter"],
+	.tox-tbtn[data-mce-name="link"],
+	.tox-tbtn[data-mce-name="image"],
+	.tox-tbtn[data-mce-name="asciimathcharmap"],
+	.tox-tbtn[data-mce-name="alignleft"] {
+		display: none !important;
+	}
+}
+@media (max-width: 385px) {
+	.tox-tbtn[data-mce-name="forecolor"],
+	.tox-tbtn[data-mce-name="forecolor-chevron"] {
+		display: none !important;
+	}
+}*/
