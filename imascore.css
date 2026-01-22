@@ -1578,7 +1578,6 @@ fieldset.plain legend {
 @media (max-width: 665px) {
 	.tox-tbtn[data-mce-name="underline"],
 	.tox-tbtn[data-mce-name="unlink"],
-	.tox-tbtn[data-mce-name="table"],
 	.tox-tbtn[data-mce-name="code"] {
 		display: none !important;
 	}
@@ -1593,7 +1592,32 @@ fieldset.plain legend {
 	.tox-tbtn[data-mce-name="superscript"],
 	.tox-tbtn[data-mce-name="snippet"],
 	.tox-tbtn[data-mce-name="attach"],
+	.tox-tbtn[data-mce-name="table"],
 	.tox-tbtn[data-mce-name="alignright"] {
+		display: none !important;
+	}
+}
+@media (max-width: 455px) {
+	.tox-toolbar:first-of-type .tox-tbtn[data-mce-name="bold"],
+	.tox-toolbar:first-of-type .tox-tbtn[data-mce-name="italic"],
+	.tox-tbtn[data-mce-name="alignleft"],
+	.tox-tbtn[data-mce-name="aligncenter"] {
+		display: none !important;
+	}
+}
+@media (max-width: 380px) {
+	.tox-tbtn[data-mce-name="backcolor"],
+	.tox-tbtn[data-mce-name="backcolor-chevron"],
+	.tox-tbtn[data-mce-name="image"] {
+		display: none !important;
+	}
+}
+@media (max-width: 340px) {
+	.tox-tbtn[data-mce-name="forecolor"],
+	.tox-tbtn[data-mce-name="forecolor-chevron"],
+	.tox-tbtn[data-mce-name="bold"],
+	.tox-tbtn[data-mce-name="italic"],
+	.tox-tbtn[data-mce-name="link"] {
 		display: none !important;
 	}
 }
