@@ -417,7 +417,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
-	} else if (isset($_POST['posted']) && $_POST['posted']=='maketutor' && count($_POST['checked'])> 0) {
+	} else if (isset($_POST['posted']) && $_POST['posted']=='maketutor' && !empty($_POST['checked'])) {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Add Tutors\n";
 		$pagetitle = "Add Tutors";
 
