@@ -271,3 +271,34 @@ tr.textsegmentrow td {
   input[type=number] {
     -moz-appearance: textfield;
   }
+@media (max-width: 740px) {
+	.tox-tbtn[data-mce-name="code"] {
+		display: none !important;
+	}
+}
+@media (max-width: 710px) {
+	.tox-tbtn[data-mce-name="snippet"] {
+		display: none !important;
+	}
+    .tox-toolbar__group {
+		padding: 0 0px !important;
+		border-right: 0px !important;
+	}
+}
+@media (max-width: 590px) {
+    .tox-tbtn[data-mce-name="subscript"] {
+		display: none !important;
+	}
+}
+@media (max-width: 520px) {
+	.tox-tbtn[data-mce-name="backcolor"],
+    .tox-tbtn[data-mce-name="backcolor-chevron"]{
+		display: none !important;
+	}
+}
+@media (max-width: 400px) {
+	.tox-tbtn[data-mce-name="forecolor"],
+    .tox-tbtn[data-mce-name="forecolor-chevron"]{
+		display: none !important;
+	}
+}

@@ -1587,6 +1587,7 @@ fieldset.plain legend {
 		border-right: 0px !important;
 	}
 }
+
 @media (max-width: 575px) {
 	.tox-tbtn[data-mce-name="subscript"],
 	.tox-tbtn[data-mce-name="superscript"],
@@ -1594,6 +1595,15 @@ fieldset.plain legend {
 	.tox-tbtn[data-mce-name="attach"],
 	.tox-tbtn[data-mce-name="alignright"] {
 		display: none !important;
+	}
+}
+@media (max-width: 820px) {
+	.tox-tinymce-inline {
+		left: 5px !important;
+		width: auto !important;
+	}
+	.tox-tinymce-inline .tox-editor-header {
+		max-width: 100% !important;
 	}
 }
 /* Handle below in init for alt positioning */

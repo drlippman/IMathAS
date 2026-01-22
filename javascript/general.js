@@ -669,10 +669,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			}]
         }
 	
-	if (document.documentElement.clientWidth<350) {
-		edsetup.toolbar1 = "myEdit myInsert styles saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
-	} else if (document.documentElement.clientWidth<465) {
+	if (document.documentElement.clientWidth<465) {
 		edsetup.toolbar1 = "myEdit myInsert styles forecolor saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
 	} /* 
