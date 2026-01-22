@@ -174,8 +174,19 @@ if ($myrights<20) {
     }
     $res = $a2->scoreQuestion($qn, $parts_to_score);
 
-		$score = implode('~', $res['scores']);
-		$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."/1</p>\n";
+	$scoretot = round(array_sum($res['scores']), 2);
+	$score = $scoretot . '/1';
+	if (count($res['scores'])>1) {
+		$weightTot = array_sum($res['answeights']);
+		$scaledWeights = array_map(function($w) use ($weightTot) {
+			return $weightTot>0 ? round($w/$weightTot,4) : 0;
+		}, $res['answeights']);
+		$score .= ' (' . implode(', ', array_map(function($score, $weight) {
+			return "$score/$weight";
+		}, $res['scores'], $scaledWeights)) . ')';
+	} 
+	$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."</p>\n";
+
     if (!empty($res['errors'])) {
       $page_scoreMsg .= '<ul class="small">';
       foreach ($res['errors'] as $err) {
