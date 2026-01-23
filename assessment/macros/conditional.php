@@ -12,7 +12,8 @@ array_push(
     'comparesetexp',
     'comparentuples',
     'comparenumberswithunits',
-    'comparesameform'
+    'comparesameform',
+    'scoreperiodic'
 );
 
 
@@ -661,4 +662,49 @@ function comparesameform($a, $b, $vars = "x") {
     }
 
     return ($afunc->normalizeTreeString() === $bfunc->normalizeTreeString());
+}
+
+function scoreperiodic($ans, $stuans, $var, $tol = .0015) {
+    if (empty($ans) || empty($stuans)) {
+        return $ans;
+    }
+    $anss = explode(',', $ans);
+    $stuanss = explode(',', $stuans);
+    $stubases = [];
+    $stuperiods = [];
+    $ansbases = [];
+    $ansperiods = [];
+    $used = [];
+    $parser = new MathParser($var, [], '', false);
+    foreach ($stuanss as $k=>$sa) {
+        try {
+            $parser->parse($sa);
+            $stubases[$k] = $parser->evaluate([$var => 0]);
+            $stuperiods[$k] = $parser->evaluate([$var => 1]) - $stubases[$k];
+        } catch (Throwable $t) {
+            return $ans;
+        }
+    }
+    foreach ($anss as $k=>$a) {
+        try {
+            $parser->parse($a);
+            $ansbases[$k] = $parser->evaluate([$var => 0]); 
+            $ansperiods[$k] = $parser->evaluate([$var => 1]) - $ansbases[$k];
+        } catch (Throwable $t) {
+            return $ans;
+        }
+    }
+    foreach ($stubases as $j=>$sb) {
+        foreach ($ansbases as $k=>$ab) {
+            if (!empty($used[$k]) || $ansperiods[$k] == 0) { continue; }
+            $mult = ($ab - $sb)/$ansperiods[$k];
+            // check if mult is whole number and period is same
+            if (abs($mult - round($mult)) < $tol/$ansperiods[$k]) {
+                $anss[$k] = $sb . ' + (' . $ansperiods[$k] . ')*' . $var;
+                $used[$k] = 1;
+                continue 2;
+            }
+        }
+    }
+    return implode(',', $anss);
 }
