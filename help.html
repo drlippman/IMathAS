@@ -2692,6 +2692,26 @@ These macros are fairly general purpose:
 	</li>
   </ul>
   </li>
+<li><strong>scoreperiodic(answer, stuanswer, variable, [tolerance])</strong>: This helps scoring of "all solutions"
+	periodic answers, like "pi/6+2pik" by redefining the $answer if the student's answer is equivalent but 
+	with a different base value, like "-11pi/6+2pik". It works for a single expression or list of solutions.
+	The function returns a value that should replace $answer, so make sure you separately define $showanswer so 
+	a "nice" answer gets displayed in the key. Here's a couple examples of use:
+	<ul>
+		<li>Single part: (algebraic expression type)<br/>
+			<code>$answerformat = "list"</code><br/>
+			<code>$variables = "k"</code><br/>
+			<code>$answer = "pi/6 + 2pik, pi/3+2pik"</code><br/>
+			<code>$showanswer = "`$answer`"</code><br/>
+			<code>$answer = scoreperiodic($answer, $stuanswers[$thisq], "k")</code>
+		</li>
+		<li>Multipart part (suppose part index 3 is "numfunc"):<br/>
+			<code>$answer[3] = "pi/12 + pi/3n</code><br/>
+			<code>$variables[3] = "n"</code><br/>
+			<code>$showanswer[3] = "`$answer[3]`"</code><br/>
+			<code>$answer[3] = scoreperiodic($answer[3], getstuans($stuanswers,$thisq,3), "n")</code>
+		</li>
+	</ul>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
