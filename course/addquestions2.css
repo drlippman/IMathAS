@@ -302,13 +302,16 @@ tr.textsegmentrow td {
 	}
 }
 @media (max-width: 410px) {
-	.tox-tbtn[data-mce-name="link"] {
-		display: none !important;
-	}
-}
-@media (max-width: 375px) {
-	.tox-tbtn[data-mce-name="numlist"],
+	.tox-tbtn[data-mce-name="link"],
+    .tox-tbtn[data-mce-name="numlist"],
     .tox-tbtn[data-mce-name="numlist-chevron"] {
 		display: none !important;
 	}
 }
+@media (max-width: 370px) {
+	.tox-tbtn[data-mce-name="indent"],
+    .tox-tbtn[data-mce-name="outdent"] {
+		display: none !important;
+	}
+}
+

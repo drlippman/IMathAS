@@ -669,11 +669,13 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			}]
         }
 	
-	// handle these in CSS for better responsiveness
-	/*if (document.documentElement.clientWidth<465) {
+	// on smaller start, move bold to bottom for longer retention while resizing
+	if (document.documentElement.clientWidth<465) {
 		edsetup.toolbar1 = "myEdit myInsert styles forecolor backcolor";
 		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg saveclose";
-	} 
+	}
+	// handle these in CSS for better responsiveness
+	/*
 	else if (document.documentElement.clientWidth<575) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic forecolor backcolor saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";

@@ -1615,7 +1615,7 @@ fieldset.plain legend {
 @media (max-width: 340px) {
 	.tox-tbtn[data-mce-name="forecolor"],
 	.tox-tbtn[data-mce-name="forecolor-chevron"],
-	.tox-tbtn[data-mce-name="bold"],
+	.tox-toolbar:first-of-type .tox-tbtn[data-mce-name="bold"],
 	.tox-tbtn[data-mce-name="italic"],
 	.tox-tbtn[data-mce-name="link"] {
 		display: none !important;
