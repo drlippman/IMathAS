@@ -392,7 +392,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
-    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=012126\" type=\"text/css\" />";
+    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=012426\" type=\"text/css\" />";
     $placeinhead .= '<script>
         $(function() {
             if (window.top != window.self) {

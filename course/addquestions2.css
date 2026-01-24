@@ -272,7 +272,7 @@ tr.textsegmentrow td {
     -moz-appearance: textfield;
   }
 @media (max-width: 740px) {
-	.tox-tbtn[data-mce-name="code"] {
+	.tox-tbtn[data-mce-name="alignright"] {
 		display: none !important;
 	}
 }
@@ -285,20 +285,30 @@ tr.textsegmentrow td {
 		border-right: 0px !important;
 	}
 }
-@media (max-width: 590px) {
-    .tox-tbtn[data-mce-name="subscript"] {
+@media (max-width: 595px) {
+    .tox-tbtn[data-mce-name="attach"] {
 		display: none !important;
 	}
 }
 @media (max-width: 520px) {
-	.tox-tbtn[data-mce-name="backcolor"],
-    .tox-tbtn[data-mce-name="backcolor-chevron"]{
+	.tox-tbtn[data-mce-name="alignleft"],
+    .tox-tbtn[data-mce-name="aligncenter"]{
 		display: none !important;
 	}
 }
-@media (max-width: 400px) {
-	.tox-tbtn[data-mce-name="forecolor"],
-    .tox-tbtn[data-mce-name="forecolor-chevron"]{
+@media (max-width: 445px) {
+	.tox-tbtn[data-mce-name="image"] {
+		display: none !important;
+	}
+}
+@media (max-width: 410px) {
+	.tox-tbtn[data-mce-name="link"] {
+		display: none !important;
+	}
+}
+@media (max-width: 375px) {
+	.tox-tbtn[data-mce-name="numlist"],
+    .tox-tbtn[data-mce-name="numlist-chevron"] {
 		display: none !important;
 	}
 }

@@ -569,8 +569,8 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		cache_suffix: '?v=011526',
 		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons accordion ableplayer",
 		menubar: false,
-		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
-		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
+		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code",
+		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg | saveclose",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr],asvg[sscr|src|type|style]',
 		custom_elements: 'asvg',
         content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
@@ -669,11 +669,11 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			}]
         }
 	
-	if (document.documentElement.clientWidth<465) {
-		edsetup.toolbar1 = "myEdit myInsert styles forecolor saveclose";
-		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg";
-	} /* 
 	// handle these in CSS for better responsiveness
+	/*if (document.documentElement.clientWidth<465) {
+		edsetup.toolbar1 = "myEdit myInsert styles forecolor backcolor";
+		edsetup.toolbar2 = "bullist numlist outdent indent bold italic asciimath asciisvg saveclose";
+	} 
 	else if (document.documentElement.clientWidth<575) {
 		edsetup.toolbar1 = "myEdit myInsert styles bold italic forecolor backcolor saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link image | asciimath asciimathcharmap asciisvg";
