@@ -514,8 +514,6 @@ if ($overwriteBody==1) {
   if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
       $disp['jsparams']['noMQ'] = true;
   }
-  // temporary fix for multipart with 1 part not rescoring on resubmission
-  $disp['jsparams']['submitall'] = true;
   if (!empty($disp['errors'])) {
     echo '<ul class="small">';
     foreach ($disp['errors'] as $err) {

@@ -354,7 +354,7 @@ class AssessStandalone {
         } else {
           $this->state['partattemptn'][$qn][$k]++;
         }
-        if (count($partla)>1) {
+        if ($this->qdata[$qsid]['qtype'] == 'multipart' || $this->qdata[$qsid]['qtype'] == 'conditional') {
           if (!isset($this->state['stuanswers'][$qn+1]) || !is_array($this->state['stuanswers'][$qn+1])) {
             $this->state['stuanswers'][$qn+1] = array();
           }
