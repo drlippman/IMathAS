@@ -42,7 +42,7 @@ $preview_all = ($canViewAll && !empty($_POST['preview_all']));
 
 // load settings including question info
 $assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all || !empty($_POST['in_print']));
-$assess_info->loadException($uid, $isstudent);
+$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }

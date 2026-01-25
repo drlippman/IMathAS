@@ -22,7 +22,7 @@ class AssessHelpers
    * @param  bool $transaction  Whether to wrap in a transaction
    */
   public static function retotalAll($cid, $aid, $updateLTI=true, $forceresend=false, $convertsubmitby='',$transaction=true) {
-    global $DBH;
+    global $DBH, $latepasshrs, $courseenddate;
     // Re-total any student attempts on this assessment
       //need to re-score assessment attempts based on withdrawal
     if ($transaction) {
@@ -55,7 +55,7 @@ class AssessHelpers
             $assess_info->setException(
                 $row['userid'],
                 isset($exceptions[$row['userid']]) ? $exceptions[$row['userid']] : false,
-                true
+                true, 0, $latepasshrs, $courseenddate
             );
             $assess_info->applyTimelimitMultiplier($timelimitmults[$row['userid']]);
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -93,7 +93,7 @@ class AssessHelpers
    * @param  int $uid   The user ID 
    */
   public static function retotalOne($cid, $aid, $uid) {
-    global $DBH;
+    global $DBH, $latepasshrs, $courseenddate;
     // Re-total any student attempts on this assessment
       //need to re-score assessment attempts based on withdrawal
     $DBH->beginTransaction();
@@ -105,7 +105,7 @@ class AssessHelpers
   	$stm->execute(array($aid, $uid));
   	if ($stm->rowCount() > 0) {
   		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-        $assess_info->loadException($uid, true);
+        $assess_info->loadException($uid, true, 0, $latepasshrs, $courseenddate);
         $assess_info->applyTimelimitMultiplier($timelimitmult);
         $assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
@@ -138,7 +138,7 @@ class AssessHelpers
    * @return int      The number of assessments submitted
    */
   public static function submitAllUnsumitted($cid, $aid) {
-    global $DBH;
+    global $DBH, $latepasshrs, $courseenddate;
     // load settings
     $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 
@@ -162,7 +162,7 @@ class AssessHelpers
       $assess_record->parseData();
 
       // need to check if assessment is still available for student
-      $assess_info->loadException($line['userid'], true);
+      $assess_info->loadException($line['userid'], true, 0, $latepasshrs, $courseenddate);
       if ($assess_info->getSetting('available') === 'yes') {
         // skip if still available to student and no time limit or not expired
         if (abs($assess_info->getSetting('timelimit')) > 0) {
