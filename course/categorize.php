@@ -152,26 +152,7 @@ END;
 		$libnames[$row[1]] = $row[2];
 	}
 
-	//add assessment names as options
-	//find the names of assessments these questionsetids appear in
-	$query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
-	$query .= "FROM imas_questions INNER JOIN imas_assessments ";
-	$query .= "ON imas_questions.assessmentid=imas_assessments.id ";
-	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid=:assessmentid) ";
-	$query .= "AND imas_assessments.courseid=:courseid ";
-	$query .= "ORDER BY aid";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
-	$assessmentnames = array();
-	$qsetidassessment = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		//store the relevent assessment names
-		$assessmentnames[$row['aid']] = $row['name'];
-		if ($row['aid']!=$aid) {
-			//remember this other assignment which uses this same questionsetid
-				$qsetidassessment[$row['qsetid']][] = $row['aid'];
-		}
-	}
+	// get questions in assessment
 	$query = "SELECT iq.id,iqs.id AS qsetid,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 	$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
 	$stm = $DBH->prepare($query);
@@ -187,6 +168,28 @@ END;
 		$qsetids[$line['id']]=$line['qsetid'];
 		if (!is_numeric($line['category']) && 0!=strncmp($line['category'],"AID-",4) && trim($line['category'])!='' && !in_array($line['category'],$extracats)) {
 			$extracats[] = $line['category'];
+		}
+	}
+
+	$qsetidlist = implode(',', array_map('intval', array_values(array_unique($qsetids))));
+	//add assessment names as options
+	//find the names of assessments these questionsetids appear in
+	$query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
+	$query .= "FROM imas_questions INNER JOIN imas_assessments ";
+	$query .= "ON imas_questions.assessmentid=imas_assessments.id ";
+	$query .= "AND imas_questions.questionsetid IN ($qsetidlist) ";
+	$query .= "AND imas_assessments.courseid=:courseid ";
+	$query .= "ORDER BY aid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	$assessmentnames = array();
+	$qsetidassessment = array();
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		//store the relevent assessment names
+		$assessmentnames[$row['aid']] = $row['name'];
+		if ($row['aid']!=$aid) {
+			//remember this other assignment which uses this same questionsetid
+				$qsetidassessment[$row['qsetid']][] = $row['aid'];
 		}
 	}
 	
