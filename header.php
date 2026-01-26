@@ -71,8 +71,9 @@ div.breadcrumb { display:none;}
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
+<?php if (isset($CFG['S3']['altendpoint'])) { echo 'var altfilesendpoint = "'.Sanitize::encodeStringForDisplay($CFG['S3']['altendpoint']).'";';} ?>
 </script>
-<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=012426"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/general.js?v=012626"></script>
 <?php
 // override allowedImgDomains if set in config
 if (isset($CFG['GEN']['allowedImgDomains'])) {

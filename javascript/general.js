@@ -534,6 +534,9 @@ var allowedImgDomains = [
 	'.amazonaws.com',
 	window.location.hostname
 ];
+if (typeof altfilesendpoint !== "undefined") {
+	allowedImgDomains.push(altfilesendpoint);
+}
 function isAllowedImgSrc(src) {
 	try {
 		var parser = document.createElement('a');
