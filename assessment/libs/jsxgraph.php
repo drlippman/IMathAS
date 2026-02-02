@@ -1892,8 +1892,7 @@ function jsx_creategeometryboard($label, $ops) {
             enabled: {$pan},
             needshift: false
         },
-        title: '$title',
-        description: '$description'
+        title: '$title $description'
     });";
 
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
@@ -1961,8 +1960,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 				enabled: {$pan},
 				needshift: false
 			 },
-             title: '$title',
-             description: '$description'
+             title: '$title $description'
            });";
 
 	$out .= "var xTicks{$label}, yTicks{$label};";
@@ -2088,8 +2086,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 				enabled: {$pan},
 				needshift: false
 			},
-            title: '$title',
-            description: '$description'
+            title: '$title $description'
 		});
 	";
 
