@@ -130,7 +130,7 @@ class EssayAnswerBox implements AnswerBox
             $sa .= $answer;
         }
 
-        if ($scoremethod == 'takeanythingorblank' && trim($la) == '') {
+        if ($scoremethod == 'takeanythingorblank') {
             $params['submitblank'] = 1;
         }
 
