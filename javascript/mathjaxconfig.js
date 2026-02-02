@@ -47,6 +47,7 @@ window.MathJax = {
             });
         }
         MathJax.startup.defaultReady();
+        MathJax.startup.promise.then(sendLTIresizemsg);
         }
     }
 };

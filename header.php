@@ -120,14 +120,9 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp'] > 0) { // mathjax
 	echo '<script>var mathjaxdisp = 9;</script>'; // default MJ 4
 	echo '<script nomodule>mathjaxdisp = 8;</script>'; // fallback to MJ 3 for old browsers
-    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=011726\" type=\"text/javascript\"></script>\n";
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=020226\" type=\"text/javascript\"></script>\n";
     echo '<script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
 		<script nomodule src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script-fb"></script>';
-    if (isset($_SESSION['ltiitemtype'])) {
-        echo '<script type="text/javascript">
-            MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
-            </script>';
-    }
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==0) { // none
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"none\";function rendermathnode(el,callback) {if(typeof callback=='function'){callback();}}</script>";
