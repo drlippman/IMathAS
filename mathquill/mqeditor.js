@@ -250,7 +250,11 @@ var MQeditor = (function($) {
     // set up editor to display on focus
     $(mqel).find(".mq-textarea > [tabindex=0]")
       .on('focus.mqeditor', showEditor)
-      .on('blur.mqeditor', function() {
+      .on('blur.mqeditor', function(e) {
+        if (e.relatedTarget && $(e.relatedTarget).closest("#mqeditor").length > 0) {
+          // do not hide editor if focus moved inside editor
+          return;
+        }
         blurTimer = setTimeout(hideEditor, 100);
         var mf = MQ.MathField(mqel[0]);
         if (mf && mf.data.history) {
@@ -538,7 +542,7 @@ var MQeditor = (function($) {
     }
     // add close button
     buildButton(tabdiv, {s: 1});
-    buildButton(tabdiv, {p: '&times;', c: 'close', lb: 'close'});
+    buildButton(tabdiv, {p: '&times;', c: 'close', a: 'close'});
 
     $(baseel).find(".mqed-tab").first().addClass("mqed-activetab");
   }
@@ -673,9 +677,8 @@ var MQeditor = (function($) {
         $(btnel).addClass("mqed-closebtn");
       }
     }
-    if (btn.lb) {
-        btnel.setAttribute('aria-label', btn.lb);
-    }
+    btnel.setAttribute('aria-label', btn.a || cmdval);
+
     // make it small; 1 for 90%, 2 for 80%, etc.
     if (btn.sm) {
       btnel.style.fontSize = (100-10*btn.sm) + '%';
@@ -725,9 +728,9 @@ var MQeditor = (function($) {
     }
 
 
-    // return focus to editor
     //clearTimeout(blurTimer);
-    //curMQfield.focus();
+    // return focus to editor
+    curMQfield.focus();
 
     if (cmdtype == 't') {
       // do typedText
