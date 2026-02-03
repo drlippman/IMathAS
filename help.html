@@ -2568,15 +2568,18 @@ These macros are for working with arrays:
 <ul>
 <li><strong>listtoarray(list, [tonum])</strong>:  Converts a list, like "1,2,3,4" or "cat,dog,rabbit" to an array. 
 	If the list is decimal or integer numbers, set tonum to true to ensure they're treated like numbers.</li>
-<li><strong>explode(symbol, string)</strong>:  Converts a string to an array, breaking it apart on the given symbol.</li>
-<li><strong>arraytolist(array, [space])</strong>:  Converts an array to a list. Set the second argument to <code>true</code> to add spaces after the commas.</li>
 <li><strong>calclisttoarray(list)</strong>:  Converts a list of calculations, like "2^2,3^5,7/2" to an array, evaluating the calculations
     along the way.</li>
+<li><strong>explode(symbol, string)</strong>:  Converts a string to an array, breaking it apart on the given symbol.</li>
+<li><strong>arraytolist(array, [space])</strong>:  Converts an array to a list. Set the second argument to <code>true</code> to add spaces after the commas.</li>
+<li><strong>joinarray(array,[symbol,ksort])</strong>:  Convert an array to a string, joining elements with the given symbol (default comma). Set ksort to true to sort the array by key before joining, useful if elements were defined out of order.</li>
 <li><strong>stringtoarray(string, [tonum])</strong>: Converts a text string to an array of characters. 
 	If the characters are all numbers, set tonum to true to ensure they're treated as numbers.</li>
 <li><strong>fillarray(value,num,[start])</strong>:  Creates an array with num entries, all of which are the same given value.  Array indexing
     starts at 0 unless specified. Alternatively, num can be an array of indices, in which case the array will
 	only be defined to the value at those indices.</li>
+<li><strong>consecutive(min,max,[step])</strong>:  Creates an array of consecutive numbers, starting at min and ending at max, in increments of
+    step.  Step is optional; it defaults to 1.</li>
 <li><strong>arraysetvalues(array,keyarray,value/valuearray)</strong>:
 	Sets values on an existing array, at the keys specified in the keyarray. If value is a single value,
 	that value is set at all the keys. This is similar to fillarray with an array for num, but this function 
@@ -2590,8 +2593,6 @@ These macros are for working with arrays:
     give the optional second parameter as "keyfill". In this case you can optionally provide a third 
     argument for the max key to fill the array with.</li>
 <li><strong>jointsort(array,array,[array,...])</strong>:  Jointly reorders two or more arrays based on a lowest-to-highest sort of values in the first array</li>
-<li><strong>consecutive(min,max,[step])</strong>:  Creates an array of consecutive numbers, starting at min and ending at max, in increments of
-    step.  Step is optional; it defaults to 1.</li>
 <li><strong>calconarray(array,calculation)</strong>:  Returns an array, performing the given calculation on each element of the given array.  Use
     "x" as the variable to represent each element of the array.  Example: $b = calconarray($a,"x^2") will create an array that is the
     square each element of the array $a.</li>
@@ -2611,7 +2612,6 @@ These macros are for working with arrays:
 	 </ul>
 	 </li>
 <li><strong>splicearray(array,offset,length,[replacement])</strong>: Removes the elements designated by offset and length from the given array, and replaces them with the elements of the replacement array, if supplied.</li>
-<li><strong>joinarray(array,[symbol,ksort])</strong>:  Convert an array to a string, joining elements with the given symbol (default comma). Set ksort to true to sort the array by key before joining, useful if elements were defined out of order.</li>
 <li><strong>mergearrays(array,array,[array,...])</strong>:  Combines two or more arrays into one long array</li>
 <li><strong>unionarrays(array,array)</strong>:  Unions two arrays, preventing duplicates, into a new array</li>
 <li><strong>intersectarrays(array,array)</strong>:  Finds the intersection of two arrays</li>
