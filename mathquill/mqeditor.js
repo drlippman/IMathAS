@@ -678,7 +678,9 @@ var MQeditor = (function($) {
       }
     }
     btnel.setAttribute('aria-label', btn.a || cmdval);
-
+    btnel.setAttribute('role', 'button');
+    btnel.setAttribute('tabindex', '-1');
+    
     // make it small; 1 for 90%, 2 for 80%, etc.
     if (btn.sm) {
       btnel.style.fontSize = (100-10*btn.sm) + '%';

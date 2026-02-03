@@ -67,6 +67,7 @@
   padding: 0;
   border-radius: 4px;
   cursor: pointer;
+  user-select: none;
   /*font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;*/
 }
 .mqed-closebtn {
