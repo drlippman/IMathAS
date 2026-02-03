@@ -4,8 +4,13 @@
 $DBH->beginTransaction();
 
 $query = 'ALTER TABLE imas_ltiqueue DROP INDEX `sendon`, 
-    DROP INDEX `failures`,
-    ADD INDEX `send_fail` (`sendon`, `failures`)';
+    DROP INDEX `failures`';
+$res = $DBH->query($query);
+ if ($res===false) {
+ 	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . ". Continuing anyway.</p>";
+ }
+
+ $query = 'ALTER TABLE imas_ltiqueue ADD INDEX `send_fail` (`sendon`, `failures`)';
 $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -16,9 +21,7 @@ $res = $DBH->query($query);
 $query = 'ALTER TABLE imas_content_track DROP INDEX `userid`';
 $res = $DBH->query($query);
  if ($res===false) {
- 	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
-	$DBH->rollBack();
-	return false;
+ 	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . ". Continuing anyway.</p>";
  }
 
 $query = 'CREATE FULLTEXT INDEX authoridx ON imas_questionset(author)';
