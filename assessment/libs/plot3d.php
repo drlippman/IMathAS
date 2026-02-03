@@ -109,7 +109,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 			}
 	  	  $GLOBALS['3dplotcnt'] = $r;
 	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
-	  	  $html .= 'role="img" tabindex="0" aria-label="'.Sanitize::encodeStringForDisplay($alt).'" ';
+	  	  $html .= 'role="img" tabindex="0" aria-hidden="true" ';
 	  	  $html .= ">";
 	  	  if (isset($bounds)) {
 			  $bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
@@ -119,6 +119,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	  	  $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
 		  $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a></span>";
 	  	  $html .= "</canvas>";
+		  $html .= '<span class="sr-only">' . Sanitize::encodeStringForDisplay($alt) . '<wbr/></span>';
 				$init = "var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height', showaxes:$axes}, 'plot3d$r');";
 				if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 					$html .= "<script type=\"text/javascript\"> $init </script>";
@@ -264,13 +265,14 @@ function spacecurve($func,$tmin,$tmax) {
 		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
-	  	 $html .= 'role="img" tabindex="0" aria-label="'.Sanitize::encodeStringForDisplay($alt).'" ';
+	  	 $html .= 'role="img" tabindex="0" aria-hidden="true" ';
 	  	 $html .= ">";
-
 	  	 $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
 
 		 $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
 	  	 $html .= "</canvas>";
+		$html .= '<span class="sr-only">' . Sanitize::encodeStringForDisplay($alt) . '<wbr/></span>';
+
         if (isset($bounds)) {
             $bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
         } else {
@@ -288,7 +290,8 @@ function spacecurve($func,$tmin,$tmax) {
 }
 
 function replace3dalttext($plot, $alttext) {
-	return preg_replace('/aria-label="[^"]*"/', 'aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"', $plot);
+	//return preg_replace('/aria-label="[^"]*"/', 'aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"', $plot);
+	return preg_replace('/sr-only">.*?<wbr\/><\//', 'sr-only">'.Sanitize::encodeStringForDisplay($alttext).'<wbr/></', $plot);
 }
 
 //CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])
@@ -298,9 +301,10 @@ function CalcPlot3Dembed($funcs, $width=500, $height=500, $xmin=-2, $xmax=2, $ym
 	$out = '<div class="video-wrapper-wrapper" style="max-width: '.Sanitize::onlyInt($width).'px">';
 	$aspectRatio = round(100*$height/$width,2);
 	$out .= '<div class="fluid-width-video-wrapper" style="padding-top:'.$aspectRatio.'%">';
-	$out .= '<iframe frameborder=0 scrolling="no" aria-label="3D graph" ';
+	$out .= '<iframe frameborder=0 scrolling="no" aria-hidden="true" ';
 	//$querystring is sanitized as it's constructed
 	$out .= 'src="https://c3d.libretexts.org/CalcPlot3D/dynamicFigure/index.html?'.$querystring.'"></iframe>';
+	$out .= '<div class="sr-only">3D Graph<wbr/></div>';
 	$out .= '</div></div>';
 	return $out;
 }
