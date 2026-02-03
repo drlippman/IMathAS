@@ -499,9 +499,9 @@ gradebook-detail_title = Review Assessment Attempts
 gradebook-started = Started
 gradebook-lastchange = Last Changed
 gradebook-time_onscreen = 
-    { $all ->
-        [true] Total time questions were on-screen (all attempts)
-        *[other] Total time questions were on-screen
+    { $n ->
+        [one] Total time questions were on-screen
+        *[other] Total time questions were on-screen (all attempts)
     }
 gradebook-time_on_version = Time spent on this version
 gradebook-due = Due Date
