@@ -35,11 +35,18 @@
 				)
 			);
 		}
-		//update sections
+		//update sections and nomsg
 		if (isset($_POST['section']) && count($_POST['section'])>0) {
 			foreach ($_POST['section'] as $id=>$val) {
-				$stm = $DBH->prepare("UPDATE imas_tutors SET section=:section WHERE id=:id AND courseid=:courseid");
-				$stm->execute(array(':section'=>$val, ':id'=>$id, ':courseid'=>$cid));
+				$nomsg = 0;
+				if (empty($_POST['nomsg1'][$id])) {
+					$nomsg |= 1;
+				}
+				if (empty($_POST['nomsg2'][$id])) {
+					$nomsg |= 2;
+				}
+				$stm = $DBH->prepare("UPDATE imas_tutors SET section=:section,nomsg=:nomsg WHERE id=:id AND courseid=:courseid");
+				$stm->execute(array(':section'=>$val, ':nomsg'=>$nomsg, ':id'=>$id, ':courseid'=>$cid));
 			}
 		}
 		//add new tutors
@@ -111,15 +118,20 @@
 	}
 	sort($sections);
 
+	//messaging options
+	$msgkeys = [0,1,2,3];
+	$msgvals = [_('Yes'),_('Only via question help'),_('Only directly'),_('No')];
+
 	//get tutorlist
 	$tutorlist = array();
 	$i = 0;
-	$stm = $DBH->prepare("SELECT tut.id,u.LastName,u.FirstName,tut.section FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid=:courseid ORDER BY u.LastName,u.FirstName");
+	$stm = $DBH->prepare("SELECT tut.id,u.LastName,u.FirstName,tut.section,tut.nomsg FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid=:courseid ORDER BY u.LastName,u.FirstName");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$tutorlist[$i]['id'] = $row[0];
 		$tutorlist[$i]['name'] = $row[1].', '.$row[2];
 		$tutorlist[$i]['section'] = $row[3];
+		$tutorlist[$i]['nomsg'] = $row[4];
 		$i++;
 	}
 
@@ -148,7 +160,7 @@
 		<tr>
 			<th>Tutor name</th>
 			<th>Limit to <?php echo Sanitize::encodeStringForDisplay($limitname); ?></th>
-
+			<th>Students can Message<sup>*</sup></th>
 			<th>Remove?</th>
 
 		</tr>
@@ -176,6 +188,14 @@ foreach ($tutorlist as $tutor) {
 	echo '</select>';
 	echo '</td>';
 	echo '<td>';
+	echo '<label><input type=checkbox name="nomsg1['.Sanitize::encodeStringForDisplay($tutor['id']).']" value="1"';
+	if (($tutor['nomsg']&1)==0) { echo ' checked="true"'; }
+	echo '>'._('Directly').'</label><br/>';
+	echo '<label><input type=checkbox name="nomsg2['.Sanitize::encodeStringForDisplay($tutor['id']).']" value="2"';
+	if (($tutor['nomsg']&2)==0) { echo ' checked="true"'; }
+	echo '>'._('Via question help').'</label>';
+	echo '</td>';
+	echo '<td>';
 	echo '<input type="checkbox" name="remove[]" value="'.Sanitize::encodeStringForDisplay($tutor['id']).'" aria-labelledby="u'.$i.'" />';
 	echo '</td>';
 	echo '</tr>';
@@ -191,5 +211,6 @@ foreach ($tutorlist as $tutor) {
 
 <?php
 	echo '<p>'._('You can add additional tutors by having them enroll as students, then in the roster select them and use the "With Selected: Add as Tutors" option.').'</p>';
+	echo '<p><sup>*</sup> ' . _('The message settings only apply if the course message settings allow messaging instructors. Messaging directly is via the course page New Message button. Via question help is when the "message instructor" help option is enabled on an assessment.').'</p>';
 	require_once "../footer.php";
 ?>
