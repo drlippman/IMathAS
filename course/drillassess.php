@@ -249,7 +249,7 @@ if ($courseUIver > 1) {
     $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assessment/mathtest.css" />';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/style.css?v='.$lastvueupdate.'" />';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
-    $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=012126" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=020326" type="text/javascript"></script>';
     $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=010726">
