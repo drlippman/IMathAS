@@ -140,6 +140,9 @@ function processShortScript($script) {
 		while (count($sa) > $inx+9) {
 			$this->stroke = $sa[$inx+7];
 			$this->strokewidth = $sa[$inx+8];
+			if (!is_numeric($this->strokewidth)) {
+				$this->strokewidth = 1;
+			}
 			if ($this->usegd2) {
 				imagesetthickness($this->img,(int) round($this->strokewidth > 0.5 ? $this->strokewidth : 1));
 			}

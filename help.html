@@ -23,8 +23,6 @@
 	<li><a href="#questionsetmanagement">Question Set Management</a>
 		<ul>
 		<li><a href="#managequestionset">Manage Question Set</a></li>
-		<li><a href="#exportquestionset">Export Question Set</a></li>
-		<li><a href="#importquestionset">Import Question Set</a></li>
 		</ul></li>
 	<li><a href="#librarymanagement">Library Management</a>
 		<ul>
@@ -73,8 +71,6 @@
 	<li><a href="#questionsetmanagementcm">Question Set Management</a>
 		<ul>
 		<li><a href="#managequestionsetcm">Manage Question Set</a></li>
-		<li><a href="#exportquestionsetcm">Export Question Set</a></li>
-		<li><a href="#importquestionsetcm">Import Question Set</a></li>
 		</ul></li>
 	<li><a href="#librarymanagementcm">Library Management</a>
 		<ul>
@@ -303,34 +299,6 @@ to remove the question from the assigned library</p>
 
 
 </div> <!-- h3 -->
-<div class=h3>
-<h3 id="exportquestionset">Export Question Set</h3>
-
-Use the &quot;Export Question Set&quot; feature to export a portion of the Question Set
-for backup or sharing.  Use the search feature with the checkboxes to select
-questions for inclusion in the export.  Clicking the &quot;Finalize&quot; button, you
-will be asked for a Library Description.
-
-
-</div> <!-- h3 -->
-<div class=h3>
-<h3 id="importquestionset">Import Question Set</h3>
-<p>
-Use the &quot;Import Question Set&quot; feature to import a Question Set that you or
-someone else had exported from IMathAS.  Be sure to only import question sets from
-trusted sources.  After specifying an import file, you will be given a chance
-to select specific questions from the set to be imported.
-</p>
-<p>
-Imported questions will have ownership assigned to the importer.  Select the
-userights you want to apply to all imported questions.  You also can import
-the questions directly into an existing or new question library</p>
-
-<p>If any questions (identified by a unique id) already exist in your system, you
-will be asked if you want to update the existing questions, or add as new questions.
-If you have modified questions previously imported, you may want to add as new. </p>
-
-</div> <!-- h3 -->
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="librarymanagement">Library Management</h2>
@@ -387,7 +355,8 @@ at the same level.
 <div class=h3>
 <h3 id="importlibraries">Import Libraries</h3>
 <p>Use the &quot;Import Libraries&quot; feature to import an entire library or tree
-of libraries.  After selecting a file, the tree of libraries in the import file
+of libraries.  Note this feature may be restricted to admin users only.
+After selecting a file, the tree of libraries in the import file
 will be shown, and you can deselect libraries you do not want to import.  Note that
 if a parent library is not selected, NONE of the children libraries will be added,
 regardless of whether they're checked or not.</p>
@@ -1013,35 +982,6 @@ The options available in the question set manager are:
 to remove the question from the assigned library</p>
 
 </div> <!-- h3 -->
-<div class=h3>
-<h3 id="exportquestionsetcm">Export Question Set</h3>
-
-Use the &quot;Export Question Set&quot; feature to export a portion of the Question Set
-for backup or sharing.  Use the search feature with the checkboxes to select
-questions for inclusion in the export.  Clicking the &quot;Finalize&quot; button, you
-will be asked for a Library Description.
-
-
-</div> <!-- h3 -->
-<div class=h3>
-<h3 id="importquestionsetcm">Import Question Set</h3>
-<p>
-Use the &quot;Import Question Set&quot; feature to import a Question Set that you or
-someone else had exported from IMathAS.  Be sure to only import question sets from
-trusted sources.  After specifying an import file, you will be given a chance
-to select specific questions from the set to be imported.
-</p>
-<p>
-Imported questions will have ownership assigned to the importer.  Select the
-userights you want to apply to all imported questions.  You can import
-the questions directly into an existing library, or into the Unassigned library
-for later assignment.</p>
-
-<p>If any questions (identified by a unique id) already exist in your system, you
-will be asked if you want to update the existing questions, or add as new questions.
-If you have modified questions previously imported, you may want to add as new. </p>
-
-</div> <!-- h3 -->
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="librarymanagementcm">Library Management</h2>
@@ -1097,7 +1037,8 @@ at the same level.
 <div class=h3>
 <h3 id="importlibrariescm">Import Libraries</h3>
 <p>Use the &quot;Import Libraries&quot; feature to import an entire library or tree
-of libraries.  After selecting a file, the tree of libraries in the import file
+of libraries.  Note this feature may be restricted to admin users only.
+After selecting a file, the tree of libraries in the import file
 will be shown, and you can deselect libraries you do not want to import.  Note that
 if a parent library is not selected, NONE of the children libraries will be added,
 regardless of whether they're checked or not.</p>
