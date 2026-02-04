@@ -368,7 +368,7 @@ if (count($vidids) > 0 && isset($CFG['YouTubeAPIKey'])) {
                 $vidtoqueue[] = $vidid;
             }
         } else if ($viddata[$vidid][1] == 3) {
-            adderror(1, sprintf(_('Missing/broken video (ID %s)'), $vidid),
+            adderror(1, sprintf(_('Missing/broken or unscannable video (ID %s)'), $vidid),
                 $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
         } else if ($viddata[$vidid][0] == 0 && $viddata[$vidid][1] > 0) {
             adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid),
@@ -507,7 +507,7 @@ function outputerrortable($errorlevel) {
             </script>';
 }
 
-echo '<p>'._('Videos marked as "Missing/broken" that seem to be available are likely unlisted videos, preventing lookup of caption data.').'</p>';
+echo '<p>'._('Videos marked as "Missing/broken or unscannable" that seem to be available are likely unlisted videos, preventing lookup of caption data.').'</p>';
 
 
 require_once '../footer.php';
