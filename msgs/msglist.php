@@ -415,7 +415,7 @@ if (isset($_GET['add'])) {
 		}
 
 		$courseid = ($cid == 0) ? $filtercid : $cid;
-		if ($cid == 0 && $courseopts == '') {
+		if ($filtercid == 0 && $courseopts == '') {
 			echo '<p>' . _('No courses available to send messages through.') . '</p>';
 			require_once "../footer.php";
 			exit;
