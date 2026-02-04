@@ -4,7 +4,7 @@ require_once __DIR__ . "/htmLawed.php";
 
 class Sanitize
 {
-
+	/*
 	private static $blacklistedFilenames = array(
 		'/^\./',
 		'/\.php\d?$/',
@@ -27,6 +27,24 @@ class Sanitize
 		'/\.xhtml$/',
 		'/\.xml$/'
 	);
+	*/
+	private static $whitelistedExtensions = [
+		'.jpg', '.jpeg', '.png',  '.gif',  '.webp', '.heic', '.tiff', '.bmp', '.svg',
+		'.doc', '.xls',  '.ppt',  '.docx', '.xlsx', '.pptx', '.rtf',  '.csv',  
+		'.pdf', '.txt',  '.odt',  '.ods',  '.odp',  '.key',  '.md',   '.epub', '.tex',
+		'.zip', '.rar',  '.7z',   '.gz',   
+		'.mp4', '.mov',  '.mkv',  '.mp3',  '.m4a',  '.vtt',  '.srt',
+		'.nb',  '.nbp',  '.mw',   '.mws',  '.m',    '.mat',  '.mlx',  
+		'.sas', '.sav',  '.r',    '.rda',  '.rds',  '.dta',  '.rdata', '.rmd',  
+		'.sps', '.qmd',  '.mpx',  '.mpj',  '.mwx',  '.mtw',  '.jmp',   '.jrn', '.jrp', 
+		'.dat',  '.json', 
+		'.imas', '.imscc', '.ggb',
+		'.ipynb', '.pages', '.numbers'
+	];
+
+	private static $whitelistedNonlocalExtensions = [
+		'.htm', '.html', '.js', '.xml', '.xhtml'
+	];
 
 	/**
 	 * Sanitize a filename and check it against a blacklist. Request processing is halted
@@ -37,7 +55,7 @@ class Sanitize
 	 */
 	public static function sanitizeFilenameAndCheckBlacklist($uncleanFilename)
 	{
-		$safeFilename = preg_replace('/[^\da-z\._\-]/i', '', $uncleanFilename);
+		$safeFilename = self::singleExtension(preg_replace('/[^\da-z\._\-]/i', '', $uncleanFilename));
 
 		if (self::isFilenameBlacklisted($safeFilename)) {
 			print("Invalid filename used! Halting.\n");
@@ -66,6 +84,8 @@ class Sanitize
 			$saferFilePath = str_replace('../','',$saferFilePath,$cnt);
 		}
 
+		$saferFilePath = self::singleExtension($saferFilePath);
+		
 		if (self::isFilenameBlacklisted(basename($saferFilePath)) || basename($saferFilePath)=='') {
 			print("Invalid filename used! Halting.\n");
 			// Normally, an exception would be thrown here, but we don't have exception handling. Yet! :)
@@ -83,20 +103,29 @@ class Sanitize
 	 */
 	public static function isFilenameBlacklisted($filenameToCheck)
 	{
+		$filenameToCheck = strtolower($filenameToCheck);
+		$pos = strrpos($filenameToCheck, '.');
+		if ($pos === false) {
+			$ext = ''; // no extension
+		} else {
+			$ext = strtolower(substr($filenameToCheck, $pos));
+		}
 		if (isset($GLOBALS['CFG']['GEN']['filewhitelist'])) {
-			$filenameToCheck = strtolower($filenameToCheck);
-			$pos = strrpos($filenameToCheck, '.');
-			if ($pos === false) {
-				$ext = ''; // no extension
-			} else {
-				$ext = substr($filenameToCheck, $pos);
-			}
 			if (in_array($ext, $GLOBALS['CFG']['GEN']['filewhitelist'])) {
 				return false;
-			} else {
-				return true;
-			}
+			} 
+			
 		} else {
+			if (in_array($ext, self::$whitelistedExtensions)) {
+				return false;
+			}
+			if (!empty($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) &&
+				in_array($ext, self::$whitelistedNonlocalExtensions)
+			) {
+				return false;
+			}
+			/*
+			// old blacklist method
 			$filenameToCheck = strtolower($filenameToCheck);
 			foreach (self::$blacklistedFilenames as $blacklistedFilename) {
 				if (preg_match($blacklistedFilename, $filenameToCheck)) {
@@ -115,7 +144,9 @@ class Sanitize
 			}
 
 			return false;
+			*/
 		}
+		return true;
 	}
 
 	/**
@@ -678,4 +709,28 @@ class Sanitize
             $text
         );
     }
+
+	/**
+	 * adjusts file extensions to a single one.  So file.ext.ex2 would come file_ext.ex2
+	 */
+	private static function singleExtension(string $filename): string
+	{
+		// Get the last extension
+		$lastDotPos = strrpos($filename, '.');
+		
+		if ($lastDotPos === false) {
+			// No extension found, just replace all dots
+			return str_replace('.', '_', $filename);
+		}
+		
+		// Split into name and extension
+		$name = substr($filename, 0, $lastDotPos);
+		$extension = substr($filename, $lastDotPos); // includes the dot
+		
+		// Replace all dots in the name part with underscores
+		$safeName = str_replace('.', '_', $name);
+		
+		// Combine back together
+		return $safeName . $extension;
+	}
 }
