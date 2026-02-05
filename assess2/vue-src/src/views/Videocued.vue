@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+    <a href="#" class="sr-only" @click.prevent="jumpFocus">
       {{ $t('jumptocontent') }}
     </a>
     <assess-header></assess-header>
@@ -23,7 +23,6 @@
       class="scrollpane"
       role="region"
       ref="scrollpane"
-      tabindex="-1"
       :aria-label="$t('regions-q_and_vid')"
     >
       <intro-text
@@ -334,6 +333,11 @@ export default {
     },
     addShowFollowup (val) {
       this.showfolloup.push(val);
+    },
+    jumpFocus () {
+      this.$refs.scrollpane.setAttribute("tabindex","-1");
+      this.$refs.scrollpane.focus();
+      this.$refs.scrollpane.removeAttribute("tabindex");
     }
   },
   mounted () {

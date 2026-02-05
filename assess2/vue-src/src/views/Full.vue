@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <a href="#" class="sr-only" id="skipnav" @click.prevent="$refs.scrollpane.focus()">
+    <a href="#" class="sr-only" id="skipnav" @click.prevent="jumpFocus">
       {{ $t('jumptocontent') }}
     </a>
     <assess-header></assess-header>
@@ -27,7 +27,6 @@
       class="scrollpane fulldisp"
       role="region"
       ref="scrollpane"
-      tabindex="-1"
       :aria-label="$t('regions-questions')"
     >
       <intro-text
@@ -146,6 +145,11 @@ export default {
     showAllAns () {
       window.$("span[id^='ans']").removeClass('hidden').toggle();
       window.$('.keybtn').attr('aria-expanded', function (i, v) { return !JSON.parse(v); });
+    },
+    jumpFocus () {
+      this.$refs.scrollpane.setAttribute("tabindex","-1");
+      this.$refs.scrollpane.focus();
+      this.$refs.scrollpane.removeAttribute("tabindex");
     }
   }
 };
