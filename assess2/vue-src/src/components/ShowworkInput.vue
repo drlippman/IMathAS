@@ -39,7 +39,7 @@
 }
 </style>
 <script>
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 
 export default {
   name: 'ShowworkInput',

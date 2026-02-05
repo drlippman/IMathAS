@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { store } from '../../basicstore';
+import { store } from '@/basicstore';
 import Question from '@/components/question/Question.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 

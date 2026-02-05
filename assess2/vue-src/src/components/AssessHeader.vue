@@ -122,7 +122,7 @@ import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 import BadgedIcon from '@/components/BadgedIcon.vue';
 
 import { attemptedMixin } from '@/mixins/attemptedMixin';
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 
 export default {
   name: 'AssessHeader',

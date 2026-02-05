@@ -81,7 +81,7 @@ import LivepollSettings from '@/components/LivepollSettings.vue';
 import LivepollResults from '@/components/LivepollResults.vue';
 import Question from '@/components/question/Question.vue';
 import Timer from '@/components/Timer.vue';
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 
 export default {
   name: 'livepoll',

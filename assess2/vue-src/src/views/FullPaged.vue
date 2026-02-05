@@ -96,7 +96,7 @@ import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
 import IntroText from '@/components/IntroText.vue';
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 
 export default {
   name: 'FullPaged',

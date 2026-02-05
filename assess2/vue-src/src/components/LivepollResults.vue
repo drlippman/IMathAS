@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 import LivepollResultsChoices from '@/components/LivepollResultsChoices.vue';
 import LivepollResultsGeneral from '@/components/LivepollResultsGeneral.vue';
 

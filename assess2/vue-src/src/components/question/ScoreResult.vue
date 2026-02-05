@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { store, actions } from '../../basicstore';
+import { store, actions } from '@/basicstore';
 import Icons from '@/components/widgets/Icons.vue';
 
 export default {

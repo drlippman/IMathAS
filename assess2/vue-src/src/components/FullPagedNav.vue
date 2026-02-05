@@ -56,7 +56,7 @@ import MenuButton from '@/components/widgets/MenuButton.vue';
 import FullPagedListItem from '@/components/FullPagedListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import { attemptedMixin } from '@/mixins/attemptedMixin';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'FullPagedNav',

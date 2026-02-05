@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { store, actions } from '../../basicstore';
+import { store, actions } from '@/basicstore';
 import ScoreResult from '@/components/question/ScoreResult.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionHelps from '@/components/question/QuestionHelps.vue';

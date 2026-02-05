@@ -37,7 +37,7 @@
 <script>
 import Icons from '@/components/widgets/Icons.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
-import { store } from '../../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'QuestionHelps',

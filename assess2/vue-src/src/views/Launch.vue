@@ -140,7 +140,7 @@ import SummaryGbScore from '@/components/summary/SummaryGbScore.vue';
 
 import Icons from '@/components/widgets/Icons.vue';
 
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 
 export default {
   name: 'Launch',

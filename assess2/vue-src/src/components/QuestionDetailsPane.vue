@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 import QuestionDetailsTable from '@/components/QuestionDetailsTable.vue';
 import PenaltiesApplied from '@/components/PenaltiesApplied.vue';
 

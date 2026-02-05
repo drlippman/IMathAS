@@ -17,7 +17,7 @@
 <script>
 import Icons from '@/components/widgets/Icons.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 /*
  Dropdown menu for LTI users

@@ -130,7 +130,6 @@ export const actions = {
         // overwrite properties with those from response
         response = this.processSettings(response);
         store.assessInfo = Object.assign({}, store.assessInfo, response);
-
         // clear out trackers, in case we're retaking
         store.autosaveQueue = {};
         store.autosaveTimeactive = {};

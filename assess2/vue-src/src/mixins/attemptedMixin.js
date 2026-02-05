@@ -1,4 +1,4 @@
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export const attemptedMixin = {
   computed: {

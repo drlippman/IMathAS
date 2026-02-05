@@ -69,9 +69,9 @@ function updatePhpFiles() {
       // Update your PHP file
       let phpPath = path.resolve(__dirname, '../index.php');
       let phpContent = fs.readFileSync(phpPath, 'utf-8');
-      phpContent = phpContent.replace(/js\/index\.js\?v=\w+/g, jsFile)
-                            .replace(/js\/index-legacy\.js\?v=\w+/g, legacyJsFile)
-                            .replace(/css\/style\.css\?v=\w+/g, cssFile);
+      phpContent = phpContent.replace(/js\/index\.js\?v=[\w\-]+/g, jsFile)
+                            .replace(/js\/index-legacy\.js\?v=[\w\-]+/g, legacyJsFile)
+                            .replace(/css\/style\.css\?v=[\w\-]+/g, cssFile);
       fs.writeFileSync(phpPath, phpContent);
 
       // gbviewassess
@@ -82,9 +82,9 @@ function updatePhpFiles() {
       // Update your PHP file
       phpPath = path.resolve(__dirname, '../gbviewassess.php');
       phpContent = fs.readFileSync(phpPath, 'utf-8');
-      phpContent = phpContent.replace(/js\/gbviewassess\.js\?v=\w+/g, jsFile)
-                            .replace(/js\/gbviewassess-legacy\.js\?v=\w+/g, legacyJsFile)
-                            .replace(/css\/style\.js\?v=\w+/g, cssFile);
+      phpContent = phpContent.replace(/js\/gbviewassess\.js\?v=[\w\-]+/g, jsFile)
+                            .replace(/js\/gbviewassess-legacy\.js\?v=[\w\-]+/g, legacyJsFile)
+                            .replace(/css\/style\.js\?v=[\w\-]+/g, cssFile);
       fs.writeFileSync(phpPath, phpContent);
 
       // Delete the .html files copied into /vue/

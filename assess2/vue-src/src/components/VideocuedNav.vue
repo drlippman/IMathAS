@@ -16,7 +16,7 @@
 <script>
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import VideocuedNavListItem from '@/components/VideocuedNavListItem.vue';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'VideocuedNav',

@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 import Question from '@/components/question/Question.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import ShowworkInput from '@/components/ShowworkInput.vue';

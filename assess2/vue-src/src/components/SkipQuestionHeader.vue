@@ -77,7 +77,7 @@ import MenuButton from '@/components/widgets/MenuButton.vue';
 import SkipQuestionListItem from '@/components/SkipQuestionListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import { attemptedMixin } from '@/mixins/attemptedMixin';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'SkipQuestionHeader',

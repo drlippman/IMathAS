@@ -102,7 +102,7 @@ import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
 import VideocuedResultNav from '@/components/VideocuedResultNav.vue';
 import Question from '@/components/question/Question.vue';
 import IntroText from '@/components/IntroText.vue';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'videocued',

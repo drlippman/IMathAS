@@ -54,7 +54,7 @@
 <script>
 import Icons from '@/components/widgets/Icons.vue';
 import A11yDialog from './a11y-dialog';
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 
 export default {
   name: 'DueDialog',

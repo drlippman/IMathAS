@@ -21,7 +21,7 @@
 
 <script>
 import Icons from '@/components/widgets/Icons.vue';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 import { attemptedMixin } from '@/mixins/attemptedMixin';
 
 export default {

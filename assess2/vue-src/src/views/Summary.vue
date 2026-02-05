@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { store, actions } from '../basicstore';
+import { store, actions } from '@/basicstore';
 import SummaryHeader from '@/components/summary/SummaryHeader.vue';
 import SummaryGbScore from '@/components/summary/SummaryGbScore.vue';
 import SummaryScoreTotal from '@/components/summary/SummaryScoreTotal.vue';

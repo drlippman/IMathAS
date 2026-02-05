@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 import Icons from '@/components/widgets/Icons.vue';
 
 export default {

@@ -66,7 +66,7 @@
 <script>
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import Icons from '@/components/widgets/Icons.vue';
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'LivepollNav',

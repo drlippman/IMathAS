@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { store, actions } from './basicstore';
+import { store, actions } from '@/basicstore';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import DueDialog from '@/components/DueDialog.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';

@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { store } from '../../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'SummaryGbScore',

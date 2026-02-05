@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 import InterQuestionText from '@/components/InterQuestionText.vue';
 
 export default {

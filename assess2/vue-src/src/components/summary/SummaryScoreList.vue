@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { store } from '../../basicstore';
+import { store } from '@/basicstore';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionDetailsTable from '@/components/QuestionDetailsTable.vue';
 import ClickToShow from '@/components/widgets/ClickToShow.vue';

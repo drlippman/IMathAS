@@ -68,7 +68,7 @@ import Question from '@/components/question/Question.vue';
 import IntroText from '@/components/IntroText.vue';
 import Icons from '@/components/widgets/Icons.vue';
 
-import { store } from '../basicstore';
+import { store } from '@/basicstore';
 
 export default {
   name: 'skip',
