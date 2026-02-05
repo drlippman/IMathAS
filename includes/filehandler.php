@@ -958,7 +958,7 @@ function deleteqimage($file) {
 }
 
 function deletefilebykey($key) {
-	$safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
+	$safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = $safeFilename;
