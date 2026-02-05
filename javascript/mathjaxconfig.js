@@ -1,6 +1,6 @@
 window.MathJax = {
     loader: {
-        load: ["input/asciimath", "output/chtml", "ui/menu"]
+        load: ["input/asciimath", "output/svg", "ui/menu"]
     },
     options: {
         ignoreHtmlClass: "skipmathrender",

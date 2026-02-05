@@ -11,7 +11,6 @@ function showUserPrefsForm($limited = false) {
 
 	$prefs = array();
 	$prefs['mathdisp'] = array(
-		'8'=>_('MathJax 3'),
 		'9'=>_('MathJax 4'),
 		'6'=>_('Katex - faster display'),
 		'2'=>_('Image-based display'),
@@ -47,7 +46,7 @@ function showUserPrefsForm($limited = false) {
 		'1'=>_('Show live preview of answer entry as I type'),
 		'0'=>_('Only show a preview when I click the Preview button'));
 	$prefdefaults = array(
-		'mathdisp'=>8,
+		'mathdisp'=>9,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
@@ -131,7 +130,7 @@ function storeUserPrefs() {
 		$currentuserprefs[$row[0]] = array($row[1],$row[2]);
 	}
 	$prefdefaults = array(
-		'mathdisp'=>8,
+		'mathdisp'=>9,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
@@ -198,7 +197,7 @@ function generateuserprefs($uid) {
 
 	$_SESSION['userprefs'] = array();
 	$prefdefaults = array(
-		'mathdisp'=>8,
+		'mathdisp'=>9,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
@@ -229,7 +228,7 @@ function generateuserprefs($uid) {
 			$_SESSION['userprefs']['mathdisp'] == 7 || 
 			$_SESSION['userprefs']['mathdisp'] == 8
 		) {
-			$_SESSION['userprefs']['mathdisp'] = 8;
+			$_SESSION['userprefs']['mathdisp'] = 9;
 		}
 		foreach(array('graphdisp','mathdisp','useed') as $key) {
 			if (isset($_SESSION['userprefs'][$key])) {
