@@ -103,6 +103,7 @@ class FileScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
+            $filename = Sanitize::sanitizeFilenameAndCheckBlacklist($filename);
             if (!empty($assessmentId)) { //going to use assessmentid/random
                 $randstr = '';
 

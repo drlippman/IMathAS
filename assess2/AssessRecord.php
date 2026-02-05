@@ -983,6 +983,7 @@ class AssessRecord
       if (Sanitize::isFilenameBlacklisted($filename)) {
         return [false, 'file_invalidtype'];
       }
+      $filename = Sanitize::sanitizeFilenameAndCheckBlacklist($filename);
       $s3object = "adata/$s3asid/$filename";
       require_once __DIR__."/../includes/filehandler.php";
       if (storeuploadedfile("qn$qref",$s3object)) {
