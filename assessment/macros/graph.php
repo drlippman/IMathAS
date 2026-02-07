@@ -1144,22 +1144,9 @@ function addimageborder($img, $w = 1, $m = 0) {
     return $img;
 }
 
-// private, used by invertplot
-function invertpts ($m) {
-    $pts = explode('],[', substr($m[2],1,-1));
-    foreach ($pts as $k=>$pt) {
-        $pt = explode(',', $pt);
-        $pts[$k] = $pt[1].','.$pt[0];
-    }
-    if ($m[1] == 'path') {
-        return 'path([[' . implode('],[', $pts) . ']]);';
-    } else if ($m[1] == 'line') {
-        return 'line([' . implode('],[', $pts) . ']);';
-    }
-}
-
 function invertplot($plot) {
-    $plot = preg_replace_callback('/(path)\(\[(.*?)\]\);/', 'invertpts', $plot);
-    $plot = preg_replace_callback('/(line)\((.*?)\);/', 'invertpts', $plot);
+    $plot = preg_replace_callback('/\[([^,\[\]]*?),([^,\[\]]*?)\]/', function($m) {
+        return '['.$m[2].','.$m[1].']';
+    }, $plot);
     return $plot;
 }
