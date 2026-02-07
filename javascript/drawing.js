@@ -2639,15 +2639,13 @@ function setCursor(cursor, target) {
 	target = target || curTarget;
 
 	if (targets[target].cursor != cursor) {
+		var fmt = isSafari ? 'png' : 'svg';
 		if (cursor=='move') {
 			targets[target].el.style.cursor = cursor;
-		} else if (isSafari) {
-			// use .cur for Safari which doesn't handle hotspot on svg cursors well
-			targets[target].el.style.cursor = 'url('+staticroot+'/img/'+cursor+'.cur), auto';	
 		} else if (cursor=='pen') {
-			targets[target].el.style.cursor = 'url('+staticroot+'/img/penup.svg) 0 0, auto';
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/penup.'+fmt+') 0 0, auto';
 		} else if (cursor=='pendown') {
-			targets[target].el.style.cursor = 'url('+staticroot+'/img/pendown.svg) 0 20, auto';
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/pendown.'+fmt+') 0 20, auto';
 		}
 		targets[target].cursor = cursor;
 	}
