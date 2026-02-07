@@ -100,6 +100,7 @@ var hasTouch = false;
 var didMultiTouch = false;
 var clickmightbenewcurve = false;
 var hasTouchTimer = null;
+var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 var tpModeN = {
 	"5": 2, "5.1": 2, "5.2": 2, "5.3": 2, "5.4": 2,
 	"6": 2, "6.1": 2, "6.2": 2, "6.3": 2, "6.5": 2, "6.6": 2, "6.7": 3,
@@ -2640,6 +2641,9 @@ function setCursor(cursor, target) {
 	if (targets[target].cursor != cursor) {
 		if (cursor=='move') {
 			targets[target].el.style.cursor = cursor;
+		} else if (isSafari) {
+			// use .cur for Safari which doesn't handle hotspot on svg cursors well
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/'+cursor+'.cur), auto';	
 		} else if (cursor=='pen') {
 			targets[target].el.style.cursor = 'url('+staticroot+'/img/penup.svg) 0 0, auto';
 		} else if (cursor=='pendown') {
