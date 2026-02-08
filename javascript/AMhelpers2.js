@@ -2426,6 +2426,8 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 
 var seqgroupcollapsed = {};
 function setupSeqPartToggles(base) {
+    var righttri = '<svg style="vertical-align:middle" width="12" height="12" viewBox="0 0 12 12"><path d="M2 2 L2 10 L10 6 Z" fill="currentColor"/></svg>';
+    var downtri = '<svg style="vertical-align:middle" width="12" height="12" viewBox="0 0 12 12"><path d="M2 2 L10 2 L6 10 Z" fill="currentColor"/></svg>';
     if (base.id && base.id.match(/questionwrap/)) {
         var qn = parseInt(base.id.substr(12));
         var seqseps = $(base).find(".seqsep");
@@ -2444,7 +2446,7 @@ function setupSeqPartToggles(base) {
                     "aria-expanded": !seqgroupcollapsed[qn][i],
                     "aria-controls": "seqgrp"+qn+"-"+i,
                     "aria-label": seqgroupcollapsed[qn][i] ? _('Expand') : _('Collapse'),
-                    html: seqgroupcollapsed[qn][i] ? '&#x25B6;' : '&#x25BC;',
+                    html: seqgroupcollapsed[qn][i] ? righttri : downtri,
                     type: 'button',
                     click: function (e) {
                         var state = (this.getAttribute("aria-expanded") == 'true');
@@ -2452,11 +2454,11 @@ function setupSeqPartToggles(base) {
                         if (state) {
                             this.setAttribute("aria-expanded", "false");
                             this.setAttribute("aria-label", _('Expand'));
-                            this.innerHTML = '&#x25B6;'
+                            this.innerHTML = righttri
                         } else {
                             this.setAttribute("aria-expanded", "true");
                             this.setAttribute("aria-label", _('Collapse'));
-                            this.innerHTML ='&#x25BC;';
+                            this.innerHTML = downtri;
                         }
                         $("#"+ctls).slideToggle(300);
                         var pts = ctls.substr(6).split("-");
