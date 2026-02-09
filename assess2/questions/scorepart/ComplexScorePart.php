@@ -116,12 +116,24 @@ class ComplexScorePart implements ScorePart
                     $tchk = str_replace('j','i', $tchk);
                 }
                 if (in_array('generalcomplex', $ansformats)) {
-                    // skip format checks
+                    // basic format check
+                    if ($answer != 'DNE' && $answer != 'oo' && !simplecheckanswerformat($tchk, $ansformats)) {
+                        //return 0;
+                        unset($gaarr[$i]);
+                        continue;
+                    }
                 } else if (in_array('sloppycomplex', $ansformats)) {
+                    // basic format check
+                    if ($answer != 'DNE' && $answer != 'oo' && !simplecheckanswerformat($tchk, $ansformats)) {
+                        //return 0;
+                        unset($gaarr[$i]);
+                        continue;
+                    }
+                    // check for one i
                     $tchk = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $tchk);
                     if (substr_count($tchk, 'i') > 1) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        unset($gaarr[$i]);
+                        continue;
                     }
                     $tchk = str_replace(array('s$n', 'p$'), array('sin', 'pi'), $tchk);
                 } else {
@@ -138,11 +150,13 @@ class ComplexScorePart implements ScorePart
                         //return 0;
                         unset($gaarr[$i]);
                     }
-                    if ($answer != 'DNE' && $answer != 'oo' && !empty($requiretimeslistpart) && checkreqtimes($tchk, $requiretimeslistpart) == 0) {
-                        //return 0;
-                        unset($gaarr[$i]);
-                    }
                 }
+                // requiretimes check for all types
+                if ($answer != 'DNE' && $answer != 'oo' && !empty($requiretimeslistpart) && checkreqtimes($tchk, $requiretimeslistpart) == 0) {
+                    //return 0;
+                    unset($gaarr[$i]);
+                }
+                // sameform check all types
                 if ($checkSameform) {
                     $gafunc = parseMathQuiet($tchk, 'i');
                     if ($gafunc === false) {

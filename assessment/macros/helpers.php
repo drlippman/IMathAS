@@ -1052,6 +1052,39 @@ function checkreqtimes($tocheck,$rtimes) {
 	return 1;
 }
 
+// only check for things like nodecimal and notrig, that can be checked
+// for non-simple-number expressions
+function simplecheckanswerformat($tocheck, $ansformats) {
+    $tocheck = trim($tocheck);
+	$tocheck = str_replace(',','',$tocheck);
+	if (!is_array($ansformats)) {$ansformats = explode(',',$ansformats);}
+	if (strtoupper($tocheck)=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
+		return true;
+	}
+    if (in_array("notrig",$ansformats)) {
+		if (preg_match('/(sin|cos|tan|cot|csc|sec)/i',$tocheck)) {
+			return false;
+		}
+    }
+	if (in_array("nolongdec",$ansformats)) {
+		if (preg_match('/\.\d{6}/',$tocheck)) {
+			return false;
+		}
+	}
+    if (in_array("nodecimal",$ansformats)) {
+		if (strpos($tocheck,'.')!==false) {
+			return false;
+		}
+		if (strpos($tocheck,'E-')!==false) {
+			return false;
+		}
+		if (preg_match('/10\^\(?\-/',$tocheck)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 //checks the format of a value
 //tocheck:  string to check
 //ansformats:  array of answer formats.  Currently supports:

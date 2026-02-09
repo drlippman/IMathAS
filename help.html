@@ -4079,7 +4079,8 @@ or if the question type gives away critical info to the student.</dd>
             "allowjcomplex" allows for use of j instead of i as the imaginary unit.<br/>
         The other options require each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
         without decimals (also disallows 10^-2 and 3E-2), or
-        an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+        an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".
+		Note that component-based answerformats won't be checked for sloppycomplex or generalcomplex.<br/>
         $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
         $ansprompt = "One value, x=;No values;Many values"
         </dd>
