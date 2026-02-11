@@ -33,7 +33,7 @@ const BINARIES_SETEXP = array("nn","ominus","uu","-");
 const ALTS_SETEXP = array( "cap"=> "nn", "and" => "nn", "∩"=>"nn", "\\cap" => "nn",
                     "xor" => "ominus", "\\oplus" => "ominus", "oplus" => "ominus", "⊕" => "ominus", "\\ominus" => "ominus", "triangle" => "ominus", "⊖" => "ominus", "\\triangle" => "ominus", "△" => "ominus",
                     "cup" => "uu", "or" => "uu", "∪"=>"uu", "\\cup" => "uu",
-                    "'" => '!', "^c" => '!');
+                    "'" => '!', "^c" => '!', "^(c)" => '!');
 // PRECEDENCE_SETEXP gives the precidence of the operations. Lower is higher precedence.
 const PRECEDENCE_SETEXP = array('!'=>0,"nn"=>1,"uu"=>1,"ominus"=>1,"-"=>2);
 // VENN2_SETEXP gives the coordinates for the 4 regions of the 2-circle Venn diagram, used in venn2diagram

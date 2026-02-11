@@ -489,8 +489,8 @@ function comparesetexp($a, $b, $vars) {
     }
     $varlist = implode(',', $vars);
 
-    $keywords = ['and', 'nn', 'cap', 'xor', 'oplus', 'ominus', 'triangle', 'or', 'cup', 'uu', '-',  '\''];
-    $replace =     ['#a',  '#a', '#a',     '#x',  '#x',    '#x',     '#x',       '#o', '#o',  '#o', '#m',    '^c'];
+    $keywords = ['and', 'nn', 'cap', 'xor', 'oplus', 'ominus', 'triangle', 'or', 'cup', 'uu', '-',  '\'', '^(c)'];
+    $replace =     ['#a',  '#a', '#a',     '#x',  '#x',    '#x',     '#x',       '#o', '#o',  '#o', '#m',    '^c', '^c'];
 
     $ab = [$a, $b];
     foreach ($ab as &$str) {
