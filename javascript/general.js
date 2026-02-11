@@ -1107,11 +1107,11 @@ function togglefileembed(id, newstate) {
 				id: 'fileiframe' + id,
 				text: 'Converting HEIC file (this may take a while)...'
 			}).insertAfter(toggleel);
-			if (!window.heic2any) {
-				jQuery.getScript(staticroot+'/javascript/heic2any.min.js')
-				 .done(function() { convertheic(href, 'fileiframe' + id); });
+			if (!window.HeicTo) {
+				jQuery.getScript(staticroot+'/javascript/heic-to.min.js')
+				 .done(function() { convertheic2(href, 'fileiframe' + id); });
 			} else {
-				convertheic(href, 'fileiframe' + id);
+				convertheic2(href, 'fileiframe' + id);
 			}
 		} else {
 			jQuery('<div>').append(jQuery('<img/>', {
@@ -1158,6 +1158,20 @@ function convertheic(href, divid) {
   .then(function(res) { return res.blob();})
   .then(function(blob) {
 		return heic2any({blob:blob});
+	})
+  .then(function(conversionResult) {
+    var url = URL.createObjectURL(conversionResult);
+    document.getElementById(divid).innerHTML = '<img src="' + url + '" onclick="rotateimg(this)">';
+  })
+  .catch(function(e) {
+    console.log(e);
+  });
+}
+function convertheic2(href, divid) {
+	fetch(href)
+  .then(function(res) { return res.blob();})
+  .then(async function(blob) {
+		return await HeicTo({blob:blob, type:"image/jpeg", quality: 0.5});
 	})
   .then(function(conversionResult) {
     var url = URL.createObjectURL(conversionResult);
