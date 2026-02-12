@@ -145,6 +145,10 @@ AblePlayer
 Copyright (c) 2014-2025 The Able Player Contributors
 MIT License
 
+heic-to
+Copyright hoppergee 
+https://github.com/hoppergee/heic-to
+LGPL
 
 
 
