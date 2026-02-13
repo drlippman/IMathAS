@@ -34,7 +34,7 @@ class Sanitize
 		'.pdf', '.txt',  '.odt',  '.ods',  '.odp',  '.key',  '.md',   '.epub', '.tex',
 		'.zip', '.rar',  '.7z',   '.gz',   
 		'.mp4', '.mov',  '.mkv',  '.mp3',  '.m4a',  '.vtt',  '.srt',
-		'.nb',  '.nbp',  '.mw',   '.mws',  '.m',    '.mat',  '.mlx',  
+		'.nb',  '.nbp',  '.mw',   '.mws',  '.m',    '.mat',  '.mlx',   '.omv',
 		'.sas', '.sav',  '.r',    '.rda',  '.rds',  '.dta',  '.rdata', '.rmd',  
 		'.sps', '.qmd',  '.mpx',  '.mpj',  '.mwx',  '.mtw',  '.jmp',   '.jrn', '.jrp', 
 		'.dat',  '.json', 
