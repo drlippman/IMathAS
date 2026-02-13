@@ -58,11 +58,12 @@ class FileUploadAnswerBox implements AnswerBox
         }
         if (!isset($GLOBALS['useeditor']) || $GLOBALS['useeditor'] !== 'review') {
             $out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" class=\"filealt\"";
-            if (!empty($answerformat)) {
-                $answerformat = str_replace('images', '.jpg,.jpeg,.gif,.png', $answerformat);
-                $answerformat = str_replace('canpreview', '.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
-                $out .= ' accept="' . preg_replace('/[^\w\.,\/\*\-]/', '', $answerformat) . '"';
+            if (empty($answerformat)) {
+                $answerformat = str_replace(' ','',Sanitize::getFileWhitelist());
             }
+            $answerformat = str_replace('images', '.jpg,.jpeg,.gif,.png', $answerformat);
+            $answerformat = str_replace('canpreview', '.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
+            $out .= ' accept="' . preg_replace('/[^\w\.,\/\*\-]/', '', $answerformat) . '"';
             
             $out .= "/>\n";
             $out .= '<label for="qn' . $qn . '"><span role="button" class="filealt-btn ' . $colorbox . '">';

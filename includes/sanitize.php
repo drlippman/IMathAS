@@ -150,6 +150,17 @@ class Sanitize
 	}
 
 	/**
+	 * Get whitelist extensions as string
+	 */
+	public static function getFileWhitelist() {
+		$str = implode(', ', self::$whitelistedExtensions);
+		if (!empty($GLOBALS['CFG']['GEN']['AWSforcoursefiles'])) {
+			$str .= ', ' . implode(', ', self::$whitelistedNonlocalExtensions);
+		}
+		return $str;
+	}
+
+	/**
 	 * Encode a string for display in a web browser. Use for page text and HTML attributes only!
 	 *
 	 * @see encodeStringForJavascript

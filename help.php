@@ -39,6 +39,7 @@
 			$buffer = fgets($handle, 4096);
 			$buffer = str_replace('https://yourIMathASsite', $basesiteurl, $buffer);
 			$buffer = str_replace('IMathAS', $installname, $buffer);
+			$buffer = str_replace('@whitelist@', Sanitize::getFileWhitelist(), $buffer);
 			if (!$inbody) {
 				if (strpos($buffer,"<body")!==false) {
 					$inbody = true;
