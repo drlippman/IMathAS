@@ -1,5 +1,5 @@
 <template>
-  <i>
+  <span>
     <svg
       xmlns = "http://www.w3.org/2000/svg"
       class = "svgicon"
@@ -143,7 +143,7 @@
     <span class="sronly" v-if="alttext.length > 0">
       {{ alttext }}
     </span>
-  </i>
+  </span>
 </template>
 
 <script>
