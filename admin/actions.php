@@ -172,7 +172,7 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
 			$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=:groupid WHERE ownerid=:ownerid");
-			$stm->execute(array(':groupid'=>$_POST['group'], ':ownerid'=>$_GET['id']));
+			$stm->execute(array(':groupid'=>$newgroup, ':ownerid'=>$_GET['id']));
 		} else {
 			$newgroup = $groupid;
 			$arr[':groupid'] = $groupid;
