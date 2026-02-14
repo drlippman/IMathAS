@@ -503,7 +503,7 @@ if (count($threaddata) > 0) {
 
 $pagetitle = "Threads";
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=021326\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
 $placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid';</script>";
@@ -812,9 +812,9 @@ echo "</p>";
 
 				echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');" role="switch" aria-checked="'.(!empty($tags[$line['id']])?'true':'false').'" aria-label="'._('Tag post').'">';
 				if (!empty($tags[$line['id']])) {
-					echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
+					echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.svg\" alt=\"\"/>";
 				} else {
-					echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
+					echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.svg\" alt=\"\"/>";
 				}
 				echo '</button>';
 
@@ -828,7 +828,7 @@ echo "</p>";
 				if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby) || ($allowdel && $line['userid']==$userid && $posts==0)) {
 					echo '<span class="dropdown">';
 					echo '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenu'.Sanitize::onlyInt($line['id']).'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-					echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
+					echo ' <img src="'.$staticroot.'/img/gears.svg" class="mida" alt="Options"/>';
 					echo '</a>';
 					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.Sanitize::onlyInt($line['id']).'">';
 

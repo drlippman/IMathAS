@@ -824,20 +824,20 @@ function outputSearchUI($searchtype = 'libs', $searchterms = '', $search_results
                     <div><?php echo _('Last Modified');?>: <div>
                         <input size=8 id="search-lastmod-min" name="search-lastmod-min" aria-label="<?php echo _('last modified minimum date');?>">
                         <a href="#" onClick="displayDatePicker('search-lastmod-min', this); return false">
-			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			            <img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
                         to 
                         <input size=8 id="search-lastmod-max" name="search-lastmod-max" aria-label="<?php echo _('last modified maximum date');?>">
                         <a href="#" onClick="displayDatePicker('search-lastmod-max', this); return false">
-			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			            <img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
                     </div></div>
                     <div><?php echo _('Created');?>: <div>
                         <input size=8 id="search-created-min" name="search-created-min" aria-label="<?php echo _('created minimum date');?>">
                         <a href="#" onClick="displayDatePicker('search-created-min', this); return false">
-			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			            <img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
                         to 
                         <input size=8 id="search-created-max" name="search-created-max" aria-label="<?php echo _('created maximum date');?>">
                         <a href="#" onClick="displayDatePicker('search-created-max', this); return false">
-			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			            <img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
                     </div></div>
                     <p><label><input type=checkbox id="search-mine" onclick="$('#search-intext-wrap').toggle(this.checked)"><?php echo _('Mine Only');?></label> 
 <?php

@@ -204,7 +204,7 @@ foreach($gbitems as $id=>$name) {
 		<input type=radio name="sdatetype" value="sdate" checked="checked" aria-label="Date"/>
 		<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="show after date">
 		<a href="#" onClick="displayDatePicker('sdate', this); return false">
-		<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+		<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 		at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="show after time">
 	</td>
 </tr>

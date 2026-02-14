@@ -507,7 +507,7 @@ $(function() { chghidetitle(); });
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?> aria-label="Available after a date"/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="available after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="available after time">
 		</span><BR class=form>
 
@@ -518,7 +518,7 @@ $(function() { chghidetitle(); });
 			<input type=radio name="edatetype" value="edate" <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="available until a date"/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="available until date">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="available until time">
 		</span><BR class=form>
 
@@ -537,7 +537,7 @@ $(function() { chghidetitle(); });
 			<label><input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on</label>
 			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>" aria-label="date on calendar">
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> <br/>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a> <br/>
 			<label>With tag: <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/></label>
 		</span><BR class=form>
 		</div>

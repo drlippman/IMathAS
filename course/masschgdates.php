@@ -786,7 +786,7 @@ if ($overwriteBody==1) {
 
 		echo "<input type=text class=dateinp id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\" aria-label=\"Start Date\"/>(";
 		echo "<span id=\"sd$cnt\">".getshortday($sdatebase).'</span>';
-		echo ") <a href=\"#\" onClick=\"displayDatePicker('sdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
+		echo ") <a href=\"#\" onClick=\"displayDatePicker('sdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a>";
 
 		echo " at <input type=text class=timeinp id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\" aria-label=\"Start Time\">";
 		echo '</span></td>';
@@ -807,8 +807,8 @@ if ($overwriteBody==1) {
 
 		echo "<input type=text class=dateinp id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\" aria-label=\"End Date\"/>(";
 		echo "<span id=\"ed$cnt\">".getshortday($edatebase).'</span>';
-		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-		echo ") <a href=\"#\" onClick=\"displayDatePicker('edate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
+		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.svg\" alt=\"Calendar\"/></a>";
+		echo ") <a href=\"#\" onClick=\"displayDatePicker('edate$cnt', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a>";
 
 		echo " at <input type=text class=timeinp id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\" aria-label=\End Time\">";
 		echo '</span></td>';
@@ -836,7 +836,7 @@ if ($overwriteBody==1) {
 			echo '<span id="lpspan1'.$cnt.'" class="'.($LPcutoffs[$i]==0?'hide':'show').'" aria-label="Latepass cutoff date">';
 			echo "<input type=text class=dateinp id=\"lpdate$cnt\" name=\"lpdate$cnt\" value=\"$lpdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"lpd$cnt\">".getshortday($lpdatebase).'</span>';
-			echo ") <a href=\"#\" onClick=\"displayDatePicker('lpdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('lpdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a>";
 			echo " at <input type=text class=timeinp id=\"lptime$cnt\" name=\"lptime$cnt\" value=\"$lptime\" aria-label=\"Latepass cutoff time\"></span>";
 		}
 		echo '</td>';
@@ -868,8 +868,8 @@ if ($overwriteBody==1) {
 
 			echo "<input type=text class=dateinp id=\"fpdate$cnt\" name=\"fpdate$cnt\" value=\"$fpdate\" onblur=\"ob(this)\" aria-label=\"Forum post-by date\"/>(";
 			echo "<span id=\"fpd$cnt\">".getshortday($fpdatebase).'</span>';
-			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].fpdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].fpdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo ") <a href=\"#\" onClick=\"displayDatePicker('fpdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
+			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].fpdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].fpdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.svg\" alt=\"Calendar\"/></a>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('fpdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a>";
 
 			echo " at <input type=text class=timeinp id=\"fptime$cnt\" name=\"fptime$cnt\" value=\"$fptime\" aria-label=\"Forum post-by time\"></span>";
 		}
@@ -902,8 +902,8 @@ if ($overwriteBody==1) {
 
 			echo "<input type=text class=dateinp id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\" aria-label=\"Forum reply-by date\"/>(";
 			echo "<span id=\"frd$cnt\">".getshortday($frdatebase).'</span>';
-			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a>";
+			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.svg\" alt=\"Calendar\"/></a>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a>";
 
 			echo " at <input type=text class=timeinp id=\"frtime$cnt\" name=\"frtime$cnt\" value=\"$frtime\" aria-label=\"Forum reply-by time\"></span>";
 		}
@@ -912,7 +912,7 @@ if ($overwriteBody==1) {
 		// send down
 		echo '<td class="c"><div class="dropdown">';
 		echo '<a role=button tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$cnt.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-		echo ' Action <img src="'.$staticroot.'/img/collapse.gif" width="10" class="mida" alt="" />';
+		echo ' Action <img src="'.$staticroot.'/img/collapse.svg" width="10" class="mida" alt="" />';
 		echo '</a>';
 		echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$cnt.'">';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',1)">Send down date &amp; time changes</a></li>';

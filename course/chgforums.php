@@ -350,7 +350,7 @@ foreach($forumitems as $id=>$name) {
 	<label><input type=radio name="postby" value="Date" />Before</label>:
 	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>" aria-label="create threads by date">
 	<a href="#" onClick="displayDatePicker('postbydate', this); return false">
-	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+	<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 	at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>" aria-label="create threads by time">
 
 	</td>
@@ -365,7 +365,7 @@ foreach($forumitems as $id=>$name) {
 	<label><input type=radio name="replyby" value="Date" />Before</label>:
 	<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>" aria-label="reply by date">
 	<a href="#" onClick="displayDatePicker('replybydate', this); return false">
-	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+	<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 	at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>" aria-label="reply by time">
 
 	</td>

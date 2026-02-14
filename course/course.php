@@ -387,7 +387,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=081325\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=021326\"></script>";
 if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -462,7 +462,7 @@ if ($overwriteBody==1) {
 		if (isset($_SESSION['ltiitemtype'])) {
 			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\">";
 			echo "<span id=\"myname\" class=\"pii-full-name\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
-			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\""._('User Preferences')."\"/></a>";
+			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.svg\" alt=\""._('User Preferences')."\"/></a>";
 		} else {
 			echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($userfullname).'</span>';
 		}
@@ -476,7 +476,7 @@ if ($overwriteBody==1) {
 			} else {
 				$incclass = '';
 			}
-			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$staticroot.'/img/menu.png"></span> ';
+			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$staticroot.'/img/menu.svg"></span> ';
 		}
 		echo $curBreadcrumb;
 		?>

@@ -501,7 +501,7 @@ switch($_GET['action']) {
 			if (isset($enablebasiclti) && $enablebasiclti==true) {
 				//Start grouping: LMS Integration
 				echo '<div class="block grouptoggle">';
-				echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
+				echo '<img class="mida" src="'.$staticroot.'/img/expand.svg" /> ';
 				echo 'LMS Integration (LTI)';
 				echo '</div>';
 				echo '<div class="blockitems hidden">';
@@ -858,7 +858,7 @@ switch($_GET['action']) {
                 }
 			}
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.svg" /> ';
 			echo _('Course Copy Options');
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -892,7 +892,7 @@ switch($_GET['action']) {
 		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.svg" /> ';
 		echo _('Availability and Access');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
@@ -936,10 +936,10 @@ switch($_GET['action']) {
 		}
 		echo '<label>'._('Start').': <input type=text size=10 name="sdate" value="'.$sdate.'"></label>
 			<a href="#" onClick="displayDatePicker(\'sdate\', this); return false">
-			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.svg" alt="Calendar"/></a> ';
 		echo '<label>'._('End').': <input type=text size=10 name="edate" value="'.$edate.'"></label>
 			<a href="#" onClick="displayDatePicker(\'edate\', this); return false">
-			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.svg" alt="Calendar"/></a> ';
 		echo '</span><br class=form />';
 
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
@@ -988,7 +988,7 @@ switch($_GET['action']) {
 		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			//Start grouping: LMS Integration
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.svg" /> ';
 			echo 'LMS Integration (LTI)';
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -1061,7 +1061,7 @@ switch($_GET['action']) {
 
 		//Start grouping: Additional Options
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.svg" /> ';
 		echo _('Additional Options');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';

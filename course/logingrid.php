@@ -146,10 +146,10 @@ if ($overwriteBody==1) {
 ?>
 	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>" aria-label="Start date">
 	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> through
+	<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a> through
 	<input type="text" size="10" name="edate" value="<?php echo $edate;?>" aria-label="End date">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+	<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 	<button type="submit" name="daterange" value="go">Go</button></p>
     </form>
 <?php

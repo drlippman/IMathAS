@@ -111,7 +111,7 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name)
     $blockid = intval($blockid);
     $out = '<div class="itemhdrdd dropdown">';
     $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-    $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
+    $out .= ' <img src="' . $staticroot . '/img/gearsdd.svg" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
     $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     if ($blocktype == 'T') {
@@ -133,7 +133,7 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
     global $cid, $staticroot;
     $out = '<div class="itemhdrdd dropdown">';
     $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-    $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
+    $out .= ' <img src="' . $staticroot . '/img/gearsdd.svg" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
     $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     $out .= " <li><a href=\"addquestions2.php?aid=$typeid&cid=$cid\">" . _('Questions') . "</a></li>";
@@ -156,7 +156,7 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name)
     global $cid, $staticroot;
     $out = '<div class="itemhdrdd dropdown">';
     $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-    $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
+    $out .= ' <img src="' . $staticroot . '/img/gearsdd.svg" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
     $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     $out .= " <li><a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -174,7 +174,7 @@ function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $sho
     global $cid, $staticroot;
     $out = '<div class="itemhdrdd dropdown">';
     $out .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-    $out .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
+    $out .= ' <img src="' . $staticroot . '/img/gearsdd.svg" alt="' . _('Options for') . ' ' . Sanitize::encodeStringForDisplay($name) . '" class="mida"/>';
     $out .= '</a>';
     $out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
     $out .= " <li><a href=\"add$typename.php?id=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -442,7 +442,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     echo '<div class="itemhdricon">';
                     echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$staticroot/img/";
                     if ($isopen) {echo 'collapse';} else {echo 'expand';}
-                    echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
+                    echo ".svg\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
                     echo 'aria-controls="block' . $items[$i]['id'] . '" aria-expanded="' . ($isopen ? "true" : "false") . '"/>';
                     echo '</div>';
 
@@ -623,7 +623,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     echo '<div class="itemhdricon">';
                     echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$staticroot/img/";
                     if ($isopen) {echo 'collapse';} else {echo 'expand';}
-                    echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
+                    echo ".svg\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
                     echo 'aria-controls="block' . $items[$i]['id'] . '" aria-expanded="' . ($isopen ? "true" : "false") . '"/>';
                     echo '</div>';
 
@@ -718,7 +718,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                  */
                 $calmenu .= '<div class="dropdown">';            
                 $calmenu .= '<a tabindex=0 class="dropdown-toggle" role="button" id="dropdownMenuCtrl' . $i . '" aria-controls="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-                $calmenu .= ' <img src="' . $staticroot . '/img/gearsdd.png" alt="Options" class="mida"/>';
+                $calmenu .= ' <img src="' . $staticroot . '/img/gearsdd.svg" alt="Options" class="mida"/>';
                 $calmenu .= '</a>';
                 $calmenu .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" id="dropdownMenu' . $i . '" aria-labelledby="dropdownMenuCtrl' . $i . '">';
                 $calmenu .= " <li><a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">". _('Delete'). "</a></li>";

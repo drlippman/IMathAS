@@ -106,7 +106,7 @@ $placeinhead .= '<script type="text/javascript">
 	function addnewevent(date) {
 		var html = "<tr><td><span id=\"ne"+nextnewcnt+"\" class=\"sr-only\">New event "+(nextnewcnt+1)+"</span>";
 		html += "<input type=text size=10 id=\"datenew-"+nextnewcnt+"\" name=\"datenew-"+nextnewcnt+"\" aria-labelledby=\"ne"+nextnewcnt+"\"> ";
-		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"'.$staticroot.'/img/cal.gif\" alt=\"Calendar\"/></a></td>";
+		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"'.$staticroot.'/img/cal.svg\" alt=\"Calendar\"/></a></td>";
 		html += "<td><input name=\"tagnew-"+nextnewcnt+"\" id=\"tagnew-"+nextnewcnt+"\" type=text size=8  aria-labelledby=\"ne"+nextnewcnt+"\"/></td>";
         html += "<td><input name=\"txtnew-"+nextnewcnt+"\" id=\"txtnew-"+nextnewcnt+"\" type=text size=80  aria-labelledby=\"ne"+nextnewcnt+"\"/>";
         html += "<button type=\"button\" onclick=\"togglerepeat(this)\" aria-controls=\"repeat"+nextnewcnt+"\" aria-expanded=\"false\">'._('Repeat').'</button>";
@@ -175,7 +175,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	echo "<td><span id=\"ee$cnt\" class=\"sr-only\">".sprintf('Event %d', $cnt).'</span>';
 	echo "<input type=text size=10 id=\"date" . Sanitize::onlyInt($row[0]) . "\" name=\"date".Sanitize::onlyInt($row[0])."\" value=\"";
 	echo Sanitize::encodeStringForDisplay($date) . "\" oninput=\"txtchg()\" aria-labelledby=\"ee". $cnt . "\" /> ";
-	echo "<a href=\"#\" onClick=\"displayDatePicker('date".Sanitize::onlyInt($row[0])."', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
+	echo "<a href=\"#\" onClick=\"displayDatePicker('date".Sanitize::onlyInt($row[0])."', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a></td>";
 	echo '<td><input name="tag['.Sanitize::onlyInt($row[0]).']" type=text size=8 value="'.Sanitize::encodeStringForDisplay($row[3]).'" oninput="txtchg()" aria-labelledby="ee'.$cnt.'"/></td>';
 	echo '<td><input name="txt['.Sanitize::onlyInt($row[0]).']" type=text size=80 value="'.Sanitize::encodeStringForDisplay($row[2]).'" oninput="txtchg()" aria-labelledby="ee'.$cnt.'"/></td>';
 	echo '<td><input type=checkbox name="del['.Sanitize::onlyInt($row[0]).']" aria-labelledby="ee'.$cnt.'"/></td>';
@@ -201,7 +201,7 @@ echo '<script>$(function() { addnewevent("'.Sanitize::encodeStringForDisplay($da
 /*echo '<tr>';
 //echo '<td></td>';
 echo "<td><input type=text size=10 id=\"datenew-0\" name=\"datenew-0\" value=\"$date\" oninput=\"txtchg()\"/> ";
-echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
+echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></a></td>";
 $cnt++;
 echo '<td><input name="tagnew-0" id="tagnew-0" type=text size=8 value="!" oninput="txtchg()" /></td>';
 echo '<td><input name="txtnew-0" id="txtnew-0" type=text size=80 value="" oninput="txtchg()" /></td>';

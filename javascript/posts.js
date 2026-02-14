@@ -24,11 +24,11 @@ function toggleshow(butn) {
 	let newopen = true;
 	if (forumgrp.hasClass("hidden")) {
 		forumgrp.removeClass("hidden");
-		img.src = staticroot+'/img/collapse.gif';
+		img.src = staticroot+'/img/collapse.svg';
 		newopen = true;
 	} else {
 		forumgrp.addClass("hidden");
-		img.src = staticroot+'/img/expand.gif';
+		img.src = staticroot+'/img/expand.svg';
 		newopen = false;
 	}
 	butn.setAttribute("aria-expanded", newopen);
@@ -50,13 +50,13 @@ function toggleitem(butn) {
 function expandall() {
 	$(".expcol").each(function(i) {
 		var forumgrp = $(this).closest(".postwrap").nextAll(".forumgrp").first().removeClass("hidden");
-		this.src = staticroot+'/img/collapse.gif';
+		this.src = staticroot+'/img/collapse.svg';
 	});
 }
 function collapseall() {
 	$(".expcol").each(function(i) {
 		var forumgrp = $(this).closest(".postwrap").nextAll(".forumgrp").first().addClass("hidden");
-		this.src = staticroot+'/img/expand.gif';
+		this.src = staticroot+'/img/expand.svg';
 	});
 }
 function showall() {

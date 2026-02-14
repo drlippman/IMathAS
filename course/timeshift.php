@@ -220,7 +220,7 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<input type=text size=10 name="sdate" id="sdate" value="<?php echo $sdate ?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/>
 			</a>
 		</span><br class=form>
 		<div class=submit><input type=submit value="Change Dates"></div>

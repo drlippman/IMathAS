@@ -170,7 +170,7 @@ require_once "posthandler.php";
 
 $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=011825" type="text/css" />';
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=110425"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=021326"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
@@ -532,9 +532,9 @@ if (!$oktoshow) {
 
 	echo '<button type=button class="plain nopad" onclick="toggletagged('.$threadid.');" role="switch" aria-checked="'.($tagged?'true':'false').'" aria-label="'._('Tag post').'">';
 	if ($tagged) {
-		echo "<img class=\"pointer\" id=\"tag".$threadid."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
+		echo "<img class=\"pointer\" id=\"tag".$threadid."\" src=\"$staticroot/img/flagfilled.svg\" alt=\"\"/>";
 	} else {
-		echo "<img class=\"pointer\" id=\"tag".$threadid."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
+		echo "<img class=\"pointer\" id=\"tag".$threadid."\" src=\"$staticroot/img/flagempty.svg\" alt=\"\"/>";
 	}
 	echo '</button>';
 
@@ -702,7 +702,7 @@ function printchildren($base,$restricttoowner=false) {
 		if ($isteacher || ($ownerid[$child]==$userid && $allowmod && (($base==0 && time()<$postby) || ($base>0 && time()<$replyby))) || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 			echo '<span class="dropdown">';
 			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-			echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
+			echo ' <img src="'.$staticroot.'/img/gears.svg" class="mida" alt="Options"/>';
 			echo '</a>';
 			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';
 
@@ -814,8 +814,8 @@ if ($caneditscore && $haspoints) {
 	}
 	echo "</form>";
 }
-echo "<img src=\"$staticroot/img/expand.gif\" style=\"visibility:hidden\" alt=\"Expand\" />";
-echo "<img src=\"$staticroot/img/collapse.gif\" style=\"visibility:hidden\" alt=\"Collapse\" />";
+echo "<img src=\"$staticroot/img/expand.svg\" style=\"visibility:hidden\" alt=\"Expand\" />";
+echo "<img src=\"$staticroot/img/collapse.svg\" style=\"visibility:hidden\" alt=\"Collapse\" />";
 
 }
 if (empty($_GET['embed'])) {

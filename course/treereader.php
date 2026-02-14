@@ -534,7 +534,7 @@ function upsendexceptions(&$items) {
 </div>
 
 <div id="leftcontent" class="treeleftcontent" role="navigation" aria-label="<?php echo _('Content navigation');?>">
-<img id="navtoggle" src="<?php echo $staticroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse" aria-expanded="true" aria-controls="leftcontenttext"/>
+<img id="navtoggle" src="<?php echo $staticroot;?>/img/collapse.svg"  onclick="toggletreereadernav()" alt="Expand/Collapse" aria-expanded="true" aria-controls="leftcontenttext"/>
 <ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
 <?php
 $ul = printlist($items);

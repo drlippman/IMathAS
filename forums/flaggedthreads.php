@@ -56,7 +56,7 @@ if (isset($_GET['unflagall'])) {
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js?v=011517"></script>';
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/thread.js?v=011517"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/thread.js?v=021326"></script>';
 $pagetitle = _('Flagged Forum Posts');
 require_once "../header.php";
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
@@ -81,7 +81,7 @@ if (count($lastpost)>0) {
     echo '<td><div class=flexgroup><span style="flex-grow:1">';
     echo "<a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "&thread=" . Sanitize::encodeUrlParam($line['threadid']) . "&page=-5\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a>";
     echo '</span><button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['threadid']).');" role="switch" aria-checked="'.(!empty($tags[$line['threadid']])?'true':'false').'" aria-label="'._('Tag post').'">';
-		echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
+		echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.svg\" alt=\"\"/>";
 		echo '</button>';
     echo "</div></td><td><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($name) . "</span></td>";
     echo "<td><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "\">" . Sanitize::encodeStringForDisplay($forumname[$line['threadid']]) . '</a></td>';

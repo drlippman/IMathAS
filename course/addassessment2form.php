@@ -151,7 +151,7 @@ $vueData = array(
 			</label>
 			<input type=text size=10 name="sdate" v-model="sdate" aria-label="<?php echo _('show after date');?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 			at <input type=text size=8 name=stime v-model="stime" aria-label="<?php echo _('show after time');?>">
 		</span><br class="form"/>
 
@@ -167,7 +167,7 @@ $vueData = array(
 			</label>
 			<input type=text size=10 name="edate" v-model="edate" aria-label="<?php echo _('show until date');?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', '<?php echo _('Start date');?>'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime" aria-label="<?php echo _('show until time');?>">
 		</span><br class="form"/>
 	</div>
@@ -233,7 +233,7 @@ $vueData = array(
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All');?></a>
 		</div>
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.gif" alt="Collapse" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.svg" alt="Collapse" />
 			<?php echo _('Core Options');?>
 		</div>
 		<div class="blockitems">
@@ -398,7 +398,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.svg" alt="Expand" />
 			<?php echo _('Additional Display Options');?>
 		</div>
 		<div class="blockitems hidden">
@@ -490,7 +490,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.svg" alt="Expand" />
 			<?php echo _('Time Limit and Access Control');?>
 		</div>
 		<div class="blockitems hidden">
@@ -522,7 +522,7 @@ $vueData = array(
 						<?php echo _('No extensions past');?>
 						<input type=text size=10 name="lpdate" v-model="lpdate" aria-label="<?php echo _('latepass cutoff date');?>">
 						<a href="#" onClick="displayDatePicker('lpdate', this); return false">
-						<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+						<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 						at <input type=text size=8 name=lptime v-model="lptime" aria-label="<?php echo _('latepass cutoff time');?>">
 					</span>
 				</span>
@@ -581,7 +581,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.svg" alt="Expand" />
 			<?php echo _('Help and Hints');?>
 		</div>
 		<div class="blockitems hidden">
@@ -660,7 +660,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.svg" alt="Expand" />
 			<?php echo _('Grading and Feedback');?>
 		</div>
 		<div class="blockitems hidden">
@@ -742,7 +742,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" alt="Expand" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.svg" alt="Expand" />
 			<?php echo _('Group Assessment');?>
 		</div>
 		<div class="blockitems hidden">

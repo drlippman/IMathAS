@@ -77,7 +77,7 @@ function toggleblock(event,bnum,folder) {
           $("#blockhead"+bnum+" *[aria-expanded=true]").attr("aria-expanded",false);
           //butn.value = 'Expand';
 	  if (img != null) {
-		  img.src = staticroot+'/img/expand.gif';
+		  img.src = staticroot+'/img/expand.svg';
 	  }
           if (loc>-1) {oblist.splice(loc,1);}
       } else {
@@ -90,7 +90,7 @@ function toggleblock(event,bnum,folder) {
           $("#blockhead"+bnum+" *[aria-expanded=false]").attr("aria-expanded",true);
           //butn.value = 'Collapse';
 	  if (img != null) {
-		  img.src = staticroot+'/img/collapse.gif';
+		  img.src = staticroot+'/img/collapse.svg';
 	  }
           if (loc==-1) {oblist.push(bnum);}
       }

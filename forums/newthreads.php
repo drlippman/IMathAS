@@ -101,7 +101,7 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && !empty($_POST['check
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js?v=011517"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=021326\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});</script>';
 $pagetitle = _('New Forum Posts');
@@ -148,9 +148,9 @@ if (count($lastpost)>0) {
 
     echo '<button type=button class="plain nopad" onclick="toggletagged('.Sanitize::onlyInt($line['threadid']).');" role="switch" aria-checked="'.(!empty($tags[$line['threadid']])?'true':'false').'" aria-label="'._('Tag post').'">';
 			if (!empty($tags[$line['threadid']])) {
-				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
+				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagfilled.svg\" alt=\"\"/>";
 			} else {
-				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
+				echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['threadid'])."\" src=\"$staticroot/img/flagempty.svg\" alt=\"\"/>";
 			}
 		echo '</button>';
     echo "</div></td>";

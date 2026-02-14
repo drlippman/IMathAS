@@ -548,7 +548,7 @@ $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	});';
 $placeinhead .= "</script>";
 $placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">INSERTNAME <img src="'.$staticroot.'/img/collapse.gif" width="10" class="mida" alt="" /></a>\';
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">INSERTNAME <img src="'.$staticroot.'/img/collapse.svg" width="10" class="mida" alt="" /></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
   $("a[data-uid]").each(function (i,el) {
   	var uid = $(el).attr("data-uid");
@@ -961,7 +961,7 @@ if ($overwriteBody==1) {
 				echo $hasCodeData;
 		
 				$nameline = Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']);
-				//echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
+				//echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.svg"/> ';
 				echo '<th scope=row>';
 				
 				if ($line['locked']>0) {

@@ -1205,7 +1205,7 @@ function generateTable() {
                             html +=
                                 '<img src="' +
                                 imasroot +
-                                '/img/collapse.gif" onclick="collapseqgrp(' +
+                                '/img/collapse.svg" onclick="collapseqgrp(' +
                                 i +
                                 ')" alt="' +
                                 _("Collapse") +
@@ -1214,7 +1214,7 @@ function generateTable() {
                             html +=
                                 '<img src="' +
                                 imasroot +
-                                '/img/expand.gif" onclick="expandqgrp(' +
+                                '/img/expand.svg" onclick="expandqgrp(' +
                                 i +
                                 ')" alt="' +
                                 _("Expand") +

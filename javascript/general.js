@@ -1599,11 +1599,11 @@ jQuery(document).ready(function($) {
 				if (e.type=="click" || e.which==13) {
 					if ($(this).attr("aria-expanded") == "true") {
 						$(this).attr("aria-expanded", false);
-						$(this).children("img").attr("src", staticroot+"/img/expand.gif");
+						$(this).children("img").attr("src", staticroot+"/img/expand.svg");
 						$(this).next(".blockitems").slideUp();
 					} else {
 						$(this).attr("aria-expanded", true);
-						$(this).children("img").attr("src", staticroot+"/img/collapse.gif");
+						$(this).children("img").attr("src", staticroot+"/img/collapse.svg");
 						$(this).next(".blockitems").slideDown();
 					}
 				}

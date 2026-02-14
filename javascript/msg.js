@@ -5,10 +5,10 @@ function togglecolor(threadid,tagged) {
 	var imgchg = document.getElementById("tag"+threadid);
 	if (tagged==1) {
 		$('#tr'+threadid).addClass("tagged")
-		imgchg.src = staticroot+"/img/flagfilled.gif";
+		imgchg.src = staticroot+"/img/flagfilled.svg";
 	} else {
 		$('#tr'+threadid).removeClass("tagged")
-		imgchg.src = staticroot+"/img/flagempty.gif";
+		imgchg.src = staticroot+"/img/flagempty.svg";
 	}
 	$(imgchg).parent('button').attr("aria-checked", tagged==1);
 }

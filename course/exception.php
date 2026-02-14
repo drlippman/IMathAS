@@ -334,14 +334,14 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>" aria-label="Available after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime ?>" aria-label="Available after time">
 		</span><BR class=form>
 		<span class=form>Available Until:</span>
 		<span class=formright>
 			<input type=text size=10 name=edate value="<?php echo $edate ?>" aria-label="Available until date">
 			<a href="#" onClick="displayDatePicker('edate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime ?>" aria-label="Available until time">
 		</span><BR class=form>
 <?php

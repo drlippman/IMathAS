@@ -232,7 +232,7 @@ if ($overwriteBody==1) {
 			<label><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always</label><br/>
 			<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?> aria-label="Date" />
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="show after date">
-			<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="show after time"></span><BR class=form>
 
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','addcol[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','addcol[]',false)">None</a></p>

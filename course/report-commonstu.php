@@ -174,7 +174,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			<span v-if="currentRule.timeframe=='since' || currentRule.timeframe=='between'">
 				<input type=text size=10 name="sdate" id="sdate" v-model="currentRule.sdate" aria-label="start date">
 				<a href="#" onClick="displayDatePicker('sdate', this); return false">
-				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+				<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 			</span>
 			<span v-if="currentRule.timeframe=='thisweek' || currentRule.timeframe=='week'">
 				<select v-model="currentRule.dayofweek" aria-label="day of week">
@@ -188,7 +188,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 				and
 				<input type=text size=10 name="edate" id="edate" v-model="currentRule.edate" aria-label="end date">
 				<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+				<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 			</span>
 			<span v-if="currentRule.timeframe=='due'">
 				<input v-model="currentRule.innextDays" size=2 aria-label="number of dates"> days

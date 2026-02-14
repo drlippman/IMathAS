@@ -702,7 +702,7 @@ if (isset($_GET['removeid'])) {
 }
 
 $pagetitle = "Messages";
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/msg.js?v=052725\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/msg.js?v=021326\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 $placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}
 		.pagelist { display: inline-block; margin:0; padding: 0}
@@ -1017,9 +1017,9 @@ $address = $GLOBALS['basesiteurl'] . "/msgs/msglist.php?cid=$cid&filtercid=";
 						echo "</td><td>";
 						echo '<button type=button class=plain onclick="toggletagged(' . Sanitize::onlyInt($line['id']) . ');" role="switch" aria-checked="' . ($line['tagged'] == 1 ? 'true' : 'false') . '" aria-label="' . _('Tag post') . '">';
 						if ($line['tagged'] == 1) {
-							echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagfilled.gif\" alt=\"\"/>";
+							echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagfilled.svg\" alt=\"\"/>";
 						} else {
-							echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagempty.gif\" alt=\"\"/>";
+							echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagempty.svg\" alt=\"\"/>";
 						}
 						echo '</button>';
 						echo '</td>';

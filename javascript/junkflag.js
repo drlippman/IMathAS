@@ -4,9 +4,9 @@
 function toggleJunkFlagcolor(libitemid,tagged) {
 	var imgchg = document.getElementById("tag"+libitemid);
 	if (tagged==1) {
-		imgchg.src = staticroot+"/img/flagfilled.gif";
+		imgchg.src = staticroot+"/img/flagfilled.svg";
 	} else {
-		imgchg.src = staticroot+"/img/flagempty.gif";
+		imgchg.src = staticroot+"/img/flagempty.svg";
 	}
 }
 

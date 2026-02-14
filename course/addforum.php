@@ -536,7 +536,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?> aria-label="Available after a date"/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="Available after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="Available after time">
 		</span><BR class=form>
 
@@ -547,14 +547,14 @@ if ($overwriteBody==1) {
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="Available until a date"/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="Available until date">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="Available until time">
 		</span><BR class=form>
 		</div>
 
 		<div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
-		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.svg" alt="expand-collapse">
 			Basic Options
 		</div>
 		<div class="blockitems">
@@ -603,7 +603,7 @@ if ($overwriteBody==1) {
 		</span><br class="form" />
 
 		</div>
-		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.svg" alt="expand-collapse">
 			Display Options
 		</div>
 		<div class="blockitems">
@@ -647,7 +647,7 @@ if ($overwriteBody==1) {
 
 		</div>
 
-		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.svg" alt="expand-collapse">
 			Posting and Reply Instructions
 		</div>
 		<div class="blockitems">
@@ -663,7 +663,7 @@ if ($overwriteBody==1) {
 		</div>
 		</div>
 
-		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.svg" alt="expand-collapse">
 			Grading and Access Control
 		</div>
 		<div class="blockitems">
@@ -673,7 +673,7 @@ if ($overwriteBody==1) {
 			<label><input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before</label>:
 			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>" aria-label="post before date">
 			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>" aria-label="post before time">
 		</span><br class="form"/>
 
@@ -684,7 +684,7 @@ if ($overwriteBody==1) {
 			<label><input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before</label>:
 			<input type=text size=10 name="replybydate" value="<?php echo Sanitize::encodeStringForDisplay($replybydate);?>" aria-label="reply before date">
 			<a href="#" onClick="displayDatePicker('replybydate', this, 'sdate', 'start date'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo Sanitize::encodeStringForDisplay($replybytime);?>" aria-label="reply before time">
 		</span><br class="form" />
 		<label for=allowlate class=form>Allow use of LatePasses?: </label>

@@ -89,7 +89,7 @@ $curBreadcrumb .= _('Diagnostics');
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 $placeinhead .= '<script type="text/javascript">
 $(function() {
-  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.svg" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
   $("tr td:first-child").css("clear","both").each(function (i,el) {
     var href = $(el).find("a").attr("href");

@@ -298,7 +298,7 @@ if ($started) {
 			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?> aria-label="show after a date"/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>" aria-label="show after date">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>" aria-label="show after time">
 		</span><BR class=form>
 
@@ -309,7 +309,7 @@ if ($started) {
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?> aria-label="show until a date"/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>" aria-label="show until date">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>" aria-label="show until time">
 		</span><BR class=form>
 		</div>
@@ -331,7 +331,7 @@ if ($started) {
 			<label><input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before</label>:
 			<input type=text size=10 name="rdate" value="<?php echo $rdate;?>" aria-label="edit before date">
 			<a href="#" onClick="displayDatePicker('rdate', this, 'sdate', 'start date'); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
 			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>" aria-label="edit before time">
 		</span><br class="form" />
 

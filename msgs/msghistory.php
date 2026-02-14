@@ -163,12 +163,12 @@
 	       node.className = 'hidden';
 	       //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
 	//       butn.value = 'Expand';
-		butn.src = staticroot+'/img/expand.gif';
+		butn.src = staticroot+'/img/expand.svg';
 	   } else {
 	       node.className = 'forumgrp';
 	       //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
 	//       butn.value = 'Collapse';
-		butn.src = staticroot+'/img/collapse.gif';
+		butn.src = staticroot+'/img/collapse.svg';
 	}
 	}
 	function toggleitem(inum) {
@@ -189,7 +189,7 @@
 	     node.className = 'forumgrp';
 	//     butn.value = 'Collapse';
 	       //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
-	       butn.src = staticroot+'/img/collapse.gif';
+	       butn.src = staticroot+'/img/collapse.svg';
 	   }
 	}
 	function collapseall() {
@@ -199,7 +199,7 @@
 	     node.className = 'hidden';
 	//     butn.value = 'Expand';
 	       //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
-	       butn.src = staticroot+'/img/expand.gif';
+	       butn.src = staticroot+'/img/expand.svg';
 	   }
 	}
 

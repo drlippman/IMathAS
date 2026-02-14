@@ -650,11 +650,11 @@ require_once __DIR__."/../includes/checkdata.php";
 		//$etime = tzdate("g:i a",$wk);
 		echo "<span class=form>Available After:</span><span class=formright>";
 		echo "<input type=text size=10 name=sdate value=\"$sdate\" aria-label=\"available after date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=stime value=\"$stime\" aria-label=\"available after time\"></span><BR class=form>\n";
 
 		echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\" aria-label=\"available until date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=etime value=\"$etime\" aria-label=\"available until time\"></span><BR class=form>\n";
 
 		echo "Set Exception for assessments: ";
@@ -692,11 +692,11 @@ require_once __DIR__."/../includes/checkdata.php";
 		echo '<option value="R" checked">Override Reply By only</option></select></span><br class="form"/>';
 
 		echo "<span class=form>Post By:</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\" aria-label=\"post by date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=pbtime value=\"$pbtime\" aria-label=\"post by time\"></span><BR class=form>\n";
 
 		echo "<span class=form>Reply By:</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\" aria-label=\"reply by date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=rbtime value=\"$rbtime\" aria-label=\"reply by time\"></span><BR class=form>\n";
 
 

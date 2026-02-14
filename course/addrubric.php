@@ -183,7 +183,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 /******* begin html output ********/
 $placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=090725"></script>';
 $placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.svg" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
 	var fromstr = "'.Sanitize::encodeStringForJavascript($fromstr).'";
   $("img[data-rid]").each(function (i,el) {
@@ -218,7 +218,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo '<img data-rid="' . Sanitize::onlyInt($row[0]) . '" ';
 		echo 'data-mine="' . ($row[2] == $userid ? "true" : "false") .'" ';
-		echo 'src="'.$staticroot.'/img/gears.png"/>';
+		echo 'src="'.$staticroot.'/img/gears.svg"/>';
 		echo Sanitize::encodeStringForDisplay($row[1]) . '<br/>';
 
 	}

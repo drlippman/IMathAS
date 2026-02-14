@@ -470,7 +470,7 @@ if ($overwriteBody==1) {
 		<input type=text size=10 name="sdate" value="<?php echo $sdate;?>" 
 		aria-label="<?php echo _('available after this date');?>">
 		<a href="#" onClick="displayDatePicker('sdate', this); return false">
-		<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+		<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 		at <input type=text size=10 name=stime value="<?php echo $stime;?>"
 		aria-label="<?php echo _('available after this time');?>">
 	</span>
@@ -485,7 +485,7 @@ if ($overwriteBody==1) {
 		<input type=text size=10 name=edate value="<?php echo $edate;?>"
 		aria-label="<?php echo _('available until this date');?>">
 		<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-		<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+		<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></a>
 		at <input type=text size=10 name=etime value="<?php echo $etime;?>"
 		aria-label="<?php echo _('available until this time');?>">
 	</span>

@@ -233,7 +233,7 @@ if ($overwriteBody==1) {
         echo 'class="hocptd" ';
       }
       echo '>';
-      echo '<img src="'.$staticroot.'/img/gears.png"/> ';
+      echo '<img src="'.$staticroot.'/img/gears.svg"/> ';
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
         echo '<i>';
@@ -278,7 +278,7 @@ if ($overwriteBody==1) {
       }
       echo '>';
       if ($course['canedit']) {
-      	      echo '<img src="'.$staticroot.'/img/gears.png"/> ';
+      	      echo '<img src="'.$staticroot.'/img/gears.svg"/> ';
       }
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
@@ -319,7 +319,7 @@ if ($overwriteBody==1) {
       }
       echo '>';
       if ($course['canedit']) {
-      	      echo '<img src="'.$staticroot.'/img/gears.png"/> ';
+      	      echo '<img src="'.$staticroot.'/img/gears.svg"/> ';
       }
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
@@ -394,7 +394,7 @@ if ($overwriteBody==1) {
   }
 
   $(function() {
-    var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
+    var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.svg" alt="Options"/></a>\';
     html += \'<ul role="menu" class="dropdown-menu">\';
     $("#courses-teaching tr td:first-child").css("clear","both").each(function (i,el) {
       var cid = $(el).attr("data-cid");
