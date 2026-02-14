@@ -1150,7 +1150,7 @@ a[target=_blank]::after {
     height:1em;
     overflow: hidden;
 	display: inline-block;
-	background: url(img/extlink.png) center right no-repeat;
+	background: url(img/extlink.svg) center right no-repeat;
 }
 body.mce-content-body {
     margin: 5px 10px;

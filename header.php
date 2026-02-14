@@ -28,7 +28,7 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=021326";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=021426";?>" type="text/css" />
 <?php
 $isfw = false;
 if (isset($coursetheme)) {

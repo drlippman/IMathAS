@@ -999,7 +999,7 @@ a[rel*=noopener]:after {
 	width:16px;
 	height:1em;
 	display: inline-block;
-	background: url(../img/extlink.png) center right no-repeat;
+	background: url(../img/extlink.svg) center right no-repeat;
 }
 .mce-content-body a[target=_blank]:after {
 	display: none;
