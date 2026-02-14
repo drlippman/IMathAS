@@ -102,7 +102,7 @@
 		$curname = $coursename;
 	}
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=021326\"></script>";
 require_once "../header.php";
 ?>
 <script>
