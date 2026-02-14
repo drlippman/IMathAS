@@ -1140,8 +1140,8 @@ span.boxed {
 	padding: 2px 5px;
 }
 a.attach {
-    background: url(tinymce8/plugins/attach/ed_attach.gif) center left no-repeat;
-    padding-left: 20px;
+    background: url(tinymce8/plugins/attach/ed_attach.svg) center left no-repeat;
+    padding-left: 18px;
 }
 a[target=_blank]::after {
     content: "Opens Externally";
