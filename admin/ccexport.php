@@ -164,7 +164,7 @@ $alt = 0;
         echo '</td>';
         $tdpad = 5 * strlen($prespace[$i]);
 
-        echo '<td style="padding-left:' . $tdpad . 'px"><img alt="' . $types[$i] . '" title="' . $types[$i] . '" src="' . $staticroot . '/img/';
+        echo '<td style="padding-left:' . $tdpad . 'px"><img width=16 alt="' . $types[$i] . '" title="' . $types[$i] . '" src="' . $staticroot . '/img/';
         switch ($types[$i]) {
             case 'Calendar':echo $CFG['CPS']['miniicons']['calendar'];
                 break;

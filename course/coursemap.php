@@ -46,7 +46,7 @@ function showicon($type,$alt='') {
 	global $CFG,$imasroot,$staticroot;
 	if ($alt=='') {$alt = $type;}
 	if (isset($CFG['CPS']['miniicons'][$type])) {
-		echo '<img alt="'.$alt.'" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons'][$type].'" class="mida icon" /> ';
+		echo '<img width=16 alt="'.$alt.'" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons'][$type].'" class="mida icon" /> ';
 	}
 }
 

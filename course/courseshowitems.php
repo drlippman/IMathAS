@@ -35,7 +35,7 @@ function enditem($canedit)
 
 if (!isset($CFG['CPS']['itemicons'])) {
     $itemicons = array(
-        'folder' => 'folder2.gif',
+        'folder' => 'folder.png',
         'foldertree' => 'folder_tree.png',
         'assess' => 'assess.png',
         'inline' => 'inline.png',
@@ -59,9 +59,9 @@ if (!isset($CFG['CPS']['itemicons'])) {
         'swf' => 'video.png',
         'avi' => 'video.png',
         'mpg' => 'video.png',
-        'nb' => 'mathnb.png',
-        'mws' => 'maple.png',
-        'mw' => 'maple.png',
+        'nb' => 'doc.png',
+        'mws' => 'doc.png',
+        'mw' => 'doc.png',
     );
 } else {
     $itemicons = $CFG['CPS']['itemicons'];
@@ -88,7 +88,7 @@ function getItemIcon($type, $alt, $faded = false, $status = -1, $scoremsg = '')
     }
     $out .= '>';
     $class = ($faded ? 'class="faded"' : '');
-    $out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
+    $out .= '<img width=24 alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
     if ($status > -1) {
         switch ($status) {
             case 0:$icon = 'emptycircle';
@@ -349,7 +349,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     } else {
                         echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
                     }
-                    echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
+                    echo "<img width=24 alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
                     echo '</div>';
 
                     echo "<div class=title>";
@@ -394,7 +394,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                     if (!$ispublic) {
                         echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
                     }
-                    echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\">";
+                    echo "<img width=24 alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\">";
                     if (!$ispublic) {
                         echo "</a>";
                     }
@@ -539,7 +539,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo '<div class="itemhdricon">';
                     echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-                    echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
+                    echo "<img width=24 alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
                     echo '</div>';
 
                     echo "<div class=title>";
@@ -577,7 +577,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo '<div class="itemhdricon">';
                     echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-                    echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\"></a>";
+                    echo "<img width=24 alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\"></a>";
                     echo '</div>';
 
                     echo "<div class=title>";
@@ -1928,7 +1928,7 @@ function generateadditem($blk, $tb)
 
         $html .= "<a href=\"$addassess?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['assess'])) {
-            $html .= "<img alt=\"assessment\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+            $html .= "<img width=16 alt=\"assessment\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
         }
         $html .= _('Assessment') . "</a> | ";
 
@@ -1941,43 +1941,43 @@ function generateadditem($blk, $tb)
 
         $html .= "<a href=\"addinlinetext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['inline'])) {
-            $html .= "<img alt=\"inline text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+            $html .= "<img width=16 alt=\"inline text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
         }
         $html .= _('Text') . "</a> | ";
 
         $html .= "<a href=\"addlinkedtext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['linked'])) {
-            $html .= "<img alt=\"linked text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+            $html .= "<img width=16 alt=\"linked text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
         }
         $html .= _('Link') . "</a> | ";
 
         $html .= "<a href=\"addforum.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['forum'])) {
-            $html .= "<img alt=\"forum\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+            $html .= "<img width=16 alt=\"forum\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
         }
         $html .= _('Forum') . "</a> | ";
 
         $html .= "<a href=\"addwiki.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['wiki'])) {
-            $html .= "<img alt=\"wiki\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+            $html .= "<img width=16 alt=\"wiki\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
         }
         $html .= _('Wiki') . "</a> | ";
 
         $html .= "<a href=\"adddrillassess.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['drill'])) {
-            $html .= "<img alt=\"drill\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
+            $html .= "<img width=16 alt=\"drill\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
         }
         $html .= _('Drill') . "</a> | ";
 
         $html .= "<a href=\"addblock.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['folder'])) {
-            $html .= "<img alt=\"folder\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+            $html .= "<img width=16 alt=\"folder\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
         }
         $html .= _('Block') . "</a> | ";
 
         $html .= "<a href=\"addcalendar.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
         if (isset($CFG['CPS']['miniicons']['calendar'])) {
-            $html .= "<img alt=\"calendar\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+            $html .= "<img width=16 alt=\"calendar\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
         }
         $html .= _('Calendar') . "</a>";
         $html .= '</span>';
@@ -2181,7 +2181,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['folder'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">B</span>';
             } else {
-                $icon = '<span class=icon><img alt="folder" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['folder'] . '" class="mida"/></span> ';
+                $icon = '<span class=icon><img width=16 alt="folder" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['folder'] . '" class="mida"/></span> ';
             }
             echo '<li class="' . $liclass . '" id="' . "$parent-$bnum" . '" obn="' . Sanitize::encodeStringForDisplay($items[$i]['id']) . '">' . $icon;
             
@@ -2213,7 +2213,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['calendar'])) {
                 $icon = '<span class=icon style="background-color:#0f0;">C</span>';
             } else {
-                $icon = '<span class=icon><img alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida"/></span> ';
+                $icon = '<span class=icon><img width=16 alt="calendar" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['calendar'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
             echo '<span class="noedit" id="cal' . Sanitize::encodeStringForDisplay($items[$i]) .'">'._('Calendar').'</span></li>';
@@ -2246,7 +2246,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['assess'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">?</span>';
             } else {
-                $icon = '<span class=icon><img alt="assessment" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['assess'] . '" class="mida"/></span> ';
+                $icon = '<span class=icon><img width=16 alt="assessment" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['assess'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2326,7 +2326,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['inline'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">!</span>';
             } else {
-                $icon = '<span class=icon><img alt="text" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['inline'] . '" class="mida"/></span> ';
+                $icon = '<span class=icon><img width=16 alt="text" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['inline'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2376,7 +2376,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['linked'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">!</span>';
             } else {
-                $icon = '<span class=icon><img alt="link" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['linked'] . '" class="mida"/></span> ';
+                $icon = '<span class=icon><img width=16 alt="link" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['linked'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2427,7 +2427,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['forum'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">F</span>';
             } else {
-                $icon = '<span class=icon><img alt="forum" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['forum'] . '" class="mida"/></span> ';
+                $icon = '<span class=icon><img width=16 alt="forum" src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['forum'] . '" class="mida"/></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2478,7 +2478,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['wiki'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">W</span>';
             } else {
-                $icon = '<span class=icon><img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['wiki'] . '" class="mida" /></span> ';
+                $icon = '<span class=icon><img width=16 alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['wiki'] . '" class="mida" /></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 
@@ -2529,7 +2529,7 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             if (!isset($CFG['CPS']['miniicons']['drill'])) {
                 $icon = '<span class=icon style="background-color:' . $color . '">D</span>';
             } else {
-                $icon = '<span class=icon><img alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['drill'] . '" class="mida" /></span> ';
+                $icon = '<span class=icon><img width=16 alt="wiki"  src="' . $staticroot . '/img/' . $CFG['CPS']['miniicons']['drill'] . '" class="mida" /></span> ';
             }
             echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">' . $icon;
 

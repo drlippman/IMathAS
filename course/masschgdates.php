@@ -730,7 +730,7 @@ if ($overwriteBody==1) {
 		}
 		echo "<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
 		echo '<label for="cb'.$cnt.'" id="lbl'.$cnt.'">';
-		echo '<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$staticroot.'/img/';
+		echo '<img width=16 alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$staticroot.'/img/';
 		switch ($types[$i]) {
 			case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
 			case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;

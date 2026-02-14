@@ -41,8 +41,8 @@ function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$wi
 	$width = Sanitize::onlyInt($width);
 
 	$out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
-	$out .= "<img border=0 src=\"$staticroot/img/assess.png\" alt=\"rubric\"></a>";
+	$out .= "<img width=16 border=0 src=\"$staticroot/img/assess.png\" alt=\"rubric\"></a>";
 	$out .= "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\" style=\"display:none\" class=\"rubriclink\" id=\"rublink-$scorebox\">";
-	$out .= "<img border=0 src=\"$staticroot/img/assess.png\" alt=\"rubric\"></a>";
+	$out .= "<img width=16 border=0 src=\"$staticroot/img/assess.png\" alt=\"rubric\"></a>";
 	return $out;
 }

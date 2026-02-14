@@ -731,7 +731,7 @@ function addnewblock() {
     $("#qviewtree").prepend(
 		'<li id=newblock'+newblockcnt+' class=blockli>' +
 		 '<span class=icon>' +
-		 '<img alt="'+_('block')+'" class=mida src="'+blockiconsrc+'"/></span> ' +
+		 '<img width=16 alt="'+_('block')+'" class=mida src="'+blockiconsrc+'"/></span> ' +
 		 '<b><span id="NB'+newblockcnt+'">' + _("New Block") + '</span></b>' +
 		 '<ul class=qview></ul></li>'
     );

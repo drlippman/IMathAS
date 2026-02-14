@@ -25,14 +25,14 @@ if (isset($CFG['CPS']['theme'])) {
 $coursetheme = $defaultcoursetheme; //will be overwritten later if set
 if (!isset($CFG['CPS']['miniicons'])) {
     $CFG['CPS']['miniicons'] = array(
-        'assess' => 'assess_tiny.png',
-        'drill' => 'drill_tiny.png',
-        'inline' => 'inline_tiny.png',
-        'linked' => 'html_tiny.png',
-        'forum' => 'forum_tiny.png',
-        'wiki' => 'wiki_tiny.png',
-        'folder' => 'folder_tiny.png',
-        'tree' => 'folder_tree_tiny.png',
+        'assess' => 'assess.png',
+        'drill' => 'drill.png',
+        'inline' => 'inline.png',
+        'linked' => 'html.png',
+        'forum' => 'forum.png',
+        'wiki' => 'wiki.png',
+        'folder' => 'folder.png',
+        'tree' => 'folder_tree.png',
         'calendar' => '1day.png');
 }
 
