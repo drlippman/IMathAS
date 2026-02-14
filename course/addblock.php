@@ -36,16 +36,11 @@ function buildExistBlocksArray($items,$parent) {
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$pagetitle = "Block Settings";
+$pagetitle = isset($_GET['id']) ? _('Modify Block') : _('Add Block');
 $cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
-$curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
+$curBreadcrumb .= "&gt; $pagetitle";
 
-if (isset($_GET['id'])) {
-	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Modify Block <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
-} else {
-	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Add Block <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
-}
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
 } else {
@@ -446,7 +441,7 @@ if ($overwriteBody==1) {
 	<?php echo $curBreadcrumb; ?>
 </div>
 
-<?php echo $formTitle; ?>
+<div id="headeraddblock" class="pagetitle"><h1><?php echo $pagetitle; ?></h1></div>
 
 <form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder'] ?? 0); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
 	<span class=form><label for="title"><?php echo _('Title'); ?></label>: </span>

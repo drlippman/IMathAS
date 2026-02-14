@@ -627,9 +627,9 @@ $(function() {
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
-		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h1></div>
+	<div id="headerchgassessments" class="pagetitle">
+		<h1><?php echo _('Mass Change Assessment Settings');?></h1>
+	</div>
 
 	<div class="cpmid">
 	<a href="masschgprereqs.php?cid=<?php echo $cid;?>&from=chgassessments"><?php echo _('Mass Change Prereqs'); ?></a>

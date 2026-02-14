@@ -1227,9 +1227,9 @@ if ($overwriteBody==1) {
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 
-	<div id="headeraddquestions" class="pagetitle"><h1><?php echo _('Add/Remove Questions'); ?>
-		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-    </h1></div>
+	<div id="headeraddquestions" class="pagetitle">
+		<h1><?php echo _('Add/Remove Questions'); ?></h1>
+	</div>
     <div class="cp">
         <span class="column">
 <?php
@@ -1269,7 +1269,6 @@ if ($overwriteBody==1) {
 		echo "<p>"._("No Questions currently in assessment")."</p>\n";
 
 		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-		echo "<img src=\"$staticroot/img/help.gif\" alt=\"Help\"/> ";
 		echo _('How do I find questions to add?'),'</a>';
 		echo '<div id="helpwithadding" style="display:none">';
 		if ($_SESSION['selfrom'.$aid]=='lib') {

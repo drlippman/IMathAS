@@ -387,7 +387,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=121025\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=021326\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=111925\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js?v=021326\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
@@ -498,9 +498,9 @@ if ($overwriteBody==1) {
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 
-	<div id="headeraddquestions" class="pagetitle"><h1><?php echo _('Add/Remove Questions'); ?>
-		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-    </h1></div>
+	<div id="headeraddquestions" class="pagetitle">
+		<h1><?php echo _('Add/Remove Questions'); ?></h1>
+	</div>
     <div class="cp">
         <span class="column">
 <?php
@@ -542,7 +542,6 @@ if ($overwriteBody==1) {
     echo "<p>"._("No Questions currently in assessment")."</p>\n";
 
     echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-    echo "<img src=\"$staticroot/img/help.gif\" alt=\"Help\"/> ";
     echo _('How do I find questions to add?'),'</a>';
     echo '<div id="helpwithadding" style="display:none">';
     echo '<p>',_('Under Potential Questions below, use the selector on the left to decide whether you want to select specific libraries, search all libraries, or select assessments to choose from.'),'</p>';

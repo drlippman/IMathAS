@@ -1741,14 +1741,14 @@ function generateTable() {
             _("Collapse All") +
             '" class="text-segment-button text-segment-button-global"><span id="collapse-button-spanglobal" class="icon-shrink2"></span></button></div>';
     }
-    html +=
+    /*html +=
         '<div class="text-segment-iconglobal"><img src="' +
         imasroot +
         '/img/help.gif" alt="Help" onClick="window.open(\'' +
         imasroot +
         "/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left=" +
         (screen.width - 420) +
-        "')\"/></div>";
+        "')\"/></div>";*/
     html += "</td><td></td><td></td></tr>";
 
     html += "</tbody></table>";

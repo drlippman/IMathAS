@@ -596,7 +596,6 @@ if ($myrights<20) {
 	} else { //DEFAULT DATA MANIPULATION
 		$curBreadcrumb .= " &gt; " . _('Manage Question Set');
 		$pagetitle = _("Question Set Management");
-		$helpicon = "<img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managequestionset','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
 		if ($isadmin) {
 			$page_adminMsg =  '<p>'._("You are in Admin mode, which means actions will apply to all questions, regardless of owner").'</p>';
 		} else if ($isgrpadmin) {
@@ -709,7 +708,7 @@ if (isset($searchtype)) {
 </script>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
-	<div id="headermanageqset" class="pagetitle"><h1><?php echo $pagetitle; echo $helpicon; ?></h1></div>
+	<div id="headermanageqset" class="pagetitle"><h1><?php echo $pagetitle; ?></h1></div>
 
 <?php
 	if (isset($_POST['remove']) || isset($_GET['remove'])) {

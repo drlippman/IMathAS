@@ -1628,7 +1628,7 @@ $placeinfooter='
 	<div id="solverinsides">
 	<div id="operationselect">
 	Select and drag or copy an expression from your question code.
-	<img id="solverinputhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
+	<img id="solverinputhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br/>
 	<div id="solverinputhelp" style="display: none;">
 	</div>
 	<input id="imathastosage" type="text" size="30">
@@ -1645,14 +1645,14 @@ $placeinfooter='
 	<div id="sagemathcode" style="display: none;"></div>
 	<div id="sagecellcontainer">
 		<div id="sagecell"></div>
-		<img id="solverhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
+		<img id="solverhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br/>
 	</div>
 	<div id="solverhelpbody" style="display: none">
 	</div>
 	<div id="sagecelloutput"></div>
     <div id="sagetocontroldiv" style="display: none;" >
 		Drag this to the Common Control box or use the buttons below.
-	<img id="solveroutputhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
+	<img id="solveroutputhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br/>
 	<div id="sagetocontrolresult">
 		<p><span id="sagetocontrol" draggable="true"></span></p>
 	</div>

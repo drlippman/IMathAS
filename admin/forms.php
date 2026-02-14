@@ -301,7 +301,7 @@ switch($_GET['action']) {
             }
 		}
 
-		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
+		echo "<BR><span class=form>Set User rights to: </span> \n";
 		echo "<span class=formright><label><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
 		echo "> Guest User</label> <BR>\n";

@@ -507,7 +507,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
+	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 
 	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
 		<label for=name class=form><?php echo _('Forum Name');?>: </label>

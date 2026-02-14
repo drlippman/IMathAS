@@ -733,9 +733,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
 
             if (isset($_GET['id'])) {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment</h1></div>\n";
             } else {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment</h1></div>\n";
             }
 
             $page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);

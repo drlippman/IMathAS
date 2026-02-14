@@ -526,7 +526,6 @@ if ($myrights<20) {
 
 	} else { //DEFAULT PROCESSING HERE
 		$pagetitle = "Library Management";
-		$helpicon = "&nbsp;&nbsp; <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managelibraries','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
 		$curBreadcrumb .= " &gt; Manage Libraries ";
 		if ($isadmin) {
 			$page_AdminModeMsg = "You are in Admin mode, which means actions will apply to all libraries, regardless of owner";
@@ -583,7 +582,7 @@ if ($overwriteBody==1) {
 	</style>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb; ?></div>
-	<div id="headermanagelibs" class="pagetitle"><h1><?php echo $pagetitle; echo $helpicon; ?></h1></div>
+	<div id="headermanagelibs" class="pagetitle"><h1><?php echo $pagetitle; ?></h1></div>
 
 <?php
 	if (isset($_POST['remove'])) {
