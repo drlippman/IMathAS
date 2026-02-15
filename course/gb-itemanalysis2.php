@@ -121,6 +121,7 @@
 
 	$itemarr = array();
 	$itemnum = array();
+	$itemStructure = array();
 	$curqnum = 1;
 	foreach (explode(',',$itemorder) as $k=>$itel) {
 		if (strpos($itel,'~')!==false) {
@@ -130,14 +131,18 @@
 			} else {
 				$grppts = array(1);
 			}
+			$gqids = array();
 			foreach ($sub as $j=>$itsub) {
 				$itemarr[] = $itsub;
 				$itemnum[$itsub] = $curqnum.'-'.($j+1);
+				$gqids[] = $itsub;
 			}
+			$itemStructure[] = array('type'=>'group','qids'=>$gqids,'display_num'=>$curqnum,'grppts'=>$grppts[0]);
 			$curqnum += $grppts[0];
 		} else {
 			$itemarr[] = $itel;
 			$itemnum[$itel] = $curqnum;
+			$itemStructure[] = array('type'=>'single','qid'=>$itel,'display_num'=>$curqnum);
 			$curqnum++;
 		}
 	}
@@ -258,41 +263,6 @@
         }
 	}
 
-// FIXME: Delete this entire commented block after refactoring.
-//
-//    while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-//		foreach ($questions as $k=>$ques) {
-//			if (trim($ques)=='') {continue;}
-//
-//			if (!isset($qincomplete[$ques])) { $qincomplete[$ques]=0;}
-//			if (!isset($qtotal[$ques])) { $qtotal[$ques]=0;}
-//			if (!isset($qcnt[$ques])) { $qcnt[$ques]=0;}
-//			if (!isset($tcnt[$ques])) { $tcnt[$ques]=0;}
-//			if (!isset($attempts[$ques])) { $attempts[$ques]=0;}
-//			if (!isset($regens[$ques])) { $regens[$ques]=0;}
-//			if (!isset($timeontask[$ques])) { $timeontask[$ques]=0;}
-//			if (strpos($scores[$k],'-1')!==false) {
-//				$qincomplete[$ques] += 1;
-//			}
-//			$qtotal[$ques] += getpts($scores[$k]);
-//			$attempts[$ques] += $attp[$k];
-//			$regens[$ques] += substr_count($bla[$k],'ReGen');
-//			$qcnt[$ques] += 1;
-//			$timeot[$k] = explode('~',$timeot[$k]);
-//			$tcnt[$ques] += count($timeot[$k]);
-//			$totsum = array_sum($timeot[$k]);
-//			$timeontask[$ques] += $totsum;
-//			$timeotthisstu += $totsum;
-//
-//		}
-//		if ($line['endtime'] >0 && $line['starttime'] > 0) {
-//			$timetaken[] = $line['endtime']-$line['starttime'];
-//		} else {
-//			$timetaken[] = 0;
-//		}
-//		$timeontaskbystu[] = $timeotthisstu;
-//	}
-
 	$vidcnt = array();
 	if (count($qcnt)>0) {
 		$qlist = implode(',', array_map('intval', array_keys($qcnt)));
@@ -343,7 +313,6 @@
 	echo "<th scope=\"col\">Preview</th></tr></thead>\n";
 	echo "<tbody>";
 	if (count($qtotal)>0) {
-		$i = 1;
 		//$qs = array_keys($qtotal);
 		$qslist = array_map('Sanitize::onlyInt',$itemarr);
 		$query_placeholders = Sanitize::generateQueryPlaceholders($qslist);
@@ -388,8 +357,13 @@
 		$avgscore = array();
 		$qs = array();
 
-		foreach ($itemarr as $qid) {
-			if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
+		/* helper: render a single question row (updates $rowcnt) */
+		function renderQuestionRow($qid) {
+			global $points,$defpoints,$qcnt,$qincomplete,$qtotal,$attempts,$regens,$timeontask,$timeontaskperversion;
+			global $partscores,$parttries,$partcounts,$descrips,$withdrawn,$itemnum,$qsetids,$needmanualgrade,$showwork,$extracredit;
+			global $showhints,$vidcnt,$showextref,$submitby,$stu,$cid,$aid,$rowcnt,$avgscore,$qs,$showpartdets;
+
+			if ($rowcnt%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
 			$pts = $points[$qid];
 			if ($pts==9999) {
 				$pts = $defpoints;
@@ -401,8 +375,9 @@
 				} else {
 					$avg2 = 0;
 				}
-				$avgscore[$i-1] = round($avg*$pts,2);
-				$qs[$i-1] = $qid;
+				// push scores for catscores
+				$avgscore[] = round($avg*$pts,2);
+				$qs[] = $qid;
 
 				if ($pts>0) {
 					$pc = round(100*$avg);
@@ -416,14 +391,14 @@
 					$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgtot = round($timeontask[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
-          $avgtota = round($timeontaskperversion[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+					$avgtota = round($timeontaskperversion[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					if ($avgtot==0) {
 						$avgtot = 'N/A';
 					} else {
 						$avgtot = round($avgtot/60,2) . ' min';
 					}
 					if ($avgtota==0) {
-						$avgtot = 'N/A';
+						$avgtota = 'N/A';
 					} else {
 						$avgtota = round($avgtota/60,2) . ' min';
 					}
@@ -438,54 +413,54 @@
 				$avg2 = "NA";
 				$avgatt = "NA";
 				$avgreg = "NA";
-                $avgtot = "NA";
-                $avgtota = "NA";
+				$avgtot = "NA";
+				$avgtota = "NA";
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
 
 			echo '<td title="'._('Question ID').' '. Sanitize::onlyInt($qsetids[$qid]) . '">'; 
-            echo Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
+			echo Sanitize::encodeStringForDisplay($itemnum[$qid]) . "</td><td>";
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
 			echo Sanitize::encodeStringForDisplay($descrips[$qid]);
-            echo "</td>";
+			echo "</td>";
 			echo "<td><a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&asid=average&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "\" ";
 			if (isset($needmanualgrade[$qid])) {
 				echo 'class="manualgrade" ';
 			}
-            echo ">Grade</a>";
-            if ($showwork[$qid]) {
-                echo ' <span title="' . _('Has Show Work enabled') . '" aria-label="' . _('Has Show Work enabled') . '">' .
-                  '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>';
-            }
-            echo "</td>";
+			echo ">Grade</a>";
+			if ($showwork[$qid]) {
+				echo ' <span title="' . _('Has Show Work enabled') . '" aria-label="' . _('Has Show Work enabled') . '">' .
+				  '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>';
+			}
+			echo "</td>";
 			echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></a>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
-            if ($extracredit[$qid] == 1) {
-                echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
-            }
-            echo '</td>';
+				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
+			if ($extracredit[$qid] == 1) {
+				echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
+			}
+			echo '</td>';
 			if ($submitby == 'by_question') {
 				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</a></td>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
+				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
 			} else {
 				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</a></td>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt));
+				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt));
 			}
 			echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</a></td>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($pi));
+				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($pi));
 			if ($submitby == 'by_question') {
 				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</a></td>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
+				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
 			} else {
 				echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</a></td>",
-                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
+				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
 			if ($showhints) {
 				if ($showextref[$qid] && isset($qcnt[$qid]) && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</a></td>",
-                        $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
+						$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*($vidcnt[$qid] ?? 0)/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
 					echo '<td class="c">N/A</td>';
 				}
@@ -493,59 +468,145 @@
 			echo sprintf("<td><input type=button value=\"Preview\" onClick=\"previewq(%d)\"/></td>\n", Sanitize::onlyInt($qsetids[$qid]));
 
 			echo "</tr>\n";
+			$rowcnt++;
 
-            if ($showpartdets && isset($partcounts[$qid])) {
-                for ($pn=0;$pn<$partcounts[$qid];$pn++) {
-                    if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
-                    echo '<td></td>';
-                    echo '<td>' . _('Part').' '.($pn+1).'</td>';
-                    echo '<td></td>';
-                    echo '<td class=c>';
-                    if (!empty($partscores[$qid][$pn])) {
-                        echo round(100*array_sum($partscores[$qid][$pn])/count($partscores[$qid][$pn])) . '%';
-                    } else {
-                        echo '0%';
-                    }
-                    echo '</td>';
-                    echo '<td>';
-                    if (!empty($parttries[$qid][$pn])) {
-                        echo round(array_sum($parttries[$qid][$pn])/count($parttries[$qid][$pn]), 1);                    
-                    }
-                    echo '</td>';
-                    echo '<td class=c>';
-                    $cntpartscores = isset($partscores[$qid][$pn]) ? count($partscores[$qid][$pn]) : 0;
-                    echo round(100*($qcnt[$qid] - $cntpartscores)/($qcnt[$qid])).'%';
-                    echo '</td>';
-                    echo '<td colspan=3></td>';
-                    echo '</tr>';
-                }
-            }
-			$i++;
+			if ($showpartdets && isset($partcounts[$qid])) {
+				for ($pn=0;$pn<$partcounts[$qid];$pn++) {
+					if ($rowcnt%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
+					echo '<td></td>';
+					echo '<td>' . _('Part').' '.($pn+1).'</td>';
+					echo '<td></td>';
+					echo '<td class=c>';
+					if (!empty($partscores[$qid][$pn])) {
+						echo round(100*array_sum($partscores[$qid][$pn])/count($partscores[$qid][$pn])) . '%';
+					} else {
+						echo '0%';
+					}
+					echo '</td>';
+					echo '<td>';
+					if (!empty($parttries[$qid][$pn])) {
+						echo round(array_sum($parttries[$qid][$pn])/count($parttries[$qid][$pn]), 1);
+					}
+					echo '</td>';
+					echo '<td class=c>';
+					$cntpartscores = isset($partscores[$qid][$pn]) ? count($partscores[$qid][$pn]) : 0;
+					echo round(100*($qcnt[$qid] - $cntpartscores)/($qcnt[$qid])).'%';
+					echo '</td>';
+					echo '<td colspan=3></td>';
+					echo '</tr>';
+					$rowcnt++;
+				}
+			}
 		}
 
-		echo "</tbody></table>\n";
+		$rowcnt = 1;
+		foreach ($itemStructure as $entry) {
+			if ($entry['type'] == 'group') {
+				// compute group aggregates
+				$group_qids = $entry['qids'];
+				$group_percent_sum = 0; // sum of per-attempt percents (as fraction, not %)
+				$group_effectiveCount_sum = 0; // number of completed attempts included in percent calc
+				$groupAttemptTotal = 0;
+				$groupRegensTotal = 0;
+				$groupTimeTotal = 0;
+				$groupTimePerVersionTotal = 0;
+				$groupVidCntTotal = 0;
+				$group_qcnt_sum = 0;
+				$group_qincomplete_sum = 0;
+				$groupShowextref = false;
+
+				foreach ($group_qids as $gqid) {
+					$pts = $points[$gqid];
+					if ($pts==9999) $pts = $defpoints;
+
+					$qcnt_g = $qcnt[$gqid] ?? 0;
+					$qincomplete_g = $qincomplete[$gqid] ?? 0;
+					$effective = max(0, $qcnt_g - $qincomplete_g);
+
+					// include this question's completed attempts only if it has positive points
+					if ($effective > 0 && $pts > 0) {
+						// sum of per-attempt fractions (rawscore fractions already normalized to [0..1])
+						$group_percent_sum += ($qtotal[$gqid] ?? 0);
+						$groupAttemptTotal += $attempts[$gqid] ?? 0;
+						$groupRegensTotal += $regens[$gqid] ?? 0;
+						$groupTimeTotal += $timeontask[$gqid] ?? 0;
+						$groupTimePerVersionTotal += $timeontaskperversion[$gqid] ?? 0;
+						$groupVidCntTotal += ($vidcnt[$gqid] ?? 0);
+						$groupShowextref |= $showextref[$gqid];
+						$group_effectiveCount_sum += $effective;
+					} else {
+						// if pts<=0, skip percent/attempt/time/regens aggregation entirely (can't compute valid percent)
+						// (do not add to percent_sum or effectiveCount_sum)
+					}
+					$group_qcnt_sum += $qcnt_g;
+					$group_qincomplete_sum += $qincomplete_g;
+				}
+
+				if ($group_effectiveCount_sum > 0) {
+					// average percent across all completed question-attempts in the group
+					$groupAvgFraction = $group_percent_sum / $group_effectiveCount_sum;
+					$groupAvgPercent = round(100*$groupAvgFraction);
+					$groupAvgAtt = round($groupAttemptTotal / $group_effectiveCount_sum, 2);
+					$groupAvgReg = round($groupRegensTotal / $group_effectiveCount_sum, 2);
+					$groupAvgTime = $groupTimeTotal / $group_effectiveCount_sum;
+					$groupAvgTimePerVer = $groupTimePerVersionTotal / $group_effectiveCount_sum;
+					$groupAvgTimeDisplay = $groupAvgTime == 0 ? 'N/A' : round($groupAvgTime/60, 2) . ' min';
+					$groupAvgTimePerVerDisplay = $groupAvgTimePerVer == 0 ? 'N/A' : round($groupAvgTimePerVer/60, 2) . ' min';
+					$groupPi = $group_qcnt_sum > 0 ? round(100*$group_qincomplete_sum/$group_qcnt_sum, 1) : 'NA';
+					$groupHelp = $group_effectiveCount_sum > 0 ? round(100*$groupVidCntTotal/$group_effectiveCount_sum) : 'N/A';
+				} else {
+					$groupAvgPercent = 'N/A';
+					$groupAvgAtt = 'N/A';
+					$groupAvgReg = 'N/A';
+					$groupAvgTimeDisplay = 'N/A';
+					$groupAvgTimePerVerDisplay = 'N/A';
+					$groupPi = 'N/A';
+					$groupHelp = 'N/A';
+				}
+
+				// print group row
+				if ($rowcnt%2!=0) { echo "<tr class=even>"; } else { echo "<tr class=odd>"; }
+				$rowcnt++;
+				echo '<td>' . Sanitize::encodeStringForDisplay($entry['display_num']) . '</td>';
+				echo '<td><em>' . _('Group average') . '</em></td>';
+				echo '<td></td>';
+				if (is_numeric($groupAvgPercent)) {
+					echo "<td class=\"c\"><b>".Sanitize::encodeStringForDisplay($groupAvgPercent)."%</b></td>";
+				} else {
+					echo "<td class=\"c\">N/A</td>";
+				}
+				if (is_numeric($groupAvgAtt)) {
+					echo "<td class=\"c\">".Sanitize::encodeStringForDisplay($groupAvgAtt).($groupAvgReg !== 'N/A' ? " ($groupAvgReg)" : "")."</td>";
+				} else {
+					echo "<td class=\"c\">N/A</td>";
+				}
+				echo "<td class=\"c\">".Sanitize::encodeStringForDisplay($groupPi)."%</td>";
+				echo "<td class=\"c\">".Sanitize::encodeStringForDisplay($groupAvgTimeDisplay);
+				if ($groupAvgTimePerVerDisplay !== 'N/A') echo " (".Sanitize::encodeStringForDisplay($groupAvgTimePerVerDisplay).")";
+				echo "</td>";
+				if ($showhints) {
+					if ($groupShowextref && is_numeric($groupHelp)) {
+						echo '<td class="c">'.Sanitize::encodeStringForDisplay($groupHelp).'%' . '</td>';
+					} else {
+						echo '<td class="c">N/A</td>';
+					}
+				}
+				echo '<td></td>';
+				// print individual questions in the group
+				foreach ($entry['qids'] as $gqid) {
+					renderQuestionRow($gqid);
+				}
+			} else {
+				renderQuestionRow($entry['qid']);
+			}
+		}
 		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array('N','S',false,'N','N','N','N','N',false),true);\n";
 		echo "</script>\n";
-		/*echo "<p>Average time taken on this assessment: ";
-		if (count($timetaken)>0) {
-			echo round(array_sum($timetaken)/count($timetaken)/60,1);
-		} else {
-			echo 0;
-		}
-		echo " minutes<br/>\n";
-		echo 'Average time in questions: ';
-		if (count($timeontaskbystu)>0) {
-			echo round(array_sum($timeontaskbystu)/count($timeontaskbystu)/60,1);
-		} else {
-			echo 0;
-		}
-		echo ' minutes</p>';
-        */
+		
 	} else {
 		echo '</tbody></table>';
 	}
-	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 
     echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading. ';
     echo 'Those marked with <span title="' . _('Show Work') . '" aria-label="' . _('Show Work') . '">' .
