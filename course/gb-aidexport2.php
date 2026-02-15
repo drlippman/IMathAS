@@ -13,7 +13,7 @@ if (!$isteacher) {
 	echo "This page not available to students";
 	exit;
 }
-$doemail = $dopts = $doptpts = $doraw = $doptraw = $doba = $dobca = $dola = $doqsid = $includelocked = false;
+$doemail = $dopts = $doptpts = $doraw = $doptraw = $doba = $dobaraw = $dobca = $dola = $doqsid = $includelocked = false;
 if (isset($_POST['options'])) {
 	//ready to output
 	$outcol = 0;
@@ -23,6 +23,7 @@ if (isset($_POST['options'])) {
     if (isset($_POST['raw'])) { $doraw = true; $outcol++;}
 	if (isset($_POST['ptraw'])) { $doptraw = true; $outcol++;}
 	if (isset($_POST['ba'])) { $doba = true; $outcol++;}
+	if (isset($_POST['baraw'])) { $dobaraw = true; $outcol++;}
 	if (isset($_POST['bca'])) { $dobca = true; $outcol++;}
 	if (isset($_POST['la'])) { $dola = true; $outcol++;}
     if (isset($_POST['qsid'])) { $doqsid = true;}
@@ -110,6 +111,11 @@ if (isset($_POST['options'])) {
 			$gb[1][$initoffset + $outcol*$k + $offset] = "Scored Answer";
 			$offset++;
 		}
+		if ($dobaraw) {
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Scored Answer (raw)";
+			$offset++;
+		}
 		if ($dobca) {
 			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
 			$gb[1][$initoffset + $outcol*$k + $offset] = "Scored Correct Answer";
@@ -184,7 +190,7 @@ if (isset($_POST['options'])) {
         // to jsparams.
         $question_objects = $assess_record->getAllQuestionObjects(true, true, $dobca ? 2 : false, 'scored');
         list($questionIds, $toloadqids) = $assess_record->getQuestionIds(range(0,count($question_objects)-1), 'scored');
-        if (!$dobca && $doba) {
+        if (!$dobca && ($doba || $dobaraw)) {
             list($stuanswers, $stuanswersval) = $assess_record->getStuanswers('scored');
         }
         for ($qn = 0; $qn < count($question_objects); $qn++) {
@@ -193,7 +199,7 @@ if (isset($_POST['options'])) {
             if ($dobca) {
                 $correctAns = $question_object['jsparams']['ans'];
                 $stuAns = $question_object['jsparams']['stuans'];
-            } else if ($doba) {
+            } else if ($doba || $dobaraw) {
                 $stuAns = $stuanswers[$qn+1];
             }
 
@@ -235,6 +241,10 @@ if (isset($_POST['options'])) {
                 $offset++;
             }
             if ($doba) {
+                $gb[$r][$c + $offset] = Sanitize::stripHtmlTags(is_array($stuAns) ? implode('&', $stuAns) : $stuAns);
+                $offset++;
+            }
+			if ($dobaraw) {
                 $gb[$r][$c + $offset] = is_array($stuAns) ? implode('&', $stuAns) : $stuAns;
                 $offset++;
             }
@@ -260,7 +270,6 @@ if (isset($_POST['options'])) {
 			  $val = str_replace("\n", " ", $val);
 			  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
 			  $val = str_replace("&nbsp;"," ",$val);
-              $val = Sanitize::stripHtmlTags($val);
               
 			  # if a deliminator char, a double quote char or a newline are in the field, add quotes
 			  if(preg_match("/[\,\"\n\r]/", $val)) {
@@ -290,7 +299,8 @@ if (isset($_POST['options'])) {
     echo '<li><label><input type="checkbox" name="ptpts" value="1"/> Multipart broken-down Points earned</label></li>';
     echo '<li><label><input type="checkbox" name="raw" value="1"/> Raw score</label></li>';
 	echo '<li><label><input type="checkbox" name="ptraw" value="1"/> Multipart broken-down raw score</label></li>';
-	echo '<li><label><input type="checkbox" name="ba" value="1"/> Scored Attempt</label></li>';
+	echo '<li><label><input type="checkbox" name="ba" value="1"/> Scored Attempt (cleaned)</label></li>';
+	echo '<li><label><input type="checkbox" name="baraw" value="1"/> Scored Attempt (raw)</label></li>';
 	echo '<li><label><input type="checkbox" name="bca" value="1"/> Correct Answers for Scored Attempt</label></li>';
     echo '<li><label><input type="checkbox" name="email" value="1"/> Email Addresses</label></li>';
     echo '<li><label><input type="checkbox" name="qsid" value="1"/> Question ID as third header row</label></li>';
