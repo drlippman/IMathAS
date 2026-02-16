@@ -118,30 +118,38 @@
 
 		// Make table cells droppable
 		$("table.cal td").each(function() {
+			let dragCounter = 0;
+
 			this.addEventListener('dragover', function(e) {
-				if (e.preventDefault) {
-					e.preventDefault();
-				}
+				e.preventDefault();
+				e.stopPropagation();
+
 				e.dataTransfer.dropEffect = 'move';
 				$(this).addClass('drag-over');
 				return false;
 			});
 
 			this.addEventListener('dragenter', function(e) {
+				e.preventDefault(); 
+        		e.stopPropagation();
+				dragCounter++;
 				$(this).addClass('drag-over');
 			});
 
 			this.addEventListener('dragleave', function(e) {
-				$(this).removeClass('drag-over');
+				dragCounter--;
+				if (dragCounter <= 0) {
+					$(this).removeClass('drag-over');
+					dragCounter = 0;
+				}
 			});
 
 			this.addEventListener('drop', function(e) {
-				if (e.stopPropagation) {
-					e.stopPropagation();
-				}
+				e.stopPropagation();
 				e.preventDefault();
 
 				$(this).removeClass('drag-over');
+				dragCounter = 0;
 
 				var draggedId = e.dataTransfer.getData('text/html');
 				var dropped = $("#" + draggedId);
