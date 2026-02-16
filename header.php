@@ -18,7 +18,7 @@ if (isset($CFG['hooks']['header'])) {
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <?php
-echo '<script src="'.$imasroot.'/javascript/jquery.min.js"></script>';
+echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
