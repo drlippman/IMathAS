@@ -18,12 +18,7 @@ if (isset($CFG['hooks']['header'])) {
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <?php
-if (!empty($CFG['GEN']['uselocaljs'])) {
-	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
-} else {
-    echo '<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>';
-	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
-}
+echo '<script src="'.$imasroot.'/javascript/jquery.min.js"></script>';
 if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
@@ -126,7 +121,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<script>var mathjaxdisp = 9;</script>'; // default MJ 4
 	echo '<script nomodule>mathjaxdisp = 8;</script>'; // fallback to MJ 3 for old browsers
     echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=020426\" type=\"text/javascript\"></script>\n";
-    echo '<script type="module" src="https://cdn.jsdelivr.net/npm/mathjax@4/startup.js" id="MathJax-script"></script>
+    echo '<script type="module" src="'.$staticroot.'/javascript/mathjax4/startup.js?ver=020426" id="MathJax-script"></script>
 		<script nomodule src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script-fb"></script>';
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==0) { // none

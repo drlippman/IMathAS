@@ -14,7 +14,8 @@ window.MathJax = {
     output: {
         linebreaks: {
             inline: false
-        }
+        },
+        fontPath: staticroot+'/javascript/mathjax4/mathjax-newcm-font'
     },
     addDataAttr: function (math, doc) {
         math.typesetRoot.setAttribute("data-asciimath", math.math);
