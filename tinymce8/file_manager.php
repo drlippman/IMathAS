@@ -80,10 +80,7 @@ if (isset($_REQUEST["action"]))
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?php echo $strings["title"]; ?></title>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-<script type="text/javascript">
-  if (!window.jQuery) {  document.write('<script src="<?php echo $staticroot;?>/javascript/jquery.min.js"><\/script>');}
-</script>
+<script src="<?php echo $staticroot;?>/javascript/jquery.min.js"></script>
 <link href="file_manager/styles.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
 var FileBrowserDialogue = {
