@@ -244,7 +244,7 @@ account request.  The account approval process will auto-create group associatio
 account requests are collected with this data.
 
 ### Development
-- `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.
+- `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions. 
 
 ### Course Cleanup
 Automated course cleanup (unenrolling students from a course) can be enabled.  To use this, you'll need to set up a cron job (good on a single server setup) or scheduled web call (better for multi-server environments) to run:
