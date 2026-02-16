@@ -41,8 +41,6 @@
 	}
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=021326\"></script>";
 	if ($editingon) {
-		$placeinhead .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.css" integrity="sha256-Els0hoF6/l1WxcZEDh4lQsp7EqyeeYXMHCWyv6SdmX0=" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>';
 		$loadiconfont = true;
 	}
 
@@ -56,7 +54,7 @@
 		padding: 2px 5px;
 		cursor: move;
 	}
-	span.calitemhighlight {
+	span.calitem:hover {
 		background-color: #6cf;
 	}
 	span.calitem span {
@@ -72,84 +70,131 @@
 	span.calitem[id^=AE],span.calitem[id^=IE],span.calitem[id^=LE],span.calitem[id^=DE],span.calitem[id^=FE],span.calitem[id^=BE] {
 		border-radius: 0 10px 10px 0;
 	}
+	.drag-over {
+		background-color: #eee;
+	}
 	</style>
   <script type="text/javascript">
-	function initcaldragreorder () {
-			$("span.calitem[id^=CD]").attr("title",_("Calendar Event Date"));
-			$("span.calitem[id^=AS]").attr("title",_("Assessment Available After"));
-			$("span.calitem[id^=AE]").attr("title",_("Assessment Due Date"));
-			$("span.calitem[id^=AR]").attr("title",_("Assessment Review Date"));
-			$("span.calitem[id^=IS]").attr("title",_("Inline Text Available After"));
-			$("span.calitem[id^=IE]").attr("title",_("Inline Text Available Until"));
-			$("span.calitem[id^=IO]").attr("title",_("Inline Text On Calendar Date"));
-			$("span.calitem[id^=LS]").attr("title",_("Link Available After"));
-			$("span.calitem[id^=LE]").attr("title",_("Link Available Until"));
-			$("span.calitem[id^=LO]").attr("title",_("Link On Calendar Date"));
-			$("span.calitem[id^=DS]").attr("title",_("Drill Available After"));
-			$("span.calitem[id^=DE]").attr("title",_("Drill Available Until"));
-			$("span.calitem[id^=FS]").attr("title",_("Forum Available After"));
-			$("span.calitem[id^=FE]").attr("title",_("Forum Available Until"));
-			$("span.calitem[id^=FP]").attr("title",_("Forum Post By"));
-			$("span.calitem[id^=FR]").attr("title",_("Forum Reply By"));
-			$("span.calitem").draggable({
-					containment: "table.cal",
-					revert: "invalid",
-					start: function() {
-						$(this).data("originalParent", $(this).closest("td").attr("id"));
-					}
-				}).on('mouseenter', function(ev) {
-					var id = this.id.substr(2);
-					$("span.calitem[id$='"+id+"']").addClass("calitemhighlight");
-				}).on('mouseleave', function(ev) {
-					var id = this.id.substr(2);
-					$("span.calitem[id$='"+id+"']").removeClass("calitemhighlight");
-				});
-			$("table.cal td").droppable({
-				drop: function(event,ui) {
-					var dropped = ui.draggable;
-					var droppedOn = $(this);
-					$(dropped).detach().css({top: 0,left: 0}).appendTo(droppedOn.find("div.center"));
-					if (droppedOn.attr("id") != $(dropped).data("originalParent")) {
-						$(".calupdatenotice").html('<img src="<?php echo $staticroot;?>/img/updating.gif" alt="Saving"/> '+_("Saving..."));
-						$.ajax({
-							"url": "savecalendardrag.php",
-							data: {
-								cid: <?php echo $cid;?>,
-								item: ui.draggable[0].id,
-								dest: this.id
-							}
-						}).done(function(msg) {
-							if (msg.res=="error") {
-								console.log("ERROR: "+msg.error);
-								$(".calupdatenotice").html(_("Error saving change"));
-								$(dropped).detach().css({top: 0,left: 0}).appendTo($("#"+$(dropped).data("originalParent")).find("div.center"));
-							} else {
-								$(".calupdatenotice").html("");
-								var daycaldata = caleventsarr[$(dropped).data("originalParent")].data;
-								for (var i=0; i<daycaldata.length;i++) {
-									if (daycaldata[i].type + daycaldata[i].typeref == dropped[0].id) {
-										var thisrec = daycaldata.splice(i,1);
-										if (caleventsarr[droppedOn.attr("id")].hasOwnProperty("data")) {
-											caleventsarr[droppedOn.attr("id")].data.push(thisrec[0]);
-										} else {
-											caleventsarr[droppedOn.attr("id")].data = thisrec;
-										}
-										if ($("table.cal td.today").length>0) {
-											showcalcontents($("table.cal td.today")[0]);
-										}
-										break;
-									}
-								}
+	function initcaldragreorder() {
+		// Set titles
+		$("span.calitem[id^=CD]").attr("title", _("Calendar Event Date"));
+		$("span.calitem[id^=AS]").attr("title", _("Assessment Available After"));
+		$("span.calitem[id^=AE]").attr("title", _("Assessment Due Date"));
+		$("span.calitem[id^=AR]").attr("title", _("Assessment Review Date"));
+		$("span.calitem[id^=IS]").attr("title", _("Inline Text Available After"));
+		$("span.calitem[id^=IE]").attr("title", _("Inline Text Available Until"));
+		$("span.calitem[id^=IO]").attr("title", _("Inline Text On Calendar Date"));
+		$("span.calitem[id^=LS]").attr("title", _("Link Available After"));
+		$("span.calitem[id^=LE]").attr("title", _("Link Available Until"));
+		$("span.calitem[id^=LO]").attr("title", _("Link On Calendar Date"));
+		$("span.calitem[id^=DS]").attr("title", _("Drill Available After"));
+		$("span.calitem[id^=DE]").attr("title", _("Drill Available Until"));
+		$("span.calitem[id^=FS]").attr("title", _("Forum Available After"));
+		$("span.calitem[id^=FE]").attr("title", _("Forum Available Until"));
+		$("span.calitem[id^=FP]").attr("title", _("Forum Post By"));
+		$("span.calitem[id^=FR]").attr("title", _("Forum Reply By"));
 
-							}
-						}).fail(function() {
-								$(dropped).detach().css({top: 0,left: 0}).appendTo($("#"+$(dropped).data("originalParent")).find("div.center"));
-						});
-					}
-
-				}
+		// Make calitems draggable with HTML5 API
+		$("span.calitem").each(function() {
+			this.draggable = true;
+			
+			this.addEventListener('dragstart', function(e) {
+				e.dataTransfer.effectAllowed = 'move';
+				e.dataTransfer.setData('text/html', this.id);
+				
+				// Store original parent
+				var originalParent = $(this).closest("td").attr("id");
+				$(this).data("originalParent", originalParent);
+				
+				// Add dragging class for styling
+				$(this).addClass('dragging');
 			});
+			
+			this.addEventListener('dragend', function(e) {
+				$(this).removeClass('dragging');
+			});
+		});
+
+
+		// Make table cells droppable
+		$("table.cal td").each(function() {
+			this.addEventListener('dragover', function(e) {
+				if (e.preventDefault) {
+					e.preventDefault();
+				}
+				e.dataTransfer.dropEffect = 'move';
+				$(this).addClass('drag-over');
+				return false;
+			});
+
+			this.addEventListener('dragenter', function(e) {
+				$(this).addClass('drag-over');
+			});
+
+			this.addEventListener('dragleave', function(e) {
+				$(this).removeClass('drag-over');
+			});
+
+			this.addEventListener('drop', function(e) {
+				if (e.stopPropagation) {
+					e.stopPropagation();
+				}
+				e.preventDefault();
+
+				$(this).removeClass('drag-over');
+
+				var draggedId = e.dataTransfer.getData('text/html');
+				var dropped = $("#" + draggedId);
+				var droppedOn = $(this);
+				var originalParent = dropped.data("originalParent");
+
+				// Move the element
+				dropped.detach().appendTo(droppedOn.find("div.center"));
+
+				// Check if actually moved to a different cell
+				if (droppedOn.attr("id") != originalParent) {
+					$(".calupdatenotice").html('<img src="<?php echo $staticroot;?>/img/updating.gif" alt="Saving"/> ' + _("Saving..."));
+					
+					$.ajax({
+						"url": "savecalendardrag.php",
+						data: {
+							cid: <?php echo $cid;?>,
+							item: draggedId,
+							dest: this.id
+						}
+					}).done(function(msg) {
+						if (msg.res == "error") {
+							console.log("ERROR: " + msg.error);
+							$(".calupdatenotice").html(_("Error saving change"));
+							dropped.detach().appendTo($("#" + originalParent).find("div.center"));
+						} else {
+							$(".calupdatenotice").html("");
+							var daycaldata = caleventsarr[originalParent].data;
+							for (var i = 0; i < daycaldata.length; i++) {
+								if (daycaldata[i].type + daycaldata[i].typeref == draggedId) {
+									var thisrec = daycaldata.splice(i, 1);
+									if (caleventsarr[droppedOn.attr("id")].hasOwnProperty("data")) {
+										caleventsarr[droppedOn.attr("id")].data.push(thisrec[0]);
+									} else {
+										caleventsarr[droppedOn.attr("id")].data = thisrec;
+									}
+									if ($("table.cal td.today").length > 0) {
+										showcalcontents($("table.cal td.today")[0]);
+									}
+									break;
+								}
+							}
+						}
+					}).fail(function() {
+						dropped.detach().appendTo($("#" + originalParent).find("div.center"));
+					});
+				}
+
+				return false;
+			});
+		});
 	}
+
 	$(function() {
 		initcaldragreorder();
 	});
