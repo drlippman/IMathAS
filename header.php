@@ -70,7 +70,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 var staticroot = '<?php echo $staticroot; ?>';
-var localjs = <?php echo !empty($CFG['GEN']['uselocaljs']) ? 'true' : 'false'; ?>;
+var uselocaljs = <?php echo !empty($CFG['GEN']['uselocaljs']) ? 'true' : 'false'; ?>;
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 <?php if (isset($CFG['S3']['altendpoint'])) { echo 'var altfilesendpoint = "'.Sanitize::encodeStringForDisplay($CFG['S3']['altendpoint']).'";';} ?>
 </script>
