@@ -339,13 +339,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$pagetitle = _('Gradebook');
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=051820\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
-		function showfb(id,type,uid) {
+		function showfb(id,type,uid,link) {
 			if (type=="all") {
 				GB_show(_("Feedback"), "showfeedbackall.php?cid="+cid+"&stu="+id, 600, 600);
 			} else if (type=="F") {
 				GB_show(_("Feedback"), "viewforumgrade.php?embed=true&cid="+cid+"&uid="+uid+"&fid="+id, 600, 600);
 			} else if (type=="A2") {
-				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id+"&uid="+uid, 600, 600);
+				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id+"&uid="+uid+"&link="+link, 600, 600);
 			} else {
 				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 600, 600);
 			}
@@ -1244,7 +1244,7 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
-						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[0][1][$i][7]).',\'A2\','.Sanitize::onlyInt($gbt[1][4][0]).')">', _('View Feedback'), '</a></td>';
+						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[0][1][$i][7]).',\'A2\','.Sanitize::onlyInt($gbt[1][4][0]).','.($haslink?1:0).')">', _('View Feedback'), '</a></td>';
 					} else {
 						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][4]).',\'A\')">', _('View Feedback'), '</a></td>';
 					}

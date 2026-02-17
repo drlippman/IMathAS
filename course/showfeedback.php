@@ -14,6 +14,8 @@ if (!isset($studentid) && !isset($tutorid) && !isset($teacherid)) {
 
 $id = Sanitize::onlyInt($_GET['id']);
 $type = Sanitize::simpleString($_GET['type']);
+$showlink = Sanitize::onlyInt($_GET['link'] ?? 0);
+
 $now = time();
 
 if ($type=='A') {
@@ -89,6 +91,19 @@ if ($type=='A') {
 	$by_question = ($submitby == 'by_question');
 
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
+	if ($showlink) {
+		echo '<script>
+		function showwork() {
+			var url = "'.$basesiteurl.'/assess2/gbviewassess.php?cid='.$cid.'&aid='.$id.'&uid='.$uid.'";
+			if (window.self !== window.top) {
+				window.parent.location.href = url;
+			} else {
+				window.location.href = url;
+			}
+		}
+		</script>';
+		echo '<p><a href="#" onclick="showwork()">'._('View feedback in context with your work').'</a></p>';
+	}
 	$hasFb = false;
 	foreach ($scoreddata['assess_versions'] as $av => $aver) {
 		$fbdisp = '';
